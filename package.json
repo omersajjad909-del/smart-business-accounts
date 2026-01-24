@@ -1,0 +1,51 @@
+{
+  "name": "smart-business-accounts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "postinstall": "node -e \"try { console.log('Prisma files:', require('fs').readdirSync('prisma')); } catch (e) { console.error(e); }\" && prisma generate",
+    "seed": "node prisma/seed.js",
+    "db:test": "npx prisma db pull",
+    "db:generate": "npx prisma generate",
+    "db:migrate": "npx prisma migrate dev",
+    "db:studio": "npx prisma studio"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "dependencies": {
+  "@prisma/client": "^6.19.1",
+  "@tailwindcss/vite": "^4.1.18",
+  "@types/nodemailer": "^7.0.5",
+  "bcryptjs": "^3.0.3",
+  "dotenv": "^17.2.3",
+  "jspdf": "^4.0.0",
+  "jspdf-autotable": "^5.0.7",
+  "lucide-react": "^0.562.0",
+  "motion": "^12.23.26",
+  "next": "16.0.10",
+  "nodemailer": "^7.0.12",
+  "prisma": "^6.19.1",
+  "react": "18.3.1",
+  "react-dom": "18.3.1",
+  "react-hot-toast": "^2.6.0"
+}
+  ,
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+   "@types/react": "18.3.12",
+  "@types/react-dom": "18.3.1",
+    "autoprefixer": "^10.4.23",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.10",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5"
+  }
+}

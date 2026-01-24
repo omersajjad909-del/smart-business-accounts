@@ -1,0 +1,15 @@
+{
+  "/api/accounts/route": "app/api/accounts/route.js",
+  "/api/delivery-challan/route": "app/api/delivery-challan/route.js",
+  "/api/purchase-invoice/route": "app/api/purchase-invoice/route.js",
+  "/api/reports/dashboard-charts/route": "app/api/reports/dashboard-charts/route.js",
+  "/api/reports/dashboard-summary/route": "app/api/reports/dashboard-summary/route.js",
+  "/api/sales-invoice/route": "app/api/sales-invoice/route.js",
+  "/api/search/route": "app/api/search/route.js",
+  "/api/stock-available-for-sale/route": "app/api/stock-available-for-sale/route.js",
+  "/api/tax-configuration/route": "app/api/tax-configuration/route.js",
+  "/dashboard/delivery-challan/page": "app/dashboard/delivery-challan/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/purchase-invoice/page": "app/dashboard/purchase-invoice/page.js",
+  "/dashboard/sales-invoice/page": "app/dashboard/sales-invoice/page.js"
+}

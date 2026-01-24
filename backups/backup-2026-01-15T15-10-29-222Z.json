@@ -1,0 +1,1914 @@
+{
+  "accounts": [
+    {
+      "id": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+      "code": "1",
+      "name": "SAJJAD ENTERPRISES",
+      "type": "GENERAL",
+      "parentId": null,
+      "partyType": "CUSTOMER",
+      "city": "FAISALABAD",
+      "phone": "03008653693",
+      "email": null,
+      "openDate": "2026-01-03T00:00:00.000Z",
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": 0,
+      "creditLimit": 0,
+      "createdAt": "2026-01-03T10:26:13.843Z"
+    },
+    {
+      "id": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+      "code": "1",
+      "name": "CASH IN HAND",
+      "type": "GENERAL",
+      "parentId": null,
+      "partyType": null,
+      "city": "FAISALABAD",
+      "phone": null,
+      "email": null,
+      "openDate": "2026-01-03T00:00:00.000Z",
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": 0,
+      "creditLimit": 0,
+      "createdAt": "2026-01-03T10:38:27.622Z"
+    },
+    {
+      "id": "ca3e032b-5f03-4fd6-b48a-d9875b994317",
+      "code": "EXP014",
+      "name": "Advertising & Marketing",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.846Z"
+    },
+    {
+      "id": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+      "code": "1",
+      "name": "SHEHZAD INTERNATIOAL",
+      "type": "GENERAL",
+      "parentId": null,
+      "partyType": "SUPPLIER",
+      "city": "FAISALABAD",
+      "phone": "03047653693",
+      "email": null,
+      "openDate": "2026-01-03T00:00:00.000Z",
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": 0,
+      "creditLimit": 0,
+      "createdAt": "2026-01-03T10:40:53.157Z"
+    },
+    {
+      "id": "26e7b717-3eaf-4546-b133-d2d0f6259cdd",
+      "code": "PURCHASE",
+      "name": "Purchase",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-04T13:05:28.811Z"
+    },
+    {
+      "id": "6bb8b576-505f-45e3-9800-4f9e6b9adcd7",
+      "code": "2",
+      "name": "US TRADERS",
+      "type": "GENERAL",
+      "parentId": null,
+      "partyType": "SUPPLIER",
+      "city": "FAISALABAD",
+      "phone": "03047653693",
+      "email": null,
+      "openDate": "2026-01-04T00:00:00.000Z",
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": 0,
+      "creditLimit": 0,
+      "createdAt": "2026-01-04T13:44:09.290Z"
+    },
+    {
+      "id": "ad13f77c-2899-4fee-8ad0-45c91ba8afd4",
+      "code": "SALES_RETURN",
+      "name": "Sales Return",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-05T17:27:15.592Z"
+    },
+    {
+      "id": "26cc668e-c089-49cd-be03-6c51f7d4ec87",
+      "code": "2",
+      "name": "UMER SAJJAD",
+      "type": "GENERAL",
+      "parentId": null,
+      "partyType": "CUSTOMER",
+      "city": "FAISALABAD",
+      "phone": "03047653693",
+      "email": null,
+      "openDate": "2026-01-06T00:00:00.000Z",
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": 0,
+      "creditLimit": 0,
+      "createdAt": "2026-01-06T07:27:21.049Z"
+    },
+    {
+      "id": "812a8f86-218f-4291-8366-a6eec07efe54",
+      "code": "1",
+      "name": "MEEZAN BANK",
+      "type": "GENERAL",
+      "parentId": null,
+      "partyType": "BANKS",
+      "city": "FAISALABAD",
+      "phone": null,
+      "email": null,
+      "openDate": "2026-01-06T00:00:00.000Z",
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": 0,
+      "creditLimit": 0,
+      "createdAt": "2026-01-06T07:27:42.266Z"
+    },
+    {
+      "id": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+      "code": "BANK-1768205551322",
+      "name": "MEEZAN BANK - 04010107630932",
+      "type": "BANK",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 100000,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-12T08:12:31.325Z"
+    },
+    {
+      "id": "5d5a4543-152f-4a67-86b6-1211f0b63a53",
+      "code": "SALES",
+      "name": "Sales",
+      "type": "INCOME",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-12T18:02:41.923Z"
+    },
+    {
+      "id": "40180351-aae3-4bf6-ae54-33dea0b0c2fe",
+      "code": "1",
+      "name": "OFFICE STATIONARY",
+      "type": "GENERAL",
+      "parentId": null,
+      "partyType": "EXPENSE",
+      "city": "FAISALABAD",
+      "phone": null,
+      "email": null,
+      "openDate": "2026-01-13T00:00:00.000Z",
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": 0,
+      "creditLimit": 0,
+      "createdAt": "2026-01-13T17:20:12.477Z"
+    },
+    {
+      "id": "07f8d28f-0edb-4a5f-ba4f-dc0af6d53e46",
+      "code": "CASH001",
+      "name": "Cash in Hand",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.700Z"
+    },
+    {
+      "id": "a2b7c302-f96f-45bb-ad9b-4e8f9380a322",
+      "code": "BANK001",
+      "name": "Bank Account - Main",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": "BANKS",
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.709Z"
+    },
+    {
+      "id": "b7ca63a7-d685-41dd-bc7b-bcb4f252efbe",
+      "code": "BANK002",
+      "name": "Bank Account - Savings",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": "BANKS",
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.716Z"
+    },
+    {
+      "id": "be944a11-3ff0-4d80-b599-034885fb3b2c",
+      "code": "AR001",
+      "name": "Accounts Receivable",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.718Z"
+    },
+    {
+      "id": "011a6f32-7369-4dea-bdac-6e02a22e1f99",
+      "code": "INV001",
+      "name": "Stock/Inventory",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.721Z"
+    },
+    {
+      "id": "65ae02b6-2032-449a-b02f-115b295d7ad7",
+      "code": "FA001",
+      "name": "Building",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.724Z"
+    },
+    {
+      "id": "48c694ab-eb1f-44df-a61e-82b4a9d011a2",
+      "code": "FA002",
+      "name": "Machinery & Equipment",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.728Z"
+    },
+    {
+      "id": "6f5bcf8c-dc96-4ec4-834b-01f1c212a153",
+      "code": "FA003",
+      "name": "Furniture & Fixtures",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.731Z"
+    },
+    {
+      "id": "4dff9924-88e1-4da8-bc47-e1a826404232",
+      "code": "FA004",
+      "name": "Vehicles",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.736Z"
+    },
+    {
+      "id": "3d60c20d-5727-4932-a3a5-c98e21f7fa76",
+      "code": "FA005",
+      "name": "Accumulated Depreciation - Building",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.742Z"
+    },
+    {
+      "id": "5f030ed6-e756-40c8-a43b-d6e5d4d867cb",
+      "code": "FA006",
+      "name": "Accumulated Depreciation - Machinery",
+      "type": "ASSET",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.745Z"
+    },
+    {
+      "id": "eb60db56-39c6-4eb1-9dfd-164f32657262",
+      "code": "AP001",
+      "name": "Accounts Payable",
+      "type": "LIABILITY",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.750Z"
+    },
+    {
+      "id": "0fec9c70-4eff-4cde-9b0e-b666da52c25a",
+      "code": "LOAN001",
+      "name": "Bank Loan",
+      "type": "LIABILITY",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.753Z"
+    },
+    {
+      "id": "f899f0dd-5f99-4bfb-a39f-51e36f4b345b",
+      "code": "LOAN002",
+      "name": "Short Term Loan",
+      "type": "LIABILITY",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.755Z"
+    },
+    {
+      "id": "9f577528-3333-4a57-9a1f-47ec369c7e7e",
+      "code": "TAX001",
+      "name": "Sales Tax Payable",
+      "type": "LIABILITY",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.758Z"
+    },
+    {
+      "id": "fc5ebeca-44f0-4452-831e-659aa8a69c0f",
+      "code": "TAX002",
+      "name": "Income Tax Payable",
+      "type": "LIABILITY",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.762Z"
+    },
+    {
+      "id": "8a85f3b8-7bd3-4f66-a58a-7e68dae9d9e6",
+      "code": "EQUITY001",
+      "name": "Opening Balance",
+      "type": "EQUITY",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.766Z"
+    },
+    {
+      "id": "751ea7d3-980e-4dbc-8a71-c464d2c1799e",
+      "code": "EQUITY002",
+      "name": "Capital/Owner Equity",
+      "type": "EQUITY",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.783Z"
+    },
+    {
+      "id": "e95a9aa8-5c63-4a6f-8dd4-f014965b98b4",
+      "code": "EQUITY003",
+      "name": "Retained Earnings",
+      "type": "EQUITY",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.787Z"
+    },
+    {
+      "id": "963b89cc-1cf0-431e-9391-aaee914b9e96",
+      "code": "SALES001",
+      "name": "Sales Revenue",
+      "type": "INCOME",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.791Z"
+    },
+    {
+      "id": "7f897ebc-ef39-4a14-9f36-1da35e6eb32d",
+      "code": "SALES002",
+      "name": "Service Income",
+      "type": "INCOME",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.795Z"
+    },
+    {
+      "id": "a20c0bba-351f-48fc-aec6-a7a140712e7b",
+      "code": "SALES003",
+      "name": "Interest Income",
+      "type": "INCOME",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.797Z"
+    },
+    {
+      "id": "4d9e1598-d062-43af-8145-c10005ca5923",
+      "code": "SALES004",
+      "name": "Other Income",
+      "type": "INCOME",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.799Z"
+    },
+    {
+      "id": "cd75ffe7-a08b-4690-9bad-2afeae598051",
+      "code": "EXP001",
+      "name": "Purchase",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.801Z"
+    },
+    {
+      "id": "eb15ba07-8690-4771-a05b-9450a197c53f",
+      "code": "EXP002",
+      "name": "Salary & Wages",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.803Z"
+    },
+    {
+      "id": "04868952-cae8-4157-bbc4-b29f9395bdbe",
+      "code": "EXP003",
+      "name": "Rent Expense",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.806Z"
+    },
+    {
+      "id": "75cfae6a-f2c0-4d9a-bd1d-a0f58473a9d2",
+      "code": "EXP004",
+      "name": "Utilities (Electricity, Water, Gas)",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.810Z"
+    },
+    {
+      "id": "fc636165-a03d-4741-a06c-2cf71cc600bc",
+      "code": "EXP005",
+      "name": "Freight & Transportation",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.814Z"
+    },
+    {
+      "id": "21411bcc-dec0-424e-b595-8c41946673e4",
+      "code": "EXP006",
+      "name": "Office Supplies & Expenses",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.816Z"
+    },
+    {
+      "id": "3caf0895-18ab-45cf-a577-40576d990e19",
+      "code": "EXP007",
+      "name": "Maintenance & Repair",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.818Z"
+    },
+    {
+      "id": "0583b3f4-9a18-45e7-a9a8-1de791e8d1d5",
+      "code": "EXP008",
+      "name": "Depreciation Expense",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.821Z"
+    },
+    {
+      "id": "eb7f5936-dc8b-48e6-b0d9-97ce1a702895",
+      "code": "EXP009",
+      "name": "Insurance",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.825Z"
+    },
+    {
+      "id": "042eed6c-6460-4f5d-a475-7863ff27f3b5",
+      "code": "EXP010",
+      "name": "Travel & Conveyance",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.830Z"
+    },
+    {
+      "id": "227e1012-0b9d-411b-b6f1-2dc994eb1f03",
+      "code": "EXP011",
+      "name": "Telephone & Internet",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.833Z"
+    },
+    {
+      "id": "82964d07-b059-47b2-bd1f-deb02737e6ae",
+      "code": "EXP012",
+      "name": "Interest Expense",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.837Z"
+    },
+    {
+      "id": "63204787-ab17-41eb-8fd2-c6236e14bbd4",
+      "code": "EXP013",
+      "name": "Bank Charges",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.840Z"
+    },
+    {
+      "id": "0be5aa2c-37eb-4ad4-a93d-acd17212b667",
+      "code": "EXP015",
+      "name": "Professional Fees",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.848Z"
+    },
+    {
+      "id": "a0532d2f-d49e-4ad2-9744-9bbc2b208c59",
+      "code": "EXP016",
+      "name": "Miscellaneous Expense",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.850Z"
+    },
+    {
+      "id": "cd1b5311-9e0a-4550-ba1f-3dd2b31de52d",
+      "code": "CONTRA001",
+      "name": "Sales Return",
+      "type": "INCOME",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.853Z"
+    },
+    {
+      "id": "16f628d6-3203-4668-8d7e-e9f1e33478fb",
+      "code": "CONTRA002",
+      "name": "Purchase Return",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.856Z"
+    },
+    {
+      "id": "3915e536-38b9-4f19-b713-817d8f10b679",
+      "code": "CONTRA003",
+      "name": "Sales Discount",
+      "type": "INCOME",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.861Z"
+    },
+    {
+      "id": "6ff8da2a-8fe8-4183-8703-93a8e15f78ec",
+      "code": "CONTRA004",
+      "name": "Purchase Discount",
+      "type": "EXPENSE",
+      "parentId": null,
+      "partyType": null,
+      "city": null,
+      "phone": null,
+      "email": null,
+      "openDate": null,
+      "openDebit": 0,
+      "openCredit": 0,
+      "creditDays": null,
+      "creditLimit": null,
+      "createdAt": "2026-01-15T11:00:06.865Z"
+    }
+  ],
+  "items": [
+    {
+      "id": "c37b344d-1de3-4ce3-9fa8-699009078984",
+      "code": "I-1",
+      "name": "Zip # 5 ",
+      "unit": "Bundle",
+      "rate": 1600,
+      "minStock": 10,
+      "description": "CFC (Bleech White)",
+      "createdAt": "2026-01-04T10:31:23.336Z"
+    },
+    {
+      "id": "0b0bc43a-1e4e-44b1-a0f9-f16629e8530e",
+      "code": "I-2",
+      "name": "Zip # 5",
+      "unit": "Bundle",
+      "rate": 1600,
+      "minStock": 10,
+      "description": "CFC (Black)",
+      "createdAt": "2026-01-04T13:06:41.088Z"
+    }
+  ],
+  "vouchers": [
+    {
+      "id": "8d9e198f-953d-4d95-9194-b5f4f727b41c",
+      "voucherNo": "PI-1",
+      "type": "PI",
+      "date": "2026-01-07T00:00:00.000Z",
+      "narration": "Purchase Invoice PI-1 from SHEHZAD INTERNATIOAL",
+      "createdAt": "2026-01-07T09:42:37.666Z",
+      "entries": [
+        {
+          "id": "4b1a9e6a-7e81-45ea-94cf-350e88128247",
+          "voucherId": "8d9e198f-953d-4d95-9194-b5f4f727b41c",
+          "accountId": "26e7b717-3eaf-4546-b133-d2d0f6259cdd",
+          "amount": 1601000
+        },
+        {
+          "id": "5283ac7e-acda-4002-94f1-340e6bf76563",
+          "voucherId": "8d9e198f-953d-4d95-9194-b5f4f727b41c",
+          "accountId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+          "amount": -1601000
+        }
+      ]
+    },
+    {
+      "id": "469c0564-f90d-417b-8331-a71ed4bad7d5",
+      "voucherNo": "PI-2",
+      "type": "PI",
+      "date": "2026-01-07T00:00:00.000Z",
+      "narration": "Purchase Invoice PI-2 from US TRADERS",
+      "createdAt": "2026-01-07T09:42:58.925Z",
+      "entries": [
+        {
+          "id": "055f8999-588d-4f00-b3f6-e17a8139e5f9",
+          "voucherId": "469c0564-f90d-417b-8331-a71ed4bad7d5",
+          "accountId": "26e7b717-3eaf-4546-b133-d2d0f6259cdd",
+          "amount": 1601000
+        },
+        {
+          "id": "3219d8ae-d1ba-42b4-81ed-ab0c85b18581",
+          "voucherId": "469c0564-f90d-417b-8331-a71ed4bad7d5",
+          "accountId": "6bb8b576-505f-45e3-9800-4f9e6b9adcd7",
+          "amount": -1601000
+        }
+      ]
+    },
+    {
+      "id": "e7d9e93f-abb4-4b83-ad9a-7ae279096f47",
+      "voucherNo": "CRV-1",
+      "type": "CRV",
+      "date": "2026-01-08T00:00:00.000Z",
+      "narration": "Cash received",
+      "createdAt": "2026-01-08T06:46:40.247Z",
+      "entries": [
+        {
+          "id": "aa860f98-3be9-4bc8-8435-9a261ddc2a77",
+          "voucherId": "e7d9e93f-abb4-4b83-ad9a-7ae279096f47",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": -100000
+        },
+        {
+          "id": "bc5cb67a-4339-4f40-a400-413e6fe8c77d",
+          "voucherId": "e7d9e93f-abb4-4b83-ad9a-7ae279096f47",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": 100000
+        }
+      ]
+    },
+    {
+      "id": "81d81717-ed9b-4293-9323-a374fe74107f",
+      "voucherNo": "CPV-1",
+      "type": "CPV",
+      "date": "2026-01-08T00:00:00.000Z",
+      "narration": "Cash payment",
+      "createdAt": "2026-01-08T06:47:13.191Z",
+      "entries": [
+        {
+          "id": "0ee04ebf-173a-4f66-9cac-d5c2ffacaa48",
+          "voucherId": "81d81717-ed9b-4293-9323-a374fe74107f",
+          "accountId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+          "amount": 1000000
+        },
+        {
+          "id": "c012a3f5-7aac-4003-8c1a-5f21ac976281",
+          "voucherId": "81d81717-ed9b-4293-9323-a374fe74107f",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": -1000000
+        }
+      ]
+    },
+    {
+      "id": "12fb8958-599b-4cf8-8957-9207fe61ea82",
+      "voucherNo": "CPV-2",
+      "type": "CPV",
+      "date": "2026-01-08T00:00:00.000Z",
+      "narration": "Cash payment",
+      "createdAt": "2026-01-08T07:02:15.565Z",
+      "entries": [
+        {
+          "id": "feb4d0bf-0be4-4df2-a2ab-e2b1dbf7f309",
+          "voucherId": "12fb8958-599b-4cf8-8957-9207fe61ea82",
+          "accountId": "6bb8b576-505f-45e3-9800-4f9e6b9adcd7",
+          "amount": 1200000
+        },
+        {
+          "id": "d06763a3-4767-4607-8da9-d1dccc200a8d",
+          "voucherId": "12fb8958-599b-4cf8-8957-9207fe61ea82",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": -1200000
+        }
+      ]
+    },
+    {
+      "id": "21e2424c-9afe-4493-bd00-bc0f42089a33",
+      "voucherNo": "CPV-3",
+      "type": "CPV",
+      "date": "2026-01-11T00:00:00.000Z",
+      "narration": "Cash payment",
+      "createdAt": "2026-01-11T11:51:06.801Z",
+      "entries": [
+        {
+          "id": "6a1e2586-bacc-41c8-9fff-680460c18b22",
+          "voucherId": "21e2424c-9afe-4493-bd00-bc0f42089a33",
+          "accountId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+          "amount": 100000
+        },
+        {
+          "id": "085bfcec-8b11-438a-b2f4-89bb1299f6e5",
+          "voucherId": "21e2424c-9afe-4493-bd00-bc0f42089a33",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": -100000
+        }
+      ]
+    },
+    {
+      "id": "2d00600c-7c9d-454e-b7e5-825348a68379",
+      "voucherNo": "CRV-2",
+      "type": "CRV",
+      "date": "2026-01-11T00:00:00.000Z",
+      "narration": "\n",
+      "createdAt": "2026-01-11T11:51:19.708Z",
+      "entries": [
+        {
+          "id": "03873e73-911d-444d-93c7-0bf1aa3e6f3e",
+          "voucherId": "2d00600c-7c9d-454e-b7e5-825348a68379",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": -200000
+        },
+        {
+          "id": "63229f01-c24f-4c45-950a-ca267fa8284e",
+          "voucherId": "2d00600c-7c9d-454e-b7e5-825348a68379",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": 200000
+        }
+      ]
+    },
+    {
+      "id": "a852a47e-308c-4389-9a18-629751fa0e78",
+      "voucherNo": "CPV-4",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Bank payment",
+      "createdAt": "2026-01-12T08:50:13.465Z",
+      "entries": [
+        {
+          "id": "eebb20db-212f-4ca5-be5f-6dd16a66c6ed",
+          "voucherId": "a852a47e-308c-4389-9a18-629751fa0e78",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 100000
+        },
+        {
+          "id": "a2b94e99-72c2-45fa-b5f5-c13c67e85ad0",
+          "voucherId": "a852a47e-308c-4389-9a18-629751fa0e78",
+          "accountId": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+          "amount": -100000
+        }
+      ]
+    },
+    {
+      "id": "2a93ae10-e7d0-4172-bb6b-95619473da59",
+      "voucherNo": "CPV-5",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Bank payment",
+      "createdAt": "2026-01-12T09:04:40.335Z",
+      "entries": [
+        {
+          "id": "d258954a-8221-4fa5-bb4a-dbccf061f0a2",
+          "voucherId": "2a93ae10-e7d0-4172-bb6b-95619473da59",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 100000
+        },
+        {
+          "id": "cf888fd6-d0b2-48a9-9f07-e0cbdddfda39",
+          "voucherId": "2a93ae10-e7d0-4172-bb6b-95619473da59",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": -100000
+        }
+      ]
+    },
+    {
+      "id": "478d0670-af8c-4774-94df-35f1956fc9ba",
+      "voucherNo": "CPV-6",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Bank payment",
+      "createdAt": "2026-01-12T09:10:29.686Z",
+      "entries": [
+        {
+          "id": "af18cddd-e079-4364-8bf1-04d11a5e16b0",
+          "voucherId": "478d0670-af8c-4774-94df-35f1956fc9ba",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 10000
+        },
+        {
+          "id": "ee9429d1-13fd-4d07-acb9-26b01d2a47b2",
+          "voucherId": "478d0670-af8c-4774-94df-35f1956fc9ba",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": -10000
+        }
+      ]
+    },
+    {
+      "id": "26530162-742b-4f88-98b0-8fced049db0e",
+      "voucherNo": "CPV-7",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Cash payment",
+      "createdAt": "2026-01-12T09:19:56.397Z",
+      "entries": [
+        {
+          "id": "4114e004-a0f8-4435-8312-f2226f61933f",
+          "voucherId": "26530162-742b-4f88-98b0-8fced049db0e",
+          "accountId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+          "amount": 100000
+        },
+        {
+          "id": "e329e851-11ec-4fcc-a44a-aeab92c52534",
+          "voucherId": "26530162-742b-4f88-98b0-8fced049db0e",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": -100000
+        }
+      ]
+    },
+    {
+      "id": "9cf01876-37f3-4fed-97a6-3152e7804002",
+      "voucherNo": "CPV-8",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Cash payment",
+      "createdAt": "2026-01-12T09:26:05.325Z",
+      "entries": [
+        {
+          "id": "b9689953-22d5-4cf5-913c-87fe0386924a",
+          "voucherId": "9cf01876-37f3-4fed-97a6-3152e7804002",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 100000
+        },
+        {
+          "id": "05a1589e-33a1-439c-9ed3-d3fa5981241d",
+          "voucherId": "9cf01876-37f3-4fed-97a6-3152e7804002",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": -100000
+        }
+      ]
+    },
+    {
+      "id": "0efa1d86-8d9a-4137-bf7c-85c518c31b3f",
+      "voucherNo": "CRV-3",
+      "type": "CRV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Cash received",
+      "createdAt": "2026-01-12T09:26:28.438Z",
+      "entries": [
+        {
+          "id": "220c4b53-9236-4903-9267-2c02fd4a9d70",
+          "voucherId": "0efa1d86-8d9a-4137-bf7c-85c518c31b3f",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": -100000
+        },
+        {
+          "id": "73adb736-2ef6-40be-b4e0-95f77f7b7675",
+          "voucherId": "0efa1d86-8d9a-4137-bf7c-85c518c31b3f",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": 100000
+        }
+      ]
+    },
+    {
+      "id": "9837570b-6a81-4a8e-84f1-b3a2d2257cc7",
+      "voucherNo": "CRV-4",
+      "type": "CRV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Cash received",
+      "createdAt": "2026-01-12T09:27:53.694Z",
+      "entries": [
+        {
+          "id": "ef7ed22a-8392-4003-8e8c-c87727565c5e",
+          "voucherId": "9837570b-6a81-4a8e-84f1-b3a2d2257cc7",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": -12345
+        },
+        {
+          "id": "1611c5ac-7f64-42c9-a720-4d90473996de",
+          "voucherId": "9837570b-6a81-4a8e-84f1-b3a2d2257cc7",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": 12345
+        }
+      ]
+    },
+    {
+      "id": "fc5b7c0d-7934-4193-8304-a06aeeda82dd",
+      "voucherNo": "CPV-9",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Bank payment",
+      "createdAt": "2026-01-12T09:33:10.626Z",
+      "entries": [
+        {
+          "id": "67727eb0-35b0-4447-b31b-84879d9dd280",
+          "voucherId": "fc5b7c0d-7934-4193-8304-a06aeeda82dd",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 5820
+        },
+        {
+          "id": "8320b6ac-ffb6-4c32-8fae-26524435d468",
+          "voucherId": "fc5b7c0d-7934-4193-8304-a06aeeda82dd",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": -5820
+        }
+      ]
+    },
+    {
+      "id": "635632fa-ff7d-4357-aaa2-59238d2d1267",
+      "voucherNo": "CPV-10",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Bank payment",
+      "createdAt": "2026-01-12T09:46:57.388Z",
+      "entries": [
+        {
+          "id": "90af9741-83d0-491f-ba3d-4d23f3e409cd",
+          "voucherId": "635632fa-ff7d-4357-aaa2-59238d2d1267",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 100000
+        },
+        {
+          "id": "fa4e41c0-c951-43b4-bfab-691dd8d4d3c5",
+          "voucherId": "635632fa-ff7d-4357-aaa2-59238d2d1267",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": -100000
+        }
+      ]
+    },
+    {
+      "id": "22c50f5a-bad1-4475-996a-db731b772dc7",
+      "voucherNo": "CPV-11",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Bank payment",
+      "createdAt": "2026-01-12T09:58:31.705Z",
+      "entries": [
+        {
+          "id": "27595103-2364-4acd-b20a-f8bfdedc3d16",
+          "voucherId": "22c50f5a-bad1-4475-996a-db731b772dc7",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 100000
+        },
+        {
+          "id": "4bb7311d-0749-4b38-b993-09fab164794d",
+          "voucherId": "22c50f5a-bad1-4475-996a-db731b772dc7",
+          "accountId": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+          "amount": -100000
+        }
+      ]
+    },
+    {
+      "id": "4e0a4413-66b0-4df1-811a-09668edeb642",
+      "voucherNo": "CPV-12",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Bank payment",
+      "createdAt": "2026-01-12T09:59:25.149Z",
+      "entries": [
+        {
+          "id": "ffabd238-c7fb-423f-9c6f-dbfa27aa4fc2",
+          "voucherId": "4e0a4413-66b0-4df1-811a-09668edeb642",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 2654
+        },
+        {
+          "id": "667b355b-3789-47ca-9db3-a143f4032039",
+          "voucherId": "4e0a4413-66b0-4df1-811a-09668edeb642",
+          "accountId": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+          "amount": -2654
+        }
+      ]
+    },
+    {
+      "id": "c23bca58-6a91-4cae-88ef-36de7f8e2298",
+      "voucherNo": "PI-3",
+      "type": "PI",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Purchase Invoice PI-3 from SHEHZAD INTERNATIOAL",
+      "createdAt": "2026-01-12T16:20:27.314Z",
+      "entries": [
+        {
+          "id": "5e2af8cc-97fc-4f96-a01a-a92f138b7b70",
+          "voucherId": "c23bca58-6a91-4cae-88ef-36de7f8e2298",
+          "accountId": "26e7b717-3eaf-4546-b133-d2d0f6259cdd",
+          "amount": 5100
+        },
+        {
+          "id": "5df068e2-b638-48e6-8908-df08a3ca5834",
+          "voucherId": "c23bca58-6a91-4cae-88ef-36de7f8e2298",
+          "accountId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+          "amount": -5100
+        }
+      ]
+    },
+    {
+      "id": "30d16f70-b2a3-45c3-8d46-eca28532f5b0",
+      "voucherNo": "CPV-13",
+      "type": "CPV",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Cash payment",
+      "createdAt": "2026-01-12T16:30:19.775Z",
+      "entries": [
+        {
+          "id": "e2dd0ab8-5d15-43e7-878e-2a22016196f5",
+          "voucherId": "30d16f70-b2a3-45c3-8d46-eca28532f5b0",
+          "accountId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+          "amount": 123654
+        },
+        {
+          "id": "2adc7e33-2359-47ab-9755-2854ccb6fb68",
+          "voucherId": "30d16f70-b2a3-45c3-8d46-eca28532f5b0",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": -123654
+        }
+      ]
+    },
+    {
+      "id": "7200f99e-26a3-419f-b138-31b469618dbf",
+      "voucherNo": "SI-3",
+      "type": "SI",
+      "date": "2026-01-12T00:00:00.000Z",
+      "narration": "Sales Invoice",
+      "createdAt": "2026-01-12T18:02:41.926Z",
+      "entries": [
+        {
+          "id": "89cdc62e-b98b-4ae9-b542-b1eb9266e286",
+          "voucherId": "7200f99e-26a3-419f-b138-31b469618dbf",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": 110000
+        },
+        {
+          "id": "43ca1f51-93f5-467f-8a92-f7b6216114bf",
+          "voucherId": "7200f99e-26a3-419f-b138-31b469618dbf",
+          "accountId": "5d5a4543-152f-4a67-86b6-1211f0b63a53",
+          "amount": -110000
+        }
+      ]
+    },
+    {
+      "id": "e7164e59-ca5b-4bcb-bca6-591726ae1c82",
+      "voucherNo": "REC-1",
+      "type": "CRV",
+      "date": "2026-01-13T00:00:00.000Z",
+      "narration": "Payment received from SAJJAD ENTERPRISES",
+      "createdAt": "2026-01-13T12:57:20.023Z",
+      "entries": [
+        {
+          "id": "92748893-7e00-46fa-a753-6250f7e08f74",
+          "voucherId": "e7164e59-ca5b-4bcb-bca6-591726ae1c82",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": -123654
+        },
+        {
+          "id": "bdb64b72-c2d0-49cb-8b52-f00c9c9deee3",
+          "voucherId": "e7164e59-ca5b-4bcb-bca6-591726ae1c82",
+          "accountId": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+          "amount": 123654
+        }
+      ]
+    },
+    {
+      "id": "ed20414a-4a8c-4de7-9fbc-a3ec6289e467",
+      "voucherNo": "CRV-6",
+      "type": "CRV",
+      "date": "2026-01-13T00:00:00.000Z",
+      "narration": "Cash received",
+      "createdAt": "2026-01-13T13:26:42.431Z",
+      "entries": [
+        {
+          "id": "bedcb754-92f1-4a7e-989f-0146bd101bdb",
+          "voucherId": "ed20414a-4a8c-4de7-9fbc-a3ec6289e467",
+          "accountId": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+          "amount": -100000
+        },
+        {
+          "id": "3a106f5e-3167-4e0c-92fb-b010f13b9003",
+          "voucherId": "ed20414a-4a8c-4de7-9fbc-a3ec6289e467",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": 100000
+        }
+      ]
+    },
+    {
+      "id": "f29a1aed-b8b2-4f92-820e-25a83dc11450",
+      "voucherNo": "CPV-14",
+      "type": "CPV",
+      "date": "2026-01-13T00:00:00.000Z",
+      "narration": "Cash payment",
+      "createdAt": "2026-01-13T13:31:00.127Z",
+      "entries": [
+        {
+          "id": "8d5cbee7-6d35-4036-8fe8-b255e2611695",
+          "voucherId": "f29a1aed-b8b2-4f92-820e-25a83dc11450",
+          "accountId": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+          "amount": 12345
+        },
+        {
+          "id": "212cfbba-7398-4410-81c9-878fbafc2b75",
+          "voucherId": "f29a1aed-b8b2-4f92-820e-25a83dc11450",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": -12345
+        }
+      ]
+    },
+    {
+      "id": "10ef9d67-db48-402a-bd89-08578abfc478",
+      "voucherNo": "CRV-7",
+      "type": "CRV",
+      "date": "2026-01-13T00:00:00.000Z",
+      "narration": "Cash received",
+      "createdAt": "2026-01-13T13:31:15.415Z",
+      "entries": [
+        {
+          "id": "64f28da2-57d2-4035-b55c-ca51206f6929",
+          "voucherId": "10ef9d67-db48-402a-bd89-08578abfc478",
+          "accountId": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+          "amount": -6789
+        },
+        {
+          "id": "2bccd340-e5b2-404c-8c5a-2e913dec9b95",
+          "voucherId": "10ef9d67-db48-402a-bd89-08578abfc478",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": 6789
+        }
+      ]
+    },
+    {
+      "id": "eca444fe-fa02-47ba-8aff-57033a6f3ab8",
+      "voucherNo": "REC-2",
+      "type": "CRV",
+      "date": "2026-01-13T00:00:00.000Z",
+      "narration": "Payment received from UMER SAJJAD",
+      "createdAt": "2026-01-13T15:32:42.496Z",
+      "entries": [
+        {
+          "id": "45c3ad1f-a250-49cc-bcc6-b8c6bd271f36",
+          "voucherId": "eca444fe-fa02-47ba-8aff-57033a6f3ab8",
+          "accountId": "26cc668e-c089-49cd-be03-6c51f7d4ec87",
+          "amount": -52000
+        },
+        {
+          "id": "370ee939-01a9-45cd-b6d2-33f6c7ec1e73",
+          "voucherId": "eca444fe-fa02-47ba-8aff-57033a6f3ab8",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 52000
+        }
+      ]
+    },
+    {
+      "id": "6f3e37cb-76db-434a-8623-7e7cdfb21d7b",
+      "voucherNo": "REC-3",
+      "type": "CRV",
+      "date": "2026-01-13T00:00:00.000Z",
+      "narration": "Payment received from SAJJAD ENTERPRISES",
+      "createdAt": "2026-01-13T15:33:58.495Z",
+      "entries": [
+        {
+          "id": "f2182027-8d35-459b-96af-c0840fd06acc",
+          "voucherId": "6f3e37cb-76db-434a-8623-7e7cdfb21d7b",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": -50000
+        },
+        {
+          "id": "45b896af-b159-41c4-bd90-b581cdd03ae7",
+          "voucherId": "6f3e37cb-76db-434a-8623-7e7cdfb21d7b",
+          "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+          "amount": 50000
+        }
+      ]
+    },
+    {
+      "id": "85c33345-98d7-4bf1-b4fe-5ae07afbdaf3",
+      "voucherNo": "REC-4",
+      "type": "CRV",
+      "date": "2026-01-13T00:00:00.000Z",
+      "narration": "Payment received from SAJJAD ENTERPRISES",
+      "createdAt": "2026-01-13T16:41:52.993Z",
+      "entries": [
+        {
+          "id": "08980f25-b92d-43e8-a18f-8a0a15ff587a",
+          "voucherId": "85c33345-98d7-4bf1-b4fe-5ae07afbdaf3",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": -100000
+        },
+        {
+          "id": "b7b16ff9-b949-45ed-b29b-af444ad36c6d",
+          "voucherId": "85c33345-98d7-4bf1-b4fe-5ae07afbdaf3",
+          "accountId": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+          "amount": 100000
+        }
+      ]
+    },
+    {
+      "id": "6ede8862-239e-4497-8113-de36c5738618",
+      "voucherNo": "CPV-15",
+      "type": "CPV",
+      "date": "2026-01-13T00:00:00.000Z",
+      "narration": "Cash payment",
+      "createdAt": "2026-01-13T16:43:27.605Z",
+      "entries": [
+        {
+          "id": "09c732d0-0ce6-4bc0-aa4c-b45666f28a1b",
+          "voucherId": "6ede8862-239e-4497-8113-de36c5738618",
+          "accountId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+          "amount": 10000
+        },
+        {
+          "id": "5cf37865-38eb-45d5-be6a-dd7da47a942b",
+          "voucherId": "6ede8862-239e-4497-8113-de36c5738618",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": -10000
+        }
+      ]
+    },
+    {
+      "id": "e6ea5dac-f832-45f9-95da-3df57abf9597",
+      "voucherNo": "CRV-11",
+      "type": "CRV",
+      "date": "2026-01-13T00:00:00.000Z",
+      "narration": "Cash received",
+      "createdAt": "2026-01-13T16:49:34.840Z",
+      "entries": [
+        {
+          "id": "afff8414-ffe1-4cf1-aac1-2b9e6ea70a3c",
+          "voucherId": "e6ea5dac-f832-45f9-95da-3df57abf9597",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": -10000
+        },
+        {
+          "id": "6b4338ef-ad21-449d-abef-12cffd4a0553",
+          "voucherId": "e6ea5dac-f832-45f9-95da-3df57abf9597",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": 10000
+        }
+      ]
+    },
+    {
+      "id": "8ba543a3-d882-4f79-b3f2-88fca4696869",
+      "voucherNo": "PI-4",
+      "type": "PI",
+      "date": "2026-01-15T00:00:00.000Z",
+      "narration": "Purchase Invoice PI-4 from SHEHZAD INTERNATIOAL",
+      "createdAt": "2026-01-15T09:21:19.268Z",
+      "entries": [
+        {
+          "id": "c8e8ecf6-bd1a-4abc-a086-11239ca0e096",
+          "voucherId": "8ba543a3-d882-4f79-b3f2-88fca4696869",
+          "accountId": "26e7b717-3eaf-4546-b133-d2d0f6259cdd",
+          "amount": 93600
+        },
+        {
+          "id": "00a20d3d-de2a-4274-912f-65300191a112",
+          "voucherId": "8ba543a3-d882-4f79-b3f2-88fca4696869",
+          "accountId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+          "amount": -93600
+        }
+      ]
+    },
+    {
+      "id": "07f5d801-7bf3-46d2-9266-953751c3db3b",
+      "voucherNo": "SI-4",
+      "type": "SI",
+      "date": "2026-01-15T00:00:00.000Z",
+      "narration": "Sales Invoice",
+      "createdAt": "2026-01-15T09:32:19.588Z",
+      "entries": [
+        {
+          "id": "ca2e7f28-949e-42c2-9357-2fc6ec7c5ab1",
+          "voucherId": "07f5d801-7bf3-46d2-9266-953751c3db3b",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": 94600
+        },
+        {
+          "id": "65eaecbd-ae9b-41dd-b9f5-679ad47ff9ff",
+          "voucherId": "07f5d801-7bf3-46d2-9266-953751c3db3b",
+          "accountId": "5d5a4543-152f-4a67-86b6-1211f0b63a53",
+          "amount": -94600
+        }
+      ]
+    },
+    {
+      "id": "ab4eed42-8f52-4879-8918-cec5d40198be",
+      "voucherNo": "JV-1",
+      "type": "JV",
+      "date": "2026-01-15T00:00:00.000Z",
+      "narration": "Journal Entry",
+      "createdAt": "2026-01-15T09:59:02.637Z",
+      "entries": [
+        {
+          "id": "98036ca3-2f67-4fb3-bd01-06545bbcda48",
+          "voucherId": "ab4eed42-8f52-4879-8918-cec5d40198be",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": 100000
+        },
+        {
+          "id": "9f82486a-b117-4179-a7ec-ce7425c7fce9",
+          "voucherId": "ab4eed42-8f52-4879-8918-cec5d40198be",
+          "accountId": "26cc668e-c089-49cd-be03-6c51f7d4ec87",
+          "amount": -100000
+        }
+      ]
+    },
+    {
+      "id": "eebf27ff-9bf2-4cb1-b5dd-f49b6b870093",
+      "voucherNo": "CRV-12",
+      "type": "CRV",
+      "date": "2026-01-15T00:00:00.000Z",
+      "narration": "Cash received",
+      "createdAt": "2026-01-15T10:14:30.744Z",
+      "entries": [
+        {
+          "id": "3f887b6f-9af8-4223-81bd-cfdaf0ab34c1",
+          "voucherId": "eebf27ff-9bf2-4cb1-b5dd-f49b6b870093",
+          "accountId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+          "amount": -10000
+        },
+        {
+          "id": "74f29597-25b9-419e-98ee-768f697b1835",
+          "voucherId": "eebf27ff-9bf2-4cb1-b5dd-f49b6b870093",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": 10000
+        }
+      ]
+    },
+    {
+      "id": "2d9459bd-28f7-4be9-9bdc-03ccf5af5daa",
+      "voucherNo": "CPV-16",
+      "type": "CPV",
+      "date": "2026-01-15T00:00:00.000Z",
+      "narration": "Cash payment",
+      "createdAt": "2026-01-15T10:32:10.319Z",
+      "entries": [
+        {
+          "id": "0bb95633-a7ca-4597-a14a-fc8112b74217",
+          "voucherId": "2d9459bd-28f7-4be9-9bdc-03ccf5af5daa",
+          "accountId": "6bb8b576-505f-45e3-9800-4f9e6b9adcd7",
+          "amount": 205000
+        },
+        {
+          "id": "e68755be-3580-445f-bab5-35e672abe8e9",
+          "voucherId": "2d9459bd-28f7-4be9-9bdc-03ccf5af5daa",
+          "accountId": "477fe9cb-c02e-4bde-82fe-4ef5cfaead6b",
+          "amount": -205000
+        }
+      ]
+    }
+  ],
+  "salesInvoices": [
+    {
+      "id": "6bc20681-8a7e-43a2-8189-5ca8fdb4f7f2",
+      "invoiceNo": "SI-1",
+      "date": "2026-01-07T00:00:00.000Z",
+      "total": 160000,
+      "customerId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+      "taxConfigId": null,
+      "createdAt": "2026-01-07T09:43:28.088Z",
+      "items": [
+        {
+          "id": "e4634b5f-36d5-4775-8f60-e242558c712d",
+          "invoiceId": "6bc20681-8a7e-43a2-8189-5ca8fdb4f7f2",
+          "itemId": "c37b344d-1de3-4ce3-9fa8-699009078984",
+          "qty": 100,
+          "rate": 1600,
+          "amount": 160000
+        }
+      ]
+    },
+    {
+      "id": "653a6d01-b0ed-407c-9af2-c039b6b0a6ec",
+      "invoiceNo": "SI-2",
+      "date": "2026-01-07T00:00:00.000Z",
+      "total": 1000000,
+      "customerId": "26cc668e-c089-49cd-be03-6c51f7d4ec87",
+      "taxConfigId": null,
+      "createdAt": "2026-01-07T09:43:45.035Z",
+      "items": [
+        {
+          "id": "74cb0d20-b39f-4776-9361-c8da6f3ab11d",
+          "invoiceId": "653a6d01-b0ed-407c-9af2-c039b6b0a6ec",
+          "itemId": "0b0bc43a-1e4e-44b1-a0f9-f16629e8530e",
+          "qty": 500,
+          "rate": 2000,
+          "amount": 1000000
+        }
+      ]
+    },
+    {
+      "id": "89c63a6d-10ec-42e0-8f05-c4ac4edcb643",
+      "invoiceNo": "SI-3",
+      "date": "2026-01-12T00:00:00.000Z",
+      "total": 110000,
+      "customerId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+      "taxConfigId": null,
+      "createdAt": "2026-01-12T18:02:41.881Z",
+      "items": [
+        {
+          "id": "535724b0-ab01-421f-a08c-885ba8684205",
+          "invoiceId": "89c63a6d-10ec-42e0-8f05-c4ac4edcb643",
+          "itemId": "0b0bc43a-1e4e-44b1-a0f9-f16629e8530e",
+          "qty": 550,
+          "rate": 200,
+          "amount": 110000
+        }
+      ]
+    },
+    {
+      "id": "16c36925-2f64-4fe5-a2da-a1bd57acd1ee",
+      "invoiceNo": "SI-4",
+      "date": "2026-01-15T00:00:00.000Z",
+      "total": 80000,
+      "customerId": "749cf4cb-049d-4d1b-a4d2-0e4a9a790843",
+      "taxConfigId": null,
+      "createdAt": "2026-01-15T09:32:19.551Z",
+      "items": [
+        {
+          "id": "b997336e-2412-4212-adda-a3503114cbca",
+          "invoiceId": "16c36925-2f64-4fe5-a2da-a1bd57acd1ee",
+          "itemId": "c37b344d-1de3-4ce3-9fa8-699009078984",
+          "qty": 40,
+          "rate": 2000,
+          "amount": 80000
+        }
+      ]
+    }
+  ],
+  "purchaseInvoices": [
+    {
+      "id": "6557ad5b-754f-4bb2-be27-8638d36cfb0b",
+      "invoiceNo": "PI-1",
+      "date": "2026-01-07T00:00:00.000Z",
+      "poId": "ac3ae2b7-40a3-4bfd-80d1-1020cedceccc",
+      "supplierId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+      "total": 1601000,
+      "taxConfigId": null,
+      "createdAt": "2026-01-07T09:42:37.625Z",
+      "items": [
+        {
+          "id": "4cbeae55-21c2-46a8-847a-888f73504ee7",
+          "invoiceId": "6557ad5b-754f-4bb2-be27-8638d36cfb0b",
+          "itemId": "c37b344d-1de3-4ce3-9fa8-699009078984",
+          "qty": 100,
+          "rate": 16000,
+          "amount": 1600000
+        }
+      ]
+    },
+    {
+      "id": "99c36a81-4ad4-4a05-aa8e-ef335bcbb8c6",
+      "invoiceNo": "PI-2",
+      "date": "2026-01-07T00:00:00.000Z",
+      "poId": "40931848-9793-43f7-bfa3-86c868cbd929",
+      "supplierId": "6bb8b576-505f-45e3-9800-4f9e6b9adcd7",
+      "total": 1601000,
+      "taxConfigId": null,
+      "createdAt": "2026-01-07T09:42:58.912Z",
+      "items": [
+        {
+          "id": "2de7d93b-7c60-42a3-a7b0-bfeae7d95f30",
+          "invoiceId": "99c36a81-4ad4-4a05-aa8e-ef335bcbb8c6",
+          "itemId": "0b0bc43a-1e4e-44b1-a0f9-f16629e8530e",
+          "qty": 1000,
+          "rate": 1600,
+          "amount": 1600000
+        }
+      ]
+    },
+    {
+      "id": "acfd5b74-e0b4-491e-86eb-2c5a2456c7a0",
+      "invoiceNo": "PI-3",
+      "date": "2026-01-12T00:00:00.000Z",
+      "poId": "7528aa46-4cb2-4ff1-a543-7e498489ffed",
+      "supplierId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+      "total": 5100,
+      "taxConfigId": null,
+      "createdAt": "2026-01-12T16:20:27.275Z",
+      "items": [
+        {
+          "id": "5dc480da-dbe9-45c9-a242-3fe2aea69160",
+          "invoiceId": "acfd5b74-e0b4-491e-86eb-2c5a2456c7a0",
+          "itemId": "0b0bc43a-1e4e-44b1-a0f9-f16629e8530e",
+          "qty": 50,
+          "rate": 100,
+          "amount": 5000
+        }
+      ]
+    },
+    {
+      "id": "1fc64dee-1155-40df-aea0-beb486b5a795",
+      "invoiceNo": "PI-4",
+      "date": "2026-01-15T00:00:00.000Z",
+      "poId": "d125a054-475f-4aaa-b7e5-f9587af310aa",
+      "supplierId": "4e40ca7c-80f5-4f00-b42a-1205f64a1a9f",
+      "total": 93600,
+      "taxConfigId": "def2ccc0-734e-4abc-a432-076130408795",
+      "createdAt": "2026-01-15T09:21:19.177Z",
+      "items": [
+        {
+          "id": "770791e8-00e1-4172-aa63-e64af334a408",
+          "invoiceId": "1fc64dee-1155-40df-aea0-beb486b5a795",
+          "itemId": "c37b344d-1de3-4ce3-9fa8-699009078984",
+          "qty": 50,
+          "rate": 1600,
+          "amount": 80000
+        }
+      ]
+    }
+  ],
+  "bankAccounts": [
+    {
+      "id": "9d3d86d7-ebaf-43df-a7c4-3a13feb0f102",
+      "accountNo": "1",
+      "bankName": "MEEZAN BANK",
+      "accountName": "MEEZAN BANK",
+      "balance": -113820,
+      "lastReconcile": null,
+      "accountId": "812a8f86-218f-4291-8366-a6eec07efe54",
+      "createdAt": "2026-01-12T09:04:40.324Z"
+    },
+    {
+      "id": "411e032c-2487-4e0d-a7ea-e5fe52ff6277",
+      "accountNo": "04010107630932",
+      "bankName": "MEEZAN BANK",
+      "accountName": "MUHAMMAD UMER",
+      "balance": 121000,
+      "lastReconcile": null,
+      "accountId": "b2c97356-8a7f-4d22-8c58-ff7525b19159",
+      "createdAt": "2026-01-12T08:12:31.410Z"
+    }
+  ],
+  "budgets": [],
+  "recurringTransactions": [],
+  "financialYears": [
+    {
+      "id": "71d1f641-177b-45a1-a14a-aad01edb8542",
+      "year": 2026,
+      "startDate": "2026-01-01T00:00:00.000Z",
+      "endDate": "2026-12-31T00:00:00.000Z",
+      "isActive": true,
+      "isClosed": false,
+      "closedAt": null,
+      "closedBy": null,
+      "createdAt": "2026-01-15T15:07:10.315Z"
+    }
+  ],
+  "timestamp": "2026-01-15T15:10:29.373Z"
+}

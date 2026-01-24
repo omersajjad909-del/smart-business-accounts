@@ -1,0 +1,826 @@
+[00:00:02.252] Server  LOG      ✓ Ready in 1728ms
+[00:00:31.389] Server  LOG      ○ Compiling /dashboard/sales-invoice ...
+[00:00:33.292] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:34.836] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:34.836] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:34.836] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.837] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:00:35.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:01:57.525] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:01:57.525] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:01:59.145] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:01:59.145] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:00.626] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:00.626] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:00.854] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:00.854] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:00.854] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:00.854] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:02.340] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:02.340] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:16.748] Server  LOG      ✓ Compiled in 423ms
+[00:02:16.899] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:16.899] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.389] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:20.552] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.553] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.553] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:20.832] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:24.143] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:24.143] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:26.019] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:26.019] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:27.260] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:27.260] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:27.406] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:27.406] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:27.406] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:27.406] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:28.526] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:28.526] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:42.880] Server  LOG      ✓ Compiled in 346ms
+[00:02:43.841] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:43.841] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:49.954] Server  LOG      ✓ Compiled in 298ms
+[00:02:50.841] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:02:50.841] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:28.523] Server  LOG      ✓ Compiled in 383ms
+[00:03:28.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:28.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:31.508] Server  LOG      ✓ Compiled in 316ms
+[00:03:31.847] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:31.847] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:42.881] Server  LOG      ✓ Compiled in 202ms
+[00:03:43.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:43.838] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:53.191] Server  LOG      ✓ Compiled in 239ms
+[00:03:53.871] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:53.871] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:59.442] Server  LOG      ✓ Compiled in 213ms
+[00:03:59.842] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:03:59.842] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:06.294] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:06.294] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:19.623] Server  LOG      ✓ Compiled in 314ms
+[00:04:19.840] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:19.840] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:29.689] Server  LOG      ✓ Compiled in 249ms
+[00:04:30.841] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:30.841] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:35.629] Server  LOG      ✓ Compiled in 145ms
+[00:04:35.840] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:35.840] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:37.519] Server  LOG      ✓ Compiled in 303ms
+[00:04:37.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:37.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:41.868] Server  LOG      ✓ Compiled in 270ms
+[00:04:42.834] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:42.834] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:47.257] Server  LOG      ✓ Compiled in 169ms
+[00:04:47.836] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:47.836] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:52.325] Server  LOG      ✓ Compiled in 162ms
+[00:04:52.837] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:04:52.837] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:05:08.882] Server  LOG      ✓ Compiled in 405ms
+[00:05:09.837] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:05:09.837] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:05:59.886] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:05:59.886] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:05:59.886] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:05:59.886] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:00.073] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:00.073] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:00.073] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:00.073] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:00.073] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:00.073] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:00.073] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:00.073] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:01.024] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:01.024] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:01.024] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:01.024] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:03.492] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:06:03.492] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:10:22.359] Server  LOG      ✓ Compiled in 543ms
+[00:10:33.685] Server  LOG      ✓ Compiled in 582ms
+[00:10:44.280] Server  LOG      ✓ Compiled in 867ms
+[00:10:54.103] Server  LOG      ✓ Compiled in 745ms
+[00:11:05.038] Server  LOG      ✓ Compiled in 1065ms
+[00:11:23.714] Server  LOG      ✓ Compiled in 928ms
+[00:11:40.569] Server  LOG      ✓ Compiled in 1260ms
+[00:13:14.815] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:14.815] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:13:15.101] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:16.213] Server  LOG      ✓ Compiled in 255ms
+[00:15:16.834] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:16.834] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:16.834] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:16.834] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:25.696] Server  LOG      ✓ Compiled in 421ms
+[00:15:25.844] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:25.844] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:33.655] Server  LOG      ✓ Compiled in 312ms
+[00:15:33.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:33.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:42.033] Server  LOG      ✓ Compiled in 159ms
+[00:15:42.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:15:42.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.332] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:17:03.523] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.523] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.523] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:03.795] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:09.209] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:09.209] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.725] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.725] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.872] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.872] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.872] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.872] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.872] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.872] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.873] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:13.873] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:14.182] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:14.182] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:14.182] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:14.182] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:14.182] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:14.182] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:14.182] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:14.182] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:15.337] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:19.204] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:19.496] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:19.556] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:19.571] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "si",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:17:20.023] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:20.031] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:20.035] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "si-",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:17:20.100] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:20.497] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:20.502] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:20.505] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "si-1",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:17:20.584] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:26.203] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:26.206] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:26.208] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SI",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:17:26.275] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:27.088] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:27.091] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:27.094] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SI-",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:17:27.178] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:27.848] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:27.852] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:27.854] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SI-1",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:17:27.926] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:29.411] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:29.415] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:29.419] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SI-",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:17:29.495] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:17:31.091] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:31.095] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:17:31.099] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SA",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:17:31.169] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:23:15.524] Server  LOG      ✓ Compiled in 199ms
+[00:26:09.654] Server  LOG      ✓ Compiled in 245ms
+[00:26:09.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:26:09.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:26:10.375] Server  LOG      ✓ Compiled in 622ms
+[00:26:10.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:26:10.839] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:26:25.215] Server  LOG      ✓ Compiled in 141ms
+[00:27:58.907] Server  LOG      ✓ Compiled in 191ms
+[00:27:59.183] Server  LOG      ✓ Compiled in 174ms
+[00:27:59.566] Server  LOG      ✓ Compiled in 203ms
+[00:29:59.856] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:30:00.079] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.079] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.079] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.376] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.377] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.377] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.377] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.377] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.377] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.377] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:00.377] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:02.733] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:02.733] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:04.693] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:04.693] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:08.399] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:08.400] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:09.408] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:09.408] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:12.468] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:12.468] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:13.493] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:13.493] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:15.665] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:15.665] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:16.554] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:16.554] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:17.471] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:17.471] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:19.188] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:19.188] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:19.764] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:19.764] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:31.155] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:30:31.512] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:31.512] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:31.512] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:34.944] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:34.948] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:34.952] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SI",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:30:34.970] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:35.952] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:35.956] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:35.959] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SI-",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:30:35.976] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:37.073] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:37.079] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:37.081] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SI-1",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:30:37.097] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:46.775] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:46.779] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:46.782] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SA",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:30:46.800] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:47.669] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:47.671] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:47.672] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SAJJ",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:30:47.710] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}
+[00:30:48.776] Server  ERROR   D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:48.782] Server  ERROR   D:\projects\smart-business-accounts\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:30:48.785] Server  ERROR   ❌ SEARCH ERROR: PrismaClientValidationError: 
+Invalid `prisma.salesInvoice.findMany()` invocation in
+D:\projects\smart-business-accounts\.next\dev\server\chunks\[root-of-the-server]__3500dfd1._.js:137:57
+
+  134     }
+  135 });
+  136 // Search Sales Invoices
+→ 137 const salesInvoices = await prisma.salesInvoice.findMany({
+        where: {
+          invoiceNo: {
+            contains: "SAJ",
+            mode: "insensitive"
+          }
+        },
+        take: 10,
+        include: {
+        ~~~~~~~
+          customer: {
+            select: {
+              name: true
+            }
+          }
+        },
+        select: {
+        ~~~~~~
+          id: true,
+          invoiceNo: true,
+          date: true,
+          total: true,
+          customer: true
+        }
+      })
+
+Please either use `include` or `select`, but not both at the same time.
+[00:30:48.800] Browser LOG     ✅ getCurrentUser: {"email":"Admin","role":"ADMIN"}

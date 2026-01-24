@@ -1,0 +1,94 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = (globalThis as any).prisma || new PrismaClient();
+
+if (process.env.NODE_ENV === "development") {
+  (globalThis as any).prisma = prisma;
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const invoiceType = searchParams.get('invoiceType');
+    const invoiceId = searchParams.get('invoiceId');
+
+    const filter: any = {};
+    if (invoiceType) filter.invoiceType = invoiceType;
+    if (invoiceId) filter.invoiceId = invoiceId;
+
+    const taxes = await prisma.invoiceTax.findMany({
+      where: filter,
+      include: {
+        taxConfiguration: true,
+      },
+    });
+
+    return NextResponse.json(taxes);
+  } catch (error) {
+    console.error('Error fetching invoice taxes:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch invoice taxes' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const {
+      invoiceType,
+      invoiceId,
+      taxConfigurationId,
+      subtotal,
+      taxAmount,
+      totalAmount,
+    } = body;
+
+    const tax = await prisma.invoiceTax.create({
+      data: {
+        invoiceType,
+        invoiceId,
+        taxConfigurationId,
+        subtotal,
+        taxAmount,
+        totalAmount,
+      },
+      include: {
+        taxConfiguration: true,
+      },
+    });
+
+    return NextResponse.json(tax, { status: 201 });
+  } catch (error) {
+    console.error('Error creating invoice tax:', error);
+    return NextResponse.json(
+      { error: 'Failed to create invoice tax' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { id, ...updateData } = body;
+
+    const tax = await prisma.invoiceTax.update({
+      where: { id },
+      data: updateData,
+      include: {
+        taxConfiguration: true,
+      },
+    });
+
+    return NextResponse.json(tax);
+  } catch (error) {
+    console.error('Error updating invoice tax:', error);
+    return NextResponse.json(
+      { error: 'Failed to update invoice tax' },
+      { status: 500 }
+    );
+  }
+}

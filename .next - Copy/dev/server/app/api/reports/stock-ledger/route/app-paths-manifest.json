@@ -1,0 +1,3 @@
+{
+  "/api/reports/stock-ledger/route": "app/api/reports/stock-ledger/route.js"
+}
