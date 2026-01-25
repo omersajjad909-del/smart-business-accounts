@@ -10,10 +10,13 @@
     "postinstall": "prisma generate",
     "seed": "node prisma/seed.js",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "setup:prod": "bash scripts/setup-production.sh",
+    "verify:env": "node scripts/verify-env.js",
     "db:test": "npx prisma db pull",
     "db:generate": "npx prisma generate",
     "db:migrate": "npx prisma migrate dev",
-    "db:studio": "npx prisma studio"
+    "db:studio": "npx prisma studio",
+    "db:reset": "npx prisma migrate reset --force && npm run seed"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
