@@ -3,13 +3,118 @@ const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
+// Complete permission sets for each role
+const ROLE_PERMISSIONS = {
+  ADMIN: [
+    // All permissions - ADMIN gets everything automatically in code
+    // No need to store in DB
+  ],
+  
+  ACCOUNTANT: [
+    // Dashboard & Basic
+    "VIEW_DASHBOARD",
+    
+    // Accounts - Full Access
+    "VIEW_ACCOUNTS",
+    "CREATE_ACCOUNTS",
+    "CREATE_CPV",
+    "CREATE_CRV",
+    
+    // Catalog
+    "VIEW_CATALOG",
+    "CREATE_ITEMS",
+    "CREATE_STOCK_RATE",
+    
+    // Sales
+    "CREATE_QUOTATION",
+    "CREATE_DELIVERY_CHALLAN",
+    "CREATE_SALES_INVOICE",
+    "CREATE_SALE_RETURN",
+    
+    // Inventory
+    "VIEW_INVENTORY",
+    "CREATE_PURCHASE_ORDER",
+    "CREATE_PURCHASE_INVOICE",
+    "CREATE_OUTWARD",
+    
+    // Financial Reports
+    "VIEW_FINANCIAL_REPORTS",
+    "VIEW_REPORTS",
+    "VIEW_AGEING_REPORT",
+    "VIEW_LEDGER_REPORT",
+    "VIEW_TRIAL_BALANCE_REPORT",
+    "VIEW_PROFIT_LOSS_REPORT",
+    "VIEW_BALANCE_SHEET_REPORT",
+    
+    // Inventory Reports
+    "VIEW_INVENTORY_REPORTS",
+    "VIEW_INWARD",
+    "VIEW_OUTWARD",
+    "VIEW_SALES_REPORT",
+    "VIEW_STOCK_LEDGER",
+    "VIEW_STOCK_SUMMARY",
+    "VIEW_LOW_STOCK",
+    "VIEW_LOCATION",
+    
+    // Banking
+    "BANK_RECONCILIATION",
+    "PAYMENT_RECEIPTS",
+    "EXPENSE_VOUCHERS",
+    "TAX_CONFIGURATION",
+    
+    // HR
+    "VIEW_HR_PAYROLL",
+    
+    // Advanced
+    "BUDGET_PLANNING",
+    "RECURRING_TRANSACTIONS",
+    "FINANCIAL_YEAR",
+  ],
+  
+  VIEWER: [
+    // Dashboard
+    "VIEW_DASHBOARD",
+    
+    // View Only
+    "VIEW_ACCOUNTS",
+    "VIEW_CATALOG",
+    "VIEW_INVENTORY",
+    
+    // All Reports
+    "VIEW_FINANCIAL_REPORTS",
+    "VIEW_REPORTS",
+    "VIEW_AGEING_REPORT",
+    "VIEW_LEDGER_REPORT",
+    "VIEW_TRIAL_BALANCE_REPORT",
+    "VIEW_PROFIT_LOSS_REPORT",
+    "VIEW_BALANCE_SHEET_REPORT",
+    
+    // Inventory Reports
+    "VIEW_INVENTORY_REPORTS",
+    "VIEW_INWARD",
+    "VIEW_OUTWARD",
+    "VIEW_SALES_REPORT",
+    "VIEW_STOCK_LEDGER",
+    "VIEW_STOCK_SUMMARY",
+    "VIEW_LOW_STOCK",
+    "VIEW_LOCATION",
+    
+    // HR/CRM View Only
+    "VIEW_HR_PAYROLL",
+    "VIEW_CRM",
+  ],
+};
+
 async function main() {
+  console.log("🌱 Seeding database...\n");
+
+  // 1. Create Admin user
+  console.log("1️⃣ Creating admin user...");
   const password = await bcrypt.hash("us786", 10);
 
-  // Create Admin user
   await prisma.user.upsert({
     where: { email: "admin@local.com" },
-    update: {},
+    update: { password, active: true }, // Update if exists
     create: {
       name: "Admin",
       email: "admin@local.com",
@@ -18,55 +123,46 @@ async function main() {
       active: true,
     },
   });
+  console.log("   ✅ Admin user: admin@local.com / us786\n");
 
-  console.log("✅ Admin user created");
-
-  // Set default permissions for ACCOUNTANT role
-  await prisma.rolePermission.deleteMany({ where: { role: "ACCOUNTANT" } });
+  // 2. Setup permissions for each role
+  console.log("2️⃣ Setting up role permissions...");
   
-  const accountantPermissions = [
-    "VIEW_ACCOUNTS",
-    "CREATE_CPV",
-    "CREATE_CRV",
-    "VIEW_CATALOG",
-    "VIEW_INVENTORY",
-    "VIEW_FINANCIAL_REPORTS",
-    "VIEW_REPORTS",
-    "VIEW_LEDGER_REPORT",
-    "VIEW_TRIAL_BALANCE_REPORT",
-    "VIEW_AGEING_REPORT",
-  ];
+  // Clear existing permissions
+  await prisma.rolePermission.deleteMany({});
+  console.log("   🗑️  Cleared existing permissions");
 
-  for (const perm of accountantPermissions) {
+  // Setup ACCOUNTANT permissions
+  console.log("   📝 ACCOUNTANT permissions...");
+  for (const perm of ROLE_PERMISSIONS.ACCOUNTANT) {
     await prisma.rolePermission.create({
       data: { role: "ACCOUNTANT", permission: perm },
     });
   }
-  console.log("✅ ACCOUNTANT role permissions set");
+  console.log(`   ✅ ACCOUNTANT: ${ROLE_PERMISSIONS.ACCOUNTANT.length} permissions`);
 
-  // Set default permissions for VIEWER role
-  await prisma.rolePermission.deleteMany({ where: { role: "VIEWER" } });
-  
-  const viewerPermissions = [
-    "VIEW_ACCOUNTS",
-    "VIEW_CATALOG",
-    "VIEW_INVENTORY",
-    "VIEW_FINANCIAL_REPORTS",
-    "VIEW_REPORTS",
-    "VIEW_LEDGER_REPORT",
-    "VIEW_TRIAL_BALANCE_REPORT",
-    "VIEW_AGEING_REPORT",
-  ];
-
-  for (const perm of viewerPermissions) {
+  // Setup VIEWER permissions
+  console.log("   📝 VIEWER permissions...");
+  for (const perm of ROLE_PERMISSIONS.VIEWER) {
     await prisma.rolePermission.create({
       data: { role: "VIEWER", permission: perm },
     });
   }
-  console.log("✅ VIEWER role permissions set");
+  console.log(`   ✅ VIEWER: ${ROLE_PERMISSIONS.VIEWER.length} permissions`);
 
-  // ADMIN has all permissions (no need to store in DB)
-  console.log("✅ ADMIN role (all permissions by default)");
+  console.log("   ✅ ADMIN: All permissions (automatic)\n");
+
+  // 3. Summary
+  console.log("=" .repeat(50));
+  console.log("\n✅ Seeding Complete!\n");
+  console.log("📊 Summary:");
+  console.log("   👤 Admin user created");
+  console.log(`   🔐 Permissions configured for all roles`);
+  console.log("\n🔑 Default Login:");
+  console.log("   Email:    admin@local.com");
+  console.log("   Password: us786");
+  console.log("\n⚠️  Change password after first login!");
+  console.log("\n" + "=".repeat(50) + "\n");
 }
 
 main()

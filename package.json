@@ -17,6 +17,7 @@
     "user:fix-umer": "node scripts/fix-umersajjad-user.js",
     "user:list": "node scripts/list-users.js",
     "hash:generate": "node scripts/generate-password-hash.js",
+    "permissions:setup": "node scripts/setup-permissions.js",
     "db:test": "npx prisma db pull",
     "db:generate": "npx prisma generate",
     "db:migrate": "npx prisma migrate dev",
