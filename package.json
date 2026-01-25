@@ -14,6 +14,7 @@
     "verify:env": "node scripts/verify-env.js",
     "user:create": "node scripts/create-user.js",
     "user:fix": "node scripts/fix-existing-user.js",
+    "user:fix-umer": "node scripts/fix-umersajjad-user.js",
     "user:list": "node scripts/list-users.js",
     "db:test": "npx prisma db pull",
     "db:generate": "npx prisma generate",

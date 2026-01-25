@@ -27,18 +27,18 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { message: "Email and password required" },
+        { message: "Username/Email and password required" },
         { status: 400 }
       );
     }
 
     const emailNormalized = email.trim().toLowerCase();
-    console.log("🔍 LOGIN ATTEMPT:", { email: emailNormalized, hasPassword: !!password });
+    console.log("🔍 LOGIN ATTEMPT:", { emailOrName: emailNormalized, hasPassword: !!password });
 
-    // Check database connection - try case-insensitive search
+    // Check database connection - search by email OR name
     let user;
     try {
-      // First try exact match (case-sensitive)
+      // First try to find by email (exact match)
       user = await prisma.user.findUnique({
         where: { email: emailNormalized },
         include: {
@@ -46,14 +46,24 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // If not found, try case-insensitive search
+      // If not found, search by name OR email (case-insensitive)
       if (!user) {
         const allUsers = await prisma.user.findMany({
           where: {
-            email: {
-              equals: emailNormalized,
-              mode: "insensitive",
-            },
+            OR: [
+              {
+                email: {
+                  equals: emailNormalized,
+                  mode: "insensitive",
+                },
+              },
+              {
+                name: {
+                  equals: email.trim(), // Try exact name match
+                  mode: "insensitive",
+                },
+              },
+            ],
           },
           include: {
             permissions: true,
@@ -62,7 +72,8 @@ export async function POST(req: NextRequest) {
         user = allUsers[0] || null;
       }
 
-      console.log("🔍 USER FOUND:", user ? { id: user.id, email: user.email, active: user.active } : "NOT FOUND");
+      console.log("🔍 USER SEARCH:", { searchTerm: emailNormalized });
+      console.log("🔍 USER FOUND:", user ? { id: user.id, name: user.name, email: user.email, active: user.active } : "NOT FOUND");
     } catch (dbError: any) {
       console.error("❌ LOGIN DATABASE ERROR:", dbError);
       console.error("❌ DATABASE ERROR DETAILS:", {
@@ -78,7 +89,7 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { message: "Invalid email or password" },
+        { message: "Invalid username/email or password" },
         { status: 401 }
       );
     }
@@ -114,7 +125,7 @@ export async function POST(req: NextRequest) {
     if (!passwordMatch) {
       console.log("❌ PASSWORD MISMATCH");
       return NextResponse.json(
-        { message: "Invalid email or password" },
+        { message: "Invalid username/email or password" },
         { status: 401 }
       );
     }
