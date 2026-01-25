@@ -3,7 +3,7 @@ import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "US Traders | Faisalabad",
+  title: "US Developer | Faisalabad",
   description: "Financial Management System",
 };
 
