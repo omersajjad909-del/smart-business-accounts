@@ -18,6 +18,8 @@
     "user:list": "node scripts/list-users.js",
     "hash:generate": "node scripts/generate-password-hash.js",
     "permissions:setup": "node scripts/setup-permissions.js",
+    "db:setup": "bash scripts/db-helper.sh setup",
+    "db:status": "bash scripts/db-helper.sh status",
     "db:test": "npx prisma db pull",
     "db:generate": "npx prisma generate",
     "db:migrate": "npx prisma migrate dev",
