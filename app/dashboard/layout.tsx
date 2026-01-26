@@ -53,7 +53,7 @@ export default function DashboardLayout({
   const [openFinReports, setOpenFinReports] = useState(false);
   const [openInvReports, setOpenInvReports] = useState(false);
   const [openPhase1, setOpenPhase1] = useState(false);
-  const [openAccounting, setOpenAccounting] = useState(false);
+  const [openAccounting, setOpenAccounting] = useState(true);
   const [openHR, setOpenHR] = useState(false);
   const [openCRM, setOpenCRM] = useState(false);
   const [openCurrency, setOpenCurrency] = useState(false);
