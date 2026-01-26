@@ -1,27 +1,34 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { ResponsiveContainer, PageHeader, Card } from "@/components/ui/ResponsiveContainer";
-import { ResponsiveForm, FormField, FormActions } from "@/components/ui/ResponsiveForm";
-import { MobileTable, MobileCard, MobileCardRow, DesktopTable } from "@/components/ui/MobileTable";
-import toast from "react-hot-toast";
+import { useState, useEffect } from 'react';
+import { ResponsiveContainer, PageHeader, Card } from '@/components/ui/ResponsiveContainer';
+import { ResponsiveForm, FormField, FormActions } from '@/components/ui/ResponsiveForm';
+import { MobileTable, MobileCard, MobileCardRow, DesktopTable, EmptyState } from '@/components/ui/MobileTable';
 
-type ContraEntry = {
+interface ContraEntry {
   id: string;
-  contraNo: string;
+  contraNumber: string;
   date: string;
+  fromAccountId: string;
+  toAccountId: string;
   amount: number;
-  fromAccount: { id: string; name: string };
-  toAccount: { id: string; name: string };
   narration?: string;
+  fromAccount?: {
+    id: string;
+    name: string;
+  };
+  toAccount?: {
+    id: string;
+    name: string;
+  };
   createdAt: string;
-};
+}
 
-type Account = {
+interface Account {
   id: string;
   name: string;
-  type: string;
-};
+  accountType: string;
+}
 
 export default function ContraPage() {
   const [entries, setEntries] = useState<ContraEntry[]>([]);
@@ -29,341 +36,286 @@ export default function ContraPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
-  // Form state
-  const [contraNo, setContraNo] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [amount, setAmount] = useState("");
-  const [fromAccountId, setFromAccountId] = useState("");
-  const [toAccountId, setToAccountId] = useState("");
-  const [narration, setNarration] = useState("");
+  const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    fromAccountId: '',
+    toAccountId: '',
+    amount: '',
+    narration: '',
+  });
 
   useEffect(() => {
-    fetchData();
+    fetchEntries();
+    fetchAccounts();
   }, []);
 
-  async function fetchData() {
+  const fetchEntries = async () => {
     try {
-      const [entriesRes, accountsRes] = await Promise.all([
-        fetch("/api/contra"),
-        fetch("/api/accounts"),
-      ]);
-
-      const entriesData = await entriesRes.json();
-      const accountsData = await accountsRes.json();
-
-      setEntries(entriesData);
-      
-      // Filter only CASH and BANK accounts
-      const cashBankAccounts = accountsData.filter(
-        (acc: Account) => acc.type === "CASH" || acc.type === "BANK"
-      );
-      setAccounts(cashBankAccounts);
-
-      // Generate next contra number
-      if (entriesData.length > 0) {
-        const lastNo = Math.max(...entriesData.map((e: ContraEntry) => {
-          const match = e.contraNo.match(/\d+/);
-          return match ? parseInt(match[0]) : 0;
-        }));
-        setContraNo(`CE-${String(lastNo + 1).padStart(3, "0")}`);
-      } else {
-        setContraNo("CE-001");
+      const response = await fetch('/api/contra');
+      if (response.ok) {
+        const data = await response.json();
+        setEntries(data);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
-      toast.error("Failed to load data");
+      console.error('Error fetching contra entries:', error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  async function handleSubmit(e: React.FormEvent) {
+  const fetchAccounts = async () => {
+    try {
+      const response = await fetch('/api/accounts');
+      if (response.ok) {
+        const data = await response.json();
+        // Filter only CASH and BANK accounts
+        const cashBankAccounts = data.filter(
+          (acc: Account) => acc.accountType === 'CASH' || acc.accountType === 'BANK'
+        );
+        setAccounts(cashBankAccounts);
+      }
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!fromAccountId || !toAccountId || !amount) {
-      toast.error("Please fill all required fields");
+    if (formData.fromAccountId === formData.toAccountId) {
+      alert('From and To accounts must be different');
       return;
     }
-
-    if (fromAccountId === toAccountId) {
-      toast.error("From and To accounts cannot be the same");
-      return;
-    }
-
-    setLoading(true);
 
     try {
-      const res = await fetch("/api/contra", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/contra', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contraNo,
-          date,
-          amount: parseFloat(amount),
-          fromAccountId,
-          toAccountId,
-          narration,
+          ...formData,
+          amount: parseFloat(formData.amount),
         }),
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Contra entry created successfully!");
-        resetForm();
-        fetchData();
+      if (response.ok) {
         setShowForm(false);
-      } else {
-        toast.error(data.error || "Failed to create contra entry");
+        setFormData({
+          date: new Date().toISOString().split('T')[0],
+          fromAccountId: '',
+          toAccountId: '',
+          amount: '',
+          narration: '',
+        });
+        fetchEntries();
       }
     } catch (error) {
-      console.error("Error creating contra entry:", error);
-      toast.error("Failed to create contra entry");
-    } finally {
-      setLoading(false);
+      console.error('Error creating contra entry:', error);
     }
-  }
+  };
 
-  function resetForm() {
-    setDate(new Date().toISOString().split("T")[0]);
-    setAmount("");
-    setFromAccountId("");
-    setToAccountId("");
-    setNarration("");
-  }
-
-  async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this contra entry?")) return;
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this contra entry?')) return;
 
     try {
-      const res = await fetch(`/api/contra?id=${id}`, {
-        method: "DELETE",
+      const response = await fetch(`/api/contra?id=${id}`, {
+        method: 'DELETE',
       });
 
-      if (res.ok) {
-        toast.success("Contra entry deleted!");
-        fetchData();
-      } else {
-        const data = await res.json();
-        toast.error(data.error || "Failed to delete");
+      if (response.ok) {
+        fetchEntries();
       }
     } catch (error) {
-      console.error("Error deleting:", error);
-      toast.error("Failed to delete");
+      console.error('Error deleting contra entry:', error);
     }
-  }
+  };
 
-  if (loading && entries.length === 0) {
+  if (loading) {
     return (
       <ResponsiveContainer>
-        <div className="text-center py-10">Loading...</div>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500">Loading...</p>
+        </div>
       </ResponsiveContainer>
     );
   }
 
   return (
-    <ResponsiveContainer maxWidth="xl">
+    <ResponsiveContainer>
       <PageHeader
-        title="💱 Contra Entry"
-        subtitle="Cash to Bank / Bank to Bank transfers"
-        actions={
-          <Button
-            variant="primary"
-            onClick={() => setShowForm(!showForm)}
-          >
-            {showForm ? "Cancel" : "+ New Contra Entry"}
-          </Button>
-        }
+        title="Contra Entry"
+        description="Cash to Bank or Bank to Bank transfers"
+        action={{
+          label: 'New Contra Entry',
+          onClick: () => setShowForm(true),
+        }}
       />
 
+      {/* Form Modal */}
       {showForm && (
-        <Card className="mb-6">
-          <ResponsiveForm onSubmit={handleSubmit} columns={2}>
-            <FormField label="Contra No" required>
-              <Input
-                type="text"
-                value={contraNo}
-                onChange={(e) => setContraNo(e.target.value)}
-                required
-              />
-            </FormField>
-
-            <FormField label="Date" required>
-              <Input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-              />
-            </FormField>
-
-            <FormField label="From Account (Credit)" required>
-              <Select
-                value={fromAccountId}
-                onChange={(e) => setFromAccountId(e.target.value)}
-                required
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold">New Contra Entry</h2>
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-gray-400 hover:text-gray-600"
               >
-                <option value="">Select Account</option>
-                {accounts.map((acc) => (
-                  <option key={acc.id} value={acc.id}>
-                    {acc.name} ({acc.type})
-                  </option>
-                ))}
-              </Select>
-            </FormField>
+                ✕
+              </button>
+            </div>
 
-            <FormField label="To Account (Debit)" required>
-              <Select
-                value={toAccountId}
-                onChange={(e) => setToAccountId(e.target.value)}
-                required
-              >
-                <option value="">Select Account</option>
-                {accounts.map((acc) => (
-                  <option key={acc.id} value={acc.id}>
-                    {acc.name} ({acc.type})
-                  </option>
-                ))}
-              </Select>
-            </FormField>
+            <ResponsiveForm onSubmit={handleSubmit}>
+              <FormField label="Date" required>
+                <input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  required
+                />
+              </FormField>
 
-            <FormField label="Amount" required>
-              <Input
-                type="number"
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.00"
-                required
+              <FormField label="From Account (Credit)" required>
+                <select
+                  value={formData.fromAccountId}
+                  onChange={(e) => setFormData({ ...formData, fromAccountId: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  required
+                >
+                  <option value="">Select Account</option>
+                  {accounts.map((account) => (
+                    <option key={account.id} value={account.id}>
+                      {account.name} ({account.accountType})
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+
+              <FormField label="To Account (Debit)" required>
+                <select
+                  value={formData.toAccountId}
+                  onChange={(e) => setFormData({ ...formData, toAccountId: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  required
+                >
+                  <option value="">Select Account</option>
+                  {accounts.map((account) => (
+                    <option key={account.id} value={account.id}>
+                      {account.name} ({account.accountType})
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+
+              <FormField label="Amount" required>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="0.00"
+                  required
+                />
+              </FormField>
+
+              <FormField label="Narration">
+                <textarea
+                  value={formData.narration}
+                  onChange={(e) => setFormData({ ...formData, narration: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  rows={3}
+                  placeholder="Optional description"
+                />
+              </FormField>
+
+              <FormActions
+                onCancel={() => setShowForm(false)}
+                submitLabel="Create Contra Entry"
               />
-            </FormField>
-
-            <FormField label="Narration" fullWidth>
-              <Input
-                type="text"
-                value={narration}
-                onChange={(e) => setNarration(e.target.value)}
-                placeholder="Optional description"
-              />
-            </FormField>
-
-            <FormActions>
-              <Button type="submit" variant="primary" disabled={loading}>
-                {loading ? "Saving..." : "Save Contra Entry"}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => {
-                  setShowForm(false);
-                  resetForm();
-                }}
-              >
-                Cancel
-              </Button>
-            </FormActions>
-          </ResponsiveForm>
-        </Card>
+            </ResponsiveForm>
+          </Card>
+        </div>
       )}
 
+      {/* Contra Entries Table */}
       <Card>
-        {/* Desktop Table */}
-        <div className="hidden md:block overflow-x-auto">
-          <DesktopTable>
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Contra No
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Date
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  From Account
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  To Account
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                  Amount
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {entries.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                    No contra entries found. Create your first one!
-                  </td>
+        <h2 className="text-lg font-semibold mb-4">Contra Entries</h2>
+
+        {entries.length === 0 ? (
+          <EmptyState
+            message="No contra entries found"
+            actionLabel="Create First Entry"
+            onAction={() => setShowForm(true)}
+          />
+        ) : (
+          <>
+            {/* Desktop Table */}
+            <DesktopTable>
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-3 px-4">Contra No.</th>
+                  <th className="text-left py-3 px-4">Date</th>
+                  <th className="text-left py-3 px-4">From Account</th>
+                  <th className="text-left py-3 px-4">To Account</th>
+                  <th className="text-right py-3 px-4">Amount</th>
+                  <th className="text-right py-3 px-4">Actions</th>
                 </tr>
-              ) : (
-                entries.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                      {entry.contraNo}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {new Date(entry.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {entry.fromAccount.name}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {entry.toAccount.name}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-right font-medium text-gray-900">
-                      Rs. {entry.amount.toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
+              </thead>
+              <tbody>
+                {entries.map((entry) => (
+                  <tr key={entry.id} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-4 font-medium">{entry.contraNumber}</td>
+                    <td className="py-3 px-4">{new Date(entry.date).toLocaleDateString()}</td>
+                    <td className="py-3 px-4">{entry.fromAccount?.name || 'N/A'}</td>
+                    <td className="py-3 px-4">{entry.toAccount?.name || 'N/A'}</td>
+                    <td className="py-3 px-4 text-right font-medium">₹{entry.amount.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-right">
                       <button
                         onClick={() => handleDelete(entry.id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-600 hover:text-red-800 text-sm"
                       >
                         Delete
                       </button>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </DesktopTable>
-        </div>
+                ))}
+              </tbody>
+            </DesktopTable>
 
-        {/* Mobile Cards */}
-        <div className="md:hidden">
-          <MobileTable
-            data={entries}
-            emptyMessage="No contra entries found. Create your first one!"
-            renderCard={(entry) => (
-              <MobileCard>
-                <MobileCardRow label="Contra No" value={entry.contraNo} />
-                <MobileCardRow
-                  label="Date"
-                  value={new Date(entry.date).toLocaleDateString()}
-                />
-                <MobileCardRow label="From" value={entry.fromAccount.name} />
-                <MobileCardRow label="To" value={entry.toAccount.name} />
-                <MobileCardRow
-                  label="Amount"
-                  value={`Rs. ${entry.amount.toLocaleString()}`}
-                  valueClassName="font-bold text-green-600"
-                />
-                <div className="pt-2 mt-2 border-t border-gray-200">
-                  <Button
-                    variant="danger"
-                    onClick={() => handleDelete(entry.id)}
-                    className="w-full"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </MobileCard>
-            )}
-          />
-        </div>
+            {/* Mobile Cards */}
+            <MobileTable>
+              {entries.map((entry) => (
+                <MobileCard key={entry.id}>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <div className="font-medium">{entry.contraNumber}</div>
+                      <div className="text-sm text-gray-500">{new Date(entry.date).toLocaleDateString()}</div>
+                    </div>
+                  </div>
+                  <MobileCardRow label="From" value={entry.fromAccount?.name || 'N/A'} />
+                  <MobileCardRow label="To" value={entry.toAccount?.name || 'N/A'} />
+                  <MobileCardRow 
+                    label="Amount" 
+                    value={`₹${entry.amount.toFixed(2)}`}
+                    valueClassName="font-medium text-green-600"
+                  />
+                  {entry.narration && (
+                    <MobileCardRow label="Narration" value={entry.narration} />
+                  )}
+                  <div className="mt-3 pt-3 border-t">
+                    <button
+                      onClick={() => handleDelete(entry.id)}
+                      className="w-full px-3 py-2 bg-red-600 text-white rounded-lg text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </MobileCard>
+              ))}
+            </MobileTable>
+          </>
+        )}
       </Card>
     </ResponsiveContainer>
   );
