@@ -202,27 +202,23 @@ export default function DashboardLayout({
                 </>
               )}
 
-              {/* ACCOUNTING FEATURES */}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && (
-  <>
-    <SubHeader
-      title="Accounting"
-      open={openAccounting}
-      onClick={() => setOpenAccounting(!openAccounting)}
-    />
-    {openAccounting && (
-      <div className="ml-4 space-y-1">
-        <MenuLink href="/dashboard/contra">Contra Entry</MenuLink>
-        <MenuLink href="/dashboard/advance-payment">Advance Payment</MenuLink>
-        <MenuLink href="/dashboard/petty-cash">Petty Cash</MenuLink>
-        <MenuLink href="/dashboard/credit-note">Credit Notes</MenuLink>
-        <MenuLink href="/dashboard/debit-note">Debit Notes</MenuLink>
-        <MenuLink href="/dashboard/fixed-assets">Fixed Assets</MenuLink>
-        <MenuLink href="/dashboard/loans">Loans</MenuLink>
-      </div>
-    )}
-  </>
-)}
+              {/* ACCOUNTING FEATURES - ALWAYS VISIBLE */}
+              <SubHeader
+                title="Accounting"
+                open={openAccounting}
+                onClick={() => setOpenAccounting(!openAccounting)}
+              />
+              {openAccounting && (
+                <div className="ml-4 space-y-1">
+                  <MenuLink href="/dashboard/contra">💱 Contra Entry</MenuLink>
+                  <MenuLink href="/dashboard/advance-payment">💰 Advance Payment</MenuLink>
+                  <MenuLink href="/dashboard/petty-cash">💵 Petty Cash</MenuLink>
+                  <MenuLink href="/dashboard/credit-note">📝 Credit Notes</MenuLink>
+                  <MenuLink href="/dashboard/debit-note">📋 Debit Notes</MenuLink>
+                  <MenuLink href="/dashboard/fixed-assets">🏢 Fixed Assets</MenuLink>
+                  <MenuLink href="/dashboard/loans">🏦 Loans</MenuLink>
+                </div>
+              )}
 
 
               {/* CATALOG */}
