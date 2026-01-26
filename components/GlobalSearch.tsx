@@ -108,6 +108,13 @@ export default function GlobalSearch() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.length >= 2 && setShowResults(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && allResults.length > 0) {
+              e.preventDefault();
+              // Navigate to first result
+              handleResultClick(allResults[0].url);
+            }
+          }}
           placeholder="Search accounts, items, invoices..."
           className="w-full px-4 py-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />

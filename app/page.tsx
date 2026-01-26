@@ -137,6 +137,13 @@ export default function LoginPage() {
                   className="flex-1 bg-gray-300 text-black px-1 py-0.5 outline-none w-full"
                   value={username}
                   onChange={(e) => handleUserChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
+                      if (passwordInput) passwordInput.focus();
+                    }
+                  }}
                 >
                   <option value="">-- Select User --</option>
                   {usersList.map((u) => (
@@ -152,6 +159,12 @@ export default function LoginPage() {
                   className="flex-1 bg-gray-300 text-black px-1 py-0.5 outline-none w-full"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleLogin();
+                    }
+                  }}
                 />
               </div>
 

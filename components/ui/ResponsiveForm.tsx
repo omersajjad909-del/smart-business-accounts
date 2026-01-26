@@ -7,8 +7,35 @@ interface ResponsiveFormProps {
 }
 
 export function ResponsiveForm({ children, onSubmit, className = '' }: ResponsiveFormProps) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    // Handle Enter key globally in form
+    if (e.key === 'Enter') {
+      const target = e.target as HTMLElement;
+      
+      // Don't submit if in textarea (allow newlines)
+      if (target.tagName === 'TEXTAREA') return;
+      
+      // Don't submit if Shift+Enter
+      if (e.shiftKey) return;
+      
+      // If in an input/select, submit the form
+      if (target.tagName === 'INPUT' || target.tagName === 'SELECT') {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+        if (submitButton && !submitButton.disabled) {
+          submitButton.click();
+        }
+      }
+    }
+  };
+
   return (
-    <form onSubmit={onSubmit} className={`space-y-4 sm:space-y-6 ${className}`}>
+    <form 
+      onSubmit={onSubmit} 
+      onKeyDown={handleKeyDown}
+      className={`space-y-4 sm:space-y-6 ${className}`}
+    >
       {children}
     </form>
   );
