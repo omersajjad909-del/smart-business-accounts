@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { ResponsiveContainer, PageHeader, Card } from "@/components/ui/ResponsiveContainer";
-import { ResponsiveForm, FormField, FormActions } from "@/components/ui/ResponsiveForm";
-import { MobileTable, MobileCard, MobileCardRow, DesktopTable } from "@/components/ui/MobileTable";
+import { ResponsiveForm, FormField, Input, Select, Button, FormActions } from "@/omponents/ui/ResponsiveForm";
+import { MobileTable, MobileCard, MobileCardRow, DesktopTable, StatusBadge } from "@/components/ui/MobileTable";
 import toast from "react-hot-toast";
 
 type ContraEntry = {
