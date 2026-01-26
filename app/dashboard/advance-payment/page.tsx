@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ResponsiveContainer, PageHeader, Card } from "@/components/ResponsiveContainer";
-import { ResponsiveForm, FormField, Input, Select, Button, FormActions } from "@/components/ResponsiveForm";
-import { MobileTable, MobileCard, MobileCardRow, DesktopTable, StatusBadge } from "@/components/MobileTable";
+import { ResponsiveContainer, PageHeader, Card } from "@/components/ui/ResponsiveContainer";
+import { ResponsiveForm, FormField, FormActions } from "@/components/ui/ResponsiveForm";
+import { MobileTable, MobileCard, MobileCardRow, DesktopTable } from "@/components/ui/MobileTable";
 import toast from "react-hot-toast";
 
 type AdvancePayment = {
