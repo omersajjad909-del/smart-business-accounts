@@ -53,6 +53,7 @@ export default function DashboardLayout({
   const [openFinReports, setOpenFinReports] = useState(false);
   const [openInvReports, setOpenInvReports] = useState(false);
   const [openPhase1, setOpenPhase1] = useState(false);
+  const [openAccounting, setOpenAccounting] = useState(false);
   const [openHR, setOpenHR] = useState(false);
   const [openCRM, setOpenCRM] = useState(false);
   const [openCurrency, setOpenCurrency] = useState(false);
@@ -199,6 +200,20 @@ export default function DashboardLayout({
                     </div>
                   )}
                 </>
+              )}
+
+              {/* ACCOUNTING FEATURES */}
+              <SubHeader title="Accounting" open={openAccounting} onClick={() => setOpenAccounting(!openAccounting)} />
+              {openAccounting && (
+                <div className="ml-4 space-y-1">
+                  <MenuLink href="/dashboard/contra">Contra Entry</MenuLink>
+                  <MenuLink href="/dashboard/advance-payment">Advance Payment</MenuLink>
+                  <MenuLink href="/dashboard/petty-cash">Petty Cash</MenuLink>
+                  <MenuLink href="/dashboard/credit-note">Credit Notes</MenuLink>
+                  <MenuLink href="/dashboard/debit-note">Debit Notes</MenuLink>
+                  <MenuLink href="/dashboard/fixed-assets">Fixed Assets</MenuLink>
+                  <MenuLink href="/dashboard/loans">Loans</MenuLink>
+                </div>
               )}
 
               {/* CATALOG */}
