@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { logout } from "@/lib/logout";
@@ -53,7 +53,7 @@ export default function DashboardLayout({
   const [openFinReports, setOpenFinReports] = useState(false);
   const [openInvReports, setOpenInvReports] = useState(false);
   const [openPhase1, setOpenPhase1] = useState(false);
-  const [openAccounting, setOpenAccounting] = useState(true);
+  const [openAccounting, setOpenAccounting] = useState(false);
   const [openHR, setOpenHR] = useState(false);
   const [openCRM, setOpenCRM] = useState(false);
   const [openCurrency, setOpenCurrency] = useState(false);
@@ -374,16 +374,18 @@ export default function DashboardLayout({
         <div className="bg-gray-50 border-b px-4 md:px-6 py-3 flex items-center gap-4 print:hidden">
           
           {/* HAMBURGER BUTTON */}
-          <button 
-            className="md:hidden text-gray-600 p-2"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          <button
+            className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg mr-2"
+            onClick={() => setIsMobileMenuOpen(true)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </button>
 
-          <GlobalSearch />
+          <Suspense fallback={<div className="w-full max-w-md h-10 bg-gray-200 animate-pulse rounded" />}>
+            <GlobalSearch />
+          </Suspense>
           <div className="ml-auto text-sm text-gray-600">
             {currentUser.name || currentUser.email}
           </div>
