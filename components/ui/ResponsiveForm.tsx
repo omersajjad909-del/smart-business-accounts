@@ -62,27 +62,81 @@ export function FormField({ label, children, required, error }: FormFieldProps) 
 }
 
 interface FormActionsProps {
-  onCancel: () => void;
+  onCancel?: () => void;
   submitLabel?: string;
   cancelLabel?: string;
+  children?: React.ReactNode;
 }
 
-export function FormActions({ onCancel, submitLabel = 'Submit', cancelLabel = 'Cancel' }: FormActionsProps) {
+export function FormActions({ onCancel, submitLabel = 'Submit', cancelLabel = 'Cancel', children }: FormActionsProps) {
+  if (children) {
+    return (
+      <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-4">
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-4">
-      <button
-        type="button"
-        onClick={onCancel}
-        className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-      >
-        {cancelLabel}
-      </button>
-      <button
+      {onCancel && (
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onCancel}
+          className="w-full sm:w-auto"
+        >
+          {cancelLabel}
+        </Button>
+      )}
+      <Button
         type="submit"
-        className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        className="w-full sm:w-auto"
       >
         {submitLabel}
-      </button>
+      </Button>
     </div>
+  );
+}
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+export function Input({ className = "", ...props }: InputProps) {
+  return (
+    <input
+      className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${className}`}
+      {...props}
+    />
+  );
+}
+
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {}
+
+export function Select({ className = "", ...props }: SelectProps) {
+  return (
+    <select
+      className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${className}`}
+      {...props}
+    />
+  );
+}
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'danger' | 'success';
+}
+
+export function Button({ className = "", variant = 'primary', ...props }: ButtonProps) {
+  const variants = {
+    primary: "bg-blue-600 text-white hover:bg-blue-700",
+    secondary: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50",
+    danger: "bg-red-600 text-white hover:bg-red-700",
+    success: "bg-green-600 text-white hover:bg-green-700",
+  };
+
+  return (
+    <button
+      className={`inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${variants[variant]} ${className}`}
+      {...props}
+    />
   );
 }

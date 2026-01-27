@@ -31,7 +31,7 @@ export function useEnterKeySubmit<T extends HTMLElement>() {
 
       // Find the form element
       const form = element.tagName === 'FORM' 
-        ? element as HTMLFormElement
+        ? element as unknown as HTMLFormElement
         : element.closest('form');
 
       if (!form) return;

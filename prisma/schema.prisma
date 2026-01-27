@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 model Account {
@@ -43,6 +43,7 @@ model Account {
   expenseVouchers ExpenseVoucher[] @relation("ExpenseAccount")
   paymentVouchers ExpenseVoucher[] @relation("PaymentAccount")
   taxAccounts     TaxAccount[]
+  advancePayments AdvancePayment[] @relation("SupplierAdvances")
 
   // Advanced Features
   budgets            Budget[]
@@ -831,3 +832,39 @@ model DeliveryChallanItem {
   challan DeliveryChallan @relation(fields: [challanId], references: [id], onDelete: Cascade)
   item    ItemNew         @relation(fields: [itemId], references: [id])
 }
+
+// ================= FEATURE 9: ADVANCE PAYMENT TO SUPPLIERS =================
+
+model AdvancePayment {
+  id             String   @id @default(uuid())
+  advanceNo      String   @unique
+  date           DateTime
+  amount         Float
+  adjustedAmount Float    @default(0)
+  balance        Float
+  status         String   @default("OPEN") // OPEN | ADJUSTED | CLOSED
+  
+  supplierId     String
+  supplier       Account  @relation("SupplierAdvances", fields: [supplierId], references: [id])
+  
+  narration      String?
+  
+  adjustments    AdvanceAdjustment[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model AdvanceAdjustment {
+  id               String         @id @default(uuid())
+  advancePaymentId String
+  advancePayment   AdvancePayment @relation(fields: [advancePaymentId], references: [id], onDelete: Cascade)
+  
+  invoiceNo        String
+  amount           Float
+  date             DateTime
+  remarks          String?
+  
+  createdAt        DateTime @default(now())
+}
+

@@ -1,10 +1,30 @@
 import React from 'react';
 
-interface MobileTableProps {
-  children: React.ReactNode;
+interface MobileTableProps<T> {
+  children?: React.ReactNode;
+  data?: T[];
+  emptyMessage?: string;
+  renderCard?: (item: T) => React.ReactNode;
 }
 
-export function MobileTable({ children }: MobileTableProps) {
+export function MobileTable<T>({ children, data, emptyMessage, renderCard }: MobileTableProps<T>) {
+  if (data && renderCard) {
+    if (data.length === 0) {
+      return (
+        <div className="md:hidden py-8 text-center text-gray-500 bg-white rounded-lg border border-gray-200">
+          {emptyMessage || "No items found"}
+        </div>
+      );
+    }
+    return (
+      <div className="md:hidden space-y-4">
+        {data.map((item, index) => (
+          <React.Fragment key={index}>{renderCard(item)}</React.Fragment>
+        ))}
+      </div>
+    );
+  }
+
   return <div className="md:hidden space-y-4">{children}</div>;
 }
 
@@ -105,19 +125,20 @@ export function ActionButtons({
 }
 
 interface EmptyStateProps {
-  message: string;
-  actionLabel?: string;
+  message?: string;
+  className?: string;
   onAction?: () => void;
+  actionLabel?: string;
 }
 
-export function EmptyState({ message, actionLabel, onAction }: EmptyStateProps) {
+export function EmptyState({ message = "No items found", className = "", onAction, actionLabel = "Create New" }: EmptyStateProps) {
   return (
-    <div className="text-center py-12">
-      <p className="text-gray-500 mb-4">{message}</p>
-      {actionLabel && onAction && (
+    <div className={`text-center py-10 text-gray-500 bg-gray-50 rounded-lg flex flex-col items-center justify-center gap-4 ${className}`}>
+      <p>{message}</p>
+      {onAction && (
         <button
           onClick={onAction}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
         >
           {actionLabel}
         </button>

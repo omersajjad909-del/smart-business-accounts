@@ -1,10 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ResponsiveContainer, PageHeader, Card } from "@/components/ui/ResponsiveContainer";
-import { ResponsiveForm, FormField, FormActions } from "@/components/ui/ResponsiveForm";
-import { MobileTable, MobileCard, MobileCardRow, DesktopTable } from "@/components/ui/MobileTable";
 import toast from "react-hot-toast";
+
+import {
+  ResponsiveContainer,
+  PageHeader,
+  Card,
+} from "@/components/ui/ResponsiveContainer";
+
+import {
+  ResponsiveForm,
+  FormField,
+  FormActions,
+  Input,
+  Select,
+  Button,
+} from "@/components/ui/ResponsiveForm";
+
+import {
+  MobileTable,
+  MobileCard,
+  MobileCardRow,
+  DesktopTable,
+} from "@/components/ui/MobileTable";
+
 
 type AdvancePayment = {
   id: string;
@@ -20,11 +40,13 @@ type AdvancePayment = {
   createdAt: string;
 };
 
-type Account = {
+interface Account {
   id: string;
   name: string;
   type: string;
-};
+  partyType?: string | null;
+}
+
 
 export default function AdvancePaymentPage() {
   const [advances, setAdvances] = useState<AdvancePayment[]>([]);
@@ -64,8 +86,9 @@ export default function AdvancePaymentPage() {
 
       // Filter suppliers
       const supplierAccounts = accountsData.filter(
-        (acc: Account) => acc.type === "SUPPLIER" || acc.partyType === "SUPPLIER"
-      );
+  (acc: Account) => acc.type === "SUPPLIER"
+);
+
       setSuppliers(supplierAccounts);
 
       // Generate next advance number
@@ -209,14 +232,22 @@ export default function AdvancePaymentPage() {
     }
   }
 
-  function getStatusBadge(status: string) {
-    const variants: { [key: string]: "success" | "warning" | "info" } = {
-      PENDING: "warning",
-      ADJUSTED: "info",
-      CLOSED: "success",
-    };
-    return <StatusBadge status={status} variant={variants[status] || "default"} />;
-  }
+function getStatusBadge(status: string) {
+  const color =
+    status === "CLOSED"
+      ? "bg-green-100 text-green-700"
+      : status === "ADJUSTED"
+      ? "bg-blue-100 text-blue-700"
+      : "bg-yellow-100 text-yellow-700";
+
+  return (
+    <span
+      className={`px-2 py-1 rounded text-xs font-semibold inline-block ${color}`}
+    >
+      {status}
+    </span>
+  );
+}
 
   if (loading && advances.length === 0) {
     return (
@@ -227,20 +258,19 @@ export default function AdvancePaymentPage() {
   }
 
   return (
-    <ResponsiveContainer maxWidth="xl">
+    <ResponsiveContainer>
       <PageHeader
         title="💰 Advance Payment to Suppliers"
-        subtitle="Track supplier advances and adjust against invoices"
-        actions={
-          <Button variant="primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? "Cancel" : "+ New Advance Payment"}
-          </Button>
-        }
+        description="Track supplier advances and adjust against invoices"
+        action={{
+          label: showForm ? "Cancel" : "+ New Advance Payment",
+          onClick: () => setShowForm(!showForm)
+        }}
       />
 
       {showForm && (
         <Card className="mb-6">
-          <ResponsiveForm onSubmit={handleSubmit} columns={2}>
+          <ResponsiveForm onSubmit={handleSubmit}>
             <FormField label="Advance No" required>
               <Input
                 type="text"
@@ -285,7 +315,7 @@ export default function AdvancePaymentPage() {
               />
             </FormField>
 
-            <FormField label="Narration" fullWidth>
+            <FormField label="Narration">
               <Input
                 type="text"
                 value={narration}
@@ -322,7 +352,7 @@ export default function AdvancePaymentPage() {
             Supplier: <strong>{selectedAdvance.supplier.name}</strong> | 
             Balance: <strong>Rs. {selectedAdvance.balance.toLocaleString()}</strong>
           </p>
-          <ResponsiveForm onSubmit={handleAdjust} columns={2}>
+          <ResponsiveForm onSubmit={handleAdjust}>
             <FormField label="Invoice No" required>
               <Input
                 type="text"
@@ -345,7 +375,7 @@ export default function AdvancePaymentPage() {
               />
             </FormField>
 
-            <FormField label="Remarks" fullWidth>
+            <FormField label="Remarks">
               <Input
                 type="text"
                 value={adjustRemarks}
