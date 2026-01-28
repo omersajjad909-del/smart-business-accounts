@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import Barcode from "react-barcode";
+import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
+
+const Barcode = dynamic(() => import("react-barcode"), { ssr: false });
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 
@@ -560,7 +562,14 @@ export default function SalesInvoicePage() {
       {showForm && (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center bg-gray-50 p-4 border rounded print:hidden gap-4">
-            <h1 className="text-2xl font-bold">Sales Invoice ({invoiceNo})</h1>
+            <div>
+              <h1 className="text-2xl font-bold">Sales Invoice ({invoiceNo})</h1>
+              {(invoiceNo && invoiceNo !== "SI-1") && (
+                 <div className="mt-1">
+                   <Barcode value={invoiceNo} width={1} height={30} fontSize={12} displayValue={true} />
+                 </div>
+              )}
+            </div>
             {!preview ? (
               <div className="flex flex-wrap gap-2">
                 <button onClick={saveInvoice} disabled={saving} className="bg-blue-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
