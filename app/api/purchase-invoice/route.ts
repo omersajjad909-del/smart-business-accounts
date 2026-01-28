@@ -67,10 +67,10 @@ export async function POST(req: Request) {
 
     const validItems = items.filter((i: any) => Number(i.qty) > 0 && i.itemId);
 
-    // 2. Start Transaction
-    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-
-
+    // 2. Start Transaction (Disabled due to Supabase connection issues)
+    // const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const tx = prisma;
+      
       // A. Supplier اور Inventory Account تلاش کریں
       const supplier = await tx.account.findUnique({ where: { id: supplierId } });
       if (!supplier) throw new Error("Supplier not found");
@@ -165,7 +165,7 @@ export async function POST(req: Request) {
       // E. اگر PO ہے تو اس کا اسٹیٹس چیک کریں
       if (poId) {
         const allItems = await tx.purchaseOrderItem.findMany({ where: { poId } });
-        const isDone = allItems.every(pi => pi.invoicedQty >= pi.qty);
+        const isDone = allItems.every((pi: any) => pi.invoicedQty >= pi.qty);
         await tx.purchaseOrder.update({
           where: { id: poId },
           data: { status: isDone ? "COMPLETED" : "PENDING" },
@@ -189,7 +189,8 @@ export async function POST(req: Request) {
       });
 
       return invoice;
-    });
+    // });
+    const result = invoice;
 
     return NextResponse.json({ success: true, id: result.id, invoiceNo: result.invoiceNo });
   } catch (e: any) {
@@ -240,7 +241,8 @@ export async function PUT(req: Request) {
     
     const netTotal = totalItemsAmount + Number(freight) + taxAmount;
 
-    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    // const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const tx = prisma;
 
       await tx.purchaseInvoiceItem.deleteMany({ where: { invoiceId: id } });
 
@@ -268,8 +270,9 @@ export async function PUT(req: Request) {
         },
       });
 
-      return invoice;
-    });
+      // return invoice;
+    // });
+    const result = invoice;
 
     return NextResponse.json({ success: true, invoice: result });
   } catch (e: any) {
@@ -293,11 +296,12 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
     }
 
-    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    // await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const tx = prisma;
 
       await tx.purchaseInvoiceItem.deleteMany({ where: { invoiceId: id } });
       await tx.purchaseInvoice.delete({ where: { id } });
-    });
+    // });
 
     return NextResponse.json({ success: true });
   } catch (e: any) {
