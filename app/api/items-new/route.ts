@@ -48,6 +48,7 @@ export async function POST(req: Request) {
         unit: body.unit,
         rate: Number(body.rate) || 0,
         minStock: Number(body.minStock) || 0,
+        barcode: body.barcode ? String(body.barcode).trim() : null,
         description: body.description || "",
       },
     });
@@ -55,6 +56,12 @@ export async function POST(req: Request) {
     return NextResponse.json(item);
   } catch (e: any) {
     console.error("❌ ITEMS-NEW POST ERROR:", e);
+    if (e.code === "P2002") {
+      return NextResponse.json(
+        { error: "Barcode or Code already exists" },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: e.message || "Save failed" },
       { status: 500 }
@@ -71,7 +78,7 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    const { id, name, unit, rate, minStock, description } = body;
+    const { id, name, unit, rate, minStock, barcode, description } = body;
 
     if (!id || !name || !unit) {
       return NextResponse.json(
@@ -87,6 +94,7 @@ export async function PUT(req: Request) {
         unit,
         rate: Number(rate) || 0,
         minStock: Number(minStock) || 0,
+        barcode: barcode ? String(barcode).trim() : null,
         description: description || "",
       },
     });
@@ -94,6 +102,12 @@ export async function PUT(req: Request) {
     return NextResponse.json(item);
   } catch (e: any) {
     console.error("❌ ITEMS-NEW PUT ERROR:", e);
+    if (e.code === "P2002") {
+      return NextResponse.json(
+        { error: "Barcode already exists" },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: e.message || "Update failed" },
       { status: 500 }

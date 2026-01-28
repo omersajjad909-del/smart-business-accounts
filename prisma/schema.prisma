@@ -59,6 +59,7 @@ model ItemNew {
   unit        String
   rate        Float    @default(0)
   minStock    Int      @default(0)
+  barcode     String?  @unique
   description String?
   createdAt   DateTime @default(now())
 

@@ -35,6 +35,10 @@ export default function PurchaseOrderPage() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [savedPO, setSavedPO] = useState<PO | null>(null);
 
+  // Email Modal State
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [recipientEmail, setRecipientEmail] = useState("");
+
 
   // Keyboard shortcuts - F7: Clear date/customer, F8: Query dialog
   useEffect(() => {
@@ -203,14 +207,19 @@ export default function PurchaseOrderPage() {
     setPreview(false);
   }
 
-  async function sendPoEmail() {
+  function openEmailModal() {
     if (!preview) {
       toast.error("Please save and preview the PO first");
       return;
     }
+    // Try to find supplier email
+    const supplier = suppliers.find(s => s.id === supplierId);
+    setRecipientEmail(supplier?.email || "");
+    setEmailModalOpen(true);
+  }
 
-    const supplierEmail = prompt("Enter supplier email address:");
-    if (!supplierEmail || !supplierEmail.includes("@")) {
+  async function confirmSendEmail() {
+    if (!recipientEmail || !recipientEmail.includes("@")) {
       toast.error("Please enter a valid email address");
       return;
     }
@@ -227,15 +236,14 @@ export default function PurchaseOrderPage() {
         body: JSON.stringify({
           type: "purchase-order",
           invoiceId: savedPO?.id,
-          to: supplierEmail,
-        })
-
-        ,
+          to: recipientEmail,
+        }),
       });
 
       const data = await res.json();
       if (res.ok) {
         toast.success("✅ Email sent successfully!");
+        setEmailModalOpen(false);
       } else {
         toast.error(data.error || "Failed to send email");
       }
@@ -336,7 +344,7 @@ export default function PurchaseOrderPage() {
                     Print / Download PDF
                   </button>
                   <button
-                    onClick={sendPoEmail}
+                    onClick={openEmailModal}
                     disabled={sendingEmail}
                     className="bg-blue-600 text-white px-6 py-2 rounded font-bold uppercase disabled:bg-gray-400"
                   >
@@ -491,6 +499,39 @@ export default function PurchaseOrderPage() {
             </div>
           )}
         </>
+      )}
+      {/* EMAIL MODAL */}
+      {emailModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Send Email</h2>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2">Recipient Email</label>
+              <input
+                type="email"
+                value={recipientEmail}
+                onChange={(e) => setRecipientEmail(e.target.value)}
+                className="w-full border p-2 rounded"
+                placeholder="supplier@example.com"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setEmailModalOpen(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmSendEmail}
+                disabled={sendingEmail}
+                className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+              >
+                {sendingEmail ? "Sending..." : "Send"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
