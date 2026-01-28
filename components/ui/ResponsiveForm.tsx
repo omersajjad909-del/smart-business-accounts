@@ -20,12 +20,8 @@ export function ResponsiveForm({ children, onSubmit, className = '' }: Responsiv
       
       // If in an input/select, submit the form
       if (target.tagName === 'INPUT' || target.tagName === 'SELECT') {
-        e.preventDefault();
-        const form = e.currentTarget;
-        const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-        if (submitButton && !submitButton.disabled) {
-          submitButton.click();
-        }
+        // Handled by global hook now
+        // e.preventDefault();
       }
     }
   };

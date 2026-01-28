@@ -12,6 +12,7 @@ type Item = {
   name: string;
   description?: string;
   availableQty: number;
+  barcode?: string;
 };
 type Row = {
   itemId: string;
@@ -74,6 +75,7 @@ export default function SalesInvoicePage() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [previewMode, setPreviewMode] = useState<"INVOICE" | "DELIVERY">("INVOICE");
   const [searchTerm, setSearchTerm] = useState("");
+  const [scanCode, setScanCode] = useState("");
 
   // Tax states
   const [applyTax, setApplyTax] = useState(false);
@@ -167,6 +169,45 @@ export default function SalesInvoicePage() {
       }
     } catch (e) {
       console.error("Load invoices error:", e);
+    }
+  }
+
+  function handleScan(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission
+      if (!scanCode) return;
+
+      const found = items.find(
+        (i) => i.barcode === scanCode || i.id === scanCode // Fallback to ID if needed
+      );
+
+      if (found) {
+        // Add to rows
+        const newRow: Row = {
+          itemId: found.id,
+          name: found.name,
+          description: found.description || "",
+          availableQty: found.availableQty,
+          qty: 1,
+          rate: "", // or fetch default rate if available
+        };
+
+        // If the last row is empty, replace it. Otherwise append.
+        const lastRow = rows[rows.length - 1];
+        if (!lastRow.itemId) {
+          const newRows = [...rows];
+          newRows[rows.length - 1] = newRow;
+          setRows(newRows);
+        } else {
+          setRows([...rows, newRow]);
+        }
+
+        toast.success(`Added ${found.name}`);
+        setScanCode("");
+      } else {
+        toast.error("Item not found");
+        setScanCode("");
+      }
     }
   }
 
@@ -572,6 +613,21 @@ export default function SalesInvoicePage() {
                 <div className="flex flex-col">
                   <label className="text-xs font-bold">Vehicle No</label>
                   <input type="text" className="border p-2" value={vehicleNo} onChange={e => setVehicleNo(e.target.value)} placeholder="Vehicle No" />
+                </div>
+              </div>
+
+              {/* 📟 BARCODE SCANNER SECTION */}
+              <div className="flex items-center gap-4 bg-blue-50 p-4 rounded border border-blue-200 shadow-sm">
+                <span className="text-3xl">📟</span>
+                <div className="flex-1">
+                  <label className="text-xs font-bold text-blue-800 block mb-1">SCAN BARCODE / SKU TO ADD ITEM</label>
+                  <input
+                    value={scanCode}
+                    onChange={(e) => setScanCode(e.target.value)}
+                    onKeyDown={handleScan}
+                    placeholder="Click here and scan barcode..."
+                    className="border-2 border-blue-400 p-2 w-full rounded text-lg font-mono focus:ring-4 focus:ring-blue-200 outline-none transition-all"
+                  />
                 </div>
               </div>
 

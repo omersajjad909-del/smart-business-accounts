@@ -50,13 +50,7 @@ export default function GlobalSearch() {
       }
 
       // Perform global search
-      // If we are on a list page, we might want to skip the global dropdown and just let the page filter
-      const isListPage = pathname?.includes("/sales-invoice") || 
-                         pathname?.includes("/quotation") ||
-                         pathname?.includes("/delivery-challan") ||
-                         pathname?.includes("/purchase-invoice");
-
-      if (query.length >= 2 && !isListPage) {
+      if (query.length >= 2) {
         performSearch();
       } else {
         setResults(null);

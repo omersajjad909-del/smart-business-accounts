@@ -7,6 +7,7 @@ import { logout } from "@/lib/logout";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import GlobalSearch from "@/components/GlobalSearch";
+import { useGlobalEnterNavigation } from "@/hooks/useGlobalEnterNavigation";
 
 type PermissionEntry = { permission: string } | string;
 
@@ -61,6 +62,9 @@ export default function DashboardLayout({
 
   // MOBILE MENU STATE
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Enable global Enter key navigation
+  useGlobalEnterNavigation();
 
   useEffect(() => {
     const u = getCurrentUser() as CurrentUser;
@@ -157,7 +161,7 @@ export default function DashboardLayout({
         {/* ---- HEADER ---- */}
         <div className="px-4 py-3 border-b border-gray-700">
           <div className="font-semibold text-white uppercase tracking-wider">
-            US Traders
+            US Traders 
           </div>
           <div className="text-[10px] text-gray-400">
             Business Management System

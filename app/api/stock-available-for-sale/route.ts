@@ -11,6 +11,7 @@ type ItemRow = {
   id: string;
   name: string;
   description: string | null;
+  barcode: string | null;
 };
 
 
@@ -44,6 +45,7 @@ export async function GET() {
     id: true,
     name: true,
     description: true,
+    barcode: true,
   },
 });
 

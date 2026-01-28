@@ -9,6 +9,7 @@ type Item = {
   unit: string;
   rate: number;
   minStock: number; 
+  barcode?: string | null;
   description?: string | null;
 };
 
@@ -18,6 +19,7 @@ export default function ItemsNewPage() {
   const [unit, setUnit] = useState("");
   const [rate, setRate] = useState("");
   const [minStock, setMinStock] = useState("");
+  const [barcode, setBarcode] = useState("");
   const [description, setDescription] = useState("");
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -67,6 +69,7 @@ export default function ItemsNewPage() {
           unit,
           rate,
           minStock,
+          barcode,
           description
         }),
       });
@@ -81,6 +84,7 @@ export default function ItemsNewPage() {
       setUnit("");
       setRate("");
       setMinStock("");
+      setBarcode("");
       setDescription("");
       setEditingId(null);
 
@@ -99,6 +103,7 @@ export default function ItemsNewPage() {
     setUnit(item.unit);
     setRate(String(item.rate || ""));
     setMinStock(String(item.minStock || ""));
+    setBarcode(item.barcode || "");
     setDescription(item.description || "");
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -183,6 +188,14 @@ export default function ItemsNewPage() {
           onChange={(e) => setMinStock(e.target.value)}
         />
 
+        {/* 📟 BARCODE INPUT */}
+        <input
+          className="border p-2 rounded bg-gray-50"
+          placeholder="Scan Barcode / SKU"
+          value={barcode}
+          onChange={(e) => setBarcode(e.target.value)}
+        />
+
         <input
           className="border p-2 rounded col-span-2"
           placeholder="Description"
@@ -216,6 +229,7 @@ export default function ItemsNewPage() {
             <tr>
               <th className="p-3">Code</th>
               <th className="p-3">Name</th>
+              <th className="p-3">Barcode</th>
               <th className="p-3">Unit</th>
               <th className="p-3 text-right">Rate</th>
               <th className="p-3 text-right text-red-600">Min Stock</th>
@@ -228,6 +242,7 @@ export default function ItemsNewPage() {
               <tr key={i.id} className="border-b hover:bg-gray-50">
                 <td className="p-3 font-mono text-xs">{i.code}</td>
                 <td className="p-3 font-bold">{i.name}</td>
+                <td className="p-3 font-mono text-xs text-gray-600">{i.barcode || "-"}</td>
                 <td className="p-3">{i.unit}</td>
                 <td className="p-3 text-right">{i.rate}</td>
                 <td className="p-3 text-right font-bold text-red-500">{i.minStock}</td>
