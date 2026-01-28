@@ -47,7 +47,7 @@ export default function PurchasePrint() {
                     </div>
                     {origin && (
                         <div className="flex flex-col items-center border-t pt-1 mt-1">
-                            <QRCodeSVG value={`${origin}/dashboard/purchase-invoice?id=${data.invoiceNo}`} size={60} />
+                            <QRCodeSVG value={`${origin}/view/purchase-invoice?id=${data.id}`} size={60} />
                             <span className="text-[8px] font-bold mt-1 bg-black text-white px-1">SCAN FOR ONLINE BILL</span>
                         </div>
                     )}
