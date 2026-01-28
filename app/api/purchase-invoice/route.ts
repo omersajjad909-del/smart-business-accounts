@@ -17,6 +17,22 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
+    const id = searchParams.get("id");
+
+    // If id provided, return specific invoice
+    if (id) {
+      const invoice = await prisma.purchaseInvoice.findUnique({
+        where: { id },
+        include: {
+          supplier: true,
+          items: {
+            include: { item: true },
+          },
+        },
+      });
+      if (!invoice) return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json(invoice);
+    }
 
     // If type=invoices, return all purchase invoices
     if (type === "invoices") {

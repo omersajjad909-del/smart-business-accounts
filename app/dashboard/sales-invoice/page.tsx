@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
+import Barcode from "react-barcode";
 import { getCurrentUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -44,6 +46,8 @@ type TaxConfig = {
 };
 
 export default function SalesInvoicePage() {
+  const searchParams = useSearchParams();
+  const queryId = searchParams.get("id");
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 
@@ -154,6 +158,28 @@ export default function SalesInvoicePage() {
       })
       .catch(err => console.log("Access Denied or Error"));
   }, []);
+
+  useEffect(() => {
+    if (!queryId || !user) return;
+    fetch(`/api/sales-invoice?id=${queryId}`, {
+      headers: {
+        "x-user-role": user.role || "",
+        "x-user-id": user.id || ""
+      }
+    })
+      .then(r => r.json())
+      .then(inv => {
+        if (inv && !inv.error) {
+          setSavedInvoice(inv);
+          setInvoiceNo(inv.invoiceNo || invoiceNo);
+          setCustomerName(inv.customer?.name || inv.customerName || "");
+          setPreview(true);
+          setShowForm(true);
+          setShowList(false);
+        }
+      })
+      .catch(e => console.error("Error loading sales invoice:", e));
+  }, [queryId, user]);
 
   async function loadInvoices() {
     try {
@@ -734,6 +760,11 @@ export default function SalesInvoicePage() {
                   <p><b>Invoice #:</b> {savedInvoice?.invoiceNo || invoiceNo}</p>
                   <p><b>Date:</b> {savedInvoice?.date ? new Date(savedInvoice.date).toISOString().slice(0, 10) : date}</p>
                   <p><b>Location:</b> {location}</p>
+                  {(savedInvoice?.invoiceNo || invoiceNo) && (
+                     <div className="flex justify-end mt-2">
+                        <Barcode value={savedInvoice?.invoiceNo || invoiceNo} width={1.5} height={50} fontSize={14} displayValue={false} />
+                     </div>
+                  )}
                 </div>
               </div>
 

@@ -103,10 +103,30 @@ export default function GlobalSearch() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.length >= 2 && setShowResults(true)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && allResults.length > 0) {
+            if (e.key === 'Enter') {
               e.preventDefault();
-              // Navigate to first result
-              handleResultClick(allResults[0].url);
+              const invoicePattern = /^(SI|PI)-\d+$/i;
+              if (invoicePattern.test(query)) {
+                // Force search immediately and open first result when ready
+                (async () => {
+                  await performSearch();
+                  const data = results;
+                  const merged = data
+                    ? [
+                        ...(data.accounts || []),
+                        ...(data.items || []),
+                        ...(data.salesInvoices || []),
+                        ...(data.purchaseInvoices || []),
+                        ...(data.vouchers || []),
+                      ]
+                    : [];
+                  if (merged.length > 0) {
+                    handleResultClick(merged[0].url);
+                  }
+                })();
+              } else if (allResults.length > 0) {
+                handleResultClick(allResults[0].url);
+              }
             }
           }}
           placeholder="Search accounts, items, invoices..."

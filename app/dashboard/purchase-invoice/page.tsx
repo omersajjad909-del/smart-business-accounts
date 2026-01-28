@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
+import Barcode from "react-barcode";
 import { getCurrentUser } from "@/lib/auth";
 
 type Supplier = { id: string; name: string; partyType: string };
@@ -52,6 +54,8 @@ type TaxConfig = {
 };
 
 export default function PurchaseInvoicePage() {
+  const searchParams = useSearchParams();
+  const queryId = searchParams.get("id");
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 
@@ -149,6 +153,21 @@ const [searchTerm, setSearchTerm] = useState("");
         if (Array.isArray(data)) setAllPOs(data);
       });
   }, []);
+
+  useEffect(() => {
+    if (queryId) {
+      fetch(`/api/purchase-invoice?id=${queryId}`, {
+         headers: { "x-user-role": user?.role || "ADMIN" }
+      })
+      .then(r => r.json())
+      .then(data => {
+         if (data && !data.error) {
+            startEdit(data);
+         }
+      })
+      .catch(e => console.error("Error loading invoice:", e));
+    }
+  }, [queryId]);
 
   async function loadInvoices() {
     try {
@@ -615,6 +634,11 @@ const [searchTerm, setSearchTerm] = useState("");
                   <h2 className="text-2xl font-black uppercase underline">Purchase Invoice</h2>
                   <p className="text-sm font-bold mt-1">INV #: {invoiceId}</p>
                   <p className="text-sm">Date: {date}</p>
+                  {invoiceId && (
+                    <div className="flex justify-end mt-2">
+                       <Barcode value={invoiceId} width={1.5} height={50} fontSize={14} displayValue={false} />
+                    </div>
+                  )}
                 </div>
               </div>
 

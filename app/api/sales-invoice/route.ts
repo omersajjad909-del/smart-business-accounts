@@ -38,6 +38,35 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "No Access" }, { status: 403 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (id) {
+      const inv = await prisma.salesInvoice.findUnique({
+        where: { id },
+        include: {
+          customer: true,
+          items: { include: { item: true } },
+          returns: { include: { items: true } }
+        }
+      });
+      if (!inv) return NextResponse.json({ error: "Not found" }, { status: 404 });
+      
+      return NextResponse.json({
+        id: inv.id,
+        invoiceNo: inv.invoiceNo,
+        customerId: inv.customerId,
+        customerName: inv.customer?.name || "Unknown",
+        date: inv.date,
+        total: inv.total,
+        items: inv.items,
+        customer: inv.customer,
+        driverName: inv.driverName,
+        vehicleNo: inv.vehicleNo,
+        location: inv.location
+      });
+    }
+
     // Calculate next invoice number
     const allInvoices = await prisma.salesInvoice.findMany({
       where: { invoiceNo: { startsWith: "SI-" } },
