@@ -6,9 +6,9 @@ import { notFound } from "next/navigation";
 export default async function PublicPurchaseInvoicePage({
   searchParams,
 }: {
-  searchParams: { id: string };
+  searchParams: Promise<{ id: string }>;
 }) {
-  const { id } = searchParams;
+  const { id } = await searchParams;
 
   if (!id) return <div>Invalid Invoice ID</div>;
 
