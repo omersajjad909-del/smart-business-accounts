@@ -41,11 +41,14 @@ export default function PurchasePrint() {
             <div className="font-bold">Invoice #: {data.invoiceNo}</div>
             {data.invoiceNo && (
                 <div className="mt-1 flex flex-col items-end gap-2">
-                    <Barcode value={data.invoiceNo} width={1.5} height={40} fontSize={10} displayValue={false} />
+                    <div className="text-center">
+                        <Barcode value={data.invoiceNo} width={1.5} height={40} fontSize={10} displayValue={false} />
+                        <span className="text-[10px] font-bold">{data.invoiceNo}</span>
+                    </div>
                     {origin && (
-                        <div className="flex flex-col items-center">
-                            <QRCodeSVG value={`${origin}/dashboard/purchase-invoice?id=${data.invoiceNo}`} size={50} />
-                            <span className="text-[8px] font-bold mt-1">SCAN FOR BILL</span>
+                        <div className="flex flex-col items-center border-t pt-1 mt-1">
+                            <QRCodeSVG value={`${origin}/dashboard/purchase-invoice?id=${data.invoiceNo}`} size={60} />
+                            <span className="text-[8px] font-bold mt-1 bg-black text-white px-1">SCAN FOR ONLINE BILL</span>
                         </div>
                     )}
                 </div>
