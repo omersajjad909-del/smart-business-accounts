@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Barcode from "react-barcode";
 
 export default function PurchasePrint() {
   const params = useSearchParams();
@@ -22,9 +23,19 @@ export default function PurchasePrint() {
         PURCHASE INVOICE
       </h2>
 
-      <div className="flex justify-between mb-4">
-        <div>Supplier: {data.supplier.name}</div>
-        <div>Date: {data.date}</div>
+      <div className="flex justify-between mb-4 items-start">
+        <div>
+            <div className="font-bold">Supplier: {data.supplier.name}</div>
+        </div>
+        <div className="text-right flex flex-col items-end">
+            <div>Date: {new Date(data.date).toLocaleDateString()}</div>
+            <div className="font-bold">Invoice #: {data.invoiceNo}</div>
+            {data.invoiceNo && (
+                <div className="mt-1">
+                    <Barcode value={data.invoiceNo} width={1.5} height={40} fontSize={10} displayValue={false} />
+                </div>
+            )}
+        </div>
       </div>
 
       <table className="w-full border">
