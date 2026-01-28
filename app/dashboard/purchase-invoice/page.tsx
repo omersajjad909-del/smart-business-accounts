@@ -662,7 +662,7 @@ const [searchTerm, setSearchTerm] = useState("");
                       
                       {origin && (
                         <div className="flex flex-col items-center mt-2 border-t pt-2">
-                          <QRCodeSVG value={`${origin}/dashboard/purchase-invoice?id=${invoiceId}`} size={80} />
+                          <QRCodeSVG value={`${origin}/view/purchase-invoice?id=${invoiceId}`} size={80} />
                           <span className="text-[10px] font-bold mt-1 bg-black text-white px-1">SCAN FOR ONLINE BILL</span>
                         </div>
                       )}
