@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import Barcode from "react-barcode";
+import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
+
+const Barcode = dynamic(() => import("react-barcode"), { ssr: false });
 
 type Supplier = { id: string; name: string; partyType: string };
 
@@ -468,9 +470,16 @@ const [searchTerm, setSearchTerm] = useState("");
       {showForm && (
         <>
           <div className="flex justify-between items-center bg-gray-50 p-4 border rounded print:hidden">
-            <h1 className="text-xl font-bold">
-              {editing ? "Edit Invoice" : "Purchase Invoice"}
-            </h1>
+            <div>
+              <h1 className="text-xl font-bold">
+                {editing ? "Edit Invoice" : "Purchase Invoice"}
+              </h1>
+              {invoiceId && (
+                <div className="mt-1">
+                   <Barcode value={invoiceId} width={1} height={30} fontSize={12} displayValue={true} />
+                </div>
+              )}
+            </div>
             <div className="flex gap-3">
               {!showPreview ? (
                 <button onClick={saveInvoice} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold shadow-md transition-all">

@@ -2,7 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Barcode from "react-barcode";
+import dynamic from "next/dynamic";
+
+const Barcode = dynamic(() => import("react-barcode"), { ssr: false });
 
 export default function PurchasePrint() {
   const params = useSearchParams();
