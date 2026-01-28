@@ -655,11 +655,15 @@ const [searchTerm, setSearchTerm] = useState("");
                   <p className="text-sm">Date: {date}</p>
                   {invoiceId && (
                     <div className="flex flex-col items-end gap-2 mt-2">
-                      <Barcode value={invoiceId} width={1.5} height={50} fontSize={14} displayValue={false} />
+                      <div className="text-center">
+                        <Barcode value={invoiceId} width={1.5} height={40} fontSize={14} displayValue={false} />
+                        <span className="text-[10px] font-bold">INV ID: {invoiceId}</span>
+                      </div>
+                      
                       {origin && (
-                        <div className="flex flex-col items-center">
-                          <QRCodeSVG value={`${origin}/dashboard/purchase-invoice?id=${invoiceId}`} size={64} />
-                          <span className="text-[8px] font-bold mt-1">SCAN FOR BILL</span>
+                        <div className="flex flex-col items-center mt-2 border-t pt-2">
+                          <QRCodeSVG value={`${origin}/dashboard/purchase-invoice?id=${invoiceId}`} size={80} />
+                          <span className="text-[10px] font-bold mt-1 bg-black text-white px-1">SCAN FOR ONLINE BILL</span>
                         </div>
                       )}
                     </div>
