@@ -10,6 +10,7 @@ const Barcode = dynamic(() => import("react-barcode"), {
   ssr: false,
   loading: () => <p>Loading Barcode...</p>
 });
+import { QRCodeSVG } from "qrcode.react";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 
@@ -85,6 +86,11 @@ function SalesInvoiceContent() {
   const [previewMode, setPreviewMode] = useState<"INVOICE" | "DELIVERY">("INVOICE");
   const [searchTerm, setSearchTerm] = useState("");
   const [scanCode, setScanCode] = useState("");
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   // Tax states
   const [applyTax, setApplyTax] = useState(false);
@@ -773,9 +779,15 @@ function SalesInvoiceContent() {
                   <p><b>Date:</b> {savedInvoice?.date ? new Date(savedInvoice.date).toISOString().slice(0, 10) : date}</p>
                   <p><b>Location:</b> {location}</p>
                   {(savedInvoice?.invoiceNo || invoiceNo) && (
-                     <div className="flex justify-end mt-2">
-                        <Barcode value={savedInvoice?.invoiceNo || invoiceNo} width={1.5} height={50} fontSize={14} displayValue={false} />
-                     </div>
+                    <div className="flex flex-col items-end gap-2 mt-2">
+                      <Barcode value={savedInvoice?.invoiceNo || invoiceNo} width={1.5} height={50} fontSize={14} displayValue={false} />
+                      {origin && (
+                        <div className="flex flex-col items-center">
+                          <QRCodeSVG value={`${origin}/dashboard/sales-invoice?id=${savedInvoice?.invoiceNo || invoiceNo}`} size={64} />
+                          <span className="text-[8px] font-bold mt-1">SCAN FOR BILL</span>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

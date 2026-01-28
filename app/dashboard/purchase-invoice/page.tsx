@@ -10,6 +10,7 @@ const Barcode = dynamic(() => import("react-barcode"), {
   ssr: false,
   loading: () => <p>Loading Barcode...</p>
 });
+import { QRCodeSVG } from "qrcode.react";
 
 type Supplier = { id: string; name: string; partyType: string };
 
@@ -89,6 +90,12 @@ const [searchTerm, setSearchTerm] = useState("");
 
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
   const [sendingEmail, setSendingEmail] = useState(false);
   const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null);
   
@@ -647,8 +654,14 @@ const [searchTerm, setSearchTerm] = useState("");
                   <p className="text-sm font-bold mt-1">INV #: {invoiceId}</p>
                   <p className="text-sm">Date: {date}</p>
                   {invoiceId && (
-                    <div className="flex justify-end mt-2">
-                       <Barcode value={invoiceId} width={1.5} height={50} fontSize={14} displayValue={false} />
+                    <div className="flex flex-col items-end gap-2 mt-2">
+                      <Barcode value={invoiceId} width={1.5} height={50} fontSize={14} displayValue={false} />
+                      {origin && (
+                        <div className="flex flex-col items-center">
+                          <QRCodeSVG value={`${origin}/dashboard/purchase-invoice?id=${invoiceId}`} size={64} />
+                          <span className="text-[8px] font-bold mt-1">SCAN FOR BILL</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
