@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
 
-const Barcode = dynamic(() => import("react-barcode"), { ssr: false });
+const Barcode = dynamic(() => import("react-barcode"), { 
+  ssr: false,
+  loading: () => <p>Loading Barcode...</p>
+});
 
 type Supplier = { id: string; name: string; partyType: string };
 
@@ -55,7 +58,7 @@ type TaxConfig = {
   description?: string;
 };
 
-export default function PurchaseInvoicePage() {
+function PurchaseInvoiceContent() {
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
   const today = new Date().toISOString().slice(0, 10);
@@ -709,5 +712,13 @@ const [searchTerm, setSearchTerm] = useState("");
         </>
       )}
     </div>
+  );
+}
+
+export default function PurchaseInvoicePage() {
+  return (
+    <Suspense fallback={<div className="p-4 text-center">Loading Invoice...</div>}>
+      <PurchaseInvoiceContent />
+    </Suspense>
   );
 }

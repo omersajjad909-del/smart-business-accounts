@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
 
-const Barcode = dynamic(() => import("react-barcode"), { ssr: false });
+const Barcode = dynamic(() => import("react-barcode"), { 
+  ssr: false,
+  loading: () => <p>Loading Barcode...</p>
+});
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 
@@ -47,7 +50,7 @@ type TaxConfig = {
   description?: string;
 };
 
-export default function SalesInvoicePage() {
+function SalesInvoiceContent() {
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
   const today = new Date().toISOString().slice(0, 10);
@@ -866,5 +869,13 @@ export default function SalesInvoicePage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function SalesInvoicePage() {
+  return (
+    <Suspense fallback={<div className="p-4 text-center">Loading Invoice...</div>}>
+      <SalesInvoiceContent />
+    </Suspense>
   );
 }
