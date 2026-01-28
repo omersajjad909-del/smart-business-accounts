@@ -231,10 +231,25 @@ const [searchTerm, setSearchTerm] = useState("");
         body: JSON.stringify(body),
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        setInvoiceId(data.invoiceNo || data.id || invoiceId);
-        setSavedInvoiceId(data.id || editing?.id || null);
+      const contentType = res.headers.get("content-type") || "";
+      let data: any = null;
+      if (contentType.includes("application/json")) {
+        try {
+          data = await res.json();
+        } catch {
+          data = null;
+        }
+      } else {
+        try {
+          const text = await res.text();
+          data = text || null;
+        } catch {
+          data = null;
+        }
+      }
+      if (res.ok && data) {
+        setInvoiceId((typeof data === "object" && data.invoiceNo) ? data.invoiceNo : (data?.id || invoiceId));
+        setSavedInvoiceId((typeof data === "object" && data.id) ? data.id : (editing?.id || null));
         setShowPreview(true);
         await loadInvoices();
         if (editing) {
@@ -244,7 +259,12 @@ const [searchTerm, setSearchTerm] = useState("");
         }
         toast.success("Invoice saved successfully!");
       } else {
-        toast.error("Error: " + (data.error || "Save failed"));
+        const msg = (data && typeof data === "object" && data.error)
+          ? data.error
+          : (typeof data === "string" && data.trim().length > 0)
+            ? data
+            : "Save failed (empty/invalid response)";
+        toast.error("Error: " + msg);
       }
     } catch (err: any) {
       toast.error("System Error: " + err.message);
@@ -252,6 +272,7 @@ const [searchTerm, setSearchTerm] = useState("");
       setSaving(false);
     }
   }
+
 
   function startEdit(inv: PurchaseInvoice) {
     setEditing(inv);
