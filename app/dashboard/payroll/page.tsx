@@ -1284,14 +1284,21 @@ export default function PayrollPage() {
       body: JSON.stringify(formData),
     });
     setEditingId(null);
-    setFormData({ employeeId: "", monthYear, baseSalary: 0, allowances: 0, deductions: 0 });
+    setFormData({ employeeId: "", monthYear, baseSalary: 0, allowances: 0, deductions: 0, deductionReason: "" });
     fetchPayroll();
     setLoading(false);
   }
 
   function handleEdit(p: Payroll) {
     setEditingId(p.id);
-    setFormData({ employeeId: p.employeeId, monthYear: p.monthYear, baseSalary: p.baseSalary, allowances: p.allowances, deductions: 0 });
+    setFormData({
+      employeeId: p.employeeId,
+      monthYear: p.monthYear,
+      baseSalary: p.baseSalary,
+      allowances: p.allowances,
+      deductions: p.deductions,
+      deductionReason: p.deductionReason || "",
+    });
   }
 
   async function handleDelete(id: string) {
