@@ -241,6 +241,7 @@ export default function EmployeesPage() {
               >
                 <option value="">Select Department</option>
                 <option value="ACCOUNTS">Accounts</option>
+                <option value="GODOWN">Godown</option>
                 <option value="HR">Human Resources</option>
                 <option value="OPERATIONS">Operations</option>
                 <option value="SALES">Sales</option>
