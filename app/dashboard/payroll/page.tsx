@@ -1563,7 +1563,7 @@ export default function PayrollPage() {
                   
                   <td className="p-3 text-center font-bold text-blue-700">{p.additionalCash > 0 ? `+${p.additionalCash.toLocaleString()}` : "-"}</td>
                   <td className="p-3 text-center font-bold text-red-800 bg-red-50">
-                      {(p.netSalary - (p.additionalCash || 0)).toLocaleString()}
+                      {(p.netSalary + (p.additionalCash || 0)).toLocaleString()}
                   </td>
                   <td className="p-3 text-center space-x-2 flex justify-center items-center">
                     <button onClick={() => handlePrintPayslip(p)} className="text-gray-600 font-bold bg-gray-200 px-2 py-1 rounded text-xs hover:bg-gray-300">Slip</button>
@@ -1616,7 +1616,7 @@ export default function PayrollPage() {
                           <td className="border-2 border-black p-2 text-center text-blue-600 font-bold">{p.additionalCash > 0 ? p.additionalCash.toLocaleString() : "-"}</td>
                           
                           <td className="border-2 border-black p-2 text-center text-red-800 font-bold bg-red-50">
-                              {(p.netSalary - (p.additionalCash || 0)).toLocaleString()}
+                              {(p.netSalary + (p.additionalCash || 0)).toLocaleString()}
                           </td>
                       </tr>
                   ))}
@@ -1679,7 +1679,7 @@ export default function PayrollPage() {
                          <td className="border border-gray-400 p-2 text-center text-sm text-blue-600 font-bold">{p.additionalCash > 0 ? `+${p.additionalCash.toLocaleString()}` : "-"}</td>
                          
                           <td className="border border-gray-400 p-2 text-center text-sm text-red-800 font-bold bg-gray-50">
-                              {(p.netSalary - (p.additionalCash || 0)).toLocaleString()}
+                              {(p.netSalary + (p.additionalCash || 0)).toLocaleString()}
                           </td>
                        </tr>
                    ))}
