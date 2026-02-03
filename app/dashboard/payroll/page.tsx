@@ -1536,9 +1536,8 @@ export default function PayrollPage() {
                 <th className="p-3 text-left">Basic Salary</th>
                 <th className="p-3 text-center">Deductions</th>
                 <th className="p-3 text-center">Deduction Reason</th>
-                <th className="p-3 text-center">Add. Cash</th>
                 <th className="p-3 text-center">Net Salary</th>
-                
+                <th className="p-3 text-center">Add. Cash</th>
                 <th className="p-3 text-center">Action</th>
               </tr>
             </thead>
@@ -1550,7 +1549,6 @@ export default function PayrollPage() {
                   <td className="p-3">{p.baseSalary.toLocaleString()}</td>
                   <td className="p-3 text-center font-bold text-red-700">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
                   <td className="p-3 text-center font-bold text-red-700">{p.deductionReason}</td>
-                  <td className="p-3 text-center font-bold text-blue-700">{p.additionalCash > 0 ? `+${p.additionalCash.toLocaleString()}` : "-"}</td>
                   <td className="p-3 text-center font-bold text-green-700">
                     {p.netSalary < 0 ? (
                       <div className="bg-red-100 text-red-700 px-2 py-1 rounded-md border border-red-200">
@@ -1561,6 +1559,8 @@ export default function PayrollPage() {
                       p.netSalary.toLocaleString()
                     )}
                   </td>
+                  <td className="p-3 text-center font-bold text-blue-700">{p.additionalCash > 0 ? `+${p.additionalCash.toLocaleString()}` : "-"}</td>
+                  
                   <td className="p-3 text-center space-x-2 flex justify-center items-center">
                     <button onClick={() => handlePrintPayslip(p)} className="text-gray-600 font-bold bg-gray-200 px-2 py-1 rounded text-xs hover:bg-gray-300">Slip</button>
                     <button onClick={() => handleEdit(p)} className="text-blue-600 font-bold">Edit</button>
