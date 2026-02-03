@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
       baseSalary,
       allowances,
       deductions,
+      deductionReason,
     } = body;
 
     if (!employeeId || !monthYear || !baseSalary) {
@@ -58,6 +59,7 @@ export async function POST(req: NextRequest) {
         baseSalary,
         allowances: allowances || 0,
         deductions: deductions || 0,
+        deductionReason: deductionReason || null,
         netSalary,
       },
     });
