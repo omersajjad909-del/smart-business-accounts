@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
         monthYear: monthYear || undefined,
         paymentStatus: status || undefined,
       },
-      include: { employee: { select: { firstName: true, lastName: true, salary: true } } },
+      include: { employee: { select: { firstName: true, lastName: true, salary: true, employeeId: true } } },
       orderBy: { monthYear: "desc" },
     });
 

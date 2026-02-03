@@ -222,7 +222,7 @@ export default function AttendancePage() {
   }).length;
 
   const stats = {
-    present: records.filter(r => r.status === "PRESENT").length,
+    present: records.filter(r => r.status === "PRESENT" || r.status === "LATE").length,
     absent: records.filter(r => r.status === "ABSENT").length,
     leave: records.filter(r => r.status === "LEAVE" || r.status === "HALF_DAY").length,
     holiday: explicitHolidays + defaultHolidaySundays,
@@ -299,9 +299,9 @@ export default function AttendancePage() {
               <p className="text-3xl font-black text-purple-800">{stats.holiday}</p>
             </div>
             <div className="bg-blue-100 p-4 rounded-xl border border-blue-200">
-              <p className="text-blue-600 font-bold text-sm uppercase">Total Records</p>
+              <p className="text-blue-600 font-bold text-sm uppercase">Attendance + Holidays</p>
               <p className="text-3xl font-black text-blue-800">
-                {records.filter(r => r.status !== "HOLIDAY").length + stats.holiday}
+                {stats.present + stats.absent + stats.leave + stats.holiday}
               </p>
             </div>
           </div>
