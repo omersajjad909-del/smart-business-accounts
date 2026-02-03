@@ -1307,15 +1307,28 @@ export default function PayrollPage() {
   }
 
   async function fetchEmployees() {
-    const res = await fetch("/api/employees");
-    setEmployees(await res.json());
+    try {
+      const res = await fetch("/api/employees");
+      const data = await res.json();
+      setEmployees(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching employees", error);
+      setEmployees([]);
+    }
   }
 
   async function fetchPayroll() {
     setLoading(true);
-    const res = await fetch(`/api/payroll?monthYear=${monthYear}`);
-    setPayroll(await res.json());
-    setLoading(false);
+    try {
+      const res = await fetch(`/api/payroll?monthYear=${monthYear}`);
+      const data = await res.json();
+      setPayroll(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching payroll", error);
+      setPayroll([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
