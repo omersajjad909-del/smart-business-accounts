@@ -245,6 +245,7 @@ export default function EmployeesPage() {
                 <option value="HR">Human Resources</option>
                 <option value="OPERATIONS">Operations</option>
                 <option value="GATE">Gate</option>
+                <option value="SECURITY">Security</option>
                 <option value="SALES">Sales</option>
                 <option value="IT">IT</option>
               </select>
