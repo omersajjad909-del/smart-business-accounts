@@ -63,7 +63,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const netSalary = baseSalary + (allowances || 0) - (deductions || 0) + (additionalCash || 0);
+    // Net Salary should be strictly Earnings - Deductions.
+    // Additional Cash is a payment/advance that reduces the balance (or increases debt), 
+    // calculated dynamically as (NetSalary - AdditionalCash).
+    const netSalary = baseSalary + (allowances || 0) - (deductions || 0);
 
     const payroll = await prisma.payroll.create({
       data: {
