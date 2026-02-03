@@ -113,10 +113,10 @@ export async function PUT(req: NextRequest) {
     if (body.baseSalary || body.allowances || body.deductions || body.additionalCash !== undefined) {
       const existing = await prisma.payroll.findUnique({ where: { id } });
       if (existing) {
+        // Net Salary = Earnings - Deductions (Excluding Additional Cash)
         body.netSalary = (body.baseSalary || existing.baseSalary) + 
                          (body.allowances || existing.allowances) - 
-                         (body.deductions || existing.deductions) +
-                         (body.additionalCash !== undefined ? body.additionalCash : existing.additionalCash);
+                         (body.deductions || existing.deductions);
       }
     }
 
