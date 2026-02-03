@@ -1537,8 +1537,8 @@ export default function PayrollPage() {
                 <th className="p-3 text-center">Deductions</th>
                 <th className="p-3 text-center">Deduction Reason</th>
                 <th className="p-3 text-center">Net Salary</th>
-                <th className="p-3 text-center bg-red-50 text-red-800">Actual Balance</th>
                 <th className="p-3 text-center">Add. Cash</th>
+                <th className="p-3 text-center bg-red-50 text-red-800">Actual Balance</th>                
                 <th className="p-3 text-center">Action</th>
               </tr>
             </thead>
@@ -1652,8 +1652,9 @@ export default function PayrollPage() {
                       <th className="border border-gray-400 p-2 text-sm">Basic</th>
                       <th className="border border-gray-400 p-2 text-sm text-red-600">Deduction</th>
                       <th className="border border-gray-400 p-2 text-sm text-red-600">Deduction Reason</th>
-                      <th className="border border-gray-400 p-2 text-sm text-blue-600">Add. Cash</th>
+                      
                        <th className="border border-gray-400 p-2 text-sm">Net</th>
+                       <th className="border border-gray-400 p-2 text-sm text-blue-600">Add. Cash</th>
                        <th className="border border-gray-400 p-2 text-sm text-red-800">Actual Bal.</th>
                     </tr>
                  </thead>
