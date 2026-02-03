@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
         allowances: true,
         deductions: true,
         deductionReason: true,
+        additionalCash: true,
         netSalary: true,
         paymentStatus: true,
         employee: { select: { firstName: true, lastName: true, salary: true, employeeId: true } }
