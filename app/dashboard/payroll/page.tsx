@@ -438,8 +438,8 @@ export default function PayrollPage() {
                           <td className="border-2 border-black p-2 text-center text-red-800 font-bold bg-red-50">
                             {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? (
                               <div className="flex flex-col items-center">
-                                <span className="text-black">0</span>
-                                <span className="text-red-600 text-[10px] whitespace-nowrap">Carry: {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
+                                {/* <span className="text-black">0</span> */}
+                                <span className="text-red-600 text-[10px] whitespace-nowrap">{((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
                               </div>
                             ) : ((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}
                           </td>
@@ -501,8 +501,8 @@ export default function PayrollPage() {
                           <td className="border border-gray-400 p-2 text-center text-sm text-red-800 font-bold bg-gray-50">
                             {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? (
                               <div className="flex flex-col items-center">
-                                <span className="text-black">0</span>
-                                <span className="text-red-600 text-[10px] whitespace-nowrap">Carry: {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
+                                {/* <span className="text-black">0</span> */}
+                                <span className="text-red-600 text-sm font-bold whitespace-nowrap">{((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
                               </div>
                             ) : ((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}
                           </td>
