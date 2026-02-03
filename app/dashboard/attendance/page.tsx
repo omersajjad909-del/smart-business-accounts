@@ -205,10 +205,27 @@ export default function AttendancePage() {
   const selectedEmployee = employees.find(e => e.id === selectedEmployeeId);
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  // Calculate Sundays that are treated as holidays (either explicitly marked or default)
+  const isSunday = (d: Date) => d.getDay() === 0;
+  
+  // Get all valid dates in the current month view
+  const validDatesInMonth = calendarDays.filter((d): d is Date => d !== null);
+  
+  // Count explicit holidays
+  const explicitHolidays = records.filter(r => r.status === "HOLIDAY").length;
+  
+  // Count Sundays that have NO record (default holidays)
+  const defaultHolidaySundays = validDatesInMonth.filter(d => {
+    if (!isSunday(d)) return false;
+    const hasRecord = getRecordForDate(d);
+    return !hasRecord;
+  }).length;
+
   const stats = {
     present: records.filter(r => r.status === "PRESENT").length,
     absent: records.filter(r => r.status === "ABSENT").length,
     leave: records.filter(r => r.status === "LEAVE" || r.status === "HALF_DAY").length,
+    holiday: explicitHolidays + defaultHolidaySundays,
   };
 
   return (
@@ -264,7 +281,7 @@ export default function AttendancePage() {
 
         {/* STATS BOXES */}
         {selectedEmployeeId && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 pb-0">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 pb-0">
             <div className="bg-green-100 p-4 rounded-xl border border-green-200">
               <p className="text-green-600 font-bold text-sm uppercase">Present</p>
               <p className="text-3xl font-black text-green-800">{stats.present}</p>
@@ -276,6 +293,10 @@ export default function AttendancePage() {
             <div className="bg-yellow-100 p-4 rounded-xl border border-yellow-200">
               <p className="text-yellow-600 font-bold text-sm uppercase">Leaves</p>
               <p className="text-3xl font-black text-yellow-800">{stats.leave}</p>
+            </div>
+            <div className="bg-purple-100 p-4 rounded-xl border border-purple-200">
+              <p className="text-purple-600 font-bold text-sm uppercase">Holidays</p>
+              <p className="text-3xl font-black text-purple-800">{stats.holiday}</p>
             </div>
             <div className="bg-blue-100 p-4 rounded-xl border border-blue-200">
               <p className="text-blue-600 font-bold text-sm uppercase">Total Records</p>
@@ -304,6 +325,7 @@ export default function AttendancePage() {
                 const dateStr = toLocalISOString(date);
                 const isToday = dateStr === toLocalISOString(new Date());
                 const isSelected = selectedDate === dateStr;
+                const isDefaultHoliday = !record && isSunday(date);
 
                 return (
                   <div
@@ -321,7 +343,7 @@ export default function AttendancePage() {
                       } else {
                          // Reset form for new entry
                          setFormData({
-                          status: "PRESENT",
+                          status: isSunday(date) ? "HOLIDAY" : "PRESENT",
                           checkIn: "",
                           checkOut: "",
                           remarks: "",
@@ -330,7 +352,7 @@ export default function AttendancePage() {
                     }}
                     className={`bg-white min-h-[120px] p-2 hover:bg-gray-50 cursor-pointer transition-colors relative flex flex-col justify-between ${
                       isToday ? "ring-2 ring-blue-500 inset-0 z-10" : ""
-                    } ${isSelected ? "bg-blue-50" : ""}`}
+                    } ${isSelected ? "bg-blue-50" : ""} ${isDefaultHoliday ? "bg-purple-50/50" : ""}`}
                   >
                     <div className="flex justify-between items-start">
                       <span className={`text-sm font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>
@@ -343,7 +365,7 @@ export default function AttendancePage() {
                             handleDelete(record.id);
                           }}
                           className="text-gray-400 hover:text-red-600 text-xs font-bold px-1"
-                        >
+                          >
                           ✕
                         </button>
                       )}
@@ -354,6 +376,7 @@ export default function AttendancePage() {
                         <span className={`block text-center text-xs font-black py-1 rounded ${
                           record.status === "PRESENT" ? "bg-green-100 text-green-800" :
                           record.status === "ABSENT" ? "bg-red-100 text-red-800" :
+                          record.status === "HOLIDAY" ? "bg-purple-100 text-purple-800" :
                           "bg-yellow-100 text-yellow-800"
                         }`}>
                           {record.status}
@@ -363,6 +386,12 @@ export default function AttendancePage() {
                             {formatPakTime(record.checkIn)} - {formatPakTime(record.checkOut)}
                           </div>
                         )}
+                      </div>
+                    ) : isDefaultHoliday ? (
+                      <div className="mt-1 space-y-1 opacity-60">
+                         <span className="block text-center text-xs font-black py-1 rounded bg-purple-50 text-purple-400 border border-purple-100">
+                          HOLIDAY
+                        </span>
                       </div>
                     ) : (
                       <div className="flex-1 flex items-center justify-center opacity-0 hover:opacity-100">
@@ -412,6 +441,7 @@ export default function AttendancePage() {
                   <option value="LEAVE">Leave</option>
                   <option value="HALF_DAY">Half Day</option>
                   <option value="LATE">Late</option>
+                  <option value="HOLIDAY">Holiday</option>
                 </select>
               </div>
 
