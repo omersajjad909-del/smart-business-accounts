@@ -1239,6 +1239,8 @@ export default function PayrollPage() {
   useEffect(() => {
     fetchEmployees();
     fetchPayroll();
+    // Sync form date with view date for convenience
+    setFormData(prev => ({ ...prev, monthYear }));
   }, [monthYear]);
 
   useEffect(() => {
@@ -1370,8 +1372,16 @@ export default function PayrollPage() {
       <div className="max-w-6xl mx-auto space-y-6 print:hidden">
         
         {/* HEADER */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-black text-gray-800">💰 Payroll Management</h1>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-black text-gray-800">💰 Payroll</h1>
+            <input
+              type="month"
+              value={monthYear}
+              onChange={(e) => setMonthYear(e.target.value)}
+              className="border-2 border-blue-500 text-blue-800 font-bold px-3 py-1 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
           <div className="flex gap-3">
             <button
               onClick={() => setShowPreview(true)}
