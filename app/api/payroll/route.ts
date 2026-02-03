@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
       allowances,
       deductions,
       deductionReason,
+      additionalCash,
     } = body;
 
     if (!employeeId || !monthYear || !baseSalary) {
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const netSalary = baseSalary + (allowances || 0) - (deductions || 0);
+    const netSalary = baseSalary + (allowances || 0) - (deductions || 0) + (additionalCash || 0);
 
     const payroll = await prisma.payroll.create({
       data: {
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
         allowances: allowances || 0,
         deductions: deductions || 0,
         deductionReason: deductionReason || null,
+        additionalCash: additionalCash || 0,
         netSalary,
       },
     });
@@ -93,12 +95,13 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     
     // Recalculate netSalary if needed
-    if (body.baseSalary || body.allowances || body.deductions) {
+    if (body.baseSalary || body.allowances || body.deductions || body.additionalCash !== undefined) {
       const existing = await prisma.payroll.findUnique({ where: { id } });
       if (existing) {
         body.netSalary = (body.baseSalary || existing.baseSalary) + 
                          (body.allowances || existing.allowances) - 
-                         (body.deductions || existing.deductions);
+                         (body.deductions || existing.deductions) +
+                         (body.additionalCash !== undefined ? body.additionalCash : existing.additionalCash);
       }
     }
 

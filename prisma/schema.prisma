@@ -632,6 +632,7 @@ model Payroll {
   baseSalary      Float
   allowances      Float    @default(0) // HRA, DA, etc.
   deductions      Float    @default(0) // Tax, insurance, etc.
+  additionalCash  Float    @default(0)
   netSalary       Float
   paidAmount      Float    @default(0)
   paymentStatus   String   @default("PENDING") // PENDING | PAID | PARTIAL

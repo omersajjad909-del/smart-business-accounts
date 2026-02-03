@@ -1211,6 +1211,7 @@ interface Payroll {
   allowances: number;
   deductions: number;
   deductionReason?: string;
+  additionalCash: number;
   netSalary: number;
   paymentStatus: string;
   employee: { firstName: string; lastName: string; employeeId: string };
@@ -1235,6 +1236,7 @@ export default function PayrollPage() {
     allowances: 0,
     deductions: 0,
     deductionReason: "",
+    additionalCash: 0,
   });
 
   useEffect(() => {
@@ -1326,7 +1328,7 @@ export default function PayrollPage() {
       body: JSON.stringify(formData),
     });
     setEditingId(null);
-    setFormData({ employeeId: "", monthYear, baseSalary: 0, allowances: 0, deductions: 0, deductionReason: "" });
+    setFormData({ employeeId: "", monthYear, baseSalary: 0, allowances: 0, deductions: 0, deductionReason: "", additionalCash: 0 });
     fetchPayroll();
     setLoading(false);
   }
@@ -1340,6 +1342,7 @@ export default function PayrollPage() {
       allowances: p.allowances,
       deductions: p.deductions,
       deductionReason: p.deductionReason || "",
+      additionalCash: p.additionalCash || 0,
     });
   }
 
@@ -1402,6 +1405,12 @@ export default function PayrollPage() {
             <span class="label">Net Salary:</span>
             <span class="amount">${p.netSalary < 0 ? "0" : p.netSalary.toLocaleString()}</span>
           </div>
+          ${p.additionalCash > 0 ? `
+            <div class="row">
+                <span class="label">Additional Cash (Manual):</span>
+                <span class="amount">+${p.additionalCash.toLocaleString()}</span>
+            </div>
+          ` : ""}
           ${p.netSalary < 0 ? `
             <div class="row" style="color: red; border-top: 1px dashed red; margin-top: 5px; padding-top: 5px;">
                 <span class="label">Balance (Next Month):</span>
@@ -1487,6 +1496,19 @@ export default function PayrollPage() {
                  </div>
                  <input type="text" placeholder="Reason (e.g. Advance)" value={formData.deductionReason} onChange={(e) => setFormData({ ...formData, deductionReason: e.target.value })} className="border p-2 rounded-lg w-full" />
                </div>
+               
+               {/* NEW FIELD: Additional Cash */}
+               <div className="col-span-2 mt-2">
+                  <label className="text-sm font-bold text-gray-700">Additional Cash (Manual Add):</label>
+                  <input 
+                    type="number" 
+                    placeholder="e.g. 1000" 
+                    value={formData.additionalCash} 
+                    onChange={(e) => setFormData({ ...formData, additionalCash: +e.target.value || 0 })} 
+                    className="border p-2 rounded-lg w-full border-green-500" 
+                  />
+                  <p className="text-xs text-gray-500">This amount will be added to Net Salary but won't affect next month balance.</p>
+               </div>
             </div>
           </form>
         </div>
@@ -1501,6 +1523,7 @@ export default function PayrollPage() {
                 <th className="p-3 text-left">Basic Salary</th>
                 <th className="p-3 text-center">Deductions</th>
                 <th className="p-3 text-center">Deduction Reason</th>
+                <th className="p-3 text-center">Add. Cash</th>
                 <th className="p-3 text-center">Net Salary</th>
                 
                 <th className="p-3 text-center">Action</th>
@@ -1514,6 +1537,7 @@ export default function PayrollPage() {
                   <td className="p-3">{p.baseSalary.toLocaleString()}</td>
                   <td className="p-3 text-center font-bold text-red-700">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
                   <td className="p-3 text-center font-bold text-red-700">{p.deductionReason}</td>
+                  <td className="p-3 text-center font-bold text-blue-700">{p.additionalCash > 0 ? `+${p.additionalCash.toLocaleString()}` : "-"}</td>
                   <td className="p-3 text-center font-bold text-green-700">
                     {p.netSalary < 0 ? (
                       <div className="bg-red-100 text-red-700 px-2 py-1 rounded-md border border-red-200">
@@ -1550,8 +1574,8 @@ export default function PayrollPage() {
                       <th className="border-2 border-black p-2">Basic</th>
                       <th className="border-2 border-black p-2">Deductions</th>
                       <th className="border-2 border-black p-2">Deduction reason</th>
+                      <th className="border-2 border-black p-2">Add. Cash</th>
                       <th className="border-2 border-black p-2">Net Salary</th>
-                      <th className="border-2 border-black p-2 w-24">Signature</th>
                   </tr>
               </thead>
               <tbody>
@@ -1560,12 +1584,17 @@ export default function PayrollPage() {
                           <td className="border-2 border-black p-2 text-center">{p.employee.employeeId}</td>
                           <td className="border-2 border-black p-2">{p.employee.firstName} {p.employee.lastName}</td>
                           <td className="border-2 border-black p-2 text-center">{p.baseSalary.toLocaleString()}</td>
-                          <td className="border-2 border-black p-2 text-center">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
-                          <td className="border-2 border-black p-2 text-center">{p.deductionReason}</td>
+                          <td className="border-2 border-black p-2 text-center text-red-600 font-bold">{p.deductions > 0 ? p.deductions.toLocaleString() : "-"}</td>
+                          <td className="border-2 border-black p-2 text-center">{p.deductionReason || "-"}</td>
+                          <td className="border-2 border-black p-2 text-center text-blue-600 font-bold">{p.additionalCash > 0 ? p.additionalCash.toLocaleString() : "-"}</td>
                           <td className="border-2 border-black p-2 text-center font-bold">
-                            {p.netSalary < 0 ? `${p.netSalary.toLocaleString()} (Next Month)` : p.netSalary.toLocaleString()}
+                            {p.netSalary < 0 ? (
+                              <div className="flex flex-col items-center">
+                                <span className="text-black">0</span>
+                                <span className="text-red-600 text-[10px] whitespace-nowrap">Carry: {p.netSalary.toLocaleString()}</span>
+                              </div>
+                            ) : p.netSalary.toLocaleString()}
                           </td>
-                          <td className="border-2 border-black p-2"></td>
                       </tr>
                   ))}
               </tbody>
@@ -1602,8 +1631,8 @@ export default function PayrollPage() {
                       <th className="border border-gray-400 p-2 text-sm">Basic</th>
                       <th className="border border-gray-400 p-2 text-sm text-red-600">Deduction</th>
                       <th className="border border-gray-400 p-2 text-sm text-red-600">Deduction Reason</th>
+                      <th className="border border-gray-400 p-2 text-sm text-blue-600">Add. Cash</th>
                       <th className="border border-gray-400 p-2 text-sm">Net</th>
-                      <th className="border border-gray-400 p-2 text-sm w-20">Sign</th>
                    </tr>
                 </thead>
                 <tbody>
@@ -1614,13 +1643,28 @@ export default function PayrollPage() {
                          <td className="border border-gray-400 p-2 text-center text-sm">{p.baseSalary.toLocaleString()}</td>
                          <td className="border border-gray-400 p-2 text-center text-sm text-red-600">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
                          <td className="border border-gray-400 p-2 text-center text-sm text-red-600">{p.deductionReason}</td>
+                         <td className="border border-gray-400 p-2 text-center text-sm text-blue-600 font-bold">{p.additionalCash > 0 ? `+${p.additionalCash.toLocaleString()}` : "-"}</td>
                          <td className="border border-gray-400 p-2 text-center text-sm font-bold">
-                            {p.netSalary < 0 ? <span className="text-red-600">{p.netSalary.toLocaleString()} (Next Month)</span> : p.netSalary.toLocaleString()}
+                            {p.netSalary < 0 ? (
+                               <div className="flex flex-col items-center">
+                                 <span className="text-black">0</span>
+                                 <span className="text-red-600 text-[10px] whitespace-nowrap">Carry: {p.netSalary.toLocaleString()}</span>
+                               </div>
+                             ) : p.netSalary.toLocaleString()}
                          </td>
-                         <td className="border border-gray-400 p-2"></td>
                       </tr>
                    ))}
                 </tbody>
+                <tfoot>
+                    <tr className="bg-gray-100 font-bold">
+                        <td colSpan={2} className="border border-gray-400 p-2 text-right">TOTALS:</td>
+                        <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + p.baseSalary, 0).toLocaleString()}</td>
+                        <td className="border border-gray-400 p-2 text-center text-red-600">{payroll.reduce((sum, p) => sum + p.deductions, 0).toLocaleString()}</td>
+                        <td className="border border-gray-400 p-2"></td>
+                        <td className="border border-gray-400 p-2 text-center text-blue-600">{payroll.reduce((sum, p) => sum + (p.additionalCash || 0), 0).toLocaleString()}</td>
+                        <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0), 0).toLocaleString()}</td>
+                    </tr>
+                </tfoot>
              </table>
 
              <div className="flex justify-between mt-32 px-5">
