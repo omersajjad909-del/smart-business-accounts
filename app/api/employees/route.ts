@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       },
       include: {
         attendances: { orderBy: { date: "desc" }, take: 10 },
-        payroll: { orderBy: { monthYear: "desc" }, take: 3 },
+        // payroll: { orderBy: { monthYear: "desc" }, take: 3 },
       },
       orderBy: { firstName: "asc" },
     });
