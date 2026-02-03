@@ -1234,6 +1234,7 @@ export default function PayrollPage() {
     baseSalary: 0,
     allowances: 0,
     deductions: 0,
+    deductionReason: "",
   });
 
   useEffect(() => {
@@ -1350,8 +1351,14 @@ export default function PayrollPage() {
           </div>
           <div class="row net-pay">
             <span class="label">Net Salary:</span>
-            <span class="amount">${p.netSalary.toLocaleString()}</span>
+            <span class="amount">${p.netSalary < 0 ? "0" : p.netSalary.toLocaleString()}</span>
           </div>
+          ${p.netSalary < 0 ? `
+            <div class="row" style="color: red; border-top: 1px dashed red; margin-top: 5px; padding-top: 5px;">
+                <span class="label">Balance (Next Month):</span>
+                <span class="amount">${p.netSalary.toLocaleString()}</span>
+            </div>
+          ` : ""}
           <div class="row">
             <span class="label">Reason/Remarks:</span>
             <span>${p.deductionReason || "-"}</span>
@@ -1424,9 +1431,12 @@ export default function PayrollPage() {
 
             <div className="col-span-1 md:col-span-4 grid grid-cols-2 gap-4 mt-2">
                <input type="number" placeholder="Allowances" value={formData.allowances} onChange={(e) => setFormData({ ...formData, allowances: +e.target.value || 0 })} className="border p-2 rounded-lg" />
-               <div className="relative">
-                  <input type="number" placeholder="Deductions" value={formData.deductions} onChange={(e) => setFormData({ ...formData, deductions: +e.target.value || 0 })} className="border p-2 rounded-lg w-full" />
-                  {detectedAdvance > 0 && <span className="text-xs text-red-500 absolute -bottom-5 left-0">Advance: {detectedAdvance}</span>}
+               <div className="grid grid-cols-2 gap-2">
+                 <div className="relative">
+                    <input type="number" placeholder="Deductions" value={formData.deductions} onChange={(e) => setFormData({ ...formData, deductions: +e.target.value || 0 })} className="border p-2 rounded-lg w-full" />
+                    {detectedAdvance > 0 && <span className="text-xs text-red-500 absolute -bottom-5 left-0">Advance: {detectedAdvance}</span>}
+                 </div>
+                 <input type="text" placeholder="Reason (e.g. Advance)" value={formData.deductionReason} onChange={(e) => setFormData({ ...formData, deductionReason: e.target.value })} className="border p-2 rounded-lg w-full" />
                </div>
             </div>
           </form>
@@ -1455,7 +1465,15 @@ export default function PayrollPage() {
                   <td className="p-3">{p.baseSalary.toLocaleString()}</td>
                   <td className="p-3 text-center font-bold text-red-700">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
                   <td className="p-3 text-center font-bold text-red-700">{p.deductionReason}</td>
-                  <td className="p-3 text-center font-bold text-green-700">{p.netSalary.toLocaleString()}</td>
+                  <td className="p-3 text-center font-bold text-green-700">
+                    {p.netSalary < 0 ? (
+                      <span className="text-red-600 font-black">
+                        {p.netSalary.toLocaleString()} (Next Month)
+                      </span>
+                    ) : (
+                      p.netSalary.toLocaleString()
+                    )}
+                  </td>
                   <td className="p-3 text-center space-x-2 flex justify-center items-center">
                     <button onClick={() => handlePrintPayslip(p)} className="text-gray-600 font-bold bg-gray-200 px-2 py-1 rounded text-xs hover:bg-gray-300">Slip</button>
                     <button onClick={() => handleEdit(p)} className="text-blue-600 font-bold">Edit</button>
@@ -1494,7 +1512,9 @@ export default function PayrollPage() {
                           <td className="border-2 border-black p-2 text-center">{p.baseSalary.toLocaleString()}</td>
                           <td className="border-2 border-black p-2 text-center">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
                           <td className="border-2 border-black p-2 text-center">{p.deductionReason}</td>
-                          <td className="border-2 border-black p-2 text-center font-bold">{p.netSalary.toLocaleString()}</td>
+                          <td className="border-2 border-black p-2 text-center font-bold">
+                            {p.netSalary < 0 ? `${p.netSalary.toLocaleString()} (Next Month)` : p.netSalary.toLocaleString()}
+                          </td>
                           <td className="border-2 border-black p-2"></td>
                       </tr>
                   ))}
@@ -1544,7 +1564,9 @@ export default function PayrollPage() {
                          <td className="border border-gray-400 p-2 text-center text-sm">{p.baseSalary.toLocaleString()}</td>
                          <td className="border border-gray-400 p-2 text-center text-sm text-red-600">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
                          <td className="border border-gray-400 p-2 text-center text-sm text-red-600">{p.deductionReason}</td>
-                         <td className="border border-gray-400 p-2 text-center text-sm font-bold">{p.netSalary.toLocaleString()}</td>
+                         <td className="border border-gray-400 p-2 text-center text-sm font-bold">
+                            {p.netSalary < 0 ? <span className="text-red-600">{p.netSalary.toLocaleString()} (Next Month)</span> : p.netSalary.toLocaleString()}
+                         </td>
                          <td className="border border-gray-400 p-2"></td>
                       </tr>
                    ))}
