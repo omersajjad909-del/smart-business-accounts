@@ -239,7 +239,7 @@ export default function PayrollPage() {
           </div>
           <div className="row net-pay">
             <span class="label">Net Salary:</span>
-            <span class="amount">${p.netSalary.toLocaleString()}</span>
+            <span class="amount">${(p.baseSalary + p.allowances - p.deductions).toLocaleString()}</span>
           </div>
           ${p.additionalCash > 0 ? `
             <div class="row">
@@ -249,12 +249,12 @@ export default function PayrollPage() {
           ` : ""}
           <div class="row" style="font-weight: bold; border-top: 1px solid #eee; padding-top: 5px;">
               <span class="label">Actual Balance:</span>
-              <span class="amount">${(p.netSalary - (p.additionalCash || 0)).toLocaleString()}</span>
+              <span class="amount">${((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
           </div>
-          ${(p.netSalary - (p.additionalCash || 0)) < 0 ? `
+          ${((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? `
             <div class="row" style="color: red; margin-top: 5px;">
                 <span class="label">Carry Forward to Next Month:</span>
-                <span class="amount">${(p.netSalary - (p.additionalCash || 0)).toLocaleString()}</span>
+                <span class="amount">${((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
             </div>
           ` : ""}
           <div class="row">
@@ -382,13 +382,13 @@ export default function PayrollPage() {
                   </td>
                   <td className="p-3 text-center font-bold text-blue-700">{p.additionalCash > 0 ? `${p.additionalCash.toLocaleString()}` : "-"}</td>
                   <td className="p-3 text-center font-bold text-green-700 bg-red-50">
-                    {(p.netSalary - (p.additionalCash || 0)) < 0 ? (
+                    {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? (
                       <div className="bg-red-100 text-red-700 px-2 py-1 rounded-md border border-red-200">
                         <p className="font-black text-lg">0</p>
-                        <p className="text-[10px] uppercase">Carry: {(p.netSalary - (p.additionalCash || 0)).toLocaleString()}</p>
+                        <p className="text-[10px] uppercase">Carry: {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</p>
                       </div>
                     ) : (
-                      (p.netSalary - (p.additionalCash || 0)).toLocaleString()
+                      ((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()
                     )}
                   </td>
                   <td className="p-3 text-center space-x-2 flex justify-center items-center">
@@ -436,12 +436,12 @@ export default function PayrollPage() {
                           </td>
                           <td className="border-2 border-black p-2 text-center text-blue-600 font-bold">{p.additionalCash > 0 ? p.additionalCash.toLocaleString() : "-"}</td>
                           <td className="border-2 border-black p-2 text-center text-red-800 font-bold bg-red-50">
-                            {(p.netSalary - (p.additionalCash || 0)) < 0 ? (
+                            {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? (
                               <div className="flex flex-col items-center">
                                 <span className="text-black">0</span>
-                                <span className="text-red-600 text-[10px] whitespace-nowrap">Carry: {(p.netSalary - (p.additionalCash || 0)).toLocaleString()}</span>
+                                <span className="text-red-600 text-[10px] whitespace-nowrap">Carry: {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
                               </div>
-                            ) : (p.netSalary - (p.additionalCash || 0)).toLocaleString()}
+                            ) : ((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}
                           </td>
                       </tr>
                   ))}
@@ -499,12 +499,12 @@ export default function PayrollPage() {
                          <td className="border border-gray-400 p-2 text-center text-sm text-blue-600 font-bold">{p.additionalCash > 0 ? `${p.additionalCash.toLocaleString()}` : "-"}</td>
                          
                           <td className="border border-gray-400 p-2 text-center text-sm text-red-800 font-bold bg-gray-50">
-                            {(p.netSalary - (p.additionalCash || 0)) < 0 ? (
+                            {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? (
                               <div className="flex flex-col items-center">
                                 <span className="text-black">0</span>
-                                <span className="text-red-600 text-[10px] whitespace-nowrap">Carry: {(p.netSalary - (p.additionalCash || 0)).toLocaleString()}</span>
+                                <span className="text-red-600 text-[10px] whitespace-nowrap">Carry: {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
                               </div>
-                            ) : (p.netSalary - (p.additionalCash || 0)).toLocaleString()}
+                            ) : ((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}
                           </td>
                        </tr>
                    ))}
