@@ -102,6 +102,16 @@ export async function PUT(req: NextRequest) {
 
     const body = await req.json();
 
+    // Fix: Convert dateOfJoining to Date object if present
+    if (body.dateOfJoining) {
+      body.dateOfJoining = new Date(body.dateOfJoining);
+    }
+    
+    // Remove ID from body if present to avoid changing primary key (optional but good practice)
+    delete body.id;
+    delete body.createdAt;
+    delete body.updatedAt;
+
     const employee = await prisma.employee.update({
       where: { id },
       data: body,
@@ -111,6 +121,9 @@ export async function PUT(req: NextRequest) {
   } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Employee not found" }, { status: 404 });
+    }
+    if (error.code === "P2002") {
+      return NextResponse.json({ error: "Employee ID or Email already exists" }, { status: 400 });
     }
     console.error("Error updating employee:", error);
     return NextResponse.json({ error: "Failed to update employee" }, { status: 500 });
