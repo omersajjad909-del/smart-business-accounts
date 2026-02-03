@@ -1320,7 +1320,7 @@ export default function PayrollPage() {
   async function fetchPayroll() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/payroll?monthYear=${monthYear}`);
+      const res = await fetch(`/api/payroll?monthYear=${monthYear}`, { cache: "no-store" });
       const data = await res.json();
       setPayroll(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -1342,7 +1342,7 @@ export default function PayrollPage() {
     });
     setEditingId(null);
     setFormData({ employeeId: "", monthYear, baseSalary: 0, allowances: 0, deductions: 0, deductionReason: "", additionalCash: 0 });
-    fetchPayroll();
+    await fetchPayroll();
     setLoading(false);
   }
 
@@ -1365,7 +1365,7 @@ export default function PayrollPage() {
       method: "DELETE",
       headers: { "x-user-role": user.role, "x-user-id": user.id },
     });
-    fetchPayroll();
+    await fetchPayroll();
   }
 
   /* ================= PAYSLIP PRINT ================= */
