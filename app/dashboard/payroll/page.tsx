@@ -1246,19 +1246,61 @@ export default function PayrollPage() {
 
   useEffect(() => {
     if (formData.employeeId && formData.monthYear) {
-      checkAdvances();
+      calculateAutoDeductions();
     } else {
       setDetectedAdvance(0);
     }
-  }, [formData.employeeId, formData.monthYear]);
+  }, [formData.employeeId, formData.monthYear, formData.baseSalary]);
 
-  async function checkAdvances() {
-    const res = await fetch(`/api/advance?employeeId=${formData.employeeId}&status=PENDING&monthYear=${formData.monthYear}`);
-    const data = await res.json();
-    const total = Array.isArray(data) ? data.reduce((s: number, a: any) => s + a.amount, 0) : 0;
-    setDetectedAdvance(total);
-    if (total > 0 && formData.deductions === 0) {
-      setFormData((p) => ({ ...p, deductions: total }));
+  async function calculateAutoDeductions() {
+    try {
+      // 1. Fetch Advances
+      const resAdvance = await fetch(
+        `/api/advance?employeeId=${formData.employeeId}&status=PENDING&monthYear=${formData.monthYear}`
+      );
+      const dataAdvance = await resAdvance.json();
+      const advanceTotal = Array.isArray(dataAdvance)
+        ? dataAdvance.reduce((sum: number, a: any) => sum + a.amount, 0)
+        : 0;
+      
+      setDetectedAdvance(advanceTotal);
+
+      // 2. Fetch Attendance (Absents)
+      const resAttendance = await fetch(
+        `/api/attendance?employeeId=${formData.employeeId}&month=${formData.monthYear}`
+      );
+      const dataAttendance = await resAttendance.json();
+      const absents = Array.isArray(dataAttendance) 
+        ? dataAttendance.filter((r: any) => r.status === "ABSENT").length 
+        : 0;
+
+      // 3. Calculate Total Deduction
+      // Assumption: 30 days per month
+      const perDaySalary = formData.baseSalary > 0 ? formData.baseSalary / 30 : 0;
+      const absentDeduction = Math.round(absents * perDaySalary);
+      
+      const totalDeduction = advanceTotal + absentDeduction;
+
+      // 4. Generate Reason
+      const parts = [];
+      if (absents > 0) parts.push(`${absents} Absent`);
+      if (advanceTotal > 0) parts.push("Advance");
+      
+      const reason = parts.join(", ");
+
+      // 5. Update Form (Only if we have something to deduct, or reset if 0)
+      // We overwrite if it's a new selection (user hasn't manually edited yet logic is hard to track, 
+      // but usually when changing employee we want fresh auto-calc)
+      if (totalDeduction > 0) {
+        setFormData((prev) => ({ 
+            ...prev, 
+            deductions: totalDeduction,
+            deductionReason: reason 
+        }));
+      }
+
+    } catch (error) {
+      console.error("Error calculating deductions", error);
     }
   }
 
@@ -1474,9 +1516,10 @@ export default function PayrollPage() {
                   <td className="p-3 text-center font-bold text-red-700">{p.deductionReason}</td>
                   <td className="p-3 text-center font-bold text-green-700">
                     {p.netSalary < 0 ? (
-                      <span className="text-red-600 font-black">
-                        {p.netSalary.toLocaleString()} (Next Month)
-                      </span>
+                      <div className="bg-red-100 text-red-700 px-2 py-1 rounded-md border border-red-200">
+                        <p className="font-black text-lg">{p.netSalary.toLocaleString()}</p>
+                        <p className="text-[10px] uppercase">Carry Forward</p>
+                      </div>
                     ) : (
                       p.netSalary.toLocaleString()
                     )}
