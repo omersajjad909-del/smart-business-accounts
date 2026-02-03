@@ -1518,7 +1518,7 @@ export default function PayrollPage() {
                     {p.netSalary < 0 ? (
                       <div className="bg-red-100 text-red-700 px-2 py-1 rounded-md border border-red-200">
                         <p className="font-black text-lg">{p.netSalary.toLocaleString()}</p>
-                        <p className="text-[10px] uppercase">Carry Forward</p>
+                        
                       </div>
                     ) : (
                       p.netSalary.toLocaleString()
