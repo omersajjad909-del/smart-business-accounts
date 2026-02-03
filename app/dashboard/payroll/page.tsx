@@ -1537,6 +1537,7 @@ export default function PayrollPage() {
                 <th className="p-3 text-center">Deductions</th>
                 <th className="p-3 text-center">Deduction Reason</th>
                 <th className="p-3 text-center">Net Salary</th>
+                <th className="p-3 text-center bg-red-50 text-red-800">Actual Balance</th>
                 <th className="p-3 text-center">Add. Cash</th>
                 <th className="p-3 text-center">Action</th>
               </tr>
@@ -1552,12 +1553,15 @@ export default function PayrollPage() {
                   <td className="p-3 text-center font-bold text-green-700">
                     {p.netSalary < 0 ? (
                       <div className="bg-red-100 text-red-700 px-2 py-1 rounded-md border border-red-200">
-                        <p className="font-black text-lg">{p.netSalary.toLocaleString()}</p>
-                        
+                        <p className="font-black text-lg">0</p>
+                        <p className="text-[10px] uppercase">Carry: {p.netSalary.toLocaleString()}</p>
                       </div>
                     ) : (
                       p.netSalary.toLocaleString()
                     )}
+                  </td>
+                  <td className="p-3 text-center font-bold text-red-800 bg-red-50">
+                      {(p.netSalary - (p.additionalCash || 0)).toLocaleString()}
                   </td>
                   <td className="p-3 text-center font-bold text-blue-700">{p.additionalCash > 0 ? `+${p.additionalCash.toLocaleString()}` : "-"}</td>
                   
