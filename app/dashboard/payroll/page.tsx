@@ -384,8 +384,8 @@ export default function PayrollPage() {
                   <td className="p-3 text-center font-bold text-green-700 bg-red-50">
                     {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? (
                       <div className="bg-red-100 text-red-700 px-2 py-1 rounded-md border border-red-200">
-                        <p className="font-black text-lg">0</p>
-                        <p className="text-[10px] uppercase">Carry: {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</p>
+                        
+                        <p className="text-[10px] uppercase">{((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</p>
                       </div>
                     ) : (
                       ((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()
