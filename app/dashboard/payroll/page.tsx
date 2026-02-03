@@ -515,8 +515,9 @@ export default function PayrollPage() {
                         <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + p.baseSalary, 0).toLocaleString()}</td>
                         <td className="border border-gray-400 p-2 text-center text-red-600">{payroll.reduce((sum, p) => sum + p.deductions, 0).toLocaleString()}</td>
                         <td className="border border-gray-400 p-2"></td>
+                        <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0), 0).toLocaleString()}</td>
                         <td className="border border-gray-400 p-2 text-center text-blue-600">{payroll.reduce((sum, p) => sum + (p.additionalCash || 0), 0).toLocaleString()}</td>
-                         <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0), 0).toLocaleString()}</td>
+                         
                          <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">{payroll.reduce((sum, p) => sum + (p.netSalary - (p.additionalCash || 0)), 0).toLocaleString()}</td>
                      </tr>
                  </tfoot>
