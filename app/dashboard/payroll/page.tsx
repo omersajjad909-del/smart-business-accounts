@@ -564,15 +564,10 @@ export default function PayrollPage() {
                     .toLocaleString()}
                 </td>
                 <td className="border border-gray-400 p-2 text-center text-red-600">
-                  {(() => {
-                    const total = payroll.reduce(
-                      (sum, p) => sum + p.deductions,
-                      0,
-                    );
-                    return total < 0
-                      ? total.toLocaleString() // - ke saath aayega
-                      : Math.abs(total).toLocaleString(); // simple likhega
-                  })()}
+                  -
+                  {payroll
+                    .reduce((sum, p) => sum + p.deductions, 0)
+                    .toLocaleString()}
                 </td>
 
                 <td className="border border-gray-400 p-2"></td>
@@ -701,15 +696,10 @@ export default function PayrollPage() {
                   .toLocaleString()}
               </td>
               <td className="border border-gray-400 p-2 text-center text-red-600">
-                {(() => {
-                  const total = payroll.reduce(
-                    (sum, p) => sum + p.deductions,
-                    0,
-                  );
-                  return total < 0
-                    ? total.toLocaleString() // - ke saath aayega
-                    : Math.abs(total).toLocaleString(); // simple likhega
-                })()}
+                -
+                {payroll
+                  .reduce((sum, p) => sum + p.deductions, 0)
+                  .toLocaleString()}
               </td>
 
               <td className="border border-gray-400 p-2"></td>
@@ -879,15 +869,10 @@ export default function PayrollPage() {
                       .toLocaleString()}
                   </td>
                   <td className="border border-gray-400 p-2 text-center text-red-600">
-                    {(() => {
-                      const total = payroll.reduce(
-                        (sum, p) => sum + p.deductions,
-                        0,
-                      );
-                      return total < 0
-                        ? total.toLocaleString() // - ke saath aayega
-                        : Math.abs(total).toLocaleString(); // simple likhega
-                    })()}
+                    -
+                    {payroll
+                      .reduce((sum, p) => sum + p.deductions, 0)
+                      .toLocaleString()}
                   </td>
 
                   <td className="border border-gray-400 p-2"></td>
