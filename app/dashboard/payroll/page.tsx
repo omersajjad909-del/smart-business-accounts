@@ -259,7 +259,7 @@ export default function PayrollPage() {
             <span class="amount">-${p.deductions.toLocaleString()}</span>
           </div>
           <div className="row net-pay">
-            <span class="label">Net Salary:</span>
+            <span class="label">Pay:</span>
             <span class="amount">${(p.baseSalary + p.allowances - p.deductions).toLocaleString()}</span>
           </div>
           ${
@@ -466,7 +466,7 @@ export default function PayrollPage() {
                 <th className="p-3 text-left">Basic Salary</th>
                 <th className="p-3 text-center">Deductions</th>
                 <th className="p-3 text-center">Deduction Reason</th>
-                <th className="p-3 text-center">Net Salary</th>
+                <th className="p-3 text-center">Pay</th>
                 <th className="p-3 text-center">Payable</th>
                 <th className="p-3 text-center bg-red-50 text-red-800">
                   Next Month
@@ -624,7 +624,7 @@ export default function PayrollPage() {
               <th className="border-2 border-black p-2">Deductions</th>
               <th className="border-2 border-black p-2">Deduction reason</th>
 
-              <th className="border-2 border-black p-2">Net Salary</th>
+              <th className="border-2 border-black p-2">Pay</th>
               <th className="border-2 border-black p-2">Payable</th>
               <th className="border-2 border-black p-2 bg-red-100">
                 Next Month
