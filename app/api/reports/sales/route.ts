@@ -6,7 +6,7 @@ type SalesInvoiceWithItems = Prisma.SalesInvoiceGetPayload<{
   };
 }>;
 
-type SalesInvoiceItem = Prisma.SalesInvoiceItemGetPayload<{}>;
+type SalesInvoiceItem = Prisma.SalesInvoiceItemGetPayload<Prisma.SalesInvoiceItemDefaultArgs>;
 
 
 const prisma = (globalThis as any).prisma || new PrismaClient();

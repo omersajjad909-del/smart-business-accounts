@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
-type VoucherEntry = Prisma.VoucherEntryGetPayload<{}>;
+type VoucherEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
 
 
 const prisma = (globalThis as any).prisma || new PrismaClient();

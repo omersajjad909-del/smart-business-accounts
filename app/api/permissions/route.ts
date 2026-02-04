@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
-type RolePermission = Prisma.RolePermissionGetPayload<{}>;
+type RolePermission = Prisma.RolePermissionGetPayload<Prisma.RolePermissionDefaultArgs>;
 
 
 if (process.env.NODE_ENV === "development") {

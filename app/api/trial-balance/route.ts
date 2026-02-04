@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 
-type Account = Prisma.AccountGetPayload<{}>;
+type Account = Prisma.AccountGetPayload<Prisma.AccountDefaultArgs>;
 type Voucher = Prisma.VoucherGetPayload<{
   include: { entries: true };
 }>;

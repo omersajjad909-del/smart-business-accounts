@@ -7,10 +7,10 @@ type VoucherWithEntries = Prisma.VoucherGetPayload<{
   };
 }>;
 
-type VoucherEntry = Prisma.VoucherEntryGetPayload<{}>;
-type SalesInvoice = Prisma.SalesInvoiceGetPayload<{}>;
-type PurchaseInvoice = Prisma.PurchaseInvoiceGetPayload<{}>;
-type saleReturn = Prisma.SaleReturnGetPayload<{}>;
+type VoucherEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
+type SalesInvoice = Prisma.SalesInvoiceGetPayload<Prisma.SalesInvoiceDefaultArgs>;
+type PurchaseInvoice = Prisma.PurchaseInvoiceGetPayload<Prisma.PurchaseInvoiceDefaultArgs>;
+type SaleReturn = Prisma.SaleReturnGetPayload<Prisma.SaleReturnDefaultArgs>;
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -156,7 +156,7 @@ export async function GET(req: Request) {
       });
     });
 
-    returns.forEach((r:saleReturn) => {
+    returns.forEach((r: SaleReturn) => {
       combinedData.push({
         date: new Date(r.date),
         voucherNo: r.returnNo,

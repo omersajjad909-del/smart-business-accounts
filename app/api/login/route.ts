@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
-type RolePermission = Prisma.RolePermissionGetPayload<{}>;
+type RolePermission = Prisma.RolePermissionGetPayload<Prisma.RolePermissionDefaultArgs>;
 
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
