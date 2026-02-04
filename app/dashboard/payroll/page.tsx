@@ -571,11 +571,7 @@ export default function PayrollPage() {
                 </td>
 
                 <td className="border border-gray-400 p-2"></td>
-                <td className="border border-gray-400 p-2 text-center">
-                  {payroll
-                    .reduce((sum, p) => sum + p.netSalary, 0)
-                    .toLocaleString()}
-                </td>
+                <td className="border border-gray-400 p-2"></td>
                 <td className="border border-gray-400 p-2 text-center text-blue-600">
                   {payroll
                     .reduce((sum, p) => sum + (p.additionalCash || 0), 0)
