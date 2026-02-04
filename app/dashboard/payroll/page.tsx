@@ -578,10 +578,7 @@ export default function PayrollPage() {
                 <td className="border border-gray-400 p-2"></td>
                 <td className="border border-gray-400 p-2 text-center">
                   {payroll
-                    .reduce(
-                      (sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0),
-                      0,
-                    )
+                    .reduce((sum, p) => sum + p.netSalary, 0)
                     .toLocaleString()}
                 </td>
                 <td className="border border-gray-400 p-2 text-center text-blue-600">
@@ -718,10 +715,7 @@ export default function PayrollPage() {
               <td className="border border-gray-400 p-2"></td>
               <td className="border border-gray-400 p-2 text-center">
                 {payroll
-                  .reduce(
-                    (sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0),
-                    0,
-                  )
+                  .reduce((sum, p) => sum + p.netSalary, 0)
                   .toLocaleString()}
               </td>
               <td className="border border-gray-400 p-2 text-center text-blue-600">
@@ -899,10 +893,7 @@ export default function PayrollPage() {
                   <td className="border border-gray-400 p-2"></td>
                   <td className="border border-gray-400 p-2 text-center">
                     {payroll
-                      .reduce(
-                        (sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0),
-                        0,
-                      )
+                      .reduce((sum, p) => sum + p.netSalary, 0)
                       .toLocaleString()}
                   </td>
                   <td className="border border-gray-400 p-2 text-center text-blue-600">
