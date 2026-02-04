@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
-type BankAccount = Prisma.AccountGetPayload<{}>;
+type BankAccount = Prisma.AccountGetPayload<Prisma.AccountDefaultArgs>;
 
 type VoucherWithEntries = Prisma.VoucherGetPayload<{
   include: {

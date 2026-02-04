@@ -6,7 +6,7 @@ type OutwardWithItems = Prisma.OutwardGetPayload<{
   };
 }>;
 
-type OutwardItem = Prisma.OutwardItemGetPayload<{}>;
+type OutwardItem = Prisma.OutwardItemGetPayload<Prisma.OutwardItemDefaultArgs>;
 
 
 const prisma = (globalThis as any).prisma || new PrismaClient();

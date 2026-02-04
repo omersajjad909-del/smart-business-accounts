@@ -7,7 +7,7 @@ type SaleReturnWithItems = Prisma.SaleReturnGetPayload<{
   };
 }>;
 
-type SaleReturnItem = Prisma.SaleReturnItemGetPayload<{}>;
+type SaleReturnItem = Prisma.SaleReturnItemGetPayload<Prisma.SaleReturnItemDefaultArgs>;
 
 type SalesInvoiceItemWithItem = Prisma.SalesInvoiceItemGetPayload<{
   include: {

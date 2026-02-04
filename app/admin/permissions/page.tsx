@@ -33,6 +33,12 @@ export default function AdminPermissionsPage() {
   const [selectedRole, setSelectedRole] = useState<string>("ADMIN");
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
 
+  const selectRole = (roleName: string) => {
+    setSelectedRole(roleName);
+    const role = roles.find(r => r.role === roleName);
+    setRolePermissions(role?.permissions || []);
+  };
+
   // 🔹 load user once (client only)
   useEffect(() => {
     const u = getCurrentUser();
@@ -130,13 +136,6 @@ export default function AdminPermissionsPage() {
   };
 
   // ================= ROLES TAB ACTIONS =================
-
-  const selectRole = (roleName: string) => {
-    setSelectedRole(roleName);
-    const role = roles.find(r => r.role === roleName);
-    setRolePermissions(role?.permissions || []);
-  };
-
   const toggleRolePermission = (perm: string) => {
     setRolePermissions(prev =>
       prev.includes(perm)
