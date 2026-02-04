@@ -581,11 +581,11 @@ export default function PayrollPage() {
                     .reduce((sum, p) => sum + (p.additionalCash || 0), 0)
                     .toLocaleString()}
                 </td>
-
                 <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">
                   {payroll
                     .reduce((sum, p) => {
-                      const balance = p.netSalary - (p.additionalCash || 0);
+                      const pay = p.baseSalary + p.allowances - p.deductions;
+                      const balance = pay - (p.additionalCash || 0);
                       return balance < 0 ? sum + balance : sum;
                     }, 0)
                     .toLocaleString()}
@@ -717,7 +717,8 @@ export default function PayrollPage() {
               <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">
                 {payroll
                   .reduce((sum, p) => {
-                    const balance = p.netSalary - (p.additionalCash || 0);
+                    const pay = p.baseSalary + p.allowances - p.deductions;
+                    const balance = pay - (p.additionalCash || 0);
                     return balance < 0 ? sum + balance : sum;
                   }, 0)
                   .toLocaleString()}
@@ -890,7 +891,8 @@ export default function PayrollPage() {
                   <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">
                     {payroll
                       .reduce((sum, p) => {
-                        const balance = p.netSalary - (p.additionalCash || 0);
+                        const pay = p.baseSalary + p.allowances - p.deductions;
+                        const balance = pay - (p.additionalCash || 0);
                         return balance < 0 ? sum + balance : sum;
                       }, 0)
                       .toLocaleString()}
