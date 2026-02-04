@@ -33,6 +33,12 @@ export default function StockRatePage() {
     "x-user-role": "ADMIN", // 🔴 REQUIRED
   };
 
+  function loadRates() {
+    fetch("/api/stock-rate", { headers })
+      .then(r => r.json())
+      .then(d => setRates(Array.isArray(d) ? d : []));
+  }
+
   useEffect(() => {
     fetch("/api/items-new", { headers })
       .then(r => r.json())
@@ -40,12 +46,6 @@ export default function StockRatePage() {
 
     loadRates();
   }, []);
-
-  function loadRates() {
-    fetch("/api/stock-rate", { headers })
-      .then(r => r.json())
-      .then(d => setRates(Array.isArray(d) ? d : []));
-  }
 
   async function saveRate() {
     if (!itemId || !rate) {

@@ -1,25 +1,21 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
 export default function AdminGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [checking, setChecking] = useState(true);
+  const user = getCurrentUser();
+  const isAdmin = user?.role === "ADMIN";
 
   useEffect(() => {
-    const user = getCurrentUser();
-
-    if (!user || user.role !== "ADMIN") {
+    if (!user || !isAdmin) {
       router.replace("/dashboard"); // ✅ NO BLINK
-      return;
     }
+  }, [isAdmin, router, user]);
 
-    setChecking(false);
-  }, [router]);
-
-  if (checking) {
+  if (!user || !isAdmin) {
     return (
       <div className="p-10 text-center text-gray-400">
         Checking permissions...
@@ -29,3 +25,4 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
 
   return <>{children}</>;
 }
+
