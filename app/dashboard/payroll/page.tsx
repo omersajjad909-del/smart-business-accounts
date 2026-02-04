@@ -248,7 +248,7 @@ export default function PayrollPage() {
             </div>
           ` : ""}
           <div class="row" style="font-weight: bold; border-top: 1px solid #eee; padding-top: 5px;">
-              <span class="label">Actual Balance:</span>
+              <span class="label">Next Month:</span>
               <span class="amount">${((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
           </div>
           ${((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? `
@@ -365,7 +365,7 @@ export default function PayrollPage() {
                 <th className="p-3 text-center">Deduction Reason</th>
                 <th className="p-3 text-center">Net Salary</th>
                 <th className="p-3 text-center">Payable</th>
-                <th className="p-3 text-center bg-red-50 text-red-800">Actual Balance</th>
+                <th className="p-3 text-center bg-red-50 text-red-800">Next Month</th>
                 <th className="p-3 text-center">Action</th>
               </tr>
             </thead>
@@ -420,7 +420,7 @@ export default function PayrollPage() {
                       
                       <th className="border-2 border-black p-2">Net Salary</th>
                       <th className="border-2 border-black p-2">Payable</th>
-                      <th className="border-2 border-black p-2 bg-red-100">Actual Balance</th>
+                      <th className="border-2 border-black p-2 bg-red-100">Next Month</th>
                   </tr>
               </thead>
               <tbody>
@@ -482,7 +482,7 @@ export default function PayrollPage() {
                       
                        <th className="border border-gray-400 p-2 text-sm">Net</th>
                        <th className="border border-gray-400 p-2 text-sm text-blue-600">Payable</th>
-                       <th className="border border-gray-400 p-2 text-sm text-red-800">Actual Bal.</th>
+                       <th className="border border-gray-400 p-2 text-sm text-red-800">Next Month</th>
                     </tr>
                  </thead>
                 <tbody>
