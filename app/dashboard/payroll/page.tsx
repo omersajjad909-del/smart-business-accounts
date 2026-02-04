@@ -23,9 +23,11 @@ export default function PayrollPage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [monthYear, setMonthYear] = useState(new Date().toISOString().slice(0, 7));
+  const [monthYear, setMonthYear] = useState(
+    new Date().toISOString().slice(0, 7),
+  );
   const [detectedAdvance, setDetectedAdvance] = useState(0);
-  
+
   // Preview State
   const [showPreview, setShowPreview] = useState(false);
 
@@ -43,7 +45,7 @@ export default function PayrollPage() {
     fetchEmployees();
     fetchPayroll();
     // Sync form date with view date for convenience
-    setFormData(prev => ({ ...prev, monthYear }));
+    setFormData((prev) => ({ ...prev, monthYear }));
   }, [monthYear]);
 
   useEffect(() => {
@@ -58,22 +60,22 @@ export default function PayrollPage() {
     try {
       // 1. Fetch Advances
       const resAdvance = await fetch(
-        `/api/advance?employeeId=${formData.employeeId}&status=PENDING&monthYear=${formData.monthYear}`
+        `/api/advance?employeeId=${formData.employeeId}&status=PENDING&monthYear=${formData.monthYear}`,
       );
       const dataAdvance = await resAdvance.json();
       const advanceTotal = Array.isArray(dataAdvance)
         ? dataAdvance.reduce((sum: number, a: any) => sum + a.amount, 0)
         : 0;
-      
+
       setDetectedAdvance(advanceTotal);
 
       // 2. Fetch Attendance (Absents)
       const resAttendance = await fetch(
-        `/api/attendance?employeeId=${formData.employeeId}&month=${formData.monthYear}`
+        `/api/attendance?employeeId=${formData.employeeId}&month=${formData.monthYear}`,
       );
       const dataAttendance = await resAttendance.json();
-      const absents = Array.isArray(dataAttendance) 
-        ? dataAttendance.filter((r: any) => r.status === "ABSENT").length 
+      const absents = Array.isArray(dataAttendance)
+        ? dataAttendance.filter((r: any) => r.status === "ABSENT").length
         : 0;
 
       // 3. Check Previous Month Balance (Carry Forward)
@@ -82,19 +84,22 @@ export default function PayrollPage() {
         const [year, month] = formData.monthYear.split("-").map(Number);
         const prevDate = new Date(year, month - 2); // Month is 0-indexed, so current is month-1, prev is month-2
         const prevMonthStr = prevDate.toISOString().slice(0, 7);
-        
-        const resPrev = await fetch(`/api/payroll?employeeId=${formData.employeeId}&monthYear=${prevMonthStr}`);
+
+        const resPrev = await fetch(
+          `/api/payroll?employeeId=${formData.employeeId}&monthYear=${prevMonthStr}`,
+        );
         const dataPrev = await resPrev.json();
-        
+
         if (Array.isArray(dataPrev) && dataPrev.length > 0) {
-           const prevRecord = dataPrev[0];
-           // Actual Balance = Net Salary - Additional Cash
-           const prevActualBalance = prevRecord.netSalary - (prevRecord.additionalCash || 0);
-           
-           // If Actual Balance is negative, it means they owe us money (Carry Forward)
-           if (prevActualBalance < 0) {
-              prevBalanceDeduction = Math.abs(prevActualBalance);
-           }
+          const prevRecord = dataPrev[0];
+          // Actual Balance = Net Salary - Additional Cash
+          const prevActualBalance =
+            prevRecord.netSalary - (prevRecord.additionalCash || 0);
+
+          // If Actual Balance is negative, it means they owe us money (Carry Forward)
+          if (prevActualBalance < 0) {
+            prevBalanceDeduction = Math.abs(prevActualBalance);
+          }
         }
       } catch (e) {
         console.error("Error checking previous balance", e);
@@ -102,28 +107,30 @@ export default function PayrollPage() {
 
       // 4. Calculate Total Deduction
       // Assumption: 30 days per month
-      const perDaySalary = formData.baseSalary > 0 ? formData.baseSalary / 30 : 0;
+      const perDaySalary =
+        formData.baseSalary > 0 ? formData.baseSalary / 30 : 0;
       const absentDeduction = Math.round(absents * perDaySalary);
-      
-      const totalDeduction = advanceTotal + absentDeduction + prevBalanceDeduction;
+
+      const totalDeduction =
+        advanceTotal + absentDeduction + prevBalanceDeduction;
 
       // 5. Generate Reason
       const parts = [];
-      if (prevBalanceDeduction > 0) parts.push(`Prev Bal: ${prevBalanceDeduction}`);
+      if (prevBalanceDeduction > 0)
+        parts.push(`Prev Bal: ${prevBalanceDeduction}`);
       if (absents > 0) parts.push(`${absents} Absent`);
       if (advanceTotal > 0) parts.push("Advance");
-      
+
       const reason = parts.join(", ");
 
       // 6. Update Form
       if (totalDeduction > 0) {
-        setFormData((prev) => ({ 
-            ...prev, 
-            deductions: totalDeduction,
-            deductionReason: reason 
+        setFormData((prev) => ({
+          ...prev,
+          deductions: totalDeduction,
+          deductionReason: reason,
         }));
       }
-
     } catch (error) {
       console.error("Error calculating deductions", error);
     }
@@ -143,7 +150,9 @@ export default function PayrollPage() {
   async function fetchPayroll() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/payroll?monthYear=${monthYear}`, { cache: "no-store" });
+      const res = await fetch(`/api/payroll?monthYear=${monthYear}`, {
+        cache: "no-store",
+      });
       const data = await res.json();
       setPayroll(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -160,11 +169,23 @@ export default function PayrollPage() {
     setLoading(true);
     await fetch(editingId ? `/api/payroll?id=${editingId}` : "/api/payroll", {
       method: editingId ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json", "x-user-role": user.role, "x-user-id": user.id },
+      headers: {
+        "Content-Type": "application/json",
+        "x-user-role": user.role,
+        "x-user-id": user.id,
+      },
       body: JSON.stringify(formData),
     });
     setEditingId(null);
-    setFormData({ employeeId: "", monthYear, baseSalary: 0, allowances: 0, deductions: 0, deductionReason: "", additionalCash: 0 });
+    setFormData({
+      employeeId: "",
+      monthYear,
+      baseSalary: 0,
+      allowances: 0,
+      deductions: 0,
+      deductionReason: "",
+      additionalCash: 0,
+    });
     await fetchPayroll();
     setLoading(false);
   }
@@ -241,22 +262,34 @@ export default function PayrollPage() {
             <span class="label">Net Salary:</span>
             <span class="amount">${(p.baseSalary + p.allowances - p.deductions).toLocaleString()}</span>
           </div>
-          ${p.additionalCash > 0 ? `
+          ${
+            p.additionalCash > 0
+              ? `
             <div class="row">
                 <span class="label">Additional Cash (Manual):</span>
                 <span class="amount">-${p.additionalCash.toLocaleString()}</span>
             </div>
-          ` : ""}
+          `
+              : ""
+          }
           <div class="row" style="font-weight: bold; border-top: 1px solid #eee; padding-top: 5px;">
               <span class="label">Next Month:</span>
-              <span class="amount">${((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
+              <span class="amount">${(p.baseSalary + p.allowances - p.deductions - (p.additionalCash || 0)).toLocaleString()}</span>
           </div>
-          ${((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? `
+          ${
+            p.baseSalary +
+              p.allowances -
+              p.deductions -
+              (p.additionalCash || 0) <
+            0
+              ? `
             <div class="row" style="color: red; margin-top: 5px;">
                 <span class="label">Carry Forward to Next Month:</span>
-                <span class="amount">${((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
+                <span class="amount">${(p.baseSalary + p.allowances - p.deductions - (p.additionalCash || 0)).toLocaleString()}</span>
             </div>
-          ` : ""}
+          `
+              : ""
+          }
           <div class="row">
             <span class="label">Reason/Remarks:</span>
             <span>${p.deductionReason || "-"}</span>
@@ -275,7 +308,6 @@ export default function PayrollPage() {
   return (
     <div className="p-6 bg-gray-100 min-h-screen print:bg-white print:p-0">
       <div className="max-w-6xl mx-auto space-y-6 print:hidden">
-        
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-4">
@@ -305,50 +337,121 @@ export default function PayrollPage() {
 
         {/* FORM */}
         <div className="bg-white p-6 rounded-xl shadow-sm border">
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-4 gap-4"
+          >
             <select
               required
               value={formData.employeeId}
               onChange={(e) => {
                 const emp = employees.find((x) => x.id === e.target.value);
-                setFormData({ ...formData, employeeId: e.target.value, baseSalary: emp?.salary || 0 });
+                setFormData({
+                  ...formData,
+                  employeeId: e.target.value,
+                  baseSalary: emp?.salary || 0,
+                });
               }}
               className="border p-2 rounded-lg outline-none"
             >
               <option value="">Select Employee</option>
               {employees.map((e) => (
-                <option key={e.id} value={e.id}>{e.employeeId} - {e.firstName} {e.lastName}</option>
+                <option key={e.id} value={e.id}>
+                  {e.employeeId} - {e.firstName} {e.lastName}
+                </option>
               ))}
             </select>
 
-            <input type="month" value={formData.monthYear} onChange={(e) => setFormData({ ...formData, monthYear: e.target.value })} className="border p-2 rounded-lg" />
-            <input type="number" placeholder="Basic Salary" value={formData.baseSalary} onChange={(e) => setFormData({ ...formData, baseSalary: +e.target.value || 0 })} className="border p-2 rounded-lg" />
-            <button disabled={loading} className="bg-black text-white rounded-lg font-bold py-2 px-4 transition-colors">
+            <input
+              type="month"
+              value={formData.monthYear}
+              onChange={(e) =>
+                setFormData({ ...formData, monthYear: e.target.value })
+              }
+              className="border p-2 rounded-lg"
+            />
+            <input
+              type="number"
+              placeholder="Basic Salary"
+              value={formData.baseSalary}
+              onChange={(e) =>
+                setFormData({ ...formData, baseSalary: +e.target.value || 0 })
+              }
+              className="border p-2 rounded-lg"
+            />
+            <button
+              disabled={loading}
+              className="bg-black text-white rounded-lg font-bold py-2 px-4 transition-colors"
+            >
               {editingId ? "Update Record" : "Save Record"}
             </button>
 
             <div className="col-span-1 md:col-span-4 grid grid-cols-2 gap-4 mt-2">
-               <input type="number" placeholder="Allowances" value={formData.allowances} onChange={(e) => setFormData({ ...formData, allowances: +e.target.value || 0 })} className="border p-2 rounded-lg" />
-               <div className="grid grid-cols-2 gap-2">
-                 <div className="relative">
-                    <input type="number" placeholder="Deductions" value={formData.deductions} onChange={(e) => setFormData({ ...formData, deductions: +e.target.value || 0 })} className="border p-2 rounded-lg w-full" />
-                    {detectedAdvance > 0 && <span className="text-xs text-red-500 absolute -bottom-5 left-0">Advance: {detectedAdvance}</span>}
-                 </div>
-                 <input type="text" placeholder="Reason (e.g. Advance)" value={formData.deductionReason} onChange={(e) => setFormData({ ...formData, deductionReason: e.target.value })} className="border p-2 rounded-lg w-full" />
-               </div>
-               
-               {/* NEW FIELD: Additional Cash */}
-               <div className="col-span-2 mt-2">
-                  <label className="text-sm font-bold text-gray-700">Additional Cash (Manual Add):</label>
-                  <input 
-                    type="number" 
-                    placeholder="e.g. 1000" 
-                    value={formData.additionalCash} 
-                    onChange={(e) => setFormData({ ...formData, additionalCash: +e.target.value || 0 })} 
-                    className="border p-2 rounded-lg w-full border-green-500" 
+              <input
+                type="number"
+                placeholder="Allowances"
+                value={formData.allowances}
+                onChange={(e) =>
+                  setFormData({ ...formData, allowances: +e.target.value || 0 })
+                }
+                className="border p-2 rounded-lg"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <div className="relative">
+                  <input
+                    type="number"
+                    placeholder="Deductions"
+                    value={formData.deductions}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        deductions: +e.target.value || 0,
+                      })
+                    }
+                    className="border p-2 rounded-lg w-full"
                   />
-                  <p className="text-xs text-gray-500">This amount is subtracted from Net Salary (increasing deduction/debt). Final Balance carries forward.</p>
-               </div>
+                  {detectedAdvance > 0 && (
+                    <span className="text-xs text-red-500 absolute -bottom-5 left-0">
+                      Advance: {detectedAdvance}
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  placeholder="Reason (e.g. Advance)"
+                  value={formData.deductionReason}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      deductionReason: e.target.value,
+                    })
+                  }
+                  className="border p-2 rounded-lg w-full"
+                />
+              </div>
+
+              {/* NEW FIELD: Additional Cash */}
+              <div className="col-span-2 mt-2">
+                <label className="text-sm font-bold text-gray-700">
+                  Additional Cash (Manual Add):
+                </label>
+                <input
+                  type="number"
+                  placeholder="e.g. 1000"
+                  value={formData.additionalCash}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      additionalCash: +e.target.value || 0,
+                    })
+                  }
+                  className="border p-2 rounded-lg w-full border-green-500"
+                />
+                <p className="text-xs text-gray-500">
+                  This amount is subtracted from Net Salary (increasing
+                  deduction/debt). Final Balance carries forward.
+                </p>
+              </div>
             </div>
           </form>
         </div>
@@ -365,7 +468,9 @@ export default function PayrollPage() {
                 <th className="p-3 text-center">Deduction Reason</th>
                 <th className="p-3 text-center">Net Salary</th>
                 <th className="p-3 text-center">Payable</th>
-                <th className="p-3 text-center bg-red-50 text-red-800">Next Month</th>
+                <th className="p-3 text-center bg-red-50 text-red-800">
+                  Next Month
+                </th>
                 <th className="p-3 text-center">Action</th>
               </tr>
             </thead>
@@ -373,189 +478,464 @@ export default function PayrollPage() {
               {payroll.map((p) => (
                 <tr key={p.id} className="border-b">
                   <td className="p-3 font-medium">{p.employee.employeeId}</td>
-                  <td className="p-3">{p.employee.firstName} {p.employee.lastName}</td>
-                  <td className="p-3">{p.baseSalary.toLocaleString()}</td>
-                  <td className="p-3 text-center font-bold text-red-700">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
-                  <td className="p-3 text-center font-bold text-red-700">{p.deductionReason}</td>
-                  <td className="p-3 text-center font-bold text-gray-700">
-                      {(p.baseSalary + p.allowances - p.deductions).toLocaleString()}
+                  <td className="p-3">
+                    {p.employee.firstName} {p.employee.lastName}
                   </td>
-                  <td className="p-3 text-center font-bold text-blue-700">{p.additionalCash > 0 ? `${p.additionalCash.toLocaleString()}` : "-"}</td>
+                  <td className="p-3">{p.baseSalary.toLocaleString()}</td>
+                  <td className="p-3 text-center font-bold text-red-700">
+                    {p.deductions > 0
+                      ? `-${p.deductions.toLocaleString()}`
+                      : p.deductions}
+                  </td>
+                  <td className="p-3 text-center font-bold text-red-700">
+                    {p.deductionReason}
+                  </td>
+                  <td className="p-3 text-center font-bold text-gray-700">
+                    {(
+                      p.baseSalary +
+                      p.allowances -
+                      p.deductions
+                    ).toLocaleString()}
+                  </td>
+                  <td className="p-3 text-center font-bold text-blue-700">
+                    {p.additionalCash > 0
+                      ? `${p.additionalCash.toLocaleString()}`
+                      : "-"}
+                  </td>
                   <td className="p-3 text-center font-bold text-green-700 bg-red-50">
-                    {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? (
+                    {p.baseSalary +
+                      p.allowances -
+                      p.deductions -
+                      (p.additionalCash || 0) <
+                    0 ? (
                       <div className="bg-red-100 text-red-700 px-2 py-1 rounded-md border border-red-200">
-                        
-                        <p className="text-[10px] uppercase">{((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</p>
+                        <p className="text-[10px] uppercase">
+                          {(
+                            p.baseSalary +
+                            p.allowances -
+                            p.deductions -
+                            (p.additionalCash || 0)
+                          ).toLocaleString()}
+                        </p>
                       </div>
                     ) : (
-                      ((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()
+                      (
+                        p.baseSalary +
+                        p.allowances -
+                        p.deductions -
+                        (p.additionalCash || 0)
+                      ).toLocaleString()
                     )}
                   </td>
                   <td className="p-3 text-center space-x-2 flex justify-center items-center">
-                    <button onClick={() => handlePrintPayslip(p)} className="text-gray-600 font-bold bg-gray-200 px-2 py-1 rounded text-xs hover:bg-gray-300">Slip</button>
-                    <button onClick={() => handleEdit(p)} className="text-blue-600 font-bold">Edit</button>
-                    <button onClick={() => handleDelete(p.id)} className="text-red-600 font-bold">Delete</button>
+                    <button
+                      onClick={() => handlePrintPayslip(p)}
+                      className="text-gray-600 font-bold bg-gray-200 px-2 py-1 rounded text-xs hover:bg-gray-300"
+                    >
+                      Slip
+                    </button>
+                    <button
+                      onClick={() => handleEdit(p)}
+                      className="text-blue-600 font-bold"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p.id)}
+                      className="text-red-600 font-bold"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
-                <tfoot>
-                    <tr className="bg-gray-100 font-bold">
-                        <td colSpan={2} className="border border-gray-400 p-2 text-right">TOTALS:</td>
-                        <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + p.baseSalary, 0).toLocaleString()}</td>
-                        <td className="border border-gray-400 p-2 text-center text-red-600">{payroll.reduce((sum, p) => sum + p.deductions, 0).toLocaleString()}</td>
-                        <td className="border border-gray-400 p-2"></td>
-                        <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0), 0).toLocaleString()}</td>
-                        <td className="border border-gray-400 p-2 text-center text-blue-600">{payroll.reduce((sum, p) => sum + (p.additionalCash || 0), 0).toLocaleString()}</td>
-                         
-                         <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">{payroll.reduce((sum, p) => sum + (p.netSalary - (p.additionalCash || 0)), 0).toLocaleString()}</td>
-                     </tr>
-                 </tfoot>
+            <tfoot>
+              <tr className="bg-gray-100 font-bold">
+                <td
+                  colSpan={2}
+                  className="border border-gray-400 p-2 text-right"
+                >
+                  TOTALS:
+                </td>
+                <td className="border border-gray-400 p-2 text-center">
+                  {payroll
+                    .reduce((sum, p) => sum + p.baseSalary, 0)
+                    .toLocaleString()}
+                </td>
+                <td className="border border-gray-400 p-2 text-center text-red-600">
+                  {(() => {
+                    const total = payroll.reduce(
+                      (sum, p) => sum + p.deductions,
+                      0,
+                    );
+                    return total < 0
+                      ? total.toLocaleString() // - ke saath aayega
+                      : Math.abs(total).toLocaleString(); // simple likhega
+                  })()}
+                </td>
+
+                <td className="border border-gray-400 p-2"></td>
+                <td className="border border-gray-400 p-2 text-center">
+                  {payroll
+                    .reduce(
+                      (sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0),
+                      0,
+                    )
+                    .toLocaleString()}
+                </td>
+                <td className="border border-gray-400 p-2 text-center text-blue-600">
+                  {payroll
+                    .reduce((sum, p) => sum + (p.additionalCash || 0), 0)
+                    .toLocaleString()}
+                </td>
+
+                <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">
+                  {payroll
+                    .reduce(
+                      (sum, p) => sum + (p.netSalary - (p.additionalCash || 0)),
+                      0,
+                    )
+                    .toLocaleString()}
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>
 
       {/* --- ACTUAL PRINTING CONTENT (Hidden on screen, shown on print) --- */}
       <div className="invoice-print hidden print:block font-serif text-black p-8">
-          <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold uppercase tracking-widest">Payroll Report</h1>
-              <p className="text-lg">For the Month of: <span className="font-bold underline">{monthYear}</span></p>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold uppercase tracking-widest">
+            Payroll Report
+          </h1>
+          <p className="text-lg">
+            For the Month of:{" "}
+            <span className="font-bold underline">{monthYear}</span>
+          </p>
+        </div>
+        <table className="w-full border-2 border-black">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border-2 border-black p-2">ID</th>
+              <th className="border-2 border-black p-2">Employee Name</th>
+              <th className="border-2 border-black p-2">Basic</th>
+              <th className="border-2 border-black p-2">Deductions</th>
+              <th className="border-2 border-black p-2">Deduction reason</th>
+
+              <th className="border-2 border-black p-2">Net Salary</th>
+              <th className="border-2 border-black p-2">Payable</th>
+              <th className="border-2 border-black p-2 bg-red-100">
+                Next Month
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {payroll.map((p) => (
+              <tr key={p.id}>
+                <td className="border-2 border-black p-2 text-center">
+                  {p.employee.employeeId}
+                </td>
+                <td className="border-2 border-black p-2">
+                  {p.employee.firstName} {p.employee.lastName}
+                </td>
+                <td className="border-2 border-black p-2 text-center">
+                  {p.baseSalary.toLocaleString()}
+                </td>
+                <td className="border-2 border-black p-2 text-center text-red-600 font-bold">
+                  {p.deductions > 0
+                    ? `-${p.deductions.toLocaleString()}`
+                    : p.deductions}
+                </td>
+                {/* {p.deductions > 0 ? p.deductions.toLocaleString() : "-"} */}
+                <td className="border-2 border-black p-2 text-center">
+                  {p.deductionReason || "-"}
+                </td>
+                <td className="border-2 border-black p-2 text-center font-bold">
+                  {(
+                    p.baseSalary +
+                    p.allowances -
+                    p.deductions
+                  ).toLocaleString()}
+                </td>
+                <td className="border-2 border-black p-2 text-center text-blue-600 font-bold">
+                  {p.additionalCash > 0
+                    ? p.additionalCash.toLocaleString()
+                    : "-"}
+                </td>
+                <td className="border-2 border-black p-2 text-center text-red-800 font-bold bg-red-50">
+                  {p.baseSalary +
+                    p.allowances -
+                    p.deductions -
+                    (p.additionalCash || 0) <
+                  0 ? (
+                    <div className="flex flex-col items-center">
+                      {/* <span className="text-black">0</span> */}
+                      <span className="text-red-600 text-[10px] whitespace-nowrap">
+                        {(
+                          p.baseSalary +
+                          p.allowances -
+                          p.deductions -
+                          (p.additionalCash || 0)
+                        ).toLocaleString()}
+                      </span>
+                    </div>
+                  ) : (
+                    (
+                      p.baseSalary +
+                      p.allowances -
+                      p.deductions -
+                      (p.additionalCash || 0)
+                    ).toLocaleString()
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="bg-gray-100 font-bold">
+              <td colSpan={2} className="border border-gray-400 p-2 text-right">
+                TOTALS:
+              </td>
+              <td className="border border-gray-400 p-2 text-center">
+                {payroll
+                  .reduce((sum, p) => sum + p.baseSalary, 0)
+                  .toLocaleString()}
+              </td>
+              <td className="border border-gray-400 p-2 text-center text-red-600">
+                {(() => {
+                  const total = payroll.reduce(
+                    (sum, p) => sum + p.deductions,
+                    0,
+                  );
+                  return total < 0
+                    ? total.toLocaleString() // - ke saath aayega
+                    : Math.abs(total).toLocaleString(); // simple likhega
+                })()}
+              </td>
+
+              <td className="border border-gray-400 p-2"></td>
+              <td className="border border-gray-400 p-2 text-center">
+                {payroll
+                  .reduce(
+                    (sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0),
+                    0,
+                  )
+                  .toLocaleString()}
+              </td>
+              <td className="border border-gray-400 p-2 text-center text-blue-600">
+                {payroll
+                  .reduce((sum, p) => sum + (p.additionalCash || 0), 0)
+                  .toLocaleString()}
+              </td>
+
+              <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">
+                {payroll
+                  .reduce(
+                    (sum, p) => sum + (p.netSalary - (p.additionalCash || 0)),
+                    0,
+                  )
+                  .toLocaleString()}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+        <div className="flex justify-between mt-20 px-10">
+          <div className="border-t-2 border-black w-40 text-center pt-2 font-bold">
+            Prepared By
           </div>
-          <table className="w-full border-2 border-black">
-              <thead>
-                  <tr className="bg-gray-200">
-                      <th className="border-2 border-black p-2">ID</th>
-                      <th className="border-2 border-black p-2">Employee Name</th>
-                      <th className="border-2 border-black p-2">Basic</th>
-                      <th className="border-2 border-black p-2">Deductions</th>
-                      <th className="border-2 border-black p-2">Deduction reason</th>
-                      
-                      <th className="border-2 border-black p-2">Net Salary</th>
-                      <th className="border-2 border-black p-2">Payable</th>
-                      <th className="border-2 border-black p-2 bg-red-100">Next Month</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {payroll.map(p => (
-                      <tr key={p.id}>
-                          <td className="border-2 border-black p-2 text-center">{p.employee.employeeId}</td>
-                          <td className="border-2 border-black p-2">{p.employee.firstName} {p.employee.lastName}</td>
-                          <td className="border-2 border-black p-2 text-center">{p.baseSalary.toLocaleString()}</td>
-                          <td className="border-2 border-black p-2 text-center text-red-600 font-bold">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
-                          {/* {p.deductions > 0 ? p.deductions.toLocaleString() : "-"} */}
-                          <td className="border-2 border-black p-2 text-center">{p.deductionReason || "-"}</td>
-                          <td className="border-2 border-black p-2 text-center font-bold">
-                              {(p.baseSalary + p.allowances - p.deductions).toLocaleString()}
-                          </td>
-                          <td className="border-2 border-black p-2 text-center text-blue-600 font-bold">{p.additionalCash > 0 ? p.additionalCash.toLocaleString() : "-"}</td>
-                          <td className="border-2 border-black p-2 text-center text-red-800 font-bold bg-red-50">
-                            {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? (
-                              <div className="flex flex-col items-center">
-                                {/* <span className="text-black">0</span> */}
-                                <span className="text-red-600 text-[10px] whitespace-nowrap">{((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
-                              </div>
-                            ) : ((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}
-                          </td>
-                      </tr>
-                  ))}
-              </tbody>
-                  <tfoot>
-                    <tr className="bg-gray-100 font-bold">
-                        <td colSpan={2} className="border border-gray-400 p-2 text-right">TOTALS:</td>
-                        <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + p.baseSalary, 0).toLocaleString()}</td>
-                        <td className="border border-gray-400 p-2 text-center text-red-600">{payroll.reduce((sum, p) => sum + p.deductions, 0).toLocaleString()}</td>
-                        <td className="border border-gray-400 p-2"></td>
-                        <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0), 0).toLocaleString()}</td>
-                        <td className="border border-gray-400 p-2 text-center text-blue-600">{payroll.reduce((sum, p) => sum + (p.additionalCash || 0), 0).toLocaleString()}</td>
-                         
-                         <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">{payroll.reduce((sum, p) => sum + (p.netSalary - (p.additionalCash || 0)), 0).toLocaleString()}</td>
-                     </tr>
-                 </tfoot>
-          </table>
-          <div className="flex justify-between mt-20 px-10">
-              <div className="border-t-2 border-black w-40 text-center pt-2 font-bold">Prepared By</div>
-              <div className="border-t-2 border-black w-40 text-center pt-2 font-bold">Approved By</div>
+          <div className="border-t-2 border-black w-40 text-center pt-2 font-bold">
+            Approved By
           </div>
+        </div>
       </div>
 
       {/* --- PREVIEW MODAL --- */}
       {showPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex flex-col items-center overflow-auto p-4 md:p-10 print:hidden">
           <div className="flex w-full max-w-[210mm] justify-between mb-4">
-            <h2 className="text-white text-xl font-bold italic">Print Preview (A4 View)</h2>
+            <h2 className="text-white text-xl font-bold italic">
+              Print Preview (A4 View)
+            </h2>
             <div className="flex gap-2">
-                <button onClick={() => window.print()} className="bg-blue-500 text-white px-4 py-1 rounded shadow font-bold">Print Now</button>
-                <button onClick={() => setShowPreview(false)} className="bg-red-500 text-white px-4 py-1 rounded shadow font-bold">Close</button>
+              <button
+                onClick={() => window.print()}
+                className="bg-blue-500 text-white px-4 py-1 rounded shadow font-bold"
+              >
+                Print Now
+              </button>
+              <button
+                onClick={() => setShowPreview(false)}
+                className="bg-red-500 text-white px-4 py-1 rounded shadow font-bold"
+              >
+                Close
+              </button>
             </div>
           </div>
 
           {/* This mimics the paper */}
           <div className="bg-white w-full max-w-[210mm] min-h-[297mm] p-[20mm] shadow-2xl rounded-sm text-black">
-             <div className="text-center mb-8 border-b-2 border-gray-100 pb-4">
-                <h1 className="text-2xl font-bold uppercase tracking-widest text-gray-800">Payroll Report</h1>
-                <p className="text-gray-600 mt-1">Month Year: <span className="font-bold">{monthYear}</span></p>
-             </div>
+            <div className="text-center mb-8 border-b-2 border-gray-100 pb-4">
+              <h1 className="text-2xl font-bold uppercase tracking-widest text-gray-800">
+                Payroll Report
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Month Year: <span className="font-bold">{monthYear}</span>
+              </p>
+            </div>
 
-             <table className="w-full border-collapse border border-gray-400">
-                <thead className="bg-gray-50">
-                   <tr>
-                      <th className="border border-gray-400 p-2 text-sm">ID</th>
-                      <th className="border border-gray-400 p-2 text-sm text-left">Employee</th>
-                      <th className="border border-gray-400 p-2 text-sm">Basic</th>
-                      <th className="border border-gray-400 p-2 text-sm text-red-600">Deduction</th>
-                      <th className="border border-gray-400 p-2 text-sm text-red-600">Deduction Reason</th>
-                      
-                       <th className="border border-gray-400 p-2 text-sm">Net</th>
-                       <th className="border border-gray-400 p-2 text-sm text-blue-600">Payable</th>
-                       <th className="border border-gray-400 p-2 text-sm text-red-800">Next Month</th>
-                    </tr>
-                 </thead>
-                <tbody>
-                   {payroll.map(p => (
-                      <tr key={p.id}>
-                         <td className="border border-gray-400 p-2 text-center text-sm">{p.employee.employeeId}</td>
-                         <td className="border border-gray-400 p-2 text-sm">{p.employee.firstName} {p.employee.lastName}</td>
-                         <td className="border border-gray-400 p-2 text-center text-sm">{p.baseSalary.toLocaleString()}</td>
-                         <td className="border border-gray-400 p-2 text-center text-sm text-red-600">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
-                         <td className="border border-gray-400 p-2 text-center text-sm text-red-600">{p.deductionReason}</td>
-                         <td className="border border-gray-400 p-2 text-center text-sm font-bold">
-                             {(p.baseSalary + p.allowances - p.deductions).toLocaleString()}
-                         </td>
-                         <td className="border border-gray-400 p-2 text-center text-sm text-blue-600 font-bold">{p.additionalCash > 0 ? `${p.additionalCash.toLocaleString()}` : "-"}</td>
-                         
-                          <td className="border border-gray-400 p-2 text-center text-sm text-red-800 font-bold bg-gray-50">
-                            {((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)) < 0 ? (
-                              <div className="flex flex-col items-center">
-                                {/* <span className="text-black">0</span> */}
-                                <span className="text-red-600 text-sm font-bold whitespace-nowrap">{((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}</span>
-                              </div>
-                            ) : ((p.baseSalary + p.allowances - p.deductions) - (p.additionalCash || 0)).toLocaleString()}
-                          </td>
-                       </tr>
-                   ))}
-                </tbody>
-                <tfoot>
-                    <tr className="bg-gray-100 font-bold">
-                        <td colSpan={2} className="border border-gray-400 p-2 text-right">TOTALS:</td>
-                        <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + p.baseSalary, 0).toLocaleString()}</td>
-                        <td className="border border-gray-400 p-2 text-center text-red-600">{payroll.reduce((sum, p) => sum + p.deductions, 0).toLocaleString()}</td>
-                        <td className="border border-gray-400 p-2"></td>
-                        <td className="border border-gray-400 p-2 text-center">{payroll.reduce((sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0), 0).toLocaleString()}</td>
-                        <td className="border border-gray-400 p-2 text-center text-blue-600">{payroll.reduce((sum, p) => sum + (p.additionalCash || 0), 0).toLocaleString()}</td>
-                         
-                         <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">{payroll.reduce((sum, p) => sum + (p.netSalary - (p.additionalCash || 0)), 0).toLocaleString()}</td>
-                     </tr>
-                 </tfoot>
-             </table>
+            <table className="w-full border-collapse border border-gray-400">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="border border-gray-400 p-2 text-sm">ID</th>
+                  <th className="border border-gray-400 p-2 text-sm text-left">
+                    Employee
+                  </th>
+                  <th className="border border-gray-400 p-2 text-sm">Basic</th>
+                  <th className="border border-gray-400 p-2 text-sm text-red-600">
+                    Deduction
+                  </th>
+                  <th className="border border-gray-400 p-2 text-sm text-red-600">
+                    Deduction Reason
+                  </th>
 
-             <div className="flex justify-between mt-32 px-5">
-                <div className="border-t border-black w-32 text-center pt-1 text-xs font-bold uppercase">Prepared By</div>
-                <div className="border-t border-black w-32 text-center pt-1 text-xs font-bold uppercase">Approved By</div>
-             </div>
-             
-             <div className="mt-20 text-[10px] text-gray-400 text-center">
-                System Generated Report - {new Date().toLocaleString()}
-             </div>
+                  <th className="border border-gray-400 p-2 text-sm">Net</th>
+                  <th className="border border-gray-400 p-2 text-sm text-blue-600">
+                    Payable
+                  </th>
+                  <th className="border border-gray-400 p-2 text-sm text-red-800">
+                    Next Month
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {payroll.map((p) => (
+                  <tr key={p.id}>
+                    <td className="border border-gray-400 p-2 text-center text-sm">
+                      {p.employee.employeeId}
+                    </td>
+                    <td className="border border-gray-400 p-2 text-sm">
+                      {p.employee.firstName} {p.employee.lastName}
+                    </td>
+                    <td className="border border-gray-400 p-2 text-center text-sm">
+                      {p.baseSalary.toLocaleString()}
+                    </td>
+                    <td className="border border-gray-400 p-2 text-center text-sm text-red-600">
+                      {p.deductions > 0
+                        ? `-${p.deductions.toLocaleString()}`
+                        : p.deductions}
+                    </td>
+                    <td className="border border-gray-400 p-2 text-center text-sm text-red-600">
+                      {p.deductionReason}
+                    </td>
+                    <td className="border border-gray-400 p-2 text-center text-sm font-bold">
+                      {(
+                        p.baseSalary +
+                        p.allowances -
+                        p.deductions
+                      ).toLocaleString()}
+                    </td>
+                    <td className="border border-gray-400 p-2 text-center text-sm text-blue-600 font-bold">
+                      {p.additionalCash > 0
+                        ? `${p.additionalCash.toLocaleString()}`
+                        : "-"}
+                    </td>
+
+                    <td className="border border-gray-400 p-2 text-center text-sm text-red-800 font-bold bg-gray-50">
+                      {p.baseSalary +
+                        p.allowances -
+                        p.deductions -
+                        (p.additionalCash || 0) <
+                      0 ? (
+                        <div className="flex flex-col items-center">
+                          {/* <span className="text-black">0</span> */}
+                          <span className="text-red-600 text-sm font-bold whitespace-nowrap">
+                            {(
+                              p.baseSalary +
+                              p.allowances -
+                              p.deductions -
+                              (p.additionalCash || 0)
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+                      ) : (
+                        (
+                          p.baseSalary +
+                          p.allowances -
+                          p.deductions -
+                          (p.additionalCash || 0)
+                        ).toLocaleString()
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className="bg-gray-100 font-bold">
+                  <td
+                    colSpan={2}
+                    className="border border-gray-400 p-2 text-right"
+                  >
+                    TOTALS:
+                  </td>
+                  <td className="border border-gray-400 p-2 text-center">
+                    {payroll
+                      .reduce((sum, p) => sum + p.baseSalary, 0)
+                      .toLocaleString()}
+                  </td>
+                  <td className="border border-gray-400 p-2 text-center text-red-600">
+                    {(() => {
+                      const total = payroll.reduce(
+                        (sum, p) => sum + p.deductions,
+                        0,
+                      );
+                      return total < 0
+                        ? total.toLocaleString() // - ke saath aayega
+                        : Math.abs(total).toLocaleString(); // simple likhega
+                    })()}
+                  </td>
+
+                  <td className="border border-gray-400 p-2"></td>
+                  <td className="border border-gray-400 p-2 text-center">
+                    {payroll
+                      .reduce(
+                        (sum, p) => sum + (p.netSalary > 0 ? p.netSalary : 0),
+                        0,
+                      )
+                      .toLocaleString()}
+                  </td>
+                  <td className="border border-gray-400 p-2 text-center text-blue-600">
+                    {payroll
+                      .reduce((sum, p) => sum + (p.additionalCash || 0), 0)
+                      .toLocaleString()}
+                  </td>
+
+                  <td className="border border-gray-400 p-2 text-center text-red-800 bg-gray-50">
+                    {payroll
+                      .reduce(
+                        (sum, p) =>
+                          sum + (p.netSalary - (p.additionalCash || 0)),
+                        0,
+                      )
+                      .toLocaleString()}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+
+            <div className="flex justify-between mt-32 px-5">
+              <div className="border-t border-black w-32 text-center pt-1 text-xs font-bold uppercase">
+                Prepared By
+              </div>
+              <div className="border-t border-black w-32 text-center pt-1 text-xs font-bold uppercase">
+                Approved By
+              </div>
+            </div>
+
+            <div className="mt-20 text-[10px] text-gray-400 text-center">
+              System Generated Report - {new Date().toLocaleString()}
+            </div>
           </div>
         </div>
       )}
