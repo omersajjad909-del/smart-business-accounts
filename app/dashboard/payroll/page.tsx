@@ -467,7 +467,7 @@ export default function PayrollPage() {
                 <th className="p-3 text-center">Deductions</th>
                 <th className="p-3 text-center">Deduction Reason</th>
                 <th className="p-3 text-center">Pay</th>
-                <th className="p-3 text-center">Payable</th>
+                <th className="p-3 text-center">Paid</th>
                 <th className="p-3 text-center bg-red-50 text-red-800">
                   Next Month
                 </th>
@@ -613,7 +613,7 @@ export default function PayrollPage() {
               <th className="border-2 border-black p-2">Deduction reason</th>
 
               <th className="border-2 border-black p-2">Pay</th>
-              <th className="border-2 border-black p-2">Payable</th>
+              <th className="border-2 border-black p-2">Paid</th>
               <th className="border-2 border-black p-2 bg-red-100">
                 Next Month
               </th>
@@ -779,7 +779,7 @@ export default function PayrollPage() {
 
                   <th className="border border-gray-400 p-2 text-sm">Net</th>
                   <th className="border border-gray-400 p-2 text-sm text-blue-600">
-                    Payable
+                    Paid
                   </th>
                   <th className="border border-gray-400 p-2 text-sm text-red-800">
                     Next Month
