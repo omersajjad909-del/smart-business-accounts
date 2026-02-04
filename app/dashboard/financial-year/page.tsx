@@ -27,14 +27,15 @@ export default function FinancialYearPage() {
   });
 
   const user = getCurrentUser();
-
-  if (!hasPermission(user, PERMISSIONS.FINANCIAL_YEAR)) {
-    return <div>Access Denied</div>;
-  }
+  const canAccess = hasPermission(user, PERMISSIONS.FINANCIAL_YEAR);
 
   useEffect(() => {
     loadYears();
   }, []);
+
+  if (!canAccess) {
+    return <div>Access Denied</div>;
+  }
 
   async function loadYears() {
     setLoading(true);

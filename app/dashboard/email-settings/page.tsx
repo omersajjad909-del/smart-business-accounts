@@ -7,10 +7,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 
 export default function EmailSettingsPage() {
   const user = getCurrentUser();
-
-  if (!hasPermission(user, PERMISSIONS.EMAIL_SETTINGS)) {
-    return <div className="p-6 text-red-600">Access Denied</div>;
-  }
+  const canAccess = hasPermission(user, PERMISSIONS.EMAIL_SETTINGS);
 
   const [smtpHost, setSmtpHost] = useState("");
   const [smtpPort, setSmtpPort] = useState("");
@@ -43,6 +40,10 @@ export default function EmailSettingsPage() {
       setSmtpSecure(false);
     }
   }, []);
+
+  if (!canAccess) {
+    return <div className="p-6 text-red-600">Access Denied</div>;
+  }
 
   async function testEmail() {
     setTesting(true);
@@ -203,8 +204,8 @@ SMTP_FROM=noreply@ustraders.com`}
           <h3 className="font-bold mb-2">Gmail Setup Instructions:</h3>
           <ol className="text-sm space-y-1 list-decimal list-inside">
             <li>Enable 2-Step Verification on your Google account</li>
-            <li>Go to Google Account → Security → App Passwords</li>
-            <li>Generate a new App Password for "Mail"</li>
+            <li>Go to Google Account &rarr; Security &rarr; App Passwords</li>
+            <li>Generate a new App Password for &quot;Mail&quot;</li>
             <li>Use that App Password in SMTP Password field</li>
             <li>Set SMTP Host: smtp.gmail.com</li>
             <li>Set SMTP Port: 587 (or 465 for SSL)</li>
@@ -214,3 +215,4 @@ SMTP_FROM=noreply@ustraders.com`}
     </div>
   );
 }
+

@@ -56,10 +56,7 @@ function SalesInvoiceContent() {
   const queryId = searchParams.get("id");
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
-
-  if (!hasPermission(user, PERMISSIONS.CREATE_SALES_INVOICE)) {
-    return <div>Access Denied</div>;
-  }
+  const canCreate = hasPermission(user, PERMISSIONS.CREATE_SALES_INVOICE);
 
   const [customers, setCustomers] = useState<Account[]>([]);
   const [items, setItems] = useState<Item[]>([]);
@@ -490,6 +487,10 @@ function SalesInvoiceContent() {
     const url = `sms:?body=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
+
+  if (!canCreate) {
+    return <div>Access Denied</div>;
+  }
 
   return (
     <div className="p-6 space-y-6">

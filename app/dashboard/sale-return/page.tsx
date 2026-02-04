@@ -39,6 +39,67 @@ export default function SalesReturnPage() {
   const [preview, setPreview] = useState(false);
   const [savedData, setSavedData] = useState<any>(null);
 
+  async function loadReturns() {
+    try {
+      const res = await fetch("/api/sale-return", {
+        headers: { "x-user-role": user?.role || "ADMIN" },
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setReturns(data);
+      }
+    } catch (e) {
+      console.error("Load returns error:", e);
+    }
+  }
+
+  async function handleInvoiceChange(id: string) {
+    setInvoiceId(id);
+    if (!id) { 
+      setRows([]); 
+      setCustomerName(""); 
+      setDisplayInvoiceNo(""); 
+      return; 
+    }
+
+    const selectedInv = invoices.find(i => i.id === id);
+    if (selectedInv) setDisplayInvoiceNo(selectedInv.invoiceNo);
+
+    try {
+      const user = getCurrentUser();
+      const res = await fetch(`/api/sales-invoice/${id}`, {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-user-id": user?.id || ""
+        }
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        alert(errorData.error || "Failed to load invoice details");
+        setInvoiceId("");
+        setRows([]);
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.items && data.items.length === 0) {
+        alert("Ye Invoice pehle hi mukammal return ho chuki hai!");
+        setInvoiceId("");
+        setRows([]);
+        return;
+      }
+
+      setCustomerName(data.customerName || "");
+      setCustomerId(data.customerId || "");
+      setRows(data.items || []);
+    } catch (err: any) {
+      console.error("Load error:", err);
+      alert(`Error loading invoice: ${err.message || "Unknown error"}`);
+    }
+  }
+
   // Keyboard shortcuts - F7: Clear date/customer, F8: Query dialog
   useEffect(() => {
     function handleKeyPress(e: KeyboardEvent) {
@@ -115,67 +176,6 @@ export default function SalesReturnPage() {
         alert(`Failed to load invoices: ${err.message}`);
       });
   }, []);
-
-  async function loadReturns() {
-    try {
-      const res = await fetch("/api/sale-return", {
-        headers: { "x-user-role": user?.role || "ADMIN" },
-      });
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setReturns(data);
-      }
-    } catch (e) {
-      console.error("Load returns error:", e);
-    }
-  }
-
-  async function handleInvoiceChange(id: string) {
-    setInvoiceId(id);
-    if (!id) { 
-      setRows([]); 
-      setCustomerName(""); 
-      setDisplayInvoiceNo(""); 
-      return; 
-    }
-
-    const selectedInv = invoices.find(i => i.id === id);
-    if (selectedInv) setDisplayInvoiceNo(selectedInv.invoiceNo);
-
-    try {
-      const user = getCurrentUser();
-      const res = await fetch(`/api/sales-invoice/${id}`, {
-        headers: {
-          "x-user-role": user?.role || "",
-          "x-user-id": user?.id || ""
-        }
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        alert(errorData.error || "Failed to load invoice details");
-        setInvoiceId("");
-        setRows([]);
-        return;
-      }
-
-      const data = await res.json();
-
-      if (data.items && data.items.length === 0) {
-        alert("Ye Invoice pehle hi mukammal return ho chuki hai!");
-        setInvoiceId("");
-        setRows([]);
-        return;
-      }
-
-      setCustomerName(data.customerName || "");
-      setCustomerId(data.customerId || "");
-      setRows(data.items || []);
-    } catch (err: any) {
-      console.error("Load error:", err);
-      alert(`Error loading invoice: ${err.message || "Unknown error"}`);
-    }
-  }
 
   const updateRow = <K extends keyof Row>(
   index: number,

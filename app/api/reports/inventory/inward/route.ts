@@ -8,7 +8,7 @@ type PurchaseWithItems = Prisma.PurchaseInvoiceGetPayload<{
     items: true;
   };
 }>;
-type PurchaseItem = Prisma.PurchaseInvoiceItemGetPayload<{}>;
+type PurchaseItem = Prisma.PurchaseInvoiceItemGetPayload<Prisma.PurchaseInvoiceItemDefaultArgs>;
 
 
 

@@ -4,19 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export default function UsersPage() {
   const userSession = getCurrentUser();
-
-  // Guard - صرف ADMIN رسائی کر سکتے ہیں
-  if (!userSession) return null;
-  if (userSession.role !== "ADMIN") {
-    return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <h2 className="text-xl font-bold text-red-600 mb-2">❌ رسائی مسترد</h2>
-          <p className="text-red-700">صرف ADMIN صارفین رولز کو سنبھال سکتے ہیں</p>
-        </div>
-      </div>
-    );
-  }
+  const isAdmin = userSession?.role === "ADMIN";
 
   const [users, setUsers] = useState<any[]>([]);
   const [roles, setRoles] = useState<any[]>([]); // رولز کے لیے اسٹیٹ
@@ -76,6 +64,19 @@ export default function UsersPage() {
     setEditing(false);
   };
 
+
+  // Guard - صرف ADMIN رسائی کر سکتے ہیں
+  if (!userSession) return null;
+  if (!isAdmin) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <h2 className="text-xl font-bold text-red-600 mb-2">❌ رسائی مسترد</h2>
+          <p className="text-red-700">صرف ADMIN صارفین رولز کو سنبھال سکتے ہیں</p>
+        </div>
+      </div>
+    );
+  }
   if (loading) return <div className="p-10 text-center">Loading Data...</div>;
 
   return (
@@ -136,3 +137,5 @@ export default function UsersPage() {
     </div>
   );
 }
+
+

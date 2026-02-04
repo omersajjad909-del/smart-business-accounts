@@ -59,17 +59,7 @@ export default function BackupRestorePage() {
   const [creating, setCreating] = useState(false);
 
   const user = getCurrentUser();
-
-  if (!userHasPerm(user, 'BACKUP_RESTORE')) {
-    return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <h2 className="text-xl font-bold text-red-600 mb-2">❌ Access Denied</h2>
-          <p className="text-red-700">You do not have permission to access backup & restore.</p>
-        </div>
-      </div>
-    );
-  }
+  const canAccess = userHasPerm(user, 'BACKUP_RESTORE');
 
   useEffect(() => {
     loadBackups();
@@ -172,6 +162,16 @@ export default function BackupRestorePage() {
     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   }
 
+  if (!canAccess) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <h2 className="text-xl font-bold text-red-600 mb-2">❌ Access Denied</h2>
+          <p className="text-red-700">You do not have permission to access backup & restore.</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -260,3 +260,7 @@ export default function BackupRestorePage() {
     </div>
   );
 }
+
+
+
+
