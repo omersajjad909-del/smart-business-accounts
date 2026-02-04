@@ -2,12 +2,36 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  active: boolean;
+};
+
+type CurrentUser = {
+  id: string;
+  role: string;
+  name?: string;
+  email?: string;
+};
+
+type UserForm = {
+  id: string | null;
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  active: boolean;
+};
+
 export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<UserForm>({
     id: null,
     name: "",
     email: "",
@@ -16,6 +40,16 @@ export default function UsersPage() {
     active: true,
   });
   const [editing, setEditing] = useState(false);
+
+  function reload() {
+    setLoading(true);
+    fetch("/api/users", {
+      headers: { "x-user-role": "ADMIN" },
+    })
+      .then((r) => r.json())
+      .then((data) => setUsers(Array.isArray(data) ? data : []))
+      .finally(() => setLoading(false));
+  }
 
   useEffect(() => {
     const u = getCurrentUser();
@@ -27,16 +61,6 @@ export default function UsersPage() {
       setLoading(false);
     }
   }, []);
-
-  function reload() {
-    setLoading(true);
-    fetch("/api/users", {
-      headers: { "x-user-role": "ADMIN" },
-    })
-      .then((r) => r.json())
-      .then(setUsers)
-      .finally(() => setLoading(false));
-  }
 
   async function save() {
     if (!form.name || !form.email) return alert("Please fill required fields");
@@ -63,7 +87,7 @@ export default function UsersPage() {
     reload();
   }
 
-  function edit(u: any) {
+  function edit(u: User) {
     setForm({ ...u, password: "" });
     setEditing(true);
   }

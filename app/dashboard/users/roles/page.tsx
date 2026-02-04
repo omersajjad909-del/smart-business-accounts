@@ -11,23 +11,17 @@ type User = {
 };
 
 export default function AdminPermissionsPage() {
-  const [me, setMe] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const me = getCurrentUser();
+  const isAdmin = me?.role === "ADMIN";
 
   const [users, setUsers] = useState<User[]>([]);
   const [selected, setSelected] = useState<User | null>(null);
   const [checked, setChecked] = useState<string[]>([]);
 
   // 🔐 load session ONCE
-  useEffect(() => {
-    const u = getCurrentUser();
-    setMe(u);
-    setLoading(false);
-  }, []);
-
   // 🔐 fetch users AFTER auth
   useEffect(() => {
-    if (!me || me.role !== "ADMIN") return;
+    if (!me || !isAdmin) return;
 
     fetch("/api/admin/user-permissions", {
       headers: {
@@ -38,12 +32,10 @@ export default function AdminPermissionsPage() {
       .then(r => r.json())
       .then(setUsers)
       .catch(console.error);
-  }, [me]);
+  }, [isAdmin, me?.id, me?.role]);
 
   // ⛔ nothing renders until ready
-  if (loading) return <div className="p-6">Loading…</div>;
-
-  if (!me || me.role !== "ADMIN") {
+  if (!me || !isAdmin) {
     return <div className="p-6 text-red-600">Access denied</div>;
   }
 
@@ -133,3 +125,4 @@ export default function AdminPermissionsPage() {
     </div>
   );
 }
+

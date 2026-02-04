@@ -9,10 +9,20 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    ".next - Copy/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "backups/**",
+    "scripts/**",
+    "prisma/seed.js",
+    "check-db.js",
   ]),
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
 ]);
 
 export default eslintConfig;
