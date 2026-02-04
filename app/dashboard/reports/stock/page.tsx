@@ -119,7 +119,7 @@ export default function StockReportPage() {
             {loading ? (
               <tr><td colSpan={4} className="p-10 text-center animate-pulse">FETCHING INVENTORY...</td></tr>
             ) : filteredRows.length === 0 ? (
-              <tr><td colSpan={4} className="p-10 text-center text-gray-400 italic font-medium">No items found for "{stockStatus}" status.</td></tr>
+              <tr><td colSpan={4} className="p-10 text-center text-gray-400 italic font-medium">No items found for &quot;{stockStatus}&quot; status.</td></tr>
             ) : (
               filteredRows.map((r) => (
                 <tr key={r.itemId} className={`hover:bg-yellow-50 transition-colors uppercase ${r.stockQty <= 0 ? 'bg-red-50/30' : ''}`}>

@@ -5,10 +5,29 @@ import { PERMISSIONS } from "@/lib/permissions"; // آپ کی پرمیشنز ک�
 
 export default function AdminPermissionsPage() {
   const userSession = getCurrentUser();
+  const isAdmin = userSession?.role === "ADMIN";
+
+  const [users, setUsers] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // 1. تمام یوزرز لوڈ کریں (ہیڈر کے ساتھ)
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetch("/api/users", {
+      headers: { "x-user-role": "ADMIN" },
+    })
+      .then(r => r.json())
+      .then(data => setUsers(Array.isArray(data) ? data : []))
+      .catch(err => console.error("Error loading users:", err));
+  }, [isAdmin]);
+
+  // 2. یوزر کی موجودہ پرمیشنز لوڈ کرنا
 
   // Guard - صرف ADMIN رسائی کر سکتے ہیں
   if (!userSession) return null;
-  if (userSession.role !== "ADMIN") {
+  if (!isAdmin) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
@@ -18,23 +37,6 @@ export default function AdminPermissionsPage() {
       </div>
     );
   }
-
-  const [users, setUsers] = useState<any[]>([]);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [permissions, setPermissions] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  // 1. تمام یوزرز لوڈ کریں (ہیڈر کے ساتھ)
-  useEffect(() => {
-    fetch("/api/users", {
-      headers: { "x-user-role": "ADMIN" }
-    })
-      .then(r => r.json())
-      .then(data => setUsers(Array.isArray(data) ? data : []))
-      .catch(err => console.error("Error loading users:", err));
-  }, []);
-
-  // 2. یوزر کی موجودہ پرمیشنز لوڈ کرنا
   function loadPermissions(user: any) {
     // اگر یوزر ابجیکٹ میں پرمیشنز پہلے سے ہیں تو وہ اٹھا لو
     if (user.permissions) {
@@ -141,3 +143,5 @@ export default function AdminPermissionsPage() {
     </div>
   );
 }
+
+

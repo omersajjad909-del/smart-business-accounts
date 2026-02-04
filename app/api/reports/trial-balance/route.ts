@@ -66,19 +66,19 @@ export async function GET(req: Request) {
           voucher: { date: { gte: fromDate, lte: toDate } },
         },
       });
-let transDebit = periodVouchers
-  .filter((v: VoucherEntry) => Number(v.amount) > 0)
-  .reduce(
-    (s: number, v: VoucherEntry) => s + Number(v.amount),
-    0
-  );
+      const transDebit = periodVouchers
+        .filter((v: VoucherEntry) => Number(v.amount) > 0)
+        .reduce(
+          (s: number, v: VoucherEntry) => s + Number(v.amount),
+          0
+        );
 
-let transCredit = periodVouchers
-  .filter((v: VoucherEntry) => Number(v.amount) < 0)
-  .reduce(
-    (s: number, v: VoucherEntry) => s + Math.abs(Number(v.amount)),
-    0
-  );
+      const transCredit = periodVouchers
+        .filter((v: VoucherEntry) => Number(v.amount) < 0)
+        .reduce(
+          (s: number, v: VoucherEntry) => s + Math.abs(Number(v.amount)),
+          0
+        );
 
 
       const closingNet = openingNet + (transDebit - transCredit);

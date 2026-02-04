@@ -9,7 +9,7 @@ type ItemWithInventory = Prisma.ItemNewGetPayload<{
 
 }>;
 
-type InventoryTxn = Prisma.InventoryTxnGetPayload<{}>;
+type InventoryTxn = Prisma.InventoryTxnGetPayload<Prisma.InventoryTxnDefaultArgs>;
 
 
 if (process.env.NODE_ENV === "development") {

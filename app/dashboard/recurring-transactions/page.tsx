@@ -38,15 +38,16 @@ export default function RecurringTransactionsPage() {
   const [accounts, setAccounts] = useState<any[]>([]);
 
   const user = getCurrentUser();
-
-  if (!hasPermission(user, PERMISSIONS.RECURRING_TRANSACTIONS)) {
-    return <div>Access Denied</div>;
-  }
+  const canAccess = hasPermission(user, PERMISSIONS.RECURRING_TRANSACTIONS);
 
   useEffect(() => {
     loadTransactions();
     loadAccounts();
   }, []);
+
+  if (!canAccess) {
+    return <div>Access Denied</div>;
+  }
 
   async function loadTransactions() {
     setLoading(true);

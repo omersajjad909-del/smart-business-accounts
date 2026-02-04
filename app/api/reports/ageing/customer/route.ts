@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient ,Prisma} from "@prisma/client";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
-type CreditEntry = Prisma.VoucherEntryGetPayload<{}>;
+type CreditEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
 
 
 if (process.env.NODE_ENV === "development") {

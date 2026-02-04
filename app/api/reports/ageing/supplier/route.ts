@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    type DebitEntry = Prisma.VoucherEntryGetPayload<{}>;
+    type DebitEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
 
 let availableDebit = debits.reduce(
   (s: number, d: DebitEntry) => s + Number(d.amount),

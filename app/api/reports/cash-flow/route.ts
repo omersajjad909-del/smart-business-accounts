@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
     const financing: CashFlowItem[] = [];
 
     // Get Cash account - try multiple variations
-    let cashAccount = await prisma.account.findFirst({
+    const cashAccount = await prisma.account.findFirst({
       where: { name: { contains: "Cash", mode: "insensitive" } },
     });
 
