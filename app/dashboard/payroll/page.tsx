@@ -429,7 +429,8 @@ export default function PayrollPage() {
                           <td className="border-2 border-black p-2 text-center">{p.employee.employeeId}</td>
                           <td className="border-2 border-black p-2">{p.employee.firstName} {p.employee.lastName}</td>
                           <td className="border-2 border-black p-2 text-center">{p.baseSalary.toLocaleString()}</td>
-                          <td className="border-2 border-black p-2 text-center text-red-600 font-bold">{p.deductions > 0 ? p.deductions.toLocaleString() : "-"}</td>
+                          <td className="border-2 border-black p-2 text-center text-red-600 font-bold">{p.deductions > 0 ? `-${p.deductions.toLocaleString()}` : p.deductions}</td>
+                          {/* {p.deductions > 0 ? p.deductions.toLocaleString() : "-"} */}
                           <td className="border-2 border-black p-2 text-center">{p.deductionReason || "-"}</td>
                           <td className="border-2 border-black p-2 text-center font-bold">
                               {(p.baseSalary + p.allowances - p.deductions).toLocaleString()}
