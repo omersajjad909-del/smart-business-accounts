@@ -23,9 +23,10 @@ export default function PayrollPage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [monthYear, setMonthYear] = useState(
-    new Date().toISOString().slice(0, 7),
-  );
+  const [monthYear, setMonthYear] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
   const [detectedAdvance, setDetectedAdvance] = useState(0);
 
   // Preview State
@@ -33,7 +34,10 @@ export default function PayrollPage() {
 
   const [formData, setFormData] = useState({
     employeeId: "",
-    monthYear: new Date().toISOString().slice(0, 7),
+    monthYear: (() => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    })(),
     baseSalary: 0,
     allowances: 0,
     deductions: 0,
@@ -82,19 +86,34 @@ export default function PayrollPage() {
       let prevBalanceDeduction = 0;
       try {
         const [year, month] = formData.monthYear.split("-").map(Number);
-        const prevDate = new Date(year, month - 2); // Month is 0-indexed, so current is month-1, prev is month-2
-        const prevMonthStr = prevDate.toISOString().slice(0, 7);
+        
+        // Robust previous month calculation avoiding timezone issues
+        let prevYear = year;
+        let prevMonth = month - 1;
+        if (prevMonth === 0) {
+          prevMonth = 12;
+          prevYear -= 1;
+        }
+        const prevMonthStr = `${prevYear}-${prevMonth.toString().padStart(2, "0")}`;
 
         const resPrev = await fetch(
           `/api/payroll?employeeId=${formData.employeeId}&monthYear=${prevMonthStr}`,
+          { cache: "no-store" },
         );
         const dataPrev = await resPrev.json();
 
         if (Array.isArray(dataPrev) && dataPrev.length > 0) {
           const prevRecord = dataPrev[0];
+
+          // Recalculate Net Salary strictly as (Earnings - Deductions) to ignore any DB inconsistencies
+          const prevNetSalary =
+            prevRecord.baseSalary +
+            (prevRecord.allowances || 0) -
+            (prevRecord.deductions || 0);
+
           // Actual Balance = Net Salary - Additional Cash
           const prevActualBalance =
-            prevRecord.netSalary - (prevRecord.additionalCash || 0);
+            prevNetSalary - (prevRecord.additionalCash || 0);
 
           // If Actual Balance is negative, it means they owe us money (Carry Forward)
           if (prevActualBalance < 0) {
