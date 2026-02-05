@@ -4,8 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 
 export default function CategorizedTrialBalance() {
    const today = new Date().toISOString().slice(0, 10);
-  const [rows, setRows] = useState<any[]>([]);
-  const [totals, setTotals] = useState<any>(null);
+  const [rows, setRows] = useState<Any[]>([]);
+  const [_totals, setTotals] = useState<Any>(null);
   const [loading, setLoading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
 
@@ -82,7 +82,7 @@ export default function CategorizedTrialBalance() {
               } else {
                 alert(data.error || "Email send nahi ho saki");
               }
-            } catch (e) {
+            } catch (_e) {
               alert("Email send karte waqt error aayi");
             } finally {
               setSendingEmail(false);

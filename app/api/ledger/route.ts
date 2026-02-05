@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
 
 const prisma =
-  (globalThis as any).prisma || new PrismaClient();
+  (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: Request) {
@@ -56,3 +56,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Ledger failed" }, { status: 500 });
   }
 }
+

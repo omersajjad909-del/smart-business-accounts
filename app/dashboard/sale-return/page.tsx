@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
 type Invoice = { id: string; invoiceNo: string; customerName: string; customerId: string; };
@@ -15,7 +15,24 @@ type SaleReturn = {
   invoiceId: string;
   invoice?: { invoiceNo: string };
   total: number;
-  items: Array<{ item: { name: string }; qty: number; rate: number }>;
+  items: Array<{ itemId?: string; item?: { name: string }; qty: number; rate: number }>;
+};
+
+type SavedItem = {
+  name: string;
+  qty: number;
+  rate: number;
+};
+
+type SavedReturnData = {
+  returnNo: string;
+  date: string;
+  customerName: string;
+  invoiceNo: string;
+  items: SavedItem[];
+  total: number;
+  freight: number;
+  netTotal: number;
 };
 
 export default function SalesReturnPage() {
@@ -37,9 +54,9 @@ export default function SalesReturnPage() {
   const [freight, setFreight] = useState<number | "">("");
 
   const [preview, setPreview] = useState(false);
-  const [savedData, setSavedData] = useState<any>(null);
+  const [savedData, setSavedData] = useState<SavedReturnData | null>(null);
 
-  async function loadReturns() {
+  const loadReturns = useCallback(async () => {
     try {
       const res = await fetch("/api/sale-return", {
         headers: { "x-user-role": user?.role || "ADMIN" },
@@ -51,9 +68,9 @@ export default function SalesReturnPage() {
     } catch (e) {
       console.error("Load returns error:", e);
     }
-  }
+  }, [user?.role]);
 
-  async function handleInvoiceChange(id: string) {
+  const handleInvoiceChange = useCallback(async (id: string) => {
     setInvoiceId(id);
     if (!id) { 
       setRows([]); 
@@ -94,11 +111,12 @@ export default function SalesReturnPage() {
       setCustomerName(data.customerName || "");
       setCustomerId(data.customerId || "");
       setRows(data.items || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error";
       console.error("Load error:", err);
-      alert(`Error loading invoice: ${err.message || "Unknown error"}`);
+      alert(`Error loading invoice: ${message}`);
     }
-  }
+  }, [invoices]);
 
   // Keyboard shortcuts - F7: Clear date/customer, F8: Query dialog
   useEffect(() => {
@@ -135,8 +153,9 @@ export default function SalesReturnPage() {
     }
     document.addEventListener("keydown", handleKeyPress, true);
     return () => document.removeEventListener("keydown", handleKeyPress, true);
-  }, [today, showForm, preview, invoices]);
+  }, [today, showForm, preview, invoices, handleInvoiceChange]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     loadReturns();
     const user = getCurrentUser();
@@ -163,7 +182,9 @@ export default function SalesReturnPage() {
       })
       .then((d) => {
         if (d?.invoices) {
-          const activeInvoices = d.invoices.filter((inv: any) => inv.status !== "RETURNED");
+          const activeInvoices = d.invoices.filter(
+            (inv: { status?: string }) => inv.status !== "RETURNED"
+          );
           setInvoices(activeInvoices);
         } else if (d?.error) {
           alert(`Error: ${d.error}`);
@@ -171,11 +192,13 @@ export default function SalesReturnPage() {
           console.error("Unexpected response format:", d);
         }
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : "Unknown error";
         console.error("Load invoices error:", err);
-        alert(`Failed to load invoices: ${err.message}`);
+        alert(`Failed to load invoices: ${message}`);
       });
-  }, []);
+  }, [loadReturns]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const updateRow = <K extends keyof Row>(
   index: number,
@@ -238,7 +261,7 @@ export default function SalesReturnPage() {
     setCustomerId(ret.customerId);
     setCustomerName(ret.customer?.name || "");
     setDate(new Date(ret.date).toISOString().slice(0, 10));
-    setRows(ret.items.map((it: any) => ({
+    setRows(ret.items.map((it) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       qty: it.qty.toString(),
@@ -263,7 +286,7 @@ export default function SalesReturnPage() {
         const err = await res.json();
         alert(err.error || "Delete failed");
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Delete failed");
     }
   }
@@ -461,7 +484,7 @@ export default function SalesReturnPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {savedData.items.map((it: any, idx: number) => (
+                    {savedData.items.map((it, idx) => (
                       <tr key={idx}>
                         <td className="border border-black p-2">{it.name}</td>
                         <td className="border border-black p-2 text-center">{it.qty}</td>

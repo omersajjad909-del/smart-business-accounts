@@ -3,10 +3,10 @@ import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma =
-  (globalThis as any).prisma || new PrismaClient();
+  (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(item);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("❌ ITEMS-NEW POST ERROR:", e);
     if (e.code === "P2002") {
       return NextResponse.json(
@@ -120,7 +120,7 @@ export async function PUT(req: NextRequest) {
     const item = await prisma.itemNew.findUnique({ where: { id } });
 
     return NextResponse.json(item);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("❌ ITEMS-NEW PUT ERROR:", e);
     if (e.code === "P2002") {
       return NextResponse.json(
@@ -180,7 +180,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("❌ ITEMS-NEW DELETE ERROR:", e);
     return NextResponse.json(
       { error: e.message || "Delete failed" },
@@ -188,3 +188,4 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+

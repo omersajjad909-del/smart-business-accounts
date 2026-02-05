@@ -18,7 +18,7 @@ export default function StockReportPage() {
   const [searchTerm, setSearchTerm] = useState("");
   // 👈 نیا فلٹر سٹیٹ: all, remaining, nill
   const [stockStatus, setStockStatus] = useState("all"); 
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [_showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     loadStock();

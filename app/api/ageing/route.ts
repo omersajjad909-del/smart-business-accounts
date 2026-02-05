@@ -3,10 +3,10 @@ import { PrismaClient } from "@prisma/client";
 
 // ✅ Prisma singleton (dev safe)
 const prisma =
-  (globalThis as any).prisma || new PrismaClient();
+  (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: Request) {
@@ -33,13 +33,13 @@ export async function GET(req: Request) {
 
     const today = new Date();
 
-    const result = parties.map((party: any) => {
+    const result = parties.map((party: Any) => {
       let b0_30 = 0;
       let b31_60 = 0;
       let b61_90 = 0;
       let b90p = 0;
 
-      vouchers.forEach((v: any) => {
+      vouchers.forEach((v: Any) => {
         if (v.accountId !== party.id) return;
 
         const days =
@@ -83,3 +83,4 @@ export async function GET(req: Request) {
     );
   }
 }
+

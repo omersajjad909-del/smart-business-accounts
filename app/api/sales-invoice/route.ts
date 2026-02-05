@@ -18,10 +18,10 @@ type SalesInvoiceFull = Prisma.SalesInvoiceGetPayload<{
 type TxClient = Prisma.TransactionClient;
 
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
       nextNo,
       invoices: formattedInvoices
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
     const { invoiceNo, customerId, date, location, freight = 0, items, applyTax = false, taxConfigId = null, driverName = null, vehicleNo = null } = body;
 
     const total = items.reduce(
-      (s: number, i: any) => s + i.qty * i.rate,
+      (s: number, i: Any) => s + i.qty * i.rate,
       0
     );
 
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
         vehicleNo,
         total: total + freight + taxAmount,
         items: {
-          create: items.map((i: any) => ({
+          create: items.map((i: Any) => ({
             itemId: i.itemId,
             qty: i.qty,
             rate: i.rate,
@@ -241,7 +241,7 @@ export async function POST(req: NextRequest) {
       invoiceNo: invoice.invoiceNo,
       invoice: savedInvoice
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
@@ -268,7 +268,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, customerId, date, location, freight = 0, items, applyTax = false, taxConfigId = null, driverName = null, vehicleNo = null } = body;
+    const { id, customerId: _customerId, date, location: _location, freight = 0, items, applyTax = false, taxConfigId = null, driverName = null, vehicleNo = null } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
@@ -283,7 +283,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    const total = items.reduce((s: number, i: any) => s + i.qty * i.rate, 0);
+    const total = items.reduce((s: number, i: Any) => s + i.qty * i.rate, 0);
 
     // Calculate tax if applied
     let taxAmount = 0;
@@ -308,7 +308,7 @@ export async function PUT(req: NextRequest) {
           total: total + freight + taxAmount,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
-            create: items.map((i: any) => ({
+            create: items.map((i: Any) => ({
               itemId: i.itemId,
               qty: i.qty,
               rate: i.rate,
@@ -327,7 +327,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, invoice: result });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Sales Invoice PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -372,9 +372,10 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Sales Invoice DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+
 

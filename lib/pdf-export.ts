@@ -1,7 +1,7 @@
 // PDF Export Utility
 // Note: For production, use a proper PDF library like jsPDF or pdfkit
 
-export function exportToPDF(data: any[], filename: string, columns: string[]) {
+export function exportToPDF(data: Any[], filename: string, columns: string[]) {
   // Simple HTML-based PDF generation
   // For production, use jsPDF or server-side PDF generation
 
@@ -18,7 +18,7 @@ export function exportToPDF(data: any[], filename: string, columns: string[]) {
   }
 }
 
-function generatePDFHTML(data: any[], columns: string[], title: string): string {
+function generatePDFHTML(data: Any[], columns: string[], title: string): string {
   const tableRows = data
     .map(
       (row) => `
@@ -98,7 +98,7 @@ function generatePDFHTML(data: any[], columns: string[], title: string): string 
 
 // Alternative: Use jsPDF for better PDF generation
 export async function exportToPDFAdvanced(
-  data: any[],
+  data: Any[],
   filename: string,
   columns: { header: string; dataKey: string; width?: number }[]
 ) {
@@ -119,7 +119,7 @@ export async function exportToPDFAdvanced(
       ),
       startY: 40,
       styles: { fontSize: 8 },
-      columnStyles: columns.reduce((acc: any, col, idx) => {
+      columnStyles: columns.reduce((acc: Any, col, idx) => {
         if (col.width) acc[idx] = { cellWidth: col.width };
         return acc;
       }, {}),

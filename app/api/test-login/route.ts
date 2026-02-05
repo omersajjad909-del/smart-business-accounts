@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // Test endpoint to check users and database
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     // Check database connection
     await prisma.$connect();
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       users,
       message: userCount === 0 ? "No users found. Please create a user first." : "Users found",
     });
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("❌ TEST LOGIN ERROR:", error);
     return NextResponse.json(
       {
@@ -48,3 +48,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

@@ -4,10 +4,10 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(years);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Financial Year GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(financialYear);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Financial Year POST Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -122,7 +122,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "ID required" }, { status: 400 });
     }
 
-    const updateData: any = {};
+    const updateData: Any = {};
     if (isClosed !== undefined) {
       updateData.isClosed = isClosed;
       if (isClosed) {
@@ -145,8 +145,9 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(financialYear);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Financial Year PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

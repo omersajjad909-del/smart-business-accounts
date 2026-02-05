@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient , Prisma } from "@prisma/client";
+import { PrismaClient , Prisma as _Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 type StockAggRow = {
   itemId: string;
@@ -17,10 +17,10 @@ type ItemRow = {
 
 
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -75,3 +75,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json([], { status: 500 });
   }
 }
+

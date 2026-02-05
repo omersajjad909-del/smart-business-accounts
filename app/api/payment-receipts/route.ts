@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status');
     const partyId = searchParams.get('partyId');
 
-    const filter: any = { companyId };
+    const filter: Any = { companyId };
     if (status) filter.status = status;
     if (partyId) filter.partyId = partyId;
 
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create voucher and payment receipt in transaction
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = await prisma.$transaction(async (tx: Any) => {
       // 1. Create voucher (like CRV)
       const voucher = await tx.voucher.create({
         data: {
@@ -220,7 +220,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(result, { status: 201 });
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error('Error creating payment receipt:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to create payment receipt' },
@@ -308,3 +308,4 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+

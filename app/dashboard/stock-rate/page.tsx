@@ -108,7 +108,7 @@ export default function StockRatePage() {
         const err = await res.json();
         toast.error(err.error || "Delete failed");
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error("Delete failed");
     }
   }

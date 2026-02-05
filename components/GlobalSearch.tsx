@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export default function GlobalSearch() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<Any>(null);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -147,7 +147,7 @@ export default function GlobalSearch() {
               <div className="text-xs font-bold text-gray-500 uppercase px-2 py-1">
                 Accounts
               </div>
-              {results.accounts.map((item: any) => (
+              {results.accounts.map((item: Any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}
@@ -165,7 +165,7 @@ export default function GlobalSearch() {
               <div className="text-xs font-bold text-gray-500 uppercase px-2 py-1">
                 Items
               </div>
-              {results.items.map((item: any) => (
+              {results.items.map((item: Any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}
@@ -183,7 +183,7 @@ export default function GlobalSearch() {
               <div className="text-xs font-bold text-gray-500 uppercase px-2 py-1">
                 Sales Invoices
               </div>
-              {results.salesInvoices.map((item: any) => (
+              {results.salesInvoices.map((item: Any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}
@@ -201,7 +201,7 @@ export default function GlobalSearch() {
               <div className="text-xs font-bold text-gray-500 uppercase px-2 py-1">
                 Purchase Invoices
               </div>
-              {results.purchaseInvoices.map((item: any) => (
+              {results.purchaseInvoices.map((item: Any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}
@@ -219,7 +219,7 @@ export default function GlobalSearch() {
               <div className="text-xs font-bold text-gray-500 uppercase px-2 py-1">
                 Vouchers
               </div>
-              {results.vouchers.map((item: any) => (
+              {results.vouchers.map((item: Any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}

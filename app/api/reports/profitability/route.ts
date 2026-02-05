@@ -4,10 +4,10 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
         },
       });
 
-      const customerProfit: Record<string, any> = {};
+      const customerProfit: Record<string, Any> = {};
 
       for (const invoice of salesInvoices) {
         const customerId = invoice.customerId;
@@ -90,7 +90,7 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      const result = Object.values(customerProfit).map((cp: any) => ({
+      const result = Object.values(customerProfit).map((cp: Any) => ({
         ...cp,
         totalProfit: cp.totalSales - cp.totalCost,
         profitMargin: cp.totalSales > 0 ? ((cp.totalSales - cp.totalCost) / cp.totalSales) * 100 : 0,
@@ -112,7 +112,7 @@ export async function GET(req: NextRequest) {
         },
       });
 
-      const productProfit: Record<string, any> = {};
+      const productProfit: Record<string, Any> = {};
 
       for (const item of salesInvoiceItems) {
         const itemId = item.itemId;
@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
         productProfit[itemId].totalCost += avgCost * item.qty;
       }
 
-      const result = Object.values(productProfit).map((pp: any) => ({
+      const result = Object.values(productProfit).map((pp: Any) => ({
         ...pp,
         totalProfit: pp.totalSales - pp.totalCost,
         profitMargin: pp.totalSales > 0 ? ((pp.totalSales - pp.totalCost) / pp.totalSales) * 100 : 0,
@@ -153,8 +153,9 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(result);
     }
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Profitability Report Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

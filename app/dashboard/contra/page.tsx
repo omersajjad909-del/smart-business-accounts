@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 import { ResponsiveContainer, PageHeader, Card } from '@/components/ui/ResponsiveContainer';
-import { ResponsiveForm, FormField, FormActions } from '@/components/ui/ResponsiveForm';
+import { ResponsiveForm as _ResponsiveForm, FormField as _FormField, FormActions as _FormActions } from '@/components/ui/ResponsiveForm';
 import {
-  MobileTable,
-  MobileCard,
-  MobileCardRow,
+  _MobileTable,
+  _MobileCard,
+  _MobileCardRow,
   DesktopTable,
   EmptyState,
 } from '@/components/ui/MobileTable';
@@ -31,11 +31,11 @@ interface Account {
 
 export default function ContraPage() {
   const [entries, setEntries] = useState<ContraEntry[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [_accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  const [_showForm, setShowForm] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, _setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     fromAccountId: '',
     toAccountId: '',
@@ -64,7 +64,7 @@ export default function ContraPage() {
     setAccounts(data.filter((a: Account) => a.accountType === 'CASH' || a.accountType === 'BANK'));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const _handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.fromAccountId === formData.toAccountId) {
       toast.error('From & To account same nahi ho sakte');

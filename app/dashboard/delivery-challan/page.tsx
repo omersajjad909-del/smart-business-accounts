@@ -38,11 +38,11 @@ type DeliveryChallan = {
 };
 
 export default function DeliveryChallanPage() {
-  const router = useRouter();
+  const _router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 
-  const [authorized, setAuthorized] = useState(false);
+  const [_authorized, setAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [customers, setCustomers] = useState<Account[]>([]);
@@ -59,7 +59,7 @@ export default function DeliveryChallanPage() {
   const [driverName, setDriverName] = useState("");
   const [vehicleNo, setVehicleNo] = useState("");
   const [remarks, setRemarks] = useState("");
-const [searchTerm, setSearchTerm] = useState("");
+const [searchTerm, _setSearchTerm] = useState("");
 
 
   const [rows, setRows] = useState<Row[]>([{
@@ -67,7 +67,7 @@ const [searchTerm, setSearchTerm] = useState("");
   }]);
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [savedChallan, setSavedChallan] = useState<any>(null);
+  const [savedChallan, setSavedChallan] = useState<Any>(null);
 
   useEffect(() => {
     if (!user) {
@@ -91,7 +91,7 @@ const [searchTerm, setSearchTerm] = useState("");
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts || [];
-        setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
+        setCustomers(list.filter((a: Any) => a.partyType === "CUSTOMER"));
       });
 
     fetch("/api/stock-available-for-sale")
@@ -105,7 +105,7 @@ const [searchTerm, setSearchTerm] = useState("");
         }
     })
     .then(r => r.json())
-    .then(d => {
+    .then(_d => {
         // If there's logic to get nextNo from API, otherwise just handle in state
     });
 
@@ -251,7 +251,7 @@ const [searchTerm, setSearchTerm] = useState("");
         setShowList(true);
       }
       toast.success("Delivery Challan saved successfully!");
-    } catch (e: any) {
+    } catch (e: Any) {
       toast.error("Saving failed: " + (e.message || "Unknown error"));
     } finally {
       setSaving(false);
@@ -267,7 +267,7 @@ const [searchTerm, setSearchTerm] = useState("");
     setDriverName(c.driverName || "");
     setVehicleNo(c.vehicleNo || "");
     setRemarks(c.remarks || "");
-    setRows(c.items.map((it: any) => ({
+    setRows(c.items.map((it: Any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       description: it.item?.description || "",
@@ -296,7 +296,7 @@ const [searchTerm, setSearchTerm] = useState("");
         const err = await res.json();
         toast.error(err.error || "Delete failed");
       }
-    } catch (e) {
+    } catch (_e) {
       toast.error("Delete failed");
     }
   }
@@ -328,7 +328,7 @@ const [searchTerm, setSearchTerm] = useState("");
     if (savedChallan.vehicleNo) message += `Vehicle: ${savedChallan.vehicleNo}\n`;
     message += `\n*Items:*\n`;
     
-    savedChallan.items.forEach((item: any, index: number) => {
+    savedChallan.items.forEach((item: Any, index: number) => {
       // Fetch item name from local items if possible, or use from savedChallan if populated
       // savedChallan.items might not have item details fully if not populated in response, but let's assume API returns it or we use logic
       // Actually API returns items with included item details in GET but create/update response might vary.

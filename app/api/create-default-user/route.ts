@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       password: password,
     });
 
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("❌ Error creating default user:", error);
     
     if (error.code === "P2002") {
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 }
 
 // GET endpoint to show instructions
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   return NextResponse.json({
     message: "Create Default User API",
     instructions: "Send POST request with optional body",

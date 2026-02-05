@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // Simple database connection test
@@ -23,7 +23,7 @@ export async function GET() {
       database: "smart_accounts",
       host: "localhost:5432",
     });
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("❌ DATABASE CONNECTION ERROR:", error);
     return NextResponse.json(
       {
@@ -46,3 +46,4 @@ export async function GET() {
     await prisma.$disconnect().catch(() => {});
   }
 }
+

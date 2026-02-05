@@ -54,9 +54,9 @@ export default function LedgerReportPage() {
         }
     }
 
-    const totalDebit = rows.reduce((s, r) => s + (r.debit || 0), 0);
-    const totalCredit = rows.reduce((s, r) => s + (r.credit || 0), 0);
-    const finalBalance = rows.length ? rows[rows.length - 1].balance : 0;
+    const _totalDebit = rows.reduce((s, r) => s + (r.debit || 0), 0);
+    const _totalCredit = rows.reduce((s, r) => s + (r.credit || 0), 0);
+    const _finalBalance = rows.length ? rows[rows.length - 1].balance : 0;
 
     return (
         <div className="p-4 max-w-6xl mx-auto font-sans">

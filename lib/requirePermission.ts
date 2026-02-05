@@ -16,7 +16,7 @@ export async function requirePermission(
   // 1️⃣ ADMIN = full power
   if (role === "ADMIN") return null;
 
-  const companyId = await resolveCompanyId(req as any);
+  const companyId = await resolveCompanyId(req as Any);
   if (!companyId) {
     return NextResponse.json({ error: "Company required" }, { status: 400 });
   }

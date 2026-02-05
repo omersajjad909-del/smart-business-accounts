@@ -17,14 +17,16 @@ export default function PartyAccounts() {
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  async function loadAccounts() {
-    const res = await fetch("/api/accounts");
-    const data = await res.json();
-    setAccounts(data);
-  }
-
   useEffect(() => {
-    loadAccounts();
+    let active = true;
+    (async () => {
+      const res = await fetch("/api/accounts");
+      const data = (await res.json()) as Account[];
+      if (active) setAccounts(data);
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function saveParty() {
@@ -33,10 +35,18 @@ export default function PartyAccounts() {
     setLoading(true);
 
     const method = editingId ? "PUT" : "POST";
-    const body: any = {
+    const body: {
+      name: string;
+      type: "ASSET" | "LIABILITY";
+      partyType: "CUSTOMER" | "SUPPLIER";
+      id?: string;
+      code?: string;
+      phone?: string;
+    } = {
       name,
       type: partyType === "CUSTOMER" ? "ASSET" : "LIABILITY",
       partyType,
+      phone: phone || undefined,
     };
 
     if (editingId) {
@@ -55,7 +65,9 @@ export default function PartyAccounts() {
     setPartyType("CUSTOMER");
     setEditingId(null);
     setLoading(false);
-    loadAccounts();
+    const res = await fetch("/api/accounts");
+    const data = (await res.json()) as Account[];
+    setAccounts(data);
   }
 
   function handleEdit(account: Account) {
@@ -78,7 +90,9 @@ export default function PartyAccounts() {
       headers: { "x-user-role": "ADMIN" },
     });
 
-    loadAccounts();
+    const res = await fetch("/api/accounts");
+    const data = (await res.json()) as Account[];
+    setAccounts(data);
   }
 
   return (

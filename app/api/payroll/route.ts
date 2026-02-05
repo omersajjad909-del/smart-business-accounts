@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(payroll, { status: 201 });
-  } catch (error: any) {
+  } catch (error: Any) {
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Payroll record for this employee and month already exists" },

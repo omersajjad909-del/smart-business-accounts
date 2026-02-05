@@ -48,7 +48,7 @@ export default function JVPage() {
   ]);
   const [date, setDate] = useState(today);
   const [narration, setNarration] = useState("");
-  const [voucher, setVoucher] = useState<any>(null);
+  const [voucher, setVoucher] = useState<Any>(null);
   const [saving, setSaving] = useState(false);
 
   const user = getCurrentUser();
@@ -116,7 +116,7 @@ export default function JVPage() {
     setEntries(entries.filter((e) => e.id !== id));
   }
 
-  function updateEntry(id: string, field: keyof Entry, value: any) {
+  function updateEntry(id: string, field: keyof Entry, value: Any) {
     setEntries(
       entries.map((e) => {
         if (e.id === id) {
@@ -231,7 +231,7 @@ export default function JVPage() {
       resetForm();
       setShowForm(false);
       setEditing(null);
-    } catch (error: any) {
+    } catch (error: Any) {
       alert(`Error: ${error.message || "Failed to save JV"}`);
     } finally {
       setSaving(false);
@@ -282,7 +282,7 @@ export default function JVPage() {
         const data = await res.json();
         toast.error(data.error || "Delete failed");
       }
-    } catch (e) {
+    } catch (_e) {
       toast.error("Delete failed");
     }
   }
@@ -548,7 +548,7 @@ export default function JVPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {voucher.entries?.map((entry: any, idx: number) => (
+                  {voucher.entries?.map((entry: Any, idx: number) => (
                     <tr key={idx}>
                       <td className="border p-2">{entry.account?.name || entry.accountName || "N/A"}</td>
                       <td className="border p-2 text-right">

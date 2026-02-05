@@ -4,10 +4,10 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // Get all roles and their permissions
@@ -43,8 +43,8 @@ export async function GET(req: NextRequest) {
     // Group by role
     const roles = ["ADMIN", "ACCOUNTANT", "VIEWER"].map((role: string) => {
       const perms = rolePermissions
-        .filter((rp: any) => rp.role === role)
-        .map((rp: any) => rp.permission);
+        .filter((rp: Any) => rp.role === role)
+        .map((rp: Any) => rp.permission);
       
       console.log(`📌 ${role} permissions:`, perms);
       
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     console.log("✅ Final response:", roles);
 
     return NextResponse.json(roles);
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("Error fetching roles:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -116,8 +116,9 @@ export async function POST(req: NextRequest) {
       role,
       permissions: createdPermissions,
     });
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("Error updating role:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

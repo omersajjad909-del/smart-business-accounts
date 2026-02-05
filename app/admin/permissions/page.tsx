@@ -4,12 +4,23 @@ import { useEffect, useState } from "react";
 import { PERMISSIONS } from "@/lib/permissions";
 import { getCurrentUser } from "@/lib/auth";
 
+type CurrentUser = {
+  id: string;
+  role: string;
+  name?: string;
+  email?: string;
+};
+
+type UserPermission = {
+  permission: string;
+};
+
 interface User {
   id: string;
   email: string;
   name: string;
   role: string;
-  permissions: any[];
+  permissions: UserPermission[];
 }
 
 interface Role {
@@ -18,9 +29,9 @@ interface Role {
 }
 
 export default function AdminPermissionsPage() {
-  const [user, setUser] = useState<any | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+  const [user] = useState<CurrentUser | null>(() => getCurrentUser());
+  const userId = user?.id ?? null;
+  const ready = true;
   const [activeTab, setActiveTab] = useState<"users" | "roles">("users");
 
   // Users Tab
@@ -32,20 +43,6 @@ export default function AdminPermissionsPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedRole, setSelectedRole] = useState<string>("ADMIN");
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
-
-  const selectRole = (roleName: string) => {
-    setSelectedRole(roleName);
-    const role = roles.find(r => r.role === roleName);
-    setRolePermissions(role?.permissions || []);
-  };
-
-  // 🔹 load user once (client only)
-  useEffect(() => {
-    const u = getCurrentUser();
-    setUser(u);
-    setUserId(u?.id ?? null);
-    setReady(true);
-  }, []);
 
   // 🔹 fetch users and roles
   useEffect(() => {
@@ -71,9 +68,12 @@ export default function AdminPermissionsPage() {
     })
       .then(r => r.json())
       .then(data => {
-        setRoles(data || []);
-        if (data && data.length > 0) {
-          selectRole(data[0].role);
+        const roleList = Array.isArray(data) ? data : [];
+        setRoles(roleList);
+        if (roleList.length > 0) {
+          const firstRole = roleList[0];
+          setSelectedRole(firstRole.role);
+          setRolePermissions(firstRole.permissions || []);
         }
       })
       .catch(console.error);
@@ -90,7 +90,7 @@ export default function AdminPermissionsPage() {
 
   const selectUser = (u: User) => {
     setSelectedUser(u);
-    setUserPermissions(u.permissions.map((p: any) => p.permission));
+    setUserPermissions(u.permissions.map((p) => p.permission));
   };
 
   const toggleUserPermission = (perm: string) => {
@@ -167,8 +167,10 @@ export default function AdminPermissionsPage() {
           "x-user-id": userId,
         },
       }).then(r => r.json());
-      setRoles(updated);
-      selectRole(selectedRole);
+      const roleList = Array.isArray(updated) ? updated : [];
+      setRoles(roleList);
+      const current = roleList.find(r => r.role === selectedRole);
+      setRolePermissions(current?.permissions || []);
     } else {
       alert("Failed to save role permissions");
     }
@@ -277,7 +279,11 @@ export default function AdminPermissionsPage() {
               {["ADMIN", "ACCOUNTANT", "VIEWER"].map(roleName => (
                 <div
                   key={roleName}
-                  onClick={() => selectRole(roleName)}
+                  onClick={() => {
+                    setSelectedRole(roleName);
+                    const role = roles.find(r => r.role === roleName);
+                    setRolePermissions(role?.permissions || []);
+                  }}
                   className={`cursor-pointer p-3 border rounded transition ${
                     selectedRole === roleName
                       ? "bg-blue-100 border-blue-500"

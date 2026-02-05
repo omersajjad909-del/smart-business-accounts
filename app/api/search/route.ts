@@ -19,10 +19,10 @@ type ItemSearch = Prisma.ItemNewGetPayload<{
   };
 }>;
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ results: [] });
     }
 
-    const searchTerm = `%${query}%`;
+    const _searchTerm = `%${query}%`;
 
     // Search Accounts
     const accounts = await prisma.account.findMany({
@@ -207,7 +207,7 @@ export async function GET(req: NextRequest) {
   ),
 });
 
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("❌ SEARCH ERROR:", e);
     return NextResponse.json(
       { error: e.message || "Search failed" },
@@ -215,3 +215,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

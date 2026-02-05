@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(challans);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Failed to fetch delivery challans" }, { status: 500 });
   }
 }
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(challan);
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("Create Delivery Challan Error:", error);
     return NextResponse.json({ error: error.message || "Failed to create delivery challan" }, { status: 400 });
   }
@@ -141,7 +141,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(updated);
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("Update Delivery Challan Error:", error);
     return NextResponse.json({ error: error.message || "Failed to update delivery challan" }, { status: 400 });
   }
@@ -163,7 +163,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Failed to delete delivery challan" }, { status: 500 });
   }
 }

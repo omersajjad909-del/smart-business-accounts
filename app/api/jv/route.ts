@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // GET - List all JVs
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
-    const where: any = { type: "JV" };
+    const where: Any = { type: "JV" };
     if (from && to) {
       where.date = {
         gte: new Date(from + "T00:00:00"),
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
 
 
     return NextResponse.json(formatted);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("JV GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
     let requestBody;
     try {
       requestBody = await req.json();
-    } catch (parseError: any) {
+    } catch (parseError: Any) {
       console.error("❌ JV JSON PARSE ERROR:", parseError);
       return NextResponse.json(
         { error: "Invalid request body", details: parseError.message },
@@ -155,7 +155,7 @@ export async function POST(req: Request) {
           date: new Date(date),
           narration: narration || "Journal Entry",
           entries: {
-            create: entries.map((entry: any) => ({
+            create: entries.map((entry: Any) => ({
               accountId: entry.accountId,
               amount: Number(entry.amount), // +ve = Debit, -ve = Credit
             })),
@@ -183,7 +183,7 @@ export async function POST(req: Request) {
       totalDebit,
       totalCredit,
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("❌ JV ERROR:", e);
     return NextResponse.json(
       { error: e.message || "JV failed", details: e.code || "Unknown error" },
@@ -250,7 +250,7 @@ export async function PUT(req: NextRequest) {
           date: new Date(date),
           narration: narration || "Journal Entry",
           entries: {
-            create: entries.map((entry: any) => ({
+            create: entries.map((entry: Any) => ({
               accountId: entry.accountId,
               amount: Number(entry.amount),
             })),
@@ -275,7 +275,7 @@ export async function PUT(req: NextRequest) {
       totalDebit,
       totalCredit,
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("JV PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -312,8 +312,9 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("JV DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

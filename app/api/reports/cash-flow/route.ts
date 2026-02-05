@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 type BankAccount = Prisma.AccountGetPayload<Prisma.AccountDefaultArgs>;
 
 type VoucherWithEntries = Prisma.VoucherGetPayload<{
@@ -31,7 +31,7 @@ type CashFlowItem = {
 
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -215,7 +215,7 @@ const direction: "INFLOW" | "OUTFLOW" =
       },
       netCashFlow,
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("❌ CASH FLOW ERROR:", e);
     return NextResponse.json(
       { error: e.message || "Cash flow report failed" },
@@ -223,3 +223,4 @@ const direction: "INFLOW" | "OUTFLOW" =
     );
   }
 }
+

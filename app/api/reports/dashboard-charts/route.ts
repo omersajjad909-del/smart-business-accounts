@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 type SalesInvoice = Prisma.SalesInvoiceGetPayload<{
   select: {
     date: true;
@@ -26,7 +26,7 @@ type TopCustomer = {
 
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -118,7 +118,8 @@ export async function GET(req: NextRequest) {
     });
 
     // Top customers
-    const topCustomers = await prisma.salesInvoice.groupBy({\r\n      by: ["customerId"],
+    const topCustomers = await prisma.salesInvoice.groupBy({
+      by: ["customerId"],
       where: {
         date: { gte: startDate },
         companyId,
@@ -169,7 +170,7 @@ export async function GET(req: NextRequest) {
     });
 
     const itemDetails = await Promise.all(
-      topItems.map(async (item: any) => {
+      topItems.map(async (item: Any) => {
         const itemData = await prisma.itemNew.findFirst({
           where: { id: item.itemId, companyId },
           select: { name: true },
@@ -194,7 +195,7 @@ export async function GET(req: NextRequest) {
       topCustomers: customerDetails,
       topItems: itemDetails,
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("❌ DASHBOARD CHARTS ERROR:", e);
     return NextResponse.json(
       { error: e.message || "Charts data failed" },
@@ -202,4 +203,5 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
 

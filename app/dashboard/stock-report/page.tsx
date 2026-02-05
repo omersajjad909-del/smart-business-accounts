@@ -34,7 +34,7 @@ export default function StockReportPage() {
   );
 
   const totalStockQty = filtered.reduce((acc, item) => acc + (item.availableQty || 0), 0);
-  const totalStockValue = filtered.reduce((acc, item) => acc + ((item.availableQty || 0) * (item.avgRate || 0)), 0);
+  const _totalStockValue = filtered.reduce((acc, item) => acc + ((item.availableQty || 0) * (item.avgRate || 0)), 0);
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-6xl mx-auto">

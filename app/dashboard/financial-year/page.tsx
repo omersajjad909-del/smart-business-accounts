@@ -87,7 +87,7 @@ export default function FinancialYearPage() {
         const error = await res.json();
         alert(error.error || "Save failed");
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Save failed");
     } finally {
       setLoading(false);
@@ -113,7 +113,7 @@ export default function FinancialYearPage() {
       if (res.ok) {
         await loadYears();
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Close failed");
     }
   }

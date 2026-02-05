@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
 
-    const filter: any = { companyId };
+    const filter: Any = { companyId };
     if (status) filter.approvalStatus = status;
 
     const vouchers = await prisma.expenseVoucher.findMany({
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       voucherNo,
       date,
       description,
-      totalAmount,
+      _totalAmount,
       expenseAccountId,
       paymentAccountId,
       items,
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Calculate total from items
-    const calculatedTotal = items.reduce((sum: number, item: any) => 
+    const calculatedTotal = items.reduce((sum: number, item: Any) => 
       sum + parseFloat(item.amount || 0), 0
     );
 
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
         approvalStatus: 'DRAFT',
         companyId,
         items: {
-          create: items.map((item: any) => ({
+          create: items.map((item: Any) => ({
             description: item.description || '',
             amount: parseFloat(item.amount || 0),
             category: item.category || 'OTHER',
@@ -180,7 +180,7 @@ export async function PUT(req: NextRequest) {
       });
 
       // Calculate new total
-      const newTotal = items.reduce((sum: number, item: any) => 
+      const newTotal = items.reduce((sum: number, item: Any) => 
         sum + parseFloat(item.amount || 0), 0
       );
 
@@ -198,7 +198,7 @@ export async function PUT(req: NextRequest) {
         ...updateData,
         ...(items && items.length > 0 && {
           items: {
-            create: items.map((item: any) => ({
+            create: items.map((item: Any) => ({
               description: item.description || '',
               amount: parseFloat(item.amount || 0),
               category: item.category || 'OTHER',
@@ -263,3 +263,4 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+

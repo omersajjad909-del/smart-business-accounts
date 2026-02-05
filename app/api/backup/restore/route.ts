@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { apiHasPermission } from "@/lib/apiPermission";
-import { PERMISSIONS } from "@/lib/permissions";
+import { apiHasPermission as _apiHasPermission } from "@/lib/apiPermission";
+import { PERMISSIONS as _PERMISSIONS } from "@/lib/permissions";
 import { readFile } from "fs/promises";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
+    const _userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 
     // صرف ADMIN restore کر سکتا ہے
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     let backupData: string;
     try {
       backupData = await readFile(backup.filePath, "utf-8");
-    } catch (err: any) {
+    } catch (err: Any) {
       console.error("File read error:", err);
       return NextResponse.json(
         { error: `Cannot read backup file: ${err.message}` },
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     let data;
     try {
       data = JSON.parse(backupData);
-    } catch (err: any) {
+    } catch (err: Any) {
       return NextResponse.json(
         { error: `Invalid backup file format: ${err.message}` },
         { status: 400 }
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
         for (const account of data.accounts) {
           try {
             await prisma.account.create({ data: account });
-          } catch (e: any) {
+          } catch (e: Any) {
             console.warn("Error creating account:", e.message);
           }
         }
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
         for (const item of data.items) {
           try {
             await prisma.itemNew.create({ data: item });
-          } catch (e: any) {
+          } catch (e: Any) {
             console.warn("Error creating item:", e.message);
           }
         }
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
         for (const ba of data.bankAccounts) {
           try {
             await prisma.bankAccount.create({ data: ba });
-          } catch (e: any) {
+          } catch (e: Any) {
             console.warn("Error creating bank account:", e.message);
           }
         }
@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
         for (const budget of data.budgets) {
           try {
             await prisma.budget.create({ data: budget });
-          } catch (e: any) {
+          } catch (e: Any) {
             console.warn("Error creating budget:", e.message);
           }
         }
@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
         for (const rt of data.recurringTransactions) {
           try {
             await prisma.recurringTransaction.create({ data: rt });
-          } catch (e: any) {
+          } catch (e: Any) {
             console.warn("Error creating recurring transaction:", e.message);
           }
         }
@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
         for (const fy of data.financialYears) {
           try {
             await prisma.financialYear.create({ data: fy });
-          } catch (e: any) {
+          } catch (e: Any) {
             console.warn("Error creating financial year:", e.message);
           }
         }
@@ -196,12 +196,12 @@ export async function POST(req: NextRequest) {
                   await prisma.salesInvoiceItem.create({
                     data: { ...item, invoiceId: created.id },
                   });
-                } catch (e: any) {
+                } catch (e: Any) {
                   console.warn("Error creating sales invoice item:", e.message);
                 }
               }
             }
-          } catch (e: any) {
+          } catch (e: Any) {
             console.warn("Error creating sales invoice:", e.message);
           }
         }
@@ -221,12 +221,12 @@ export async function POST(req: NextRequest) {
                   await prisma.purchaseInvoiceItem.create({
                     data: { ...item, invoiceId: created.id },
                   });
-                } catch (e: any) {
+                } catch (e: Any) {
                   console.warn("Error creating purchase invoice item:", e.message);
                 }
               }
             }
-          } catch (e: any) {
+          } catch (e: Any) {
             console.warn("Error creating purchase invoice:", e.message);
           }
         }
@@ -246,12 +246,12 @@ export async function POST(req: NextRequest) {
                   await prisma.voucherEntry.create({
                     data: { ...entry, voucherId: created.id },
                   });
-                } catch (e: any) {
+                } catch (e: Any) {
                   console.warn("Error creating voucher entry:", e.message);
                 }
               }
             }
-          } catch (e: any) {
+          } catch (e: Any) {
             console.warn("Error creating voucher:", e.message);
           }
         }
@@ -263,15 +263,16 @@ export async function POST(req: NextRequest) {
         success: true,
         message: "Data restored successfully",
       });
-    } catch (error: any) {
+    } catch (error: Any) {
       console.error("Restore error:", error);
       return NextResponse.json(
         { error: `Restore failed: ${error.message}` },
         { status: 500 }
       );
     }
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Restore Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

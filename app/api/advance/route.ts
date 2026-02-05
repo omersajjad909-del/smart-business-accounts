@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get("status");
     const monthYear = searchParams.get("monthYear"); 
 
-    const where: any = {};
+    const where: Any = {};
     if (employeeId) where.employeeId = employeeId;
     if (status) where.status = status;
     
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    if (!(prisma as any).advanceSalary) {
+    if (!(prisma as Any).advanceSalary) {
         console.error("❌ Prisma Client out of sync. advanceSalary model missing.");
         return NextResponse.json({ error: "System update required. Please restart the server." }, { status: 500 });
     }
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    if (!(prisma as any).advanceSalary) {
+    if (!(prisma as Any).advanceSalary) {
        console.error("❌ Prisma Client out of sync. advanceSalary model missing.");
        return NextResponse.json({ error: "System update required. Please restart the server to apply changes." }, { status: 500 });
     }
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     console.log("✅ Saved:", advance);
     return NextResponse.json(advance, { status: 201 });
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("❌ Error creating advance:", error);
     return NextResponse.json({ error: "Failed to create advance: " + error.message }, { status: 500 });
   }

@@ -4,10 +4,10 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // Bulk payment processing
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     for (const payment of payments) {
       try {
-        const { accountId, bankAccountId, paymentMode, amount } = payment;
+        const { accountId, bankAccountId, paymentMode: _paymentMode, amount } = payment;
 
         if (!accountId || !amount || !date) {
           results.push({
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
           status: "success",
           voucherId: voucher.id,
         });
-      } catch (error: any) {
+      } catch (error: Any) {
         results.push({
           accountId: payment.accountId,
           status: "error",
@@ -131,8 +131,9 @@ export async function POST(req: NextRequest) {
       processed: results.length,
       results,
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Bulk Payments Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

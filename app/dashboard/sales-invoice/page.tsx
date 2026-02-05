@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef as _useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
@@ -78,10 +78,10 @@ function SalesInvoiceContent() {
   const [freight, setFreight] = useState<number | "">("");
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [savedInvoice, setSavedInvoice] = useState<any>(null);
+  const [savedInvoice, setSavedInvoice] = useState<Any>(null);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [previewMode, setPreviewMode] = useState<"INVOICE" | "DELIVERY">("INVOICE");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, _setSearchTerm] = useState("");
   const [scanCode, setScanCode] = useState("");
   const [origin, setOrigin] = useState("");
 
@@ -138,7 +138,7 @@ function SalesInvoiceContent() {
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts || [];
-        setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
+        setCustomers(list.filter((a: Any) => a.partyType === "CUSTOMER"));
       });
 
     fetch("/api/stock-available-for-sale")
@@ -164,7 +164,7 @@ function SalesInvoiceContent() {
       .then(d => {
         if (d?.nextNo) setInvoiceNo(d.nextNo);
       })
-      .catch(err => console.log("Access Denied or Error"));
+      .catch (_err => console.log("Access Denied or Error"));
   }, []);
 
   useEffect(() => {
@@ -345,7 +345,7 @@ function SalesInvoiceContent() {
         setShowList(true);
       }
       toast.success("Invoice saved successfully!");
-    } catch (e: any) {
+    } catch (e: Any) {
       toast.error("Saving failed: " + (e.message || "Unknown error"));
     } finally {
       setSaving(false);
@@ -360,7 +360,7 @@ function SalesInvoiceContent() {
     setDate(new Date(inv.date).toISOString().slice(0, 10));
     setDriverName(inv.driverName || "");
     setVehicleNo(inv.vehicleNo || "");
-    setRows(inv.items.map((it: any) => ({
+    setRows(inv.items.map((it: Any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       description: it.item?.description || "",
@@ -389,7 +389,7 @@ function SalesInvoiceContent() {
         const err = await res.json();
         toast.error(err.error || "Delete failed");
       }
-    } catch (e) {
+    } catch (_e) {
       toast.error("Delete failed");
     }
   }
@@ -443,7 +443,7 @@ function SalesInvoiceContent() {
       } else {
         alert(`❌ Failed to send email: ${data.error || "Unknown error"}`);
       }
-    } catch (error) {
+    } catch (_error) {
       alert("❌ Failed to send email. Please check email configuration.");
     } finally {
       setSendingEmail(false);
@@ -462,7 +462,7 @@ function SalesInvoiceContent() {
     message += `Customer: ${customerName}\n\n`;
     message += `*Items:*\n`;
 
-    savedInvoice.items.forEach((item: any, index: number) => {
+    savedInvoice.items.forEach((item: Any, index: number) => {
       message += `${index + 1}. ${item.item.name} x ${item.qty} @ ${item.rate} = ${(item.qty * item.rate).toLocaleString()}\n`;
     });
 
@@ -472,7 +472,7 @@ function SalesInvoiceContent() {
     window.open(url, '_blank');
   };
 
-  const shareOnSMS = () => {
+  const _shareOnSMS = () => {
     if (!savedInvoice) {
       toast.error("Please save the invoice first");
       return;
@@ -822,7 +822,7 @@ function SalesInvoiceContent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(savedInvoice?.items || rows.filter(r => r.itemId)).map((r: any, i: number) => {
+                  {(savedInvoice?.items || rows.filter(r => r.itemId)).map((r: Any, i: number) => {
                     const itemName = r.item?.name || r.name || "Unknown";
                     const itemDesc = r.item?.description || r.description || "";
                     const qty = r.qty || 0;

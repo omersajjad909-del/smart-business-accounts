@@ -57,7 +57,7 @@ export default function EmailSettingsPage() {
       });
       const data = await res.json();
       setTestResult(data);
-    } catch (error) {
+    } catch (_error) {
       setTestResult({
         success: false,
         message: "Failed to test email configuration",

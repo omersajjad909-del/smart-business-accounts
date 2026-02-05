@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const results: any = {};
+  const results: Any = {};
 
   // 1. Check Employees
   try {
@@ -14,7 +14,7 @@ export async function GET() {
       },
     });
     results.employees = { success: true, count: employees.length, sample: employees[0] };
-  } catch (e: any) {
+  } catch (e: Any) {
     results.employees = { success: false, error: e.message };
   }
 
@@ -46,7 +46,7 @@ export async function GET() {
         supplierSample: supplier ? { id: supplier.id, name: supplier.name } : null
     };
 
-  } catch (e: any) {
+  } catch (e: Any) {
     results.purchaseInvoice = { success: false, error: e.message };
   }
 

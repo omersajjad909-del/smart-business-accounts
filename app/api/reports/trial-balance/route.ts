@@ -4,14 +4,14 @@ import { resolveCompanyId } from "@/lib/tenant";
 type VoucherEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
 
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 /* ================= CATEGORY RESOLVER ================= */
-function resolveCategory(acc: any) {
+function resolveCategory(acc: Any) {
   if (acc.partyType === "EMPLOYES" || acc.partyType === "EMPLOYEE") return "EMPLOYEES";
   if (acc.partyType === "CUSTOMER") return "CUSTOMERS";
   if (acc.partyType === "SUPPLIER") return "SUPPLIERS";
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
       orderBy: [{ name: "asc" }],
     });
 
-    const rows: any[] = [];
+    const rows: Any[] = [];
 
     for (const acc of accounts) {
       /* ---------- OPENING: Opening balance + vouchers before period ---------- */
@@ -126,3 +126,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
+

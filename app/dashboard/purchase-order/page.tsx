@@ -17,8 +17,8 @@ export default function PurchaseOrderPage() {
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 
-  const [suppliers, setSuppliers] = useState<any[]>([]);
-  const [items, setItems] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<Any[]>([]);
+  const [items, setItems] = useState<Any[]>([]);
   const [pos, setPos] = useState<PO[]>([]);
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -85,7 +85,7 @@ export default function PurchaseOrderPage() {
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts;
-        setSuppliers((list || []).filter((a: any) => a.partyType === "SUPPLIER"));
+        setSuppliers((list || []).filter((a: Any) => a.partyType === "SUPPLIER"));
       });
 
     fetch("/api/items-new", { headers: { "x-user-role": user?.role || "ADMIN" } })
@@ -111,9 +111,9 @@ export default function PurchaseOrderPage() {
     }
   }
 
-  function updateRow(i: number, key: string, val: any) {
+  function updateRow(i: number, key: string, val: Any) {
     const copy = [...rows];
-    (copy[i] as any)[key] = val;
+    (copy[i] as Any)[key] = val;
     setRows(copy);
   }
 
@@ -155,7 +155,7 @@ export default function PurchaseOrderPage() {
         const err = await res.json();
         alert(err.error || "Saving failed");
       }
-    } catch (err) { alert("Error saving PO"); }
+    } catch (_err) { alert("Error saving PO"); }
     finally { setSaving(false); }
   }
 
@@ -166,7 +166,7 @@ export default function PurchaseOrderPage() {
     setSupplierName(po.supplier?.name || "");
     setDate(new Date(po.date).toISOString().slice(0, 10));
     setRemarks(po.remarks || "");
-    setRows(po.items.map((it: any) => ({
+    setRows(po.items.map((it: Any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       desc: it.item?.description || "",
@@ -191,7 +191,7 @@ export default function PurchaseOrderPage() {
         const err = await res.json();
         alert(err.error || "Delete failed");
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Delete failed");
     }
   }
@@ -247,7 +247,7 @@ export default function PurchaseOrderPage() {
       } else {
         toast.error(data.error || "Failed to send email");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to send email. Please check email configuration.");
     } finally {
       setSendingEmail(false);

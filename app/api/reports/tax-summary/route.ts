@@ -4,10 +4,10 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -34,12 +34,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const from = searchParams.get("from");
     const to = searchParams.get("to");
-    const taxType = searchParams.get("taxType");
+    const _taxType = searchParams.get("taxType");
 
     const fromDate = from ? new Date(from + "T00:00:00") : undefined;
     const toDate = to ? new Date(to + "T23:59:59.999") : undefined;
 
-    const where: any = {};
+    const where: Any = {};
     if (fromDate && toDate) {
       where.date = { gte: fromDate, lte: toDate };
     }
@@ -80,10 +80,10 @@ export async function GET(req: NextRequest) {
     });
 
     // Group by tax type
-    const summary: Record<string, any> = {};
+    const summary: Record<string, Any> = {};
 
     // Process Sales Invoices
-    salesInvoicesWithTax.forEach((inv: any) => {
+    salesInvoicesWithTax.forEach((inv: Any) => {
       if (!inv.taxConfig) return;
       const key = inv.taxConfig.taxType;
       
@@ -111,7 +111,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Process Purchase Invoices
-    purchaseInvoicesWithTax.forEach((inv: any) => {
+    purchaseInvoicesWithTax.forEach((inv: Any) => {
       if (!inv.taxConfig) return;
       const key = inv.taxConfig.taxType;
       
@@ -139,7 +139,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Process Legacy InvoiceTax entries
-    legacyTaxes.forEach((it: any) => {
+    legacyTaxes.forEach((it: Any) => {
       const key = it.taxConfiguration.taxType;
       if (!summary[key]) {
         summary[key] = {
@@ -159,14 +159,15 @@ export async function GET(req: NextRequest) {
       summary[key].totalAmount += it.totalAmount;
     });
 
-    const result = Object.values(summary).map((s: any) => ({
+    const result = Object.values(summary).map((s: Any) => ({
       ...s,
       averageTaxRate: s.totalSubtotal > 0 ? (s.totalTaxAmount / s.totalSubtotal) * 100 : 0,
     }));
 
     return NextResponse.json(result);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Tax Summary Report Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

@@ -4,9 +4,9 @@ import { resolveCompanyId } from "@/lib/tenant";
 
 
 const prisma =
-  (globalThis as any).prisma || new PrismaClient();
+  (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // ---------- POST ----------
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         remarks,
         companyId,
         items: {
-          create: items.map((i: any) => ({
+          create: items.map((i: Any) => ({
             itemId: i.itemId,
             qty: Number(i.qty),
             rate: 0,
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(entry);
-  } catch (e: any) {
+  } catch (e: Any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(data);
-  } catch (e: any) {
+  } catch (e: Any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
@@ -147,7 +147,7 @@ export async function PUT(req: NextRequest) {
           remarks,
           companyId,
           items: {
-            create: items.map((i: any) => ({
+            create: items.map((i: Any) => ({
               itemId: i.itemId,
               qty: Number(i.qty),
               rate: 0,
@@ -165,7 +165,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(result);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Outward PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -204,8 +204,9 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Outward DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

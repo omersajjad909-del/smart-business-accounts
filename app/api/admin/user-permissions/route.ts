@@ -4,10 +4,10 @@ import { requirePermission } from "@/lib/requirePermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 /* =========================
@@ -90,8 +90,9 @@ export async function POST(req: NextRequest) {
     ]);
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("TRANSACTION ERROR:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

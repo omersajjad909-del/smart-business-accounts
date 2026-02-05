@@ -37,10 +37,10 @@ type PendingItem = {
 
 
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // ================= GET FUNCTION =================
@@ -104,7 +104,7 @@ const pendingItems = invoice.items
       items: pendingItems,
     });
 
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("DETAIL FETCH ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await prisma.$transaction(async (tx: TxClient) => {
-      const subtotal = items.reduce((s: number, i: any) => s + Number(i.qty) * Number(i.rate), 0);
+      const subtotal = items.reduce((s: number, i: Any) => s + Number(i.qty) * Number(i.rate), 0);
       const total = subtotal + Number(freight);
 
       // 2. سیلز ریٹرن ریکارڈ بنانا
@@ -163,7 +163,7 @@ export async function POST(req: NextRequest) {
           companyId,
           total: total,
           items: {
-            create: items.map((i: any) => ({
+            create: items.map((i: Any) => ({
               itemId: i.itemId,
               qty: Number(i.qty),
               rate: Number(i.rate),
@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, returnNo: nextNo, id: result.id });
 
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("POST ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

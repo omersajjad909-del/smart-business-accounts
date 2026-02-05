@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 type PurchaseWithItems = Prisma.PurchaseInvoiceGetPayload<{
   include: {
@@ -14,7 +14,7 @@ type PurchaseItem = Prisma.PurchaseInvoiceItemGetPayload<Prisma.PurchaseInvoiceI
 
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -70,3 +70,4 @@ const rows = purchases.flatMap((inv: PurchaseWithItems) =>
     return NextResponse.json({ error: "Failed to fetch report" }, { status: 500 });
   }
 }
+

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
-type QuotationInput = {
+type _QuotationInput = {
   id?: string;
   quotationNo?: string;   // 👈 THIS IS THE KEY
   date: string;
@@ -90,7 +90,7 @@ export async function GET(req: NextRequest) {
       nextNo,
       quotations
     });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Failed to fetch quotations" }, { status: 500 });
   }
 }
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ quotation });
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("Create Quotation Error:", error);
     return NextResponse.json({ error: error.message || "Failed to create quotation" }, { status: 400 });
   }
@@ -203,7 +203,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ quotation: updated });
 
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error("Update Quotation Error:", error);
     return NextResponse.json({ error: error.message || "Failed to update quotation" }, { status: 400 });
   }
@@ -225,7 +225,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Failed to delete quotation" }, { status: 500 });
   }
 }

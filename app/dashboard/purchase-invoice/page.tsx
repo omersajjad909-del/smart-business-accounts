@@ -148,7 +148,7 @@ const [searchTerm, setSearchTerm] = useState("");
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts;
-        setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER"));
+        setSuppliers(list.filter((a: Any) => a.partyType === "SUPPLIER"));
       });
 
     // Load tax configurations
@@ -263,7 +263,7 @@ const [searchTerm, setSearchTerm] = useState("");
       });
 
       const contentType = res.headers.get("content-type") || "";
-      let data: any = null;
+      let data: Any = null;
       if (contentType.includes("application/json")) {
         try {
           data = await res.json();
@@ -297,7 +297,7 @@ const [searchTerm, setSearchTerm] = useState("");
             : "Save failed (empty/invalid response)";
         toast.error("Error: " + msg);
       }
-    } catch (err: any) {
+    } catch (err: Any) {
       toast.error("System Error: " + err.message);
     } finally {
       setSaving(false);
@@ -311,7 +311,7 @@ const [searchTerm, setSearchTerm] = useState("");
     setSupplierId(inv.supplierId);
     setSupplierName(inv.supplier?.name || "");
     setDate(new Date(inv.date).toISOString().slice(0, 10));
-    setRows(inv.items.map((it: any) => ({
+    setRows(inv.items.map((it: Any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       description: it.item?.description || "",
@@ -336,7 +336,7 @@ const [searchTerm, setSearchTerm] = useState("");
         const err = await res.json();
         toast.error(err.error || "Delete failed");
       }
-    } catch (e) {
+    } catch (_e) {
       toast.error("Delete failed");
     }
   }
@@ -390,7 +390,7 @@ const [searchTerm, setSearchTerm] = useState("");
       } else {
         toast.error(`❌ Failed to send email: ${data.error || "Unknown error"}`);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("❌ Failed to send email. Please check email configuration.");
     } finally {
       setSendingEmail(false);

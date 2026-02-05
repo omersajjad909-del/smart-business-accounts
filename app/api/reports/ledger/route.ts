@@ -12,10 +12,10 @@ type SalesInvoice = Prisma.SalesInvoiceGetPayload<Prisma.SalesInvoiceDefaultArgs
 type PurchaseInvoice = Prisma.PurchaseInvoiceGetPayload<Prisma.PurchaseInvoiceDefaultArgs>;
 type SaleReturn = Prisma.SaleReturnGetPayload<Prisma.SaleReturnDefaultArgs>;
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -129,7 +129,7 @@ export async function GET(req: NextRequest) {
     // ---------------------------------------------------------
     // 3. 🟠 COMBINE AND SORT
     // ---------------------------------------------------------
-    const combinedData: any[] = [];
+    const combinedData: Any[] = [];
     vouchers.forEach((v: VoucherWithEntries) => {
       const amount = v.entries
         .filter((e: VoucherEntry) => e.accountId === accountId)
@@ -208,8 +208,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(finalRows);
 
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("LEDGER ERROR:", e);
     return NextResponse.json({ error: "Ledger generation failed" }, { status: 500 });
   }
 }
+

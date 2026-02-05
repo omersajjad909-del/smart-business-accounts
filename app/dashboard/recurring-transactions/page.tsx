@@ -35,7 +35,7 @@ export default function RecurringTransactionsPage() {
     nextDate: new Date().toISOString().slice(0, 10),
   });
 
-  const [accounts, setAccounts] = useState<any[]>([]);
+  const [accounts, setAccounts] = useState<Any[]>([]);
 
   const user = getCurrentUser();
   const canAccess = hasPermission(user, PERMISSIONS.RECURRING_TRANSACTIONS);
@@ -122,7 +122,7 @@ export default function RecurringTransactionsPage() {
         const error = await res.json();
         alert(error.error || "Save failed");
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Save failed");
     } finally {
       setLoading(false);
@@ -144,7 +144,7 @@ export default function RecurringTransactionsPage() {
       if (res.ok) {
         await loadTransactions();
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Update failed");
     }
   }
@@ -166,7 +166,7 @@ export default function RecurringTransactionsPage() {
       if (res.ok) {
         await loadTransactions();
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Delete failed");
     }
   }

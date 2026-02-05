@@ -6,15 +6,15 @@ import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
+    const _userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(backups);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Backup GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       const backupDir = join(process.cwd(), "backups");
       try {
         await mkdir(backupDir, { recursive: true });
-      } catch (e: any) {
+      } catch (_e: Any) {
         // Directory might already exist
       }
 
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
           fileSize: stats.size,
         },
       });
-    } catch (error: any) {
+    } catch (error: Any) {
       await prisma.systemBackup.update({
         where: { id: backup.id },
         data: {
@@ -151,8 +151,9 @@ export async function POST(req: NextRequest) {
 
       throw error;
     }
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Backup POST Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+
