@@ -33,6 +33,7 @@ export default function RecurringTransactionsPage() {
     description: "",
     narration: "",
     nextDate: new Date().toISOString().slice(0, 10),
+    metadataText: "",
   });
 
   const [accounts, setAccounts] = useState<Any[]>([]);
@@ -95,6 +96,18 @@ export default function RecurringTransactionsPage() {
         : "/api/recurring-transactions";
       const method = editing ? "PUT" : "POST";
 
+      const payload = editing ? { id: editing.id, ...formData } : formData;
+      let metadata: Any = null;
+      if (payload.metadataText && payload.metadataText.trim()) {
+        try {
+          metadata = JSON.parse(payload.metadataText);
+        } catch (_e) {
+          alert("Invalid metadata JSON");
+          setLoading(false);
+          return;
+        }
+      }
+
       const res = await fetch(url, {
         method,
         headers: {
@@ -102,7 +115,10 @@ export default function RecurringTransactionsPage() {
           "x-user-role": user?.role || "",
           "x-user-id": user?.id || "",
         },
-        body: JSON.stringify(editing ? { id: editing.id, ...formData } : formData),
+        body: JSON.stringify({
+          ...payload,
+          metadata,
+        }),
       });
 
       if (res.ok) {
@@ -117,6 +133,7 @@ export default function RecurringTransactionsPage() {
           description: "",
           narration: "",
           nextDate: new Date().toISOString().slice(0, 10),
+          metadataText: "",
         });
       } else {
         const error = await res.json();
@@ -181,6 +198,7 @@ export default function RecurringTransactionsPage() {
       description: t.description,
       narration: t.narration || "",
       nextDate: new Date(t.nextDate).toISOString().slice(0, 10),
+      metadataText: "",
     });
     setShowForm(true);
   }
@@ -201,6 +219,7 @@ export default function RecurringTransactionsPage() {
               description: "",
               narration: "",
               nextDate: new Date().toISOString().slice(0, 10),
+              metadataText: "",
             });
           }}
           className="bg-blue-600 text-white px-4 py-2 rounded"
@@ -247,6 +266,8 @@ export default function RecurringTransactionsPage() {
                 <option value="CRV">Cash Receipt (CRV)</option>
                 <option value="EXPENSE">Expense</option>
                 <option value="PAYMENT">Payment</option>
+                <option value="SALES_INVOICE">Sales Invoice</option>
+                <option value="PURCHASE_INVOICE">Purchase Invoice</option>
               </select>
             </div>
 
@@ -315,6 +336,19 @@ export default function RecurringTransactionsPage() {
                 value={formData.nextDate}
                 onChange={(e) =>
                   setFormData({ ...formData, nextDate: e.target.value })
+                }
+              />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm font-bold mb-1">
+                Metadata (JSON, optional)
+              </label>
+              <textarea
+                className="w-full border p-2 rounded text-sm min-h-[120px]"
+                placeholder='{"customerId":"...","items":[{"itemId":"...","qty":1,"rate":100}]}'
+                value={formData.metadataText}
+                onChange={(e) =>
+                  setFormData({ ...formData, metadataText: e.target.value })
                 }
               />
             </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { resolveCompanyId } from "@/lib/tenant";
+import { ensureOpenPeriod } from "@/lib/financialLock";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -60,6 +61,8 @@ export async function POST(req: NextRequest) {
       expenseAccountId,
       paymentAccountId,
       items,
+      currencyId,
+      exchangeRate = 1,
     } = body;
 
     // Validation
@@ -105,6 +108,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    await ensureOpenPeriod(prisma, companyId, new Date(date));
+
     // Calculate total from items
     const calculatedTotal = items.reduce((sum: number, item: Any) => 
       sum + parseFloat(item.amount || 0), 0
@@ -119,7 +124,7 @@ export async function POST(req: NextRequest) {
         totalAmount: calculatedTotal,
         expenseAccountId,
         paymentAccountId,
-        approvalStatus: 'DRAFT',
+        approvalStatus: 'PENDING',
         companyId,
         items: {
           create: items.map((item: Any) => ({
@@ -137,6 +142,20 @@ export async function POST(req: NextRequest) {
         paymentAccount: true,
       },
     });
+
+    if (currencyId) {
+      await prisma.currencyTransaction.create({
+        data: {
+          transactionType: "EXPENSE",
+          transactionId: voucher.id,
+          currencyId,
+          amountInLocal: calculatedTotal,
+          amountInBase: calculatedTotal * Number(exchangeRate || 1),
+          exchangeRate: Number(exchangeRate || 1),
+          conversionDate: new Date(date),
+        },
+      });
+    }
 
     return NextResponse.json(voucher, { status: 201 });
   } catch (error) {
@@ -156,7 +175,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, items, date, ...updateData } = body;
+    const { id, items, date, currencyId, exchangeRate = 1, ...updateData } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -168,11 +187,14 @@ export async function PUT(req: NextRequest) {
     // First, delete old items if new items are provided
     const existing = await prisma.expenseVoucher.findFirst({
       where: { id, companyId },
-      select: { id: true },
+      select: { id: true, date: true },
     });
     if (!existing) {
       return NextResponse.json({ error: "Voucher not found" }, { status: 404 });
     }
+
+    const effectiveDate = date ? new Date(date) : existing.date;
+    await ensureOpenPeriod(prisma, companyId, effectiveDate);
 
     if (items && items.length > 0) {
       await prisma.expenseItem.deleteMany({
@@ -214,6 +236,24 @@ export async function PUT(req: NextRequest) {
         paymentAccount: true,
       },
     });
+
+    await prisma.currencyTransaction.deleteMany({
+      where: { transactionType: "EXPENSE", transactionId: id },
+    });
+    if (currencyId) {
+      const total = updateData.totalAmount ?? voucher.totalAmount;
+      await prisma.currencyTransaction.create({
+        data: {
+          transactionType: "EXPENSE",
+          transactionId: voucher.id,
+          currencyId,
+          amountInLocal: Number(total || 0),
+          amountInBase: Number(total || 0) * Number(exchangeRate || 1),
+          exchangeRate: Number(exchangeRate || 1),
+          conversionDate: effectiveDate,
+        },
+      });
+    }
 
     return NextResponse.json(voucher);
   } catch (error) {
@@ -263,4 +303,3 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
-

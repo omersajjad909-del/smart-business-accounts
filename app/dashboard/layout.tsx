@@ -336,6 +336,7 @@ export default function DashboardLayout({
                 {openAdmin && (
               <div className="ml-2 mt-2 space-y-1 border-l border-gray-800">
                 <MenuLink href="/dashboard/users">👥 Users & Permissions</MenuLink>
+                <MenuLink href="/dashboard/approvals">✅ Approvals</MenuLink>
                 {hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <MenuLink href="/dashboard/backup-restore">💾 Backup & Restore</MenuLink>}
                 {hasPermission(currentUser, PERMISSIONS.EMAIL_SETTINGS) && <MenuLink href="/dashboard/email-settings">✉️ Email Settings</MenuLink>}
                 {hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) && <MenuLink href="/dashboard/users/logs">📋 System Logs</MenuLink>}
@@ -414,26 +415,46 @@ export default function DashboardLayout({
             <GlobalSearch />
           </Suspense>
           {currentUser?.companies && currentUser.companies.length > 0 && (
-            <select
-              className="ml-2 border rounded px-2 py-1 text-xs bg-white"
-              value={currentUser.companyId || ""}
-              onChange={(e) => {
-                const raw = localStorage.getItem("user");
-                if (!raw) return;
-                const parsed = JSON.parse(raw);
-                const user = parsed.user ?? parsed;
-                user.companyId = e.target.value;
-                const payload = parsed.user ? { ...parsed, user } : user;
-                localStorage.setItem("user", JSON.stringify(payload));
-                window.location.reload();
-              }}
-            >
-              {currentUser.companies.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name || c.code || c.id}
-                </option>
-              ))}
-            </select>
+            <div className="ml-2 flex items-center gap-2">
+              <select
+                className="border rounded px-2 py-1 text-xs bg-white"
+                value={currentUser.companyId || ""}
+                onChange={async (e) => {
+                  const nextCompanyId = e.target.value;
+                  const raw = localStorage.getItem("user");
+                  if (!raw) return;
+                  const parsed = JSON.parse(raw);
+                  const user = parsed.user ?? parsed;
+
+                  user.companyId = nextCompanyId;
+                  const payload = parsed.user ? { ...parsed, user } : user;
+                  localStorage.setItem("user", JSON.stringify(payload));
+
+                  try {
+                    await fetch("/api/companies", {
+                      method: "PUT",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "x-user-id": user.id,
+                        "x-user-role": user.role,
+                      },
+                      body: JSON.stringify({ companyId: nextCompanyId, setDefault: true }),
+                    });
+                  } catch (err) {
+                    console.error("Failed to set default company:", err);
+                  }
+
+                  window.location.reload();
+                }}
+              >
+                {currentUser.companies.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name || c.code || c.id}
+                  </option>
+                ))}
+              </select>
+              <span className="text-[10px] text-gray-500">Default</span>
+            </div>
           )}
           <div className="ml-auto text-sm text-gray-600">
             {currentUser.name || currentUser.email}

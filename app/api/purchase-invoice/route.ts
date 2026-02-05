@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient ,Prisma as _Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
+import { ensureOpenPeriod } from "@/lib/financialLock";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -86,12 +87,25 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { supplierId, poId, date, items, location, freight = 0, applyTax = false, taxConfigId = null } = body;
+    const {
+      supplierId,
+      poId,
+      date,
+      items,
+      location,
+      freight = 0,
+      applyTax = false,
+      taxConfigId = null,
+      currencyId = null,
+      exchangeRate = 1,
+    } = body;
 
     // 1. Validation
     if (!supplierId || !date || !items?.length) {
       return NextResponse.json({ error: "Data missing" }, { status: 400 });
     }
+
+    await ensureOpenPeriod(prisma, companyId, new Date(date));
 
     const validItems = items.filter((i: Any) => Number(i.qty) > 0 && i.itemId);
 
@@ -155,6 +169,7 @@ export async function POST(req: NextRequest) {
           poId: poId || null,
           companyId,
           total: netTotal,
+          approvalStatus: "PENDING",
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
             create: validItems.map((i: Any) => ({
@@ -166,6 +181,20 @@ export async function POST(req: NextRequest) {
           },
         },
       });
+
+      if (currencyId) {
+        await tx.currencyTransaction.create({
+          data: {
+            transactionType: "INVOICE",
+            transactionId: invoice.id,
+            currencyId,
+            amountInLocal: netTotal,
+            amountInBase: netTotal * Number(exchangeRate || 1),
+            exchangeRate: Number(exchangeRate || 1),
+            conversionDate: new Date(date),
+          },
+        });
+      }
 
       // D. اسٹاک اور PO اپڈیٹ کریں
       if (poId) {
@@ -249,11 +278,24 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, supplierId: _supplierId, date, items, location: _location, freight = 0, applyTax = false, taxConfigId = null } = body;
+    const {
+      id,
+      supplierId: _supplierId,
+      date,
+      items,
+      location: _location,
+      freight = 0,
+      applyTax = false,
+      taxConfigId = null,
+      currencyId = null,
+      exchangeRate = 1,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
     }
+
+    await ensureOpenPeriod(prisma, companyId, new Date(date));
 
     const existing = await prisma.purchaseInvoice.findFirst({
       where: { id, companyId },
@@ -311,6 +353,23 @@ export async function PUT(req: NextRequest) {
         },
       });
 
+      await tx.currencyTransaction.deleteMany({
+        where: { transactionType: "INVOICE", transactionId: id },
+      });
+      if (currencyId) {
+        await tx.currencyTransaction.create({
+          data: {
+            transactionType: "INVOICE",
+            transactionId: id,
+            currencyId,
+            amountInLocal: netTotal,
+            amountInBase: netTotal * Number(exchangeRate || 1),
+            exchangeRate: Number(exchangeRate || 1),
+            conversionDate: new Date(date),
+          },
+        });
+      }
+
       // return invoice;
     // });
     const result = invoice;
@@ -364,4 +423,3 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-
