@@ -35,7 +35,7 @@ export default function CRVPage() {
   const today = new Date().toISOString().split("T")[0];
 
   const [customers, setCustomers] = useState<Account[]>([]);
-  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<Any[]>([]);
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -46,7 +46,7 @@ export default function CRVPage() {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(today);
   const [narration, setNarration] = useState("");
-  const [voucher, setVoucher] = useState<any>(null);
+  const [voucher, setVoucher] = useState<Any>(null);
   const [saving, setSaving] = useState(false);
   const [selectedName, setSelectedName] = useState("");
   const [selectedPhone, setSelectedPhone] = useState("");
@@ -97,7 +97,7 @@ export default function CRVPage() {
           setCustomers(filtered);
         }
 
-        const allBanks: any[] = [];
+        const allBanks: Any[] = [];
         // Removed manual addition of banks from accountsData as banksData already includes them
 
         if (Array.isArray(banksData)) {
@@ -173,7 +173,7 @@ export default function CRVPage() {
       resetForm();
       setShowForm(false);
       setEditing(null);
-    } catch (e: any) {
+    } catch (e: Any) {
       alert(`Error: ${e.message || "Failed to save"}`);
     } finally {
       setSaving(false);
@@ -218,7 +218,7 @@ export default function CRVPage() {
         const data = await res.json();
         alert(data.error || "Delete failed");
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Delete failed");
     }
   }

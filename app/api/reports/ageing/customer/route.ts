@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient ,Prisma} from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 type CreditEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
 
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -63,7 +63,7 @@ let availableCredit = credits.reduce(
 );
 
     let runningBalance = 0;
-    const rows: any[] = [];
+    const rows: Any[] = [];
 
     for (const inv of invoices) {
       const billAmount = Number(inv.total) || 0;
@@ -104,3 +104,4 @@ let availableCredit = credits.reduce(
     return NextResponse.json([]);
   }
 }
+

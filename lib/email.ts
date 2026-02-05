@@ -30,8 +30,8 @@ const getTransporter = () => {
 
 // Email templates
 export const emailTemplates = {
-  salesInvoice: (invoice: any, customer: any) => {
-    const itemsHtml = invoice.items?.map((item: any) => `
+  salesInvoice: (invoice: Any, customer: Any) => {
+    const itemsHtml = invoice.items?.map((item: Any) => `
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;">${item.item?.name || 'N/A'}</td>
         <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${item.qty}</td>
@@ -89,8 +89,8 @@ export const emailTemplates = {
     `;
   },
 
-  purchaseOrder: (po: any, supplier: any) => {
-  const itemsHtml = po.items?.map((item: any) => `
+  purchaseOrder: (po: Any, supplier: Any) => {
+  const itemsHtml = po.items?.map((item: Any) => `
     <tr>
       <td style="padding:8px;border:1px solid #ddd;">${item.item?.name || "N/A"}</td>
       <td style="padding:8px;border:1px solid #ddd;text-align:center;">${item.qty}</td>
@@ -104,7 +104,7 @@ export const emailTemplates = {
   `).join("") || "";
 
   const total = po.items?.reduce(
-    (s: number, i: any) => s + i.qty * (i.rate || 0),
+    (s: number, i: Any) => s + i.qty * (i.rate || 0),
     0
   ) || 0;
 
@@ -156,8 +156,8 @@ export const emailTemplates = {
 },
 
 
-  purchaseInvoice: (invoice: any, supplier: any) => {
-    const itemsHtml = invoice.items?.map((item: any) => `
+  purchaseInvoice: (invoice: Any, supplier: Any) => {
+    const itemsHtml = invoice.items?.map((item: Any) => `
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;">${item.item?.name || 'N/A'}</td>
         <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${item.qty}</td>
@@ -213,7 +213,7 @@ export const emailTemplates = {
     `;
   },
 
-  report: (title: string, content: string, reportType: string) => {
+  report: (title: string, content: string, _reportType: string) => {
     return `
       <!DOCTYPE html>
       <html>
@@ -270,7 +270,7 @@ export async function sendEmail(options: {
       success: true,
       messageId: info.messageId,
     };
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error('❌ Email send error:', error);
     return {
       success: false,
@@ -296,7 +296,7 @@ export async function testEmailConfig(): Promise<{ success: boolean; message: st
       success: true,
       message: 'Email configuration is valid',
     };
-  } catch (error: any) {
+  } catch (error: Any) {
     return {
       success: false,
       message: error.message || 'Email configuration test failed',

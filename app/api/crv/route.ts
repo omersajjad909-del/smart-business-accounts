@@ -4,10 +4,10 @@ import { PrismaClient } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // GET - List all CRVs
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
-    const where: any = { type: "CRV" };
+    const where: Any = { type: "CRV" };
     if (from && to) {
       where.date = {
         gte: new Date(from + "T00:00:00"),
@@ -43,9 +43,9 @@ export async function GET(req: NextRequest) {
     });
 
     // Format vouchers
-    const formatted = vouchers.map((v: any) => {
-      const receiptEntry = v.entries.find((e: any) => e.amount > 0);
-      const customerEntry = v.entries.find((e: any) => e.amount < 0);
+    const formatted = vouchers.map((v: Any) => {
+      const receiptEntry = v.entries.find((e: Any) => e.amount > 0);
+      const customerEntry = v.entries.find((e: Any) => e.amount < 0);
       return {
         id: v.id,
         voucherNo: v.voucherNo,
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(formatted);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("CRV GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     let requestBody;
     try {
       requestBody = await req.json();
-    } catch (parseError: any) {
+    } catch (parseError: Any) {
       console.error("❌ CRV JSON PARSE ERROR:", parseError);
       return NextResponse.json(
         { error: "Invalid request body", details: parseError.message },
@@ -196,7 +196,7 @@ export async function POST(req: Request) {
     console.log("🔥 CREATING CRV:", { voucherNo, receiptAmount, customerId: customer.id, paymentAccountId: paymentAccount.id });
 
     // Create voucher and update bank balance in transaction
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = await prisma.$transaction(async (tx: Any) => {
       // CRV = Cash Receipt Voucher (روپے وصول)
       // Customer سے روپے آ رہے ہیں
       // 
@@ -292,7 +292,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(responseData);
 
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("❌ CRV ERROR:", e);
     console.error("❌ CRV ERROR DETAILS:", {
       message: e.message,
@@ -378,9 +378,9 @@ export async function PUT(req: NextRequest) {
     }
 
     const receiptAmount = Math.abs(amountNum);
-    const oldAmount = Math.abs(existing.entries.find((e: any) => e.amount < 0)?.amount || 0);
+    const oldAmount = Math.abs(existing.entries.find((e: Any) => e.amount < 0)?.amount || 0);
 
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = await prisma.$transaction(async (tx: Any) => {
       await tx.voucherEntry.deleteMany({ where: { voucherId: id } });
 
       const voucher = await tx.voucher.update({
@@ -422,7 +422,7 @@ export async function PUT(req: NextRequest) {
       amount: receiptAmount,
       paymentMode: paymentMode || "CASH",
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("CRV PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -458,7 +458,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("CRV DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

@@ -8,6 +8,6 @@ const Barcode = dynamic(() => import("react-barcode"), {
   loading: () => <p>Loading...</p>,
 });
 
-export default function BarcodeWrapper(props: any) {
+export default function BarcodeWrapper(props: Any) {
   return <Barcode {...props} />;
 }

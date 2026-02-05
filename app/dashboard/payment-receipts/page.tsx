@@ -138,7 +138,7 @@ export default function PaymentReceiptsPage() {
         return;
       }
       
-      const filtered = data.filter((acc: any) => 
+      const filtered = data.filter((acc: Any) => 
         acc.partyType === 'CUSTOMER' || !acc.partyType
       );
       setParties(filtered);

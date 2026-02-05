@@ -13,15 +13,27 @@ import { QRCodeSVG } from "qrcode.react";
 export default function PurchasePrint() {
   const params = useSearchParams();
   const id = params.get("id");
-  const [data, setData] = useState<any>(null);
-  const [origin, setOrigin] = useState("");
+  const [data, setData] = useState<{
+    id: string;
+    date: string;
+    invoiceNo: string;
+    total: number;
+    supplier: { name: string };
+    items: Array<{
+      id: string;
+      qty: number;
+      rate: number;
+      amount: number;
+      item: { name: string };
+    }>;
+  } | null>(null);
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   useEffect(() => {
-    setOrigin(window.location.origin);
     if (!id) return;
     fetch(`/api/purchase-invoice?id=${id}`)
       .then(r => r.json())
-      .then(setData);
+      .then((payload) => setData(payload));
   }, [id]);
 
   if (!data) return null;
@@ -66,7 +78,7 @@ export default function PurchasePrint() {
           </tr>
         </thead>
         <tbody>
-          {data.items.map((i: any) => (
+          {data.items.map((i) => (
             <tr key={i.id}>
               <td>{i.item.name}</td>
               <td>{i.qty}</td>

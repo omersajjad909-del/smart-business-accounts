@@ -98,7 +98,7 @@ export default function ExpenseVouchersPage() {
   const handleItemChange = (
     index: number,
     field: string,
-    value: any
+    value: Any
   ) => {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };

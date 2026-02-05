@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       include: { item: { select: { name: true, unit: true } } },
     });
 
-    const map: Record<string, any> = {};
+    const map: Record<string, Any> = {};
 
     for (const t of txns) {
       // Key format: Location-ItemID
@@ -46,10 +46,10 @@ export async function GET(req: NextRequest) {
     }
 
     // صرف وہ آئٹمز دکھائیں جن کا اسٹاک 0 نہیں ہے
-    const result = Object.values(map).filter((r: any) => r.qty !== 0);
+    const result = Object.values(map).filter((r: Any) => r.qty !== 0);
     
     // لوکیشن کے حساب سے ترتیب دیں (Sorting)
-    result.sort((a: any, b: any) => a.location.localeCompare(b.location));
+    result.sort((a: Any, b: Any) => a.location.localeCompare(b.location));
 
     return NextResponse.json(result);
   } catch (e) {
@@ -57,3 +57,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json([]);
   }
 }
+

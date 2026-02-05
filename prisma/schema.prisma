@@ -388,11 +388,11 @@ model ActivityLog {
   action    String
   details   String?
   userId    String?
-  companyId String?
+  companyId String
   createdAt DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id])
-  company Company? @relation(fields: [companyId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
 
   @@index([companyId])
 }
@@ -402,8 +402,8 @@ model RolePermission {
   role       String // ADMIN | ACCOUNTANT | VIEWER
   permission String // e.g. CREATE_USER
 
-  companyId String?
-  company Company? @relation(fields: [companyId], references: [id])
+  companyId String
+  company Company @relation(fields: [companyId], references: [id])
 
   @@unique([role, permission, companyId])
   @@index([companyId])
@@ -413,10 +413,10 @@ model UserPermission {
   id         String @id @default(uuid())
   userId     String
   permission String
-  companyId String?
+  companyId String
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([userId, permission, companyId])
   @@index([companyId])

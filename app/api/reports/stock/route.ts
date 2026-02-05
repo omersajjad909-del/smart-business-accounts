@@ -18,10 +18,10 @@ type ItemWithInventory = Prisma.ItemNewGetPayload<{
 
 
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -81,3 +81,4 @@ const result = items.map((item: ItemWithInventory) => {
     return NextResponse.json([], { status: 500 });
   }
 }
+

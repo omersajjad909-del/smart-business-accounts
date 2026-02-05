@@ -23,7 +23,7 @@ export default function ItemsNewPage() {
   const [description, setDescription] = useState("");
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const UNITS = ["PCS", "KG", "GM", "LTR", "ML", "MTR", "FT", "BOX", "PACK"];
+  const _UNITS = ["PCS", "KG", "GM", "LTR", "ML", "MTR", "FT", "BOX", "PACK"];
 
 
   async function loadItems() {
@@ -90,7 +90,7 @@ export default function ItemsNewPage() {
 
       await loadItems();
       alert(editingId ? "Item updated successfully" : "Item saved successfully");
-    } catch (err: any) {
+    } catch (err: Any) {
       alert(err.message);
     } finally {
       setSaving(false);
@@ -135,7 +135,7 @@ export default function ItemsNewPage() {
 
       await loadItems();
       alert("Item deleted successfully");
-    } catch (err: any) {
+    } catch (err: Any) {
       alert(err.message);
     }
   }

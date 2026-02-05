@@ -21,7 +21,7 @@ export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
-  const today = new Date().toISOString().slice(0, 10);
+  const _today = new Date().toISOString().slice(0, 10);
   const [formData, setFormData] = useState({
     employeeId: "",
     firstName: "",

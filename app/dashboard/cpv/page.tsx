@@ -27,7 +27,7 @@ export default function CPVPage() {
   const today = new Date().toISOString().split("T")[0];
 
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<Any[]>([]);
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -38,7 +38,7 @@ export default function CPVPage() {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(today);
   const [narration, setNarration] = useState("");
-  const [voucher, setVoucher] = useState<any>(null);
+  const [voucher, setVoucher] = useState<Any>(null);
   const [saving, setSaving] = useState(false);
   const [selectedName, setSelectedName] = useState("");
   const [selectedPhone, setSelectedPhone] = useState("");
@@ -91,11 +91,11 @@ export default function CPVPage() {
           );
         }
 
-        const allBanks: any[] = [];
+        const allBanks: Any[] = [];
         // Removed manual addition of banks from accountsData as banksData already includes them
         
         if (Array.isArray(banksData)) {
-          banksData.forEach((bank: any) => {
+          banksData.forEach((bank: Any) => {
             allBanks.push({
               id: bank.id,
               accountId: bank.accountId,
@@ -168,7 +168,7 @@ export default function CPVPage() {
       resetForm();
       setShowForm(false);
       setEditing(null);
-    } catch (e: any) {
+    } catch (e: Any) {
       alert(`Error: ${e.message || "Failed to save"}`);
     } finally {
       setSaving(false);
@@ -213,7 +213,7 @@ export default function CPVPage() {
         const data = await res.json();
         alert(data.error || "Delete failed");
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Delete failed");
     }
   }

@@ -71,7 +71,6 @@ export default function BankReconciliationPage() {
       setSystemBalance(0);
       setBankBalance(0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAccount, bankAccounts]);
 
   const fetchBankAccounts = async () => {

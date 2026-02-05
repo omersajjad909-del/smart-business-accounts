@@ -36,7 +36,7 @@ type AdvancePayment = {
   status: string;
   supplier: { id: string; name: string };
   po?: { id: string; poNo: string };
-  adjustments: any[];
+  adjustments: Any[];
   createdAt: string;
 };
 

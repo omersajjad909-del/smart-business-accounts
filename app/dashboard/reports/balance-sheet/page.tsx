@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export default function DetailedBalanceSheet() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Any>(null);
   const [loading, setLoading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
 
@@ -73,7 +73,7 @@ export default function DetailedBalanceSheet() {
                 } else {
                   alert(data.error || "Email send nahi ho saki");
                 }
-              } catch (e) {
+              } catch (_e) {
                 alert("Email send karte waqt error aayi");
               } finally {
                 setSendingEmail(false);
@@ -104,7 +104,7 @@ export default function DetailedBalanceSheet() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data?.assets && data.assets.length > 0 ? data.assets.map((a: any, i: number) => (
+                  {data?.assets && data.assets.length > 0 ? data.assets.map((a: Any, i: number) => (
                     <tr key={i} className="border-b border-gray-100">
                       <td className="p-2 font-semibold uppercase text-[11px]">{a.name}</td>
                       <td className="p-2 text-right font-mono text-[11px]">{Math.abs(a.amount).toLocaleString()}</td>
@@ -133,13 +133,13 @@ export default function DetailedBalanceSheet() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data?.liabilities && data.liabilities.length > 0 && data.liabilities.map((l: any, i: number) => (
+                  {data?.liabilities && data.liabilities.length > 0 && data.liabilities.map((l: Any, i: number) => (
                     <tr key={i} className="border-b border-gray-100">
                       <td className="p-2 font-semibold uppercase text-[11px]">{l.name}</td>
                       <td className="p-2 text-right font-mono text-[11px]">{Math.abs(l.amount).toLocaleString()}</td>
                     </tr>
                   ))}
-                  {data?.equity && data.equity.length > 0 && data.equity.map((e: any, i: number) => (
+                  {data?.equity && data.equity.length > 0 && data.equity.map((e: Any, i: number) => (
                     <tr key={`eq-${i}`} className="border-b border-gray-100 bg-green-50">
                       <td className="p-2 font-semibold uppercase text-[11px]">{e.name}</td>
                       <td className="p-2 text-right font-mono text-[11px]">{Math.abs(e.amount).toLocaleString()}</td>

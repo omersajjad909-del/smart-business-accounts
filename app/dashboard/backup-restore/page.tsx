@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
-import { PERMISSIONS } from "@/lib/permissions";
+import { PERMISSIONS as _PERMISSIONS } from "@/lib/permissions";
 type AuthUser = {
   id?: string;
   role?: string;
@@ -109,7 +109,7 @@ export default function BackupRestorePage() {
         const error = await res.json();
         alert(error.error || "Backup failed");
       }
-    } catch (e) {
+    } catch (_e) {
       alert("Backup failed");
     } finally {
       setCreating(false);

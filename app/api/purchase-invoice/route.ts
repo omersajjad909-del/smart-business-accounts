@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient ,Prisma } from "@prisma/client";
+import { PrismaClient ,Prisma as _Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 /* ================= GET: Pending POs for Selection OR All Purchase Invoices ================= */
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(pos);
-  } catch (e: any) {
+  } catch (e: Any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Data missing" }, { status: 400 });
     }
 
-    const validItems = items.filter((i: any) => Number(i.qty) > 0 && i.itemId);
+    const validItems = items.filter((i: Any) => Number(i.qty) > 0 && i.itemId);
 
     // 2. Start Transaction (Disabled due to Supabase connection issues)
     // const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       }
       const invoiceNo = `PI-${nextNo}`;
 
-      const totalItemsAmount = validItems.reduce((s: number, i: any) => s + (Number(i.qty) * Number(i.rate)), 0);
+      const totalItemsAmount = validItems.reduce((s: number, i: Any) => s + (Number(i.qty) * Number(i.rate)), 0);
       
       // Calculate tax if applied
       let taxAmount = 0;
@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
           total: netTotal,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
-            create: validItems.map((i: any) => ({
+            create: validItems.map((i: Any) => ({
               itemId: i.itemId,
               qty: Number(i.qty),
               rate: Number(i.rate),
@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
       // E. اگر PO ہے تو اس کا اسٹیٹس چیک کریں
       if (poId) {
         const allItems = await tx.purchaseOrderItem.findMany({ where: { poId } });
-        const isDone = allItems.every((pi: any) => pi.invoicedQty >= pi.qty);
+        const isDone = allItems.every((pi: Any) => pi.invoicedQty >= pi.qty);
         await tx.purchaseOrder.update({
           where: { id: poId },
           data: { status: isDone ? "COMPLETED" : "PENDING" },
@@ -229,7 +229,7 @@ export async function POST(req: NextRequest) {
     const result = invoice;
 
     return NextResponse.json({ success: true, id: result.id, invoiceNo: result.invoiceNo });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("PI ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -249,7 +249,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, supplierId, date, items, location, freight = 0, applyTax = false, taxConfigId = null } = body;
+    const { id, supplierId: _supplierId, date, items, location: _location, freight = 0, applyTax = false, taxConfigId = null } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
@@ -266,8 +266,8 @@ export async function PUT(req: NextRequest) {
 
     // Note: Updating purchase invoices is complex due to inventory transactions
     // For now, we'll just update the invoice data
-    const validItems = items.filter((i: any) => Number(i.qty) > 0 && i.itemId);
-    const totalItemsAmount = validItems.reduce((s: number, i: any) => s + (Number(i.qty) * Number(i.rate)), 0);
+    const validItems = items.filter((i: Any) => Number(i.qty) > 0 && i.itemId);
+    const totalItemsAmount = validItems.reduce((s: number, i: Any) => s + (Number(i.qty) * Number(i.rate)), 0);
     
     // Calculate tax if applied
     let taxAmount = 0;
@@ -294,7 +294,7 @@ export async function PUT(req: NextRequest) {
           total: netTotal,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
-            create: validItems.map((i: any) => ({
+            create: validItems.map((i: Any) => ({
               itemId: i.itemId,
               qty: Number(i.qty),
               rate: Number(i.rate),
@@ -316,7 +316,7 @@ export async function PUT(req: NextRequest) {
     const result = invoice;
 
     return NextResponse.json({ success: true, invoice: result });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("PI PUT ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -359,8 +359,9 @@ export async function DELETE(req: NextRequest) {
     // });
 
     return NextResponse.json({ success: true });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("PI DELETE ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

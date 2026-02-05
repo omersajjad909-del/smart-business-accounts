@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
 type User = {
@@ -28,7 +28,7 @@ type UserForm = {
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const [currentUser] = useState<CurrentUser | null>(() => getCurrentUser());
   const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState<UserForm>({
@@ -41,7 +41,7 @@ export default function UsersPage() {
   });
   const [editing, setEditing] = useState(false);
 
-  function reload() {
+  const reload = useCallback(() => {
     setLoading(true);
     fetch("/api/users", {
       headers: { "x-user-role": "ADMIN" },
@@ -49,18 +49,17 @@ export default function UsersPage() {
       .then((r) => r.json())
       .then((data) => setUsers(Array.isArray(data) ? data : []))
       .finally(() => setLoading(false));
-  }
+  }, []);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const u = getCurrentUser();
-    setCurrentUser(u);
-
-    if (u?.role === "ADMIN") {
+    if (currentUser?.role === "ADMIN") {
       reload();
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [currentUser, reload]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   async function save() {
     if (!form.name || !form.email) return alert("Please fill required fields");

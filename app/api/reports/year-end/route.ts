@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function POST(req: NextRequest) {
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
       profit,
       status: "YEAR CLOSED SUCCESSFULLY",
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("YEAR END ERROR:", e);
     return NextResponse.json(
       { error: e.message },
@@ -135,3 +135,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

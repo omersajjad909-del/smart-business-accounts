@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const bankAccountId = searchParams.get('bankAccountId');
     const isReconciled = searchParams.get('isReconciled');
 
-    const filter: any = { companyId };
+    const filter: Any = { companyId };
     if (bankAccountId) filter.bankAccountId = bankAccountId;
     if (isReconciled !== null) filter.isReconciled = isReconciled === 'true';
 
@@ -163,3 +163,4 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+

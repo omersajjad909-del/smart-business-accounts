@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
 
 // GET: Fetch all currencies
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const currencies = await prisma.currency.findMany({
       where: { isActive: true },
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(currency, { status: 201 });
-  } catch (error: any) {
+  } catch (error: Any) {
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Currency code already exists" },
@@ -81,7 +81,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(currency);
-  } catch (error: any) {
+  } catch (error: Any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Currency not found" }, { status: 404 });
     }
@@ -108,7 +108,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "Currency deleted successfully" });
-  } catch (error: any) {
+  } catch (error: Any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Currency not found" }, { status: 404 });
     }

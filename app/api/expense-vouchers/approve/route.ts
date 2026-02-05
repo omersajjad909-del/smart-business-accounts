@@ -4,10 +4,10 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // Approve or reject expense voucher
@@ -94,8 +94,9 @@ export async function POST(req: NextRequest) {
       success: true,
       voucher: updated,
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Expense Approval Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

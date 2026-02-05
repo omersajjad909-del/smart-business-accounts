@@ -5,9 +5,9 @@ import { PERMISSIONS } from "@/lib/permissions";
 import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function POST(req: NextRequest) {
@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
       message: 'Email sent successfully',
       messageId: result.messageId,
     });
-  } catch (error: any) {
+  } catch (error: Any) {
     console.error('❌ Email send API error:', error);
 
     try {
@@ -184,3 +184,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

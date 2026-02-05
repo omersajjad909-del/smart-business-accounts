@@ -4,10 +4,10 @@ import bcrypt from "bcryptjs";
 type RolePermission = Prisma.RolePermissionGetPayload<Prisma.RolePermissionDefaultArgs>;
 
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function POST(req: NextRequest) {
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
 
       console.log("🔍 USER SEARCH:", { searchTerm: emailNormalized });
       console.log("🔍 USER FOUND:", user ? { id: user.id, name: user.name, email: user.email, active: user.active } : "NOT FOUND");
-    } catch (dbError: any) {
+    } catch (dbError: Any) {
       console.error("❌ LOGIN DATABASE ERROR:", dbError);
       console.error("❌ DATABASE ERROR DETAILS:", {
         message: dbError.message,
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
       });
       passwordMatch = await bcrypt.compare(password, user.password);
       console.log("🔐 PASSWORD MATCH:", passwordMatch);
-    } catch (bcryptError: any) {
+    } catch (bcryptError: Any) {
       console.error("❌ LOGIN BCRYPT ERROR:", bcryptError);
       console.error("❌ BCRYPT ERROR DETAILS:", {
         message: bcryptError.message,
@@ -137,13 +137,13 @@ export async function POST(req: NextRequest) {
         where: { userId: user.id },
         include: { company: true },
       });
-    } catch (companyError: any) {
+    } catch (companyError: Any) {
       console.error("LOGIN COMPANIES ERROR:", companyError);
     }
 
     const defaultCompanyId =
       user.defaultCompanyId ||
-      companies.find((c: any) => c.isDefault)?.companyId ||
+      companies.find((c: Any) => c.isDefault)?.companyId ||
       companies[0]?.companyId ||
       null;
 
@@ -154,14 +154,14 @@ export async function POST(req: NextRequest) {
         where: { role: user.role, companyId: defaultCompanyId || undefined },
         select: { permission: true },
       });
-    } catch (permError: any) {
+    } catch (permError: Any) {
       console.error("❌ LOGIN PERMISSIONS ERROR:", permError);
       // Continue without role permissions if error occurs
     }
 
     const userPermissions = (user.permissions || [])
-      .filter((p: any) => !defaultCompanyId || p.companyId === defaultCompanyId)
-      .map((p: any) => p.permission || p);
+      .filter((p: Any) => !defaultCompanyId || p.companyId === defaultCompanyId)
+      .map((p: Any) => p.permission || p);
 
     // 🔥 FRONTEND KE LIYE SAFE USER OBJECT (getCurrentUser() ke format ke mutabiq)
     const safeUser = {
@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
       permissions: userPermissions, // User-specific permissions
       rolePermissions: rolePermissions.map((rp: RolePermission) => rp.permission),
       companyId: defaultCompanyId,
-      companies: companies.map((c: any) => ({
+      companies: companies.map((c: Any) => ({
         id: c.companyId,
         name: c.company?.name,
         code: c.company?.code,
@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ user: safeUser });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("❌ LOGIN ERROR:", e);
     console.error("❌ LOGIN ERROR DETAILS:", {
       message: e.message,
@@ -204,5 +204,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
 
 

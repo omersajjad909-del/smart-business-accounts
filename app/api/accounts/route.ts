@@ -3,10 +3,10 @@
 
 // // Prisma singleton
 // const prisma =
-//   (globalThis as any).prisma || new PrismaClient();
+//   (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 // if (process.env.NODE_ENV === "development") {
-//   (globalThis as any).prisma = prisma;
+//   (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 // }
 
 // // const CATEGORY_TYPE_MAP: Record<string, string> = {
@@ -309,7 +309,7 @@
 //     });
 
 //     return NextResponse.json({ message: "Account deleted successfully" });
-//   } catch (e: any) {
+//   } catch (e: Any) {
 //     console.error("❌ ACCOUNT DELETE ERROR:", e);
     
 //     return NextResponse.json(
@@ -363,7 +363,7 @@
 //     });
 
 //     return NextResponse.json(updatedAccount);
-//   } catch (e: any) {
+//   } catch (e: Any) {
 //     console.error("❌ ACCOUNT UPDATE ERROR:", e);
 //     return NextResponse.json(
 //       { error: "Failed to update account" },
@@ -378,10 +378,10 @@ import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
 // Prisma singleton
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 /* ================= CATEGORY TO TYPE MAPPING ================= */
@@ -561,7 +561,7 @@ export async function PUT(req: NextRequest) {
     }
     const updatedAccount = await prisma.account.findUnique({ where: { id } });
     return NextResponse.json(updatedAccount);
-  } catch (e) {
+  } catch (_e) {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }
@@ -584,7 +584,8 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.account.deleteMany({ where: { id: id, companyId } });
     return NextResponse.json({ message: "Deleted" });
-  } catch (e) {
+  } catch (_e) {
     return NextResponse.json({ error: "Cannot delete. Account in use." }, { status: 500 });
   }
 }
+

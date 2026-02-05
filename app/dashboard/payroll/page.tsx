@@ -20,7 +20,7 @@ interface Payroll {
 export default function PayrollPage() {
   const user = getCurrentUser();
   const [payroll, setPayroll] = useState<Payroll[]>([]);
-  const [employees, setEmployees] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<Any[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [monthYear, setMonthYear] = useState(() => {
@@ -68,7 +68,7 @@ export default function PayrollPage() {
       );
       const dataAdvance = await resAdvance.json();
       const advanceTotal = Array.isArray(dataAdvance)
-        ? dataAdvance.reduce((sum: number, a: any) => sum + a.amount, 0)
+        ? dataAdvance.reduce((sum: number, a: Any) => sum + a.amount, 0)
         : 0;
 
       setDetectedAdvance(advanceTotal);
@@ -79,7 +79,7 @@ export default function PayrollPage() {
       );
       const dataAttendance = await resAttendance.json();
       const absents = Array.isArray(dataAttendance)
-        ? dataAttendance.filter((r: any) => r.status === "ABSENT").length
+        ? dataAttendance.filter((r: Any) => r.status === "ABSENT").length
         : 0;
 
       // 3. Check Previous Month Balance (Carry Forward)

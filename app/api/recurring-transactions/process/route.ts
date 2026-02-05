@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // Process recurring transactions that are due
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
           status: "success",
           created,
         });
-      } catch (error: any) {
+      } catch (error: Any) {
         results.push({
           id: transaction.id,
           status: "error",
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       processed: results.length,
       results,
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Process Recurring Transactions Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -98,7 +98,7 @@ function calculateNextDate(currentDate: Date, frequency: string): Date {
   return next;
 }
 
-async function createCPV(transaction: any) {
+async function createCPV(transaction: Any) {
   // Generate voucher number
   const count = await prisma.voucher.count({ where: { type: "CPV" } });
   const voucherNo = `CPV-${count + 1}`;
@@ -129,7 +129,7 @@ async function createCPV(transaction: any) {
   return voucher;
 }
 
-async function createCRV(transaction: any) {
+async function createCRV(transaction: Any) {
   const count = await prisma.voucher.count({ where: { type: "CRV" } });
   const voucherNo = `CRV-${count + 1}`;
 
@@ -159,7 +159,7 @@ async function createCRV(transaction: any) {
   return voucher;
 }
 
-async function createExpense(transaction: any) {
+async function createExpense(transaction: Any) {
   const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
 
   const expense = await prisma.expenseVoucher.create({
@@ -182,3 +182,4 @@ async function createExpense(transaction: any) {
 
   return expense;
 }
+

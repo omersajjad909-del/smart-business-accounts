@@ -3,10 +3,10 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(publicUsers);
-  } catch (error: any) {
+  } catch (error: Any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       },
     });
     return NextResponse.json(user);
-  } catch (error: any) {
+  } catch (error: Any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -95,7 +95,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const { id, name, email, password, role, active } = await req.json();
-    const updateData: any = { name, email, role, active };
+    const updateData: Any = { name, email, role, active };
     if (password && password.trim()) {
       updateData.password = await bcrypt.hash(password, 10);
     }
@@ -113,7 +113,7 @@ export async function PUT(req: NextRequest) {
       data: updateData,
     });
     return NextResponse.json(updatedUser);
-  } catch (error: any) {
+  } catch (error: Any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -142,7 +142,8 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.user.delete({ where: { id } });
     return NextResponse.json({ message: "User deleted successfully" });
-  } catch (error: any) {
+  } catch (error: Any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient,Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 const prisma =
-  (globalThis as any).prisma || new PrismaClient();
+  (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       companyId,
       status: "PENDING", // 🔴 یہ لائن شامل کرنا ضروری تھی جو مسنگ تھی
       items: {
-        create: items.map((i: any) => ({
+        create: items.map((i: Any) => ({
           itemId: i.itemId,
           qty: Number(i.qty),
           rate: Number(i.rate || 0),
@@ -145,7 +145,7 @@ export async function PUT(req: NextRequest) {
         remarks: remarks || "",
         companyId,
         items: {
-          create: items.map((i: any) => ({
+          create: items.map((i: Any) => ({
             itemId: i.itemId,
             qty: Number(i.qty),
             rate: Number(i.rate || 0),
@@ -196,5 +196,6 @@ export async function DELETE(req: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
+
 
 

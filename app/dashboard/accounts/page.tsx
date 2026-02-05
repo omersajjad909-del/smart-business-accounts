@@ -81,7 +81,7 @@ export default function ChartOfAccounts() {
     }
 
     const prefix = PREFIX_MAP[category] || "ACC";
-    const user = getCurrentUser();
+    const _user = getCurrentUser();
 
     try {
       // یہاں ہم نے پاتھ کو ٹھیک کیا ہے: /api/accounts/next-code کی جگہ /api/accounts استعمال کریں

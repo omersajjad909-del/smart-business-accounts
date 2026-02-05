@@ -7,8 +7,8 @@ export default function AdminPermissionsPage() {
   const userSession = getCurrentUser();
   const isAdmin = userSession?.role === "ADMIN";
 
-  const [users, setUsers] = useState<any[]>([]);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [users, setUsers] = useState<Any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<Any>(null);
   const [permissions, setPermissions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -37,10 +37,10 @@ export default function AdminPermissionsPage() {
       </div>
     );
   }
-  function loadPermissions(user: any) {
+  function loadPermissions(user: Any) {
     // اگر یوزر ابجیکٹ میں پرمیشنز پہلے سے ہیں تو وہ اٹھا لو
     if (user.permissions) {
-      setPermissions(user.permissions.map((p: any) => p.permission));
+      setPermissions(user.permissions.map((p: Any) => p.permission));
     } else {
       setPermissions([]);
     }
@@ -76,7 +76,7 @@ export default function AdminPermissionsPage() {
         const err = await res.json();
         alert("Error: " + (err.error || "Failed to save"));
       }
-    } catch (err) {
+    } catch (_err) {
       alert("Network error occurred!");
     } finally {
       setLoading(false);
@@ -116,7 +116,7 @@ export default function AdminPermissionsPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {/* آپ کی PERMISSIONS فائل سے تمام آپشنز یہاں خود بخود آ جائیں گے */}
-            {Object.values(PERMISSIONS).map((p: any) => (
+            {Object.values(PERMISSIONS).map((p: Any) => (
               <label key={p} className="flex items-center p-3 bg-white border rounded-lg hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
                 <input
                   type="checkbox"

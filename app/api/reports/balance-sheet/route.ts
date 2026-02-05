@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 type AccountWithEntries = Prisma.AccountGetPayload<{
   include: {
     voucherEntries: true;
@@ -11,7 +11,7 @@ type AccountWithEntries = Prisma.AccountGetPayload<{
 
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // api/reports/balance-sheet/route.ts
@@ -39,9 +39,9 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const assetsList: any[] = [];
-    const liabilitiesList: any[] = [];
-    const equityList: any[] = [];
+    const assetsList: Any[] = [];
+    const liabilitiesList: Any[] = [];
+    const equityList: Any[] = [];
 
     let incomeTotal = 0;
     let expenseTotal = 0;
@@ -133,3 +133,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Balance calculation failed" }, { status: 500 });
   }
 }
+

@@ -10,10 +10,10 @@ type OutwardWithItems = Prisma.OutwardGetPayload<{
 type OutwardItem = Prisma.OutwardItemGetPayload<Prisma.OutwardItemDefaultArgs>;
 
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
@@ -22,11 +22,11 @@ export async function GET(req: NextRequest) {
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
-    }
     }
 
     // 🔎 FILTERS
@@ -39,7 +39,9 @@ export async function GET(req: NextRequest) {
 
     // 📦 DATA
     const data = await prisma.outward.findMany({
-      where: {\r\n        companyId,\r\n        date: { gte: fromDate, lte: toDate },
+      where: {
+        companyId,
+        date: { gte: fromDate, lte: toDate },
         customerId: customerId && customerId !== "" ? customerId : undefined,
       },
       include: {
@@ -50,7 +52,7 @@ export async function GET(req: NextRequest) {
       },
       orderBy: { outwardNo: "desc" },
     });
-    const reportRows: any[] = [];
+    const reportRows: Any[] = [];
 
     data.forEach((out: OutwardWithItems) => {
       out.items.forEach((line: OutwardItem) => {
@@ -68,9 +70,10 @@ export async function GET(req: NextRequest) {
 
 
     return NextResponse.json(reportRows);
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("OUTWARD REPORT ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+
 

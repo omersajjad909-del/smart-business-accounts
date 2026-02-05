@@ -4,10 +4,10 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 
-const prisma = (globalThis as any).prisma || new PrismaClient();
+const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
-  (globalThis as any).prisma = prisma;
+  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 // Annual Financial Statements
@@ -96,7 +96,7 @@ const accountBalances: AccountBalance[] = accounts.map(
 
 
     // Group by account type
-    const grouped: Record<string, any[]> = {};
+    const grouped: Record<string, Any[]> = {};
    accountBalances.forEach((acc) => {
   if (!grouped[acc.type]) {
     grouped[acc.type] = [];
@@ -152,8 +152,9 @@ const accountBalances: AccountBalance[] = accounts.map(
         netProfit,
       },
     });
-  } catch (e: any) {
+  } catch (e: Any) {
     console.error("Annual Statements Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

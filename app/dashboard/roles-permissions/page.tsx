@@ -9,8 +9,15 @@ interface Role {
   permissions: string[];
 }
 
+type CurrentUser = {
+  id: string;
+  role: string;
+  name?: string;
+  email?: string;
+};
+
 export default function RolePermissionManager() {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<CurrentUser | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedRole, setSelectedRole] = useState<string>("ADMIN");
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
@@ -40,7 +47,7 @@ export default function RolePermissionManager() {
     }
   }, [roles, selectedRole]);
 
-  const loadRoles = async (u: any) => {
+  const loadRoles = async (u: CurrentUser) => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/roles", {
@@ -56,7 +63,7 @@ export default function RolePermissionManager() {
       
       // Set initial role permissions
       if (data && data.length > 0) {
-        const adminRole = data.find((r: any) => r.role === "ADMIN");
+        const adminRole = data.find((r: Role) => r.role === "ADMIN");
         if (adminRole) {
           setRolePermissions(adminRole.permissions || []);
         }
