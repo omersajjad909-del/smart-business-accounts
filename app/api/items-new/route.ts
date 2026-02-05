@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma =
   (globalThis as any).prisma || new PrismaClient();
@@ -8,20 +9,29 @@ if (process.env.NODE_ENV === "development") {
   (globalThis as any).prisma = prisma;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const companyId = await resolveCompanyId(req);
+  if (!companyId) {
+    return NextResponse.json({ error: "Company required" }, { status: 400 });
+  }
   const items = await prisma.itemNew.findMany({
+    where: { companyId },
     orderBy: { name: "asc" },
   });
   return NextResponse.json(items);
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   if (role !== "ADMIN") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const body = await req.json();
 
     if (!body.name || !body.unit) {
@@ -32,6 +42,7 @@ export async function POST(req: Request) {
     }
 
     const lastItem = await prisma.itemNew.findFirst({
+      where: { companyId },
       orderBy: { createdAt: "desc" },
     });
 
@@ -43,6 +54,7 @@ export async function POST(req: Request) {
 
     const item = await prisma.itemNew.create({
       data: {
+        companyId,
         code: `I-${nextNumber}`,
         name: body.name,
         unit: body.unit,
@@ -70,13 +82,17 @@ export async function POST(req: Request) {
 }
 
 /* ================= PUT (EDIT) ================= */
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   if (role !== "ADMIN") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const body = await req.json();
     const { id, name, unit, rate, minStock, barcode, description } = body;
 
@@ -87,8 +103,8 @@ export async function PUT(req: Request) {
       );
     }
 
-    const item = await prisma.itemNew.update({
-      where: { id },
+    const updated = await prisma.itemNew.updateMany({
+      where: { id, companyId },
       data: {
         name,
         unit,
@@ -98,6 +114,10 @@ export async function PUT(req: Request) {
         description: description || "",
       },
     });
+    if (!updated.count) {
+      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+    }
+    const item = await prisma.itemNew.findUnique({ where: { id } });
 
     return NextResponse.json(item);
   } catch (e: any) {
@@ -116,13 +136,17 @@ export async function PUT(req: Request) {
 }
 
 /* ================= DELETE ================= */
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   if (role !== "ADMIN") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -151,8 +175,8 @@ export async function DELETE(req: Request) {
       );
     }
 
-    await prisma.itemNew.delete({
-      where: { id },
+    await prisma.itemNew.deleteMany({
+      where: { id, companyId },
     });
 
     return NextResponse.json({ success: true });

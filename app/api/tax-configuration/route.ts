@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -9,10 +10,15 @@ if (process.env.NODE_ENV === "development") {
 
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const isActive = searchParams.get('isActive');
 
-    const filter: any = {};
+    const filter: any = { companyId };
     if (isActive !== null) filter.isActive = isActive === 'true';
 
     const taxes = await prisma.taxConfiguration.findMany({
@@ -35,6 +41,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { taxType, taxCode, taxRate, description } = body;
 
@@ -45,6 +56,7 @@ export async function POST(req: NextRequest) {
         taxRate,
         description,
         isActive: true,
+        companyId,
       },
       include: {
         taxAccounts: { include: { account: true } },
@@ -68,8 +80,21 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, ...updateData } = body;
+
+    const existing = await prisma.taxConfiguration.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Tax config not found" }, { status: 404 });
+    }
 
     const tax = await prisma.taxConfiguration.update({
       where: { id },
@@ -96,6 +121,11 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -104,6 +134,14 @@ export async function DELETE(req: NextRequest) {
         { error: 'ID required' },
         { status: 400 }
       );
+    }
+
+    const existing = await prisma.taxConfiguration.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Tax config not found" }, { status: 404 });
     }
 
     await prisma.taxConfiguration.delete({

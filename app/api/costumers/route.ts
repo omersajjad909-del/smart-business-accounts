@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 // ✅ Prisma singleton (dev safe)
 const prisma =
@@ -9,7 +10,7 @@ if (process.env.NODE_ENV === "development") {
   (globalThis as any).prisma = prisma;
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     // ✅ ROLE FROM HEADER (SINGLE SOURCE OF TRUTH)
     const role = req.headers.get("x-user-role");
@@ -22,9 +23,14 @@ export async function GET(req: Request) {
       );
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     // ✅ DATA
     const customers = await prisma.account.findMany({
-      where: { partyType: "CUSTOMER" },
+      where: { partyType: "CUSTOMER", companyId },
       select: {
         id: true,
         name: true,

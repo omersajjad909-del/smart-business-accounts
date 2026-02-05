@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
+import { resolveCompanyId } from "@/lib/tenant";
 
 // GET: Fetch all employees
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const { searchParams } = new URL(req.url);
     const department = searchParams.get("department");
     const isActiveParam = searchParams.get("isActive");
@@ -15,6 +20,7 @@ export async function GET(req: NextRequest) {
 
     const employees = await prisma.employee.findMany({
       where: {
+        companyId,
         ...(department && { department }),
         ...(isActive !== undefined && { isActive }),
       },
@@ -38,6 +44,10 @@ export async function POST(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const body = await req.json();
     const {
       employeeId,
@@ -61,6 +71,7 @@ export async function POST(req: NextRequest) {
 
     const employee = await prisma.employee.create({
       data: {
+        companyId,
         employeeId,
         firstName,
         lastName,
@@ -93,6 +104,10 @@ export async function PUT(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -112,10 +127,14 @@ export async function PUT(req: NextRequest) {
     delete body.createdAt;
     delete body.updatedAt;
 
-    const employee = await prisma.employee.update({
-      where: { id },
+    const updated = await prisma.employee.updateMany({
+      where: { id, companyId },
       data: body,
     });
+    if (!updated.count) {
+      return NextResponse.json({ error: "Employee not found" }, { status: 404 });
+    }
+    const employee = await prisma.employee.findUnique({ where: { id } });
 
     return NextResponse.json(employee);
   } catch (error: any) {
@@ -136,6 +155,10 @@ export async function DELETE(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -143,8 +166,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    await prisma.employee.delete({
-      where: { id },
+    await prisma.employee.deleteMany({
+      where: { id, companyId },
     });
 
     return NextResponse.json({ message: "Employee deleted successfully" });

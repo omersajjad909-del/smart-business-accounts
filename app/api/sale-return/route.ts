@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 type SaleReturn = Prisma.SaleReturnGetPayload<{
   select: {
     returnNo: true;
@@ -24,7 +25,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const returns = await prisma.saleReturn.findMany({
+      where: { companyId },
       include: {
         customer: true,
         invoice: true,
@@ -42,22 +49,37 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   if (role !== "ADMIN" && role !== "ACCOUNTANT") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { customerId, invoiceId, date, items, freight = 0 } = await req.json();
 
     if (!customerId || !date || !items?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    if (invoiceId) {
+      const invoice = await prisma.salesInvoice.findFirst({
+        where: { id: invoiceId, companyId },
+        select: { id: true },
+      });
+      if (!invoice) {
+        return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+      }
+    }
+
     // 1. تمام موجودہ SR نمبرز حاصل کر کے اگلا نمبر (SR-1, SR-2...) نکالنا
     const allReturns = await prisma.saleReturn.findMany({
-      where: { returnNo: { startsWith: 'SR-' } },
+      where: { returnNo: { startsWith: 'SR-' }, companyId },
       select: { returnNo: true }
     });
 
@@ -81,12 +103,12 @@ export async function POST(req: Request) {
   const total = subtotal + Number(freight);
 
   let salesReturnAcc = await tx.account.findFirst({
-    where: { name: { equals: "Sales Return", mode: "insensitive" } },
+    where: { name: { equals: "Sales Return", mode: "insensitive" }, companyId },
   });
 
   if (!salesReturnAcc) {
     salesReturnAcc = await tx.account.create({
-      data: { code: "SALES_RETURN", name: "Sales Return", type: "EXPENSE" },
+      data: { code: "SALES_RETURN", name: "Sales Return", type: "EXPENSE", companyId },
     });
   }
 
@@ -96,6 +118,7 @@ export async function POST(req: Request) {
       date: new Date(date),
       customerId,
       invoiceId: invoiceId || null,
+      companyId,
       total,
       items: {
         create: items.map((i: any) => ({
@@ -119,6 +142,7 @@ export async function POST(req: Request) {
             rate: Number(i.rate),
             amount: Number(i.qty) * Number(i.rate),
             partyId: customerId,
+            companyId,
           },
         });
       }
@@ -130,6 +154,7 @@ export async function POST(req: Request) {
           type: "SR",
           date: new Date(date),
           narration: `Sales Return ${nextNo} (Invoice: ${invoiceId || 'N/A'})`,
+          companyId,
           entries: {
             create: [
               { accountId: salesReturnAcc.id, amount: total }, // Debit
@@ -157,6 +182,11 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, customerId, invoiceId, date, items, freight = 0 } = body;
 
@@ -164,8 +194,8 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Return ID required" }, { status: 400 });
     }
 
-    const existing = await prisma.saleReturn.findUnique({
-      where: { id },
+    const existing = await prisma.saleReturn.findFirst({
+      where: { id, companyId },
       include: { items: true },
     });
 
@@ -220,11 +250,25 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
       return NextResponse.json({ error: "Return ID required" }, { status: 400 });
+    }
+
+    const existing = await prisma.saleReturn.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Return not found" }, { status: 404 });
     }
 
     await prisma.$transaction(async (tx : TxClient) => {

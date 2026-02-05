@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -9,11 +10,16 @@ if (process.env.NODE_ENV === "development") {
 
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const invoiceType = searchParams.get('invoiceType');
     const invoiceId = searchParams.get('invoiceId');
 
-    const filter: any = {};
+    const filter: any = { taxConfiguration: { companyId } };
     if (invoiceType) filter.invoiceType = invoiceType;
     if (invoiceId) filter.invoiceId = invoiceId;
 
@@ -36,6 +42,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const {
       invoiceType,
@@ -45,6 +56,14 @@ export async function POST(req: NextRequest) {
       taxAmount,
       totalAmount,
     } = body;
+
+    const taxConfig = await prisma.taxConfiguration.findFirst({
+      where: { id: taxConfigurationId, companyId },
+      select: { id: true },
+    });
+    if (!taxConfig) {
+      return NextResponse.json({ error: "Tax configuration not found" }, { status: 404 });
+    }
 
     const tax = await prisma.invoiceTax.create({
       data: {
@@ -72,8 +91,31 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, ...updateData } = body;
+
+    const existing = await prisma.invoiceTax.findFirst({
+      where: { id, taxConfiguration: { companyId } },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Invoice tax not found" }, { status: 404 });
+    }
+
+    if (updateData.taxConfigurationId) {
+      const taxConfig = await prisma.taxConfiguration.findFirst({
+        where: { id: updateData.taxConfigurationId, companyId },
+        select: { id: true },
+      });
+      if (!taxConfig) {
+        return NextResponse.json({ error: "Tax configuration not found" }, { status: 404 });
+      }
+    }
 
     const tax = await prisma.invoiceTax.update({
       where: { id },

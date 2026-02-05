@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 type SaleReturnWithItems = Prisma.SaleReturnGetPayload<{
   include: {
@@ -47,13 +48,17 @@ if (process.env.NODE_ENV === "development") {
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     if (!id) {
       return NextResponse.json({ error: "Invoice ID is missing" }, { status: 400 });
     }
 
-    const invoice = await prisma.salesInvoice.findUnique({
-      where: { id: id },
+    const invoice = await prisma.salesInvoice.findFirst({
+      where: { id, companyId },
       include: {
         customer: true,
         items: { include: { item: true } },
@@ -109,12 +114,27 @@ const pendingItems = invoice.items
 // سیلز ریٹرن کو سیو کرنا، اسٹاک اپ ڈیٹ کرنا اور واؤچر بنانا
 export async function POST(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { customerId, invoiceId, date, freight = 0, items } = body;
 
+    if (invoiceId) {
+      const invoice = await prisma.salesInvoice.findFirst({
+        where: { id: invoiceId, companyId },
+        select: { id: true },
+      });
+      if (!invoice) {
+        return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+      }
+    }
+
     // 1. اگلا SR نمبر جنریٹ کرنا (SR-1, SR-2...)
     const allReturns = await prisma.saleReturn.findMany({
-      where: { returnNo: { startsWith: 'SR-' } },
+      where: { returnNo: { startsWith: 'SR-' }, companyId },
       select: { returnNo: true }
     });
 
@@ -140,6 +160,7 @@ export async function POST(req: NextRequest) {
           date: new Date(date),
           customerId,
           invoiceId,
+          companyId,
           total: total,
           items: {
             create: items.map((i: any) => ({
@@ -163,6 +184,7 @@ export async function POST(req: NextRequest) {
             rate: Number(i.rate),
             amount: Number(i.qty) * Number(i.rate),
             partyId: customerId,
+            companyId,
           },
         });
       }
@@ -174,6 +196,7 @@ export async function POST(req: NextRequest) {
           type: "SR",
           date: new Date(date),
           narration: `Sales Return ${nextNo} against Invoice ID ${invoiceId}`,
+          companyId,
           entries: {
             create: [
               { accountId: "SALES_RETURN_ACC_ID", amount: total }, // Debit (Replace with real ID)
@@ -193,3 +216,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+
+
+

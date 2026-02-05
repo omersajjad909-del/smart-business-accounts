@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -24,12 +25,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const year = searchParams.get("year");
     const month = searchParams.get("month");
     const accountId = searchParams.get("accountId");
 
-    const where: any = {};
+    const where: any = { companyId };
     if (year) where.year = parseInt(year);
     if (month) where.month = parseInt(month);
     if (accountId) where.accountId = accountId;
@@ -51,6 +57,7 @@ export async function GET(req: NextRequest) {
             accountId: budget.accountId,
             voucher: {
               date: { gte: startDate, lte: endDate },
+              companyId,
             },
           },
         });
@@ -90,6 +97,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { accountId, year, month, amount, category, description } = body;
 
@@ -100,28 +112,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const budget = await prisma.budget.upsert({
+    const account = await prisma.account.findFirst({
+      where: { id: accountId, companyId },
+      select: { id: true },
+    });
+    if (!account) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    }
+
+    const existing = await prisma.budget.findFirst({
       where: {
-        accountId_year_month: {
-          accountId,
-          year: parseInt(year),
-          month: month ? parseInt(month) : null,
-        },
-      },
-      update: {
-        amount: parseFloat(amount),
-        category: category || null,
-        description: description || null,
-      },
-      create: {
         accountId,
         year: parseInt(year),
         month: month ? parseInt(month) : null,
-        amount: parseFloat(amount),
-        category: category || null,
-        description: description || null,
+        companyId,
       },
     });
+
+    const budget = existing
+      ? await prisma.budget.update({
+          where: { id: existing.id },
+          data: {
+            amount: parseFloat(amount),
+            category: category || null,
+            description: description || null,
+          },
+        })
+      : await prisma.budget.create({
+          data: {
+            accountId,
+            year: parseInt(year),
+            month: month ? parseInt(month) : null,
+            amount: parseFloat(amount),
+            category: category || null,
+            description: description || null,
+            companyId,
+          },
+        });
 
     return NextResponse.json(budget);
   } catch (e: any) {
@@ -145,11 +172,24 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
       return NextResponse.json({ error: "ID required" }, { status: 400 });
+    }
+
+    const existing = await prisma.budget.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Budget not found" }, { status: 404 });
     }
 
     await prisma.budget.delete({ where: { id } });

@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
+import { resolveCompanyId } from "@/lib/tenant";
 
 // GET: Fetch payroll records
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const { searchParams } = new URL(req.url);
     const employeeId = searchParams.get("employeeId");
     const monthYear = searchParams.get("monthYear");
@@ -12,6 +17,7 @@ export async function GET(req: NextRequest) {
 
     const payroll = await prisma.payroll.findMany({
       where: {
+        companyId,
         employeeId: employeeId || undefined,
         monthYear: monthYear || undefined,
         paymentStatus: status || undefined,
@@ -45,6 +51,10 @@ export async function POST(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const body = await req.json();
     const {
       employeeId,
@@ -70,6 +80,7 @@ export async function POST(req: NextRequest) {
 
     const payroll = await prisma.payroll.create({
       data: {
+        companyId,
         employeeId,
         monthYear,
         baseSalary,
@@ -100,6 +111,10 @@ export async function PUT(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -120,10 +135,14 @@ export async function PUT(req: NextRequest) {
       }
     }
 
-    const payroll = await prisma.payroll.update({
-      where: { id },
+    const updated = await prisma.payroll.updateMany({
+      where: { id, companyId },
       data: body,
     });
+    if (!updated.count) {
+      return NextResponse.json({ error: "Payroll not found" }, { status: 404 });
+    }
+    const payroll = await prisma.payroll.findUnique({ where: { id } });
 
     return NextResponse.json(payroll);
   } catch (error) {
@@ -138,6 +157,10 @@ export async function DELETE(req: NextRequest) {
     if (guard) return guard;
   
     try {
+      const companyId = await resolveCompanyId(req);
+      if (!companyId) {
+        return NextResponse.json({ error: "Company required" }, { status: 400 });
+      }
       const { searchParams } = new URL(req.url);
       const id = searchParams.get("id");
   
@@ -145,8 +168,8 @@ export async function DELETE(req: NextRequest) {
         return NextResponse.json({ error: "ID is required" }, { status: 400 });
       }
   
-      await prisma.payroll.delete({
-        where: { id },
+      await prisma.payroll.deleteMany({
+        where: { id, companyId },
       });
   
       return NextResponse.json({ success: true });
