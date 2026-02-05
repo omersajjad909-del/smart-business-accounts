@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -9,10 +10,15 @@ if (process.env.NODE_ENV === "development") {
 
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
 
-    const filter: any = {};
+    const filter: any = { companyId };
     if (status) filter.approvalStatus = status;
 
     const vouchers = await prisma.expenseVoucher.findMany({
@@ -40,6 +46,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const {
       voucherNo,
@@ -67,8 +78,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if voucher number already exists
-    const existing = await prisma.expenseVoucher.findUnique({
-      where: { voucherNo },
+    const existing = await prisma.expenseVoucher.findFirst({
+      where: { voucherNo, companyId },
     });
 
     if (existing) {
@@ -79,12 +90,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate accounts exist
-    const expenseAccount = await prisma.account.findUnique({
-      where: { id: expenseAccountId },
+    const expenseAccount = await prisma.account.findFirst({
+      where: { id: expenseAccountId, companyId },
     });
 
-    const paymentAccount = await prisma.account.findUnique({
-      where: { id: paymentAccountId },
+    const paymentAccount = await prisma.account.findFirst({
+      where: { id: paymentAccountId, companyId },
     });
 
     if (!expenseAccount || !paymentAccount) {
@@ -109,6 +120,7 @@ export async function POST(req: NextRequest) {
         expenseAccountId,
         paymentAccountId,
         approvalStatus: 'DRAFT',
+        companyId,
         items: {
           create: items.map((item: any) => ({
             description: item.description || '',
@@ -138,6 +150,11 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, items, date, ...updateData } = body;
 
@@ -149,6 +166,14 @@ export async function PUT(req: NextRequest) {
     }
 
     // First, delete old items if new items are provided
+    const existing = await prisma.expenseVoucher.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Voucher not found" }, { status: 404 });
+    }
+
     if (items && items.length > 0) {
       await prisma.expenseItem.deleteMany({
         where: { expenseVoucherId: id },
@@ -202,6 +227,11 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -210,6 +240,14 @@ export async function DELETE(req: NextRequest) {
         { error: 'ID required' },
         { status: 400 }
       );
+    }
+
+    const existing = await prisma.expenseVoucher.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Voucher not found" }, { status: 404 });
     }
 
     await prisma.expenseVoucher.delete({

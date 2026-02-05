@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { resolveCompanyId } from "@/lib/tenant";
 type SalesInvoiceNoOnly = Prisma.SalesInvoiceGetPayload<{
   select: { invoiceNo: true };
 }>;
@@ -38,12 +39,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "No Access" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (id) {
-      const inv = await prisma.salesInvoice.findUnique({
-        where: { id },
+      const inv = await prisma.salesInvoice.findFirst({
+        where: { id, companyId },
         include: {
           customer: true,
           items: { include: { item: true } },
@@ -69,7 +75,7 @@ export async function GET(req: NextRequest) {
 
     // Calculate next invoice number
     const allInvoices = await prisma.salesInvoice.findMany({
-      where: { invoiceNo: { startsWith: "SI-" } },
+      where: { invoiceNo: { startsWith: "SI-" }, companyId },
       select: { invoiceNo: true }
     });
 
@@ -85,6 +91,7 @@ export async function GET(req: NextRequest) {
     }
 
     const invoices = await prisma.salesInvoice.findMany({
+      where: { companyId },
       include: {
         customer: true,
         items: { include: { item: true } },
@@ -132,6 +139,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { invoiceNo, customerId, date, location, freight = 0, items, applyTax = false, taxConfigId = null, driverName = null, vehicleNo = null } = body;
 
@@ -143,8 +155,8 @@ export async function POST(req: NextRequest) {
     // Calculate tax if applied
     let taxAmount = 0;
     if (applyTax && taxConfigId) {
-      const tax = await prisma.taxConfiguration.findUnique({
-        where: { id: taxConfigId }
+      const tax = await prisma.taxConfiguration.findFirst({
+        where: { id: taxConfigId, companyId }
       });
       if (tax) {
         taxAmount = (total * tax.taxRate) / 100;
@@ -153,6 +165,7 @@ export async function POST(req: NextRequest) {
 
     const invoice = await prisma.salesInvoice.create({
       data: {
+        companyId,
         invoiceNo,
         date: new Date(date),
         customerId,
@@ -172,25 +185,26 @@ export async function POST(req: NextRequest) {
     });
 
     let salesAcc = await prisma.account.findFirst({
-      where: { name: { equals: "Sales", mode: "insensitive" } },
+      where: { name: { equals: "Sales", mode: "insensitive" }, companyId },
     });
 
     if (!salesAcc) {
       salesAcc = await prisma.account.create({
-        data: { code: "SALES", name: "Sales", type: "INCOME" },
+        data: { companyId, code: "SALES", name: "Sales", type: "INCOME" },
       });
     }
 
     await prisma.voucher.create({
       data: {
+        companyId,
         voucherNo: invoice.invoiceNo,
         type: "SI",
         date: new Date(date),
         narration: "Sales Invoice",
         entries: {
           create: [
-            { accountId: customerId, amount: total + freight + taxAmount },
-            { accountId: salesAcc.id, amount: -(total + freight + taxAmount) },
+            { companyId, accountId: customerId, amount: total + freight + taxAmount },
+            { companyId, accountId: salesAcc.id, amount: -(total + freight + taxAmount) },
           ],
         },
       },
@@ -199,6 +213,7 @@ export async function POST(req: NextRequest) {
     for (const i of items) {
       await prisma.inventoryTxn.create({
         data: {
+          companyId,
           type: "SALE",
           date: new Date(date),
           itemId: i.itemId,
@@ -247,6 +262,11 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, customerId, date, location, freight = 0, items, applyTax = false, taxConfigId = null, driverName = null, vehicleNo = null } = body;
 
@@ -254,8 +274,8 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
     }
 
-    const existing = await prisma.salesInvoice.findUnique({
-      where: { id },
+    const existing = await prisma.salesInvoice.findFirst({
+      where: { id, companyId },
       include: { items: true },
     });
 
@@ -268,8 +288,8 @@ export async function PUT(req: NextRequest) {
     // Calculate tax if applied
     let taxAmount = 0;
     if (applyTax && taxConfigId) {
-      const tax = await prisma.taxConfiguration.findUnique({
-        where: { id: taxConfigId }
+      const tax = await prisma.taxConfiguration.findFirst({
+        where: { id: taxConfigId, companyId }
       });
       if (tax) {
         taxAmount = (total * tax.taxRate) / 100;
@@ -329,11 +349,21 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
+    }
+
+    const existing = await prisma.salesInvoice.findFirst({ where: { id, companyId } });
+    if (!existing) {
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
     await prisma.$transaction(async (tx: TxClient) => {

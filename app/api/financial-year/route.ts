@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -24,7 +25,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const years = await prisma.financialYear.findMany({
+      where: { companyId },
       orderBy: { year: "desc" },
     });
 
@@ -50,6 +57,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { year, startDate, endDate } = body;
 
@@ -62,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     // Deactivate all other years
     await prisma.financialYear.updateMany({
-      where: { isActive: true },
+      where: { isActive: true, companyId },
       data: { isActive: false },
     });
 
@@ -72,6 +84,7 @@ export async function POST(req: NextRequest) {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         isActive: true,
+        companyId,
       },
     });
 
@@ -97,6 +110,11 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, isClosed, closedBy } = body;
 
@@ -111,6 +129,14 @@ export async function PUT(req: NextRequest) {
         updateData.closedAt = new Date();
         updateData.closedBy = closedBy || userId;
       }
+    }
+
+    const existing = await prisma.financialYear.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Financial year not found" }, { status: 404 });
     }
 
     const financialYear = await prisma.financialYear.update({

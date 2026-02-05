@@ -373,8 +373,9 @@
 // }
 
 
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 // Prisma singleton
 const prisma = (globalThis as any).prisma || new PrismaClient();
@@ -402,7 +403,7 @@ const CATEGORY_TYPE_MAP: Record<string, string> = {
 };
 
 /* ================= GET ================= */
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   const { searchParams } = new URL(req.url);
   const prefix = searchParams.get("prefix");
@@ -411,11 +412,16 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const companyId = await resolveCompanyId(req);
+  if (!companyId) {
+    return NextResponse.json({ error: "Company required" }, { status: 400 });
+  }
+
   // اگر ریکوئسٹ میں Prefix ہے تو صرف اگلا کوڈ بھیجیں (Auto-Code Logic)
   // Back-end (route.ts) کے اندر GET میں تبدیلی:
 if (prefix) {
   const lastAccount = await prisma.account.findFirst({
-    where: { code: { startsWith: prefix } },
+    where: { code: { startsWith: prefix }, companyId },
     orderBy: { code: "desc" },
   });
 
@@ -434,6 +440,7 @@ if (prefix) {
 
   // ورنہ تمام اکاؤنٹس کی لسٹ بھیجیں
   const accounts = await prisma.account.findMany({
+    where: { companyId },
     orderBy: { name: "asc" },
   });
 
@@ -441,13 +448,18 @@ if (prefix) {
 }
 
 /* ================= POST ================= */
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const rawRole = req.headers.get("x-user-role");
     const role = rawRole?.toUpperCase();
 
     if (role !== "ADMIN") {
       return NextResponse.json({ error: "Only ADMIN can create accounts" }, { status: 403 });
+    }
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
     const body = await req.json();
@@ -458,6 +470,7 @@ export async function POST(req: Request) {
       const result = await prisma.account.deleteMany({
         where: {
           code: { in: removableCodes },
+          companyId,
           voucherEntries: { none: {} },
           salesInvoices: { none: {} },
         },
@@ -473,6 +486,7 @@ export async function POST(req: Request) {
 
     const account = await prisma.account.create({
       data: {
+        companyId,
         code: body.code,
         name: body.name,
         type: fixedType,
@@ -492,6 +506,7 @@ export async function POST(req: Request) {
       const nameParts = account.name.split(" - ");
       await prisma.bankAccount.create({
         data: {
+          companyId,
           accountNo: nameParts[1] || account.code,
           bankName: nameParts[0] || account.name,
           accountName: account.name,
@@ -509,10 +524,15 @@ export async function POST(req: Request) {
 }
 
 /* ================= PUT (EDIT) ================= */
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role")?.toUpperCase();
     if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const body = await req.json();
     const { id, ...updateData } = body;
@@ -531,11 +551,15 @@ export async function PUT(req: Request) {
       creditLimit: updateData.creditLimit !== undefined ? Number(updateData.creditLimit) : undefined,
     };
 
-    const updatedAccount = await prisma.account.update({
-      where: { id: id },
+    const updated = await prisma.account.updateMany({
+      where: { id: id, companyId },
       data: formattedData,
     });
 
+    if (!updated.count) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    }
+    const updatedAccount = await prisma.account.findUnique({ where: { id } });
     return NextResponse.json(updatedAccount);
   } catch (e) {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
@@ -543,17 +567,22 @@ export async function PUT(req: Request) {
 }
 
 /* ================= DELETE ================= */
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role")?.toUpperCase();
     if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
-    await prisma.account.delete({ where: { id: id } });
+    await prisma.account.deleteMany({ where: { id: id, companyId } });
     return NextResponse.json({ message: "Deleted" });
   } catch (e) {
     return NextResponse.json({ error: "Cannot delete. Account in use." }, { status: 500 });

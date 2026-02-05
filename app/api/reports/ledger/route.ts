@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
-import SalesInvoicePage from "@/app/dashboard/sales-invoice/page";
+import { resolveCompanyId } from "@/lib/tenant";
 type VoucherWithEntries = Prisma.VoucherGetPayload<{
   include: {
     entries: true;
@@ -18,12 +18,17 @@ if (process.env.NODE_ENV === "development") {
   (globalThis as any).prisma = prisma;
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     // 🔐 Role Check
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -32,6 +37,12 @@ export async function GET(req: Request) {
     const to = searchParams.get("to");
 
     if (!accountId) return NextResponse.json([]);
+
+    const account = await prisma.account.findFirst({
+      where: { id: accountId, companyId },
+      select: { id: true },
+    });
+    if (!account) return NextResponse.json([]);
 
     // 📅 Dates Calculation
     const fromDate = from ? new Date(from + "T00:00:00") : new Date("2024-01-01");
@@ -44,7 +55,7 @@ export async function GET(req: Request) {
 
     // Previous Vouchers
     const prevVouchers = await prisma.voucher.findMany({
-      where: { date: { lt: fromDate }, entries: { some: { accountId } } },
+      where: { date: { lt: fromDate }, entries: { some: { accountId } }, companyId },
       include: { entries: true }
     });
     let openingBal = prevVouchers.reduce(
@@ -61,21 +72,21 @@ export async function GET(req: Request) {
 
     // Previous Sales
     const prevSales = await prisma.salesInvoice.aggregate({
-      where: { date: { lt: fromDate }, customerId: accountId },
+      where: { date: { lt: fromDate }, customerId: accountId, companyId },
       _sum: { total: true }
     });
     openingBal += Number(prevSales._sum.total || 0);
 
     // Previous Purchases
     const prevPurchases = await prisma.purchaseInvoice.aggregate({
-      where: { date: { lt: fromDate }, supplierId: accountId },
+      where: { date: { lt: fromDate }, supplierId: accountId, companyId },
       _sum: { total: true }
     });
     openingBal -= Number(prevPurchases._sum.total || 0);
 
     // Previous Returns
     const prevReturns = await prisma.saleReturn.aggregate({
-      where: { date: { lt: fromDate }, customerId: accountId },
+      where: { date: { lt: fromDate }, customerId: accountId, companyId },
       _sum: { total: true }
     });
     openingBal -= Number(prevReturns._sum.total || 0);
@@ -90,6 +101,7 @@ export async function GET(req: Request) {
       where: {
         date: { gte: fromDate, lte: toDate },
         entries: { some: { accountId } },
+        companyId,
         // 🔥 ڈبل انٹری روکنے کے لیے فلٹر
         NOT: {
           OR: [
@@ -103,15 +115,15 @@ export async function GET(req: Request) {
     });
 
     const sales = await prisma.salesInvoice.findMany({
-      where: { date: { gte: fromDate, lte: toDate }, customerId: accountId },
+      where: { date: { gte: fromDate, lte: toDate }, customerId: accountId, companyId },
     });
 
     const purchases = await prisma.purchaseInvoice.findMany({
-      where: { date: { gte: fromDate, lte: toDate }, supplierId: accountId },
+      where: { date: { gte: fromDate, lte: toDate }, supplierId: accountId, companyId },
     });
 
     const returns = await prisma.saleReturn.findMany({
-      where: { date: { gte: fromDate, lte: toDate }, customerId: accountId },
+      where: { date: { gte: fromDate, lte: toDate }, customerId: accountId, companyId },
     });
 
     // ---------------------------------------------------------

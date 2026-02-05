@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -13,8 +14,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const companyId = await resolveCompanyId(req);
+  if (!companyId) {
+    return NextResponse.json({ error: "Company required" }, { status: 400 });
+  }
+
   const suppliers = await prisma.account.findMany({
-    where: { partyType: "SUPPLIER" },
+    where: { partyType: "SUPPLIER", companyId },
     orderBy: { name: "asc" },
   });
 

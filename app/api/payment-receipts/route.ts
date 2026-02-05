@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -9,11 +10,16 @@ if (process.env.NODE_ENV === "development") {
 
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
     const partyId = searchParams.get('partyId');
 
-    const filter: any = {};
+    const filter: any = { companyId };
     if (status) filter.status = status;
     if (partyId) filter.partyId = partyId;
 
@@ -38,6 +44,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const {
       receiptNo: providedReceiptNo,
@@ -67,8 +78,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Get party (customer)
-    const party = await prisma.account.findUnique({
-      where: { id: partyId },
+    const party = await prisma.account.findFirst({
+      where: { id: partyId, companyId },
     });
 
     if (!party) {
@@ -81,7 +92,7 @@ export async function POST(req: NextRequest) {
     // Auto-generate receipt number if not provided
     let receiptNo = providedReceiptNo;
     if (!receiptNo) {
-      const count = await prisma.paymentReceipt.count();
+      const count = await prisma.paymentReceipt.count({ where: { companyId } });
       receiptNo = `REC-${count + 1}`;
     }
 
@@ -98,8 +109,8 @@ export async function POST(req: NextRequest) {
       }
 
       // Find bank account
-      bankAccountRecord = await prisma.bankAccount.findUnique({
-        where: { id: bankAccountId },
+      bankAccountRecord = await prisma.bankAccount.findFirst({
+        where: { id: bankAccountId, companyId },
         include: { account: true },
       });
 
@@ -119,6 +130,7 @@ export async function POST(req: NextRequest) {
             { name: { contains: 'Cash', mode: 'insensitive' } },
             { code: { contains: 'CASH', mode: 'insensitive' } },
           ],
+          companyId,
         },
       });
 
@@ -129,6 +141,7 @@ export async function POST(req: NextRequest) {
             code: 'CASH',
             name: 'Cash',
             type: 'ASSET',
+            companyId,
           },
         });
       }
@@ -143,6 +156,7 @@ export async function POST(req: NextRequest) {
           type: 'CRV', // Payment Receipt = Cash Receipt Voucher
           date: new Date(date),
           narration: narration || `Payment received from ${party.name}`,
+          companyId,
           entries: {
             create: [
               { accountId: party.id, amount: -amountNum }, // Customer debit (they owe less)
@@ -170,6 +184,7 @@ export async function POST(req: NextRequest) {
           narration,
           voucherId: voucher.id,
           status,
+          companyId,
         },
         include: {
           party: true,
@@ -196,6 +211,7 @@ export async function POST(req: NextRequest) {
             description: narration || `Receipt ${receiptNo} from ${party.name}`,
             referenceNo: receiptNo,
             isReconciled: false,
+            companyId,
           },
         });
       }
@@ -215,11 +231,24 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, ...updateData } = body;
 
     if (updateData.date) {
       updateData.date = new Date(updateData.date);
+    }
+
+    const existing = await prisma.paymentReceipt.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Receipt not found" }, { status: 404 });
     }
 
     const receipt = await prisma.paymentReceipt.update({
@@ -243,6 +272,11 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -251,6 +285,14 @@ export async function DELETE(req: NextRequest) {
         { error: 'ID required' },
         { status: 400 }
       );
+    }
+
+    const existing = await prisma.paymentReceipt.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Receipt not found" }, { status: 404 });
     }
 
     await prisma.paymentReceipt.delete({

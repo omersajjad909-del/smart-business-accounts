@@ -108,22 +108,49 @@ const ROLE_PERMISSIONS = {
 async function main() {
   console.log("🌱 Seeding database...\n");
 
+  // 0. Create default company
+  console.log("0️⃣ Creating default company...");
+  const defaultCompany = await prisma.company.upsert({
+    where: { code: "DEFAULT" },
+    update: {},
+    create: {
+      name: "Default Company",
+      code: "DEFAULT",
+      isActive: true,
+    },
+  });
+  console.log(`   ✅ Company: ${defaultCompany.name}\n`);
+
+
   // 1. Create Admin user
   console.log("1️⃣ Creating admin user...");
   const password = await bcrypt.hash("us786", 10);
 
-  await prisma.user.upsert({
+  const adminUser = await prisma.user.upsert({
     where: { email: "admin@local.com" },
-    update: { password, active: true }, // Update if exists
+    update: { password, active: true, defaultCompanyId: defaultCompany.id }, // Update if exists
     create: {
       name: "Admin",
       email: "admin@local.com",
       password,
       role: "ADMIN",
       active: true,
+      defaultCompanyId: defaultCompany.id,
     },
   });
   console.log("   ✅ Admin user: admin@local.com / us786\n");
+
+  // Link admin to default company
+  await prisma.userCompany.upsert({
+    where: { userId_companyId: { userId: adminUser.id, companyId: defaultCompany.id } },
+    update: { isDefault: true },
+    create: {
+      userId: adminUser.id,
+      companyId: defaultCompany.id,
+      isDefault: true,
+    },
+  });
+
 
   // 2. Setup permissions for each role
   console.log("2️⃣ Setting up role permissions...");

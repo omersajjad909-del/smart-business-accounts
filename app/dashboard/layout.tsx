@@ -18,6 +18,13 @@ type CurrentUser = {
   role: string;
   permissions: PermissionEntry[];
   rolePermissions: PermissionEntry[];
+  companyId?: string | null;
+  companies?: Array<{
+    id: string;
+    name?: string;
+    code?: string | null;
+    isDefault?: boolean;
+  }>;
 } | null;
 
 type MenuHeaderProps = {
@@ -87,6 +94,7 @@ export default function DashboardLayout({
           headers: {
             "x-user-id": u.id,
             "x-user-role": u.role,
+            "x-company-id": u.companyId || "",
           },
         });
 
@@ -120,6 +128,21 @@ export default function DashboardLayout({
 
     loadFreshPermissions();
   }, []);
+
+  useEffect(() => {
+    if (!currentUser?.companyId) return;
+    const originalFetch = window.fetch;
+    window.fetch = (input, init = {}) => {
+      const headers = new Headers(init.headers || {});
+      if (!headers.has("x-company-id")) {
+        headers.set("x-company-id", currentUser.companyId || "");
+      }
+      return originalFetch(input, { ...init, headers });
+    };
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [currentUser?.companyId]);
 
   if (!ready) {
     return (
@@ -390,6 +413,28 @@ export default function DashboardLayout({
           <Suspense fallback={<div className="w-full max-w-md h-10 bg-gray-200 animate-pulse rounded" />}>
             <GlobalSearch />
           </Suspense>
+          {currentUser?.companies && currentUser.companies.length > 0 && (
+            <select
+              className="ml-2 border rounded px-2 py-1 text-xs bg-white"
+              value={currentUser.companyId || ""}
+              onChange={(e) => {
+                const raw = localStorage.getItem("user");
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                const user = parsed.user ?? parsed;
+                user.companyId = e.target.value;
+                const payload = parsed.user ? { ...parsed, user } : user;
+                localStorage.setItem("user", JSON.stringify(payload));
+                window.location.reload();
+              }}
+            >
+              {currentUser.companies.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name || c.code || c.id}
+                </option>
+              ))}
+            </select>
+          )}
           <div className="ml-auto text-sm text-gray-600">
             {currentUser.name || currentUser.email}
           </div>

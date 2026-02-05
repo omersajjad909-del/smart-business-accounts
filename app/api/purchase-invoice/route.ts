@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient ,Prisma } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -8,11 +9,16 @@ if (process.env.NODE_ENV === "development") {
 }
 
 /* ================= GET: Pending POs for Selection OR All Purchase Invoices ================= */
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -21,8 +27,8 @@ export async function GET(req: Request) {
 
     // If id provided, return specific invoice
     if (id) {
-      const invoice = await prisma.purchaseInvoice.findUnique({
-        where: { id },
+      const invoice = await prisma.purchaseInvoice.findFirst({
+        where: { id, companyId },
         include: {
           supplier: true,
           items: {
@@ -37,6 +43,7 @@ export async function GET(req: Request) {
     // If type=invoices, return all purchase invoices
     if (type === "invoices") {
       const invoices = await prisma.purchaseInvoice.findMany({
+        where: { companyId },
         include: {
           supplier: true,
           items: {
@@ -50,7 +57,7 @@ export async function GET(req: Request) {
 
     // Default: return pending POs
     const pos = await prisma.purchaseOrder.findMany({
-      where: { status: "PENDING" },
+      where: { status: "PENDING", companyId },
       include: {
         supplier: true,
         items: {
@@ -66,13 +73,18 @@ export async function GET(req: Request) {
 }
 
 /* ================= POST: Create Invoice & Update Everything ================= */
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   if (role !== "ADMIN" && role !== "ACCOUNTANT") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { supplierId, poId, date, items, location, freight = 0, applyTax = false, taxConfigId = null } = body;
 
@@ -88,7 +100,7 @@ export async function POST(req: Request) {
     const tx = prisma;
       
       // A. Supplier اور Inventory Account تلاش کریں
-      const supplier = await tx.account.findUnique({ where: { id: supplierId } });
+      const supplier = await tx.account.findFirst({ where: { id: supplierId, companyId } });
       if (!supplier) throw new Error("Supplier not found");
 
       let inventoryAcc = await tx.account.findFirst({
@@ -97,18 +109,19 @@ export async function POST(req: Request) {
             { name: { equals: "Stock/Inventory", mode: "insensitive" } },
             { code: { equals: "INV001", mode: "insensitive" } },
           ],
+          companyId,
         },
       });
 
       if (!inventoryAcc) {
         inventoryAcc = await tx.account.create({
-          data: { code: "INV001", name: "Stock/Inventory", type: "ASSET" },
+          data: { code: "INV001", name: "Stock/Inventory", type: "ASSET", companyId },
         });
       }
 
       // B. Invoice Number جنریٹ کریں (PI-1, PI-2...)
       const last = await tx.purchaseInvoice.findFirst({
-        where: { invoiceNo: { startsWith: "PI-" } },
+        where: { invoiceNo: { startsWith: "PI-" }, companyId },
         orderBy: { createdAt: "desc" },
       });
       let nextNo = 1;
@@ -123,8 +136,8 @@ export async function POST(req: Request) {
       // Calculate tax if applied
       let taxAmount = 0;
       if (applyTax && taxConfigId) {
-        const tax = await tx.taxConfiguration.findUnique({
-          where: { id: taxConfigId }
+        const tax = await tx.taxConfiguration.findFirst({
+          where: { id: taxConfigId, companyId }
         });
         if (tax) {
           taxAmount = (totalItemsAmount * tax.taxRate) / 100;
@@ -140,6 +153,7 @@ export async function POST(req: Request) {
           date: new Date(date),
           supplierId,
           poId: poId || null,
+          companyId,
           total: netTotal,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
@@ -154,6 +168,10 @@ export async function POST(req: Request) {
       });
 
       // D. اسٹاک اور PO اپڈیٹ کریں
+      if (poId) {
+        const po = await tx.purchaseOrder.findFirst({ where: { id: poId, companyId } });
+        if (!po) throw new Error("Purchase order not found");
+      }
       for (const i of validItems) {
         // 1. Inventory میں مال داخل کریں (Stock In)
         await tx.inventoryTxn.create({
@@ -166,6 +184,7 @@ export async function POST(req: Request) {
             amount: Number(i.qty) * Number(i.rate),
             location: location || "MAIN",
             partyId: supplierId,
+            companyId,
           },
         });
 
@@ -195,6 +214,7 @@ export async function POST(req: Request) {
           type: "PI",
           date: new Date(date),
           narration: `Purchase Invoice ${invoiceNo} from ${supplier.name}`,
+          companyId,
           entries: {
             create: [
               { accountId: inventoryAcc.id, amount: netTotal }, // Debit Inventory (Asset)
@@ -216,13 +236,18 @@ export async function POST(req: Request) {
 }
 
 // PUT - Update Purchase Invoice
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   if (role !== "ADMIN" && role !== "ACCOUNTANT") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, supplierId, date, items, location, freight = 0, applyTax = false, taxConfigId = null } = body;
 
@@ -230,8 +255,8 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
     }
 
-    const existing = await prisma.purchaseInvoice.findUnique({
-      where: { id },
+    const existing = await prisma.purchaseInvoice.findFirst({
+      where: { id, companyId },
       include: { items: true },
     });
 
@@ -247,8 +272,8 @@ export async function PUT(req: Request) {
     // Calculate tax if applied
     let taxAmount = 0;
     if (applyTax && taxConfigId) {
-      const tax = await prisma.taxConfiguration.findUnique({
-        where: { id: taxConfigId }
+      const tax = await prisma.taxConfiguration.findFirst({
+        where: { id: taxConfigId, companyId }
       });
       if (tax) {
         taxAmount = (totalItemsAmount * tax.taxRate) / 100;
@@ -298,13 +323,18 @@ export async function PUT(req: Request) {
 }
 
 // DELETE - Delete Purchase Invoice
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   if (role !== "ADMIN" && role !== "ACCOUNTANT") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -314,6 +344,15 @@ export async function DELETE(req: Request) {
 
     // await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const tx = prisma;
+
+      const existing = await tx.purchaseInvoice.findFirst({
+        where: { id, companyId },
+        select: { id: true },
+      });
+
+      if (!existing) {
+        return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+      }
 
       await tx.purchaseInvoiceItem.deleteMany({ where: { invoiceId: id } });
       await tx.purchaseInvoice.delete({ where: { id } });

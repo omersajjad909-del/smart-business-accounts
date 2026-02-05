@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -9,8 +10,14 @@ if (process.env.NODE_ENV === "development") {
 
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     // Get banks from BankAccount table (with full details)
     const bankAccountsFromTable = await prisma.bankAccount.findMany({
+      where: { companyId },
       include: {
         account: true,
         statements: true,
@@ -20,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     // Get banks from Account table (partyType = "BANKS") jo BankAccount table mein nahi hain
     const allBankAccounts = await prisma.account.findMany({
-      where: { partyType: "BANKS" },
+      where: { partyType: "BANKS", companyId },
       include: {
         bankAccounts: true,
       },
@@ -75,6 +82,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { accountNo, bankName, accountName, balance } = body;
 
@@ -88,7 +100,7 @@ export async function POST(req: NextRequest) {
 
     // Check if account number already exists
     const existingBank = await prisma.bankAccount.findFirst({
-      where: { accountNo },
+      where: { accountNo, companyId },
     });
 
     if (existingBank) {
@@ -100,13 +112,13 @@ export async function POST(req: NextRequest) {
 
     // First create or find the parent Account in Ledger
     let account = await prisma.account.findFirst({
-      where: { name: `${bankName} - ${accountNo}` },
+      where: { name: `${bankName} - ${accountNo}`, companyId },
     });
 
     if (!account) {
       // Generate unique code for bank (e.g., BNK-0001, BNK-0002)
       const bankCount = await prisma.account.count({
-        where: { type: 'BANK' },
+        where: { type: 'BANK', companyId },
       });
       const bankCode = `BNK-${String(bankCount + 1).padStart(4, '0')}`;
 
@@ -117,6 +129,7 @@ export async function POST(req: NextRequest) {
           type: 'BANK',
           partyType: 'BANKS', // 🔥 یہ ledger میں show ہوگا
           openDebit: balance || 0, // شروعاتی balance
+          companyId,
         },
       });
     } else {
@@ -138,6 +151,7 @@ export async function POST(req: NextRequest) {
         accountName,
         accountId: account.id,
         balance: balance || 0,
+        companyId,
       },
       include: { account: true },
     });
@@ -154,12 +168,17 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, accountNo, bankName, accountName, balance } = body;
 
     // Get the bank account first
-    const bankAccount = await prisma.bankAccount.findUnique({
-      where: { id },
+    const bankAccount = await prisma.bankAccount.findFirst({
+      where: { id, companyId },
       include: { account: true },
     });
 
@@ -205,6 +224,11 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -215,12 +239,23 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
+    const bankAccount = await prisma.bankAccount.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!bankAccount) {
+      return NextResponse.json(
+        { error: 'Bank account not found' },
+        { status: 404 }
+      );
+    }
+
     // Check if bank account has statements or reconciliations
     const hasStatements = await prisma.bankStatement.findFirst({
-      where: { bankAccountId: id },
+      where: { bankAccountId: id, companyId },
     });
     const hasReconciliations = await prisma.bankReconciliation.findFirst({
-      where: { bankAccountId: id },
+      where: { bankAccountId: id, companyId },
     });
 
     if (hasStatements || hasReconciliations) {

@@ -143,6 +143,23 @@ export async function POST(req: NextRequest) {
     }
 
     // 🔥 FRONTEND KE LIYE SAFE USER OBJECT (getCurrentUser() ke format ke mutabiq)
+
+    // Fetch companies for multi-tenant context
+    let companies = [];
+    try {
+      companies = await prisma.userCompany.findMany({
+        where: { userId: user.id },
+        include: { company: true },
+      });
+    } catch (companyError: any) {
+      console.error("LOGIN COMPANIES ERROR:", companyError);
+    }
+
+    const defaultCompanyId =
+      user.defaultCompanyId ||
+      companies.find((c: any) => c.isDefault)?.companyId ||
+      companies[0]?.companyId ||
+      null;
     const safeUser = {
       id: user.id,
       name: user.name,
@@ -150,6 +167,13 @@ export async function POST(req: NextRequest) {
       role: user.role.toUpperCase(), // Ensure uppercase
       permissions: (user.permissions || []).map((p: any) => p.permission || p), // User-specific permissions
       rolePermissions: rolePermissions.map((rp: RolePermission) => rp.permission),
+      companyId: defaultCompanyId,
+      companies: companies.map((c: any) => ({
+        id: c.companyId,
+        name: c.company?.name,
+        code: c.company?.code,
+        isDefault: c.isDefault,
+      })),
 
     };
 
@@ -176,3 +200,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+

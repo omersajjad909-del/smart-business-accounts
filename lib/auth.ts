@@ -26,6 +26,8 @@ export function getCurrentUser() {
       // 🔥 User-specific aur role-based permissions
       permissions: Array.isArray(user.permissions) ? user.permissions : [],
       rolePermissions: Array.isArray(user.rolePermissions) ? user.rolePermissions : [],
+      companyId: user.companyId || user.defaultCompanyId || null,
+      companies: Array.isArray(user.companies) ? user.companies : [],
     };
 
     console.log("✅ getCurrentUser:", { email: currentUser.email, role: currentUser.role });
@@ -35,3 +37,5 @@ export function getCurrentUser() {
     return null;
   }
 }
+
+
