@@ -29,17 +29,17 @@ export async function GET(req: NextRequest) {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 
-    const allowed = await apiHasPermission(
-      userId,
-      userRole,
-      PERMISSIONS.CREATE_SALES_INVOICE
-    );
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_SALES_INVOICE, companyId);
 
     if (!allowed) {
       return NextResponse.json({ error: "No Access" }, { status: 403 });
     }
 
-    const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
@@ -129,17 +129,17 @@ export async function POST(req: NextRequest) {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 
-    const allowed = await apiHasPermission(
-      userId,
-      userRole,
-      PERMISSIONS.CREATE_SALES_INVOICE
-    );
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_SALES_INVOICE, companyId);
 
     if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
@@ -252,17 +252,17 @@ export async function PUT(req: NextRequest) {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 
-    const allowed = await apiHasPermission(
-      userId,
-      userRole,
-      PERMISSIONS.CREATE_SALES_INVOICE
-    );
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_SALES_INVOICE, companyId);
 
     if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
@@ -339,17 +339,17 @@ export async function DELETE(req: NextRequest) {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 
-    const allowed = await apiHasPermission(
-      userId,
-      userRole,
-      PERMISSIONS.CREATE_SALES_INVOICE
-    );
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_SALES_INVOICE, companyId);
 
     if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
@@ -377,3 +377,4 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

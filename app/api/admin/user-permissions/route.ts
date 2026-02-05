@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { requirePermission } from "@/lib/requirePermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -10,21 +11,25 @@ if (process.env.NODE_ENV === "development") {
 }
 
 /* =========================
-   GET → list users + perms
+   GET ? list users + perms
 ========================= */
-export async function GET(req: Request) {
-  // پہلے چیک کریں کہ کیا بھیجنے والا ADMIN ہیڈر کے ساتھ آ رہا ہے
+export async function GET(req: NextRequest) {
   const role = req.headers.get("x-user-role");
-  
-  // اگر ایڈمن نہیں ہے، تب پرمیشن چیک کرو
+
   if (role !== "ADMIN") {
     const guard = await requirePermission(req, PERMISSIONS.MANAGE_USERS);
     if (guard) return guard;
   }
 
+  const companyId = await resolveCompanyId(req);
+  if (!companyId) {
+    return NextResponse.json({ error: "Company required" }, { status: 400 });
+  }
+
   const users = await prisma.user.findMany({
+    where: { companies: { some: { companyId } } },
     include: {
-      permissions: true,
+      permissions: { where: { companyId } },
     },
     orderBy: { name: "asc" },
   });
@@ -33,47 +38,53 @@ export async function GET(req: Request) {
 }
 
 /* =========================
-   POST → update permissions
+   POST ? update permissions
 ========================= */
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role");
 
-  // ایڈمن کے لیے چھوٹ، باقیوں کے لیے پرمیشن لازمی
   if (role !== "ADMIN") {
     const guard = await requirePermission(req, PERMISSIONS.MANAGE_USERS);
     if (guard) return guard;
   }
 
+  const companyId = await resolveCompanyId(req);
+  if (!companyId) {
+    return NextResponse.json({ error: "Company required" }, { status: 400 });
+  }
+
   const { userId, permissions } = await req.json();
 
   if (!userId || !Array.isArray(permissions)) {
-    return NextResponse.json(
-      { error: "Invalid data" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid data" }, { status: 400 });
   }
 
   try {
-    await prisma.$transaction([
-      // 🔥 پچھلی تمام پرمیشنز مٹائیں
-      prisma.userPermission.deleteMany({
-        where: { userId },
-      }),
+    const target = await prisma.userCompany.findFirst({
+      where: { userId, companyId },
+      select: { userId: true },
+    });
+    if (!target) {
+      return NextResponse.json({ error: "User not in company" }, { status: 404 });
+    }
 
-      // 🔥 نئی پرمیشنز ڈالیں
+    await prisma.$transaction([
+      prisma.userPermission.deleteMany({
+        where: { userId, companyId },
+      }),
       prisma.userPermission.createMany({
         data: permissions.map((p: string) => ({
           userId,
           permission: p,
+          companyId,
         })),
       }),
-
-      // 🔥 ایکٹیویٹی لاگ بنائیں
       prisma.activityLog.create({
         data: {
           action: "PERMISSIONS_UPDATED",
           details: `Updated permissions for user ${userId}`,
-          userId: userId, // یہاں وہ یوزر آئی ڈی دیں جس نے چینج کیا یا جس کی چینج ہوئی
+          userId: userId,
+          companyId,
         },
       }),
     ]);

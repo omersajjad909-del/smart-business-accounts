@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 type ItemWithInventory = Prisma.ItemNewGetPayload<{
   select: {
@@ -33,14 +34,20 @@ if (process.env.NODE_ENV === "development") {
   (globalThis as any).prisma = prisma;
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const items = await prisma.itemNew.findMany({
+      where: { companyId },
       select: {
         id: true,
         name: true,
@@ -48,6 +55,7 @@ export async function GET(req: Request) {
         minStock: true,
         description: true,
         inventoryTxns: {
+          where: { companyId },
           select: { qty: true }
         }
       },

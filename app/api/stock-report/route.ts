@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 type ItemWithTxns = Prisma.ItemNewGetPayload<{
   include: {
     inventoryTxns: true;
@@ -19,8 +20,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const companyId = await resolveCompanyId(req);
+  if (!companyId) {
+    return NextResponse.json({ error: "Company required" }, { status: 400 });
+  }
+
   const items = await prisma.itemNew.findMany({
-    include: { inventoryTxns: true },
+    where: { companyId },
+    include: { inventoryTxns: { where: { companyId } } },
   });
 
 const report = items.map((item: ItemWithTxns) => {

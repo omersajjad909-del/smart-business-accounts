@@ -321,6 +321,37 @@ model Company {
 
   users         UserCompany[]
   defaultUsers  User[] @relation("UserDefaultCompany")
+
+  accounts              Account[]
+  items                 ItemNew[]
+  purchaseOrders         PurchaseOrder[]
+  purchaseInvoices       PurchaseInvoice[]
+  inventoryTxns         InventoryTxn[]
+  salesInvoices         SalesInvoice[]
+  vouchers              Voucher[]
+  voucherEntries        VoucherEntry[]
+  stockRates            StockRate[]
+  saleReturns           SaleReturn[]
+  outwards              Outward[]
+  employees             Employee[]
+  attendances           Attendance[]
+  payrolls              Payroll[]
+  advanceSalaries        AdvanceSalary[]
+  contacts              Contact[]
+  quotations            Quotation[]
+  deliveryChallans       DeliveryChallan[]
+  advancePayments        AdvancePayment[]
+  bankAccounts          BankAccount[]
+  paymentReceipts       PaymentReceipt[]
+  expenseVouchers        ExpenseVoucher[]
+  taxConfigurations     TaxConfiguration[]
+  budgets               Budget[]
+  recurringTransactions RecurringTransaction[]
+  financialYears        FinancialYear[]
+  currencies            Currency[]
+  activityLogs          ActivityLog[]
+  rolePermissions       RolePermission[]
+  userPermissions       UserPermission[]
 }
 
 model UserCompany {
@@ -357,25 +388,38 @@ model ActivityLog {
   action    String
   details   String?
   userId    String?
+  companyId String?
   createdAt DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
 }
 
 model RolePermission {
   id         String @id @default(uuid())
   role       String // ADMIN | ACCOUNTANT | VIEWER
   permission String // e.g. CREATE_USER
+
+  companyId String?
+  company Company? @relation(fields: [companyId], references: [id])
+
+  @@unique([role, permission, companyId])
+  @@index([companyId])
 }
 
 model UserPermission {
   id         String @id @default(uuid())
   userId     String
   permission String
+  companyId String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, permission])
+  @@unique([userId, permission, companyId])
+  @@index([companyId])
 }
 
 // ================= PHASE 1: BANKING & PAYMENT MODELS =================
@@ -783,7 +827,7 @@ model Contact {
   name        String
   email       String?  @unique
   phone       String
-  company     String
+  companyName String
   position    String? // Job title
   type        String   // CUSTOMER | SUPPLIER | LEAD | PARTNER
   accountId   String? // Link to Chart of Accounts

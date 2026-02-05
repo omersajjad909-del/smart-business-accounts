@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -14,11 +15,16 @@ export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.CREATE_ACCOUNTS
+      PERMISSIONS.CREATE_ACCOUNTS,
+      companyId
     );
 
     if (!allowed) {
@@ -51,8 +57,36 @@ export async function POST(req: NextRequest) {
         }
 
         // Generate voucher number
-        const count = await prisma.voucher.count({ where: { type: "CPV" } });
+        const count = await prisma.voucher.count({ where: { type: "CPV", companyId } });
         const voucherNo = `CPV-${count + 1}`;
+
+        const account = await prisma.account.findFirst({
+          where: { id: accountId, companyId },
+          select: { id: true },
+        });
+        if (!account) {
+          results.push({
+            accountId,
+            status: "error",
+            error: "Account not found",
+          });
+          continue;
+        }
+
+        if (bankAccountId) {
+          const bankAccount = await prisma.bankAccount.findFirst({
+            where: { id: bankAccountId, companyId },
+            select: { id: true },
+          });
+          if (!bankAccount) {
+            results.push({
+              accountId,
+              status: "error",
+              error: "Bank account not found",
+            });
+            continue;
+          }
+        }
 
         // Create voucher
         const voucher = await prisma.voucher.create({
@@ -61,6 +95,7 @@ export async function POST(req: NextRequest) {
             type: "CPV",
             date: new Date(date),
             narration: narration || `Bulk payment - ${payment.accountId}`,
+            companyId,
             entries: {
               create: [
                 {

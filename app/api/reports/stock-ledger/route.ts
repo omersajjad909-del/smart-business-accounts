@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 type InventoryTxnWithParty = Prisma.InventoryTxnGetPayload<{
   include: {
     party: true;
@@ -25,7 +26,7 @@ if (process.env.NODE_ENV === "development") {
   (globalThis as any).prisma = prisma;
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const itemId = searchParams.get("itemId");
@@ -34,12 +35,23 @@ export async function GET(req: Request) {
 
     if (!itemId) return NextResponse.json([]);
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const item = await prisma.itemNew.findFirst({
+      where: { id: itemId, companyId },
+      select: { id: true },
+    });
+    if (!item) return NextResponse.json([]);
+
     const fromDate = from ? new Date(from + "T00:00:00") : new Date("2025-01-01");
     const toDate = to ? new Date(to + "T23:59:59.999") : new Date();
 
     // 1. OPENING BALANCE
     const openingTxns = await prisma.inventoryTxn.aggregate({
-      where: { itemId, date: { lt: fromDate } },
+      where: { itemId, date: { lt: fromDate }, companyId },
       _sum: { qty: true },
     });
     let runningBalance = openingTxns._sum.qty || 0;
@@ -47,7 +59,7 @@ export async function GET(req: Request) {
     // 2. FETCH TRANSACTIONS
     // ہم نے SalesInvoiceItem کو بھی شامل کیا ہے تاکہ وہاں سے لنک ڈھونڈ سکیں
     const txns = await prisma.inventoryTxn.findMany({
-      where: { itemId, date: { gte: fromDate, lte: toDate } },
+      where: { itemId, date: { gte: fromDate, lte: toDate }, companyId },
       include: {
         party: { select: { name: true } },
       },
@@ -80,7 +92,7 @@ export async function GET(req: Request) {
           where: {
             itemId: t.itemId,
             qty: Math.abs(t.qty),
-            invoice: { date: t.date },
+            invoice: { date: t.date, companyId },
           },
           include: {
             invoice: { include: { customer: true } },

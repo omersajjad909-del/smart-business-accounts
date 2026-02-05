@@ -3,6 +3,7 @@ import { sendEmail, emailTemplates } from "@/lib/email";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { PrismaClient } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 if (process.env.NODE_ENV === "development") {
@@ -13,11 +14,16 @@ export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.VIEW_REPORTS
+      PERMISSIONS.VIEW_REPORTS,
+      companyId
     );
 
     if (!allowed) {
@@ -39,8 +45,8 @@ export async function POST(req: NextRequest) {
 
     // Handle different email types
     if (type === 'sales-invoice' && invoiceId) {
-      const invoice = await prisma.salesInvoice.findUnique({
-        where: { id: invoiceId },
+      const invoice = await prisma.salesInvoice.findFirst({
+        where: { id: invoiceId, companyId },
         include: {
           customer: true,
           items: {
@@ -61,8 +67,8 @@ export async function POST(req: NextRequest) {
       html = emailTemplates.salesInvoice(invoice, invoice.customer);
       emailSubject = subject || `Sales Invoice ${invoice.invoiceNo} - US Traders`;
     } else if (type === 'purchase-invoice' && invoiceId) {
-      const invoice = await prisma.purchaseInvoice.findUnique({
-        where: { id: invoiceId },
+      const invoice = await prisma.purchaseInvoice.findFirst({
+        where: { id: invoiceId, companyId },
         include: {
           supplier: true,
           items: {
@@ -84,8 +90,8 @@ export async function POST(req: NextRequest) {
       emailSubject = subject || `Purchase Invoice ${invoice.invoiceNo} - US Traders`;
     } else if (type === "purchase-order" && invoiceId) {
 
-  const po = await prisma.purchaseOrder.findUnique({
-    where: { id: invoiceId },
+  const po = await prisma.purchaseOrder.findFirst({
+    where: { id: invoiceId, companyId },
     include: {
       supplier: true,
       items: {
@@ -128,6 +134,7 @@ export async function POST(req: NextRequest) {
           action: "EMAIL_SEND_FAILED",
           details: `type=${type}, to=${recipients}, error=${result.error || "Unknown error"}`,
           userId: userId || null,
+          companyId,
         },
       });
 
@@ -142,6 +149,7 @@ export async function POST(req: NextRequest) {
         action: "EMAIL_SENT",
         details: `type=${type}, to=${recipients}, subject=${emailSubject}`,
         userId: userId || null,
+        companyId,
       },
     });
 
@@ -155,13 +163,17 @@ export async function POST(req: NextRequest) {
 
     try {
       const userId = req.headers.get("x-user-id");
-      await prisma.activityLog.create({
-        data: {
-          action: "EMAIL_SEND_FAILED",
-          details: error.message || "Unhandled email send error",
-          userId: userId || null,
-        },
-      });
+      const companyId = await resolveCompanyId(req);
+      if (companyId) {
+        await prisma.activityLog.create({
+          data: {
+            action: "EMAIL_SEND_FAILED",
+            details: error.message || "Unhandled email send error",
+            userId: userId || null,
+            companyId,
+          },
+        });
+      }
     } catch (logError) {
       console.error("❌ Failed to log email send error:", logError);
     }

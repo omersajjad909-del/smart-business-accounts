@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -14,12 +15,17 @@ export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     // Only users with manage-users permission can access
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.MANAGE_USERS
+      PERMISSIONS.MANAGE_USERS,
+      companyId
     );
 
     if (!allowed) {
@@ -28,6 +34,7 @@ export async function GET(req: NextRequest) {
 
     // Get all role permissions
     const rolePermissions = await prisma.rolePermission.findMany({
+      where: { companyId },
       orderBy: { role: "asc" },
     });
 
@@ -61,12 +68,17 @@ export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     // Only users with manage-users permission can modify
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.MANAGE_USERS
+      PERMISSIONS.MANAGE_USERS,
+      companyId
     );
 
     if (!allowed) {
@@ -85,14 +97,14 @@ export async function POST(req: NextRequest) {
 
     // Delete existing permissions for this role
     await prisma.rolePermission.deleteMany({
-      where: { role },
+      where: { role, companyId },
     });
 
     // Create new permissions
     const createdPermissions = await Promise.all(
       permissions.map((permission: string) =>
         prisma.rolePermission.create({
-          data: { role, permission },
+          data: { role, permission, companyId },
         })
       )
     );

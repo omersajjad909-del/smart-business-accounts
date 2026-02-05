@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 type SalesInvoice = Prisma.SalesInvoiceGetPayload<{
@@ -28,11 +29,16 @@ if (process.env.NODE_ENV === "development") {
   (globalThis as any).prisma = prisma;
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -59,6 +65,7 @@ export async function GET(req: Request) {
     const salesInvoices = await prisma.salesInvoice.findMany({
       where: {
         date: { gte: startDate },
+        companyId,
       },
       select: {
         date: true,
@@ -70,6 +77,7 @@ export async function GET(req: Request) {
     const purchaseInvoices = await prisma.purchaseInvoice.findMany({
       where: {
         date: { gte: startDate },
+        companyId,
       },
       select: {
         date: true,
@@ -110,10 +118,10 @@ export async function GET(req: Request) {
     });
 
     // Top customers
-    const topCustomers = await prisma.salesInvoice.groupBy({
-      by: ["customerId"],
+    const topCustomers = await prisma.salesInvoice.groupBy({\r\n      by: ["customerId"],
       where: {
         date: { gte: startDate },
+        companyId,
       },
       _sum: {
         total: true,
@@ -128,8 +136,8 @@ export async function GET(req: Request) {
 
     const customerDetails = await Promise.all(
       topCustomers.map(async (item: TopCustomer) => {
-        const customer = await prisma.account.findUnique({
-          where: { id: item.customerId },
+        const customer = await prisma.account.findFirst({
+          where: { id: item.customerId, companyId },
           select: { name: true },
         });
         return {
@@ -145,6 +153,7 @@ export async function GET(req: Request) {
       where: {
         invoice: {
           date: { gte: startDate },
+          companyId,
         },
       },
       _sum: {
@@ -161,8 +170,8 @@ export async function GET(req: Request) {
 
     const itemDetails = await Promise.all(
       topItems.map(async (item: any) => {
-        const itemData = await prisma.itemNew.findUnique({
-          where: { id: item.itemId },
+        const itemData = await prisma.itemNew.findFirst({
+          where: { id: item.itemId, companyId },
           select: { name: true },
         });
         return {
@@ -193,3 +202,4 @@ export async function GET(req: Request) {
     );
   }
 }
+

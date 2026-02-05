@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -15,10 +16,21 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const supplierId = req.nextUrl.searchParams.get("supplierId");
     const asOnParam = req.nextUrl.searchParams.get("date");
 
     if (!supplierId) return NextResponse.json([]);
+
+    const supplier = await prisma.account.findFirst({
+      where: { id: supplierId, companyId },
+      select: { id: true },
+    });
+    if (!supplier) return NextResponse.json([]);
 
     const asOn = asOnParam
       ? new Date(asOnParam + "T23:59:59.999")
@@ -29,6 +41,7 @@ export async function GET(req: NextRequest) {
       where: {
         supplierId,
         date: { lte: asOn },
+        companyId,
       },
       orderBy: { date: "asc" },
     });
@@ -38,7 +51,7 @@ export async function GET(req: NextRequest) {
       where: {
         accountId: supplierId,
         amount: { gt: 0 },
-        voucher: { date: { lte: asOn } },
+        voucher: { date: { lte: asOn }, companyId },
       },
     });
 

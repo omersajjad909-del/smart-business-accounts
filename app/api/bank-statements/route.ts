@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -9,11 +10,16 @@ if (process.env.NODE_ENV === "development") {
 
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const bankAccountId = searchParams.get('bankAccountId');
     const isReconciled = searchParams.get('isReconciled');
 
-    const filter: any = {};
+    const filter: any = { companyId };
     if (bankAccountId) filter.bankAccountId = bankAccountId;
     if (isReconciled !== null) filter.isReconciled = isReconciled === 'true';
 
@@ -35,6 +41,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const {
       bankAccountId,
@@ -45,6 +56,14 @@ export async function POST(req: NextRequest) {
       referenceNo,
     } = body;
 
+    const bankAccount = await prisma.bankAccount.findFirst({
+      where: { id: bankAccountId, companyId },
+      select: { id: true },
+    });
+    if (!bankAccount) {
+      return NextResponse.json({ error: "Bank account not found" }, { status: 404 });
+    }
+
     const statement = await prisma.bankStatement.create({
       data: {
         bankAccountId,
@@ -53,6 +72,7 @@ export async function POST(req: NextRequest) {
         amount,
         description,
         referenceNo,
+        companyId,
       },
       include: { bankAccount: true },
     });
@@ -69,11 +89,24 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { id, ...updateData } = body;
 
     if (updateData.date) {
       updateData.date = new Date(updateData.date);
+    }
+
+    const existing = await prisma.bankStatement.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Statement not found" }, { status: 404 });
     }
 
     const statement = await prisma.bankStatement.update({
@@ -94,6 +127,11 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -102,6 +140,14 @@ export async function DELETE(req: NextRequest) {
         { error: 'Statement ID is required' },
         { status: 400 }
       );
+    }
+
+    const existing = await prisma.bankStatement.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Statement not found" }, { status: 404 });
     }
 
     await prisma.bankStatement.delete({

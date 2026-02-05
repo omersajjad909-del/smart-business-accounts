@@ -1,22 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveCompanyId } from "@/lib/tenant";
 
 export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
 
-    if (!userId || !userRole) {
+    if (!userId || !userRole || !companyId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const [userPermissions, rolePermissions] = await Promise.all([
       prisma.userPermission.findMany({
-        where: { userId },
+        where: { userId, companyId },
         select: { permission: true },
       }),
       prisma.rolePermission.findMany({
-        where: { role: userRole },
+        where: { role: userRole, companyId },
         select: { permission: true },
       }),
     ]);

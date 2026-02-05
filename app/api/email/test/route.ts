@@ -3,6 +3,7 @@ import { testEmailConfig } from "@/lib/email";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { PrismaClient } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 if (process.env.NODE_ENV === "development") {
@@ -13,11 +14,16 @@ export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.MANAGE_USERS
+      PERMISSIONS.MANAGE_USERS,
+      companyId
     );
 
     if (!allowed) {
@@ -31,6 +37,7 @@ export async function GET(req: NextRequest) {
         action: result.success ? "EMAIL_TEST_SUCCESS" : "EMAIL_TEST_FAILED",
         details: result.message || "Email configuration test",
         userId: userId || null,
+        companyId,
       },
     });
 
@@ -40,13 +47,17 @@ export async function GET(req: NextRequest) {
 
     try {
       const userId = req.headers.get("x-user-id");
-      await prisma.activityLog.create({
-        data: {
-          action: "EMAIL_TEST_FAILED",
-          details: error.message || "Unhandled email test error",
-          userId: userId || null,
-        },
-      });
+      const companyId = await resolveCompanyId(req);
+      if (companyId) {
+        await prisma.activityLog.create({
+          data: {
+            action: "EMAIL_TEST_FAILED",
+            details: error.message || "Unhandled email test error",
+            userId: userId || null,
+            companyId,
+          },
+        });
+      }
     } catch (logError) {
       console.error("❌ Failed to log email test error:", logError);
     }

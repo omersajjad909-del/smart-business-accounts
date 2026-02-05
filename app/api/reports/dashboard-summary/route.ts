@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -7,21 +8,27 @@ if (process.env.NODE_ENV === "development") {
   (globalThis as any).prisma = prisma;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
     // 1. کل سیلز (Sales)
     const sales = await prisma.salesInvoice.aggregate({
+      where: { companyId },
       _sum: { total: true },
     });
 
     // 2. کل خریداری (Purchases)
     const purchases = await prisma.purchaseInvoice.aggregate({
+      where: { companyId },
       _sum: { total: true },
     });
 
     // 3. ایکٹو کسٹمرز کی تعداد
     const customersCount = await prisma.account.count({
-      where: { partyType: "CUSTOMER" },
+      where: { partyType: "CUSTOMER", companyId },
     });
 
     const totalSales = Number(sales._sum.total || 0);
