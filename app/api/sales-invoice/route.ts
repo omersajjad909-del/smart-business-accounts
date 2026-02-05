@@ -3,6 +3,7 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
+import { ensureOpenPeriod } from "@/lib/financialLock";
 type SalesInvoiceNoOnly = Prisma.SalesInvoiceGetPayload<{
   select: { invoiceNo: true };
 }>;
@@ -145,7 +146,22 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { invoiceNo, customerId, date, location, freight = 0, items, applyTax = false, taxConfigId = null, driverName = null, vehicleNo = null } = body;
+    const {
+      invoiceNo,
+      customerId,
+      date,
+      location,
+      freight = 0,
+      items,
+      applyTax = false,
+      taxConfigId = null,
+      driverName = null,
+      vehicleNo = null,
+      currencyId = null,
+      exchangeRate = 1,
+    } = body;
+
+    await ensureOpenPeriod(prisma, companyId, new Date(date));
 
     const total = items.reduce(
       (s: number, i: Any) => s + i.qty * i.rate,
@@ -172,6 +188,7 @@ export async function POST(req: NextRequest) {
         driverName,
         vehicleNo,
         total: total + freight + taxAmount,
+        approvalStatus: "PENDING",
         items: {
           create: items.map((i: Any) => ({
             itemId: i.itemId,
@@ -183,6 +200,20 @@ export async function POST(req: NextRequest) {
         taxConfigId: applyTax ? taxConfigId : null,
       },
     });
+
+    if (currencyId) {
+      await prisma.currencyTransaction.create({
+        data: {
+          transactionType: "INVOICE",
+          transactionId: invoice.id,
+          currencyId,
+          amountInLocal: total + taxAmount + Number(freight || 0),
+          amountInBase: (total + taxAmount + Number(freight || 0)) * Number(exchangeRate || 1),
+          exchangeRate: Number(exchangeRate || 1),
+          conversionDate: new Date(date),
+        },
+      });
+    }
 
     let salesAcc = await prisma.account.findFirst({
       where: { name: { equals: "Sales", mode: "insensitive" }, companyId },
@@ -268,11 +299,26 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, customerId: _customerId, date, location: _location, freight = 0, items, applyTax = false, taxConfigId = null, driverName = null, vehicleNo = null } = body;
+    const {
+      id,
+      customerId: _customerId,
+      date,
+      location: _location,
+      freight = 0,
+      items,
+      applyTax = false,
+      taxConfigId = null,
+      driverName = null,
+      vehicleNo = null,
+      currencyId = null,
+      exchangeRate = 1,
+    } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
     }
+
+    await ensureOpenPeriod(prisma, companyId, new Date(date));
 
     const existing = await prisma.salesInvoice.findFirst({
       where: { id, companyId },
@@ -322,6 +368,23 @@ export async function PUT(req: NextRequest) {
           taxConfig: true
         },
       });
+
+      await tx.currencyTransaction.deleteMany({
+        where: { transactionType: "INVOICE", transactionId: id },
+      });
+      if (currencyId) {
+        await tx.currencyTransaction.create({
+          data: {
+            transactionType: "INVOICE",
+            transactionId: id,
+            currencyId,
+            amountInLocal: total + taxAmount + Number(freight || 0),
+            amountInBase: (total + taxAmount + Number(freight || 0)) * Number(exchangeRate || 1),
+            exchangeRate: Number(exchangeRate || 1),
+            conversionDate: new Date(date),
+          },
+        });
+      }
 
       return invoice;
     });
@@ -377,5 +440,3 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-
-

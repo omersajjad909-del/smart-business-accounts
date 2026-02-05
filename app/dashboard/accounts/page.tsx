@@ -42,6 +42,8 @@ export default function ChartOfAccounts() {
   const [activeTab, setActiveTab] = useState("ALL");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showImport, setShowImport] = useState(false);
+  const [importCsv, setImportCsv] = useState("");
 
 
   const [form, setForm] = useState({
@@ -128,6 +130,32 @@ export default function ChartOfAccounts() {
     }
   }
 
+  async function importAccounts() {
+    const user = getCurrentUser();
+    if (!user) return alert("Session expired");
+    if (!importCsv.trim()) return alert("Paste CSV first");
+
+    const res = await fetch("/api/accounts/import", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-user-role": user.role,
+        "x-user-id": user.id,
+      },
+      body: JSON.stringify({ csv: importCsv }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert(`Imported: ${data.created}, Skipped: ${data.skipped}`);
+      setImportCsv("");
+      setShowImport(false);
+      loadAccounts();
+    } else {
+      alert(data.error || "Import failed");
+    }
+  }
+
   async function deleteAccount(id: string) {
     if (!confirm("Are you sure?")) return;
     const user = getCurrentUser();
@@ -185,14 +213,60 @@ const res = await fetch(`/api/accounts?id=${id}`, {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen space-y-6">
-      <h1 className="text-2xl font-black border-b-4 border-black pb-2 uppercase italic">Chart of Accounts</h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <h1 className="text-2xl font-black border-b-4 border-black pb-2 uppercase italic">Chart of Accounts</h1>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => window.open("/api/accounts?format=csv", "_blank")}
+            className="bg-black text-white px-4 py-2 rounded text-sm"
+          >
+            Export CSV
+          </button>
+          <button
+            onClick={() => setShowImport((v) => !v)}
+            className="bg-blue-600 text-white px-4 py-2 rounded text-sm"
+          >
+            Import CSV
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
         <input
-    type="text"
-    placeholder="Search accounts..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    className="border px-3 py-2 rounded w-full md:w-64"
-  />
+          type="text"
+          placeholder="Search accounts..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border px-3 py-2 rounded w-full md:w-72"
+        />
+      </div>
+
+      {showImport && (
+        <div className="bg-white border rounded p-4 space-y-3">
+          <div className="text-sm text-gray-600">
+            Paste CSV with headers: `code,name,partyType,type,city,phone,openDebit,openCredit,openDate,creditDays,creditLimit`
+          </div>
+          <textarea
+            className="w-full border rounded p-3 text-sm min-h-[140px]"
+            value={importCsv}
+            onChange={(e) => setImportCsv(e.target.value)}
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={importAccounts}
+              className="bg-green-600 text-white px-4 py-2 rounded text-sm"
+            >
+              Import
+            </button>
+            <button
+              onClick={() => setShowImport(false)}
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className={`bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${editingId ? 'border-blue-500 bg-blue-50' : ''}`}>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 text-sm font-bold">
@@ -276,4 +350,3 @@ const res = await fetch(`/api/accounts?id=${id}`, {
     </div>
   );
 }
-

@@ -134,6 +134,11 @@ model PurchaseInvoice {
 
   items PurchaseInvoiceItem[]
 
+  approvalStatus  String   @default("DRAFT") // DRAFT | PENDING | APPROVED | REJECTED
+  approvedBy      String?
+  approvedAt      DateTime?
+  approvalRemarks String?
+
   createdAt DateTime @default(now())
 }
 
@@ -193,6 +198,11 @@ model SalesInvoice {
 
   driverName String?
   vehicleNo  String?
+
+  approvalStatus  String   @default("DRAFT") // DRAFT | PENDING | APPROVED | REJECTED
+  approvedBy      String?
+  approvedAt      DateTime?
+  approvalRemarks String?
 
   createdAt DateTime           @default(now())
 }
@@ -483,6 +493,10 @@ model PaymentReceipt {
   referenceNo String?
   narration   String?
   status      String   @default("PENDING") // PENDING | POSTED | RECONCILED
+  approvalStatus  String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  approvedBy      String?
+  approvedAt      DateTime?
+  approvalRemarks String?
   voucherId   String?
   voucher     Voucher? @relation(fields: [voucherId], references: [id])
   createdAt   DateTime @default(now())

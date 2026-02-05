@@ -407,6 +407,7 @@ export async function GET(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   const { searchParams } = new URL(req.url);
   const prefix = searchParams.get("prefix");
+  const format = searchParams.get("format") || "json";
 
   if (role !== "ADMIN" && role !== "ACCOUNTANT") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -443,6 +444,42 @@ if (prefix) {
     where: { companyId },
     orderBy: { name: "asc" },
   });
+
+  if (format === "csv") {
+    const header = [
+      "code",
+      "name",
+      "partyType",
+      "type",
+      "city",
+      "phone",
+      "openDebit",
+      "openCredit",
+      "openDate",
+      "creditDays",
+      "creditLimit",
+    ].join(",");
+    const rows = accounts.map((a) => [
+      JSON.stringify(a.code || ""),
+      JSON.stringify(a.name || ""),
+      JSON.stringify(a.partyType || ""),
+      JSON.stringify(a.type || ""),
+      JSON.stringify(a.city || ""),
+      JSON.stringify(a.phone || ""),
+      a.openDebit ?? "",
+      a.openCredit ?? "",
+      a.openDate ? new Date(a.openDate).toISOString().slice(0, 10) : "",
+      a.creditDays ?? "",
+      a.creditLimit ?? "",
+    ].join(","));
+    const csv = [header, ...rows].join("\n");
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv",
+        "Content-Disposition": "attachment; filename=chart-of-accounts.csv",
+      },
+    });
+  }
 
   return NextResponse.json(accounts);
 }
@@ -588,4 +625,3 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Cannot delete. Account in use." }, { status: 500 });
   }
 }
-

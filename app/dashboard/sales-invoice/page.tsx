@@ -51,6 +51,13 @@ type TaxConfig = {
   description?: string;
 };
 
+type Currency = {
+  id: string;
+  code: string;
+  name: string;
+  exchangeRate: number;
+};
+
 function SalesInvoiceContent() {
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
@@ -93,6 +100,18 @@ function SalesInvoiceContent() {
   const [applyTax, setApplyTax] = useState(false);
   const [selectedTaxId, setSelectedTaxId] = useState("");
   const [taxes, setTaxes] = useState<TaxConfig[]>([]);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [currencyId, setCurrencyId] = useState("");
+  const [exchangeRate, setExchangeRate] = useState(1);
+
+  useEffect(() => {
+    fetch("/api/currencies")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setCurrencies(data);
+      })
+      .catch(() => {});
+  }, []);
 
   // Keyboard shortcuts - F7: Clear date/customer, F8: Query dialog
   useEffect(() => {
@@ -310,6 +329,8 @@ function SalesInvoiceContent() {
         items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) })),
         applyTax,
         taxConfigId: applyTax ? selectedTaxId : null,
+        currencyId: currencyId || null,
+        exchangeRate,
       };
       const body = editing ? { id: editing.id, ...baseBody } : baseBody;
 
@@ -643,6 +664,35 @@ function SalesInvoiceContent() {
                 <div>
                   <label className="text-xs font-bold">Date (F7: Clear)</label>
                   <input type="date" className="border p-2 w-full" value={date} onChange={e => setDate(e.target.value)} />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs font-bold">Currency</label>
+                  <select
+                    className="border p-2"
+                    value={currencyId}
+                    onChange={(e) => {
+                      const nextId = e.target.value;
+                      setCurrencyId(nextId);
+                      const cur = currencies.find((c) => c.id === nextId);
+                      if (cur) setExchangeRate(cur.exchangeRate || 1);
+                    }}
+                  >
+                    <option value="">Base Currency</option>
+                    {currencies.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.code} - {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs font-bold">Exchange Rate</label>
+                  <input
+                    type="number"
+                    className="border p-2"
+                    value={exchangeRate}
+                    onChange={(e) => setExchangeRate(Number(e.target.value) || 1)}
+                  />
                 </div>
                 <div className="flex flex-col">
                   <label className="text-xs font-bold">Location</label>

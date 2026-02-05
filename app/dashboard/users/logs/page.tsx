@@ -9,6 +9,11 @@ export default function ActivityLogsPage() {
   const [logs, setLogs] = useState<Any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionFilter, setActionFilter] = useState("");
+  const [userFilter, setUserFilter] = useState("");
+  const [search, setSearch] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -21,7 +26,14 @@ export default function ActivityLogsPage() {
           return;
         }
 
-        const response = await fetch("/api/logs", {
+        const params = new URLSearchParams();
+        if (actionFilter) params.set("action", actionFilter);
+        if (userFilter) params.set("userId", userFilter);
+        if (search) params.set("q", search);
+        if (fromDate) params.set("from", fromDate);
+        if (toDate) params.set("to", toDate);
+
+        const response = await fetch(`/api/logs?${params.toString()}`, {
           headers: {
             "x-user-role": u.role,
             "x-user-id": u.id,
@@ -44,7 +56,7 @@ export default function ActivityLogsPage() {
     };
 
     fetchLogs();
-  }, []);
+  }, [actionFilter, userFilter, search, fromDate, toDate]);
 
   if (loading) {
     return (
@@ -66,7 +78,7 @@ export default function ActivityLogsPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <History className="text-blue-600" size={28} />
@@ -81,8 +93,57 @@ export default function ActivityLogsPage() {
         </div>
       </div>
 
+      <div className="bg-white border rounded-xl p-4 mb-6 grid grid-cols-1 md:grid-cols-6 gap-3">
+        <input
+          className="border rounded px-3 py-2 text-sm md:col-span-2"
+          placeholder="Search details..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <input
+          className="border rounded px-3 py-2 text-sm"
+          placeholder="Action (e.g. CREATE)"
+          value={actionFilter}
+          onChange={(e) => setActionFilter(e.target.value)}
+        />
+        <input
+          className="border rounded px-3 py-2 text-sm"
+          placeholder="User ID"
+          value={userFilter}
+          onChange={(e) => setUserFilter(e.target.value)}
+        />
+        <input
+          type="date"
+          className="border rounded px-3 py-2 text-sm"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+        />
+        <input
+          type="date"
+          className="border rounded px-3 py-2 text-sm"
+          value={toDate}
+          onChange={(e) => setToDate(e.target.value)}
+        />
+        <button
+          onClick={() => {
+            const params = new URLSearchParams();
+            if (actionFilter) params.set("action", actionFilter);
+            if (userFilter) params.set("userId", userFilter);
+            if (search) params.set("q", search);
+            if (fromDate) params.set("from", fromDate);
+            if (toDate) params.set("to", toDate);
+            params.set("format", "csv");
+            window.open(`/api/logs?${params.toString()}`, "_blank");
+          }}
+          className="bg-blue-600 text-white px-4 py-2 rounded text-sm md:col-span-1"
+        >
+          Export CSV
+        </button>
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm text-right">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-right min-w-[700px]">
           <thead className="bg-gray-50 text-gray-600 font-semibold uppercase tracking-wider">
             <tr>
               <th className="p-4 border-b">Action</th>
@@ -123,7 +184,8 @@ export default function ActivityLogsPage() {
               ))
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
     </div>
   );

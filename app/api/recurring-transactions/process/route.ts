@@ -37,6 +37,10 @@ export async function POST(_req: NextRequest) {
           created = await createCRV(transaction);
         } else if (transaction.type === "EXPENSE") {
           created = await createExpense(transaction);
+        } else if (transaction.type === "SALES_INVOICE") {
+          created = await createSalesInvoice(transaction);
+        } else if (transaction.type === "PURCHASE_INVOICE") {
+          created = await createPurchaseInvoice(transaction);
         }
 
         // Update recurring transaction
@@ -100,13 +104,16 @@ function calculateNextDate(currentDate: Date, frequency: string): Date {
 
 async function createCPV(transaction: Any) {
   // Generate voucher number
-  const count = await prisma.voucher.count({ where: { type: "CPV" } });
+  const count = await prisma.voucher.count({
+    where: { type: "CPV", companyId: transaction.companyId },
+  });
   const voucherNo = `CPV-${count + 1}`;
 
   const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
 
   const voucher = await prisma.voucher.create({
     data: {
+      companyId: transaction.companyId,
       voucherNo,
       type: "CPV",
       date: new Date(),
@@ -130,13 +137,16 @@ async function createCPV(transaction: Any) {
 }
 
 async function createCRV(transaction: Any) {
-  const count = await prisma.voucher.count({ where: { type: "CRV" } });
+  const count = await prisma.voucher.count({
+    where: { type: "CRV", companyId: transaction.companyId },
+  });
   const voucherNo = `CRV-${count + 1}`;
 
   const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
 
   const voucher = await prisma.voucher.create({
     data: {
+      companyId: transaction.companyId,
       voucherNo,
       type: "CRV",
       date: new Date(),
@@ -166,6 +176,7 @@ async function createExpense(transaction: Any) {
     data: {
       voucherNo: `EXP-${Date.now()}`,
       date: new Date(),
+      companyId: transaction.companyId,
       accountId: transaction.accountId,
       paymentAccountId: metadata.paymentAccountId || transaction.accountId,
       totalAmount: transaction.amount,
@@ -183,3 +194,78 @@ async function createExpense(transaction: Any) {
   return expense;
 }
 
+async function createSalesInvoice(transaction: Any) {
+  const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
+  const items = Array.isArray(metadata.items) ? metadata.items : [];
+  if (!metadata.customerId || items.length === 0) {
+    throw new Error("Sales invoice metadata missing customerId or items");
+  }
+
+  const count = await prisma.salesInvoice.count({
+    where: { companyId: transaction.companyId },
+  });
+  const invoiceNo = metadata.invoiceNo || `SI-${count + 1}`;
+
+  const total = items.reduce(
+    (sum: number, i: Any) => sum + Number(i.qty || 0) * Number(i.rate || 0),
+    0
+  );
+
+  const invoice = await prisma.salesInvoice.create({
+    data: {
+      companyId: transaction.companyId,
+      invoiceNo,
+      date: new Date(),
+      customerId: metadata.customerId,
+      total,
+      items: {
+        create: items.map((i: Any) => ({
+          itemId: i.itemId,
+          qty: Number(i.qty || 0),
+          rate: Number(i.rate || 0),
+          amount: Number(i.qty || 0) * Number(i.rate || 0),
+        })),
+      },
+    },
+  });
+
+  return invoice;
+}
+
+async function createPurchaseInvoice(transaction: Any) {
+  const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
+  const items = Array.isArray(metadata.items) ? metadata.items : [];
+  if (!metadata.supplierId || items.length === 0) {
+    throw new Error("Purchase invoice metadata missing supplierId or items");
+  }
+
+  const count = await prisma.purchaseInvoice.count({
+    where: { companyId: transaction.companyId },
+  });
+  const invoiceNo = metadata.invoiceNo || `PI-${count + 1}`;
+
+  const total = items.reduce(
+    (sum: number, i: Any) => sum + Number(i.qty || 0) * Number(i.rate || 0),
+    0
+  );
+
+  const invoice = await prisma.purchaseInvoice.create({
+    data: {
+      companyId: transaction.companyId,
+      invoiceNo,
+      date: new Date(),
+      supplierId: metadata.supplierId,
+      total,
+      items: {
+        create: items.map((i: Any) => ({
+          itemId: i.itemId,
+          qty: Number(i.qty || 0),
+          rate: Number(i.rate || 0),
+          amount: Number(i.qty || 0) * Number(i.rate || 0),
+        })),
+      },
+    },
+  });
+
+  return invoice;
+}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { resolveCompanyId } from "@/lib/tenant";
+import { ensureOpenPeriod } from "@/lib/financialLock";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -59,6 +60,8 @@ export async function POST(req: NextRequest) {
       referenceNo,
       narration,
       bankAccountId, // New: which bank/cash account received this
+      currencyId,
+      exchangeRate = 1,
     } = body;
 
     // Validation
@@ -68,6 +71,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    await ensureOpenPeriod(prisma, companyId, new Date(date));
 
     const amountNum = parseFloat(amount);
     if (isNaN(amountNum) || amountNum <= 0) {
@@ -191,6 +196,20 @@ export async function POST(req: NextRequest) {
           voucher: { include: { entries: true } },
         },
       });
+
+      if (currencyId) {
+        await tx.currencyTransaction.create({
+          data: {
+            transactionType: "PAYMENT",
+            transactionId: receipt.id,
+            currencyId,
+            amountInLocal: amountNum,
+            amountInBase: amountNum * Number(exchangeRate || 1),
+            exchangeRate: Number(exchangeRate || 1),
+            conversionDate: new Date(date),
+          },
+        });
+      }
 
       // 3. Update bank balance if bank payment
       if ((paymentMode === 'BANK_TRANSFER' || paymentMode === 'CHEQUE') && bankAccountRecord) {
