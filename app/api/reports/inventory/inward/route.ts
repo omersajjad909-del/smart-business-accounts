@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -24,6 +25,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const from = searchParams.get("from");
     const to = searchParams.get("to");
@@ -34,7 +40,8 @@ export async function GET(req: NextRequest) {
     // Fetching Purchase Invoices as Inward Data
     const purchases = await prisma.purchaseInvoice.findMany({
       where: {
-        date: { gte: fromDate, lte: toDate }
+        date: { gte: fromDate, lte: toDate },
+        companyId,
       },
       include: {
         supplier: true,

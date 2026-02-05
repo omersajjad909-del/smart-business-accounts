@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 type BankAccount = Prisma.AccountGetPayload<Prisma.AccountDefaultArgs>;
@@ -40,6 +41,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const from = searchParams.get("from");
     const to = searchParams.get("to");
@@ -58,6 +64,7 @@ export async function GET(req: NextRequest) {
     const vouchers = await prisma.voucher.findMany({
       where: {
         date: { gte: fromDate, lte: toDate },
+        companyId,
       },
       include: {
         entries: {
@@ -75,7 +82,7 @@ export async function GET(req: NextRequest) {
 
     // Get Cash account - try multiple variations
     const cashAccount = await prisma.account.findFirst({
-      where: { name: { contains: "Cash", mode: "insensitive" } },
+      where: { name: { contains: "Cash", mode: "insensitive" }, companyId },
     });
 
     if (!cashAccount) {
@@ -84,7 +91,7 @@ export async function GET(req: NextRequest) {
 
     // Get Bank accounts
     const bankAccounts = await prisma.account.findMany({
-      where: { partyType: { equals: "BANKS", mode: "insensitive" } },
+      where: { partyType: { equals: "BANKS", mode: "insensitive" }, companyId },
     });
 
     const cashAccountIds = [

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient ,Prisma} from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 type CreditEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
@@ -17,10 +18,21 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const customerId = req.nextUrl.searchParams.get("customerId");
     const asOnParam = req.nextUrl.searchParams.get("date");
 
     if (!customerId) return NextResponse.json([]);
+
+    const customer = await prisma.account.findFirst({
+      where: { id: customerId, companyId },
+      select: { id: true },
+    });
+    if (!customer) return NextResponse.json([]);
 
     const asOn = asOnParam
       ? new Date(asOnParam + "T23:59:59.999")
@@ -31,6 +43,7 @@ export async function GET(req: NextRequest) {
       where: {
         customerId,
         date: { lte: asOn },
+        companyId,
       },
       orderBy: { date: "asc" },
     });
@@ -40,7 +53,7 @@ export async function GET(req: NextRequest) {
       where: {
         accountId: customerId,
         amount: { lt: 0 },
-        voucher: { date: { lte: asOn } },
+        voucher: { date: { lte: asOn }, companyId },
       },
     });
 

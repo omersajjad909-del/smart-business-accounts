@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -12,16 +13,20 @@ export async function GET(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role");
 
-    // اگر یہ ایڈمن پینل سے کال ہو رہی ہے تو مکمل ڈیٹا بھیجیں
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     if (role === "ADMIN") {
       const users = await prisma.user.findMany({
+        where: { companies: { some: { companyId } } },
         include: { permissions: true },
         orderBy: { createdAt: "desc" },
       });
       return NextResponse.json(users);
     }
 
-    // لاگ ان پیج کے لیے صرف ضروری ڈیٹا بھیجیں (سیکیورٹی کے لیے پاس ورڈ نکال دیا گیا ہے)
     const publicUsers = await prisma.user.findMany({
       select: {
         id: true,
@@ -29,7 +34,7 @@ export async function GET(req: NextRequest) {
         email: true,
         role: true,
       },
-      where: { active: true },
+      where: { active: true, companies: { some: { companyId } } },
       orderBy: { name: "asc" },
     });
 
@@ -42,10 +47,14 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const userRole = req.headers.get("x-user-role");
-    
-    // صرف ADMIN صارفین نئے users create کر سکتے ہیں
+
     if (userRole !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden - Admin only" }, { status: 403 });
+    }
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
     const { name, email, password, role } = await req.json();
@@ -60,6 +69,10 @@ export async function POST(req: NextRequest) {
         password: hashedPassword,
         role: role || "ACCOUNTANT",
         active: true,
+        defaultCompanyId: companyId,
+        companies: {
+          create: [{ companyId, isDefault: true }],
+        },
       },
     });
     return NextResponse.json(user);
@@ -71,10 +84,14 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const userRole = req.headers.get("x-user-role");
-    
-    // صرف ADMIN صارفین کو update کر سکتے ہیں
+
     if (userRole !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden - Admin only" }, { status: 403 });
+    }
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
     const { id, name, email, password, role, active } = await req.json();
@@ -82,6 +99,15 @@ export async function PUT(req: NextRequest) {
     if (password && password.trim()) {
       updateData.password = await bcrypt.hash(password, 10);
     }
+
+    const target = await prisma.userCompany.findFirst({
+      where: { userId: id, companyId },
+      select: { userId: true },
+    });
+    if (!target) {
+      return NextResponse.json({ error: "User not in company" }, { status: 404 });
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id },
       data: updateData,
@@ -95,13 +121,25 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const userRole = req.headers.get("x-user-role");
-    
-    // صرف ADMIN صارفین کو delete کر سکتے ہیں
+
     if (userRole !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden - Admin only" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { id } = await req.json();
+    const target = await prisma.userCompany.findFirst({
+      where: { userId: id, companyId },
+      select: { userId: true },
+    });
+    if (!target) {
+      return NextResponse.json({ error: "User not in company" }, { status: 404 });
+    }
+
     await prisma.user.delete({ where: { id } });
     return NextResponse.json({ message: "User deleted successfully" });
   } catch (error: any) {

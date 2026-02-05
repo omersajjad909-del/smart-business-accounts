@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -15,10 +16,16 @@ export async function GET(req: NextRequest) {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.VIEW_REPORTS
+      PERMISSIONS.VIEW_REPORTS,
+      companyId
     );
 
     if (!allowed) {
@@ -33,11 +40,13 @@ export async function GET(req: NextRequest) {
 
     // Get all accounts with their balances
     const accounts = await prisma.account.findMany({
+      where: { companyId },
       include: {
         voucherEntries: {
           where: {
             voucher: {
               date: { gte: startDate, lte: endDate },
+              companyId,
             },
           },
         },

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -13,11 +14,16 @@ export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.VIEW_ACCOUNTS
+      PERMISSIONS.VIEW_ACCOUNTS,
+      companyId
     );
 
     if (!allowed) {
@@ -27,7 +33,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const isActive = searchParams.get("isActive");
 
-    const where: any = {};
+    const where: any = { companyId };
     if (isActive !== null) {
       where.isActive = isActive === "true";
     }
@@ -49,11 +55,16 @@ export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.CREATE_ACCOUNTS
+      PERMISSIONS.CREATE_ACCOUNTS,
+      companyId
     );
 
     if (!allowed) {
@@ -79,6 +90,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const account = await prisma.account.findFirst({
+      where: { id: accountId, companyId },
+      select: { id: true },
+    });
+    if (!account) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    }
+
     const transaction = await prisma.recurringTransaction.create({
       data: {
         accountId,
@@ -89,6 +108,7 @@ export async function POST(req: NextRequest) {
         narration: narration || null,
         nextDate: new Date(nextDate),
         metadata: metadata ? JSON.stringify(metadata) : null,
+        companyId,
       },
       include: { account: true },
     });
@@ -104,11 +124,16 @@ export async function PUT(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.CREATE_ACCOUNTS
+      PERMISSIONS.CREATE_ACCOUNTS,
+      companyId
     );
 
     if (!allowed) {
@@ -129,6 +154,14 @@ export async function PUT(req: NextRequest) {
       updateData.metadata = JSON.stringify(updateData.metadata);
     }
 
+    const existing = await prisma.recurringTransaction.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
+    }
+
     const transaction = await prisma.recurringTransaction.update({
       where: { id },
       data: updateData,
@@ -146,11 +179,16 @@ export async function DELETE(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.CREATE_ACCOUNTS
+      PERMISSIONS.CREATE_ACCOUNTS,
+      companyId
     );
 
     if (!allowed) {
@@ -162,6 +200,14 @@ export async function DELETE(req: NextRequest) {
 
     if (!id) {
       return NextResponse.json({ error: "ID required" }, { status: 400 });
+    }
+
+    const existing = await prisma.recurringTransaction.findFirst({
+      where: { id, companyId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
     }
 
     await prisma.recurringTransaction.delete({ where: { id } });

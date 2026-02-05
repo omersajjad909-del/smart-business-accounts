@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 type EntryWithAccount = Prisma.VoucherEntryGetPayload<{
   include: {
     account: true;
@@ -13,7 +14,7 @@ if (process.env.NODE_ENV === "development") {
   (globalThis as any).prisma = prisma;
 }
 // api/reports/profit-loss/route.ts
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const from = searchParams.get("from");
@@ -21,11 +22,17 @@ export async function GET(req: Request) {
     const fromDate = from ? new Date(from + "T00:00:00") : new Date("2000-01-01");
     const toDate = to ? new Date(to + "T23:59:59.999") : new Date();
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const entries = await prisma.voucherEntry.findMany({
       where: {
-        voucher: { date: { gte: fromDate, lte: toDate } },
+        voucher: { date: { gte: fromDate, lte: toDate }, companyId },
         account: {
           type: { in: ["INCOME", "EXPENSE", "REVENUE", "COST"] },
+          companyId,
         },
       },
       include: { account: true },

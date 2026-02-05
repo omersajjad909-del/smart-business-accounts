@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "./prisma";
+import { resolveCompanyId } from "@/lib/tenant";
 
 export async function requirePermission(
   req: Request,
@@ -15,16 +16,21 @@ export async function requirePermission(
   // 1️⃣ ADMIN = full power
   if (role === "ADMIN") return null;
 
+  const companyId = await resolveCompanyId(req as any);
+  if (!companyId) {
+    return NextResponse.json({ error: "Company required" }, { status: 400 });
+  }
+
   // 2️⃣ Role based permission
   const roleAllowed = await prisma.rolePermission.findFirst({
-    where: { role, permission },
+    where: { role, permission, companyId },
   });
 
   if (roleAllowed) return null;
 
   // 3️⃣ User specific permission
   const userAllowed = await prisma.userPermission.findFirst({
-    where: { userId, permission },
+    where: { userId, permission, companyId },
   });
 
   if (userAllowed) return null;

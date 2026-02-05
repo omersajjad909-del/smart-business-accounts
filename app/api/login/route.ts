@@ -130,20 +130,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Fetch role-based permissions
-    let rolePermissions = [];
-    try {
-      rolePermissions = await prisma.rolePermission.findMany({
-        where: { role: user.role },
-        select: { permission: true },
-      });
-    } catch (permError: any) {
-      console.error("❌ LOGIN PERMISSIONS ERROR:", permError);
-      // Continue without role permissions if error occurs
-    }
-
-    // 🔥 FRONTEND KE LIYE SAFE USER OBJECT (getCurrentUser() ke format ke mutabiq)
-
     // Fetch companies for multi-tenant context
     let companies = [];
     try {
@@ -160,12 +146,30 @@ export async function POST(req: NextRequest) {
       companies.find((c: any) => c.isDefault)?.companyId ||
       companies[0]?.companyId ||
       null;
+
+    // Fetch role-based permissions
+    let rolePermissions = [];
+    try {
+      rolePermissions = await prisma.rolePermission.findMany({
+        where: { role: user.role, companyId: defaultCompanyId || undefined },
+        select: { permission: true },
+      });
+    } catch (permError: any) {
+      console.error("❌ LOGIN PERMISSIONS ERROR:", permError);
+      // Continue without role permissions if error occurs
+    }
+
+    const userPermissions = (user.permissions || [])
+      .filter((p: any) => !defaultCompanyId || p.companyId === defaultCompanyId)
+      .map((p: any) => p.permission || p);
+
+    // 🔥 FRONTEND KE LIYE SAFE USER OBJECT (getCurrentUser() ke format ke mutabiq)
     const safeUser = {
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role.toUpperCase(), // Ensure uppercase
-      permissions: (user.permissions || []).map((p: any) => p.permission || p), // User-specific permissions
+      permissions: userPermissions, // User-specific permissions
       rolePermissions: rolePermissions.map((rp: RolePermission) => rp.permission),
       companyId: defaultCompanyId,
       companies: companies.map((c: any) => ({

@@ -156,14 +156,16 @@ async function main() {
   console.log("2️⃣ Setting up role permissions...");
   
   // Clear existing permissions
-  await prisma.rolePermission.deleteMany({});
+  await prisma.rolePermission.deleteMany({
+    where: { companyId: defaultCompany.id },
+  });
   console.log("   🗑️  Cleared existing permissions");
 
   // Setup ACCOUNTANT permissions
   console.log("   📝 ACCOUNTANT permissions...");
   for (const perm of ROLE_PERMISSIONS.ACCOUNTANT) {
     await prisma.rolePermission.create({
-      data: { role: "ACCOUNTANT", permission: perm },
+      data: { role: "ACCOUNTANT", permission: perm, companyId: defaultCompany.id },
     });
   }
   console.log(`   ✅ ACCOUNTANT: ${ROLE_PERMISSIONS.ACCOUNTANT.length} permissions`);
@@ -172,7 +174,7 @@ async function main() {
   console.log("   📝 VIEWER permissions...");
   for (const perm of ROLE_PERMISSIONS.VIEWER) {
     await prisma.rolePermission.create({
-      data: { role: "VIEWER", permission: perm },
+      data: { role: "VIEWER", permission: perm, companyId: defaultCompany.id },
     });
   }
   console.log(`   ✅ VIEWER: ${ROLE_PERMISSIONS.VIEWER.length} permissions`);

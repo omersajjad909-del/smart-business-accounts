@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 type VoucherEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
 
 
@@ -23,11 +24,16 @@ function resolveCategory(acc: any) {
   return "OTHERS";
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -38,6 +44,7 @@ export async function GET(req: Request) {
     const toDate = to ? new Date(to + "T23:59:59.999") : new Date();
 
     const accounts = await prisma.account.findMany({
+      where: { companyId },
       orderBy: [{ name: "asc" }],
     });
 
@@ -48,7 +55,7 @@ export async function GET(req: Request) {
       const opVouchers = await prisma.voucherEntry.aggregate({
         where: {
           accountId: acc.id,
-          voucher: { date: { lt: fromDate } },
+          voucher: { date: { lt: fromDate }, companyId },
         },
         _sum: { amount: true },
       });
@@ -63,7 +70,7 @@ export async function GET(req: Request) {
       const periodVouchers = await prisma.voucherEntry.findMany({
         where: {
           accountId: acc.id,
-          voucher: { date: { gte: fromDate, lte: toDate } },
+          voucher: { date: { gte: fromDate, lte: toDate }, companyId },
         },
       });
       const transDebit = periodVouchers

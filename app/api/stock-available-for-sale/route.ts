@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 type StockAggRow = {
   itemId: string;
   _sum: {
@@ -22,10 +23,16 @@ if (process.env.NODE_ENV === "development") {
   (globalThis as any).prisma = prisma;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const txns = await prisma.inventoryTxn.groupBy({
       by: ["itemId"],
+      where: { companyId },
       _sum: { qty: true },
     });
 
@@ -36,18 +43,19 @@ export async function GET() {
     if (!inStock.length) return NextResponse.json([]);
 
     const items = await prisma.itemNew.findMany({
-  where: {
-    id: {
-      in: inStock.map((t: StockAggRow) => t.itemId),
-    },
-  },
-  select: {
-    id: true,
-    name: true,
-    description: true,
-    barcode: true,
-  },
-});
+      where: {
+        companyId,
+        id: {
+          in: inStock.map((t: StockAggRow) => t.itemId),
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        barcode: true,
+      },
+    });
 
 
     const stockMap = new Map<string, number>();

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -14,10 +15,16 @@ export async function GET(req: NextRequest) {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.VIEW_REPORTS
+      PERMISSIONS.VIEW_REPORTS,
+      companyId
     );
 
     if (!allowed) {
@@ -37,6 +44,7 @@ export async function GET(req: NextRequest) {
       const salesInvoices = await prisma.salesInvoice.findMany({
         where: {
           date: { gte: fromDate, lte: toDate },
+          companyId,
         },
         include: {
           customer: true,
@@ -71,7 +79,7 @@ export async function GET(req: NextRequest) {
         // Calculate cost (simplified - using average cost)
         for (const item of invoice.items) {
           const stockRates = await prisma.stockRate.findMany({
-            where: { itemId: item.itemId },
+            where: { itemId: item.itemId, companyId },
             orderBy: { createdAt: "desc" },
             take: 1,
           });
@@ -95,6 +103,7 @@ export async function GET(req: NextRequest) {
         where: {
           invoice: {
             date: { gte: fromDate, lte: toDate },
+            companyId,
           },
         },
         include: {
@@ -125,7 +134,7 @@ export async function GET(req: NextRequest) {
 
         // Get average cost
         const stockRates = await prisma.stockRate.findMany({
-          where: { itemId },
+          where: { itemId, companyId },
           orderBy: { createdAt: "desc" },
           take: 1,
         });

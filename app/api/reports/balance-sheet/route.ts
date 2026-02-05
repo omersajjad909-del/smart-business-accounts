@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 type AccountWithEntries = Prisma.AccountGetPayload<{
@@ -19,12 +20,19 @@ export async function GET(req: NextRequest) {
     const dateParam = req.nextUrl.searchParams.get("date");
     const asOn = dateParam ? new Date(dateParam + "T23:59:59.999") : new Date();
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const accounts = await prisma.account.findMany({
+      where: { companyId },
       include: {
         voucherEntries: {
           where: {
             voucher: {
               date: { lte: asOn },
+              companyId,
             },
           },
         },

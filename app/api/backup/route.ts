@@ -4,6 +4,7 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as any).prisma || new PrismaClient();
 
@@ -15,6 +16,10 @@ export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     // صرف ADMIN backup دیکھ سکتا ہے
     if (userRole !== "ADMIN") {
@@ -37,11 +42,16 @@ export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
     const allowed = await apiHasPermission(
       userId,
       userRole,
-      PERMISSIONS.CREATE_ACCOUNTS
+      PERMISSIONS.CREATE_ACCOUNTS,
+      companyId
     );
 
     if (!allowed) {
@@ -66,21 +76,26 @@ export async function POST(req: NextRequest) {
     try {
       // Export all data
       const data = {
-        accounts: await prisma.account.findMany(),
-        items: await prisma.itemNew.findMany(),
+        accounts: await prisma.account.findMany({ where: { companyId } }),
+        items: await prisma.itemNew.findMany({ where: { companyId } }),
         vouchers: await prisma.voucher.findMany({
+          where: { companyId },
           include: { entries: true },
         }),
         salesInvoices: await prisma.salesInvoice.findMany({
+          where: { companyId },
           include: { items: true },
         }),
         purchaseInvoices: await prisma.purchaseInvoice.findMany({
+          where: { companyId },
           include: { items: true },
         }),
-        bankAccounts: await prisma.bankAccount.findMany(),
-        budgets: await prisma.budget.findMany(),
-        recurringTransactions: await prisma.recurringTransaction.findMany(),
-        financialYears: await prisma.financialYear.findMany(),
+        bankAccounts: await prisma.bankAccount.findMany({ where: { companyId } }),
+        budgets: await prisma.budget.findMany({ where: { companyId } }),
+        recurringTransactions: await prisma.recurringTransaction.findMany({
+          where: { companyId },
+        }),
+        financialYears: await prisma.financialYear.findMany({ where: { companyId } }),
         timestamp: new Date().toISOString(),
       };
 
