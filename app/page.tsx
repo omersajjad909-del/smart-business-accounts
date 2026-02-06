@@ -97,7 +97,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-blue-300 flex items-center justify-center font-sans p-4">
+    <div className="min-h-screen w-full bg-blue-500 flex items-center justify-center font-sans p-4">
       <div className="w-full max-w-md bg-white border border-gray-600 shadow-lg my-8">
         <div className="flex justify-between px-6 py-3">
           <span className="font-bold text-blue-800 text-lg">US Traders</span>
