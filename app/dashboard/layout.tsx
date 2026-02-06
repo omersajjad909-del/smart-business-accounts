@@ -488,7 +488,7 @@ function SubHeader({ title, open, onClick }: SubHeaderProps) {
       className="cursor-pointer px-3 py-1 text-[var(--accent)] flex justify-between items-center hover:text-[var(--accent-strong)] transition-colors"
     >
       <span className="font-semibold tracking-wide uppercase text-[11px]">{title}</span>
-      <span className="text-[10px]">{open ? "âˆ’" : "+"}</span>
+      <span className="text-[10px]">{open ? "-" : "+"}</span>
     </div>
   );
 }
