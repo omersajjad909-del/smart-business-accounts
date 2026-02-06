@@ -15,7 +15,18 @@ export async function GET(req: NextRequest) {
 
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
-      return NextResponse.json({ error: "Company required" }, { status: 400 });
+      // Allow login screen to fetch a basic user list before company is selected
+      const publicUsers = await prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },
+        where: { active: true },
+        orderBy: { name: "asc" },
+      });
+      return NextResponse.json(publicUsers);
     }
 
     if (role === "ADMIN") {
