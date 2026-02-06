@@ -199,7 +199,7 @@ export default function LoginPage() {
                   Cancel
                 </button>
               </div>
-              {usersList.length === 0 && (
+              {/* {usersList.length === 0 && (
                 <div className="mt-4 text-[10px] text-[var(--warning)] bg-[rgba(244,194,91,0.12)] p-3 border border-[rgba(244,194,91,0.35)] rounded">
                   <p className="font-bold mb-1">No users found!</p>
                   <button
@@ -231,7 +231,7 @@ export default function LoginPage() {
                   </button>
                   <p className="mt-2 text-xs">Or run: <code>npm run seed</code></p>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
           <div className="flex justify-between px-4 py-3 text-[10px] border-t border-[var(--border)] text-[var(--text-muted)]">
