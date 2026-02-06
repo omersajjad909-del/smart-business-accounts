@@ -50,6 +50,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
+  const isAdmin = currentUser?.role?.toUpperCase() === "ADMIN";
   const [ready, setReady] = useState(false);
 
   // SIDEBAR STATES
@@ -303,7 +304,7 @@ export default function DashboardLayout({
                   {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <MenuLink href="/dashboard/reports/annual-statements">Annual Statements</MenuLink>}
                   <div className="ml-4 space-y-1 mt-2">
                     {hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <MenuLink href="/dashboard/budget">Budget Planning</MenuLink>}
-                    {hasPermission(currentUser, PERMISSIONS.RECURRING_TRANSACTIONS) && <MenuLink href="/dashboard/recurring-transactions">Recurring Transactions</MenuLink>}
+                    {(hasPermission(currentUser, PERMISSIONS.RECURRING_TRANSACTIONS) || isAdmin) && <MenuLink href="/dashboard/recurring-transactions">Recurring Transactions</MenuLink>}
                     {hasPermission(currentUser, PERMISSIONS.FINANCIAL_YEAR) && <MenuLink href="/dashboard/financial-year">Financial Year</MenuLink>}
                   </div>
                 </div>
@@ -330,7 +331,7 @@ export default function DashboardLayout({
 
 
           {/* ================= ADMIN SETTINGS ================= */}
-          {hasPermission(currentUser, PERMISSIONS.MANAGE_USERS) && (
+          {(hasPermission(currentUser, PERMISSIONS.MANAGE_USERS) || isAdmin) && (
             <div className="pt-4 mt-4 border-t border-gray-800">
               <MenuHeader title="Admin Settings" open={openAdmin} onClick={() => setopenAdmin(!openAdmin)} />
                 {openAdmin && (
@@ -339,7 +340,7 @@ export default function DashboardLayout({
                 <MenuLink href="/dashboard/approvals">✅ Approvals</MenuLink>
                 {hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <MenuLink href="/dashboard/backup-restore">💾 Backup & Restore</MenuLink>}
                 {hasPermission(currentUser, PERMISSIONS.EMAIL_SETTINGS) && <MenuLink href="/dashboard/email-settings">✉️ Email Settings</MenuLink>}
-                {hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) && <MenuLink href="/dashboard/users/logs">📋 System Logs</MenuLink>}
+                {(hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) || isAdmin) && <MenuLink href="/dashboard/users/logs">📋 System Logs</MenuLink>}
               </div>
               )}
             </div>
