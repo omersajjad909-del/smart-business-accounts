@@ -28,8 +28,14 @@ export default function ApprovalsPage() {
       headers: {
         "x-user-id": user.id,
         "x-user-role": user.role,
+        "x-company-id": user.companyId || "",
       },
     });
+    if (!res.ok) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
     const data = await res.json();
     const list = [
       ...(data.sales || []),
@@ -50,6 +56,7 @@ export default function ApprovalsPage() {
         "Content-Type": "application/json",
         "x-user-id": user.id,
         "x-user-role": user.role,
+        "x-company-id": user.companyId || "",
       },
       body: JSON.stringify({
         id,
