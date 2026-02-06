@@ -1,16 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
+import { resolveCompanyId } from "@/lib/tenant";
 
 // GET: Fetch advances
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const employeeId = searchParams.get("employeeId");
     const status = searchParams.get("status");
     const monthYear = searchParams.get("monthYear"); 
 
     const where: Any = {};
+    where.companyId = companyId;
     if (employeeId) where.employeeId = employeeId;
     if (status) where.status = status;
     
@@ -50,6 +57,11 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     console.log("📥 Payload:", body);
     
@@ -68,6 +80,7 @@ export async function POST(req: NextRequest) {
     console.log("💾 Saving to DB...");
     const advance = await prisma.advanceSalary.create({
       data: {
+        companyId,
         employeeId,
         amount: Number(amount),
         date: new Date(date),

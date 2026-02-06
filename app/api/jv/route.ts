@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
-
-
+import { resolveCompanyId } from "@/lib/tenant";
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
@@ -11,6 +10,11 @@ if (process.env.NODE_ENV === "development") {
 // GET - List all JVs
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -20,7 +24,7 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
-    const where: Any = { type: "JV" };
+    const where: Any = { type: "JV", companyId };
     if (from && to) {
       where.date = {
         gte: new Date(from + "T00:00:00"),
@@ -81,6 +85,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   try {
+    const companyId = await resolveCompanyId(req as NextRequest);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -142,7 +151,7 @@ export async function POST(req: Request) {
     }
 
     // Generate voucher number
-    const count = await prisma.voucher.count({ where: { type: "JV" } });
+    const count = await prisma.voucher.count({ where: { type: "JV", companyId } });
     const voucherNo = `JV-${count + 1}`;
 
     // Create voucher with entries in transaction
@@ -154,10 +163,12 @@ export async function POST(req: Request) {
           type: "JV",
           date: new Date(date),
           narration: narration || "Journal Entry",
+          companyId,
           entries: {
             create: entries.map((entry: Any) => ({
               accountId: entry.accountId,
               amount: Number(entry.amount), // +ve = Debit, -ve = Credit
+              companyId,
             })),
           },
         },
@@ -195,6 +206,11 @@ export async function POST(req: Request) {
 // PUT - Update JV
 export async function PUT(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -231,7 +247,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const existing = await prisma.voucher.findUnique({
-      where: { id },
+      where: { id, companyId },
       include: { entries: true },
     });
 
@@ -242,10 +258,10 @@ export async function PUT(req: NextRequest) {
     const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
 
 
-      await tx.voucherEntry.deleteMany({ where: { voucherId: id } });
+      await tx.voucherEntry.deleteMany({ where: { voucherId: id, companyId } });
 
       const voucher = await tx.voucher.update({
-        where: { id },
+        where: { id, companyId },
         data: {
           date: new Date(date),
           narration: narration || "Journal Entry",
@@ -253,6 +269,7 @@ export async function PUT(req: NextRequest) {
             create: entries.map((entry: Any) => ({
               accountId: entry.accountId,
               amount: Number(entry.amount),
+              companyId,
             })),
           },
         },
@@ -284,6 +301,11 @@ export async function PUT(req: NextRequest) {
 // DELETE - Delete JV
 export async function DELETE(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -297,7 +319,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     const existing = await prisma.voucher.findUnique({
-      where: { id },
+      where: { id, companyId },
       include: { entries: true },
     });
 
@@ -307,8 +329,8 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
 
-      await tx.voucherEntry.deleteMany({ where: { voucherId: id } });
-      await tx.voucher.delete({ where: { id } });
+      await tx.voucherEntry.deleteMany({ where: { voucherId: id, companyId } });
+      await tx.voucher.delete({ where: { id, companyId } });
     });
 
     return NextResponse.json({ success: true });

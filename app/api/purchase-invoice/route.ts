@@ -246,8 +246,8 @@ export async function POST(req: NextRequest) {
           companyId,
           entries: {
             create: [
-              { accountId: inventoryAcc.id, amount: netTotal }, // Debit Inventory (Asset)
-              { accountId: supplier.id, amount: -netTotal },    // Credit Supplier
+              { accountId: inventoryAcc.id, amount: netTotal, companyId }, // Debit Inventory (Asset)
+              { accountId: supplier.id, amount: -netTotal, companyId },    // Credit Supplier
             ],
           },
         },

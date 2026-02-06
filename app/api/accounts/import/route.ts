@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
     for (const r of rows) {
       const code = r.code?.trim();
       const name = r.name?.trim();
-      if (!code || !name) {
+      const type = r.type?.trim();
+      if (!code || !name || !type) {
         skipped += 1;
         continue;
       }
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
           code,
           name,
           partyType: r.partyType || null,
-          type: r.type || null,
+          type,
           city: r.city || null,
           phone: r.phone || null,
           openDebit: r.openDebit ? Number(r.openDebit) : 0,

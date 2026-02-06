@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
+import { resolveCompanyId } from "@/lib/tenant";
 
 // GET: Fetch attendance records
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const employeeId = searchParams.get("employeeId");
     const month = searchParams.get("month"); // YYYY-MM
@@ -20,6 +26,7 @@ export async function GET(req: NextRequest) {
 
     const attendance = await prisma.attendance.findMany({
       where: {
+        companyId,
         employeeId: employeeId || undefined,
         date: Object.keys(dateFilter).length ? dateFilter : undefined,
         status: status || undefined,
@@ -48,6 +55,11 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { employeeId, date, status, checkIn, checkOut, remarks } = body;
 
@@ -82,6 +94,7 @@ export async function POST(req: NextRequest) {
 
     const attendance = await prisma.attendance.create({
       data: {
+        companyId,
         employeeId,
         date: baseDate,
         status,

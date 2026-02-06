@@ -27,7 +27,7 @@ export async function GET(
     }
 
     const invoices = await prisma.salesInvoice.findMany({
-      where: { accountId: params.id },
+      where: { customerId: params.id },
       orderBy: { date: "desc" },
       select: {
         id: true,

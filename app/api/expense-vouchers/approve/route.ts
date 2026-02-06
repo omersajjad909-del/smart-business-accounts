@@ -59,8 +59,6 @@ export async function POST(req: NextRequest) {
       where: { id: voucherId },
       data: {
         approvalStatus: newStatus,
-        approvedAt: action === "APPROVE" ? new Date() : null,
-        remarks: remarks || null,
       },
     });
 
@@ -79,10 +77,12 @@ export async function POST(req: NextRequest) {
               {
                 accountId: voucher.expenseAccountId,
                 amount: voucher.totalAmount,
+                companyId,
               },
               {
                 accountId: voucher.paymentAccountId,
                 amount: -voucher.totalAmount,
+                companyId,
               },
             ],
           },

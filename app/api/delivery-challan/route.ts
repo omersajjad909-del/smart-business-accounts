@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { resolveCompanyId } from "@/lib/tenant";
 
 // VALIDATION SCHEMA
 const challanSchema = z.object({
@@ -22,12 +23,17 @@ const challanSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (id) {
       const challan = await prisma.deliveryChallan.findUnique({
-        where: { id },
+        where: { id, companyId },
         include: {
           customer: true,
           items: {
@@ -40,6 +46,7 @@ export async function GET(req: NextRequest) {
     }
 
     const challans = await prisma.deliveryChallan.findMany({
+      where: { companyId },
       include: {
         customer: true,
         items: true,
@@ -55,15 +62,21 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const data = challanSchema.parse(body);
 
     // Auto-generate Challan No
-    const count = await prisma.deliveryChallan.count();
+    const count = await prisma.deliveryChallan.count({ where: { companyId } });
     const challanNo = `DC-${String(count + 1).padStart(4, "0")}`;
 
     const challan = await prisma.deliveryChallan.create({
       data: {
+        companyId,
         challanNo,
         date: new Date(data.date),
         customerId: data.customerId,
@@ -101,6 +114,11 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const data = challanSchema.parse(body);
 
@@ -110,12 +128,12 @@ export async function PUT(req: NextRequest) {
     const updated = await prisma.$transaction(async (tx) => {
       // 1. Delete existing items
       await tx.deliveryChallanItem.deleteMany({
-        where: { challanId: data.id },
+        where: { challanId: data.id, challan: { companyId } },
       });
 
       // 2. Update Challan
       return await tx.deliveryChallan.update({
-        where: { id: data.id },
+        where: { id: data.id, companyId },
         data: {
           date: new Date(data.date),
           customerId: data.customerId,
@@ -154,12 +172,17 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
     await prisma.deliveryChallan.delete({
-      where: { id },
+      where: { id, companyId },
     });
 
     return NextResponse.json({ success: true });

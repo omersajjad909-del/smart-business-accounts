@@ -5,13 +5,7 @@ import toast from 'react-hot-toast';
 
 import { ResponsiveContainer, PageHeader, Card } from '@/components/ui/ResponsiveContainer';
 import { ResponsiveForm as _ResponsiveForm, FormField as _FormField, FormActions as _FormActions } from '@/components/ui/ResponsiveForm';
-import {
-  _MobileTable,
-  _MobileCard,
-  _MobileCardRow,
-  DesktopTable,
-  EmptyState,
-} from '@/components/ui/MobileTable';
+import { DesktopTable, EmptyState } from '@/components/ui/MobileTable';
 
 interface ContraEntry {
   id: string;

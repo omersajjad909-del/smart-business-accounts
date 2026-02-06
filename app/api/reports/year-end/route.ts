@@ -98,12 +98,14 @@ export async function POST(req: NextRequest) {
             ...Object.entries(incomeMap).map(([accId, amt]) => ({
               accountId: accId,
               amount: amt,
+              companyId,
             })),
 
             // CLOSE EXPENSE (CREDIT)
             ...Object.entries(expenseMap).map(([accId, amt]) => ({
               accountId: accId,
               amount: -amt,
+              companyId,
             })),
 
             // PROFIT / LOSS → CAPITAL
@@ -111,10 +113,12 @@ export async function POST(req: NextRequest) {
               ? {
                   accountId: capital.id,
                   amount: -profit, // PROFIT
+                  companyId,
                 }
               : {
                   accountId: capital.id,
                   amount: Math.abs(profit), // LOSS
+                  companyId,
                 },
           ],
         },

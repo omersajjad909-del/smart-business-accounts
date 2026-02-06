@@ -101,10 +101,12 @@ export async function POST(req: NextRequest) {
                 {
                   accountId,
                   amount: -parseFloat(amount),
+                  companyId,
                 },
                 {
                   accountId: bankAccountId || accountId,
                   amount: parseFloat(amount),
+                  companyId,
                 },
               ],
             },
@@ -136,4 +138,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-

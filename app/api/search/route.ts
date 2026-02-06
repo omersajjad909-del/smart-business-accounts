@@ -82,15 +82,12 @@ export async function GET(req: NextRequest) {
         invoiceNo: { contains: query, mode: "insensitive" },
       },
       take: 10,
-      include: {
-        customer: { select: { name: true } },
-      },
       select: {
         id: true,
         invoiceNo: true,
         date: true,
         total: true,
-        customer: true,
+        customer: { select: { name: true } },
       },
     });
 
@@ -100,15 +97,12 @@ export async function GET(req: NextRequest) {
         invoiceNo: { contains: query, mode: "insensitive" },
       },
       take: 10,
-      include: {
-        supplier: { select: { name: true } },
-      },
       select: {
         id: true,
         invoiceNo: true,
         date: true,
         total: true,
-        supplier: true,
+        supplier: { select: { name: true } },
       },
     });
 
@@ -215,4 +209,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-

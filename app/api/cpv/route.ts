@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { resolveCompanyId } from "@/lib/tenant";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -10,6 +11,11 @@ if (process.env.NODE_ENV === "development") {
 // GET - List all CPVs
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -19,7 +25,7 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
-    const where: Any = { type: "CPV" };
+    const where: Any = { type: "CPV", companyId };
     if (from && to) {
       where.date = {
         gte: new Date(from + "T00:00:00"),
@@ -65,6 +71,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   try {
+    const companyId = await resolveCompanyId(req as NextRequest);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -113,7 +124,7 @@ export async function POST(req: Request) {
     }
 
     const account = await prisma.account.findUnique({
-      where: { id: accountId },
+      where: { id: accountId, companyId },
     });
 
     if (!account || account.partyType === "CUSTOMER") {
@@ -129,14 +140,14 @@ export async function POST(req: Request) {
     if (paymentMode === "BANK") {
       // First find BankAccount record (bankAccountId is BankAccount table ID)
       bankAccountRecord = await prisma.bankAccount.findUnique({
-        where: { id: bankAccountId },
+        where: { id: bankAccountId, companyId },
         include: { account: true },
       });
 
       if (!bankAccountRecord) {
         // If not found in BankAccount, try to find in Account table
         const accountFromTable = await prisma.account.findUnique({
-          where: { id: bankAccountId },
+          where: { id: bankAccountId, companyId },
         });
 
         if (!accountFromTable || accountFromTable.partyType !== "BANKS") {
@@ -158,6 +169,7 @@ export async function POST(req: Request) {
             accountName: accountFromTable.name,
             accountId: accountFromTable.id,
             balance: accountFromTable.openDebit || 0,
+            companyId,
           },
           include: { account: true },
         });
@@ -173,7 +185,7 @@ export async function POST(req: Request) {
       }
     } else {
       paymentAccount = await prisma.account.findFirst({
-        where: { name: { equals: "Cash in hand", mode: "insensitive" } },
+        where: { name: { equals: "Cash in hand", mode: "insensitive" }, companyId },
       });
 
       if (!paymentAccount) {
@@ -184,7 +196,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const count = await prisma.voucher.count({ where: { type: "CPV" } });
+    const count = await prisma.voucher.count({ where: { type: "CPV", companyId } });
     const voucherNo = `CPV-${count + 1}`;
     const paymentAmount = Math.abs(amountNum); // Use already validated amountNum
 
@@ -205,10 +217,11 @@ export async function POST(req: Request) {
           type: "CPV",
           date: new Date(date),
           narration: narration || `${paymentMode === "BANK" ? "Bank" : "Cash"} payment`,
+          companyId,
           entries: {
             create: [
-              { accountId: account.id, amount: paymentAmount },        // Supplier/Expense DEBIT (+)
-              { accountId: paymentAccount.id, amount: -paymentAmount }, // Bank/Cash CREDIT (-)
+              { accountId: account.id, amount: paymentAmount, companyId },        // Supplier/Expense DEBIT (+)
+              { accountId: paymentAccount.id, amount: -paymentAmount, companyId }, // Bank/Cash CREDIT (-)
             ],
           },
         },
@@ -236,6 +249,7 @@ export async function POST(req: Request) {
             description: narration || `Payment to ${account.name}`,
             referenceNo: voucherNo,
             isReconciled: false,
+            companyId,
           },
         });
       }
@@ -245,7 +259,7 @@ export async function POST(req: Request) {
 
     // Fetch complete voucher with entries
     const fullVoucher = await prisma.voucher.findUnique({
-      where: { id: result.id },
+      where: { id: result.id, companyId },
       include: {
         entries: {
           include: {
@@ -303,6 +317,11 @@ export async function POST(req: Request) {
 // PUT - Update CPV
 export async function PUT(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -321,7 +340,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const existing = await prisma.voucher.findUnique({
-      where: { id },
+      where: { id, companyId },
       include: { entries: true },
     });
 
@@ -329,7 +348,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "CPV not found" }, { status: 404 });
     }
 
-    const account = await prisma.account.findUnique({ where: { id: accountId } });
+    const account = await prisma.account.findUnique({ where: { id: accountId, companyId } });
     if (!account) {
       return NextResponse.json({ error: "Account not found" }, { status: 400 });
     }
@@ -338,12 +357,12 @@ export async function PUT(req: NextRequest) {
     let bankAccountRecord = null;
     if (paymentMode === "BANK" && bankAccountId) {
       bankAccountRecord = await prisma.bankAccount.findUnique({
-        where: { id: bankAccountId },
+        where: { id: bankAccountId, companyId },
         include: { account: true },
       });
       if (!bankAccountRecord) {
         const accountFromTable = await prisma.account.findUnique({
-          where: { id: bankAccountId },
+          where: { id: bankAccountId, companyId },
         });
         if (accountFromTable && accountFromTable.partyType === "BANKS") {
           const nameParts = accountFromTable.name.split(" - ");
@@ -354,6 +373,7 @@ export async function PUT(req: NextRequest) {
               accountName: accountFromTable.name,
               accountId: accountFromTable.id,
               balance: accountFromTable.openDebit || 0,
+              companyId,
             },
             include: { account: true },
           });
@@ -362,7 +382,7 @@ export async function PUT(req: NextRequest) {
       paymentAccount = bankAccountRecord?.account;
     } else {
       paymentAccount = await prisma.account.findFirst({
-        where: { name: { equals: "Cash in hand", mode: "insensitive" } },
+        where: { name: { equals: "Cash in hand", mode: "insensitive" }, companyId },
       });
     }
 
@@ -374,17 +394,17 @@ export async function PUT(req: NextRequest) {
     const oldAmount = Math.abs(existing.entries.find((e: Any) => e.amount > 0)?.amount || 0);
 
     const result = await prisma.$transaction(async (tx: Any) => {
-      await tx.voucherEntry.deleteMany({ where: { voucherId: id } });
+      await tx.voucherEntry.deleteMany({ where: { voucherId: id, companyId } });
 
       const voucher = await tx.voucher.update({
-        where: { id },
+        where: { id, companyId },
         data: {
           date: new Date(date),
           narration: narration || `${paymentMode === "BANK" ? "Bank" : "Cash"} payment`,
           entries: {
             create: [
-              { accountId: account.id, amount: paymentAmount },
-              { accountId: paymentAccount.id, amount: -paymentAmount },
+              { accountId: account.id, amount: paymentAmount, companyId },
+              { accountId: paymentAccount.id, amount: -paymentAmount, companyId },
             ],
           },
         },
@@ -424,6 +444,11 @@ export async function PUT(req: NextRequest) {
 // DELETE - Delete CPV
 export async function DELETE(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -437,7 +462,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     const existing = await prisma.voucher.findUnique({
-      where: { id },
+      where: { id, companyId },
       include: { entries: true },
     });
 
@@ -446,8 +471,8 @@ export async function DELETE(req: NextRequest) {
     }
 
     await prisma.$transaction(async (tx: Any) => {
-      await tx.voucherEntry.deleteMany({ where: { voucherId: id } });
-      await tx.voucher.delete({ where: { id } });
+      await tx.voucherEntry.deleteMany({ where: { voucherId: id, companyId } });
+      await tx.voucher.delete({ where: { id, companyId } });
     });
 
     return NextResponse.json({ success: true });

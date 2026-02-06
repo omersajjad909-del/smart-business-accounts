@@ -199,8 +199,8 @@ export async function POST(req: NextRequest) {
           companyId,
           entries: {
             create: [
-              { accountId: "SALES_RETURN_ACC_ID", amount: total }, // Debit (Replace with real ID)
-              { accountId: customerId, amount: -total },           // Credit
+              { accountId: "SALES_RETURN_ACC_ID", amount: total, companyId }, // Debit (Replace with real ID)
+              { accountId: customerId, amount: -total, companyId },           // Credit
             ],
           },
         },

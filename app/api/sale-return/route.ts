@@ -157,8 +157,8 @@ export async function POST(req: NextRequest) {
           companyId,
           entries: {
             create: [
-              { accountId: salesReturnAcc.id, amount: total }, // Debit
-              { accountId: customerId, amount: -total },       // Credit
+              { accountId: salesReturnAcc.id, amount: total, companyId }, // Debit
+              { accountId: customerId, amount: -total, companyId },       // Credit
             ],
           },
         },
@@ -282,4 +282,3 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-
