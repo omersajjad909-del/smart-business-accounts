@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface UserType {
   id: string;
@@ -9,7 +10,6 @@ interface UserType {
   name: string;
   role: string;
 }
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -75,18 +75,15 @@ export default function LoginPage() {
       }
 
       if (res.ok && data.user) {
-        // Save user to localStorage (getCurrentUser() expects this format)
         localStorage.setItem("user", JSON.stringify(data.user));
-        console.log("✅ User saved to localStorage:", data.user);
-        
-        // Small delay to ensure localStorage is set
+        console.log("User saved to localStorage:", data.user);
         setTimeout(() => {
           router.push("/dashboard");
         }, 100);
       } else {
         const errorMsg = data.message || data.error || "Login failed. Please check your credentials.";
         setError(errorMsg);
-        console.error("❌ Login failed:", errorMsg, data);
+        console.error("Login failed:", errorMsg, data);
       }
     } catch (err: Any) {
       console.error("Login error:", err);
@@ -97,133 +94,149 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-blue-500 flex items-center justify-center font-sans p-4">
-      <div className="w-full max-w-md bg-white border border-gray-600 shadow-lg my-8">
-        <div className="flex justify-between px-6 py-3">
-          <span className="font-bold text-blue-800 text-lg">US Traders</span>
-          <span className="text-sm font-semibold">FAISALABAD</span>
-        </div>
-        <div className="border-t border-b border-blue-800 py-2 text-center font-semibold tracking-widest text-sm uppercase">
-          User Information
-        </div>
-        <div className="flex justify-center py-6 px-4">
-          <div className="bg-blue-900 text-white p-6 w-full border">
-            <p className="text-sm mb-3 font-semibold">Please Login Here...</p>
-            {error && (
-              <div className="text-[10px] bg-red-600 text-white p-1 mb-2 text-center">
-                {error}
-                <br />
-                <button
-                  onClick={async () => {
-                    try {
-                      const res = await fetch("/api/test-login");
-                      const data = await res.json();
-                      alert(JSON.stringify(data, null, 2));
-                    } catch (e) {
-                      alert("Test failed: " + e);
-                    }
-                  }}
-                  className="mt-1 text-xs underline"
-                >
-                  Check Database
-                </button>
-              </div>
-            )}
-
-            <div className="space-y-3 text-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label className="w-24 font-semibold sm:font-normal">User Name:</label>
-                <select 
-                  className="flex-1 bg-gray-300 text-black px-1 py-0.5 outline-none w-full"
-                  value={username}
-                  onChange={(e) => handleUserChange(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
-                      if (passwordInput) passwordInput.focus();
-                    }
-                  }}
-                >
-                  <option value="">-- Select User --</option>
-                  {usersList.map((u) => (
-                    <option key={u.id} value={u.email}>{u.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label className="w-24 font-semibold sm:font-normal">Password:</label>
-                <input 
-                  type="password" 
-                  className="flex-1 bg-gray-300 text-black px-1 py-0.5 outline-none w-full"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleLogin();
-                    }
-                  }}
-                />
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label className="w-24 font-semibold sm:font-normal">User Role:</label>
-                <input 
-                  type="text" 
-                  readOnly 
-                  className="flex-1 text-black px-1 py-0.5 bg-gray-300 font-bold outline-none w-full"
-                  value={selectedRole}
-                />
-              </div>
+    <div className="min-h-screen w-full bg-[var(--app-bg)] flex items-center justify-center font-[var(--font-sans)] p-4">
+      <div className="w-full max-w-md my-8">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel-bg)] shadow-[var(--shadow)] overflow-hidden">
+          <div className="px-6 py-4 flex items-center justify-between bg-[linear-gradient(120deg,_rgba(33,199,183,0.15),_rgba(15,27,53,0.6))]">
+            <div>
+              <div className="text-lg font-semibold text-[var(--text-primary)] font-[var(--font-display)]">US Traders</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Business Management</div>
             </div>
-
-            <div className="flex justify-center gap-6 mt-6">
-              <button onClick={handleLogin} disabled={loading} className="px-6 py-1 bg-gray-200 text-black border border-gray-500 text-sm active:bg-gray-400">
-                {loading ? "..." : "OK"}
-              </button>
-              <button className="px-6 py-1 bg-gray-200 text-black border border-gray-500 text-sm">Cancel</button>
-            </div>
-            {usersList.length === 0 && (
-              <div className="mt-4 text-[10px] text-yellow-600 bg-yellow-100 p-2 border border-yellow-400">
-                <p className="font-bold mb-1">⚠️ No users found!</p>
-                <button
-                  onClick={async () => {
-                    try {
-                      setLoading(true);
-                      const res = await fetch("/api/create-default-user", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ password: "us786" }),
-                      });
-                      const data = await res.json();
-                      if (res.ok) {
-                        toast.success(`✅ ${data.message}\nEmail: ${data.email}\nPassword: ${data.password}`, { duration: 6000 });
-                        // Reload users list
-                        setTimeout(() => window.location.reload(), 2000);
-                      } else {
-                        toast.error("Error: " + (data.error || "Failed to create user"));
-                      }
-                    } catch (e: Any) {
-                      toast.error("Error: " + e.message);
-                    } finally {
-                      setLoading(false);
-                    }
-                  }}
-                  disabled={loading}
-                  className="mt-2 bg-green-600 text-white px-3 py-1 rounded text-xs font-bold disabled:bg-gray-400"
-                >
-                  {loading ? "Creating..." : "Create Default Admin User"}
-                </button>
-                <p className="mt-2 text-xs">Or run: <code>npm run seed</code></p>
-              </div>
-            )}
+            <div className="text-xs font-semibold text-[var(--text-muted)]">FAISALABAD</div>
           </div>
-        </div>
-        <div className="flex justify-between px-4 py-2 text-[10px] border-t border-gray-500">
-          <span className="text-blue-700 underline">For further detail.</span>
-          <span className="text-right">US DEVELOPERS.<br />Umer Sajjad 0304-76536939</span>
+          <div className="border-t border-b border-[var(--border)] py-2 text-center font-semibold tracking-[0.35em] text-xs uppercase text-[var(--text-muted)]">
+            User Information
+          </div>
+          <div className="flex justify-center py-6 px-5">
+            <div className="bg-[var(--card-bg)] text-[var(--text-primary)] p-6 w-full border border-[var(--border)] rounded-xl">
+              <p className="text-sm mb-3 font-semibold text-[var(--text-primary)]">Please Login Here...</p>
+              {error && (
+                <div className="text-[10px] bg-[var(--danger)] text-[#0b1324] p-2 mb-3 text-center rounded">
+                  {error}
+                  <br />
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch("/api/test-login");
+                        const data = await res.json();
+                        alert(JSON.stringify(data, null, 2));
+                      } catch (e) {
+                        alert("Test failed: " + e);
+                      }
+                    }}
+                    className="mt-1 text-xs underline"
+                  >
+                    Check Database
+                  </button>
+                </div>
+              )}
+
+              <div className="space-y-3 text-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">User Name:</label>
+                  <select
+                    className="flex-1 bg-[var(--panel-bg-2)] text-[var(--text-primary)] px-2 py-1.5 outline-none w-full rounded border border-[var(--border)]"
+                    value={username}
+                    onChange={(e) => handleUserChange(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
+                        if (passwordInput) passwordInput.focus();
+                      }
+                    }}
+                  >
+                    <option value="">-- Select User --</option>
+                    {usersList.map((u) => (
+                      <option key={u.id} value={u.email}>
+                        {u.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">Password:</label>
+                  <input
+                    type="password"
+                    className="flex-1 bg-[var(--panel-bg-2)] text-[var(--text-primary)] px-2 py-1.5 outline-none w-full rounded border border-[var(--border)]"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleLogin();
+                      }
+                    }}
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">User Role:</label>
+                  <input
+                    type="text"
+                    readOnly
+                    className="flex-1 text-[var(--text-primary)] px-2 py-1.5 bg-[var(--panel-bg-2)] font-semibold outline-none w-full rounded border border-[var(--border)]"
+                    value={selectedRole}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-center gap-4 mt-6">
+                <button
+                  onClick={handleLogin}
+                  disabled={loading}
+                  className="px-6 py-2 bg-[var(--accent)] text-[#0b1324] rounded-md text-sm font-semibold hover:bg-[var(--accent-strong)] disabled:opacity-70"
+                >
+                  {loading ? "..." : "OK"}
+                </button>
+                <button className="px-6 py-2 bg-[var(--panel-bg-2)] text-[var(--text-primary)] border border-[var(--border)] rounded-md text-sm">
+                  Cancel
+                </button>
+              </div>
+              {usersList.length === 0 && (
+                <div className="mt-4 text-[10px] text-[var(--warning)] bg-[rgba(244,194,91,0.12)] p-3 border border-[rgba(244,194,91,0.35)] rounded">
+                  <p className="font-bold mb-1">No users found!</p>
+                  <button
+                    onClick={async () => {
+                      try {
+                        setLoading(true);
+                        const res = await fetch("/api/create-default-user", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ password: "us786" }),
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                          toast.success(`Created: ${data.email}`, { duration: 6000 });
+                          setTimeout(() => window.location.reload(), 2000);
+                        } else {
+                          toast.error("Error: " + (data.error || "Failed to create user"));
+                        }
+                      } catch (e: Any) {
+                        toast.error("Error: " + e.message);
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    className="mt-2 bg-[var(--success)] text-[#0b1324] px-3 py-1 rounded text-xs font-bold disabled:opacity-70"
+                  >
+                    {loading ? "Creating..." : "Create Default Admin User"}
+                  </button>
+                  <p className="mt-2 text-xs">Or run: <code>npm run seed</code></p>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between px-4 py-3 text-[10px] border-t border-[var(--border)] text-[var(--text-muted)]">
+            <span className="underline">For further detail.</span>
+            <span className="text-right">
+              US DEVELOPERS.
+              <br />
+              Umer Sajjad 0304-76536939
+            </span>
+          </div>
         </div>
       </div>
     </div>
