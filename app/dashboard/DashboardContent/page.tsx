@@ -4,6 +4,7 @@ import { useRequirePermission } from "@/lib/useRequirePermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import Link from "next/link";
 import SimpleChart from "@/components/SimpleChart";
+import { getCurrentUser } from "@/lib/auth";
 
 type ChartPoint = { label: string; value: number; color?: string };
 
@@ -31,16 +32,34 @@ export default function DashboardContent() {
 
     async function fetchStats() {
       try {
+        const user = getCurrentUser();
+        const headers: Record<string, string> = {};
+        if (user?.role) headers["x-user-role"] = user.role;
+        if (user?.id) headers["x-user-id"] = user.id;
+        if (user?.companyId) headers["x-company-id"] = user.companyId;
+
         const [statsRes, chartsRes] = await Promise.all([
-          fetch('/api/reports/dashboard-summary'),
-          fetch('/api/reports/dashboard-charts?period=month', {
-            headers: { "x-user-role": "ADMIN" }
-          })
+          fetch('/api/reports/dashboard-summary', { headers }),
+          fetch('/api/reports/dashboard-charts?period=month', { headers })
         ]);
-        const statsData = await statsRes.json();
-        const chartsData = await chartsRes.json();
-        setStats(statsData);
-        setCharts(chartsData);
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          setStats({
+            sales: Number(statsData?.sales || 0),
+            purchases: Number(statsData?.purchases || 0),
+            profit: Number(statsData?.profit || 0),
+            customers: Number(statsData?.customers || 0),
+          });
+        } else {
+          setStats({ sales: 0, purchases: 0, profit: 0, customers: 0 });
+        }
+
+        if (chartsRes.ok) {
+          const chartsData = await chartsRes.json();
+          setCharts(chartsData);
+        } else {
+          setCharts(null);
+        }
       } catch (e) {
         console.error("Dashboard Error:", e);
       } finally {
