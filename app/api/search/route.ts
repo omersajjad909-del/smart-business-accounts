@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient , Prisma} from "@prisma/client";
+﻿import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient, Prisma } from "@prisma/client";
 
 type AccountSearch = Prisma.AccountGetPayload<{
   select: {
     id: true;
     name: true;
-      code: true,  
+    code: true;
     type: true;
     partyType: true;
   };
 }>;
+
 type ItemSearch = Prisma.ItemNewGetPayload<{
   select: {
     id: true;
@@ -32,18 +33,28 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = req.headers.get("x-company-id") || "";
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const query = searchParams.get("q")?.trim();
 
     if (!query || query.length < 2) {
-      return NextResponse.json({ results: [] });
+      return NextResponse.json({
+        accounts: [],
+        items: [],
+        salesInvoices: [],
+        purchaseInvoices: [],
+        vouchers: [],
+      });
     }
 
-    const _searchTerm = `%${query}%`;
-
-    // Search Accounts
     const accounts = await prisma.account.findMany({
       where: {
+        companyId,
+        deletedAt: null,
         OR: [
           { name: { contains: query, mode: "insensitive" } },
           { code: { contains: query, mode: "insensitive" } },
@@ -59,9 +70,10 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Search Items
     const items = await prisma.itemNew.findMany({
       where: {
+        companyId,
+        deletedAt: null,
         OR: [
           { name: { contains: query, mode: "insensitive" } },
           { code: { contains: query, mode: "insensitive" } },
@@ -76,9 +88,10 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Search Sales Invoices
     const salesInvoices = await prisma.salesInvoice.findMany({
       where: {
+        companyId,
+        deletedAt: null,
         invoiceNo: { contains: query, mode: "insensitive" },
       },
       take: 10,
@@ -91,9 +104,10 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Search Purchase Invoices
     const purchaseInvoices = await prisma.purchaseInvoice.findMany({
       where: {
+        companyId,
+        deletedAt: null,
         invoiceNo: { contains: query, mode: "insensitive" },
       },
       take: 10,
@@ -106,9 +120,10 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Search Vouchers
     const vouchers = await prisma.voucher.findMany({
       where: {
+        companyId,
+        deletedAt: null,
         OR: [
           { voucherNo: { contains: query, mode: "insensitive" } },
           { narration: { contains: query, mode: "insensitive" } },
@@ -124,88 +139,84 @@ export async function GET(req: NextRequest) {
       },
     });
 
-   return NextResponse.json({
-  accounts: accounts.map((a: AccountSearch) => ({
-    type: "account",
-    id: a.id,
-    title: a.name,
-    subtitle: `${a.code} - ${a.type}${a.partyType ? ` (${a.partyType})` : ""}`,
-    url: `/dashboard/accounts`,
-  })),
+    return NextResponse.json({
+      accounts: accounts.map((a: AccountSearch) => ({
+        type: "account",
+        id: a.id,
+        title: a.name,
+        subtitle: `${a.code} - ${a.type}${a.partyType ? ` (${a.partyType})` : ""}`,
+        url: `/dashboard/accounts`,
+      })),
 
-  items: items.map((i: ItemSearch) => ({
-    type: "item",
-    id: i.id,
-    title: i.name,
-    subtitle: `${i.code} - ${i.unit}`,
-    url: `/dashboard/items-new`,
-  })),
+      items: items.map((i: ItemSearch) => ({
+        type: "item",
+        id: i.id,
+        title: i.name,
+        subtitle: `${i.code} - ${i.unit}`,
+        url: `/dashboard/items-new`,
+      })),
 
-  salesInvoices: salesInvoices.map(
-    (inv: {
-      id: string;
-      invoiceNo: string;
-      date: Date;
-      total: number;
-      customer?: { name: string } | null;
-    }) => ({
-      type: "sales-invoice",
-      id: inv.id,
-      title: inv.invoiceNo,
-      subtitle: `${inv.customer?.name || "N/A"} - ${new Date(
-        inv.date
-      ).toLocaleDateString()} - Rs. ${inv.total}`,
-      url: `/dashboard/sales-invoice?id=${inv.id}`,
-    })
-  ),
+      salesInvoices: salesInvoices.map(
+        (inv: {
+          id: string;
+          invoiceNo: string;
+          date: Date;
+          total: number;
+          customer?: { name: string } | null;
+        }) => ({
+          type: "sales-invoice",
+          id: inv.id,
+          title: inv.invoiceNo,
+          subtitle: `${inv.customer?.name || "N/A"} - ${new Date(
+            inv.date
+          ).toLocaleDateString()} - Rs. ${inv.total}`,
+          url: `/dashboard/sales-invoice?id=${inv.id}`,
+        })
+      ),
 
-  purchaseInvoices: purchaseInvoices.map(
-    (inv: {
-      id: string;
-      invoiceNo: string;
-      date: Date;
-      total: number;
-      supplier?: { name: string } | null;
-    }) => ({
-      type: "purchase-invoice",
-      id: inv.id,
-      title: inv.invoiceNo,
-      subtitle: `${inv.supplier?.name || "N/A"} - ${new Date(
-        inv.date
-      ).toLocaleDateString()} - Rs. ${inv.total}`,
-      url: `/dashboard/purchase-invoice?id=${inv.id}`,
-    })
-  ),
+      purchaseInvoices: purchaseInvoices.map(
+        (inv: {
+          id: string;
+          invoiceNo: string;
+          date: Date;
+          total: number;
+          supplier?: { name: string } | null;
+        }) => ({
+          type: "purchase-invoice",
+          id: inv.id,
+          title: inv.invoiceNo,
+          subtitle: `${inv.supplier?.name || "N/A"} - ${new Date(
+            inv.date
+          ).toLocaleDateString()} - Rs. ${inv.total}`,
+          url: `/dashboard/purchase-invoice?id=${inv.id}`,
+        })
+      ),
 
-  vouchers: vouchers.map(
-    (v: {
-      id: string;
-      voucherNo: string;
-      type: string;
-      date: Date;
-      narration?: string | null;
-    }) => ({
-      type: "voucher",
-      id: v.id,
-      title: v.voucherNo,
-      subtitle: `${v.type} - ${new Date(
-        v.date
-      ).toLocaleDateString()}${v.narration ? ` - ${v.narration}` : ""}`,
-      url:
-        v.type === "CPV"
-          ? `/dashboard/cpv`
-          : v.type === "CRV"
-          ? `/dashboard/crv`
-          : `/dashboard/jv`,
-    })
-  ),
-});
-
+      vouchers: vouchers.map(
+        (v: {
+          id: string;
+          voucherNo: string;
+          type: string;
+          date: Date;
+          narration?: string | null;
+        }) => ({
+          type: "voucher",
+          id: v.id,
+          title: v.voucherNo,
+          subtitle: `${v.type} - ${new Date(
+            v.date
+          ).toLocaleDateString()}${v.narration ? ` - ${v.narration}` : ""}`,
+          url:
+            v.type === "CPV"
+              ? `/dashboard/cpv`
+              : v.type === "CRV"
+              ? `/dashboard/crv`
+              : `/dashboard/jv`,
+        })
+      ),
+    });
   } catch (e: Any) {
-    console.error("❌ SEARCH ERROR:", e);
-    return NextResponse.json(
-      { error: e.message || "Search failed" },
-      { status: 500 }
-    );
+    console.error("SEARCH ERROR:", e);
+    return NextResponse.json({ error: e.message || "Search failed" }, { status: 500 });
   }
 }

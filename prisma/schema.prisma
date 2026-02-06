@@ -53,6 +53,8 @@ model Account {
   recurringTransactions RecurringTransaction[]
 
   createdAt DateTime @default(now())
+  deletedAt DateTime?
+  deletedBy String?
 }
 
 model ItemNew {
@@ -80,6 +82,9 @@ model ItemNew {
   inventoryTxns     InventoryTxn[]
   salesInvoiceItems SalesInvoiceItem[]
   SaleReturnItem    SaleReturnItem[]
+
+  deletedAt DateTime?
+  deletedBy String?
 }
 
 model PurchaseOrder {
@@ -140,6 +145,8 @@ model PurchaseInvoice {
   approvalRemarks String?
 
   createdAt DateTime @default(now())
+  deletedAt DateTime?
+  deletedBy String?
 }
 
 model PurchaseInvoiceItem {
@@ -167,9 +174,9 @@ model InventoryTxn {
   rate      Float
   amount    Float
   accountId String?
-  location  String  @default("MAIN") // 👈 GODOWN / LOCATION
+  location  String  @default("MAIN") // ðŸ‘ˆ GODOWN / LOCATION
 
-  // 🔥 PARTY LINK
+  // ðŸ”¥ PARTY LINK
   partyId String?
   party   Account? @relation(fields: [partyId], references: [id])
 
@@ -205,6 +212,8 @@ model SalesInvoice {
   approvalRemarks String?
 
   createdAt DateTime           @default(now())
+  deletedAt DateTime?
+  deletedBy String?
 }
 
 model SalesInvoiceItem {
@@ -230,9 +239,12 @@ model Voucher {
   narration String?
   createdAt DateTime @default(now())
 
-  entries         VoucherEntry[] // 🔥 THIS IS REQUIRED
+  entries         VoucherEntry[] // ðŸ”¥ THIS IS REQUIRED
   paymentReceipts PaymentReceipt[]
   expenseVouchers ExpenseVoucher[]
+
+  deletedAt DateTime?
+  deletedBy String?
 }
 
 model VoucherEntry {
@@ -270,7 +282,7 @@ model SaleReturn {
   returnNo String
   date     DateTime
 
-  invoiceId String? // 👈 OPTIONAL
+  invoiceId String? // ðŸ‘ˆ OPTIONAL
   invoice   SalesInvoice? @relation("InvoiceReturns", fields: [invoiceId], references: [id])
 
   customerId String
@@ -295,7 +307,7 @@ model SaleReturnItem {
 }
 
 model Outward {
-  id         String        @id @default(uuid()) // اسے String ہی رکھیں
+  id         String        @id @default(uuid()) // Ø§Ø³Û’ String ÛÛŒ Ø±Ú©Ú¾ÛŒÚº
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -312,7 +324,7 @@ model Outward {
 
 model OutwardItem {
   id        String @id @default(uuid())
-  outwardId String // صرف یہ ایک لائن ہونی چاہیے
+  outwardId String // ØµØ±Ù ÛŒÛ Ø§ÛŒÚ© Ù„Ø§Ø¦Ù† ÛÙˆÙ†ÛŒ Ú†Ø§ÛÛŒÛ’
   itemId    String
   qty       Int
   rate      Float?
@@ -362,6 +374,7 @@ model Company {
   activityLogs          ActivityLog[]
   rolePermissions       RolePermission[]
   userPermissions       UserPermission[]
+  backupSchedules       BackupSchedule[]
 }
 
 model UserCompany {
@@ -449,6 +462,8 @@ model BankAccount {
   statements      BankStatement[]
   reconciliations BankReconciliation[]
   createdAt       DateTime             @default(now())
+  deletedAt       DateTime?
+  deletedBy       String?
 }
 
 model BankStatement {
@@ -500,6 +515,8 @@ model PaymentReceipt {
   voucherId   String?
   voucher     Voucher? @relation(fields: [voucherId], references: [id])
   createdAt   DateTime @default(now())
+  deletedAt   DateTime?
+  deletedBy   String?
 }
 
 model ExpenseVoucher {
@@ -522,6 +539,8 @@ model ExpenseVoucher {
   attachments      ExpenseAttachment[]
   approvals        ExpenseApproval[]
   createdAt        DateTime            @default(now())
+  deletedAt        DateTime?
+  deletedBy        String?
 }
 
 model ExpenseItem {
@@ -665,6 +684,24 @@ model SystemBackup {
   createdBy   String?
 
   @@index([createdAt, status])
+}
+
+model BackupSchedule {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+
+  frequency   String   // DAILY | WEEKLY | MONTHLY
+  timeOfDay   String   // HH:mm
+  dayOfWeek   Int?     // 0-6 (Sun-Sat)
+  dayOfMonth  Int?     // 1-31
+  isActive    Boolean  @default(true)
+  lastRunAt   DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId])
 }
 
 // ================= FEATURE 4: MULTI-CURRENCY SUPPORT =================
@@ -813,6 +850,9 @@ model AdvanceSalary {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  deletedAt DateTime?
+  deletedBy String?
+
   @@index([employeeId, status])
   @@index([monthYear])
 }
@@ -848,6 +888,9 @@ model Contact {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  deletedAt DateTime?
+  deletedBy String?
 
   interactions Interaction[]
   opportunities Opportunity[]
