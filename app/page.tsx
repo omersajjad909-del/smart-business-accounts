@@ -95,9 +95,13 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full bg-[var(--app-bg)] flex items-center justify-center font-[var(--font-sans)] p-4">
-      <div className="w-full max-w-md my-8">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-32 right-10 h-72 w-72 rounded-full bg-[radial-gradient(circle,_rgba(33,199,183,0.25)_0%,_rgba(33,199,183,0)_65%)]" />
+        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0.08)_0%,_rgba(255,255,255,0)_70%)]" />
+      </div>
+      <div className="w-full max-w-md my-8 relative">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel-bg)] shadow-[var(--shadow)] overflow-hidden">
-          <div className="px-6 py-4 flex items-center justify-between bg-[linear-gradient(120deg,_rgba(33,199,183,0.15),_rgba(15,27,53,0.6))]">
+          <div className="px-6 py-4 flex items-center justify-between bg-[linear-gradient(120deg,_rgba(33,199,183,0.18),_rgba(15,27,53,0.7))]">
             <div>
               <div className="text-lg font-semibold text-[var(--text-primary)] font-[var(--font-display)]">US Traders</div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Business Management</div>
@@ -109,7 +113,8 @@ export default function LoginPage() {
           </div>
           <div className="flex justify-center py-6 px-5">
             <div className="bg-[var(--card-bg)] text-[var(--text-primary)] p-6 w-full border border-[var(--border)] rounded-xl">
-              <p className="text-sm mb-3 font-semibold text-[var(--text-primary)]">Please Login Here...</p>
+              <p className="text-sm mb-1 font-semibold text-[var(--text-primary)]">Please Login Here...</p>
+              <p className="text-[11px] text-[var(--text-muted)] mb-4">Secure access for authorized users only.</p>
               {error && (
                 <div className="text-[10px] bg-[var(--danger)] text-[#0b1324] p-2 mb-3 text-center rounded">
                   {error}
