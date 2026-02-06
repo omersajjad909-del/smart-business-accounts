@@ -1,33 +1,30 @@
-import { NextResponse, NextRequest } from "next/server";
+﻿import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
+import { logActivity } from "@/lib/audit";
 
-// Prisma singleton
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
   (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
-/* ================= CATEGORY TO TYPE MAPPING ================= */
-
 const CATEGORY_TYPE_MAP: Record<string, string> = {
-  "CUSTOMER": "ASSET",
-  "SUPPLIER": "LIABILITY",
-  "BANKS": "ASSET",
-  "CASH": "ASSET",
+  CUSTOMER: "ASSET",
+  SUPPLIER: "LIABILITY",
+  BANKS: "ASSET",
+  CASH: "ASSET",
   "FIXED ASSETS": "ASSET",
   "ACCUMULATED DEPRECIATION": "CONTRA_ASSET",
-  "EXPENSE": "EXPENSE",
-  "INCOME": "INCOME",
-  "EQUITY": "EQUITY",
-  "LIABILITIES": "LIABILITY",
-  "STOCK": "ASSET",
-  "GENERAL": "ASSET",
-  "CONTRA": "CONTRA_ASSET",
+  EXPENSE: "EXPENSE",
+  INCOME: "INCOME",
+  EQUITY: "EQUITY",
+  LIABILITIES: "LIABILITY",
+  STOCK: "ASSET",
+  GENERAL: "ASSET",
+  CONTRA: "CONTRA_ASSET",
 };
 
-/* ================= GET ================= */
 export async function GET(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   const { searchParams } = new URL(req.url);
@@ -43,30 +40,26 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Company required" }, { status: 400 });
   }
 
-  // اگر ریکوئسٹ میں Prefix ہے تو صرف اگلا کوڈ بھیجیں (Auto-Code Logic)
-  // Back-end (route.ts) کے اندر GET میں تبدیلی:
-if (prefix) {
-  const lastAccount = await prisma.account.findFirst({
-    where: { code: { startsWith: prefix }, companyId },
-    orderBy: { code: "desc" },
-  });
+  if (prefix) {
+    const lastAccount = await prisma.account.findFirst({
+      where: { code: { startsWith: prefix }, companyId, deletedAt: null },
+      orderBy: { code: "desc" },
+    });
 
-  let nextNumber = 1;
-  if (lastAccount) {
-    // یہ ریجیکس (Regex) کوڈ کے آخر سے نمبر نکال لے گا چاہے بیچ میں ڈیش ہو یا نہ ہو
-    const match = lastAccount.code.match(/\d+$/);
-    if (match) {
-      nextNumber = parseInt(match[0]) + 1;
+    let nextNumber = 1;
+    if (lastAccount) {
+      const match = lastAccount.code.match(/\d+$/);
+      if (match) {
+        nextNumber = parseInt(match[0]) + 1;
+      }
     }
+
+    const nextCode = `${prefix}-${String(nextNumber).padStart(3, "0")}`;
+    return NextResponse.json({ nextCode });
   }
 
-  const nextCode = `${prefix}-${String(nextNumber).padStart(3, "0")}`;
-  return NextResponse.json({ nextCode });
-}
-
-  // ورنہ تمام اکاؤنٹس کی لسٹ بھیجیں
   const accounts = await prisma.account.findMany({
-    where: { companyId },
+    where: { companyId, deletedAt: null },
     orderBy: { name: "asc" },
   });
 
@@ -109,11 +102,11 @@ if (prefix) {
   return NextResponse.json(accounts);
 }
 
-/* ================= POST ================= */
 export async function POST(req: NextRequest) {
   try {
     const rawRole = req.headers.get("x-user-role");
     const role = rawRole?.toUpperCase();
+    const userId = req.headers.get("x-user-id");
 
     if (role !== "ADMIN") {
       return NextResponse.json({ error: "Only ADMIN can create accounts" }, { status: 403 });
@@ -126,16 +119,25 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    // Standard Cleanup Logic
     if (body && body.cleanupStandard === true) {
-      const removableCodes = ["BANK002", "AP001", "EXP001", "TAX001"]; // وغیرہ
-      const result = await prisma.account.deleteMany({
+      const removableCodes = ["BANK002", "AP001", "EXP001", "TAX001"];
+      const result = await prisma.account.updateMany({
         where: {
           code: { in: removableCodes },
           companyId,
           voucherEntries: { none: {} },
           salesInvoices: { none: {} },
         },
+        data: {
+          deletedAt: new Date(),
+          deletedBy: userId || null,
+        },
+      });
+      await logActivity(prisma, {
+        companyId,
+        userId,
+        action: "ACCOUNTS_CLEANUP",
+        details: `Soft-deleted ${result.count} accounts`,
       });
       return NextResponse.json({ cleaned: result.count });
     }
@@ -163,7 +165,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Bank Account creation logic
     if (body.partyType === "BANKS") {
       const nameParts = account.name.split(" - ");
       await prisma.bankAccount.create({
@@ -178,18 +179,25 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    await logActivity(prisma, {
+      companyId,
+      userId,
+      action: "ACCOUNT_CREATED",
+      details: `Created account ${account.code} - ${account.name}`,
+    });
+
     return NextResponse.json(account);
   } catch (e) {
-    console.error("❌ ACCOUNT CREATE ERROR:", e);
+    console.error("ACCOUNT CREATE ERROR:", e);
     return NextResponse.json({ error: "Failed to create account" }, { status: 500 });
   }
 }
 
-/* ================= PUT (EDIT) ================= */
 export async function PUT(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role")?.toUpperCase();
     if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const userId = req.headers.get("x-user-id");
 
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
@@ -222,17 +230,25 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
     const updatedAccount = await prisma.account.findUnique({ where: { id } });
+
+    await logActivity(prisma, {
+      companyId,
+      userId,
+      action: "ACCOUNT_UPDATED",
+      details: `Updated account ${id}`,
+    });
+
     return NextResponse.json(updatedAccount);
   } catch (_e) {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }
 
-/* ================= DELETE ================= */
 export async function DELETE(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role")?.toUpperCase();
     if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const userId = req.headers.get("x-user-id");
 
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
@@ -244,7 +260,21 @@ export async function DELETE(req: NextRequest) {
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
-    await prisma.account.deleteMany({ where: { id: id, companyId } });
+    await prisma.account.updateMany({
+      where: { id: id, companyId },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: userId || null,
+      },
+    });
+
+    await logActivity(prisma, {
+      companyId,
+      userId,
+      action: "ACCOUNT_DELETED",
+      details: `Soft-deleted account ${id}`,
+    });
+
     return NextResponse.json({ message: "Deleted" });
   } catch (_e) {
     return NextResponse.json({ error: "Cannot delete. Account in use." }, { status: 500 });
