@@ -27,15 +27,17 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
     <div className="mb-6 sm:mb-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] font-[var(--font-display)]">
+            {title}
+          </h1>
           {description && (
-            <p className="mt-1 text-sm sm:text-base text-gray-600">{description}</p>
+            <p className="mt-1 text-sm sm:text-base text-[var(--text-muted)]">{description}</p>
           )}
         </div>
         {action && (
           <button
             onClick={action.onClick}
-            className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full sm:w-auto px-4 py-2 bg-[var(--accent)] text-[#0b1324] rounded-lg hover:bg-[var(--accent-strong)] transition-colors"
           >
             {action.label}
           </button>
@@ -52,7 +54,7 @@ interface CardProps {
 
 export function Card({ children, className = '' }: CardProps) {
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 ${className}`}>
+    <div className={`bg-[var(--card-bg)] rounded-lg shadow-[var(--shadow)] border border-[var(--border)] p-4 sm:p-6 ${className}`}>
       {children}
     </div>
   );

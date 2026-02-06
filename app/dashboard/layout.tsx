@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
@@ -147,17 +147,17 @@ export default function DashboardLayout({
 
   if (!ready) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 font-sans">
-        <div className="animate-pulse text-gray-500">Loading session...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--app-bg)] font-[var(--font-sans)]">
+        <div className="animate-pulse text-[var(--text-muted)]">Loading session...</div>
       </div>
     );
   }
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <div className="text-red-500 font-bold text-lg">Session expired.</div>
-        <button onClick={logout} className="mt-4 text-blue-600 underline">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--app-bg)]">
+        <div className="text-[var(--danger)] font-bold text-lg">Session expired.</div>
+        <button onClick={logout} className="mt-4 text-[var(--accent)] underline">
           Back to Login
         </button>
       </div>
@@ -165,7 +165,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100 text-sm font-sans relative">
+    <div className="flex min-h-screen bg-[var(--app-bg)] text-sm font-[var(--font-sans)] text-[var(--text-primary)] relative">
       
       {/* MOBILE OVERLAY */}
       {isMobileMenuOpen && (
@@ -177,17 +177,17 @@ export default function DashboardLayout({
 
       <aside className={`
         fixed md:static inset-y-0 left-0 z-30
-        w-64 bg-black text-gray-200 flex flex-col
+        w-64 bg-[var(--panel-bg)] text-[var(--text-muted)] flex flex-col border-r border-[var(--border)]
         transform transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}>
 
         {/* ---- HEADER ---- */}
-        <div className="px-4 py-3 border-b border-gray-700">
-          <div className="font-semibold text-white uppercase tracking-wider">
+        <div className="px-4 py-3 border-b border-[var(--border)]">
+          <div className="font-semibold text-[var(--text-primary)] uppercase tracking-wider font-[var(--font-display)]">
             US Traders 
           </div>
-          <div className="text-[10px] text-gray-400">
+          <div className="text-[10px] text-[var(--text-muted)]">
             Business Management System
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function DashboardLayout({
           <MenuHeader title="Forms" open={openForms} onClick={() => setOpenForms(!openForms)} />
 
           {openForms && (
-            <div className="ml-2 space-y-2 border-l border-gray-800">
+            <div className="ml-2 space-y-2 border-l border-[var(--border)]">
 
               {/* PHASE 1 */}
               {hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
@@ -210,7 +210,7 @@ export default function DashboardLayout({
                       {hasPermission(currentUser, PERMISSIONS.PAYMENT_RECEIPTS) && <MenuLink href="/dashboard/payment-receipts">Payment Receipts</MenuLink>}
                       {hasPermission(currentUser, PERMISSIONS.EXPENSE_VOUCHERS) && <MenuLink href="/dashboard/expense-vouchers">Expense Vouchers</MenuLink>}
                       {hasPermission(currentUser, PERMISSIONS.TAX_CONFIGURATION) && <MenuLink href="/dashboard/tax-configuration">Tax Configuration</MenuLink>}
-                      <MenuLink href="/dashboard/phase1-guide">📖 Complete Guide</MenuLink>
+                      <MenuLink href="/dashboard/phase1-guide">ðŸ“– Complete Guide</MenuLink>
                     </div>
                   )}
                 </>
@@ -238,13 +238,13 @@ export default function DashboardLayout({
               />
               {openAccounting && (
                 <div className="ml-4 space-y-1">
-                  <MenuLink href="/dashboard/contra">💱 Contra Entry</MenuLink>
-                  <MenuLink href="/dashboard/advance-payment">💰 Advance Payment</MenuLink>
-                  <MenuLink href="/dashboard/petty-cash">💵 Petty Cash</MenuLink>
-                  <MenuLink href="/dashboard/credit-note">📝 Credit Notes</MenuLink>
-                  <MenuLink href="/dashboard/debit-note">📋 Debit Notes</MenuLink>
-                  <MenuLink href="/dashboard/fixed-assets">🏢 Fixed Assets</MenuLink>
-                  <MenuLink href="/dashboard/loans">🏦 Loans</MenuLink>
+                  <MenuLink href="/dashboard/contra">ðŸ’± Contra Entry</MenuLink>
+                  <MenuLink href="/dashboard/advance-payment">ðŸ’° Advance Payment</MenuLink>
+                  <MenuLink href="/dashboard/petty-cash">ðŸ’µ Petty Cash</MenuLink>
+                  <MenuLink href="/dashboard/credit-note">ðŸ“ Credit Notes</MenuLink>
+                  <MenuLink href="/dashboard/debit-note">ðŸ“‹ Debit Notes</MenuLink>
+                  <MenuLink href="/dashboard/fixed-assets">ðŸ¢ Fixed Assets</MenuLink>
+                  <MenuLink href="/dashboard/loans">ðŸ¦ Loans</MenuLink>
                 </div>
               )}
 
@@ -287,7 +287,7 @@ export default function DashboardLayout({
           {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (    
           <MenuHeader title="Reports" open={openReports} onClick={() => setOpenReports(!openReports)} />)}
           {openReports && (
-            <div className="ml-2 space-y-2 border-l border-gray-800">
+            <div className="ml-2 space-y-2 border-l border-[var(--border)]">
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && (
                 <SubHeader title="Financial Reports" open={openFinReports} onClick={() => setOpenFinReports(!openFinReports)} />
               )}
@@ -332,15 +332,15 @@ export default function DashboardLayout({
 
           {/* ================= ADMIN SETTINGS ================= */}
           {(hasPermission(currentUser, PERMISSIONS.MANAGE_USERS) || isAdmin) && (
-            <div className="pt-4 mt-4 border-t border-gray-800">
+            <div className="pt-4 mt-4 border-t border-[var(--border)]">
               <MenuHeader title="Admin Settings" open={openAdmin} onClick={() => setopenAdmin(!openAdmin)} />
                 {openAdmin && (
-              <div className="ml-2 mt-2 space-y-1 border-l border-gray-800">
-                <MenuLink href="/dashboard/users">👥 Users & Permissions</MenuLink>
-                <MenuLink href="/dashboard/approvals">✅ Approvals</MenuLink>
-                {hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <MenuLink href="/dashboard/backup-restore">💾 Backup & Restore</MenuLink>}
-                {hasPermission(currentUser, PERMISSIONS.EMAIL_SETTINGS) && <MenuLink href="/dashboard/email-settings">✉️ Email Settings</MenuLink>}
-                {(hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) || isAdmin) && <MenuLink href="/dashboard/users/logs">📋 System Logs</MenuLink>}
+              <div className="ml-2 mt-2 space-y-1 border-l border-[var(--border)]">
+                <MenuLink href="/dashboard/users">ðŸ‘¥ Users & Permissions</MenuLink>
+                <MenuLink href="/dashboard/approvals">âœ… Approvals</MenuLink>
+                {hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <MenuLink href="/dashboard/backup-restore">ðŸ’¾ Backup & Restore</MenuLink>}
+                {hasPermission(currentUser, PERMISSIONS.EMAIL_SETTINGS) && <MenuLink href="/dashboard/email-settings">âœ‰ï¸ Email Settings</MenuLink>}
+                {(hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) || isAdmin) && <MenuLink href="/dashboard/users/logs">ðŸ“‹ System Logs</MenuLink>}
               </div>
               )}
             </div>
@@ -351,11 +351,11 @@ export default function DashboardLayout({
             <>
               <SubHeader title="HR & Payroll" open={openHR} onClick={() => setOpenHR(!openHR)} />
               {openHR && (
-                <div className="ml-4 space-y-1 border-l border-gray-800 pl-2">
-                  <MenuLink href="/dashboard/employees">👥 Employees</MenuLink>
-                  <MenuLink href="/dashboard/attendance">📋 Attendance</MenuLink>
-                  <MenuLink href="/dashboard/advance">💸 Advance Salary</MenuLink>
-                  <MenuLink href="/dashboard/payroll">💰 Payroll</MenuLink>
+                <div className="ml-4 space-y-1 border-l border-[var(--border)] pl-2">
+                  <MenuLink href="/dashboard/employees">ðŸ‘¥ Employees</MenuLink>
+                  <MenuLink href="/dashboard/attendance">ðŸ“‹ Attendance</MenuLink>
+                  <MenuLink href="/dashboard/advance">ðŸ’¸ Advance Salary</MenuLink>
+                  <MenuLink href="/dashboard/payroll">ðŸ’° Payroll</MenuLink>
                 </div>
               )}
             </>
@@ -366,10 +366,10 @@ export default function DashboardLayout({
             <>
               <SubHeader title="CRM & Sales" open={openCRM} onClick={() => setOpenCRM(!openCRM)} />
               {openCRM && (
-                <div className="ml-4 space-y-1 border-l border-gray-800 pl-2">
-                  <MenuLink href="/dashboard/crm/contacts">📇 Contacts</MenuLink>
-                  <MenuLink href="/dashboard/crm/opportunities">💼 Opportunities</MenuLink>
-                  <MenuLink href="/dashboard/crm/interactions">📞 Interactions</MenuLink>
+                <div className="ml-4 space-y-1 border-l border-[var(--border)] pl-2">
+                  <MenuLink href="/dashboard/crm/contacts">ðŸ“‡ Contacts</MenuLink>
+                  <MenuLink href="/dashboard/crm/opportunities">ðŸ’¼ Opportunities</MenuLink>
+                  <MenuLink href="/dashboard/crm/interactions">ðŸ“ž Interactions</MenuLink>
                 </div>
               )}
             </>
@@ -380,8 +380,8 @@ export default function DashboardLayout({
             <>
               <SubHeader title="Settings" open={openCurrency} onClick={() => setOpenCurrency(!openCurrency)} />
               {openCurrency && (
-                <div className="ml-4 space-y-1 border-l border-gray-800 pl-2">
-                  <MenuLink href="/dashboard/currencies">💱 Currencies</MenuLink>
+                <div className="ml-4 space-y-1 border-l border-[var(--border)] pl-2">
+                  <MenuLink href="/dashboard/currencies">ðŸ’± Currencies</MenuLink>
                 </div>
               )}
             </>
@@ -389,22 +389,22 @@ export default function DashboardLayout({
         </nav>
 
 
-        <div className="p-3 border-t border-gray-700 bg-gray-950">
-          <div className="px-3 py-1 mb-2 text-[10px] text-gray-500 truncate">
+        <div className="p-3 border-t border-[var(--border)] bg-[var(--panel-bg-2)]">
+          <div className="px-3 py-1 mb-2 text-[10px] text-[var(--text-muted)] truncate">
             Logged as: {currentUser.email}
           </div>
-          <button onClick={logout} className="w-full text-left px-3 py-2 text-red-400 hover:bg-red-900/20 rounded">
+          <button onClick={logout} className="w-full text-left px-3 py-2 text-[var(--danger)] hover:bg-[var(--card-bg)] rounded">
             Logout
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col bg-white overflow-hidden min-h-screen">
-        <div className="bg-gray-50 border-b px-4 md:px-6 py-3 flex items-center gap-4 print:hidden">
+      <main className="flex-1 flex flex-col bg-[var(--surface)] overflow-hidden min-h-screen min-w-0">
+        <div className="bg-[var(--panel-bg-2)] border-b border-[var(--border)] px-4 md:px-6 py-3 flex items-center gap-4 print:hidden">
           
           {/* HAMBURGER BUTTON */}
           <button
-            className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg mr-2"
+            className="md:hidden p-2 text-[var(--text-muted)] hover:bg-[var(--card-bg)] rounded-lg mr-2"
             onClick={() => setIsMobileMenuOpen(true)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -412,13 +412,13 @@ export default function DashboardLayout({
             </svg>
           </button>
 
-          <Suspense fallback={<div className="w-full max-w-md h-10 bg-gray-200 animate-pulse rounded" />}>
+          <Suspense fallback={<div className="w-full max-w-md h-10 bg-[var(--card-bg-2)] animate-pulse rounded" />}>
             <GlobalSearch />
           </Suspense>
           {currentUser?.companies && currentUser.companies.length > 0 && (
             <div className="ml-2 flex items-center gap-2">
               <select
-                className="border rounded px-2 py-1 text-xs bg-white"
+                className="border border-[var(--border)] rounded px-2 py-1 text-xs bg-[var(--panel-bg)] text-[var(--text-primary)]"
                 value={currentUser.companyId || ""}
                 onChange={async (e) => {
                   const nextCompanyId = e.target.value;
@@ -454,14 +454,16 @@ export default function DashboardLayout({
                   </option>
                 ))}
               </select>
-              <span className="text-[10px] text-gray-500">Default</span>
+              <span className="text-[10px] text-[var(--text-muted)]">Default</span>
             </div>
           )}
-          <div className="ml-auto text-sm text-gray-600">
+          <div className="ml-auto text-sm text-[var(--text-muted)]">
             {currentUser.name || currentUser.email}
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">{children}</div>
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+          <div className="w-full max-w-7xl mx-auto">{children}</div>
+        </div>
       </main>
     </div>
   );
@@ -471,10 +473,10 @@ function MenuHeader({ title, open, onClick }: MenuHeaderProps) {
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer px-3 py-2 bg-gray-900 text-gray-100 font-medium rounded flex justify-between items-center hover:bg-gray-800 transition-all"
+      className="cursor-pointer px-3 py-2 bg-[var(--panel-bg-2)] text-[var(--text-primary)] font-medium rounded flex justify-between items-center hover:bg-[var(--card-bg)] transition-all"
     >
       <span>{title}</span>
-      <span className="text-gray-500 text-xs">{open ? "▼" : "▶"}</span>
+      <span className="text-[var(--text-muted)] text-xs">{open ? "â–¼" : "â–¶"}</span>
     </div>
   );
 }
@@ -483,10 +485,10 @@ function SubHeader({ title, open, onClick }: SubHeaderProps) {
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer px-3 py-1 text-yellow-500/80 flex justify-between items-center hover:text-yellow-500 transition-colors"
+      className="cursor-pointer px-3 py-1 text-[var(--accent)] flex justify-between items-center hover:text-[var(--accent-strong)] transition-colors"
     >
       <span className="font-semibold tracking-wide uppercase text-[11px]">{title}</span>
-      <span className="text-[10px]">{open ? "−" : "+"}</span>
+      <span className="text-[10px]">{open ? "âˆ’" : "+"}</span>
     </div>
   );
 }
@@ -495,7 +497,7 @@ function MenuLink({ href, children }: MenuLinkProps) {
   return (
     <Link
       href={href}
-      className="block px-3 py-1.5 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded transition-all text-[13px]"
+      className="block px-3 py-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--card-bg)] rounded transition-all text-[13px]"
     >
       {children}
     </Link>
