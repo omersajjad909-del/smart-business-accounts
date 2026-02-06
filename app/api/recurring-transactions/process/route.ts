@@ -121,12 +121,14 @@ async function createCPV(transaction: Any) {
       entries: {
         create: [
           {
-            accountId: transaction.accountId,
             amount: -transaction.amount,
+            account: { connect: { id: transaction.accountId } },
+            company: { connect: { id: transaction.companyId } },
           },
           {
-            accountId: metadata.paymentAccountId || transaction.accountId,
             amount: transaction.amount,
+            account: { connect: { id: metadata.paymentAccountId || transaction.accountId } },
+            company: { connect: { id: transaction.companyId } },
           },
         ],
       },
@@ -154,12 +156,14 @@ async function createCRV(transaction: Any) {
       entries: {
         create: [
           {
-            accountId: transaction.accountId,
             amount: transaction.amount,
+            account: { connect: { id: transaction.accountId } },
+            company: { connect: { id: transaction.companyId } },
           },
           {
-            accountId: metadata.receiptAccountId || transaction.accountId,
             amount: -transaction.amount,
+            account: { connect: { id: metadata.receiptAccountId || transaction.accountId } },
+            company: { connect: { id: transaction.companyId } },
           },
         ],
       },
@@ -176,15 +180,17 @@ async function createExpense(transaction: Any) {
     data: {
       voucherNo: `EXP-${Date.now()}`,
       date: new Date(),
-      companyId: transaction.companyId,
-      accountId: transaction.accountId,
-      paymentAccountId: metadata.paymentAccountId || transaction.accountId,
+      description: transaction.description,
+      company: { connect: { id: transaction.companyId } },
+      expenseAccount: { connect: { id: transaction.accountId } },
+      paymentAccount: { connect: { id: metadata.paymentAccountId || transaction.accountId } },
       totalAmount: transaction.amount,
       items: {
         create: [
           {
             description: transaction.description,
             amount: transaction.amount,
+            category: metadata.category || "OTHER",
           },
         ],
       },

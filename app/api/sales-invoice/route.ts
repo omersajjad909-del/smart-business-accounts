@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
         customer: inv.customer,
         driverName: inv.driverName,
         vehicleNo: inv.vehicleNo,
-        location: inv.location
+        // location removed (not on SalesInvoice)
       });
     }
 

@@ -218,7 +218,12 @@ export default function SalesReturnPage() {
   const netTotal = total + (Number(freight) || 0);
 
   async function saveReturn() {
-    const clean = rows.filter(r => r.itemId && Number(r.qty) > 0);
+    const clean = rows
+      .filter(r => r.itemId && Number(r.qty) > 0)
+      .map(r => ({
+        ...r,
+        qty: Number(r.qty),
+      }));
     if (!invoiceId || !clean.length) return alert("Select items to return");
 
     const method = editing ? "PUT" : "POST";
@@ -264,7 +269,7 @@ export default function SalesReturnPage() {
     setRows(ret.items.map((it) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
-      qty: it.qty.toString(),
+      qty: it.qty,
       rate: it.rate,
       maxQty: it.qty,
     })));
@@ -466,12 +471,12 @@ export default function SalesReturnPage() {
               <div className="print-voucher bg-white p-10 border shadow-sm mx-auto">
                 <div className="text-center mb-8 border-b-2 border-black pb-4">
                   <h1 className="text-3xl font-black uppercase">Sales Return Voucher</h1>
-                  <p className="text-sm">Date: {savedData.date} | Voucher No: {savedData.returnNo}</p>
+                  <p className="text-sm">Date: {savedData?.date} | Voucher No: {savedData?.returnNo}</p>
                 </div>
 
                 <div className="mb-6 grid grid-cols-1 md:grid-cols-2">
-                  <p><strong>Customer:</strong> {savedData.customerName}</p>
-                  <p className="text-right"><strong>Ref Invoice:</strong> {savedData.invoiceNo}</p>
+                  <p><strong>Customer:</strong> {savedData?.customerName}</p>
+                  <p className="text-right"><strong>Ref Invoice:</strong> {savedData?.invoiceNo}</p>
                 </div>
 
                 <table className="w-full border-collapse border border-black text-sm">
@@ -484,7 +489,7 @@ export default function SalesReturnPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {savedData.items.map((it, idx) => (
+                    {savedData?.items.map((it, idx) => (
                       <tr key={idx}>
                         <td className="border border-black p-2">{it.name}</td>
                         <td className="border border-black p-2 text-center">{it.qty}</td>
@@ -496,9 +501,9 @@ export default function SalesReturnPage() {
                 </table>
 
                 <div className="mt-6 flex flex-col items-end font-bold space-y-1">
-                  <p>Subtotal: {savedData.total.toLocaleString()}</p>
-                  <p>Freight: {savedData.freight.toLocaleString()}</p>
-                  <p className="text-xl border-t-2 border-black pt-2">Net Total: {savedData.netTotal.toLocaleString()}</p>
+                  <p>Subtotal: {savedData?.total.toLocaleString()}</p>
+                  <p>Freight: {savedData?.freight.toLocaleString()}</p>
+                  <p className="text-xl border-t-2 border-black pt-2">Net Total: {savedData?.netTotal.toLocaleString()}</p>
                 </div>
               </div>
             </div>

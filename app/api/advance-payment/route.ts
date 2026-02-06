@@ -1,9 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveCompanyId } from "@/lib/tenant";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(request);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const advances = await prisma.advancePayment.findMany({
+      where: { companyId },
       include: {
         supplier: {
           select: {
@@ -32,8 +39,13 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(request);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await request.json();
     const { advanceNo, date, amount, supplierId, narration } = body;
 
@@ -59,6 +71,7 @@ export async function POST(request: Request) {
 
     const advance = await prisma.advancePayment.create({
       data: {
+        companyId,
         advanceNo,
         date: new Date(date),
         amount,

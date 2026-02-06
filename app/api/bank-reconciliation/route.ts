@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     if (bankAccountId) {
       const reconciliation = await prisma.bankReconciliation.findMany({
-        where: { bankAccountId, companyId },
+        where: { bankAccountId, bankAccount: { companyId } },
         include: {
           bankAccount: true,
           statements: true,
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     }
 
     const allReconciliations = await prisma.bankReconciliation.findMany({
-      where: { companyId },
+      where: { bankAccount: { companyId } },
       include: {
         bankAccount: true,
         statements: true,
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
     if (statementIds && statementIds.length > 0) {
       const validStatements = await prisma.bankStatement.findMany({
-        where: { id: { in: statementIds }, companyId, bankAccountId },
+        where: { id: { in: statementIds }, bankAccountId, bankAccount: { companyId } },
         select: { id: true },
       });
       if (validStatements.length !== statementIds.length) {
@@ -97,7 +97,6 @@ export async function POST(req: NextRequest) {
         bankBalance,
         difference,
         narration,
-        companyId,
         statements: {
           connect: statementIds?.map((id: string) => ({ id })) || [],
         },
@@ -111,7 +110,7 @@ export async function POST(req: NextRequest) {
     // Update bank statements as reconciled
     if (statementIds && statementIds.length > 0) {
       await prisma.bankStatement.updateMany({
-        where: { id: { in: statementIds }, companyId },
+        where: { id: { in: statementIds }, bankAccount: { companyId } },
         data: { isReconciled: true },
       });
     }

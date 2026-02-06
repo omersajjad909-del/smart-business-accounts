@@ -252,10 +252,10 @@ export async function DELETE(req: NextRequest) {
 
     // Check if bank account has statements or reconciliations
     const hasStatements = await prisma.bankStatement.findFirst({
-      where: { bankAccountId: id, companyId },
+      where: { bankAccountId: id, bankAccount: { companyId } },
     });
     const hasReconciliations = await prisma.bankReconciliation.findFirst({
-      where: { bankAccountId: id, companyId },
+      where: { bankAccountId: id, bankAccount: { companyId } },
     });
 
     if (hasStatements || hasReconciliations) {

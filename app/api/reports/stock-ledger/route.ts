@@ -3,7 +3,7 @@ import { PrismaClient , Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 type InventoryTxnWithParty = Prisma.InventoryTxnGetPayload<{
   include: {
-    party: true;
+    party: { select: { name: true } };
   };
 }>;
 
@@ -125,4 +125,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json([], { status: 500 });
   }
 }
-

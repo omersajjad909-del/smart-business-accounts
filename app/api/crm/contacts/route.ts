@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
+import { resolveCompanyId } from "@/lib/tenant";
 
 // GET: Fetch all contacts
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
     const company = searchParams.get("company");
@@ -12,8 +18,9 @@ export async function GET(req: NextRequest) {
 
     const contacts = await prisma.contact.findMany({
       where: {
+        companyId,
         ...(type && { type }),
-        ...(company && { company: { contains: company, mode: "insensitive" } }),
+        ...(company && { companyName: { contains: company, mode: "insensitive" } }),
         ...(isActive !== undefined && { isActive }),
       },
       include: {
@@ -36,6 +43,11 @@ export async function POST(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { name, email, phone, company, position, type } = body;
 
@@ -48,10 +60,11 @@ export async function POST(req: NextRequest) {
 
     const contact = await prisma.contact.create({
       data: {
+        companyId,
         name,
         email: email || null,
         phone,
-        company,
+        companyName: company,
         position,
         type,
       },

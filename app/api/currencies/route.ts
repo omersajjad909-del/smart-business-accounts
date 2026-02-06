@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
+import { resolveCompanyId } from "@/lib/tenant";
 
 // GET: Fetch all currencies
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const currencies = await prisma.currency.findMany({
-      where: { isActive: true },
+      where: { isActive: true, companyId },
       orderBy: { code: "asc" },
     });
     return NextResponse.json(currencies);
@@ -22,6 +28,11 @@ export async function POST(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { code, name, symbol, exchangeRate } = body;
 
@@ -34,6 +45,7 @@ export async function POST(req: NextRequest) {
 
     const currency = await prisma.currency.create({
       data: {
+        companyId,
         code: code.toUpperCase(),
         name,
         symbol,

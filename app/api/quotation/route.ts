@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { resolveCompanyId } from "@/lib/tenant";
 
 type _QuotationInput = {
   id?: string;
@@ -42,12 +43,17 @@ const quotationSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (id) {
       const quotation = await prisma.quotation.findUnique({
-        where: { id },
+        where: { id, companyId },
         include: {
           customer: true,
           items: {
@@ -61,7 +67,7 @@ export async function GET(req: NextRequest) {
 
     // Calculate next quotation number
     const allQuotations = await prisma.quotation.findMany({
-      where: { quotationNo: { startsWith: "QT-" } },
+      where: { quotationNo: { startsWith: "QT-" }, companyId },
       select: { quotationNo: true }
     });
 
@@ -77,6 +83,7 @@ export async function GET(req: NextRequest) {
     }
 
     const quotations = await prisma.quotation.findMany({
+      where: { companyId },
       include: {
         customer: true,
         items: {
@@ -102,6 +109,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const data = quotationSchema.parse(body);
 
@@ -117,12 +129,13 @@ export async function POST(req: NextRequest) {
     
     let quotationNo = data.quotationNo;
     if (!quotationNo) {
-       const count = await prisma.quotation.count();
+       const count = await prisma.quotation.count({ where: { companyId } });
        quotationNo = `QT-${String(count + 1).padStart(4, "0")}`;
     }
 
     const quotation = await prisma.quotation.create({
       data: {
+        companyId,
         quotationNo, // Use the one we decided on
         date: new Date(data.date),
         validUntil: data.validUntil ? new Date(data.validUntil) : null,
@@ -161,6 +174,11 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const data = quotationSchema.parse(body);
 
@@ -170,12 +188,12 @@ export async function PUT(req: NextRequest) {
     const updated = await prisma.$transaction(async (tx) => {
       // 1. Delete existing items
       await tx.quotationItem.deleteMany({
-        where: { quotationId: data.id },
+        where: { quotationId: data.id, quotation: { companyId } },
       });
 
       // 2. Update Quotation
       return await tx.quotation.update({
-        where: { id: data.id },
+        where: { id: data.id, companyId },
         data: {
           date: new Date(data.date),
           validUntil: data.validUntil ? new Date(data.validUntil) : null,
@@ -216,12 +234,17 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
     await prisma.quotation.delete({
-      where: { id },
+      where: { id, companyId },
     });
 
     return NextResponse.json({ success: true });

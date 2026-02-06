@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch companies for multi-tenant context
-    let companies = [];
+    let companies: Prisma.UserCompanyGetPayload<{ include: { company: true } }>[] = [];
     try {
       companies = await prisma.userCompany.findMany({
         where: { userId: user.id },
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
       null;
 
     // Fetch role-based permissions
-    let rolePermissions = [];
+    let rolePermissions: Array<{ permission: string }> = [];
     try {
       rolePermissions = await prisma.rolePermission.findMany({
         where: { role: user.role, companyId: defaultCompanyId || undefined },
@@ -170,7 +170,7 @@ export async function POST(req: NextRequest) {
       email: user.email,
       role: user.role.toUpperCase(), // Ensure uppercase
       permissions: userPermissions, // User-specific permissions
-      rolePermissions: rolePermissions.map((rp: RolePermission) => rp.permission),
+      rolePermissions: rolePermissions.map((rp) => rp.permission),
       companyId: defaultCompanyId,
       companies: companies.map((c: Any) => ({
         id: c.companyId,

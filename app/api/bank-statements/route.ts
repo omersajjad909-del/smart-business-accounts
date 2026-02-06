@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const bankAccountId = searchParams.get('bankAccountId');
     const isReconciled = searchParams.get('isReconciled');
 
-    const filter: Any = { companyId };
+    const filter: Any = { bankAccount: { companyId } };
     if (bankAccountId) filter.bankAccountId = bankAccountId;
     if (isReconciled !== null) filter.isReconciled = isReconciled === 'true';
 
@@ -72,7 +72,6 @@ export async function POST(req: NextRequest) {
         amount,
         description,
         referenceNo,
-        companyId,
       },
       include: { bankAccount: true },
     });
@@ -102,7 +101,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const existing = await prisma.bankStatement.findFirst({
-      where: { id, companyId },
+      where: { id, bankAccount: { companyId } },
       select: { id: true },
     });
     if (!existing) {
@@ -143,7 +142,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     const existing = await prisma.bankStatement.findFirst({
-      where: { id, companyId },
+      where: { id, bankAccount: { companyId } },
       select: { id: true },
     });
     if (!existing) {
