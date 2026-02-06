@@ -11,7 +11,7 @@ export function MobileTable<T>({ children, data, emptyMessage, renderCard }: Mob
   if (data && renderCard) {
     if (data.length === 0) {
       return (
-        <div className="md:hidden py-8 text-center text-gray-500 bg-white rounded-lg border border-gray-200">
+        <div className="md:hidden py-8 text-center text-[var(--text-muted)] bg-[var(--card-bg)] rounded-lg border border-[var(--border)]">
           {emptyMessage || "No items found"}
         </div>
       );
@@ -35,7 +35,7 @@ interface MobileCardProps {
 
 export function MobileCard({ children, className = '' }: MobileCardProps) {
   return (
-    <div className={`bg-white border border-gray-200 rounded-lg p-4 ${className}`}>
+    <div className={`bg-[var(--card-bg)] border border-[var(--border)] rounded-lg p-4 ${className}`}>
       {children}
     </div>
   );
@@ -49,9 +49,9 @@ interface MobileCardRowProps {
 
 export function MobileCardRow({ label, value, valueClassName = '' }: MobileCardRowProps) {
   return (
-    <div className="flex justify-between items-start py-2 border-b border-gray-100 last:border-0">
-      <span className="text-sm text-gray-500 font-medium">{label}:</span>
-      <span className={`text-sm text-gray-900 text-right ${valueClassName}`}>{value}</span>
+    <div className="flex justify-between items-start py-2 border-b border-[var(--border)]/50 last:border-0">
+      <span className="text-sm text-[var(--text-muted)] font-medium">{label}:</span>
+      <span className={`text-sm text-[var(--text-primary)] text-right ${valueClassName}`}>{value}</span>
     </div>
   );
 }
@@ -64,7 +64,7 @@ interface DesktopTableProps {
 export function DesktopTable({ children, className = '' }: DesktopTableProps) {
   return (
     <div className="hidden md:block overflow-x-auto">
-      <table className={`min-w-full divide-y divide-gray-200 ${className}`}>
+      <table className={`min-w-full divide-y divide-[var(--border)] ${className}`}>
         {children}
       </table>
     </div>
@@ -99,7 +99,7 @@ export function ActionButtons({
       {showView && onView && (
         <button
           onClick={onView}
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          className="text-[var(--accent)] hover:text-[var(--accent-strong)] text-sm font-medium"
         >
           {viewLabel}
         </button>
@@ -107,7 +107,7 @@ export function ActionButtons({
       {showEdit && onEdit && (
         <button
           onClick={onEdit}
-          className="text-yellow-600 hover:text-yellow-800 text-sm font-medium"
+          className="text-[var(--warning)] hover:opacity-90 text-sm font-medium"
         >
           {editLabel}
         </button>
@@ -115,7 +115,7 @@ export function ActionButtons({
       {showDelete && onDelete && (
         <button
           onClick={onDelete}
-          className="text-red-600 hover:text-red-800 text-sm font-medium"
+          className="text-[var(--danger)] hover:opacity-90 text-sm font-medium"
         >
           {deleteLabel}
         </button>
@@ -133,12 +133,12 @@ interface EmptyStateProps {
 
 export function EmptyState({ message = "No items found", className = "", onAction, actionLabel = "Create New" }: EmptyStateProps) {
   return (
-    <div className={`text-center py-10 text-gray-500 bg-gray-50 rounded-lg flex flex-col items-center justify-center gap-4 ${className}`}>
+    <div className={`text-center py-10 text-[var(--text-muted)] bg-[var(--card-bg-2)] rounded-lg flex flex-col items-center justify-center gap-4 ${className}`}>
       <p>{message}</p>
       {onAction && (
         <button
           onClick={onAction}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          className="px-4 py-2 bg-[var(--accent)] text-[#0b1324] rounded-lg hover:bg-[var(--accent-strong)] transition-colors text-sm font-medium"
         >
           {actionLabel}
         </button>

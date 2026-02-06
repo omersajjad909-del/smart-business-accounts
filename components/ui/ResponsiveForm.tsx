@@ -47,12 +47,12 @@ interface FormFieldProps {
 export function FormField({ label, children, required, error }: FormFieldProps) {
   return (
     <div className="space-y-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-[var(--text-muted)]">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       {children}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
     </div>
   );
 }
@@ -100,7 +100,7 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 export function Input({ className = "", ...props }: InputProps) {
   return (
     <input
-      className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${className}`}
+      className={`block w-full rounded-md border border-[var(--border)] bg-[var(--panel-bg-2)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)] sm:text-sm p-2 ${className}`}
       {...props}
     />
   );
@@ -111,7 +111,7 @@ type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>;
 export function Select({ className = "", ...props }: SelectProps) {
   return (
     <select
-      className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${className}`}
+      className={`block w-full rounded-md border border-[var(--border)] bg-[var(--panel-bg-2)] text-[var(--text-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)] sm:text-sm p-2 ${className}`}
       {...props}
     />
   );
@@ -123,15 +123,15 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function Button({ className = "", variant = 'primary', ...props }: ButtonProps) {
   const variants = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700",
-    secondary: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50",
-    danger: "bg-red-600 text-white hover:bg-red-700",
-    success: "bg-green-600 text-white hover:bg-green-700",
+    primary: "bg-[var(--accent)] text-[#0b1324] hover:bg-[var(--accent-strong)]",
+    secondary: "bg-[var(--panel-bg-2)] text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--card-bg)]",
+    danger: "bg-[var(--danger)] text-[#0b1324] hover:opacity-90",
+    success: "bg-[var(--success)] text-[#0b1324] hover:opacity-90",
   };
 
   return (
     <button
-      className={`inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${variants[variant]} ${className}`}
+      className={`inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--panel-bg)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${variants[variant]} ${className}`}
       {...props}
     />
   );
