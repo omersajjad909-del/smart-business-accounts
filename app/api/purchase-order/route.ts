@@ -34,9 +34,10 @@ export async function POST(req: NextRequest) {
       date: new Date(date),
       remarks: remarks || "",
       companyId,
-      status: "PENDING",\n      approvalStatus: "PENDING"
+      status: "PENDING",
+      approvalStatus: "PENDING",
       items: {
-        create: items.map((i: Any) => ({
+        create: items.map((i: any) => ({
           itemId: i.itemId,
           qty: Number(i.qty),
           rate: Number(i.rate || 0),
