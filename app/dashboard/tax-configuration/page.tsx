@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { getCurrentUser } from '@/lib/auth';
 
 interface TaxConfiguration {
   id: string;
@@ -23,8 +24,11 @@ export default function TaxConfigurationPage() {
   });
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState('');
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    const u = getCurrentUser();
+    setUser(u);
     fetchTaxes();
   }, []);
 
@@ -47,9 +51,18 @@ export default function TaxConfigurationPage() {
         : '/api/tax-configuration';
       const method = editingId ? 'PUT' : 'POST';
 
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      if (user) {
+        headers['x-user-id'] = user.id;
+        headers['x-user-role'] = user.role;
+      }
+
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           id: editingId,
           ...formData,

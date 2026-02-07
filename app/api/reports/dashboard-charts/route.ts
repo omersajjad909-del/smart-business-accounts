@@ -170,7 +170,7 @@ export async function GET(req: NextRequest) {
     });
 
     const itemDetails = await Promise.all(
-      topItems.map(async (item: Any) => {
+      topItems.map(async (item: any) => {
         const itemData = await prisma.itemNew.findFirst({
           where: { id: item.itemId, companyId },
           select: { name: true },
@@ -195,7 +195,7 @@ export async function GET(req: NextRequest) {
       topCustomers: customerDetails,
       topItems: itemDetails,
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("❌ DASHBOARD CHARTS ERROR:", e);
     return NextResponse.json(
       { error: e.message || "Charts data failed" },

@@ -122,6 +122,7 @@ export default function PaymentReceiptsPage() {
         headers: {
           'x-user-role': user?.role || 'ADMIN',
           'x-user-id': user?.id || '',
+          'x-company-id': user?.companyId || '',
         },
       });
       
@@ -157,7 +158,11 @@ export default function PaymentReceiptsPage() {
       
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-company-id': user?.companyId || '',
+          'x-user-role': user?.role || 'ADMIN',
+        },
         body: JSON.stringify({ id: editingId, ...formData }),
       });
 
@@ -228,7 +233,11 @@ export default function PaymentReceiptsPage() {
     try {
       const response = await fetch(`/api/payment-receipts?id=${receipt.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-company-id': user?.companyId || '',
+          'x-user-role': user?.role || 'ADMIN',
+        },
         body: JSON.stringify({ 
           id: receipt.id, 
           status: 'CLEARED',
