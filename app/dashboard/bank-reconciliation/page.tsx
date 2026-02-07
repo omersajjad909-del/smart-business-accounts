@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getCurrentUser } from '@/lib/auth';
 
 interface BankAccount {
   id: string;
@@ -29,6 +30,7 @@ interface BankStatement {
 
 
 export default function BankReconciliationPage() {
+  const user = getCurrentUser();
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const [statements, setStatements] = useState<BankStatement[]>([]);
   const [selectedAccount, setSelectedAccount] = useState('');
@@ -74,8 +76,20 @@ export default function BankReconciliationPage() {
   }, [selectedAccount, bankAccounts]);
 
   const fetchBankAccounts = async () => {
+    if (!user) return;
+    if (!user.companyId) {
+      console.warn("No company selected, skipping bank accounts fetch");
+      return;
+    }
+
     try {
-      const response = await fetch('/api/bank-accounts');
+      const response = await fetch('/api/bank-accounts', {
+        headers: {
+          "x-user-role": user.role || "ADMIN",
+          "x-user-id": user.id || "",
+          "x-company-id": user.companyId || ""
+        }
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch bank accounts');
       }
@@ -93,6 +107,8 @@ export default function BankReconciliationPage() {
   };
 
   const fetchStatements = async (accountId: string) => {
+    if (!user) return;
+    if (!user.companyId) return;
     try {
       // Check if this is a BankAccount ID or Account ID
       const bankAccount = bankAccounts.find(ba => ba.id === accountId || ba.accountId === accountId);
@@ -113,7 +129,13 @@ export default function BankReconciliationPage() {
         }
       }
 
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          "x-user-role": user.role || "ADMIN",
+          "x-user-id": user.id || "",
+          "x-company-id": user.companyId || ""
+        }
+      });
       if (!response.ok) {
          throw new Error('Failed to fetch statements');
       }
@@ -138,6 +160,7 @@ export default function BankReconciliationPage() {
   };
 
   const handleReconcile = async () => {
+    if (!user) return alert("Please login first");
     if (!selectedAccount || selectedStatements.length === 0) {
       alert('Please select bank account and statements');
       return;
@@ -147,7 +170,12 @@ export default function BankReconciliationPage() {
     try {
       const response = await fetch('/api/bank-reconciliation', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          "x-user-role": user.role || "ADMIN",
+          "x-user-id": user.id || "",
+          "x-company-id": user.companyId || ""
+        },
         body: JSON.stringify({
           bankAccountId: selectedAccount,
           reconcileDate: new Date(),
@@ -175,6 +203,8 @@ export default function BankReconciliationPage() {
 
   const handleAddBank = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return alert("Please login first");
+    if (!user.companyId) return alert("Please select a company first");
 
     if (!newBankForm.bankName || !newBankForm.accountNo || !newBankForm.accountName) {
       alert('Please fill in all required fields');
@@ -188,7 +218,12 @@ export default function BankReconciliationPage() {
 
       const response = await fetch('/api/bank-accounts', {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          "x-user-role": user.role || "ADMIN",
+          "x-user-id": user.id || "",
+          "x-company-id": user.companyId || ""
+        },
         body: JSON.stringify(body),
       });
 
@@ -228,10 +263,16 @@ export default function BankReconciliationPage() {
 
   const handleDeleteBank = async (id: string) => {
     if (!confirm('Are you sure? This cannot be undone.')) return;
+    if (!user) return alert("Please login first");
 
     try {
       const response = await fetch(`/api/bank-accounts?id=${id}`, {
         method: 'DELETE',
+        headers: {
+          "x-user-role": user.role || "ADMIN",
+          "x-user-id": user.id || "",
+          "x-company-id": user.companyId || ""
+        }
       });
 
       if (response.ok) {
@@ -255,6 +296,12 @@ export default function BankReconciliationPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      {user && !user.companyId && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
+          <p className="font-bold">Attention</p>
+          <p>Please select a company from the top menu to view and manage bank accounts.</p>
+        </div>
+      )}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Bank Reconciliation</h1>
         <button

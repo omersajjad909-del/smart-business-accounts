@@ -81,7 +81,13 @@ export default function PurchaseOrderPage() {
   /* LOAD DATA */
   useEffect(() => {
     loadPOs();
-    fetch("/api/accounts", { headers: { "x-user-role": user?.role || "ADMIN" } })
+    fetch("/api/accounts", { 
+      headers: { 
+        "x-user-role": user?.role || "ADMIN",
+        "x-user-id": user?.id || "",
+        "x-company-id": user?.companyId || ""
+      } 
+    })
       .then(r => {
         if (!r.ok) throw new Error("Failed to load accounts");
         return r.json();
@@ -99,7 +105,13 @@ export default function PurchaseOrderPage() {
         setSuppliers([]);
       });
 
-    fetch("/api/items-new", { headers: { "x-user-role": user?.role || "ADMIN" } })
+    fetch("/api/items-new", { 
+      headers: { 
+        "x-user-role": user?.role || "ADMIN",
+        "x-user-id": user?.id || "",
+        "x-company-id": user?.companyId || ""
+      } 
+    })
       .then(r => {
         if (!r.ok) throw new Error("Failed to load items");
         return r.json();
@@ -121,18 +133,34 @@ export default function PurchaseOrderPage() {
   async function loadPOs() {
     try {
       // Load next PO number
-      const nextRes = await fetch("/api/purchase-order?nextNo=true", { headers: { "x-user-role": user?.role || "ADMIN" } });
+      const nextRes = await fetch("/api/purchase-order?nextNo=true", { 
+        headers: { 
+          "x-user-role": user?.role || "ADMIN",
+          "x-user-id": user?.id || "",
+          "x-company-id": user?.companyId || ""
+        } 
+      });
       const nextData = await nextRes.json();
       if (nextData?.poNo) setPoNo(nextData.poNo);
 
       // Load all POs
-      const res = await fetch("/api/purchase-order", { headers: { "x-user-role": user?.role || "ADMIN" } });
+      const res = await fetch("/api/purchase-order", { 
+        headers: { 
+          "x-user-role": user?.role || "ADMIN",
+          "x-user-id": user?.id || "",
+          "x-company-id": user?.companyId || ""
+        } 
+      });
       const data = await res.json();
       if (Array.isArray(data)) {
         setPos(data);
+      } else {
+        console.error("POs API returned non-array:", data);
+        setPos([]);
       }
     } catch (e) {
       console.error("Load POs error:", e);
+      setPos([]);
     }
   }
 
@@ -207,7 +235,11 @@ export default function PurchaseOrderPage() {
     try {
       const res = await fetch(`/api/purchase-order?id=${id}`, {
         method: "DELETE",
-        headers: { "x-user-role": user?.role || "ADMIN" },
+        headers: { 
+          "x-user-role": user?.role || "ADMIN",
+          "x-user-id": user?.id || "",
+          "x-company-id": user?.companyId || ""
+        },
       });
       if (res.ok) {
         alert("PO deleted successfully");
