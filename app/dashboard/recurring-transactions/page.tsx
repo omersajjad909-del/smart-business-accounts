@@ -36,7 +36,7 @@ export default function RecurringTransactionsPage() {
     metadataText: "",
   });
 
-  const [accounts, setAccounts] = useState<Any[]>([]);
+  const [accounts, setAccounts] = useState<any[]>([]);
 
   const user = getCurrentUser();
   const canAccess = hasPermission(user, PERMISSIONS.RECURRING_TRANSACTIONS);
@@ -57,6 +57,7 @@ export default function RecurringTransactionsPage() {
         headers: {
           "x-user-role": user?.role || "",
           "x-user-id": user?.id || "",
+          "x-company-id": user?.companyId || "",
         },
       });
       const data = await res.json();
@@ -73,7 +74,10 @@ export default function RecurringTransactionsPage() {
   async function loadAccounts() {
     try {
       const res = await fetch("/api/accounts", {
-        headers: { "x-user-role": user?.role || "" },
+        headers: { 
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
       });
       const data = await res.json();
       const list = Array.isArray(data) ? data : data.accounts || [];
@@ -97,7 +101,7 @@ export default function RecurringTransactionsPage() {
       const method = editing ? "PUT" : "POST";
 
       const payload = editing ? { id: editing.id, ...formData } : formData;
-      let metadata: Any = null;
+      let metadata: any = null;
       if (payload.metadataText && payload.metadataText.trim()) {
         try {
           metadata = JSON.parse(payload.metadataText);
@@ -114,6 +118,7 @@ export default function RecurringTransactionsPage() {
           "Content-Type": "application/json",
           "x-user-role": user?.role || "",
           "x-user-id": user?.id || "",
+          "x-company-id": user?.companyId || "",
         },
         body: JSON.stringify({
           ...payload,
@@ -177,6 +182,7 @@ export default function RecurringTransactionsPage() {
         headers: {
           "x-user-role": user?.role || "",
           "x-user-id": user?.id || "",
+          "x-company-id": user?.companyId || "",
         },
       });
 

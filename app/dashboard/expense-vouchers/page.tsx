@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { getCurrentUser } from '@/lib/auth';
 
 interface ExpenseVoucher {
   id: string;
@@ -34,6 +35,7 @@ type AccountWithMeta = {
 
 
 export default function ExpenseVouchersPage() {
+  const user = getCurrentUser();
   const [vouchers, setVouchers] = useState<ExpenseVoucher[]>([]);
   const [accounts, setAccounts] = useState<AccountWithMeta[]>([]);
   const [showForm, setShowForm] = useState(true);
@@ -60,7 +62,12 @@ export default function ExpenseVouchersPage() {
     try {
       let url = '/api/expense-vouchers';
       if (statusFilter) url += `?status=${statusFilter}`;
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch vouchers');
       }
@@ -79,11 +86,11 @@ export default function ExpenseVouchersPage() {
 
   const fetchAccounts = async () => {
     try {
-      // User role header zaroori hai warna API data nahi degi
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const role = (user.role || user?.user?.role || 'ADMIN').toUpperCase();
       const response = await fetch('/api/accounts', {
-        headers: { 'x-user-role': role }
+        headers: { 
+          'x-user-role': user?.role || 'ADMIN',
+          'x-company-id': user?.companyId || '',
+        }
       });
       const data = await response.json();
       setAccounts(Array.isArray(data) ? data : []);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getCurrentUser } from '@/lib/auth';
 
 type Account = {
   id: string;
@@ -9,6 +10,7 @@ type Account = {
 };
 
 export default function PartyAccounts() {
+  const user = getCurrentUser();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -20,7 +22,13 @@ export default function PartyAccounts() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const res = await fetch("/api/accounts");
+      if (!user) return;
+      const res = await fetch("/api/accounts", {
+        headers: {
+          "x-user-role": user.role || "",
+          "x-company-id": user.companyId || ""
+        }
+      });
       const data = (await res.json()) as Account[];
       if (active) setAccounts(data);
     })();
@@ -57,7 +65,11 @@ export default function PartyAccounts() {
 
     await fetch("/api/accounts", {
       method,
-      headers: { "Content-Type": "application/json", "x-user-role": "ADMIN" },
+      headers: { 
+        "Content-Type": "application/json", 
+        "x-user-role": user?.role || "ADMIN",
+        "x-company-id": user?.companyId || "",
+      },
       body: JSON.stringify(body),
     });
 
@@ -87,10 +99,18 @@ export default function PartyAccounts() {
 
     await fetch(`/api/accounts?id=${id}`, {
       method: "DELETE",
-      headers: { "x-user-role": "ADMIN" },
+      headers: { 
+        "x-user-role": user?.role || "ADMIN",
+        "x-company-id": user?.companyId || "",
+      },
     });
 
-    const res = await fetch("/api/accounts");
+    const res = await fetch("/api/accounts", {
+      headers: {
+        "x-user-role": user?.role || "",
+        "x-company-id": user?.companyId || "",
+      }
+    });
     const data = (await res.json()) as Account[];
     setAccounts(data);
   }

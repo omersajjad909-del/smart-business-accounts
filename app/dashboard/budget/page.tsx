@@ -40,7 +40,10 @@ export default function BudgetPage() {
 
     try {
       const res = await fetch("/api/accounts", {
-        headers: { "x-user-role": user.role },
+        headers: { 
+          "x-user-role": user.role,
+          "x-company-id": user.companyId || ""
+        },
       });
       const data = await res.json();
       setAccounts(Array.isArray(data) ? data : data.accounts || []);
@@ -54,7 +57,10 @@ export default function BudgetPage() {
     try {
       const user = getCurrentUser();
       const res = await fetch(`/api/budget?year=${year}`, {
-        headers: { "x-user-role": user?.role || "ADMIN" },
+        headers: { 
+          "x-user-role": user?.role || "ADMIN",
+          "x-company-id": user?.companyId || ""
+        },
       });
       const data = await res.json();
       setBudgets(Array.isArray(data) ? data : []);
@@ -79,6 +85,7 @@ export default function BudgetPage() {
         headers: {
           "Content-Type": "application/json",
           "x-user-role": user?.role || "ADMIN",
+          "x-company-id": user?.companyId || "",
         },
         body: JSON.stringify({
           accountId: selectedAccount,

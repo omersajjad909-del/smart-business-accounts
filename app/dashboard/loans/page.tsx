@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getCurrentUser } from '@/lib/auth';
 import { ResponsiveContainer, PageHeader, Card } from '@/components/ui/ResponsiveContainer';
 import { ResponsiveForm, FormField, FormActions } from '@/components/ui/ResponsiveForm';
 import { MobileTable, MobileCard, MobileCardRow, DesktopTable, ActionButtons, EmptyState } from '@/components/ui/MobileTable';
@@ -42,6 +43,7 @@ interface Account {
 }
 
 export default function LoansPage() {
+  const user = getCurrentUser();
   const [loans, setLoans] = useState<Loan[]>([]);
   const [payments, setPayments] = useState<LoanPayment[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -79,7 +81,12 @@ export default function LoansPage() {
 
   const fetchLoans = async () => {
     try {
-      const response = await fetch('/api/loans');
+      const response = await fetch('/api/loans', {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setLoans(data);
@@ -105,7 +112,12 @@ export default function LoansPage() {
 
   const fetchPayments = async (loanId: string) => {
     try {
-      const response = await fetch(`/api/loan-payment?loanId=${loanId}`);
+      const response = await fetch(`/api/loans/payments?loanId=${loanId}`, {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setPayments(data);

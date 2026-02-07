@@ -58,6 +58,7 @@ export default function TaxConfigurationPage() {
       if (user) {
         headers['x-user-id'] = user.id;
         headers['x-user-role'] = user.role;
+        headers['x-company-id'] = user.companyId || '';
       }
 
       const response = await fetch(url, {

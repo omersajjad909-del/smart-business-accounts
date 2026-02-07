@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getCurrentUser } from '@/lib/auth';
 import { ResponsiveContainer, PageHeader, Card } from '@/components/ui/ResponsiveContainer';
 import { ResponsiveForm, FormField, FormActions } from '@/components/ui/ResponsiveForm';
 import { MobileTable, MobileCard, MobileCardRow, DesktopTable, ActionButtons, EmptyState } from '@/components/ui/MobileTable';
@@ -30,6 +31,7 @@ interface Account {
 }
 
 export default function CreditNotePage() {
+  const user = getCurrentUser();
   const [creditNotes, setCreditNotes] = useState<CreditNote[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +53,12 @@ export default function CreditNotePage() {
 
   const fetchCreditNotes = async () => {
     try {
-      const response = await fetch('/api/credit-note');
+      const response = await fetch('/api/credit-note', {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setCreditNotes(data);
@@ -65,7 +72,12 @@ export default function CreditNotePage() {
 
   const fetchAccounts = async () => {
     try {
-      const response = await fetch('/api/accounts');
+      const response = await fetch('/api/accounts', {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         // Filter for customer accounts only
@@ -84,7 +96,11 @@ export default function CreditNotePage() {
     try {
       const response = await fetch('/api/credit-note', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
         body: JSON.stringify({
           ...formData,
           amount: parseFloat(formData.amount),

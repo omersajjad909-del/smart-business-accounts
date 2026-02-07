@@ -149,6 +149,7 @@ export default function ChartOfAccounts() {
         "Content-Type": "application/json",
         "x-user-role": user.role,
         "x-user-id": user.id,
+        "x-company-id": user.companyId,
       },
       body: JSON.stringify({ csv: importCsv }),
     });
@@ -339,7 +340,7 @@ const res = await fetch(`/api/accounts?id=${id}`, {
               <th className="p-3 border-r">Name</th>
               <th className="p-3 border-r">Category</th>
               <th className="p-3 border-r">City</th>
-              <th className="p-3 text-center">Actions</th>
+              <th className="p-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody className="font-bold uppercase text-[12px]">
