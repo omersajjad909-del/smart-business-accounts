@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
       overdueReceivablesCount,
       lowStockCount,
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("DASHBOARD SUMMARY ERROR:", e);
     return NextResponse.json(
       { error: e.message || "Dashboard summary failed" },
