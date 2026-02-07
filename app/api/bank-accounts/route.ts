@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Combine both: BankAccount table se + Account table se (jo BankAccount mein nahi hain)
-    const combinedAccounts = bankAccountsFromTable.map((ba: Any) => ({
+    const combinedAccounts = bankAccountsFromTable.map((ba: any) => ({
       id: ba.id,
       accountNo: ba.accountNo,
       bankName: ba.bankName,
