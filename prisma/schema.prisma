@@ -89,8 +89,8 @@ model ItemNew {
 
 model PurchaseOrder {
   id      String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
 
   poNo    String
   date    DateTime
@@ -230,8 +230,8 @@ model SalesInvoiceItem {
 
 model Voucher {
   id        String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
 
   voucherNo String
   type      String
@@ -249,8 +249,8 @@ model Voucher {
 
 model VoucherEntry {
   id        String @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
 
   voucherId String
   accountId String
@@ -262,8 +262,8 @@ model VoucherEntry {
 
 model StockRate {
   id     String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
 
   itemId String
   rate   Float
@@ -743,8 +743,8 @@ model CurrencyTransaction {
 
 model Employee {
   id              String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
 
   employeeId      String   @unique
   firstName       String
@@ -777,8 +777,8 @@ model Employee {
 
 model Attendance {
   id         String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
 
   employeeId String
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
@@ -812,8 +812,8 @@ model Leave {
 
 model Payroll {
   id              String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
 
   employeeId      String
   employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
@@ -837,8 +837,8 @@ model Payroll {
 
 model AdvanceSalary {
   id          String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
 
   employeeId  String
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
