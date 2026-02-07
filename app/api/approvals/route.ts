@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    const [sales, purchases, payments, expenses] = await Promise.all([
+    const [sales, purchases, payments, expenses, orders, quotations, challans] = await Promise.all([
       prisma.salesInvoice.findMany({
         where: { companyId, approvalStatus: "PENDING" },
         select: { id: true, invoiceNo: true, total: true, date: true },
@@ -44,6 +44,21 @@ export async function GET(req: NextRequest) {
         select: { id: true, voucherNo: true, totalAmount: true, date: true },
         orderBy: { date: "desc" },
       }),
+      prisma.purchaseOrder.findMany({
+        where: { companyId, approvalStatus: "PENDING" },
+        select: { id: true, poNo: true, status: true, date: true },
+        orderBy: { date: "desc" },
+      }),
+      prisma.quotation.findMany({
+        where: { companyId, approvalStatus: "PENDING" },
+        select: { id: true, quotationNo: true, total: true, date: true },
+        orderBy: { date: "desc" },
+      }),
+      prisma.deliveryChallan.findMany({
+        where: { companyId, approvalStatus: "PENDING" },
+        select: { id: true, challanNo: true, status: true, date: true },
+        orderBy: { date: "desc" },
+      }),
     ]);
 
     return NextResponse.json({
@@ -51,6 +66,9 @@ export async function GET(req: NextRequest) {
       purchases: purchases.map((p) => ({ type: "PURCHASE_INVOICE", ...p })),
       payments: payments.map((p) => ({ type: "PAYMENT_RECEIPT", ...p })),
       expenses: expenses.map((e) => ({ type: "EXPENSE_VOUCHER", ...e })),
+      orders: orders.map((o) => ({ type: "PURCHASE_ORDER", ...o })),
+      quotations: quotations.map((q) => ({ type: "QUOTATION", ...q })),
+      challans: challans.map((c) => ({ type: "DELIVERY_CHALLAN", ...c })),
       userId,
     });
   } catch (e: Any) {
@@ -74,7 +92,14 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = (await req.json()) as {
-      type: "SALES_INVOICE" | "PURCHASE_INVOICE" | "PAYMENT_RECEIPT" | "EXPENSE_VOUCHER";
+      type:
+        | "SALES_INVOICE"
+        | "PURCHASE_INVOICE"
+        | "PAYMENT_RECEIPT"
+        | "EXPENSE_VOUCHER"
+        | "PURCHASE_ORDER"
+        | "QUOTATION"
+        | "DELIVERY_CHALLAN";
       id: string;
       status: "APPROVED" | "REJECTED";
       remarks?: string;
@@ -131,6 +156,42 @@ export async function PATCH(req: NextRequest) {
           approverId: userId,
           approvalStatus: body.status,
           remarks: body.remarks || null,
+        },
+      });
+    }
+
+    if (body.type === "PURCHASE_ORDER") {
+      await prisma.purchaseOrder.update({
+        where: { id: body.id },
+        data: {
+          approvalStatus: body.status,
+          approvedBy: userId,
+          approvedAt: now,
+          approvalRemarks: body.remarks || null,
+        },
+      });
+    }
+
+    if (body.type === "QUOTATION") {
+      await prisma.quotation.update({
+        where: { id: body.id },
+        data: {
+          approvalStatus: body.status,
+          approvedBy: userId,
+          approvedAt: now,
+          approvalRemarks: body.remarks || null,
+        },
+      });
+    }
+
+    if (body.type === "DELIVERY_CHALLAN") {
+      await prisma.deliveryChallan.update({
+        where: { id: body.id },
+        data: {
+          approvalStatus: body.status,
+          approvedBy: userId,
+          approvedAt: now,
+          approvalRemarks: body.remarks || null,
         },
       });
     }

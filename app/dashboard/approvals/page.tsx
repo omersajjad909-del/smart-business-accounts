@@ -7,6 +7,9 @@ type ApprovalItem = {
   id: string;
   type: string;
   invoiceNo?: string;
+  poNo?: string;
+  quotationNo?: string;
+  challanNo?: string;
   voucherNo?: string;
   receiptNo?: string;
   total?: number;
@@ -42,6 +45,9 @@ export default function ApprovalsPage() {
       ...(data.purchases || []),
       ...(data.payments || []),
       ...(data.expenses || []),
+      ...(data.orders || []),
+      ...(data.quotations || []),
+      ...(data.challans || []),
     ];
     setItems(list);
     setLoading(false);
@@ -101,7 +107,7 @@ export default function ApprovalsPage() {
           <div key={item.id} className="bg-white border rounded p-4 space-y-3">
             <div className="text-xs text-gray-500 uppercase">{item.type}</div>
             <div className="text-lg font-semibold">
-              {item.invoiceNo || item.voucherNo || item.receiptNo || item.id}
+              {item.invoiceNo || item.poNo || item.quotationNo || item.challanNo || item.voucherNo || item.receiptNo || item.id}
             </div>
             <div className="text-sm text-gray-600">
               Date: {new Date(item.date).toLocaleDateString()}
