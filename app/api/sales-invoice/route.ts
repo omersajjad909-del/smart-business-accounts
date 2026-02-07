@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
       nextNo,
       invoices: formattedInvoices
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
     await ensureOpenPeriod(prisma, companyId, new Date(date));
 
     const total = items.reduce(
-      (s: number, i: Any) => s + i.qty * i.rate,
+      (s: number, i: any) => s + i.qty * i.rate,
       0
     );
 
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
         total: total + freight + taxAmount,
         approvalStatus: "PENDING",
         items: {
-          create: items.map((i: Any) => ({
+          create: items.map((i: any) => ({
             itemId: i.itemId,
             qty: i.qty,
             rate: i.rate,

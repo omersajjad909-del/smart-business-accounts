@@ -91,7 +91,9 @@ export default function BankReconciliationPage() {
         }
       });
       if (!response.ok) {
-        throw new Error('Failed to fetch bank accounts');
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Bank Accounts API Error:", errorData);
+        throw new Error(errorData.details || errorData.error || 'Failed to fetch bank accounts');
       }
       const data = await response.json();
       if (Array.isArray(data)) {

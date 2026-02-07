@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(publicUsers);
-  } catch (error: Any) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
       },
     });
     return NextResponse.json(user);
-  } catch (error: Any) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
