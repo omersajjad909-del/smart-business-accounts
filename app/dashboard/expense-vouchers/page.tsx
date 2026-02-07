@@ -61,10 +61,19 @@ export default function ExpenseVouchersPage() {
       let url = '/api/expense-vouchers';
       if (statusFilter) url += `?status=${statusFilter}`;
       const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch vouchers');
+      }
       const data = await response.json();
-      setVouchers(data);
+      if (Array.isArray(data)) {
+        setVouchers(data);
+      } else {
+        console.error('Vouchers API returned non-array:', data);
+        setVouchers([]);
+      }
     } catch (error) {
       console.error('Error fetching vouchers:', error);
+      setVouchers([]);
     }
   };
 
