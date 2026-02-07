@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
 
-    const filter: Any = { companyId };
+    const filter: any = { companyId };
     if (status) filter.approvalStatus = status;
 
     const vouchers = await prisma.expenseVoucher.findMany({
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
     await ensureOpenPeriod(prisma, companyId, new Date(date));
 
     // Calculate total from items
-    const calculatedTotal = items.reduce((sum: number, item: Any) => 
+    const calculatedTotal = items.reduce((sum: number, item: any) => 
       sum + parseFloat(item.amount || 0), 0
     );
 
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
         approvalStatus: 'PENDING',
         companyId,
         items: {
-          create: items.map((item: Any) => ({
+          create: items.map((item: any) => ({
             description: item.description || '',
             amount: parseFloat(item.amount || 0),
             category: item.category || 'OTHER',
@@ -202,7 +202,7 @@ export async function PUT(req: NextRequest) {
       });
 
       // Calculate new total
-      const newTotal = items.reduce((sum: number, item: Any) => 
+      const newTotal = items.reduce((sum: number, item: any) => 
         sum + parseFloat(item.amount || 0), 0
       );
 
@@ -220,7 +220,7 @@ export async function PUT(req: NextRequest) {
         ...updateData,
         ...(items && items.length > 0 && {
           items: {
-            create: items.map((item: Any) => ({
+            create: items.map((item: any) => ({
               description: item.description || '',
               amount: parseFloat(item.amount || 0),
               category: item.category || 'OTHER',
