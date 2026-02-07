@@ -20,12 +20,21 @@ export const metadata: Metadata = {
   description: "Financial Management System",
 };
 
+import { ThemeProvider } from "@/components/theme-provider";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${sora.variable} ${spaceGrotesk.variable} app-root`}>
-        <Toaster position="top-center" />
-        {children}
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+          <Toaster position="top-center" />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

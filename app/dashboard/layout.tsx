@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿"use client";
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿"use client";
 
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import GlobalSearch from "@/components/GlobalSearch";
 import { useGlobalEnterNavigation } from "@/hooks/useGlobalEnterNavigation";
+import { ModeToggle } from "@/components/mode-toggle";
 
 type PermissionEntry = { permission: string } | string;
 
@@ -460,8 +461,11 @@ export default function DashboardLayout({
               <span className="text-[10px] text-[var(--text-muted)]">Default</span>
             </div>
           )}
-          <div className="ml-auto text-sm text-[var(--text-muted)]">
-            {currentUser.name || currentUser.email}
+          <div className="ml-auto flex items-center gap-4">
+            <ModeToggle />
+            <div className="text-sm text-[var(--text-muted)]">
+              {currentUser.name || currentUser.email}
+            </div>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-4 md:p-6">
