@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
 
       console.log("🔍 USER SEARCH:", { searchTerm: emailNormalized });
       console.log("🔍 USER FOUND:", user ? { id: user.id, name: user.name, email: user.email, active: user.active } : "NOT FOUND");
-    } catch (dbError: Any) {
+    } catch (dbError: any) {
       console.error("❌ LOGIN DATABASE ERROR:", dbError);
       console.error("❌ DATABASE ERROR DETAILS:", {
         message: dbError.message,

@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(company, { status: 201 });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("COMPANIES POST ERROR:", e);
     return NextResponse.json({ error: "Failed to create company" }, { status: 500 });
   }
