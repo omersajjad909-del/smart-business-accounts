@@ -64,7 +64,10 @@ export default function ChartOfAccounts() {
     if (!user) { setLoading(false); return; }
     try {
       const res = await fetch("/api/accounts", {
-        headers: { "x-user-role": user.role },
+        headers: { 
+          "x-user-role": user.role,
+          "x-company-id": user.companyId 
+        },
       });
       const data = await res.json();
       if (res.ok && Array.isArray(data)) setAccounts(data);
@@ -90,7 +93,8 @@ export default function ChartOfAccounts() {
       // اس URL کو تبدیل کریں
       const res = await fetch(`/api/accounts?prefix=${prefix}`, { // 'next-code' ہٹا دیں
         headers: {
-          "x-user-role": "ADMIN" // رول بھیجنا لازمی ہے
+          "x-user-role": "ADMIN", // رول بھیجنا لازمی ہے
+          "x-company-id": _user?.companyId || ""
         }
       });
 
@@ -117,7 +121,11 @@ export default function ChartOfAccounts() {
 
     const res = await fetch("/api/accounts", {
       method: method,
-      headers: { "Content-Type": "application/json", "x-user-role": user.role },
+      headers: { 
+        "Content-Type": "application/json", 
+        "x-user-role": user.role,
+        "x-company-id": user.companyId
+      },
       body: JSON.stringify(payload),
     });
 
@@ -166,7 +174,10 @@ export default function ChartOfAccounts() {
 
 const res = await fetch(`/api/accounts?id=${id}`, {
   method: "DELETE",
-  headers: { "x-user-role": user.role },
+  headers: { 
+    "x-user-role": user.role,
+    "x-company-id": user.companyId
+  },
 });
 
     if (res.ok) loadAccounts();

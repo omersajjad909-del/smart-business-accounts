@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const invoiceType = searchParams.get('invoiceType');
     const invoiceId = searchParams.get('invoiceId');
 
-    const filter: Any = { taxConfiguration: { companyId } };
+    const filter: any = { taxConfiguration: { companyId } };
     if (invoiceType) filter.invoiceType = invoiceType;
     if (invoiceId) filter.invoiceId = invoiceId;
 

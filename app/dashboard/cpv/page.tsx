@@ -27,7 +27,7 @@ export default function CPVPage() {
   const today = new Date().toISOString().split("T")[0];
 
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [bankAccounts, setBankAccounts] = useState<Any[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -38,7 +38,7 @@ export default function CPVPage() {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(today);
   const [narration, setNarration] = useState("");
-  const [voucher, setVoucher] = useState<Any>(null);
+  const [voucher, setVoucher] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [selectedName, setSelectedName] = useState("");
   const [selectedPhone, setSelectedPhone] = useState("");
@@ -48,7 +48,12 @@ export default function CPVPage() {
   /* ================= LOAD DATA ================= */
   useEffect(() => {
     if (!user) {
-      toast.error("Session expired");
+      // toast.error("Session expired");
+      return;
+    }
+
+    if (!user.companyId) {
+      toast.error("Please select a company first");
       return;
     }
 
@@ -58,8 +63,12 @@ export default function CPVPage() {
 
   async function loadVouchers() {
     try {
+      if (!user?.companyId) return;
       const res = await fetch("/api/cpv", {
-        headers: { "x-user-role": user?.role || "" },
+        headers: { 
+          "x-user-role": user?.role || "",
+          "x-company-id": user.companyId 
+        },
       });
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -71,12 +80,22 @@ export default function CPVPage() {
   }
 
   async function loadAccounts() {
+    if (!user?.companyId) return;
+    
+    const headers = { 
+      "x-user-role": user?.role || "",
+      "x-company-id": user.companyId 
+    };
+
     Promise.all([
       fetch("/api/accounts", {
         method: "GET",
-        headers: { "x-user-role": user?.role || "" },
+        headers,
       }),
-      fetch("/api/bank-accounts", { method: "GET" }),
+      fetch("/api/bank-accounts", { 
+        method: "GET",
+        headers,
+      }),
     ])
       .then(async ([accountsRes, banksRes]) => {
         const accountsData = await accountsRes.json();
@@ -91,11 +110,11 @@ export default function CPVPage() {
           );
         }
 
-        const allBanks: Any[] = [];
+        const allBanks: any[] = [];
         // Removed manual addition of banks from accountsData as banksData already includes them
         
         if (Array.isArray(banksData)) {
-          banksData.forEach((bank: Any) => {
+          banksData.forEach((bank: any) => {
             allBanks.push({
               id: bank.id,
               accountId: bank.accountId,

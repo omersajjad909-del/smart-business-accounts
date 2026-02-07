@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const isActive = searchParams.get('isActive');
 
-    const filter: Any = { companyId };
+    const filter: any = { companyId };
     if (isActive !== null) filter.isActive = isActive === 'true';
 
     const taxes = await prisma.taxConfiguration.findMany({
