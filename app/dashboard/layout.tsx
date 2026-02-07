@@ -1,4 +1,4 @@
-﻿﻿"use client";
+﻿﻿﻿﻿"use client";
 
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
@@ -382,6 +382,9 @@ export default function DashboardLayout({
               {openCurrency && (
                 <div className="ml-4 space-y-1 border-l border-[var(--border)] pl-2">
                   <MenuLink href="/dashboard/currencies">ðŸ’± Currencies</MenuLink>
+                  <MenuLink href="/dashboard/branches">ðŸ“ Branches</MenuLink>
+                  <MenuLink href="/dashboard/cost-centers">ðŸ“Š Cost Centers</MenuLink>
+                  <MenuLink href="/dashboard/department-budgets">ðŸ“ Dept Budgets</MenuLink>
                 </div>
               )}
             </>

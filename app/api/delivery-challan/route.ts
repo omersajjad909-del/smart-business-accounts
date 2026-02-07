@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { resolveCompanyId } from "@/lib/tenant";
@@ -190,3 +190,4 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Failed to delete delivery challan" }, { status: 500 });
   }
 }
+

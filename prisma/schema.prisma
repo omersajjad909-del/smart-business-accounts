@@ -91,11 +91,19 @@ model PurchaseOrder {
   id      String   @id @default(uuid())
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+  costCenterId String?
+  costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
   poNo    String
   date    DateTime
   remarks String
   status  String   @default("PENDING")
+  approvalStatus  String   @default("DRAFT")
+  approvedBy      String?
+  approvedAt      DateTime?
+  approvalRemarks String?
 
   supplierId String
   supplier   Account @relation("PurchaseSupplier", fields: [supplierId], references: [id])
@@ -122,6 +130,10 @@ model PurchaseInvoice {
   id        String   @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+  costCenterId String?
+  costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
   invoiceNo String
   date      DateTime
@@ -189,6 +201,10 @@ model SalesInvoice {
   id        String   @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+  costCenterId String?
+  costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
   invoiceNo String
   date      DateTime
@@ -232,6 +248,10 @@ model Voucher {
   id        String   @id @default(uuid())
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+  costCenterId String?
+  costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
   voucherNo String
   type      String
@@ -375,6 +395,9 @@ model Company {
   rolePermissions       RolePermission[]
   userPermissions       UserPermission[]
   backupSchedules       BackupSchedule[]
+  branches              Branch[]
+  costCenters           CostCenter[]
+  departmentBudgets     DepartmentBudget[]
 }
 
 model UserCompany {
@@ -498,6 +521,10 @@ model PaymentReceipt {
   id          String   @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+  costCenterId String?
+  costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
   receiptNo   String   @unique
   date        DateTime
@@ -523,6 +550,10 @@ model ExpenseVoucher {
   id               String              @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+  costCenterId String?
+  costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
   voucherNo        String              @unique
   date             DateTime
@@ -702,6 +733,70 @@ model BackupSchedule {
   updatedAt   DateTime @updatedAt
 
   @@unique([companyId])
+}
+
+model Branch {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  code      String
+  name      String
+  city      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  purchaseOrders   PurchaseOrder[]
+  purchaseInvoices PurchaseInvoice[]
+  salesInvoices    SalesInvoice[]
+  vouchers         Voucher[]
+  paymentReceipts  PaymentReceipt[]
+  expenseVouchers  ExpenseVoucher[]
+  quotations       Quotation[]
+  deliveryChallans DeliveryChallan[]
+
+  @@unique([companyId, code])
+  @@index([companyId, isActive])
+}
+
+model CostCenter {
+  id        String   @id @default(uuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  code      String
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  purchaseOrders   PurchaseOrder[]
+  purchaseInvoices PurchaseInvoice[]
+  salesInvoices    SalesInvoice[]
+  vouchers         Voucher[]
+  paymentReceipts  PaymentReceipt[]
+  expenseVouchers  ExpenseVoucher[]
+  quotations       Quotation[]
+  deliveryChallans DeliveryChallan[]
+
+  @@unique([companyId, code])
+  @@index([companyId, isActive])
+}
+
+model DepartmentBudget {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+
+  department  String
+  year        Int
+  month       Int?
+  amount      Float
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, department, year, month])
+  @@index([companyId, year, month])
 }
 
 // ================= FEATURE 4: MULTI-CURRENCY SUPPORT =================
@@ -983,12 +1078,20 @@ model Quotation {
   id          String   @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+  costCenterId String?
+  costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
   quotationNo String   @unique
   date        DateTime
   total       Float
   validUntil  DateTime?
   status      String   @default("DRAFT") // DRAFT | SENT | ACCEPTED | REJECTED
+  approvalStatus  String   @default("DRAFT")
+  approvedBy      String?
+  approvedAt      DateTime?
+  approvalRemarks String?
 
   customerId   String?
   customer     Account? @relation("QuotationCustomer", fields: [customerId], references: [id])
@@ -1014,6 +1117,10 @@ model DeliveryChallan {
   id        String   @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+  costCenterId String?
+  costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
   challanNo String   @unique
   date      DateTime
@@ -1027,6 +1134,10 @@ model DeliveryChallan {
 
   items  DeliveryChallanItem[]
   status String                @default("PENDING") // PENDING | DELIVERED | INVOICED
+  approvalStatus  String   @default("DRAFT")
+  approvedBy      String?
+  approvedAt      DateTime?
+  approvalRemarks String?
 
   createdAt DateTime @default(now())
 }

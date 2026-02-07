@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient,Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 const prisma =
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       date: new Date(date),
       remarks: remarks || "",
       companyId,
-      status: "PENDING", // 🔴 یہ لائن شامل کرنا ضروری تھی جو مسنگ تھی
+      status: "PENDING",\n      approvalStatus: "PENDING"
       items: {
         create: items.map((i: Any) => ({
           itemId: i.itemId,
@@ -196,6 +196,7 @@ export async function DELETE(req: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
+
 
 
 
