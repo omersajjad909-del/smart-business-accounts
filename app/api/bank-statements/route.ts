@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const bankAccountId = searchParams.get('bankAccountId');
     const isReconciled = searchParams.get('isReconciled');
 
-    const filter: Any = { bankAccount: { companyId } };
+    const filter: any = { bankAccount: { companyId } };
     if (bankAccountId) filter.bankAccountId = bankAccountId;
     if (isReconciled !== null) filter.isReconciled = isReconciled === 'true';
 

@@ -76,10 +76,19 @@ export default function BankReconciliationPage() {
   const fetchBankAccounts = async () => {
     try {
       const response = await fetch('/api/bank-accounts');
+      if (!response.ok) {
+        throw new Error('Failed to fetch bank accounts');
+      }
       const data = await response.json();
-      setBankAccounts(data);
+      if (Array.isArray(data)) {
+        setBankAccounts(data);
+      } else {
+        console.error('Bank accounts API returned non-array:', data);
+        setBankAccounts([]);
+      }
     } catch (error) {
       console.error('Error fetching bank accounts:', error);
+      setBankAccounts([]);
     }
   };
 
@@ -88,22 +97,33 @@ export default function BankReconciliationPage() {
       // Check if this is a BankAccount ID or Account ID
       const bankAccount = bankAccounts.find(ba => ba.id === accountId || ba.accountId === accountId);
 
+      let url = '';
       if (bankAccount && bankAccount.source === 'BankAccount') {
         // This is from BankAccount table, use bankAccountId
-        const response = await fetch(`/api/bank-statements?bankAccountId=${accountId}&isReconciled=false`);
-        const data = await response.json();
-        setStatements(data);
+        url = `/api/bank-statements?bankAccountId=${accountId}&isReconciled=false`;
       } else {
         // This is from Account table, find BankAccount by accountId
         const bankAcc = bankAccounts.find(ba => ba.accountId === accountId);
         if (bankAcc && bankAcc.source === 'BankAccount') {
-          const response = await fetch(`/api/bank-statements?bankAccountId=${bankAcc.id}&isReconciled=false`);
-          const data = await response.json();
-          setStatements(data);
+          url = `/api/bank-statements?bankAccountId=${bankAcc.id}&isReconciled=false`;
         } else {
           // No BankAccount entry, no statements
           setStatements([]);
+          return;
         }
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) {
+         throw new Error('Failed to fetch statements');
+      }
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
+        setStatements(data);
+      } else {
+        console.error('Statements API returned non-array:', data);
+        setStatements([]);
       }
     } catch (error) {
       console.error('Error fetching statements:', error);
