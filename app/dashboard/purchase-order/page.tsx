@@ -17,8 +17,8 @@ export default function PurchaseOrderPage() {
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 
-  const [suppliers, setSuppliers] = useState<Any[]>([]);
-  const [items, setItems] = useState<Any[]>([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([]);
   const [pos, setPos] = useState<PO[]>([]);
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -82,15 +82,40 @@ export default function PurchaseOrderPage() {
   useEffect(() => {
     loadPOs();
     fetch("/api/accounts", { headers: { "x-user-role": user?.role || "ADMIN" } })
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error("Failed to load accounts");
+        return r.json();
+      })
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts;
-        setSuppliers((list || []).filter((a: Any) => a.partyType === "SUPPLIER"));
+        if (Array.isArray(list)) {
+          setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER"));
+        } else {
+          setSuppliers([]);
+        }
+      })
+      .catch(err => {
+        console.error("Error loading suppliers:", err);
+        setSuppliers([]);
       });
 
     fetch("/api/items-new", { headers: { "x-user-role": user?.role || "ADMIN" } })
-      .then(r => r.json())
-      .then(setItems);
+      .then(r => {
+        if (!r.ok) throw new Error("Failed to load items");
+        return r.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setItems(data);
+        } else {
+          console.error("Items API returned non-array:", data);
+          setItems([]);
+        }
+      })
+      .catch(err => {
+        console.error("Error loading items:", err);
+        setItems([]);
+      });
   }, []);
 
   async function loadPOs() {
@@ -111,9 +136,9 @@ export default function PurchaseOrderPage() {
     }
   }
 
-  function updateRow(i: number, key: string, val: Any) {
+  function updateRow(i: number, key: string, val: any) {
     const copy = [...rows];
-    (copy[i] as Any)[key] = val;
+    (copy[i] as any)[key] = val;
     setRows(copy);
   }
 
@@ -166,7 +191,7 @@ export default function PurchaseOrderPage() {
     setSupplierName(po.supplier?.name || "");
     setDate(new Date(po.date).toISOString().slice(0, 10));
     setRemarks(po.remarks || "");
-    setRows(po.items.map((it: Any) => ({
+    setRows(po.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       desc: it.item?.description || "",
