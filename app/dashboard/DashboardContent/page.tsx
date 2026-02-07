@@ -22,6 +22,9 @@ export default function DashboardContent() {
     purchases: 0,
     profit: 0,
     customers: 0,
+    overdueReceivables: 0,
+    overdueReceivablesCount: 0,
+    lowStockCount: 0,
   });
 
   const [charts, setCharts] = useState<ChartData>(null);
@@ -49,9 +52,12 @@ export default function DashboardContent() {
             purchases: Number(statsData?.purchases || 0),
             profit: Number(statsData?.profit || 0),
             customers: Number(statsData?.customers || 0),
+            overdueReceivables: Number(statsData?.overdueReceivables || 0),
+            overdueReceivablesCount: Number(statsData?.overdueReceivablesCount || 0),
+            lowStockCount: Number(statsData?.lowStockCount || 0),
           });
         } else {
-          setStats({ sales: 0, purchases: 0, profit: 0, customers: 0 });
+          setStats({ sales: 0, purchases: 0, profit: 0, customers: 0, overdueReceivables: 0, overdueReceivablesCount: 0, lowStockCount: 0 });
         }
 
         if (chartsRes.ok) {
@@ -112,6 +118,27 @@ export default function DashboardContent() {
         <div className="bg-black text-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]">
           <p className="text-[10px] font-black uppercase opacity-60">Total Customers</p>
           <p className="text-3xl font-black">{stats.customers}</p>
+        </div>
+
+        {/* ⚠️ ALERTS ROW */}
+        <div className="md:col-span-2 bg-red-50 border-4 border-red-600 p-6 shadow-[8px_8px_0px_0px_rgba(220,38,38,1)] flex justify-between items-center">
+          <div>
+            <p className="text-[10px] font-black uppercase text-red-600">Overdue Receivables ({stats.overdueReceivablesCount})</p>
+            <p className="text-3xl font-black text-red-700">Rs. {stats.overdueReceivables.toLocaleString()}</p>
+          </div>
+          <Link href="/dashboard/reports/ageing" className="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-800">
+            VIEW DETAILS
+          </Link>
+        </div>
+
+        <div className="md:col-span-2 bg-yellow-50 border-4 border-yellow-500 p-6 shadow-[8px_8px_0px_0px_rgba(234,179,8,1)] flex justify-between items-center">
+          <div>
+            <p className="text-[10px] font-black uppercase text-yellow-700">Low Stock Items</p>
+            <p className="text-3xl font-black text-yellow-800">{stats.lowStockCount}</p>
+          </div>
+          <Link href="/dashboard/reports/stock/low" className="bg-yellow-500 text-black px-4 py-2 font-bold hover:bg-yellow-600">
+            CHECK STOCK
+          </Link>
         </div>
       </div>
 
