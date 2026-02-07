@@ -34,7 +34,13 @@ export default function TaxConfigurationPage() {
 
   const fetchTaxes = async () => {
     try {
-      const response = await fetch('/api/tax-configuration');
+      const u = getCurrentUser();
+      const headers: Record<string, string> = {};
+      if (u) {
+        headers['x-user-role'] = u.role || '';
+        headers['x-company-id'] = u.companyId || '';
+      }
+      const response = await fetch('/api/tax-configuration', { headers });
       const data = await response.json();
       setTaxes(data);
     } catch (error) {
