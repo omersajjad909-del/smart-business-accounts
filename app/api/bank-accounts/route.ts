@@ -71,10 +71,10 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json(combinedAccounts);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching bank accounts:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch bank accounts' },
+      { error: 'Failed to fetch bank accounts', details: error.message },
       { status: 500 }
     );
   }
@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
   try {
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
+      console.error("POST /api/bank-accounts: Company ID not found");
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
