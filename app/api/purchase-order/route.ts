@@ -120,7 +120,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Company required" }, { status: 400 });
   }
 
-  const { id, poNo, supplierId, date, items, remarks } = await req.json();
+  const { id, poNo, supplierId, date, items, remarks, approvalStatus } = await req.json();
 
   if (!id) {
     return NextResponse.json({ error: "PO ID required" }, { status: 400 });
@@ -145,6 +145,7 @@ export async function PUT(req: NextRequest) {
         date: new Date(date),
         remarks: remarks || "",
         companyId,
+        approvalStatus,
         items: {
           create: items.map((i: any) => ({
             itemId: i.itemId,
