@@ -146,7 +146,7 @@ export async function PUT(req: NextRequest) {
         remarks: remarks || "",
         companyId,
         items: {
-          create: items.map((i: Any) => ({
+          create: items.map((i: any) => ({
             itemId: i.itemId,
             qty: Number(i.qty),
             rate: Number(i.rate || 0),
