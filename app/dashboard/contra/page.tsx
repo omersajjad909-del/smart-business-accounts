@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { getCurrentUser } from '@/lib/auth';
 
 import { ResponsiveContainer, PageHeader, Card } from '@/components/ui/ResponsiveContainer';
 import { ResponsiveForm as _ResponsiveForm, FormField as _FormField, FormActions as _FormActions } from '@/components/ui/ResponsiveForm';
@@ -24,6 +25,7 @@ interface Account {
 }
 
 export default function ContraPage() {
+  const user = getCurrentUser();
   const [entries, setEntries] = useState<ContraEntry[]>([]);
   const [_accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,14 @@ export default function ContraPage() {
   };
 
   const fetchAccounts = async () => {
-    const res = await fetch('/api/accounts');
+    const u = getCurrentUser();
+    if (!u) return;
+    const res = await fetch('/api/accounts', {
+      headers: {
+        "x-user-role": u.role || "",
+        "x-company-id": u.companyId || ""
+      }
+    });
     if (!res.ok) return;
     const data = await res.json();
     setAccounts(data.filter((a: Account) => a.accountType === 'CASH' || a.accountType === 'BANK'));
@@ -67,7 +76,11 @@ export default function ContraPage() {
 
     const res = await fetch('/api/contra', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        "x-user-role": user?.role || "",
+        "x-company-id": user?.companyId || "",
+      },
       body: JSON.stringify({ ...formData, amount: Number(formData.amount) }),
     });
 

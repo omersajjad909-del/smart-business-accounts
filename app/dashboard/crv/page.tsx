@@ -35,7 +35,7 @@ export default function CRVPage() {
   const today = new Date().toISOString().split("T")[0];
 
   const [customers, setCustomers] = useState<Account[]>([]);
-  const [bankAccounts, setBankAccounts] = useState<Any[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -46,7 +46,7 @@ export default function CRVPage() {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(today);
   const [narration, setNarration] = useState("");
-  const [voucher, setVoucher] = useState<Any>(null);
+  const [voucher, setVoucher] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [selectedName, setSelectedName] = useState("");
   const [selectedPhone, setSelectedPhone] = useState("");
@@ -66,7 +66,10 @@ export default function CRVPage() {
   async function loadVouchers() {
     try {
       const res = await fetch("/api/crv", {
-        headers: { "x-user-role": user?.role || "" },
+        headers: { 
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || ""
+        },
       });
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -78,12 +81,20 @@ export default function CRVPage() {
   }
 
   async function loadAccounts() {
+    const headers = {
+      "x-user-role": user?.role || "",
+      "x-company-id": user?.companyId || ""
+    };
+
     Promise.all([
       fetch("/api/accounts", {
         method: "GET",
-        headers: { "x-user-role": user?.role || "" },
+        headers,
       }),
-      fetch("/api/bank-accounts", { method: "GET" }),
+      fetch("/api/bank-accounts", { 
+        method: "GET",
+        headers
+      }),
     ])
       .then(async ([accountsRes, banksRes]) => {
         const accountsData = await accountsRes.json();
@@ -97,7 +108,7 @@ export default function CRVPage() {
           setCustomers(filtered);
         }
 
-        const allBanks: Any[] = [];
+        const allBanks: any[] = [];
         // Removed manual addition of banks from accountsData as banksData already includes them
 
         if (Array.isArray(banksData)) {
@@ -173,7 +184,7 @@ export default function CRVPage() {
       resetForm();
       setShowForm(false);
       setEditing(null);
-    } catch (e: Any) {
+    } catch (e: any) {
       alert(`Error: ${e.message || "Failed to save"}`);
     } finally {
       setSaving(false);

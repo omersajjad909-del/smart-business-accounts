@@ -222,7 +222,10 @@ export default function CPVPage() {
     try {
       const res = await fetch(`/api/cpv?id=${id}`, {
         method: "DELETE",
-        headers: { "x-user-role": user?.role || "" },
+        headers: { 
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
       });
 
       if (res.ok) {

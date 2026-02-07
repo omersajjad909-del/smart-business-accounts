@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
-    const where: Any = { type: "CPV", companyId };
+    const where: any = { type: "CPV", companyId };
     if (from && to) {
       where.date = {
         gte: new Date(from + "T00:00:00"),
@@ -46,9 +46,9 @@ export async function GET(req: NextRequest) {
     });
 
     // Format vouchers with account names
-    const formatted = vouchers.map((v: Any) => {
-      const paymentEntry = v.entries.find((e: Any) => e.amount < 0);
-      const accountEntry = v.entries.find((e: Any) => e.amount > 0);
+    const formatted = vouchers.map((v: any) => {
+      const paymentEntry = v.entries.find((e: any) => e.amount < 0);
+      const accountEntry = v.entries.find((e: any) => e.amount > 0);
       return {
         id: v.id,
         voucherNo: v.voucherNo,
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(formatted);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("CPV GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -300,7 +300,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(responseData);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("❌ CPV ERROR:", e);
     console.error("❌ CPV ERROR DETAILS:", {
       message: e.message,
@@ -391,9 +391,9 @@ export async function PUT(req: NextRequest) {
     }
 
     const paymentAmount = Math.abs(amountNum);
-    const oldAmount = Math.abs(existing.entries.find((e: Any) => e.amount > 0)?.amount || 0);
+    const oldAmount = Math.abs(existing.entries.find((e: any) => e.amount > 0)?.amount || 0);
 
-    const result = await prisma.$transaction(async (tx: Any) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       await tx.voucherEntry.deleteMany({ where: { voucherId: id, companyId } });
 
       const voucher = await tx.voucher.update({
@@ -470,13 +470,32 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "CPV not found" }, { status: 404 });
     }
 
-    await prisma.$transaction(async (tx: Any) => {
+    await prisma.$transaction(async (tx: any) => {
+      // Revert bank balance if applicable
+      const creditEntry = existing.entries.find((e: any) => e.amount < 0);
+      if (creditEntry) {
+        const bankAccount = await tx.bankAccount.findFirst({
+          where: { accountId: creditEntry.accountId, companyId },
+        });
+
+        if (bankAccount) {
+          await tx.bankAccount.update({
+            where: { id: bankAccount.id },
+            data: { balance: { increment: Math.abs(creditEntry.amount) } },
+          });
+
+          await tx.bankStatement.deleteMany({
+            where: { referenceNo: existing.voucherNo, companyId },
+          });
+        }
+      }
+
       await tx.voucherEntry.deleteMany({ where: { voucherId: id, companyId } });
       await tx.voucher.delete({ where: { id, companyId } });
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("CPV DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
