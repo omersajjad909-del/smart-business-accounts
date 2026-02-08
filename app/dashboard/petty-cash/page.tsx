@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getCurrentUser } from '@/lib/auth';
 import { ResponsiveContainer, PageHeader, Card } from '@/components/ui/ResponsiveContainer';
 import { ResponsiveForm, FormField, FormActions } from '@/components/ui/ResponsiveForm';
 import { MobileTable, MobileCard, MobileCardRow, DesktopTable, ActionButtons, EmptyState } from '@/components/ui/MobileTable';
@@ -28,6 +29,7 @@ interface PettyCashExpense {
 }
 
 export default function PettyCashPage() {
+  const user = getCurrentUser();
   const [pettyCashAccounts, setPettyCashAccounts] = useState<PettyCash[]>([]);
   const [expenses, setExpenses] = useState<PettyCashExpense[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
@@ -64,7 +66,12 @@ export default function PettyCashPage() {
 
   const fetchPettyCashAccounts = async () => {
     try {
-      const response = await fetch('/api/petty-cash');
+      const headers: Record<string, string> = {};
+      if (user) {
+        headers['x-user-role'] = user.role || '';
+        headers['x-company-id'] = user.companyId || '';
+      }
+      const response = await fetch('/api/petty-cash', { headers });
       if (response.ok) {
         const data = await response.json();
         setPettyCashAccounts(data);
@@ -78,7 +85,12 @@ export default function PettyCashPage() {
 
   const fetchExpenses = async (accountId: string) => {
     try {
-      const response = await fetch(`/api/petty-cash-expense?pettyCashId=${accountId}`);
+      const headers: Record<string, string> = {};
+      if (user) {
+        headers['x-user-role'] = user.role || '';
+        headers['x-company-id'] = user.companyId || '';
+      }
+      const response = await fetch(`/api/petty-cash-expense?pettyCashId=${accountId}`, { headers });
       if (response.ok) {
         const data = await response.json();
         setExpenses(data);
@@ -91,9 +103,14 @@ export default function PettyCashPage() {
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (user) {
+        headers['x-user-role'] = user.role || '';
+        headers['x-company-id'] = user.companyId || '';
+      }
       const response = await fetch('/api/petty-cash', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           ...accountForm,
           openingBalance: parseFloat(accountForm.openingBalance),
@@ -113,9 +130,14 @@ export default function PettyCashPage() {
   const handleCreateExpense = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (user) {
+        headers['x-user-role'] = user.role || '';
+        headers['x-company-id'] = user.companyId || '';
+      }
       const response = await fetch('/api/petty-cash-expense', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           ...expenseForm,
           amount: parseFloat(expenseForm.amount),
@@ -145,8 +167,14 @@ export default function PettyCashPage() {
     if (!confirm('Are you sure you want to delete this petty cash account?')) return;
 
     try {
+      const headers: Record<string, string> = {};
+      if (user) {
+        headers['x-user-role'] = user.role || '';
+        headers['x-company-id'] = user.companyId || '';
+      }
       const response = await fetch(`/api/petty-cash?id=${id}`, {
         method: 'DELETE',
+        headers,
       });
 
       if (response.ok) {
@@ -165,8 +193,14 @@ export default function PettyCashPage() {
     if (!confirm('Are you sure you want to delete this expense?')) return;
 
     try {
+      const headers: Record<string, string> = {};
+      if (user) {
+        headers['x-user-role'] = user.role || '';
+        headers['x-company-id'] = user.companyId || '';
+      }
       const response = await fetch(`/api/petty-cash-expense?id=${id}`, {
         method: 'DELETE',
+        headers,
       });
 
       if (response.ok) {

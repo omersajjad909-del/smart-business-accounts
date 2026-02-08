@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient,Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 const prisma =
@@ -149,7 +149,7 @@ export async function PUT(req: NextRequest) {
         items: {
           create: items.map((i: any) => ({
             itemId: i.itemId,
-            qty: Number(i.qty),
+            qty: Number(i.qty || 0),
             rate: Number(i.rate || 0),
           })),
         },

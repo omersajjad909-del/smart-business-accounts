@@ -46,7 +46,13 @@ export default function ContraPage() {
 
   const fetchEntries = async () => {
     try {
-      const res = await fetch('/api/contra');
+      const u = getCurrentUser();
+      const headers: Record<string, string> = {};
+      if (u) {
+        headers['x-user-role'] = u.role || '';
+        headers['x-company-id'] = u.companyId || '';
+      }
+      const res = await fetch('/api/contra', { headers });
       if (res.ok) setEntries(await res.json());
     } finally {
       setLoading(false);

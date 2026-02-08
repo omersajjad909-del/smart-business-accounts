@@ -20,7 +20,7 @@ const CATEGORY_TYPE_MAP: Record<string, string> = {
 };
 
 export async function GET(req: NextRequest) {
-  const role = req.headers.get("x-user-role");
+  const role = req.headers.get("x-user-role")?.toUpperCase();
   const { searchParams } = new URL(req.url);
   const prefix = searchParams.get("prefix");
   const format = searchParams.get("format") || "json";

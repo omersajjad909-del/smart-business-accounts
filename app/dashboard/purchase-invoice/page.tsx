@@ -90,6 +90,7 @@ const [searchTerm, setSearchTerm] = useState("");
   const [date, setDate] = useState(today);
   const [location, setLocation] = useState("MAIN");
   const [freight, setFreight] = useState<number | "">("");
+  const [approvalStatus, setApprovalStatus] = useState("PENDING");
 
   const [rows, setRows] = useState<Row[]>([
     { itemId: "", name: "", description: "", qty: "", rate: "" },
@@ -171,7 +172,7 @@ const [searchTerm, setSearchTerm] = useState("");
       });
 
     // Load tax configurations
-    fetch("/api/tax-configuration")
+    fetch("/api/tax-configuration", { headers: { "x-user-role": user?.role || "ADMIN" } })
       .then(r => r.json())
       .then(d => setTaxes(Array.isArray(d) ? d : []))
       .catch(err => console.log("Tax config error:", err));
@@ -274,6 +275,7 @@ const [searchTerm, setSearchTerm] = useState("");
         taxConfigId: applyTax ? selectedTaxId : null,
         currencyId: currencyId || null,
         exchangeRate,
+        approvalStatus,
       };
       const body = editing ? { id: editing.id, ...baseBody } : baseBody;
 
@@ -318,7 +320,7 @@ const [searchTerm, setSearchTerm] = useState("");
             : "Save failed (empty/invalid response)";
         toast.error("Error: " + msg);
       }
-    } catch (err: Any) {
+    } catch (err: any) {
       toast.error("System Error: " + err.message);
     } finally {
       setSaving(false);
@@ -331,6 +333,7 @@ const [searchTerm, setSearchTerm] = useState("");
     setInvoiceId(inv.invoiceNo);
     setSupplierId(inv.supplierId);
     setSupplierName(inv.supplier?.name || "");
+    setApprovalStatus(inv.approvalStatus || "PENDING");
     setDate(new Date(inv.date).toISOString().slice(0, 10));
     setRows(inv.items.map((it: Any) => ({
       itemId: it.itemId || "",
@@ -370,6 +373,7 @@ const [searchTerm, setSearchTerm] = useState("");
     setDate(today);
     setLocation("MAIN");
     setFreight("");
+    setApprovalStatus("PENDING");
     setRows([{ itemId: "", name: "", description: "", qty: "", rate: "" }]);
     setApplyTax(false);
     setSelectedTaxId("");
@@ -600,6 +604,20 @@ const [searchTerm, setSearchTerm] = useState("");
                     value={exchangeRate}
                     onChange={(e) => setExchangeRate(Number(e.target.value) || 1)}
                   />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-xs font-bold">Approval Status</label>
+                  <select
+                    className="border p-2 rounded"
+                    value={approvalStatus}
+                    onChange={(e) => setApprovalStatus(e.target.value)}
+                  >
+                    <option value="DRAFT">Draft</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="APPROVED">Approved</option>
+                    <option value="REJECTED">Rejected</option>
+                  </select>
                 </div>
 
                 <select className="border p-2 rounded" value={location} onChange={e => setLocation(e.target.value)}>

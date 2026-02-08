@@ -62,6 +62,7 @@ export default function PaymentReceiptsPage() {
         headers: {
           'x-user-role': user?.role || 'ADMIN',
           'x-user-id': user?.id || '',
+          'x-company-id': user?.companyId || '',
         },
       });
       
@@ -93,6 +94,7 @@ export default function PaymentReceiptsPage() {
         headers: {
           'x-user-role': user?.role || 'ADMIN',
           'x-user-id': user?.id || '',
+          'x-company-id': user?.companyId || '',
         },
       });
       
@@ -139,7 +141,7 @@ export default function PaymentReceiptsPage() {
         return;
       }
       
-      const filtered = data.filter((acc: Any) => 
+      const filtered = data.filter((acc: any) => 
         acc.partyType === 'CUSTOMER' || !acc.partyType
       );
       setParties(filtered);

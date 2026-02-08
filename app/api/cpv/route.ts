@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     let requestBody;
     try {
       requestBody = await req.json();
-    } catch (parseError: Any) {
+    } catch (parseError: any) {
       console.error("❌ CPV JSON PARSE ERROR:", parseError);
       return NextResponse.json(
         { error: "Invalid request body", details: parseError.message },
@@ -203,7 +203,7 @@ export async function POST(req: Request) {
     console.log("🔥 CREATING CPV:", { voucherNo, paymentAmount, accountId: account.id, paymentAccountId: paymentAccount.id });
 
     // Create voucher and update bank balance in transaction
-    const result = await prisma.$transaction(async (tx: Any) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // CPV = Cash Payment Voucher (روپے ادا کرنا)
       // Supplier/Expense کو روپے دے رہے ہیں
       //
@@ -435,7 +435,7 @@ export async function PUT(req: NextRequest) {
       amount: paymentAmount,
       paymentMode: paymentMode || "CASH",
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("CPV PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
