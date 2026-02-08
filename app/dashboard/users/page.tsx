@@ -68,7 +68,7 @@ export default function UsersMasterPage() {
     // صرف ADMIN access کر سکتا ہے
     if (user.role === "ADMIN") {
       setAuthorized(true);
-      loadUsers();
+      loadUsers(user);
       loadRoles(user);
     } else {
       setAuthorized(false);
@@ -77,10 +77,17 @@ export default function UsersMasterPage() {
   }, []);
 
   // ============ USERS TAB FUNCTIONS ============
-  const loadUsers = async () => {
+  const loadUsers = async (currentUser?: any) => {
+    const u = currentUser || me;
+    if (!u) return;
+
     try {
       const res = await fetch("/api/users", {
-        headers: { "x-user-role": "ADMIN" },
+        headers: { 
+          "x-user-role": "ADMIN",
+          "x-user-id": u.id,
+          "x-company-id": u.companyId || ""
+        },
       });
       const data = await res.json();
       setUsers(Array.isArray(data) ? data : []);
@@ -91,7 +98,9 @@ export default function UsersMasterPage() {
     }
   };
 
-  const saveUser = async () => {
+  const saveUser = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    
     if (!userForm.name || !userForm.email)
       return toast.error("Name and Email required!");
 
@@ -101,6 +110,8 @@ export default function UsersMasterPage() {
         headers: {
           "Content-Type": "application/json",
           "x-user-role": "ADMIN",
+          "x-user-id": me?.id,
+          "x-company-id": me?.companyId || ""
         },
         body: JSON.stringify({
           id: userForm.id,
@@ -115,7 +126,7 @@ export default function UsersMasterPage() {
       if (res.ok) {
         toast.success(editing ? "✅ User updated!" : "✅ User created!");
         resetUserForm();
-        loadUsers();
+        loadUsers(me);
       } else {
         toast.error("Failed to save user");
       }
@@ -133,13 +144,15 @@ export default function UsersMasterPage() {
         headers: {
           "Content-Type": "application/json",
           "x-user-role": "ADMIN",
+          "x-user-id": me?.id,
+          "x-company-id": me?.companyId || ""
         },
         body: JSON.stringify({ id }),
       });
 
       if (res.ok) {
         toast.success("✅ User deleted!");
-        loadUsers();
+        loadUsers(me);
       }
     } catch (err) {
       console.error("Delete error:", err);
@@ -312,76 +325,81 @@ export default function UsersMasterPage() {
               {editing ? "✏️ Edit User" : "➕ Add New User"}
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-              <input
-                type="text"
-                placeholder="Name"
-                value={userForm.name}
-                onChange={(e) =>
-                  setUserForm({ ...userForm, name: e.target.value })
-                }
-                className="border rounded px-3 py-2"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={userForm.email}
-                onChange={(e) =>
-                  setUserForm({ ...userForm, email: e.target.value })
-                }
-                className="border rounded px-3 py-2"
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={userForm.password}
-                onChange={(e) =>
-                  setUserForm({ ...userForm, password: e.target.value })
-                }
-                className="border rounded px-3 py-2"
-              />
-              <select
-                value={userForm.role}
-                onChange={(e) =>
-                  setUserForm({ ...userForm, role: e.target.value })
-                }
-                className="border rounded px-3 py-2"
-              >
-                <option value="ADMIN">ADMIN</option>
-                <option value="ACCOUNTANT">ACCOUNTANT</option>
-                <option value="VIEWER">VIEWER</option>
-              </select>
-            </div>
-
-            <div className="flex gap-2 mb-4">
-              <label className="flex items-center gap-2">
+            <form onSubmit={saveUser}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <input
-                  type="checkbox"
-                  checked={userForm.active}
+                  type="text"
+                  placeholder="Name"
+                  value={userForm.name}
                   onChange={(e) =>
-                    setUserForm({ ...userForm, active: e.target.checked })
+                    setUserForm({ ...userForm, name: e.target.value })
                   }
+                  className="border rounded px-3 py-2"
                 />
-                Active
-              </label>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={saveUser}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                {editing ? "✏️ Edit User" : "✅ Add User"}
-              </button>
-              {editing && (
-                <button
-                  onClick={resetUserForm}
-                  className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={userForm.email}
+                  onChange={(e) =>
+                    setUserForm({ ...userForm, email: e.target.value })
+                  }
+                  className="border rounded px-3 py-2"
+                  autoComplete="username"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={userForm.password}
+                  onChange={(e) =>
+                    setUserForm({ ...userForm, password: e.target.value })
+                  }
+                  className="border rounded px-3 py-2"
+                  autoComplete="new-password"
+                />
+                <select
+                  value={userForm.role}
+                  onChange={(e) =>
+                    setUserForm({ ...userForm, role: e.target.value })
+                  }
+                  className="border rounded px-3 py-2"
                 >
-                  منسوخ کریں
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="ACCOUNTANT">ACCOUNTANT</option>
+                  <option value="VIEWER">VIEWER</option>
+                </select>
+              </div>
+
+              <div className="flex gap-2 mb-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={userForm.active}
+                    onChange={(e) =>
+                      setUserForm({ ...userForm, active: e.target.checked })
+                    }
+                  />
+                  Active
+                </label>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  {editing ? "✏️ Edit User" : "✅ Add User"}
                 </button>
-              )}
-            </div>
+                {editing && (
+                  <button
+                    type="button"
+                    onClick={resetUserForm}
+                    className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+                  >
+                    منسوخ کریں
+                  </button>
+                )}
+              </div>
+            </form>
           </div>
 
           {/* USERS TABLE */}
