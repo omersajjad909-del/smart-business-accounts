@@ -272,7 +272,7 @@ export async function POST(req: NextRequest) {
       invoiceNo: invoice.invoiceNo,
       invoice: savedInvoice
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
