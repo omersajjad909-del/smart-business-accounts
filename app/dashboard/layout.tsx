@@ -1,4 +1,4 @@
-﻿﻿"use client";
+﻿"use client";
 
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
@@ -341,7 +341,7 @@ export default function DashboardLayout({
           {/* ================= ADMIN SETTINGS ================= */}
           {(hasPermission(currentUser, PERMISSIONS.MANAGE_USERS) || isAdmin) && (
             <div className="pt-4 mt-4 border-t border-[var(--border)]">
-              <MenuHeader title="Admin Settings" open={openAdmin} onClick={() => setopenAdmin(!openAdmin)} />
+              <MenuHeader title="Admin Settings" open={openAdmin} onClick={() => setOpenAdmin(!openAdmin)} />
                 {openAdmin && (
               <div className="ml-2 mt-2 space-y-1 border-l border-[var(--border)]">
                 <MenuLink href="/dashboard/users">ðŸ‘¥ Users & Permissions</MenuLink>

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Company required" }, { status: 400 });
   }
 
-  const { poNo, supplierId, date, items, remarks } = await req.json();
+  const { poNo, supplierId, date, items, remarks, approvalStatus } = await req.json();
 
   const supplier = await prisma.account.findFirst({ where: { id: supplierId, companyId } });
   if (!supplier) {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       remarks: remarks || "",
       companyId,
       status: "PENDING",
-      approvalStatus: "PENDING",
+      approvalStatus: approvalStatus || "PENDING",
       items: {
         create: items.map((i: any) => ({
           itemId: i.itemId,
