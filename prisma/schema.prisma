@@ -47,6 +47,9 @@ model Account {
   paymentVouchers ExpenseVoucher[] @relation("PaymentAccount")
   taxAccounts     TaxAccount[]
   advancePayments AdvancePayment[] @relation("SupplierAdvances")
+  creditNotes     CreditNote[]     @relation("CreditNoteAccount")
+  debitNotes      DebitNote[]      @relation("DebitNoteAccount")
+  loans           Loan[]           @relation("LoanAccount")
 
   // Advanced Features
   budgets            Budget[]
@@ -398,6 +401,109 @@ model Company {
   branches              Branch[]
   costCenters           CostCenter[]
   departmentBudgets     DepartmentBudget[]
+  creditNotes           CreditNote[]
+  debitNotes            DebitNote[]
+  loans                 Loan[]
+  fixedAssets           FixedAsset[]
+}
+
+model CreditNote {
+  id               String   @id @default(uuid())
+  companyId        String
+  company          Company  @relation(fields: [companyId], references: [id])
+  creditNoteNumber String
+  date             DateTime
+  accountId        String
+  account          Account  @relation("CreditNoteAccount", fields: [accountId], references: [id])
+  amount           Float
+  reason           String
+  description      String?
+  reference        String?
+  status           String   @default("PENDING") // PENDING, APPROVED, APPLIED, CANCELLED
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model DebitNote {
+  id              String   @id @default(uuid())
+  companyId       String
+  company         Company  @relation(fields: [companyId], references: [id])
+  debitNoteNumber String
+  date            DateTime
+  accountId       String
+  account         Account  @relation("DebitNoteAccount", fields: [accountId], references: [id])
+  amount          Float
+  reason          String
+  description     String?
+  reference       String?
+  status          String   @default("PENDING") // PENDING, APPROVED, APPLIED, CANCELLED
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Loan {
+  id                String   @id @default(uuid())
+  companyId         String
+  company           Company  @relation(fields: [companyId], references: [id])
+  loanNumber        String
+  loanType          String
+  accountId         String
+  account           Account  @relation("LoanAccount", fields: [accountId], references: [id])
+  principalAmount   Float
+  interestRate      Float
+  tenure            Int
+  emi               Float    @default(0)
+  startDate         DateTime
+  endDate           DateTime?
+  status            String   @default("ACTIVE") // ACTIVE, CLOSED, DEFAULTED
+  outstandingAmount Float    @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  payments          LoanPayment[]
+}
+
+model LoanPayment {
+  id                 String   @id @default(uuid())
+  loanId             String
+  loan               Loan     @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  paymentDate        DateTime
+  amount             Float
+  principalPaid      Float    @default(0)
+  interestPaid       Float    @default(0)
+  outstandingBalance Float    @default(0)
+  createdAt          DateTime @default(now())
+}
+
+model FixedAsset {
+  id                 String   @id @default(uuid())
+  companyId          String
+  company            Company  @relation(fields: [companyId], references: [id])
+  assetName          String
+  assetCode          String
+  category           String
+  purchaseDate       DateTime
+  purchaseValue      Float
+  currentValue       Float    @default(0)
+  depreciationMethod String   @default("STRAIGHT_LINE")
+  depreciationRate   Float
+  usefulLife         Int
+  salvageValue       Float    @default(0)
+  location           String?
+  status             String   @default("ACTIVE") // ACTIVE, DISPOSED, SOLD, SCRAPPED
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  depreciations      Depreciation[]
+}
+
+model Depreciation {
+  id                      String     @id @default(uuid())
+  fixedAssetId            String
+  fixedAsset              FixedAsset @relation(fields: [fixedAssetId], references: [id], onDelete: Cascade)
+  date                    DateTime
+  amount                  Float
+  accumulatedDepreciation Float      @default(0)
+  bookValue               Float      @default(0)
+  createdAt               DateTime   @default(now())
 }
 
 model UserCompany {

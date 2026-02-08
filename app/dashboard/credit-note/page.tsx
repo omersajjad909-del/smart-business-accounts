@@ -130,6 +130,10 @@ export default function CreditNotePage() {
     try {
       const response = await fetch(`/api/credit-note?id=${id}`, {
         method: 'DELETE',
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
       });
 
       if (response.ok) {
