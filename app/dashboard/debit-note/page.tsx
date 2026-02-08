@@ -130,6 +130,10 @@ export default function DebitNotePage() {
     try {
       const response = await fetch(`/api/debit-note?id=${id}`, {
         method: 'DELETE',
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
       });
 
       if (response.ok) {

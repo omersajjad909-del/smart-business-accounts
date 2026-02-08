@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getCurrentUser } from '@/lib/auth';
 import { ResponsiveContainer, PageHeader, Card } from '@/components/ui/ResponsiveContainer';
 import { ResponsiveForm, FormField, FormActions } from '@/components/ui/ResponsiveForm';
 import { MobileTable, MobileCard, MobileCardRow, DesktopTable, ActionButtons, EmptyState } from '@/components/ui/MobileTable';
@@ -33,6 +34,7 @@ interface Depreciation {
 }
 
 export default function FixedAssetsPage() {
+  const user = getCurrentUser();
   const [assets, setAssets] = useState<FixedAsset[]>([]);
   const [depreciations, setDepreciations] = useState<Depreciation[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
@@ -72,7 +74,12 @@ export default function FixedAssetsPage() {
 
   const fetchAssets = async () => {
     try {
-      const response = await fetch('/api/fixed-assets');
+      const response = await fetch('/api/fixed-assets', {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setAssets(data);
@@ -86,7 +93,12 @@ export default function FixedAssetsPage() {
 
   const fetchDepreciations = async (assetId: string) => {
     try {
-      const response = await fetch(`/api/depreciation?fixedAssetId=${assetId}`);
+      const response = await fetch(`/api/depreciation?fixedAssetId=${assetId}`, {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setDepreciations(data);
@@ -101,7 +113,11 @@ export default function FixedAssetsPage() {
     try {
       const response = await fetch('/api/fixed-assets', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
         body: JSON.stringify({
           ...assetForm,
           purchaseValue: parseFloat(assetForm.purchaseValue),
@@ -137,7 +153,11 @@ export default function FixedAssetsPage() {
     try {
       const response = await fetch('/api/depreciation', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
         body: JSON.stringify({
           ...depreciationForm,
           amount: parseFloat(depreciationForm.amount),
@@ -167,6 +187,10 @@ export default function FixedAssetsPage() {
     try {
       const response = await fetch(`/api/fixed-assets?id=${id}`, {
         method: 'DELETE',
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
       });
 
       if (response.ok) {

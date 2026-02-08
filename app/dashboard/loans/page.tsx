@@ -137,7 +137,11 @@ export default function LoansPage() {
     try {
       const response = await fetch('/api/loans', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
         body: JSON.stringify({
           ...loanForm,
           principalAmount: parseFloat(loanForm.principalAmount),
@@ -168,7 +172,11 @@ export default function LoansPage() {
     try {
       const response = await fetch('/api/loan-payment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
         body: JSON.stringify({
           ...paymentForm,
           amount: parseFloat(paymentForm.amount),
@@ -198,6 +206,10 @@ export default function LoansPage() {
     try {
       const response = await fetch(`/api/loans?id=${id}`, {
         method: 'DELETE',
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
       });
 
       if (response.ok) {
