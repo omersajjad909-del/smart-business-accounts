@@ -42,7 +42,7 @@ export default function TaxConfigurationPage() {
       }
       const response = await fetch('/api/tax-configuration', { headers });
       const data = await response.json();
-      setTaxes(data);
+      setTaxes(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching taxes:', error);
     }
