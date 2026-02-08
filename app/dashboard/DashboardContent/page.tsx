@@ -57,6 +57,9 @@ export default function DashboardContent() {
             lowStockCount: Number(statsData?.lowStockCount || 0),
           });
         } else {
+          console.error("Stats API Error:", statsRes.status, statsRes.statusText);
+          const errText = await statsRes.text();
+          console.error("Stats API Response:", errText);
           setStats({ sales: 0, purchases: 0, profit: 0, customers: 0, overdueReceivables: 0, overdueReceivablesCount: 0, lowStockCount: 0 });
         }
 
@@ -64,6 +67,9 @@ export default function DashboardContent() {
           const chartsData = await chartsRes.json();
           setCharts(chartsData);
         } else {
+          console.error("Charts API Error:", chartsRes.status, chartsRes.statusText);
+          const errText = await chartsRes.text();
+          console.error("Charts API Response:", errText);
           setCharts(null);
         }
       } catch (e) {
