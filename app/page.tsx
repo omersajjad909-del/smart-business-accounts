@@ -142,6 +142,9 @@ export default function LoginPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                     <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">User Name:</label>
                     <select
+                      id="username"
+                      name="username"
+                      autoComplete="username"
                       className="flex-1 bg-[var(--panel-bg-2)] text-[var(--text-primary)] px-2 py-1.5 outline-none w-full rounded border border-[var(--border)]"
                       value={username}
                       onChange={(e) => handleUserChange(e.target.value)}
@@ -166,6 +169,9 @@ export default function LoginPage() {
                     <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">Password:</label>
                     <input
                       type="password"
+                      id="password"
+                      name="password"
+                      autoComplete="current-password"
                       className="flex-1 bg-[var(--panel-bg-2)] text-[var(--text-primary)] px-2 py-1.5 outline-none w-full rounded border border-[var(--border)]"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
