@@ -93,7 +93,7 @@ export default function ChartOfAccounts() {
       // اس URL کو تبدیل کریں
       const res = await fetch(`/api/accounts?prefix=${prefix}`, { // 'next-code' ہٹا دیں
         headers: {
-          "x-user-role": "ADMIN", // رول بھیجنا لازمی ہے
+          "x-user-role": _user?.role || "", // رول بھیجنا لازمی ہے
           "x-company-id": _user?.companyId || ""
         }
       });

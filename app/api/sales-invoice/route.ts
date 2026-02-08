@@ -329,7 +329,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    const total = items.reduce((s: number, i: Any) => s + i.qty * i.rate, 0);
+    const total = items.reduce((s: number, i: any) => s + i.qty * i.rate, 0);
 
     // Calculate tax if applied
     let taxAmount = 0;

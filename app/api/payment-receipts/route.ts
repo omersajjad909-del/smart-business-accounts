@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status');
     const partyId = searchParams.get('partyId');
 
-    const filter: Any = { companyId };
+    const filter: any = { companyId };
     if (status) filter.status = status;
     if (partyId) filter.partyId = partyId;
 
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create voucher and payment receipt in transaction
-    const result = await prisma.$transaction(async (tx: Any) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // 1. Create voucher (like CRV)
       const voucher = await tx.voucher.create({
         data: {
@@ -239,7 +239,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(result, { status: 201 });
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error('Error creating payment receipt:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to create payment receipt' },

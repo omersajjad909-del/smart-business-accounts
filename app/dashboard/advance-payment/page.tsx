@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { getCurrentUser } from "@/lib/auth";
 
 import {
   ResponsiveContainer,
@@ -36,7 +37,7 @@ type AdvancePayment = {
   status: string;
   supplier: { id: string; name: string };
   po?: { id: string; poNo: string };
-  adjustments: Any[];
+  adjustments: any[];
   createdAt: string;
 };
 
@@ -49,6 +50,7 @@ interface Account {
 
 
 export default function AdvancePaymentPage() {
+  const user = getCurrentUser();
   const [advances, setAdvances] = useState<AdvancePayment[]>([]);
   const [suppliers, setSuppliers] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,20 +76,25 @@ export default function AdvancePaymentPage() {
 
   async function fetchData() {
     try {
+      const headers = {
+        "x-user-role": user?.role || "",
+        "x-company-id": user?.companyId || "",
+      };
+
       const [advancesRes, accountsRes] = await Promise.all([
-        fetch("/api/advance-payment"),
-        fetch("/api/accounts"),
+        fetch("/api/advance-payment", { headers }),
+        fetch("/api/accounts", { headers }),
       ]);
 
       const advancesData = await advancesRes.json();
       const accountsData = await accountsRes.json();
 
-      setAdvances(advancesData);
+      setAdvances(Array.isArray(advancesData) ? advancesData : []);
 
       // Filter suppliers
-      const supplierAccounts = accountsData.filter(
-  (acc: Account) => acc.type === "SUPPLIER"
-);
+      const supplierAccounts = Array.isArray(accountsData) ? accountsData.filter(
+        (acc: Account) => acc.partyType === "SUPPLIER"
+      ) : [];
 
       setSuppliers(supplierAccounts);
 
@@ -122,7 +129,11 @@ export default function AdvancePaymentPage() {
     try {
       const res = await fetch("/api/advance-payment", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
         body: JSON.stringify({
           advanceNo,
           date,
@@ -169,7 +180,11 @@ export default function AdvancePaymentPage() {
     try {
       const res = await fetch("/api/advance-payment", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
         body: JSON.stringify({
           id: selectedAdvance.id,
           invoiceNo,

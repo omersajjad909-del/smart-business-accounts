@@ -260,6 +260,7 @@ export default function PurchaseOrderPage() {
     setSupplierName("");
     setDate(today);
     setRemarks("");
+    setApprovalStatus("PENDING");
     setRows([{ itemId: "", name: "", desc: "", qty: "", rate: "" }]);
     setPreview(false);
   }
@@ -436,6 +437,19 @@ export default function PurchaseOrderPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
                 <div><label className="text-xs font-bold uppercase text-gray-500">PO Number</label><input className="border w-full p-2 bg-gray-50 rounded font-bold" value={poNo} disabled /></div>
                 <div><label className="text-xs font-bold uppercase text-gray-500">Order Date (F7: Clear)</label><input type="date" className="border w-full p-2 rounded font-bold" value={date} onChange={e => setDate(e.target.value)} /></div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-gray-500">Approval Status</label>
+                  <select
+                    className="border w-full p-2 rounded font-bold bg-white"
+                    value={approvalStatus}
+                    onChange={(e) => setApprovalStatus(e.target.value)}
+                  >
+                    <option value="DRAFT">DRAFT</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="APPROVED">APPROVED</option>
+                    <option value="REJECTED">REJECTED</option>
+                  </select>
+                </div>
               </div>
               <div>
                 <label className="text-xs font-bold uppercase text-gray-500">Select Supplier (F7: Clear, F8: Query)</label>

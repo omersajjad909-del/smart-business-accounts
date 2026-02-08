@@ -155,6 +155,7 @@ export default function CPVPage() {
         headers: {
           "Content-Type": "application/json",
           "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
         },
         body: JSON.stringify(editing ? {
           id: editing.id,
@@ -187,7 +188,7 @@ export default function CPVPage() {
       resetForm();
       setShowForm(false);
       setEditing(null);
-    } catch (e: Any) {
+    } catch (e: any) {
       alert(`Error: ${e.message || "Failed to save"}`);
     } finally {
       setSaving(false);

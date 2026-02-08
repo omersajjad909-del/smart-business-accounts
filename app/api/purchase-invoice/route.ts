@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(pos);
-  } catch (e: Any) {
+  } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
 
     await ensureOpenPeriod(prisma, companyId, new Date(date));
 
-    const validItems = items.filter((i: Any) => Number(i.qty) > 0 && i.itemId);
+    const validItems = items.filter((i: any) => Number(i.qty) > 0 && i.itemId);
 
     // 2. Start Transaction (Disabled due to Supabase connection issues)
     // const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
           approvalStatus: "PENDING",
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
-            create: validItems.map((i: Any) => ({
+            create: validItems.map((i: any) => ({
               itemId: i.itemId,
               qty: Number(i.qty),
               rate: Number(i.rate),
@@ -289,6 +289,7 @@ export async function PUT(req: NextRequest) {
       taxConfigId = null,
       currencyId = null,
       exchangeRate = 1,
+      approvalStatus,
     } = body;
 
     if (!id) {
@@ -308,8 +309,8 @@ export async function PUT(req: NextRequest) {
 
     // Note: Updating purchase invoices is complex due to inventory transactions
     // For now, we'll just update the invoice data
-    const validItems = items.filter((i: Any) => Number(i.qty) > 0 && i.itemId);
-    const totalItemsAmount = validItems.reduce((s: number, i: Any) => s + (Number(i.qty) * Number(i.rate)), 0);
+    const validItems = items.filter((i: any) => Number(i.qty) > 0 && i.itemId);
+    const totalItemsAmount = validItems.reduce((s: number, i: any) => s + (Number(i.qty) * Number(i.rate)), 0);
     
     // Calculate tax if applied
     let taxAmount = 0;
@@ -334,6 +335,7 @@ export async function PUT(req: NextRequest) {
         data: {
           date: new Date(date),
           total: netTotal,
+          approvalStatus,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
             create: validItems.map((i: Any) => ({
@@ -418,7 +420,7 @@ export async function DELETE(req: NextRequest) {
     // });
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("PI DELETE ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

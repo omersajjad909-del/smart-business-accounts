@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿"use client";
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿"use client";
 
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
@@ -71,6 +71,12 @@ export default function DashboardLayout({
 
   // MOBILE MENU STATE
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   // Enable global Enter key navigation
   useGlobalEnterNavigation();
