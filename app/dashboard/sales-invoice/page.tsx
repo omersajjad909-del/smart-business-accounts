@@ -483,7 +483,7 @@ function SalesInvoiceContent() {
     message += `Customer: ${customerName}\n\n`;
     message += `*Items:*\n`;
 
-    savedInvoice.items.forEach((item: Any, index: number) => {
+    savedInvoice.items.forEach((item: any, index: number) => {
       message += `${index + 1}. ${item.item.name} x ${item.qty} @ ${item.rate} = ${(item.qty * item.rate).toLocaleString()}\n`;
     });
 

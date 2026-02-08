@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
-    const where: Any = { type: "JV", companyId };
+    const where: any = { type: "JV", companyId };
     if (from && to) {
       where.date = {
         gte: new Date(from + "T00:00:00"),
@@ -165,7 +165,7 @@ export async function POST(req: Request) {
           narration: narration || "Journal Entry",
           companyId,
           entries: {
-            create: entries.map((entry: Any) => ({
+            create: entries.map((entry: any) => ({
               accountId: entry.accountId,
               amount: Number(entry.amount), // +ve = Debit, -ve = Credit
               companyId,
@@ -194,7 +194,7 @@ export async function POST(req: Request) {
       totalDebit,
       totalCredit,
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("❌ JV ERROR:", e);
     return NextResponse.json(
       { error: e.message || "JV failed", details: e.code || "Unknown error" },
@@ -334,7 +334,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("JV DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
