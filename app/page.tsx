@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
@@ -23,10 +23,11 @@ export default function LoginPage() {
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const res = await fetch("/api/users");
+        const res = await fetch("/api/users", { cache: "no-store" });
         const data = await res.json();
         if (res.ok) {
           const users = Array.isArray(data) ? data : [];
+          console.log("Fetched users:", users.length, users);
           setUsersList(users);
           if (users.length === 0) {
             setError("No users found. Please create a user first.");
@@ -136,69 +137,71 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <div className="space-y-3 text-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">User Name:</label>
-                  <select
-                    className="flex-1 bg-[var(--panel-bg-2)] text-[var(--text-primary)] px-2 py-1.5 outline-none w-full rounded border border-[var(--border)]"
-                    value={username}
-                    onChange={(e) => handleUserChange(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
-                        if (passwordInput) passwordInput.focus();
-                      }
-                    }}
+              <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
+                <div className="space-y-3 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">User Name:</label>
+                    <select
+                      className="flex-1 bg-[var(--panel-bg-2)] text-[var(--text-primary)] px-2 py-1.5 outline-none w-full rounded border border-[var(--border)]"
+                      value={username}
+                      onChange={(e) => handleUserChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
+                          if (passwordInput) passwordInput.focus();
+                        }
+                      }}
+                    >
+                      <option value="">-- Select User --</option>
+                      {usersList.map((u) => (
+                        <option key={u.id} value={u.email}>
+                          {u.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">Password:</label>
+                    <input
+                      type="password"
+                      className="flex-1 bg-[var(--panel-bg-2)] text-[var(--text-primary)] px-2 py-1.5 outline-none w-full rounded border border-[var(--border)]"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleLogin();
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">User Role:</label>
+                    <input
+                      type="text"
+                      readOnly
+                      className="flex-1 text-[var(--text-primary)] px-2 py-1.5 bg-[var(--panel-bg-2)] font-semibold outline-none w-full rounded border border-[var(--border)]"
+                      value={selectedRole}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-center gap-4 mt-6">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-6 py-2 bg-[var(--accent)] text-[#0b1324] rounded-md text-sm font-semibold hover:bg-[var(--accent-strong)] disabled:opacity-70"
                   >
-                    <option value="">-- Select User --</option>
-                    {usersList.map((u) => (
-                      <option key={u.id} value={u.email}>
-                        {u.name}
-                      </option>
-                    ))}
-                  </select>
+                    {loading ? "..." : "OK"}
+                  </button>
+                  <button type="button" className="px-6 py-2 bg-[var(--panel-bg-2)] text-[var(--text-primary)] border border-[var(--border)] rounded-md text-sm">
+                    Cancel
+                  </button>
                 </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">Password:</label>
-                  <input
-                    type="password"
-                    className="flex-1 bg-[var(--panel-bg-2)] text-[var(--text-primary)] px-2 py-1.5 outline-none w-full rounded border border-[var(--border)]"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleLogin();
-                      }
-                    }}
-                  />
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <label className="w-24 font-semibold sm:font-normal text-[var(--text-muted)]">User Role:</label>
-                  <input
-                    type="text"
-                    readOnly
-                    className="flex-1 text-[var(--text-primary)] px-2 py-1.5 bg-[var(--panel-bg-2)] font-semibold outline-none w-full rounded border border-[var(--border)]"
-                    value={selectedRole}
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-center gap-4 mt-6">
-                <button
-                  onClick={handleLogin}
-                  disabled={loading}
-                  className="px-6 py-2 bg-[var(--accent)] text-[#0b1324] rounded-md text-sm font-semibold hover:bg-[var(--accent-strong)] disabled:opacity-70"
-                >
-                  {loading ? "..." : "OK"}
-                </button>
-                <button className="px-6 py-2 bg-[var(--panel-bg-2)] text-[var(--text-primary)] border border-[var(--border)] rounded-md text-sm">
-                  Cancel
-                </button>
-              </div>
+              </form>
               {/* {usersList.length === 0 && (
                 <div className="mt-4 text-[10px] text-[var(--warning)] bg-[rgba(244,194,91,0.12)] p-3 border border-[rgba(244,194,91,0.35)] rounded">
                   <p className="font-bold mb-1">No users found!</p>
