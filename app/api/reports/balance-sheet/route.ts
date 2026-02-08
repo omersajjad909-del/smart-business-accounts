@@ -39,9 +39,9 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const assetsList: Any[] = [];
-    const liabilitiesList: Any[] = [];
-    const equityList: Any[] = [];
+    const assetsList: any[] = [];
+    const liabilitiesList: any[] = [];
+    const equityList: any[] = [];
 
     let incomeTotal = 0;
     let expenseTotal = 0;

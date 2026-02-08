@@ -85,7 +85,7 @@ function SalesInvoiceContent() {
   const [freight, setFreight] = useState<number | "">("");
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [savedInvoice, setSavedInvoice] = useState<Any>(null);
+  const [savedInvoice, setSavedInvoice] = useState<any>(null);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [previewMode, setPreviewMode] = useState<"INVOICE" | "DELIVERY">("INVOICE");
   const [searchTerm, _setSearchTerm] = useState("");
@@ -157,7 +157,7 @@ function SalesInvoiceContent() {
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts || [];
-        setCustomers(list.filter((a: Any) => a.partyType === "CUSTOMER"));
+        setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
       });
 
     fetch("/api/stock-available-for-sale")
@@ -366,7 +366,7 @@ function SalesInvoiceContent() {
         setShowList(true);
       }
       toast.success("Invoice saved successfully!");
-    } catch (e: Any) {
+    } catch (e: any) {
       toast.error("Saving failed: " + (e.message || "Unknown error"));
     } finally {
       setSaving(false);
@@ -381,7 +381,7 @@ function SalesInvoiceContent() {
     setDate(new Date(inv.date).toISOString().slice(0, 10));
     setDriverName(inv.driverName || "");
     setVehicleNo(inv.vehicleNo || "");
-    setRows(inv.items.map((it: Any) => ({
+    setRows(inv.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       description: it.item?.description || "",
@@ -872,7 +872,7 @@ function SalesInvoiceContent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(savedInvoice?.items || rows.filter(r => r.itemId)).map((r: Any, i: number) => {
+                  {(savedInvoice?.items || rows.filter(r => r.itemId)).map((r: any, i: number) => {
                     const itemName = r.item?.name || r.name || "Unknown";
                     const itemDesc = r.item?.description || r.description || "";
                     const qty = r.qty || 0;

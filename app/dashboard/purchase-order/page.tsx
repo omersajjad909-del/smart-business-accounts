@@ -10,6 +10,7 @@ type PO = {
   supplierId: string;
   supplier?: { name: string };
   remarks?: string;
+  approvalStatus?: string;
   items: Array<{ item: { name: string }; qty: number; rate: number }>;
 };
 

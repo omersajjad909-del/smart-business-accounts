@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       profit,
       status: "YEAR CLOSED SUCCESSFULLY",
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("YEAR END ERROR:", e);
     return NextResponse.json(
       { error: e.message },

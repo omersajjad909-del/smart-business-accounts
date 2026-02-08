@@ -7,7 +7,7 @@ export default function YearEndClosingPage() {
 
   const [date, setDate] = useState(today);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<Any>(null);
+  const [result, setResult] = useState<any>(null);
   const [error, setError] = useState("");
 
   async function runClosing() {
@@ -31,7 +31,7 @@ export default function YearEndClosingPage() {
       }
 
       setResult(data);
-    } catch (e: Any) {
+    } catch (e: any) {
       setError(e.message);
     } finally {
       setLoading(false);

@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     const month = searchParams.get("month"); // YYYY-MM
     const status = searchParams.get("status");
 
-    let dateFilter: Any = {};
+    let dateFilter: any = {};
     if (month) {
       const [year, monthNum] = month.split("-").map(Number);
       const startDate = new Date(year, monthNum - 1, 1);
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(attendance, { status: 201 });
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Attendance record for this date already exists" },
@@ -133,7 +133,7 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const { status, checkIn, checkOut, remarks, date: _date } = body; // Extract relevant fields
 
-    const updateData: Any = {
+    const updateData: any = {
       status,
       remarks,
     };
@@ -192,7 +192,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(attendance);
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Attendance record not found" }, { status: 404 });
     }
@@ -234,7 +234,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "Attendance record deleted successfully" });
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Attendance record not found" }, { status: 404 });
     }

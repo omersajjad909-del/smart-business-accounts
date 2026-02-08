@@ -33,13 +33,13 @@ export async function GET(req: Request) {
 
     const today = new Date();
 
-    const result = parties.map((party: Any) => {
+    const result = parties.map((party: any) => {
       let b0_30 = 0;
       let b31_60 = 0;
       let b61_90 = 0;
       let b90p = 0;
 
-      vouchers.forEach((v: Any) => {
+      vouchers.forEach((v: any) => {
         if (v.accountId !== party.id) return;
 
         const days =

@@ -95,7 +95,7 @@ export default function AdvancePage() {
         });
         fetchAdvances();
       }
-    } catch (error: Any) {
+    } catch (error: any) {
       console.error("Submit error:", error);
       alert("Network Error: " + error.message);
     } finally {

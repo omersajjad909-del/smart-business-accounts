@@ -129,7 +129,7 @@ export async function GET(req: NextRequest) {
     // ---------------------------------------------------------
     // 3. 🟠 COMBINE AND SORT
     // ---------------------------------------------------------
-    const combinedData: Any[] = [];
+    const combinedData: any[] = [];
     vouchers.forEach((v: VoucherWithEntries) => {
       const amount = v.entries
         .filter((e: VoucherEntry) => e.accountId === accountId)
@@ -208,7 +208,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(finalRows);
 
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("LEDGER ERROR:", e);
     return NextResponse.json({ error: "Ledger generation failed" }, { status: 500 });
   }

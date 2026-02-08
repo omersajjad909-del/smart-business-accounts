@@ -21,8 +21,8 @@ export default function OutwardPage() {
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 
-  const [customers, setCustomers] = useState<Any[]>([]);
-  const [customerInvoices, setCustomerInvoices] = useState<Any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [customerInvoices, setCustomerInvoices] = useState<any[]>([]);
   const [outwards, setOutwards] = useState<Outward[]>([]);
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
@@ -38,7 +38,7 @@ export default function OutwardPage() {
 
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [savedData, setSavedData] = useState<Any>(null);
+  const [savedData, setSavedData] = useState<any>(null);
 
   // Keyboard shortcuts - F7: Clear date/customer, F8: Query dialog
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function OutwardPage() {
       .then(r => r.json())
       .then(d => {
         const data = Array.isArray(d) ? d : (d.accounts || []);
-        setCustomers(data.filter((a: Any) => a.partyType === "CUSTOMER"));
+        setCustomers(data.filter((a: any) => a.partyType === "CUSTOMER"));
       })
       .catch(err => {
         console.error("Error loading customers:", err);
@@ -146,7 +146,7 @@ export default function OutwardPage() {
       })
       .then(d => {
         if (d?.invoices) {
-          const filtered = d.invoices.filter((inv: Any) => 
+          const filtered = d.invoices.filter((inv: any) => 
             inv.customerId === customerId && inv.status !== "RETURNED"
           );
           setCustomerInvoices(filtered);
@@ -173,7 +173,7 @@ export default function OutwardPage() {
 
     const inv = customerInvoices.find(i => i.id === invId);
     if (inv && inv.items && Array.isArray(inv.items)) {
-      const autoRows = inv.items.map((it: Any) => ({
+      const autoRows = inv.items.map((it: any) => ({
         itemId: it.itemId,
         name: it.item?.name || it.name || "Unknown Item",
         qty: it.qty,
@@ -186,8 +186,8 @@ export default function OutwardPage() {
     }
   }
 
-  function updateRow(i: number, key: keyof Row, val: Any) {
-    const copy = [...rows] as Any;
+  function updateRow(i: number, key: keyof Row, val: any) {
+    const copy = [...rows] as any;
     copy[i][key] = val;
     setRows(copy);
   }
@@ -220,7 +220,7 @@ export default function OutwardPage() {
         setShowForm(false);
         setShowList(true);
       }
-    } catch (err: Any) {
+    } catch (err: any) {
       alert(err.message);
     } finally {
       setSaving(false);
@@ -234,7 +234,7 @@ export default function OutwardPage() {
     setDriverName(out.driverName || "");
     setVehicleNo(out.vehicleNo || "");
     setRemarks(out.remarks || "");
-    setRows(out.items.map((it: Any) => ({
+    setRows(out.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       qty: it.qty.toString(),
@@ -301,7 +301,7 @@ export default function OutwardPage() {
                </tr>
              </thead>
              <tbody>
-               {savedData.items.map((it: Any, i: number) => (
+               {savedData.items.map((it: any, i: number) => (
                  <tr key={i}>
                    <td className="border-2 p-2 font-bold">{rows[i]?.name}</td>
                    <td className="border-2 p-2 text-center text-xl font-black">{it.qty}</td>

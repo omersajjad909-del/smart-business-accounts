@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
       challans: challans.map((c) => ({ type: "DELIVERY_CHALLAN", ...c })),
       userId,
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("APPROVALS GET ERROR:", e);
     return NextResponse.json({ error: e.message || "Approvals failed" }, { status: 500 });
   }
@@ -197,7 +197,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("APPROVALS PATCH ERROR:", e);
     return NextResponse.json({ error: e.message || "Approval update failed" }, { status: 500 });
   }

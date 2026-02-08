@@ -51,7 +51,7 @@ export default function AgeingReportPage() {
         console.log("📊 All Accounts:", list);
 
         // کیس سینسیٹیو فلٹرنگ (Case Sensitive Fix)
-        const filtered = list.filter((a: Any) => {
+        const filtered = list.filter((a: any) => {
           const pType = a.partyType?.toUpperCase();
           return type === "customer"
             ? pType === "CUSTOMER"
@@ -116,7 +116,7 @@ export default function AgeingReportPage() {
           <select
             className="border px-3 py-2"
             value={type}
-            onChange={e => setType(e.target.value as Any)}
+            onChange={e => setType(e.target.value as any)}
           >
             <option value="customer">Customer</option>
             <option value="supplier">Supplier</option>

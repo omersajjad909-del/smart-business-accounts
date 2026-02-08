@@ -64,7 +64,7 @@ let availableDebit = debits.reduce(
 
 
     let runningBalance = 0;
-    const rows: Any[] = [];
+    const rows: any[] = [];
 
     for (const inv of invoices) {
       const billAmount = Number(inv.total) || 0;

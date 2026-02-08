@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
 
 
     return NextResponse.json(formatted);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("JV GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -98,7 +98,7 @@ export async function POST(req: Request) {
     let requestBody;
     try {
       requestBody = await req.json();
-    } catch (parseError: Any) {
+    } catch (parseError: any) {
       console.error("❌ JV JSON PARSE ERROR:", parseError);
       return NextResponse.json(
         { error: "Invalid request body", details: parseError.message },
@@ -266,7 +266,7 @@ export async function PUT(req: NextRequest) {
           date: new Date(date),
           narration: narration || "Journal Entry",
           entries: {
-            create: entries.map((entry: Any) => ({
+            create: entries.map((entry: any) => ({
               accountId: entry.accountId,
               amount: Number(entry.amount),
               companyId,
@@ -292,7 +292,7 @@ export async function PUT(req: NextRequest) {
       totalDebit,
       totalCredit,
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("JV PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

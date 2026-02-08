@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       },
       orderBy: { outwardNo: "desc" },
     });
-    const reportRows: Any[] = [];
+    const reportRows: any[] = [];
 
     data.forEach((out: OutwardWithItems) => {
       out.items.forEach((line: OutwardItem) => {
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
 
 
     return NextResponse.json(reportRows);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("OUTWARD REPORT ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

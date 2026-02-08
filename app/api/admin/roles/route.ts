@@ -43,8 +43,8 @@ export async function GET(req: NextRequest) {
     // Group by role
     const roles = ["ADMIN", "ACCOUNTANT", "VIEWER"].map((role: string) => {
       const perms = rolePermissions
-        .filter((rp: Any) => rp.role === role)
-        .map((rp: Any) => rp.permission);
+        .filter((rp: any) => rp.role === role)
+        .map((rp: any) => rp.permission);
       
       console.log(`📌 ${role} permissions:`, perms);
       
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     console.log("✅ Final response:", roles);
 
     return NextResponse.json(roles);
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("Error fetching roles:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       role,
       permissions: createdPermissions,
     });
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("Error updating role:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

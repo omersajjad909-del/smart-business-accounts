@@ -169,7 +169,7 @@ const [searchTerm, setSearchTerm] = useState("");
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts;
-        setSuppliers(list.filter((a: Any) => a.partyType === "SUPPLIER"));
+        setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER"));
       });
 
     // Load tax configurations
@@ -287,7 +287,7 @@ const [searchTerm, setSearchTerm] = useState("");
       });
 
       const contentType = res.headers.get("content-type") || "";
-      let data: Any = null;
+      let data: any = null;
       if (contentType.includes("application/json")) {
         try {
           data = await res.json();
@@ -336,7 +336,7 @@ const [searchTerm, setSearchTerm] = useState("");
     setSupplierName(inv.supplier?.name || "");
     setApprovalStatus(inv.approvalStatus || "PENDING");
     setDate(new Date(inv.date).toISOString().slice(0, 10));
-    setRows(inv.items.map((it: Any) => ({
+    setRows(inv.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       description: it.item?.description || "",

@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(schedule || null);
-  } catch (e: Any) {
+  } catch (e: any) {
     return NextResponse.json({ error: e.message || "Failed to load schedule" }, { status: 500 });
   }
 }
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(schedule);
-  } catch (e: Any) {
+  } catch (e: any) {
     return NextResponse.json({ error: e.message || "Failed to save schedule" }, { status: 500 });
   }
 }

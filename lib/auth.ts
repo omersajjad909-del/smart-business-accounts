@@ -32,7 +32,7 @@ export function getCurrentUser() {
 
     console.log("✅ getCurrentUser:", { email: currentUser.email, role: currentUser.role });
     return currentUser;
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("❌ getCurrentUser error:", e);
     return null;
   }

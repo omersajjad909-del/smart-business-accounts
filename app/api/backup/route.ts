@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(backups);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Backup GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       const backupDir = join(process.cwd(), "backups");
       try {
         await mkdir(backupDir, { recursive: true });
-      } catch (_e: Any) {
+      } catch (_e: any) {
         // Directory might already exist
       }
 
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
           fileSize: stats.size,
         },
       });
-    } catch (error: Any) {
+    } catch (error: any) {
       await prisma.systemBackup.update({
         where: { id: backup.id },
         data: {
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
 
       throw error;
     }
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Backup POST Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

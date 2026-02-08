@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(opportunity, { status: 201 });
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("Error creating opportunity:", error);
     return NextResponse.json({ error: "Failed to create opportunity" }, { status: 500 });
   }
@@ -83,7 +83,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(opportunity);
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
     }
@@ -110,7 +110,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "Opportunity deleted successfully" });
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
     }

@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(item);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("ITEMS-NEW POST ERROR:", e);
     if (e.code === "P2002") {
       return NextResponse.json({ error: "Barcode or Code already exists" }, { status: 400 });
@@ -148,7 +148,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(item);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("ITEMS-NEW PUT ERROR:", e);
     if (e.code === "P2002") {
       return NextResponse.json({ error: "Barcode already exists" }, { status: 400 });
@@ -200,7 +200,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("ITEMS-NEW DELETE ERROR:", e);
     return NextResponse.json({ error: e.message || "Delete failed" }, { status: 500 });
   }

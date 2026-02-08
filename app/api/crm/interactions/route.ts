@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(interaction, { status: 201 });
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("Error creating interaction:", error);
     return NextResponse.json({ error: "Failed to create interaction" }, { status: 500 });
   }
@@ -85,7 +85,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(interaction);
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Interaction not found" }, { status: 404 });
     }
@@ -112,7 +112,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "Interaction deleted successfully" });
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Interaction not found" }, { status: 404 });
     }

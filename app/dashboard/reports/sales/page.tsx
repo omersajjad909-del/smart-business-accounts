@@ -29,7 +29,7 @@ export default function SalesReportPage() {
     if (!user) return;
     fetch("/api/accounts", { headers: { "x-user-role": user.role } })
       .then(r => r.json())
-      .then(d => setCustomers((Array.isArray(d) ? d : []).filter((a: Any) => a.partyType === "CUSTOMER")))
+      .then(d => setCustomers((Array.isArray(d) ? d : []).filter((a: any) => a.partyType === "CUSTOMER")))
       .catch(err => console.error("Customer fetch error:", err));
   }, []);
 

@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(challan);
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("Create Delivery Challan Error:", error);
     return NextResponse.json({ error: error.message || "Failed to create delivery challan" }, { status: 400 });
   }
@@ -159,7 +159,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(updated);
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("Update Delivery Challan Error:", error);
     return NextResponse.json({ error: error.message || "Failed to update delivery challan" }, { status: 400 });
   }

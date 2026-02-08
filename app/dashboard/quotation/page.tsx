@@ -69,7 +69,7 @@ export default function QuotationPage() {
 
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [savedQuotation, setSavedQuotation] = useState<Any>(null);
+  const [savedQuotation, setSavedQuotation] = useState<any>(null);
   const [_sendingEmail, _setSendingEmail] = useState(false);
   const [hideRates, setHideRates] = useState(false);
   
@@ -98,7 +98,7 @@ export default function QuotationPage() {
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts || [];
-        setCustomers(list.filter((a: Any) => a.partyType === "CUSTOMER"));
+        setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
       });
 
     fetch("/api/items-new")
@@ -264,7 +264,7 @@ export default function QuotationPage() {
         setShowList(true);
       }
       toast.success("Quotation saved successfully!");
-    } catch (e: Any) {
+    } catch (e: any) {
       toast.error("Saving failed: " + (e.message || "Unknown error"));
     } finally {
       setSaving(false);
@@ -277,7 +277,7 @@ export default function QuotationPage() {
     setCustomerId(q.customerId);
     setCustomerName(q.customer?.name || "");
     setDate(new Date(q.date).toISOString().slice(0, 10));
-    setRows(q.items.map((it: Any) => ({
+    setRows(q.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       description: it.item?.description || "",
@@ -336,7 +336,7 @@ export default function QuotationPage() {
     message += `Customer: ${customerName}\n\n`;
     message += `*Items:*\n`;
     
-    savedQuotation.items.forEach((item: Any, index: number) => {
+    savedQuotation.items.forEach((item: any, index: number) => {
       message += `${index + 1}. ${item.item.name} x ${item.qty} @ ${item.rate} = ${(item.qty * item.rate).toLocaleString()}\n`;
     });
     
@@ -651,7 +651,7 @@ export default function QuotationPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {savedQuotation.items.map((item: Any, i: number) => (
+                  {savedQuotation.items.map((item: any, i: number) => (
                     <tr key={i} className="border-b">
                       <td className="py-2 px-4">
                         <p className="font-bold">{item.item.name}</p>

@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ quotation });
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("Create Quotation Error:", error);
     return NextResponse.json({ error: error.message || "Failed to create quotation" }, { status: 400 });
   }
@@ -221,7 +221,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ quotation: updated });
 
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("Update Quotation Error:", error);
     return NextResponse.json({ error: error.message || "Failed to update quotation" }, { status: 400 });
   }

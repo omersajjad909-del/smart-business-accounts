@@ -106,7 +106,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const { id, name, email, password, role, active } = await req.json();
-    const updateData: Any = { name, email, role, active };
+    const updateData: any = { name, email, role, active };
     if (password && password.trim()) {
       updateData.password = await bcrypt.hash(password, 10);
     }
@@ -124,7 +124,7 @@ export async function PUT(req: NextRequest) {
       data: updateData,
     });
     return NextResponse.json(updatedUser);
-  } catch (error: Any) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -153,7 +153,7 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.user.delete({ where: { id } });
     return NextResponse.json({ message: "User deleted successfully" });
-  } catch (error: Any) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

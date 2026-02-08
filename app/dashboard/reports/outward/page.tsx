@@ -9,8 +9,8 @@ export default function OutwardReportPage() {
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(today);
   const [customerId, setCustomerId] = useState("");
-  const [customers, setCustomers] = useState<Any[]>([]);
-  const [rows, setRows] = useState<Any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   // 🛠️ کسٹمرز لوڈ کرنا (With Safety Fix)
@@ -20,7 +20,7 @@ export default function OutwardReportPage() {
       .then((d) => {
         // چیک کریں کہ d ایرے ہے، اگر نہیں تو خالی ایرے سیٹ کریں
         const data = Array.isArray(d) ? d : (d.accounts || []);
-        setCustomers(data.filter((a: Any) => a.partyType === "CUSTOMER"));
+        setCustomers(data.filter((a: any) => a.partyType === "CUSTOMER"));
       })
       .catch(err => console.error("Customer fetch error:", err));
   }, []);

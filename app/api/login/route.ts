@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
       });
       passwordMatch = await bcrypt.compare(password, user.password);
       console.log("🔐 PASSWORD MATCH:", passwordMatch);
-    } catch (bcryptError: Any) {
+    } catch (bcryptError: any) {
       console.error("❌ LOGIN BCRYPT ERROR:", bcryptError);
       console.error("❌ BCRYPT ERROR DETAILS:", {
         message: bcryptError.message,
@@ -137,13 +137,13 @@ export async function POST(req: NextRequest) {
         where: { userId: user.id },
         include: { company: true },
       });
-    } catch (companyError: Any) {
+    } catch (companyError: any) {
       console.error("LOGIN COMPANIES ERROR:", companyError);
     }
 
     const defaultCompanyId =
       user.defaultCompanyId ||
-      companies.find((c: Any) => c.isDefault)?.companyId ||
+      companies.find((c: any) => c.isDefault)?.companyId ||
       companies[0]?.companyId ||
       null;
 
@@ -154,14 +154,14 @@ export async function POST(req: NextRequest) {
         where: { role: user.role, companyId: defaultCompanyId || undefined },
         select: { permission: true },
       });
-    } catch (permError: Any) {
+    } catch (permError: any) {
       console.error("❌ LOGIN PERMISSIONS ERROR:", permError);
       // Continue without role permissions if error occurs
     }
 
     const userPermissions = (user.permissions || [])
-      .filter((p: Any) => !defaultCompanyId || p.companyId === defaultCompanyId)
-      .map((p: Any) => p.permission || p);
+      .filter((p: any) => !defaultCompanyId || p.companyId === defaultCompanyId)
+      .map((p: any) => p.permission || p);
 
     // 🔥 FRONTEND KE LIYE SAFE USER OBJECT (getCurrentUser() ke format ke mutabiq)
     const safeUser = {
@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
       permissions: userPermissions, // User-specific permissions
       rolePermissions: rolePermissions.map((rp) => rp.permission),
       companyId: defaultCompanyId,
-      companies: companies.map((c: Any) => ({
+      companies: companies.map((c: any) => ({
         id: c.companyId,
         name: c.company?.name,
         code: c.company?.code,
@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ user: safeUser });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("❌ LOGIN ERROR:", e);
     console.error("❌ LOGIN ERROR DETAILS:", {
       message: e.message,

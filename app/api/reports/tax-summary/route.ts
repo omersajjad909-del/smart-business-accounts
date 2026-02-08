@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     const fromDate = from ? new Date(from + "T00:00:00") : undefined;
     const toDate = to ? new Date(to + "T23:59:59.999") : undefined;
 
-    const where: Any = {};
+    const where: any = {};
     if (fromDate && toDate) {
       where.date = { gte: fromDate, lte: toDate };
     }
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
     const summary: Record<string, Any> = {};
 
     // Process Sales Invoices
-    salesInvoicesWithTax.forEach((inv: Any) => {
+    salesInvoicesWithTax.forEach((inv: any) => {
       if (!inv.taxConfig) return;
       const key = inv.taxConfig.taxType;
       
@@ -111,7 +111,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Process Purchase Invoices
-    purchaseInvoicesWithTax.forEach((inv: Any) => {
+    purchaseInvoicesWithTax.forEach((inv: any) => {
       if (!inv.taxConfig) return;
       const key = inv.taxConfig.taxType;
       
@@ -139,7 +139,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Process Legacy InvoiceTax entries
-    legacyTaxes.forEach((it: Any) => {
+    legacyTaxes.forEach((it: any) => {
       const key = it.taxConfiguration.taxType;
       if (!summary[key]) {
         summary[key] = {
@@ -159,13 +159,13 @@ export async function GET(req: NextRequest) {
       summary[key].totalAmount += it.totalAmount;
     });
 
-    const result = Object.values(summary).map((s: Any) => ({
+    const result = Object.values(summary).map((s: any) => ({
       ...s,
       averageTaxRate: s.totalSubtotal > 0 ? (s.totalTaxAmount / s.totalSubtotal) * 100 : 0,
     }));
 
     return NextResponse.json(result);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Tax Summary Report Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

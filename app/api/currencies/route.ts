@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(currency, { status: 201 });
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Currency code already exists" },
@@ -93,7 +93,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(currency);
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Currency not found" }, { status: 404 });
     }
@@ -120,7 +120,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "Currency deleted successfully" });
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Currency not found" }, { status: 404 });
     }

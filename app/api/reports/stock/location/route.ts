@@ -46,10 +46,10 @@ export async function GET(req: NextRequest) {
     }
 
     // صرف وہ آئٹمز دکھائیں جن کا اسٹاک 0 نہیں ہے
-    const result = Object.values(map).filter((r: Any) => r.qty !== 0);
+    const result = Object.values(map).filter((r: any) => r.qty !== 0);
     
     // لوکیشن کے حساب سے ترتیب دیں (Sorting)
-    result.sort((a: Any, b: Any) => a.location.localeCompare(b.location));
+    result.sort((a: any, b: any) => a.location.localeCompare(b.location));
 
     return NextResponse.json(result);
   } catch (e) {
