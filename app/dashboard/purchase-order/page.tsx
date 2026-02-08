@@ -184,8 +184,8 @@ export default function PurchaseOrderPage() {
     try {
       const method = editing ? "PUT" : "POST";
       const body = editing
-        ? { id: editing.id, poNo, supplierId, date, remarks, items: clean }
-        : { poNo, supplierId, date, remarks, items: clean };
+        ? { id: editing.id, poNo, supplierId, date, remarks, approvalStatus, items: clean }
+        : { poNo, supplierId, date, remarks, approvalStatus, items: clean };
 
       const res = await fetch("/api/purchase-order", {
         method,
