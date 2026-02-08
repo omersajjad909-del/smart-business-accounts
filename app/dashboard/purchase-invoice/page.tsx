@@ -40,6 +40,7 @@ type PurchaseInvoice = {
   supplierId: string;
   supplier?: { name: string };
   total: number;
+  approvalStatus?: string;
   items: Array<{ item: { name: string }; qty: number; rate: number }>;
 };
 
