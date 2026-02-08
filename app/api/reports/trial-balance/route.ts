@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 /* ================= CATEGORY RESOLVER ================= */
-function resolveCategory(acc: Any) {
+function resolveCategory(acc: any) {
   if (acc.partyType === "EMPLOYES" || acc.partyType === "EMPLOYEE") return "EMPLOYEES";
   if (acc.partyType === "CUSTOMER") return "CUSTOMERS";
   if (acc.partyType === "SUPPLIER") return "SUPPLIERS";
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
       orderBy: [{ name: "asc" }],
     });
 
-    const rows: Any[] = [];
+    const rows: any[] = [];
 
     for (const acc of accounts) {
       /* ---------- OPENING: Opening balance + vouchers before period ---------- */

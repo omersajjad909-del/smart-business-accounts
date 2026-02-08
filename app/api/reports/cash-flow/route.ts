@@ -215,7 +215,7 @@ const direction: "INFLOW" | "OUTFLOW" =
       },
       netCashFlow,
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("❌ CASH FLOW ERROR:", e);
     return NextResponse.json(
       { error: e.message || "Cash flow report failed" },

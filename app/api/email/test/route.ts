@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(result);
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("❌ Email test error:", error);
 
     try {

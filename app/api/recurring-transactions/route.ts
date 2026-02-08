@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const isActive = searchParams.get("isActive");
 
-    const where: Any = { companyId };
+    const where: any = { companyId };
     if (isActive !== null) {
       where.isActive = isActive === "true";
     }
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(transactions);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Recurring Transactions GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(transaction);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Recurring Transactions POST Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -169,7 +169,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(transaction);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Recurring Transactions PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -213,7 +213,7 @@ export async function DELETE(req: NextRequest) {
     await prisma.recurringTransaction.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Recurring Transactions DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

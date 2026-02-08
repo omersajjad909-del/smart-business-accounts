@@ -57,7 +57,7 @@ export async function POST(_req: NextRequest) {
           status: "success",
           created,
         });
-      } catch (error: Any) {
+      } catch (error: any) {
         results.push({
           id: transaction.id,
           status: "error",
@@ -70,7 +70,7 @@ export async function POST(_req: NextRequest) {
       processed: results.length,
       results,
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Process Recurring Transactions Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -102,7 +102,7 @@ function calculateNextDate(currentDate: Date, frequency: string): Date {
   return next;
 }
 
-async function createCPV(transaction: Any) {
+async function createCPV(transaction: any) {
   // Generate voucher number
   const count = await prisma.voucher.count({
     where: { type: "CPV", companyId: transaction.companyId },
@@ -138,7 +138,7 @@ async function createCPV(transaction: Any) {
   return voucher;
 }
 
-async function createCRV(transaction: Any) {
+async function createCRV(transaction: any) {
   const count = await prisma.voucher.count({
     where: { type: "CRV", companyId: transaction.companyId },
   });
@@ -173,7 +173,7 @@ async function createCRV(transaction: Any) {
   return voucher;
 }
 
-async function createExpense(transaction: Any) {
+async function createExpense(transaction: any) {
   const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
 
   const expense = await prisma.expenseVoucher.create({
@@ -200,7 +200,7 @@ async function createExpense(transaction: Any) {
   return expense;
 }
 
-async function createSalesInvoice(transaction: Any) {
+async function createSalesInvoice(transaction: any) {
   const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
   const items = Array.isArray(metadata.items) ? metadata.items : [];
   if (!metadata.customerId || items.length === 0) {
@@ -213,7 +213,7 @@ async function createSalesInvoice(transaction: Any) {
   const invoiceNo = metadata.invoiceNo || `SI-${count + 1}`;
 
   const total = items.reduce(
-    (sum: number, i: Any) => sum + Number(i.qty || 0) * Number(i.rate || 0),
+    (sum: number, i: any) => sum + Number(i.qty || 0) * Number(i.rate || 0),
     0
   );
 
@@ -225,7 +225,7 @@ async function createSalesInvoice(transaction: Any) {
       customerId: metadata.customerId,
       total,
       items: {
-        create: items.map((i: Any) => ({
+        create: items.map((i: any) => ({
           itemId: i.itemId,
           qty: Number(i.qty || 0),
           rate: Number(i.rate || 0),
@@ -238,7 +238,7 @@ async function createSalesInvoice(transaction: Any) {
   return invoice;
 }
 
-async function createPurchaseInvoice(transaction: Any) {
+async function createPurchaseInvoice(transaction: any) {
   const metadata = transaction.metadata ? JSON.parse(transaction.metadata) : {};
   const items = Array.isArray(metadata.items) ? metadata.items : [];
   if (!metadata.supplierId || items.length === 0) {
@@ -251,7 +251,7 @@ async function createPurchaseInvoice(transaction: Any) {
   const invoiceNo = metadata.invoiceNo || `PI-${count + 1}`;
 
   const total = items.reduce(
-    (sum: number, i: Any) => sum + Number(i.qty || 0) * Number(i.rate || 0),
+    (sum: number, i: any) => sum + Number(i.qty || 0) * Number(i.rate || 0),
     0
   );
 
@@ -263,7 +263,7 @@ async function createPurchaseInvoice(transaction: Any) {
       supplierId: metadata.supplierId,
       total,
       items: {
-        create: items.map((i: Any) => ({
+        create: items.map((i: any) => ({
           itemId: i.itemId,
           qty: Number(i.qty || 0),
           rate: Number(i.rate || 0),

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(returns);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Sale Return GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
     // 2. ٹرانزیکشن شروع کریں تاکہ سارا ڈیٹا ایک ساتھ سیو ہو
    const result = await prisma.$transaction(async (tx: TxClient) => {
   const subtotal = items.reduce(
-    (s: number, i: Any) => s + Number(i.qty) * Number(i.rate),
+    (s: number, i: any) => s + Number(i.qty) * Number(i.rate),
     0
   );
   const total = subtotal + Number(freight);
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
       companyId,
       total,
       items: {
-        create: items.map((i: Any) => ({
+        create: items.map((i: any) => ({
           itemId: i.itemId,
           qty: Number(i.qty),
           rate: Number(i.rate),
@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, id: result.id, returnNo: nextNo });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("SALE RETURN ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -203,7 +203,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Return not found" }, { status: 404 });
     }
 
-    const subtotal = items.reduce((s: number, i: Any) => s + Number(i.qty) * Number(i.rate), 0);
+    const subtotal = items.reduce((s: number, i: any) => s + Number(i.qty) * Number(i.rate), 0);
     const total = subtotal + Number(freight);
 
     const result = await prisma.$transaction(async (tx: TxClient) => {
@@ -216,7 +216,7 @@ export async function PUT(req: NextRequest) {
           date: new Date(date),
           total: total,
           items: {
-            create: items.map((i: Any) => ({
+            create: items.map((i: any) => ({
               itemId: i.itemId,
               qty: Number(i.qty),
               rate: Number(i.rate),
@@ -236,7 +236,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, return: result });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Sale Return PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -277,7 +277,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Sale Return DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

@@ -34,7 +34,7 @@ export default function LoginPage() {
         } else {
           setError(data.error || "Failed to load users");
         }
-      } catch (err: Any) {
+      } catch (err: any) {
         console.error("Users fetch error:", err);
         setError("Connection Error: " + (err.message || "Cannot connect to server"));
       }
@@ -85,7 +85,7 @@ export default function LoginPage() {
         setError(errorMsg);
         console.error("Login failed:", errorMsg, data);
       }
-    } catch (err: Any) {
+    } catch (err: any) {
       console.error("Login error:", err);
       setError(err.message || "Network error. Please check your connection.");
     } finally {
@@ -218,7 +218,7 @@ export default function LoginPage() {
                         } else {
                           toast.error("Error: " + (data.error || "Failed to create user"));
                         }
-                      } catch (e: Any) {
+                      } catch (e: any) {
                         toast.error("Error: " + e.message);
                       } finally {
                         setLoading(false);

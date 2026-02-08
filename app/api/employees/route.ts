@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(employee, { status: 201 });
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2002") {
       return NextResponse.json(
         { error: "Employee ID or email already exists" },
@@ -137,7 +137,7 @@ export async function PUT(req: NextRequest) {
     const employee = await prisma.employee.findUnique({ where: { id } });
 
     return NextResponse.json(employee);
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Employee not found" }, { status: 404 });
     }
@@ -171,7 +171,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "Employee deleted successfully" });
-  } catch (error: Any) {
+  } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Employee not found" }, { status: 404 });
     }

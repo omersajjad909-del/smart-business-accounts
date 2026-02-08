@@ -6,7 +6,7 @@ import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 
 export default function ActivityLogsPage() {
-  const [logs, setLogs] = useState<Any[]>([]);
+  const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionFilter, setActionFilter] = useState("");
@@ -48,7 +48,7 @@ export default function ActivityLogsPage() {
         const data = await response.json();
         setLogs(data);
 
-      } catch (err: Any) {
+      } catch (err: any) {
         setError(err.message || "Error Loading Logs");
       } finally {
         setLoading(false);

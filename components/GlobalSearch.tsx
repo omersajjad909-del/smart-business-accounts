@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export default function GlobalSearch() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Any>(null);
+  const [results, setResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -165,7 +165,7 @@ export default function GlobalSearch() {
           {results.accounts && results.accounts.length > 0 && (
             <div className="p-2">
               <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Accounts</div>
-              {results.accounts.map((item: Any) => (
+              {results.accounts.map((item: any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}
@@ -181,7 +181,7 @@ export default function GlobalSearch() {
           {results.items && results.items.length > 0 && (
             <div className="p-2 border-t">
               <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Items</div>
-              {results.items.map((item: Any) => (
+              {results.items.map((item: any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}
@@ -197,7 +197,7 @@ export default function GlobalSearch() {
           {results.salesInvoices && results.salesInvoices.length > 0 && (
             <div className="p-2 border-t">
               <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Sales Invoices</div>
-              {results.salesInvoices.map((item: Any) => (
+              {results.salesInvoices.map((item: any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}
@@ -213,7 +213,7 @@ export default function GlobalSearch() {
           {results.purchaseInvoices && results.purchaseInvoices.length > 0 && (
             <div className="p-2 border-t">
               <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Purchase Invoices</div>
-              {results.purchaseInvoices.map((item: Any) => (
+              {results.purchaseInvoices.map((item: any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}
@@ -229,7 +229,7 @@ export default function GlobalSearch() {
           {results.vouchers && results.vouchers.length > 0 && (
             <div className="p-2 border-t">
               <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Vouchers</div>
-              {results.vouchers.map((item: Any) => (
+              {results.vouchers.map((item: any) => (
                 <div
                   key={item.id}
                   onClick={() => handleResultClick(item.url)}

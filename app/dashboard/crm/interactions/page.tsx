@@ -15,7 +15,7 @@ interface Interaction {
 
 export default function InteractionsPage() {
   const [interactions, setInteractions] = useState<Interaction[]>([]);
-  const [contacts, setContacts] = useState<Any[]>([]);
+  const [contacts, setContacts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [filterType, setFilterType] = useState("ALL");

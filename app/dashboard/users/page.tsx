@@ -27,7 +27,7 @@ interface Role {
 }
 
 export default function UsersMasterPage() {
-  const [me, setMe] = useState<Any>(null);
+  const [me, setMe] = useState<any>(null);
   const [_authorized, setAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -35,7 +35,7 @@ export default function UsersMasterPage() {
   const [activeTab, setActiveTab] = useState("users"); // "users" یا "permissions"
 
   // USERS STATE
-  const [users, setUsers] = useState<Any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [editing, setEditing] = useState(false);
   const [userForm, setUserForm] = useState({
     id: null,
@@ -146,7 +146,7 @@ export default function UsersMasterPage() {
     }
   };
 
-  const editUser = (user: Any) => {
+  const editUser = (user: any) => {
     setUserForm({
       id: user.id,
       name: user.name,
@@ -171,7 +171,7 @@ export default function UsersMasterPage() {
   };
 
   // ============ PERMISSIONS TAB FUNCTIONS ============
-  const loadRoles = async (user: Any) => {
+  const loadRoles = async (user: any) => {
     try {
       const res = await fetch("/api/admin/roles", {
         headers: {
@@ -184,7 +184,7 @@ export default function UsersMasterPage() {
       setRoles(data || []);
 
       // Set initial ADMIN permissions
-      const adminRole = data?.find((r: Any) => r.role === "ADMIN");
+      const adminRole = data?.find((r: any) => r.role === "ADMIN");
       if (adminRole) {
         setRolePermissions(adminRole.permissions || []);
       }
@@ -397,7 +397,7 @@ export default function UsersMasterPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user: Any) => (
+                {users.map((user: any) => (
                   <tr
                     key={user.id}
                     className="border-t hover:bg-gray-50 text-xs"

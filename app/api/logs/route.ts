@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
   const to = searchParams.get("to") || undefined;
   const format = searchParams.get("format") || "json";
 
-  const where: Any = { companyId };
+  const where: any = { companyId };
   if (action) where.action = action;
   if (actorId) where.userId = actorId;
   if (q) where.details = { contains: q, mode: "insensitive" };

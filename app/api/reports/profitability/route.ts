@@ -90,7 +90,7 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      const result = Object.values(customerProfit).map((cp: Any) => ({
+      const result = Object.values(customerProfit).map((cp: any) => ({
         ...cp,
         totalProfit: cp.totalSales - cp.totalCost,
         profitMargin: cp.totalSales > 0 ? ((cp.totalSales - cp.totalCost) / cp.totalSales) * 100 : 0,
@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
         productProfit[itemId].totalCost += avgCost * item.qty;
       }
 
-      const result = Object.values(productProfit).map((pp: Any) => ({
+      const result = Object.values(productProfit).map((pp: any) => ({
         ...pp,
         totalProfit: pp.totalSales - pp.totalCost,
         profitMargin: pp.totalSales > 0 ? ((pp.totalSales - pp.totalCost) / pp.totalSales) * 100 : 0,
@@ -153,7 +153,7 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(result);
     }
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Profitability Report Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

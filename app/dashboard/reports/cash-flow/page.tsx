@@ -8,7 +8,7 @@ export default function CashFlowPage() {
   const today = new Date().toISOString().slice(0, 10);
   const [from, setFrom] = useState("2026-01-01");
   const [to, setTo] = useState(today);
-  const [data, setData] = useState<Any>(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   async function loadReport() {
@@ -42,7 +42,7 @@ export default function CashFlowPage() {
   function exportReport() {
     if (!data) return;
     const exportData = [
-      ...data.operating.items.map((item: Any) => ({
+      ...data.operating.items.map((item: any) => ({
         category: "Operating",
         date: item.date,
         voucherNo: item.voucherNo,
@@ -50,7 +50,7 @@ export default function CashFlowPage() {
         type: item.type,
         amount: item.amount,
       })),
-      ...data.investing.items.map((item: Any) => ({
+      ...data.investing.items.map((item: any) => ({
         category: "Investing",
         date: item.date,
         voucherNo: item.voucherNo,
@@ -58,7 +58,7 @@ export default function CashFlowPage() {
         type: item.type,
         amount: item.amount,
       })),
-      ...data.financing.items.map((item: Any) => ({
+      ...data.financing.items.map((item: any) => ({
         category: "Financing",
         date: item.date,
         voucherNo: item.voucherNo,

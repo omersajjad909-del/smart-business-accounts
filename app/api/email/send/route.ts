@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
       message: 'Email sent successfully',
       messageId: result.messageId,
     });
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error('❌ Email send API error:', error);
 
     try {

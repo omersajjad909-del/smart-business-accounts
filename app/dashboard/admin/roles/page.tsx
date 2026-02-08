@@ -6,8 +6,8 @@ export default function UsersPage() {
   const userSession = getCurrentUser();
   const isAdmin = userSession?.role === "ADMIN";
 
-  const [users, setUsers] = useState<Any[]>([]);
-  const [roles, setRoles] = useState<Any[]>([]); // رولز کے لیے اسٹیٹ
+  const [users, setUsers] = useState<any[]>([]);
+  const [roles, setRoles] = useState<any[]>([]); // رولز کے لیے اسٹیٹ
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({

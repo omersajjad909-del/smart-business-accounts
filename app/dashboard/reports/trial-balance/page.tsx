@@ -4,8 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 
 export default function CategorizedTrialBalance() {
    const today = new Date().toISOString().slice(0, 10);
-  const [rows, setRows] = useState<Any[]>([]);
-  const [_totals, setTotals] = useState<Any>(null);
+  const [rows, setRows] = useState<any[]>([]);
+  const [_totals, setTotals] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
 

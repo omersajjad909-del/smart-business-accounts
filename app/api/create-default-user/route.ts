@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       password: password,
     });
 
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("❌ Error creating default user:", error);
     
     if (error.code === "P2002") {

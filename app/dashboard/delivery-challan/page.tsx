@@ -67,7 +67,7 @@ const [searchTerm, _setSearchTerm] = useState("");
   }]);
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [savedChallan, setSavedChallan] = useState<Any>(null);
+  const [savedChallan, setSavedChallan] = useState<any>(null);
 
   useEffect(() => {
     if (!user) {
@@ -91,7 +91,7 @@ const [searchTerm, _setSearchTerm] = useState("");
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts || [];
-        setCustomers(list.filter((a: Any) => a.partyType === "CUSTOMER"));
+        setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
       });
 
     fetch("/api/stock-available-for-sale")
@@ -251,7 +251,7 @@ const [searchTerm, _setSearchTerm] = useState("");
         setShowList(true);
       }
       toast.success("Delivery Challan saved successfully!");
-    } catch (e: Any) {
+    } catch (e: any) {
       toast.error("Saving failed: " + (e.message || "Unknown error"));
     } finally {
       setSaving(false);
@@ -267,7 +267,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     setDriverName(c.driverName || "");
     setVehicleNo(c.vehicleNo || "");
     setRemarks(c.remarks || "");
-    setRows(c.items.map((it: Any) => ({
+    setRows(c.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
       description: it.item?.description || "",
@@ -328,7 +328,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     if (savedChallan.vehicleNo) message += `Vehicle: ${savedChallan.vehicleNo}\n`;
     message += `\n*Items:*\n`;
     
-    savedChallan.items.forEach((item: Any, index: number) => {
+    savedChallan.items.forEach((item: any, index: number) => {
       // Fetch item name from local items if possible, or use from savedChallan if populated
       // savedChallan.items might not have item details fully if not populated in response, but let's assume API returns it or we use logic
       // Actually API returns items with included item details in GET but create/update response might vary.

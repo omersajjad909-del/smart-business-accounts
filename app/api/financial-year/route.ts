@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(years);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Financial Year GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(financialYear);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Financial Year POST Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -122,7 +122,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "ID required" }, { status: 400 });
     }
 
-    const updateData: Any = {};
+    const updateData: any = {};
     if (isClosed !== undefined) {
       updateData.isClosed = isClosed;
       if (isClosed) {
@@ -145,7 +145,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(financialYear);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Financial Year PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

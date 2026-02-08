@@ -104,7 +104,7 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("COMPANIES PUT ERROR:", e);
     return NextResponse.json({ error: "Failed to update company" }, { status: 500 });
   }

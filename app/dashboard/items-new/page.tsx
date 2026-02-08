@@ -90,7 +90,7 @@ export default function ItemsNewPage() {
 
       await loadItems();
       alert(editingId ? "Item updated successfully" : "Item saved successfully");
-    } catch (err: Any) {
+    } catch (err: any) {
       alert(err.message);
     } finally {
       setSaving(false);
@@ -135,7 +135,7 @@ export default function ItemsNewPage() {
 
       await loadItems();
       alert("Item deleted successfully");
-    } catch (err: Any) {
+    } catch (err: any) {
       alert(err.message);
     }
   }

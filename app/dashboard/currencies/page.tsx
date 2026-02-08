@@ -15,7 +15,7 @@ export default function CurrenciesPage() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
-  const [user, setUser] = useState<Any>(null);
+  const [user, setUser] = useState<any>(null);
   const [formData, setFormData] = useState({
     code: "",
     name: "",

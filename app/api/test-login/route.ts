@@ -35,7 +35,7 @@ export async function GET(_req: NextRequest) {
       users,
       message: userCount === 0 ? "No users found. Please create a user first." : "Users found",
     });
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("❌ TEST LOGIN ERROR:", error);
     return NextResponse.json(
       {

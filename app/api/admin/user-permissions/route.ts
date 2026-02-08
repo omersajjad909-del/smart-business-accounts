@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     ]);
 
     return NextResponse.json({ success: true });
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("TRANSACTION ERROR:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

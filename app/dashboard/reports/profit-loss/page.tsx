@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 export default function ProfitLossFinal() {
   const [from, setFrom] = useState("2026-01-01");
   const [to, setTo] = useState("2026-01-08");
-  const [report, setReport] = useState<Any>(null);
+  const [report, setReport] = useState<any>(null);
   const [_loading, setLoading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
 
@@ -79,7 +79,7 @@ export default function ProfitLossFinal() {
           <div className="bg-black text-white p-2 font-bold uppercase text-center italic text-[11px] tracking-widest">Expenses / Outwards</div>
           <table className="w-full">
             <tbody className="divide-y divide-gray-100">
-              {report?.expense && report.expense.length > 0 ? report.expense.map((item: Any, i: number) => (
+              {report?.expense && report.expense.length > 0 ? report.expense.map((item: any, i: number) => (
                 <tr key={i} className="hover:bg-red-50 transition-colors">
                   <td className="p-2 uppercase font-bold text-gray-700 text-[11px]">{item.name}</td>
                   <td className="p-2 text-right font-black text-[12px]">{Math.abs(item.amount).toLocaleString()}</td>
@@ -95,7 +95,7 @@ export default function ProfitLossFinal() {
           <div className="bg-gray-800 text-white p-2 font-bold uppercase text-center italic text-[11px] tracking-widest">Income / Inwards</div>
           <table className="w-full">
             <tbody className="divide-y divide-gray-100">
-              {report?.income && report.income.length > 0 ? report.income.map((item: Any, i: number) => (
+              {report?.income && report.income.length > 0 ? report.income.map((item: any, i: number) => (
                 <tr key={i} className="hover:bg-green-50 transition-colors">
                   <td className="p-2 uppercase font-bold text-gray-700 text-[11px]">{item.name}</td>
                   <td className="p-2 text-right font-black text-[12px]">{Math.abs(item.amount).toLocaleString()}</td>

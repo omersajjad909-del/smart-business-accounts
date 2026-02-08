@@ -23,7 +23,7 @@ export async function GET() {
       database: "smart_accounts",
       host: "localhost:5432",
     });
-  } catch (error: Any) {
+  } catch (error: any) {
     console.error("❌ DATABASE CONNECTION ERROR:", error);
     return NextResponse.json(
       {

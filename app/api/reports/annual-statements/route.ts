@@ -152,7 +152,7 @@ const accountBalances: AccountBalance[] = accounts.map(
         netProfit,
       },
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Annual Statements Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

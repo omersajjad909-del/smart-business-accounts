@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(formatted);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("CRV GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
     let requestBody;
     try {
       requestBody = await req.json();
-    } catch (parseError: Any) {
+    } catch (parseError: any) {
       console.error("❌ CRV JSON PARSE ERROR:", parseError);
       return NextResponse.json(
         { error: "Invalid request body", details: parseError.message },
@@ -396,9 +396,9 @@ export async function PUT(req: NextRequest) {
     }
 
     const receiptAmount = Math.abs(amountNum);
-    const oldAmount = Math.abs(existing.entries.find((e: Any) => e.amount < 0)?.amount || 0);
+    const oldAmount = Math.abs(existing.entries.find((e: any) => e.amount < 0)?.amount || 0);
 
-    const result = await prisma.$transaction(async (tx: Any) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       await tx.voucherEntry.deleteMany({ where: { voucherId: id, companyId } });
 
       const voucher = await tx.voucher.update({
@@ -440,7 +440,7 @@ export async function PUT(req: NextRequest) {
       amount: receiptAmount,
       paymentMode: paymentMode || "CASH",
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("CRV PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

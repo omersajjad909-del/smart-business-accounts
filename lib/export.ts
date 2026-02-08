@@ -1,6 +1,6 @@
 // Excel/CSV Export Utility Functions
 
-export function exportToCSV(data: Any[], filename: string) {
+export function exportToCSV(data: any[], filename: string) {
   if (!data || data.length === 0) {
     alert("No data to export");
     return;
@@ -41,7 +41,7 @@ export function exportToCSV(data: Any[], filename: string) {
   document.body.removeChild(link);
 }
 
-export function exportToExcel(data: Any[], filename: string) {
+export function exportToExcel(data: any[], filename: string) {
   // For Excel, we'll use CSV format (works in Excel)
   // For proper Excel, you'd need a library like xlsx
   exportToCSV(data, filename);

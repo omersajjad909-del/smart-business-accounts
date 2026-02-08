@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     const month = searchParams.get("month");
     const accountId = searchParams.get("accountId");
 
-    const where: Any = { companyId };
+    const where: any = { companyId };
     if (year) where.year = parseInt(year);
     if (month) where.month = parseInt(month);
     if (accountId) where.accountId = accountId;
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     // Calculate actual vs budget
     const budgetsWithActual = await Promise.all(
-      budgets.map(async (budget: Any) => {
+      budgets.map(async (budget: any) => {
         const startDate = new Date(budget.year, budget.month ? budget.month - 1 : 0, 1);
         const endDate = new Date(budget.year, budget.month ? budget.month : 12, 0, 23, 59, 59);
 
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
           },
         });
 
-        const actual = entries.reduce((sum: number, e: Any) => sum + (e.amount > 0 ? e.amount : 0), 0);
+        const actual = entries.reduce((sum: number, e: any) => sum + (e.amount > 0 ? e.amount : 0), 0);
         const variance = budget.amount - actual;
         const variancePercent = budget.amount > 0 ? (variance / budget.amount) * 100 : 0;
 
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     );
 
     return NextResponse.json(budgetsWithActual);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Budget GET Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
         });
 
     return NextResponse.json(budget);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Budget POST Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -198,7 +198,7 @@ export async function DELETE(req: NextRequest) {
     await prisma.budget.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Budget DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

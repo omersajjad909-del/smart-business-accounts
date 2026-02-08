@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         remarks,
         companyId,
         items: {
-          create: items.map((i: Any) => ({
+          create: items.map((i: any) => ({
             itemId: i.itemId,
             qty: Number(i.qty),
             rate: 0,
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(entry);
-  } catch (e: Any) {
+  } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(data);
-  } catch (e: Any) {
+  } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
@@ -147,7 +147,7 @@ export async function PUT(req: NextRequest) {
           remarks,
           companyId,
           items: {
-            create: items.map((i: Any) => ({
+            create: items.map((i: any) => ({
               itemId: i.itemId,
               qty: Number(i.qty),
               rate: 0,
@@ -165,7 +165,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json(result);
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Outward PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -204,7 +204,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Outward DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

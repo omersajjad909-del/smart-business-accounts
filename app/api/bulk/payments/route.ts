@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
           status: "success",
           voucherId: voucher.id,
         });
-      } catch (error: Any) {
+      } catch (error: any) {
         results.push({
           accountId: payment.accountId,
           status: "error",
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
       processed: results.length,
       results,
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Bulk Payments Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

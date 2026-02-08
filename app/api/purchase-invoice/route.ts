@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
       }
       const invoiceNo = `PI-${nextNo}`;
 
-      const totalItemsAmount = validItems.reduce((s: number, i: Any) => s + (Number(i.qty) * Number(i.rate)), 0);
+      const totalItemsAmount = validItems.reduce((s: number, i: any) => s + (Number(i.qty) * Number(i.rate)), 0);
       
       // Calculate tax if applied
       let taxAmount = 0;
@@ -229,7 +229,7 @@ export async function POST(req: NextRequest) {
       // E. اگر PO ہے تو اس کا اسٹیٹس چیک کریں
       if (poId) {
         const allItems = await tx.purchaseOrderItem.findMany({ where: { poId } });
-        const isDone = allItems.every((pi: Any) => pi.invoicedQty >= pi.qty);
+        const isDone = allItems.every((pi: any) => pi.invoicedQty >= pi.qty);
         await tx.purchaseOrder.update({
           where: { id: poId },
           data: { status: isDone ? "COMPLETED" : "PENDING" },
@@ -258,7 +258,7 @@ export async function POST(req: NextRequest) {
     const result = invoice;
 
     return NextResponse.json({ success: true, id: result.id, invoiceNo: result.invoiceNo });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("PI ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -338,7 +338,7 @@ export async function PUT(req: NextRequest) {
           approvalStatus,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
-            create: validItems.map((i: Any) => ({
+            create: validItems.map((i: any) => ({
               itemId: i.itemId,
               qty: Number(i.qty),
               rate: Number(i.rate),
@@ -377,7 +377,7 @@ export async function PUT(req: NextRequest) {
     const result = invoice;
 
     return NextResponse.json({ success: true, invoice: result });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("PI PUT ERROR:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

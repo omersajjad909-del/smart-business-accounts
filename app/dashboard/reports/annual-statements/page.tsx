@@ -8,7 +8,7 @@ import { exportToPDF } from "@/lib/pdf-export";
 export default function AnnualStatementsPage() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear.toString());
-  const [data, setData] = useState<Any>(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const user = getCurrentUser();
@@ -169,7 +169,7 @@ export default function AnnualStatementsPage() {
             </tr>
           </thead>
           <tbody>
-            {data.accounts.map((acc: Any, i: number) => (
+            {data.accounts.map((acc: any, i: number) => (
               <tr key={i} className="border-t">
                 <td className="p-3">{acc.code}</td>
                 <td className="p-3">{acc.name}</td>

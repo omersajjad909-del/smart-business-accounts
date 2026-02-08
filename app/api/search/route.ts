@@ -215,7 +215,7 @@ export async function GET(req: NextRequest) {
         })
       ),
     });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("SEARCH ERROR:", e);
     return NextResponse.json({ error: e.message || "Search failed" }, { status: 500 });
   }
