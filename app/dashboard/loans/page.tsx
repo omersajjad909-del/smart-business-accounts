@@ -100,7 +100,12 @@ export default function LoansPage() {
 
   const fetchAccounts = async () => {
     try {
-      const response = await fetch('/api/accounts');
+      const response = await fetch('/api/accounts', {
+        headers: {
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setAccounts(data);
