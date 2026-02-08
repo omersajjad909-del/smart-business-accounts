@@ -29,6 +29,7 @@ export default function PurchaseOrderPage() {
   const [supplierName, setSupplierName] = useState("");
   const [date, setDate] = useState(today);
   const [remarks, setRemarks] = useState("");
+  const [approvalStatus, setApprovalStatus] = useState("PENDING");
   const [rows, setRows] = useState([{ itemId: "", name: "", desc: "", qty: "", rate: "" }]);
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
