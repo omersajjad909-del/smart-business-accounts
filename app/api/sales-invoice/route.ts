@@ -354,7 +354,7 @@ export async function PUT(req: NextRequest) {
           total: total + freight + taxAmount,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
-            create: items.map((i: Any) => ({
+            create: items.map((i: any) => ({
               itemId: i.itemId,
               qty: i.qty,
               rate: i.rate,
@@ -390,7 +390,7 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, invoice: result });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Sales Invoice PUT Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -435,7 +435,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (e: Any) {
+  } catch (e: any) {
     console.error("Sales Invoice DELETE Error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

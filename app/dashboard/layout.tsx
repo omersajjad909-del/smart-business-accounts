@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
@@ -68,7 +68,7 @@ export default function DashboardLayout({
   const [openHR, setOpenHR] = useState(false);
   const [openCRM, setOpenCRM] = useState(false);
   const [openCurrency, setOpenCurrency] = useState(false);
-  const [openAdmin, setopenAdmin] =useState(false)
+  const [openAdmin, setOpenAdmin] = useState(false);
 
   // MOBILE MENU STATE
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

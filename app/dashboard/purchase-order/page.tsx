@@ -220,6 +220,7 @@ export default function PurchaseOrderPage() {
     setSupplierName(po.supplier?.name || "");
     setDate(new Date(po.date).toISOString().slice(0, 10));
     setRemarks(po.remarks || "");
+    setApprovalStatus(po.approvalStatus || "PENDING");
     setRows(po.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
