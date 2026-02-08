@@ -1,7 +1,8 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿"use client";
+﻿﻿"use client";
 
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { logout } from "@/lib/logout";
 import { hasPermission } from "@/lib/hasPermission";
