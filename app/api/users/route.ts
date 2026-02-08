@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
         where: { active: true },
         orderBy: { name: "asc" },
       });
+      console.log(`[API/Users] Public fetch: ${publicUsers.length} users found.`);
       return NextResponse.json(publicUsers);
     }
 
