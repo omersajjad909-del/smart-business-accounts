@@ -1,49 +1,49 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { NextResponse, NextRequest } from "next/server";
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
 import { logActivity } from "@/lib/audit";
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
-  const companyId = await resolveCompanyId(req);
-  if (!companyId) {
-    return NextResponse.json({ error: "Company required" }, { status: 400 });
-  }
+  try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
 
-  const { searchParams } = new URL(req.url);
-  const format = searchParams.get("format") || "json";
+    const { searchParams } = new URL(req.url);
+    const format = searchParams.get("format") || "json";
 
-  const items = await prisma.itemNew.findMany({
-    where: { companyId, deletedAt: null },
-    orderBy: { name: "asc" },
-  });
-
-  if (format === "csv") {
-    const header = ["code", "name", "unit", "rate", "minStock", "barcode", "description"].join(",");
-    const rows = items.map((i) => [
-      JSON.stringify(i.code || ""),
-      JSON.stringify(i.name || ""),
-      JSON.stringify(i.unit || ""),
-      i.rate ?? "",
-      i.minStock ?? "",
-      JSON.stringify(i.barcode || ""),
-      JSON.stringify(i.description || ""),
-    ].join(","));
-    const csv = [header, ...rows].join("\n");
-    return new NextResponse(csv, {
-      headers: {
-        "Content-Type": "text/csv",
-        "Content-Disposition": "attachment; filename=items.csv",
-      },
+    const items = await prisma.itemNew.findMany({
+      where: { companyId, deletedAt: null },
+      orderBy: { name: "asc" },
     });
-  }
 
-  return NextResponse.json(items);
+    if (format === "csv") {
+      const header = ["code", "name", "unit", "rate", "minStock", "barcode", "description"].join(",");
+      const rows = items.map((i) => [
+        JSON.stringify(i.code || ""),
+        JSON.stringify(i.name || ""),
+        JSON.stringify(i.unit || ""),
+        i.rate ?? "",
+        i.minStock ?? "",
+        JSON.stringify(i.barcode || ""),
+        JSON.stringify(i.description || ""),
+      ].join(","));
+      const csv = [header, ...rows].join("\n");
+      return new NextResponse(csv, {
+        headers: {
+          "Content-Type": "text/csv",
+          "Content-Disposition": "attachment; filename=items.csv",
+        },
+      });
+    }
+
+    return NextResponse.json(items);
+  } catch (error: any) {
+    console.error("ITEMS-NEW GET ERROR:", error);
+    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
