@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 type RolePermission = Prisma.RolePermissionGetPayload<Prisma.RolePermissionDefaultArgs>;
-
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 export async function POST(req: NextRequest) {
   try {
