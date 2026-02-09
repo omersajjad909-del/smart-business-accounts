@@ -1,15 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
-
-
-
-// ✅ Prisma singleton (dev safe)
-const prisma =
-  (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   try {
