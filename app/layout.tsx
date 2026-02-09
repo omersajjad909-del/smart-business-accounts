@@ -24,11 +24,6 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Smart Accounts",
   },
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
