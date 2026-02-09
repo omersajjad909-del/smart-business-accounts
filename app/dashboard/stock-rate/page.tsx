@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
 
 type Item = {
@@ -18,6 +19,7 @@ type Rate = {
 };
 
 export default function StockRatePage() {
+  const user = getCurrentUser();
   const today = new Date().toISOString().slice(0, 10);
 
   const [items, setItems] = useState<Item[]>([]);
@@ -30,7 +32,8 @@ export default function StockRatePage() {
 
   const headers = {
     "Content-Type": "application/json",
-    "x-user-role": "ADMIN", // 🔴 REQUIRED
+    "x-user-role": user?.role || "ADMIN",
+    "x-company-id": user?.companyId || "",
   };
 
   function loadRates() {
@@ -98,7 +101,7 @@ export default function StockRatePage() {
     try {
       const res = await fetch(`/api/stock-rate?id=${id}`, {
         method: "DELETE",
-        headers: { "x-user-role": "ADMIN" },
+        headers,
       });
 
       if (res.ok) {
