@@ -18,6 +18,12 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "US Traders | Faisalabad",
   description: "Financial Management System",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Smart Accounts",
+  },
 };
 
 import { ThemeProvider } from "@/components/theme-provider";

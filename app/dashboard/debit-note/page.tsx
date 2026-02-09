@@ -118,9 +118,13 @@ export default function DebitNotePage() {
           reference: '',
         });
         fetchDebitNotes();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || 'Failed to create debit note'}`);
       }
     } catch (error) {
       console.error('Error creating debit note:', error);
+      alert('An unexpected error occurred');
     }
   };
 

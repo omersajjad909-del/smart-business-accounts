@@ -118,9 +118,13 @@ export default function CreditNotePage() {
           reference: '',
         });
         fetchCreditNotes();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || 'Failed to create credit note'}`);
       }
     } catch (error) {
       console.error('Error creating credit note:', error);
+      alert('An unexpected error occurred');
     }
   };
 

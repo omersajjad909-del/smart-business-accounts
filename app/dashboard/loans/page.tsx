@@ -194,9 +194,13 @@ export default function LoansPage() {
         if (selectedLoan) {
           fetchPayments(selectedLoan);
         }
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || 'Failed to record payment'}`);
       }
     } catch (error) {
       console.error('Error creating payment:', error);
+      alert('An unexpected error occurred');
     }
   };
 
