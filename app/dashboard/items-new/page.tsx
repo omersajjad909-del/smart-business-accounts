@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
 
 type Item = {
   id: string;
@@ -14,6 +15,7 @@ type Item = {
 };
 
 export default function ItemsNewPage() {
+  const user = getCurrentUser();
   const [items, setItems] = useState<Item[]>([]);
   const [name, setName] = useState("");
   const [unit, setUnit] = useState("");
@@ -30,7 +32,8 @@ export default function ItemsNewPage() {
     try {
       const res = await fetch("/api/items-new", {
         headers: {
-          "x-user-role": "ADMIN",
+          "x-user-role": user?.role || "ADMIN",
+          "x-company-id": user?.companyId || "",
         },
       });
 
@@ -61,7 +64,8 @@ export default function ItemsNewPage() {
         method,
         headers: {
           "Content-Type": "application/json",
-          "x-user-role": "ADMIN",
+          "x-user-role": user?.role || "ADMIN",
+          "x-company-id": user?.companyId || "",
         },
         body: JSON.stringify({
           id: editingId,
@@ -124,7 +128,8 @@ export default function ItemsNewPage() {
       const res = await fetch(`/api/items-new?id=${id}`, {
         method: "DELETE",
         headers: {
-          "x-user-role": "ADMIN",
+          "x-user-role": user?.role || "ADMIN",
+          "x-company-id": user?.companyId || "",
         },
       });
 
