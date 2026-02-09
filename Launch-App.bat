@@ -3,7 +3,7 @@ setlocal
 title Smart Accounts Launcher
 
 echo ===================================================
-echo   STARTING SMART BUSINESS ACCOUNTS (DESKTOP MODE)
+echo   STARTING SMART BUSINESS ACCOUNTS (APP MODE)
 echo ===================================================
 echo.
 
@@ -15,31 +15,23 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-:: 2. Check if .env exists
-if not exist .env (
-    echo [WARNING] .env file missing. Creating from example...
-    copy .env.example .env >nul
-    echo [IMPORTANT] Please update .env with your database credentials!
-    pause
+:: 2. Check for Production Build
+if not exist ".next\BUILD_ID" (
+    echo [INFO] First time setup: Building the application...
+    echo This may take a few minutes. Please wait...
+    call npm run vercel-build
+    echo Build complete!
 )
 
-:: 3. Start the Server in a new minimized window
+:: 3. Start the Server (Production Mode)
 echo Starting Server...
-echo (Do not close the 'Next.js Server' window while using the app)
-start "Next.js Server" /min cmd /c "npm run dev"
+start "Smart Accounts Server" /min cmd /c "npm start"
 
-:: 4. Wait for server to be ready (approx 10 seconds)
-echo Waiting for system to initialize...
-timeout /t 10 /nobreak >nul
+:: 4. Wait for server to be ready (approx 5 seconds)
+timeout /t 5 /nobreak >nul
 
-:: 5. Open in Desktop App Mode (Chrome/Edge)
-echo Launching App Interface...
+:: 5. Open in Desktop App Mode
+:: This tries to open the installed PWA if registered, otherwise opens in App mode
 start chrome --app=http://localhost:3000
 
-:: Option to close
-echo.
-echo ===================================================
-echo   App is running!
-echo   Close the 'Next.js Server' window to stop.
-echo ===================================================
-pause
+exit
