@@ -11,6 +11,14 @@ const Barcode = dynamic(() => import("react-barcode"), {
 import { QRCodeSVG } from "qrcode.react";
 
 export default function PurchasePrint() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Loading Print Preview...</div>}>
+      <PurchasePrintContent />
+    </Suspense>
+  );
+}
+
+function PurchasePrintContent() {
   const params = useSearchParams();
   const id = params.get("id");
   const [data, setData] = useState<{

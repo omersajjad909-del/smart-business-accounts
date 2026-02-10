@@ -3,6 +3,8 @@ import BarcodeWrapper from "@/components/BarcodeWrapper";
 import QRCodeWrapper from "@/components/QRCodeWrapper";
 import { notFound } from "next/navigation";
 
+import PrintButton from "@/components/PrintButton";
+
 export default async function PublicPurchaseInvoicePage({
   searchParams,
 }: {
@@ -45,12 +47,7 @@ export default async function PublicPurchaseInvoicePage({
     <div className="min-h-screen bg-gray-100 p-4 md:p-10 flex flex-col items-center">
         {/* Print Button */}
         <div className="mb-6 w-full max-w-4xl flex justify-end print:hidden">
-            <button 
-                className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 font-bold"
-                onClick={() => window.print()}
-            >
-                🖨️ Print / Save as PDF
-            </button>
+            <PrintButton />
         </div>
 
       <div className="invoice-print bg-white p-10 shadow-lg max-w-4xl w-full mx-auto text-black print:shadow-none print:p-0">
