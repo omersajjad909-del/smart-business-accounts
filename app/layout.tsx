@@ -19,6 +19,15 @@ export const metadata: Metadata = {
   title: "US Traders | Faisalabad",
   description: "Financial Management System",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+    other: {
+      rel: "apple-touch-icon-precomposed",
+      url: "/icon.png",
+    },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
