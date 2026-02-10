@@ -39,6 +39,19 @@ export default function CompaniesPage() {
       if (res.ok) {
         const data = await res.json();
         setCompanies(data);
+        
+        // Update localStorage to reflect new companies immediately
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          // Handle structure where user might be nested or direct
+          if (parsed.user) {
+            parsed.user.companies = data;
+          } else {
+            parsed.companies = data;
+          }
+          localStorage.setItem("user", JSON.stringify(parsed));
+        }
       }
     } catch (error) {
       console.error("Failed to load companies", error);
@@ -63,7 +76,7 @@ export default function CompaniesPage() {
 
       if (res.ok) {
         setForm({ name: "", code: "" });
-        loadCompanies();
+        await loadCompanies();
         // Force reload to update the company switcher in the header
         window.location.reload(); 
       } else {
