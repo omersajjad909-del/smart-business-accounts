@@ -246,13 +246,13 @@ export default function DashboardLayout({
               />
               {openAccounting && (
                 <div className="ml-4 space-y-1">
-                  <MenuLink href="/dashboard/contra">ðŸ’± Contra Entry</MenuLink>
-                  <MenuLink href="/dashboard/advance-payment">ðŸ’° Advance Payment</MenuLink>
-                  <MenuLink href="/dashboard/petty-cash">ðŸ’µ Petty Cash</MenuLink>
-                  <MenuLink href="/dashboard/credit-note">ðŸ“ Credit Notes</MenuLink>
-                  <MenuLink href="/dashboard/debit-note">ðŸ“‹ Debit Notes</MenuLink>
-                  <MenuLink href="/dashboard/fixed-assets">ðŸ¢ Fixed Assets</MenuLink>
-                  <MenuLink href="/dashboard/loans">ðŸ¦ Loans</MenuLink>
+                  <MenuLink href="/dashboard/contra">Contra Entry</MenuLink>
+                  <MenuLink href="/dashboard/advance-payment">Advance Payment</MenuLink>
+                  <MenuLink href="/dashboard/petty-cash">Petty Cash</MenuLink>
+                  <MenuLink href="/dashboard/credit-note">Credit Notes</MenuLink>
+                  <MenuLink href="/dashboard/debit-note">Debit Notes</MenuLink>
+                  <MenuLink href="/dashboard/fixed-assets">Fixed Assets</MenuLink>
+                  <MenuLink href="/dashboard/loans">Loans</MenuLink>
                 </div>
               )}
 
@@ -310,11 +310,10 @@ export default function DashboardLayout({
                   {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <MenuLink href="/dashboard/reports/tax-summary">Tax Summary</MenuLink>}
                   {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <MenuLink href="/dashboard/reports/profitability">Profitability</MenuLink>}
                   {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <MenuLink href="/dashboard/reports/annual-statements">Annual Statements</MenuLink>}
-                  <div className="ml-4 space-y-1 mt-2">
-                    {hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <MenuLink href="/dashboard/budget">Budget Planning</MenuLink>}
-                    {(hasPermission(currentUser, PERMISSIONS.RECURRING_TRANSACTIONS) || isAdmin) && <MenuLink href="/dashboard/recurring-transactions">Recurring Transactions</MenuLink>}
-                    {hasPermission(currentUser, PERMISSIONS.FINANCIAL_YEAR) && <MenuLink href="/dashboard/financial-year">Financial Year</MenuLink>}
-                  </div>
+                  {hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <MenuLink href="/dashboard/budget">Budget Planning</MenuLink>}
+                  {(hasPermission(currentUser, PERMISSIONS.RECURRING_TRANSACTIONS) || isAdmin) && <MenuLink href="/dashboard/recurring-transactions">Recurring Transactions</MenuLink>}
+                  {hasPermission(currentUser, PERMISSIONS.FINANCIAL_YEAR) && <MenuLink href="/dashboard/financial-year">Financial Year</MenuLink>}
+                  
                 </div>
               )}
 
@@ -344,11 +343,11 @@ export default function DashboardLayout({
               <MenuHeader title="Admin Settings" open={openAdmin} onClick={() => setOpenAdmin(!openAdmin)} />
                 {openAdmin && (
               <div className="ml-2 mt-2 space-y-1 border-l border-[var(--border)]">
-                <MenuLink href="/dashboard/users">ðŸ‘¥ Users & Permissions</MenuLink>
-                <MenuLink href="/dashboard/approvals">âœ… Approvals</MenuLink>
-                {hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <MenuLink href="/dashboard/backup-restore">ðŸ’¾ Backup & Restore</MenuLink>}
-                {hasPermission(currentUser, PERMISSIONS.EMAIL_SETTINGS) && <MenuLink href="/dashboard/email-settings">âœ‰ï¸ Email Settings</MenuLink>}
-                {(hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) || isAdmin) && <MenuLink href="/dashboard/users/logs">ðŸ“‹ System Logs</MenuLink>}
+                <MenuLink href="/dashboard/users">Users & Permissions</MenuLink>
+                <MenuLink href="/dashboard/approvals">Approvals</MenuLink>
+                {hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <MenuLink href="/dashboard/backup-restore">Backup & Restore</MenuLink>}
+                {hasPermission(currentUser, PERMISSIONS.EMAIL_SETTINGS) && <MenuLink href="/dashboard/email-settings">Email Settings</MenuLink>}
+                {(hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) || isAdmin) && <MenuLink href="/dashboard/users/logs">System Logs</MenuLink>}
               </div>
               )}
             </div>
@@ -360,10 +359,10 @@ export default function DashboardLayout({
               <SubHeader title="HR & Payroll" open={openHR} onClick={() => setOpenHR(!openHR)} />
               {openHR && (
                 <div className="ml-4 space-y-1 border-l border-[var(--border)] pl-2">
-                  <MenuLink href="/dashboard/employees">ðŸ‘¥ Employees</MenuLink>
-                  <MenuLink href="/dashboard/attendance">ðŸ“‹ Attendance</MenuLink>
-                  <MenuLink href="/dashboard/advance">ðŸ’¸ Advance Salary</MenuLink>
-                  <MenuLink href="/dashboard/payroll">ðŸ’° Payroll</MenuLink>
+                  <MenuLink href="/dashboard/employees">Employees</MenuLink>
+                  <MenuLink href="/dashboard/attendance">Attendance</MenuLink>
+                  <MenuLink href="/dashboard/advance">Advance Salary</MenuLink>
+                  <MenuLink href="/dashboard/payroll">Payroll</MenuLink>
                 </div>
               )}
             </>
@@ -375,9 +374,9 @@ export default function DashboardLayout({
               <SubHeader title="CRM & Sales" open={openCRM} onClick={() => setOpenCRM(!openCRM)} />
               {openCRM && (
                 <div className="ml-4 space-y-1 border-l border-[var(--border)] pl-2">
-                  <MenuLink href="/dashboard/crm/contacts">ðŸ“‡ Contacts</MenuLink>
-                  <MenuLink href="/dashboard/crm/opportunities">ðŸ’¼ Opportunities</MenuLink>
-                  <MenuLink href="/dashboard/crm/interactions">ðŸ“ž Interactions</MenuLink>
+                  <MenuLink href="/dashboard/crm/contacts">Contacts</MenuLink>
+                  <MenuLink href="/dashboard/crm/opportunities">Opportunities</MenuLink>
+                  <MenuLink href="/dashboard/crm/interactions">Interactions</MenuLink>
                 </div>
               )}
             </>
@@ -389,10 +388,10 @@ export default function DashboardLayout({
               <SubHeader title="Settings" open={openCurrency} onClick={() => setOpenCurrency(!openCurrency)} />
               {openCurrency && (
                 <div className="ml-4 space-y-1 border-l border-[var(--border)] pl-2">
-                  <MenuLink href="/dashboard/currencies">ðŸ’± Currencies</MenuLink>
-                  <MenuLink href="/dashboard/branches">ðŸ“ Branches</MenuLink>
-                  <MenuLink href="/dashboard/cost-centers">ðŸ“Š Cost Centers</MenuLink>
-                  <MenuLink href="/dashboard/department-budgets">ðŸ“ Dept Budgets</MenuLink>
+                  <MenuLink href="/dashboard/currencies">Currencies</MenuLink>
+                  <MenuLink href="/dashboard/branches">Branches</MenuLink>
+                  <MenuLink href="/dashboard/cost-centers">Cost Centers</MenuLink>
+                  <MenuLink href="/dashboard/department-budgets">Dept Budgets</MenuLink>
                 </div>
               )}
             </>
