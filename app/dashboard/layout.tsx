@@ -344,6 +344,7 @@ export default function DashboardLayout({
                 {openAdmin && (
               <div className="ml-2 mt-2 space-y-1 border-l border-[var(--border)]">
                 <MenuLink href="/dashboard/users">Users & Permissions</MenuLink>
+                <MenuLink href="/dashboard/companies">Companies</MenuLink>
                 <MenuLink href="/dashboard/approvals">Approvals</MenuLink>
                 {hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <MenuLink href="/dashboard/backup-restore">Backup & Restore</MenuLink>}
                 {hasPermission(currentUser, PERMISSIONS.EMAIL_SETTINGS) && <MenuLink href="/dashboard/email-settings">Email Settings</MenuLink>}
