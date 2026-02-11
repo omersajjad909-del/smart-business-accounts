@@ -17,6 +17,7 @@ const eslintConfig = defineConfig([
     "scripts/**",
     "prisma/seed.js",
     "check-db.js",
+    "test-connection.js",
   ]),
   {
     rules: {
