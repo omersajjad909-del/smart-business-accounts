@@ -4,6 +4,7 @@ import { resolveCompanyId } from "@/lib/tenant";
 import { logActivity } from "@/lib/audit";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
+import { seedMinimalChart } from "@/lib/services/accountsSeed";
 
 const CATEGORY_TYPE_MAP: Record<string, string> = {
   CUSTOMER: "ASSET",
@@ -64,6 +65,15 @@ export async function GET(req: NextRequest) {
     where: { companyId, deletedAt: null },
     orderBy: { name: "asc" },
   });
+
+  if (accounts.length === 0 && role === "ADMIN") {
+    await seedMinimalChart(prisma, companyId);
+    const seeded = await prisma.account.findMany({
+      where: { companyId, deletedAt: null },
+      orderBy: { name: "asc" },
+    });
+    return NextResponse.json(seeded);
+  }
 
   if (format === "csv") {
     const header = [

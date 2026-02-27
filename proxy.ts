@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const headers = new Headers(req.headers);
 
   const hasUserId = headers.get("x-user-id");

@@ -28,3 +28,18 @@ export async function requireEntitlement(req: Request, entitlement: string) {
   return null;
 }
 
+export async function requireActiveSubscription(req: Request) {
+  const companyId = await resolveCompanyId(req as any);
+  if (!companyId) {
+    return NextResponse.json({ error: "Company required" }, { status: 400 });
+  }
+  const company = await prisma.company.findUnique({
+    where: { id: companyId },
+    select: { subscriptionStatus: true },
+  });
+  const status = (company?.subscriptionStatus || "ACTIVE").toUpperCase();
+  if (status !== "ACTIVE") {
+    return NextResponse.json({ error: "Subscription inactive" }, { status: 402 });
+  }
+  return null;
+}

@@ -4,6 +4,7 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
+import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 type SalesInvoiceNoOnly = Prisma.SalesInvoiceGetPayload<{
   select: { invoiceNo: true };
 }>;
@@ -127,6 +128,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const sub = await requireActiveSubscription(req);
+    if (sub) return sub;
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
 
