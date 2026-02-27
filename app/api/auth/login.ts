@@ -16,19 +16,23 @@ export async function POST(req: NextRequest) {
   if (!valid) {
     return NextResponse.json({ success: false, error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password.' } }, { status: 401 });
   }
-  // Create session & JWT
-  const session = await prisma.session.create({
-    data: {
-      userId: user.id,
-      companyId,
-      token: signJwt({ userId: user.id, companyId, role: user.role }),
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-      ip: (req.headers.get('x-forwarded-for') || '').split(',')[0] || '',
-      userAgent: req.headers.get('user-agent') || '',
-    },
-  });
+  const token = signJwt({ userId: user.id, companyId, role: user.role });
+  try {
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        companyId,
+        token,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        ip: (req.headers.get('x-forwarded-for') || '').split(',')[0] || '',
+        userAgent: req.headers.get('user-agent') || '',
+      },
+    });
+  } catch (e: any) {
+    console.warn('⚠️ SESSION CREATE FAILED, proceeding with cookie-only auth', { code: e?.code, message: e?.message });
+  }
   // Set HTTP-only cookie
   const res = NextResponse.json({ success: true });
-  res.cookies.set('sb_auth', session.token, { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 7 });
+  res.cookies.set('sb_auth', token, { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 7 });
   return res;
 }
