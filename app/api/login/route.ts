@@ -189,16 +189,23 @@ export async function POST(req: NextRequest) {
     });
 
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    await prisma.session.create({
-      data: {
-        userId: safeUser.id,
-        token,
-        expiresAt,
-        companyId: defaultCompanyId || safeUser.companyId || "",
-        ip: req.headers.get("x-forwarded-for"),
-        userAgent: req.headers.get("user-agent") || null,
-      },
-    });
+    try {
+      await prisma.session.create({
+        data: {
+          userId: safeUser.id,
+          token,
+          expiresAt,
+          companyId: defaultCompanyId || safeUser.companyId || "",
+          ip: req.headers.get("x-forwarded-for"),
+          userAgent: req.headers.get("user-agent") || null,
+        },
+      });
+    } catch (sessionErr: any) {
+      console.warn("⚠️ SESSION CREATE FAILED, proceeding with cookie-only auth:", {
+        code: sessionErr?.code,
+        message: sessionErr?.message,
+      });
+    }
 
     const res = NextResponse.json({ user: safeUser });
     res.cookies.set("sb_auth", token, {
