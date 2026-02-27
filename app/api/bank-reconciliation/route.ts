@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { resolveCompanyId } from "@/lib/tenant";
+import { PERMISSIONS } from "@/lib/permissions";
+import { apiHasPermission } from "@/lib/apiPermission";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -13,6 +15,13 @@ export async function GET(req: NextRequest) {
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const userId = req.headers.get("x-user-id");
+    const userRole = req.headers.get("x-user-role");
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.BANK_RECONCILIATION, companyId);
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -54,6 +63,13 @@ export async function POST(req: NextRequest) {
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const userId = req.headers.get("x-user-id");
+    const userRole = req.headers.get("x-user-role");
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.BANK_RECONCILIATION, companyId);
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await req.json();

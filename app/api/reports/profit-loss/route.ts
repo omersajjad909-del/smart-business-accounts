@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
+import { PERMISSIONS } from "@/lib/permissions";
+import { apiHasPermission } from "@/lib/apiPermission";
+import { requireEntitlement } from "@/lib/subscriptionGuard";
 type EntryWithAccount = Prisma.VoucherEntryGetPayload<{
   include: {
     account: true;
@@ -16,6 +19,8 @@ if (process.env.NODE_ENV === "development") {
 // api/reports/profit-loss/route.ts
 export async function GET(req: NextRequest) {
   try {
+    const userId = req.headers.get("x-user-id");
+    const userRole = req.headers.get("x-user-role");
     const { searchParams } = new URL(req.url);
     const from = searchParams.get("from");
     const to = searchParams.get("to");
@@ -26,6 +31,12 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT, companyId);
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const sub = await requireEntitlement(req, "proReports");
+    if (sub) return sub;
 
     const entries = await prisma.voucherEntry.findMany({
       where: {

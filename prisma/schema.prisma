@@ -364,6 +364,13 @@ model Company {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
+  // SaaS Subscription (MVP)
+  plan                 String   @default("STARTER")
+  subscriptionStatus   String   @default("ACTIVE")
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  currentPeriodEnd     DateTime?
+
   users         UserCompany[]
   defaultUsers  User[] @relation("UserDefaultCompany")
 
@@ -524,7 +531,7 @@ model User {
   id          String           @id @default(uuid())
   name        String
   email       String           @unique
-  password    String
+  password    String           // bcrypt hash
   role        String           @default("VIEWER") // ADMIN, ACCOUNTANT, VIEWER
   active      Boolean          @default(true)
   logs        ActivityLog[]
@@ -533,6 +540,22 @@ model User {
   defaultCompanyId String?
   defaultCompany   Company? @relation("UserDefaultCompany", fields: [defaultCompanyId], references: [id])
   companies        UserCompany[]
+  sessions    Session[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  ip        String?
+  userAgent String?
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  @@index([userId, companyId])
 }
 
 model ActivityLog {

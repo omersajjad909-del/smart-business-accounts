@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
+import { PERMISSIONS } from "@/lib/permissions";
+import { apiHasPermission } from "@/lib/apiPermission";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -16,8 +18,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    const role = req.headers.get("x-user-role");
-    if (role !== "ADMIN" && role !== "ACCOUNTANT") {
+    const userId = req.headers.get("x-user-id");
+    const userRole = req.headers.get("x-user-role");
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_CPV, companyId);
+    if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -76,8 +80,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    const role = req.headers.get("x-user-role");
-    if (role !== "ADMIN" && role !== "ACCOUNTANT") {
+    const userId = (req as any).headers.get("x-user-id");
+    const userRole = (req as any).headers.get("x-user-role");
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_CPV, companyId);
+    if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -322,8 +328,10 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    const role = req.headers.get("x-user-role");
-    if (role !== "ADMIN" && role !== "ACCOUNTANT") {
+    const userId = req.headers.get("x-user-id");
+    const userRole = req.headers.get("x-user-role");
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_CPV, companyId);
+    if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -449,8 +457,10 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    const role = req.headers.get("x-user-role");
-    if (role !== "ADMIN" && role !== "ACCOUNTANT") {
+    const userId = req.headers.get("x-user-id");
+    const userRole = req.headers.get("x-user-role");
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_CPV, companyId);
+    if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
