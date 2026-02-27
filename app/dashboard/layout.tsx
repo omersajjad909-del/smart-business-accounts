@@ -201,7 +201,9 @@ export default function DashboardLayout({
         </div>
 
         <nav className="p-3 space-y-2 overflow-y-auto flex-1 pb-24">
-          <MenuLink href="/dashboard">Dashboard</MenuLink>
+          {hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
+            <MenuLink href="/dashboard">Dashboard</MenuLink>
+          )}
 
           {/* ================= FORMS ================= */}
           <MenuHeader title="Forms" open={openForms} onClick={() => setOpenForms(!openForms)} />

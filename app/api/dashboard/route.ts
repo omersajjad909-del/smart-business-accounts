@@ -1,22 +1,32 @@
 import { NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { resolveCompanyId } from "@/lib/tenant";
+import { PERMISSIONS } from "@/lib/permissions";
+import { apiHasPermission } from "@/lib/apiPermission";
 
 export async function GET(req: Request) {
   try {
-    // 🔐 ROLE CHECK
-    const role = req.headers.get("x-user-role");
-    if (role !== "ADMIN" && role !== "ACCOUNTANT") {
+    const companyId = await resolveCompanyId(req as any);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+    const userId = (req as any).headers.get("x-user-id");
+    const userRole = (req as any).headers.get("x-user-role");
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_DASHBOARD, companyId);
+    if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // ================= TOTAL SALES =================
     const sales = await prisma.salesInvoice.aggregate({
-      _sum: { total: true }, // ✅ correct field
+      where: { companyId },
+      _sum: { total: true },
     });
 
     // ================= STOCK VALUE =================
     const items = await prisma.itemNew.findMany({
+      where: { companyId },
       include: { inventoryTxns: true },
     });
 

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
+import { PERMISSIONS } from "@/lib/permissions";
+import { apiHasPermission } from "@/lib/apiPermission";
+import { requireEntitlement } from "@/lib/subscriptionGuard";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 type AccountWithEntries = Prisma.AccountGetPayload<{
@@ -20,10 +23,18 @@ export async function GET(req: NextRequest) {
     const dateParam = req.nextUrl.searchParams.get("date");
     const asOn = dateParam ? new Date(dateParam + "T23:59:59.999") : new Date();
 
+    const userId = req.headers.get("x-user-id");
+    const userRole = req.headers.get("x-user-role");
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_BALANCE_SHEET_REPORT, companyId);
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const sub = await requireEntitlement(req, "proReports");
+    if (sub) return sub;
 
     const accounts = await prisma.account.findMany({
       where: { companyId },
@@ -133,4 +144,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Balance calculation failed" }, { status: 500 });
   }
 }
-

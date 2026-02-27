@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { logActivity } from "@/lib/audit";
+import { PERMISSIONS } from "@/lib/permissions";
+import { apiHasPermission } from "@/lib/apiPermission";
 
 const CATEGORY_TYPE_MAP: Record<string, string> = {
   CUSTOMER: "ASSET",
@@ -25,7 +27,13 @@ export async function GET(req: NextRequest) {
   const prefix = searchParams.get("prefix");
   const format = searchParams.get("format") || "json";
 
-  if (role !== "ADMIN" && role !== "ACCOUNTANT") {
+  const userId = req.headers.get("x-user-id");
+  const companyIdForPerm = await resolveCompanyId(req);
+  if (!companyIdForPerm) {
+    return NextResponse.json({ error: "Company required" }, { status: 400 });
+  }
+  const allowed = await apiHasPermission(userId, role || null, PERMISSIONS.VIEW_ACCOUNTS, companyIdForPerm);
+  if (!allowed) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -102,14 +110,15 @@ export async function POST(req: NextRequest) {
     const role = rawRole?.toUpperCase();
     const userId = req.headers.get("x-user-id");
 
-    if (role !== "ADMIN") {
-      return NextResponse.json({ error: "Only ADMIN can create accounts" }, { status: 403 });
-    }
-
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const allowed = await apiHasPermission(userId, role || null, PERMISSIONS.CREATE_ACCOUNTS, companyId);
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
 
     const body = await req.json();
 
@@ -190,12 +199,15 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role")?.toUpperCase();
-    if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const userId = req.headers.get("x-user-id");
 
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+    const allowed = await apiHasPermission(userId, role || null, PERMISSIONS.CREATE_ACCOUNTS, companyId);
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await req.json();
@@ -241,12 +253,15 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const role = req.headers.get("x-user-role")?.toUpperCase();
-    if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const userId = req.headers.get("x-user-id");
 
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+    const allowed = await apiHasPermission(userId, role || null, PERMISSIONS.CREATE_ACCOUNTS, companyId);
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);

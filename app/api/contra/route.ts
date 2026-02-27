@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { logActivity } from "@/lib/audit";
+import { PERMISSIONS } from "@/lib/permissions";
+import { apiHasPermission } from "@/lib/apiPermission";
 
 export async function GET(req: NextRequest) {
   try {
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const userId = req.headers.get("x-user-id");
+    const userRole = req.headers.get("x-user-role");
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_ACCOUNTING, companyId);
+    if (!allowed) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const vouchers = await prisma.voucher.findMany({
