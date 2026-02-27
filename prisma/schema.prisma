@@ -412,6 +412,7 @@ model Company {
   debitNotes            DebitNote[]
   loans                 Loan[]
   fixedAssets           FixedAsset[]
+  sessions              Session[]
 }
 
 model CreditNote {

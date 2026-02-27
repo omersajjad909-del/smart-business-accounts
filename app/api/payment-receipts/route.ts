@@ -1,15 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { z } from "zod";
 import { resolveCompanyId } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
+import { logActivity } from "@/lib/audit";
+import { rateLimit } from "@/lib/rateLimit";
+import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
   (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
+
+const receiptSchema = z.object({
+  receiptNo: z.string().optional(),
+  date: z.string(),
+  amount: z.union([z.number(), z.string()]),
+  paymentMode: z.enum(["CASH", "CHEQUE", "BANK_TRANSFER"]),
+  partyId: z.string(),
+  bankAccountId: z.string().optional(),
+  referenceNo: z.string().optional(),
+  narration: z.string().optional(),
+  currencyId: z.string().optional(),
+  exchangeRate: z.union([z.number(), z.string()]).optional(),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -54,6 +71,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const sub = await requireActiveSubscription(req);
+    if (sub) return sub;
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+    const companyIdKey = req.headers.get("x-company-id") || "unknown";
+    const rl = rateLimit(`receipt:${companyIdKey}:${ip}`, 30, 60_000);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
@@ -67,6 +92,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+    const parsed = receiptSchema.parse(body);
     const {
       receiptNo: providedReceiptNo,
       date,
@@ -75,27 +101,21 @@ export async function POST(req: NextRequest) {
       partyId,
       referenceNo,
       narration,
-      bankAccountId, // New: which bank/cash account received this
+      bankAccountId,
       currencyId,
       exchangeRate = 1,
-    } = body;
+    } = parsed;
 
     // Validation
     if (!partyId || !amount || !date) {
-      return NextResponse.json(
-        { error: 'Party, amount, and date are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Party, amount, and date are required' }, { status: 400 });
     }
 
     await ensureOpenPeriod(prisma, companyId, new Date(date));
 
-    const amountNum = parseFloat(amount);
+    const amountNum = typeof amount === "string" ? parseFloat(amount) : Number(amount);
     if (isNaN(amountNum) || amountNum <= 0) {
-      return NextResponse.json(
-        { error: 'Invalid amount' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
     }
 
     // Get party (customer)
@@ -227,8 +247,8 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // 3. Update bank balance if bank payment
-      if ((paymentMode === 'BANK_TRANSFER' || paymentMode === 'CHEQUE') && bankAccountRecord) {
+      // 3. Update bank balance if bank transfer (cheque will be applied on clearing)
+      if (paymentMode === 'BANK_TRANSFER' && bankAccountRecord) {
         await tx.bankAccount.update({
           where: { id: bankAccountRecord.id },
           data: {
@@ -245,6 +265,20 @@ export async function POST(req: NextRequest) {
             amount: amountNum, // Positive for receipt
             description: narration || `Receipt ${receiptNo} from ${party.name}`,
             referenceNo: receiptNo,
+            isReconciled: true,
+            companyId,
+          },
+        });
+      } else if (paymentMode === 'CHEQUE' && bankAccountRecord) {
+        // Record pending cheque statement without affecting balance
+        await tx.bankStatement.create({
+          data: {
+            bankAccountId: bankAccountRecord.id,
+            statementNo: `STMT-${Date.now()}`,
+            date: new Date(date),
+            amount: amountNum,
+            description: narration || `Cheque ${referenceNo || receiptNo} from ${party.name}`,
+            referenceNo: receiptNo,
             isReconciled: false,
             companyId,
           },
@@ -252,6 +286,13 @@ export async function POST(req: NextRequest) {
       }
 
       return receipt;
+    });
+
+    await logActivity(prisma, {
+      companyId,
+      userId,
+      action: "PAYMENT_RECEIPT_CREATED",
+      details: `receiptNo=${result.receiptNo} amount=${amountNum}`,
     });
 
     return NextResponse.json(result, { status: 201 });
@@ -266,6 +307,8 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const sub = await requireActiveSubscription(req);
+    if (sub) return sub;
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
@@ -302,6 +345,46 @@ export async function PUT(req: NextRequest) {
       },
     });
 
+    // If clearing a cheque, apply bank balance and reconcile statement
+    if (updateData.status === "CLEARED") {
+      const current = await prisma.paymentReceipt.findUnique({
+        where: { id },
+        include: {
+          voucher: true,
+        },
+      });
+      if (current?.paymentMode === "CHEQUE") {
+        // Find the bank statement by referenceNo
+        const stmt = await prisma.bankStatement.findFirst({
+          where: {
+            referenceNo: current.receiptNo,
+            bankAccount: { companyId },
+            isReconciled: false,
+          },
+          include: {
+            bankAccount: true,
+          },
+        });
+        if (stmt?.bankAccount?.id) {
+          await prisma.bankAccount.update({
+            where: { id: stmt.bankAccount.id },
+            data: { balance: { increment: Number(current.amount || 0) } },
+          });
+          await prisma.bankStatement.update({
+            where: { id: stmt.id },
+            data: { isReconciled: true },
+          });
+        }
+      }
+    }
+
+    await logActivity(prisma, {
+      companyId,
+      userId,
+      action: "PAYMENT_RECEIPT_UPDATED",
+      details: `id=${id}`,
+    });
+
     return NextResponse.json(receipt);
   } catch (error) {
     console.error('Error updating payment receipt:', error);
@@ -314,6 +397,8 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const sub = await requireActiveSubscription(req);
+    if (sub) return sub;
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
@@ -346,6 +431,13 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.paymentReceipt.delete({
       where: { id },
+    });
+
+    await logActivity(prisma, {
+      companyId,
+      userId,
+      action: "PAYMENT_RECEIPT_DELETED",
+      details: `id=${id}`,
     });
 
     return NextResponse.json({ success: true });

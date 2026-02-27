@@ -9,7 +9,7 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "seed": "node prisma/seed.js",
-    "vercel-build": "prisma generate && next build",
+    "vercel-build": "prisma migrate deploy && prisma generate && next build",
     "setup:prod": "bash scripts/setup-production.sh",
     "verify:env": "node scripts/verify-env.js",
     "user:create": "node scripts/create-user.js",

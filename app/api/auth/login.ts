@@ -22,9 +22,9 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       companyId,
       token: signJwt({ userId: user.id, companyId, role: user.role }),
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days
-      ip: req.ip ?? '',
-      userAgent: req.headers.get('user-agent') ?? '',
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      ip: (req.headers.get('x-forwarded-for') || '').split(',')[0] || '',
+      userAgent: req.headers.get('user-agent') || '',
     },
   });
   // Set HTTP-only cookie

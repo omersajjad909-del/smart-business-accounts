@@ -69,6 +69,8 @@ export default function DashboardLayout({
   const [openCRM, setOpenCRM] = useState(false);
   const [openCurrency, setOpenCurrency] = useState(false);
   const [openAdmin, setOpenAdmin] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+  const [subInfo, setSubInfo] = useState<{ plan: string; status: string } | null>(null);
 
   // MOBILE MENU STATE
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -127,6 +129,26 @@ export default function DashboardLayout({
         };
 
         setCurrentUser(updatedUser);
+        try {
+          const c = await fetch("/api/me/company", {
+            headers: {
+              "x-user-id": u.id,
+              "x-user-role": u.role,
+              "x-company-id": u.companyId || "",
+            },
+          });
+          if (c.ok) {
+            const cj = await c.json();
+            setIsPro(String(cj.plan || "").toUpperCase() === "PRO" && String(cj.subscriptionStatus || "").toUpperCase() === "ACTIVE");
+            setSubInfo({ plan: String(cj.plan || "STARTER"), status: String(cj.subscriptionStatus || "ACTIVE") });
+          } else {
+            setIsPro(false);
+            setSubInfo(null);
+          }
+        } catch {
+          setIsPro(false);
+          setSubInfo(null);
+        }
         setReady(true);
       } catch (err) {
         console.error("Failed to fetch current user permissions:", err);
@@ -307,8 +329,8 @@ export default function DashboardLayout({
                   {hasPermission(currentUser, PERMISSIONS.VIEW_AGEING_REPORT) && <MenuLink href="/dashboard/reports/ageing">Ageing</MenuLink>}
                   {hasPermission(currentUser, PERMISSIONS.VIEW_LEDGER_REPORT) && <MenuLink href="/dashboard/reports/ledger">Ledger</MenuLink>}
                   {hasPermission(currentUser, PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT) && <MenuLink href="/dashboard/reports/trial-balance">Trial Balance</MenuLink>}
-                  {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <MenuLink href="/dashboard/reports/profit-loss">P&L</MenuLink>}
-                  {hasPermission(currentUser, PERMISSIONS.VIEW_BALANCE_SHEET_REPORT) && <MenuLink href="/dashboard/reports/balance-sheet">Balance Sheet</MenuLink>}
+                  {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && isPro && <MenuLink href="/dashboard/reports/profit-loss">P&L</MenuLink>}
+                  {hasPermission(currentUser, PERMISSIONS.VIEW_BALANCE_SHEET_REPORT) && isPro && <MenuLink href="/dashboard/reports/balance-sheet">Balance Sheet</MenuLink>}
                   {hasPermission(currentUser, PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT) && <MenuLink href="/dashboard/reports/cash-flow">Cash Flow</MenuLink>}
                   {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <MenuLink href="/dashboard/reports/tax-summary">Tax Summary</MenuLink>}
                   {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <MenuLink href="/dashboard/reports/profitability">Profitability</MenuLink>}
@@ -396,6 +418,8 @@ export default function DashboardLayout({
                   <MenuLink href="/dashboard/branches">Branches</MenuLink>
                   <MenuLink href="/dashboard/cost-centers">Cost Centers</MenuLink>
                   <MenuLink href="/dashboard/department-budgets">Dept Budgets</MenuLink>
+                  <MenuLink href="/dashboard">Subscription</MenuLink>
+                  <MenuLink href="/landing">Landing</MenuLink>
                 </div>
               )}
             </>
@@ -473,6 +497,11 @@ export default function DashboardLayout({
           )}
           <div className="ml-auto flex items-center gap-4">
             <ModeToggle />
+            {subInfo && (
+              <div className={`text-xs px-2 py-1 rounded border ${subInfo.status === "ACTIVE" ? "border-green-600 text-green-700 bg-green-50" : "border-red-600 text-red-700 bg-red-50"}`}>
+                {subInfo.plan} • {subInfo.status}
+              </div>
+            )}
             <div className="text-sm text-[var(--text-muted)]">
               {currentUser.name || currentUser.email}
             </div>

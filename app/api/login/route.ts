@@ -2,10 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { signJwt } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 type RolePermission = Prisma.RolePermissionGetPayload<Prisma.RolePermissionDefaultArgs>;
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+    const rl = rateLimit(`login:${ip}`, 10, 60_000);
+    if (!rl.allowed) {
+      return NextResponse.json({ message: "Too many attempts, slow down" }, { status: 429 });
+    }
     let body;
     try {
       body = await req.json();
@@ -175,13 +182,33 @@ export async function POST(req: NextRequest) {
 
     };
 
-    console.log("✅ LOGIN SUCCESS:", { 
-      userId: safeUser.id, 
-      email: safeUser.email, 
-      role: safeUser.role 
+    const token = signJwt({
+      userId: safeUser.id,
+      role: safeUser.role,
+      companyId: defaultCompanyId,
     });
 
-    return NextResponse.json({ user: safeUser });
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await prisma.session.create({
+      data: {
+        userId: safeUser.id,
+        token,
+        expiresAt,
+        companyId: defaultCompanyId || safeUser.companyId || "",
+        ip: req.headers.get("x-forwarded-for"),
+        userAgent: req.headers.get("user-agent") || null,
+      },
+    });
+
+    const res = NextResponse.json({ user: safeUser });
+    res.cookies.set("sb_auth", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+    return res;
   } catch (e: any) {
     console.error("❌ LOGIN ERROR:", e);
     console.error("❌ LOGIN ERROR DETAILS:", {

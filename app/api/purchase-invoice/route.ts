@@ -4,6 +4,7 @@ import { resolveCompanyId } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
+import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -84,6 +85,8 @@ export async function POST(req: NextRequest) {
   const userRole = req.headers.get("x-user-role");
 
   try {
+    const sub = await requireActiveSubscription(req);
+    if (sub) return sub;
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });

@@ -17,6 +17,8 @@ type ChartData = {
 
 export default function DashboardContent() {
   const allowed = useRequirePermission(PERMISSIONS.VIEW_DASHBOARD);
+  const [subInfo, setSubInfo] = useState<{ plan: string; subscriptionStatus: string } | null>(null);
+  const [priceId, setPriceId] = useState("");
   const [stats, setStats] = useState({
     sales: 0,
     purchases: 0,
@@ -41,9 +43,10 @@ export default function DashboardContent() {
         if (user?.id) headers["x-user-id"] = user.id;
         if (user?.companyId) headers["x-company-id"] = user.companyId;
 
-        const [statsRes, chartsRes] = await Promise.all([
+        const [statsRes, chartsRes, subRes] = await Promise.all([
           fetch('/api/reports/dashboard-summary', { headers }),
-          fetch('/api/reports/dashboard-charts?period=month', { headers })
+          fetch('/api/reports/dashboard-charts?period=month', { headers }),
+          fetch('/api/me/company', { headers }),
         ]);
         if (statsRes.ok) {
           const statsData = await statsRes.json();
@@ -72,6 +75,13 @@ export default function DashboardContent() {
           console.error("Charts API Response:", errText);
           setCharts(null);
         }
+
+        if (subRes.ok) {
+          const s = await subRes.json();
+          setSubInfo({ plan: String(s.plan || "STARTER"), subscriptionStatus: String(s.subscriptionStatus || "ACTIVE") });
+        }
+        const envPrice = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO;
+        if (envPrice && typeof envPrice === "string") setPriceId(envPrice);
       } catch (e) {
         console.error("Dashboard Error:", e);
       } finally {
@@ -99,6 +109,25 @@ export default function DashboardContent() {
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+      {subInfo && subInfo.plan === "PRO" && subInfo.subscriptionStatus === "ACTIVE" && (
+        <div className="mb-4 p-3 rounded border border-green-600 bg-green-50 text-green-800 text-sm">
+          Subscription active: PRO plan enabled with advanced features.
+        </div>
+      )}
+      {/* Starter helper card */}
+      {stats.sales === 0 && stats.purchases === 0 && stats.customers === 0 && (
+        <div className="mb-6 bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <p className="text-[12px] font-black uppercase text-gray-500">Getting Started</p>
+          <h2 className="text-xl font-black mt-1">Import Opening Balances</h2>
+          <p className="text-sm text-gray-700 mt-2">Set up your accounts and opening balances to begin professional tracking.</p>
+          <div className="mt-4 flex gap-3">
+            <a href="/dashboard/accounts" className="px-4 py-2 bg-black text-white font-bold">Open Accounts</a>
+            <a href="/dashboard/opening-balances" className="px-4 py-2 border-2 border-black font-bold">Import Opening Balances</a>
+            <a href="/onboarding/checklist" className="px-4 py-2 border-2 border-black font-bold">Setup Checklist</a>
+            <a href="/onboarding/choose-plan" className="px-4 py-2 border-2 border-black font-bold">Upgrade to PRO</a>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b-4 border-black pb-2 gap-4">
         <h1 className="text-2xl md:text-3xl font-black uppercase italic">Admin Command Centre</h1>
         {loading && <span className="animate-spin text-2xl">⏳</span>}
@@ -147,6 +176,65 @@ export default function DashboardContent() {
           </Link>
         </div>
       </div>
+
+      {/* 🧾 SUBSCRIPTION STATUS */}
+      {subInfo && (
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <p className="text-[10px] font-black uppercase text-gray-400">Current Plan</p>
+            <p className="text-3xl font-black">{subInfo.plan}</p>
+          </div>
+          <div className={`p-6 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${subInfo.subscriptionStatus === "ACTIVE" ? "bg-green-100" : "bg-red-100"}`}>
+            <p className="text-[10px] font-black uppercase text-gray-400">Subscription Status</p>
+            <p className="text-3xl font-black">{subInfo.subscriptionStatus}</p>
+          </div>
+          <div className="bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <p className="text-[10px] font-black uppercase text-gray-400 mb-2">Upgrade to PRO</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={priceId}
+                onChange={(e) => setPriceId(e.target.value)}
+                placeholder="Stripe Price ID"
+                className="border-2 border-black px-2 py-1 text-sm flex-1"
+              />
+              <button
+                onClick={async () => {
+                  if (!priceId) return alert("Enter Stripe Price ID");
+                  try {
+                    const user = getCurrentUser();
+                    const headers: Record<string, string> = { "Content-Type": "application/json" };
+                    if (user?.role) headers["x-user-role"] = user.role;
+                    if (user?.id) headers["x-user-id"] = user.id;
+                    if (user?.companyId) headers["x-company-id"] = user.companyId;
+                    const res = await fetch("/api/billing/checkout", {
+                      method: "POST",
+                      headers,
+                      body: JSON.stringify({
+                        planCode: "PRO",
+                        priceId,
+                        successUrl: window.location.origin + "/dashboard",
+                        cancelUrl: window.location.origin + "/dashboard",
+                      }),
+                    });
+                    const data = await res.json();
+                    if (res.ok && data?.url) {
+                      window.location.href = data.url;
+                    } else {
+                      alert(data?.error || "Stripe checkout failed");
+                    }
+                  } catch (err) {
+                    alert("Checkout error");
+                  }
+                }}
+                className="bg-black text-white px-4 py-2 font-bold text-sm hover:bg-gray-800"
+              >
+                Upgrade
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 🚀 QUICK ACTIONS WITH LINKS */}
       <div className="mt-12">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getCurrentUser } from '@/lib/auth';
+import { exportToCSV } from '@/lib/export';
 
 interface PaymentReceipt {
   id: string;
@@ -277,6 +278,26 @@ export default function PaymentReceiptsPage() {
         >
           {showList ? "Back to Form" : "View List"}
         </button>
+        {showList && receipts.length > 0 && (
+          <button
+            onClick={() =>
+              exportToCSV(
+                receipts.map(r => ({
+                  receiptNo: r.receiptNo,
+                  date: r.date,
+                  amount: r.amount,
+                  paymentMode: r.paymentMode,
+                  referenceNo: r.referenceNo || "",
+                  status: r.status,
+                  party: r.party?.name || ""
+                })), "payment-receipts"
+              )
+            }
+            className="bg-green-600 text-white px-6 py-2 rounded font-semibold hover:bg-green-700 ml-2"
+          >
+            Export CSV
+          </button>
+        )}
       </div>
 
       {/* Form */}
