@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
 if (process.env.NODE_ENV === "development") {
@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
-    const where: any = { type: "JV", companyId };
+    const where: any = { type: "JV", companyId, ...(branchId ? { branchId } : {}) };
     if (from && to) {
       where.date = {
         gte: new Date(from + "T00:00:00"),
@@ -89,6 +90,7 @@ export async function POST(req: Request) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req as any, companyId);
 
     const role = req.headers.get("x-user-role");
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
@@ -151,7 +153,7 @@ export async function POST(req: Request) {
     }
 
     // Generate voucher number
-    const count = await prisma.voucher.count({ where: { type: "JV", companyId } });
+    const count = await prisma.voucher.count({ where: { type: "JV", companyId, ...(branchId ? { branchId } : {}) } });
     const voucherNo = `JV-${count + 1}`;
 
     // Create voucher with entries in transaction
@@ -164,6 +166,7 @@ export async function POST(req: Request) {
           date: new Date(date),
           narration: narration || "Journal Entry",
           companyId,
+          branchId,
           entries: {
             create: entries.map((entry: any) => ({
               accountId: entry.accountId,
@@ -339,4 +342,3 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-

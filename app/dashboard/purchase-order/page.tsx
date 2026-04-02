@@ -24,6 +24,7 @@ export default function PurchaseOrderPage() {
   const [showList, setShowList] = useState(false);
   const [showForm, setShowForm] = useState(true);
   const [editing, setEditing] = useState<PO | null>(null);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
 
   const [poNo, setPoNo] = useState("");
   const [supplierId, setSupplierId] = useState("");
@@ -83,6 +84,7 @@ export default function PurchaseOrderPage() {
   /* LOAD DATA */
   useEffect(() => {
     loadPOs();
+    loadCompany();
     fetch("/api/accounts", { 
       headers: { 
         "x-user-role": user?.role || "ADMIN",
@@ -131,6 +133,21 @@ export default function PurchaseOrderPage() {
         setItems([]);
       });
   }, []);
+
+  async function loadCompany() {
+    try {
+      const res = await fetch("/api/me/company", {
+        headers: { 
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || ""
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCompanyInfo(data);
+      }
+    } catch (e) {}
+  }
 
   async function loadPOs() {
     try {
@@ -499,7 +516,7 @@ export default function PurchaseOrderPage() {
               </table>
               <button onClick={addRow} className="text-blue-600 font-bold uppercase text-xs">+ Add New Row</button>
               <textarea className="border w-full p-3 rounded h-24 font-sans text-sm" placeholder="Any Special Remarks..." value={remarks} onChange={e => setRemarks(e.target.value)} />
-              <div className="text-right text-3xl font-black text-blue-700">Rs. {total.toLocaleString()}</div>
+              <div className="text-right text-3xl font-black text-blue-700">{companyInfo?.baseCurrency || "$"} {total.toLocaleString()}</div>
             </div>
           )}
 
@@ -508,8 +525,8 @@ export default function PurchaseOrderPage() {
             <div className="invoice-print bg-white border-2 p-12 shadow-2xl rounded-sm mx-auto min-h-[297mm] print:shadow-none print:border-0 print:p-0 text-black">
               <div className="flex justify-between items-start border-b-4 border-black pb-6 mb-8">
                 <div>
-                  <h1 className="text-4xl font-black tracking-tighter">US TRADERS</h1>
-                  <p className="text-xs uppercase tracking-widest font-bold text-gray-500">Premium Quality Industrial Suppliers</p>
+                  <h1 className="text-4xl font-black tracking-tighter">{companyInfo?.name || "FINOVA SME"}</h1>
+                  <p className="text-xs uppercase tracking-widest font-bold text-gray-500">{companyInfo?.country || "GLOBAL"} OPERATIONS</p>
                 </div>
                 <div className="text-right">
                   <h2 className="text-2xl font-black uppercase italic">Purchase Order</h2>
@@ -562,7 +579,7 @@ export default function PurchaseOrderPage() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-xl border-t-4 border-black pt-3 font-black uppercase">
                     <span>Net Total:</span>
-                    <span>Rs. {total.toLocaleString()}</span>
+                    <span>{total.toLocaleString()}</span>
                   </div>
                   <div className="pt-20 flex justify-between gap-4">
                     <div className="flex-1 border-t-2 border-black text-center text-[9px] font-black uppercase pt-1">Prepared By</div>

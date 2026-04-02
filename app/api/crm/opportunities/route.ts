@@ -5,6 +5,11 @@ import { prisma } from "@/lib/prisma";
 // GET: Fetch opportunities
 export async function GET(req: NextRequest) {
   try {
+    const companyId = req.headers.get("x-company-id");
+    if (!companyId) {
+      return NextResponse.json({ error: "Company context required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const contactId = searchParams.get("contactId");
     const stage = searchParams.get("stage");
@@ -13,9 +18,10 @@ export async function GET(req: NextRequest) {
       where: {
         contactId: contactId || undefined,
         stage: stage || undefined,
+        contact: { companyId }, // Enforce company scoping
       },
       include: { 
-        contact: { select: { name: true, company: true } },
+        contact: { select: { name: true, companyName: true } },
         activities: { orderBy: { date: "desc" } },
       },
       orderBy: { expectedCloseDate: "asc" },
@@ -34,6 +40,11 @@ export async function POST(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = req.headers.get("x-company-id");
+    if (!companyId) {
+      return NextResponse.json({ error: "Company context required" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { contactId, title, description, value, probability, stage, expectedCloseDate } = body;
 
@@ -42,6 +53,15 @@ export async function POST(req: NextRequest) {
         { error: "contactId, title, value, and expectedCloseDate are required" },
         { status: 400 }
       );
+    }
+
+    // Verify contact belongs to the company
+    const contact = await prisma.contact.findFirst({
+      where: { id: contactId, companyId }
+    });
+
+    if (!contact) {
+      return NextResponse.json({ error: "Contact not found in this company" }, { status: 404 });
     }
 
     const opportunity = await prisma.opportunity.create({
@@ -69,6 +89,11 @@ export async function PUT(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = req.headers.get("x-company-id");
+    if (!companyId) {
+      return NextResponse.json({ error: "Company context required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -76,7 +101,22 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
+    // Verify opportunity belongs to the company via contact
+    const existing = await prisma.opportunity.findFirst({
+      where: { id, contact: { companyId } }
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
+    }
+
     const body = await req.json();
+    // Don't allow changing contactId to a contact in another company (though body shouldn't have it)
+    if (body.contactId) {
+        const contact = await prisma.contact.findFirst({ where: { id: body.contactId, companyId }});
+        if (!contact) return NextResponse.json({ error: "New contact not found in this company" }, { status: 400 });
+    }
+
     const opportunity = await prisma.opportunity.update({
       where: { id },
       data: body,
@@ -84,9 +124,6 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(opportunity);
   } catch (error: any) {
-    if (error.code === "P2025") {
-      return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
-    }
     console.error("Error updating opportunity:", error);
     return NextResponse.json({ error: "Failed to update opportunity" }, { status: 500 });
   }
@@ -98,6 +135,11 @@ export async function DELETE(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = req.headers.get("x-company-id");
+    if (!companyId) {
+      return NextResponse.json({ error: "Company context required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -105,15 +147,18 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    await prisma.opportunity.delete({
-      where: { id },
+    // Verify ownership
+    const existing = await prisma.opportunity.findFirst({
+      where: { id, contact: { companyId } }
     });
 
-    return NextResponse.json({ message: "Opportunity deleted successfully" });
-  } catch (error: any) {
-    if (error.code === "P2025") {
+    if (!existing) {
       return NextResponse.json({ error: "Opportunity not found" }, { status: 404 });
     }
+
+    await prisma.opportunity.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
     console.error("Error deleting opportunity:", error);
     return NextResponse.json({ error: "Failed to delete opportunity" }, { status: 500 });
   }

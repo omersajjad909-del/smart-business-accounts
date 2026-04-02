@@ -29,7 +29,12 @@ export default function StockReportPage() {
     const user = getCurrentUser();
     try {
       const res = await fetch("/api/reports/stock", {
-        headers: { "x-user-role": user?.role || "ADMIN" }
+        credentials: "include",
+        headers: {
+          "x-user-id":    user?.id        || "",
+          "x-user-role":  user?.role      || "",
+          "x-company-id": user?.companyId || "",
+        },
       });
       const data = await res.json();
       setRows(Array.isArray(data) ? data : []);

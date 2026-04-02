@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 type BankAccount = Prisma.AccountGetPayload<Prisma.AccountDefaultArgs>;
@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const { searchParams } = new URL(req.url);
     const from = searchParams.get("from");
@@ -65,6 +66,7 @@ export async function GET(req: NextRequest) {
       where: {
         date: { gte: fromDate, lte: toDate },
         companyId,
+        ...(branchId ? { branchId } : {}),
       },
       include: {
         entries: {

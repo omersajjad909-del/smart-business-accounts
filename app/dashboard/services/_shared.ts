@@ -1,0 +1,93 @@
+"use client";
+
+import type { BusinessRecord } from "@/lib/useBusinessRecords";
+
+export type ServiceCatalogItem = {
+  id: string;
+  name: string;
+  billingType: string;
+  rate: number;
+  turnaroundDays: number;
+  scope: string;
+};
+
+export type ServiceProject = {
+  id: string;
+  projectCode: string;
+  name: string;
+  client: string;
+  manager: string;
+  dueDate: string;
+  budget: number;
+  status: string;
+};
+
+export type ServiceDelivery = {
+  id: string;
+  deliveryNo: string;
+  projectCode: string;
+  client: string;
+  milestone: string;
+  dueDate: string;
+  status: string;
+};
+
+export type ServiceTimesheet = {
+  id: string;
+  entryNo: string;
+  projectCode: string;
+  consultant: string;
+  billableHours: number;
+  billingRate: number;
+  workDate: string;
+  status: string;
+};
+
+export function mapServiceCatalogRecord(record: BusinessRecord): ServiceCatalogItem {
+  return {
+    id: record.id,
+    name: record.title,
+    billingType: String(record.data?.billingType || "fixed"),
+    rate: record.amount || 0,
+    turnaroundDays: Number(record.data?.turnaroundDays || 0),
+    scope: String(record.data?.scope || ""),
+  };
+}
+
+export function mapServiceProjectRecord(record: BusinessRecord): ServiceProject {
+  return {
+    id: record.id,
+    projectCode: String(record.data?.projectCode || record.title),
+    name: record.title,
+    client: String(record.data?.client || ""),
+    manager: String(record.data?.manager || ""),
+    dueDate: record.date?.split("T")[0] || "",
+    budget: record.amount || 0,
+    status: record.status || "active",
+  };
+}
+
+export function mapServiceDeliveryRecord(record: BusinessRecord): ServiceDelivery {
+  return {
+    id: record.id,
+    deliveryNo: String(record.data?.deliveryNo || record.title),
+    projectCode: String(record.data?.projectCode || ""),
+    client: String(record.data?.client || ""),
+    milestone: record.title,
+    dueDate: record.date?.split("T")[0] || "",
+    status: record.status || "planned",
+  };
+}
+
+export function mapServiceTimesheetRecord(record: BusinessRecord): ServiceTimesheet {
+  return {
+    id: record.id,
+    entryNo: String(record.data?.entryNo || record.title),
+    projectCode: String(record.data?.projectCode || ""),
+    consultant: String(record.data?.consultant || ""),
+    billableHours: Number(record.data?.billableHours || 0),
+    billingRate: record.amount || 0,
+    workDate: record.date?.split("T")[0] || "",
+    status: record.status || "draft",
+  };
+}

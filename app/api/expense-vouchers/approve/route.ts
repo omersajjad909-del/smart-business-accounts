@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
           date: voucher.date,
           narration: voucher.description || "Expense Voucher",
           companyId,
+          branchId: voucher.branchId,
           entries: {
             create: [
               {

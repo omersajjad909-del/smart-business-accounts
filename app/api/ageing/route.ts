@@ -11,8 +11,13 @@ if (process.env.NODE_ENV === "development") {
 
 export async function GET(req: Request) {
   try {
-    // ✅ ROLE FROM HEADER
+    // ✅ ROLE & COMPANY FROM HEADER
     const role = req.headers.get("x-user-role");
+    const companyId = req.headers.get("x-company-id");
+
+    if (!companyId) {
+      return NextResponse.json({ error: "Company context required" }, { status: 400 });
+    }
 
     // ✅ REPORTS ACCESS: ADMIN + ACCOUNTANT
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
@@ -25,11 +30,14 @@ export async function GET(req: Request) {
     // ================= DATA =================
     const parties = await prisma.account.findMany({
       where: {
+        companyId, // Scope by company
         partyType: { not: null },
       },
     });
 
-    const vouchers = await prisma.voucher.findMany();
+    const vouchers = await prisma.voucher.findMany({
+      where: { companyId }, // Scope by company
+    });
 
     const today = new Date();
 

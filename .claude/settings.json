@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx prisma:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node_modules/.bin/tsc --noEmit --skipLibCheck)",
+      "Bash(node -e \"const { TOTP, generateSecret, generateURI, verify } = require\\(''otplib''\\); console.log\\(typeof TOTP, typeof generateSecret, typeof generateURI, typeof verify\\)\")",
+      "Bash(node -e \"const { generateSecret, generateURI, verify } = require\\(''otplib''\\); const s = generateSecret\\(\\); console.log\\(''secret:'', s\\); const uri = generateURI\\(''test@test.com'', ''App'', s\\); console.log\\(''uri:'', uri\\);\")",
+      "Bash(node -e \"const { TOTP, generateSecret } = require\\(''otplib''\\); const t = new TOTP\\(\\); const s = generateSecret\\(\\); console.log\\(''secret:'', s\\); const uri = t.keyuri\\(''test@test.com'', ''App'', s\\); console.log\\(''uri:'', uri\\); const code = t.generate\\(s\\); const ok = t.verify\\({token: code, secret: s}\\); console.log\\(''verify:'', ok\\);\")",
+      "Bash(node -e \"const o = require\\(''otplib''\\); const t = new o.TOTP\\(\\); console.log\\(Object.getOwnPropertyNames\\(Object.getPrototypeOf\\(t\\)\\)\\)\")",
+      "Bash(node -e \"const { TOTP, generateSecret } = require\\(''otplib''\\); const t = new TOTP\\(\\); const s = t.generateSecret\\(\\); const uri = t.toURI\\({ label: ''test@test.com'', issuer: ''App'', secret: s }\\); console.log\\(''uri:'', uri\\); const code = t.generate\\(s\\); const ok = t.verify\\({token: code, secret: s}\\); console.log\\(''ok:'', ok\\);\")",
+      "Bash(node -e \"const { generateSecret, generate, verify, generateURI } = require\\(''otplib''\\); const s = generateSecret\\(\\); console.log\\(''s:'', s\\); const uri = generateURI\\({ label: ''test@test.com'', issuer: ''App'', secret: s }\\); console.log\\(''uri:'', uri\\); const code = generate\\(s\\); console.log\\(''code:'', code\\); const ok = verify\\({ token: code, secret: s }\\); console.log\\(''ok:'', ok\\);\")",
+      "Bash(node -e \":*)",
+      "Bash(node -e \"console.log\\(require\\(''d:/projects/smart-business-accounts/node_modules/otplib/package.json''\\).version\\)\")",
+      "Bash(npm run:*)",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(cat app/api/admin/companies/[id]/route.ts)",
+      "Bash(ls d:/projects/smart-business-accounts/app/\\\\\\(marketing\\\\\\)/)",
+      "Bash(ls d:/projects/smart-business-accounts/app/\\\\\\(marketing\\\\\\)/landing/)",
+      "Bash(ls d:/projects/smart-business-accounts/app/\\\\\\(marketing\\\\\\)/pricing/)",
+      "Bash(ls d:/projects/smart-business-accounts/app/\\\\\\(marketing\\\\\\)/blog/)",
+      "Bash(grep -v \"//\")",
+      "Bash(head -100 d:/projects/smart-business-accounts/app/\\\\\\(marketing\\\\\\)/pricing/page.tsx)",
+      "Bash(grep -rn \"12\\\\b.*first\\\\|49.*75\\\\|99.*75\\\\|249.*75\\\\|$49\\\\|$99\\\\|$249\\\\|$12\\\\|$24\\\\|$62\" d:/projects/smart-business-accounts/app/\\\\\\(marketing\\\\\\)/landing/page.tsx)",
+      "Bash(grep -rn \"$12\\\\|$24\\\\|$49\\\\|$62\\\\|$99\\\\|$249\\\\|75.*OFF\\\\|plan-config\" d:/projects/smart-business-accounts/app/\\\\\\(marketing\\\\\\)/landing/ -l)",
+      "Bash(ls d:/projects/smart-business-accounts/app/dashboard/*/page.tsx)",
+      "Bash(ls d:/projects/smart-business-accounts/app/api/*/route.ts)",
+      "Bash(ls -la \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\chat\"\" 2>/dev/null || echo \"Directory not found \")"
+    ],
+    "additionalDirectories": [
+      "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations"
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
 import { ResponsiveContainer, PageHeader, Card } from "@/components/ui/ResponsiveContainer";
 import { ResponsiveForm, FormField, FormActions, Input, Button } from "@/components/ui/ResponsiveForm";
 
@@ -13,10 +14,21 @@ type DeptBudget = {
   description?: string | null;
 };
 
+function getHeaders(): Record<string, string> {
+  const user = getCurrentUser();
+  if (!user) return {};
+  return {
+    "x-user-id": user.id,
+    "x-user-role": user.role ?? "",
+    "x-company-id": user.companyId ?? "",
+  };
+}
+
 export default function DepartmentBudgetsPage() {
   const [items, setItems] = useState<DeptBudget[]>([]);
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [form, setForm] = useState({
     department: "",
     year: new Date().getFullYear(),
@@ -26,13 +38,30 @@ export default function DepartmentBudgetsPage() {
   });
 
   async function load() {
-    const res = await fetch("/api/department-budgets");
+    const res = await fetch("/api/department-budgets", {
+      credentials: "include",
+      headers: getHeaders(),
+    });
     const data = await res.json();
     setItems(Array.isArray(data) ? data : []);
   }
 
+  async function loadCompany() {
+    try {
+      const res = await fetch("/api/me/company", {
+        credentials: "include",
+        headers: getHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCompanyInfo(data);
+      }
+    } catch (e) {}
+  }
+
   useEffect(() => {
     load();
+    loadCompany();
   }, []);
 
   async function submit(e: React.FormEvent) {
@@ -49,7 +78,8 @@ export default function DepartmentBudgetsPage() {
     const method = editId ? "PUT" : "POST";
     await fetch("/api/department-budgets", {
       method,
-      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...getHeaders() },
       body: JSON.stringify(payload),
     });
     setForm({ department: "", year: new Date().getFullYear(), month: "", amount: "", description: "" });
@@ -59,7 +89,11 @@ export default function DepartmentBudgetsPage() {
   }
 
   async function remove(id: string) {
-    await fetch(`/api/department-budgets?id=${id}`, { method: "DELETE" });
+    await fetch(`/api/department-budgets?id=${id}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: getHeaders(),
+    });
     load();
   }
 
@@ -98,7 +132,7 @@ export default function DepartmentBudgetsPage() {
           <Card key={b.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <div className="font-semibold">
-                {b.department} — {b.year}{b.month ? `/${b.month}` : ""} — Rs. {Number(b.amount).toLocaleString()}
+                {b.department} — {b.year}{b.month ? `/${b.month}` : ""} — {companyInfo?.baseCurrency || "$"} {Number(b.amount).toLocaleString()}
               </div>
               <div className="text-xs text-[var(--text-muted)]">{b.description || "No description"}</div>
             </div>

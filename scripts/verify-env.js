@@ -18,6 +18,8 @@ const optionalVars = [
   'DIRECT_URL',
   'NODE_ENV',
   'NEXT_PUBLIC_APP_URL',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET',
 ];
 
 console.log('🔍 Verifying Environment Variables...\n');

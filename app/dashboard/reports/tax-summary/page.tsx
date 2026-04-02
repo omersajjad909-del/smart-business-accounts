@@ -22,20 +22,44 @@ export default function TaxSummaryPage() {
   const [to, setTo] = useState(today);
   const [data, setData] = useState<TaxSummary[]>([]);
   const [loading, setLoading] = useState(false);
-
-  const user = getCurrentUser();
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
 
   useEffect(() => {
     loadReport();
+    loadCompany();
   }, []);
+
+  async function loadCompany() {
+    try {
+      const user = getCurrentUser();
+      const res = await fetch("/api/me/company", {
+        credentials: "include",
+        headers: {
+          "x-user-id":    user?.id        || "",
+          "x-user-role":  user?.role      || "",
+          "x-company-id": user?.companyId || "",
+        },
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setCompanyInfo(d);
+      }
+    } catch (e) {}
+  }
 
   async function loadReport() {
     setLoading(true);
+    const user = getCurrentUser();
     try {
       const res = await fetch(
         `/api/reports/tax-summary?from=${from}&to=${to}`,
         {
-          headers: { "x-user-role": user?.role || "ADMIN" },
+          credentials: "include",
+          headers: {
+            "x-user-id":    user?.id        || "",
+            "x-user-role":  user?.role      || "",
+            "x-company-id": user?.companyId || "",
+          },
         }
       );
       const result = await res.json();

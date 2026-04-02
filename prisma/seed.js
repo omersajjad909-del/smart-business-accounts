@@ -121,6 +121,18 @@ async function main() {
   });
   console.log(`   ✅ Company: ${defaultCompany.name}\n`);
 
+  await prisma.branch.upsert({
+    where: { companyId_code: { companyId: defaultCompany.id, code: "MAIN" } },
+    update: { name: "Main Branch", isActive: true },
+    create: {
+      companyId: defaultCompany.id,
+      code: "MAIN",
+      name: "Main Branch",
+      city: null,
+      isActive: true,
+    },
+  });
+
 
   // 1. Create Admin user
   console.log("1️⃣ Creating admin user...");

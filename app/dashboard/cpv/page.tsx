@@ -42,6 +42,7 @@ export default function CPVPage() {
   const [saving, setSaving] = useState(false);
   const [selectedName, setSelectedName] = useState("");
   const [selectedPhone, setSelectedPhone] = useState("");
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
 
   const user = getCurrentUser();
 
@@ -59,7 +60,23 @@ export default function CPVPage() {
 
     loadVouchers();
     loadAccounts();
+    loadCompany();
   }, []);
+
+  async function loadCompany() {
+    try {
+      const res = await fetch("/api/me/company", {
+        headers: { 
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || ""
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCompanyInfo(data);
+      }
+    } catch (e) {}
+  }
 
   async function loadVouchers() {
     try {
@@ -265,7 +282,7 @@ export default function CPVPage() {
       `--------------------------\n` +
       `*Voucher No:* ${voucher.voucherNo}\n` +
       `*Paid To:* ${selectedName || voucher.accountName}\n` +
-      `*Amount:* Rs. ${Number(voucher.amount || amount || 0).toLocaleString()}/-\n` +
+      `*Amount:* ${Number(voucher.amount || amount || 0).toLocaleString()}/-\n` +
       `*Date:* ${voucher.date?.split('T')[0] || date}\n` +
       `*Narration:* ${narration || "N/A"}\n` +
       `--------------------------\n` +
@@ -453,8 +470,8 @@ export default function CPVPage() {
           <div className="invoice-print max-w-[210mm] mx-auto bg-white p-8 border-2 border-black text-black shadow-lg min-w-[700px]">
             <div className="flex justify-between items-start border-b-4 border-black pb-4 mb-8">
             <div>
-              <h1 className="text-4xl font-black italic tracking-tighter uppercase">US TRADERS</h1>
-              <p className="text-[10px] font-bold tracking-[3px] text-gray-600 uppercase">Industrial Goods & Services</p>
+              <h1 className="text-4xl font-black italic tracking-tighter uppercase">{companyInfo?.name || "FINOVA SME"}</h1>
+              <p className="text-[10px] font-bold tracking-[3px] text-gray-600 uppercase">{companyInfo?.country || "GLOBAL"} OPERATIONS</p>
             </div>
             <div className="text-right">
               <h2 className="text-2xl font-black uppercase underline decoration-2 underline-offset-4">
@@ -476,9 +493,9 @@ export default function CPVPage() {
             </div>
 
             <div className="flex items-end gap-4 border-b border-gray-300 pb-2">
-              <span className="text-xs font-black uppercase w-32 shrink-0">Amount (PKR):</span>
+              <span className="text-xs font-black uppercase w-32 shrink-0">Amount ({companyInfo?.baseCurrency || "$"}):</span>
               <span className="text-xl font-bold italic flex-1 border-b-2 border-black px-2">
-                Rs. {Number(voucher.amount || amount || 0).toLocaleString()}/-
+                {companyInfo?.baseCurrency || "$"} {Number(voucher.amount || amount || 0).toLocaleString()}/-
               </span>
             </div>
 

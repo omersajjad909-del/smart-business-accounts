@@ -57,6 +57,7 @@ export default function AdvancePaymentPage() {
   const [showForm, setShowForm] = useState(false);
   const [showAdjustForm, setShowAdjustForm] = useState(false);
   const [selectedAdvance, setSelectedAdvance] = useState<AdvancePayment | null>(null);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
 
   // Form state
   const [advanceNo, setAdvanceNo] = useState("");
@@ -72,18 +73,37 @@ export default function AdvancePaymentPage() {
 
   useEffect(() => {
     fetchData();
+    loadCompany();
   }, []);
+
+  function getAuthHeaders(): Record<string, string> {
+    return {
+      "x-user-id": user?.id || "",
+      "x-user-role": user?.role || "",
+      "x-company-id": user?.companyId || "",
+    };
+  }
+
+  async function loadCompany() {
+    try {
+      const res = await fetch("/api/me/company", {
+        credentials: "include",
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCompanyInfo(data);
+      }
+    } catch (e) {}
+  }
 
   async function fetchData() {
     try {
-      const headers = {
-        "x-user-role": user?.role || "",
-        "x-company-id": user?.companyId || "",
-      };
+      const headers = getAuthHeaders();
 
       const [advancesRes, accountsRes] = await Promise.all([
-        fetch("/api/advance-payment", { headers }),
-        fetch("/api/accounts", { headers }),
+        fetch("/api/advance-payment", { headers, credentials: "include" }),
+        fetch("/api/accounts", { headers, credentials: "include" }),
       ]);
 
       const advancesData = await advancesRes.json();
@@ -129,10 +149,10 @@ export default function AdvancePaymentPage() {
     try {
       const res = await fetch("/api/advance-payment", {
         method: "POST",
-        headers: { 
+        credentials: "include",
+        headers: {
           "Content-Type": "application/json",
-          "x-user-role": user?.role || "",
-          "x-company-id": user?.companyId || "",
+          ...getAuthHeaders(),
         },
         body: JSON.stringify({
           advanceNo,
@@ -171,7 +191,7 @@ export default function AdvancePaymentPage() {
 
     const adjustAmount = parseFloat(adjustedAmount);
     if (adjustAmount > selectedAdvance.balance) {
-      toast.error(`Adjusted amount cannot exceed balance: Rs. ${selectedAdvance.balance.toLocaleString()}`);
+      toast.error(`Adjusted amount cannot exceed balance: ${selectedAdvance.balance.toLocaleString()}`);
       return;
     }
 
@@ -180,10 +200,10 @@ export default function AdvancePaymentPage() {
     try {
       const res = await fetch("/api/advance-payment", {
         method: "PUT",
-        headers: { 
+        credentials: "include",
+        headers: {
           "Content-Type": "application/json",
-          "x-user-role": user?.role || "",
-          "x-company-id": user?.companyId || "",
+          ...getAuthHeaders(),
         },
         body: JSON.stringify({
           id: selectedAdvance.id,
@@ -232,6 +252,8 @@ export default function AdvancePaymentPage() {
     try {
       const res = await fetch(`/api/advance-payment?id=${id}`, {
         method: "DELETE",
+        credentials: "include",
+        headers: getAuthHeaders(),
       });
 
       if (res.ok) {
@@ -365,7 +387,7 @@ function getStatusBadge(status: string) {
           </h3>
           <p className="text-sm text-gray-600 mb-4">
             Supplier: <strong>{selectedAdvance.supplier.name}</strong> | 
-            Balance: <strong>Rs. {selectedAdvance.balance.toLocaleString()}</strong>
+            Balance: <strong>{selectedAdvance.balance.toLocaleString()}</strong>
           </p>
           <ResponsiveForm onSubmit={handleAdjust}>
             <FormField label="Invoice No" required>
@@ -471,13 +493,13 @@ function getStatusBadge(status: string) {
                       {adv.supplier.name}
                     </td>
                     <td className="px-4 py-3 text-sm text-right font-medium text-gray-900">
-                      Rs. {adv.amount.toLocaleString()}
+                      {companyInfo?.baseCurrency || "$"} {adv.amount.toLocaleString()}
                     </td>
                     <td className="px-4 py-3 text-sm text-right text-blue-600">
-                      Rs. {adv.adjustedAmount.toLocaleString()}
+                      {companyInfo?.baseCurrency || "$"} {adv.adjustedAmount.toLocaleString()}
                     </td>
                     <td className="px-4 py-3 text-sm text-right font-bold text-green-600">
-                      Rs. {adv.balance.toLocaleString()}
+                      {companyInfo?.baseCurrency || "$"} {adv.balance.toLocaleString()}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       {getStatusBadge(adv.status)}
@@ -523,16 +545,16 @@ function getStatusBadge(status: string) {
                 <MobileCardRow label="Supplier" value={adv.supplier.name} />
                 <MobileCardRow
                   label="Amount"
-                  value={`Rs. ${adv.amount.toLocaleString()}`}
+                  value={`${companyInfo?.baseCurrency || '$'} ${adv.amount.toLocaleString()}`}
                   valueClassName="font-bold"
                 />
                 <MobileCardRow
                   label="Adjusted"
-                  value={`Rs. ${adv.adjustedAmount.toLocaleString()}`}
+                  value={`${companyInfo?.baseCurrency || '$'} ${adv.adjustedAmount.toLocaleString()}`}
                 />
                 <MobileCardRow
                   label="Balance"
-                  value={`Rs. ${adv.balance.toLocaleString()}`}
+                  value={`${companyInfo?.baseCurrency || '$'} ${adv.balance.toLocaleString()}`}
                   valueClassName="font-bold text-green-600"
                 />
                 <MobileCardRow

@@ -1,0 +1,106 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { resolveCompanyId } from "@/lib/tenant";
+import { apiHasPermission } from "@/lib/apiPermission";
+import { PERMISSIONS } from "@/lib/permissions";
+
+function daysBetween(a: Date, b: Date): number {
+  return Math.floor((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const userId   = req.headers.get("x-user-id");
+    const userRole = req.headers.get("x-user-role");
+
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) return NextResponse.json({ error: "Company context required" }, { status: 400 });
+
+    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_FINANCIAL_REPORTS, companyId);
+    if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const { searchParams } = new URL(req.url);
+    const supplierId = searchParams.get("supplierId");
+    const from = searchParams.get("from");
+    const to   = searchParams.get("to");
+
+    if (!supplierId) return NextResponse.json({ error: "supplierId is required" }, { status: 400 });
+
+    const fromDate = from ? new Date(from + "T00:00:00") : new Date(new Date().getFullYear() + "-01-01T00:00:00");
+    const toDate   = to   ? new Date(to + "T23:59:59.999") : new Date();
+
+    const supplier = await prisma.account.findFirst({
+      where: { id: supplierId, companyId, partyType: "SUPPLIER", deletedAt: null },
+    });
+    if (!supplier) return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
+
+    // Opening balance = purchase invoices - payments BEFORE fromDate (positive = we owe supplier)
+    const [prevInvAgg, prevPmtAgg] = await Promise.all([
+      prisma.purchaseInvoice.aggregate({
+        where: { supplierId, companyId, date: { lt: fromDate }, deletedAt: null },
+        _sum: { total: true },
+      }),
+      prisma.paymentReceipt.aggregate({
+        where: { partyId: supplierId, companyId, date: { lt: fromDate }, deletedAt: null },
+        _sum: { amount: true },
+      }),
+    ]);
+    const openingBalance = Number(prevInvAgg._sum.total || 0) - Number(prevPmtAgg._sum.amount || 0);
+
+    // Period transactions
+    const [invoices, payments] = await Promise.all([
+      prisma.purchaseInvoice.findMany({
+        where: { supplierId, companyId, date: { gte: fromDate, lte: toDate }, deletedAt: null },
+        orderBy: { date: "asc" },
+      }),
+      prisma.paymentReceipt.findMany({
+        where: { partyId: supplierId, companyId, date: { gte: fromDate, lte: toDate }, deletedAt: null },
+        orderBy: { date: "asc" },
+      }),
+    ]);
+
+    // Supplier perspective: invoice = credit (we owe more), payment = debit (we paid)
+    type RawRow = { date: string; ref: string; type: "Invoice" | "Payment"; description: string; debit: number; credit: number };
+    const raw: RawRow[] = [
+      ...invoices.map(inv => ({ date: new Date(inv.date).toISOString().slice(0, 10), ref: inv.invoiceNo, type: "Invoice" as const, description: "Purchase Invoice", debit: 0, credit: Number(inv.total) })),
+      ...payments.map(pmt => ({ date: new Date(pmt.date).toISOString().slice(0, 10), ref: pmt.receiptNo, type: "Payment" as const, description: pmt.narration || "Payment Made", debit: Number(pmt.amount), credit: 0 })),
+    ];
+    raw.sort((a, b) => a.date.localeCompare(b.date));
+
+    let running = openingBalance;
+    const rows = raw.map(r => { running += r.credit - r.debit; return { ...r, balance: running }; });
+
+    const totalInvoiced = invoices.reduce((s, i) => s + Number(i.total), 0);
+    const totalPaid     = payments.reduce((s, p) => s + Number(p.amount), 0);
+
+    // Ageing (what we still owe)
+    const [allInv, allPmt] = await Promise.all([
+      prisma.purchaseInvoice.findMany({ where: { supplierId, companyId, deletedAt: null }, orderBy: { date: "asc" } }),
+      prisma.paymentReceipt.findMany({ where: { partyId: supplierId, companyId, deletedAt: null }, orderBy: { date: "asc" } }),
+    ]);
+    let remainingCredit = allPmt.reduce((s, p) => s + Number(p.amount), 0);
+    const ageing = { current: 0, days30: 0, days60: 0, days90plus: 0 };
+    const today  = new Date();
+    for (const inv of allInv) {
+      const invAmt    = Number(inv.total);
+      const applied   = Math.min(remainingCredit, invAmt);
+      remainingCredit = Math.max(0, remainingCredit - invAmt);
+      const outstanding = invAmt - applied;
+      if (outstanding <= 0) continue;
+      const effectiveAge = Math.max(0, daysBetween(new Date(inv.date), today) - Number(supplier.creditDays || 0));
+      if      (effectiveAge <= 30) ageing.current += outstanding;
+      else if (effectiveAge <= 60) ageing.days30  += outstanding;
+      else if (effectiveAge <= 90) ageing.days60  += outstanding;
+      else                         ageing.days90plus += outstanding;
+    }
+
+    return NextResponse.json({
+      supplier: { id: supplier.id, name: supplier.name, email: supplier.email || null, phone: supplier.phone || null, city: supplier.city || null, creditDays: supplier.creditDays || 0, creditLimit: supplier.creditLimit || 0 },
+      period: { from: fromDate.toISOString().slice(0, 10), to: toDate.toISOString().slice(0, 10) },
+      openingBalance, totalInvoiced, totalPaid, closingBalance: running, rows, ageing,
+    });
+  } catch (err) {
+    console.error("SUPPLIER STATEMENT ERROR:", err);
+    return NextResponse.json({ error: "Failed to generate supplier statement" }, { status: 500 });
+  }
+}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 type VoucherEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT, companyId);
     if (!allowed) {
@@ -60,7 +61,7 @@ export async function GET(req: NextRequest) {
       const opVouchers = await prisma.voucherEntry.aggregate({
         where: {
           accountId: acc.id,
-          voucher: { date: { lt: fromDate }, companyId },
+          voucher: { date: { lt: fromDate }, companyId, ...(branchId ? { branchId } : {}) },
         },
         _sum: { amount: true },
       });
@@ -75,7 +76,7 @@ export async function GET(req: NextRequest) {
       const periodVouchers = await prisma.voucherEntry.findMany({
         where: {
           accountId: acc.id,
-          voucher: { date: { gte: fromDate, lte: toDate }, companyId },
+          voucher: { date: { gte: fromDate, lte: toDate }, companyId, ...(branchId ? { branchId } : {}) },
         },
       });
       const transDebit = periodVouchers

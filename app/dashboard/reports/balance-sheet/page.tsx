@@ -7,10 +7,19 @@ export default function DetailedBalanceSheet() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [companyName, setCompanyName] = useState("Your Company");
 
   const load = async () => {
     setLoading(true);
-    const res = await fetch(`/api/reports/balance-sheet?date=${date}`);
+    const user = getCurrentUser();
+    const res = await fetch(`/api/reports/balance-sheet?date=${date}`, {
+      credentials: "include",
+      headers: {
+        ...(user?.id        ? { "x-user-id":      user.id }        : {}),
+        ...(user?.role      ? { "x-user-role":     user.role }      : {}),
+        ...(user?.companyId ? { "x-company-id":    user.companyId } : {}),
+      },
+    });
     const d = await res.json();
     setData(d);
     setLoading(false);
@@ -18,13 +27,24 @@ export default function DetailedBalanceSheet() {
 
   useEffect(() => {
     load();
+    const user = getCurrentUser();
+    fetch("/api/me/company", {
+      headers: {
+        "x-user-id": user?.id || "",
+        "x-user-role": user?.role || "",
+        "x-company-id": user?.companyId || "",
+      },
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.name) setCompanyName(d.name); })
+      .catch(() => {});
   }, [date]);
 
   return (
     <div className="p-4 max-w-4xl mx-auto bg-white border shadow-lg font-sans text-sm">
       <div className="flex justify-between items-center border-b-4 border-black pb-2 mb-4">
         <div className="text-left">
-          <h1 className="text-2xl font-black uppercase">US TRADERS</h1>
+          <h1 className="text-2xl font-black uppercase">{companyName || "Your Company"}</h1>
           <h2 className="text-md font-bold italic">Final Balance Sheet Statement</h2>
         </div>
         <div className="flex gap-1 print:hidden">
@@ -64,7 +84,7 @@ export default function DetailedBalanceSheet() {
                     type: "custom",
                     to: email,
                     subject: `Balance Sheet as on ${date}`,
-                    message: "Balance Sheet report from US TRADERS system.",
+                    message: `Balance Sheet report from ${companyName} system.`,
                   }),
                 });
                 const data = await res.json();

@@ -3,9 +3,19 @@ import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 
+async function ensureContactScopedUniqueIndexes() {
+  await prisma.$executeRawUnsafe(`DROP INDEX IF EXISTS "Contact_email_key"`);
+  await prisma.$executeRawUnsafe(`
+    CREATE UNIQUE INDEX IF NOT EXISTS "Contact_companyId_email_key"
+    ON "Contact"("companyId", "email")
+    WHERE "email" IS NOT NULL
+  `);
+}
+
 // GET: Fetch all contacts
 export async function GET(req: NextRequest) {
   try {
+    await ensureContactScopedUniqueIndexes();
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
@@ -14,7 +24,11 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
     const company = searchParams.get("company");
-    const isActive = searchParams.get("isActive") === "true";
+    const isActiveParam = searchParams.get("isActive");
+    const isActive =
+      isActiveParam === null
+        ? true
+        : isActiveParam === "true";
 
     const contacts = await prisma.contact.findMany({
       where: {
@@ -43,6 +57,7 @@ export async function POST(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    await ensureContactScopedUniqueIndexes();
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
@@ -50,6 +65,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { name, email, phone, company, position, type } = body;
+    const normalizedEmail = email ? String(email).trim().toLowerCase() : null;
 
     if (!name || !phone || !company || !type) {
       return NextResponse.json(
@@ -58,11 +74,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (normalizedEmail) {
+      const existing = await prisma.contact.findFirst({
+        where: {
+          companyId,
+          email: normalizedEmail,
+        },
+        select: { id: true },
+      });
+
+      if (existing) {
+        return NextResponse.json(
+          { error: "This email already exists in this company." },
+          { status: 400 }
+        );
+      }
+    }
+
     const contact = await prisma.contact.create({
       data: {
         companyId,
         name,
-        email: email || null,
+        email: normalizedEmail,
         phone,
         companyName: company,
         position,
@@ -89,6 +122,12 @@ export async function PUT(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    await ensureContactScopedUniqueIndexes();
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -97,10 +136,40 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const contact = await prisma.contact.update({
-      where: { id },
+    const normalizedEmail = body.email ? String(body.email).trim().toLowerCase() : null;
+
+    if (body.email !== undefined) {
+      body.email = normalizedEmail;
+    }
+
+    if (normalizedEmail) {
+      const duplicate = await prisma.contact.findFirst({
+        where: {
+          companyId,
+          id: { not: id },
+          email: normalizedEmail,
+        },
+        select: { id: true },
+      });
+
+      if (duplicate) {
+        return NextResponse.json(
+          { error: "This email already exists in this company." },
+          { status: 400 }
+        );
+      }
+    }
+
+    const updated = await prisma.contact.updateMany({
+      where: { id, companyId },
       data: body,
     });
+
+    if (!updated.count) {
+      return NextResponse.json({ error: "Contact not found" }, { status: 404 });
+    }
+
+    const contact = await prisma.contact.findUnique({ where: { id } });
 
     return NextResponse.json(contact);
   } catch (error: any) {
@@ -118,6 +187,11 @@ export async function DELETE(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -125,8 +199,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    await prisma.contact.delete({
-      where: { id },
+    await prisma.contact.deleteMany({
+      where: { id, companyId },
     });
 
     return NextResponse.json({ message: "Contact deleted successfully" });

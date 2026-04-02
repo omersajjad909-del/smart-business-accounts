@@ -1,16 +1,16 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 model Account {
-  id            String         @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -49,19 +49,23 @@ model Account {
   advancePayments AdvancePayment[] @relation("SupplierAdvances")
   creditNotes     CreditNote[]     @relation("CreditNoteAccount")
   debitNotes      DebitNote[]      @relation("DebitNoteAccount")
-  loans           Loan[]           @relation("LoanAccount")
+  loans             Loan[]             @relation("LoanAccount")
+  goodsReceiptNotes GoodsReceiptNote[] @relation("GRNSupplier")
 
   // Advanced Features
-  budgets            Budget[]
+  budgets               Budget[]
   recurringTransactions RecurringTransaction[]
 
-  createdAt DateTime @default(now())
+  // Financial Core
+  ledgerEntries LedgerEntry[] @relation("AccountLedgerEntries")
+
+  createdAt DateTime  @default(now())
   deletedAt DateTime?
   deletedBy String?
 }
 
 model ItemNew {
-  id          String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -78,32 +82,33 @@ model ItemNew {
   outwardItems OutwardItem[]
 
   quotationItems QuotationItem[]
-  challanItems   DeliveryChallanItem[]
 
   poItems           PurchaseOrderItem[]
   invoiceItems      PurchaseInvoiceItem[]
   inventoryTxns     InventoryTxn[]
   salesInvoiceItems SalesInvoiceItem[]
   SaleReturnItem    SaleReturnItem[]
+  grnItems          GoodsReceiptNoteItem[]
 
-  deletedAt DateTime?
-  deletedBy String?
+  deletedAt            DateTime?
+  deletedBy            String?
+  deliveryChallanItems DeliveryChallanItem[]
 }
 
 model PurchaseOrder {
-  id      String   @id @default(uuid())
-  companyId String?
-  company   Company? @relation(fields: [companyId], references: [id])
-  branchId  String?
-  branch    Branch? @relation(fields: [branchId], references: [id])
+  id           String      @id @default(uuid())
+  companyId    String?
+  company      Company?    @relation(fields: [companyId], references: [id])
+  branchId     String?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
-  poNo    String
-  date    DateTime
-  remarks String
-  status  String   @default("PENDING")
-  approvalStatus  String   @default("DRAFT")
+  poNo            String
+  date            DateTime
+  remarks         String
+  status          String    @default("PENDING")
+  approvalStatus  String    @default("DRAFT")
   approvedBy      String?
   approvedAt      DateTime?
   approvalRemarks String?
@@ -111,8 +116,9 @@ model PurchaseOrder {
   supplierId String
   supplier   Account @relation("PurchaseSupplier", fields: [supplierId], references: [id])
 
-  items    PurchaseOrderItem[]
-  invoices PurchaseInvoice[]
+  items             PurchaseOrderItem[]
+  invoices          PurchaseInvoice[]
+  goodsReceiptNotes GoodsReceiptNote[]
 
   createdAt DateTime @default(now())
 }
@@ -130,11 +136,11 @@ model PurchaseOrderItem {
 }
 
 model PurchaseInvoice {
-  id        String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-  branchId  String?
-  branch    Branch? @relation(fields: [branchId], references: [id])
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id])
+  branchId     String?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
@@ -154,12 +160,12 @@ model PurchaseInvoice {
 
   items PurchaseInvoiceItem[]
 
-  approvalStatus  String   @default("DRAFT") // DRAFT | PENDING | APPROVED | REJECTED
+  approvalStatus  String    @default("DRAFT") // DRAFT | PENDING | APPROVED | REJECTED
   approvedBy      String?
   approvedAt      DateTime?
   approvalRemarks String?
 
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   deletedAt DateTime?
   deletedBy String?
 }
@@ -177,7 +183,7 @@ model PurchaseInvoiceItem {
 }
 
 model InventoryTxn {
-  id   String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -201,11 +207,11 @@ model InventoryTxn {
 }
 
 model SalesInvoice {
-  id        String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-  branchId  String?
-  branch    Branch? @relation(fields: [branchId], references: [id])
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id])
+  branchId     String?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
@@ -219,18 +225,18 @@ model SalesInvoice {
   taxConfigId String?
   taxConfig   TaxConfiguration? @relation("SalesTax", fields: [taxConfigId], references: [id])
 
-  items     SalesInvoiceItem[]
-  returns   SaleReturn[]       @relation("InvoiceReturns")
+  items   SalesInvoiceItem[]
+  returns SaleReturn[]       @relation("InvoiceReturns")
 
   driverName String?
   vehicleNo  String?
 
-  approvalStatus  String   @default("DRAFT") // DRAFT | PENDING | APPROVED | REJECTED
+  approvalStatus  String    @default("DRAFT") // DRAFT | PENDING | APPROVED | REJECTED
   approvedBy      String?
   approvedAt      DateTime?
   approvalRemarks String?
 
-  createdAt DateTime           @default(now())
+  createdAt DateTime  @default(now())
   deletedAt DateTime?
   deletedBy String?
 }
@@ -248,11 +254,11 @@ model SalesInvoiceItem {
 }
 
 model Voucher {
-  id        String   @id @default(uuid())
-  companyId String?
-  company   Company? @relation(fields: [companyId], references: [id])
-  branchId  String?
-  branch    Branch? @relation(fields: [branchId], references: [id])
+  id           String      @id @default(uuid())
+  companyId    String?
+  company      Company?    @relation(fields: [companyId], references: [id])
+  branchId     String?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
@@ -271,7 +277,7 @@ model Voucher {
 }
 
 model VoucherEntry {
-  id        String @id @default(uuid())
+  id        String   @id @default(uuid())
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
@@ -284,7 +290,7 @@ model VoucherEntry {
 }
 
 model StockRate {
-  id     String   @id @default(uuid())
+  id        String   @id @default(uuid())
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
@@ -298,7 +304,7 @@ model StockRate {
 }
 
 model SaleReturn {
-  id       String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -330,7 +336,7 @@ model SaleReturnItem {
 }
 
 model Outward {
-  id         String        @id @default(uuid()) // Ø§Ø³Û’ String ÛÛŒ Ø±Ú©Ú¾ÛŒÚº
+  id        String  @id @default(uuid()) // Ø§Ø³Û’ String ÛÛŒ Ø±Ú©Ú¾ÛŒÚº
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -358,26 +364,39 @@ model OutwardItem {
 }
 
 model Company {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   name      String
-  code      String?  @unique
-  isActive  Boolean  @default(true)
+  code      String?
+  isActive  Boolean @default(true)
+  country   String?  @default("United States")
+  baseCurrency String @default("USD")
+  plan      String   @default("STARTER")
+  businessType  String  @default("trading") // trading|manufacturing|distribution|retail|service|restaurant|real_estate|construction
+  businessSetupDone Boolean @default(false)
+  activeModules String? // Comma separated IDs for Custom plan
+  customPrice   Float?
+  subscriptionStatus String? @default("ACTIVE")
+  stripeCustomerId   String?
+  currentPeriodEnd    DateTime?
   createdAt DateTime @default(now())
 
-  // SaaS Subscription (MVP)
-  plan                 String   @default("STARTER")
-  subscriptionStatus   String   @default("ACTIVE")
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  currentPeriodEnd     DateTime?
+  users        UserCompany[]
+  defaultUsers User[]        @relation("UserDefaultCompany")
 
-  users         UserCompany[]
-  defaultUsers  User[] @relation("UserDefaultCompany")
+  // Billing & Subscriptions
+  subscription Subscription?
+
+  // Audit & Logging
+  auditLogs AuditLog[] @relation("CompanyAuditLogs")
+  loginLogs LoginLog[] @relation("CompanyLoginLogs")
+
+  // Financial Core
+  ledgerEntries LedgerEntry[] @relation("CompanyLedgerEntries")
 
   accounts              Account[]
   items                 ItemNew[]
-  purchaseOrders         PurchaseOrder[]
-  purchaseInvoices       PurchaseInvoice[]
+  purchaseOrders        PurchaseOrder[]
+  purchaseInvoices      PurchaseInvoice[]
   inventoryTxns         InventoryTxn[]
   salesInvoices         SalesInvoice[]
   vouchers              Voucher[]
@@ -388,14 +407,15 @@ model Company {
   employees             Employee[]
   attendances           Attendance[]
   payrolls              Payroll[]
-  advanceSalaries        AdvanceSalary[]
+  advanceSalaries       AdvanceSalary[]
   contacts              Contact[]
   quotations            Quotation[]
-  deliveryChallans       DeliveryChallan[]
-  advancePayments        AdvancePayment[]
+  deliveryChallans      DeliveryChallan[]
+  advancePayments       AdvancePayment[]
   bankAccounts          BankAccount[]
+  bankStatements        BankStatement[]
   paymentReceipts       PaymentReceipt[]
-  expenseVouchers        ExpenseVoucher[]
+  expenseVouchers       ExpenseVoucher[]
   taxConfigurations     TaxConfiguration[]
   budgets               Budget[]
   recurringTransactions RecurringTransaction[]
@@ -405,7 +425,9 @@ model Company {
   rolePermissions       RolePermission[]
   userPermissions       UserPermission[]
   backupSchedules       BackupSchedule[]
+  systemBackups         SystemBackup[]
   branches              Branch[]
+  goodsReceiptNotes     GoodsReceiptNote[]
   costCenters           CostCenter[]
   departmentBudgets     DepartmentBudget[]
   creditNotes           CreditNote[]
@@ -413,6 +435,8 @@ model Company {
   loans                 Loan[]
   fixedAssets           FixedAsset[]
   sessions              Session[]
+  businessRecords       BusinessRecord[]
+  teamInvites           TeamInvite[]
 }
 
 model CreditNote {
@@ -450,23 +474,23 @@ model DebitNote {
 }
 
 model Loan {
-  id                String   @id @default(uuid())
+  id                String        @id @default(uuid())
   companyId         String
-  company           Company  @relation(fields: [companyId], references: [id])
+  company           Company       @relation(fields: [companyId], references: [id])
   loanNumber        String
   loanType          String
   accountId         String
-  account           Account  @relation("LoanAccount", fields: [accountId], references: [id])
+  account           Account       @relation("LoanAccount", fields: [accountId], references: [id])
   principalAmount   Float
   interestRate      Float
   tenure            Int
-  emi               Float    @default(0)
+  emi               Float         @default(0)
   startDate         DateTime
   endDate           DateTime?
-  status            String   @default("ACTIVE") // ACTIVE, CLOSED, DEFAULTED
-  outstandingAmount Float    @default(0)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  status            String        @default("ACTIVE") // ACTIVE, CLOSED, DEFAULTED
+  outstandingAmount Float         @default(0)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
   payments          LoanPayment[]
 }
 
@@ -483,23 +507,23 @@ model LoanPayment {
 }
 
 model FixedAsset {
-  id                 String   @id @default(uuid())
+  id                 String         @id @default(uuid())
   companyId          String
-  company            Company  @relation(fields: [companyId], references: [id])
+  company            Company        @relation(fields: [companyId], references: [id])
   assetName          String
   assetCode          String
   category           String
   purchaseDate       DateTime
   purchaseValue      Float
-  currentValue       Float    @default(0)
-  depreciationMethod String   @default("STRAIGHT_LINE")
+  currentValue       Float          @default(0)
+  depreciationMethod String         @default("STRAIGHT_LINE")
   depreciationRate   Float
   usefulLife         Int
-  salvageValue       Float    @default(0)
+  salvageValue       Float          @default(0)
   location           String?
-  status             String   @default("ACTIVE") // ACTIVE, DISPOSED, SOLD, SCRAPPED
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  status             String         @default("ACTIVE") // ACTIVE, DISPOSED, SOLD, SCRAPPED
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
   depreciations      Depreciation[]
 }
 
@@ -521,27 +545,36 @@ model UserCompany {
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company  Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([userId, companyId])
   @@index([companyId])
 }
 
 model User {
-  id          String           @id @default(uuid())
-  name        String
-  email       String           @unique
-  password    String           // bcrypt hash
-  role        String           @default("VIEWER") // ADMIN, ACCOUNTANT, VIEWER
-  active      Boolean          @default(true)
-  logs        ActivityLog[]
-  createdAt   DateTime         @default(now())
-  permissions UserPermission[]
+  id               String           @id @default(uuid())
+  name             String
+  email            String           @unique
+  password         String // bcrypt hash
+  role             String           @default("VIEWER") // ADMIN, ACCOUNTANT, VIEWER
+  active           Boolean          @default(true)
+  logs             ActivityLog[]
+  createdAt        DateTime         @default(now())
+  permissions      UserPermission[]
   defaultCompanyId String?
-  defaultCompany   Company? @relation("UserDefaultCompany", fields: [defaultCompanyId], references: [id])
+  defaultCompany   Company?         @relation("UserDefaultCompany", fields: [defaultCompanyId], references: [id])
   companies        UserCompany[]
-  sessions    Session[]
+  loginLogs        LoginLog[]       @relation("UserLoginLogs")
+  sessions         Session[]
+
+  // 2FA / TOTP
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
+
+  // Referral
+  referralCode String? @unique
+  referrals    Referral[] @relation("ReferrerUser")
 }
 
 model Session {
@@ -560,15 +593,16 @@ model Session {
 }
 
 model ActivityLog {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   action    String
   details   String?
   userId    String?
-  companyId String
+  companyId String?
+
   createdAt DateTime @default(now())
 
-  user User? @relation(fields: [userId], references: [id])
-  company Company @relation(fields: [companyId], references: [id])
+  user    User?    @relation(fields: [userId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id])
 
   @@index([companyId])
 }
@@ -579,7 +613,7 @@ model RolePermission {
   permission String // e.g. CREATE_USER
 
   companyId String
-  company Company @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
 
   @@unique([role, permission, companyId])
   @@index([companyId])
@@ -589,9 +623,9 @@ model UserPermission {
   id         String @id @default(uuid())
   userId     String
   permission String
-  companyId String
+  companyId  String
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([userId, permission, companyId])
@@ -601,7 +635,7 @@ model UserPermission {
 // ================= PHASE 1: BANKING & PAYMENT MODELS =================
 
 model BankAccount {
-  id              String               @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -614,13 +648,23 @@ model BankAccount {
   account         Account              @relation(fields: [accountId], references: [id])
   statements      BankStatement[]
   reconciliations BankReconciliation[]
-  createdAt       DateTime             @default(now())
-  deletedAt       DateTime?
-  deletedBy       String?
+
+  // Plaid Integration Fields
+  plaidAccessToken String?
+  plaidItemId      String?
+  institutionId    String?
+  isPlaidLinked    Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  deletedAt     DateTime?
+  deletedBy     String?
 }
 
 model BankStatement {
   id               String              @id @default(uuid())
+  companyId        String?
+  company          Company?            @relation(fields: [companyId], references: [id])
   bankAccountId    String
   bankAccount      BankAccount         @relation(fields: [bankAccountId], references: [id])
   statementNo      String
@@ -648,40 +692,40 @@ model BankReconciliation {
 }
 
 model PaymentReceipt {
-  id          String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-  branchId  String?
-  branch    Branch? @relation(fields: [branchId], references: [id])
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id])
+  branchId     String?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
-  receiptNo   String   @unique
-  date        DateTime
-  amount      Float
-  paymentMode String // CASH | CHECK | BANK_TRANSFER
-  partyId     String?
-  party       Account? @relation(fields: [partyId], references: [id])
-  referenceNo String?
-  narration   String?
-  status      String   @default("PENDING") // PENDING | POSTED | RECONCILED
-  approvalStatus  String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  receiptNo       String    @unique
+  date            DateTime
+  amount          Float
+  paymentMode     String // CASH | CHECK | BANK_TRANSFER
+  partyId         String?
+  party           Account?  @relation(fields: [partyId], references: [id])
+  referenceNo     String?
+  narration       String?
+  status          String    @default("PENDING") // PENDING | POSTED | RECONCILED
+  approvalStatus  String    @default("PENDING") // PENDING | APPROVED | REJECTED
   approvedBy      String?
   approvedAt      DateTime?
   approvalRemarks String?
-  voucherId   String?
-  voucher     Voucher? @relation(fields: [voucherId], references: [id])
-  createdAt   DateTime @default(now())
-  deletedAt   DateTime?
-  deletedBy   String?
+  voucherId       String?
+  voucher         Voucher?  @relation(fields: [voucherId], references: [id])
+  createdAt       DateTime  @default(now())
+  deletedAt       DateTime?
+  deletedBy       String?
 }
 
 model ExpenseVoucher {
-  id               String              @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-  branchId  String?
-  branch    Branch? @relation(fields: [branchId], references: [id])
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id])
+  branchId     String?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
@@ -734,20 +778,20 @@ model ExpenseApproval {
 }
 
 model TaxConfiguration {
-  id           String       @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  taxType      String // GST | VAT | INCOME_TAX | SALES_TAX
-  taxCode      String       @unique
-  taxRate      Float
-  description  String?
-  isActive     Boolean      @default(true)
-  taxAccounts  TaxAccount[]
-  invoiceTaxes InvoiceTax[]
-  salesInvoices SalesInvoice[] @relation("SalesTax")
+  taxType          String // GST | VAT | INCOME_TAX | SALES_TAX
+  taxCode          String            @unique
+  taxRate          Float
+  description      String?
+  isActive         Boolean           @default(true)
+  taxAccounts      TaxAccount[]
+  invoiceTaxes     InvoiceTax[]
+  salesInvoices    SalesInvoice[]    @relation("SalesTax")
   purchaseInvoices PurchaseInvoice[] @relation("PurchaseTax")
-  createdAt    DateTime     @default(now())
+  createdAt        DateTime          @default(now())
 }
 
 model TaxAccount {
@@ -776,7 +820,7 @@ model InvoiceTax {
 // ================= ADVANCED FEATURES =================
 
 model Budget {
-  id          String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -795,80 +839,83 @@ model Budget {
 }
 
 model RecurringTransaction {
-  id          String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
   accountId   String
-  account     Account  @relation(fields: [accountId], references: [id])
-  type        String   // CPV | CRV | JV | EXPENSE | PAYMENT
-  frequency   String   // DAILY | WEEKLY | MONTHLY | QUARTERLY | YEARLY
+  account     Account   @relation(fields: [accountId], references: [id])
+  type        String // CPV | CRV | JV | EXPENSE | PAYMENT
+  frequency   String // DAILY | WEEKLY | MONTHLY | QUARTERLY | YEARLY
   amount      Float
   description String
   narration   String?
   nextDate    DateTime
   lastRun     DateTime?
-  isActive    Boolean  @default(true)
-  metadata    String?  // JSON string for additional data
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive    Boolean   @default(true)
+  metadata    String? // JSON string for additional data
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([nextDate, isActive])
 }
 
 model FinancialYear {
-  id          String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  year        Int      @unique
-  startDate   DateTime
-  endDate     DateTime
-  isActive    Boolean  @default(false)
-  isClosed    Boolean  @default(false)
-  closedAt    DateTime?
-  closedBy   String?
-  createdAt   DateTime @default(now())
+  year      Int       @unique
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean   @default(false)
+  isClosed  Boolean   @default(false)
+  closedAt  DateTime?
+  closedBy  String?
+  createdAt DateTime  @default(now())
 
   @@index([year, isActive])
 }
 
 model SystemBackup {
-  id          String   @id @default(uuid())
-  fileName    String
-  filePath    String?
-  fileSize    Int?
-  backupType  String   // FULL | PARTIAL
-  status      String   // PENDING | COMPLETED | FAILED
-  metadata    String?  // JSON string
-  createdAt   DateTime @default(now())
-  createdBy   String?
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 
-  @@index([createdAt, status])
+  fileName   String
+  filePath   String?
+  fileSize   Int?
+  backupType String // FULL | PARTIAL
+  status     String // PENDING | COMPLETED | FAILED
+  metadata   String? // JSON string
+  createdAt  DateTime @default(now())
+  createdBy  String?
+
+  @@index([companyId, createdAt, status])
 }
 
 model BackupSchedule {
-  id          String   @id @default(uuid())
-  companyId   String
-  company     Company  @relation(fields: [companyId], references: [id])
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 
-  frequency   String   // DAILY | WEEKLY | MONTHLY
-  timeOfDay   String   // HH:mm
-  dayOfWeek   Int?     // 0-6 (Sun-Sat)
-  dayOfMonth  Int?     // 1-31
-  isActive    Boolean  @default(true)
-  lastRunAt   DateTime?
+  frequency  String // DAILY | WEEKLY | MONTHLY
+  timeOfDay  String // HH:mm
+  dayOfWeek  Int? // 0-6 (Sun-Sat)
+  dayOfMonth Int? // 1-31
+  isActive   Boolean   @default(true)
+  lastRunAt  DateTime?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([companyId])
 }
 
 model Branch {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
 
   code      String
   name      String
@@ -876,23 +923,24 @@ model Branch {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
-  purchaseOrders   PurchaseOrder[]
-  purchaseInvoices PurchaseInvoice[]
-  salesInvoices    SalesInvoice[]
-  vouchers         Voucher[]
-  paymentReceipts  PaymentReceipt[]
-  expenseVouchers  ExpenseVoucher[]
-  quotations       Quotation[]
-  deliveryChallans DeliveryChallan[]
+  purchaseOrders    PurchaseOrder[]
+  purchaseInvoices  PurchaseInvoice[]
+  salesInvoices     SalesInvoice[]
+  vouchers          Voucher[]
+  paymentReceipts   PaymentReceipt[]
+  expenseVouchers   ExpenseVoucher[]
+  quotations        Quotation[]
+  deliveryChallans  DeliveryChallan[]
+  goodsReceiptNotes GoodsReceiptNote[]
 
   @@unique([companyId, code])
   @@index([companyId, isActive])
 }
 
 model CostCenter {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
 
   code      String
   name      String
@@ -913,9 +961,9 @@ model CostCenter {
 }
 
 model DepartmentBudget {
-  id          String   @id @default(uuid())
-  companyId   String
-  company     Company  @relation(fields: [companyId], references: [id])
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 
   department  String
   year        Int
@@ -932,7 +980,7 @@ model DepartmentBudget {
 // ================= FEATURE 4: MULTI-CURRENCY SUPPORT =================
 
 model Currency {
-  id           String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -940,7 +988,7 @@ model Currency {
   name         String
   symbol       String
   isActive     Boolean  @default(true)
-  exchangeRate Float    @default(1.0) // Rate against base currency (PKR)
+  exchangeRate Float    @default(1.0) // Rate against company base currency (e.g. USD)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -949,15 +997,34 @@ model Currency {
   @@index([code, isActive])
 }
 
+model CustomPlanRequest {
+  id        String   @id @default(uuid())
+  email     String
+  name      String
+  company   String
+  modules   String // Comma separated IDs
+  price     Float
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ModulePrice {
+  id        String   @id @default(uuid())
+  moduleId  String   @unique
+  price     Float
+  updatedAt DateTime @updatedAt
+}
+
 model CurrencyTransaction {
   id              String   @id @default(uuid())
-  transactionType String   // INVOICE | PAYMENT | EXPENSE | CONVERSION
-  transactionId   String   // Reference to original transaction
+  transactionType String // INVOICE | PAYMENT | EXPENSE | CONVERSION
+  transactionId   String // Reference to original transaction
   currencyId      String
   currency        Currency @relation(fields: [currencyId], references: [id])
   amountInLocal   Float
-  amountInBase    Float    // Converted to base currency (PKR)
-  exchangeRate    Float    // Rate used at time of transaction
+  amountInBase    Float // Converted to company base currency
+  exchangeRate    Float // Rate used at time of transaction
   conversionDate  DateTime
   createdAt       DateTime @default(now())
 
@@ -967,16 +1034,16 @@ model CurrencyTransaction {
 // ================= FEATURE 6: ATTENDANCE/HR MODULE =================
 
 model Employee {
-  id              String   @id @default(uuid())
+  id        String   @id @default(uuid())
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
-  employeeId      String   @unique
+  employeeId      String
   firstName       String
   lastName        String
-  email           String   @unique
+  email           String
   phone           String?
-  designations    String   // Job title
+  designations    String // Job title
   department      String
   dateOfJoining   DateTime
   dateOfBirth     DateTime?
@@ -984,11 +1051,11 @@ model Employee {
   address         String?
   city            String?
   salary          Float
-  salaryFrequency String   // MONTHLY | WEEKLY | HOURLY
+  salaryFrequency String // MONTHLY | WEEKLY | HOURLY
   accountId       String? // Link to Chart of Accounts if needed
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   attendances Attendance[]
   leaves      Leave[]
@@ -998,82 +1065,83 @@ model Employee {
 
   @@index([department, isActive])
   @@index([email])
+  @@unique([companyId, employeeId])
+  @@unique([companyId, email])
 }
 
 model Attendance {
-  id         String   @id @default(uuid())
+  id        String   @id @default(uuid())
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
   employeeId String
-  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   date       DateTime
-  status     String   // PRESENT | ABSENT | LEAVE | HALF_DAY | LATE
+  status     String // PRESENT | ABSENT | LEAVE | HALF_DAY | LATE
   checkIn    DateTime?
   checkOut   DateTime?
   remarks    String?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime  @default(now())
 
   @@unique([employeeId, date])
   @@index([employeeId, date])
 }
 
 model Leave {
-  id              String   @id @default(uuid())
-  employeeId      String
-  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  leaveType       String   // CASUAL | SICK | ANNUAL | UNPAID
-  startDate       DateTime
-  endDate         DateTime
-  totalDays       Int
-  approvalStatus  String   @default("PENDING") // PENDING | APPROVED | REJECTED
-  approvedBy      String?
-  reason          String
-  attachmentUrl   String?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(uuid())
+  employeeId     String
+  employee       Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType      String // CASUAL | SICK | ANNUAL | UNPAID
+  startDate      DateTime
+  endDate        DateTime
+  totalDays      Int
+  approvalStatus String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  approvedBy     String?
+  reason         String
+  attachmentUrl  String?
+  createdAt      DateTime @default(now())
 
   @@index([employeeId, startDate])
 }
 
 model Payroll {
-  id              String   @id @default(uuid())
+  id        String   @id @default(uuid())
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
   employeeId      String
-  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  monthYear       String   // YYYY-MM
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  monthYear       String // YYYY-MM
   baseSalary      Float
-  allowances      Float    @default(0) // HRA, DA, etc.
-  deductions      Float    @default(0) // Tax, insurance, etc.
-  additionalCash  Float    @default(0)
+  allowances      Float     @default(0) // HRA, DA, etc.
+  deductions      Float     @default(0) // Tax, insurance, etc.
+  additionalCash  Float     @default(0)
   netSalary       Float
-  paidAmount      Float    @default(0)
-  paymentStatus   String   @default("PENDING") // PENDING | PAID | PARTIAL
+  paidAmount      Float     @default(0)
+  paymentStatus   String    @default("PENDING") // PENDING | PAID | PARTIAL
   paymentDate     DateTime?
   remarks         String?
-  createdAt       DateTime @default(now())
+  createdAt       DateTime  @default(now())
   deductionReason String?
-
 
   @@unique([employeeId, monthYear])
   @@index([employeeId, monthYear, paymentStatus])
 }
 
 model AdvanceSalary {
-  id          String   @id @default(uuid())
+  id        String   @id @default(uuid())
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
-  employeeId  String
-  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  amount      Float
-  date        DateTime
-  monthYear   String?  // Target deduction month (YYYY-MM). If null, pending until deducted.
-  status      String   @default("PENDING") // PENDING | DEDUCTED
-  remarks     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  amount     Float
+  date       DateTime
+  monthYear  String? // Target deduction month (YYYY-MM). If null, pending until deducted.
+  status     String   @default("PENDING") // PENDING | DEDUCTED
+  remarks    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   deletedAt DateTime?
   deletedBy String?
@@ -1083,15 +1151,15 @@ model AdvanceSalary {
 }
 
 model EmployeeDocument {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   employeeId String
-  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  docType    String   // CNIC | PASSPORT | DEGREE | CERTIFICATE | CONTRACT
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  docType    String // CNIC | PASSPORT | DEGREE | CERTIFICATE | CONTRACT
   fileName   String
   fileUrl    String
-  uploadDate DateTime @default(now())
+  uploadDate DateTime  @default(now())
   expiryDate DateTime?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime  @default(now())
 
   @@index([employeeId, docType])
 }
@@ -1099,16 +1167,16 @@ model EmployeeDocument {
 // ================= FEATURE 7: CRM FEATURES =================
 
 model Contact {
-  id          String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
   name        String
-  email       String?  @unique
+  email       String?
   phone       String
   companyName String
   position    String? // Job title
-  type        String   // CUSTOMER | SUPPLIER | LEAD | PARTNER
+  type        String // CUSTOMER | SUPPLIER | LEAD | PARTNER
   accountId   String? // Link to Chart of Accounts
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -1117,45 +1185,46 @@ model Contact {
   deletedAt DateTime?
   deletedBy String?
 
-  interactions Interaction[]
+  interactions  Interaction[]
   opportunities Opportunity[]
-  documents    ContactDocument[]
-  notes        ContactNote[]
+  documents     ContactDocument[]
+  notes         ContactNote[]
 
   @@index([type, isActive])
   @@index([email, phone])
+  @@unique([companyId, email])
 }
 
 model Interaction {
-  id          String   @id @default(uuid())
-  contactId   String
-  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  type        String   // CALL | EMAIL | MEETING | MESSAGE | VISIT
-  date        DateTime
-  subject     String
-  description String
-  outcome     String? // POSITIVE | NEGATIVE | NEUTRAL
+  id           String    @id @default(uuid())
+  contactId    String
+  contact      Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  type         String // CALL | EMAIL | MEETING | MESSAGE | VISIT
+  date         DateTime
+  subject      String
+  description  String
+  outcome      String? // POSITIVE | NEGATIVE | NEUTRAL
   nextFollowUp DateTime?
-  createdBy   String? // User ID
-  createdAt   DateTime @default(now())
+  createdBy    String? // User ID
+  createdAt    DateTime  @default(now())
 
   @@index([contactId, date])
   @@index([type, date])
 }
 
 model Opportunity {
-  id          String   @id @default(uuid())
-  contactId   String
-  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  title       String
-  description String
-  value       Float
-  probability Int      @default(50) // 0-100
-  stage       String   // LEAD | PROSPECT | NEGOTIATION | CLOSE | WON | LOST
+  id                String    @id @default(uuid())
+  contactId         String
+  contact           Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  title             String
+  description       String
+  value             Float
+  probability       Int       @default(50) // 0-100
+  stage             String // LEAD | PROSPECT | NEGOTIATION | CLOSE | WON | LOST
   expectedCloseDate DateTime
-  actualCloseDate DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  actualCloseDate   DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   activities OpportunityActivity[]
 
@@ -1167,10 +1236,10 @@ model OpportunityActivity {
   id            String      @id @default(uuid())
   opportunityId String
   opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  activityType  String      // CALL | EMAIL | MEETING | PROPOSAL | FOLLOW_UP
+  activityType  String // CALL | EMAIL | MEETING | PROPOSAL | FOLLOW_UP
   date          DateTime
   description   String
-  status        String      // COMPLETED | PENDING | CANCELLED
+  status        String // COMPLETED | PENDING | CANCELLED
   createdAt     DateTime    @default(now())
 
   @@index([opportunityId, date])
@@ -1180,7 +1249,7 @@ model ContactDocument {
   id         String   @id @default(uuid())
   contactId  String
   contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  docType    String   // QUOTE | PROPOSAL | CONTRACT | INVOICE | AGREEMENT
+  docType    String // QUOTE | PROPOSAL | CONTRACT | INVOICE | AGREEMENT
   fileName   String
   fileUrl    String
   uploadDate DateTime @default(now())
@@ -1201,24 +1270,23 @@ model ContactNote {
   @@index([contactId, createdAt])
 }
 
-
 // ================= FEATURE 8: QUOTATION & DELIVERY CHALLAN =================
 
 model Quotation {
-  id          String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-  branchId  String?
-  branch    Branch? @relation(fields: [branchId], references: [id])
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id])
+  branchId     String?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
-  quotationNo String   @unique
-  date        DateTime
-  total       Float
-  validUntil  DateTime?
-  status      String   @default("DRAFT") // DRAFT | SENT | ACCEPTED | REJECTED
-  approvalStatus  String   @default("DRAFT")
+  quotationNo     String    @unique
+  date            DateTime
+  total           Float
+  validUntil      DateTime?
+  status          String    @default("DRAFT") // DRAFT | SENT | ACCEPTED | REJECTED
+  approvalStatus  String    @default("DRAFT")
   approvedBy      String?
   approvedAt      DateTime?
   approvalRemarks String?
@@ -1244,11 +1312,11 @@ model QuotationItem {
 }
 
 model DeliveryChallan {
-  id        String   @id @default(uuid())
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-  branchId  String?
-  branch    Branch? @relation(fields: [branchId], references: [id])
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id])
+  branchId     String?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
   costCenterId String?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
@@ -1262,9 +1330,9 @@ model DeliveryChallan {
   vehicleNo  String?
   remarks    String?
 
-  items  DeliveryChallanItem[]
-  status String                @default("PENDING") // PENDING | DELIVERED | INVOICED
-  approvalStatus  String   @default("DRAFT")
+  items           DeliveryChallanItem[]
+  status          String                @default("PENDING") // PENDING | DELIVERED | INVOICED
+  approvalStatus  String                @default("DRAFT")
   approvedBy      String?
   approvedAt      DateTime?
   approvalRemarks String?
@@ -1286,7 +1354,7 @@ model DeliveryChallanItem {
 // ================= FEATURE 9: ADVANCE PAYMENT TO SUPPLIERS =================
 
 model AdvancePayment {
-  id             String   @id @default(uuid())
+  id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
@@ -1296,28 +1364,460 @@ model AdvancePayment {
   adjustedAmount Float    @default(0)
   balance        Float
   status         String   @default("OPEN") // OPEN | ADJUSTED | CLOSED
-  
-  supplierId     String
-  supplier       Account  @relation("SupplierAdvances", fields: [supplierId], references: [id])
-  
-  narration      String?
-  
-  adjustments    AdvanceAdjustment[]
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  supplierId String
+  supplier   Account @relation("SupplierAdvances", fields: [supplierId], references: [id])
+
+  narration String?
+
+  adjustments AdvanceAdjustment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AdvanceAdjustment {
   id               String         @id @default(uuid())
   advancePaymentId String
   advancePayment   AdvancePayment @relation(fields: [advancePaymentId], references: [id], onDelete: Cascade)
-  
-  invoiceNo        String
-  amount           Float
-  date             DateTime
-  remarks          String?
-  
-  createdAt        DateTime @default(now())
+
+  invoiceNo String
+  amount    Float
+  date      DateTime
+  remarks   String?
+
+  createdAt DateTime @default(now())
 }
 
+// ================= BILLING & SUBSCRIPTIONS =================
+
+model Subscription {
+  id        String  @id @default(uuid())
+  companyId String  @unique
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  plan                 String // STARTER | PROFESSIONAL | ENTERPRISE
+  status               String  @default("ACTIVE") // ACTIVE | SUSPENDED | CANCELLED | EXPIRED
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String? @unique
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean   @default(false)
+  canceledAt         DateTime?
+
+  billingCycle       String    @default("MONTHLY") // MONTHLY | YEARLY
+  pricePerMonth      Float     @default(0)
+  totalPaid          Float     @default(0)
+  failedPayments     Int       @default(0)
+  lastPaymentAttempt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, currentPeriodEnd])
+}
+
+// ================= LOGIN & GEO TRACKING =================
+
+model LoginLog {
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation("UserLoginLogs", fields: [userId], references: [id], onDelete: Cascade)
+  companyId String
+  company   Company @relation("CompanyLoginLogs", fields: [companyId], references: [id], onDelete: Cascade)
+
+  ipAddress   String?
+  country     String? // Resolved from GeoIP
+  countryCode String? // ISO code (e.g., PK, US)
+  city        String?
+  userAgent   String?
+
+  loginAt         DateTime  @default(now())
+  logoutAt        DateTime?
+  sessionDuration Int? // seconds
+
+  @@index([userId, loginAt])
+  @@index([companyId, loginAt])
+  @@index([country, loginAt])
+}
+
+// ================= AUDIT LOGGING =================
+
+model AuditLog {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation("CompanyAuditLogs", fields: [companyId], references: [id], onDelete: Cascade)
+
+  entity   String // e.g. "SalesInvoice", "Account", "Subscription"
+  entityId String // UUID of the entity
+  action   String // CREATE | READ | UPDATE | DELETE
+
+  userId   String?
+  userName String? // Cached for deleted users
+  userRole String?
+
+  beforeValues String? // JSON snapshot of before state
+  afterValues  String? // JSON snapshot of after state
+
+  description String?
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId, createdAt])
+  @@index([entity, entityId])
+  @@index([userId, createdAt])
+  @@index([action])
+}
+
+// ================= LEDGER ENTRIES (Financial Core) =================
+
+model LedgerEntry {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation("CompanyLedgerEntries", fields: [companyId], references: [id], onDelete: Cascade)
+
+  accountId String
+  account   Account @relation("AccountLedgerEntries", fields: [accountId], references: [id], onDelete: Cascade)
+
+  voucherId String? // Link to voucher
+  invoiceId String? // Link to sales/purchase invoice
+
+  debit  Float @default(0)
+  credit Float @default(0)
+
+  description String?
+  date        DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId, accountId, date])
+  @@index([date])
+  @@index([accountId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO | WARNING | ERROR | SUCCESS
+  link      String? // Optional link to redirect
+  isRead    Boolean  @default(false)
+  userId    String? // If null, it's for all admins
+  createdAt DateTime @default(now())
+
+  @@index([isRead, createdAt])
+}
+
+// Update User model to add LoginLog relation
+// (Note: This is handled by adding the @relation in the User model)
+
+// =================== GRN (GOODS RECEIPT NOTE) ===================
+
+model GoodsReceiptNote {
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id])
+  branchId     String?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
+
+  grnNo        String
+  date         DateTime
+  poId         String?
+  po           PurchaseOrder? @relation(fields: [poId], references: [id])
+  supplierId   String
+  supplier     Account     @relation("GRNSupplier", fields: [supplierId], references: [id])
+
+  remarks      String?
+  status       String      @default("DRAFT") // DRAFT | RECEIVED | PARTIAL | CANCELLED
+
+  items        GoodsReceiptNoteItem[]
+
+  createdAt    DateTime    @default(now())
+  createdBy    String?
+  deletedAt    DateTime?
+  deletedBy    String?
+
+  @@index([companyId])
+  @@index([date])
+}
+
+model GoodsReceiptNoteItem {
+  id        String           @id @default(uuid())
+  grnId     String
+  grn       GoodsReceiptNote @relation(fields: [grnId], references: [id], onDelete: Cascade)
+  itemId    String
+  item      ItemNew          @relation(fields: [itemId], references: [id])
+
+  orderedQty  Int
+  receivedQty Int
+  rate        Float
+  amount      Float
+  remarks     String?
+}
+
+// ─── Live Chat ───────────────────────────────────────────────────────────────
+
+model ChatConversation {
+  id            String        @id @default(uuid())
+  customerName  String
+  customerEmail String?
+  status        String        @default("bot") // bot | waiting | agent | closed
+  assignedAgent String?
+  companyId     String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  messages      ChatMessage[]
+}
+
+model ChatMessage {
+  id             String           @id @default(uuid())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         String           // customer | bot | agent
+  text           String           @db.Text
+  createdAt      DateTime         @default(now())
+}
+
+// ─── Admin Team Members ───────────────────────────────────────────────────────
+
+model AdminUser {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  isSuperAdmin Boolean   @default(false)
+  allowedPages String    @default("[]") // JSON array of page names
+  team         String?   // e.g. "Contact Team", "Marketing Team"
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  lastLoginAt  DateTime?
+}
+
+// ─── Coupons ──────────────────────────────────────────────────────────────────
+
+model Coupon {
+  id           String             @id @default(uuid())
+  code         String             @unique
+  type         String             // percent | fixed
+  value        Float
+  maxUses      Int?
+  usedCount    Int                @default(0)
+  expiresAt    DateTime?
+  applicableTo String?            // null = all | starter | pro | enterprise
+
+  // Targeting — all null = open to everyone
+  allowedEmails        String?   // JSON array of user emails e.g. ["ali@co.com","sara@x.com"]
+  allowedCompanyIds    String?   // JSON array of company IDs
+  allowedBusinessTypes String?   // JSON array of business type slugs e.g. ["trading","distribution"]
+  allowedCountries     String?   // JSON array of ISO country codes e.g. ["PK","AE","SA"]
+
+  active       Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  redemptions  CouponRedemption[]
+}
+
+model CouponRedemption {
+  id        String   @id @default(uuid())
+  couponId  String
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId    String?
+  companyId String?
+  createdAt DateTime @default(now())
+}
+
+// ─── Email Logs ───────────────────────────────────────────────────────────────
+
+model EmailLog {
+  id        String   @id @default(uuid())
+  to        String
+  subject   String
+  status    String   // sent | failed
+  error     String?
+  createdAt DateTime @default(now())
+}
+
+// ─── Referrals ────────────────────────────────────────────────────────────────
+
+model Referral {
+  id           String    @id @default(uuid())
+  referrerId   String
+  referrer     User      @relation("ReferrerUser", fields: [referrerId], references: [id])
+  refereeEmail String
+  status       String    @default("pending") // pending | signed_up | converted
+  reward       Float?
+  createdAt    DateTime  @default(now())
+  convertedAt  DateTime?
+}
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  company   String?
+  role      String?
+  message   String
+  rating    Int      @default(5)
+  avatar    String?
+  planUsed  String?
+  status    String   @default("PENDING")   // PENDING | PUBLISHED | REJECTED
+  featured  Boolean  @default(false)
+  userId    String?
+  companyId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Leads ────────────────────────────────────────────────────────────────────
+
+model Lead {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  message   String?
+  source    String?
+  status    String   @default("new")
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+// ─── Business Records (generic store for all business types) ──────────────────
+// Handles: hospital patients/appointments, salon bookings, gym memberships,
+// real-estate tenants/leases, law cases, IT projects/sprints, etc.
+
+model BusinessRecord {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  branchId    String?
+
+  category    String   // e.g. "patient", "appointment", "member", "case", "tenant"
+  subCategory String?  // e.g. "lab", "hair", "criminal" — optional sub-grouping
+  title       String   // searchable display name
+  status      String   @default("active")
+  refId       String?  // link to another BusinessRecord (e.g. appointment → patient)
+  data        Json     // all business-specific fields as JSON
+  amount      Float?   // for financial records (rent, billing, membership fee, etc.)
+  date        DateTime? // for date-based records (appointment date, hearing date, etc.)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([companyId, category])
+  @@index([companyId, category, status])
+  @@index([refId])
+}
+
+// ── Support & Tickets ────────────────────────────────────────────────────────
+
+model SupportTicket {
+  id        String   @id @default(uuid())
+  companyId String?
+  userId    String?
+  subject   String
+  message   String   @db.Text
+  status    String   @default("OPEN") // OPEN | IN_PROGRESS | CLOSED
+  priority  String   @default("MEDIUM") // LOW | MEDIUM | HIGH | URGENT
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ── Team Invitations ─────────────────────────────────────────────────────────
+
+model TeamInvite {
+  id        String   @id @default(uuid())
+  email     String
+  role      String   @default("USER")
+  token     String   @unique
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  status    String   @default("PENDING") // PENDING | ACCEPTED | EXPIRED
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([email])
+}
+
+// ── Business Waitlist ─────────────────────────────────────────────────────────
+// "Notify me when live" requests for coming-soon business types
+
+model BusinessWaitlist {
+  id           String    @id @default(cuid())
+  email        String
+  businessType String                       // e.g. "manufacturing", "hospital"
+  name         String?
+  createdAt    DateTime  @default(now())
+  notified     Boolean   @default(false)
+  notifiedAt   DateTime?
+
+  @@unique([email, businessType])
+  @@index([businessType])
+  @@index([notified])
+}
+
+// ── Admin Action Log ──────────────────────────────────────────────────────────
+// ── Newsletter Subscribers ────────────────────────────────────────────────────
+// Stores emails of website visitors / users who subscribed for news & offers
+
+model NewsletterSubscriber {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  source          String?                       // "landing" | "footer" | "pricing" | "blog" | "app"
+  status          String    @default("active")  // active | unsubscribed
+  createdAt       DateTime  @default(now())
+  unsubscribedAt  DateTime?
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ── Feedback (Complaints & Suggestions) ──────────────────────────────────────
+// Separate from Testimonial — covers complaints, bug reports, suggestions
+
+model Feedback {
+  id          String    @id @default(cuid())
+  type        String                          // complaint | suggestion | bug | general
+  subject     String
+  message     String    @db.Text
+  email       String?                         // for public (non-logged-in) submissions
+  name        String?
+  status      String    @default("open")      // open | in_review | resolved | closed
+  priority    String    @default("normal")    // low | normal | high | urgent
+  userId      String?
+  companyId   String?
+  adminNote   String?   @db.Text
+  resolvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([type])
+  @@index([userId])
+  @@index([companyId])
+}
+
+// Tracks all actions performed by admin panel users (super admin + team members)
+
+model AdminActionLog {
+  id          String   @id @default(uuid())
+  adminId     String                       // AdminUser.id or super-admin User.id
+  adminEmail  String
+  action      String                       // CHANGE_PLAN | IMPERSONATE | DELETE_USER | UPDATE_COMPANY | etc.
+  targetType  String                       // Company | User | Subscription | etc.
+  targetId    String?
+  targetLabel String?                      // Company name or user email for quick display
+  companyId   String?                      // Affected company (if applicable)
+  details     String?  @db.Text           // JSON snapshot of before/after or extra context
+  createdAt   DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@index([companyId, createdAt])
+  @@index([action])
+}

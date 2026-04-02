@@ -8,16 +8,48 @@ export default function CategorizedTrialBalance() {
   const [_totals, setTotals] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
 
   const [fromDate, setFromDate] = useState("2026-01-01");
     const [toDate, setToDate] = useState(today);
+
+  useEffect(() => {
+    loadReport();
+    loadCompany();
+  }, []);
+
+  async function loadCompany() {
+    try {
+      const user = getCurrentUser();
+      const res = await fetch("/api/me/company", {
+        credentials: "include",
+        headers: {
+          "x-user-id":   user?.id        || "",
+          "x-user-role": user?.role      || "",
+          "x-company-id": user?.companyId || "",
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCompanyInfo(data);
+      }
+    } catch (e) {}
+  }
+
   const loadReport = async () => {
     setLoading(true);
     try {
       const user = getCurrentUser();
       const res = await fetch(
         `/api/reports/trial-balance?from=${fromDate}&to=${toDate}`,
-        { headers: { "x-user-role": user?.role || "" } }
+        {
+          credentials: "include",
+          headers: {
+            "x-user-id":    user?.id        || "",
+            "x-user-role":  user?.role      || "",
+            "x-company-id": user?.companyId || "",
+          },
+        }
       );
       const data = await res.json();
       setRows(data.rows || []);
@@ -73,7 +105,7 @@ export default function CategorizedTrialBalance() {
                   type: "custom",
                   to: email,
                   subject: `Trial Balance ${fromDate} to ${toDate}`,
-                  message: "Trial Balance report attached from US TRADERS system.",
+                  message: `Trial Balance report attached from ${companyInfo?.name || "Your Company"} system.`,
                 }),
               });
               const data = await res.json();
@@ -101,7 +133,7 @@ export default function CategorizedTrialBalance() {
         <div className="space-y-8">
           {/* HEADER */}
           <div className="text-center">
-            <h1 className="text-2xl font-black">US TRADERS</h1>
+            <h1 className="text-2xl font-black">{companyInfo?.name || "Your Company"}</h1>
             <h2 className="text-sm font-bold border-b-2 border-black inline-block px-10 pb-1 italic">TRIAL BALANCE</h2>
           </div>
 
@@ -177,12 +209,12 @@ export default function CategorizedTrialBalance() {
             {/* Difference Section */}
             <div className="flex justify-between items-center mt-4 border-t-2 border-black pt-2">
               <div className="text-[10px] font-bold uppercase text-gray-400 italic">
-                Verified by: US TRADERS Accounting System
+                Verified by: {companyInfo?.name || "FINOVA SME"} Accounting System
               </div>
               <div className="text-right">
                 <span className="text-sm font-bold uppercase mr-4">Final Difference:</span>
                 <span className={`text-2xl font-black italic ${difference === 0 ? "text-green-600" : "text-red-600"}`}>
-                  {Math.abs(difference).toLocaleString()} PKR
+                  {Math.abs(difference).toLocaleString()} {companyInfo?.baseCurrency || "$"}
                 </span>
               </div>
             </div>

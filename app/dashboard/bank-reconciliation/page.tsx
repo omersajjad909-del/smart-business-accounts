@@ -40,6 +40,7 @@ export default function BankReconciliationPage() {
   const [loading, setLoading] = useState(false);
   const [showAddBankForm, setShowAddBankForm] = useState(false);
   const [editingBankId, setEditingBankId] = useState('');
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [newBankForm, setNewBankForm] = useState({
     bankName: '',
     accountNo: '',
@@ -49,7 +50,24 @@ export default function BankReconciliationPage() {
 
   useEffect(() => {
     fetchBankAccounts();
+    loadCompany();
   }, []);
+
+  async function loadCompany() {
+    try {
+      const user = getCurrentUser();
+      const res = await fetch("/api/me/company", {
+        headers: { 
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || ""
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCompanyInfo(data);
+      }
+    } catch (e) {}
+  }
 
   useEffect(() => {
     if (selectedAccount) {
@@ -298,6 +316,24 @@ export default function BankReconciliationPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <div className="text-sm font-semibold text-blue-800">Guided Flow</div>
+        <div className="mt-1 text-xs text-blue-700">Import → Match → Confirm</div>
+        <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-blue-800">
+          <div className="rounded border border-blue-200 bg-white p-3">
+            <div className="font-semibold">1. Import</div>
+            <div>Upload bank statements to populate unreconciled entries.</div>
+          </div>
+          <div className="rounded border border-blue-200 bg-white p-3">
+            <div className="font-semibold">2. Match</div>
+            <div>Select statements and align with system balance.</div>
+          </div>
+          <div className="rounded border border-blue-200 bg-white p-3">
+            <div className="font-semibold">3. Confirm</div>
+            <div>When difference is 0.00, click Reconcile to lock.</div>
+          </div>
+        </div>
+      </div>
       {user && !user.companyId && (
         <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
           <p className="font-bold">Attention</p>
@@ -324,7 +360,7 @@ export default function BankReconciliationPage() {
               <input
                 type="text"
                 required
-                placeholder="e.g., HBL, UBL, MCB"
+                placeholder="e.g., Chase, Barclays, HBL"
                 value={newBankForm.bankName}
                 onChange={(e) => setNewBankForm({ ...newBankForm, bankName: e.target.value })}
                 className="w-full border border-gray-300 rounded px-3 py-2"
@@ -335,34 +371,31 @@ export default function BankReconciliationPage() {
               <input
                 type="text"
                 required
-                placeholder="e.g., 1234-5678-9"
+                placeholder="IBAN or Account Number"
                 value={newBankForm.accountNo}
                 onChange={(e) => setNewBankForm({ ...newBankForm, accountNo: e.target.value })}
                 className="w-full border border-gray-300 rounded px-3 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-2">Account Holder Name</label>
+              <label className="block text-sm font-semibold mb-2">Account Name</label>
               <input
                 type="text"
                 required
-                placeholder="Your name or company name"
+                placeholder="Account Title"
                 value={newBankForm.accountName}
                 onChange={(e) => setNewBankForm({ ...newBankForm, accountName: e.target.value })}
                 className="w-full border border-gray-300 rounded px-3 py-2"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-2">Starting Balance (Rs.)</label>
+              <label className="block text-sm font-semibold mb-2">Initial Balance ({companyInfo?.baseCurrency || "$"})</label>
               <input
                 type="number"
-                step="0.01"
-                placeholder="0.00"
-                value={newBankForm.balance || ''}
-                onChange={(e) => {
-                  const val = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0;
-                  setNewBankForm({ ...newBankForm, balance: val });
-                }}
+                required
+                placeholder="Opening Balance"
+                value={newBankForm.balance}
+                onChange={(e) => setNewBankForm({ ...newBankForm, balance: Number(e.target.value) })}
                 className="w-full border border-gray-300 rounded px-3 py-2"
               />
             </div>
@@ -480,7 +513,7 @@ export default function BankReconciliationPage() {
       {/* Show Difference */}
       <div className={`p-4 rounded-lg mb-6 text-white font-semibold ${isBalanced ? 'bg-green-500' : 'bg-red-500'
         }`}>
-        Difference: {difference.toFixed(2)} {isBalanced ? '✓ Balanced' : '✗ Not Balanced'}
+        Difference: {companyInfo?.baseCurrency || "$"} {difference.toFixed(2)} {isBalanced ? '✓ Balanced' : '✗ Not Balanced'}
       </div>
 
       {/* Statements List */}

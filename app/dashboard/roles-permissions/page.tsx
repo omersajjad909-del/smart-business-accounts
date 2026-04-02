@@ -59,11 +59,12 @@ export default function RolePermissionManager() {
       const data = await res.json();
       console.log("Loaded roles:", data);
       
-      setRoles(data || []);
+      const list: Role[] = Array.isArray(data) ? data : (Array.isArray(data?.roles) ? data.roles : []);
+      setRoles(list);
       
       // Set initial role permissions
-      if (data && data.length > 0) {
-        const adminRole = data.find((r: Role) => r.role === "ADMIN");
+      if (Array.isArray(list) && list.length > 0) {
+        const adminRole = list.find((r: Role) => r.role === "ADMIN");
         if (adminRole) {
           setRolePermissions(adminRole.permissions || []);
         }

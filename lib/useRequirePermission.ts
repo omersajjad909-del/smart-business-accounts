@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { getCurrentUser } from "@/lib/auth";
 import { hasPermission } from "@/lib/hasPermission";
 
 type PermissionEntry = { permission: string } | string;
@@ -14,18 +15,7 @@ export function useRequirePermission(permission: string) {
     if (typeof window === "undefined") return null;
 
     try {
-      const userStr = localStorage.getItem("user");
-      if (!userStr) return false;
-
-      const parsed = JSON.parse(userStr) as unknown;
-      let user: PermissionUser = null;
-
-      if (parsed && typeof parsed === "object" && "user" in (parsed as Record<string, unknown>)) {
-        user = (parsed as { user: PermissionUser }).user;
-      } else {
-        user = parsed as PermissionUser;
-      }
-
+      const user = getCurrentUser() as PermissionUser;
       if (!user) return false;
       return hasPermission(user, permission);
     } catch {

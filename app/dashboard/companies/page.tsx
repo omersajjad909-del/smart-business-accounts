@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ResponsiveContainer, PageHeader, Card } from "@/components/ui/ResponsiveContainer";
 import { ResponsiveForm, FormField, FormActions, Input, Button } from "@/components/ui/ResponsiveForm";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, updateStoredUser } from "@/lib/auth";
 
 type Company = {
   id: string;
@@ -32,8 +32,10 @@ export default function CompaniesPage() {
       // We can reuse the same API used for the switcher, or create a specific GET if needed.
       // The current GET /api/companies returns companies for the logged-in user.
       const res = await fetch("/api/companies", {
+        credentials: "include",
         headers: {
-          "x-user-id": u.id,
+          "x-user-id":   u.id,
+          "x-user-role": u.role || "",
         },
       });
       if (res.ok) {
@@ -41,17 +43,12 @@ export default function CompaniesPage() {
         setCompanies(data);
         
         // Update localStorage to reflect new companies immediately
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const parsed = JSON.parse(storedUser);
-          // Handle structure where user might be nested or direct
-          if (parsed.user) {
-            parsed.user.companies = data;
-          } else {
-            parsed.companies = data;
+        updateStoredUser((parsed) => {
+          if (parsed?.user) {
+            return { ...parsed, user: { ...parsed.user, companies: data } };
           }
-          localStorage.setItem("user", JSON.stringify(parsed));
-        }
+          return { ...parsed, companies: data };
+        });
       }
     } catch (error) {
       console.error("Failed to load companies", error);
@@ -111,7 +108,7 @@ export default function CompaniesPage() {
       <Card>
         <div className="mb-4">
           <h3 className="text-lg font-semibold mb-2">Create New Company</h3>
-          <p className="text-sm text-[var(--text-muted)] mb-4">
+          <p className="text-sm text-(--text-muted) mb-4">
             Add a new company to manage its accounts, inventory, and employees separately.
           </p>
         </div>
@@ -122,7 +119,7 @@ export default function CompaniesPage() {
               <Input 
                 value={form.name} 
                 onChange={(e) => setForm({ ...form, name: e.target.value })} 
-                placeholder="e.g. US Traders (Lahore)"
+                placeholder="e.g. Finova SME Solutions"
                 required 
               />
             </FormField>
@@ -148,11 +145,11 @@ export default function CompaniesPage() {
           <Card key={c.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <div className="font-semibold text-lg">{c.name}</div>
-              <div className="text-sm text-[var(--text-muted)]">
+              <div className="text-sm text-(--text-muted)">
                 Code: {c.code || "N/A"} {c.isDefault && <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">Default</span>}
               </div>
             </div>
-            <div className="text-sm text-[var(--text-muted)]">
+            <div className="text-sm text-(--text-muted)">
               {c.id}
             </div>
           </Card>

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+require("dotenv").config(); // 🔥 Load .env for DB connection
+
 /**
  * Create User Script
  * Properly creates a user with bcrypt hashed password
@@ -55,6 +57,46 @@ async function createUser() {
         active: true,
       },
     });
+
+    // 🔥 Fix for "Company context required" and "Verification"
+    console.log("🛠️  Linking to default company and marking as verified...");
+    
+    const firstCompany = await prisma.company.findFirst();
+    const targetCompanyId = firstCompany ? firstCompany.id : null;
+
+    if (!targetCompanyId) {
+      console.log("⚠️  No company found in database. Please create a company first or run seeds.");
+    } else {
+      // 1. Mark as verified so login proceeds
+      await prisma.activityLog.upsert({
+        where: { id: `verified-${user.id}` },
+        update: { createdAt: new Date() },
+        create: {
+          id: `verified-${user.id}`,
+          action: "EMAIL_VERIFIED",
+          userId: user.id,
+          companyId: targetCompanyId,
+          details: "Verified via setup script",
+        }
+      });
+
+      // 2. Link to first company
+      await prisma.userCompany.upsert({
+        where: { userId_companyId: { userId: user.id, companyId: targetCompanyId } },
+        update: {},
+        create: {
+          userId: user.id,
+          companyId: targetCompanyId,
+          isDefault: true
+        }
+      });
+      
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { defaultCompanyId: targetCompanyId }
+      });
+      console.log(`🔗 Linked to company: ${firstCompany.name} and marked as VERIFIED.`);
+    }
 
     console.log("\n✅ User created/updated successfully!");
     console.log("\n📋 User Details:");

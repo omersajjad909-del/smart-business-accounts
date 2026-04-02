@@ -58,6 +58,21 @@ type Currency = {
   exchangeRate: number;
 };
 
+type PrintPreferences = {
+  paperSize: "A4" | "THERMAL_80MM" | "THERMAL_58MM";
+  invoiceTemplate: "classic" | "compact" | "modern";
+  receiptTemplate: "standard" | "mart" | "restaurant";
+  defaultOutput: "pdf" | "browser-print";
+  showLogo: boolean;
+  showPhone: boolean;
+  showAddress: boolean;
+  showTaxNumber: boolean;
+  logoUrl: string;
+  headerNote: string;
+  footerNote: string;
+  thermalFontSize: "sm" | "md" | "lg";
+};
+
 function SalesInvoiceContent() {
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
@@ -91,10 +106,48 @@ function SalesInvoiceContent() {
   const [searchTerm, _setSearchTerm] = useState("");
   const [scanCode, setScanCode] = useState("");
   const [origin, setOrigin] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
+  const [printPrefs, setPrintPrefs] = useState<PrintPreferences>({
+    paperSize: "A4",
+    invoiceTemplate: "classic",
+    receiptTemplate: "standard",
+    defaultOutput: "browser-print",
+    showLogo: true,
+    showPhone: true,
+    showAddress: true,
+    showTaxNumber: true,
+    logoUrl: "",
+    headerNote: "",
+    footerNote: "Thank you for your business.",
+    thermalFontSize: "md",
+  });
 
   useEffect(() => {
     setOrigin(window.location.origin);
+    loadCompany();
   }, []);
+
+  async function loadCompany() {
+    try {
+      const [companyRes, printRes] = await Promise.all([
+        fetch("/api/me/company"),
+        fetch("/api/company/admin-control"),
+      ]);
+      if (companyRes.ok) {
+        const data = await companyRes.json();
+        setCompanyInfo(data);
+      }
+      if (printRes.ok) {
+        const settings = await printRes.json();
+        if (settings?.printPreferences) {
+          setPrintPrefs((prev) => ({ ...prev, ...settings.printPreferences }));
+        }
+      }
+    } catch (e) {} finally {
+      setLoading(false);
+    }
+  }
 
   // Tax states
   const [applyTax, setApplyTax] = useState(false);
@@ -103,6 +156,9 @@ function SalesInvoiceContent() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [currencyId, setCurrencyId] = useState("");
   const [exchangeRate, setExchangeRate] = useState(1);
+  const isThermalPrint = printPrefs.paperSize !== "A4";
+  const thermalWidth = printPrefs.paperSize === "THERMAL_58MM" ? "58mm" : "80mm";
+  const thermalFontSize = printPrefs.thermalFontSize === "sm" ? 11 : printPrefs.thermalFontSize === "lg" ? 14 : 12;
 
   useEffect(() => {
     fetch("/api/currencies")
@@ -613,7 +669,7 @@ function SalesInvoiceContent() {
             ) : (
               <div className="flex flex-wrap gap-2">
                 <button onClick={() => window.print()} className="bg-green-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
-                  Print
+                  {printPrefs.paperSize === "A4" ? "Print A4" : `Print ${printPrefs.paperSize === "THERMAL_58MM" ? "58mm" : "80mm"}`}
                 </button>
                 <button
                   onClick={() => setPreviewMode(prev => prev === "INVOICE" ? "DELIVERY" : "INVOICE")}
@@ -819,13 +875,36 @@ function SalesInvoiceContent() {
 
           {/* PREVIEW */}
           {preview && (
-            <div className="invoice-print bg-white p-10 border shadow-lg mx-auto print:border-0 print:p-0 print:shadow-none min-h-[297mm]">
-              <div className="flex justify-between items-start border-b-2 border-black pb-4 mb-6">
-                <div>
-                  <h1 className="text-4xl font-black">{previewMode === "DELIVERY" ? "DELIVERY NOTE" : "SALES INVOICE"}</h1>
-                  <p className="text-gray-600">US Traders</p>
+            <div
+              className="invoice-print bg-white border shadow-lg mx-auto print:border-0 print:p-0 print:shadow-none"
+              style={{
+                padding: isThermalPrint ? "12px" : "40px",
+                minHeight: isThermalPrint ? "auto" : "297mm",
+                width: isThermalPrint ? thermalWidth : "100%",
+                maxWidth: isThermalPrint ? thermalWidth : "1100px",
+                fontSize: isThermalPrint ? thermalFontSize : 16,
+              }}
+            >
+              {printPrefs.headerNote && (
+                <div className="text-center text-gray-600 mb-3" style={{ fontSize: isThermalPrint ? thermalFontSize - 1 : 13 }}>
+                  {printPrefs.headerNote}
                 </div>
-                <div className="text-right">
+              )}
+              <div className={`${isThermalPrint ? "block" : "flex justify-between items-start"} border-b-2 border-black pb-4 mb-6`}>
+                <div>
+                  <div className={`flex ${isThermalPrint ? "flex-col items-center text-center" : "items-center gap-4"}`}>
+                    {printPrefs.showLogo && printPrefs.logoUrl && (
+                      <img src={printPrefs.logoUrl} alt="Company logo" style={{ width: isThermalPrint ? 48 : 72, height: "auto", marginBottom: isThermalPrint ? 8 : 0 }} />
+                    )}
+                    <div>
+                      <h1 className={isThermalPrint ? "text-xl font-black text-center" : "text-4xl font-black"}>
+                        {previewMode === "DELIVERY" ? "DELIVERY NOTE" : (isThermalPrint ? "RECEIPT" : "SALES INVOICE")}
+                      </h1>
+                      <p className="text-gray-600 font-bold uppercase tracking-wider">{companyInfo?.name || "FINOVA SME"}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className={isThermalPrint ? "text-center mt-4" : "text-right"}>
                   <p><b>Invoice #:</b> {savedInvoice?.invoiceNo || invoiceNo}</p>
                   <p><b>Date:</b> {savedInvoice?.date ? new Date(savedInvoice.date).toISOString().slice(0, 10) : date}</p>
                   <p><b>Location:</b> {location}</p>
@@ -847,12 +926,12 @@ function SalesInvoiceContent() {
                 </div>
               </div>
 
-              <div className="mb-8 grid grid-cols-2">
+              <div className={`mb-8 ${isThermalPrint ? "space-y-3" : "grid grid-cols-2"}`}>
                 <div>
                   <h3 className="text-gray-500 uppercase text-xs font-bold mb-1">Bill To:</h3>
                   <p className="text-xl font-bold">{savedInvoice?.customer?.name || customerName || "Not Selected"}</p>
                 </div>
-                <div className="text-right">
+                <div className={isThermalPrint ? "" : "text-right"}>
                   {(savedInvoice?.driverName || driverName) && (
                     <p><b>Driver:</b> {savedInvoice?.driverName || driverName}</p>
                   )}
@@ -867,7 +946,7 @@ function SalesInvoiceContent() {
                   <tr className="border-y-2 border-black">
                     <th className="py-2 text-left">Description</th>
                     <th className="py-2 text-center w-24">Qty</th>
-                    {previewMode === "INVOICE" && <th className="py-2 text-right w-32">Rate</th>}
+                    {previewMode === "INVOICE" && !isThermalPrint && <th className="py-2 text-right w-32">Rate</th>}
                     {previewMode === "INVOICE" && <th className="py-2 text-right w-32">Amount</th>}
                   </tr>
                 </thead>
@@ -886,7 +965,7 @@ function SalesInvoiceContent() {
                           {itemDesc && <p className="text-sm text-gray-600">{itemDesc}</p>}
                         </td>
                         <td className="py-3 text-center">{qty}</td>
-                        {previewMode === "INVOICE" && <td className="py-3 text-right">{Number(rate).toLocaleString()}</td>}
+                        {previewMode === "INVOICE" && !isThermalPrint && <td className="py-3 text-right">{Number(rate).toLocaleString()}</td>}
                         {previewMode === "INVOICE" && <td className="py-3 text-right font-semibold">{amount.toLocaleString()}</td>}
                       </tr>
                     );
@@ -895,8 +974,8 @@ function SalesInvoiceContent() {
               </table>
 
               {previewMode === "INVOICE" && (
-                <div className="flex justify-end">
-                  <div className="w-72 space-y-2">
+                <div className={`flex ${isThermalPrint ? "justify-center" : "justify-end"}`}>
+                  <div className={`${isThermalPrint ? "w-full" : "w-72"} space-y-2`}>
                     <div className="flex justify-between">
                       <span>Subtotal:</span>
                       <span>{total.toLocaleString()}</span>
@@ -929,7 +1008,7 @@ function SalesInvoiceContent() {
               </div>
 
               <div className="mt-20 border-t pt-4 text-center text-gray-400 text-sm">
-                Thank you for your business!
+                {printPrefs.footerNote}
               </div>
             </div>
           )}

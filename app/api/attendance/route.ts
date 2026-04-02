@@ -206,7 +206,7 @@ function _formatPakTime(dateString?: string | Date | null) {
   const d = new Date(dateString);
   if (isNaN(d.getTime())) return "--";
 
-  return d.toLocaleTimeString("en-PK", {
+  return d.toLocaleTimeString(undefined, {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,

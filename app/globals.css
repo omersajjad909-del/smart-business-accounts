@@ -28,6 +28,8 @@
 :root {
   /* LIGHT MODE (Default) */
   color-scheme: light;
+  --font-sans: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
   --app-bg: #f8fafc;        /* Slate 50 */
   --surface: #ffffff;       /* White */
   --panel-bg: #f1f5f9;      /* Slate 100 */

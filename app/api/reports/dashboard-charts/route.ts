@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
 type SalesInvoice = Prisma.SalesInvoiceGetPayload<{
   select: {
@@ -40,6 +40,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const { searchParams } = new URL(req.url);
     const period = searchParams.get("period") || "month"; // month, week, year
@@ -66,6 +67,7 @@ export async function GET(req: NextRequest) {
       where: {
         date: { gte: startDate },
         companyId,
+        ...(branchId ? { branchId } : {}),
       },
       select: {
         date: true,
@@ -78,6 +80,7 @@ export async function GET(req: NextRequest) {
       where: {
         date: { gte: startDate },
         companyId,
+        ...(branchId ? { branchId } : {}),
       },
       select: {
         date: true,
@@ -123,6 +126,7 @@ export async function GET(req: NextRequest) {
       where: {
         date: { gte: startDate },
         companyId,
+        ...(branchId ? { branchId } : {}),
       },
       _sum: {
         total: true,
@@ -155,6 +159,7 @@ export async function GET(req: NextRequest) {
         invoice: {
           date: { gte: startDate },
           companyId,
+          ...(branchId ? { branchId } : {}),
         },
       },
       _sum: {

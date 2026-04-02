@@ -26,6 +26,16 @@ interface Role {
   permissions: string[];
 }
 
+interface Branch {
+  id: string;
+  code: string;
+  name: string;
+}
+
+type AdminControlSettings = {
+  branchAssignments?: Record<string, string[]>;
+};
+
 export default function UsersMasterPage() {
   const [me, setMe] = useState<any>(null);
   const [_authorized, setAuthorized] = useState(false);
@@ -45,6 +55,9 @@ export default function UsersMasterPage() {
     role: "ACCOUNTANT",
     active: true,
   });
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [branchAssignments, setBranchAssignments] = useState<Record<string, string[]>>({});
+  const [selectedBranchIds, setSelectedBranchIds] = useState<string[]>([]);
 
   // PERMISSIONS STATE
   const [roles, setRoles] = useState<Role[]>([]);
@@ -70,6 +83,8 @@ export default function UsersMasterPage() {
       setAuthorized(true);
       loadUsers(user);
       loadRoles(user);
+      loadBranches(user);
+      loadBranchAssignments(user);
     } else {
       setAuthorized(false);
       setLoading(false);
@@ -95,6 +110,42 @@ export default function UsersMasterPage() {
       console.error("Load users error:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadBranches = async (currentUser?: any) => {
+    const u = currentUser || me;
+    if (!u) return;
+    try {
+      const res = await fetch("/api/branches", {
+        headers: {
+          "x-user-role": "ADMIN",
+          "x-user-id": u.id,
+          "x-company-id": u.companyId || ""
+        },
+      });
+      const data = await res.json();
+      setBranches(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Load branches error:", err);
+    }
+  };
+
+  const loadBranchAssignments = async (currentUser?: any) => {
+    const u = currentUser || me;
+    if (!u) return;
+    try {
+      const res = await fetch("/api/company/admin-control", {
+        headers: {
+          "x-user-role": "ADMIN",
+          "x-user-id": u.id,
+          "x-company-id": u.companyId || ""
+        },
+      });
+      const data: AdminControlSettings = await res.json();
+      setBranchAssignments(data?.branchAssignments || {});
+    } catch (err) {
+      console.error("Load branch assignments error:", err);
     }
   };
 
@@ -124,9 +175,29 @@ export default function UsersMasterPage() {
       });
 
       if (res.ok) {
+        const savedUser = await res.json();
+        const targetUserId = savedUser?.id || userForm.id;
+        if (targetUserId) {
+          await fetch("/api/company/admin-control", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-user-role": "ADMIN",
+              "x-user-id": me?.id,
+              "x-company-id": me?.companyId || ""
+            },
+            body: JSON.stringify({
+              branchAssignments: {
+                ...branchAssignments,
+                [targetUserId]: selectedBranchIds,
+              },
+            }),
+          });
+        }
         toast.success(editing ? "✅ User updated!" : "✅ User created!");
         resetUserForm();
         loadUsers(me);
+        loadBranchAssignments(me);
       } else {
         toast.error("Failed to save user");
       }
@@ -151,8 +222,21 @@ export default function UsersMasterPage() {
       });
 
       if (res.ok) {
+        const nextAssignments = { ...branchAssignments };
+        delete nextAssignments[id];
+        await fetch("/api/company/admin-control", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-role": "ADMIN",
+            "x-user-id": me?.id,
+            "x-company-id": me?.companyId || ""
+          },
+          body: JSON.stringify({ branchAssignments: nextAssignments }),
+        });
         toast.success("✅ User deleted!");
         loadUsers(me);
+        loadBranchAssignments(me);
       }
     } catch (err) {
       console.error("Delete error:", err);
@@ -168,6 +252,7 @@ export default function UsersMasterPage() {
       role: user.role,
       active: user.active,
     });
+    setSelectedBranchIds(branchAssignments[user.id] || []);
     setEditing(true);
   };
 
@@ -180,6 +265,7 @@ export default function UsersMasterPage() {
       role: "ACCOUNTANT",
       active: true,
     });
+    setSelectedBranchIds([]);
     setEditing(false);
   };
 
@@ -194,10 +280,11 @@ export default function UsersMasterPage() {
       });
       const data = await res.json();
       console.log("📊 Loaded roles:", data);
-      setRoles(data || []);
+      const list: Role[] = Array.isArray(data) ? data : (Array.isArray(data?.roles) ? data.roles : []);
+      setRoles(list);
 
       // Set initial ADMIN permissions
-      const adminRole = data?.find((r: any) => r.role === "ADMIN");
+      const adminRole = Array.isArray(list) ? list.find((r: any) => r.role === "ADMIN") : undefined;
       if (adminRole) {
         setRolePermissions(adminRole.permissions || []);
       }
@@ -369,6 +456,29 @@ export default function UsersMasterPage() {
                 </select>
               </div>
 
+              <div className="mb-4">
+                <label className="block text-sm font-semibold mb-2">Allowed Branches</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                  {branches.map((branch) => (
+                    <label key={branch.id} className="flex items-center gap-2 border rounded px-3 py-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={selectedBranchIds.includes(branch.id)}
+                        onChange={(e) =>
+                          setSelectedBranchIds((prev) =>
+                            e.target.checked
+                              ? [...prev, branch.id]
+                              : prev.filter((id) => id !== branch.id)
+                          )
+                        }
+                      />
+                      <span>{branch.code} - {branch.name}</span>
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Admin user ke liye full access dena ho to saari branches select rakhein.</p>
+              </div>
+
               <div className="flex gap-2 mb-4">
                 <label className="flex items-center gap-2">
                   <input
@@ -410,6 +520,7 @@ export default function UsersMasterPage() {
                   <th className="p-3 text-left">Name</th>
                   <th className="p-3 text-left">Email</th>
                   <th className="p-3 text-left">Role</th>
+                  <th className="p-3 text-left">Branches</th>
                   <th className="p-3 text-left">Status</th>
                   <th className="p-3 text-left">Actions</th>
                 </tr>
@@ -425,6 +536,13 @@ export default function UsersMasterPage() {
                     <td className="p-3">
                       <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
                         {user.role}
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      <span className="text-xs text-gray-600">
+                        {(branchAssignments[user.id] || [])
+                          .map((branchId) => branches.find((branch) => branch.id === branchId)?.name || branchId)
+                          .join(", ") || "All / Not set"}
                       </span>
                     </td>
                     <td className="p-3">

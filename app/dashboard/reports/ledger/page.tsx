@@ -23,14 +23,32 @@ export default function LedgerReportPage() {
     const [toDate, setToDate] = useState(today);
     const [rows, setRows] = useState<LedgerRow[]>([]);
     const [loading, setLoading] = useState(false);
+    const [companyInfo, setCompanyInfo] = useState<any>(null);
 
     useEffect(() => {
         const user = getCurrentUser();
         if (!user) return;
-        fetch("/api/accounts", { headers: { "x-user-role": user.role } })
+        fetch("/api/accounts", { credentials: "include", headers: { "x-user-id": user.id, "x-user-role": user.role, "x-company-id": user.companyId || "" } })
             .then(r => r.json())
             .then(d => setAccounts(d));
+        loadCompany();
     }, []);
+
+    async function loadCompany() {
+        try {
+            const user = getCurrentUser();
+            const res = await fetch("/api/me/company", {
+                headers: { 
+                    "x-user-role": user?.role || "",
+                    "x-company-id": user?.companyId || ""
+                },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setCompanyInfo(data);
+            }
+        } catch (e) {}
+    }
 
     async function loadLedger() {
         if (!accountId) return;
@@ -41,9 +59,12 @@ export default function LedgerReportPage() {
             const res = await fetch(
                 `/api/reports/ledger?accountId=${accountId}&from=${fromDate}&to=${toDate}`,
                 {
+                    credentials: "include",
                     headers: {
-                        "x-user-role": user?.role ?? ""
-                    }
+                        "x-user-id":    user?.id        ?? "",
+                        "x-user-role":  user?.role      ?? "",
+                        "x-company-id": user?.companyId ?? "",
+                    },
                 }
             );
 
@@ -105,10 +126,10 @@ export default function LedgerReportPage() {
                         <div>
                             {/* کمپنی کا نام بڑے اور بولڈ فونٹ میں */}
                             <h1 className="text-4xl font-black tracking-tighter text-black uppercase">
-                                US TRADERS
+                                {companyInfo?.name || "FINOVA SME"}
                             </h1>
                             <p className="text-xs font-bold text-gray-500 mt-1 tracking-widest uppercase italic">
-                                Wholesale & Distribution Management
+                                {companyInfo?.country || "GLOBAL"} OPERATIONS
                             </p>
                         </div>
                         <div className="text-right border-l-4 border-black pl-4">
@@ -144,7 +165,7 @@ export default function LedgerReportPage() {
                 {!loading && rows.length > 0 && (
                     <div className="flex justify-between items-end mb-1 print:mt-4">
                         <div className="text-[10px] font-bold text-gray-500 uppercase italic">
-                            * All amounts are in PKR
+                            * All amounts are in {companyInfo?.baseCurrency || "$"}
                         </div>
                         <div className="bg-white border-2 border-black p-2 px-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center gap-4">
                             <span className="text-[11px] font-black uppercase tracking-tighter text-gray-400">

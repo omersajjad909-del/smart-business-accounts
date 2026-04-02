@@ -40,13 +40,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { name, code } = body;
+    const { name, code, baseCurrency } = body;
     if (!name) {
       return NextResponse.json({ error: "Company name required" }, { status: 400 });
     }
 
     const company = await prisma.company.create({
-      data: { name, code: code || null, isActive: true },
+      data: { name, code: code || null, isActive: true, baseCurrency: baseCurrency || "USD" },
     });
 
     await prisma.userCompany.create({

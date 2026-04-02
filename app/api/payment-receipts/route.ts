@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { z } from "zod";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { logActivity } from "@/lib/audit";
+import { logAuditFromReq } from "@/lib/auditLogger";
 import { rateLimit } from "@/lib/rateLimit";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 
@@ -34,6 +35,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
@@ -46,7 +48,7 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status');
     const partyId = searchParams.get('partyId');
 
-    const filter: any = { companyId };
+    const filter: any = { companyId, ...(branchId ? { branchId } : {}) };
     if (status) filter.status = status;
     if (partyId) filter.partyId = partyId;
 
@@ -83,6 +85,7 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
 
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
@@ -133,7 +136,7 @@ export async function POST(req: NextRequest) {
     // Auto-generate receipt number if not provided
     let receiptNo = providedReceiptNo;
     if (!receiptNo) {
-      const count = await prisma.paymentReceipt.count({ where: { companyId } });
+      const count = await prisma.paymentReceipt.count({ where: { companyId, ...(branchId ? { branchId } : {}) } });
       receiptNo = `REC-${count + 1}`;
     }
 
@@ -198,6 +201,7 @@ export async function POST(req: NextRequest) {
           date: new Date(date),
           narration: narration || `Payment received from ${party.name}`,
           companyId,
+          branchId,
           entries: {
             create: [
               { accountId: party.id, amount: -amountNum }, // Customer debit (they owe less)
@@ -226,6 +230,7 @@ export async function POST(req: NextRequest) {
           voucherId: voucher.id,
           status,
           companyId,
+          branchId,
         },
         include: {
           party: true,
@@ -293,6 +298,15 @@ export async function POST(req: NextRequest) {
       userId,
       action: "PAYMENT_RECEIPT_CREATED",
       details: `receiptNo=${result.receiptNo} amount=${amountNum}`,
+    });
+
+    await logAuditFromReq(req, {
+      companyId,
+      entity: "PaymentReceipt",
+      entityId: result.id,
+      action: "CREATE",
+      afterValues: result,
+      description: `Created payment receipt ${result.receiptNo} for ${result.party?.name} (${amountNum})`,
     });
 
     return NextResponse.json(result, { status: 201 });

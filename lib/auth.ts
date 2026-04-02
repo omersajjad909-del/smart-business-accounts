@@ -1,48 +1,116 @@
+import { createHmac } from "crypto";
+
+const BROWSER_USER_KEY = "user";
+const DEMO_BUSINESS_KEY = "finova_demo_business";
+
+function normalizeBrowserUser(raw: string | null) {
+  if (!raw) return null;
+
+  const parsed = JSON.parse(raw);
+  const user = parsed.user ?? parsed;
+
+  if (!user?.id || !user?.email) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    name: user.name || user.email,
+    email: user.email,
+    role: (user.role || "VIEWER").trim().toUpperCase(),
+    businessType: user.businessType || null,
+    permissions: Array.isArray(user.permissions) ? user.permissions : [],
+    rolePermissions: Array.isArray(user.rolePermissions) ? user.rolePermissions : [],
+    companyId: user.companyId || user.defaultCompanyId || null,
+    companies: Array.isArray(user.companies) ? user.companies : [],
+  };
+}
+
 export function getCurrentUser() {
   if (typeof window === "undefined") return null;
 
   try {
-    const raw = localStorage.getItem("user");
+    const sessionRaw = window.sessionStorage.getItem(BROWSER_USER_KEY);
+    const localRaw = window.localStorage.getItem(BROWSER_USER_KEY);
+    const raw = sessionRaw || localRaw;
+
     if (!raw) {
-      console.log("🔍 No user in localStorage");
       return null;
     }
 
-    const parsed = JSON.parse(raw);
-    // Handle both { user: {...} } and direct user object
-    const user = parsed.user ?? parsed;
-
-    if (!user?.id || !user?.email) {
-      console.log("🔍 Invalid user object:", user);
+    const currentUser = normalizeBrowserUser(raw);
+    if (!currentUser) {
       return null;
     }
 
-    const currentUser = {
-      id: user.id,
-      name: user.name || user.email,
-      email: user.email,
-      role: (user.role || "VIEWER").trim().toUpperCase(),
+    if (!sessionRaw && localRaw) {
+      window.sessionStorage.setItem(BROWSER_USER_KEY, localRaw);
+    }
 
-      // 🔥 User-specific aur role-based permissions
-      permissions: Array.isArray(user.permissions) ? user.permissions : [],
-      rolePermissions: Array.isArray(user.rolePermissions) ? user.rolePermissions : [],
-      companyId: user.companyId || user.defaultCompanyId || null,
-      companies: Array.isArray(user.companies) ? user.companies : [],
-    };
-
-    console.log("✅ getCurrentUser:", { email: currentUser.email, role: currentUser.role });
     return currentUser;
-  } catch (e: any) {
-    console.error("❌ getCurrentUser error:", e);
+  } catch {
     return null;
   }
+}
+
+export function setCurrentUser(user: unknown) {
+  if (typeof window === "undefined") return;
+  const serialized = JSON.stringify(user);
+  window.sessionStorage.setItem(BROWSER_USER_KEY, serialized);
+  window.localStorage.setItem(BROWSER_USER_KEY, serialized);
+}
+
+export function clearCurrentUser() {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.removeItem(BROWSER_USER_KEY);
+  window.localStorage.removeItem(BROWSER_USER_KEY);
+}
+
+export function updateStoredUser(mutator: (current: any) => any) {
+  if (typeof window === "undefined") return null;
+  try {
+    const sessionRaw = window.sessionStorage.getItem(BROWSER_USER_KEY);
+    const localRaw = window.localStorage.getItem(BROWSER_USER_KEY);
+    const parsed = JSON.parse(sessionRaw || localRaw || "{}");
+    const next = mutator(parsed);
+    const serialized = JSON.stringify(next);
+    window.sessionStorage.setItem(BROWSER_USER_KEY, serialized);
+    window.localStorage.setItem(BROWSER_USER_KEY, serialized);
+    return next;
+  } catch {
+    return null;
+  }
+}
+
+export function getStoredDemoBusinessPreference() {
+  if (typeof window === "undefined") return null;
+  try {
+    return (
+      window.sessionStorage.getItem(DEMO_BUSINESS_KEY) ||
+      window.localStorage.getItem(DEMO_BUSINESS_KEY) ||
+      null
+    );
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredDemoBusinessPreference(businessType: string | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (!businessType) {
+      window.sessionStorage.removeItem(DEMO_BUSINESS_KEY);
+      window.localStorage.removeItem(DEMO_BUSINESS_KEY);
+      return;
+    }
+    window.sessionStorage.setItem(DEMO_BUSINESS_KEY, businessType);
+    window.localStorage.setItem(DEMO_BUSINESS_KEY, businessType);
+  } catch {}
 }
 
 // ===== Server-side auth helpers =====
 // Minimal HS256 JWT sign/verify without external deps
 // Used by API routes and proxy/auth middleware helpers
-import { createHmac } from "crypto";
-
 export function signJwt(payload: Record<string, any>): string {
   const secret = process.env.SESSION_SECRET || "dev-insecure-secret";
   const header = { alg: "HS256", typ: "JWT" };
@@ -82,5 +150,3 @@ export function getTokenFromRequest(req: Request): string | null {
     return null;
   }
 }
-
-

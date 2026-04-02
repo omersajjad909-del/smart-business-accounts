@@ -169,7 +169,7 @@ export async function GET(req: NextRequest) {
           title: inv.invoiceNo,
           subtitle: `${inv.customer?.name || "N/A"} - ${new Date(
             inv.date
-          ).toLocaleDateString()} - Rs. ${inv.total}`,
+          ).toLocaleDateString()} - ${inv.total}`,
           url: `/dashboard/sales-invoice?id=${inv.id}`,
         })
       ),
@@ -187,7 +187,7 @@ export async function GET(req: NextRequest) {
           title: inv.invoiceNo,
           subtitle: `${inv.supplier?.name || "N/A"} - ${new Date(
             inv.date
-          ).toLocaleDateString()} - Rs. ${inv.total}`,
+          ).toLocaleDateString()} - ${inv.total}`,
           url: `/dashboard/purchase-invoice?id=${inv.id}`,
         })
       ),

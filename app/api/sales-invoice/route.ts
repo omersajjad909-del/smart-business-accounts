@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
+import { logAuditFromReq } from "@/lib/auditLogger";
 type SalesInvoiceNoOnly = Prisma.SalesInvoiceGetPayload<{
   select: { invoiceNo: true };
 }>;
@@ -35,6 +36,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_SALES_INVOICE, companyId);
 
@@ -77,7 +79,7 @@ export async function GET(req: NextRequest) {
 
     // Calculate next invoice number
     const allInvoices = await prisma.salesInvoice.findMany({
-      where: { invoiceNo: { startsWith: "SI-" }, companyId },
+      where: { invoiceNo: { startsWith: "SI-" }, companyId, ...(branchId ? { branchId } : {}) },
       select: { invoiceNo: true }
     });
 
@@ -93,7 +95,7 @@ export async function GET(req: NextRequest) {
     }
 
     const invoices = await prisma.salesInvoice.findMany({
-      where: { companyId },
+      where: { companyId, ...(branchId ? { branchId } : {}) },
       include: {
         customer: true,
         items: { include: { item: true } },
@@ -137,6 +139,7 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_SALES_INVOICE, companyId);
 
@@ -185,6 +188,7 @@ export async function POST(req: NextRequest) {
     const invoice = await prisma.salesInvoice.create({
       data: {
         companyId,
+        branchId,
         invoiceNo,
         date: new Date(date),
         customerId,
@@ -231,6 +235,7 @@ export async function POST(req: NextRequest) {
     await prisma.voucher.create({
       data: {
         companyId,
+        branchId,
         voucherNo: invoice.invoiceNo,
         type: "SI",
         date: new Date(date),
@@ -267,6 +272,15 @@ export async function POST(req: NextRequest) {
         items: { include: { item: true } },
         taxConfig: true
       }
+    });
+
+    await logAuditFromReq(req, {
+      companyId,
+      entity: "SalesInvoice",
+      entityId: invoice.id,
+      action: "CREATE",
+      afterValues: savedInvoice,
+      description: `Created sales invoice ${invoice.invoiceNo} for ${savedInvoice?.customer?.name}`,
     });
 
     return NextResponse.json({

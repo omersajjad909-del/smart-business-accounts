@@ -1,4 +1,9 @@
 export function logout() {
-  localStorage.clear(); // 💣 sab kuch saaf
+  try {
+    sessionStorage.removeItem("user");
+    localStorage.removeItem("user");
+    localStorage.removeItem("pendingVerification");
+    localStorage.removeItem("pendingBusinessType");
+  } catch {}
   window.location.href = "/";
 }

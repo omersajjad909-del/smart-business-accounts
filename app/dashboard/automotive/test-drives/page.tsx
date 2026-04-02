@@ -1,0 +1,113 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { autoBg, autoBorder, autoFont, autoMuted, autoStatusColor, mapShowroomTestDrives, mapShowroomVehicles, todayIso } from "../_shared";
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  background: "rgba(255,255,255,.06)",
+  border: "1px solid rgba(255,255,255,.1)",
+  borderRadius: 10,
+  color: "#fff",
+  padding: "12px 14px",
+  fontSize: 14,
+};
+
+const primaryButton: React.CSSProperties = {
+  background: "#2563eb",
+  color: "#fff",
+  border: "none",
+  borderRadius: 10,
+  padding: "12px 16px",
+  fontWeight: 800,
+  cursor: "pointer",
+};
+
+const smallButton: React.CSSProperties = {
+  background: "rgba(37,99,235,.18)",
+  color: "#bfdbfe",
+  border: "1px solid rgba(96,165,250,.25)",
+  borderRadius: 10,
+  padding: "8px 10px",
+  fontWeight: 700,
+  cursor: "pointer",
+};
+
+export default function TestDrivesPage() {
+  const vehicleStore = useBusinessRecords("auto_vehicle");
+  const { records, loading, create, update } = useBusinessRecords("showroom_test_drive");
+  const vehicles = useMemo(() => mapShowroomVehicles(vehicleStore.records).filter((item) => item.status !== "Sold"), [vehicleStore.records]);
+  const drives = useMemo(() => mapShowroomTestDrives(records), [records]);
+  const [form, setForm] = useState({ customer: "", phone: "", vehicleId: "", driveDate: todayIso() });
+
+  const saveDrive = async () => {
+    const customer = form.customer.trim();
+    const phone = form.phone.trim();
+    const vehicle = vehicles.find((item) => item.id === form.vehicleId);
+    if (!customer || !phone) return alert("Customer aur phone required hain.");
+    if (!vehicle) return alert("Vehicle select karein.");
+    if (drives.some((item) => item.phone === phone && item.vehicleId === vehicle.id && item.status !== "cancelled")) {
+      return alert("Is customer ka same vehicle ke liye active test drive already hai.");
+    }
+    await create({
+      title: customer,
+      status: "scheduled",
+      date: form.driveDate,
+      data: {
+        phone,
+        vehicleId: vehicle.id,
+        vehicleLabel: `${vehicle.make} ${vehicle.model} ${vehicle.year}`,
+      },
+    });
+    setForm({ customer: "", phone: "", vehicleId: "", driveDate: todayIso() });
+  };
+
+  return (
+    <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: autoFont }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Test Drives</h1>
+        <p style={{ margin: 0, fontSize: 14, color: autoMuted }}>Interested buyers ke liye vehicle-level drive scheduling aur follow-up yahan manage karein.</p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 18 }}>
+        <div style={{ background: autoBg, border: `1px solid ${autoBorder}`, borderRadius: 18, padding: 20 }}>
+          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 16 }}>Schedule Test Drive</div>
+          <div style={{ display: "grid", gap: 12 }}>
+            <input style={inputStyle} value={form.customer} onChange={(e) => setForm((p) => ({ ...p, customer: e.target.value }))} placeholder="Customer name" />
+            <input style={inputStyle} value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} placeholder="Phone" />
+            <select style={inputStyle} value={form.vehicleId} onChange={(e) => setForm((p) => ({ ...p, vehicleId: e.target.value }))}>
+              <option value="">Select vehicle</option>
+              {vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model} {vehicle.year}</option>)}
+            </select>
+            <input type="date" style={inputStyle} value={form.driveDate} onChange={(e) => setForm((p) => ({ ...p, driveDate: e.target.value }))} />
+            <button style={primaryButton} onClick={saveDrive}>Save Drive</button>
+          </div>
+        </div>
+
+        <div style={{ background: autoBg, border: `1px solid ${autoBorder}`, borderRadius: 18, overflow: "hidden" }}>
+          <div style={{ padding: "16px 18px", borderBottom: `1px solid ${autoBorder}`, fontSize: 16, fontWeight: 800 }}>Drive Desk</div>
+          <div style={{ display: "grid", gap: 12, padding: 18 }}>
+            {!loading && drives.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No test drives yet.</div>}
+            {drives.map((row) => (
+              <div key={row.id} style={{ border: "1px solid rgba(255,255,255,.07)", background: "rgba(255,255,255,.03)", borderRadius: 14, padding: 16 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 800 }}>{row.customer}</div>
+                    <div style={{ fontSize: 12, color: autoMuted, marginTop: 6 }}>{row.phone} | {row.driveDate}</div>
+                    <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 8 }}>{row.vehicleLabel}</div>
+                  </div>
+                  <span style={{ padding: "4px 10px", borderRadius: 999, background: `${autoStatusColor(row.status)}20`, color: autoStatusColor(row.status), fontSize: 12, fontWeight: 700 }}>{row.status}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+                  {row.status === "scheduled" && <button style={smallButton} onClick={() => update(row.id, { status: "completed" })}>Complete</button>}
+                  {row.status !== "cancelled" && row.status !== "completed" && <button style={smallButton} onClick={() => update(row.id, { status: "cancelled" })}>Cancel</button>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

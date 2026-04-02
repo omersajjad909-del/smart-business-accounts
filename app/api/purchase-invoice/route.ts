@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient ,Prisma as _Prisma } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
+import { logAuditFromReq } from "@/lib/auditLogger";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -22,6 +23,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_PURCHASE_INVOICE, companyId);
     if (!allowed) {
@@ -50,7 +52,7 @@ export async function GET(req: NextRequest) {
     // If type=invoices, return all purchase invoices
     if (type === "invoices") {
       const invoices = await prisma.purchaseInvoice.findMany({
-        where: { companyId },
+        where: { companyId, ...(branchId ? { branchId } : {}) },
         include: {
           supplier: true,
           items: {
@@ -64,7 +66,7 @@ export async function GET(req: NextRequest) {
 
     // Default: return pending POs
     const pos = await prisma.purchaseOrder.findMany({
-      where: { status: "PENDING", companyId },
+      where: { status: "PENDING", companyId, ...(branchId ? { branchId } : {}) },
       include: {
         supplier: true,
         items: {
@@ -91,6 +93,7 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_PURCHASE_INVOICE, companyId);
     if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -145,7 +148,7 @@ export async function POST(req: NextRequest) {
 
       // B. Invoice Number جنریٹ کریں (PI-1, PI-2...)
       const last = await tx.purchaseInvoice.findFirst({
-        where: { invoiceNo: { startsWith: "PI-" }, companyId },
+        where: { invoiceNo: { startsWith: "PI-" }, companyId, ...(branchId ? { branchId } : {}) },
         orderBy: { createdAt: "desc" },
       });
       let nextNo = 1;
@@ -178,6 +181,7 @@ export async function POST(req: NextRequest) {
           supplierId,
           poId: poId || null,
           companyId,
+          branchId,
           total: netTotal,
           approvalStatus: "PENDING",
           taxConfigId: applyTax ? taxConfigId : null,
@@ -254,6 +258,7 @@ export async function POST(req: NextRequest) {
           date: new Date(date),
           narration: `Purchase Invoice ${invoiceNo} from ${supplier.name}`,
           companyId,
+          branchId,
           entries: {
             create: [
               { accountId: inventoryAcc.id, amount: netTotal, companyId }, // Debit Inventory (Asset)
@@ -266,6 +271,15 @@ export async function POST(req: NextRequest) {
       // return invoice;
     // });
     const result = invoice;
+
+    await logAuditFromReq(req, {
+      companyId,
+      entity: "PurchaseInvoice",
+      entityId: result.id,
+      action: "CREATE",
+      afterValues: result,
+      description: `Created purchase invoice ${result.invoiceNo} from ${supplier?.name}`,
+    });
 
     return NextResponse.json({ success: true, id: result.id, invoiceNo: result.invoiceNo });
   } catch (e: any) {

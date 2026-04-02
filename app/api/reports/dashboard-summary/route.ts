@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,14 +13,15 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const [salesAgg, purchaseAgg, customers] = await Promise.all([
       prisma.salesInvoice.aggregate({
-        where: { companyId, deletedAt: null },
+        where: { companyId, deletedAt: null, ...(branchId ? { branchId } : {}) },
         _sum: { total: true },
       }),
       prisma.purchaseInvoice.aggregate({
-        where: { companyId, deletedAt: null },
+        where: { companyId, deletedAt: null, ...(branchId ? { branchId } : {}) },
         _sum: { total: true },
       }),
       prisma.account.count({
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
     const totalPurchases = Number(purchaseAgg._sum.total || 0);
 
     const invoices = await prisma.salesInvoice.findMany({
-      where: { companyId, deletedAt: null },
+      where: { companyId, deletedAt: null, ...(branchId ? { branchId } : {}) },
       select: {
         total: true,
         date: true,

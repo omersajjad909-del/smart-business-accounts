@@ -37,6 +37,14 @@ type DeliveryChallan = {
   status: string;
 };
 
+type PrintPreferences = {
+  paperSize: "A4" | "THERMAL_80MM" | "THERMAL_58MM";
+  showLogo: boolean;
+  logoUrl: string;
+  headerNote: string;
+  footerNote: string;
+};
+
 export default function DeliveryChallanPage() {
   const _router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
@@ -68,6 +76,16 @@ const [searchTerm, _setSearchTerm] = useState("");
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
   const [savedChallan, setSavedChallan] = useState<any>(null);
+  const [companyName, setCompanyName] = useState("FINOVA SME");
+  const [printPrefs, setPrintPrefs] = useState<PrintPreferences>({
+    paperSize: "A4",
+    showLogo: true,
+    logoUrl: "",
+    headerNote: "",
+    footerNote: "Thank you for your business!",
+  });
+  const isThermalPrint = printPrefs.paperSize !== "A4";
+  const thermalWidth = printPrefs.paperSize === "THERMAL_58MM" ? "58mm" : "80mm";
 
   useEffect(() => {
     if (!user) {
@@ -108,6 +126,25 @@ const [searchTerm, _setSearchTerm] = useState("");
     .then(_d => {
         // If there's logic to get nextNo from API, otherwise just handle in state
     });
+
+    fetch("/api/me/company")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.name) setCompanyName(d.name); });
+
+    fetch("/api/company/admin-control")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.printPreferences) {
+          setPrintPrefs((prev) => ({
+            ...prev,
+            paperSize: d.printPreferences.paperSize || prev.paperSize,
+            showLogo: d.printPreferences.showLogo ?? prev.showLogo,
+            logoUrl: d.printPreferences.logoUrl || prev.logoUrl,
+            headerNote: d.printPreferences.headerNote || prev.headerNote,
+            footerNote: d.printPreferences.footerNote || prev.footerNote,
+          }));
+        }
+      });
 
     setLoading(false);
   }, []);
@@ -454,7 +491,7 @@ const [searchTerm, _setSearchTerm] = useState("");
             ) : (
               <div className="flex flex-wrap gap-2">
                 <button onClick={() => window.print()} className="bg-green-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
-                  Print
+                  {printPrefs.paperSize === "A4" ? "Print A4" : "Print Thermal"}
                 </button>
                 <button 
                   onClick={shareOnWhatsApp}
@@ -563,9 +600,12 @@ const [searchTerm, _setSearchTerm] = useState("");
 
           {/* PREVIEW */}
           {preview && (
-            <div className="bg-white border p-8 rounded shadow-lg mt-6 print:border-none print:shadow-none" id="print-area">
+            <div className="bg-white border rounded shadow-lg mt-6 print:border-none print:shadow-none" id="print-area" style={{ padding: isThermalPrint ? 12 : 32, width: isThermalPrint ? thermalWidth : "100%", maxWidth: isThermalPrint ? thermalWidth : "100%" }}>
+              {printPrefs.headerNote && <div className="text-center text-gray-500 mb-2 text-sm">{printPrefs.headerNote}</div>}
               <div className="text-center mb-8">
+                {printPrefs.showLogo && printPrefs.logoUrl && <img src={printPrefs.logoUrl} alt="Company logo" style={{ width: isThermalPrint ? 44 : 70, margin: "0 auto 8px" }} />}
                 <h1 className="text-3xl font-bold uppercase tracking-wide">Delivery Challan</h1>
+                <p className="text-gray-700 font-semibold">{companyName}</p>
                 <p className="text-gray-500">No: {savedChallan?.challanNo || challanNo}</p>
               </div>
 
@@ -589,7 +629,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                     <th className="p-3 text-left">#</th>
                     <th className="p-3 text-left">Item Description</th>
                     <th className="p-3 text-right">Qty</th>
-                    <th className="p-3 text-right">Rate</th>
+                    {!isThermalPrint && <th className="p-3 text-right">Rate</th>}
                     <th className="p-3 text-right">Amount</th>
                   </tr>
                 </thead>
@@ -602,7 +642,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                         <span className="text-sm text-gray-500">{row.description}</span>
                       </td>
                       <td className="p-3 text-right font-bold">{row.qty}</td>
-                      <td className="p-3 text-right">{row.rate || "-"}</td>
+                      {!isThermalPrint && <td className="p-3 text-right">{row.rate || "-"}</td>}
                       <td className="p-3 text-right">{(Number(row.qty) * Number(row.rate) || 0).toLocaleString()}</td>
                     </tr>
                   ))}
@@ -627,6 +667,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                     <p className="border-t border-gray-400 mt-8 pt-2">Received By</p>
                 </div>
               </div>
+              <div className="mt-8 text-center text-gray-500 text-sm">{printPrefs.footerNote}</div>
             </div>
           )}
         </>

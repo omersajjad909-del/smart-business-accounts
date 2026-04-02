@@ -42,6 +42,15 @@ type TaxConfig = {
   description?: string;
 };
 
+type PrintPreferences = {
+  paperSize: "A4" | "THERMAL_80MM" | "THERMAL_58MM";
+  showLogo: boolean;
+  logoUrl: string;
+  headerNote: string;
+  footerNote: string;
+  thermalFontSize: "sm" | "md" | "lg";
+};
+
 export default function QuotationPage() {
   const _router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
@@ -72,6 +81,17 @@ export default function QuotationPage() {
   const [savedQuotation, setSavedQuotation] = useState<any>(null);
   const [_sendingEmail, _setSendingEmail] = useState(false);
   const [hideRates, setHideRates] = useState(false);
+  const [companyName, setCompanyName] = useState("FINOVA SME");
+  const [printPrefs, setPrintPrefs] = useState<PrintPreferences>({
+    paperSize: "A4",
+    showLogo: true,
+    logoUrl: "",
+    headerNote: "",
+    footerNote: "Thank you for your business!",
+    thermalFontSize: "md",
+  });
+  const isThermalPrint = printPrefs.paperSize !== "A4";
+  const thermalWidth = printPrefs.paperSize === "THERMAL_58MM" ? "58mm" : "80mm";
   
   // Tax states
   const [applyTax, setApplyTax] = useState(false);
@@ -120,6 +140,26 @@ export default function QuotationPage() {
     .then(d => {
         if(d?.nextNo) setQuotationNo(d.nextNo);
     });
+
+    fetch("/api/me/company")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.name) setCompanyName(d.name); });
+
+    fetch("/api/company/admin-control")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.printPreferences) {
+          setPrintPrefs((prev) => ({
+            ...prev,
+            paperSize: d.printPreferences.paperSize || prev.paperSize,
+            showLogo: d.printPreferences.showLogo ?? prev.showLogo,
+            logoUrl: d.printPreferences.logoUrl || prev.logoUrl,
+            headerNote: d.printPreferences.headerNote || prev.headerNote,
+            footerNote: d.printPreferences.footerNote || prev.footerNote,
+            thermalFontSize: d.printPreferences.thermalFontSize || prev.thermalFontSize,
+          }));
+        }
+      });
 
     setLoading(false);
   }, []);
@@ -471,7 +511,7 @@ export default function QuotationPage() {
             ) : (
               <div className="flex flex-wrap gap-2">
                 <button onClick={() => window.print()} className="bg-green-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
-                  Print
+                  {printPrefs.paperSize === "A4" ? "Print A4" : "Print Thermal"}
                 </button>
                 <button 
                   onClick={() => setHideRates(!hideRates)} 
@@ -621,9 +661,12 @@ export default function QuotationPage() {
 
           {/* PREVIEW SECTION */}
           {preview && savedQuotation && (
-            <div className="bg-white p-8 border rounded shadow-lg max-w-4xl mx-auto print:shadow-none print:border-none">
+            <div className="bg-white border rounded shadow-lg mx-auto print:shadow-none print:border-none" style={{ padding: isThermalPrint ? 12 : 32, maxWidth: isThermalPrint ? thermalWidth : "56rem", width: isThermalPrint ? thermalWidth : "100%" }}>
+              {printPrefs.headerNote && <div className="text-center text-gray-500 mb-2 text-sm">{printPrefs.headerNote}</div>}
               <div className="text-center mb-8">
+                {printPrefs.showLogo && printPrefs.logoUrl && <img src={printPrefs.logoUrl} alt="Company logo" style={{ width: isThermalPrint ? 44 : 70, margin: "0 auto 8px" }} />}
                 <h1 className="text-3xl font-bold uppercase tracking-wider">Quotation</h1>
+                <p className="text-gray-700 font-semibold">{companyName}</p>
                 <p className="text-gray-500">Date: {new Date(savedQuotation.date).toLocaleDateString()}</p>
                 <p className="text-gray-500 font-bold">#{savedQuotation.quotationNo}</p>
               </div>
@@ -646,7 +689,7 @@ export default function QuotationPage() {
                   <tr className="bg-gray-100 border-b-2 border-gray-300">
                     <th className="text-left py-2 px-4">Item</th>
                     <th className="text-center py-2 px-4">Qty</th>
-                    {!hideRates && <th className="text-right py-2 px-4">Rate</th>}
+                    {!hideRates && !isThermalPrint && <th className="text-right py-2 px-4">Rate</th>}
                     {!hideRates && <th className="text-right py-2 px-4">Amount</th>}
                   </tr>
                 </thead>
@@ -658,7 +701,7 @@ export default function QuotationPage() {
                         {item.item.description && <p className="text-xs text-gray-500">{item.item.description}</p>}
                       </td>
                       <td className="text-center py-2 px-4">{item.qty}</td>
-                      {!hideRates && <td className="text-right py-2 px-4">{item.rate.toLocaleString()}</td>}
+                      {!hideRates && !isThermalPrint && <td className="text-right py-2 px-4">{item.rate.toLocaleString()}</td>}
                       {!hideRates && <td className="text-right py-2 px-4">{(item.qty * item.rate).toLocaleString()}</td>}
                     </tr>
                   ))}
@@ -682,7 +725,7 @@ export default function QuotationPage() {
               )}
               
               <div className="mt-12 pt-8 border-t text-center text-gray-500 text-sm">
-                <p>Thank you for your business!</p>
+                <p>{printPrefs.footerNote}</p>
               </div>
             </div>
           )}

@@ -1,15 +1,14 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
-
-type Party = {
+interface Party {
   id: string;
   name: string;
-};
+  partyType: string;
+}
 
-type AgeingRow = {
+interface AgeingRow {
   numType: string;
   date: string;
   narration: string;
@@ -17,7 +16,21 @@ type AgeingRow = {
   billBalance: number;
   days: number;
   totalBalance: number;
-};
+}
+
+function getHeaders(): Record<string, string> {
+  const user = getCurrentUser();
+  if (!user) return {};
+  return {
+    "x-user-id": user.id,
+    "x-user-role": user.role ?? "",
+    "x-company-id": user.companyId ?? "",
+  };
+}
+
+function fmt(n: number) {
+  return Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
 export default function AgeingReportPage() {
   const today = new Date().toISOString().slice(0, 10);
@@ -28,114 +41,161 @@ export default function AgeingReportPage() {
   const [parties, setParties] = useState<Party[]>([]);
   const [data, setData] = useState<AgeingRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [partiesLoading, setPartiesLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // 🔄 Load customers / suppliers
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user || !user.role) {
-      console.log("Waiting for user session...");
-      return;
-    }
-
+  // Load parties whenever type changes
+  const loadParties = useCallback(async () => {
+    setPartiesLoading(true);
     setPartyId("");
     setData([]);
-
-    fetch("/api/accounts", {
-      headers: {
-        "x-user-role": user.role, // یہ ہیڈر لازمی ہے
-      },
-    })
-      .then(r => r.json())
-      .then(d => {
-        const list = Array.isArray(d) ? d : (d.accounts || []);
-        console.log("📊 All Accounts:", list);
-
-        // کیس سینسیٹیو فلٹرنگ (Case Sensitive Fix)
-        const filtered = list.filter((a: any) => {
-          const pType = a.partyType?.toUpperCase();
-          return type === "customer"
-            ? pType === "CUSTOMER"
-            : pType === "SUPPLIER";
-        });
-
-        console.log(`🔍 Filtered ${type}s:`, filtered);
-        setParties(filtered);
+    setError(null);
+    try {
+      const res = await fetch("/api/accounts", {
+        headers: getHeaders(),
+        credentials: "include",
       });
+      const d = await res.json();
+      const list: Party[] = Array.isArray(d) ? d : (d.accounts ?? []);
+      const filtered = list.filter(a => {
+        const pt = (a.partyType ?? "").toUpperCase();
+        return type === "customer" ? pt === "CUSTOMER" : pt === "SUPPLIER";
+      });
+      setParties(filtered);
+    } catch {
+      setError("Failed to load accounts");
+    } finally {
+      setPartiesLoading(false);
+    }
   }, [type]);
 
-  async function loadData() {
-    if (!partyId) return;
+  useEffect(() => {
+    loadParties();
+  }, [loadParties]);
 
+  const loadData = async () => {
+    if (!partyId) return;
     setLoading(true);
     setData([]);
+    setError(null);
 
-    const url =
-      type === "customer"
-        ? `/api/reports/ageing/customer?date=${asOnDate}&customerId=${partyId}`
-        : `/api/reports/ageing/supplier?date=${asOnDate}&supplierId=${partyId}`;
+    const url = type === "customer"
+      ? `/api/reports/ageing/customer?date=${asOnDate}&customerId=${partyId}`
+      : `/api/reports/ageing/supplier?date=${asOnDate}&supplierId=${partyId}`;
 
     try {
       const res = await fetch(url, {
-        headers: {
-          "x-user-role": "ADMIN", // 🔥 THIS WAS MISSING
-        },
+        headers: getHeaders(),
+        credentials: "include",
       });
-
       const json = await res.json();
-      console.log(`📋 Ageing Data for ${type}:`, json);
+      if (!res.ok) {
+        setError(json.error || "Failed to load ageing data");
+        return;
+      }
       setData(Array.isArray(json) ? json : []);
+    } catch {
+      setError("Network error — could not load ageing data");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
+  const totalBillAmount = data.reduce((s, r) => s + r.billAmount, 0);
+  const totalBillBalance = data.reduce((s, r) => s + r.billBalance, 0);
+  const totalBalance = data.length > 0 ? data[data.length - 1].totalBalance : 0;
 
+  const panelBg = "var(--panel-bg, #0f1729)";
+  const border = "var(--border, #1e2a45)";
+  const textPrimary = "var(--text-primary, #f1f5f9)";
+  const textMuted = "var(--text-muted, #94a3b8)";
+
+  const inputStyle: React.CSSProperties = {
+    background: panelBg,
+    border: `1px solid ${border}`,
+    borderRadius: 8,
+    padding: "8px 12px",
+    color: textPrimary,
+    fontSize: 13,
+    outline: "none",
+    fontFamily: "'Outfit','Inter',sans-serif",
+  };
+
+  const thStyle: React.CSSProperties = {
+    padding: "10px 14px",
+    textAlign: "left",
+    fontSize: 11,
+    color: textMuted,
+    textTransform: "uppercase",
+    letterSpacing: 0.7,
+    borderBottom: `1px solid ${border}`,
+    fontWeight: 600,
+    whiteSpace: "nowrap",
+  };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div style={{ minHeight: "100vh", background: "var(--app-bg, #060918)", padding: "28px 24px", fontFamily: "'Outfit','Inter',sans-serif", color: textPrimary }}>
 
-      <h1 className="text-2xl font-bold">Bill Wise Ageing Report</h1>
-
-      {/* 🔹 FILTER BAR */}
-      <div className="flex gap-4 flex-wrap items-end">
-
-        {/* DATE */}
+      {/* ── Header ── */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
         <div>
-          <label className="block text-sm">As On Date</label>
-          <input
-            type="date"
-            className="border px-3 py-2"
-            value={asOnDate}
-            onChange={e => setAsOnDate(e.target.value)}
-          />
+          <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 4px", letterSpacing: -0.5 }}>Bill-Wise Ageing Report</h1>
+          <p style={{ margin: 0, fontSize: 13, color: textMuted }}>Outstanding receivables &amp; payables by age</p>
+        </div>
+        <button
+          onClick={() => window.print()}
+          className="print:hidden"
+          style={{ background: "transparent", color: textMuted, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+        >
+          Print
+        </button>
+      </div>
+
+      {/* ── Filter bar ── */}
+      <div className="print:hidden" style={{ background: panelBg, border: `1px solid ${border}`, borderRadius: 12, padding: "16px 20px", marginBottom: 20, display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-end" }}>
+
+        {/* Type toggle */}
+        <div>
+          <div style={{ fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6, fontWeight: 600 }}>Type</div>
+          <div style={{ display: "flex", background: "var(--app-bg, #060918)", border: `1px solid ${border}`, borderRadius: 8, overflow: "hidden" }}>
+            {(["customer", "supplier"] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setType(t)}
+                style={{
+                  padding: "8px 16px", border: "none", cursor: "pointer",
+                  background: type === t ? "#6366f1" : "transparent",
+                  color: type === t ? "#fff" : textMuted,
+                  fontSize: 13, fontWeight: 600,
+                  fontFamily: "'Outfit','Inter',sans-serif",
+                }}
+              >
+                {t === "customer" ? "Customer" : "Supplier"}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* TYPE */}
+        {/* As on date */}
         <div>
-          <label className="block text-sm">Type</label>
-          <select
-            className="border px-3 py-2"
-            value={type}
-            onChange={e => setType(e.target.value as any)}
-          >
-            <option value="customer">Customer</option>
-            <option value="supplier">Supplier</option>
-          </select>
+          <div style={{ fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6, fontWeight: 600 }}>As On Date</div>
+          <input type="date" value={asOnDate} onChange={e => setAsOnDate(e.target.value)} style={inputStyle} />
         </div>
 
-        {/* PARTY */}
-        <div>
-          <label className="block text-sm">
-            Select {type === "customer" ? "Customer" : "Supplier"}
-          </label>
+        {/* Party select */}
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <div style={{ fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 6, fontWeight: 600 }}>
+            {type === "customer" ? "Customer" : "Supplier"}
+          </div>
           <select
-            className="border px-3 py-2 min-w-[240px]"
             value={partyId}
             onChange={e => setPartyId(e.target.value)}
+            style={{ ...inputStyle, width: "100%" }}
           >
-            <option value="">Select</option>
-            {/* سلیکٹ مینو کے اندر میپنگ کو اس طرح محفوظ بنائیں */}
-            {Array.isArray(parties) && parties.map(p => (
+            <option value="">
+              {partiesLoading ? "Loading…" : `Select ${type === "customer" ? "Customer" : "Supplier"}`}
+            </option>
+            {parties.map(p => (
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
           </select>
@@ -143,79 +203,124 @@ export default function AgeingReportPage() {
 
         <button
           onClick={loadData}
-          className="bg-black text-white px-6 py-2"
+          disabled={!partyId || loading}
+          style={{
+            background: partyId ? "#6366f1" : "rgba(99,102,241,0.3)",
+            color: "#fff", border: "none", borderRadius: 8, padding: "9px 24px",
+            fontSize: 13, fontWeight: 700, cursor: partyId ? "pointer" : "not-allowed",
+            fontFamily: "'Outfit','Inter',sans-serif",
+          }}
         >
-          Show
+          {loading ? "Loading…" : "Show Report"}
         </button>
       </div>
 
-      {/* 🔹 TABLE */}
-      <div className="border bg-white overflow-x-auto">
-        <table className="w-full text-sm border-collapse">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border p-2">Num & Typ</th>
-              <th className="border p-2">Date</th>
-              <th className="border p-2">Narration</th>
-              <th className="border p-2 text-right">Bill Amount</th>
-              <th className="border p-2 text-right">Bill Balance</th>
-              <th className="border p-2 text-right">Days</th>
-              <th className="border p-2 text-right">Total Balance</th>
-            </tr>
-          </thead>
+      {/* ── Error ── */}
+      {error && (
+        <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "12px 16px", marginBottom: 20, color: "#f87171", fontSize: 13 }}>
+          {error}
+        </div>
+      )}
 
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={7} className="p-4 text-center">Loading…</td>
+      {/* ── Table ── */}
+      <div style={{ background: panelBg, border: `1px solid ${border}`, borderRadius: 12, overflow: "hidden" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: "rgba(255,255,255,0.02)" }}>
+                <th style={thStyle}>Num &amp; Type</th>
+                <th style={thStyle}>Date</th>
+                <th style={thStyle}>Narration</th>
+                <th style={{ ...thStyle, textAlign: "right" }}>Bill Amount</th>
+                <th style={{ ...thStyle, textAlign: "right" }}>Bill Balance</th>
+                <th style={{ ...thStyle, textAlign: "right" }}>Days</th>
+                <th style={{ ...thStyle, textAlign: "right" }}>Running Balance</th>
               </tr>
+            </thead>
+            <tbody>
+              {loading && (
+                <tr>
+                  <td colSpan={7} style={{ padding: "32px 14px", textAlign: "center", color: textMuted, fontSize: 13 }}>
+                    Loading data…
+                  </td>
+                </tr>
+              )}
+
+              {!loading && data.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={{ padding: "32px 14px", textAlign: "center", color: textMuted, fontSize: 13 }}>
+                    {partyId ? "No outstanding bills found for this party" : `Select a ${type} and click Show Report`}
+                  </td>
+                </tr>
+              )}
+
+              {data.map((r, i) => {
+                // Colour code by age bracket (via days)
+                const dayColor = r.days > 90 ? "#f87171" : r.days > 60 ? "#fb923c" : r.days > 30 ? "#fbbf24" : textPrimary;
+                return (
+                  <tr key={i} style={{ borderBottom: `1px solid ${border}` }}>
+                    <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "monospace", color: "#a5b4fc" }}>{r.numType}</td>
+                    <td style={{ padding: "10px 14px", fontSize: 12, color: textMuted, whiteSpace: "nowrap" }}>{r.date}</td>
+                    <td style={{ padding: "10px 14px", fontSize: 13, color: textPrimary }}>{r.narration}</td>
+                    <td style={{ padding: "10px 14px", textAlign: "right", fontSize: 13, color: textPrimary }}>{fmt(r.billAmount)}</td>
+                    <td style={{ padding: "10px 14px", textAlign: "right", fontSize: 13, color: r.billBalance < 0 ? "#f87171" : "#4ade80" }}>
+                      {r.billBalance < 0 ? "−" : ""}{fmt(r.billBalance)}
+                    </td>
+                    <td style={{ padding: "10px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: dayColor }}>{r.days}</td>
+                    <td style={{ padding: "10px 14px", textAlign: "right", fontSize: 13, fontWeight: 700, color: textPrimary }}>
+                      {r.totalBalance < 0 ? "−" : ""}{fmt(r.totalBalance)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+
+            {/* Totals footer */}
+            {data.length > 0 && (
+              <tfoot>
+                <tr style={{ background: "rgba(99,102,241,0.06)", borderTop: `2px solid rgba(99,102,241,0.2)` }}>
+                  <td colSpan={3} style={{ padding: "12px 14px", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.5, color: textMuted }}>
+                    Totals
+                  </td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 800, fontSize: 14, color: textPrimary }}>
+                    {fmt(totalBillAmount)}
+                  </td>
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 800, fontSize: 14, color: totalBillBalance < 0 ? "#f87171" : "#4ade80" }}>
+                    {totalBillBalance < 0 ? "−" : ""}{fmt(totalBillBalance)}
+                  </td>
+                  <td />
+                  <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 900, fontSize: 16, color: totalBalance < 0 ? "#f87171" : "#4ade80" }}>
+                    {totalBalance < 0 ? "−" : ""}{fmt(totalBalance)}
+                  </td>
+                </tr>
+              </tfoot>
             )}
-
-            {!loading && data.length === 0 && (
-              <tr>
-                <td colSpan={7} className="p-4 text-center text-gray-500">
-                  No data found
-                </td>
-              </tr>
-            )}
-
-            {data.map((r, i) => (
-              <tr key={i}>
-                <td className="border p-2">{r.numType}</td>
-                <td className="border p-2">{r.date}</td>
-                <td className="border p-2">{r.narration}</td>
-                <td className="border p-2 text-right">
-                  {r.billAmount.toLocaleString()}
-                </td>
-                <td className="border p-2 text-right text-red-600">
-                  {r.billBalance >= 0 ? "" : "-"}{Math.abs(r.billBalance).toLocaleString()}
-                </td>
-                <td className="border p-2 text-right font-semibold">
-                  {r.days}
-                </td>
-                <td className="border p-2 text-right font-bold">
-                  {r.totalBalance >= 0 ? "" : "-"}{Math.abs(r.totalBalance).toLocaleString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Total Balance Summary */}
-        {data.length > 0 && (
-          <div className="mt-4 flex justify-end">
-            <div className="border-2 border-black p-4 bg-gray-100 w-80">
-              <div className="flex justify-between items-center gap-4">
-                <span className="font-bold uppercase text-sm">Total Balance:</span>
-                <span className="text-2xl font-black">
-                  {data[data.length - 1].totalBalance >= 0 ? "" : "-"}{Math.abs(data[data.length - 1].totalBalance).toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
+          </table>
+        </div>
       </div>
 
+      {/* Age legend */}
+      <div className="print:hidden" style={{ marginTop: 16, display: "flex", gap: 20, fontSize: 12, color: textMuted }}>
+        <span style={{ color: textPrimary }}>Age colour:</span>
+        {[
+          { label: "0–30 days", color: textPrimary },
+          { label: "31–60 days", color: "#fbbf24" },
+          { label: "61–90 days", color: "#fb923c" },
+          { label: "90+ days", color: "#f87171" },
+        ].map(({ label, color }) => (
+          <span key={label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <span style={{ width: 10, height: 10, borderRadius: "50%", background: color, display: "inline-block" }} />
+            {label}
+          </span>
+        ))}
+      </div>
+
+      <style>{`
+        @media print {
+          body { background: white !important; color: black !important; }
+          .print\\:hidden { display: none !important; }
+        }
+      `}</style>
     </div>
   );
 }

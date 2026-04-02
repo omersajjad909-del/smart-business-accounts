@@ -1,0 +1,256 @@
+import { PERMISSIONS } from "@/lib/permissions";
+
+type PermissionValue = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
+
+export type PermissionCategory = {
+  key: string;
+  label: string;
+  permissions: PermissionValue[];
+};
+
+export const PERMISSION_CATEGORIES: PermissionCategory[] = [
+  {
+    key: "core",
+    label: "Core",
+    permissions: [
+      PERMISSIONS.VIEW_DASHBOARD,
+      PERMISSIONS.VIEW_SETTINGS,
+      PERMISSIONS.VIEW_LOGS,
+      PERMISSIONS.VIEW_AUDIT_LOG,
+    ],
+  },
+  {
+    key: "accounts",
+    label: "Accounts",
+    permissions: [
+      PERMISSIONS.VIEW_ACCOUNTS,
+      PERMISSIONS.CREATE_CPV,
+      PERMISSIONS.CREATE_CRV,
+      PERMISSIONS.VIEW_ACCOUNTING,
+    ],
+  },
+  {
+    key: "inventory_sales",
+    label: "Inventory & Sales",
+    permissions: [
+      PERMISSIONS.VIEW_CATALOG,
+      PERMISSIONS.CREATE_ACCOUNTS,
+      PERMISSIONS.CREATE_ITEMS,
+      PERMISSIONS.CREATE_STOCK_RATE,
+      PERMISSIONS.VIEW_INVENTORY,
+      PERMISSIONS.CREATE_PURCHASE_ORDER,
+      PERMISSIONS.CREATE_PURCHASE_INVOICE,
+      PERMISSIONS.CREATE_SALES_INVOICE,
+      PERMISSIONS.CREATE_SALE_RETURN,
+      PERMISSIONS.CREATE_OUTWARD,
+      PERMISSIONS.CREATE_QUOTATION,
+      PERMISSIONS.CREATE_DELIVERY_CHALLAN,
+    ],
+  },
+  {
+    key: "reports",
+    label: "Reports",
+    permissions: [
+      PERMISSIONS.VIEW_REPORTS,
+      PERMISSIONS.VIEW_FINANCIAL_REPORTS,
+      PERMISSIONS.VIEW_AGEING_REPORT,
+      PERMISSIONS.VIEW_LEDGER_REPORT,
+      PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT,
+      PERMISSIONS.VIEW_PROFIT_LOSS_REPORT,
+      PERMISSIONS.VIEW_BALANCE_SHEET_REPORT,
+      PERMISSIONS.VIEW_INVENTORY_REPORTS,
+      PERMISSIONS.VIEW_INWARD,
+      PERMISSIONS.VIEW_OUTWARD,
+      PERMISSIONS.VIEW_SALES_REPORT,
+      PERMISSIONS.VIEW_STOCK_LEDGER,
+      PERMISSIONS.VIEW_STOCK_SUMMARY,
+      PERMISSIONS.VIEW_LOW_STOCK,
+      PERMISSIONS.VIEW_LOCATION,
+    ],
+  },
+  {
+    key: "banking",
+    label: "Banking & Tax",
+    permissions: [
+      PERMISSIONS.BANK_RECONCILIATION,
+      PERMISSIONS.PAYMENT_RECEIPTS,
+      PERMISSIONS.EXPENSE_VOUCHERS,
+      PERMISSIONS.TAX_CONFIGURATION,
+    ],
+  },
+  {
+    key: "org",
+    label: "Organization",
+    permissions: [
+      PERMISSIONS.MANAGE_USERS,
+      PERMISSIONS.MANAGE_ROLES,
+      PERMISSIONS.VIEW_HR_PAYROLL,
+      PERMISSIONS.VIEW_CRM,
+      PERMISSIONS.BUDGET_PLANNING,
+      PERMISSIONS.RECURRING_TRANSACTIONS,
+      PERMISSIONS.FINANCIAL_YEAR,
+      PERMISSIONS.BACKUP_RESTORE,
+      PERMISSIONS.EMAIL_SETTINGS,
+    ],
+  },
+];
+
+const ALL_PERMISSION_VALUES: PermissionValue[] = Array.from(
+  new Set(PERMISSION_CATEGORIES.flatMap((c) => c.permissions))
+);
+
+export const PLAN_DEFAULT_PERMISSIONS: Record<string, PermissionValue[]> = {
+  STARTER: [
+    PERMISSIONS.VIEW_DASHBOARD,
+    PERMISSIONS.VIEW_SETTINGS,
+    PERMISSIONS.VIEW_ACCOUNTS,
+    PERMISSIONS.CREATE_CPV,
+    PERMISSIONS.CREATE_CRV,
+    PERMISSIONS.VIEW_ACCOUNTING,
+    PERMISSIONS.VIEW_CATALOG,
+    PERMISSIONS.CREATE_ACCOUNTS,
+    PERMISSIONS.CREATE_ITEMS,
+    PERMISSIONS.CREATE_STOCK_RATE,
+    PERMISSIONS.VIEW_INVENTORY,
+    PERMISSIONS.CREATE_PURCHASE_ORDER,
+    PERMISSIONS.CREATE_PURCHASE_INVOICE,
+    PERMISSIONS.CREATE_SALES_INVOICE,
+    PERMISSIONS.CREATE_SALE_RETURN,
+    PERMISSIONS.CREATE_OUTWARD,
+    PERMISSIONS.CREATE_QUOTATION,
+    PERMISSIONS.CREATE_DELIVERY_CHALLAN,
+    PERMISSIONS.VIEW_REPORTS,
+    PERMISSIONS.VIEW_FINANCIAL_REPORTS,
+    PERMISSIONS.VIEW_AGEING_REPORT,
+    PERMISSIONS.VIEW_LEDGER_REPORT,
+    PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT,
+    PERMISSIONS.BANK_RECONCILIATION,
+    PERMISSIONS.PAYMENT_RECEIPTS,
+    PERMISSIONS.EXPENSE_VOUCHERS,
+    PERMISSIONS.TAX_CONFIGURATION,
+  ],
+  PRO: [
+    ...ALL_PERMISSION_VALUES.filter((p) => p !== PERMISSIONS.VIEW_HR_PAYROLL),
+  ],
+  ENTERPRISE: [...ALL_PERMISSION_VALUES],
+};
+
+type ModulePermissionMap = Record<string, PermissionValue[]>;
+
+export const CUSTOM_MODULE_PERMISSIONS: ModulePermissionMap = {
+  accounting: [
+    PERMISSIONS.VIEW_ACCOUNTS,
+    PERMISSIONS.CREATE_CPV,
+    PERMISSIONS.CREATE_CRV,
+    PERMISSIONS.VIEW_ACCOUNTING,
+    PERMISSIONS.VIEW_REPORTS,
+    PERMISSIONS.VIEW_FINANCIAL_REPORTS,
+    PERMISSIONS.VIEW_LEDGER_REPORT,
+    PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT,
+  ],
+  crm: [
+    PERMISSIONS.VIEW_CRM,
+    PERMISSIONS.CREATE_QUOTATION,
+    PERMISSIONS.CREATE_DELIVERY_CHALLAN,
+  ],
+  hr_payroll: [PERMISSIONS.VIEW_HR_PAYROLL],
+  bank_reconciliation: [
+    PERMISSIONS.BANK_RECONCILIATION,
+    PERMISSIONS.PAYMENT_RECEIPTS,
+    PERMISSIONS.EXPENSE_VOUCHERS,
+  ],
+  inventory: [
+    PERMISSIONS.VIEW_CATALOG,
+    PERMISSIONS.CREATE_ACCOUNTS,
+    PERMISSIONS.CREATE_ITEMS,
+    PERMISSIONS.CREATE_STOCK_RATE,
+    PERMISSIONS.VIEW_INVENTORY,
+    PERMISSIONS.CREATE_PURCHASE_ORDER,
+    PERMISSIONS.CREATE_PURCHASE_INVOICE,
+    PERMISSIONS.CREATE_SALES_INVOICE,
+    PERMISSIONS.CREATE_SALE_RETURN,
+    PERMISSIONS.CREATE_OUTWARD,
+    PERMISSIONS.VIEW_INVENTORY_REPORTS,
+    PERMISSIONS.VIEW_INWARD,
+    PERMISSIONS.VIEW_OUTWARD,
+    PERMISSIONS.VIEW_SALES_REPORT,
+    PERMISSIONS.VIEW_STOCK_LEDGER,
+    PERMISSIONS.VIEW_STOCK_SUMMARY,
+    PERMISSIONS.VIEW_LOW_STOCK,
+    PERMISSIONS.VIEW_LOCATION,
+  ],
+  reports: [
+    PERMISSIONS.VIEW_REPORTS,
+    PERMISSIONS.VIEW_FINANCIAL_REPORTS,
+    PERMISSIONS.VIEW_AGEING_REPORT,
+    PERMISSIONS.VIEW_LEDGER_REPORT,
+    PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT,
+    PERMISSIONS.VIEW_PROFIT_LOSS_REPORT,
+    PERMISSIONS.VIEW_BALANCE_SHEET_REPORT,
+    PERMISSIONS.VIEW_INVENTORY_REPORTS,
+    PERMISSIONS.VIEW_INWARD,
+    PERMISSIONS.VIEW_OUTWARD,
+    PERMISSIONS.VIEW_SALES_REPORT,
+    PERMISSIONS.VIEW_STOCK_LEDGER,
+    PERMISSIONS.VIEW_STOCK_SUMMARY,
+    PERMISSIONS.VIEW_LOW_STOCK,
+    PERMISSIONS.VIEW_LOCATION,
+  ],
+  multi_branch: [PERMISSIONS.VIEW_SETTINGS],
+  api_access: [PERMISSIONS.VIEW_SETTINGS],
+  tax_filing: [PERMISSIONS.TAX_CONFIGURATION],
+  whatsapp: [PERMISSIONS.VIEW_SETTINGS],
+};
+
+function normalizeModuleId(id: string): string {
+  return String(id || "")
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, "_");
+}
+
+export function getCustomPlanPermissions(activeModules: string | null | undefined): string[] {
+  const base = new Set<string>([PERMISSIONS.VIEW_DASHBOARD]);
+  const modules = String(activeModules || "")
+    .split(",")
+    .map((m) => normalizeModuleId(m))
+    .filter(Boolean);
+
+  for (const mod of modules) {
+    const perms = CUSTOM_MODULE_PERMISSIONS[mod] || [];
+    for (const p of perms) base.add(p);
+  }
+
+  return Array.from(base);
+}
+
+export function normalizePlanCode(plan: string | null | undefined): string {
+  const p = String(plan || "").toUpperCase();
+  if (p === "PROFESSIONAL") return "PRO";
+  return p || "STARTER";
+}
+
+export function resolvePlanPermissions(params: {
+  plan: string | null | undefined;
+  configuredPlanPermissions?: Record<string, string[]> | null;
+  activeModules?: string | null;
+}): string[] {
+  const planCode = normalizePlanCode(params.plan);
+
+  if (planCode === "CUSTOM") {
+    return getCustomPlanPermissions(params.activeModules);
+  }
+
+  const cfg = params.configuredPlanPermissions || {};
+  const configured =
+    cfg[planCode] ||
+    cfg[planCode.toLowerCase()] ||
+    cfg[planCode.toUpperCase()];
+
+  if (Array.isArray(configured) && configured.length > 0) {
+    return configured;
+  }
+
+  return PLAN_DEFAULT_PERMISSIONS[planCode] || PLAN_DEFAULT_PERMISSIONS.STARTER;
+}
+

@@ -21,19 +21,23 @@ interface Employee {
   department: string;
 }
 
+const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  PRESENT:  { bg: "rgba(52,211,153,.12)",  text: "#34d399", border: "rgba(52,211,153,.25)"  },
+  ABSENT:   { bg: "rgba(248,113,113,.12)", text: "#f87171", border: "rgba(248,113,113,.25)" },
+  HOLIDAY:  { bg: "rgba(167,139,250,.12)", text: "#a78bfa", border: "rgba(167,139,250,.25)" },
+  LEAVE:    { bg: "rgba(251,191,36,.12)",  text: "#fbbf24", border: "rgba(251,191,36,.25)"  },
+  HALF_DAY: { bg: "rgba(251,191,36,.12)",  text: "#fbbf24", border: "rgba(251,191,36,.25)"  },
+  LATE:     { bg: "rgba(99,102,241,.12)",  text: "#818cf8", border: "rgba(99,102,241,.25)"  },
+};
+
 export default function AttendancePage() {
-  const user = getCurrentUser();
-  
-  // State
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(false);
-  
-  // Selection
+
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
-  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
-  
-  // Form State (for Modal/Inline)
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
+
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     status: "PRESENT",
@@ -44,21 +48,23 @@ export default function AttendancePage() {
 
   /* ================= FETCH DATA ================= */
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
+  useEffect(() => { fetchEmployees(); }, []);
 
   useEffect(() => {
-    if (selectedEmployeeId) {
-      fetchAttendance(selectedEmployeeId, month);
-    } else {
-      setRecords([]);
-    }
+    if (selectedEmployeeId) fetchAttendance(selectedEmployeeId, month);
+    else setRecords([]);
   }, [selectedEmployeeId, month]);
 
   async function fetchEmployees() {
+    const user = getCurrentUser();
     try {
-      const res = await fetch("/api/employees");
+      const res = await fetch("/api/employees", {
+        headers: {
+          ...(user?.role ? { "x-user-role": user.role } : {}),
+          ...(user?.id   ? { "x-user-id":   user.id }   : {}),
+          ...(user?.companyId ? { "x-company-id": user.companyId } : {}),
+        },
+      });
       const data = await res.json();
       setEmployees(Array.isArray(data) ? data : []);
     } catch {
@@ -67,14 +73,15 @@ export default function AttendancePage() {
   }
 
   async function fetchAttendance(empId: string, monthStr: string) {
+    const user = getCurrentUser();
     if (!user) return;
     setLoading(true);
     try {
-      // Fetch specific employee's attendance for the month
       const res = await fetch(`/api/attendance?month=${monthStr}&employeeId=${empId}`, {
         headers: {
           "x-user-role": user.role || "",
-          "x-user-id": user.id || "",
+          "x-user-id":   user.id   || "",
+          ...(user.companyId ? { "x-company-id": user.companyId } : {}),
         },
       });
       const data = await res.json();
@@ -86,96 +93,67 @@ export default function AttendancePage() {
 
   /* ================= HELPERS ================= */
 
-  // Helper to get local date string YYYY-MM-DD
   function toLocalISOString(date: Date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
   }
 
-  function formatPakTime(dateString?: string | Date | null) {
+  function formatTime(dateString?: string | Date | null) {
     if (!dateString) return "--";
     const d = new Date(dateString);
     if (isNaN(d.getTime())) return "--";
-    return d.toLocaleTimeString("en-PK", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: "Asia/Karachi",
-    });
+    return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", hour12: true });
   }
 
-  // Generate Calendar Days
-  const getCalendarDays = () => {
+  function getCalendarDays() {
     const [y, m] = month.split("-").map(Number);
     const date = new Date(y, m - 1, 1);
-    const days = [];
-    
-    // Add empty slots for days before the 1st
-    const firstDayIndex = date.getDay(); // 0 = Sun
-    for (let i = 0; i < firstDayIndex; i++) {
-      days.push(null);
-    }
-    
-    // Add actual days
+    const days: (Date | null)[] = [];
+    for (let i = 0; i < date.getDay(); i++) days.push(null);
     while (date.getMonth() === m - 1) {
       days.push(new Date(date));
       date.setDate(date.getDate() + 1);
     }
-    
     return days;
-  };
+  }
 
-  const getRecordForDate = (date: Date) => {
+  function getRecordForDate(date: Date) {
     const dateStr = toLocalISOString(date);
-    // Backend returns date as ISO string (UTC), but usually we compare by YYYY-MM-DD
-    // If backend stores time as 00:00:00 UTC, then toISOString().slice(0,10) matches.
-    // However, we want to match based on the local day we are viewing.
-    // The record.date from backend is typically "2024-01-02T00:00:00.000Z".
-    // If we sent "2024-01-02" (local), backend saved "2024-01-02T00:00:00.000Z".
-    // So checking startWith("2024-01-02") works.
     return records.find(r => r.date.startsWith(dateStr));
-  };
+  }
 
   /* ================= ACTIONS ================= */
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    const user = getCurrentUser();
     if (!user || !selectedEmployeeId || !selectedDate) return;
 
     setLoading(true);
     try {
-      const payload = {
-        employeeId: selectedEmployeeId,
-        date: selectedDate,
-        ...formData
-      };
-
-      // Check if updating existing
       const existing = getRecordForDate(new Date(selectedDate));
-      const url = existing 
-        ? `/api/attendance?id=${existing.id}` 
-        : "/api/attendance";
-      
+      const url    = existing ? `/api/attendance?id=${existing.id}` : "/api/attendance";
       const method = existing ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
-          "x-user-role": user.role || "",
-          "x-user-id": user.id || "",
+          "Content-Type":  "application/json",
+          "x-user-role":   user.role || "",
+          "x-user-id":     user.id   || "",
+          ...(user.companyId ? { "x-company-id": user.companyId } : {}),
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ employeeId: selectedEmployeeId, date: selectedDate, ...formData }),
       });
 
       if (!res.ok) {
         const err = await res.json();
-        alert(err.error || "Failed");
+        alert(err.error || "Failed to save");
       } else {
         fetchAttendance(selectedEmployeeId, month);
-        setSelectedDate(null); // Close form
+        setSelectedDate(null);
       }
     } catch (err) {
       console.error(err);
@@ -187,13 +165,15 @@ export default function AttendancePage() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this record?")) return;
+    const user = getCurrentUser();
     if (!user) return;
 
     await fetch(`/api/attendance?id=${id}`, {
       method: "DELETE",
       headers: {
         "x-user-role": user.role || "",
-        "x-user-id": user.id || "",
+        "x-user-id":   user.id   || "",
+        ...(user.companyId ? { "x-company-id": user.companyId } : {}),
       },
     });
     if (selectedEmployeeId) fetchAttendance(selectedEmployeeId, month);
@@ -201,242 +181,389 @@ export default function AttendancePage() {
 
   /* ================= RENDER ================= */
 
-  const calendarDays = getCalendarDays();
+  const calendarDays    = getCalendarDays();
   const selectedEmployee = employees.find(e => e.id === selectedEmployeeId);
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDays        = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const isSunday        = (d: Date) => d.getDay() === 0;
+  const validDates      = calendarDays.filter((d): d is Date => d !== null);
 
-  // Calculate Sundays that are treated as holidays (either explicitly marked or default)
-  const isSunday = (d: Date) => d.getDay() === 0;
-  
-  // Get all valid dates in the current month view
-  const validDatesInMonth = calendarDays.filter((d): d is Date => d !== null);
-  
-  // Count explicit holidays
-  const explicitHolidays = records.filter(r => r.status === "HOLIDAY").length;
-  
-  // Count Sundays that have NO record (default holidays)
-  const defaultHolidaySundays = validDatesInMonth.filter(d => {
-    if (!isSunday(d)) return false;
-    const hasRecord = getRecordForDate(d);
-    return !hasRecord;
-  }).length;
+  const explicitHolidays    = records.filter(r => r.status === "HOLIDAY").length;
+  const defaultHolidaySundays = validDates.filter(d => isSunday(d) && !getRecordForDate(d)).length;
 
   const stats = {
     present: records.filter(r => r.status === "PRESENT" || r.status === "LATE").length,
-    absent: records.filter(r => r.status === "ABSENT").length,
-    leave: records.filter(r => r.status === "LEAVE" || r.status === "HALF_DAY").length,
+    absent:  records.filter(r => r.status === "ABSENT").length,
+    leave:   records.filter(r => r.status === "LEAVE"  || r.status === "HALF_DAY").length,
     holiday: explicitHolidays + defaultHolidaySundays,
   };
 
+  const STAT_CARDS = [
+    { label: "Present",  value: stats.present, color: "#34d399", bg: "rgba(52,211,153,.08)",  border: "rgba(52,211,153,.18)"  },
+    { label: "Absent",   value: stats.absent,  color: "#f87171", bg: "rgba(248,113,113,.08)", border: "rgba(248,113,113,.18)" },
+    { label: "Leaves",   value: stats.leave,   color: "#fbbf24", bg: "rgba(251,191,36,.08)",  border: "rgba(251,191,36,.18)"  },
+    { label: "Holidays", value: stats.holiday, color: "#a78bfa", bg: "rgba(167,139,250,.08)", border: "rgba(167,139,250,.18)" },
+    {
+      label: "Total Days",
+      value: stats.present + stats.absent + stats.leave + stats.holiday,
+      color: "#818cf8",
+      bg:    "rgba(99,102,241,.08)",
+      border: "rgba(99,102,241,.18)",
+    },
+  ];
+
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">
-      
-      {/* SIDEBAR: Employee List */}
-      <div className="w-full md:w-80 h-60 md:h-full bg-white border-r flex flex-col shadow-lg z-10 shrink-0">
-        <div className="p-4 border-b bg-gray-100">
-          <h2 className="font-black text-xl mb-1">Employees</h2>
-          <p className="text-xs text-gray-500">Select to view calendar</p>
+    <div
+      className="flex flex-col md:flex-row overflow-hidden"
+      style={{ height: "100%", minHeight: 0, background: "#060918" }}
+    >
+      {/* ── SIDEBAR: Employee List ─────────────────────── */}
+      <div
+        className="w-full md:w-72 shrink-0 flex flex-col z-10"
+        style={{
+          background: "rgba(255,255,255,.02)",
+          borderRight: "1px solid rgba(255,255,255,.06)",
+          height: "100%",
+          minHeight: 0,
+        }}
+      >
+        <div style={{ padding: "18px 16px 14px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: "white", marginBottom: 3 }}>Employees</div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>Select to view calendar</div>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto">
-          {employees.map(emp => (
-            <div
-              key={emp.id}
-              onClick={() => setSelectedEmployeeId(emp.id)}
-              className={`p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors ${
-                selectedEmployeeId === emp.id ? "bg-blue-50 border-l-4 border-l-blue-600" : ""
-              }`}
-            >
-              <p className="font-bold text-gray-800">{emp.firstName} {emp.lastName}</p>
-              <p className="text-xs text-gray-500">{emp.department}</p>
-            </div>
-          ))}
+          {employees.map(emp => {
+            const active = selectedEmployeeId === emp.id;
+            return (
+              <div
+                key={emp.id}
+                onClick={() => setSelectedEmployeeId(emp.id)}
+                style={{
+                  padding: "13px 16px",
+                  borderBottom: "1px solid rgba(255,255,255,.04)",
+                  cursor: "pointer",
+                  background: active ? "rgba(99,102,241,.12)" : "transparent",
+                  borderLeft: active ? "3px solid #6366f1" : "3px solid transparent",
+                  transition: "all .15s",
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>
+                  {emp.firstName} {emp.lastName}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>
+                  {emp.department}
+                </div>
+              </div>
+            );
+          })}
           {employees.length === 0 && (
-            <div className="p-4 text-center text-gray-400 italic">No employees found</div>
+            <div style={{ padding: 24, textAlign: "center", fontSize: 12, color: "rgba(255,255,255,.25)" }}>
+              No employees found
+            </div>
           )}
         </div>
       </div>
 
-      {/* MAIN CONTENT: Calendar */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        
-        {/* HEADER */}
-        <div className="p-6 bg-white border-b flex justify-between items-center shadow-sm">
+      {/* ── MAIN CONTENT ───────────────────────────────── */}
+      <div className="flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
+
+        {/* Header */}
+        <div
+          style={{
+            padding: "18px 24px",
+            borderBottom: "1px solid rgba(255,255,255,.06)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            background: "rgba(255,255,255,.015)",
+          }}
+        >
           <div>
-            <h1 className="text-2xl font-black text-gray-900">
-              {selectedEmployee ? `${selectedEmployee.firstName}'s Attendance` : "Attendance Calendar"}
+            <h1 style={{ fontSize: 18, fontWeight: 800, color: "white", margin: 0 }}>
+              {selectedEmployee ? `${selectedEmployee.firstName} ${selectedEmployee.lastName}` : "Attendance Calendar"}
             </h1>
-            <p className="text-sm text-gray-500">
-              {selectedEmployee ? "Manage daily records" : "Select an employee from the list"}
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)", margin: "3px 0 0" }}>
+              {selectedEmployee ? "Click any day to mark or update attendance" : "Select an employee from the sidebar"}
             </p>
           </div>
-          
+
           <input
             type="month"
             value={month}
-            onChange={(e) => setMonth(e.target.value)}
-            className="border px-4 py-2 rounded-lg font-bold shadow-sm"
+            onChange={e => setMonth(e.target.value)}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 10,
+              border: "1px solid rgba(255,255,255,.12)",
+              background: "rgba(255,255,255,.05)",
+              color: "white",
+              fontSize: 13,
+              fontWeight: 700,
+              outline: "none",
+            }}
           />
         </div>
 
-        {/* STATS BOXES */}
+        {/* Stat cards */}
         {selectedEmployeeId && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 pb-0">
-            <div className="bg-green-100 p-4 rounded-xl border border-green-200">
-              <p className="text-green-600 font-bold text-sm uppercase">Present</p>
-              <p className="text-3xl font-black text-green-800">{stats.present}</p>
-            </div>
-            <div className="bg-red-100 p-4 rounded-xl border border-red-200">
-              <p className="text-red-600 font-bold text-sm uppercase">Absent</p>
-              <p className="text-3xl font-black text-red-800">{stats.absent}</p>
-            </div>
-            <div className="bg-yellow-100 p-4 rounded-xl border border-yellow-200">
-              <p className="text-yellow-600 font-bold text-sm uppercase">Leaves</p>
-              <p className="text-3xl font-black text-yellow-800">{stats.leave}</p>
-            </div>
-            <div className="bg-purple-100 p-4 rounded-xl border border-purple-200">
-              <p className="text-purple-600 font-bold text-sm uppercase">Holidays</p>
-              <p className="text-3xl font-black text-purple-800">{stats.holiday}</p>
-            </div>
-            <div className="bg-blue-100 p-4 rounded-xl border border-blue-200">
-              <p className="text-blue-600 font-bold text-sm uppercase">Attendance + Holidays</p>
-              <p className="text-3xl font-black text-blue-800">
-                {stats.present + stats.absent + stats.leave + stats.holiday}
-              </p>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, padding: "16px 24px 0" }}>
+            {STAT_CARDS.map(s => (
+              <div
+                key={s.label}
+                style={{
+                  borderRadius: 12,
+                  background: s.bg,
+                  border: `1px solid ${s.border}`,
+                  padding: "14px 16px",
+                }}
+              >
+                <div style={{ fontSize: 10, fontWeight: 700, color: s.color, textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>
+                  {s.label}
+                </div>
+                <div style={{ fontSize: 26, fontWeight: 900, color: "white" }}>{s.value}</div>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* CALENDAR GRID */}
+        {/* Calendar or empty state */}
         {selectedEmployeeId ? (
-          <div className="flex-1 overflow-auto p-6">
-            
-            <div className="grid grid-cols-7 gap-px bg-gray-200 border rounded-xl overflow-hidden shadow-sm min-w-[600px]">
-              {/* Weekday Headers */}
-              {weekDays.map(day => (
-                <div key={day} className="bg-gray-100 p-2 text-center font-bold text-gray-500 text-sm">
-                  {day}
-                </div>
-              ))}
-
-              {/* Days */}
-              {calendarDays.map((date, i) => {
-                if (!date) return <div key={i} className="bg-white min-h-[100px]" />;
-                
-                const record = getRecordForDate(date);
-                const dateStr = toLocalISOString(date);
-                const isToday = dateStr === toLocalISOString(new Date());
-                const isSelected = selectedDate === dateStr;
-                const isDefaultHoliday = !record && isSunday(date);
-
-                return (
+          <div className="flex-1 overflow-auto" style={{ padding: "16px 24px 24px" }}>
+            {loading ? (
+              <div style={{ paddingTop: 60, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13 }}>
+                Loading…
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(7, 1fr)",
+                  gap: 1,
+                  background: "rgba(255,255,255,.04)",
+                  borderRadius: 14,
+                  overflow: "hidden",
+                  border: "1px solid rgba(255,255,255,.06)",
+                  minWidth: 600,
+                }}
+              >
+                {/* Weekday headers */}
+                {weekDays.map(day => (
                   <div
-                    key={i}
-                    onClick={() => {
-                      setSelectedDate(dateStr);
-                      // Pre-fill form if record exists
-                      if (record) {
-                        setFormData({
-                          status: record.status,
-                          checkIn: record.checkIn ? new Date(record.checkIn).toTimeString().slice(0, 5) : "",
-                          checkOut: record.checkOut ? new Date(record.checkOut).toTimeString().slice(0, 5) : "",
-                          remarks: record.remarks || "",
-                        });
-                      } else {
-                         // Reset form for new entry
-                         setFormData({
-                          status: isSunday(date) ? "HOLIDAY" : "PRESENT",
-                          checkIn: "",
-                          checkOut: "",
-                          remarks: "",
-                        });
-                      }
+                    key={day}
+                    style={{
+                      padding: "10px 0",
+                      textAlign: "center",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,.3)",
+                      textTransform: "uppercase",
+                      letterSpacing: ".05em",
+                      background: "rgba(255,255,255,.03)",
                     }}
-                    className={`bg-white min-h-[120px] p-2 hover:bg-gray-50 cursor-pointer transition-colors relative flex flex-col justify-between ${
-                      isToday ? "ring-2 ring-blue-500 inset-0 z-10" : ""
-                    } ${isSelected ? "bg-blue-50" : ""} ${isDefaultHoliday ? "bg-purple-50/50" : ""}`}
                   >
-                    <div className="flex justify-between items-start">
-                      <span className={`text-sm font-bold ${isToday ? "text-blue-600" : "text-gray-700"}`}>
-                        {date.getDate()}
-                      </span>
-                      {record && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(record.id);
-                          }}
-                          className="text-gray-400 hover:text-red-600 text-xs font-bold px-1"
-                          >
-                          ✕
-                        </button>
-                      )}
-                    </div>
+                    {day}
+                  </div>
+                ))}
 
-                    {record ? (
-                      <div className="mt-1 space-y-1">
-                        <span className={`block text-center text-xs font-black py-1 rounded ${
-                          record.status === "PRESENT" ? "bg-green-100 text-green-800" :
-                          record.status === "ABSENT" ? "bg-red-100 text-red-800" :
-                          record.status === "HOLIDAY" ? "bg-purple-100 text-purple-800" :
-                          "bg-yellow-100 text-yellow-800"
-                        }`}>
-                          {record.status}
+                {/* Days */}
+                {calendarDays.map((date, i) => {
+                  if (!date) {
+                    return (
+                      <div
+                        key={i}
+                        style={{ minHeight: 110, background: "rgba(0,0,0,.15)" }}
+                      />
+                    );
+                  }
+
+                  const record           = getRecordForDate(date);
+                  const dateStr          = toLocalISOString(date);
+                  const isToday          = dateStr === toLocalISOString(new Date());
+                  const isSelected       = selectedDate === dateStr;
+                  const isDefaultHoliday = !record && isSunday(date);
+                  const sc               = record ? (STATUS_COLORS[record.status] || STATUS_COLORS.PRESENT) : null;
+
+                  return (
+                    <div
+                      key={i}
+                      onClick={() => {
+                        setSelectedDate(dateStr);
+                        if (record) {
+                          setFormData({
+                            status:   record.status,
+                            checkIn:  record.checkIn  ? new Date(record.checkIn).toTimeString().slice(0, 5)  : "",
+                            checkOut: record.checkOut ? new Date(record.checkOut).toTimeString().slice(0, 5) : "",
+                            remarks:  record.remarks  || "",
+                          });
+                        } else {
+                          setFormData({ status: isSunday(date) ? "HOLIDAY" : "PRESENT", checkIn: "", checkOut: "", remarks: "" });
+                        }
+                      }}
+                      style={{
+                        minHeight: 110,
+                        padding: 8,
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        background: isSelected
+                          ? "rgba(99,102,241,.12)"
+                          : isDefaultHoliday
+                            ? "rgba(167,139,250,.04)"
+                            : "rgba(255,255,255,.015)",
+                        outline: isToday ? "2px solid #6366f1" : "none",
+                        outlineOffset: "-2px",
+                        transition: "background .15s",
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                        <span
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            color: isToday ? "#818cf8" : "rgba(255,255,255,.7)",
+                          }}
+                        >
+                          {date.getDate()}
                         </span>
-                        {(record.checkIn || record.checkOut) && (
-                          <div className="text-[10px] text-center text-gray-500 font-mono">
-                            {formatPakTime(record.checkIn)} - {formatPakTime(record.checkOut)}
-                          </div>
+                        {record && (
+                          <button
+                            onClick={e => { e.stopPropagation(); handleDelete(record.id); }}
+                            style={{
+                              fontSize: 10,
+                              color: "rgba(255,255,255,.2)",
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              padding: "0 2px",
+                              lineHeight: 1,
+                            }}
+                          >
+                            ✕
+                          </button>
                         )}
                       </div>
-                    ) : isDefaultHoliday ? (
-                      <div className="mt-1 space-y-1 opacity-60">
-                         <span className="block text-center text-xs font-black py-1 rounded bg-purple-50 text-purple-400 border border-purple-100">
+
+                      {record && sc ? (
+                        <div style={{ marginTop: 4 }}>
+                          <span
+                            style={{
+                              display: "block",
+                              textAlign: "center",
+                              fontSize: 10,
+                              fontWeight: 800,
+                              padding: "3px 0",
+                              borderRadius: 6,
+                              background: sc.bg,
+                              color: sc.text,
+                              border: `1px solid ${sc.border}`,
+                              letterSpacing: ".03em",
+                            }}
+                          >
+                            {record.status}
+                          </span>
+                          {(record.checkIn || record.checkOut) && (
+                            <div style={{ fontSize: 9, textAlign: "center", color: "rgba(255,255,255,.3)", marginTop: 4, fontFamily: "monospace" }}>
+                              {formatTime(record.checkIn)} – {formatTime(record.checkOut)}
+                            </div>
+                          )}
+                        </div>
+                      ) : isDefaultHoliday ? (
+                        <span
+                          style={{
+                            display: "block",
+                            textAlign: "center",
+                            fontSize: 9,
+                            fontWeight: 700,
+                            padding: "3px 0",
+                            borderRadius: 6,
+                            background: "rgba(167,139,250,.08)",
+                            color: "rgba(167,139,250,.4)",
+                            border: "1px solid rgba(167,139,250,.12)",
+                          }}
+                        >
                           HOLIDAY
                         </span>
-                      </div>
-                    ) : (
-                      <div className="flex-1 flex items-center justify-center opacity-0 hover:opacity-100">
-                        <span className="text-2xl text-gray-200">+</span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                      ) : (
+                        <span style={{ fontSize: 18, color: "rgba(255,255,255,.06)", textAlign: "center" }}>+</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
-            <div className="text-6xl mb-4">👈</div>
-            <p className="text-xl font-bold">Select an employee from the left</p>
-            <p>to view and manage their attendance calendar</p>
+          <div
+            className="flex-1 flex flex-col items-center justify-center"
+            style={{ color: "rgba(255,255,255,.2)" }}
+          >
+            <div style={{ fontSize: 48, marginBottom: 16 }}>👈</div>
+            <p style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>Select an employee from the sidebar</p>
+            <p style={{ fontSize: 12, marginTop: 6 }}>to view and manage their attendance calendar</p>
           </div>
         )}
       </div>
 
-      {/* EDIT MODAL / SIDEBAR */}
+      {/* ── MODAL ──────────────────────────────────────── */}
       {selectedDate && selectedEmployeeId && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="p-4 bg-gray-100 border-b flex justify-between items-center">
-              <h3 className="font-black text-lg">
-                {new Date(selectedDate).toDateString()}
-              </h3>
-              <button 
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,.7)" }}
+        >
+          <div
+            style={{
+              background: "#0e1120",
+              border: "1px solid rgba(255,255,255,.1)",
+              borderRadius: 18,
+              width: "100%",
+              maxWidth: 420,
+              overflow: "hidden",
+            }}
+          >
+            {/* Modal header */}
+            <div
+              style={{
+                padding: "16px 20px",
+                borderBottom: "1px solid rgba(255,255,255,.07)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span style={{ fontWeight: 800, color: "white", fontSize: 14 }}>
+                {new Date(selectedDate + "T12:00:00").toLocaleDateString(undefined, {
+                  weekday: "long", year: "numeric", month: "long", day: "numeric",
+                })}
+              </span>
+              <button
                 onClick={() => setSelectedDate(null)}
-                className="text-gray-500 hover:text-black font-bold"
+                style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", cursor: "pointer", fontSize: 16 }}
               >
                 ✕
               </button>
             </div>
-            
-            <form onSubmit={handleSave} className="p-6 space-y-4">
+
+            <form onSubmit={handleSave} style={{ padding: 20, display: "flex", flexDirection: "column", gap: 14 }}>
+              {/* Status */}
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Status</label>
+                <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".05em", display: "block", marginBottom: 6 }}>
+                  Status
+                </label>
                 <select
-                  className="w-full border rounded-lg px-3 py-2 font-bold"
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    border: "1px solid rgba(255,255,255,.1)",
+                    background: "rgba(255,255,255,.05)",
+                    color: "white",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    outline: "none",
+                  }}
                 >
                   <option value="PRESENT">Present</option>
                   <option value="ABSENT">Absent</option>
@@ -447,52 +574,81 @@ export default function AttendancePage() {
                 </select>
               </div>
 
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Check In</label>
-                  <input
-                    type="time"
-                    className="w-full border rounded-lg px-3 py-2"
-                    value={formData.checkIn}
-                    onChange={(e) => setFormData({ ...formData, checkIn: e.target.value })}
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Check Out</label>
-                  <input
-                    type="time"
-                    className="w-full border rounded-lg px-3 py-2"
-                    value={formData.checkOut}
-                    onChange={(e) => setFormData({ ...formData, checkOut: e.target.value })}
-                  />
-                </div>
+              {/* Check In / Out */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[
+                  { label: "Check In",  key: "checkIn"  as const },
+                  { label: "Check Out", key: "checkOut" as const },
+                ].map(({ label, key }) => (
+                  <div key={key}>
+                    <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".05em", display: "block", marginBottom: 6 }}>
+                      {label}
+                    </label>
+                    <input
+                      type="time"
+                      value={formData[key]}
+                      onChange={e => setFormData({ ...formData, [key]: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        borderRadius: 10,
+                        border: "1px solid rgba(255,255,255,.1)",
+                        background: "rgba(255,255,255,.05)",
+                        color: "white",
+                        fontSize: 13,
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
 
+              {/* Remarks */}
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Remarks</label>
+                <label style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".05em", display: "block", marginBottom: 6 }}>
+                  Remarks
+                </label>
                 <input
                   type="text"
-                  placeholder="Optional note..."
-                  className="w-full border rounded-lg px-3 py-2"
+                  placeholder="Optional note…"
                   value={formData.remarks}
-                  onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
+                  onChange={e => setFormData({ ...formData, remarks: e.target.value })}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    border: "1px solid rgba(255,255,255,.1)",
+                    background: "rgba(255,255,255,.05)",
+                    color: "white",
+                    fontSize: 13,
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
                 />
               </div>
 
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-black text-white py-3 rounded-xl font-black hover:bg-gray-800 transition-colors disabled:opacity-50"
-                >
-                  {loading ? "Saving..." : "Save Record"}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  padding: "12px",
+                  borderRadius: 12,
+                  border: "none",
+                  background: loading ? "rgba(99,102,241,.4)" : "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  color: "white",
+                  fontSize: 14,
+                  fontWeight: 800,
+                  cursor: loading ? "not-allowed" : "pointer",
+                  transition: "all .2s",
+                }}
+              >
+                {loading ? "Saving…" : "Save Record"}
+              </button>
             </form>
           </div>
         </div>
       )}
-
     </div>
   );
 }

@@ -1,0 +1,385 @@
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient , Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import { signJwt } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
+import {
+  createVerificationCodeLog,
+  getAvailableChannels,
+  getMaskedTarget,
+  getUserVerificationTargets,
+  isUserVerified,
+  sendVerificationCode,
+} from "@/lib/verification";
+type RolePermission = Prisma.RolePermissionGetPayload<Prisma.RolePermissionDefaultArgs>;
+
+export async function POST(req: NextRequest) {
+  try {
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+    const rl = rateLimit(`login:${ip}`, 10, 60_000);
+    if (!rl.allowed) {
+      return NextResponse.json({ message: "Too many attempts, slow down" }, { status: 429 });
+    }
+    let body;
+    try {
+      body = await req.json();
+    } catch (parseError) {
+      console.error("❌ LOGIN JSON PARSE ERROR:", parseError);
+      return NextResponse.json(
+        { message: "Invalid request format" },
+        { status: 400 }
+      );
+    }
+
+    const { email, password } = body;
+
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Username/Email and password required" },
+        { status: 400 }
+      );
+    }
+
+    const emailNormalized = email.trim().toLowerCase();
+    console.log("🔍 LOGIN ATTEMPT:", { emailOrName: emailNormalized, hasPassword: !!password });
+
+    // Check database connection - search by email OR name
+    let user;
+    try {
+      // First try to find by email (exact match)
+      user = await prisma.user.findUnique({
+        where: { email: emailNormalized },
+        include: {
+          permissions: true,
+        },
+      });
+
+      // If not found, search by name OR email (case-insensitive)
+      if (!user) {
+        const allUsers = await prisma.user.findMany({
+          where: {
+            OR: [
+              {
+                email: {
+                  equals: emailNormalized,
+                  mode: "insensitive",
+                },
+              },
+              {
+                name: {
+                  equals: email.trim(), // Try exact name match
+                  mode: "insensitive",
+                },
+              },
+            ],
+          },
+          include: {
+            permissions: true,
+          },
+        });
+        user = allUsers[0] || null;
+      }
+
+      console.log("🔍 USER SEARCH:", { searchTerm: emailNormalized });
+      console.log("🔍 USER FOUND:", user ? { id: user.id, name: user.name, email: user.email, active: user.active } : "NOT FOUND");
+    } catch (dbError: any) {
+      console.error("❌ LOGIN DATABASE ERROR:", dbError);
+      console.error("❌ DATABASE ERROR DETAILS:", {
+        message: dbError.message,
+        code: dbError.code,
+        meta: dbError.meta,
+      });
+      return NextResponse.json(
+        { message: "Database connection error. Please try again.", error: dbError.message },
+        { status: 500 }
+      );
+    }
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Invalid username/email or password" },
+        { status: 401 }
+      );
+    }
+
+    if (!user.active) {
+      return NextResponse.json(
+        { message: "Account is inactive. Please contact administrator." },
+        { status: 401 }
+      );
+    }
+
+    // Verify password
+    let passwordMatch = false;
+    try {
+      console.log("🔐 PASSWORD CHECK:", {
+        hasStoredPassword: !!user.password,
+        storedPasswordLength: user.password?.length,
+      });
+      passwordMatch = await bcrypt.compare(password, user.password);
+      console.log("🔐 PASSWORD MATCH:", passwordMatch);
+    } catch (bcryptError: any) {
+      console.error("❌ LOGIN BCRYPT ERROR:", bcryptError);
+      console.error("❌ BCRYPT ERROR DETAILS:", {
+        message: bcryptError.message,
+        stack: bcryptError.stack,
+      });
+      return NextResponse.json(
+        { message: "Password verification failed", error: bcryptError.message },
+        { status: 500 }
+      );
+    }
+
+    if (!passwordMatch) {
+      console.log("❌ PASSWORD MISMATCH");
+      return NextResponse.json(
+        { message: "Invalid username/email or password" },
+        { status: 401 }
+      );
+    }
+
+    // Fetch companies for multi-tenant context
+    let companies: Prisma.UserCompanyGetPayload<{ include: { company: true } }>[] = [];
+    try {
+      companies = await prisma.userCompany.findMany({
+        where: { userId: user.id },
+        include: { company: true },
+      });
+    } catch (companyError: any) {
+      console.error("LOGIN COMPANIES ERROR:", companyError);
+    }
+
+    const defaultCompanyId =
+      user.defaultCompanyId ||
+      companies.find((c: any) => c.isDefault)?.companyId ||
+      companies[0]?.companyId ||
+      null;
+
+    // Fetch role-based permissions
+    let rolePermissions: Array<{ permission: string }> = [];
+    try {
+      rolePermissions = await prisma.rolePermission.findMany({
+        where: { role: user.role, companyId: defaultCompanyId || undefined },
+        select: { permission: true },
+      });
+    } catch (permError: any) {
+      console.error("❌ LOGIN PERMISSIONS ERROR:", permError);
+      // Continue without role permissions if error occurs
+    }
+
+    const userPermissions = (user.permissions || [])
+      .filter((p: any) => !defaultCompanyId || p.companyId === defaultCompanyId)
+      .map((p: any) => p.permission || p);
+
+    // 🔥 FRONTEND KE LIYE SAFE USER OBJECT (getCurrentUser() ke format ke mutabiq)
+    const safeUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role.toUpperCase(), // Ensure uppercase
+      permissions: userPermissions, // User-specific permissions
+      rolePermissions: rolePermissions.map((rp) => rp.permission),
+      companyId: defaultCompanyId,
+      companies: companies.map((c: any) => ({
+        id: c.companyId,
+        name: c.company?.name,
+        code: c.company?.code,
+        isDefault: c.isDefault,
+      })),
+
+    };
+
+    const targets = await getUserVerificationTargets(safeUser.id);
+    const verified = await isUserVerified(safeUser.id);
+
+    if (!verified) {
+      const companyIdForOtp = defaultCompanyId || safeUser.companyId || "";
+      if (!companyIdForOtp) return NextResponse.json({ message: "Company context required" }, { status: 400 });
+
+      const last = await prisma.activityLog.findFirst({
+        where: {
+          companyId: companyIdForOtp,
+          userId: safeUser.id,
+          action: { in: ["VERIFY_OTP", "EMAIL_OTP"] },
+        },
+        orderBy: { createdAt: "desc" },
+        select: { createdAt: true },
+      });
+      if (!last || Date.now() - last.createdAt.getTime() > 20_000) {
+        const { code, expMs } = await createVerificationCodeLog({
+          companyId: companyIdForOtp,
+          userId: safeUser.id,
+          channel: "email",
+          target: safeUser.email,
+        });
+        const emailResult = await sendVerificationCode({
+          name: safeUser.name,
+          email: safeUser.email,
+          phone: targets?.phone,
+          channel: "email",
+          code,
+        });
+
+        if (!emailResult.success) {
+          console.error("❌ Login OTP email failed:", emailResult.error);
+        }
+        const verifyToken = signJwt({
+          userId: safeUser.id,
+          companyId: companyIdForOtp,
+          role: safeUser.role,
+          email: safeUser.email,
+          phone: targets?.phone || undefined,
+          channel: "email",
+          next: "/dashboard",
+          exp: expMs,
+        });
+        const res = NextResponse.json({ 
+          needsVerification: true, 
+          email: safeUser.email,
+          phone: targets?.phone || "",
+          availableChannels: getAvailableChannels({
+            email: safeUser.email,
+            phone: targets?.phone,
+          }),
+          verifyChannel: "email",
+          verifyTarget: getMaskedTarget("email", {
+            email: safeUser.email,
+            phone: targets?.phone,
+          }),
+          // Show OTP in dev if email failed
+          ...(!emailResult.success ? { devOtp: code } : {}),
+        });
+        res.cookies.set("sb_verify", verifyToken, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 15 * 60 });
+        return res;
+      }
+
+      const res = NextResponse.json({
+        needsVerification: true,
+        email: safeUser.email,
+        phone: targets?.phone || "",
+        availableChannels: getAvailableChannels({
+          email: safeUser.email,
+          phone: targets?.phone,
+        }),
+        verifyChannel: "email",
+        verifyTarget: getMaskedTarget("email", {
+          email: safeUser.email,
+          phone: targets?.phone,
+        }),
+      });
+      return res;
+    }
+
+    // Determine first-login before creating session
+    let isFirstLogin = false;
+    try {
+      const prev = await prisma.session.count({ where: { userId: safeUser.id } });
+      isFirstLogin = prev === 0;
+    } catch {}
+
+    const token = signJwt({
+      userId: safeUser.id,
+      role: safeUser.role,
+      companyId: defaultCompanyId,
+    });
+
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    try {
+      await prisma.session.create({
+        data: {
+          userId: safeUser.id,
+          token,
+          expiresAt,
+          companyId: defaultCompanyId || safeUser.companyId || "",
+          ip: req.headers.get("x-forwarded-for"),
+          userAgent: req.headers.get("user-agent") || null,
+        },
+      });
+    } catch (sessionErr: any) {
+      console.warn("⚠️ SESSION CREATE FAILED, proceeding with cookie-only auth:", {
+        code: sessionErr?.code,
+        message: sessionErr?.message,
+      });
+    }
+
+    // Best-effort geo lookup and login logging
+    try {
+      const rawIp = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
+      const ip = rawIp || undefined;
+      let country: string | null = null;
+      let city: string | null = null;
+      if (ip && ip !== "127.0.0.1" && ip !== "::1") {
+        const ac = new AbortController();
+        const t = setTimeout(() => ac.abort(), 2000);
+        try {
+          const resp = await fetch(`https://ipapi.co/${ip}/json/`, { signal: ac.signal });
+          if (resp.ok) {
+            const j = await resp.json();
+            country = String(j.country || j.country_code || "").toUpperCase() || null;
+            city = j.city || null;
+          }
+        } catch {} finally { clearTimeout(t); }
+      }
+      // Prefer LoginLog if available, else ActivityLog
+      const anyPrisma = prisma as any;
+      if (anyPrisma.loginLog?.create) {
+        await anyPrisma.loginLog.create({
+          data: {
+            userId: safeUser.id,
+            companyId: defaultCompanyId || undefined,
+            ip: ip || null,
+            country,
+            city,
+            userAgent: req.headers.get("user-agent") || null,
+          },
+        });
+      } else if (defaultCompanyId) {
+        await prisma.activityLog.create({
+          data: {
+            companyId: defaultCompanyId,
+            userId: safeUser.id,
+            action: "LOGIN",
+            details: JSON.stringify({ ip, country, city, ua: req.headers.get("user-agent") || null }),
+          },
+        });
+      }
+    } catch {}
+
+    const res = NextResponse.json({ user: safeUser, firstLogin: isFirstLogin });
+    res.cookies.set("sb_auth", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+    if (isFirstLogin) {
+      res.cookies.set("first_login", "1", {
+        httpOnly: false,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 10 * 60,
+      });
+    }
+    return res;
+  } catch (e: any) {
+    console.error("❌ LOGIN ERROR:", e);
+    console.error("❌ LOGIN ERROR DETAILS:", {
+      message: e.message,
+      stack: e.stack,
+      name: e.name,
+    });
+    return NextResponse.json(
+      {
+        message: e.message || "Login failed. Please try again.",
+        error: process.env.NODE_ENV === "development" ? e.message : undefined,
+      },
+      { status: 500 }
+    );
+  }
+}
+
+
+

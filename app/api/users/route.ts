@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { resolveCompanyId } from "@/lib/tenant";
+import { getMaxUsersForPlan } from "@/lib/planLimits";
 
 export async function GET(req: NextRequest) {
   try {
@@ -61,6 +62,35 @@ export async function POST(req: NextRequest) {
     const companyId = await resolveCompanyId(req);
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
+    }
+
+    const company = await prisma.company.findUnique({
+      where: { id: companyId },
+      select: { plan: true },
+    });
+
+    // Check dynamic admin-configured limit first, fall back to hardcoded
+    let maxUsers = getMaxUsersForPlan(company?.plan);
+    try {
+      const cfgRow = await prisma.activityLog.findFirst({
+        where: { action: "PLAN_CONFIG" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      });
+      if (cfgRow?.details) {
+        const cfg = JSON.parse(cfgRow.details);
+        const planKey = String(company?.plan || "starter").toLowerCase();
+        if (cfg.planLimits && planKey in cfg.planLimits) {
+          maxUsers = cfg.planLimits[planKey]; // null = unlimited
+        }
+      }
+    } catch {}
+
+    if (maxUsers !== null && maxUsers !== undefined) {
+      const count = await prisma.userCompany.count({ where: { companyId } });
+      if (count >= maxUsers) {
+        return NextResponse.json({ error: `User limit reached for your plan (max ${maxUsers} users).` }, { status: 400 });
+      }
     }
 
     const { name, email, password, role } = await req.json();
@@ -152,4 +182,3 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-

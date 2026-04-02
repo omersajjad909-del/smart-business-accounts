@@ -27,7 +27,7 @@ export default function SalesReportPage() {
   useEffect(() => {
     const user = getCurrentUser();
     if (!user) return;
-    fetch("/api/accounts", { headers: { "x-user-role": user.role } })
+    fetch("/api/accounts", { credentials: "include", headers: { "x-user-id": user.id, "x-user-role": user.role, "x-company-id": user.companyId || "" } })
       .then(r => r.json())
       .then(d => setCustomers((Array.isArray(d) ? d : []).filter((a: any) => a.partyType === "CUSTOMER")))
       .catch(err => console.error("Customer fetch error:", err));
@@ -45,7 +45,12 @@ export default function SalesReportPage() {
 
     try {
       const res = await fetch(`/api/reports/sales?${qs}`, {
-        headers: { "x-user-role": user?.role || "ADMIN" }
+        credentials: "include",
+        headers: {
+          "x-user-id":    user?.id        || "",
+          "x-user-role":  user?.role      || "",
+          "x-company-id": user?.companyId || "",
+        },
       });
       const data = await res.json();
       setRows(Array.isArray(data) ? data : []);

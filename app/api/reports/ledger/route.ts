@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 type VoucherWithEntries = Prisma.VoucherGetPayload<{
@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_LEDGER_REPORT, companyId);
     if (!allowed) {
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
 
     // Previous Vouchers
     const prevVouchers = await prisma.voucher.findMany({
-      where: { date: { lt: fromDate }, entries: { some: { accountId } }, companyId },
+      where: { date: { lt: fromDate }, entries: { some: { accountId } }, companyId, ...(branchId ? { branchId } : {}) },
       include: { entries: true }
     });
     let openingBal = prevVouchers.reduce(
@@ -76,14 +77,14 @@ export async function GET(req: NextRequest) {
 
     // Previous Sales
     const prevSales = await prisma.salesInvoice.aggregate({
-      where: { date: { lt: fromDate }, customerId: accountId, companyId },
+      where: { date: { lt: fromDate }, customerId: accountId, companyId, ...(branchId ? { branchId } : {}) },
       _sum: { total: true }
     });
     openingBal += Number(prevSales._sum.total || 0);
 
     // Previous Purchases
     const prevPurchases = await prisma.purchaseInvoice.aggregate({
-      where: { date: { lt: fromDate }, supplierId: accountId, companyId },
+      where: { date: { lt: fromDate }, supplierId: accountId, companyId, ...(branchId ? { branchId } : {}) },
       _sum: { total: true }
     });
     openingBal -= Number(prevPurchases._sum.total || 0);
@@ -106,6 +107,7 @@ export async function GET(req: NextRequest) {
         date: { gte: fromDate, lte: toDate },
         entries: { some: { accountId } },
         companyId,
+        ...(branchId ? { branchId } : {}),
         // 🔥 ڈبل انٹری روکنے کے لیے فلٹر
         NOT: {
           OR: [
@@ -119,11 +121,11 @@ export async function GET(req: NextRequest) {
     });
 
     const sales = await prisma.salesInvoice.findMany({
-      where: { date: { gte: fromDate, lte: toDate }, customerId: accountId, companyId },
+      where: { date: { gte: fromDate, lte: toDate }, customerId: accountId, companyId, ...(branchId ? { branchId } : {}) },
     });
 
     const purchases = await prisma.purchaseInvoice.findMany({
-      where: { date: { gte: fromDate, lte: toDate }, supplierId: accountId, companyId },
+      where: { date: { gte: fromDate, lte: toDate }, supplierId: accountId, companyId, ...(branchId ? { branchId } : {}) },
     });
 
     const returns = await prisma.saleReturn.findMany({

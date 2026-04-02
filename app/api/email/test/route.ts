@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Permission denied" }, { status: 403 });
     }
 
-    const result = await testEmailConfig();
+    const result = await testEmailConfig(companyId);
 
     await prisma.activityLog.create({
       data: {

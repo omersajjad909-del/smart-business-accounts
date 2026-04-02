@@ -306,7 +306,7 @@ export default function InteractionsPage() {
                     <td className="px-6 py-3">
                       {interaction.nextFollowUp
                         ? new Date(interaction.nextFollowUp).toLocaleDateString(
-                            "en-PK"
+                            undefined
                           )
                         : "-"}
                     </td>

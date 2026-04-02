@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -17,11 +17,8 @@ export default function GlobalSearch() {
 
   useEffect(() => {
     const q = searchParams.get("q");
-    if (q && q !== query) {
-      setQuery(q);
-    } else if (!q && query) {
-      setQuery("");
-    }
+    if (q && q !== query) setQuery(q);
+    else if (!q && query) setQuery("");
   }, [searchParams]);
 
   useEffect(() => {
@@ -30,7 +27,6 @@ export default function GlobalSearch() {
         setShowResults(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -39,23 +35,13 @@ export default function GlobalSearch() {
     const timeoutId = setTimeout(() => {
       if (query !== (searchParams.get("q") || "")) {
         const params = new URLSearchParams(searchParams.toString());
-        if (query) {
-          params.set("q", query);
-        } else {
-          params.delete("q");
-        }
+        if (query) params.set("q", query);
+        else params.delete("q");
         router.replace(`${pathname}?${params.toString()}`);
       }
-
-      if (query.length >= 2) {
-        performSearch();
-      } else {
-        setResults(null);
-        setShowResults(false);
-        setError(null);
-      }
+      if (query.length >= 2) performSearch();
+      else { setResults(null); setShowResults(false); setError(null); }
     }, 300);
-
     return () => clearTimeout(timeoutId);
   }, [query]);
 
@@ -64,12 +50,11 @@ export default function GlobalSearch() {
     setError(null);
     try {
       const user = getCurrentUser();
-      const companyId = user?.companyId || "";
       const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`, {
         headers: {
           "x-user-id": user?.id || "",
           "x-user-role": user?.role || "ADMIN",
-          "x-company-id": companyId,
+          "x-company-id": user?.companyId || "",
         },
       });
       const text = await res.text();
@@ -83,8 +68,7 @@ export default function GlobalSearch() {
       setResults(data);
       setShowResults(true);
       return data;
-    } catch (e) {
-      console.error("Search error:", e);
+    } catch {
       setError("Search failed");
       setResults(null);
       setShowResults(true);
@@ -100,155 +84,105 @@ export default function GlobalSearch() {
     router.push(url);
   }
 
-  const allResults = results
-    ? [
-        ...(results.accounts || []),
-        ...(results.items || []),
-        ...(results.salesInvoices || []),
-        ...(results.purchaseInvoices || []),
-        ...(results.vouchers || []),
-      ]
-    : [];
+  const allResults = results ? [
+    ...(results.accounts || []),
+    ...(results.items || []),
+    ...(results.salesInvoices || []),
+    ...(results.purchaseInvoices || []),
+    ...(results.vouchers || []),
+  ] : [];
+
+  const sections = results ? [
+    { label: "Accounts", items: results.accounts || [] },
+    { label: "Items", items: results.items || [] },
+    { label: "Sales Invoices", items: results.salesInvoices || [] },
+    { label: "Purchase Invoices", items: results.purchaseInvoices || [] },
+    { label: "Vouchers", items: results.vouchers || [] },
+  ].filter(s => s.items.length > 0) : [];
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-md">
-      <div className="relative">
+    <div ref={searchRef} style={{ position: "relative", width: "100%", maxWidth: 420 }}>
+      {/* Input */}
+      <div style={{ position: "relative" }}>
+        <svg
+          width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2"
+          style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+        >
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={e => setQuery(e.target.value)}
           onFocus={() => query.length >= 2 && setShowResults(true)}
-          onKeyDown={(e) => {
+          onKeyDown={e => {
             if (e.key === "Enter") {
               e.preventDefault();
-              const invoicePattern = /^(SI|PI)-\d+$/i;
-              if (invoicePattern.test(query)) {
-                (async () => {
-                  const data = await performSearch();
-                  const merged = data
-                    ? [
-                        ...(data.accounts || []),
-                        ...(data.items || []),
-                        ...(data.salesInvoices || []),
-                        ...(data.purchaseInvoices || []),
-                        ...(data.vouchers || []),
-                      ]
-                    : [];
-                  if (merged.length > 0) {
-                    handleResultClick(merged[0].url);
-                  }
-                })();
-              } else if (allResults.length > 0) {
-                handleResultClick(allResults[0].url);
-              }
+              if (allResults.length > 0) handleResultClick(allResults[0].url);
             }
+            if (e.key === "Escape") setShowResults(false);
           }}
           placeholder="Search accounts, items, invoices..."
-          className="w-full px-4 py-2 pl-10 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--panel-bg-2)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+          style={{
+            width: "100%", padding: "8px 12px 8px 36px",
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 9, fontSize: 13,
+            color: "rgba(255,255,255,0.8)",
+            outline: "none", boxSizing: "border-box",
+            transition: "border-color .15s",
+          }}
+          onFocusCapture={e => { e.currentTarget.style.borderColor = "rgba(99,102,241,0.5)"; }}
+          onBlurCapture={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
         />
-        <div className="absolute left-3 top-2.5 text-[var(--text-muted)]">🔍</div>
         {loading && (
-          <div className="absolute right-3 top-2.5">
-            <span className="animate-spin">⏳</span>
+          <div style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)" }}>
+            <div style={{ width: 14, height: 14, border: "2px solid rgba(99,102,241,0.3)", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin .7s linear infinite" }}/>
           </div>
         )}
       </div>
 
-      {showResults && error && (
-        <div className="absolute z-50 w-full mt-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg shadow-lg p-4 text-center text-[var(--danger)]">
-          {error}
+      {/* Dropdown */}
+      {showResults && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 200,
+          background: "#0e1120", border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 12, boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+          maxHeight: 400, overflowY: "auto",
+        }}>
+          {error && (
+            <div style={{ padding: "14px 16px", fontSize: 13, color: "#f87171", textAlign: "center" }}>{error}</div>
+          )}
+
+          {!error && sections.length === 0 && !loading && query.length >= 2 && (
+            <div style={{ padding: "20px 16px", fontSize: 13, color: "rgba(255,255,255,0.3)", textAlign: "center" }}>
+              No results for &quot;{query}&quot;
+            </div>
+          )}
+
+          {sections.map((section, si) => (
+            <div key={si}>
+              {si > 0 && <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 12px" }}/>}
+              <div style={{ padding: "8px 14px 4px", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: ".08em" }}>
+                {section.label}
+              </div>
+              {section.items.map((item: any) => (
+                <div
+                  key={item.id}
+                  onClick={() => handleResultClick(item.url)}
+                  style={{ padding: "9px 14px", cursor: "pointer", transition: "background .1s" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(99,102,241,0.1)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                >
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>{item.title}</div>
+                  {item.subtitle && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{item.subtitle}</div>}
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       )}
-
-      {showResults && allResults.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg shadow-lg max-h-96 overflow-y-auto">
-          {results.accounts && results.accounts.length > 0 && (
-            <div className="p-2">
-              <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Accounts</div>
-              {results.accounts.map((item: any) => (
-                <div
-                  key={item.id}
-                  onClick={() => handleResultClick(item.url)}
-                  className="px-3 py-2 hover:bg-[var(--card-bg-2)] cursor-pointer rounded"
-                >
-                  <div className="font-medium">{item.title}</div>
-                  <div className="text-xs text-[var(--text-muted)]">{item.subtitle}</div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {results.items && results.items.length > 0 && (
-            <div className="p-2 border-t">
-              <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Items</div>
-              {results.items.map((item: any) => (
-                <div
-                  key={item.id}
-                  onClick={() => handleResultClick(item.url)}
-                  className="px-3 py-2 hover:bg-[var(--card-bg-2)] cursor-pointer rounded"
-                >
-                  <div className="font-medium">{item.title}</div>
-                  <div className="text-xs text-[var(--text-muted)]">{item.subtitle}</div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {results.salesInvoices && results.salesInvoices.length > 0 && (
-            <div className="p-2 border-t">
-              <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Sales Invoices</div>
-              {results.salesInvoices.map((item: any) => (
-                <div
-                  key={item.id}
-                  onClick={() => handleResultClick(item.url)}
-                  className="px-3 py-2 hover:bg-[var(--card-bg-2)] cursor-pointer rounded"
-                >
-                  <div className="font-medium">{item.title}</div>
-                  <div className="text-xs text-[var(--text-muted)]">{item.subtitle}</div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {results.purchaseInvoices && results.purchaseInvoices.length > 0 && (
-            <div className="p-2 border-t">
-              <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Purchase Invoices</div>
-              {results.purchaseInvoices.map((item: any) => (
-                <div
-                  key={item.id}
-                  onClick={() => handleResultClick(item.url)}
-                  className="px-3 py-2 hover:bg-[var(--card-bg-2)] cursor-pointer rounded"
-                >
-                  <div className="font-medium">{item.title}</div>
-                  <div className="text-xs text-[var(--text-muted)]">{item.subtitle}</div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {results.vouchers && results.vouchers.length > 0 && (
-            <div className="p-2 border-t">
-              <div className="text-xs font-bold text-[var(--text-muted)] uppercase px-2 py-1">Vouchers</div>
-              {results.vouchers.map((item: any) => (
-                <div
-                  key={item.id}
-                  onClick={() => handleResultClick(item.url)}
-                  className="px-3 py-2 hover:bg-[var(--card-bg-2)] cursor-pointer rounded"
-                >
-                  <div className="font-medium">{item.title}</div>
-                  <div className="text-xs text-[var(--text-muted)]">{item.subtitle}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {showResults && query.length >= 2 && !loading && allResults.length === 0 && !error && (
-        <div className="absolute z-50 w-full mt-1 bg-[var(--card-bg)] border border-[var(--border)] rounded-lg shadow-lg p-4 text-center text-[var(--text-muted)]">
-          No results found
-        </div>
-      )}
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 }

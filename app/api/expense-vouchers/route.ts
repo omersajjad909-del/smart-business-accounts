@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
 
-    const filter: any = { companyId };
+    const filter: any = { companyId, ...(branchId ? { branchId } : {}) };
     if (status) filter.approvalStatus = status;
 
     const vouchers = await prisma.expenseVoucher.findMany({
@@ -63,6 +64,7 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
 
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
@@ -101,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     // Check if voucher number already exists
     const existing = await prisma.expenseVoucher.findFirst({
-      where: { voucherNo, companyId },
+      where: { voucherNo, companyId, ...(branchId ? { branchId } : {}) },
     });
 
     if (existing) {
@@ -145,6 +147,7 @@ export async function POST(req: NextRequest) {
         paymentAccountId,
         approvalStatus: 'PENDING',
         companyId,
+        branchId,
         items: {
           create: items.map((item: any) => ({
             description: item.description || '',

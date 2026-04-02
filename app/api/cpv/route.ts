@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 
@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
-    const where: any = { type: "CPV", companyId };
+    const where: any = { type: "CPV", companyId, ...(branchId ? { branchId } : {}) };
     if (from && to) {
       where.date = {
         gte: new Date(from + "T00:00:00"),
@@ -79,6 +80,7 @@ export async function POST(req: Request) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req as any, companyId);
 
     const userId = (req as any).headers.get("x-user-id");
     const userRole = (req as any).headers.get("x-user-role");
@@ -202,7 +204,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const count = await prisma.voucher.count({ where: { type: "CPV", companyId } });
+    const count = await prisma.voucher.count({ where: { type: "CPV", companyId, ...(branchId ? { branchId } : {}) } });
     const voucherNo = `CPV-${count + 1}`;
     const paymentAmount = Math.abs(amountNum); // Use already validated amountNum
 
@@ -224,6 +226,7 @@ export async function POST(req: Request) {
           date: new Date(date),
           narration: narration || `${paymentMode === "BANK" ? "Bank" : "Cash"} payment`,
           companyId,
+          branchId,
           entries: {
             create: [
               { accountId: account.id, amount: paymentAmount, companyId },        // Supplier/Expense DEBIT (+)
@@ -327,6 +330,7 @@ export async function PUT(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
 
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");

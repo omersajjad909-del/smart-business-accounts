@@ -10,9 +10,13 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-# Supabase connection (adjust if different)
-export DATABASE_URL="postgresql://postgres.wymblxtcvkwnfrvbobnr:629984596908@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
-export DIRECT_URL="postgresql://postgres.wymblxtcvkwnfrvbobnr:629984596908@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
+# ⚠️ SECURITY: Database URLs should be provided via environment variables or .env file.
+# DO NOT commit sensitive credentials to version control.
+if [ -z "$DATABASE_URL" ]; then
+  echo -e "${RED}❌ Error: DATABASE_URL is not set.${NC}"
+  echo -e "${YELLOW}Please set DATABASE_URL in your environment or .env file.${NC}"
+  exit 1
+fi
 
 echo -e "${BLUE}🔧 Database Helper Script${NC}"
 echo -e "${BLUE}=========================${NC}\n"

@@ -128,7 +128,7 @@ export default function SetupChecklistPage() {
     { key: "accounts", title: "Create Accounts", href: "/dashboard/accounts" },
     { key: "items", title: "Add Items", href: "/dashboard/items-new" },
     { key: "openingBalances", title: "Import Opening Balances", href: "/dashboard/opening-balances" },
-    { key: "proUpgrade", title: "Upgrade to PRO (Reporting & Reconciliation)", href: "/onboarding/choose-plan" },
+    { key: "proUpgrade", title: "Upgrade to PRO (Reporting & Reconciliation)", href: "/pricing" },
   ] as const;
 
   return (
@@ -169,9 +169,19 @@ export default function SetupChecklistPage() {
                   </span>
                 </div>
               </div>
-              <Link href={i.href} className="px-3 py-1.5 bg-[var(--accent)] text-[#0b1324] rounded-md font-semibold">
-                Open
-              </Link>
+              <div className="flex items-center gap-2">
+                {i.key === "openingBalances" && (
+                  <a
+                    href="/api/opening-balances/template"
+                    className="px-3 py-1.5 border border-[var(--border)] rounded-md text-[var(--text-primary)]"
+                  >
+                    Download Template
+                  </a>
+                )}
+                <Link href={i.href} className="px-3 py-1.5 bg-[var(--accent)] text-[#0b1324] rounded-md font-semibold">
+                  Open
+                </Link>
+              </div>
             </Card>
           );
         })}

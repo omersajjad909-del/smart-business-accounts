@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient,Prisma } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 const prisma =
   (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
   if (!companyId) {
     return NextResponse.json({ error: "Company required" }, { status: 400 });
   }
+  const branchId = await resolveBranchIdOrDefault(req, companyId);
 
   const { poNo, supplierId, date, items, remarks, approvalStatus } = await req.json();
 
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
       date: new Date(date),
       remarks: remarks || "",
       companyId,
+      branchId,
       status: "PENDING",
       approvalStatus: approvalStatus || "PENDING",
       items: {
@@ -59,6 +61,7 @@ export async function GET(req: NextRequest) {
   if (!companyId) {
     return NextResponse.json({ error: "Company required" }, { status: 400 });
   }
+  const branchId = await resolveBranchId(req, companyId);
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
@@ -81,7 +84,7 @@ export async function GET(req: NextRequest) {
   const nextNo = searchParams.get("nextNo");
   if (nextNo === "true") {
     const last = await prisma.purchaseOrder.findFirst({
-      where: { poNo: { startsWith: "PO #" }, companyId },
+      where: { poNo: { startsWith: "PO #" }, companyId, ...(branchId ? { branchId } : {}) },
       orderBy: { createdAt: "desc" },
       select: { poNo: true },
     });
@@ -95,7 +98,7 @@ export async function GET(req: NextRequest) {
 
   // Return all POs
   const pos = await prisma.purchaseOrder.findMany({
-    where: { companyId },
+    where: { companyId, ...(branchId ? { branchId } : {}) },
     include: {
       supplier: true,
       items: {

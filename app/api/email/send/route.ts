@@ -126,6 +126,7 @@ export async function POST(req: NextRequest) {
       to: Array.isArray(to) ? to : [to],
       subject: emailSubject,
       html,
+      companyId,
     });
 
     if (!result.success) {

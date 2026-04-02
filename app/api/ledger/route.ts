@@ -11,6 +11,12 @@ if (process.env.NODE_ENV === "development") {
 export async function GET(req: Request) {
   try {
     const role = req.headers.get("x-user-role");
+    const companyId = req.headers.get("x-company-id");
+
+    if (!companyId) {
+      return NextResponse.json({ error: "Company context required" }, { status: 400 });
+    }
+
     if (role !== "ADMIN" && role !== "ACCOUNTANT") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -20,7 +26,10 @@ export async function GET(req: Request) {
     if (!accountId) return NextResponse.json([]);
 
     const entries = await prisma.voucherEntry.findMany({
-      where: { accountId },
+      where: { 
+        accountId,
+        voucher: { companyId } // Enforce company scoping
+      },
       include: { voucher: true },
       orderBy: { voucher: { date: "asc" } },
     });

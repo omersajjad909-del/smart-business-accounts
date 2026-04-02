@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { logActivity } from "@/lib/audit";
+import { logAuditFromReq } from "@/lib/auditLogger";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { seedMinimalChart } from "@/lib/services/accountsSeed";
@@ -199,6 +200,15 @@ export async function POST(req: NextRequest) {
       details: `Created account ${account.code} - ${account.name}`,
     });
 
+    await logAuditFromReq(req, {
+      companyId,
+      entity: "Account",
+      entityId: account.id,
+      action: "CREATE",
+      afterValues: account,
+      description: `Created account ${account.code} - ${account.name}`,
+    });
+
     return NextResponse.json(account);
   } catch (e) {
     console.error("ACCOUNT CREATE ERROR:", e);
@@ -224,6 +234,14 @@ export async function PUT(req: NextRequest) {
     const { id, ...updateData } = body;
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+
+    const beforeAccount = await prisma.account.findUnique({
+      where: { id, companyId }
+    });
+
+    if (!beforeAccount) {
+      return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    }
 
     const fixedType = CATEGORY_TYPE_MAP[updateData.partyType] || undefined;
 
@@ -254,6 +272,16 @@ export async function PUT(req: NextRequest) {
       details: `Updated account ${id}`,
     });
 
+    await logAuditFromReq(req, {
+      companyId,
+      entity: "Account",
+      entityId: id,
+      action: "UPDATE",
+      beforeValues: beforeAccount,
+      afterValues: updatedAccount,
+      description: `Updated account ${updatedAccount?.code} - ${updatedAccount?.name}`,
+    });
+
     return NextResponse.json(updatedAccount);
   } catch (_e) {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
@@ -279,6 +307,10 @@ export async function DELETE(req: NextRequest) {
 
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
+    const accountBefore = await prisma.account.findUnique({
+      where: { id, companyId }
+    });
+
     await prisma.account.updateMany({
       where: { id: id, companyId },
       data: {
@@ -292,6 +324,15 @@ export async function DELETE(req: NextRequest) {
       userId,
       action: "ACCOUNT_DELETED",
       details: `Soft-deleted account ${id}`,
+    });
+
+    await logAuditFromReq(req, {
+      companyId,
+      entity: "Account",
+      entityId: id,
+      action: "DELETE",
+      beforeValues: accountBefore,
+      description: `Soft-deleted account ${accountBefore?.code} - ${accountBefore?.name}`,
     });
 
     return NextResponse.json({ message: "Deleted" });

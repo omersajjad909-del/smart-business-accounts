@@ -175,7 +175,7 @@ export default function ActivityLogsPage() {
                     </div>
                   </td>
                   <td className="p-4 text-gray-500 font-mono text-xs">
-                    {new Date(log.createdAt).toLocaleString("en-PK", {
+                    {new Date(log.createdAt).toLocaleString(undefined, {
                        dateStyle: 'medium',
                        timeStyle: 'short'
                     })}
