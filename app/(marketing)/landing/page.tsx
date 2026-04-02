@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import Hero from "./components/Hero";
 import SolutionSection from "./components/SolutionSection";
 import FeaturesSection from "./components/FeaturesSection";
@@ -9,7 +11,26 @@ import CTASection from "./components/CTASection";
 import NewsletterSection from "./components/NewsletterSection";
 import CookieBanner from "./components/CookieBanner";
 
-export default function LandingPage() {
+async function getRequestHost() {
+  const headerStore = await headers();
+  return (
+    headerStore.get("x-forwarded-host") ||
+    headerStore.get("host") ||
+    ""
+  ).toLowerCase();
+}
+
+export default async function LandingPage() {
+  const host = await getRequestHost();
+
+  if (host === "usefinova.app" || host.endsWith(".usefinova.app")) {
+    redirect("/auth");
+  }
+
+  if (host === "finovaos.app" || host === "www.finovaos.app") {
+    redirect("/");
+  }
+
   return (
     <>
       <Hero />
