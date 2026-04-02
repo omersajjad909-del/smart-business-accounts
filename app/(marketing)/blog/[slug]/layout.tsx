@@ -6,9 +6,10 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const post = ALL_POSTS[params.slug];
+  const { slug } = await params;
+  const post = ALL_POSTS[slug];
 
   if (!post) {
     return {
