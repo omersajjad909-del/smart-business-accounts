@@ -206,9 +206,7 @@ export async function POST(req: NextRequest) {
     if (!sendResult.success) {
       return NextResponse.json(
         {
-          error:
-            sendResult.error ||
-            "We could not send the verification code email. Please check SMTP configuration.",
+          error: "We could not send the verification email. Please try again or contact support.",
         },
         { status: 500 },
       );
