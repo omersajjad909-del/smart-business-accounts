@@ -2,7 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, setCurrentUser } from "@/lib/auth";
 import { FX_USD, formatFromUSD } from "@/lib/currency";
 import { getStoredCurrencyPreference, setStoredCurrencyPreference } from "@/lib/currencyPreference";
 
@@ -328,28 +328,33 @@ export default function PaymentPage() {
     if (currentUser?.id && currentUser?.companyId) { await activatePlanDirect(); return; }
     setProcessing(true);
     try {
-      const res = await fetch("/api/auth/verify/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), channel: "email" }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setOtpError(data.error || "Failed to send verification code."); setProcessing(false); return; }
+      // Payment step sits after signup/login verification setup. If the user
+      // is not yet in browser storage, we still allow the existing sb_verify
+      // cookie session to continue instead of re-requesting auth by email.
       setStep(2);
-    } catch { setOtpError("Network error. Please try again."); }
-    finally { setProcessing(false); }
+    } catch {
+      setOtpError("Network error. Please try again.");
+    } finally {
+      setProcessing(false);
+    }
   }
 
   async function handleResendOtp() {
     if (!email.trim()) return;
     setOtpError("");
     try {
-      await fetch("/api/auth/verify/request", {
+      const res = await fetch("/api/auth/verify/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), channel: "email" }),
       });
-    } catch {}
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setOtpError(data?.error || "Failed to resend code.");
+      }
+    } catch {
+      setOtpError("Failed to resend code.");
+    }
   }
 
   async function handleVerify() {
@@ -365,7 +370,10 @@ export default function PaymentPage() {
       });
       const verifyData = await verifyRes.json();
       if (!verifyRes.ok) { setOtpError(verifyData.error || "Invalid code"); setActivating(false); return; }
-      const user = getCurrentUser();
+      if (verifyData?.user) {
+        setCurrentUser(verifyData.user);
+      }
+      const user = verifyData?.user || getCurrentUser();
       if (!user) { setOtpError("Please sign in again."); setActivating(false); return; }
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
