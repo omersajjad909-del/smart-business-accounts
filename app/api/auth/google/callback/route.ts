@@ -5,7 +5,6 @@ import { signJwt } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   createVerificationCodeLog,
-  isOtpDevMode,
   isUserVerified,
   sendVerificationCode,
 } from "@/lib/verification";
@@ -127,6 +126,9 @@ export async function GET(req: NextRequest) {
 
       if (!emailResult.success) {
         console.error("Google callback OTP email failed:", emailResult.error);
+        return NextResponse.redirect(
+          `${base}/auth?error=${encodeURIComponent("We could not send the verification email. Please try again.")}`,
+        );
       }
 
       const verifyToken = signJwt({
@@ -142,15 +144,6 @@ export async function GET(req: NextRequest) {
       const res = NextResponse.redirect(
         `${base}/auth?mode=verify&email=${encodeURIComponent(email)}`,
       );
-      if (isOtpDevMode()) {
-        res.cookies.set("sb_dev_otp", code, {
-          httpOnly: false,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          path: "/",
-          maxAge: 15 * 60,
-        });
-      }
       res.cookies.set("sb_verify", verifyToken, {
         httpOnly: true,
         secure: true,

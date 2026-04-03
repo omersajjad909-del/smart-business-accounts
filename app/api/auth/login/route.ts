@@ -223,6 +223,10 @@ export async function POST(req: NextRequest) {
 
         if (!emailResult.success) {
           console.error("❌ Login OTP email failed:", emailResult.error);
+          return NextResponse.json(
+            { error: "We could not send the verification email. Please try again." },
+            { status: 500 },
+          );
         }
         const verifyToken = signJwt({
           userId: safeUser.id,
@@ -247,8 +251,6 @@ export async function POST(req: NextRequest) {
             email: safeUser.email,
             phone: targets?.phone,
           }),
-          ...(isOtpDevMode() ? { devOtp: code, devOtpMode: true } : {}),
-          ...(!emailResult.success ? { devOtp: code } : {}),
         });
         res.cookies.set("sb_verify", verifyToken, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 15 * 60 });
         return res;
@@ -267,7 +269,6 @@ export async function POST(req: NextRequest) {
           email: safeUser.email,
           phone: targets?.phone,
         }),
-        ...(isOtpDevMode() ? { devOtpMode: true } : {}),
       });
       return res;
     }

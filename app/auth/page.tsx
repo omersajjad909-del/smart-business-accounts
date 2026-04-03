@@ -133,7 +133,6 @@ function AuthPageInner() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showOtpForm, setShowOtpForm] = useState(false);
-  const [devOtp, setDevOtp] = useState<string | null>(null);
 
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -143,15 +142,6 @@ function AuthPageInner() {
       setOtpEmail(emailParam);
       setShowOtpForm(true);
       setMessage("We sent a 6-digit code to your email. Please enter it below.");
-      try {
-        const cookieOtp = document.cookie
-          .split("; ")
-          .find((entry) => entry.startsWith("sb_dev_otp="))
-          ?.split("=")[1];
-        setDevOtp(cookieOtp ? decodeURIComponent(cookieOtp) : null);
-      } catch {
-        setDevOtp(null);
-      }
       return;
     }
     setMode(modeParam === "signup" ? "signup" : "signin");
@@ -214,7 +204,6 @@ function AuthPageInner() {
         setVerificationToken(data.verificationToken ?? null);
         setOtpEmail(data.email || email);
         setShowOtpForm(true);
-        setDevOtp(data.devOtp || null);
         setMessage(data.message || "We have sent you a 6-digit code.");
         return;
       }
@@ -267,7 +256,6 @@ function AuthPageInner() {
       const data = await response.json();
       if (!response.ok) { setError(data.error || "Unable to resend code."); return; }
       if (data.verificationToken) setVerificationToken(data.verificationToken);
-      setDevOtp(data.devOtp || devOtp);
       setMessage(data.message || "A fresh code has been sent.");
     } catch {
       setError("Unable to resend code. Please try again.");
@@ -458,11 +446,6 @@ function AuthPageInner() {
                 <div style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)", borderRadius: 14, padding: "12px 16px", fontSize: 13, color: "#6ee7b7", marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 10 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
                   {message}
-                </div>
-              )}
-              {showOtpForm && devOtp && (
-                <div style={{ background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.28)", borderRadius: 14, padding: "12px 16px", fontSize: 13, color: "#c7d2fe", marginBottom: 20 }}>
-                  Dev OTP: <span style={{ fontWeight: 800, letterSpacing: "0.18em", color: "#ffffff" }}>{devOtp}</span>
                 </div>
               )}
 
