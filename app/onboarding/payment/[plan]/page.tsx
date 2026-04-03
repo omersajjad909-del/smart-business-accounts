@@ -259,11 +259,13 @@ export default function PaymentPage() {
     if (currency) setStoredCurrencyPreference(currency, country);
   }, [currency, country]);
 
+  // 75% off for first 3 months — today's charge is 25% of full price
+  const discountedPrice  = plan === "custom" ? planPrice : Math.round(planPrice * 0.25);
   const finalPrice       = couponApplied
     ? couponApplied.type === "percent"
-      ? Math.max(0, planPrice - (planPrice * couponApplied.value) / 100)
-      : Math.max(0, planPrice - couponApplied.value)
-    : planPrice;
+      ? Math.max(0, discountedPrice - (discountedPrice * couponApplied.value) / 100)
+      : Math.max(0, discountedPrice - couponApplied.value)
+    : discountedPrice;
   const displayPlanPrice  = formatFromUSD(planPrice, currency, rates);
   const displayFinalPrice = formatFromUSD(finalPrice, currency, rates);
 
@@ -748,16 +750,20 @@ export default function PaymentPage() {
                 <div style={{ textAlign:"center", marginBottom:20 }}>
                   <div style={{ fontSize:28, marginBottom:6 }}>{meta.icon}</div>
                   <div style={{ fontSize:16, fontWeight:800, color:"white" }}>{meta.name}</div>
-                  <div style={{ fontSize:26, fontWeight:900, color:meta.color, marginTop:6, lineHeight:1 }}>
-                    {displayPlanPrice}
-                    <span style={{ fontSize:12, fontWeight:500, color:"rgba(255,255,255,.35)" }}>{billingCycle==="yearly"?"/yr":"/mo"}</span>
-                  </div>
-                  {billingCycle==="yearly" && yearlySavings>0 && (
-                    <div style={{ display:"inline-flex", alignItems:"center", gap:5, marginTop:6, padding:"3px 10px", borderRadius:99, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.2)", fontSize:10, fontWeight:700, color:"#6ee7b7" }}>
-                      🎉 Save ${yearlySavings}/year
+                  {plan !== "custom" && (
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginTop:8 }}>
+                      <span style={{ fontSize:13, color:"rgba(255,255,255,.35)", textDecoration:"line-through" }}>{displayPlanPrice}/{billingCycle==="yearly"?"yr":"mo"}</span>
+                      <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.18)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"#fb923c" }}>75% OFF</span>
                     </div>
                   )}
-                  <div style={{ fontSize:10, color:"rgba(255,255,255,.28)", marginTop:6 }}>Billing in {currency}</div>
+                  <div style={{ fontSize:26, fontWeight:900, color:meta.color, marginTop:4, lineHeight:1 }}>
+                    {formatFromUSD(discountedPrice, currency, rates)}
+                    <span style={{ fontSize:12, fontWeight:500, color:"rgba(255,255,255,.35)" }}> today</span>
+                  </div>
+                  {plan !== "custom" && (
+                    <div style={{ fontSize:10, color:"rgba(255,255,255,.38)", marginTop:5 }}>First 3 months · then {displayPlanPrice}/{billingCycle==="yearly"?"yr":"mo"}</div>
+                  )}
+                  <div style={{ fontSize:10, color:"rgba(255,255,255,.28)", marginTop:4 }}>Billing in {currency}</div>
                 </div>
 
                 {/* Billing cycle toggle */}
@@ -813,9 +819,12 @@ export default function PaymentPage() {
 
                 {/* Total */}
                 <div style={{ display:"flex", justifyContent:"space-between", padding:"14px 0 0", fontSize:14, fontWeight:800 }}>
-                  <span style={{ color:"rgba(255,255,255,.6)" }}>Total today</span>
+                  <div>
+                    <div style={{ color:"rgba(255,255,255,.6)" }}>Total today</div>
+                    {plan !== "custom" && <div style={{ fontSize:10, fontWeight:500, color:"rgba(249,115,22,.7)", marginTop:2 }}>75% off · 3 months</div>}
+                  </div>
                   <div style={{ textAlign:"right" }}>
-                    {couponApplied && <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", textDecoration:"line-through", fontWeight:400 }}>{displayPlanPrice}</div>}
+                    <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", textDecoration:"line-through", fontWeight:400 }}>{displayPlanPrice}</div>
                     <span style={{ color:meta.color }}>{displayFinalPrice}</span>
                   </div>
                 </div>
