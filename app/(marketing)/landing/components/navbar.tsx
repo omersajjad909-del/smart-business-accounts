@@ -489,45 +489,6 @@ export default function Navbar() {
 
             {/* Desktop right */}
             <div className="fn-desk" style={{ display:"flex", alignItems:"center", gap:14 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <div style={{
-                  display:"flex", alignItems:"center", gap:6,
-                  padding:"5px 10px", borderRadius:100,
-                  background:"rgba(56,189,248,.08)", border:"1px solid rgba(56,189,248,.18)",
-                }}>
-                  <span style={{ fontSize:11.5, fontWeight:800, color:"#7dd3fc", letterSpacing:".04em" }}>{currency}</span>
-                  <span style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.28)" }}>{country}</span>
-                </div>
-                <select
-                  aria-label="Select currency"
-                  value={currency}
-                  onChange={e => {
-                    setCurrency(e.target.value)
-                    setStoredCurrencyPreference(e.target.value, country)
-                  }}
-                  style={{
-                    background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)",
-                    borderRadius:10, padding:"7px 10px", color:"white", fontSize:12, fontWeight:700, outline:"none",
-                  }}
-                >
-                  {SUPPORTED_CURRENCIES.map(code => (
-                    <option key={code} value={code}>{code} - {CURRENCY_LABEL[code]}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Live status */}
-              <div style={{
-                display:"flex", alignItems:"center", gap:6,
-                padding:"5px 10px", borderRadius:100,
-                background:"rgba(16,185,129,.08)", border:"1px solid rgba(16,185,129,.2)",
-              }}>
-                <span style={{
-                  width:6, height:6, borderRadius:"50%", background:"#10b981",
-                  animation:"blink 2s ease infinite", display:"block",
-                }}/>
-                <span style={{ fontSize:11.5, fontWeight:700, color:"#10b981", letterSpacing:".02em" }}>Live</span>
-              </div>
 
               <Link href={`${APP_URL}/auth`}
                 style={{
@@ -613,27 +574,6 @@ export default function Navbar() {
         {/* ── Mobile Menu ── */}
         {mobileOpen && (
           <div style={{ background:"rgba(7,10,27,.98)", backdropFilter:"blur(24px)", borderTop:"1px solid rgba(255,255,255,.07)", padding:"18px 24px 28px", animation:"mobileIn .22s ease both" }}>
-            <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:16 }}>
-              <div style={{ padding:"6px 10px", borderRadius:999, background:"rgba(56,189,248,.08)", border:"1px solid rgba(56,189,248,.18)", color:"#7dd3fc", fontSize:12, fontWeight:800 }}>
-                {currency} · {country}
-              </div>
-              <select
-                aria-label="Select currency"
-                value={currency}
-                onChange={e => {
-                  setCurrency(e.target.value)
-                  setStoredCurrencyPreference(e.target.value, country)
-                }}
-                style={{
-                  flex:1, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)",
-                  borderRadius:10, padding:"9px 10px", color:"white", fontSize:12, fontWeight:700, outline:"none",
-                }}
-              >
-                {SUPPORTED_CURRENCIES.map(code => (
-                  <option key={code} value={code}>{code} - {CURRENCY_LABEL[code]}</option>
-                ))}
-              </select>
-            </div>
             <div style={{ display:"flex", flexDirection:"column" }}>
               <Link href="/features"  className="fn-mob" onClick={() => setMobileOpen(false)}>Features</Link>
               <Link href="/solutions" className="fn-mob" onClick={() => setMobileOpen(false)}>Solutions</Link>

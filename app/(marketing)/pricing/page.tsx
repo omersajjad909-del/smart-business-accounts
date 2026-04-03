@@ -277,14 +277,16 @@ export default function PricingPage() {
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
             style={{
-              background: "rgba(255,255,255,.05)",
-              border: "1px solid rgba(255,255,255,.1)",
+              background: "rgba(255,255,255,.04)",
+              border: "1px solid rgba(255,255,255,.09)",
               borderRadius: 12,
-              padding: "10px 14px",
-              color: "white",
-              fontSize: 13,
+              padding: "9px 12px",
+              color: "rgba(255,255,255,.8)",
+              fontSize: 12,
               fontWeight: 700,
               outline: "none",
+              cursor: "pointer",
+              fontFamily: "inherit",
             }}
           >
             {SUPPORTED_CURRENCIES.map((code) => (

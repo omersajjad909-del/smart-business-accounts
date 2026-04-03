@@ -1,6 +1,15 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import {
+  CURRENCY_LABEL, CURRENCY_SYMBOL, FX_USD, SUPPORTED_CURRENCIES,
+  formatFromUSD,
+} from "@/lib/currency";
+import {
+  getStoredCurrencyPreference,
+  setStoredCurrencyPreference,
+  FINOVA_CURRENCY_EVENT,
+} from "@/lib/currencyPreference";
 
 function useInView() {
   const ref = useRef<HTMLDivElement>(null);
@@ -139,19 +148,22 @@ function Cross() {
   );
 }
 
-function PlanCard({ plan, billing, prices, vis, i }: {
+function PlanCard({ plan, billing, prices, vis, i, currency }: {
   plan: typeof PLANS[0];
   billing: "monthly" | "yearly";
   prices: Prices;
   vis: boolean;
   i: number;
+  currency: string;
 }) {
   const [hov, setHov] = useState(false);
   const isCustom = plan.key === "custom";
-  const raw    = isCustom ? null : prices[plan.key as keyof Prices];
-  const price  = raw ? (billing === "yearly" ? Math.round(raw.yearly / 12) : raw.monthly) : 0;
-  const normal = raw ? raw.monthly : 0;
-  const first3 = Math.round(price * 0.25); // 75% off
+  const raw      = isCustom ? null : prices[plan.key as keyof Prices];
+  const priceUSD = raw ? (billing === "yearly" ? Math.round(raw.yearly / 12) : raw.monthly) : 0;
+  const normalUSD= raw ? raw.monthly : 0;
+  const first3USD= Math.round(priceUSD * 0.25); // 75% off
+  const fmt      = (usd: number) => formatFromUSD(usd, currency);
+  const sym      = CURRENCY_SYMBOL[currency] || currency;
 
   return (
     <div
@@ -208,21 +220,23 @@ function PlanCard({ plan, billing, prices, vis, i }: {
           <>
             {/* Original price + 75% off badge — small row */}
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-              <span style={{ fontSize:13, color:"rgba(255,255,255,.35)", textDecoration:"line-through" }}>${normal}/mo</span>
+              <span style={{ fontSize:13, color:"rgba(255,255,255,.35)", textDecoration:"line-through" }}>{fmt(normalUSD)}/mo</span>
               <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(249,115,22,.2)", border:"1px solid rgba(249,115,22,.4)", fontSize:10, fontWeight:800, color:"#fb923c" }}>
                 75% OFF × 3 months
               </span>
             </div>
             {/* Discounted price — big */}
             <div style={{ display:"flex", alignItems:"baseline", gap:3, marginBottom:6 }}>
-              <span style={{ fontSize:15, fontWeight:700, color:"rgba(255,255,255,.6)" }}>$</span>
-              <span style={{ fontSize:52, fontWeight:900, color:"white", letterSpacing:"-2px", lineHeight:1, fontFamily:"'Lora',serif" }}>{first3}</span>
+              <span style={{ fontSize:15, fontWeight:700, color:"rgba(255,255,255,.6)" }}>{sym}</span>
+              <span style={{ fontSize:52, fontWeight:900, color:"white", letterSpacing:"-2px", lineHeight:1, fontFamily:"'Lora',serif" }}>
+                {formatFromUSD(first3USD, currency).replace(/[^0-9.,]/g, "")}
+              </span>
               <span style={{ fontSize:13, color:"rgba(255,255,255,.4)", fontWeight:500 }}>/mo</span>
             </div>
             {/* Sub note */}
             <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:2 }}>
               {billing === "yearly" && raw
-                ? `Billed annually $${raw.yearly}/yr — saves $${(normal * 12) - raw.yearly}/yr`
+                ? `Billed annually ${fmt(raw.yearly)}/yr — saves ${fmt((normalUSD * 12) - raw.yearly)}/yr`
                 : "First 3 months discounted, then full monthly billing"}
             </div>
           </>
@@ -271,6 +285,8 @@ export default function PricingSection() {
   const [ref, vis]      = useInView();
   const [billing, setBilling] = useState<"monthly"|"yearly">("monthly");
   const [prices, setPrices]   = useState<Prices>(DEFAULT_PRICES);
+  const [currency, setCurrency] = useState<string>("USD");
+  const [country,  setCountry]  = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/public/pricing")
@@ -278,6 +294,43 @@ export default function PricingSection() {
       .then(d => { if (d?.pricing) setPrices({ ...DEFAULT_PRICES, ...d.pricing }); })
       .catch(() => {});
   }, []);
+
+  // Auto-detect currency from location
+  useEffect(() => {
+    const stored = getStoredCurrencyPreference();
+    if (stored.currency && FX_USD[stored.currency]) {
+      setCurrency(stored.currency);
+      if (stored.country) setCountry(stored.country);
+    }
+    if (!stored.currency || !stored.country) {
+      fetch("/api/public/geo")
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+          if (d?.currency && FX_USD[d.currency]) {
+            setCurrency(d.currency);
+            setStoredCurrencyPreference(d.currency, d.country || null);
+            if (d.country) setCountry(d.country);
+          }
+        })
+        .catch(() => {});
+    }
+    const onCurrencyChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ currency?: string; country?: string | null }>).detail;
+      if (detail?.currency && FX_USD[detail.currency]) setCurrency(detail.currency);
+    };
+    window.addEventListener(FINOVA_CURRENCY_EVENT, onCurrencyChanged as EventListener);
+    return () => window.removeEventListener(FINOVA_CURRENCY_EVENT, onCurrencyChanged as EventListener);
+  }, []);
+
+  function handleCurrencyChange(code: string) {
+    setCurrency(code);
+    setStoredCurrencyPreference(code, country);
+    window.dispatchEvent(new CustomEvent(FINOVA_CURRENCY_EVENT, { detail: { currency: code, country } }));
+  }
+
+  function price(usd: number) {
+    return formatFromUSD(usd, currency);
+  }
 
   return (
     <section style={{
@@ -325,31 +378,61 @@ export default function PricingSection() {
             75% off for your first 3 months. No hidden fees. Cancel anytime.
           </p>
 
-          {/* Monthly / Yearly toggle */}
-          <div style={{ display:"inline-flex", alignItems:"center", gap:0, borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", padding:4 }}>
-            {(["monthly","yearly"] as const).map(b => (
-              <button key={b} onClick={() => setBilling(b)} style={{
-                padding:"8px 22px", borderRadius:9, fontSize:13, fontWeight:700, cursor:"pointer",
-                background: billing===b ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "transparent",
-                color: billing===b ? "white" : "rgba(255,255,255,.45)",
-                border:"none", transition:"all .25s", fontFamily:"inherit",
-                boxShadow: billing===b ? "0 4px 12px rgba(99,102,241,.4)" : "none",
-              }}>
-                {b === "monthly" ? "Monthly" : "Yearly"}
-                {b === "yearly" && (
-                  <span style={{ marginLeft:6, fontSize:10, fontWeight:800, color: billing==="yearly" ? "#fbbf24" : "rgba(251,191,36,.5)", background:"rgba(251,191,36,.12)", padding:"1px 6px", borderRadius:6 }}>
-                    −20%
-                  </span>
-                )}
-              </button>
-            ))}
+          {/* Monthly / Yearly toggle + Currency selector row */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12, flexWrap:"wrap" }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:0, borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", padding:4 }}>
+              {(["monthly","yearly"] as const).map(b => (
+                <button key={b} onClick={() => setBilling(b)} style={{
+                  padding:"8px 22px", borderRadius:9, fontSize:13, fontWeight:700, cursor:"pointer",
+                  background: billing===b ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "transparent",
+                  color: billing===b ? "white" : "rgba(255,255,255,.45)",
+                  border:"none", transition:"all .25s", fontFamily:"inherit",
+                  boxShadow: billing===b ? "0 4px 12px rgba(99,102,241,.4)" : "none",
+                }}>
+                  {b === "monthly" ? "Monthly" : "Yearly"}
+                  {b === "yearly" && (
+                    <span style={{ marginLeft:6, fontSize:10, fontWeight:800, color: billing==="yearly" ? "#fbbf24" : "rgba(251,191,36,.5)", background:"rgba(251,191,36,.12)", padding:"1px 6px", borderRadius:6 }}>
+                      −20%
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Currency selector */}
+            <div style={{
+              display:"inline-flex", alignItems:"center", gap:6,
+              padding:"4px 6px 4px 10px", borderRadius:12,
+              background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.09)",
+            }}>
+              <span style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.5)" }}>
+                {CURRENCY_SYMBOL[currency] || currency}
+              </span>
+              <select
+                aria-label="Select currency"
+                value={currency}
+                onChange={e => handleCurrencyChange(e.target.value)}
+                style={{
+                  background:"transparent", border:"none",
+                  color:"rgba(255,255,255,.8)", fontSize:12, fontWeight:700,
+                  outline:"none", cursor:"pointer", fontFamily:"inherit",
+                  padding:"4px 2px",
+                }}
+              >
+                {SUPPORTED_CURRENCIES.map(code => (
+                  <option key={code} value={code} style={{ background:"#1e1b4b" }}>
+                    {code} — {CURRENCY_LABEL[code]}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
         {/* Plans */}
         <div className="pricing-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:48, alignItems:"start" }}>
           {PLANS.map((plan, i) => (
-            <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} vis={vis} i={i} />
+            <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} vis={vis} i={i} currency={currency} />
           ))}
         </div>
 
