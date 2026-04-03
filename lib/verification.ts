@@ -9,6 +9,10 @@ export type VerificationChannel = "email" | "sms";
 
 export const OTP_TTL_MS = 15 * 60 * 1000;
 
+export function isOtpDevMode() {
+  return String(process.env.OTP_DEV_MODE || "").toLowerCase() === "true";
+}
+
 function otpHash(code: string) {
   const secret = process.env.SESSION_SECRET || "dev-insecure-secret";
   return createHmac("sha256", secret).update(code).digest("hex");
@@ -152,6 +156,15 @@ export async function sendVerificationCode(params: {
   channel: VerificationChannel;
   code: string;
 }) {
+  if (isOtpDevMode()) {
+    return {
+      success: true,
+      actualChannel: params.channel,
+      transport: "dev",
+      error: null,
+    };
+  }
+
   if (params.channel === "sms") {
     if (!params.phone) {
       return {

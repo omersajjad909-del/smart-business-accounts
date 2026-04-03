@@ -7,6 +7,7 @@ import {
   getLatestVerificationLog,
   getMaskedTarget,
   getUserVerificationTargets,
+  isOtpDevMode,
   isUserVerified,
   OTP_TTL_MS,
   VerificationChannel,
@@ -100,6 +101,7 @@ export async function POST(req: NextRequest) {
         availableChannels: targets.availableChannels,
         verifyChannel: channel,
         verifyTarget: getMaskedTarget(channel, targets),
+        ...(isOtpDevMode() ? { devOtpMode: true } : {}),
       });
       res.cookies.set("sb_verify", token, {
         httpOnly: true,
@@ -162,6 +164,7 @@ export async function POST(req: NextRequest) {
       availableChannels: targets.availableChannels,
       verifyChannel: channel,
       verifyTarget: getMaskedTarget(channel, targets),
+      ...(isOtpDevMode() ? { devOtp: code, devOtpMode: true } : {}),
     });
     res.cookies.set("sb_verify", token, {
       httpOnly: true,

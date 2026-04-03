@@ -9,6 +9,7 @@ import {
   getAvailableChannels,
   getMaskedTarget,
   getUserVerificationTargets,
+  isOtpDevMode,
   isUserVerified,
   sendVerificationCode,
 } from "@/lib/verification";
@@ -247,7 +248,7 @@ export async function POST(req: NextRequest) {
             email: safeUser.email,
             phone: targets?.phone,
           }),
-          // Show OTP in dev if email failed
+          ...(isOtpDevMode() ? { devOtp: code, devOtpMode: true } : {}),
           ...(!emailResult.success ? { devOtp: code } : {}),
         });
         res.cookies.set("sb_verify", verifyToken, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 15 * 60 });
@@ -267,6 +268,7 @@ export async function POST(req: NextRequest) {
           email: safeUser.email,
           phone: targets?.phone,
         }),
+        ...(isOtpDevMode() ? { devOtpMode: true } : {}),
       });
       return res;
     }
