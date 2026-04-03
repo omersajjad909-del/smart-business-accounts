@@ -352,7 +352,7 @@ function AuthPageInner() {
             {/* Logo */}
             <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 14 }}>
               <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 24px rgba(99,102,241,0.4)" }}>
-                <Image src="/logo.svg" alt="Finova" width={24} height={24} />
+                <Image src="/icon.png" alt="Finova" width={24} height={24} />
               </div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px" }}>Finova</div>
@@ -421,7 +421,7 @@ function AuthPageInner() {
               {/* Mobile logo */}
               <Link href="/" style={{ textDecoration: "none", display: "none", alignItems: "center", gap: 12, marginBottom: 24 }} className="auth-mobile-logo">
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#8b5cf6,#d946ef)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Image src="/logo.svg" alt="Finova" width={20} height={20} />
+                  <Image src="/icon.png" alt="Finova" width={20} height={20} />
                 </div>
                 <span style={{ fontSize: 20, fontWeight: 700 }}>Finova</span>
               </Link>

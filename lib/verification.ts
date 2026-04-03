@@ -10,7 +10,7 @@ export type VerificationChannel = "email" | "sms";
 export const OTP_TTL_MS = 15 * 60 * 1000;
 
 export function isOtpDevMode() {
-  return String(process.env.OTP_DEV_MODE || "").toLowerCase() === "true";
+  return false;
 }
 
 function otpHash(code: string) {
@@ -156,15 +156,6 @@ export async function sendVerificationCode(params: {
   channel: VerificationChannel;
   code: string;
 }) {
-  if (isOtpDevMode()) {
-    return {
-      success: true,
-      actualChannel: params.channel,
-      transport: "dev",
-      error: null,
-    };
-  }
-
   if (params.channel === "sms") {
     if (!params.phone) {
       return {

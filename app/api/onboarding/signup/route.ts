@@ -9,7 +9,6 @@ import {
   createVerificationCodeLog,
   getAvailableChannels,
   getMaskedTarget,
-  isOtpDevMode,
   normalizePhone,
   sendVerificationCode,
 } from "@/lib/verification";
@@ -249,7 +248,6 @@ export async function POST(req: NextRequest) {
         email: user.email,
         phone: phoneNormalized,
       }),
-      ...(isOtpDevMode() ? { devOtp: code, devOtpMode: true } : {}),
       next,
     });
 

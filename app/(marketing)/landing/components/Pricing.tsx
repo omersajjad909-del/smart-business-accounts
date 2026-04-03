@@ -302,18 +302,17 @@ export default function PricingSection() {
       setCurrency(stored.currency);
       if (stored.country) setCountry(stored.country);
     }
-    if (!stored.currency || !stored.country) {
-      fetch("/api/public/geo")
-        .then(r => r.ok ? r.json() : null)
-        .then(d => {
-          if (d?.currency && FX_USD[d.currency]) {
-            setCurrency(d.currency);
-            setStoredCurrencyPreference(d.currency, d.country || null);
-            if (d.country) setCountry(d.country);
-          }
-        })
-        .catch(() => {});
-    }
+    // Always fetch geo to auto-detect location
+    fetch("/api/public/geo", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.currency && FX_USD[d.currency]) {
+          setCurrency(d.currency);
+          setStoredCurrencyPreference(d.currency, d.country || null);
+          if (d.country) setCountry(d.country);
+        }
+      })
+      .catch(() => {});
     const onCurrencyChanged = (event: Event) => {
       const detail = (event as CustomEvent<{ currency?: string; country?: string | null }>).detail;
       if (detail?.currency && FX_USD[detail.currency]) setCurrency(detail.currency);
@@ -429,11 +428,68 @@ export default function PricingSection() {
           </div>
         </div>
 
-        {/* Plans */}
-        <div className="pricing-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:48, alignItems:"start" }}>
-          {PLANS.map((plan, i) => (
+        {/* Plans — 3 column grid (Starter, Pro, Enterprise) */}
+        <div className="pricing-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:32, alignItems:"start" }}>
+          {PLANS.filter(p => p.key !== "custom").map((plan, i) => (
             <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} vis={vis} i={i} currency={currency} />
           ))}
+        </div>
+
+        {/* Custom plan — separate section */}
+        <div style={{
+          marginBottom:48,
+          opacity:vis?1:0, transform:vis?"translateY(0)":"translateY(20px)",
+          transition:"opacity .6s ease .35s, transform .6s ease .35s",
+        }}>
+          <div style={{
+            borderRadius:22, padding:"32px 36px",
+            background:"linear-gradient(135deg,rgba(249,115,22,.08),rgba(255,255,255,.03))",
+            border:"1.5px solid rgba(249,115,22,.25)",
+            display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:24,
+            boxShadow:"0 16px 48px rgba(249,115,22,.08)",
+          }}>
+            <div>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:7, padding:"4px 12px", borderRadius:20, marginBottom:12, background:"rgba(249,115,22,.12)", border:"1px solid rgba(249,115,22,.25)", fontSize:11, fontWeight:700, color:"#f97316" }}>
+                Custom Plan
+              </div>
+              <h3 style={{ fontSize:24, fontWeight:900, color:"white", letterSpacing:"-.5px", marginBottom:8, lineHeight:1.2 }}>
+                Pay only for what you need
+              </h3>
+              <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", lineHeight:1.6, maxWidth:520, margin:0 }}>
+                Pick modules individually — Accounting, Invoicing, HR, CRM, Inventory and more. No unused features, no bloated pricing.
+              </p>
+              <div style={{ display:"flex", gap:16, marginTop:16, flexWrap:"wrap" }}>
+                {["Per-module pricing","Flexible user count","Custom contract","Dedicated manager"].map(t => (
+                  <div key={t} style={{ display:"flex", alignItems:"center", gap:6, fontSize:12, color:"rgba(255,255,255,.5)", fontWeight:500 }}>
+                    <div style={{ width:6, height:6, borderRadius:"50%", background:"#f97316" }}/>
+                    {t}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+              <div style={{ textAlign:"center", marginBottom:4 }}>
+                <div style={{ fontSize:13, color:"rgba(255,255,255,.35)", marginBottom:2 }}>Starting from</div>
+                <div style={{ fontSize:36, fontWeight:900, color:"#f97316", letterSpacing:"-1.5px", lineHeight:1 }}>
+                  {CURRENCY_SYMBOL[currency] || currency}{formatFromUSD(15, currency).replace(/[^0-9.,]/g,"")}
+                </div>
+                <div style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>/module/mo</div>
+              </div>
+              <Link href="/onboarding/choose-plan?plan=custom" style={{
+                display:"flex", alignItems:"center", gap:8,
+                padding:"13px 28px", borderRadius:12,
+                background:"linear-gradient(135deg,#f97316,#ea580c)",
+                color:"white", fontWeight:800, fontSize:14, textDecoration:"none",
+                boxShadow:"0 6px 20px rgba(249,115,22,.35)",
+                whiteSpace:"nowrap",
+              }}>
+                Build Your Plan
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Trust strip */}

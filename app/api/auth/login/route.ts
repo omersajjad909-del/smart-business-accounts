@@ -9,7 +9,6 @@ import {
   getAvailableChannels,
   getMaskedTarget,
   getUserVerificationTargets,
-  isOtpDevMode,
   isUserVerified,
   sendVerificationCode,
 } from "@/lib/verification";

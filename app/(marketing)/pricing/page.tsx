@@ -139,17 +139,19 @@ export default function PricingPage() {
 
   useEffect(() => {
     (async () => {
+      // Apply stored preference immediately for instant render
       const stored = getStoredCurrencyPreference();
       if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
       if (stored.country) setCountry(stored.country);
 
+      // Always fetch geo to auto-detect location (overrides stored if different)
       try {
-        if (!stored.currency || !stored.country) {
-          const geo = await fetch("/api/public/geo", { cache: "no-store" });
-          if (geo.ok) {
-            const data = await geo.json();
-            if (data?.currency && FX_USD[data.currency]) setCurrency(data.currency);
-            if (data?.country) setCountry(data.country);
+        const geo = await fetch("/api/public/geo", { cache: "no-store" });
+        if (geo.ok) {
+          const data = await geo.json();
+          if (data?.currency && FX_USD[data.currency]) {
+            setCurrency(data.currency);
+            setCountry(data.country || stored.country || "US");
           }
         }
       } catch {}
@@ -327,11 +329,23 @@ export default function PricingPage() {
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.5, minHeight: 40 }}>{plan.tagline}</div>
 
                   <div style={{ margin: "24px 0" }}>
+                    {/* Strikethrough full price + 75% off badge */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                      <span style={{ fontSize: 14, color: "rgba(255,255,255,.35)", textDecoration: "line-through" }}>
+                        {formatPrice(plan.monthly)}/mo
+                      </span>
+                      <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.18)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "#fb923c" }}>
+                        75% OFF × 3 months
+                      </span>
+                    </div>
+                    {/* Discounted price — 75% off first 3 months */}
                     <div style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>
-                      {formatPrice(usdPrice)}
+                      {formatPrice(Math.round(usdPrice * 0.25))}
                     </div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.36)", marginTop: 6 }}>
-                      {billing === "monthly" ? "per month" : "per month on yearly plan"}
+                      {billing === "yearly"
+                        ? `per month for 3 months · then ${formatPrice(usdPrice)}/mo on yearly plan`
+                        : `per month for 3 months · then ${formatPrice(plan.monthly)}/mo`}
                     </div>
                   </div>
 
