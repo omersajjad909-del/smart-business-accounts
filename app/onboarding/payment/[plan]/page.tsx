@@ -209,6 +209,7 @@ export default function PaymentPage() {
   const [cvc,         setCvc]         = useState("");
   const [holder,      setHolder]      = useState("");
   const [email,       setEmail]       = useState("");
+  const [lockedVerificationEmail, setLockedVerificationEmail] = useState("");
   const [bankName,    setBankName]    = useState("");
   const [accountNo,   setAccountNo]   = useState("");
   const [phone,       setPhone]       = useState("");
@@ -228,8 +229,32 @@ export default function PaymentPage() {
 
   useEffect(() => {
     const user = getCurrentUser();
-    if (user?.email) setEmail(String(user.email));
-  }, []);
+    if (user?.email) {
+      const userEmail = String(user.email).trim().toLowerCase();
+      setEmail(userEmail);
+      setLockedVerificationEmail(userEmail);
+      return;
+    }
+
+    try {
+      const pendingVerification = localStorage.getItem("pendingVerification");
+      if (pendingVerification) {
+        const parsed = JSON.parse(pendingVerification);
+        const pendingEmail = String(parsed?.email || "").trim().toLowerCase();
+        if (pendingEmail) {
+          setEmail(pendingEmail);
+          setLockedVerificationEmail(pendingEmail);
+          return;
+        }
+      }
+    } catch {}
+
+    const queryEmail = String(searchParams.get("email") || "").trim().toLowerCase();
+    if (queryEmail) {
+      setEmail(queryEmail);
+      setLockedVerificationEmail(queryEmail);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     (async () => {
@@ -288,6 +313,8 @@ export default function PaymentPage() {
   }
 
   const brand = detectBrand(cardNumber);
+  const verificationEmail = (lockedVerificationEmail || email).trim().toLowerCase();
+  const isVerificationEmailLocked = !!lockedVerificationEmail;
 
   async function activatePlanDirect() {
     const user = getCurrentUser();
@@ -324,7 +351,7 @@ export default function PaymentPage() {
   }
 
   async function handlePaymentSubmit() {
-    if (!email.trim()) { setOtpError("Please enter your email address"); return; }
+    if (!verificationEmail) { setOtpError("Please enter your email address"); return; }
     setOtpError("");
     const currentUser = getCurrentUser();
     if (currentUser?.id && currentUser?.companyId) { await activatePlanDirect(); return; }
@@ -342,13 +369,13 @@ export default function PaymentPage() {
   }
 
   async function handleResendOtp() {
-    if (!email.trim()) return;
+    if (!verificationEmail) return;
     setOtpError("");
     try {
       const res = await fetch("/api/auth/verify/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), channel: "email" }),
+        body: JSON.stringify({ email: verificationEmail, channel: "email" }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -596,7 +623,7 @@ export default function PaymentPage() {
                         <div><label style={lbl}>CVV / CVC</label><input value={cvc} onChange={e=>setCvc(e.target.value.replace(/\D/g,"").slice(0,4))} placeholder="•••" type="password" maxLength={4} style={inp}/></div>
                       </div>
                       <div><label style={lbl}>Cardholder Name</label><input value={holder} onChange={e=>setHolder(e.target.value.toUpperCase())} placeholder="AS ON CARD" style={{...inp,textTransform:"uppercase"}}/></div>
-                      <div><label style={lbl}>Email for Receipt</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" style={inp}/></div>
+                      <div><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked?.valueOf() ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
@@ -609,7 +636,7 @@ export default function PaymentPage() {
                         </div>
                         <div style={{ fontSize:16, fontWeight:700, marginBottom:6 }}>Pay with PayPal</div>
                         <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginBottom:20 }}>Enter your PayPal email to receive a payment request</div>
-                        <div><label style={lbl}>PayPal Email</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="paypal@example.com" type="email" style={inp}/></div>
+                        <div><label style={lbl}>PayPal Email</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="paypal@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                       </div>
                     </div>
                   )}
@@ -622,7 +649,7 @@ export default function PaymentPage() {
                       </div>
                       <div style={{ fontSize:15, fontWeight:700 }}>Apple Pay</div>
                       <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", textAlign:"center", maxWidth:280 }}>Complete your purchase using Touch ID or Face ID. Available on Safari and iOS devices.</div>
-                      <div style={{ width:"100%" }}><label style={lbl}>Email for Receipt</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" style={inp}/></div>
+                      <div style={{ width:"100%" }}><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                       <div style={{ padding:"10px 16px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center" }}>
                         Apple Pay will launch automatically at checkout
                       </div>
@@ -637,7 +664,7 @@ export default function PaymentPage() {
                       </div>
                       <div style={{ fontSize:15, fontWeight:700 }}>Google Pay</div>
                       <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", textAlign:"center", maxWidth:280 }}>One-tap payment using your saved Google Pay cards.</div>
-                      <div style={{ width:"100%" }}><label style={lbl}>Email for Receipt</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" style={inp}/></div>
+                      <div style={{ width:"100%" }}><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                       <div style={{ padding:"10px 16px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center" }}>
                         Google Pay will launch automatically at checkout
                       </div>
@@ -656,7 +683,7 @@ export default function PaymentPage() {
                       </div>
                       <div><label style={lbl}>Your Bank Name</label><input value={bankName} onChange={e=>setBankName(e.target.value)} placeholder="e.g. HBL, MCB, Standard Chartered" style={inp}/></div>
                       <div><label style={lbl}>Account Number / IBAN</label><input value={accountNo} onChange={e=>setAccountNo(e.target.value)} placeholder="PK36SCBL0000001123456702" style={{...inp,fontFamily:"monospace"}}/></div>
-                      <div><label style={lbl}>Email for Confirmation</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" style={inp}/></div>
+                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
@@ -672,7 +699,7 @@ export default function PaymentPage() {
                       </div>
                       <div><label style={lbl}>Mobile Number</label><input value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,"").slice(0,11))} placeholder="03XX-XXXXXXX" style={{...inp,fontFamily:"monospace",letterSpacing:1}}/></div>
                       <div><label style={lbl}>Account ID (optional)</label><input value={walletId} onChange={e=>setWalletId(e.target.value)} placeholder="Registered wallet ID" style={inp}/></div>
-                      <div><label style={lbl}>Email for Confirmation</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" style={inp}/></div>
+                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
@@ -694,7 +721,7 @@ export default function PaymentPage() {
                         <div style={{ fontFamily:"monospace", fontSize:11, color:"#fbbf24", wordBreak:"break-all", lineHeight:1.6 }}>0x742d35Cc6634C0532925a3b8D4C9E5d4f4a2b1c8</div>
                       </div>
                       <div><label style={lbl}>Your TX Hash (after sending)</label><input value={cryptoAddr} onChange={e=>setCryptoAddr(e.target.value)} placeholder="Paste transaction hash here" style={{...inp,fontFamily:"monospace",fontSize:11}}/></div>
-                      <div><label style={lbl}>Email for Confirmation</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" style={inp}/></div>
+                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
@@ -712,7 +739,7 @@ export default function PaymentPage() {
                           </div>
                         ))}
                       </div>
-                      <div style={{ width:"100%" }}><label style={lbl}>Email for Klarna</label><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" type="email" style={inp}/></div>
+                      <div style={{ width:"100%" }}><label style={lbl}>Email for Klarna</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
                 </div>
@@ -874,7 +901,7 @@ export default function PaymentPage() {
               We&apos;ve sent a 6-digit verification code to confirm your payment.
             </p>
             <div style={{ marginBottom:24, padding:"14px 18px", borderRadius:12, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", fontSize:13, color:"rgba(255,255,255,.6)", lineHeight:1.6 }}>
-              Code sent to <strong style={{ color:"white" }}>{email}</strong>
+              Code sent to <strong style={{ color:"white" }}>{verificationEmail}</strong>
             </div>
             <div style={{ display:"flex", gap:10, justifyContent:"center", marginBottom:20 }}>
               {otp.map((digit, i) => (
