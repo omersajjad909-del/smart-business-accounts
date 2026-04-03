@@ -18,7 +18,6 @@ export default function AuthPage() {
   const [verifyTarget, setVerifyTarget] = useState("");
   const [availableChannels, setAvailableChannels] = useState<Array<"email" | "sms">>(["email"]);
   const [verifyCode, setVerifyCode] = useState<string[]>(Array(6).fill(""));
-  const [devOtpBanner, setDevOtpBanner] = useState("");
   const [welcomeBack, setWelcomeBack] = useState<{ company: string } | null>(null);
   const [welcomeStep, setWelcomeStep] = useState(0);
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
@@ -143,14 +142,7 @@ export default function AuthPage() {
       });
       const payload = await response.json().catch(() => ({})) as Record<string, unknown>;
       if (!response.ok) setError(String(payload?.error || "Failed to resend"));
-      else {
-        applyVerificationState({ ...payload, email: verifyEmail, phone: verifyPhone }, verifyEmail);
-        if (payload.devOtp) {
-          const digits = String(payload.devOtp).padStart(6, "0").split("").slice(0, 6);
-          setVerifyCode(digits);
-          setDevOtpBanner(String(payload.devOtp).padStart(6, "0"));
-        }
-      }
+      else applyVerificationState({ ...payload, email: verifyEmail, phone: verifyPhone }, verifyEmail);
     } catch (err: unknown) {
       setError((err as Error).message || "Network error");
     } finally { setLoading(false); }
@@ -567,12 +559,6 @@ export default function AuthPage() {
                   <span style={{ color:"rgba(255,255,255,.65)", fontWeight:700 }}>{verifyTarget || verifyEmail}</span>
                 </p>
               </div>
-
-              {devOtpBanner && (
-                <div style={{ padding:"11px 14px", borderRadius:10, background:"rgba(16,185,129,.08)", border:"1px solid rgba(16,185,129,.2)", color:"#a7f3d0", fontFamily:"monospace", fontWeight:800, letterSpacing:"10px", marginBottom:18, textAlign:"center" }}>
-                  {devOtpBanner}
-                </div>
-              )}
 
               {error && (
                 <div style={{ padding:"11px 14px", borderRadius:10, background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.18)", color:"#fca5a5", fontSize:13, fontWeight:600, marginBottom:18, display:"flex", alignItems:"center", gap:8 }}>

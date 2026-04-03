@@ -203,6 +203,17 @@ export async function POST(req: NextRequest) {
       code,
     });
 
+    if (!sendResult.success) {
+      return NextResponse.json(
+        {
+          error:
+            sendResult.error ||
+            "We could not send the verification code email. Please check SMTP configuration.",
+        },
+        { status: 500 },
+      );
+    }
+
     const planPath = String(planCode || "starter").toLowerCase();
     const nextParams = new URLSearchParams();
     nextParams.set(
@@ -240,8 +251,6 @@ export async function POST(req: NextRequest) {
         phone: phoneNormalized,
       }),
       next,
-      // In non-production, always expose the OTP so dev/staging can bypass email
-      ...(process.env.NODE_ENV !== "production" ? { devOtp: code } : (!sendResult.success ? { devOtp: code } : {})),
     });
 
     res.cookies.set("sb_verify", verifyToken, {

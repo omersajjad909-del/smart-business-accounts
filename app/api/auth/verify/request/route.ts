@@ -128,6 +128,14 @@ export async function POST(req: NextRequest) {
 
     if (!result.success) {
       console.error("Verification send failed:", result.error);
+      return NextResponse.json(
+        {
+          error:
+            result.error ||
+            "We could not send the verification code. Please try again in a moment.",
+        },
+        { status: 500 },
+      );
     }
 
     const existing = (() => {
@@ -154,8 +162,6 @@ export async function POST(req: NextRequest) {
       availableChannels: targets.availableChannels,
       verifyChannel: channel,
       verifyTarget: getMaskedTarget(channel, targets),
-      // In non-production, always expose the OTP so dev/staging can bypass email
-      ...(process.env.NODE_ENV !== "production" ? { devOtp: code } : (!result.success ? { devOtp: code } : {})),
     });
     res.cookies.set("sb_verify", token, {
       httpOnly: true,
