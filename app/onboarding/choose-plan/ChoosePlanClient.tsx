@@ -572,7 +572,7 @@ export default function ChoosePlanPage() {
           opacity:visible?1:0, transition:"opacity .6s ease .5s" }}>
           {[
             { icon:"🔒", label:"256-bit SSL" },
-            { icon:"💳", label:"Secure payments via Stripe" },
+              { icon:"💳", label:"Secure hosted checkout" },
             { icon:"🔄", label:"Cancel anytime" },
             { icon:"📦", label:"Price per company" },
             { icon:"⚡", label:"Setup in 10 minutes" },

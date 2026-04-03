@@ -67,7 +67,7 @@ const TRUST = [
   { icon: "⚡", label: "Setup in minutes" },
   { icon: "🔄", label: "Cancel anytime" },
   { icon: "🎧", label: "24/7 support" },
-  { icon: "💳", label: "Stripe secured" },
+  { icon: "💳", label: "Secure checkout" },
 ];
 
 export default function CTASection() {
@@ -233,7 +233,7 @@ export default function CTASection() {
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>4.9 / 5 · 2,400+ reviews</div>
           </div>
           <div style={{ width: 1, height: 26, background: "rgba(255,255,255,.1)" }}/>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,.28)", fontWeight: 500 }}>Stripe secured</div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,.28)", fontWeight: 500 }}>Secure checkout</div>
           <div style={{ width: 1, height: 26, background: "rgba(255,255,255,.1)" }}/>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,.28)", fontWeight: 500 }}>Cancel anytime</div>
         </div>

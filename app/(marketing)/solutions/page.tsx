@@ -1235,7 +1235,7 @@ export default function SolutionsPage() {
               </h2>
 
               <p style={{ fontSize:16, color:"rgba(255,255,255,.5)", marginBottom:40, maxWidth:480, margin:"0 auto 40px", lineHeight:1.8 }}>
-                Discount applies automatically. Secure payments via Stripe. Cancel anytime.
+                Discount applies automatically. Secure hosted checkout. Cancel anytime.
               </p>
 
               <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap" }}>

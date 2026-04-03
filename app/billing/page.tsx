@@ -58,7 +58,7 @@ export default function BillingPage() {
     if (r.ok && j?.url) {
       window.location.assign(j.url);
     } else {
-      setMsg(j?.error || "Checkout failed or Stripe not configured");
+      setMsg(j?.error || "Checkout failed or billing provider not configured");
     }
   }
 
@@ -66,7 +66,7 @@ export default function BillingPage() {
     <div className="min-h-screen bg-white text-slate-900 px-6 py-10">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-2">Billing</h1>
-        <p className="text-slate-600 mb-6">Select your plan and proceed to checkout.</p>
+        <p className="text-slate-600 mb-6">Select your plan and continue to secure hosted checkout.</p>
 
         {!introOfferClaimed && (
           <div className="mb-8 p-4 bg-indigo-50 border-2 border-indigo-200 rounded-xl flex items-center gap-4">
