@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { apiError, apiOk } from "@/lib/apiError";
 import { getRuntimeAppUrl } from "@/lib/domains";
+import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,19 +17,78 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const planCode   = String(body?.planCode || "STARTER").toUpperCase();
+    const planCode = String(body?.planCode || "STARTER").toUpperCase();
+    const billingCycle = String(body?.billingCycle || "MONTHLY").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
     const successUrl = String(body?.successUrl || "");
+    const cancelUrl = body?.cancelUrl ? String(body.cancelUrl) : null;
     const couponCode = body?.couponCode ? String(body.couponCode).toUpperCase().trim() : null;
     const displayCurrency = body?.displayCurrency ? String(body.displayCurrency).toUpperCase() : null;
     const displayCountry = body?.displayCountry ? String(body.displayCountry).toUpperCase() : null;
+    const customPrice = Number(body?.customPrice || 0);
 
-    // ── Activate plan directly (no Stripe) ──────────────────────────────
+    const company = await prisma.company.findUnique({
+      where: { id: companyId },
+      select: { id: true, name: true, baseCurrency: true, country: true },
+    });
+    if (!company) return apiError("Company not found", 404);
+
+    const user = userId
+      ? await prisma.user.findUnique({
+          where: { id: userId },
+          select: { id: true, name: true, email: true },
+        })
+      : null;
+
+    if (hasLemonSqueezyConfig()) {
+      const base = getRuntimeAppUrl(req.nextUrl.origin);
+      const checkout = await createLemonCheckout({
+        planCode,
+        billingCycle,
+        successUrl: successUrl || `${base}/dashboard/billing?upgrade=success`,
+        cancelUrl: cancelUrl || `${base}/dashboard/billing?cancel=1`,
+        companyId,
+        userId,
+        email: user?.email || null,
+        name: user?.name || company.name,
+        couponCode,
+        displayCurrency: displayCurrency || company.baseCurrency,
+        displayCountry: displayCountry || company.country,
+        customPriceUsd: customPrice > 0 ? customPrice : null,
+      });
+
+      await prisma.activityLog.create({
+        data: {
+          companyId,
+          userId: userId || null,
+          action: "BILLING_CHECKOUT_CREATED",
+          details: JSON.stringify({
+            provider: "LEMON_SQUEEZY",
+            planCode,
+            billingCycle,
+            checkoutId: checkout.checkoutId,
+            variantId: checkout.variantId,
+            couponCode,
+            displayCurrency: displayCurrency || company.baseCurrency,
+            displayCountry: displayCountry || company.country,
+            createdAt: new Date().toISOString(),
+          }),
+        },
+      }).catch(() => {});
+
+      return apiOk({
+        url: checkout.url,
+        provider: "lemonsqueezy",
+        checkoutId: checkout.checkoutId,
+      });
+    }
+
+    // Fallback for local/demo usage when no billing provider is configured.
     await prisma.company.update({
       where: { id: companyId },
       data: {
         plan: planCode,
         subscriptionStatus: "ACTIVE",
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        currentPeriodEnd: new Date(Date.now() + (billingCycle === "YEARLY" ? 365 : 30) * 24 * 60 * 60 * 1000),
         ...(displayCurrency ? { baseCurrency: displayCurrency } : {}),
         ...(displayCountry ? { country: displayCountry } : {}),
       },
@@ -41,14 +101,15 @@ export async function POST(req: NextRequest) {
         action: "PLAN_ACTIVATED",
         details: JSON.stringify({
           planCode,
+          billingCycle,
           activatedAt: new Date().toISOString(),
           displayCurrency,
           displayCountry,
+          provider: "DIRECT_FALLBACK",
         }),
       },
     }).catch(() => {});
 
-    // Record coupon redemption and increment usedCount
     if (couponCode) {
       try {
         const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
@@ -63,26 +124,24 @@ export async function POST(req: NextRequest) {
             }),
           ]);
         }
-      } catch { /* non-critical */ }
+      } catch {}
     }
 
-    // Mark referred user as converted
     if (userId) {
       try {
-        const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
-        if (user) {
+        const referralUser = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+        if (referralUser) {
           await prisma.referral.updateMany({
-            where: { refereeEmail: user.email, status: "signed_up" },
-            data: { status: "converted", convertedAt: new Date(), reward: 20 }, // $20 default reward
+            where: { refereeEmail: referralUser.email, status: "signed_up" },
+            data: { status: "converted", convertedAt: new Date(), reward: 20 },
           });
         }
-      } catch { /* non-critical */ }
+      } catch {}
     }
 
     const base = getRuntimeAppUrl(req.nextUrl.origin);
     const redirectUrl = successUrl || `${base}/dashboard/billing?upgrade=success`;
     return apiOk({ url: redirectUrl, sessionId: "direct" });
-
   } catch (e: any) {
     return apiError(e.message, 500);
   }
