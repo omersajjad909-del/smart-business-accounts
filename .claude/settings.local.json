@@ -67,7 +67,10 @@
       "Bash(grep -h \"db\\\\..*\\\\.find\\\\|db\\\\..*\\\\.create\\\\|db\\\\..*\\\\.update\\\\|prisma\\\\..*\\\\.find\\\\|prisma\\\\..*\\\\.create\" d:/projects/smart-business-accounts/app/api/**/*.ts)",
       "Bash(sed 's/\\\\..*//')",
       "Bash(mkdir -p \"d:/projects/smart-business-accounts/app/dashboard/retail/online-sync\")",
-      "Bash(mkdir -p \"d:/projects/smart-business-accounts/app/dashboard/retail/supplier-portal\")"
+      "Bash(mkdir -p \"d:/projects/smart-business-accounts/app/dashboard/retail/supplier-portal\")",
+      "Bash(python3 -c ':*)",
+      "Bash(py --version)",
+      "Bash(node -e ':*)"
     ]
   }
 }
