@@ -3,12 +3,6 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { Menu, X } from "lucide-react"
-import { CURRENCY_LABEL, FX_USD, SUPPORTED_CURRENCIES } from "@/lib/currency"
-import {
-  FINOVA_CURRENCY_EVENT,
-  getStoredCurrencyPreference,
-  setStoredCurrencyPreference,
-} from "@/lib/currencyPreference"
 
 /* ─── Features Mega Data ─── */
 const FEATURES_COLS = [
@@ -164,7 +158,6 @@ const SHARED_CSS = `
 
   @keyframes megaIn   { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
   @keyframes mobileIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes blink    { 0%,100%{opacity:1} 50%{opacity:.3} }
 
   .fn-link {
     position:relative; font-size:13.5px; font-weight:600;
@@ -355,9 +348,6 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeMega, setActiveMega] = useState<"features" | "solutions" | null>(null)
   const [scrolled,   setScrolled]   = useState(false)
-  const [currency, setCurrency] = useState("USD")
-  const [country, setCountry] = useState("US")
-
   const featuresRef  = useRef<HTMLDivElement>(null)
   const solutionsRef = useRef<HTMLDivElement>(null)
   const megaRef      = useRef<HTMLDivElement>(null)
@@ -380,39 +370,6 @@ export default function Navbar() {
       window.removeEventListener("scroll",    onScroll)
       window.removeEventListener("keydown",   onKey)
       window.removeEventListener("mousedown", onDown)
-    }
-  }, [])
-
-  useEffect(() => {
-    const syncCurrency = async () => {
-      const stored = getStoredCurrencyPreference()
-      if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency)
-      if (stored.country) setCountry(stored.country)
-
-      if (!stored.currency || !stored.country) {
-        try {
-          const geo = await fetch("/api/public/geo", { cache: "no-store" })
-          if (geo.ok) {
-            const data = await geo.json()
-            if (data?.currency && FX_USD[data.currency]) setCurrency(data.currency)
-            if (data?.country) setCountry(data.country)
-          }
-        } catch {}
-      }
-    }
-
-    const onCurrencyChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ currency?: string; country?: string | null }>).detail
-      if (detail?.currency && FX_USD[detail.currency]) setCurrency(detail.currency)
-      if (detail?.country) setCountry(detail.country)
-    }
-
-    syncCurrency()
-    window.addEventListener(FINOVA_CURRENCY_EVENT, onCurrencyChanged as EventListener)
-    window.addEventListener("storage", syncCurrency)
-    return () => {
-      window.removeEventListener(FINOVA_CURRENCY_EVENT, onCurrencyChanged as EventListener)
-      window.removeEventListener("storage", syncCurrency)
     }
   }, [])
 
