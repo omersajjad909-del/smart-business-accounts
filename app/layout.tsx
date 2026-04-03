@@ -76,9 +76,9 @@ export const metadata: Metadata = {
   generator: "Next.js",
   referrer: "origin-when-cross-origin",
   icons: {
-    icon: "/icon.png",
-    apple: "/icon.png",
-    shortcut: "/icon.png",
+    icon: "/icon",
+    apple: "/icon",
+    shortcut: "/icon",
   },
   manifest: "/manifest.json",
   appleWebApp: {
