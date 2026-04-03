@@ -11,7 +11,7 @@ const ADDRESS = "Global Operations";
 const SECTIONS = [
   {
     id: "acceptance",
-    icon: "âœ…",
+    icon: "✅",
     color: "#818cf8",
     dim: "rgba(129,140,248,.08)",
     border: "rgba(129,140,248,.25)",
@@ -33,7 +33,7 @@ const SECTIONS = [
   },
   {
     id: "account",
-    icon: "ðŸ‘¤",
+    icon: "👤",
     color: "#34d399",
     dim: "rgba(52,211,153,.08)",
     border: "rgba(52,211,153,.25)",
@@ -59,7 +59,7 @@ const SECTIONS = [
   },
   {
     id: "subscription",
-    icon: "ðŸ’³",
+    icon: "💳",
     color: "#fbbf24",
     dim: "rgba(251,191,36,.08)",
     border: "rgba(251,191,36,.25)",
@@ -89,7 +89,7 @@ const SECTIONS = [
   },
   {
     id: "acceptable-use",
-    icon: "ðŸ“Œ",
+    icon: "📌",
     color: "#f87171",
     dim: "rgba(248,113,113,.08)",
     border: "rgba(248,113,113,.25)",
@@ -115,7 +115,7 @@ const SECTIONS = [
   },
   {
     id: "data-ownership",
-    icon: "ðŸ—‚ï¸",
+    icon: "🗂️",
     color: "#a78bfa",
     dim: "rgba(167,139,250,.08)",
     border: "rgba(167,139,250,.25)",
@@ -141,7 +141,7 @@ const SECTIONS = [
   },
   {
     id: "availability",
-    icon: "âš¡",
+    icon: "⚡",
     color: "#06b6d4",
     dim: "rgba(6,182,212,.08)",
     border: "rgba(6,182,212,.25)",
@@ -163,7 +163,7 @@ const SECTIONS = [
   },
   {
     id: "limitation",
-    icon: "âš–ï¸",
+    icon: "⚖️",
     color: "#818cf8",
     dim: "rgba(129,140,248,.08)",
     border: "rgba(129,140,248,.25)",
@@ -189,7 +189,7 @@ const SECTIONS = [
   },
   {
     id: "termination",
-    icon: "ðŸšª",
+    icon: "🚪",
     color: "#f87171",
     dim: "rgba(248,113,113,.08)",
     border: "rgba(248,113,113,.25)",
@@ -211,7 +211,7 @@ const SECTIONS = [
   },
   {
     id: "governing-law",
-    icon: "ðŸ›ï¸",
+    icon: "🏛️",
     color: "#34d399",
     dim: "rgba(52,211,153,.08)",
     border: "rgba(52,211,153,.25)",
@@ -219,7 +219,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Governing Law",
-        body: "These Terms of Service are governed by and construed in accordance with the laws applicable to the service providerâ€™s principal place of business, without regard to conflict of law principles.",
+        body: "These Terms of Service are governed by and construed in accordance with the laws applicable to the service provider’s principal place of business, without regard to conflict of law principles.",
       },
       {
         sub: "Dispute Resolution",
@@ -318,8 +318,8 @@ export default function TermsPage() {
   return (
     <>
       <Head>
-        <title>Terms of Service â€“ Finova</title>
-        <meta name="description" content="Terms and conditions for using Finova â€” the accounting platform for modern SMEs."/>
+        <title>Terms of Service – Finova</title>
+        <meta name="description" content="Terms and conditions for using Finova — the accounting platform for modern SMEs."/>
       </Head>
 
       <div style={{
@@ -368,7 +368,7 @@ export default function TermsPage() {
         </div>
 
         <div style={{ position:"relative", zIndex:1 }}>
-          {/* â”€â”€ HERO â”€â”€ */}
+          {/* ── HERO ── */}
           <section style={{ padding:"80px 24px 48px", maxWidth:1100, margin:"0 auto" }}>
             <div ref={heroRef}>
               {/* Breadcrumb */}
@@ -397,7 +397,7 @@ export default function TermsPage() {
                     transition:"all .5s ease .06s",
                   }}>
                     <span style={{ width:5, height:5, borderRadius:"50%", background:"#fbbf24", animation:"blink 2s ease infinite" }}/>
-                    Legal Document Â· Last Updated {LAST_UPDATED}
+                    Legal Document · Last Updated {LAST_UPDATED}
                   </div>
 
                   <h1 style={{
@@ -443,11 +443,11 @@ export default function TermsPage() {
                     Key Points
                   </div>
                   {[
-                    { icon:"ðŸ”’", text:"Your data stays yours" },
-                    { icon:"ðŸ’³", text:"14-day refund on annual plans" },
-                    { icon:"ðŸ“¤", text:"Export data anytime" },
-                    { icon:"ðŸŒ", text:"Compliant with applicable laws" },
-                    { icon:"âš–ï¸", text:"Disputes handled by competent courts" },
+                    { icon:"🔒", text:"Your data stays yours" },
+                    { icon:"💳", text:"14-day refund on annual plans" },
+                    { icon:"📤", text:"Export data anytime" },
+                    { icon:"🌍", text:"Compliant with applicable laws" },
+                    { icon:"⚖️", text:"Disputes handled by competent courts" },
                   ].map(({ icon, text }) => (
                     <div key={text} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
                       <span style={{ fontSize:15 }}>{icon}</span>
@@ -465,7 +465,7 @@ export default function TermsPage() {
             </div>
           </section>
 
-          {/* â”€â”€ MAIN LAYOUT â”€â”€ */}
+          {/* ── MAIN LAYOUT ── */}
           <div className="layout-grid" style={{
             maxWidth:1100, margin:"0 auto", padding:"0 24px 80px",
             display:"grid", gridTemplateColumns:"220px 1fr", gap:48, alignItems:"start",
@@ -505,7 +505,7 @@ export default function TermsPage() {
               }}>
                 <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1,
                   background:"linear-gradient(90deg,transparent,rgba(251,191,36,.4),transparent)" }}/>
-                <div style={{ fontSize:22, marginBottom:14 }}>âš–ï¸</div>
+                <div style={{ fontSize:22, marginBottom:14 }}>⚖️</div>
                 <h3 style={{ fontFamily:"'Lora',serif", fontSize:20, fontWeight:700, color:"white", marginBottom:8 }}>
                   Legal Questions?
                 </h3>
@@ -514,8 +514,8 @@ export default function TermsPage() {
                 </p>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
                   {[
-                    { icon:"ðŸ“§", label:"Legal Email", val:EMAIL, href:`mailto:${EMAIL}` },
-                    { icon:"ðŸ“", label:"Jurisdiction", val:ADDRESS, href:"#" },
+                    { icon:"📧", label:"Legal Email", val:EMAIL, href:`mailto:${EMAIL}` },
+                    { icon:"📍", label:"Jurisdiction", val:ADDRESS, href:"#" },
                   ].map(({ icon, label, val, href }) => (
                     <a key={label} href={href} style={{
                       display:"inline-flex", alignItems:"center", gap:10,
@@ -547,7 +547,7 @@ export default function TermsPage() {
                     onMouseEnter={e=>{e.currentTarget.style.color="white";e.currentTarget.style.borderColor="rgba(255,255,255,.25)";}}
                     onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,.55)";e.currentTarget.style.borderColor="rgba(255,255,255,.1)";}}
                   >
-                    ðŸ” Privacy Policy â†’
+                    🔏 Privacy Policy →
                   </Link>
                   <Link href="/security" style={{
                     display:"inline-flex", alignItems:"center", gap:7,
@@ -559,7 +559,7 @@ export default function TermsPage() {
                     onMouseEnter={e=>{e.currentTarget.style.color="white";e.currentTarget.style.borderColor="rgba(255,255,255,.25)";}}
                     onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,.55)";e.currentTarget.style.borderColor="rgba(255,255,255,.1)";}}
                   >
-                    ðŸ”’ Security Policy â†’
+                    🔒 Security Policy →
                   </Link>
                 </div>
               </div>

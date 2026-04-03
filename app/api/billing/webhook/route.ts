@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       const currentPeriodEnd = data.current_period_end ? new Date(data.current_period_end * 1000) : null;
 
       if (companyId) {
-        // Map Stripe status â†’ our DB status properly
+        // Map Stripe status → our DB status properly
         const dbStatus =
           status === "ACTIVE"   ? "ACTIVE"   :
           status === "TRIALING" ? "TRIALING" :
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // â”€â”€ Send welcome email on new subscription â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Send welcome email on new subscription ──────────────────────────
         if (type === "customer.subscription.created" && (dbStatus === "ACTIVE" || dbStatus === "TRIALING")) {
           try {
             const PLAN_FEATURES: Record<string, string[]> = {
@@ -104,12 +104,12 @@ export async function POST(req: NextRequest) {
             if (uc?.user?.email) {
               await sendEmail({
                 to: uc.user.email,
-                subject: `Welcome to Finova! Your ${planKey.charAt(0).toUpperCase()+planKey.slice(1)} plan is active ðŸŽ‰`,
+                subject: `Welcome to Finova! Your ${planKey.charAt(0).toUpperCase()+planKey.slice(1)} plan is active 🎉`,
                 html: emailTemplates.welcomeSubscription(uc.user.name || "there", planKey, features, dashboardUrl),
                 companyId,
               });
             }
-          } catch { /* non-blocking â€” don't fail webhook */ }
+          } catch { /* non-blocking — don't fail webhook */ }
         }
       }
     }

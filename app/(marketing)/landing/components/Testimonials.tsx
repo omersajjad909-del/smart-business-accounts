@@ -122,6 +122,9 @@ export default function TestimonialsSection() {
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:wght@600;700&display=swap');
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(18px,-14px)}}
+        @media(max-width:900px){.testi-grid{grid-template-columns:repeat(2,1fr) !important;}}
+        @media(max-width:560px){.testi-grid{grid-template-columns:1fr !important;}}
+        @media(max-width:600px){.testi-proof{flex-direction:column !important; gap:8px !important;} .testi-divider{display:none !important;}}
       `}</style>
 
       <div style={{position:"absolute",inset:0,pointerEvents:"none"}}>
@@ -149,7 +152,7 @@ export default function TestimonialsSection() {
               worldwide
             </span>
           </h2>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:16,flexWrap:"wrap"}}>
+          <div className="testi-proof" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:16,flexWrap:"wrap"}}>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <div style={{display:"flex",gap:2}}>
                 {[...Array(5)].map((_,i)=>(
@@ -161,15 +164,15 @@ export default function TestimonialsSection() {
               <span style={{fontSize:18,fontWeight:800,color:"white"}}>4.9</span>
               <span style={{fontSize:13,color:"rgba(255,255,255,.4)"}}>average rating</span>
             </div>
-            <div style={{width:1,height:18,background:"rgba(255,255,255,.1)"}}/>
+            <div className="testi-divider" style={{width:1,height:18,background:"rgba(255,255,255,.1)"}}/>
             <span style={{fontSize:13,color:"rgba(255,255,255,.4)"}}>{total || "2,400"}+ verified reviews</span>
-            <div style={{width:1,height:18,background:"rgba(255,255,255,.1)"}}/>
+            <div className="testi-divider" style={{width:1,height:18,background:"rgba(255,255,255,.1)"}}/>
             <span style={{fontSize:13,color:"rgba(255,255,255,.4)"}}>40+ countries</span>
           </div>
         </div>
 
         {/* 6 cards */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:40 }}>
+        <div className="testi-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:40 }}>
           {display.map((t,i) => <TestimonialCard key={t.id} t={t} i={i} vis={vis} />)}
         </div>
 

@@ -1,5 +1,5 @@
 // FILE: lib/emailTemplates.ts
-// All Finova email templates â€” HTML branded emails
+// All Finova email templates — HTML branded emails
 // Usage: import { emailTemplates } from "@/lib/emailTemplates"
 
 import { getAppUrl, getMarketingUrl } from "@/lib/domains";
@@ -46,7 +46,7 @@ function baseTemplate(content: string, preheader = "") {
     <div class="body">${content}</div>
     <div class="footer">
       <p style="font-size:12px;color:#94a3b8;margin:0 0 8px;">
-        Â© ${new Date().getFullYear()} Finova Â· <a href="${BASE_URL}/legal/privacy" style="color:#6366f1;">Privacy Policy</a> Â· <a href="${BASE_URL}/legal/terms" style="color:#6366f1;">Terms</a>
+        © ${new Date().getFullYear()} Finova · <a href="${BASE_URL}/legal/privacy" style="color:#6366f1;">Privacy Policy</a> · <a href="${BASE_URL}/legal/terms" style="color:#6366f1;">Terms</a>
       </p>
       <p style="font-size:11px;color:#cbd5e1;margin:0;">
         You're receiving this email because you signed up for Finova.<br>
@@ -60,7 +60,7 @@ function baseTemplate(content: string, preheader = "") {
 
 export const emailTemplates = {
 
-  /* â”€â”€ 1. OTP Verification â”€â”€ */
+  /* ── 1. OTP Verification ── */
   otp: (user: { name: string; email: string }, code: string) =>
     baseTemplate(`
       <h1>Verify your email address</h1>
@@ -73,45 +73,45 @@ export const emailTemplates = {
       </div>
       <p>If you didn't create a Finova account, you can safely ignore this email.</p>
       <div class="divider"></div>
-      <p style="font-size:13px;color:#94a3b8;">For security, never share this code with anyone â€” Finova will never ask for it.</p>
+      <p style="font-size:13px;color:#94a3b8;">For security, never share this code with anyone — Finova will never ask for it.</p>
     `, `Your Finova verification code is ${code}`),
 
-  /* â”€â”€ 2. Welcome Email â”€â”€ */
+  /* ── 2. Welcome Email ── */
   welcome: (user: { name: string; email: string }, plan: string, companyName: string) =>
     baseTemplate(`
-      <h1>Welcome to Finova, ${user.name.split(" ")[0]}! ðŸŽ‰</h1>
+      <h1>Welcome to Finova, ${user.name.split(" ")[0]}! 🎉</h1>
       <p>Your <strong>${companyName}</strong> workspace is ready. You're on the <span class="tag">${plan.toUpperCase()}</span> plan.</p>
       <p>Here's what you can do right now:</p>
       <div style="margin:20px 0;">
-        <div class="feature-row"><span class="feature-icon">ðŸ“Š</span><div><strong>Set up your Chart of Accounts</strong><br><span style="font-size:13px;color:#64748b;">Go to Accounting â†’ Chart of Accounts to configure your ledger.</span></div></div>
-        <div class="feature-row"><span class="feature-icon">ðŸ§¾</span><div><strong>Create your first invoice</strong><br><span style="font-size:13px;color:#64748b;">Go to Sales â†’ New Invoice and send a professional invoice in minutes.</span></div></div>
-        <div class="feature-row"><span class="feature-icon">ðŸ‘¥</span><div><strong>Invite your team</strong><br><span style="font-size:13px;color:#64748b;">Go to Settings â†’ Team Members to add your accountant or colleagues.</span></div></div>
-        <div class="feature-row"><span class="feature-icon">ðŸ¦</span><div><strong>Connect your bank</strong><br><span style="font-size:13px;color:#64748b;">Go to Banking â†’ Add Bank Account for auto-reconciliation.</span></div></div>
+        <div class="feature-row"><span class="feature-icon">📊</span><div><strong>Set up your Chart of Accounts</strong><br><span style="font-size:13px;color:#64748b;">Go to Accounting → Chart of Accounts to configure your ledger.</span></div></div>
+        <div class="feature-row"><span class="feature-icon">🧾</span><div><strong>Create your first invoice</strong><br><span style="font-size:13px;color:#64748b;">Go to Sales → New Invoice and send a professional invoice in minutes.</span></div></div>
+        <div class="feature-row"><span class="feature-icon">👥</span><div><strong>Invite your team</strong><br><span style="font-size:13px;color:#64748b;">Go to Settings → Team Members to add your accountant or colleagues.</span></div></div>
+        <div class="feature-row"><span class="feature-icon">🏦</span><div><strong>Connect your bank</strong><br><span style="font-size:13px;color:#64748b;">Go to Banking → Add Bank Account for auto-reconciliation.</span></div></div>
       </div>
       <div class="divider"></div>
       <div style="text-align:center;margin:28px 0;">
-        <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard â†’</a>
+        <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard →</a>
       </div>
       <p style="font-size:13px;color:#94a3b8;text-align:center;">Need help? Reply to this email or visit our <a href="${BASE_URL}/help" style="color:#6366f1;">Help Centre</a>.</p>
-    `, `Your Finova workspace is ready â€” let's get started`),
+    `, `Your Finova workspace is ready — let's get started`),
 
-  /* â”€â”€ 3. Password Reset â”€â”€ */
+  /* ── 3. Password Reset ── */
   passwordReset: (user: { name: string }, resetUrl: string) =>
     baseTemplate(`
       <h1>Reset your password</h1>
       <p>Hi <strong>${user.name}</strong>,</p>
       <p>We received a request to reset your Finova password. Click the button below to set a new password.</p>
       <div style="text-align:center;margin:32px 0;">
-        <a href="${resetUrl}" class="btn">Reset Password â†’</a>
+        <a href="${resetUrl}" class="btn">Reset Password →</a>
       </div>
-      <p style="font-size:13px;color:#94a3b8;">This link expires in <strong>1 hour</strong>. If you didn't request a password reset, you can safely ignore this email â€” your password won't change.</p>
+      <p style="font-size:13px;color:#94a3b8;">This link expires in <strong>1 hour</strong>. If you didn't request a password reset, you can safely ignore this email — your password won't change.</p>
       <div class="divider"></div>
       <p style="font-size:12px;color:#94a3b8;">If the button doesn't work, copy and paste this link:<br>
         <a href="${resetUrl}" style="color:#6366f1;word-break:break-all;">${resetUrl}</a>
       </p>
     `, "Reset your Finova password"),
 
-  /* â”€â”€ 4. Team Invite â”€â”€ */
+  /* ── 4. Team Invite ── */
   teamInvite: (inviter: string, companyName: string, role: string, inviteUrl: string) =>
     baseTemplate(`
       <h1>You've been invited to join ${companyName}</h1>
@@ -123,12 +123,12 @@ export const emailTemplates = {
         <div style="font-size:13px;color:#4f46e5;font-weight:600;margin-top:4px;">Role: ${role}</div>
       </div>
       <div style="text-align:center;margin:28px 0;">
-        <a href="${inviteUrl}" class="btn">Accept Invitation â†’</a>
+        <a href="${inviteUrl}" class="btn">Accept Invitation →</a>
       </div>
       <p style="font-size:13px;color:#94a3b8;">This invitation expires in 7 days. If you don't know ${inviter}, you can ignore this email.</p>
     `, `${inviter} invited you to join ${companyName} on Finova`),
 
-  /* â”€â”€ 5. Invoice Sent (to customer) â”€â”€ */
+  /* ── 5. Invoice Sent (to customer) ── */
   invoiceSent: (customerName: string, invoiceNo: string, amount: string, dueDate: string, companyName: string, viewUrl: string) =>
     baseTemplate(`
       <h1>Invoice from ${companyName}</h1>
@@ -149,15 +149,15 @@ export const emailTemplates = {
         </div>
       </div>
       <div style="text-align:center;margin:28px 0;">
-        <a href="${viewUrl}" class="btn">View Invoice â†’</a>
+        <a href="${viewUrl}" class="btn">View Invoice →</a>
       </div>
       <p style="font-size:13px;color:#94a3b8;">For questions about this invoice, please contact <strong>${companyName}</strong> directly.</p>
-    `, `Invoice ${invoiceNo} from ${companyName} â€” ${amount} due ${dueDate}`),
+    `, `Invoice ${invoiceNo} from ${companyName} — ${amount} due ${dueDate}`),
 
-  /* â”€â”€ 6. Payment Reminder â”€â”€ */
+  /* ── 6. Payment Reminder ── */
   paymentReminder: (customerName: string, invoiceNo: string, amount: string, dueDate: string, daysOverdue: number, companyName: string, viewUrl: string) =>
     baseTemplate(`
-      <h1>Payment reminder${daysOverdue > 0 ? " â€” overdue" : ""}</h1>
+      <h1>Payment reminder${daysOverdue > 0 ? " — overdue" : ""}</h1>
       <p>Dear <strong>${customerName}</strong>,</p>
       <p>${daysOverdue > 0
         ? `This is a reminder that invoice <strong>${invoiceNo}</strong> from <strong>${companyName}</strong> is <strong style="color:#ef4444;">${daysOverdue} days overdue</strong>.`
@@ -166,17 +166,17 @@ export const emailTemplates = {
       <div style="background:${daysOverdue > 0 ? "#fef2f2" : "#f8fafc"};border-radius:12px;padding:20px;margin:24px 0;border:1px solid ${daysOverdue > 0 ? "#fecaca" : "#e2e8f0"};">
         <div style="font-size:13px;color:#64748b;margin-bottom:6px;">AMOUNT DUE</div>
         <div style="font-size:28px;font-weight:900;color:${daysOverdue > 0 ? "#ef4444" : "#4f46e5"};">${amount}</div>
-        <div style="font-size:13px;color:#64748b;margin-top:4px;">Invoice ${invoiceNo} Â· Due ${dueDate}</div>
+        <div style="font-size:13px;color:#64748b;margin-top:4px;">Invoice ${invoiceNo} · Due ${dueDate}</div>
       </div>
       <div style="text-align:center;margin:28px 0;">
-        <a href="${viewUrl}" class="btn">View & Pay Invoice â†’</a>
+        <a href="${viewUrl}" class="btn">View & Pay Invoice →</a>
       </div>
-    `, `Payment reminder â€” Invoice ${invoiceNo} â€” ${amount}`),
+    `, `Payment reminder — Invoice ${invoiceNo} — ${amount}`),
 
-  /* â”€â”€ 7. Subscription Activated â”€â”€ */
+  /* ── 7. Subscription Activated ── */
   subscriptionActivated: (user: { name: string }, plan: string, amount: string, nextBilling: string) =>
     baseTemplate(`
-      <h1>Your ${plan} plan is active âœ…</h1>
+      <h1>Your ${plan} plan is active ✅</h1>
       <p>Hi <strong>${user.name}</strong>,</p>
       <p>Your payment was successful and your <strong>${plan}</strong> plan is now active. Here's your billing summary:</p>
       <div style="background:#f0fdf4;border-radius:12px;padding:20px;margin:24px 0;border:1px solid #bbf7d0;">
@@ -194,33 +194,33 @@ export const emailTemplates = {
         </div>
       </div>
       <div style="text-align:center;margin:28px 0;">
-        <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard â†’</a>
+        <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard →</a>
       </div>
     `, `Your Finova ${plan} plan is now active`),
 
-  /* â”€â”€ 8. Email Broadcast (admin sends to users) â”€â”€ */
+  /* ── 8. Email Broadcast (admin sends to users) ── */
   broadcast: (subject: string, body: string, _companyName = "Finova") =>
     baseTemplate(`
       <h1>${subject}</h1>
       <div style="white-space:pre-wrap;font-size:15px;line-height:1.75;color:#475569;">${body}</div>
       <div class="divider"></div>
       <div style="text-align:center;margin:24px 0;">
-        <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard â†’</a>
+        <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard →</a>
       </div>
     `, subject),
 
-  /* â”€â”€ 9. Contact Form Confirmation â”€â”€ */
+  /* ── 9. Contact Form Confirmation ── */
   contactConfirmation: (name: string, subject: string) =>
     baseTemplate(`
-      <h1>We got your message âœ…</h1>
+      <h1>We got your message ✅</h1>
       <p>Hi <strong>${name}</strong>,</p>
       <p>Thanks for reaching out! We've received your message about <strong>"${subject}"</strong> and will get back to you within 24 hours.</p>
       <p>In the meantime, you might find answers in our <a href="${BASE_URL}/help" style="color:#6366f1;">Help Centre</a>.</p>
       <div class="divider"></div>
-      <p style="font-size:13px;color:#94a3b8;">â€” The Finova Team</p>
-    `, "We received your message â€” Finova"),
+      <p style="font-size:13px;color:#94a3b8;">— The Finova Team</p>
+    `, "We received your message — Finova"),
 
-  /* â”€â”€ 10. Payslip Notification â”€â”€ */
+  /* ── 10. Payslip Notification ── */
   payslip: (employeeName: string, month: string, netSalary: string, viewUrl: string) =>
     baseTemplate(`
       <h1>Your payslip for ${month} is ready</h1>
@@ -232,17 +232,17 @@ export const emailTemplates = {
         <div style="font-size:13px;color:#64748b;margin-top:4px;">${month}</div>
       </div>
       <div style="text-align:center;margin:28px 0;">
-        <a href="${viewUrl}" class="btn">View & Download Payslip â†’</a>
+        <a href="${viewUrl}" class="btn">View & Download Payslip →</a>
       </div>
     `, `Your payslip for ${month} is ready`),
 
-  /* â”€â”€ 11. Welcome â€” Subscription â”€â”€ */
+  /* ── 11. Welcome — Subscription ── */
   welcomeSubscription: (name: string, plan: string, features: string[], dashboardUrl: string) => {
     const planColors: Record<string, { bg: string; accent: string; badge: string }> = {
-      starter:    { bg: "linear-gradient(135deg,#4f46e5,#6366f1)", accent: "#818cf8", badge: "ðŸš€ Starter Plan" },
-      pro:        { bg: "linear-gradient(135deg,#7c3aed,#a78bfa)", accent: "#a78bfa", badge: "â­ Professional Plan" },
-      enterprise: { bg: "linear-gradient(135deg,#1e1b4b,#4f46e5)", accent: "#c4b5fd", badge: "ðŸ’Ž Enterprise Plan" },
-      custom:     { bg: "linear-gradient(135deg,#065f46,#059669)", accent: "#34d399", badge: "âœ¦ Custom Plan" },
+      starter:    { bg: "linear-gradient(135deg,#4f46e5,#6366f1)", accent: "#818cf8", badge: "🚀 Starter Plan" },
+      pro:        { bg: "linear-gradient(135deg,#7c3aed,#a78bfa)", accent: "#a78bfa", badge: "⭐ Professional Plan" },
+      enterprise: { bg: "linear-gradient(135deg,#1e1b4b,#4f46e5)", accent: "#c4b5fd", badge: "💎 Enterprise Plan" },
+      custom:     { bg: "linear-gradient(135deg,#065f46,#059669)", accent: "#34d399", badge: "✦ Custom Plan" },
     };
     const key = plan.toLowerCase().replace("professional","pro");
     const c = planColors[key] || planColors.starter;
@@ -263,7 +263,7 @@ export const emailTemplates = {
       <!-- Hero -->
       <div style="background:${c.bg};padding:36px 40px;text-align:center;margin:-40px -40px 32px;">
         <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">${c.badge}</div>
-        <h1 style="font-size:28px;font-weight:900;color:#ffffff;margin:0 0 10px;line-height:1.2;">Welcome to Finova! ðŸŽ‰</h1>
+        <h1 style="font-size:28px;font-weight:900;color:#ffffff;margin:0 0 10px;line-height:1.2;">Welcome to Finova! 🎉</h1>
         <p style="font-size:15px;color:rgba(255,255,255,.75);margin:0;">Your subscription is active and ready to use.</p>
       </div>
 
@@ -279,13 +279,13 @@ export const emailTemplates = {
       <!-- CTA -->
       <div style="text-align:center;margin:32px 0;">
         <a href="${dashboardUrl}" style="display:inline-block;padding:15px 36px;border-radius:12px;background:${c.bg};color:#ffffff!important;font-weight:800;font-size:15px;text-decoration:none;letter-spacing:-.01em;">
-          Go to Your Dashboard â†’
+          Go to Your Dashboard →
         </a>
       </div>
 
       <!-- Tips -->
       <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:18px 22px;margin:24px 0;">
-        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:8px;">ðŸ’¡ Quick Tips to Get Started</div>
+        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:8px;">💡 Quick Tips to Get Started</div>
         <ul style="margin:0;padding-left:18px;font-size:13px;color:#78350f;line-height:1.9;">
           <li>Set up your company profile in <strong>Settings</strong></li>
           <li>Add your team members under <strong>Users & Roles</strong></li>
@@ -296,7 +296,7 @@ export const emailTemplates = {
 
       <div class="divider"></div>
       <p style="font-size:13px;color:#94a3b8;">Questions? Reply to this email or visit our <a href="${BASE_URL}/support" style="color:#6366f1;">Help Centre</a>. We're always here.</p>
-      <p style="font-size:13px;color:#94a3b8;">â€” The Finova Team âœ¨</p>
-    `, `Welcome to Finova â€” Your ${plan} plan is active!`);
+      <p style="font-size:13px;color:#94a3b8;">— The Finova Team ✨</p>
+    `, `Welcome to Finova — Your ${plan} plan is active!`);
   },
 };

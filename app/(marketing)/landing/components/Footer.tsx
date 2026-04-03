@@ -98,6 +98,8 @@ export default function Footer() {
           transition: color .2s; font-family: 'Outfit', sans-serif;
         }
         .ft-bot-link:hover { color: rgba(255,255,255,.65); }
+        @media(max-width:900px){.ft-main-grid{grid-template-columns:1fr 1fr !important; gap:36px !important;}}
+        @media(max-width:560px){.ft-main-grid{grid-template-columns:1fr !important;} .ft-bottom{flex-direction:column !important; align-items:flex-start !important; gap:12px !important;}}
       `}</style>
 
       {/* Background elements */}
@@ -113,11 +115,11 @@ export default function Footer() {
         <div style={{ position:"absolute", top:0, left:"10%", right:"10%", height:1, background:"linear-gradient(90deg,transparent,rgba(99,102,241,.5),transparent)" }}/>
       </div>
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Main grid Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* â”€â”€ Main grid â”€â”€ */}
       <div style={{ maxWidth:1200, margin:"0 auto", padding:"72px 24px 0", position:"relative" }}>
-        <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1.3fr", gap:52, marginBottom:64 }}>
+        <div className="ft-main-grid" style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1.3fr", gap:52, marginBottom:64 }}>
 
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ Brand column Ã¢â€â‚¬Ã¢â€â‚¬ */}
+          {/* â”€â”€ Brand column â”€â”€ */}
           <div>
             {/* Logo */}
             <Link href="/" style={{ display:"inline-flex", alignItems:"center", gap:10, textDecoration:"none", marginBottom:24 }}>
@@ -174,7 +176,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ Product Ã¢â€â‚¬Ã¢â€â‚¬ */}
+          {/* â”€â”€ Product â”€â”€ */}
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:22 }}>
               <div style={{ width:3, height:13, borderRadius:2, background:"#818cf8" }}/>
@@ -196,7 +198,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ Company Ã¢â€â‚¬Ã¢â€â‚¬ */}
+          {/* â”€â”€ Company â”€â”€ */}
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:22 }}>
               <div style={{ width:3, height:13, borderRadius:2, background:"#34d399" }}/>
@@ -218,7 +220,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ Contact Ã¢â€â‚¬Ã¢â€â‚¬ */}
+          {/* â”€â”€ Contact â”€â”€ */}
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:22 }}>
               <div style={{ width:3, height:13, borderRadius:2, background:"#fbbf24" }}/>
@@ -290,12 +292,12 @@ export default function Footer() {
 
         </div>
 
-        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Divider Ã¢â€â‚¬Ã¢â€â‚¬ */}
+        {/* â”€â”€ Divider â”€â”€ */}
         <div style={{ height:1, background:"linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent)", marginBottom:24 }}/>
 
 
-        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Bottom bar Ã¢â€â‚¬Ã¢â€â‚¬ */}
-        <div style={{
+        {/* â”€â”€ Bottom bar â”€â”€ */}
+        <div className="ft-bottom" style={{
           display:"flex", justifyContent:"space-between",
           alignItems:"center", flexWrap:"wrap", gap:16,
           paddingBottom:8,

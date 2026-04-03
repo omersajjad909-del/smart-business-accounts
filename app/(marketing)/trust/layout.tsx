@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Trust & Compliance â€” GDPR, Data Privacy & Certifications",
+  title: "Trust & Compliance — GDPR, Data Privacy & Certifications",
   description:
     "Finova's commitment to data privacy, GDPR compliance, financial data security, and regulatory standards. Trusted by 12,000+ businesses across 40+ countries worldwide.",
   keywords: [

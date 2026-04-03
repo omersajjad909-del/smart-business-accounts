@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Contact Us â€” Support, Sales & Partnerships",
+  title: "Contact Us — Support, Sales & Partnerships",
   description:
     "Get in touch with the Finova team. Live chat, email support (finovaos.app@gmail.com), or submit a support ticket. Our team responds within 2 hours during business hours.",
   keywords: [
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     "customer support accounting",
   ],
   openGraph: {
-    title: "Contact Finova â€” We're Here to Help",
+    title: "Contact Finova — We're Here to Help",
     description:
       "Live chat, email (finovaos.app@gmail.com), or submit a ticket. 2-hour response time, 24/7 chat support available.",
     url: `${BASE}/contact`,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Contact Finova",
-    description: "Live chat, email, or ticket â€” we respond within 2 hours.",
+    description: "Live chat, email, or ticket — we respond within 2 hours.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/contact` },

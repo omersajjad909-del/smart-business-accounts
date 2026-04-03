@@ -59,6 +59,7 @@ export default function BlogPage() {
         .newsletter-input { flex: 1; padding: 13px 16px; border-radius: 12px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); color: white; font-size: 13px; outline: none; transition: border-color .2s; }
         .newsletter-input:focus { border-color: rgba(99,102,241,.5); }
         ::placeholder { color: rgba(255,255,255,.25); }
+        @media(max-width:700px){.blog-featured{grid-template-columns:1fr !important; min-height:auto !important;}}
       `}</style>
 
       {/* ── Hero ─────────────────────────────────────────── */}
@@ -98,7 +99,7 @@ export default function BlogPage() {
       {/* ── Featured Article ─────────────────────────────── */}
       <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 24px 52px" }}>
         <Link href={`/blog/${FEATURED.slug}`} style={{ textDecoration: "none", display: "block" }}>
-          <div className="blog-card" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 300, borderColor: "rgba(99,102,241,.2)" }}
+          <div className="blog-card blog-featured" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 300, borderColor: "rgba(99,102,241,.2)" }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,.45)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-5px)"; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,.2)"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}>
             {/* Left: image area */}

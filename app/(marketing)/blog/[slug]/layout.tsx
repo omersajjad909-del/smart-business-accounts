@@ -20,7 +20,7 @@ export async function generateMetadata({
 
   return {
     title: post.title,
-    description: post.excerpt || `${post.title} â€” Read this guide on business finance and accounting by the Finova team.`,
+    description: post.excerpt || `${post.title} — Read this guide on business finance and accounting by the Finova team.`,
     authors: post.author ? [{ name: post.author }] : undefined,
     openGraph: {
       title: post.title,

@@ -1,13 +1,13 @@
 /**
  * /api/admin/business-modules
  *
- * GET  â€” returns all business types with phase, status, enabled state, and waitlist counts
- * POST â€” actions:
- *   TOGGLE        { id, enabled }          â€” turn a single type ON/OFF
- *   RELEASE_PHASE { phase }                â€” enable all types in a phase at once
- *   RESET         { id }                   â€” remove admin override for one type
- *   RESET_ALL                              â€” clear all admin overrides
- *   NOTIFY_WAITLIST { id }                 â€” manually send emails to waitlist for a type
+ * GET  — returns all business types with phase, status, enabled state, and waitlist counts
+ * POST — actions:
+ *   TOGGLE        { id, enabled }          — turn a single type ON/OFF
+ *   RELEASE_PHASE { phase }                — enable all types in a phase at once
+ *   RESET         { id }                   — remove admin override for one type
+ *   RESET_ALL                              — clear all admin overrides
+ *   NOTIFY_WAITLIST { id }                 — manually send emails to waitlist for a type
  *
  * When a type is toggled ON, waitlist subscribers are auto-notified by email.
  * Storage: ActivityLog with action = "BUSINESS_MODULE_CONFIG"
@@ -65,7 +65,7 @@ async function notifyWaitlist(businessType: string): Promise<number> {
 
   if (!subscribers.length) return 0;
 
-  const subject = `ðŸŽ‰ ${cfg.label} is now live on Finova!`;
+  const subject = `🎉 ${cfg.label} is now live on Finova!`;
   const html = `
     <!DOCTYPE html>
     <html>
@@ -86,11 +86,11 @@ async function notifyWaitlist(businessType: string): Promise<number> {
           <h1>${cfg.label} is now Live!</h1>
         </div>
         <div class="body">
-          <p>Great news! You asked us to notify you when <strong>${cfg.label}</strong> went live on Finova â€” and it's here!</p>
+          <p>Great news! You asked us to notify you when <strong>${cfg.label}</strong> went live on Finova — and it's here!</p>
           <p>${cfg.description}</p>
-          <p>You can now select <strong>${cfg.label}</strong> as your business type and get a fully configured dashboard with accounts, KPIs, and modules â€” all set up automatically.</p>
+          <p>You can now select <strong>${cfg.label}</strong> as your business type and get a fully configured dashboard with accounts, KPIs, and modules — all set up automatically.</p>
           <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app"}/business-setup" class="cta">
-            Set Up My ${cfg.label} Dashboard â†’
+            Set Up My ${cfg.label} Dashboard →
           </a>
         </div>
         <div class="footer">
@@ -122,7 +122,7 @@ async function notifyWaitlist(businessType: string): Promise<number> {
   return sent;
 }
 
-// â”€â”€ GET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── GET ────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
@@ -168,7 +168,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ modules, byPhase, overrides });
 }
 
-// â”€â”€ POST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── POST ───────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
 
   const overrides = await loadOverrides();
 
-  // â”€â”€ TOGGLE single type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── TOGGLE single type ─────────────────────────────────────
   if (action === "TOGGLE") {
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     const turningOn = !!enabled;
@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, id, status: overrides[id], notified });
   }
 
-  // â”€â”€ RELEASE entire phase â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── RELEASE entire phase ───────────────────────────────────
   if (action === "RELEASE_PHASE") {
     if (!phase) return NextResponse.json({ error: "phase required" }, { status: 400 });
     const phaseNum = Number(phase);
@@ -232,14 +232,14 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // â”€â”€ NOTIFY_WAITLIST manually â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── NOTIFY_WAITLIST manually ───────────────────────────────
   if (action === "NOTIFY_WAITLIST") {
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     const notified = await notifyWaitlist(id);
     return NextResponse.json({ success: true, id, notified });
   }
 
-  // â”€â”€ RESET single override â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── RESET single override ──────────────────────────────────
   if (action === "RESET") {
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     delete overrides[id];
@@ -247,7 +247,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, id, reset: true });
   }
 
-  // â”€â”€ RESET ALL overrides â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── RESET ALL overrides ────────────────────────────────────
   if (action === "RESET_ALL") {
     await saveOverrides({});
     return NextResponse.json({ success: true, reset: true });

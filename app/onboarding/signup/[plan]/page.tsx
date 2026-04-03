@@ -10,7 +10,7 @@ import { COUNTRIES, sortCountries } from "@/lib/countries";
 import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Country dial codes Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* â”€â”€â”€ Country dial codes â”€â”€â”€ */
 const DIAL_CODES: Record<string, string> = {
   AF:"93",AL:"355",DZ:"213",AD:"376",AO:"244",AG:"1268",AR:"54",AM:"374",
   AU:"61",AT:"43",AZ:"994",BS:"1242",BH:"973",BD:"880",BB:"1246",BY:"375",
@@ -38,7 +38,7 @@ const DIAL_CODES: Record<string, string> = {
   UY:"598",UZ:"998",VU:"678",VE:"58",VN:"84",YE:"967",ZM:"260",ZW:"263",
 };
 
-// reverse lookup: dial Ã¢â€ â€™ country code
+// reverse lookup: dial â†’ country code
 const DIAL_TO_COUNTRY: Record<string, string> = {};
 Object.entries(DIAL_CODES).forEach(([cc, dial]) => {
   if (!DIAL_TO_COUNTRY[dial]) DIAL_TO_COUNTRY[dial] = cc;
@@ -233,7 +233,7 @@ function FloatingInput({
   );
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Phone input with editable dial code prefix Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* â”€â”€â”€ Phone input with editable dial code prefix â”€â”€â”€ */
 function PhoneInput({
   dialCode, onDialChange, phone, onPhoneChange, color,
 }: {
@@ -542,7 +542,7 @@ export default function SignupByPlanPage() {
           background:`linear-gradient(90deg,transparent,${current.color}80,transparent)` }}/>
       </div>
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ HEADER Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* â”€â”€ HEADER â”€â”€ */}
       <header className="fu" style={{
         borderBottom:"1px solid rgba(255,255,255,.06)",
         background:"rgba(8,12,30,.85)", backdropFilter:"blur(20px)",
@@ -597,11 +597,11 @@ export default function SignupByPlanPage() {
         </div>
       </header>
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ MAIN Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* â”€â”€ MAIN â”€â”€ */}
       <main className="signup-main" style={{ position:"relative", zIndex:1, maxWidth:1200, margin:"0 auto", padding:"40px 24px 80px" }}>
         <div className="main-grid" style={{ display:"grid", gridTemplateColumns:"340px 1fr", gap:28 }}>
 
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ SIDEBAR Ã¢â€â‚¬Ã¢â€â‚¬ */}
+          {/* â”€â”€ SIDEBAR â”€â”€ */}
           <aside className="fu d1 signup-sidebar" style={{ display:"flex", flexDirection:"column", gap:16 }}>
 
             {/* Plan card */}
@@ -718,7 +718,7 @@ export default function SignupByPlanPage() {
             </div>
           </aside>
 
-          {/* Ã¢â€â‚¬Ã¢â€â‚¬ FORM Ã¢â€â‚¬Ã¢â€â‚¬ */}
+          {/* â”€â”€ FORM â”€â”€ */}
           <section className="fu d2 signup-form">
             <div style={{ marginBottom:28 }}>
               <div style={{
@@ -895,22 +895,22 @@ export default function SignupByPlanPage() {
                   </div>
                   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:8}}>
                     {[
-                      { id:"retail",         icon:"Ã°Å¸ÂÂª", label:"Retail" },
-                      { id:"trading",        icon:"Ã°Å¸â€œÂ¦", label:"Trading" },
-                      { id:"restaurant",     icon:"Ã°Å¸ÂÂ½Ã¯Â¸Â", label:"Restaurant" },
-                      { id:"manufacturing",  icon:"Ã°Å¸ÂÂ­", label:"Manufacturing" },
-                      { id:"hospital",       icon:"Ã°Å¸ÂÂ¥", label:"Hospital" },
-                      { id:"school",         icon:"Ã°Å¸Å½â€œ", label:"School" },
-                      { id:"construction",   icon:"Ã°Å¸Ââ€”Ã¯Â¸Â", label:"Construction" },
-                      { id:"real_estate",    icon:"Ã°Å¸ÂÂ ", label:"Real Estate" },
-                      { id:"it_company",     icon:"Ã°Å¸â€™Â»", label:"IT Company" },
-                      { id:"service",        icon:"Ã°Å¸â€™Â¼", label:"Services" },
-                      { id:"transport",      icon:"Ã°Å¸Å¡â€º", label:"Transport" },
-                      { id:"ngo",            icon:"Ã¢ÂÂ¤Ã¯Â¸Â", label:"NGO" },
-                      { id:"hotel",          icon:"Ã°Å¸ÂÂ¨", label:"Hotel" },
-                      { id:"pharmacy",       icon:"Ã°Å¸â€™Å ", label:"Pharmacy" },
-                      { id:"law_firm",       icon:"Ã¢Å¡â€“Ã¯Â¸Â", label:"Law Firm" },
-                      { id:"other",          icon:"Ã°Å¸ÂÂ¢", label:"Other" },
+                      { id:"retail",         icon:"ðŸª", label:"Retail" },
+                      { id:"trading",        icon:"ðŸ“¦", label:"Trading" },
+                      { id:"restaurant",     icon:"ðŸ½ï¸", label:"Restaurant" },
+                      { id:"manufacturing",  icon:"ðŸ­", label:"Manufacturing" },
+                      { id:"hospital",       icon:"ðŸ¥", label:"Hospital" },
+                      { id:"school",         icon:"ðŸŽ“", label:"School" },
+                      { id:"construction",   icon:"ðŸ—ï¸", label:"Construction" },
+                      { id:"real_estate",    icon:"ðŸ ", label:"Real Estate" },
+                      { id:"it_company",     icon:"ðŸ’»", label:"IT Company" },
+                      { id:"service",        icon:"ðŸ’¼", label:"Services" },
+                      { id:"transport",      icon:"ðŸš›", label:"Transport" },
+                      { id:"ngo",            icon:"â¤ï¸", label:"NGO" },
+                      { id:"hotel",          icon:"ðŸ¨", label:"Hotel" },
+                      { id:"pharmacy",       icon:"ðŸ’Š", label:"Pharmacy" },
+                      { id:"law_firm",       icon:"âš–ï¸", label:"Law Firm" },
+                      { id:"other",          icon:"ðŸ¢", label:"Other" },
                     ].map(bt => {
                       const sel = businessType === bt.id;
                       return (
@@ -927,7 +927,7 @@ export default function SignupByPlanPage() {
                           }}>
                           <span style={{fontSize:16}}>{bt.icon}</span>
                           {bt.label}
-                          {sel && <span style={{marginLeft:"auto",fontSize:10,color:"#818cf8"}}>Ã¢Å“â€œ</span>}
+                          {sel && <span style={{marginLeft:"auto",fontSize:10,color:"#818cf8"}}>âœ“</span>}
                         </button>
                       );
                     })}

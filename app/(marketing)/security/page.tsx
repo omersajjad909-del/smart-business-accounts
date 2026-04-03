@@ -3,18 +3,18 @@ import Link from "next/link";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
-/* â”€â”€â”€ Data â”€â”€â”€ */
+/* ─── Data ─── */
 const CERTIFICATIONS = [
-  { icon:"ðŸ›¡ï¸", label:"256-bit SSL/TLS", sub:"All data in transit" },
-  { icon:"ðŸ”", label:"AES-256 Encryption", sub:"All data at rest" },
-  { icon:"ðŸ¦", label:"Bank-grade Security", sub:"PCI-DSS aligned" },
-  { icon:"ðŸŒ", label:"Global Data Residency", sub:"Tier-4 data centers" },
+  { icon:"🛡️", label:"256-bit SSL/TLS", sub:"All data in transit" },
+  { icon:"🔐", label:"AES-256 Encryption", sub:"All data at rest" },
+  { icon:"🏦", label:"Bank-grade Security", sub:"PCI-DSS aligned" },
+  { icon:"🌐", label:"Global Data Residency", sub:"Tier-4 data centers" },
 ];
 
 const PILLARS = [
   {
     id:"encryption",
-    icon:"ðŸ”’",
+    icon:"🔒",
     color:"#818cf8",
     glow:"rgba(129,140,248,.22)",
     dim:"rgba(129,140,248,.08)",
@@ -22,14 +22,14 @@ const PILLARS = [
     title:"Encryption at Every Layer",
     subtitle:"Your data is unreadable to anyone but you.",
     points:[
-      { icon:"ðŸ”‘", title:"TLS 1.3 in Transit", desc:"Every byte between your browser and our servers is encrypted using the latest TLS 1.3 protocol. No exceptions." },
-      { icon:"ðŸ’¾", title:"AES-256 at Rest", desc:"Your database records, attachments, and backups are encrypted with AES-256 before being written to disk." },
-      { icon:"ðŸ—ï¸", title:"Key Management", desc:"Encryption keys are rotated automatically and stored separately from the data they protect, in a dedicated key vault." },
+      { icon:"🔑", title:"TLS 1.3 in Transit", desc:"Every byte between your browser and our servers is encrypted using the latest TLS 1.3 protocol. No exceptions." },
+      { icon:"💾", title:"AES-256 at Rest", desc:"Your database records, attachments, and backups are encrypted with AES-256 before being written to disk." },
+      { icon:"🗝️", title:"Key Management", desc:"Encryption keys are rotated automatically and stored separately from the data they protect, in a dedicated key vault." },
     ],
   },
   {
     id:"access",
-    icon:"ðŸ‘¤",
+    icon:"👤",
     color:"#34d399",
     glow:"rgba(52,211,153,.22)",
     dim:"rgba(52,211,153,.08)",
@@ -37,14 +37,14 @@ const PILLARS = [
     title:"Access Control & Identity",
     subtitle:"The right people see the right data. Nothing more.",
     points:[
-      { icon:"ðŸŽ›ï¸", title:"Role-Based Access (RBAC)", desc:"Define granular permissions per user â€” by module, branch, and action type. A cashier can never see payroll." },
-      { icon:"ðŸ¢", title:"Company & Branch Isolation", desc:"Multi-company users have strict data boundaries. Switching companies never leaks data between entities." },
-      { icon:"ðŸ“±", title:"Two-Factor Authentication", desc:"Enforce 2FA for any or all users. Supports TOTP authenticator apps and SMS fallback." },
+      { icon:"🎛️", title:"Role-Based Access (RBAC)", desc:"Define granular permissions per user — by module, branch, and action type. A cashier can never see payroll." },
+      { icon:"🏢", title:"Company & Branch Isolation", desc:"Multi-company users have strict data boundaries. Switching companies never leaks data between entities." },
+      { icon:"📱", title:"Two-Factor Authentication", desc:"Enforce 2FA for any or all users. Supports TOTP authenticator apps and SMS fallback." },
     ],
   },
   {
     id:"infrastructure",
-    icon:"ðŸ—ï¸",
+    icon:"🏗️",
     color:"#fbbf24",
     glow:"rgba(251,191,36,.22)",
     dim:"rgba(251,191,36,.08)",
@@ -52,14 +52,14 @@ const PILLARS = [
     title:"Infrastructure & Uptime",
     subtitle:"Always on. Always backed up. Always recoverable.",
     points:[
-      { icon:"âš¡", title:"99.9% Uptime SLA", desc:"Our infrastructure runs on redundant cloud nodes across multiple availability zones. No single point of failure." },
-      { icon:"ðŸ’¿", title:"Daily Automated Backups", desc:"Full database snapshots are taken every 24 hours and retained for 30 days. Point-in-time recovery available on Enterprise." },
-      { icon:"ðŸŒ", title:"Global Cloud Infrastructure", desc:"Primary data stored on world-class servers with multi-region replication for disaster recovery." },
+      { icon:"⚡", title:"99.9% Uptime SLA", desc:"Our infrastructure runs on redundant cloud nodes across multiple availability zones. No single point of failure." },
+      { icon:"💿", title:"Daily Automated Backups", desc:"Full database snapshots are taken every 24 hours and retained for 30 days. Point-in-time recovery available on Enterprise." },
+      { icon:"🌐", title:"Global Cloud Infrastructure", desc:"Primary data stored on world-class servers with multi-region replication for disaster recovery." },
     ],
   },
   {
     id:"audit",
-    icon:"ðŸ“‹",
+    icon:"📋",
     color:"#f87171",
     glow:"rgba(248,113,113,.22)",
     dim:"rgba(248,113,113,.08)",
@@ -67,14 +67,14 @@ const PILLARS = [
     title:"Audit Trails & Compliance",
     subtitle:"Every action logged. Every change attributable.",
     points:[
-      { icon:"ðŸ“", title:"Immutable Audit Logs", desc:"Every create, edit, and delete is logged with user identity, IP address, device, and precise timestamp. Logs cannot be modified." },
-      { icon:"ðŸ”", title:"Change History", desc:"View before/after snapshots for any record. Your auditors and compliance team will love the paper trail." },
-      { icon:"ðŸ“Š", title:"Tax Compliance", desc:"Reports and data exports are structured to align with global VAT/GST and local tax authority requirements." },
+      { icon:"📝", title:"Immutable Audit Logs", desc:"Every create, edit, and delete is logged with user identity, IP address, device, and precise timestamp. Logs cannot be modified." },
+      { icon:"🔍", title:"Change History", desc:"View before/after snapshots for any record. Your auditors and compliance team will love the paper trail." },
+      { icon:"📊", title:"Tax Compliance", desc:"Reports and data exports are structured to align with global VAT/GST and local tax authority requirements." },
     ],
   },
   {
     id:"network",
-    icon:"ðŸŒ",
+    icon:"🌐",
     color:"#a78bfa",
     glow:"rgba(167,139,250,.22)",
     dim:"rgba(167,139,250,.08)",
@@ -82,14 +82,14 @@ const PILLARS = [
     title:"Network & Application Security",
     subtitle:"Hardened against modern threats, continuously monitored.",
     points:[
-      { icon:"ðŸ›¡ï¸", title:"DDoS Protection", desc:"Multi-layer DDoS mitigation protects platform availability even under large-scale attack traffic." },
-      { icon:"ðŸš§", title:"Web Application Firewall", desc:"All requests pass through a WAF that blocks SQL injection, XSS, and OWASP Top 10 vulnerabilities automatically." },
-      { icon:"ðŸ”¬", title:"Penetration Testing", desc:"Third-party security audits and penetration tests are conducted periodically to surface and remediate vulnerabilities." },
+      { icon:"🛡️", title:"DDoS Protection", desc:"Multi-layer DDoS mitigation protects platform availability even under large-scale attack traffic." },
+      { icon:"🚧", title:"Web Application Firewall", desc:"All requests pass through a WAF that blocks SQL injection, XSS, and OWASP Top 10 vulnerabilities automatically." },
+      { icon:"🔬", title:"Penetration Testing", desc:"Third-party security audits and penetration tests are conducted periodically to surface and remediate vulnerabilities." },
     ],
   },
   {
     id:"privacy",
-    icon:"ðŸ”",
+    icon:"🔏",
     color:"#06b6d4",
     glow:"rgba(6,182,212,.22)",
     dim:"rgba(6,182,212,.08)",
@@ -97,9 +97,9 @@ const PILLARS = [
     title:"Privacy & Data Ownership",
     subtitle:"Your data is yours. Always.",
     points:[
-      { icon:"ðŸš«", title:"Zero Data Selling",       desc:"We never sell, share, or license your financial data to third parties. Your business data is never used for advertising." },
-      { icon:"ðŸ“¤", title:"Full Data Export",         desc:"Export your complete data at any time in standard formats (CSV, Excel, PDF). No lock-in, no hostage data." },
-      { icon:"ðŸ—‘ï¸", title:"Right to Deletion",       desc:"Request full account deletion at any time. We purge all your data within 30 days, with written confirmation." },
+      { icon:"🚫", title:"Zero Data Selling",       desc:"We never sell, share, or license your financial data to third parties. Your business data is never used for advertising." },
+      { icon:"📤", title:"Full Data Export",         desc:"Export your complete data at any time in standard formats (CSV, Excel, PDF). No lock-in, no hostage data." },
+      { icon:"🗑️", title:"Right to Deletion",       desc:"Request full account deletion at any time. We purge all your data within 30 days, with written confirmation." },
     ],
   },
 ];
@@ -111,7 +111,7 @@ const STATS = [
   { val:"24/7",    label:"Monitoring",      color:"#f87171" },
 ];
 
-/* â”€â”€â”€ Hook â”€â”€â”€ */
+/* ─── Hook ─── */
 function useVisible(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
   const [v, setV] = useState(false);
@@ -123,7 +123,7 @@ function useVisible(threshold = 0.1) {
   return [ref, v] as const;
 }
 
-/* â”€â”€â”€ Pillar section â”€â”€â”€ */
+/* ─── Pillar section ─── */
 function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
   const [ref, visible] = useVisible(0.08);
   const [hov, setHov] = useState<number|null>(null);
@@ -296,7 +296,7 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
                 background:p.dim, border:`1px solid ${p.border}`,
                 display:"flex", alignItems:"center", gap:8,
               }}>
-                <span style={{ fontSize:13 }}>ðŸ”’</span>
+                <span style={{ fontSize:13 }}>🔒</span>
                 <span style={{ fontSize:12, color:p.color, fontWeight:600 }}>
                   All {p.points.length} protections active on every account
                 </span>
@@ -309,7 +309,7 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
   );
 }
 
-/* â”€â”€â”€ Page â”€â”€â”€ */
+/* ─── Page ─── */
 export default function SecurityPage() {
   const [heroRef, heroVisible] = useVisible(0.2);
   const [statsRef, statsVisible] = useVisible(0.15);
@@ -318,7 +318,7 @@ export default function SecurityPage() {
   return (
     <>
       <Head>
-        <title>Security â€“ Finova</title>
+        <title>Security – Finova</title>
         <meta name="description" content="Bank-grade security for your financial data. 256-bit encryption, role-based access, audit trails, and global cloud infrastructure."/>
       </Head>
 
@@ -351,7 +351,7 @@ export default function SecurityPage() {
           .cert-chip:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);transform:translateY(-2px);}
         `}</style>
 
-        {/* â”€â”€ HERO â”€â”€ */}
+        {/* ── HERO ── */}
         <section style={{ padding:"100px 24px 64px", position:"relative", overflow:"hidden" }}>
           {/* BG */}
           <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
@@ -440,7 +440,7 @@ export default function SecurityPage() {
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
               transition:"all .6s ease .22s",
             }}>
-              Finova is built on a security-first foundation. Your financial data is encrypted, isolated, audited, and stored on world-class servers â€” never sold, never shared.
+              Finova is built on a security-first foundation. Your financial data is encrypted, isolated, audited, and stored on world-class servers — never sold, never shared.
             </p>
 
             {/* Cert chips */}
@@ -477,7 +477,7 @@ export default function SecurityPage() {
                 onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 10px 32px rgba(99,102,241,.55)";}}
                 onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="0 6px 24px rgba(99,102,241,.4)";}}
               >
-                Get Started â†’
+                Get Started →
               </Link>
               <Link href="/support" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
@@ -496,7 +496,7 @@ export default function SecurityPage() {
           </div>
         </section>
 
-        {/* â”€â”€ STATS STRIP â”€â”€ */}
+        {/* ── STATS STRIP ── */}
         <div style={{
           borderTop:"1px solid rgba(255,255,255,.05)",
           borderBottom:"1px solid rgba(255,255,255,.05)",
@@ -520,7 +520,7 @@ export default function SecurityPage() {
           </div>
         </div>
 
-        {/* â”€â”€ SCROLLING TICKER â”€â”€ */}
+        {/* ── SCROLLING TICKER ── */}
         <div style={{ overflow:"hidden", padding:"12px 0", background:"rgba(255,255,255,.015)", position:"relative" }}>
           <div style={{ position:"absolute", left:0, top:0, bottom:0, width:80, background:"linear-gradient(90deg,#080c1e,transparent)", zIndex:2, pointerEvents:"none" }}/>
           <div style={{ position:"absolute", right:0, top:0, bottom:0, width:80, background:"linear-gradient(270deg,#080c1e,transparent)", zIndex:2, pointerEvents:"none" }}/>
@@ -543,10 +543,10 @@ export default function SecurityPage() {
           </div>
         </div>
 
-        {/* â”€â”€ SECURITY PILLARS â”€â”€ */}
+        {/* ── SECURITY PILLARS ── */}
         {PILLARS.map((p,i) => <PillarSection key={p.id} p={p} index={i}/>)}
 
-        {/* â”€â”€ RESPONSIBLE DISCLOSURE â”€â”€ */}
+        {/* ── RESPONSIBLE DISCLOSURE ── */}
         <section style={{ padding:"80px 24px", borderTop:"1px solid rgba(255,255,255,.05)" }}>
           <div style={{ maxWidth:760, margin:"0 auto", textAlign:"center" }}>
             <div style={{
@@ -558,7 +558,7 @@ export default function SecurityPage() {
             }}>
               <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1,
                 background:"linear-gradient(90deg,transparent,rgba(129,140,248,.5),transparent)" }}/>
-              <div style={{ fontSize:40, marginBottom:20 }}>ðŸ¤</div>
+              <div style={{ fontSize:40, marginBottom:20 }}>🤝</div>
               <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,30px)", fontWeight:700, color:"white", letterSpacing:"-.5px", lineHeight:1.2, marginBottom:12 }}>
                 Responsible Disclosure
               </h2>
@@ -575,13 +575,13 @@ export default function SecurityPage() {
                 onMouseEnter={e=>{e.currentTarget.style.background="rgba(129,140,248,.2)";e.currentTarget.style.borderColor="rgba(129,140,248,.5)";}}
                 onMouseLeave={e=>{e.currentTarget.style.background="rgba(129,140,248,.12)";e.currentTarget.style.borderColor="rgba(129,140,248,.3)";}}
               >
-                ðŸ“§ finovaos.app@gmail.com
+                📧 finovaos.app@gmail.com
               </a>
             </div>
           </div>
         </section>
 
-        {/* â”€â”€ FINAL CTA â”€â”€ */}
+        {/* ── FINAL CTA ── */}
         <section style={{ padding:"40px 24px 80px", maxWidth:1100, margin:"0 auto" }}>
           <div ref={ctaRef} style={{
             borderRadius:28, overflow:"hidden", position:"relative",
@@ -608,7 +608,7 @@ export default function SecurityPage() {
                 letterSpacing:".09em", textTransform:"uppercase", marginBottom:20,
                 animation:"floatBadge 3s ease-in-out infinite",
               }}>
-                ðŸ”’ Your data is always protected
+                🔒 Your data is always protected
               </div>
               <h2 style={{
                 fontFamily:"'Lora',serif", fontSize:"clamp(28px,4.5vw,48px)",
@@ -635,7 +635,7 @@ export default function SecurityPage() {
                   onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 10px 32px rgba(251,191,36,.55)";}}
                   onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="0 6px 24px rgba(251,191,36,.4)";}}
                 >
-                  Get Started â†’
+                  Get Started →
                 </Link>
                 <Link href="/support" style={{
                   padding:"13px 28px", borderRadius:14,
@@ -657,7 +657,7 @@ export default function SecurityPage() {
         {/* Footer links */}
         <div style={{ paddingBottom:48, display:"flex", flexDirection:"column", alignItems:"center", gap:32 }}>
           <Link href="/trust" style={{ fontSize:13, fontWeight:700, color:"#34d399", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6 }}>
-            ðŸ›¡ï¸ View our full Trust & Compliance center â†’
+            🛡️ View our full Trust & Compliance center →
           </Link>
           <div style={{ display:"flex", justifyContent:"center", gap:28, flexWrap:"wrap" }}>
             {["Privacy Policy","Terms of Use","Features","Pricing","Help Center"].map(t=>(

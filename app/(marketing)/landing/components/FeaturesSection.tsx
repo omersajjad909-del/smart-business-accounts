@@ -408,7 +408,7 @@ function FeatureRow({ f, i }: { f: typeof FEATURES[0]; i: number }) {
   );
 
   return (
-    <div ref={ref} style={{
+    <div ref={ref} className="feat-grid" style={{
       display:"grid", gridTemplateColumns:"1fr 1fr",
       gap:64, alignItems:"center",
       paddingBottom: i < FEATURES.length - 1 ? 100 : 0,
@@ -432,7 +432,10 @@ export default function FeaturesSection() {
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Lora:wght@600;700&display=swap');
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
-        @media(max-width:860px){.feat-grid{grid-template-columns:1fr !important;}.feat-vis{display:none!important;}}
+        @media(max-width:860px){
+          .feat-grid{grid-template-columns:1fr !important; gap:36px !important;}
+          .feat-flip{flex-direction:column-reverse !important;}
+        }
       `}</style>
 
       {/* BG */}

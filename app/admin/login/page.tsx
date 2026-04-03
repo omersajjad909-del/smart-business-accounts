@@ -22,7 +22,7 @@ export default function AdminLoginPage() {
     const finalEmail = (formData.get("email") as string) || email;
     const finalPassword = (formData.get("password") as string) || password;
 
-    console.log("ðŸš€ Payload Checking:", { 
+    console.log("🚀 Payload Checking:", { 
       email: finalEmail, 
       passLen: finalPassword?.length 
     });
@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
       const data = await res.json();
       
       if (res.ok) {
-        console.log("âœ… LOGIN SUCCESS!");
+        console.log("✅ LOGIN SUCCESS!");
         // We only store basic info in localStorage for UI purposes.
         // The real auth is handled by the httpOnly cookie set by the server.
         const userData = {
@@ -60,11 +60,11 @@ export default function AdminLoginPage() {
         
         router.push("/admin");
       } else {
-        console.error("âŒ SERVER ERROR DETAILS:", JSON.stringify(data));
+        console.error("❌ SERVER ERROR DETAILS:", JSON.stringify(data));
         setError(data.message || `Error ${res.status}`);
       }
     } catch (err: any) {
-      console.error("ðŸ”¥ Admin Login Error:", err);
+      console.error("🔥 Admin Login Error:", err);
       setError(`An error occurred: ${err.message}`);
     } finally {
       setLoading(false);
@@ -113,7 +113,7 @@ export default function AdminLoginPage() {
               autoComplete="current-password"
               value={password} 
               onChange={e => setPassword(e.target.value)} 
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="••••••••"
               required
               style={{ width: "100%", padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", outline: "none", transition: "all .2s" }}
             />

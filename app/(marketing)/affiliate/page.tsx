@@ -118,7 +118,7 @@ export default function AffiliatePage() {
             <div style={{ fontSize:11, fontWeight:800, color:"#818cf8", letterSpacing:".12em", textTransform:"uppercase", marginBottom:10 }}>COMMISSION TIERS</div>
             <h2 style={{ fontSize:"clamp(24px,3.5vw,36px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:0 }}>Earn more as you refer more</h2>
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+          <div className="aff-4col" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
             {TIERS.map(t=>(
               <div key={t.name} style={{ background:`linear-gradient(135deg,${t.glow},rgba(255,255,255,.02))`, borderRadius:18, border:`1.5px solid ${t.popular?"rgba(52,211,153,.4)":"rgba(255,255,255,.07)"}`, padding:"26px 20px", textAlign:"center", position:"relative" }}>
                 {t.popular && <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", padding:"3px 14px", borderRadius:20, background:"#34d399", color:"#000", fontSize:10, fontWeight:800, whiteSpace:"nowrap" }}>MOST POPULAR</div>}
@@ -165,7 +165,7 @@ export default function AffiliatePage() {
               </div>
             </div>
 
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+            <div className="aff-2col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
               <div style={{ padding:"20px", borderRadius:14, background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.25)", textAlign:"center" }}>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginBottom:6 }}>Monthly earnings</div>
                 <div style={{ fontSize:32, fontWeight:900, color:"#fbbf24", fontFamily:"Lora,serif" }}>${monthly.toLocaleString()}</div>
@@ -251,7 +251,11 @@ export default function AffiliatePage() {
         </div>
       </Section>
 
-      <style>{`*{box-sizing:border-box}`}</style>
+      <style>{`
+        *{box-sizing:border-box}
+        @media(max-width:860px){.aff-4col{grid-template-columns:repeat(2,1fr)!important;} .aff-2col{grid-template-columns:1fr!important;}}
+        @media(max-width:480px){.aff-4col{grid-template-columns:1fr!important;}}
+      `}</style>
     </main>
   );
 }

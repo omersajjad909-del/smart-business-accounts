@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Careers at Finova â€” Join Our Global Team of 120+",
+  title: "Careers at Finova — Join Our Global Team of 120+",
   description:
-    "Work at Finova: remote-first, equity included, health coverage, learning budget. 18+ countries, 4.8â˜… Glassdoor rating. We're hiring in engineering, product, and sales.",
+    "Work at Finova: remote-first, equity included, health coverage, learning budget. 18+ countries, 4.8★ Glassdoor rating. We're hiring in engineering, product, and sales.",
   keywords: [
     "Finova careers",
     "fintech jobs",
@@ -17,9 +17,9 @@ export const metadata: Metadata = {
     "product manager jobs fintech",
   ],
   openGraph: {
-    title: "Careers at Finova â€” Join Our 120+ Team",
+    title: "Careers at Finova — Join Our 120+ Team",
     description:
-      "Remote-first. Equity. Health coverage. Learning budget. 4.8â˜… Glassdoor. Join us and build the future of business finance.",
+      "Remote-first. Equity. Health coverage. Learning budget. 4.8★ Glassdoor. Join us and build the future of business finance.",
     url: `${BASE}/careers`,
     siteName: "Finova",
     images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "Careers at Finova" }],
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Join Finova â€” We're Hiring",
-    description: "Remote-first, equity, health coverage. 4.8â˜… Glassdoor. Join our global team.",
+    title: "Join Finova — We're Hiring",
+    description: "Remote-first, equity, health coverage. 4.8★ Glassdoor. Join our global team.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/careers` },
@@ -44,7 +44,7 @@ export default function CareersLayout({ children }: { children: React.ReactNode 
       sameAs: BASE,
       logo: `${BASE}/icon.png`,
     },
-    jobLocation: { "@type": "Place", address: "Remote â€” Worldwide" },
+    jobLocation: { "@type": "Place", address: "Remote — Worldwide" },
     employmentType: "FULL_TIME",
     description: "Multiple positions available in engineering, product, sales, and support.",
   };

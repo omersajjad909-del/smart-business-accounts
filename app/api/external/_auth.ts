@@ -2,10 +2,10 @@
  * Shared auth + plan-guard for all /api/external/* routes.
  *
  * Plan rules:
- *   STARTER      â†’ âŒ No API access
- *   PROFESSIONAL â†’ âœ… GET only (read-only), 500 req/hr (soft-enforced)
- *   ENTERPRISE   â†’ âœ… Full access â€” GET + POST + PUT + DELETE
- *   CUSTOM       â†’ âœ… Full access
+ *   STARTER      → ❌ No API access
+ *   PROFESSIONAL → ✅ GET only (read-only), 500 req/hr (soft-enforced)
+ *   ENTERPRISE   → ✅ Full access — GET + POST + PUT + DELETE
+ *   CUSTOM       → ✅ Full access
  */
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateApiKey } from "@/lib/apiKeys";
@@ -18,7 +18,7 @@ export type ApiSession = {
   plan:      string;   // STARTER | PROFESSIONAL | ENTERPRISE | CUSTOM
 };
 
-/* â”€â”€ Resolve key â†’ session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Resolve key → session ───────────────────────────────────────────── */
 export async function resolveApiSession(req: NextRequest): Promise<ApiSession | null> {
   const direct = req.headers.get("x-api-key")?.trim();
   const bearer = req.headers.get("authorization")?.trim();
@@ -39,7 +39,7 @@ export async function resolveApiSession(req: NextRequest): Promise<ApiSession | 
   return { ...auth, plan };
 }
 
-/* â”€â”€ Guard responses â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Guard responses ─────────────────────────────────────────────────── */
 export function unauthResponse() {
   return NextResponse.json(
     { error: "Invalid or missing API key", docs: "https://finovaos.app/developers/api" },
@@ -70,7 +70,7 @@ export function readOnlyResponse(plan: string) {
   );
 }
 
-/* â”€â”€ Plan capability checks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Plan capability checks ──────────────────────────────────────────── */
 
 /** Returns error response if plan has NO api access, otherwise null. */
 export function guardApiAccess(session: ApiSession): NextResponse | null {
@@ -92,7 +92,7 @@ export function guardWriteAccess(session: ApiSession, method: string): NextRespo
 }
 
 /**
- * All-in-one guard â€” call at the top of every external route handler.
+ * All-in-one guard — call at the top of every external route handler.
  * Returns a NextResponse error if blocked, or null if allowed.
  *
  * @param req     The incoming request

@@ -70,7 +70,9 @@
       "Bash(mkdir -p \"d:/projects/smart-business-accounts/app/dashboard/retail/supplier-portal\")",
       "Bash(python3 -c ':*)",
       "Bash(py --version)",
-      "Bash(node -e ':*)"
+      "Bash(node -e ':*)",
+      "Bash(sed -i 's/style={{ display:\"grid\", gridTemplateColumns:\"repeat\\(4,1fr\\)\", gap:14 }}/className=\"aff-4col\" style={{ display:\"grid\", gridTemplateColumns:\"repeat\\(4,1fr\\)\", gap:14 }}/' \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\\\(marketing\\)\\\\affiliate\\\\page.tsx\")",
+      "Bash(sed -i 's/style={{ display:\"grid\", gridTemplateColumns:\"1fr 1fr\", gap:14 }}/className=\"aff-2col\" style={{ display:\"grid\", gridTemplateColumns:\"1fr 1fr\", gap:14 }}/' \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\\\(marketing\\)\\\\affiliate\\\\page.tsx\")"
     ]
   }
 }

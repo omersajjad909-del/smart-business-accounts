@@ -189,7 +189,7 @@ async function handleDemoLogin(req: NextRequest, businessType?: string | null) {
         },
       });
     } catch {
-      // Non-fatal â€” proceed with cookie-only auth
+      // Non-fatal — proceed with cookie-only auth
     }
 
     const company = await prisma.company.findUnique({
@@ -223,7 +223,7 @@ async function handleDemoLogin(req: NextRequest, businessType?: string | null) {
 
     return res;
   } catch (e: any) {
-    console.error("âŒ DEMO LOGIN ERROR:", e);
+    console.error("❌ DEMO LOGIN ERROR:", e);
     return NextResponse.json(
       { message: e.message || "Demo login failed. Please try again." },
       { status: 500 }

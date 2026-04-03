@@ -140,6 +140,10 @@ export default function SolutionSection() {
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+        @media(max-width:860px){
+          .sol-detail-grid{grid-template-columns:1fr !important;}
+          .sol-stats-grid{grid-template-columns:1fr !important;}
+        }
       `}</style>
 
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
@@ -431,6 +435,7 @@ export default function SolutionSection() {
           </div>
 
           <div
+            className="sol-detail-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "minmax(0,360px) minmax(0,1fr)",
@@ -583,7 +588,7 @@ export default function SolutionSection() {
                 </Link>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1.2fr .9fr", gap: 18 }}>
+              <div className="sol-stats-grid" style={{ display: "grid", gridTemplateColumns: "1.2fr .9fr", gap: 18 }}>
                 <div
                   style={{
                     borderRadius: 18,

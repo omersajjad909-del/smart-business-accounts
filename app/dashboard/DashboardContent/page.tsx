@@ -21,7 +21,7 @@ type ChartData = {
   purchasesTrend?: ChartPoint[];
 } | null;
 
-/* â”€â”€ Tooltip Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Tooltip Styles ───────────────────────────────────────── */
 const TooltipStyle = {
   contentStyle: {
     background: "rgba(15,17,40,0.95)",
@@ -34,7 +34,7 @@ const TooltipStyle = {
   cursor: { fill: "rgba(255,255,255,0.03)" },
 };
 
-/* â”€â”€ Section header helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Section header helper ────────────────────────────────── */
 function SectionHeader({ title, sub }: { title: string; sub?: string }) {
   return (
     <div style={{ marginBottom: 14 }}>
@@ -44,7 +44,7 @@ function SectionHeader({ title, sub }: { title: string; sub?: string }) {
   );
 }
 
-/* â”€â”€ Chart card wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Chart card wrapper ───────────────────────────────────── */
 function ChartCard({ children, style }: { children: React.ReactNode; style?: CSSProperties }) {
   return (
     <div style={{
@@ -58,7 +58,7 @@ function ChartCard({ children, style }: { children: React.ReactNode; style?: CSS
   );
 }
 
-// â”€â”€â”€ AI Widget Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── AI Widget Types ──────────────────────────────────────────────────────────
 interface AIAlert { severity: "critical" | "warning" | "info"; title: string; description: string; link?: string }
 interface AIWidgetData {
   healthScore: number;
@@ -70,7 +70,7 @@ interface AIWidgetData {
   topRec: string;
 }
 
-// â”€â”€â”€ AI Widget (lazy loads, non-blocking) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── AI Widget (lazy loads, non-blocking) ─────────────────────────────────────
 function AIWidget({ companyId, role, userId }: { companyId: string; role: string; userId: string }) {
   const [data, setData] = useState<AIWidgetData | null>(null);
   const [widgetLoading, setWidgetLoading] = useState(true);
@@ -123,7 +123,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
       // Top recommendation from alerts
       const critical = alerts.find((a: AIAlert) => a.severity === "critical");
       const warning  = alerts.find((a: AIAlert) => a.severity === "warning");
-      const topRec = critical?.title || warning?.title || (alerts[0]?.title) || "All systems healthy âœ“";
+      const topRec = critical?.title || warning?.title || (alerts[0]?.title) || "All systems healthy ✓";
 
       setData({ healthScore: score, revenueChange: revChange, expenseChange: expChange, profitChange, cashRisk, alerts: alerts.slice(0, 3), topRec });
       setWidgetFailed(false);
@@ -163,14 +163,14 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
         accumulated += decoder.decode(value, { stream: true });
         setChatReply(accumulated);
       }
-    } catch { setChatReply("Error â€” please try again."); }
+    } catch { setChatReply("Error — please try again."); }
     finally { setChatLoading(false); }
   }
 
   if (widgetLoading && !data) return (
     <div style={{ borderRadius: 16, padding: "18px 20px", background: "rgba(99,102,241,.05)", border: "1px solid rgba(99,102,241,.15)", marginBottom: 18, display: "flex", alignItems: "center", gap: 12 }}>
       <div style={{ width: 16, height: 16, border: "2px solid rgba(99,102,241,.3)", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin .7s linear infinite", flexShrink: 0 }} />
-      <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>AI Financial Intelligence loadingâ€¦</span>
+      <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>AI Financial Intelligence loading…</span>
     </div>
   );
 
@@ -181,7 +181,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
         <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI summary abhi load nahi ho saki. Full AI center se data dekh sakte ho.</div>
       </div>
       <Link href="/dashboard/ai" style={{ padding: "8px 14px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
-        Open AI â†’
+        Open AI →
       </Link>
     </div>
   );
@@ -195,7 +195,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
       {/* AI Banner strip */}
       <div style={{ borderRadius: 16, border: "1px solid rgba(99,102,241,.22)", background: "linear-gradient(135deg, rgba(99,102,241,.08) 0%, rgba(79,70,229,.05) 100%)", overflow: "hidden" }}>
 
-        {/* Top row â€” 5 metric cards */}
+        {/* Top row — 5 metric cards */}
         <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr auto", gap: 0, borderBottom: "1px solid rgba(255,255,255,.06)" }}>
 
           {/* Health Score */}
@@ -219,7 +219,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
           <div style={{ padding: "14px 18px", borderRight: "1px solid rgba(255,255,255,.06)" }}>
             <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 3 }}>Revenue</div>
             <div style={{ fontSize: 14, fontWeight: 800, color: data.revenueChange >= 0 ? "#10b981" : "#ef4444" }}>
-              {data.revenueChange >= 0 ? "â–²" : "â–¼"} {sign(data.revenueChange)}
+              {data.revenueChange >= 0 ? "▲" : "▼"} {sign(data.revenueChange)}
             </div>
             <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>vs last month</div>
           </div>
@@ -228,7 +228,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
           <div style={{ padding: "14px 18px", borderRight: "1px solid rgba(255,255,255,.06)" }}>
             <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 3 }}>Expenses</div>
             <div style={{ fontSize: 14, fontWeight: 800, color: data.expenseChange <= 0 ? "#10b981" : data.expenseChange > 20 ? "#ef4444" : "#f59e0b" }}>
-              {data.expenseChange >= 0 ? "â–²" : "â–¼"} {sign(data.expenseChange)}
+              {data.expenseChange >= 0 ? "▲" : "▼"} {sign(data.expenseChange)}
             </div>
             <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>vs last month</div>
           </div>
@@ -237,7 +237,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
           <div style={{ padding: "14px 18px", borderRight: "1px solid rgba(255,255,255,.06)" }}>
             <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 3 }}>Cash Risk</div>
             <div style={{ fontSize: 14, fontWeight: 800, color: riskColor, textTransform: "capitalize" }}>
-              {data.cashRisk === "high" ? "ðŸ”´" : data.cashRisk === "medium" ? "ðŸŸ¡" : "ðŸŸ¢"} {data.cashRisk}
+              {data.cashRisk === "high" ? "🔴" : data.cashRisk === "medium" ? "🟡" : "🟢"} {data.cashRisk}
             </div>
             <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>30-day outlook</div>
           </div>
@@ -245,19 +245,19 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
           {/* CTA */}
           <div style={{ padding: "14px 20px", display: "flex", alignItems: "center" }}>
             <Link href="/dashboard/ai" style={{ padding: "8px 16px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(99,102,241,.35)" }}>
-              AI Dashboard â†’
+              AI Dashboard →
             </Link>
           </div>
         </div>
 
-        {/* Bottom row â€” alerts + top rec + quick chat */}
+        {/* Bottom row — alerts + top rec + quick chat */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", gap: 0 }}>
 
           {/* Left: alerts strip + top rec */}
           <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
             {data.alerts.length > 0 ? (
               <>
-                <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", flexShrink: 0 }}>ðŸ”” Alerts:</span>
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", flexShrink: 0 }}>🔔 Alerts:</span>
                 {data.alerts.map((a, i) => (
                   <Link key={i} href={a.link || "/dashboard/ai"} style={{
                     padding: "4px 10px", borderRadius: 20, textDecoration: "none", fontSize: 11, fontWeight: 600,
@@ -265,12 +265,12 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
                     border: `1px solid ${a.severity === "critical" ? "rgba(239,68,68,.3)" : a.severity === "warning" ? "rgba(245,158,11,.3)" : "rgba(99,102,241,.25)"}`,
                     color: a.severity === "critical" ? "#fca5a5" : a.severity === "warning" ? "#fcd34d" : "#a5b4fc",
                   }}>
-                    {a.severity === "critical" ? "ðŸš¨" : a.severity === "warning" ? "âš ï¸" : "â„¹ï¸"} {a.title}
+                    {a.severity === "critical" ? "🚨" : a.severity === "warning" ? "⚠️" : "ℹ️"} {a.title}
                   </Link>
                 ))}
               </>
             ) : (
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>âœ… No active alerts â€” financials look healthy</span>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>✅ No active alerts — financials look healthy</span>
             )}
           </div>
 
@@ -278,7 +278,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
           <div style={{ padding: "10px 20px", borderLeft: "1px solid rgba(255,255,255,.06)" }}>
             <button onClick={() => { setChatOpen(o => !o); setTimeout(() => inputRef.current?.focus(), 50); }}
               style={{ background: "none", border: "none", cursor: "pointer", color: "#a5b4fc", fontSize: 12, fontWeight: 600, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5 }}>
-              ðŸ’¬ Ask AI {chatOpen ? "â–²" : "â–¼"}
+              💬 Ask AI {chatOpen ? "▲" : "▼"}
             </button>
           </div>
         </div>
@@ -289,11 +289,11 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
             <div style={{ display: "flex", gap: 8, marginBottom: chatReply ? 10 : 0 }}>
               <input ref={inputRef} value={chat} onChange={e => setChat(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") quickChat(); }}
-                placeholder="Ask a quick questionâ€¦ e.g. What is my profit this month?"
+                placeholder="Ask a quick question… e.g. What is my profit this month?"
                 style={{ flex: 1, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 9, padding: "8px 14px", color: "white", fontSize: 12, fontFamily: "inherit", outline: "none" }} />
               <button onClick={quickChat} disabled={!chat.trim() || chatLoading}
                 style={{ padding: "8px 16px", borderRadius: 9, background: chat.trim() && !chatLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.08)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: chat.trim() && !chatLoading ? "pointer" : "not-allowed", fontFamily: "inherit" }}>
-                {chatLoading ? "â€¦" : "Ask"}
+                {chatLoading ? "…" : "Ask"}
               </button>
               <Link href="/dashboard/ai?tab=chat" style={{ padding: "8px 14px", borderRadius: 9, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.5)", fontSize: 11, fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center" }}>
                 Full AI
@@ -401,7 +401,7 @@ export default function DashboardContent() {
   }, [storedUser?.email, businessType]);
 
   if (allowed === false) return <div style={{ padding: 40, textAlign: "center", color: "#f87171", fontWeight: 700, fontSize: 18 }}>Access Denied</div>;
-  if (allowed === null) return <div style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,0.35)" }}>Checking permissionsâ€¦</div>;
+  if (allowed === null) return <div style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,0.35)" }}>Checking permissions…</div>;
 
   const currentUser = getCurrentUser();
   const isDemoUser = currentUser?.email === "finovaos.app@gmail.com";
@@ -412,7 +412,7 @@ export default function DashboardContent() {
     return <DemoBusinessShowcase businessType={businessType} companyInfo={companyInfo} />;
   }
 
-  /* â”€â”€ Build trend data â”€â”€ */
+  /* ── Build trend data ── */
   const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   // Merge sales + purchases trend into one array for the AreaChart
   const salesArr = charts?.salesTrend || [];
@@ -428,15 +428,15 @@ export default function DashboardContent() {
         Purchases: purchArr.find(p => p.label === lbl)?.value || 0,
       }));
     }
-    // fallback â€” last 7 days
+    // fallback — last 7 days
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(); d.setDate(d.getDate() - (6 - i));
       return { label: `${d.getDate()} ${MONTHS[d.getMonth()]}`, Sales: 0, Purchases: 0 };
     });
   })();
 
-  const topCustomers = (charts?.topCustomers || []).slice(0, 6).map(c => ({ name: c.name.length > 14 ? c.name.slice(0, 14) + "â€¦" : c.name, value: c.total }));
-  const topItems     = (charts?.topItems     || []).slice(0, 6).map(i => ({ name: i.name.length > 14 ? i.name.slice(0, 14) + "â€¦" : i.name, value: i.amount }));
+  const topCustomers = (charts?.topCustomers || []).slice(0, 6).map(c => ({ name: c.name.length > 14 ? c.name.slice(0, 14) + "…" : c.name, value: c.total }));
+  const topItems     = (charts?.topItems     || []).slice(0, 6).map(i => ({ name: i.name.length > 14 ? i.name.slice(0, 14) + "…" : i.name, value: i.amount }));
 
   const hasData = stats.sales > 0 || stats.purchases > 0;
 
@@ -468,11 +468,11 @@ export default function DashboardContent() {
         }
       `}</style>
 
-      {/* â”€â”€ Payment alerts â”€â”€ */}
+      {/* ── Payment alerts ── */}
       {companyInfo?.subscriptionStatus === "PENDING_PAYMENT" && (
         <div style={{ marginBottom: 20, padding: "14px 20px", borderRadius: 12, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 20 }}>ðŸ’³</span>
+            <span style={{ fontSize: 20 }}>💳</span>
             <div>
               <div style={{ fontWeight: 700, color: "#a5b4fc", fontSize: 13 }}>Payment Required</div>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>Complete your payment to unlock all features.</div>
@@ -482,7 +482,7 @@ export default function DashboardContent() {
         </div>
       )}
 
-      {/* â”€â”€ Page header â”€â”€ */}
+      {/* ── Page header ── */}
       <div className="dashboard-header" style={{ marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "white", margin: 0, letterSpacing: "-.3px" }}>Dashboard</h1>
@@ -491,12 +491,12 @@ export default function DashboardContent() {
         {loading && (
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 8, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)" }}>
             <div style={{ width: 14, height: 14, border: "2px solid rgba(99,102,241,0.3)", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin .7s linear infinite" }} />
-            <span style={{ fontSize: 11, color: "#818cf8", fontWeight: 600 }}>Loadingâ€¦</span>
+            <span style={{ fontSize: 11, color: "#818cf8", fontWeight: 600 }}>Loading…</span>
           </div>
         )}
       </div>
 
-      {/* â”€â”€ Business type banner â”€â”€ */}
+      {/* ── Business type banner ── */}
       {btMeta && btMeta.id !== "trading" && (
           <div className="dashboard-business-banner" style={{ marginBottom: 16, padding: "12px 18px", borderRadius: 12, background: `${btMeta.color}08`, border: `1px solid ${btMeta.color}20`, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span style={{ fontSize: 20 }}>{btMeta.icon}</span>
@@ -515,13 +515,13 @@ export default function DashboardContent() {
         </div>
       )}
 
-      {/* â”€â”€ KPI Cards â”€â”€ */}
+      {/* ── KPI Cards ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 14, marginBottom: 20 }}>
         {[
-          { label: "Total Revenue",    value: `${cur} ${stats.sales.toLocaleString()}`,      icon: "ðŸ“ˆ", color: "#34d399", bg: "rgba(52,211,153,0.08)",   border: "rgba(52,211,153,0.2)" },
-          { label: "Total Purchases",  value: `${cur} ${stats.purchases.toLocaleString()}`,  icon: "ðŸ“¦", color: "#818cf8", bg: "rgba(129,140,248,0.08)",  border: "rgba(129,140,248,0.2)" },
-          { label: "Net Profit",       value: `${cur} ${stats.profit.toLocaleString()}`,     icon: stats.profit >= 0 ? "ðŸ’°" : "ðŸ“‰", color: stats.profit >= 0 ? "#34d399" : "#f87171", bg: stats.profit >= 0 ? "rgba(52,211,153,0.08)" : "rgba(248,113,113,0.08)", border: stats.profit >= 0 ? "rgba(52,211,153,0.2)" : "rgba(248,113,113,0.2)" },
-          { label: "Customers",        value: stats.customers.toString(),                    icon: "ðŸ‘¥", color: "#fbbf24", bg: "rgba(251,191,36,0.08)",   border: "rgba(251,191,36,0.2)" },
+          { label: "Total Revenue",    value: `${cur} ${stats.sales.toLocaleString()}`,      icon: "📈", color: "#34d399", bg: "rgba(52,211,153,0.08)",   border: "rgba(52,211,153,0.2)" },
+          { label: "Total Purchases",  value: `${cur} ${stats.purchases.toLocaleString()}`,  icon: "📦", color: "#818cf8", bg: "rgba(129,140,248,0.08)",  border: "rgba(129,140,248,0.2)" },
+          { label: "Net Profit",       value: `${cur} ${stats.profit.toLocaleString()}`,     icon: stats.profit >= 0 ? "💰" : "📉", color: stats.profit >= 0 ? "#34d399" : "#f87171", bg: stats.profit >= 0 ? "rgba(52,211,153,0.08)" : "rgba(248,113,113,0.08)", border: stats.profit >= 0 ? "rgba(52,211,153,0.2)" : "rgba(248,113,113,0.2)" },
+          { label: "Customers",        value: stats.customers.toString(),                    icon: "👥", color: "#fbbf24", bg: "rgba(251,191,36,0.08)",   border: "rgba(251,191,36,0.2)" },
         ].map((card, i) => (
           <div key={i} style={{ borderRadius: 14, padding: "18px 20px", background: card.bg, border: `1px solid ${card.border}` }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
@@ -533,7 +533,7 @@ export default function DashboardContent() {
         ))}
       </div>
 
-      {/* â”€â”€ AI Intelligence Widget â”€â”€ */}
+      {/* ── AI Intelligence Widget ── */}
       {currentUser?.companyId && !isDemoUser && (
         <AIWidget
           companyId={currentUser.companyId}
@@ -542,25 +542,25 @@ export default function DashboardContent() {
         />
       )}
 
-      {/* â”€â”€ Alert Row â”€â”€ */}
+      {/* ── Alert Row ── */}
       <div className="dashboard-alert-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
         <div style={{ borderRadius: 14, padding: "16px 20px", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <div style={{ fontSize: 11, color: "rgba(248,113,113,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>Overdue Receivables ({stats.overdueReceivablesCount})</div>
             <div style={{ fontSize: 20, fontWeight: 800, color: "#f87171" }}>{cur} {stats.overdueReceivables.toLocaleString()}</div>
           </div>
-          <Link href="/dashboard/reports/ageing" style={{ padding: "8px 14px", borderRadius: 8, background: "rgba(248,113,113,0.15)", border: "1px solid rgba(248,113,113,0.3)", color: "#f87171", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>View â†’</Link>
+          <Link href="/dashboard/reports/ageing" style={{ padding: "8px 14px", borderRadius: 8, background: "rgba(248,113,113,0.15)", border: "1px solid rgba(248,113,113,0.3)", color: "#f87171", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>View →</Link>
         </div>
         <div style={{ borderRadius: 14, padding: "16px 20px", background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <div style={{ fontSize: 11, color: "rgba(251,191,36,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>Low Stock Items</div>
             <div style={{ fontSize: 20, fontWeight: 800, color: "#fbbf24" }}>{stats.lowStockCount} items</div>
           </div>
-          <Link href="/dashboard/reports/stock/low" style={{ padding: "8px 14px", borderRadius: 8, background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.25)", color: "#fbbf24", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>Check â†’</Link>
+          <Link href="/dashboard/reports/stock/low" style={{ padding: "8px 14px", borderRadius: 8, background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.25)", color: "#fbbf24", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>Check →</Link>
         </div>
       </div>
 
-      {/* â”€â”€ Subscription row â”€â”€ */}
+      {/* ── Subscription row ── */}
       {companyInfo && (
         <div style={{ borderRadius: 14, padding: "14px 20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 24, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -569,19 +569,19 @@ export default function DashboardContent() {
           </div>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Status: <strong style={{ color: companyInfo.subscriptionStatus === "ACTIVE" ? "#34d399" : "#f87171" }}>{companyInfo.subscriptionStatus}</strong></div>
           {companyInfo.plan !== "ENTERPRISE" && (
-            <Link href="/dashboard/billing" style={{ marginLeft: "auto", padding: "6px 16px", borderRadius: 8, background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>Upgrade Plan â†’</Link>
+            <Link href="/dashboard/billing" style={{ marginLeft: "auto", padding: "6px 16px", borderRadius: 8, background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>Upgrade Plan →</Link>
           )}
         </div>
       )}
 
-      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+      {/* ══════════════════════════════════════════════════════════
           CHARTS SECTION
-      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      ══════════════════════════════════════════════════════════ */}
       <div className="dashboard-chart-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
 
-        {/* â”€â”€ 1. Revenue vs Purchases Trend (Area) â”€â”€ */}
+        {/* ── 1. Revenue vs Purchases Trend (Area) ── */}
         <ChartCard style={{ gridColumn: "1 / -1" }}>
-          <SectionHeader title="Revenue vs Purchases â€” This Month" sub={hasData ? undefined : "No transactions yet â€” start adding sales to see trends"} />
+          <SectionHeader title="Revenue vs Purchases — This Month" sub={hasData ? undefined : "No transactions yet — start adding sales to see trends"} />
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
               <defs>
@@ -605,12 +605,12 @@ export default function DashboardContent() {
           </ResponsiveContainer>
         </ChartCard>
 
-        {/* â”€â”€ 2. Top Customers (Horizontal Bar) â”€â”€ */}
+        {/* ── 2. Top Customers (Horizontal Bar) ── */}
         <ChartCard>
           <SectionHeader title="Top Customers" sub="By total revenue" />
           {topCustomers.length === 0 ? (
             <div style={{ height: 180, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-              <span style={{ fontSize: 32 }}>ðŸ‘¥</span>
+              <span style={{ fontSize: 32 }}>👥</span>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", textAlign: "center" }}>No customer sales yet</div>
             </div>
           ) : (
@@ -628,12 +628,12 @@ export default function DashboardContent() {
           )}
         </ChartCard>
 
-        {/* â”€â”€ 3. Top Items (Vertical Bar) â”€â”€ */}
+        {/* ── 3. Top Items (Vertical Bar) ── */}
         <ChartCard>
           <SectionHeader title="Top Selling Items" sub="By revenue this month" />
           {topItems.length === 0 ? (
             <div style={{ height: 180, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-              <span style={{ fontSize: 32 }}>ðŸ“¦</span>
+              <span style={{ fontSize: 32 }}>📦</span>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,0.25)", textAlign: "center" }}>No items sold yet</div>
             </div>
           ) : (
@@ -653,7 +653,7 @@ export default function DashboardContent() {
 
       </div>
 
-      {/* â”€â”€ Quick Actions â”€â”€ */}
+      {/* ── Quick Actions ── */}
       {(() => {
         const actions = btMeta?.quickActions || [];
         const accentColor = btMeta?.color || "#6366f1";
@@ -683,7 +683,7 @@ export default function DashboardContent() {
         );
       })()}
 
-      {/* â”€â”€ Getting started (only when truly empty) â”€â”€ */}
+      {/* ── Getting started (only when truly empty) ── */}
       {!hasData && !loading && (
         <div style={{ borderRadius: 14, padding: "24px", background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.2)" }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(99,102,241,0.7)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Getting Started</div>

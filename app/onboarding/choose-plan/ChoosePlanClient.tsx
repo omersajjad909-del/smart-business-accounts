@@ -8,9 +8,9 @@ import {
   setStoredCurrencyPreference,
 } from "@/lib/currencyPreference";
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   TYPES & DATA â€” exact match with PricingSection.tsx
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ══════════════════════════════════════════════════════════
+   TYPES & DATA — exact match with PricingSection.tsx
+══════════════════════════════════════════════════════════ */
 type BillingCycle = "monthly" | "yearly";
 
 const PLANS = [
@@ -75,21 +75,21 @@ const PLANS = [
 ];
 
 const MODULES = [
-  { id:"accounting",          name:"Accounting & Invoicing", icon:"ðŸ“Š", price:15 },
-  { id:"crm",                 name:"CRM",                    icon:"ðŸ‘¥", price:15 },
-  { id:"hr_payroll",          name:"HR & Payroll",           icon:"ðŸ‘¨â€ðŸ’¼", price:20 },
-  { id:"bank_reconciliation", name:"Bank Reconciliation",    icon:"ðŸ¦", price:10 },
-  { id:"inventory",           name:"Inventory",              icon:"ðŸ“¦", price:12 },
-  { id:"reports",             name:"Advanced Reports",       icon:"ðŸ“ˆ", price:8  },
-  { id:"multi_branch",        name:"Multi-Branch",           icon:"ðŸ¢", price:15 },
-  { id:"whatsapp",            name:"WhatsApp / Slack",       icon:"ðŸ’¬", price:8  },
-  { id:"api_access",          name:"API Access",             icon:"ðŸ”—", price:20 },
-  { id:"tax_filing",          name:"Tax Filing",             icon:"ðŸ§¾", price:10 },
+  { id:"accounting",          name:"Accounting & Invoicing", icon:"📊", price:15 },
+  { id:"crm",                 name:"CRM",                    icon:"👥", price:15 },
+  { id:"hr_payroll",          name:"HR & Payroll",           icon:"👨‍💼", price:20 },
+  { id:"bank_reconciliation", name:"Bank Reconciliation",    icon:"🏦", price:10 },
+  { id:"inventory",           name:"Inventory",              icon:"📦", price:12 },
+  { id:"reports",             name:"Advanced Reports",       icon:"📈", price:8  },
+  { id:"multi_branch",        name:"Multi-Branch",           icon:"🏢", price:15 },
+  { id:"whatsapp",            name:"WhatsApp / Slack",       icon:"💬", price:8  },
+  { id:"api_access",          name:"API Access",             icon:"🔗", price:20 },
+  { id:"tax_filing",          name:"Tax Filing",             icon:"🧾", price:10 },
 ];
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════════════════
    HELPERS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+══════════════════════════════════════════════════════════ */
 function CheckIcon({ color }: { color: string }) {
   return (
     <div style={{ width:18, height:18, borderRadius:"50%", background:`${color}18`, border:`1px solid ${color}35`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -110,9 +110,9 @@ function CrossIcon() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════════════════
    MAIN PAGE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+══════════════════════════════════════════════════════════ */
 export default function ChoosePlanPage() {
   const router       = useRouter();
   const searchParams = useSearchParams();
@@ -271,7 +271,7 @@ export default function ChoosePlanPage() {
       {showCustom && (
         <div style={{ position:"fixed", inset:0, zIndex:1000, background:"rgba(6,7,26,.95)", backdropFilter:"blur(20px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
           <div style={{ width:"100%", maxWidth:640, background:"rgba(255,255,255,.04)", border:"1.5px solid rgba(255,255,255,.1)", borderRadius:24, padding:"36px 40px", position:"relative", boxShadow:"0 32px 80px rgba(0,0,0,.5)", maxHeight:"90vh", overflowY:"auto" }}>
-            <button onClick={()=>setShowCustom(false)} style={{ position:"absolute", top:20, right:20, background:"none", border:"none", color:"rgba(255,255,255,.4)", cursor:"pointer", fontSize:24, lineHeight:1 }}>âœ•</button>
+            <button onClick={()=>setShowCustom(false)} style={{ position:"absolute", top:20, right:20, background:"none", border:"none", color:"rgba(255,255,255,.4)", cursor:"pointer", fontSize:24, lineHeight:1 }}>✕</button>
 
             <div style={{ marginBottom:28 }}>
               <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 14px", borderRadius:22, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", fontSize:11, fontWeight:800, color:"#34d399", letterSpacing:".06em", textTransform:"uppercase", marginBottom:14 }}>
@@ -308,7 +308,7 @@ export default function ChoosePlanPage() {
             <div style={{ borderTop:"1px solid rgba(255,255,255,.08)", paddingTop:24, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
               <div>
                 <div style={{ fontSize:11, fontWeight:800, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:4 }}>
-                  {selectedModules.length} module{selectedModules.length!==1?"s":""} Â· {billing==="yearly"?"Billed yearly (20% off)":"Monthly billing"}
+                  {selectedModules.length} module{selectedModules.length!==1?"s":""} · {billing==="yearly"?"Billed yearly (20% off)":"Monthly billing"}
                 </div>
                 <div style={{ display:"flex", alignItems:"flex-end", gap:6 }}>
                   <span style={{ fontFamily:"Lora,serif", fontSize:40, fontWeight:700, color:"#34d399", lineHeight:1 }}>
@@ -319,7 +319,7 @@ export default function ChoosePlanPage() {
               </div>
               <button onClick={handleCustomContinue} disabled={selectedModules.length===0}
                 style={{ padding:"14px 28px", borderRadius:13, background:"linear-gradient(135deg,#059669,#34d399)", border:"none", color:"#fff", fontWeight:800, fontSize:14, cursor:"pointer", opacity:selectedModules.length===0?.5:1, fontFamily:"inherit", transition:"all .2s", boxShadow:"0 4px 20px rgba(52,211,153,.3)" }}>
-                Continue â†’
+                Continue →
               </button>
             </div>
           </div>
@@ -375,7 +375,7 @@ export default function ChoosePlanPage() {
                 {b === "monthly" ? "Monthly" : "Yearly"}
                 {b === "yearly" && (
                   <span style={{ fontSize:10, fontWeight:800, padding:"2px 7px", borderRadius:8, background:billing==="yearly"?"rgba(52,211,153,.25)":"rgba(52,211,153,.12)", color:"#34d399", border:"1px solid rgba(52,211,153,.3)" }}>
-                    âˆ’20%
+                    −20%
                   </span>
                 )}
               </button>
@@ -412,7 +412,7 @@ export default function ChoosePlanPage() {
 
                 {plan.featured && (
                   <div style={{ background:"linear-gradient(135deg,#fbbf24,#f59e0b)", padding:"9px 0", textAlign:"center", fontSize:11, fontWeight:800, color:"#0f172a", letterSpacing:".1em", textTransform:"uppercase" }}>
-                    âœ¦ Most Popular
+                    ✦ Most Popular
                   </div>
                 )}
 
@@ -524,7 +524,7 @@ export default function ChoosePlanPage() {
                 <div style={{ display:"flex", alignItems:"flex-end", gap:8, marginBottom:6 }}>
                   <div style={{ fontFamily:"Lora,serif", fontSize:50, fontWeight:700, color:"#34d399", lineHeight:1, letterSpacing:"-2px" }}>
                     $
-                    <span style={{ fontSize:32 }}>â€”</span>
+                    <span style={{ fontSize:32 }}>—</span>
                   </div>
                 </div>
                 <div style={{ fontSize:12, color:"#34d399", fontWeight:600 }}>Price calculated from modules</div>
@@ -535,12 +535,12 @@ export default function ChoosePlanPage() {
               {/* Module preview */}
               <div style={{ flex:1, display:"flex", flexDirection:"column", gap:7, marginBottom:22 }}>
                 {[
-                  { icon:"ðŸ“Š", text:"Accounting & Invoicing" },
-                  { icon:"ðŸ‘¥", text:"CRM" },
-                  { icon:"ðŸ‘¨â€ðŸ’¼", text:"HR & Payroll" },
-                  { icon:"ðŸ“¦", text:"Inventory" },
-                  { icon:"ðŸ¦", text:"Bank Reconciliation" },
-                  { icon:"ðŸ”—", text:"API Access" },
+                  { icon:"📊", text:"Accounting & Invoicing" },
+                  { icon:"👥", text:"CRM" },
+                  { icon:"👨‍💼", text:"HR & Payroll" },
+                  { icon:"📦", text:"Inventory" },
+                  { icon:"🏦", text:"Bank Reconciliation" },
+                  { icon:"🔗", text:"API Access" },
                 ].map(m => (
                   <div key={m.text} style={{ display:"flex", alignItems:"center", gap:10 }}>
                     <div style={{ width:18, height:18, borderRadius:"50%", background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:10 }}>+</div>
@@ -571,12 +571,12 @@ export default function ChoosePlanPage() {
         <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:28,
           opacity:visible?1:0, transition:"opacity .6s ease .5s" }}>
           {[
-            { icon:"ðŸ”’", label:"256-bit SSL" },
-            { icon:"ðŸ’³", label:"Secure payments via Stripe" },
-            { icon:"ðŸ”„", label:"Cancel anytime" },
-            { icon:"ðŸ“¦", label:"Price per company" },
-            { icon:"âš¡", label:"Setup in 10 minutes" },
-            { icon:"ðŸŽ¯", label:"14-day free trial" },
+            { icon:"🔒", label:"256-bit SSL" },
+            { icon:"💳", label:"Secure payments via Stripe" },
+            { icon:"🔄", label:"Cancel anytime" },
+            { icon:"📦", label:"Price per company" },
+            { icon:"⚡", label:"Setup in 10 minutes" },
+            { icon:"🎯", label:"14-day free trial" },
           ].map(({ icon, label }) => (
             <div key={label} style={{ display:"flex", alignItems:"center", gap:7, fontSize:12.5, color:"rgba(255,255,255,.35)", fontWeight:500 }}>
               <span style={{ fontSize:15 }}>{icon}</span>

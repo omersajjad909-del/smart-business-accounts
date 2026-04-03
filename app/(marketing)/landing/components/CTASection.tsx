@@ -89,6 +89,14 @@ export default function CTASection() {
         @keyframes ringRotateRev{to{transform:translate(-50%,-50%) rotate(-360deg)}}
         @keyframes floatBadge{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
         @keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+        @media(max-width:640px){
+          .cta-stats{display:grid !important; grid-template-columns:repeat(2,1fr) !important; width:100% !important;}
+          .cta-stats > div:nth-child(2){border-right:none !important;}
+          .cta-includes-grid{grid-template-columns:repeat(2,1fr) !important;}
+        }
+        @media(max-width:400px){
+          .cta-includes-grid{grid-template-columns:1fr !important;}
+        }
         .cta-primary{
           display:inline-flex;align-items:center;gap:10px;
           padding:17px 42px;border-radius:14px;border:none;
@@ -231,7 +239,7 @@ export default function CTASection() {
         </div>
 
         {/* Stats bar */}
-        <div style={{
+        <div className="cta-stats" style={{
           display: "inline-flex", borderRadius: 20,
           background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
           overflow: "hidden", marginBottom: 56,
@@ -260,7 +268,7 @@ export default function CTASection() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 8 }}>
+        <div className="cta-includes-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 8 }}>
           {INCLUDES.map(({ icon, label }) => (
             <div key={label} style={{
               display: "flex", alignItems: "center", gap: 10,

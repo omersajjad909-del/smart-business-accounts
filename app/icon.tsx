@@ -17,83 +17,81 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background:
-            "radial-gradient(circle at 28% 24%, rgba(129,140,248,.55), transparent 34%), linear-gradient(145deg, #0a1028 0%, #12183a 45%, #070b1b 100%)",
+          background: "transparent",
         }}
       >
         <div
           style={{
-            width: 380,
-            height: 380,
-            borderRadius: 96,
+            width: 420,
+            height: 420,
+            borderRadius: 108,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             position: "relative",
-            background:
-              "linear-gradient(150deg, rgba(99,102,241,.98) 0%, rgba(79,70,229,.98) 42%, rgba(124,58,237,.98) 100%)",
-            boxShadow:
-              "0 40px 80px rgba(7, 11, 27, .45), inset 0 1px 0 rgba(255,255,255,.22)",
+            background: "linear-gradient(145deg, #4f46e5 0%, #6366f1 55%, #7c3aed 100%)",
             border: "1px solid rgba(255,255,255,.18)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,.22)",
           }}
         >
           <div
             style={{
               position: "absolute",
-              inset: 18,
-              borderRadius: 80,
-              border: "1px solid rgba(255,255,255,.12)",
+              inset: 20,
+              borderRadius: 92,
+              border: "1px solid rgba(255,255,255,.1)",
             }}
           />
+
           <div
             style={{
               position: "absolute",
-              top: 52,
-              left: 58,
-              width: 110,
+              top: 72,
+              left: 86,
+              width: 120,
               height: 18,
               borderRadius: 999,
-              background: "rgba(255,255,255,.2)",
+              background: "rgba(255,255,255,.16)",
               transform: "rotate(-28deg)",
             }}
           />
+
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               position: "relative",
-              transform: "translateX(4px)",
+              transform: "translateX(8px)",
             }}
           >
             <div
               style={{
-                width: 60,
-                height: 214,
-                borderRadius: 30,
-                background: "#ffffff",
-                boxShadow: "0 10px 24px rgba(255,255,255,.16)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: 22,
-                left: 52,
-                width: 150,
-                height: 56,
-                borderRadius: 28,
+                width: 64,
+                height: 228,
+                borderRadius: 32,
                 background: "#ffffff",
               }}
             />
             <div
               style={{
                 position: "absolute",
-                top: 102,
-                left: 52,
+                top: 26,
+                left: 54,
+                width: 154,
+                height: 54,
+                borderRadius: 27,
+                background: "#ffffff",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                top: 108,
+                left: 54,
                 width: 122,
-                height: 52,
-                borderRadius: 26,
-                background: "#c7d2fe",
+                height: 48,
+                borderRadius: 24,
+                background: "#ffffff",
               }}
             />
           </div>

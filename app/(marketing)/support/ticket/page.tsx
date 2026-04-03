@@ -107,7 +107,7 @@ export default function SupportTicketPage() {
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "56px 24px 100px", position: "relative", zIndex: 1 }}>
         <div className="st-fade-1" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 22 }}>
           <Link href="/support" style={{ color: "rgba(255,255,255,.65)", textDecoration: "none", fontWeight: 600, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 18, lineHeight: 1 }}>â†</span> Back to Support
+            <span style={{ fontSize: 18, lineHeight: 1 }}>←</span> Back to Support
           </Link>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,.32)", fontWeight: 600 }}>Support Ticket</div>
         </div>
@@ -224,7 +224,7 @@ export default function SupportTicketPage() {
                       fontSize: 13,
                     }}
                   >
-                    ðŸ“Ž Attach file
+                    📎 Attach file
                   </span>
                   {attachmentName ? <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.35)" }}>{attachmentName}</span> : null}
                 </label>
@@ -273,7 +273,7 @@ export default function SupportTicketPage() {
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <a href="mailto:finovaos.app@gmail.com" style={{ textDecoration: "none", padding: "12px 12px", borderRadius: 14, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 12, background: "rgba(129,140,248,.14)", border: "1px solid rgba(129,140,248,.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>âœ‰ï¸</div>
+                  <div style={{ width: 34, height: 34, borderRadius: 12, background: "rgba(129,140,248,.14)", border: "1px solid rgba(129,140,248,.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>✉️</div>
                   <div>
                     <div style={{ fontSize: 13.5, fontWeight: 800, color: "white", marginBottom: 2 }}>Email support</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>finovaos.app@gmail.com</div>
@@ -281,7 +281,7 @@ export default function SupportTicketPage() {
                 </a>
 
                 <Link href="/support" style={{ textDecoration: "none", padding: "12px 12px", borderRadius: 14, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 12, background: "rgba(52,211,153,.14)", border: "1px solid rgba(52,211,153,.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>ðŸ“š</div>
+                  <div style={{ width: 34, height: 34, borderRadius: 12, background: "rgba(52,211,153,.14)", border: "1px solid rgba(52,211,153,.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>📚</div>
                   <div>
                     <div style={{ fontSize: 13.5, fontWeight: 800, color: "white", marginBottom: 2 }}>Support center</div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>FAQs, guides, contact options</div>

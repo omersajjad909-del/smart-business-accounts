@@ -6,7 +6,7 @@ import { resolveCompanyId } from "@/lib/tenant";
 
 type _QuotationInput = {
   id?: string;
-  quotationNo?: string;   // ðŸ‘ˆ THIS IS THE KEY
+  quotationNo?: string;   // 👈 THIS IS THE KEY
   date: string;
   validUntil?: string | null;
   customerId?: string | null;
@@ -24,7 +24,7 @@ type _QuotationInput = {
 // VALIDATION SCHEMA
 const quotationSchema = z.object({
   id: z.string().optional(),
-  quotationNo: z.string().optional(), // âœ… ADD THIS
+  quotationNo: z.string().optional(), // ✅ ADD THIS
   date: z.string(),
   validUntil: z.string().optional().nullable(),
   customerId: z.string().optional().nullable(),

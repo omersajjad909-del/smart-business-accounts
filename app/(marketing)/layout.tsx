@@ -9,11 +9,11 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: {
-    default: "Finova â€” Cloud Accounting & Business Management for SMEs",
+    default: "Finova — Cloud Accounting & Business Management for SMEs",
     template: "%s | Finova",
   },
   description:
-    "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM â€” all in one platform. Trusted by 12,000+ businesses in 40+ countries.",
+    "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. Trusted by 12,000+ businesses in 40+ countries.",
   keywords: [
     "accounting software", "cloud accounting", "invoicing software", "inventory management",
     "HR payroll", "bank reconciliation", "CRM software", "SME accounting", "financial management",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "Finova",
-    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "Finova â€” Cloud Accounting for SMEs" }],
+    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "Finova — Cloud Accounting for SMEs" }],
   },
   twitter: {
     card: "summary_large_image",

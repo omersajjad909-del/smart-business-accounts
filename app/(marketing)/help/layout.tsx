@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Help Center â€” Guides, Tutorials & Documentation",
+  title: "Help Center — Guides, Tutorials & Documentation",
   description:
     "Step-by-step guides, video tutorials, and documentation for Finova. Learn how to set up accounting, invoicing, inventory management, HR & payroll, and more for your business.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "cloud accounting help",
   ],
   openGraph: {
-    title: "Finova Help Center â€” Guides & Documentation",
+    title: "Finova Help Center — Guides & Documentation",
     description: "Step-by-step guides and tutorials for all Finova features. Get answers fast.",
     url: `${BASE}/help`,
     siteName: "Finova",

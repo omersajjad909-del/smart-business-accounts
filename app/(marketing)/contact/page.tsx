@@ -2,15 +2,15 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════════════════
    DATA
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+══════════════════════════════════════════════════════════ */
 const CONTACT_METHODS = [
   {
-    icon: "ðŸ’¬",
+    icon: "💬",
     title: "Live Chat",
     desc: "Talk to our team in real time",
-    detail: "Available Monâ€“Fri, 9amâ€“6pm GMT",
+    detail: "Available Mon–Fri, 9am–6pm GMT",
     action: "Start Chat",
     href: "#chat",
     color: "#818cf8",
@@ -18,7 +18,7 @@ const CONTACT_METHODS = [
     border: "rgba(129,140,248,.25)",
   },
   {
-    icon: "ðŸ“§",
+    icon: "📧",
     title: "Email Us",
     desc: "We'll respond within 24 hours",
     detail: "finovaos.app@gmail.com",
@@ -29,7 +29,7 @@ const CONTACT_METHODS = [
     border: "rgba(52,211,153,.25)",
   },
   {
-    icon: "ðŸ“ž",
+    icon: "📞",
     title: "Call Us",
     desc: "Speak directly with our team",
     detail: "+1 (888) 456-7890",
@@ -40,9 +40,9 @@ const CONTACT_METHODS = [
     border: "rgba(56,189,248,.25)",
   },
   {
-    icon: "ðŸ“…",
+    icon: "📅",
     title: "Book a Demo",
-    desc: "See Finova in action â€” 30 min",
+    desc: "See Finova in action — 30 min",
     detail: "Free personalised walkthrough",
     action: "Schedule Demo",
     href: "/demo",
@@ -55,7 +55,7 @@ const CONTACT_METHODS = [
 const OFFICES = [
   {
     city: "San Francisco",
-    country: "United States ðŸ‡ºðŸ‡¸",
+    country: "United States 🇺🇸",
     address: "535 Mission Street, 14th Floor, San Francisco, CA 94105",
     phone: "+1 (800) 555-0100",
     email: "finovaos.app@gmail.com",
@@ -64,7 +64,7 @@ const OFFICES = [
   },
   {
     city: "Dubai",
-    country: "UAE ðŸ‡¦ðŸ‡ª",
+    country: "UAE 🇦🇪",
     address: "Level 9, Gate District 7, DIFC, Dubai, UAE",
     phone: "+971 4 456 7890",
     email: "finovaos.app@gmail.com",
@@ -73,7 +73,7 @@ const OFFICES = [
   },
   {
     city: "London",
-    country: "United Kingdom ðŸ‡¬ðŸ‡§",
+    country: "United Kingdom 🇬🇧",
     address: "2nd Floor, 1 Aldgate, London EC3N 1RE, UK",
     phone: "+44 20 7946 0890",
     email: "finovaos.app@gmail.com",
@@ -84,24 +84,24 @@ const OFFICES = [
 
 const FAQS = [
   { q:"How quickly do you respond to support tickets?", a:"Pro and Enterprise customers receive responses within 4 hours. Starter plan customers within 24 hours. We never leave anyone hanging." },
-  { q:"Do you offer onboarding help?", a:"Yes â€” all plans include access to our help centre and video tutorials. Enterprise plans include dedicated onboarding sessions with a Finova specialist." },
+  { q:"Do you offer onboarding help?", a:"Yes — all plans include access to our help centre and video tutorials. Enterprise plans include dedicated onboarding sessions with a Finova specialist." },
   { q:"Can I migrate data from my current software?", a:"Absolutely. We support CSV/Excel imports and have native migration tools for QuickBooks, Xero, Sage, and Tally. Our team can help guide the process." },
   { q:"Is there a phone number for urgent issues?", a:"Enterprise customers have a dedicated support line available 24/7. Pro customers can access our priority callback service during business hours." },
   { q:"Do you have partners or resellers in my country?", a:"We have certified partners in 20+ countries. Contact our partnerships team at finovaos.app@gmail.com to find a local expert." },
 ];
 
 const DEPARTMENTS = [
-  { icon:"ðŸ’¼", label:"Sales",        email:"finovaos.app@gmail.com",        desc:"Plans, pricing, enterprise deals" },
-  { icon:"ðŸ› ",  label:"Support",      email:"finovaos.app@gmail.com",       desc:"Technical help & account issues" },
-  { icon:"ðŸ¤", label:"Partnerships", email:"finovaos.app@gmail.com",      desc:"Reseller & integration enquiries" },
-  { icon:"ðŸ“°", label:"Press & Media",email:"finovaos.app@gmail.com",         desc:"Interviews, coverage, assets" },
-  { icon:"âš–ï¸",  label:"Legal",        email:"finovaos.app@gmail.com",         desc:"Compliance & data requests" },
-  { icon:"ðŸ’¡", label:"Feedback",      email:"finovaos.app@gmail.com",      desc:"Product suggestions & ideas" },
+  { icon:"💼", label:"Sales",        email:"finovaos.app@gmail.com",        desc:"Plans, pricing, enterprise deals" },
+  { icon:"🛠",  label:"Support",      email:"finovaos.app@gmail.com",       desc:"Technical help & account issues" },
+  { icon:"🤝", label:"Partnerships", email:"finovaos.app@gmail.com",      desc:"Reseller & integration enquiries" },
+  { icon:"📰", label:"Press & Media",email:"finovaos.app@gmail.com",         desc:"Interviews, coverage, assets" },
+  { icon:"⚖️",  label:"Legal",        email:"finovaos.app@gmail.com",         desc:"Compliance & data requests" },
+  { icon:"💡", label:"Feedback",      email:"finovaos.app@gmail.com",      desc:"Product suggestions & ideas" },
 ];
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════════════════
    HELPERS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+══════════════════════════════════════════════════════════ */
 function useInView() {
   const ref = useRef<HTMLDivElement>(null);
   const [vis, setVis] = useState(false);
@@ -184,9 +184,9 @@ function FloatingInput({
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════════════════
    MAIN PAGE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+══════════════════════════════════════════════════════════ */
 export default function ContactPage() {
   const [heroVis, setHeroVis] = useState(false);
   const [form, setForm] = useState({
@@ -231,7 +231,7 @@ export default function ContactPage() {
       overflowX:"hidden",
     }}>
 
-      {/* â”€â”€ HERO â”€â”€ */}
+      {/* ── HERO ── */}
       <section style={{ position:"relative", overflow:"hidden", padding:"130px 24px 80px", textAlign:"center" }}>
         <div style={{ position:"absolute", top:-100, left:"50%", transform:"translateX(-50%)", width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle,rgba(99,102,241,.16) 0%,transparent 70%)", pointerEvents:"none" }}/>
         <div style={{ maxWidth:640, margin:"0 auto", position:"relative", zIndex:1 }}>
@@ -271,7 +271,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* â”€â”€ CONTACT METHODS â”€â”€ */}
+      {/* ── CONTACT METHODS ── */}
       <Section>
         <div style={{ maxWidth:1060, margin:"0 auto", padding:"0 24px 80px" }}>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))", gap:16 }}>
@@ -290,7 +290,7 @@ export default function ContactPage() {
                 <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginBottom:8, lineHeight:1.5 }}>{m.desc}</div>
                 <div style={{ fontSize:12, fontWeight:600, color:m.color, marginBottom:14 }}>{m.detail}</div>
                 <div style={{ fontSize:12, fontWeight:700, color:m.color, display:"flex", alignItems:"center", gap:4 }}>
-                  {m.action} <span>â†’</span>
+                  {m.action} <span>→</span>
                 </div>
               </a>
             ))}
@@ -298,10 +298,10 @@ export default function ContactPage() {
         </div>
       </Section>
 
-      {/* â”€â”€ CONTACT FORM + DEPARTMENTS â”€â”€ */}
+      {/* ── CONTACT FORM + DEPARTMENTS ── */}
       <Section>
         <div style={{ maxWidth:1060, margin:"0 auto", padding:"0 24px 100px" }}>
-          <div style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr", gap:24, alignItems:"start" }}>
+          <div className="contact-main" style={{ display:"grid", gridTemplateColumns:"1.4fr 1fr", gap:24, alignItems:"start" }}>
 
             {/* Form */}
             <div style={{ background:"rgba(255,255,255,.03)", borderRadius:22, border:"1px solid rgba(255,255,255,.07)", padding:"36px 32px" }}>
@@ -312,7 +312,7 @@ export default function ContactPage() {
 
               {sent ? (
                 <div style={{ padding:"40px 24px", textAlign:"center" }}>
-                  <div style={{ fontSize:48, marginBottom:16 }}>âœ…</div>
+                  <div style={{ fontSize:48, marginBottom:16 }}>✅</div>
                   <div style={{ fontSize:18, fontWeight:800, color:"white", marginBottom:8 }}>Message sent!</div>
                   <div style={{ fontSize:14, color:"rgba(255,255,255,.4)", lineHeight:1.6 }}>
                     Thank you for reaching out. Our team will get back to you within 24 hours.
@@ -353,13 +353,13 @@ export default function ContactPage() {
                   </div>
 
                   {/* Name + Email */}
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+                  <div className="contact-half" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
                     <FloatingInput label="Full Name"  value={form.name}  onChange={f("name")}  required/>
                     <FloatingInput label="Work Email" type="email" value={form.email} onChange={f("email")} required/>
                   </div>
 
                   {/* Company + Phone */}
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+                  <div className="contact-half" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
                     <FloatingInput label="Company"      value={form.company} onChange={f("company")} placeholder="Your company name"/>
                     <FloatingInput label="Phone Number" type="tel" value={form.phone} onChange={f("phone")} placeholder="+1 234 567 8900"/>
                   </div>
@@ -381,11 +381,11 @@ export default function ContactPage() {
                       boxShadow:sending?"none":"0 4px 24px rgba(79,70,229,.4)",
                       transition:"all .2s",
                     }}>
-                    {sending ? "Sending..." : "Send Message â†’"}
+                    {sending ? "Sending..." : "Send Message →"}
                   </button>
 
                   <div style={{ fontSize:11, color:"rgba(255,255,255,.2)", textAlign:"center" }}>
-                    ðŸ”’ Your data is safe. We never share or sell it.
+                    🔒 Your data is safe. We never share or sell it.
                   </div>
                 </div>
               )}
@@ -407,13 +407,13 @@ export default function ContactPage() {
                     <div style={{ fontSize:13, fontWeight:700, color:"white" }}>{d.label}</div>
                     <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:1 }}>{d.desc}</div>
                   </div>
-                  <div style={{ fontSize:11, color:"#818cf8", fontWeight:600, flexShrink:0 }}>â†—</div>
+                  <div style={{ fontSize:11, color:"#818cf8", fontWeight:600, flexShrink:0 }}>↗</div>
                 </a>
               ))}
 
               {/* Response time */}
               <div style={{ marginTop:6, padding:"16px 18px", borderRadius:14, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)" }}>
-                <div style={{ fontSize:12, fontWeight:700, color:"#34d399", marginBottom:8 }}>â± Response Times</div>
+                <div style={{ fontSize:12, fontWeight:700, color:"#34d399", marginBottom:8 }}>⏱ Response Times</div>
                 {[
                   { plan:"Enterprise", time:"< 1 hour", color:"#34d399" },
                   { plan:"Pro",        time:"< 4 hours", color:"#818cf8" },
@@ -430,7 +430,7 @@ export default function ContactPage() {
         </div>
       </Section>
 
-      {/* â”€â”€ OFFICES â”€â”€ */}
+      {/* ── OFFICES ── */}
       <Section>
         <div style={{ maxWidth:1060, margin:"0 auto", padding:"0 24px 100px" }}>
           <div style={{ textAlign:"center", marginBottom:48 }}>
@@ -465,19 +465,19 @@ export default function ContactPage() {
 
                 <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                   <div style={{ display:"flex", gap:10, alignItems:"flex-start" }}>
-                    <span style={{ fontSize:14, marginTop:1, flexShrink:0 }}>ðŸ“</span>
+                    <span style={{ fontSize:14, marginTop:1, flexShrink:0 }}>📍</span>
                     <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", lineHeight:1.6 }}>{o.address}</span>
                   </div>
                   <a href={`tel:${o.phone}`} style={{ display:"flex", gap:10, alignItems:"center", textDecoration:"none" }}
                     onMouseEnter={e=>(e.currentTarget.style.opacity=".8")}
                     onMouseLeave={e=>(e.currentTarget.style.opacity="1")}>
-                    <span style={{ fontSize:14, flexShrink:0 }}>ðŸ“ž</span>
+                    <span style={{ fontSize:14, flexShrink:0 }}>📞</span>
                     <span style={{ fontSize:12, color:o.color, fontWeight:600 }}>{o.phone}</span>
                   </a>
                   <a href={`mailto:${o.email}`} style={{ display:"flex", gap:10, alignItems:"center", textDecoration:"none" }}
                     onMouseEnter={e=>(e.currentTarget.style.opacity=".8")}
                     onMouseLeave={e=>(e.currentTarget.style.opacity="1")}>
-                    <span style={{ fontSize:14, flexShrink:0 }}>ðŸ“§</span>
+                    <span style={{ fontSize:14, flexShrink:0 }}>📧</span>
                     <span style={{ fontSize:12, color:o.color, fontWeight:600 }}>{o.email}</span>
                   </a>
                 </div>
@@ -487,7 +487,7 @@ export default function ContactPage() {
         </div>
       </Section>
 
-      {/* â”€â”€ FAQ â”€â”€ */}
+      {/* ── FAQ ── */}
       <Section>
         <div style={{ maxWidth:740, margin:"0 auto", padding:"0 24px 100px" }}>
           <div style={{ textAlign:"center", marginBottom:48 }}>
@@ -497,7 +497,7 @@ export default function ContactPage() {
             </h2>
             <p style={{ fontSize:14, color:"rgba(255,255,255,.4)", margin:0 }}>
               Can&apos;t find what you&apos;re looking for?{" "}
-              <Link href="/help" style={{ color:"#818cf8", fontWeight:700, textDecoration:"none" }}>Browse the Help Centre â†’</Link>
+              <Link href="/help" style={{ color:"#818cf8", fontWeight:700, textDecoration:"none" }}>Browse the Help Centre →</Link>
             </p>
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
@@ -520,18 +520,18 @@ export default function ContactPage() {
         </div>
       </Section>
 
-      {/* â”€â”€ BOTTOM CTA â”€â”€ */}
+      {/* ── BOTTOM CTA ── */}
       <Section>
         <div style={{ maxWidth:700, margin:"0 auto", padding:"0 24px 120px", textAlign:"center" }}>
           <div style={{ padding:"52px 40px", borderRadius:24, background:"linear-gradient(135deg,rgba(79,70,229,.2),rgba(124,58,237,.12))", border:"1px solid rgba(99,102,241,.25)", position:"relative", overflow:"hidden" }}>
             <div style={{ position:"absolute", top:-60, right:-60, width:200, height:200, borderRadius:"50%", background:"rgba(99,102,241,.15)", filter:"blur(50px)", pointerEvents:"none" }}/>
             <div style={{ position:"relative", zIndex:1 }}>
-              <div style={{ fontSize:36, marginBottom:14 }}>ðŸ‘‹</div>
+              <div style={{ fontSize:36, marginBottom:14 }}>👋</div>
               <h2 style={{ fontSize:"clamp(22px,3vw,32px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 12px" }}>
                 Still have questions?
               </h2>
               <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", lineHeight:1.7, margin:"0 auto 28px", maxWidth:420 }}>
-                Our team is genuinely happy to help. No bots, no runarounds â€” just real people who care about your business.
+                Our team is genuinely happy to help. No bots, no runarounds — just real people who care about your business.
               </p>
               <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
                 <Link href="/help" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", textDecoration:"none", boxShadow:"0 4px 20px rgba(79,70,229,.4)" }}>
@@ -548,6 +548,8 @@ export default function ContactPage() {
 
       <style>{`
         @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+        @media(max-width:860px){.contact-main{grid-template-columns:1fr!important;} .contact-form-grid{grid-template-columns:1fr!important;}}
+        @media(max-width:480px){.contact-half{grid-template-columns:1fr!important;}}
       `}</style>
     </main>
   );

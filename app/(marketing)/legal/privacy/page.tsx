@@ -11,7 +11,7 @@ const ADDRESS = "Global Operations";
 const SECTIONS = [
   {
     id: "information-we-collect",
-    icon: "ðŸ“‹",
+    icon: "📋",
     color: "#818cf8",
     dim: "rgba(129,140,248,.08)",
     border: "rgba(129,140,248,.25)",
@@ -37,7 +37,7 @@ const SECTIONS = [
   },
   {
     id: "how-we-use",
-    icon: "âš™ï¸",
+    icon: "⚙️",
     color: "#34d399",
     dim: "rgba(52,211,153,.08)",
     border: "rgba(52,211,153,.25)",
@@ -45,7 +45,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Service Delivery",
-        body: "Your data is used solely to operate Finova â€” to process transactions, generate reports, send notifications, and maintain your account.",
+        body: "Your data is used solely to operate Finova — to process transactions, generate reports, send notifications, and maintain your account.",
       },
       {
         sub: "Security & Fraud Prevention",
@@ -63,7 +63,7 @@ const SECTIONS = [
   },
   {
     id: "data-sharing",
-    icon: "ðŸ”—",
+    icon: "🔗",
     color: "#fbbf24",
     dim: "rgba(251,191,36,.08)",
     border: "rgba(251,191,36,.25)",
@@ -89,7 +89,7 @@ const SECTIONS = [
   },
   {
     id: "data-security",
-    icon: "ðŸ”’",
+    icon: "🔒",
     color: "#a78bfa",
     dim: "rgba(167,139,250,.08)",
     border: "rgba(167,139,250,.25)",
@@ -115,7 +115,7 @@ const SECTIONS = [
   },
   {
     id: "data-retention",
-    icon: "ðŸ—‚ï¸",
+    icon: "🗂️",
     color: "#f87171",
     dim: "rgba(248,113,113,.08)",
     border: "rgba(248,113,113,.25)",
@@ -137,7 +137,7 @@ const SECTIONS = [
   },
   {
     id: "your-rights",
-    icon: "âœ‹",
+    icon: "✋",
     color: "#06b6d4",
     dim: "rgba(6,182,212,.08)",
     border: "rgba(6,182,212,.25)",
@@ -163,7 +163,7 @@ const SECTIONS = [
   },
   {
     id: "cookies",
-    icon: "ðŸª",
+    icon: "🍪",
     color: "#34d399",
     dim: "rgba(52,211,153,.08)",
     border: "rgba(52,211,153,.25)",
@@ -185,7 +185,7 @@ const SECTIONS = [
   },
   {
     id: "changes",
-    icon: "ðŸ“",
+    icon: "📝",
     color: "#818cf8",
     dim: "rgba(129,140,248,.08)",
     border: "rgba(129,140,248,.25)",
@@ -290,7 +290,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Head>
-        <title>Privacy Policy â€“ Finova</title>
+        <title>Privacy Policy – Finova</title>
         <meta name="description" content="How Finova collects, uses, and protects your data."/>
       </Head>
 
@@ -334,7 +334,7 @@ export default function PrivacyPage() {
         </div>
 
         <div style={{ position:"relative", zIndex:1 }}>
-          {/* â”€â”€ HERO â”€â”€ */}
+          {/* ── HERO ── */}
           <section style={{ padding:"80px 24px 48px", maxWidth:1100, margin:"0 auto" }}>
             <div ref={heroRef}>
               {/* Breadcrumb */}
@@ -364,7 +364,7 @@ export default function PrivacyPage() {
                     transition:"all .5s ease .06s",
                   }}>
                     <span style={{ width:5, height:5, borderRadius:"50%", background:"#6366f1", animation:"blink 2s ease infinite" }}/>
-                    Legal Document Â· Last Updated {LAST_UPDATED}
+                    Legal Document · Last Updated {LAST_UPDATED}
                   </div>
 
                   <h1 style={{
@@ -408,11 +408,11 @@ export default function PrivacyPage() {
                     background:"linear-gradient(90deg,transparent,rgba(99,102,241,.5),transparent)" }}/>
                   <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:16 }}>Quick Summary</div>
                   {[
-                    { icon:"ðŸš«", text:"We never sell your data" },
-                    { icon:"ðŸ”’", text:"256-bit encryption always" },
-                    { icon:"ðŸŒ", text:"Global cloud servers" },
-                    { icon:"ðŸ“¤", text:"Full data export anytime" },
-                    { icon:"ðŸ—‘ï¸", text:"Right to deletion" },
+                    { icon:"🚫", text:"We never sell your data" },
+                    { icon:"🔒", text:"256-bit encryption always" },
+                    { icon:"🌐", text:"Global cloud servers" },
+                    { icon:"📤", text:"Full data export anytime" },
+                    { icon:"🗑️", text:"Right to deletion" },
                   ].map(({ icon, text }) => (
                     <div key={text} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
                       <span style={{ fontSize:15 }}>{icon}</span>
@@ -430,12 +430,12 @@ export default function PrivacyPage() {
             </div>
           </section>
 
-          {/* â”€â”€ MAIN LAYOUT â”€â”€ */}
+          {/* ── MAIN LAYOUT ── */}
           <div className="layout-grid" style={{
             maxWidth:1100, margin:"0 auto", padding:"0 24px 80px",
             display:"grid", gridTemplateColumns:"220px 1fr", gap:48, alignItems:"start",
           }}>
-            {/* â”€â”€ Sticky TOC Sidebar â”€â”€ */}
+            {/* ── Sticky TOC Sidebar ── */}
             <aside className="toc-sidebar" style={{ position:"sticky", top:40 }}>
               <div style={{
                 borderRadius:16, padding:"16px 12px",
@@ -456,7 +456,7 @@ export default function PrivacyPage() {
               </div>
             </aside>
 
-            {/* â”€â”€ Content â”€â”€ */}
+            {/* ── Content ── */}
             <div>
               {SECTIONS.map((s,i) => <Section key={s.id} s={s} index={i}/>)}
 
@@ -470,7 +470,7 @@ export default function PrivacyPage() {
               }}>
                 <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1,
                   background:"linear-gradient(90deg,transparent,rgba(99,102,241,.4),transparent)" }}/>
-                <div style={{ fontSize:22, marginBottom:14 }}>ðŸ“¬</div>
+                <div style={{ fontSize:22, marginBottom:14 }}>📬</div>
                 <h3 style={{ fontFamily:"'Lora',serif", fontSize:20, fontWeight:700, color:"white", marginBottom:8 }}>
                   Contact Our Privacy Team
                 </h3>
@@ -479,8 +479,8 @@ export default function PrivacyPage() {
                 </p>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
                   {[
-                    { icon:"ðŸ“§", label:"Email", val:EMAIL, href:`mailto:${EMAIL}` },
-                    { icon:"ðŸ“", label:"Address", val:ADDRESS, href:"#" },
+                    { icon:"📧", label:"Email", val:EMAIL, href:`mailto:${EMAIL}` },
+                    { icon:"📍", label:"Address", val:ADDRESS, href:"#" },
                   ].map(({ icon, label, val, href }) => (
                     <a key={label} href={href} style={{
                       display:"inline-flex", alignItems:"center", gap:10,

@@ -291,6 +291,8 @@ export default function PricingSection() {
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+        @media(max-width:1024px){.pricing-grid{grid-template-columns:repeat(2,1fr) !important;}}
+        @media(max-width:580px){.pricing-grid{grid-template-columns:1fr !important;}}
       `}</style>
 
       {/* BG */}
@@ -345,7 +347,7 @@ export default function PricingSection() {
         </div>
 
         {/* Plans */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:48, alignItems:"start" }}>
+        <div className="pricing-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:48, alignItems:"start" }}>
           {PLANS.map((plan, i) => (
             <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} vis={vis} i={i} />
           ))}

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Industry Solutions â€” Trading, Manufacturing, Services & More",
+  title: "Industry Solutions — Trading, Manufacturing, Services & More",
   description:
     "Finova is purpose-built for traders, distributors, manufacturers, retail, and service businesses. Explore industry-specific accounting workflows, inventory systems, and financial tools designed for your sector.",
   keywords: [
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Industry Solutions | Finova",
-    description: "Trading, manufacturing, retail, and services â€” Finova adapts to your industry.",
+    description: "Trading, manufacturing, retail, and services — Finova adapts to your industry.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/solutions` },

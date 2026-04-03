@@ -2,14 +2,14 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-/* â”€â”€â”€ Types â”€â”€â”€ */
+/* ─── Types ─── */
 type Status = "operational" | "degraded" | "outage" | "maintenance";
 
-/* â”€â”€â”€ Static data â”€â”€â”€ */
+/* ─── Static data ─── */
 const SERVICES = [
   {
     id: "web",
-    icon: "ðŸŒ",
+    icon: "🌐",
     name: "Web Application",
     desc: "Main dashboard & UI",
     status: "operational" as Status,
@@ -18,7 +18,7 @@ const SERVICES = [
   },
   {
     id: "api",
-    icon: "âš¡",
+    icon: "⚡",
     name: "API Gateway",
     desc: "REST API & authentication",
     status: "operational" as Status,
@@ -27,7 +27,7 @@ const SERVICES = [
   },
   {
     id: "db",
-    icon: "ðŸ—„ï¸",
+    icon: "🗄️",
     name: "Database Cluster",
     desc: "Primary data storage",
     status: "operational" as Status,
@@ -36,7 +36,7 @@ const SERVICES = [
   },
   {
     id: "reports",
-    icon: "ðŸ“Š",
+    icon: "📊",
     name: "Report Engine",
     desc: "PDF & Excel generation",
     status: "operational" as Status,
@@ -45,25 +45,25 @@ const SERVICES = [
   },
   {
     id: "email",
-    icon: "ðŸ“§",
+    icon: "📧",
     name: "Email & Notifications",
     desc: "Invoice delivery & alerts",
     status: "operational" as Status,
     uptime: "99.87%",
-    latency: "â€”",
+    latency: "—",
   },
   {
     id: "backups",
-    icon: "ðŸ’¾",
+    icon: "💾",
     name: "Backup Service",
     desc: "Automated daily backups",
     status: "operational" as Status,
     uptime: "100%",
-    latency: "â€”",
+    latency: "—",
   },
   {
     id: "cdn",
-    icon: "ðŸš€",
+    icon: "🚀",
     name: "CDN & Assets",
     desc: "Static files & media",
     status: "operational" as Status,
@@ -72,7 +72,7 @@ const SERVICES = [
   },
   {
     id: "search",
-    icon: "ðŸ”",
+    icon: "🔍",
     name: "Search & Indexing",
     desc: "Full-text record search",
     status: "operational" as Status,
@@ -99,7 +99,7 @@ const INCIDENTS: {
   },
   {
     date: "Jan 29, 2025",
-    title: "Email delivery delays â€” invoices & reminders",
+    title: "Email delivery delays — invoices & reminders",
     severity: "resolved",
     updates: [
       { time: "09:14 PKT", text: "Upstream SMTP provider reporting elevated bounce rates. Investigation started." },
@@ -118,7 +118,7 @@ const UPTIME_MONTHS = [
   { month:"Feb", pct:99.97 },
 ];
 
-/* â”€â”€â”€ Helpers â”€â”€â”€ */
+/* ─── Helpers ─── */
 const STATUS_META: Record<Status, { label: string; color: string; bg: string; border: string; dot: string }> = {
   operational: { label:"Operational", color:"#34d399", bg:"rgba(52,211,153,.1)", border:"rgba(52,211,153,.3)", dot:"#34d399" },
   degraded:    { label:"Degraded",    color:"#fbbf24", bg:"rgba(251,191,36,.1)", border:"rgba(251,191,36,.3)", dot:"#fbbf24" },
@@ -137,7 +137,7 @@ function useVisible(threshold = 0.1) {
   return [ref, v] as const;
 }
 
-/* â”€â”€â”€ Live clock â”€â”€â”€ */
+/* ─── Live clock ─── */
 function LiveClock() {
   const [time, setTime] = useState("");
   useEffect(() => {
@@ -149,7 +149,7 @@ function LiveClock() {
   return <span>{time} {Intl.DateTimeFormat().resolvedOptions().timeZone}</span>;
 }
 
-/* â”€â”€â”€ Service row â”€â”€â”€ */
+/* ─── Service row ─── */
 function ServiceRow({ svc, index }: { svc: typeof SERVICES[0]; index: number }) {
   const m = STATUS_META[svc.status];
   const [hov, setHov] = useState(false);
@@ -209,7 +209,7 @@ function ServiceRow({ svc, index }: { svc: typeof SERVICES[0]; index: number }) 
   );
 }
 
-/* â”€â”€â”€ Page â”€â”€â”€ */
+/* ─── Page ─── */
 export default function StatusPage() {
   const [heroRef, heroVisible] = useVisible(0.2);
   const [servRef, servVisible] = useVisible(0.08);
@@ -251,7 +251,7 @@ export default function StatusPage() {
 
         <div style={{ position:"relative", zIndex:1, maxWidth:900, margin:"0 auto", padding:"72px 24px 80px" }}>
 
-          {/* â”€â”€ HERO â”€â”€ */}
+          {/* ── HERO ── */}
           <div ref={heroRef} style={{ textAlign:"center", marginBottom:56 }}>
             {/* Breadcrumb */}
             <div style={{
@@ -317,12 +317,12 @@ export default function StatusPage() {
               )}
 
               <p style={{ fontSize:14, color:"rgba(255,255,255,.38)", lineHeight:1.7, marginBottom:6 }}>
-                Last checked: <LiveClock/> Â· Updated every 60 seconds
+                Last checked: <LiveClock/> · Updated every 60 seconds
               </p>
             </div>
           </div>
 
-          {/* â”€â”€ SERVICES â”€â”€ */}
+          {/* ── SERVICES ── */}
           <div ref={servRef} style={{
             opacity:servVisible?1:0, transform:servVisible?"translateY(0)":"translateY(20px)",
             transition:"all .65s ease",
@@ -352,7 +352,7 @@ export default function StatusPage() {
             </div>
           </div>
 
-          {/* â”€â”€ UPTIME CHART â”€â”€ */}
+          {/* ── UPTIME CHART ── */}
           <div ref={uptimeRef} style={{
             marginTop:48,
             opacity:uptimeVisible?1:0, transform:uptimeVisible?"translateY(0)":"translateY(20px)",
@@ -369,7 +369,7 @@ export default function StatusPage() {
                 background:"linear-gradient(90deg,transparent,rgba(52,211,153,.4),transparent)" }}/>
 
               <h3 style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", marginBottom:6 }}>
-                Platform Uptime â€” Last 6 Months
+                Platform Uptime — Last 6 Months
               </h3>
               <p style={{ fontSize:12.5, color:"rgba(255,255,255,.3)", marginBottom:28 }}>
                 Overall average: <strong style={{ color:"#34d399" }}>99.97%</strong>
@@ -407,7 +407,7 @@ export default function StatusPage() {
             </div>
           </div>
 
-          {/* â”€â”€ INCIDENT HISTORY â”€â”€ */}
+          {/* ── INCIDENT HISTORY ── */}
           <div ref={histRef} style={{
             marginTop:40,
             opacity:histVisible?1:0, transform:histVisible?"translateY(0)":"translateY(20px)",
@@ -420,7 +420,7 @@ export default function StatusPage() {
             {INCIDENTS.length === 0 ? (
               <div style={{ padding:"32px", textAlign:"center", borderRadius:16,
                 background:"rgba(52,211,153,.05)", border:"1px solid rgba(52,211,153,.2)" }}>
-                <div style={{ fontSize:28, marginBottom:10 }}>ðŸŽ‰</div>
+                <div style={{ fontSize:28, marginBottom:10 }}>🎉</div>
                 <div style={{ fontSize:14, color:"rgba(255,255,255,.5)" }}>No incidents in the past 90 days.</div>
               </div>
             ) : (
@@ -497,14 +497,14 @@ export default function StatusPage() {
 
                 <div style={{ textAlign:"center", marginTop:8 }}>
                   <span style={{ fontSize:12, color:"rgba(255,255,255,.25)", fontWeight:500 }}>
-                    No incidents in the 60 days prior. ðŸŽ‰
+                    No incidents in the 60 days prior. 🎉
                   </span>
                 </div>
               </div>
             )}
           </div>
 
-          {/* â”€â”€ SUBSCRIBE BANNER â”€â”€ */}
+          {/* ── SUBSCRIBE BANNER ── */}
           <div style={{
             marginTop:48, borderRadius:20, padding:"28px 32px",
             background:"linear-gradient(135deg,rgba(45,43,107,.8),rgba(30,27,85,.8))",
@@ -516,7 +516,7 @@ export default function StatusPage() {
           }}>
             <div>
               <div style={{ fontSize:13.5, fontWeight:700, color:"white", marginBottom:4 }}>
-                ðŸ“¬ Subscribe to status updates
+                📬 Subscribe to status updates
               </div>
               <div style={{ fontSize:12.5, color:"rgba(255,255,255,.4)" }}>
                 Get notified by email when incidents occur or are resolved.
@@ -534,7 +534,7 @@ export default function StatusPage() {
               onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(99,102,241,.5)";}}
               onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="0 4px 16px rgba(99,102,241,.35)";}}
             >
-              Subscribe â†’
+              Subscribe →
             </a>
           </div>
 

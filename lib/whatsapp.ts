@@ -69,7 +69,7 @@ export async function sendWhatsApp({ to, template, message, params, companyId }:
   }
 }
 
-// â”€â”€ Pre-built notification helpers â”€â”€
+// ── Pre-built notification helpers ──
 
 export const whatsappNotifications = {
 
@@ -77,42 +77,42 @@ export const whatsappNotifications = {
   invoiceSent: (phone: string, customerName: string, invoiceNo: string, amount: string, viewUrl: string) =>
     sendWhatsApp({
       to: phone,
-      message: `Hi ${customerName},\n\nYou have a new invoice from us.\n\nðŸ“„ Invoice: ${invoiceNo}\nðŸ’° Amount: ${amount}\n\nðŸ”— View & Pay: ${viewUrl}\n\nâ€” Finova`,
+      message: `Hi ${customerName},\n\nYou have a new invoice from us.\n\n📄 Invoice: ${invoiceNo}\n💰 Amount: ${amount}\n\n🔗 View & Pay: ${viewUrl}\n\n— Finova`,
     }),
 
   // Payment reminder
   paymentReminder: (phone: string, customerName: string, invoiceNo: string, amount: string, daysOverdue: number) =>
     sendWhatsApp({
       to: phone,
-      message: `Hi ${customerName},\n\nâš ï¸ Reminder: Invoice ${invoiceNo} for ${amount} is ${daysOverdue > 0 ? `${daysOverdue} days overdue` : "due today"}.\n\nPlease arrange payment at your earliest convenience.\n\nâ€” Finova`,
+      message: `Hi ${customerName},\n\n⚠️ Reminder: Invoice ${invoiceNo} for ${amount} is ${daysOverdue > 0 ? `${daysOverdue} days overdue` : "due today"}.\n\nPlease arrange payment at your earliest convenience.\n\n— Finova`,
     }),
 
   // OTP verification
   otp: (phone: string, name: string, code: string) =>
     sendWhatsApp({
       to: phone,
-      message: `Hi ${name},\n\nYour Finova verification code is:\n\n*${code}*\n\nValid for 15 minutes. Do not share this code.\n\nâ€” Finova`,
+      message: `Hi ${name},\n\nYour Finova verification code is:\n\n*${code}*\n\nValid for 15 minutes. Do not share this code.\n\n— Finova`,
     }),
 
   // Welcome message
   welcome: (phone: string, name: string, companyName: string) =>
     sendWhatsApp({
       to: phone,
-      message: `Welcome to Finova, ${name}! ðŸŽ‰\n\nYour ${companyName} workspace is ready.\n\nðŸš€ Get started: ${(process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app")}/dashboard\n\nNeed help? Reply to this message.\n\nâ€” The Finova Team`,
+      message: `Welcome to Finova, ${name}! 🎉\n\nYour ${companyName} workspace is ready.\n\n🚀 Get started: ${(process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app")}/dashboard\n\nNeed help? Reply to this message.\n\n— The Finova Team`,
     }),
 
   // Low stock alert (to business owner)
   lowStock: (phone: string, itemName: string, currentStock: number, minStock: number) =>
     sendWhatsApp({
       to: phone,
-      message: `âš ï¸ *Low Stock Alert*\n\nItem: ${itemName}\nCurrent Stock: ${currentStock}\nMinimum Level: ${minStock}\n\nPlease reorder to avoid stockout.\n\nâ€” Finova`,
+      message: `⚠️ *Low Stock Alert*\n\nItem: ${itemName}\nCurrent Stock: ${currentStock}\nMinimum Level: ${minStock}\n\nPlease reorder to avoid stockout.\n\n— Finova`,
     }),
 
   // Payroll processed
   payrollProcessed: (phone: string, employeeName: string, month: string, netSalary: string) =>
     sendWhatsApp({
       to: phone,
-      message: `Hi ${employeeName},\n\nYour salary for *${month}* has been processed.\n\nðŸ’° Net Salary: *${netSalary}*\n\nYour payslip is ready in Finova.\n\nâ€” HR Team`,
+      message: `Hi ${employeeName},\n\nYour salary for *${month}* has been processed.\n\n💰 Net Salary: *${netSalary}*\n\nYour payslip is ready in Finova.\n\n— HR Team`,
     }),
 };
 

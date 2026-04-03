@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Product Changelog â€” What's New at Finova",
+  title: "Product Changelog — What's New at Finova",
   description:
     "Stay up to date with the latest Finova releases, new features, improvements, and bug fixes. We ship updates every week based on customer feedback.",
   keywords: [
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     "cloud accounting updates",
   ],
   openGraph: {
-    title: "Finova Changelog â€” Latest Updates & Features",
+    title: "Finova Changelog — Latest Updates & Features",
     description: "New features, improvements, and bug fixes. Updated weekly.",
     url: `${BASE}/changelog`,
     siteName: "Finova",

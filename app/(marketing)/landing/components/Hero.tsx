@@ -1,8 +1,8 @@
 ﻿"use client";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Animated counter Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Animated counter ── */
 function useCounter(target: number, duration = 1800, active = false) {
   const [val, setVal] = useState(0);
   useEffect(() => {
@@ -20,7 +20,7 @@ function useCounter(target: number, duration = 1800, active = false) {
   return val;
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Mini sparkline Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Mini sparkline ── */
 function Sparkline({ d, color }: { d: number[]; color: string }) {
   const W = 80, H = 32, max = Math.max(...d), min = Math.min(...d);
   const pts = d.map((v, i) => `${(i / (d.length - 1)) * W},${H - ((v - min) / (max - min + 1)) * H}`).join(" ");
@@ -115,13 +115,25 @@ export default function Hero() {
         .feature-tag:hover { border-color:rgba(99,102,241,.5) !important; background:rgba(99,102,241,.12) !important; }
         .feature-tag { transition:all .2s; }
 
-        @media(max-width:900px) {
+        @media(max-width:1024px) {
           .hero-right { display:none !important; }
           .hero-grid  { grid-template-columns:1fr !important; }
+          .hero-left  { align-items:center !important; text-align:center !important; }
+          .hero-left .cta-primary,.hero-left .cta-ghost { /* stay flex */ }
+          .hero-ctarow { justify-content:center !important; }
+          .hero-proof  { justify-content:center !important; }
+          .hero-tags   { justify-content:center !important; }
+        }
+        @media(max-width:640px) {
+          .hero-stats { grid-template-columns:repeat(2,1fr) !important; }
+          .hero-stats > div:nth-child(2){ border-right:none !important; }
+          .hero-stats > div:nth-child(3){ border-bottom:none !important; }
+          .hero-main-pad { padding:90px 20px 60px !important; }
+          .hero-ctarow { flex-wrap:wrap !important; }
         }
       `}</style>
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Background layers Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* ── Background layers ── */}
       <div aria-hidden style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
         {/* Grid */}
         <div style={{
@@ -138,14 +150,14 @@ export default function Hero() {
         <div style={{ position:"absolute", bottom:0, left:"10%", right:"10%", height:1, background:"linear-gradient(90deg,transparent,rgba(99,102,241,.15),transparent)" }}/>
       </div>
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Main content Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* ── Main content ── */}
       <div style={{ flex:1, display:"flex", alignItems:"center", position:"relative", zIndex:1 }}>
-        <div style={{ maxWidth:1220, margin:"0 auto", padding:"120px 28px 80px", width:"100%" }}>
+        <div className="hero-main-pad" style={{ maxWidth:1220, margin:"0 auto", padding:"120px 28px 80px", width:"100%" }}>
 
           <div className="hero-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:56, alignItems:"center" }}>
 
-            {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â LEFT Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
-            <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
+            {/* ════════════ LEFT ════════════ */}
+            <div className="hero-left" style={{ display:"flex", flexDirection:"column", gap:0 }}>
 
               {/* Badge */}
               <div className="h1" style={{ marginBottom:20 }}>
@@ -191,7 +203,7 @@ export default function Hero() {
               </p>
 
               {/* Feature tags */}
-              <div className="h3" style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:36 }}>
+              <div className="h3 hero-tags" style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:36 }}>
                 {[
                   "Sales & Purchase Orders","Landed Cost","Multi-Warehouse",
                   "Customer Statements","Built-in AI","Double-Entry Accounting",
@@ -208,7 +220,7 @@ export default function Hero() {
               </div>
 
               {/* CTAs */}
-              <div className="h4" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:40 }}>
+              <div className="h4 hero-ctarow" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:40 }}>
                 <Link href="/onboarding/signup/starter" className="cta-primary">
                   Get Started
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -224,7 +236,7 @@ export default function Hero() {
               </div>
 
               {/* Social proof row */}
-              <div className="h5" style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
+              <div className="h5 hero-proof" style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                   {/* Stars */}
                   <div style={{ display:"flex", gap:2 }}>
@@ -245,10 +257,10 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â RIGHT Ã¢â‚¬â€ Product preview Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
+            {/* ════════════ RIGHT — Product preview ════════════ */}
             <div className="hero-right hd" style={{ position:"relative" }}>
 
-              {/* Floating notification Ã¢â‚¬â€ top left */}
+              {/* Floating notification — top left */}
               <div style={{
                 position:"absolute", top:-16, left:-12, zIndex:10,
                 animation:"floatY2 5s ease-in-out infinite .8s",
@@ -260,7 +272,16 @@ export default function Hero() {
                   backdropFilter:"blur(16px)", boxShadow:"0 12px 32px rgba(0,0,0,.4)",
                   whiteSpace:"nowrap",
                 }}>
-                  <span style={{ fontSize:18 }}>AI</span>
+                  <div style={{
+                    width:32, height:32, borderRadius:9, flexShrink:0,
+                    background:"rgba(167,139,250,.18)", border:"1px solid rgba(167,139,250,.3)",
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                  }}>
+                    {/* Sparkle / AI icon */}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+                    </svg>
+                  </div>
                   <div>
                     <div style={{ fontSize:11.5, fontWeight:700, color:"#fff" }}>AI Insight: Revenue up 22% MoM</div>
                     <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", marginTop:1 }}>Finova AI • Health score 91/100</div>
@@ -268,7 +289,7 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Floating notification Ã¢â‚¬â€ bottom right */}
+              {/* Floating notification — bottom right */}
               <div style={{
                 position:"absolute", bottom:32, right:-20, zIndex:10,
                 animation:"floatY2 6s ease-in-out infinite 1.4s",
@@ -280,7 +301,17 @@ export default function Hero() {
                   backdropFilter:"blur(16px)", boxShadow:"0 12px 32px rgba(0,0,0,.4)",
                   whiteSpace:"nowrap",
                 }}>
-                  <span style={{ fontSize:18 }}>$</span>
+                  <div style={{
+                    width:32, height:32, borderRadius:9, flexShrink:0,
+                    background:"rgba(52,211,153,.15)", border:"1px solid rgba(52,211,153,.3)",
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                  }}>
+                    {/* Dollar circle icon */}
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 6v12m-3-8.5h4.5a2 2 0 0 1 0 4H9a2 2 0 0 0 0 4H13.5"/>
+                    </svg>
+                  </div>
                   <div>
                     <div style={{ fontSize:11.5, fontWeight:700, color:"#34d399" }}>Payment received • $18,400</div>
                     <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", marginTop:1 }}>Al-Falah Trading • just now</div>
@@ -360,7 +391,7 @@ export default function Hero() {
                       <div style={{ fontSize:24, fontWeight:800, color:"#fff", letterSpacing:"-0.6px", marginBottom:8 }}>{fmt(rev)}</div>
                       <Sparkline d={[48,62,50,75,60,85,76,95,82,110,94,120]} color="#10b981"/>
                       <div style={{ display:"flex", alignItems:"center", gap:5, marginTop:8 }}>
-                        <span style={{ fontSize:10.5, fontWeight:700, color:"#34d399" }}>Ã¢â€ â€˜ 22%</span>
+                        <span style={{ fontSize:10.5, fontWeight:700, color:"#34d399" }}>↑ 22%</span>
                         <span style={{ fontSize:10, color:"rgba(255,255,255,.28)" }}>vs last month</span>
                       </div>
                     </div>
@@ -419,16 +450,16 @@ export default function Hero() {
 
                   {/* Quick stat pills */}
                   <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }}>
-                    {[
-                      { icon:"WH", label:"Warehouses", val:"3 active" },
-                      { icon:"OO", label:"Open Orders", val:"28" },
-                      { icon:"AI", label:"AI Score", val:"91/100" },
-                    ].map(s => (
+                    {([
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>, iconBg:"rgba(251,191,36,.12)", iconBorder:"rgba(251,191,36,.25)", label:"Warehouses", val:"3 active" },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>, iconBg:"rgba(52,211,153,.12)", iconBorder:"rgba(52,211,153,.25)", label:"Open Orders", val:"28" },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>, iconBg:"rgba(167,139,250,.12)", iconBorder:"rgba(167,139,250,.25)", label:"AI Score", val:"91/100" },
+                    ] as { icon: React.ReactNode; iconBg: string; iconBorder: string; label: string; val: string }[]).map(s => (
                       <div key={s.label} style={{
                         borderRadius:10, padding:"10px 8px", textAlign:"center",
                         background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)",
                       }}>
-                        <div style={{ fontSize:16, marginBottom:3 }}>{s.icon}</div>
+                        <div style={{ width:26, height:26, borderRadius:7, margin:"0 auto 5px", background:s.iconBg, border:`1px solid ${s.iconBorder}`, display:"flex", alignItems:"center", justifyContent:"center" }}>{s.icon}</div>
                         <div style={{ fontSize:12, fontWeight:800, color:"rgba(255,255,255,.85)" }}>{s.val}</div>
                         <div style={{ fontSize:9.5, color:"rgba(255,255,255,.28)", marginTop:1, fontWeight:500 }}>{s.label}</div>
                       </div>
@@ -447,10 +478,10 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Stats bar Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* ── Stats bar ── */}
       <div style={{ position:"relative", zIndex:1, borderTop:"1px solid rgba(255,255,255,.06)" }}>
         <div style={{ maxWidth:1220, margin:"0 auto", padding:"32px 28px" }}>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1 }}>
+          <div className="hero-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1 }}>
             {[
               { n:"18,000+",  l:"Businesses",  desc:"across 40 countries",   color:"#818cf8" },
               { n:"99.9%",    l:"Uptime",       desc:"guaranteed SLA",         color:"#34d399" },

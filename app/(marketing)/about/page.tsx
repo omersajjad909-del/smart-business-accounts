@@ -301,7 +301,7 @@ export default function AboutPage() {
             For too long, world-class accounting software has been expensive, complex, and built only for Western markets. Finova changes that. We're building infrastructure that makes every business — from a boutique in Singapore to a logistics firm in Lagos — financially unstoppable.
           </p>
           {/* Mission pillars */}
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginTop:20 }}>
+          <div className="about-3col" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginTop:20 }}>
             {[
               { icon:"💡", title:"Simplify", desc:"Turn complex accounting into intuitive workflows anyone can use." },
               { icon:"🌐", title:"Globalise", desc:"Multi-currency, multi-language, multi-compliance — one platform." },
@@ -554,6 +554,10 @@ export default function AboutPage() {
         </div>
       </Section>
 
+      <style>{`
+        @media(max-width:860px){.about-3col{grid-template-columns:repeat(2,1fr)!important;}}
+        @media(max-width:480px){.about-3col{grid-template-columns:1fr!important;}}
+      `}</style>
     </main>
   );
 }

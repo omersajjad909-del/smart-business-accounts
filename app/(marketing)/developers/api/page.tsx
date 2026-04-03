@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-/* â”€â”€â”€ Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Data ──────────────────────────────────────────────────────────── */
 
 const ENDPOINTS = [
   {
@@ -11,7 +11,7 @@ const ENDPOINTS = [
     tag: "Company",
     color: "#34d399",
     dim: "rgba(52,211,153,.1)",
-    summary: "Authenticated company profile â€” name, country, currency, plan, subscription status.",
+    summary: "Authenticated company profile — name, country, currency, plan, subscription status.",
     params: [],
     response: `{
   "company": {
@@ -33,7 +33,7 @@ const ENDPOINTS = [
     tag: "Reports",
     color: "#a78bfa",
     dim: "rgba(167,139,250,.1)",
-    summary: "Financial snapshot â€” revenue, expenses, gross profit, overdue receivables, low-stock count.",
+    summary: "Financial snapshot — revenue, expenses, gross profit, overdue receivables, low-stock count.",
     params: [
       { name: "from", type: "YYYY-MM-DD", note: "Default: start of current month" },
       { name: "to",   type: "YYYY-MM-DD", note: "Default: today" },
@@ -58,8 +58,8 @@ const ENDPOINTS = [
     summary: "List sales invoices. Pass ?id=<id> for a single invoice with full line items.",
     params: [
       { name: "id",       type: "string",     note: "Return single invoice with items" },
-      { name: "from",     type: "YYYY-MM-DD", note: "Filter by date â‰¥" },
-      { name: "to",       type: "YYYY-MM-DD", note: "Filter by date â‰¤" },
+      { name: "from",     type: "YYYY-MM-DD", note: "Filter by date ≥" },
+      { name: "to",       type: "YYYY-MM-DD", note: "Filter by date ≤" },
       { name: "customer", type: "string",     note: "Partial customer name match" },
       { name: "limit",    type: "number",     note: "Max 200, default 50" },
       { name: "offset",   type: "number",     note: "Pagination offset" },
@@ -89,10 +89,10 @@ const ENDPOINTS = [
     dim: "rgba(129,140,248,.1)",
     summary: "Create a new sales invoice. Customer is matched by name or auto-created.",
     params: [
-      { name: "customerName", type: "string",   note: "Required â€” matched or auto-created" },
+      { name: "customerName", type: "string",   note: "Required — matched or auto-created" },
       { name: "date",         type: "YYYY-MM-DD",note: "Required" },
-      { name: "items[]",      type: "array",    note: "Required â€” [{ name, qty, price }]" },
-      { name: "tax",          type: "number",   note: "Optional â€” added to subtotal" },
+      { name: "items[]",      type: "array",    note: "Required — [{ name, qty, price }]" },
+      { name: "tax",          type: "number",   note: "Optional — added to subtotal" },
       { name: "note",         type: "string",   note: "Optional narration" },
     ],
     response: `{
@@ -200,7 +200,7 @@ const METHOD_COLORS: Record<string, { bg: string; text: string }> = {
 
 const TAGS = ["All", "Company", "Reports", "Invoices", "Expenses", "Accounting", "Inventory"];
 
-/* â”€â”€â”€ Components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Components ────────────────────────────────────────────────────── */
 
 function EndpointCard({ ep }: { ep: typeof ENDPOINTS[0] }) {
   const [open, setOpen] = useState(false);
@@ -276,7 +276,7 @@ function EndpointCard({ ep }: { ep: typeof ENDPOINTS[0] }) {
   );
 }
 
-/* â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Page ──────────────────────────────────────────────────────────── */
 
 export default function ApiDocsPage() {
   const [activeTag, setActiveTag] = useState("All");
@@ -323,24 +323,24 @@ export default function ApiDocsPage() {
         <div style={{ marginBottom: 44 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 14px", borderRadius: 100, marginBottom: 20, background: "rgba(99,102,241,.1)", border: "1.5px solid rgba(99,102,241,.28)", fontSize: 10.5, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".09em" }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#818cf8", animation: "blink 2s ease infinite" }}/>
-            REST API â€” v1
+            REST API — v1
           </div>
           <h1 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(28px,4vw,48px)", fontWeight: 700, letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 14 }}>
             Finova API Reference
           </h1>
           <p style={{ fontSize: 15, color: "rgba(255,255,255,.42)", lineHeight: 1.8, maxWidth: 620 }}>
-            Company-scoped REST API. Generate a key from Dashboard â†’ Integrations â†’ API Access. Send it in every request header.
+            Company-scoped REST API. Generate a key from Dashboard → Integrations → API Access. Send it in every request header.
           </p>
         </div>
 
         {/* Auth cards */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 40 }}>
           <div style={{ borderRadius: 16, padding: 20, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.5)", marginBottom: 12, letterSpacing: ".06em" }}>OPTION A â€” API KEY HEADER</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.5)", marginBottom: 12, letterSpacing: ".06em" }}>OPTION A — API KEY HEADER</div>
             <pre style={{ margin: 0, padding: "12px 14px", borderRadius: 12, background: "#050816", border: "1px solid rgba(255,255,255,.07)", color: "#86efac", fontSize: 12, overflowX: "auto" }}>{`x-api-key: finova_live_your_key`}</pre>
           </div>
           <div style={{ borderRadius: 16, padding: 20, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.5)", marginBottom: 12, letterSpacing: ".06em" }}>OPTION B â€” BEARER TOKEN</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.5)", marginBottom: 12, letterSpacing: ".06em" }}>OPTION B — BEARER TOKEN</div>
             <pre style={{ margin: 0, padding: "12px 14px", borderRadius: 12, background: "#050816", border: "1px solid rgba(255,255,255,.07)", color: "#93c5fd", fontSize: 12, overflowX: "auto" }}>{`Authorization: Bearer finova_live_your_key`}</pre>
           </div>
         </div>
@@ -349,7 +349,7 @@ export default function ApiDocsPage() {
         <div style={{ borderRadius: 14, padding: "14px 20px", marginBottom: 36, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".08em", flexShrink: 0 }}>BASE URL</span>
           <code style={{ fontSize: 13, color: "#a5b4fc" }}>https://finovaos.app</code>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.25)", marginLeft: "auto" }}>All responses are JSON Â· Rate limit: 1,000 req/hr</span>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,.25)", marginLeft: "auto" }}>All responses are JSON · Rate limit: 1,000 req/hr</span>
         </div>
 
         {/* Tag filter */}
@@ -380,7 +380,7 @@ export default function ApiDocsPage() {
 
         {/* cURL example */}
         <div style={{ borderRadius: 18, padding: 24, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", marginBottom: 24 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Quick test â€” cURL</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Quick test — cURL</div>
           <pre style={{ margin: 0, padding: "14px 16px", borderRadius: 12, background: "#050816", border: "1px solid rgba(255,255,255,.07)", color: "#e5e7eb", fontSize: 12, overflowX: "auto", lineHeight: 1.8, fontFamily: "ui-monospace,monospace" }}>
 {`# Financial summary for current month
 curl -X GET "https://finovaos.app/api/external/summary" \\
@@ -410,7 +410,7 @@ curl "https://finovaos.app/api/external/inventory?low=1" \\
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Link href="/dashboard/integrations/api-access" style={{ padding: "12px 22px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontWeight: 700, fontSize: 13, textDecoration: "none", boxShadow: "0 4px 16px rgba(99,102,241,.4)" }}>
-              Generate API Key â†’
+              Generate API Key →
             </Link>
             <Link href="/docs" style={{ padding: "11px 20px", borderRadius: 12, border: "1px solid rgba(255,255,255,.12)", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.6)", fontWeight: 600, fontSize: 13, textDecoration: "none" }}>
               Back to Docs

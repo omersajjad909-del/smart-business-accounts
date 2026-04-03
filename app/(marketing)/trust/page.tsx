@@ -3,34 +3,34 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const CERTIFICATIONS = [
-  { name:"Security Program", icon:"ðŸ›¡ï¸", color:"#818cf8", glow:"rgba(129,140,248,.15)", desc:"Security, access control, and data protection practices are reviewed regularly as the platform grows.", badge:"Active", year:"Ongoing" },
-  { name:"Policy Controls",  icon:"ðŸ”", color:"#34d399", glow:"rgba(52,211,153,.12)",  desc:"Internal controls, operating procedures, and secure handling standards help protect customer data.", badge:"Managed", year:"Ongoing" },
-  { name:"GDPR Compliant", icon:"ðŸ‡ªðŸ‡º", color:"#38bdf8", glow:"rgba(56,189,248,.12)",  desc:"Full compliance with EU General Data Protection Regulation. DPA available on request.", badge:"Compliant", year:"Ongoing" },
-  { name:"Payment Security",icon:"ðŸ’³", color:"#fbbf24", glow:"rgba(251,191,36,.12)",  desc:"Payments are handled through secure providers, with encrypted transport and careful operational controls.", badge:"Protected", year:"Ongoing" },
-  { name:"CCPA Ready",     icon:"ðŸ›ï¸", color:"#c4b5fd", glow:"rgba(196,181,253,.12)", desc:"California Consumer Privacy Act compliance for all US-based users and data processing.", badge:"Compliant", year:"Ongoing" },
-  { name:"Service Standards", icon:"âœ…", color:"#f9a8d4", glow:"rgba(249,168,212,.12)",  desc:"Operational standards and documented processes help us deliver support and product updates consistently.", badge:"Documented", year:"Ongoing" },
+  { name:"Security Program", icon:"🛡️", color:"#818cf8", glow:"rgba(129,140,248,.15)", desc:"Security, access control, and data protection practices are reviewed regularly as the platform grows.", badge:"Active", year:"Ongoing" },
+  { name:"Policy Controls",  icon:"🔐", color:"#34d399", glow:"rgba(52,211,153,.12)",  desc:"Internal controls, operating procedures, and secure handling standards help protect customer data.", badge:"Managed", year:"Ongoing" },
+  { name:"GDPR Compliant", icon:"🇪🇺", color:"#38bdf8", glow:"rgba(56,189,248,.12)",  desc:"Full compliance with EU General Data Protection Regulation. DPA available on request.", badge:"Compliant", year:"Ongoing" },
+  { name:"Payment Security",icon:"💳", color:"#fbbf24", glow:"rgba(251,191,36,.12)",  desc:"Payments are handled through secure providers, with encrypted transport and careful operational controls.", badge:"Protected", year:"Ongoing" },
+  { name:"CCPA Ready",     icon:"🏛️", color:"#c4b5fd", glow:"rgba(196,181,253,.12)", desc:"California Consumer Privacy Act compliance for all US-based users and data processing.", badge:"Compliant", year:"Ongoing" },
+  { name:"Service Standards", icon:"✅", color:"#f9a8d4", glow:"rgba(249,168,212,.12)",  desc:"Operational standards and documented processes help us deliver support and product updates consistently.", badge:"Documented", year:"Ongoing" },
 ];
 
 const SECURITY_FEATURES = [
-  { icon:"ðŸ”’", title:"AES-256 Encryption",         desc:"All data encrypted at rest using AES-256 and in transit using TLS 1.3. Zero plaintext storage." },
-  { icon:"ðŸŒ", title:"99.9% Uptime SLA",            desc:"Multi-region infrastructure on AWS with automatic failover. We've maintained 99.97% uptime in 2024." },
-  { icon:"ðŸ”‘", title:"Zero-Knowledge Architecture", desc:"Our team cannot access your financial data. Encryption keys are managed per-tenant." },
-  { icon:"ðŸ‘ï¸",  title:"Real-Time Monitoring",        desc:"24/7 automated security monitoring with instant anomaly detection and incident response." },
-  { icon:"ðŸ”„", title:"Automated Backups",            desc:"Your data is backed up every 4 hours to geographically separate data centres. 30-day retention." },
-  { icon:"ðŸšª", title:"Role-Based Access Control",    desc:"Granular permissions system. Every user sees only what they need to see â€” nothing more." },
-  { icon:"ðŸ“‹", title:"Full Audit Logs",              desc:"Every action in the system is logged with timestamps, IP addresses, and user identity." },
-    { icon:"ðŸ§ª", title:"Security Reviews",             desc:"Security checks and platform hardening are performed regularly as part of our release process." },
+  { icon:"🔒", title:"AES-256 Encryption",         desc:"All data encrypted at rest using AES-256 and in transit using TLS 1.3. Zero plaintext storage." },
+  { icon:"🌐", title:"99.9% Uptime SLA",            desc:"Multi-region infrastructure on AWS with automatic failover. We've maintained 99.97% uptime in 2024." },
+  { icon:"🔑", title:"Zero-Knowledge Architecture", desc:"Our team cannot access your financial data. Encryption keys are managed per-tenant." },
+  { icon:"👁️",  title:"Real-Time Monitoring",        desc:"24/7 automated security monitoring with instant anomaly detection and incident response." },
+  { icon:"🔄", title:"Automated Backups",            desc:"Your data is backed up every 4 hours to geographically separate data centres. 30-day retention." },
+  { icon:"🚪", title:"Role-Based Access Control",    desc:"Granular permissions system. Every user sees only what they need to see — nothing more." },
+  { icon:"📋", title:"Full Audit Logs",              desc:"Every action in the system is logged with timestamps, IP addresses, and user identity." },
+    { icon:"🧪", title:"Security Reviews",             desc:"Security checks and platform hardening are performed regularly as part of our release process." },
 ];
 
 const DATA_CENTRES = [
-  { region:"Europe",        provider:"AWS eu-west-1", location:"Ireland", flag:"ðŸ‡®ðŸ‡ª", primary:true },
-  { region:"Asia Pacific",  provider:"AWS ap-south-1",location:"Mumbai",  flag:"ðŸ‡®ðŸ‡³", primary:false },
-  { region:"Middle East",   provider:"AWS me-south-1",location:"Bahrain", flag:"ðŸ‡§ðŸ‡­", primary:false },
-  { region:"Americas",      provider:"AWS us-east-1", location:"Virginia",flag:"ðŸ‡ºðŸ‡¸", primary:false },
+  { region:"Europe",        provider:"AWS eu-west-1", location:"Ireland", flag:"🇮🇪", primary:true },
+  { region:"Asia Pacific",  provider:"AWS ap-south-1",location:"Mumbai",  flag:"🇮🇳", primary:false },
+  { region:"Middle East",   provider:"AWS me-south-1",location:"Bahrain", flag:"🇧🇭", primary:false },
+  { region:"Americas",      provider:"AWS us-east-1", location:"Virginia",flag:"🇺🇸", primary:false },
 ];
 
 const FAQS = [
-  { q:"Who owns my data?", a:"You do â€” always. Finova is a data processor, not a data controller. We process your data solely to provide the service you've signed up for. We never sell, share, or monetise your data." },
+  { q:"Who owns my data?", a:"You do — always. Finova is a data processor, not a data controller. We process your data solely to provide the service you've signed up for. We never sell, share, or monetise your data." },
   { q:"Can Finova employees see my financial data?", a:"No. We use a zero-knowledge architecture where your data is encrypted with keys that even our team cannot access. System administrators can see metadata (login times, feature usage) but never financial content." },
   { q:"Where is my data stored?", a:"By default, data is stored in AWS eu-west-1 (Ireland). Enterprise customers can choose their preferred region: US (Virginia), Europe (Ireland), Middle East (Bahrain), Asia Pacific (Singapore), or UK (London)." },
   { q:"What happens to my data if I cancel?", a:"You can export all your data at any time in CSV or JSON format. After cancellation, we retain your data for 90 days so you can retrieve it, then permanently delete it. Deletion certificates are available on request." },
@@ -87,10 +87,10 @@ export default function TrustPage() {
             <span style={{ display:"block", background:"linear-gradient(90deg,#34d399,#38bdf8)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>enterprise-grade protection</span>
           </h1>
           <p style={{ fontSize:16, color:"rgba(255,255,255,.5)", lineHeight:1.75, maxWidth:500, margin:"0 auto 36px", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
-            We take security more seriously than anyone â€” because your business finances are at stake. Here&apos;s exactly how we protect you.
+            We take security more seriously than anyone — because your business finances are at stake. Here&apos;s exactly how we protect you.
           </p>
           <div style={{ display:"flex", gap:20, justifyContent:"center", flexWrap:"wrap", opacity:heroVis?1:0, transition:"all .6s ease .25s" }}>
-            {[["ðŸ›¡ï¸","Security Program"],["ðŸ”","Policy Controls"],["ðŸ‡ªðŸ‡º","GDPR"],["ðŸ’³","Payment Security"]].map(([icon,name])=>(
+            {[["🛡️","Security Program"],["🔐","Policy Controls"],["🇪🇺","GDPR"],["💳","Payment Security"]].map(([icon,name])=>(
               <div key={name} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:20, background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.2)" }}>
                 <span style={{ fontSize:16 }}>{icon}</span>
                 <span style={{ fontSize:12, fontWeight:700, color:"#34d399" }}>{name}</span>
@@ -171,7 +171,7 @@ export default function TrustPage() {
             ))}
           </div>
           <div style={{ marginTop:20, padding:"16px 20px", borderRadius:12, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", fontSize:13, color:"rgba(255,255,255,.5)", textAlign:"center", lineHeight:1.7 }}>
-            ðŸ›ï¸ <strong style={{color:"white"}}>Enterprise customers</strong> can choose their preferred data residency region for full regulatory compliance.
+            🏛️ <strong style={{color:"white"}}>Enterprise customers</strong> can choose their preferred data residency region for full regulatory compliance.
           </div>
         </div>
       </Section>
@@ -208,7 +208,7 @@ export default function TrustPage() {
         <div style={{ maxWidth:640, margin:"0 auto", padding:"0 24px 120px", textAlign:"center" }}>
           <div style={{ padding:"48px 36px", borderRadius:22, background:"linear-gradient(135deg,rgba(52,211,153,.1),rgba(56,189,248,.06))", border:"1px solid rgba(52,211,153,.2)", position:"relative", overflow:"hidden" }}>
             <div style={{ position:"relative", zIndex:1 }}>
-              <div style={{ fontSize:36, marginBottom:14 }}>ðŸ›¡ï¸</div>
+              <div style={{ fontSize:36, marginBottom:14 }}>🛡️</div>
               <h2 style={{ fontSize:"clamp(20px,3vw,30px)", fontWeight:800, fontFamily:"Lora,serif", margin:"0 0 12px" }}>Have a specific security question?</h2>
               <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", lineHeight:1.7, margin:"0 auto 24px", maxWidth:400 }}>
                 Our security team responds to all enquiries within 24 hours. Enterprise customers can request our full security documentation pack.

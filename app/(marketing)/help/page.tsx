@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 const CATEGORIES = [
   {
     id: "getting-started",
-    icon: "ðŸš€",
+    icon: "🚀",
     color: "#818cf8",
     dim: "rgba(129,140,248,.1)",
     border: "rgba(129,140,248,.28)",
@@ -17,12 +17,12 @@ const CATEGORIES = [
       { title: "Setting up your company profile",         time: "5 min",               slug: "company-profile" },
       { title: "Inviting team members & setting roles",   time: "3 min",               slug: "invite-team" },
       { title: "Connecting your bank account",            time: "6 min", popular: true, slug: "connect-bank" },
-      { title: "Your first invoice â€” step by step",       time: "4 min",               slug: "first-invoice" },
+      { title: "Your first invoice — step by step",       time: "4 min",               slug: "first-invoice" },
     ],
   },
   {
     id: "invoicing",
-    icon: "ðŸ§¾",
+    icon: "🧾",
     color: "#34d399",
     dim: "rgba(52,211,153,.1)",
     border: "rgba(52,211,153,.28)",
@@ -39,7 +39,7 @@ const CATEGORIES = [
   },
   {
     id: "reports",
-    icon: "ðŸ“Š",
+    icon: "📊",
     color: "#fbbf24",
     dim: "rgba(251,191,36,.1)",
     border: "rgba(251,191,36,.28)",
@@ -56,7 +56,7 @@ const CATEGORIES = [
   },
   {
     id: "banking",
-    icon: "ðŸ¦",
+    icon: "🏦",
     color: "#a78bfa",
     dim: "rgba(167,139,250,.1)",
     border: "rgba(167,139,250,.28)",
@@ -73,7 +73,7 @@ const CATEGORIES = [
   },
   {
     id: "inventory",
-    icon: "ðŸ“¦",
+    icon: "📦",
     color: "#06b6d4",
     dim: "rgba(6,182,212,.1)",
     border: "rgba(6,182,212,.28)",
@@ -90,7 +90,7 @@ const CATEGORIES = [
   },
   {
     id: "account",
-    icon: "âš™ï¸",
+    icon: "⚙️",
     color: "#f87171",
     dim: "rgba(248,113,113,.1)",
     border: "rgba(248,113,113,.28)",
@@ -160,7 +160,7 @@ function CategoryCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number
           }}>{cat.articles.length} articles</div>
         </div>
 
-        {/* Articles list â€” each item is a Link */}
+        {/* Articles list — each item is a Link */}
         <div style={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 8 }}>
           {shown.map((a, i) => (
             <Link
@@ -211,7 +211,7 @@ function CategoryCard({ cat, index }: { cat: typeof CATEGORIES[0]; index: number
           onMouseEnter={e => (e.currentTarget.style.background = cat.dim)}
           onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,.02)")}
         >
-          {expanded ? "Show less â†‘" : `View all ${cat.articles.length} articles â†“`}
+          {expanded ? "Show less ↑" : `View all ${cat.articles.length} articles ↓`}
         </button>
       )}
     </div>
@@ -302,11 +302,11 @@ export default function HelpPage() {
               {search && (
                 <button onClick={() => setSearch("")} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,.3)", fontSize: 16, fontFamily: "inherit", padding: 4, transition: "color .2s" }}
                   onMouseEnter={e => (e.currentTarget.style.color = "white")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.3)")}>âœ•</button>
+                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.3)")}>✕</button>
               )}
             </div>
 
-            {/* Search results â€” each result is a Link */}
+            {/* Search results — each result is a Link */}
             {filtered.length > 0 && (
               <div style={{ maxWidth: 560, margin: "12px auto 0", borderRadius: 14, background: "rgba(8,12,30,.97)", border: "1.5px solid rgba(129,140,248,.3)", backdropFilter: "blur(20px)", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,.6)", textAlign: "left" }}>
                 <div style={{ padding: "10px 14px 6px", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase" }}>
@@ -321,7 +321,7 @@ export default function HelpPage() {
                     <span style={{ fontSize: 14 }}>{a.icon}</span>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.8)" }}>{a.title}</div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", marginTop: 1 }}>{a.category} Â· {a.time} read</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", marginTop: 1 }}>{a.category} · {a.time} read</div>
                     </div>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2.5">
                       <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
@@ -332,8 +332,8 @@ export default function HelpPage() {
             )}
             {search.length > 1 && filtered.length === 0 && (
               <div style={{ maxWidth: 560, margin: "12px auto 0", padding: "24px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", textAlign: "center" }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>ðŸ”</div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,.4)" }}>No articles found for â€œ<strong style={{ color: "white" }}>{search}</strong>â€</div>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>🔍</div>
+                <div style={{ fontSize: 14, color: "rgba(255,255,255,.4)" }}>No articles found for “<strong style={{ color: "white" }}>{search}</strong>”</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.2)", marginTop: 4 }}>Try different keywords or contact support</div>
               </div>
             )}
@@ -355,10 +355,10 @@ export default function HelpPage() {
           ))}
         </div>
 
-        {/* POPULAR ARTICLES â€” each card is a Link */}
+        {/* POPULAR ARTICLES — each card is a Link */}
         <div style={{ marginBottom: 56 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-            <span style={{ fontSize: 16 }}>â­</span>
+            <span style={{ fontSize: 16 }}>⭐</span>
             <h2 style={{ fontFamily: "'Lora',serif", fontSize: 20, fontWeight: 700, color: "white", margin: 0 }}>Popular Articles</h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
@@ -376,7 +376,7 @@ export default function HelpPage() {
                 <span style={{ fontSize: 16, flexShrink: 0 }}>{a.icon}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.75)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.title}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", marginTop: 2 }}>{a.category} Â· {a.time}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", marginTop: 2 }}>{a.category} · {a.time}</div>
                 </div>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={a.color} strokeWidth="2.5" style={{ flexShrink: 0 }}>
                   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
@@ -409,13 +409,13 @@ export default function HelpPage() {
               Still need help?
             </div>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,.45)", lineHeight: 1.7, maxWidth: 480 }}>
-              Our support team is here for you. Reach out via live chat, email, or WhatsApp â€” we typically respond within 2 hours.
+              Our support team is here for you. Reach out via live chat, email, or WhatsApp — we typically respond within 2 hours.
             </p>
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 16 }}>
               {[
-                { icon: "ðŸ’¬", label: "Live Chat", sub: "Pro & Enterprise", color: "#818cf8" },
-                { icon: "âœ‰ï¸", label: "Email Us",  sub: "finovaos.app@gmail.com", color: "#34d399" },
-                { icon: "ðŸ“±", label: "WhatsApp",  sub: "+1 (800) 555-0200",  color: "#fbbf24" },
+                { icon: "💬", label: "Live Chat", sub: "Pro & Enterprise", color: "#818cf8" },
+                { icon: "✉️", label: "Email Us",  sub: "finovaos.app@gmail.com", color: "#34d399" },
+                { icon: "📱", label: "WhatsApp",  sub: "+1 (800) 555-0200",  color: "#fbbf24" },
               ].map(({ icon, label, sub, color }) => (
                 <div key={label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ width: 34, height: 34, borderRadius: 9, background: `${color}18`, border: `1px solid ${color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>{icon}</div>
@@ -433,13 +433,13 @@ export default function HelpPage() {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 10px 28px rgba(99,102,241,.5)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(99,102,241,.35)"; }}
             >
-              Open Support Ticket â†’
+              Open Support Ticket →
             </Link>
             <a href="mailto:finovaos.app@gmail.com" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px 24px", borderRadius: 12, background: "rgba(255,255,255,.05)", color: "rgba(255,255,255,.6)", fontWeight: 600, fontSize: 13, textDecoration: "none", border: "1px solid rgba(255,255,255,.1)", transition: "all .25s", whiteSpace: "nowrap" }}
               onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,.09)"; e.currentTarget.style.color = "white"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.05)"; e.currentTarget.style.color = "rgba(255,255,255,.6)"; }}
             >
-              âœ‰ï¸ finovaos.app@gmail.com
+              ✉️ finovaos.app@gmail.com
             </a>
           </div>
         </div>

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Pricing Plans â€” Starter $49/mo Â· Pro $99/mo Â· Enterprise",
+  title: "Pricing Plans — Starter $49/mo · Pro $99/mo · Enterprise",
   description:
     "Transparent, affordable pricing for every business size. Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). All plans include accounting, invoicing, and inventory. 14-day free trial. No hidden fees.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "starter plan accounting",
   ],
   openGraph: {
-    title: "Pricing Plans â€” Start at $49/month | Finova",
+    title: "Pricing Plans — Start at $49/month | Finova",
     description:
       "Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). No hidden fees. 14-day free trial. Cancel anytime.",
     url: `${BASE}/pricing`,
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Finova Pricing â€” Plans from $49/month",
-    description: "Starter Â· Professional Â· Enterprise. Transparent pricing, no hidden fees, 14-day free trial.",
+    title: "Finova Pricing — Plans from $49/month",
+    description: "Starter · Professional · Enterprise. Transparent pricing, no hidden fees, 14-day free trial.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/pricing` },

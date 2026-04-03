@@ -16,7 +16,7 @@ import { resolvePlanPermissions } from "@/lib/planPermissions";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
 
-/* â”€â”€ Finova branded loading screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Finova branded loading screen ─────────────────────── */
 function FinovaLoader() {
   return (
     <div style={{
@@ -157,7 +157,7 @@ export default function DashboardLayout({
   const [allowedPlanPerms, setAllowedPlanPerms] = useState<Set<string> | null>(null);
   const [allowedDashboardFeatures, setAllowedDashboardFeatures] = useState<Set<string> | null>(null);
 
-  // SIDEBAR STATES â€” single accordion state for top-level sections
+  // SIDEBAR STATES — single accordion state for top-level sections
   const [openSection, setOpenSection] = useState<string | null>(null);
   const toggle = (id: string) => setOpenSection(p => p === id ? null : id);
   // Sub-group states (independent within their parent section)
@@ -551,7 +551,7 @@ export default function DashboardLayout({
   }, []);
 
   // Returns true if this business type is globally enabled by admin (or status unknown).
-  // IMPORTANT: always returns true for the user's OWN business type â€” existing users
+  // IMPORTANT: always returns true for the user's OWN business type — existing users
   // should always see their sidebar modules regardless of admin phase-release settings.
   const isBusinessEnabled = (type: string) =>
     !enabledTypes || type === businessType || enabledTypes.has(type);
@@ -582,7 +582,7 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SIDEBAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      {/* ═══════════════ SIDEBAR ═══════════════ */}
       <aside style={{
         position:"fixed",
         top:0, left:0, bottom:0,
@@ -650,7 +650,7 @@ export default function DashboardLayout({
             </div>
           )}
 
-          {/* â”€â”€ SALES & PURCHASE â”€â”€ (hidden for retail which has its own groups) */}
+          {/* ── SALES & PURCHASE ── (hidden for retail which has its own groups) */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && !hasModule(businessType, "pos") && (
             <NavGroup
               title="Sales & Purchase"
@@ -671,7 +671,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ INVENTORY â”€â”€ (hidden for retail which has its own inventory group) */}
+          {/* ── INVENTORY ── (hidden for retail which has its own inventory group) */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_CATALOG) && !hasModule(businessType, "pos") && (
             <NavGroup
               title="Inventory"
@@ -689,7 +689,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ BANKING & PAYMENTS â”€â”€ */}
+          {/* ── BANKING & PAYMENTS ── */}
           {showBankingSection && (
             <NavGroup
               title="Banking & Payments"
@@ -704,7 +704,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ ACCOUNTING â”€â”€ */}
+          {/* ── ACCOUNTING ── */}
           {(hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTS) || hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING)) && (
             <NavGroup
               title="Accounting"
@@ -723,7 +723,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ FINANCIAL REPORTS â”€â”€ */}
+          {/* ── FINANCIAL REPORTS ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
             <NavGroup
               title="Financial Reports"
@@ -742,7 +742,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ ACTIVITY REPORTS â”€â”€ */}
+          {/* ── ACTIVITY REPORTS ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
             <NavGroup
               title="Activity Reports"
@@ -758,7 +758,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ CRM â”€â”€ */}
+          {/* ── CRM ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_CRM) && (
             <NavGroup
               title="CRM"
@@ -773,7 +773,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ MANUFACTURING â”€â”€ */}
+          {/* ── MANUFACTURING ── */}
           {businessType === "food_processing" && hasModule(businessType, "bom") && isBusinessEnabled(businessType) && (
             <NavGroup
               title="Food Processing"
@@ -824,7 +824,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ REAL ESTATE â”€â”€ */}
+          {/* ── REAL ESTATE ── */}
           {hasModule(businessType, "re_properties") && isBusinessEnabled(businessType) && (
             <NavGroup
               title="Real Estate"
@@ -841,7 +841,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ CONSTRUCTION â”€â”€ */}
+          {/* ── CONSTRUCTION ── */}
           {hasModule(businessType, "projects") && !hasModule(businessType, "re_properties") && isBusinessEnabled(businessType) && (
             <NavGroup
               title="Construction"
@@ -862,7 +862,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ DISTRIBUTION â”€â”€ */}
+          {/* ── DISTRIBUTION ── */}
           {hasModule(businessType, "routes") && isBusinessEnabled(businessType) && (
             <NavGroup
               title="Distribution"
@@ -880,15 +880,15 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          {/* ══════════════════════════════════════════
               RETAIL & MULTI-STORE MODULES
               (visible when businessType === "retail")
-          â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+          ══════════════════════════════════════════ */}
           {hasModule(businessType, "pos") && isBusinessEnabled(businessType) && (<>
 
-            {/* â”€â”€ 1. POS â”€â”€ */}
+            {/* ── 1. POS ── */}
             <NavGroup
-              title="ðŸ–¥ï¸ Point of Sale"
+              title="🖥️ Point of Sale"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>}
               open={openSection === "retailPos"}
               onToggle={() => toggle("retailPos")}
@@ -902,83 +902,83 @@ export default function DashboardLayout({
               {hasDashboardFeature("RETAIL_SUPPLIER_PORTAL") && <NavLink href="/dashboard/retail/supplier-portal" pathname={pathname}>Supplier Portal</NavLink>}
             </NavGroup>
 
-            {/* â”€â”€ 2. Sales â”€â”€ */}
+            {/* ── 2. Sales ── */}
             <NavGroup
-              title="ðŸ“‹ Sales"
+              title="📋 Sales"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>}
               open={openSection === "retailSales"}
               onToggle={() => toggle("retailSales")}
             >
-              <NavLink href="/dashboard/sales-invoice" pathname={pathname}>ðŸ§¾ Sales Invoices</NavLink>
-              <NavLink href="/dashboard/sale-return" pathname={pathname}>â†©ï¸ Sales Returns</NavLink>
-              <NavLink href="/dashboard/quotation" pathname={pathname}>ðŸ“„ Quotations</NavLink>
-              <NavLink href="/dashboard/delivery-challan" pathname={pathname}>ðŸšš Delivery Challan</NavLink>
-              <NavLink href="/dashboard/payment-receipts" pathname={pathname}>ðŸ’³ Payment Collection</NavLink>
-              <NavLink href="/dashboard/credit-note" pathname={pathname}>ðŸ“ Credit Notes</NavLink>
+              <NavLink href="/dashboard/sales-invoice" pathname={pathname}>🧾 Sales Invoices</NavLink>
+              <NavLink href="/dashboard/sale-return" pathname={pathname}>↩️ Sales Returns</NavLink>
+              <NavLink href="/dashboard/quotation" pathname={pathname}>📄 Quotations</NavLink>
+              <NavLink href="/dashboard/delivery-challan" pathname={pathname}>🚚 Delivery Challan</NavLink>
+              <NavLink href="/dashboard/payment-receipts" pathname={pathname}>💳 Payment Collection</NavLink>
+              <NavLink href="/dashboard/credit-note" pathname={pathname}>📝 Credit Notes</NavLink>
             </NavGroup>
 
-            {/* â”€â”€ 3. Purchases â”€â”€ */}
+            {/* ── 3. Purchases ── */}
             <NavGroup
-              title="ðŸ›’ Purchases"
+              title="🛒 Purchases"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>}
               open={openSection === "retailPurchases"}
               onToggle={() => toggle("retailPurchases")}
             >
-              <NavLink href="/dashboard/purchase-order" pathname={pathname}>ðŸ“¦ Purchase Orders</NavLink>
-              <NavLink href="/dashboard/grn" pathname={pathname}>ðŸ“¥ GRN (Goods Receipt)</NavLink>
-              <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>ðŸ§¾ Purchase Invoices</NavLink>
-              <NavLink href="/dashboard/purchase-return" pathname={pathname}>â†©ï¸ Purchase Returns</NavLink>
-              <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>ðŸ’¸ Supplier Payments</NavLink>
-              <NavLink href="/dashboard/debit-note" pathname={pathname}>ðŸ“ Debit Notes</NavLink>
+              <NavLink href="/dashboard/purchase-order" pathname={pathname}>📦 Purchase Orders</NavLink>
+              <NavLink href="/dashboard/grn" pathname={pathname}>📥 GRN (Goods Receipt)</NavLink>
+              <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>🧾 Purchase Invoices</NavLink>
+              <NavLink href="/dashboard/purchase-return" pathname={pathname}>↩️ Purchase Returns</NavLink>
+              <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>💸 Supplier Payments</NavLink>
+              <NavLink href="/dashboard/debit-note" pathname={pathname}>📝 Debit Notes</NavLink>
             </NavGroup>
 
-            {/* â”€â”€ 4. Inventory â”€â”€ */}
+            {/* ── 4. Inventory ── */}
             <NavGroup
-              title="ðŸ“¦ Inventory"
+              title="📦 Inventory"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>}
               open={openSection === "retailInventory"}
               onToggle={() => toggle("retailInventory")}
             >
-              <NavLink href="/dashboard/items-new" pathname={pathname}>ðŸ“‹ Item Master</NavLink>
+              <NavLink href="/dashboard/items-new" pathname={pathname}>📋 Item Master</NavLink>
               {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/catalog" pathname={pathname}>Product Catalog</NavLink>}
-              <NavLink href="/dashboard/barcode" pathname={pathname}>ðŸ”² Barcode Management</NavLink>
+              <NavLink href="/dashboard/barcode" pathname={pathname}>🔲 Barcode Management</NavLink>
               {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
               {hasDashboardFeature("RETAIL_STOCK_ADJUSTMENT") && <NavLink href="/dashboard/retail/stock-adjustment" pathname={pathname}>Stock Adjustment</NavLink>}
               {hasDashboardFeature("RETAIL_BATCH_EXPIRY") && <NavLink href="/dashboard/retail/batch-expiry" pathname={pathname}>Batch & Expiry</NavLink>}
-              <NavLink href="/dashboard/inventory" pathname={pathname}>ðŸ“Š Inventory Overview</NavLink>
-              <NavLink href="/dashboard/stock-rate" pathname={pathname}>ðŸ’° Stock Rates</NavLink>
-              <NavLink href="/dashboard/reports/stock/low" pathname={pathname}>ðŸš¨ Reorder Alerts</NavLink>
+              <NavLink href="/dashboard/inventory" pathname={pathname}>📊 Inventory Overview</NavLink>
+              <NavLink href="/dashboard/stock-rate" pathname={pathname}>💰 Stock Rates</NavLink>
+              <NavLink href="/dashboard/reports/stock/low" pathname={pathname}>🚨 Reorder Alerts</NavLink>
             </NavGroup>
 
-            {/* â”€â”€ 5. Customers â”€â”€ */}
+            {/* ── 5. Customers ── */}
             <NavGroup
-              title="ðŸ‘¥ Customers"
+              title="👥 Customers"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>}
               open={openSection === "retailCustomers"}
               onToggle={() => toggle("retailCustomers")}
             >
               {hasDashboardFeature("RETAIL_CUSTOMERS") && <NavLink href="/dashboard/retail/customers" pathname={pathname}>Customer List</NavLink>}
-              <NavLink href="/dashboard/reports/ledger" pathname={pathname}>ðŸ“’ Customer Ledger</NavLink>
-              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>ðŸ“… Ageing Report</NavLink>
+              <NavLink href="/dashboard/reports/ledger" pathname={pathname}>📒 Customer Ledger</NavLink>
+              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>📅 Ageing Report</NavLink>
               {hasDashboardFeature("RETAIL_LOYALTY") && <NavLink href="/dashboard/retail/loyalty" pathname={pathname}>Loyalty Points</NavLink>}
-              <NavLink href="/dashboard/crm/contacts" pathname={pathname}>ðŸ¤ CRM Contacts</NavLink>
+              <NavLink href="/dashboard/crm/contacts" pathname={pathname}>🤝 CRM Contacts</NavLink>
             </NavGroup>
 
-            {/* â”€â”€ 6. Suppliers â”€â”€ */}
+            {/* ── 6. Suppliers ── */}
             <NavGroup
-              title="ðŸ­ Suppliers"
+              title="🏭 Suppliers"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>}
               open={openSection === "retailSuppliers"}
               onToggle={() => toggle("retailSuppliers")}
             >
               {hasDashboardFeature("RETAIL_SUPPLIERS") && <NavLink href="/dashboard/retail/suppliers" pathname={pathname}>Supplier List</NavLink>}
-              <NavLink href="/dashboard/parties" pathname={pathname}>ðŸ“’ Supplier Ledger</NavLink>
-              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>ðŸ“… Supplier Ageing</NavLink>
+              <NavLink href="/dashboard/parties" pathname={pathname}>📒 Supplier Ledger</NavLink>
+              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>📅 Supplier Ageing</NavLink>
             </NavGroup>
 
-            {/* â”€â”€ 11. Multi-Store â”€â”€ */}
+            {/* ── 11. Multi-Store ── */}
             <NavGroup
-              title="ðŸª Multi-Store"
+              title="🏪 Multi-Store"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
               open={openSection === "multiStore"}
               onToggle={() => toggle("multiStore")}
@@ -991,7 +991,7 @@ export default function DashboardLayout({
 
           </>)}
 
-          {/* â”€â”€ SCHOOL â”€â”€ */}
+          {/* ── SCHOOL ── */}
           {hasModule(businessType, "student_mgmt") && isBusinessEnabled(businessType) && (
             <NavGroup title="School" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>} open={openSection === "school"} onToggle={() => toggle("school")}>
               {hasDashboardFeature("SCHOOL_OVERVIEW") && <NavLink href="/dashboard/school" pathname={pathname}>School Overview</NavLink>}
@@ -1018,7 +1018,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ HOTEL â”€â”€ */}
+          {/* ── HOTEL ── */}
           {hasModule(businessType, "room_booking") && isBusinessEnabled(businessType) && (
             <NavGroup title="Hotel" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>} open={openSection === "hotel"} onToggle={() => toggle("hotel")}>
               {hasDashboardFeature("HOTEL_OVERVIEW") && <NavLink href="/dashboard/hotel" pathname={pathname}>Hotel Overview</NavLink>}
@@ -1032,16 +1032,16 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ PHARMACY â”€â”€ */}
+          {/* ── PHARMACY ── */}
           {hasModule(businessType, "drug_inventory") && isBusinessEnabled(businessType) && (
             <NavGroup title="Pharmacy" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.5 20H4a2 2 0 01-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 011.66.9l.82 1.2a2 2 0 001.66.9H20a2 2 0 012 2v3"/><circle cx="18" cy="18" r="3"/><path d="M18 15v6M15 18h6"/></svg>} open={openSection === "pharmacy"} onToggle={() => toggle("pharmacy")}>
-              <NavLink href="/dashboard/pharmacy/inventory" pathname={pathname}>ðŸ’Š Drug Inventory</NavLink>
-              <NavLink href="/dashboard/pharmacy/prescriptions" pathname={pathname}>ðŸ“‹ Prescriptions</NavLink>
-              <NavLink href="/dashboard/pharmacy/expiry" pathname={pathname}>âš ï¸ Expiry Tracking</NavLink>
+              <NavLink href="/dashboard/pharmacy/inventory" pathname={pathname}>💊 Drug Inventory</NavLink>
+              <NavLink href="/dashboard/pharmacy/prescriptions" pathname={pathname}>📋 Prescriptions</NavLink>
+              <NavLink href="/dashboard/pharmacy/expiry" pathname={pathname}>⚠️ Expiry Tracking</NavLink>
             </NavGroup>
           )}
 
-          {/* â”€â”€ SALON â”€â”€ */}
+          {/* ── SALON ── */}
           {hasModule(businessType, "appointments_salon") && isBusinessEnabled(businessType) && (
             <NavGroup title="Salon" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>} open={openSection === "salon"} onToggle={() => toggle("salon")}>
               {hasDashboardFeature("SALON_OVERVIEW") && <NavLink href="/dashboard/salon" pathname={pathname}>Salon Overview</NavLink>}
@@ -1070,7 +1070,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ TRANSPORT â”€â”€ */}
+          {/* ── TRANSPORT ── */}
           {hasModule(businessType, "fleet_mgmt") && isBusinessEnabled(businessType) && (
             <NavGroup title="Transport" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>} open={openSection === "transport"} onToggle={() => toggle("transport")}>
               {hasDashboardFeature("TRANSPORT_OVERVIEW") && <NavLink href="/dashboard/transport" pathname={pathname}>Transport Overview</NavLink>}
@@ -1119,7 +1119,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ E-COMMERCE â”€â”€ */}
+          {/* ── E-COMMERCE ── */}
           {hasModule(businessType, "product_listings") && isBusinessEnabled(businessType) && (
             <NavGroup title="E-Commerce" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.95-1.57l1.65-7.43H6"/></svg>} open={openSection === "ecommerce"} onToggle={() => toggle("ecommerce")}>
               {hasDashboardFeature("ECOMMERCE_OVERVIEW") && <NavLink href="/dashboard/ecommerce" pathname={pathname}>Ecommerce Overview</NavLink>}
@@ -1332,7 +1332,7 @@ export default function DashboardLayout({
               </NavGroup>
             )}
 
-          {/* â”€â”€ IMPORT / EXPORT â”€â”€ */}
+          {/* ── IMPORT / EXPORT ── */}
           {hasModule(businessType, "shipments") && (
             <NavGroup title="Import / Export" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>} open={openSection === "shipments"} onToggle={() => toggle("shipments")}>
               {hasDashboardFeature("TRADE_OVERVIEW") && <NavLink href="/dashboard/trade" pathname={pathname}>Trade Overview</NavLink>}
@@ -1454,7 +1454,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ SERVICES / AGENCY â”€â”€ */}
+          {/* ── SERVICES / AGENCY ── */}
           {businessType === "service" && (
             <NavGroup
               title="Services & Agency"
@@ -1467,13 +1467,13 @@ export default function DashboardLayout({
               {hasDashboardFeature("SERVICE_PROJECTS") && <NavLink href="/dashboard/services/projects" pathname={pathname}>Client Projects</NavLink>}
               {hasDashboardFeature("SERVICE_DELIVERY") && <NavLink href="/dashboard/services/delivery" pathname={pathname}>Delivery Tracker</NavLink>}
               {hasDashboardFeature("SERVICE_TIME_BILLING") && <NavLink href="/dashboard/services/time-billing" pathname={pathname}>Time Billing</NavLink>}
-              <NavLink href="/dashboard/quotation" pathname={pathname}>ðŸ“‹ Quotations</NavLink>
-              <NavLink href="/dashboard/crm/contacts" pathname={pathname}>ðŸ¤ Clients</NavLink>
-              <NavLink href="/dashboard/crm/opportunities" pathname={pathname}>ðŸ“ˆ Pipeline</NavLink>
+              <NavLink href="/dashboard/quotation" pathname={pathname}>📋 Quotations</NavLink>
+              <NavLink href="/dashboard/crm/contacts" pathname={pathname}>🤝 Clients</NavLink>
+              <NavLink href="/dashboard/crm/opportunities" pathname={pathname}>📈 Pipeline</NavLink>
             </NavGroup>
           )}
 
-          {/* â”€â”€ WHOLESALE / TRADING â”€â”€ */}
+          {/* ── WHOLESALE / TRADING ── */}
           {!isCustomPlan && businessType === "trading" && (
             <NavGroup
               title="Trading Control"
@@ -1492,7 +1492,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ HR & PAYROLL â”€â”€ */}
+          {/* ── HR & PAYROLL ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_HR_PAYROLL) && (
             <NavGroup
               title="HR & Payroll"
@@ -1507,7 +1507,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ ADMIN â”€â”€ */}
+          {/* ── ADMIN ── */}
           {hasPermission(currentUser, PERMISSIONS.MANAGE_USERS) && (
             <NavGroup
               title="Admin"
@@ -1524,7 +1524,7 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* â”€â”€ SETTINGS â”€â”€ */}
+          {/* ── SETTINGS ── */}
           {showSettingsSection && (
             <NavGroup
               title="Settings"
@@ -1549,12 +1549,12 @@ export default function DashboardLayout({
         {/* ---- SIDEBAR FOOTER ---- */}
         <div style={{borderTop:"1px solid var(--border)",background:"var(--panel-bg-2)",position:"relative"}}>
 
-          {/* â”€â”€ User Menu Popup â”€â”€ */}
+          {/* ── User Menu Popup ── */}
           {showUserMenu && (
             <>
               {/* Backdrop */}
               <div style={{position:"fixed",inset:0,zIndex:40}} onClick={()=>setShowUserMenu(false)}/>
-              {/* Popup panel â€” slides up from footer */}
+              {/* Popup panel — slides up from footer */}
               <div style={{
                 position:"absolute",bottom:"100%",left:12,right:12,marginBottom:8,
                 background:"#0e1120",border:"1px solid rgba(255,255,255,0.12)",
@@ -1564,11 +1564,11 @@ export default function DashboardLayout({
                 {/* Company info at top */}
                 <div style={{padding:"12px 12px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)",marginBottom:4}}>
                   <div style={{display:"flex",alignItems:"center",gap:10}}>
-                    <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>ðŸ¢</div>
+                    <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>🏢</div>
                     <div style={{minWidth:0}}>
                       <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</div>
                       <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",marginTop:1,textTransform:"capitalize"}}>
-                        {companyDetail?.businessType ? companyDetail.businessType.replace(/_/g," ") : "Business"} Â· {companyDetail?.plan || "STARTER"}
+                        {companyDetail?.businessType ? companyDetail.businessType.replace(/_/g," ") : "Business"} · {companyDetail?.plan || "STARTER"}
                       </div>
                     </div>
                   </div>
@@ -1576,12 +1576,12 @@ export default function DashboardLayout({
 
                 {/* Menu items */}
                 {[
-                  { icon:"ðŸ¢", label:"Company Profile",    href:"/dashboard/company-profile" },
-                  { icon:"âš™ï¸", label:"Business Settings",  href:"/dashboard/business-settings" },
-                  { icon:"ðŸ‘¥", label:"Team Members",        href:"/dashboard/team" },
-                  { icon:"ðŸ””", label:"Notifications",       href:"/dashboard/notifications" },
-                  { icon:"ðŸŽ", label:"Refer & Earn",        href:"/dashboard/referrals" },
-                  { icon:"â­", label:"Share Your Review",   href:"/dashboard/feedback" },
+                  { icon:"🏢", label:"Company Profile",    href:"/dashboard/company-profile" },
+                  { icon:"⚙️", label:"Business Settings",  href:"/dashboard/business-settings" },
+                  { icon:"👥", label:"Team Members",        href:"/dashboard/team" },
+                  { icon:"🔔", label:"Notifications",       href:"/dashboard/notifications" },
+                  { icon:"🎁", label:"Refer & Earn",        href:"/dashboard/referrals" },
+                  { icon:"⭐", label:"Share Your Review",   href:"/dashboard/feedback" },
                 ].map(item => (
                   <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
                     style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(255,255,255,0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
@@ -1605,7 +1605,7 @@ export default function DashboardLayout({
             </>
           )}
 
-          {/* â”€â”€ Clickable User Row â”€â”€ */}
+          {/* ── Clickable User Row ── */}
           <div
             onClick={()=>setShowUserMenu(v=>!v)}
             style={{
@@ -1634,7 +1634,7 @@ export default function DashboardLayout({
 
       </aside>
 
-      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• MAIN AREA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      {/* ═══════════════ MAIN AREA ═══════════════ */}
       <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:260}} className="max-md:ml-0">
 
         {/* ---- TOPBAR ---- */}
@@ -1683,7 +1683,7 @@ export default function DashboardLayout({
               style={{display:"flex",alignItems:"center",gap:6,padding:"5px 12px",borderRadius:8,background:"rgba(251,191,36,0.08)",border:"1px solid rgba(251,191,36,0.2)",color:"#fbbf24",textDecoration:"none",fontSize:11,fontWeight:700,letterSpacing:".04em"}}
               className="hidden sm:flex"
             >
-              <span>ðŸ’°</span>
+              <span>💰</span>
               <span>Affiliate</span>
             </Link>
 
@@ -1698,7 +1698,7 @@ export default function DashboardLayout({
                 color: subInfo.status === "ACTIVE" ? "#34d399" : "#f87171",
                 background: subInfo.status === "ACTIVE" ? "rgba(52,211,153,0.08)" : "rgba(248,113,113,0.08)",
               }}>
-                {subInfo.plan} Â· {subInfo.status}
+                {subInfo.plan} · {subInfo.status}
               </div>
             )}
 
@@ -1720,7 +1720,7 @@ export default function DashboardLayout({
                 padding:"10px 18px", marginBottom:20, gap:12, flexWrap:"wrap",
               }}>
                 <div style={{display:"flex",alignItems:"center",gap:10}}>
-                  <span style={{fontSize:18}}>ðŸŽ®</span>
+                  <span style={{fontSize:18}}>🎮</span>
                   <div>
                     <span style={{fontSize:13,fontWeight:700,color:"#fbbf24"}}>Demo Mode</span>
                     <span style={{fontSize:12,color:"rgba(255,255,255,.45)",marginLeft:10}}>
@@ -1733,7 +1733,7 @@ export default function DashboardLayout({
                   background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff",
                   textDecoration:"none", whiteSpace:"nowrap",
                 }}>
-                  Get Started â†’
+                  Get Started →
                 </Link>
               </div>
             )}
@@ -1743,18 +1743,18 @@ export default function DashboardLayout({
 
       </main>
 
-      {/* â”€â”€ Company Details Modal â”€â”€ */}
+      {/* ── Company Details Modal ── */}
       {showCompanyModal && (
         <div
           onClick={e => { if (e.target === e.currentTarget) setShowCompanyModal(false); }}
           style={{ position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.75)",backdropFilter:"blur(12px)",display:"flex",alignItems:"center",justifyContent:"center",padding:20,fontFamily:"'Outfit','Inter',sans-serif" }}
         >
           <div style={{ width:"100%",maxWidth:560,background:"#0e1120",border:"1px solid rgba(255,255,255,.1)",borderRadius:20,padding:"28px 32px",boxShadow:"0 40px 100px rgba(0,0,0,.7)",maxHeight:"88vh",overflowY:"auto",position:"relative" }}>
-            <button onClick={()=>setShowCompanyModal(false)} style={{ position:"absolute",top:16,right:20,background:"none",border:"none",color:"rgba(255,255,255,.4)",cursor:"pointer",fontSize:22,lineHeight:1 }}>âœ•</button>
+            <button onClick={()=>setShowCompanyModal(false)} style={{ position:"absolute",top:16,right:20,background:"none",border:"none",color:"rgba(255,255,255,.4)",cursor:"pointer",fontSize:22,lineHeight:1 }}>✕</button>
 
             {/* Header */}
             <div style={{ display:"flex",alignItems:"center",gap:14,marginBottom:24 }}>
-              <div style={{ width:50,height:50,borderRadius:13,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>ðŸ¢</div>
+              <div style={{ width:50,height:50,borderRadius:13,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>🏢</div>
               <div>
                 <div style={{ fontSize:18,fontWeight:800,color:"white" }}>{companyDetail?.name || companyName}</div>
                 <div style={{ fontSize:12,color:"rgba(255,255,255,.35)",marginTop:3 }}>
@@ -1776,12 +1776,12 @@ export default function DashboardLayout({
             {/* Info grid */}
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:20 }}>
               {[
-                { icon:"ðŸŒ", label:"Country",       value: companyDetail?.country || "â€”" },
-                { icon:"ðŸ’±", label:"Currency",      value: companyDetail?.baseCurrency || "â€”" },
-                { icon:"ðŸ‘¥", label:"Total Users",   value: companyDetail?.totalUsers ?? "â€”" },
-                { icon:"ðŸ“Š", label:"Accounts",      value: companyDetail?.totalAccounts ?? "â€”" },
-                { icon:"ðŸ“…", label:"Joined",        value: companyDetail?.createdAt ? new Date(companyDetail.createdAt).toLocaleDateString("en-PK",{year:"numeric",month:"short",day:"numeric"}) : "â€”" },
-                { icon:"ðŸ”„", label:"Renews",        value: companyDetail?.currentPeriodEnd ? new Date(companyDetail.currentPeriodEnd).toLocaleDateString("en-PK",{year:"numeric",month:"short",day:"numeric"}) : "â€”" },
+                { icon:"🌍", label:"Country",       value: companyDetail?.country || "—" },
+                { icon:"💱", label:"Currency",      value: companyDetail?.baseCurrency || "—" },
+                { icon:"👥", label:"Total Users",   value: companyDetail?.totalUsers ?? "—" },
+                { icon:"📊", label:"Accounts",      value: companyDetail?.totalAccounts ?? "—" },
+                { icon:"📅", label:"Joined",        value: companyDetail?.createdAt ? new Date(companyDetail.createdAt).toLocaleDateString("en-PK",{year:"numeric",month:"short",day:"numeric"}) : "—" },
+                { icon:"🔄", label:"Renews",        value: companyDetail?.currentPeriodEnd ? new Date(companyDetail.currentPeriodEnd).toLocaleDateString("en-PK",{year:"numeric",month:"short",day:"numeric"}) : "—" },
               ].map(row => (
                 <div key={row.label} style={{ padding:"12px 14px",borderRadius:10,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.06)" }}>
                   <div style={{ fontSize:10,color:"rgba(255,255,255,.3)",fontWeight:700,textTransform:"uppercase",letterSpacing:".05em",marginBottom:5 }}>{row.icon} {row.label}</div>
@@ -1805,10 +1805,10 @@ export default function DashboardLayout({
             {/* Actions */}
             <div style={{ display:"flex",gap:10,marginTop:4 }}>
               <a href="/dashboard/company-profile" onClick={()=>setShowCompanyModal(false)} style={{ flex:1,padding:"11px",borderRadius:10,border:"1px solid rgba(255,255,255,.1)",background:"transparent",color:"rgba(255,255,255,.5)",fontSize:13,fontWeight:700,fontFamily:"inherit",cursor:"pointer",textDecoration:"none",textAlign:"center",display:"block" }}>
-                âœï¸ Edit Profile
+                ✏️ Edit Profile
               </a>
               <a href="/dashboard/business-settings" onClick={()=>setShowCompanyModal(false)} style={{ flex:1,padding:"11px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:13,fontWeight:700,fontFamily:"inherit",cursor:"pointer",textDecoration:"none",textAlign:"center",display:"block",boxShadow:"0 4px 16px rgba(99,102,241,.3)" }}>
-                ðŸ·ï¸ Business Settings
+                🏷️ Business Settings
               </a>
             </div>
           </div>
@@ -1818,7 +1818,7 @@ export default function DashboardLayout({
   );
 }
 
-// â”€â”€â”€ Helper nav components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Helper nav components ────────────────────────────────────────────────────
 
 function cleanNavLabel(value: string) {
   return value.replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, "").trim();
@@ -1852,7 +1852,7 @@ function NavGroup({ title, icon, open, onToggle, children }: {
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </div>
-      {/* Children â€” indented with left guide line */}
+      {/* Children — indented with left guide line */}
       {open && (
         <div style={{
           marginTop:2,marginBottom:4,

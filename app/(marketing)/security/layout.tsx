@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Enterprise-Grade Security â€” Data Protection & Compliance",
+  title: "Enterprise-Grade Security — Data Protection & Compliance",
   description:
     "Your financial data is protected with 256-bit SSL encryption, SOC 2 compliance, two-factor authentication, automated daily backups, and role-based access control. Finova Security.",
   keywords: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Finova Security â€” Enterprise-Grade Protection",
+    title: "Finova Security — Enterprise-Grade Protection",
     description: "256-bit SSL, SOC 2, 2FA, daily backups. Your data is safe with Finova.",
     images: [`${BASE}/icon.png`],
   },
