@@ -68,6 +68,7 @@ export function proxy(req: NextRequest) {
     "/api/test-login",
     "/api/analytics",
     "/api/invitations/accept",
+    "/api/invitations/preview",
     "/api/public/",
   ];
   const isApi = pathname.startsWith("/api/");
