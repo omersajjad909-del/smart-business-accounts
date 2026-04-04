@@ -32,7 +32,7 @@ export default async function RootPage() {
   }
 
   if (host === "admin.finovaos.app" || host.endsWith(".admin.finovaos.app")) {
-    redirect("/admin");
+    redirect("/admin/login");
   }
 
   if (host === "ai.finovaos.app" || host.endsWith(".ai.finovaos.app")) {
