@@ -27,6 +27,14 @@ export default async function LandingPage() {
     redirect("/auth");
   }
 
+  if (host === "admin.finovaos.app" || host.endsWith(".admin.finovaos.app")) {
+    redirect("/admin");
+  }
+
+  if (host === "ai.finovaos.app" || host.endsWith(".ai.finovaos.app")) {
+    redirect("/dashboard/ai");
+  }
+
   if (host === "finovaos.app" || host === "www.finovaos.app") {
     redirect("/");
   }

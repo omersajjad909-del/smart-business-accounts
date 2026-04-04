@@ -31,6 +31,14 @@ export default async function RootPage() {
     redirect("/auth");
   }
 
+  if (host === "admin.finovaos.app" || host.endsWith(".admin.finovaos.app")) {
+    redirect("/admin");
+  }
+
+  if (host === "ai.finovaos.app" || host.endsWith(".ai.finovaos.app")) {
+    redirect("/dashboard/ai");
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-[#060919]">
       <Offer />

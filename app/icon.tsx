@@ -28,72 +28,63 @@ export default function Icon() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            position: "relative",
-            background: "linear-gradient(145deg, #4f46e5 0%, #6366f1 55%, #7c3aed 100%)",
-            border: "1px solid rgba(255,255,255,.18)",
+            background: "linear-gradient(145deg, #4f46e5 0%, #6366f1 55%, #818cf8 100%)",
             boxShadow: "inset 0 1px 0 rgba(255,255,255,.22)",
           }}
         >
-          <div
-            style={{
+          {/* Layers / stack icon — top diamond */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, position: "relative", width: 240, height: 220 }}>
+            {/* Top layer */}
+            <div style={{
               position: "absolute",
-              inset: 20,
-              borderRadius: 92,
-              border: "1px solid rgba(255,255,255,.1)",
-            }}
-          />
-
-          <div
-            style={{
-              position: "absolute",
-              top: 72,
-              left: 86,
-              width: 120,
-              height: 18,
-              borderRadius: 999,
-              background: "rgba(255,255,255,.16)",
-              transform: "rotate(-28deg)",
-            }}
-          />
-
-          <div
-            style={{
+              top: 0,
+              left: 0,
+              right: 0,
               display: "flex",
-              flexDirection: "column",
-              position: "relative",
-              transform: "translateX(8px)",
-            }}
-          >
-            <div
-              style={{
-                width: 64,
-                height: 228,
-                borderRadius: 32,
-                background: "#ffffff",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: 26,
-                left: 54,
-                width: 154,
-                height: 54,
-                borderRadius: 27,
-                background: "#ffffff",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: 108,
-                left: 54,
-                width: 122,
-                height: 48,
-                borderRadius: 24,
-                background: "#ffffff",
-              }}
-            />
+              justifyContent: "center",
+            }}>
+              <div style={{
+                width: 240,
+                height: 52,
+                background: "rgba(255,255,255,1)",
+                borderRadius: 12,
+                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+              }}/>
+            </div>
+            {/* Middle layer */}
+            <div style={{
+              position: "absolute",
+              top: 76,
+              left: 0,
+              right: 0,
+              display: "flex",
+              justifyContent: "center",
+            }}>
+              <div style={{
+                width: 240,
+                height: 52,
+                background: "rgba(255,255,255,.85)",
+                borderRadius: 12,
+                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+              }}/>
+            </div>
+            {/* Bottom layer */}
+            <div style={{
+              position: "absolute",
+              top: 152,
+              left: 0,
+              right: 0,
+              display: "flex",
+              justifyContent: "center",
+            }}>
+              <div style={{
+                width: 240,
+                height: 52,
+                background: "rgba(255,255,255,.65)",
+                borderRadius: 12,
+                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+              }}/>
+            </div>
           </div>
         </div>
       </div>
