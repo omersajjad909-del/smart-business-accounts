@@ -63,7 +63,7 @@ const PERMISSIONS_LIST = [
 /* ═══════════════════════════════════════════════════════
    NAV CONFIG
 ═══════════════════════════════════════════════════════ */
-type Page = "dashboard"|"companies"|"users"|"revenue"|"geo"|"usage"|"plans"|"system"|"logs"|"permissions"|"settings"|"profile"|"tickets"|"broadcasts"|"flags"|"apikeys"|"visitors"|"updates"|"livesupport"|"subscriptions"|"coupons"|"emaillogs"|"referrals"|"teams"|"testimonials"|"leads"|"seo"|"social"|"business_modules"|"newsletter"|"feedback";
+type Page = "dashboard"|"companies"|"users"|"revenue"|"geo"|"usage"|"plans"|"system"|"logs"|"permissions"|"settings"|"profile"|"tickets"|"broadcasts"|"flags"|"apikeys"|"visitors"|"updates"|"livesupport"|"subscriptions"|"coupons"|"emaillogs"|"referrals"|"teams"|"testimonials"|"leads"|"seo"|"social"|"business_modules"|"newsletter"|"feedback"|"crm";
 
 // SVG icon paths per nav item (14x14 viewBox, stroke-based)
 const NAV_ICONS: Record<string, React.ReactNode> = {
@@ -110,6 +110,7 @@ const NAV: { page:Page; label:string; icon:string; color:string; badge?:string }
   { page:"business_modules", label:"Business Modules", icon:"",  color:"#a78bfa" },
   { page:"coupons",          label:"Coupon Codes",     icon:"",  color:"#34d399" },
   { page:"referrals",        label:"Referrals",        icon:"",  color:"#a78bfa" },
+  { page:"crm",              label:"CRM",              icon:"",  color:"#22d3ee" },
   { page:"leads",            label:"Lead Management",  icon:"",  color:"#f87171" },
   { page:"broadcasts",       label:"Broadcasts",       icon:"",  color:"#818cf8" },
   { page:"testimonials",     label:"Testimonials",     icon:"",  color:"#fbbf24" },
@@ -134,7 +135,7 @@ const NAV_GROUPS: { label: string; pages: Page[] }[] = [
   { label: "Overview",   pages: ["dashboard"] },
   { label: "Analytics",  pages: ["revenue","geo","usage","visitors"] },
   { label: "Business",   pages: ["companies","subscriptions","plans","business_modules"] },
-  { label: "Marketing",  pages: ["coupons","referrals","leads","broadcasts","testimonials","newsletter","feedback"] },
+  { label: "Marketing",  pages: ["coupons","referrals","crm","leads","broadcasts","testimonials","newsletter","feedback"] },
   { label: "Content",    pages: ["updates","seo","social"] },
   { label: "Support",    pages: ["livesupport","tickets"] },
   { label: "System",     pages: ["system","logs","emaillogs","flags","apikeys"] },
@@ -6056,6 +6057,24 @@ function PageTestimonials() {
 /* ═══════════════════════════════════════════════════════
    PAGE: LEAD MANAGEMENT
 ═══════════════════════════════════════════════════════ */
+function PageCRM() {
+  return (
+    <div style={{ padding: 24, fontFamily: "inherit" }}>
+      <div style={{ marginBottom: 20 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: "white", margin: "0 0 4px" }}>CRM Workspace</h1>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: 0 }}>Visitors, leads, and pipeline — full CRM view.</p>
+      </div>
+      <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <iframe
+          src="/admin/crm"
+          style={{ width: "100%", height: "calc(100vh - 140px)", border: "none", background: "#060a14" }}
+          title="CRM"
+        />
+      </div>
+    </div>
+  );
+}
+
 function PageLeads() {
   const [leads, setLeads]       = useState<any[]|null>(null);
   const [filter, setFilter]     = useState("all");
@@ -7113,6 +7132,7 @@ export default function AdminPanel() {
       case "teams":         return <PageTeams/>;
       case "testimonials":  return <PageTestimonials/>;
       case "leads":         return <PageLeads/>;
+      case "crm":           return <PageCRM/>;
       case "seo":           return <PageSeo/>;
       case "social":        return <PageSocial/>;
       case "newsletter":    return <PageNewsletter/>;
@@ -7274,76 +7294,6 @@ export default function AdminPanel() {
             );
           })}
 
-          <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.05)" }}>
-            {!collapsed && (
-              <div style={{ padding:"10px 10px 6px", fontSize:9, fontWeight:800, color:"rgba(255,255,255,.18)", letterSpacing:".12em", textTransform:"uppercase", userSelect:"none" }}>
-                CRM
-              </div>
-            )}
-            <button
-              className="nav-btn"
-              onClick={() => {
-                window.location.href = "/admin/crm";
-              }}
-              title={collapsed ? "CRM Workspace" : undefined}
-              style={{
-                display:"flex",
-                alignItems:"center",
-                gap:10,
-                padding: collapsed ? "9px 0" : "8px 10px",
-                justifyContent: collapsed ? "center" : "flex-start",
-                borderRadius:9,
-                border:"none",
-                cursor:"pointer",
-                fontFamily:"inherit",
-                width:"100%",
-                position:"relative",
-                marginBottom:1,
-                background:"linear-gradient(90deg, rgba(34,211,238,.12) 0%, rgba(99,102,241,.08) 100%)",
-                outline:"1px solid rgba(34,211,238,.18)",
-              }}
-            >
-              <div style={{
-                width:28,
-                height:28,
-                borderRadius:8,
-                flexShrink:0,
-                display:"flex",
-                alignItems:"center",
-                justifyContent:"center",
-                background:"rgba(34,211,238,.12)",
-                border:"1px solid rgba(34,211,238,.18)",
-              }}>
-                <span style={{ color:"#22d3ee", display:"flex", alignItems:"center" }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 20v-6"/>
-                    <path d="M6 20v-3"/>
-                    <path d="M18 20v-9"/>
-                    <path d="M4 10l5-5 4 4 7-7"/>
-                  </svg>
-                </span>
-              </div>
-              {!collapsed && (
-                <>
-                  <span style={{
-                    fontSize:12.5,
-                    fontWeight:700,
-                    color:"#67e8f9",
-                    flex:1,
-                    textAlign:"left",
-                    whiteSpace:"nowrap",
-                    overflow:"hidden",
-                    textOverflow:"ellipsis",
-                  }}>
-                    CRM Workspace
-                  </span>
-                  <span style={{ fontSize:9,fontWeight:800,padding:"1px 6px",borderRadius:8,background:"rgba(34,211,238,.12)",color:"#22d3ee",border:"1px solid rgba(34,211,238,.18)" }}>
-                    NEW
-                  </span>
-                </>
-              )}
-            </button>
-          </div>
         </nav>
 
         {/* ── Bottom: User + Collapse ── */}
