@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { setCurrentUser } from "@/lib/auth";
 
 /* ─── SVG Icons ──────────────────────────────────────────────────────────── */
 const IconMail = () => (
@@ -206,6 +207,7 @@ function AuthPageInner() {
         setMessage(data.message || "We have sent you a 6-digit code.");
         return;
       }
+      if (data.user) setCurrentUser(data.user);
       setMessage("Signed in successfully.");
       router.push(data.redirectTo || redirectTo);
     } catch {
@@ -232,6 +234,7 @@ function AuthPageInner() {
       const data = await response.json();
       if (!response.ok) { setError(data.error || "Verification session expired. Please restart signup."); return; }
       try { localStorage.removeItem("pendingVerification"); } catch {}
+      if (data.user) setCurrentUser(data.user);
       setMessage("Email verified! Redirecting...");
       router.push(data.next || data.redirectTo || redirectTo);
     } catch {
