@@ -4,15 +4,11 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { getOrCreateVisitorSessionId } from "@/lib/visitorSession";
 
-const APP_TRACKED_PREFIXES = [
-  "/auth",
-  "/onboarding",
-  "/billing",
-  "/website-login",
-  "/website-signup",
-  "/login",
-  "/login-email",
-  "/sso",
+// Pages to skip — internal / authenticated areas
+const SKIP_PREFIXES = [
+  "/admin",
+  "/dashboard",
+  "/api",
 ];
 
 export default function VisitorTracker() {
@@ -21,10 +17,7 @@ export default function VisitorTracker() {
   useEffect(() => {
     if (
       !pathname ||
-      pathname.startsWith("/admin") ||
-      pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/api") ||
-      !APP_TRACKED_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+      SKIP_PREFIXES.some((prefix) => pathname.startsWith(prefix))
     ) {
       return;
     }
