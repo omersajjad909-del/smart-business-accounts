@@ -6,7 +6,7 @@
     "predev": "node scripts/next-lock-recover.js",
     "dev": "next dev",
     "prebuild": "node scripts/next-lock-recover.js",
-    "build": "next build --webpack",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",

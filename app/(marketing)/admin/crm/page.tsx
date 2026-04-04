@@ -237,7 +237,7 @@ export default function AdminCrmPage() {
                   ["Cities", visitorStats?.cities ?? 0, "#22d3ee"],
                 ].map(([label, value, color]) => (
                   <div key={String(label)} style={{ borderRadius: 16, padding: "16px 18px", background: "rgba(255,255,255,.04)", border: `1px solid ${color}22` }}>
-                    <div style={{ fontSize: 27, fontWeight: 900, color }}>{loading ? "..." : Number(value).toLocaleString()}</div>
+                    <div style={{ fontSize: 27, fontWeight: 900, color: String(color) }}>{loading ? "..." : Number(value).toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", marginTop: 4 }}>{label}</div>
                   </div>
                 ))}
@@ -252,7 +252,7 @@ export default function AdminCrmPage() {
                   <div key={String(label)} style={{ marginBottom: 10 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
                       <span style={{ color: "rgba(255,255,255,.58)", textTransform: "capitalize" }}>{label}</span>
-                      <span style={{ color, fontWeight: 800 }}>{value}%</span>
+                      <span style={{ color: String(color), fontWeight: 800 }}>{value}%</span>
                     </div>
                     <div style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,.08)" }}>
                       <div style={{ height: "100%", width: `${value}%`, borderRadius: 99, background: String(color) }} />
@@ -304,7 +304,7 @@ export default function AdminCrmPage() {
                 ["Follow Ups", leadSummary.followUps, "#fbbf24"],
               ].map(([label, value, color]) => (
                 <div key={String(label)} style={{ borderRadius: 16, padding: "16px 18px", background: "rgba(255,255,255,.04)", border: `1px solid ${color}22` }}>
-                  <div style={{ fontSize: 25, fontWeight: 900, color }}>{value}</div>
+                  <div style={{ fontSize: 25, fontWeight: 900, color: String(color) }}>{value}</div>
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", marginTop: 4 }}>{label}</div>
                 </div>
               ))}
