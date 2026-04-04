@@ -77,7 +77,9 @@
       "Bash(dir \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\billing\")",
       "Bash(ls d:/projects/smart-business-accounts/app/icon*)",
       "Bash(ls d:/projects/smart-business-accounts/app/favicon*)",
-      "Bash(ls d:/projects/smart-business-accounts/public/favicon*)"
+      "Bash(ls d:/projects/smart-business-accounts/public/favicon*)",
+      "Bash(ls d:/projects/smart-business-accounts/*.ts)",
+      "Bash(ls d:/projects/smart-business-accounts/.next/server/middleware*)"
     ]
   }
 }

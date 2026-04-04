@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { getOrCreateVisitorSessionId } from "@/lib/visitorSession";
 
 /* ══════════════════════════════════════════════════════════
    DATA
@@ -210,7 +211,10 @@ export default function ContactPage() {
       await fetch("/api/public/contact", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          sessionId: getOrCreateVisitorSessionId(),
+        }),
       });
       setSent(true);
       setForm({ name:"", email:"", company:"", phone:"", subject:"general", message:"" });

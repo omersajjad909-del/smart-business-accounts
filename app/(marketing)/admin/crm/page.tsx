@@ -1,434 +1,440 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
 
 type Lead = {
-  id: string; name: string; email: string; phone?: string; company?: string;
-  message?: string; source?: string; status: string; priority: string;
-  notes?: string; followUpAt?: string; assignedTo?: string; country?: string;
-  createdAt: string; updatedAt: string;
-};
-
-type VisitorRow = {
-  country: string; countryName: string; flag: string; topCity: string;
-  visitors: number; uniqueVisitors: number;
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  company?: string | null;
+  message?: string | null;
+  source?: string | null;
+  status: string;
+  priority: string;
+  notes?: string | null;
+  followUpAt?: string | null;
+  assignedTo?: string | null;
+  country?: string | null;
+  createdAt: string;
 };
 
 type VisitorStats = {
-  totalVisits: number; uniqueVisitors: number; countries: number; cities: number;
+  totalVisits: number;
+  uniqueVisitors: number;
+  countries: number;
+  cities: number;
   deviceBreakdown: { mobile: number; desktop: number; tablet: number };
   topPages: { page: string; visits: number }[];
 };
 
+type VisitorRow = {
+  country: string;
+  countryName: string;
+  flag: string;
+  topCity: string;
+  visitors: number;
+  uniqueVisitors: number;
+};
+
+const STATUSES = ["new", "contacted", "demo", "proposal", "converted", "lost"] as const;
 const STATUS_COLORS: Record<string, string> = {
-  new:       "rgba(99,102,241,.2)",
-  contacted: "rgba(251,191,36,.2)",
-  demo:      "rgba(6,182,212,.2)",
-  proposal:  "rgba(167,139,250,.2)",
-  converted: "rgba(52,211,153,.2)",
-  lost:      "rgba(248,113,113,.2)",
+  new: "#a5b4fc",
+  contacted: "#fbbf24",
+  demo: "#22d3ee",
+  proposal: "#c4b5fd",
+  converted: "#34d399",
+  lost: "#f87171",
 };
-const STATUS_TEXT: Record<string, string> = {
-  new:"#a5b4fc", contacted:"#fbbf24", demo:"#22d3ee",
-  proposal:"#c4b5fd", converted:"#34d399", lost:"#f87171",
+const STATUS_BG: Record<string, string> = {
+  new: "rgba(99,102,241,.18)",
+  contacted: "rgba(251,191,36,.18)",
+  demo: "rgba(34,211,238,.18)",
+  proposal: "rgba(167,139,250,.18)",
+  converted: "rgba(52,211,153,.18)",
+  lost: "rgba(248,113,113,.18)",
 };
-const STATUS_LABELS = ["new","contacted","demo","proposal","converted","lost"];
-const PRIORITY_COLOR: Record<string, string> = { low:"#6ee7b7", medium:"#fbbf24", high:"#f87171" };
+const PRIORITY_COLORS: Record<string, string> = { low: "#6ee7b7", medium: "#fbbf24", high: "#f87171" };
 
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" });
+function adminHeaders(json = false) {
+  const user = getCurrentUser();
+  const headers: Record<string, string> = {};
+  if (json) headers["Content-Type"] = "application/json";
+  if (user?.id) headers["x-user-id"] = user.id;
+  if (user?.role) headers["x-user-role"] = user.role;
+  return headers;
 }
 
-function LeadCard({ lead, onUpdate, onDelete }: { lead: Lead; onUpdate: (id:string, data:any)=>void; onDelete:(id:string)=>void }) {
-  const [showNotes, setShowNotes] = useState(false);
-  const [notes, setNotes]         = useState(lead.notes || "");
-  const [saving, setSaving]       = useState(false);
-
-  async function saveNotes() {
-    setSaving(true);
-    await onUpdate(lead.id, { notes });
-    setSaving(false);
-    setShowNotes(false);
-  }
-
-  return (
-    <div style={{
-      borderRadius:14, padding:"16px 18px",
-      background:"rgba(255,255,255,.04)",
-      border:`1px solid ${STATUS_COLORS[lead.status] || "rgba(255,255,255,.08)"}`,
-      borderLeft:`3px solid ${STATUS_TEXT[lead.status] || "#818cf8"}`,
-    }}>
-      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8, marginBottom:10 }}>
-        <div>
-          <div style={{ fontSize:14, fontWeight:700, color:"white" }}>{lead.name}</div>
-          <div style={{ fontSize:12, color:"rgba(255,255,255,.45)", marginTop:2 }}>{lead.email}</div>
-          {lead.company && <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:1 }}>🏢 {lead.company}</div>}
-          {lead.phone   && <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:1 }}>📞 {lead.phone}</div>}
-        </div>
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:5, flexShrink:0 }}>
-          <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:6, background:STATUS_COLORS[lead.status], color:STATUS_TEXT[lead.status], textTransform:"uppercase" }}>
-            {lead.status}
-          </span>
-          <span style={{ fontSize:10, fontWeight:600, color:PRIORITY_COLOR[lead.priority] || "#fbbf24" }}>
-            ● {lead.priority}
-          </span>
-        </div>
-      </div>
-
-      {lead.message && (
-        <div style={{ fontSize:12, color:"rgba(255,255,255,.38)", lineHeight:1.5, marginBottom:10, padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)" }}>
-          {lead.message.slice(0,120)}{lead.message.length>120?"…":""}
-        </div>
-      )}
-
-      <div style={{ display:"flex", gap:6, marginBottom:10, flexWrap:"wrap" }}>
-        {lead.source  && <span style={{ fontSize:10, padding:"2px 7px", borderRadius:5, background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.45)" }}>📌 {lead.source}</span>}
-        {lead.country && <span style={{ fontSize:10, padding:"2px 7px", borderRadius:5, background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.45)" }}>🌍 {lead.country}</span>}
-        <span style={{ fontSize:10, padding:"2px 7px", borderRadius:5, background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.35)" }}>
-          {fmtDate(lead.createdAt)}
-        </span>
-      </div>
-
-      {/* Status changer */}
-      <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginBottom:8 }}>
-        {STATUS_LABELS.map(s => (
-          <button key={s} type="button" onClick={() => onUpdate(lead.id, { status: s })}
-            style={{ fontSize:10, padding:"2px 8px", borderRadius:5, border:"none", cursor:"pointer", fontFamily:"inherit",
-              background: lead.status===s ? STATUS_COLORS[s] : "rgba(255,255,255,.05)",
-              color: lead.status===s ? STATUS_TEXT[s] : "rgba(255,255,255,.3)",
-              fontWeight: lead.status===s ? 700 : 500,
-            }}>
-            {s}
-          </button>
-        ))}
-      </div>
-
-      {/* Notes */}
-      {showNotes ? (
-        <div style={{ marginTop:8 }}>
-          <textarea value={notes} onChange={e=>setNotes(e.target.value)} rows={3}
-            placeholder="Add notes..."
-            style={{ width:"100%", padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, fontFamily:"inherit", resize:"vertical", outline:"none" }}/>
-          <div style={{ display:"flex", gap:6, marginTop:6 }}>
-            <button type="button" onClick={saveNotes} style={{ fontSize:11, padding:"5px 12px", borderRadius:7, background:"rgba(99,102,241,.3)", border:"none", color:"white", cursor:"pointer", fontFamily:"inherit" }}>
-              {saving ? "Saving…" : "Save"}
-            </button>
-            <button type="button" onClick={()=>setShowNotes(false)} style={{ fontSize:11, padding:"5px 10px", borderRadius:7, background:"transparent", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.4)", cursor:"pointer", fontFamily:"inherit" }}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div style={{ display:"flex", gap:6, marginTop:4 }}>
-          <button type="button" onClick={()=>setShowNotes(true)}
-            style={{ fontSize:11, padding:"4px 10px", borderRadius:7, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.08)", color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>
-            {lead.notes ? "📝 Notes" : "+ Note"}
-          </button>
-          <button type="button" onClick={()=>onDelete(lead.id)}
-            style={{ fontSize:11, padding:"4px 10px", borderRadius:7, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.18)", color:"#f87171", cursor:"pointer", fontFamily:"inherit" }}>
-            Delete
-          </button>
-        </div>
-      )}
-    </div>
-  );
+function fmtDate(value?: string | null) {
+  return value ? new Date(value).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 }
 
-export default function CrmPage() {
-  const [tab,  setTab]  = useState<"visitors"|"leads"|"pipeline">("visitors");
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [visitorRows,  setVisitorRows]  = useState<VisitorRow[]>([]);
-  const [visitorStats, setVisitorStats] = useState<VisitorStats | null>(null);
-  const [topPages, setTopPages] = useState<{page:string;visits:number}[]>([]);
+export default function AdminCrmPage() {
+  const [tab, setTab] = useState<"visitors" | "leads" | "pipeline">("visitors");
+  const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [range, setRange] = useState("7d");
-  const [loading, setLoading] = useState(false);
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [visitorRows, setVisitorRows] = useState<VisitorRow[]>([]);
+  const [visitorStats, setVisitorStats] = useState<VisitorStats | null>(null);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [search, setSearch] = useState("");
-
-  // New lead form
+  const [status, setStatus] = useState("all");
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name:"", email:"", phone:"", company:"", message:"", source:"manual", priority:"medium" });
-  const [formSaving, setFormSaving] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    message: "",
+    source: "manual",
+    priority: "medium",
+    assignedTo: "",
+    country: "",
+    followUpAt: "",
+  });
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user || String(user.role || "").toUpperCase() !== "ADMIN") {
+      window.location.replace("/admin/login");
+      return;
+    }
+    setReady(true);
+  }, []);
 
   const loadVisitors = useCallback(async () => {
-    setLoading(true);
-    try {
-      const r = await fetch(`/api/admin/visitors?range=${range}`, { headers: { "x-user-role":"ADMIN" } });
-      if (r.ok) {
-        const d = await r.json();
-        setVisitorRows(d.rows || []);
-        setVisitorStats(d.stats || null);
-        setTopPages(d.stats?.topPages || []);
-      }
-    } finally { setLoading(false); }
+    const response = await fetch(`/api/admin/visitors?range=${range}`, { headers: adminHeaders() });
+    if (response.status === 403) {
+      window.location.replace("/admin/login");
+      return;
+    }
+    const data = await response.json();
+    setVisitorRows(data.rows || []);
+    setVisitorStats(data.stats || null);
   }, [range]);
 
   const loadLeads = useCallback(async () => {
-    setLoading(true);
-    try {
-      const r = await fetch("/api/admin/leads", { headers: { "x-user-role":"ADMIN" } });
-      if (r.ok) { const d = await r.json(); setLeads(d.leads || []); }
-    } finally { setLoading(false); }
-  }, []);
-
-  useEffect(() => { loadVisitors(); }, [loadVisitors]);
-  useEffect(() => { loadLeads(); }, [loadLeads]);
-
-  async function updateLead(id: string, data: any) {
-    const r = await fetch("/api/admin/leads", { method:"PATCH", headers:{"Content-Type":"application/json","x-user-role":"ADMIN"}, body: JSON.stringify({ id, ...data }) });
-    if (r.ok) setLeads(prev => prev.map(l => l.id===id ? { ...l, ...data } : l));
-  }
-
-  async function deleteLead(id: string) {
-    if (!confirm("Delete this lead?")) return;
-    const r = await fetch(`/api/admin/leads?id=${id}`, { method:"DELETE", headers:{"x-user-role":"ADMIN"} });
-    if (r.ok) setLeads(prev => prev.filter(l => l.id !== id));
-  }
-
-  async function createLead(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.name || !form.email) return;
-    setFormSaving(true);
-    try {
-      const r = await fetch("/api/admin/leads", { method:"POST", headers:{"Content-Type":"application/json","x-user-role":"ADMIN"}, body: JSON.stringify(form) });
-      if (r.ok) { const d = await r.json(); setLeads(prev => [d.lead, ...prev]); setShowForm(false); setForm({ name:"",email:"",phone:"",company:"",message:"",source:"manual",priority:"medium" }); }
-    } finally { setFormSaving(false); }
-  }
-
-  const filteredLeads = leads.filter(l => {
-    if (filterStatus !== "all" && l.status !== filterStatus) return false;
-    if (search) {
-      const s = search.toLowerCase();
-      if (!l.name.toLowerCase().includes(s) && !l.email.toLowerCase().includes(s) && !(l.company||"").toLowerCase().includes(s)) return false;
+    const params = new URLSearchParams();
+    if (status !== "all") params.set("status", status);
+    if (search.trim()) params.set("q", search.trim());
+    const response = await fetch(`/api/admin/leads?${params.toString()}`, { headers: adminHeaders() });
+    if (response.status === 403) {
+      window.location.replace("/admin/login");
+      return;
     }
-    return true;
-  });
+    const data = await response.json();
+    setLeads(data.leads || []);
+  }, [search, status]);
 
-  // Pipeline grouped by status
-  const pipeline = STATUS_LABELS.reduce((acc, s) => {
-    acc[s] = leads.filter(l => l.status === s);
-    return acc;
-  }, {} as Record<string, Lead[]>);
+  useEffect(() => {
+    if (!ready) return;
+    setLoading(true);
+    Promise.all([loadVisitors(), loadLeads()]).finally(() => setLoading(false));
+  }, [ready, loadVisitors, loadLeads]);
+
+  async function patchLead(id: string, patch: Record<string, unknown>) {
+    const response = await fetch("/api/admin/leads", {
+      method: "PATCH",
+      headers: adminHeaders(true),
+      body: JSON.stringify({ id, ...patch }),
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    setLeads((current) => current.map((lead) => (lead.id === id ? data.lead : lead)));
+  }
+
+  async function removeLead(id: string) {
+    if (!window.confirm("Delete this lead?")) return;
+    const response = await fetch(`/api/admin/leads?id=${id}`, {
+      method: "DELETE",
+      headers: adminHeaders(),
+    });
+    if (response.ok) setLeads((current) => current.filter((lead) => lead.id !== id));
+  }
+
+  async function createLead(event: React.FormEvent) {
+    event.preventDefault();
+    setSaving(true);
+    try {
+      const response = await fetch("/api/admin/leads", {
+        method: "POST",
+        headers: adminHeaders(true),
+        body: JSON.stringify({ ...form, followUpAt: form.followUpAt || null }),
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setLeads((current) => [data.lead, ...current]);
+      setShowForm(false);
+      setForm({ name: "", email: "", phone: "", company: "", message: "", source: "manual", priority: "medium", assignedTo: "", country: "", followUpAt: "" });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const pipeline = useMemo(
+    () => Object.fromEntries(STATUSES.map((item) => [item, leads.filter((lead) => lead.status === item)])) as Record<string, Lead[]>,
+    [leads],
+  );
+  const leadSummary = useMemo(
+    () => ({
+      total: leads.length,
+      high: leads.filter((lead) => lead.priority === "high").length,
+      converted: leads.filter((lead) => lead.status === "converted").length,
+      followUps: leads.filter((lead) => lead.followUpAt).length,
+    }),
+    [leads],
+  );
+
+  if (!ready) return null;
 
   return (
-    <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,#080c1e,#0c0f2e)", color:"white", fontFamily:"'Outfit',sans-serif", padding:"32px 24px" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap'); *,*::before,*::after{box-sizing:border-box;}`}</style>
-
-      {/* Header */}
-      <div style={{ maxWidth:1200, margin:"0 auto" }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:28, flexWrap:"wrap", gap:12 }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg,#080c1e,#0c0f2e)", color: "white", fontFamily: "'Outfit',sans-serif", padding: "32px 24px" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+        *,*::before,*::after{box-sizing:border-box;}
+        @media (max-width: 980px) {.crm-two{grid-template-columns:1fr!important}.crm-pipeline{grid-template-columns:repeat(3,minmax(220px,1fr))!important}}
+        @media (max-width: 720px) {.crm-pipeline{grid-template-columns:1fr!important}.crm-vis-head,.crm-vis-row{grid-template-columns:1.4fr .8fr .8fr .8fr!important}}
+      `}</style>
+      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "center", flexWrap: "wrap", marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontSize:26, fontWeight:800, color:"white", letterSpacing:"-.5px", margin:0 }}>Visitor CRM</h1>
-            <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginTop:4 }}>Track website visitors · Manage leads · Close deals</p>
+            <h1 style={{ margin: 0, fontSize: 30, fontWeight: 900 }}>Admin CRM</h1>
+            <p style={{ margin: "6px 0 0", fontSize: 13, color: "rgba(255,255,255,.42)" }}>Visitors, leads, and pipeline in one place.</p>
           </div>
-          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-            {tab==="visitors" && (
-              <select value={range} onChange={e=>{setRange(e.target.value);}} style={{ padding:"7px 12px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, fontFamily:"inherit", cursor:"pointer" }}>
-                <option value="24h">Last 24h</option>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {tab === "visitors" ? (
+              <select value={range} onChange={(e) => setRange(e.target.value)} style={{ padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }}>
+                <option value="24h">Last 24 hours</option>
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
               </select>
-            )}
-            {(tab==="leads"||tab==="pipeline") && (
-              <button type="button" onClick={()=>setShowForm(true)} style={{ padding:"8px 16px", borderRadius:9, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                + Add Lead
+            ) : (
+              <button type="button" onClick={() => setShowForm(true)} style={{ padding: "9px 16px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
+                Add Lead
               </button>
             )}
           </div>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display:"flex", gap:4, marginBottom:24, background:"rgba(255,255,255,.04)", borderRadius:12, padding:4, width:"fit-content" }}>
-          {([["visitors","👥 Visitors"],["leads","📋 Leads"],["pipeline","📊 Pipeline"]] as const).map(([t,l]) => (
-            <button key={t} type="button" onClick={()=>setTab(t)} style={{ padding:"8px 20px", borderRadius:9, border:"none", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"inherit",
-              background: tab===t ? "linear-gradient(135deg,#4f46e5,#7c3aed)" : "transparent",
-              color: tab===t ? "white" : "rgba(255,255,255,.4)",
-              boxShadow: tab===t ? "0 4px 12px rgba(99,102,241,.4)" : "none",
-            }}>{l}</button>
+        <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,.04)", borderRadius: 14, padding: 4, width: "fit-content", marginBottom: 20 }}>
+          {(["visitors", "leads", "pipeline"] as const).map((item) => (
+            <button key={item} type="button" onClick={() => setTab(item)} style={{ padding: "9px 18px", borderRadius: 10, border: "none", background: tab === item ? "linear-gradient(135deg,#4f46e5,#7c3aed)" : "transparent", color: tab === item ? "white" : "rgba(255,255,255,.42)", fontSize: 13, fontWeight: 800, cursor: "pointer", textTransform: "capitalize" }}>
+              {item}
+            </button>
           ))}
         </div>
 
-        {/* ── VISITORS TAB ── */}
-        {tab==="visitors" && (
+        {tab === "visitors" ? (
           <>
-            {/* Stats row */}
-            {visitorStats && (
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))", gap:12, marginBottom:24 }}>
+            <div className="crm-two" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 16, marginBottom: 18 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12 }}>
                 {[
-                  { label:"Total Visits",    val:visitorStats.totalVisits,    color:"#818cf8" },
-                  { label:"Unique Visitors", val:visitorStats.uniqueVisitors, color:"#34d399" },
-                  { label:"Countries",       val:visitorStats.countries,      color:"#fbbf24" },
-                  { label:"Cities",          val:visitorStats.cities,         color:"#06b6d4" },
-                ].map(s => (
-                  <div key={s.label} style={{ borderRadius:14, padding:"16px 18px", background:"rgba(255,255,255,.04)", border:`1px solid ${s.color}25` }}>
-                    <div style={{ fontSize:24, fontWeight:900, color:s.color }}>{loading ? "…" : s.val.toLocaleString()}</div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginTop:4 }}>{s.label}</div>
+                  ["Total Visits", visitorStats?.totalVisits ?? 0, "#818cf8"],
+                  ["Unique Visitors", visitorStats?.uniqueVisitors ?? 0, "#34d399"],
+                  ["Countries", visitorStats?.countries ?? 0, "#fbbf24"],
+                  ["Cities", visitorStats?.cities ?? 0, "#22d3ee"],
+                ].map(([label, value, color]) => (
+                  <div key={String(label)} style={{ borderRadius: 16, padding: "16px 18px", background: "rgba(255,255,255,.04)", border: `1px solid ${color}22` }}>
+                    <div style={{ fontSize: 27, fontWeight: 900, color }}>{loading ? "..." : Number(value).toLocaleString()}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", marginTop: 4 }}>{label}</div>
                   </div>
                 ))}
               </div>
-            )}
-
-            {/* Device breakdown + top pages */}
-            {visitorStats && (
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:24 }}>
-                <div style={{ borderRadius:14, padding:"16px 18px", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)" }}>
-                  <div style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.4)", marginBottom:14, textTransform:"uppercase", letterSpacing:".07em" }}>Device Split</div>
-                  {[
-                    { k:"desktop", label:"Desktop", color:"#818cf8", val:visitorStats.deviceBreakdown.desktop },
-                    { k:"mobile",  label:"Mobile",  color:"#34d399", val:visitorStats.deviceBreakdown.mobile  },
-                    { k:"tablet",  label:"Tablet",  color:"#fbbf24", val:visitorStats.deviceBreakdown.tablet  },
-                  ].map(d => (
-                    <div key={d.k} style={{ marginBottom:10 }}>
-                      <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, marginBottom:4 }}>
-                        <span style={{ color:"rgba(255,255,255,.6)" }}>{d.label}</span>
-                        <span style={{ color:d.color, fontWeight:700 }}>{d.val}%</span>
-                      </div>
-                      <div style={{ height:5, borderRadius:3, background:"rgba(255,255,255,.07)" }}>
-                        <div style={{ height:"100%", borderRadius:3, background:d.color, width:`${d.val}%`, transition:"width .6s ease" }}/>
-                      </div>
+              <div style={{ borderRadius: 16, padding: "16px 18px", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)" }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.42)", marginBottom: 12, textTransform: "uppercase", letterSpacing: ".06em" }}>Device Split</div>
+                {[
+                  ["desktop", visitorStats?.deviceBreakdown.desktop ?? 0, "#818cf8"],
+                  ["mobile", visitorStats?.deviceBreakdown.mobile ?? 0, "#34d399"],
+                  ["tablet", visitorStats?.deviceBreakdown.tablet ?? 0, "#fbbf24"],
+                ].map(([label, value, color]) => (
+                  <div key={String(label)} style={{ marginBottom: 10 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+                      <span style={{ color: "rgba(255,255,255,.58)", textTransform: "capitalize" }}>{label}</span>
+                      <span style={{ color, fontWeight: 800 }}>{value}%</span>
                     </div>
-                  ))}
-                </div>
-                <div style={{ borderRadius:14, padding:"16px 18px", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)" }}>
-                  <div style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.4)", marginBottom:14, textTransform:"uppercase", letterSpacing:".07em" }}>Top Pages</div>
-                  {topPages.slice(0,6).map((p,i) => (
-                    <div key={i} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 0", borderBottom:"1px solid rgba(255,255,255,.05)" }}>
-                      <span style={{ fontSize:12, color:"rgba(255,255,255,.55)", maxWidth:"70%", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.page}</span>
-                      <span style={{ fontSize:12, fontWeight:700, color:"#818cf8" }}>{p.visits}</span>
+                    <div style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,.08)" }}>
+                      <div style={{ height: "100%", width: `${value}%`, borderRadius: 99, background: String(color) }} />
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
 
-            {/* Country table */}
-            <div style={{ borderRadius:16, overflow:"hidden", border:"1px solid rgba(255,255,255,.07)" }}>
-              <div style={{ padding:"14px 18px", background:"rgba(255,255,255,.04)", borderBottom:"1px solid rgba(255,255,255,.07)", display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:12, fontSize:11, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".07em" }}>
-                <span>Country</span><span>City</span><span>Visits</span><span>Unique</span>
+            <div className="crm-two" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 16 }}>
+              <div style={{ borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,.08)" }}>
+                <div className="crm-vis-head" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr .8fr .8fr", gap: 12, padding: "14px 18px", background: "rgba(255,255,255,.04)", borderBottom: "1px solid rgba(255,255,255,.08)", fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.38)", textTransform: "uppercase", letterSpacing: ".06em" }}>
+                  <span>Country</span><span>Top City</span><span>Visits</span><span>Unique</span>
+                </div>
+                {loading ? (
+                  <div style={{ padding: 34, textAlign: "center", color: "rgba(255,255,255,.3)" }}>Loading visitors...</div>
+                ) : visitorRows.length === 0 ? (
+                  <div style={{ padding: 34, textAlign: "center", color: "rgba(255,255,255,.3)" }}>No visitor data yet.</div>
+                ) : visitorRows.map((row, index) => (
+                  <div key={`${row.country}-${index}`} className="crm-vis-row" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr .8fr .8fr", gap: 12, padding: "12px 18px", borderBottom: "1px solid rgba(255,255,255,.05)", background: index % 2 === 1 ? "rgba(255,255,255,.012)" : "transparent" }}>
+                    <span style={{ color: "white", fontSize: 13, display: "flex", gap: 8, alignItems: "center" }}><span style={{ fontSize: 17 }}>{row.flag}</span>{row.countryName}</span>
+                    <span style={{ color: "rgba(255,255,255,.46)", fontSize: 12 }}>{row.topCity || "—"}</span>
+                    <span style={{ color: "#818cf8", fontSize: 13, fontWeight: 800 }}>{row.visitors}</span>
+                    <span style={{ color: "#34d399", fontSize: 13, fontWeight: 800 }}>{row.uniqueVisitors}</span>
+                  </div>
+                ))}
               </div>
-              {loading ? (
-                <div style={{ padding:32, textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>Loading…</div>
-              ) : visitorRows.length === 0 ? (
-                <div style={{ padding:32, textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No visitor data yet. Tracking starts on the next page view.</div>
-              ) : visitorRows.map((r, i) => (
-                <div key={i} style={{ padding:"12px 18px", display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:12, borderBottom:"1px solid rgba(255,255,255,.04)", background: i%2===0 ? "transparent" : "rgba(255,255,255,.01)" }}>
-                  <span style={{ fontSize:13, color:"white", display:"flex", alignItems:"center", gap:8 }}>
-                    <span style={{ fontSize:18 }}>{r.flag}</span> {r.countryName}
-                  </span>
-                  <span style={{ fontSize:12, color:"rgba(255,255,255,.45)" }}>{r.topCity || "—"}</span>
-                  <span style={{ fontSize:13, fontWeight:700, color:"#818cf8" }}>{r.visitors}</span>
-                  <span style={{ fontSize:13, fontWeight:700, color:"#34d399" }}>{r.uniqueVisitors}</span>
+              <div style={{ borderRadius: 16, padding: "16px 18px", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)" }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.42)", marginBottom: 12, textTransform: "uppercase", letterSpacing: ".06em" }}>Top Pages</div>
+                {(visitorStats?.topPages || []).slice(0, 8).map((page) => (
+                  <div key={page.page} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.56)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "75%" }}>{page.page}</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#818cf8" }}>{page.visits}</span>
+                  </div>
+                ))}
+                {!(visitorStats?.topPages || []).length ? <div style={{ color: "rgba(255,255,255,.3)", fontSize: 12 }}>Top pages will appear after traffic starts coming in.</div> : null}
+              </div>
+            </div>
+          </>
+        ) : null}
+
+        {tab === "leads" ? (
+          <>
+            <div className="crm-two" style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 18 }}>
+              {[
+                ["Total Leads", leadSummary.total, "#818cf8"],
+                ["High Priority", leadSummary.high, "#f87171"],
+                ["Converted", leadSummary.converted, "#34d399"],
+                ["Follow Ups", leadSummary.followUps, "#fbbf24"],
+              ].map(([label, value, color]) => (
+                <div key={String(label)} style={{ borderRadius: 16, padding: "16px 18px", background: "rgba(255,255,255,.04)", border: `1px solid ${color}22` }}>
+                  <div style={{ fontSize: 25, fontWeight: 900, color }}>{value}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", marginTop: 4 }}>{label}</div>
                 </div>
               ))}
             </div>
-          </>
-        )}
-
-        {/* ── LEADS TAB ── */}
-        {tab==="leads" && (
-          <>
-            {/* Filters */}
-            <div style={{ display:"flex", gap:8, marginBottom:18, flexWrap:"wrap" }}>
-              <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search name, email, company…"
-                style={{ flex:1, minWidth:200, padding:"8px 12px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, fontFamily:"inherit", outline:"none" }}/>
-              <select value={filterStatus} onChange={e=>setFilterStatus(e.target.value)} style={{ padding:"8px 12px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, fontFamily:"inherit", cursor:"pointer" }}>
+            <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, email, company, phone" style={{ flex: 1, minWidth: 220, padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }} />
+              <select value={status} onChange={(e) => setStatus(e.target.value)} style={{ padding: "9px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }}>
                 <option value="all">All Status</option>
-                {STATUS_LABELS.map(s => <option key={s} value={s}>{s}</option>)}
+                {STATUSES.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </div>
-
-            <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:14 }}>
-              <span style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>{filteredLeads.length} lead{filteredLeads.length!==1?"s":""}</span>
-            </div>
-
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))", gap:14 }}>
-              {filteredLeads.map(lead => (
-                <LeadCard key={lead.id} lead={lead} onUpdate={updateLead} onDelete={deleteLead} />
-              ))}
-              {filteredLeads.length === 0 && (
-                <div style={{ gridColumn:"1/-1", textAlign:"center", padding:48, color:"rgba(255,255,255,.25)", fontSize:14 }}>
-                  No leads found.
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(330px,1fr))", gap: 14 }}>
+              {leads.map((lead) => (
+                <div key={lead.id} style={{ borderRadius: 16, padding: "16px 18px", background: "rgba(255,255,255,.04)", border: `1px solid ${STATUS_BG[lead.status] || "rgba(255,255,255,.08)"}`, borderLeft: `3px solid ${STATUS_COLORS[lead.status] || "#818cf8"}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "white" }}>{lead.name}</div>
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.52)", marginTop: 3 }}>{lead.email}</div>
+                      {lead.company ? <div style={{ fontSize: 11, color: "rgba(255,255,255,.34)", marginTop: 4 }}>Company: {lead.company}</div> : null}
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 999, background: STATUS_BG[lead.status], color: STATUS_COLORS[lead.status], textTransform: "uppercase" }}>{lead.status}</span>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: PRIORITY_COLORS[lead.priority] || "#fbbf24" }}>{lead.priority}</span>
+                    </div>
+                  </div>
+                  {lead.message ? <div style={{ fontSize: 12, lineHeight: 1.6, color: "rgba(255,255,255,.45)", background: "rgba(255,255,255,.03)", borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>{lead.message}</div> : null}
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+                    {lead.source ? <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 8, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }}>{lead.source}</span> : null}
+                    {lead.country ? <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 8, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }}>{lead.country}</span> : null}
+                    {lead.assignedTo ? <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 8, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.45)" }}>Assigned: {lead.assignedTo}</span> : null}
+                    {lead.followUpAt ? <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 8, background: "rgba(251,191,36,.08)", color: "#fbbf24" }}>Follow up: {fmtDate(lead.followUpAt)}</span> : null}
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+                    {STATUSES.map((item) => (
+                      <button key={item} type="button" onClick={() => patchLead(lead.id, { status: item })} style={{ fontSize: 10, fontWeight: lead.status === item ? 800 : 600, padding: "4px 8px", borderRadius: 8, border: "none", cursor: "pointer", background: lead.status === item ? STATUS_BG[item] : "rgba(255,255,255,.05)", color: lead.status === item ? STATUS_COLORS[item] : "rgba(255,255,255,.34)", textTransform: "capitalize" }}>
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                  <textarea defaultValue={lead.notes || ""} placeholder="Notes..." onBlur={(e) => patchLead(lead.id, { notes: e.currentTarget.value })} style={{ width: "100%", minHeight: 70, padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", resize: "vertical", marginBottom: 10 }} />
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>{fmtDate(lead.createdAt)}</span>
+                    <button type="button" onClick={() => removeLead(lead.id)} style={{ padding: "5px 10px", borderRadius: 8, border: "1px solid rgba(248,113,113,.25)", background: "rgba(248,113,113,.08)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              )}
+              ))}
+              {!loading && leads.length === 0 ? <div style={{ gridColumn: "1/-1", padding: 48, textAlign: "center", color: "rgba(255,255,255,.3)" }}>No leads found for this filter.</div> : null}
             </div>
           </>
-        )}
+        ) : null}
 
-        {/* ── PIPELINE TAB ── */}
-        {tab==="pipeline" && (
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(6,1fr)", gap:12, alignItems:"start", overflowX:"auto" }}>
-            {STATUS_LABELS.map(s => (
-              <div key={s} style={{ minWidth:180 }}>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10, padding:"6px 10px", borderRadius:8, background:STATUS_COLORS[s] }}>
-                  <span style={{ fontSize:11, fontWeight:800, color:STATUS_TEXT[s], textTransform:"uppercase", letterSpacing:".07em" }}>{s}</span>
-                  <span style={{ fontSize:11, fontWeight:700, color:STATUS_TEXT[s], background:"rgba(0,0,0,.2)", borderRadius:10, padding:"1px 7px" }}>{pipeline[s].length}</span>
+        {tab === "pipeline" ? (
+          <div className="crm-pipeline" style={{ display: "grid", gridTemplateColumns: "repeat(6,minmax(190px,1fr))", gap: 12, alignItems: "start" }}>
+            {STATUSES.map((item) => (
+              <div key={item} style={{ minWidth: 190 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", borderRadius: 10, background: STATUS_BG[item], marginBottom: 10 }}>
+                  <span style={{ fontSize: 11, fontWeight: 900, color: STATUS_COLORS[item], textTransform: "uppercase" }}>{item}</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: STATUS_COLORS[item] }}>{pipeline[item].length}</span>
                 </div>
-                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                  {pipeline[s].map(lead => (
-                    <div key={lead.id} style={{ borderRadius:10, padding:"10px 12px", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", cursor:"pointer" }}
-                      onClick={()=>{ setTab("leads"); setSearch(lead.email); }}>
-                      <div style={{ fontSize:12, fontWeight:700, color:"white", marginBottom:2 }}>{lead.name}</div>
-                      <div style={{ fontSize:11, color:"rgba(255,255,255,.4)" }}>{lead.company || lead.email}</div>
-                      {lead.source && <div style={{ fontSize:10, color:"rgba(255,255,255,.25)", marginTop:4 }}>📌 {lead.source}</div>}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {pipeline[item].map((lead) => (
+                    <div key={lead.id} onClick={() => { setTab("leads"); setSearch(lead.email); }} style={{ borderRadius: 12, padding: "10px 12px", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", cursor: "pointer" }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: "white" }}>{lead.name}</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: 2 }}>{lead.company || lead.email}</div>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginTop: 8 }}>
+                        <span style={{ fontSize: 10, color: PRIORITY_COLORS[lead.priority] || "#fbbf24", fontWeight: 800 }}>{lead.priority}</span>
+                        <span style={{ fontSize: 10, color: "rgba(255,255,255,.28)" }}>{lead.source || "lead"}</span>
+                      </div>
                     </div>
                   ))}
-                  {pipeline[s].length === 0 && (
-                    <div style={{ textAlign:"center", padding:"16px 0", fontSize:11, color:"rgba(255,255,255,.2)" }}>Empty</div>
-                  )}
+                  {!pipeline[item].length ? <div style={{ textAlign: "center", padding: "16px 0", fontSize: 11, color: "rgba(255,255,255,.22)" }}>Empty</div> : null}
                 </div>
               </div>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
 
-      {/* Add Lead Modal */}
-      {showForm && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.7)", backdropFilter:"blur(6px)", zIndex:9999, display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
-          <div style={{ width:"100%", maxWidth:460, borderRadius:20, background:"#0e1132", border:"1px solid rgba(255,255,255,.1)", padding:"28px 28px" }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
-              <h2 style={{ fontSize:16, fontWeight:800, color:"white", margin:0 }}>Add New Lead</h2>
-              <button type="button" onClick={()=>setShowForm(false)} style={{ background:"none", border:"none", color:"rgba(255,255,255,.4)", fontSize:20, cursor:"pointer" }}>×</button>
+      {showForm ? (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, zIndex: 1000 }}>
+          <div style={{ width: "100%", maxWidth: 520, borderRadius: 20, background: "#0e1132", border: "1px solid rgba(255,255,255,.1)", padding: "28px 28px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900 }}>Add Lead</h2>
+              <button type="button" onClick={() => setShowForm(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.45)", fontSize: 22, cursor: "pointer" }}>×</button>
             </div>
-            <form onSubmit={createLead} style={{ display:"flex", flexDirection:"column", gap:12 }}>
+            <form onSubmit={createLead} style={{ display: "grid", gap: 12 }}>
               {[
-                { k:"name",    label:"Name *",    placeholder:"Full name"    },
-                { k:"email",   label:"Email *",   placeholder:"email@co.com" },
-                { k:"phone",   label:"Phone",     placeholder:"+92 …"        },
-                { k:"company", label:"Company",   placeholder:"Company name" },
-              ].map(f => (
-                <div key={f.k}>
-                  <label style={{ fontSize:11, color:"rgba(255,255,255,.4)", fontWeight:600, display:"block", marginBottom:5 }}>{f.label}</label>
-                  <input value={(form as any)[f.k]} onChange={e=>setForm(p=>({...p,[f.k]:e.target.value}))} placeholder={f.placeholder}
-                    style={{ width:"100%", padding:"9px 12px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:13, fontFamily:"inherit", outline:"none" }}/>
+                ["name", "Name *", "Full name"],
+                ["email", "Email *", "lead@company.com"],
+                ["phone", "Phone", "+92 ..."],
+                ["company", "Company", "Company name"],
+                ["assignedTo", "Assigned To", "Owner or rep"],
+                ["country", "Country", "Country"],
+              ].map(([key, label, placeholder]) => (
+                <div key={key}>
+                  <label style={{ fontSize: 11, color: "rgba(255,255,255,.42)", fontWeight: 700, display: "block", marginBottom: 5 }}>{label}</label>
+                  <input value={(form as any)[key]} onChange={(e) => setForm((current) => ({ ...current, [key]: e.target.value }))} placeholder={placeholder} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }} />
                 </div>
               ))}
               <div>
-                <label style={{ fontSize:11, color:"rgba(255,255,255,.4)", fontWeight:600, display:"block", marginBottom:5 }}>Message</label>
-                <textarea value={form.message} onChange={e=>setForm(p=>({...p,message:e.target.value}))} rows={2} placeholder="What they need…"
-                  style={{ width:"100%", padding:"9px 12px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:13, fontFamily:"inherit", outline:"none", resize:"vertical" }}/>
+                <label style={{ fontSize: 11, color: "rgba(255,255,255,.42)", fontWeight: 700, display: "block", marginBottom: 5 }}>Message</label>
+                <textarea value={form.message} onChange={(e) => setForm((current) => ({ ...current, message: e.target.value }))} rows={3} placeholder="What they need" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", resize: "vertical" }} />
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+              <div className="crm-two" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={{ fontSize:11, color:"rgba(255,255,255,.4)", fontWeight:600, display:"block", marginBottom:5 }}>Source</label>
-                  <select value={form.source} onChange={e=>setForm(p=>({...p,source:e.target.value}))} style={{ width:"100%", padding:"9px 12px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, fontFamily:"inherit", cursor:"pointer" }}>
-                    {["manual","contact-form","demo-request","visitor","newsletter","referral","linkedin","cold-call"].map(s => <option key={s} value={s}>{s}</option>)}
+                  <label style={{ fontSize: 11, color: "rgba(255,255,255,.42)", fontWeight: 700, display: "block", marginBottom: 5 }}>Source</label>
+                  <select value={form.source} onChange={(e) => setForm((current) => ({ ...current, source: e.target.value }))} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }}>
+                    {["manual", "contact-form", "demo-request", "visitor", "newsletter", "referral", "linkedin", "cold-call"].map((item) => <option key={item} value={item}>{item}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize:11, color:"rgba(255,255,255,.4)", fontWeight:600, display:"block", marginBottom:5 }}>Priority</label>
-                  <select value={form.priority} onChange={e=>setForm(p=>({...p,priority:e.target.value}))} style={{ width:"100%", padding:"9px 12px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, fontFamily:"inherit", cursor:"pointer" }}>
-                    {["low","medium","high"].map(p => <option key={p} value={p}>{p}</option>)}
+                  <label style={{ fontSize: 11, color: "rgba(255,255,255,.42)", fontWeight: 700, display: "block", marginBottom: 5 }}>Priority</label>
+                  <select value={form.priority} onChange={(e) => setForm((current) => ({ ...current, priority: e.target.value }))} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }}>
+                    {["low", "medium", "high"].map((item) => <option key={item} value={item}>{item}</option>)}
                   </select>
                 </div>
               </div>
-              <button type="submit" disabled={formSaving || !form.name || !form.email}
-                style={{ marginTop:4, padding:"11px", borderRadius:10, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity: (!form.name||!form.email) ? .5 : 1 }}>
-                {formSaving ? "Saving…" : "Create Lead"}
+              <div>
+                <label style={{ fontSize: 11, color: "rgba(255,255,255,.42)", fontWeight: 700, display: "block", marginBottom: 5 }}>Follow Up Date</label>
+                <input type="date" value={form.followUpAt} onChange={(e) => setForm((current) => ({ ...current, followUpAt: e.target.value }))} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white" }} />
+              </div>
+              <button type="submit" disabled={saving || !form.name.trim() || !form.email.trim()} style={{ padding: "11px 14px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: 13, fontWeight: 800, cursor: "pointer", opacity: saving || !form.name.trim() || !form.email.trim() ? 0.55 : 1 }}>
+                {saving ? "Saving..." : "Create Lead"}
               </button>
             </form>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
