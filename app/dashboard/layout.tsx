@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { getCurrentUser, updateStoredUser } from "@/lib/auth";
+import { getCurrentUser, setCurrentUser as storeUser, updateStoredUser } from "@/lib/auth";
 import { logout } from "@/lib/logout";
 import { hasPermission as baseHasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -254,9 +254,23 @@ export default function DashboardLayout({
     customActiveModules.has(String(moduleId || "").trim().toLowerCase().replace(/-/g, "_"));
 
   useEffect(() => {
-    const u = getCurrentUser() as CurrentUser;
-
     const loadFreshPermissions = async () => {
+      let u = getCurrentUser() as CurrentUser;
+
+      // If localStorage is empty but cookie exists, fetch user from server
+      if (!u) {
+        try {
+          const res = await fetch("/api/me", { cache: "no-store" });
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.user) {
+              storeUser(data.user);
+              u = data.user as CurrentUser;
+            }
+          }
+        } catch {}
+      }
+
       if (!u) {
         setCurrentUser(null);
         setReady(true);
