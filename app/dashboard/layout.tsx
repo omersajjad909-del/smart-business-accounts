@@ -1704,8 +1704,8 @@ export default function DashboardLayout({
             <WhatsNew />
             <ModeToggle />
 
-            {/* Subscription badge */}
-            {subInfo && (
+            {/* Subscription badge — only for ADMIN */}
+            {subInfo && currentUser?.role === "ADMIN" && (
               <div style={{
                 fontSize:11,padding:"4px 10px",borderRadius:6,fontWeight:600,
                 border: subInfo.status === "ACTIVE" ? "1px solid rgba(52,211,153,0.3)" : "1px solid rgba(248,113,113,0.3)",
