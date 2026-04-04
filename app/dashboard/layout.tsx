@@ -586,7 +586,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div style={{display:"flex",minHeight:"100vh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
+    <div className="dashboard-root dark" style={{display:"flex",minHeight:"100vh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
 
       {/* MOBILE OVERLAY */}
       {isMobileMenuOpen && (
