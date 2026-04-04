@@ -7273,6 +7273,77 @@ export default function AdminPanel() {
               </div>
             );
           })}
+
+          <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.05)" }}>
+            {!collapsed && (
+              <div style={{ padding:"10px 10px 6px", fontSize:9, fontWeight:800, color:"rgba(255,255,255,.18)", letterSpacing:".12em", textTransform:"uppercase", userSelect:"none" }}>
+                CRM
+              </div>
+            )}
+            <button
+              className="nav-btn"
+              onClick={() => {
+                window.location.href = "/admin/crm";
+              }}
+              title={collapsed ? "CRM Workspace" : undefined}
+              style={{
+                display:"flex",
+                alignItems:"center",
+                gap:10,
+                padding: collapsed ? "9px 0" : "8px 10px",
+                justifyContent: collapsed ? "center" : "flex-start",
+                borderRadius:9,
+                border:"none",
+                cursor:"pointer",
+                fontFamily:"inherit",
+                width:"100%",
+                position:"relative",
+                marginBottom:1,
+                background:"linear-gradient(90deg, rgba(34,211,238,.12) 0%, rgba(99,102,241,.08) 100%)",
+                outline:"1px solid rgba(34,211,238,.18)",
+              }}
+            >
+              <div style={{
+                width:28,
+                height:28,
+                borderRadius:8,
+                flexShrink:0,
+                display:"flex",
+                alignItems:"center",
+                justifyContent:"center",
+                background:"rgba(34,211,238,.12)",
+                border:"1px solid rgba(34,211,238,.18)",
+              }}>
+                <span style={{ color:"#22d3ee", display:"flex", alignItems:"center" }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 20v-6"/>
+                    <path d="M6 20v-3"/>
+                    <path d="M18 20v-9"/>
+                    <path d="M4 10l5-5 4 4 7-7"/>
+                  </svg>
+                </span>
+              </div>
+              {!collapsed && (
+                <>
+                  <span style={{
+                    fontSize:12.5,
+                    fontWeight:700,
+                    color:"#67e8f9",
+                    flex:1,
+                    textAlign:"left",
+                    whiteSpace:"nowrap",
+                    overflow:"hidden",
+                    textOverflow:"ellipsis",
+                  }}>
+                    CRM Workspace
+                  </span>
+                  <span style={{ fontSize:9,fontWeight:800,padding:"1px 6px",borderRadius:8,background:"rgba(34,211,238,.12)",color:"#22d3ee",border:"1px solid rgba(34,211,238,.18)" }}>
+                    NEW
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
         </nav>
 
         {/* ── Bottom: User + Collapse ── */}
