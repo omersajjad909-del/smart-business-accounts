@@ -56,9 +56,17 @@ export async function POST(req: NextRequest) {
     try {
       await prisma.userCompany.upsert({
         where: { userId_companyId: { userId, companyId } } as any,
-        update: { isDefault: false },
-        create: { userId, companyId, isDefault: false },
+        update: { isDefault: true },
+        create: { userId, companyId, isDefault: true },
       } as any);
+    } catch {}
+
+    // Set defaultCompanyId so login doesn't fail with "Company context required"
+    try {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { defaultCompanyId: companyId } as any,
+      });
     } catch {}
 
     try {

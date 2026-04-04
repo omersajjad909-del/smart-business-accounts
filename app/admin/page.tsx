@@ -7237,9 +7237,13 @@ export default function AdminPanel() {
                         border: active ? `1px solid ${item.color}30` : "1px solid rgba(255,255,255,.05)",
                         transition:"all .15s",
                       }}>
-                        <svg width="13" height="13" viewBox="0 0 10 10" fill={active ? item.color : "rgba(255,255,255,.4)"}>
-                          <rect x="1" y="1" width="8" height="8" rx="1.5"/>
-                        </svg>
+                        <span style={{ color: active ? item.color : "rgba(255,255,255,.4)", display:"flex", alignItems:"center" }}>
+                          {NAV_ICONS[item.page] ?? (
+                            <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor">
+                              <rect x="1" y="1" width="8" height="8" rx="1.5"/>
+                            </svg>
+                          )}
+                        </span>
                       </div>
                       {/* Label */}
                       {!collapsed && (
