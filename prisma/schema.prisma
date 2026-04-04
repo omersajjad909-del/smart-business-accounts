@@ -1669,20 +1669,58 @@ model Testimonial {
   updatedAt DateTime @updatedAt
 }
 
+// ─── Website Visitor Tracking ────────────────────────────────────────────────
+
+model SiteVisit {
+  id          String   @id @default(cuid())
+  sessionId   String   // anonymous browser session ID
+  page        String
+  referrer    String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  country     String?
+  countryName String?
+  city        String?
+  flag        String?
+  device      String?  // mobile | desktop | tablet
+  browser     String?
+  os          String?
+  ip          String?
+  lat         Float?
+  lon         Float?
+  duration    Int?     // seconds on page
+  visitedAt   DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([visitedAt])
+  @@index([country])
+  @@index([page])
+}
+
 // ─── Leads ────────────────────────────────────────────────────────────────────
 
 model Lead {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  phone     String?
-  company   String?
-  message   String?
-  source    String?
-  status    String   @default("new")
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  message     String?
+  source      String?   // contact-form | demo-request | manual | visitor | newsletter
+  status      String    @default("new") // new | contacted | demo | proposal | converted | lost
+  priority    String    @default("medium") // low | medium | high
+  notes       String?   @db.Text
+  followUpAt  DateTime?
+  assignedTo  String?   // user name or email
+  country     String?
+  sessionId   String?   // link to SiteVisit sessions
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
 }
 
 

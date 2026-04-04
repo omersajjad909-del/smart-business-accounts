@@ -3,6 +3,8 @@ import Navbar from "./landing/components/navbar";
 import Offer from "./landing/components/Offer";
 import Footer from "./landing/components/Footer";
 import ChatWidget from "./landing/components/ChatWidget";
+import { Suspense } from "react";
+import VisitorTracker from "./landing/components/VisitorTracker";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
@@ -51,6 +53,7 @@ export default function MarketingLayout({
       <main className="grow overflow-x-hidden">{children}</main>
       <Footer />
       <ChatWidget />
+      <Suspense fallback={null}><VisitorTracker /></Suspense>
     </div>
   );
 }
