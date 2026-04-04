@@ -222,7 +222,7 @@ export default function AdminControlPage() {
       <ResponsiveContainer className="py-8">
         <Card>
           <h1 className="text-xl font-semibold text-[var(--text-primary)]">Admin access required</h1>
-          <p className="mt-2 text-sm text-[var(--text-muted)]">Yeh page sirf account owner/admin ke liye hai.</p>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">This page is only accessible to account owners and admins.</p>
         </Card>
       </ResponsiveContainer>
     );
@@ -230,7 +230,7 @@ export default function AdminControlPage() {
 
   return (
     <ResponsiveContainer className="space-y-6 py-6">
-      <PageHeader title="Admin Control Center" description="Branches, team access, permissions, branding aur print formats ek jagah se manage karein." />
+      <PageHeader title="Admin Control Center" description="Manage branches, team access, permissions, branding and print formats — all in one place." />
 
       {message && (
         <div className={`rounded-lg border px-4 py-3 text-sm ${message.ok ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-red-500/30 bg-red-500/10 text-red-300"}`}>
@@ -254,7 +254,7 @@ export default function AdminControlPage() {
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-[var(--text-primary)]">Company & Print Control</h2>
-                  <p className="text-sm text-[var(--text-muted)]">Logo, branding text, invoice/receipt format aur output defaults yahan set karein.</p>
+                  <p className="text-sm text-[var(--text-muted)]">Set your logo, branding text, invoice/receipt format and default output options.</p>
                 </div>
                 <Button onClick={saveCompanyAndPrint} disabled={saving}>{saving ? "Saving..." : "Save Settings"}</Button>
               </div>
@@ -292,7 +292,7 @@ export default function AdminControlPage() {
               </div>
 
               <div className="mt-5 grid gap-4 md:grid-cols-2">
-                <FormField label="Header Note"><Input value={settings.printPreferences.headerNote} onChange={(e) => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, headerNote: e.target.value } }))} placeholder="Invoice ke top par short note" /></FormField>
+                <FormField label="Header Note"><Input value={settings.printPreferences.headerNote} onChange={(e) => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, headerNote: e.target.value } }))} placeholder="Short note shown at the top of invoices" /></FormField>
                 <FormField label="Footer Note"><Input value={settings.printPreferences.footerNote} onChange={(e) => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, footerNote: e.target.value } }))} placeholder="Thanks note / bank details" /></FormField>
               </div>
             </Card>
@@ -300,14 +300,14 @@ export default function AdminControlPage() {
             <Card>
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-[var(--text-primary)]">Quick Access</h2>
-                <p className="text-sm text-[var(--text-muted)]">Deep settings aur existing modules tak jaldi pohanchne ke liye.</p>
+                <p className="text-sm text-[var(--text-muted)]">Quick links to deep settings and existing modules.</p>
               </div>
               <div className="space-y-3">
                 {[
-                  { href: "/dashboard/users", label: "Users & Invitations", desc: "Naye users banayein aur team ko onboard karein." },
-                  { href: "/dashboard/roles-permissions", label: "Detailed Roles Screen", desc: "Granular role management agar alag page par chahiye ho." },
-                  { href: "/dashboard/company-profile", label: "Company Profile", desc: "Subscription aur company summary dekhein." },
-                  { href: "/dashboard/business-settings", label: "Business Type", desc: "Industry-specific modules switch karein." },
+                  { href: "/dashboard/users", label: "Users & Invitations", desc: "Add new users and onboard your team." },
+                  { href: "/dashboard/roles-permissions", label: "Detailed Roles Screen", desc: "Granular role and permission management." },
+                  { href: "/dashboard/company-profile", label: "Company Profile", desc: "View subscription and company summary." },
+                  { href: "/dashboard/business-settings", label: "Business Type", desc: "Switch industry-specific modules on or off." },
                 ].map((item) => (
                   <Link key={item.href} href={item.href} className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg-2)] px-4 py-3 no-underline transition hover:border-[var(--accent)]">
                     <div className="text-sm font-semibold text-[var(--text-primary)]">{item.label}</div>
@@ -322,7 +322,7 @@ export default function AdminControlPage() {
             <Card>
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-[var(--text-primary)]">Branches</h2>
-                <p className="text-sm text-[var(--text-muted)]">Head office, outlets, warehouses ya city branches yahan se manage karein.</p>
+                <p className="text-sm text-[var(--text-muted)]">Manage head office, outlets, warehouses and city branches.</p>
               </div>
 
               <ResponsiveForm onSubmit={saveBranch}>
@@ -358,7 +358,7 @@ export default function AdminControlPage() {
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-[var(--text-primary)]">Branch Users & Access</h2>
-                  <p className="text-sm text-[var(--text-muted)]">Har user ko allowed branches assign karein. Admin ko sab branches ka access rehne dein.</p>
+                  <p className="text-sm text-[var(--text-muted)]">Assign allowed branches to each user. Admin always has access to all branches.</p>
                 </div>
                 <Button onClick={saveBranchAssignments}>Save Access</Button>
               </div>

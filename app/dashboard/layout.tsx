@@ -534,7 +534,13 @@ export default function DashboardLayout({
     if (!currentUser?.companyId) return;
     (async () => {
       try {
-        const res = await fetch("/api/branches");
+        const res = await fetch("/api/branches", {
+          headers: {
+            "x-user-id": currentUser.id || "",
+            "x-user-role": currentUser.role || "",
+            "x-company-id": currentUser.companyId || "",
+          },
+        });
         const data = await res.json();
         const list: Branch[] = Array.isArray(data) ? data : [];
         const scoped = allowedBranchIds?.length ? list.filter((b) => allowedBranchIds.includes(b.id)) : list;

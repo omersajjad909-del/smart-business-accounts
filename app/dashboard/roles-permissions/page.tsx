@@ -4,245 +4,173 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
 
-interface Role {
-  role: string;
-  permissions: string[];
-}
+const ALL_ROLES = [
+  { value: "ADMIN",              label: "Admin" },
+  { value: "MANAGER",            label: "Manager" },
+  { value: "ACCOUNTANT",         label: "Accountant" },
+  { value: "HR_MANAGER",         label: "HR Manager" },
+  { value: "SALES",              label: "Sales Executive" },
+  { value: "INVENTORY_MANAGER",  label: "Inventory Manager" },
+  { value: "CASHIER",            label: "Cashier" },
+  { value: "AUDITOR",            label: "Auditor" },
+  { value: "SECURITY",           label: "Security / Gate" },
+  { value: "VIEWER",             label: "Viewer (Read Only)" },
+];
 
-type CurrentUser = {
-  id: string;
-  role: string;
-  name?: string;
-  email?: string;
-};
+interface Role { role: string; permissions: string[]; }
+type CurrentUser = { id: string; role: string; name?: string; email?: string; };
 
 export default function RolePermissionManager() {
-  const [user, setUser] = useState<CurrentUser | null>(null);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [selectedRole, setSelectedRole] = useState<string>("ADMIN");
+  const [user, setUser]                     = useState<CurrentUser | null>(null);
+  const [roles, setRoles]                   = useState<Role[]>([]);
+  const [selectedRole, setSelectedRole]     = useState<string>("ADMIN");
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [loading, setLoading]               = useState(false);
+  const [saving, setSaving]                 = useState(false);
+  const [msg, setMsg]                       = useState("");
 
-  // Available permissions from lib/permissions.ts
   const availablePermissions = Object.values(PERMISSIONS);
 
-  // Load current user and roles
   useEffect(() => {
     const u = getCurrentUser();
     setUser(u);
-    if (u && u.role === "ADMIN") {
-      loadRoles(u);
-    }
+    if (u?.role === "ADMIN") loadRoles(u);
   }, []);
 
-  // When roles load, update selected role permissions
   useEffect(() => {
-    if (roles && roles.length > 0) {
-      const selectedRoleData = roles.find(r => r.role === selectedRole);
-      if (selectedRoleData) {
-        console.log(`Setting permissions for ${selectedRole}:`, selectedRoleData.permissions);
-        setRolePermissions(selectedRoleData.permissions || []);
-      }
-    }
+    const found = roles.find(r => r.role === selectedRole);
+    setRolePermissions(found?.permissions || []);
   }, [roles, selectedRole]);
 
-  const loadRoles = async (u: CurrentUser) => {
+  async function loadRoles(u: CurrentUser) {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/roles", {
-        headers: {
-          "x-user-id": u.id,
-          "x-user-role": u.role,
-        },
+        headers: { "x-user-id": u.id, "x-user-role": u.role },
       });
       const data = await res.json();
-      console.log("Loaded roles:", data);
-      
       const list: Role[] = Array.isArray(data) ? data : (Array.isArray(data?.roles) ? data.roles : []);
       setRoles(list);
-      
-      // Set initial role permissions
-      if (Array.isArray(list) && list.length > 0) {
-        const adminRole = list.find((r: Role) => r.role === "ADMIN");
-        if (adminRole) {
-          setRolePermissions(adminRole.permissions || []);
-        }
-      }
-    } catch (error) {
-      console.error("Error loading roles:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const selectRole = (roleName: string) => {
-    setSelectedRole(roleName);
-    console.log(`Selected role: ${roleName}, All roles:`, roles);
-    
-    const role = roles.find(r => r.role === roleName);
-    console.log(`Found role:`, role);
-    
-    if (role) {
-      setRolePermissions(role.permissions || []);
-    } else {
-      setRolePermissions([]);
-    }
-  };
-
-  const toggle = (perm: string) => {
-    setRolePermissions(prev =>
-      prev.includes(perm)
-        ? prev.filter(p => p !== perm)
-        : [...prev, perm]
-    );
-  };
-
-  const save = async () => {
-    if (!user || user.role !== "ADMIN") {
-      alert("Only ADMIN can save permissions");
-      return;
-    }
-
+  async function save() {
+    if (!user || user.role !== "ADMIN") return;
     setSaving(true);
     try {
       const res = await fetch("/api/admin/roles", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": user.id,
-          "x-user-role": user.role,
-        },
-        body: JSON.stringify({
-          role: selectedRole,
-          permissions: rolePermissions,
-        }),
+        headers: { "Content-Type": "application/json", "x-user-id": user.id, "x-user-role": user.role },
+        body: JSON.stringify({ role: selectedRole, permissions: rolePermissions }),
       });
-
       if (res.ok) {
-        alert(`✅ ${selectedRole} role permissions saved successfully!`);
+        setMsg("Saved successfully!");
         loadRoles(user);
       } else {
-        alert("Failed to save permissions");
+        setMsg("Failed to save.");
       }
-    } catch (error) {
-      console.error("Error saving permissions:", error);
-      alert("Error saving permissions");
     } finally {
       setSaving(false);
+      setTimeout(() => setMsg(""), 2500);
     }
+  }
+
+  /* ── styles ── */
+  const s = {
+    page:    { padding: "24px", maxWidth: 1100, margin: "0 auto", fontFamily: "inherit" },
+    heading: { fontSize: 22, fontWeight: 800, color: "white", marginBottom: 4 },
+    sub:     { fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 },
+    grid:    { display: "grid", gridTemplateColumns: "220px 1fr", gap: 16 } as React.CSSProperties,
+    panel:   { borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" },
+    roleBtn: (active: boolean): React.CSSProperties => ({
+      display: "block", width: "100%", textAlign: "left", padding: "10px 12px",
+      borderRadius: 8, border: "none", cursor: "pointer", marginBottom: 4,
+      background: active ? "rgba(99,102,241,0.2)" : "rgba(255,255,255,0.03)",
+      borderLeft: active ? "3px solid #6366f1" : "3px solid transparent",
+      color: active ? "#a5b4fc" : "rgba(255,255,255,0.55)",
+      fontFamily: "inherit",
+    }),
+    permBox: (checked: boolean): React.CSSProperties => ({
+      display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
+      borderRadius: 8, cursor: "pointer",
+      background: checked ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.03)",
+      border: checked ? "1px solid rgba(99,102,241,0.35)" : "1px solid rgba(255,255,255,0.07)",
+    }),
   };
 
-  // Guard - Check authorization
-  if (!user) {
-    return (
-      <div className="p-6">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-          <p className="text-yellow-700">Loading session...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (user.role !== "ADMIN") {
-    return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <h2 className="text-xl font-bold text-red-600 mb-2">❌ رسائی مسترد</h2>
-          <p className="text-red-700">صرف ADMIN صارفین رولز کو سنبھال سکتے ہیں</p>
-        </div>
-      </div>
-    );
-  }
+  if (!user) return <div style={{ color: "rgba(255,255,255,0.4)", padding: 32 }}>Loading…</div>;
+  if (user.role !== "ADMIN") return (
+    <div style={{ padding: 32, color: "#f87171" }}>Only ADMIN can manage roles.</div>
+  );
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">🎭 Roles & Permissions</h1>
-        <p className="text-gray-600">Configure which permissions each role has</p>
-      </div>
+    <div style={s.page}>
+      <div style={s.heading}>🎭 Roles &amp; Permissions</div>
+      <div style={s.sub}>Configure which permissions each role has</div>
 
       {loading ? (
-        <div className="text-center py-8">Loading roles...</div>
+        <div style={{ color: "rgba(255,255,255,0.4)" }}>Loading roles…</div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Role Selector */}
-          <div className="bg-white border rounded-lg p-4">
-            <h2 className="font-bold text-lg mb-4">Roles</h2>
-            <div className="space-y-2">
-              {["ADMIN", "ACCOUNTANT", "VIEWER"].map(roleName => {
-                const roleData = roles.find(r => r.role === roleName);
-                const permCount = roleData?.permissions?.length || 0;
-                
+        <div style={s.grid}>
+          {/* Role list */}
+          <div style={s.panel}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 10 }}>Roles</div>
+            {ALL_ROLES.map(({ value, label }) => {
+              const found = roles.find(r => r.role === value);
+              const count = found?.permissions?.length || 0;
+              return (
+                <button key={value} style={s.roleBtn(selectedRole === value)} onClick={() => setSelectedRole(value)}>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{label}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 2 }}>{count} permissions</div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Permissions */}
+          <div style={s.panel}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "white" }}>
+                  {ALL_ROLES.find(r => r.value === selectedRole)?.label || selectedRole}
+                </div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>Select which permissions this role should have</div>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setRolePermissions([...availablePermissions])}
+                  style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(99,102,241,0.4)", background: "rgba(99,102,241,0.1)", color: "#a5b4fc", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+                  ✓ Select All
+                </button>
+                <button onClick={() => setRolePermissions([])}
+                  style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+                  ✗ Clear All
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
+              {availablePermissions.map(p => {
+                const checked = rolePermissions.includes(p);
                 return (
-                  <button
-                    key={roleName}
-                    onClick={() => selectRole(roleName)}
-                    className={`w-full text-left px-4 py-3 rounded transition ${
-                      selectedRole === roleName
-                        ? "bg-blue-100 border-l-4 border-blue-600 font-semibold"
-                        : "bg-gray-50 hover:bg-gray-100"
-                    }`}
-                  >
-                    <div className="font-semibold">{roleName}</div>
-                    <div className="text-xs text-gray-600">
-                      {permCount} permissions
-                    </div>
-                  </button>
+                  <label key={p} style={s.permBox(checked)}>
+                    <input type="checkbox" checked={checked} onChange={() =>
+                      setRolePermissions(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p])
+                    } style={{ accentColor: "#6366f1", width: 15, height: 15 }} />
+                    <span style={{ fontSize: 12, fontWeight: 500, color: checked ? "#c7d2fe" : "rgba(255,255,255,0.55)" }}>{p}</span>
+                  </label>
                 );
               })}
             </div>
-          </div>
 
-          {/* Permissions Manager */}
-          <div className="lg:col-span-3 bg-white border rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-2">{selectedRole}</h2>
-            <p className="text-gray-600 mb-6">
-              Select which permissions this role should have
-            </p>
-
-            {/* Quick Actions */}
-            <div className="flex gap-2 mb-6">
-              <button
-                onClick={() => setRolePermissions([...availablePermissions])}
-                className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
-              >
-                ✓ Select All
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <button onClick={save} disabled={saving}
+                style={{ padding: "10px 24px", borderRadius: 9, border: "none", background: saving ? "rgba(99,102,241,0.4)" : "linear-gradient(135deg,#4f46e5,#6366f1)", color: "white", fontWeight: 700, fontSize: 13, cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit" }}>
+                {saving ? "Saving…" : "💾 Save Permissions"}
               </button>
-              <button
-                onClick={() => setRolePermissions([])}
-                className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
-              >
-                ✗ Clear All
-              </button>
+              {msg && <span style={{ fontSize: 13, color: msg.includes("success") ? "#34d399" : "#f87171" }}>{msg}</span>}
             </div>
-
-            {/* Permissions Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {availablePermissions.map(p => (
-                <label
-                  key={p}
-                  className="flex items-center cursor-pointer p-3 rounded border hover:bg-blue-50"
-                >
-                  <input
-                    type="checkbox"
-                    checked={rolePermissions.includes(p)}
-                    onChange={() => toggle(p)}
-                    className="w-4 h-4 rounded"
-                  />
-                  <span className="ml-3 text-sm font-medium">{p}</span>
-                </label>
-              ))}
-            </div>
-
-            {/* Save Button */}
-            <button
-              onClick={save}
-              disabled={saving}
-              className="px-6 py-2 bg-green-600 text-white rounded font-semibold hover:bg-green-700 disabled:opacity-50"
-            >
-              {saving ? "Saving..." : "💾 Save Permissions"}
-            </button>
           </div>
         </div>
       )}

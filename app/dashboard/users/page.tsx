@@ -476,7 +476,7 @@ export default function UsersMasterPage() {
                     </label>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Admin user ke liye full access dena ho to saari branches select rakhein.</p>
+                <p className="text-xs text-gray-500 mt-2">For Admin users, select all branches to grant full access.</p>
               </div>
 
               <div className="flex gap-2 mb-4">
