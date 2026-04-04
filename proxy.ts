@@ -16,8 +16,14 @@ export function proxy(req: NextRequest) {
   if (token) {
     decoded = verifyJwt(token);
     if (decoded) {
-      headers.set("x-user-id", String(decoded.id));
-      headers.set("x-user-role", String(decoded.role).toUpperCase());
+      const resolvedUserId = decoded.userId || decoded.id || "";
+      const resolvedRole = decoded.role ? String(decoded.role).toUpperCase() : "";
+      if (resolvedUserId) {
+        headers.set("x-user-id", String(resolvedUserId));
+      }
+      if (resolvedRole) {
+        headers.set("x-user-role", resolvedRole);
+      }
       if (decoded.name) headers.set("x-user-name", String(decoded.name));
       
       const companyId = decoded.companyId || decoded.defaultCompanyId || "system";
