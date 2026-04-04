@@ -117,8 +117,8 @@ export async function POST(req: NextRequest) {
 
     const html = `
       <div style="font-family:Arial,sans-serif;color:#111827;line-height:1.7">
-        <h2 style="margin:0 0 12px">Finova Email Test</h2>
-        <p>This is a real SMTP test email from <strong>${company?.name || "your Finova workspace"}</strong>.</p>
+        <h2 style="margin:0 0 12px">FinovaOS Email Test</h2>
+        <p>This is a real SMTP test email from <strong>${company?.name || "your FinovaOS workspace"}</strong>.</p>
         <p>If you received this message, your email configuration is working correctly.</p>
         <div style="margin-top:18px;padding:14px 16px;border-radius:10px;background:#f3f4f6;color:#4b5563;font-size:13px">
           Sent at: ${new Date().toLocaleString()}
@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
 
     const result = await sendEmail({
       to,
-      subject: "Finova SMTP test email",
+      subject: "FinovaOS SMTP test email",
       html,
       companyId,
     });

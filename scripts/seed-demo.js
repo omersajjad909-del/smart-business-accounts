@@ -18,7 +18,7 @@ const DEMO_NAME = "Demo User";
 const DEMO_ROLE = "ADMIN";
 
 const DEMO_COMPANY = {
-  name: "Finova Demo Co.",
+  name: "FinovaOS Demo Co.",
   country: "PK",
   baseCurrency: "PKR",
   businessType: "trading",
@@ -96,7 +96,7 @@ async function seedBusinessRecords(companyId) {
 }
 
 async function main() {
-  console.log("=== Finova Demo Account Seeder ===\n");
+  console.log("=== FinovaOS Demo Account Seeder ===\n");
 
   // Check if demo user already exists
   const existingUser = await prisma.user.findUnique({

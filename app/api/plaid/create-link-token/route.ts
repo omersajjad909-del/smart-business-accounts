@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     const configs = {
       user: { client_user_id: userId },
-      client_name: 'Finova',
+      client_name: 'FinovaOS',
       products: [Products.Transactions],
       country_codes: [CountryCode.Us], // Can be dynamic based on company country
       language: 'en',

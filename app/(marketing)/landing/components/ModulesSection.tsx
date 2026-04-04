@@ -177,7 +177,7 @@ export default function ModulesSection() {
             </span>
           </h2>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,.4)", lineHeight: 1.8, maxWidth: 520, margin: "0 auto" }}>
-            Unlike competitors that charge extra for each module, Finova gives you everything — accounting, inventory, HR, CRM, banking, and reports — all in one subscription.
+            Unlike competitors that charge extra for each module, FinovaOS gives you everything — accounting, inventory, HR, CRM, banking, and reports — all in one subscription.
           </p>
         </div>
 

@@ -43,7 +43,7 @@ export default function ReleaseNotesPage() {
             🚀 Product Updates
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">
-            What's New in Finova
+            What's New in FinovaOS
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
             Stay up to date with the latest features, improvements, and bug fixes we've been working on to help you manage your business better.
@@ -121,7 +121,7 @@ export default function ReleaseNotesPage() {
           <div className="relative z-10">
             <h2 className="text-3xl font-bold mb-4">Want to see these in action?</h2>
             <p className="text-indigo-100 mb-8 max-w-lg mx-auto">
-              Join thousands of businesses using Finova to automate their accounts and inventory management.
+              Join thousands of businesses using FinovaOS to automate their accounts and inventory management.
             </p>
             <Link 
               href="/signup" 

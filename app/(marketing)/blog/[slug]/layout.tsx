@@ -13,20 +13,20 @@ export async function generateMetadata({
 
   if (!post) {
     return {
-      title: "Blog Post | Finova",
-      description: "Read the latest business finance tips and accounting guides from Finova.",
+      title: "Blog Post | FinovaOS",
+      description: "Read the latest business finance tips and accounting guides from FinovaOS.",
     };
   }
 
   return {
     title: post.title,
-    description: post.excerpt || `${post.title} — Read this guide on business finance and accounting by the Finova team.`,
+    description: post.excerpt || `${post.title} — Read this guide on business finance and accounting by the FinovaOS team.`,
     authors: post.author ? [{ name: post.author }] : undefined,
     openGraph: {
       title: post.title,
       description: post.excerpt || post.title,
       url: `${BASE}/blog/${post.id}`,
-      siteName: "Finova",
+      siteName: "FinovaOS",
       images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: post.title }],
       type: "article",
       publishedTime: post.date || undefined,

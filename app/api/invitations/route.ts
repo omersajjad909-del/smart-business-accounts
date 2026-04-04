@@ -26,11 +26,11 @@ export async function POST(req: NextRequest) {
 
     const base = getRuntimeAppUrl(req.nextUrl.origin);
     const url = `${base}/onboarding/accept-invite?token=${encodeURIComponent(tokenStr)}`;
-    const html = `<p>You have been invited to join Finova as <b>${details.role}</b>.</p>
+    const html = `<p>You have been invited to join FinovaOS as <b>${details.role}</b>.</p>
       <p>Click the link below to accept and set your password:</p>
       <p><a href="${url}">${url}</a></p>`;
     try {
-      await sendEmail({ to: email, subject: "You're invited to Finova", html, companyId });
+      await sendEmail({ to: email, subject: "You're invited to FinovaOS", html, companyId });
     } catch {}
 
     return NextResponse.json({ ok: true });

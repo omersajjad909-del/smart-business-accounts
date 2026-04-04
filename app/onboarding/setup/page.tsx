@@ -128,7 +128,7 @@ function SetupPageInner() {
               <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
             </svg>
           </div>
-          <span style={{fontFamily:"'Lora',serif",fontSize:18,fontWeight:700,color:"white"}}>Finova</span>
+          <span style={{fontFamily:"'Lora',serif",fontSize:18,fontWeight:700,color:"white"}}>FinovaOS</span>
         </div>
 
         {/* Big animated icon */}

@@ -16,7 +16,7 @@ import { resolvePlanPermissions } from "@/lib/planPermissions";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
 
-/* ── Finova branded loading screen ─────────────────────── */
+/* ── FinovaOS branded loading screen ─────────────────────── */
 function FinovaLoader() {
   return (
     <div style={{
@@ -77,7 +77,7 @@ function FinovaLoader() {
       {/* Brand name */}
       <div style={{ animation: "finova-fadeup .5s ease .1s both", textAlign: "center", marginBottom: 8 }}>
         <div style={{ fontSize: 28, fontWeight: 800, color: "white", letterSpacing: "-0.5px" }}>
-          Finova
+          FinovaOS
         </div>
         <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", letterSpacing: ".12em", textTransform: "uppercase", marginTop: 4 }}>
           Global Accounting & Business Suite
@@ -641,7 +641,7 @@ export default function DashboardLayout({
               </svg>
             </div>
             <div>
-              <div style={{fontSize:14,fontWeight:700,color:"white",letterSpacing:"-.2px",lineHeight:1}}>Finova</div>
+              <div style={{fontSize:14,fontWeight:700,color:"white",letterSpacing:"-.2px",lineHeight:1}}>FinovaOS</div>
               <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",letterSpacing:".04em",marginTop:2}}>Business Suite</div>
             </div>
           </Link>

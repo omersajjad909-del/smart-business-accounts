@@ -25,7 +25,7 @@ const MODULES: Record<string, {
     glow: "rgba(129,140,248,.15)",
     title: "Accounting & Ledger",
     tagline: "Full double-entry accounting. No shortcuts.",
-    description: "Finova's accounting engine is built on true double-entry principles. Every transaction is automatically recorded across the general ledger, giving you accurate P&L, balance sheets, and trial balances at any moment — without waiting for month-end.",
+    description: "FinovaOS's accounting engine is built on true double-entry principles. Every transaction is automatically recorded across the general ledger, giving you accurate P&L, balance sheets, and trial balances at any moment — without waiting for month-end.",
     capabilities: [
       { icon: "📒", title: "General Ledger", desc: "Every debit and credit automatically posted. Full audit trail on every entry." },
       { icon: "📈", title: "Profit & Loss", desc: "Real-time P&L by date range, branch, or company. Export to PDF or Excel." },
@@ -48,7 +48,7 @@ const MODULES: Record<string, {
     glow: "rgba(52,211,153,.15)",
     title: "Invoicing",
     tagline: "Get paid faster. Track every rupee owed.",
-    description: "Create professional sales and purchase invoices in seconds. Finova handles the full billing cycle — from quotation to payment — with automatic ledger entries, tax calculations, and PDF generation built in.",
+    description: "Create professional sales and purchase invoices in seconds. FinovaOS handles the full billing cycle — from quotation to payment — with automatic ledger entries, tax calculations, and PDF generation built in.",
     capabilities: [
       { icon: "🧾", title: "Sales Invoices", desc: "Professional invoices with your logo, tax breakdown, and payment terms." },
       { icon: "🛍️", title: "Purchase Invoices", desc: "Record supplier bills, match with POs, and track what you owe." },
@@ -71,7 +71,7 @@ const MODULES: Record<string, {
     glow: "rgba(251,191,36,.15)",
     title: "Inventory Management",
     tagline: "Know exactly what you have. Everywhere. Always.",
-    description: "Track stock levels, movements, and valuations across all your warehouses in real time. Finova's inventory module syncs with invoicing and purchasing so your books and shelves always match.",
+    description: "Track stock levels, movements, and valuations across all your warehouses in real time. FinovaOS's inventory module syncs with invoicing and purchasing so your books and shelves always match.",
     capabilities: [
       { icon: "📦", title: "Real-Time Stock", desc: "Live stock levels updated on every sale, purchase, and transfer." },
       { icon: "🏭", title: "Multi-Warehouse", desc: "Manage multiple warehouses and locations from one dashboard." },
@@ -94,9 +94,9 @@ const MODULES: Record<string, {
     glow: "rgba(96,165,250,.15)",
     title: "Bank Reconciliation",
     tagline: "Close your books in hours, not days.",
-    description: "Import your bank statements and let Finova auto-match transactions against your ledger. Spot unmatched items instantly, investigate discrepancies, and mark your books as reconciled — all without a spreadsheet in sight.",
+    description: "Import your bank statements and let FinovaOS auto-match transactions against your ledger. Spot unmatched items instantly, investigate discrepancies, and mark your books as reconciled — all without a spreadsheet in sight.",
     capabilities: [
-      { icon: "📥", title: "Statement Import", desc: "Upload CSV or Excel bank statements. Finova parses them automatically." },
+      { icon: "📥", title: "Statement Import", desc: "Upload CSV or Excel bank statements. FinovaOS parses them automatically." },
       { icon: "🤝", title: "Auto-Matching", desc: "Transactions matched against ledger entries by amount, date, and reference." },
       { icon: "🔍", title: "Discrepancy View", desc: "Unmatched items highlighted. Investigate and resolve with one click." },
       { icon: "✅", title: "Reconciliation Sign-Off", desc: "Mark periods as reconciled. Lock against further changes." },
@@ -117,7 +117,7 @@ const MODULES: Record<string, {
     glow: "rgba(167,139,250,.15)",
     title: "HR & Payroll",
     tagline: "Pay your team right. Every time.",
-    description: "From onboarding to payslips, Finova's HR module handles your entire workforce. Track attendance, process salaries, manage leaves, and generate payslips — all integrated with your accounts so payroll is always in sync with your books.",
+    description: "From onboarding to payslips, FinovaOS's HR module handles your entire workforce. Track attendance, process salaries, manage leaves, and generate payslips — all integrated with your accounts so payroll is always in sync with your books.",
     capabilities: [
       { icon: "👤", title: "Employee Records", desc: "Store employee details, contracts, documents, and employment history." },
       { icon: "⏰", title: "Attendance Tracking", desc: "Mark daily attendance manually or via import. Late and absent tracking." },
@@ -140,7 +140,7 @@ const MODULES: Record<string, {
     glow: "rgba(249,115,22,.15)",
     title: "CRM",
     tagline: "Never lose a lead. Never miss a follow-up.",
-    description: "Finova's built-in CRM keeps your sales pipeline organized. Manage leads, log interactions, set follow-up reminders, and track opportunities from first contact to closed deal — all linked to your accounts.",
+    description: "FinovaOS's built-in CRM keeps your sales pipeline organized. Manage leads, log interactions, set follow-up reminders, and track opportunities from first contact to closed deal — all linked to your accounts.",
     capabilities: [
       { icon: "🎯", title: "Lead Management", desc: "Capture and qualify leads from any source. Assign to team members." },
       { icon: "📞", title: "Interaction Logs", desc: "Record calls, meetings, emails, and notes against each contact." },
@@ -163,7 +163,7 @@ const MODULES: Record<string, {
     glow: "rgba(6,182,212,.15)",
     title: "Multi-Branch & Multi-Company",
     tagline: "One login. All your businesses.",
-    description: "Run multiple branches or entirely separate companies from a single Finova account. Switch between entities in seconds, consolidate reports across all of them, and keep data perfectly isolated where needed.",
+    description: "Run multiple branches or entirely separate companies from a single FinovaOS account. Switch between entities in seconds, consolidate reports across all of them, and keep data perfectly isolated where needed.",
     capabilities: [
       { icon: "🔀", title: "Instant Switching", desc: "Switch between companies or branches in one click. No re-login." },
       { icon: "📊", title: "Consolidated Reports", desc: "Group P&L, balance sheets, and cash flow across all entities." },
@@ -186,7 +186,7 @@ const MODULES: Record<string, {
     glow: "rgba(236,72,153,.15)",
     title: "Role-Based Access Control",
     tagline: "The right access for the right person.",
-    description: "Not everyone needs to see everything. Finova's granular permission system lets you define exactly what each team member can view, create, edit, or delete — across every module and every company.",
+    description: "Not everyone needs to see everything. FinovaOS's granular permission system lets you define exactly what each team member can view, create, edit, or delete — across every module and every company.",
     capabilities: [
       { icon: "🎭", title: "Custom Roles", desc: "Create roles like Accountant, Manager, Auditor, or Cashier with specific permissions." },
       { icon: "🔒", title: "Module-Level Access", desc: "Grant or restrict access to any module individually per role." },
@@ -209,7 +209,7 @@ const MODULES: Record<string, {
     glow: "rgba(16,185,129,.15)",
     title: "Reports & Analytics",
     tagline: "Every number. One screen. Zero waiting.",
-    description: "Finova generates financial and operational reports in real time. From standard accounting reports to custom dashboards — see exactly where your business stands without chasing your accountant.",
+    description: "FinovaOS generates financial and operational reports in real time. From standard accounting reports to custom dashboards — see exactly where your business stands without chasing your accountant.",
     capabilities: [
       { icon: "💰", title: "Cash Flow Statement", desc: "Operating, investing, and financing activities. Daily or monthly view." },
       { icon: "📊", title: "P&L Statement", desc: "Income vs expenses. Filter by date, branch, or cost center." },
@@ -232,7 +232,7 @@ const MODULES: Record<string, {
     glow: "rgba(245,158,11,.15)",
     title: "Point of Sale (POS)",
     tagline: "Fast checkout. Automatic books.",
-    description: "Finova's POS is built for retail, restaurants, and counters. Ring up sales in seconds, accept any payment method, and watch your inventory and ledger update automatically — no end-of-day manual entries.",
+    description: "FinovaOS's POS is built for retail, restaurants, and counters. Ring up sales in seconds, accept any payment method, and watch your inventory and ledger update automatically — no end-of-day manual entries.",
     capabilities: [
       { icon: "⚡", title: "Fast Checkout", desc: "Keyboard-driven interface. Search items by name or barcode instantly." },
       { icon: "📷", title: "Barcode Scanning", desc: "Scan barcodes for instant item lookup and quantity entry." },
@@ -255,7 +255,7 @@ const MODULES: Record<string, {
     glow: "rgba(139,92,246,.15)",
     title: "Purchase & GRN",
     tagline: "Control your procurement end-to-end.",
-    description: "From purchase order to goods received to supplier payment — Finova tracks the full procurement cycle. Match GRNs to POs, verify quantities, and post payables automatically when goods arrive.",
+    description: "From purchase order to goods received to supplier payment — FinovaOS tracks the full procurement cycle. Match GRNs to POs, verify quantities, and post payables automatically when goods arrive.",
     capabilities: [
       { icon: "📝", title: "Purchase Orders", desc: "Create and send POs to suppliers. Track approval status." },
       { icon: "📦", title: "Goods Received Notes", desc: "Record what actually arrived. Match against the original PO." },
@@ -278,7 +278,7 @@ const MODULES: Record<string, {
     glow: "rgba(20,184,166,.15)",
     title: "Multi-Currency",
     tagline: "Do business in any currency. Anywhere.",
-    description: "Transact, invoice, and report in any currency while keeping your books in your base currency. Finova handles exchange rates, gain/loss calculations, and currency conversion automatically.",
+    description: "Transact, invoice, and report in any currency while keeping your books in your base currency. FinovaOS handles exchange rates, gain/loss calculations, and currency conversion automatically.",
     capabilities: [
       { icon: "💱", title: "Any Currency", desc: "Support for 150+ world currencies. Add custom currencies too." },
       { icon: "📡", title: "Live Exchange Rates", desc: "Auto-fetch current exchange rates or set your own manually." },
@@ -318,7 +318,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const m = MODULES[slug];
   if (!m) return { title: "Feature Not Found" };
   return {
-    title: `${m.title} — Finova`,
+    title: `${m.title} — FinovaOS`,
     description: m.description,
   };
 }

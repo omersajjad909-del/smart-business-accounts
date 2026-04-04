@@ -93,6 +93,6 @@ export async function sendVerificationSms(
 ) {
   return sendSms({
     to: phone,
-    message: `Hi ${name}, your Finova verification code is ${code}. Valid for 15 minutes. Do not share this code.`,
+    message: `Hi ${name}, your FinovaOS verification code is ${code}. Valid for 15 minutes. Do not share this code.`,
   });
 }

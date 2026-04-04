@@ -1,5 +1,5 @@
 /**
- * Finova Market Intelligence Engine
+ * FinovaOS Market Intelligence Engine
  * Complete business-type-specific knowledge base for 30+ industries.
  * Works 100% WITHOUT OpenAI — rule-based, data-driven, always available.
  */
@@ -120,7 +120,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Launch B2B Digital Ordering System",
-        steps: ["Create a WhatsApp Business catalog with your top 50 products", "Add pricing tiers for different order quantities", "Set up automatic order confirmation via Finova", "Train 2 staff on order management"],
+        steps: ["Create a WhatsApp Business catalog with your top 50 products", "Add pricing tiers for different order quantities", "Set up automatic order confirmation via FinovaOS", "Train 2 staff on order management"],
         impact: "Reduce order processing time by 70%, increase reachable customers by 3-5x",
       },
       {
@@ -198,7 +198,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Launch Loyalty + Repeat Purchase System",
-        steps: ["Set up Finova's customer tracking for purchase history", "Create 3-tier loyalty: Bronze (10% off), Silver (15%), Gold (20%)", "Send monthly WhatsApp messages to inactive customers", "Promote loyalty card at checkout every transaction"],
+        steps: ["Set up FinovaOS's customer tracking for purchase history", "Create 3-tier loyalty: Bronze (10% off), Silver (15%), Gold (20%)", "Send monthly WhatsApp messages to inactive customers", "Promote loyalty card at checkout every transaction"],
         impact: "Increase repeat purchase rate by 25-40%, raise average basket value by 15%",
       },
     ],
@@ -276,7 +276,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
       },
       {
         title: "Lock in Corporate Catering Contracts",
-        steps: ["List 10 offices within 3km radius", "Visit with sample food and pricing sheet", "Offer first week free for trial", "Use Finova invoicing for professional billing"],
+        steps: ["List 10 offices within 3km radius", "Visit with sample food and pricing sheet", "Offer first week free for trial", "Use FinovaOS invoicing for professional billing"],
         impact: "1 corporate client = guaranteed daily orders worth 2-5x walk-in revenue",
       },
     ],
@@ -346,7 +346,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Build Corporate Rate Program",
-        steps: ["Identify 20 medium-large companies within 10km", "Offer guaranteed rate card with volume discounts", "Include breakfast, airport transfer, meeting room", "Bill monthly via Finova for professional relationship"],
+        steps: ["Identify 20 medium-large companies within 10km", "Offer guaranteed rate card with volume discounts", "Include breakfast, airport transfer, meeting room", "Bill monthly via FinovaOS for professional relationship"],
         impact: "Guaranteed 40-60% room occupancy from corporate base alone",
       },
     ],
@@ -478,7 +478,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Launch Chronic Patient Home Delivery Program",
-        steps: ["Identify your top 50 chronic medication customers (diabetes, hypertension, thyroid)", "Call each to offer free monthly home delivery with auto-refill", "Set up WhatsApp group for medication reminders", "Use Finova to track recurring invoices"],
+        steps: ["Identify your top 50 chronic medication customers (diabetes, hypertension, thyroid)", "Call each to offer free monthly home delivery with auto-refill", "Set up WhatsApp group for medication reminders", "Use FinovaOS to track recurring invoices"],
         impact: "Lock in predictable monthly revenue from highest-value customers — reduces churn to near zero",
       },
     ],
@@ -661,7 +661,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Launch Corporate Health Program",
-        steps: ["List 20 companies with 50+ employees in your area", "Offer annual health screening package at corporate rates", "Include free onsite first consultation", "Use Finova for corporate invoicing and tracking"],
+        steps: ["List 20 companies with 50+ employees in your area", "Offer annual health screening package at corporate rates", "Include free onsite first consultation", "Use FinovaOS for corporate invoicing and tracking"],
         impact: "1 corporate contract = 50-500 guaranteed patients annually with no marketing cost",
       },
     ],
@@ -720,7 +720,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Launch Property Management Division",
-        steps: ["Identify 20 landlords in your existing network", "Offer 6-month free property management trial", "Handle tenant screening, rent collection, maintenance", "Use Finova for rental invoicing and owner statements"],
+        steps: ["Identify 20 landlords in your existing network", "Offer 6-month free property management trial", "Handle tenant screening, rent collection, maintenance", "Use FinovaOS for rental invoicing and owner statements"],
         impact: "50 managed properties at 10% fee = guaranteed monthly income without selling anything",
       },
     ],
@@ -840,7 +840,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Launch Corporate Wellness Program",
-        steps: ["Identify 10 offices with 30+ employees within 2km", "Offer discounted group membership at 30% off individual rate", "Provide monthly fitness session at their office (free)", "Bill corporate monthly via Finova"],
+        steps: ["Identify 10 offices with 30+ employees within 2km", "Offer discounted group membership at 30% off individual rate", "Provide monthly fitness session at their office (free)", "Bill corporate monthly via FinovaOS"],
         impact: "1 corporate deal = 20-100 memberships — 10x more efficient than individual sales",
       },
     ],
@@ -1025,7 +1025,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Launch Farm Box Subscription",
-        steps: ["Package 5kg weekly fresh vegetable box", "Price at retail + delivery fee (20-30% below supermarket)", "Market in WhatsApp groups of housing societies within 20km", "Use Finova for recurring weekly invoicing"],
+        steps: ["Package 5kg weekly fresh vegetable box", "Price at retail + delivery fee (20-30% below supermarket)", "Market in WhatsApp groups of housing societies within 20km", "Use FinovaOS for recurring weekly invoicing"],
         impact: "50 weekly subscribers = guaranteed predictable revenue with premium pricing over wholesale",
       },
     ],
@@ -1085,7 +1085,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Launch Managed IT Services (MSP)",
-        steps: ["Convert 5 one-time clients to monthly retainer contracts", "Define service tiers: Basic (email/device support), Pro (+server monitoring), Enterprise (+cybersecurity)", "Price at 3-8% of company IT asset value monthly", "Use Finova for automated monthly invoicing"],
+        steps: ["Convert 5 one-time clients to monthly retainer contracts", "Define service tiers: Basic (email/device support), Pro (+server monitoring), Enterprise (+cybersecurity)", "Price at 3-8% of company IT asset value monthly", "Use FinovaOS for automated monthly invoicing"],
         impact: "10 MSP clients at PKR 25,000/month = PKR 250,000 guaranteed monthly with minimal incremental cost",
       },
     ],
@@ -1144,7 +1144,7 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     growthStrategies: [
       {
         title: "Launch Retailer Digital Ordering",
-        steps: ["Build a simple WhatsApp or web ordering system", "Train 20 top retailers to order digitally", "Offer 1% discount for digital orders (saves you order-taking cost)", "Use Finova for automated order and invoice processing"],
+        steps: ["Build a simple WhatsApp or web ordering system", "Train 20 top retailers to order digitally", "Offer 1% discount for digital orders (saves you order-taking cost)", "Use FinovaOS for automated order and invoice processing"],
         impact: "Reduces order processing cost by 60%, increases order frequency by 30%",
       },
     ],
@@ -1208,7 +1208,7 @@ const DEFAULT_PROFILE: BusinessTypeProfile = {
   growthStrategies: [
     {
       title: "Build Customer Retention System",
-      steps: ["Use Finova to identify customers who haven't bought in 60+ days", "Create a win-back offer for lapsed customers", "Set up monthly check-in with top 20 customers", "Implement a post-purchase follow-up sequence"],
+      steps: ["Use FinovaOS to identify customers who haven't bought in 60+ days", "Create a win-back offer for lapsed customers", "Set up monthly check-in with top 20 customers", "Implement a post-purchase follow-up sequence"],
       impact: "Increasing retention by just 5% increases profits by 25-95% (Harvard Business Review)",
     },
   ],
@@ -1321,7 +1321,7 @@ export function buildBusinessAdvisor(ctx: FinancialContext): BusinessAdvisorResu
       steps: [
         `Contact all ${ctx.receivables.overdueCount} customers with overdue invoices today`,
         "Offer 2% early payment discount to incentivize immediate settlement",
-        "Set up automated payment reminders via WhatsApp using Finova",
+        "Set up automated payment reminders via WhatsApp using FinovaOS",
         "For invoices over 60 days, escalate to formal demand notice",
       ],
       impact: `Recover ${ctx.company.currency} ${Math.round(ctx.receivables.overdue).toLocaleString()} that is currently stuck — this is cash your business has earned but not collected`,
@@ -1348,7 +1348,7 @@ export function buildBusinessAdvisor(ctx: FinancialContext): BusinessAdvisorResu
       priority: "high",
       steps: [
         `Place reorder for ${ctx.inventory.lowStockItems} low-stock items: ${ctx.inventory.lowStockNames.slice(0, 3).join(", ")}`,
-        "Set minimum stock alerts in Finova for all items",
+        "Set minimum stock alerts in FinovaOS for all items",
         "Create a reorder schedule based on lead time from each supplier",
         "Consider consignment stock arrangement with key suppliers for fast-moving items",
       ],
@@ -1364,7 +1364,7 @@ export function buildBusinessAdvisor(ctx: FinancialContext): BusinessAdvisorResu
         `Review all expense vouchers from this month — expenses are up ${ctx.expenses.change}% vs last month`,
         "Category-by-category comparison to find the specific cost driver",
         "Separate one-time costs from recurring — only recurring ones need fixing",
-        "Set monthly expense budget targets by category in Finova",
+        "Set monthly expense budget targets by category in FinovaOS",
       ],
       impact: "Uncontrolled expenses are the silent profit killer — understanding what's driving them is the first step",
     });
@@ -1395,7 +1395,7 @@ export function buildBusinessAdvisor(ctx: FinancialContext): BusinessAdvisorResu
       title: "High Overdue Receivables Risk",
       severity: "critical",
       description: `${Math.round((ctx.receivables.overdue / ctx.revenue.thisMonth) * 100)}% of monthly revenue is stuck in overdue invoices`,
-      mitigation: "Implement strict credit terms and weekly receivables follow-up — use Finova Ageing Report",
+      mitigation: "Implement strict credit terms and weekly receivables follow-up — use FinovaOS Ageing Report",
     });
   }
 

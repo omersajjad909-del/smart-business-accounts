@@ -10,15 +10,15 @@ const TIERS = [
 ];
 
 const HOW_IT_WORKS = [
-  { step:"01", icon:"🔗", title:"Get your unique link",   desc:"Sign up as a Finova affiliate and receive a personalised referral link and marketing materials." },
+  { step:"01", icon:"🔗", title:"Get your unique link",   desc:"Sign up as a FinovaOS affiliate and receive a personalised referral link and marketing materials." },
   { step:"02", icon:"📣", title:"Share with your network",desc:"Share your link on social media, your website, email newsletters, or directly with business owners you know." },
   { step:"03", icon:"✅", title:"They sign up & subscribe",desc:"When someone uses your link and starts a paid plan, you earn commission from day one." },
   { step:"04", icon:"💰", title:"Get paid monthly",       desc:"Commissions are paid on the 1st of each month via bank transfer, PayPal, or crypto — your choice." },
 ];
 
 const TESTIMONIALS = [
-  { name:"David Chen", role:"Accounting Consultant, Singapore", avatar:"DC", gradient:"linear-gradient(135deg,#4f46e5,#7c3aed)", quote:"I recommended Finova to 12 of my clients last year. Made $8,400 in commissions — completely passive income on top of my consulting fees." },
-  { name:"Fatima Al-Rashid", role:"Business Coach, Dubai", avatar:"FA", gradient:"linear-gradient(135deg,#0891b2,#06b6d4)", quote:"My audience is SME owners. Finova fits perfectly. My affiliate income now covers my entire content creation costs." },
+  { name:"David Chen", role:"Accounting Consultant, Singapore", avatar:"DC", gradient:"linear-gradient(135deg,#4f46e5,#7c3aed)", quote:"I recommended FinovaOS to 12 of my clients last year. Made $8,400 in commissions — completely passive income on top of my consulting fees." },
+  { name:"Fatima Al-Rashid", role:"Business Coach, Dubai", avatar:"FA", gradient:"linear-gradient(135deg,#0891b2,#06b6d4)", quote:"My audience is SME owners. FinovaOS fits perfectly. My affiliate income now covers my entire content creation costs." },
 ];
 
 function useInView() {
@@ -75,7 +75,7 @@ export default function AffiliatePage() {
             <span style={{ background:"linear-gradient(90deg,#fbbf24,#f59e0b)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Earn real money.</span>
           </h1>
           <p style={{ fontSize:"clamp(15px,2vw,18px)", color:"rgba(255,255,255,.5)", lineHeight:1.75, maxWidth:500, margin:"0 auto 36px", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
-            Join 500+ affiliates earning monthly recurring commissions by recommending Finova to businesses they know.
+            Join 500+ affiliates earning monthly recurring commissions by recommending FinovaOS to businesses they know.
           </p>
           <div style={{ display:"flex", gap:28, justifyContent:"center", flexWrap:"wrap", marginBottom:36, opacity:heroVis?1:0, transition:"all .6s ease .25s" }}>
             {[["20–35%","Recurring commission"],["$0","Cost to join"],["Monthly","Payout schedule"],["500+","Active affiliates"]].map(([val,label])=>(

@@ -26,7 +26,7 @@ const INDUSTRIES = [
       { icon:"🔁", title:"Recurring Transactions",     desc:"Set up monthly rent, utility, and salary entries once." },
       { icon:"📋", title:"Tax Summary Reports",        desc:"Compliance-ready output for your accountant or consultant." },
     ],
-    quote: "We process 200+ invoices a day. Finova handles it without breaking a sweat.",
+    quote: "We process 200+ invoices a day. FinovaOS handles it without breaking a sweat.",
     quoteName: "Thomas Miller", quoteTitle: "CEO, Miller Trading Co. — New York",
   },
   {
@@ -460,7 +460,7 @@ const INDUSTRIES = [
       { icon:"🚙", title:"Car Rental Management",      desc:"Booking calendar, agreements, mileage tracking, and fuel log." },
       { icon:"📊", title:"Profit by Job / Vehicle",   desc:"Know your margin on every sale and every repair job." },
     ],
-    quote: "We run a showroom and workshop together. Finova ties everything — from test drive to final invoice.",
+    quote: "We run a showroom and workshop together. FinovaOS ties everything — from test drive to final invoice.",
     quoteName: "Khalid Motors", quoteTitle: "Lahore, Pakistan",
   },
 
@@ -486,7 +486,7 @@ const INDUSTRIES = [
       { icon:"🖨️", title:"Print Job Management",       desc:"Paper stock, ink, print orders, delivery — fully tracked." },
       { icon:"📊", title:"Agency Revenue Reports",     desc:"Retainer vs project vs commission — broken down clearly." },
     ],
-    quote: "We handle 30+ clients. Finova gives us real-time visibility on which accounts are actually profitable.",
+    quote: "We handle 30+ clients. FinovaOS gives us real-time visibility on which accounts are actually profitable.",
     quoteName: "Sana Digital", quoteTitle: "Digital Marketing Agency — Karachi",
   },
 
@@ -512,7 +512,7 @@ const INDUSTRIES = [
       { icon:"💳", title:"Payment Collections",        desc:"Track paid, unpaid, and overdue subscribers instantly." },
       { icon:"📊", title:"Churn & Growth Reports",     desc:"Understand where you're gaining and losing customers." },
     ],
-    quote: "Running an ISP with 2,000 customers — Finova handles all monthly billing automatically.",
+    quote: "Running an ISP with 2,000 customers — FinovaOS handles all monthly billing automatically.",
     quoteName: "NetSpeed ISP", quoteTitle: "Faisalabad, Pakistan",
   },
 
@@ -538,7 +538,7 @@ const INDUSTRIES = [
       { icon:"💰", title:"Project Profitability",      desc:"Know your margin on every project before and after completion." },
       { icon:"🛒", title:"Purchase Orders",            desc:"Raise POs for panels and equipment. Match with GRN on delivery." },
     ],
-    quote: "We do 50 installations a month. Finova tracks every panel, every wire, and every rupee.",
+    quote: "We do 50 installations a month. FinovaOS tracks every panel, every wire, and every rupee.",
     quoteName: "SunTech Solar", quoteTitle: "Islamabad, Pakistan",
   },
 
@@ -564,7 +564,7 @@ const INDUSTRIES = [
       { icon:"💱", title:"Multi-Currency Invoicing",   desc:"Invoice in USD, EUR, GBP — convert at real-time rates." },
       { icon:"📊", title:"Import Cost Reports",        desc:"Landed cost vs selling price — instant margin view." },
     ],
-    quote: "Every container has 20+ cost lines. Finova captures every one — our landed cost is finally accurate.",
+    quote: "Every container has 20+ cost lines. FinovaOS captures every one — our landed cost is finally accurate.",
     quoteName: "ZamZam Imports", quoteTitle: "Karachi, Pakistan",
   },
 
@@ -590,7 +590,7 @@ const INDUSTRIES = [
       { icon:"📄", title:"Quotation & Proposals",     desc:"Send detailed quotes. Convert to booking with client signature." },
       { icon:"📊", title:"Event Profitability",       desc:"Revenue vs cost per event — know which events make money." },
     ],
-    quote: "We planned 120 weddings last year. Finova kept every vendor, every budget, and every client in order.",
+    quote: "We planned 120 weddings last year. FinovaOS kept every vendor, every budget, and every client in order.",
     quoteName: "Royal Events", quoteTitle: "Lahore, Pakistan",
   },
 
@@ -616,7 +616,7 @@ const INDUSTRIES = [
       { icon:"💳", title:"Customer Billing",           desc:"Invoice service charge + parts. Accept advance on delivery." },
       { icon:"📊", title:"Technician Performance",     desc:"Jobs completed, revenue generated, and parts used per tech." },
     ],
-    quote: "50 phones a day through my shop. Finova tracks every job, every part, every payment automatically.",
+    quote: "50 phones a day through my shop. FinovaOS tracks every job, every part, every payment automatically.",
     quoteName: "TechFix Mobile", quoteTitle: "Lahore, Pakistan",
   },
 
@@ -942,7 +942,7 @@ export default function SolutionsPage() {
   return (
     <>
       <Head>
-        <title>Solutions – Finova</title>
+        <title>Solutions – FinovaOS</title>
         <meta name="description" content="Industry-specific business solutions for trading, distribution, manufacturing, retail, restaurant, hospital, hotel, pharmacy, construction, e-commerce, agriculture, transport, salon, school, NGO, and real estate."/>
       </Head>
 
@@ -1035,7 +1035,7 @@ export default function SolutionsPage() {
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
               transition:"all .6s ease .16s",
             }}>
-              Finova adapts to how your business actually works — whether you&apos;re a trader in Dubai, a distributor in London, or a group company spanning multiple cities.
+              FinovaOS adapts to how your business actually works — whether you&apos;re a trader in Dubai, a distributor in London, or a group company spanning multiple cities.
             </p>
 
             {/* CTA pair */}

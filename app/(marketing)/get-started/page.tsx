@@ -58,7 +58,7 @@ import { useState, useEffect } from "react";
          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
            <div className="flex items-center gap-3">
              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 shadow-lg" />
-             <span className="text-xl font-bold tracking-tight">Finova</span>
+             <span className="text-xl font-bold tracking-tight">FinovaOS</span>
            </div>
            <div className="flex items-center gap-3">
              <Link href="/dashboard" className="text-sm font-semibold text-indigo-700 hover:text-indigo-900">View Demo</Link>
@@ -239,7 +239,7 @@ import { useState, useEffect } from "react";
  
        <footer className="border-t border-indigo-100/50 bg-white">
          <div className="max-w-7xl mx-auto px-6 py-6 text-sm text-slate-500 flex items-center justify-between">
-           <div>© {new Date().getFullYear()} Finova</div>
+           <div>© {new Date().getFullYear()} FinovaOS</div>
            <div className="flex gap-4">
              <Link href="/legal/terms" className="hover:text-slate-700">Terms</Link>
              <Link href="/legal/privacy" className="hover:text-slate-700">Privacy</Link>

@@ -43,7 +43,7 @@ const CONTACT_METHODS = [
   {
     icon: "📅",
     title: "Book a Demo",
-    desc: "See Finova in action — 30 min",
+    desc: "See FinovaOS in action — 30 min",
     detail: "Free personalised walkthrough",
     action: "Schedule Demo",
     href: "/demo",
@@ -85,7 +85,7 @@ const OFFICES = [
 
 const FAQS = [
   { q:"How quickly do you respond to support tickets?", a:"Pro and Enterprise customers receive responses within 4 hours. Starter plan customers within 24 hours. We never leave anyone hanging." },
-  { q:"Do you offer onboarding help?", a:"Yes — all plans include access to our help centre and video tutorials. Enterprise plans include dedicated onboarding sessions with a Finova specialist." },
+  { q:"Do you offer onboarding help?", a:"Yes — all plans include access to our help centre and video tutorials. Enterprise plans include dedicated onboarding sessions with a FinovaOS specialist." },
   { q:"Can I migrate data from my current software?", a:"Absolutely. We support CSV/Excel imports and have native migration tools for QuickBooks, Xero, Sage, and Tally. Our team can help guide the process." },
   { q:"Is there a phone number for urgent issues?", a:"Enterprise customers have a dedicated support line available 24/7. Pro customers can access our priority callback service during business hours." },
   { q:"Do you have partners or resellers in my country?", a:"We have certified partners in 20+ countries. Contact our partnerships team at finovaos.app@gmail.com to find a local expert." },

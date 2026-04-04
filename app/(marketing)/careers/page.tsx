@@ -109,7 +109,7 @@ const JOBS = [
   },
   {
     id:"13", title:"Finance & Accounting Manager", dept:"operations",   location:"Remote · Worldwide",   type:"Full-time",   level:"Senior",
-    desc:"Manage Finova's own finances — ironic but true. Own month-end close, financial reporting, and help us practice what we preach.",
+    desc:"Manage FinovaOS's own finances — ironic but true. Own month-end close, financial reporting, and help us practice what we preach.",
     tags:["ACCA","Finance","Reporting"],
     posted:"3 days ago", color:"#38bdf8",
   },
@@ -146,7 +146,7 @@ const JOBS = [
 ];
 
 const PROCESS = [
-  { step:"01", title:"Apply Online",       desc:"Submit your CV and a short note on why Finova. No cover letter essays — just be genuine.",   icon:"📋", color:"#818cf8" },
+  { step:"01", title:"Apply Online",       desc:"Submit your CV and a short note on why FinovaOS. No cover letter essays — just be genuine.",   icon:"📋", color:"#818cf8" },
   { step:"02", title:"Intro Call",         desc:"30 min with someone from our team. We want to learn about you, and you should learn about us.", icon:"☎️", color:"#34d399" },
   { step:"03", title:"Skills Assessment",  desc:"A practical, paid task relevant to the role. We respect your time — max 3 hours.",              icon:"💡", color:"#38bdf8" },
   { step:"04", title:"Team Interviews",    desc:"2–3 conversations with future teammates and your hiring manager. No trick questions.",           icon:"👥", color:"#fbbf24" },
@@ -155,8 +155,8 @@ const PROCESS = [
 
 const TESTIMONIALS = [
   { name:"Ayesha K.",   role:"Senior Engineer, 2 years",        avatar:"AK", gradient:"linear-gradient(135deg,#4f46e5,#7c3aed)", quote:"The best team I've ever worked on. Everyone is sharp, kind, and genuinely cares about doing great work. Remote culture actually works here." },
-  { name:"James T.",    role:"Product Manager, 1.5 years",       avatar:"JT", gradient:"linear-gradient(135deg,#0891b2,#06b6d4)", quote:"I've worked at Stripe and Monzo. Finova's pace of shipping is unreal. You see your work in production the same week you build it." },
-  { name:"Fatima N.",   role:"Customer Success, 3 years",        avatar:"FN", gradient:"linear-gradient(135deg,#059669,#34d399)", quote:"Finova actually invests in your growth. My manager helped me go from Support to CS Lead in 18 months. The learning budget is real — I used all of mine." },
+  { name:"James T.",    role:"Product Manager, 1.5 years",       avatar:"JT", gradient:"linear-gradient(135deg,#0891b2,#06b6d4)", quote:"I've worked at Stripe and Monzo. FinovaOS's pace of shipping is unreal. You see your work in production the same week you build it." },
+  { name:"Fatima N.",   role:"Customer Success, 3 years",        avatar:"FN", gradient:"linear-gradient(135deg,#059669,#34d399)", quote:"FinovaOS actually invests in your growth. My manager helped me go from Support to CS Lead in 18 months. The learning budget is real — I used all of mine." },
 ];
 
 /* ══════════════════════════════════════════════════════════
@@ -301,7 +301,7 @@ export default function CareersPage() {
       <Section id="culture">
         <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 100px" }}>
           <div style={{ textAlign:"center", marginBottom:52 }}>
-            <SectionLabel text="Life at Finova"/>
+            <SectionLabel text="Life at FinovaOS"/>
             <h2 style={{ fontSize:"clamp(26px,4vw,40px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 14px" }}>
               Where great people do great work
             </h2>

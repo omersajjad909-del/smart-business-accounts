@@ -61,7 +61,7 @@ const TEAM = [
   {
     name: "Zara Ahmed",
     role: "Co-founder & CEO",
-    bio: "Former Goldman Sachs. Built and sold two fintech startups before Finova. Passionate about democratising financial tools for emerging markets.",
+    bio: "Former Goldman Sachs. Built and sold two fintech startups before FinovaOS. Passionate about democratising financial tools for emerging markets.",
     avatar: "ZA",
     gradient: "linear-gradient(135deg,#4f46e5,#7c3aed)",
     linkedin: "#",
@@ -69,7 +69,7 @@ const TEAM = [
   {
     name: "Omar Khalid",
     role: "Co-founder & CTO",
-    bio: "Ex-Stripe engineering. 12 years building payments infrastructure at scale. Architect of Finova's real-time reconciliation engine.",
+    bio: "Ex-Stripe engineering. 12 years building payments infrastructure at scale. Architect of FinovaOS's real-time reconciliation engine.",
     avatar: "OK",
     gradient: "linear-gradient(135deg,#0891b2,#06b6d4)",
     linkedin: "#",
@@ -93,7 +93,7 @@ const TEAM = [
   {
     name: "Nadia Qureshi",
     role: "Head of Finance & Compliance",
-    bio: "Chartered accountant with 15 years in Big Four. Ensures Finova meets every regulatory standard across our 40+ operating markets.",
+    bio: "Chartered accountant with 15 years in Big Four. Ensures FinovaOS meets every regulatory standard across our 40+ operating markets.",
     avatar: "NQ",
     gradient: "linear-gradient(135deg,#be185d,#ec4899)",
     linkedin: "#",
@@ -109,7 +109,7 @@ const TEAM = [
 ];
 
 const TIMELINE = [
-  { year:"2020", title:"The Idea", desc:"Frustrated by outdated accounting software, Zara and Omar sketched the first version of Finova on a whiteboard in a San Francisco co-working space.", color:"#818cf8" },
+  { year:"2020", title:"The Idea", desc:"Frustrated by outdated accounting software, Zara and Omar sketched the first version of FinovaOS on a whiteboard in a San Francisco co-working space.", color:"#818cf8" },
   { year:"2021", title:"First 100 Customers", desc:"Launched in private beta. 100 businesses signed up in the first month. We knew we were onto something.", color:"#34d399" },
   { year:"2022", title:"Series A — $8M", desc:"Raised $8M led by Sequoia Southeast Asia. Expanded to UAE, Saudi Arabia, and the UK.", color:"#38bdf8" },
   { year:"2023", title:"10,000 Businesses", desc:"Hit 10,000 active businesses across 30 countries. Launched HR & Payroll module. Team grew to 85 people.", color:"#fbbf24" },
@@ -118,7 +118,7 @@ const TIMELINE = [
 ];
 
 const PRESS = [
-  { name:"TechCrunch",   logo:"TC", quote:"Finova is redefining what SME accounting software can be in emerging markets." },
+  { name:"TechCrunch",   logo:"TC", quote:"FinovaOS is redefining what SME accounting software can be in emerging markets." },
   { name:"Forbes",       logo:"F",  quote:"One of the 50 most promising fintech startups of 2024." },
   { name:"The Guardian", logo:"G",  quote:"The accounting tool quietly powering thousands of global businesses." },
   { name:"Bloomberg",    logo:"B",  quote:"A challenger to Xero and QuickBooks with a distinctly global DNA." },
@@ -240,7 +240,7 @@ export default function AboutPage() {
             opacity: heroVis?1:0, transform: heroVis?"translateY(0)":"translateY(20px)",
             transition:"opacity .65s ease .2s, transform .65s ease .2s",
           }}>
-            Finova was born from a simple belief — every business in the world deserves accounting software that is powerful, beautiful, and actually affordable.
+            FinovaOS was born from a simple belief — every business in the world deserves accounting software that is powerful, beautiful, and actually affordable.
           </p>
 
           <div style={{
@@ -298,7 +298,7 @@ export default function AboutPage() {
             Finance tools shouldn't be a privilege
           </h2>
           <p style={{ fontSize:17, color:"rgba(255,255,255,.5)", lineHeight:1.8, maxWidth:680, margin:"0 auto 40px" }}>
-            For too long, world-class accounting software has been expensive, complex, and built only for Western markets. Finova changes that. We're building infrastructure that makes every business — from a boutique in Singapore to a logistics firm in Lagos — financially unstoppable.
+            For too long, world-class accounting software has been expensive, complex, and built only for Western markets. FinovaOS changes that. We're building infrastructure that makes every business — from a boutique in Singapore to a logistics firm in Lagos — financially unstoppable.
           </p>
           {/* Mission pillars */}
           <div className="about-3col" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginTop:20 }}>

@@ -13,8 +13,8 @@ const GOOGLE_SITE_VERIFICATION =
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Finova - Global Accounting & Business Management Platform",
-    template: "%s | Finova",
+    default: "FinovaOS - Global Accounting & Business Management Platform",
+    template: "%s | FinovaOS",
   },
   description:
     "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM - all in one platform. Used by 12,000+ businesses in 40+ countries.",
@@ -32,13 +32,13 @@ export const metadata: Metadata = {
     "UAE accounting",
     "UK accounting",
     "international business software",
-    "Finova",
+    "FinovaOS",
     "business management software",
     "online accounting",
   ],
-  authors: [{ name: "Finova", url: BASE_URL }],
-  creator: "Finova",
-  publisher: "Finova",
+  authors: [{ name: "FinovaOS", url: BASE_URL }],
+  creator: "FinovaOS",
+  publisher: "FinovaOS",
   robots: {
     index: true,
     follow: true,
@@ -52,14 +52,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: BASE_URL,
-    siteName: "Finova",
-    title: "Finova - Global Accounting & Business Management Platform",
+    siteName: "FinovaOS",
+    title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
       "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM - all in one platform.",
     images: [
       {
         url: `${BASE_URL}/icon.png`,
-        alt: "Finova - Global Accounting Platform",
+        alt: "FinovaOS - Global Accounting Platform",
       },
     ],
   },
@@ -67,12 +67,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@finova_io",
     creator: "@finova_io",
-    title: "Finova - Global Accounting & Business Management Platform",
+    title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
       "Cloud accounting software for modern SMEs. Used by 12,000+ businesses in 40+ countries.",
     images: [`${BASE_URL}/icon.png`],
   },
-  applicationName: "Finova",
+  applicationName: "FinovaOS",
   generator: "Next.js",
   referrer: "origin-when-cross-origin",
   icons: {
@@ -84,7 +84,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Finova",
+    title: "FinovaOS",
   },
   verification: {
     google: GOOGLE_SITE_VERIFICATION,
@@ -104,7 +104,7 @@ export const viewport: Viewport = {
 const softwareApplicationJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Finova",
+  name: "FinovaOS",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description: "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM.",
@@ -139,7 +139,7 @@ const softwareApplicationJsonLd = {
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Finova",
+  name: "FinovaOS",
   url: BASE_URL,
   logo: {
     "@type": "ImageObject",
@@ -175,7 +175,7 @@ const organizationJsonLd = {
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "Finova",
+  name: "FinovaOS",
   url: BASE_URL,
   description: "Cloud accounting software for modern SMEs.",
   potentialAction: {

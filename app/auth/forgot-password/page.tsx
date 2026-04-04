@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span style={{ fontSize:20, fontWeight:800, color:"white", fontFamily:"Lora,serif" }}>Finova</span>
+              <span style={{ fontSize:20, fontWeight:800, color:"white", fontFamily:"Lora,serif" }}>FinovaOS</span>
             </div>
           </Link>
         </div>

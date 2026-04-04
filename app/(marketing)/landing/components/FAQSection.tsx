@@ -31,13 +31,13 @@ const FAQS = [
   // ── Accounting ──
   {
     cat: "accounting", color: "#818cf8",
-    q: "Is Finova a true double-entry accounting system?",
-    a: "Yes. Every transaction in Finova posts both a debit and a credit automatically. Your general ledger, trial balance, P&L, and balance sheet are always in sync — no manual journal entries needed for routine transactions.",
+    q: "Is FinovaOS a true double-entry accounting system?",
+    a: "Yes. Every transaction in FinovaOS posts both a debit and a credit automatically. Your general ledger, trial balance, P&L, and balance sheet are always in sync — no manual journal entries needed for routine transactions.",
   },
   {
     cat: "accounting", color: "#818cf8",
     q: "Can I manage my chart of accounts?",
-    a: "Absolutely. Finova auto-generates a chart of accounts based on your industry when you sign up. You can add, rename, or restructure accounts at any time. Full support for assets, liabilities, equity, income, and expense accounts.",
+    a: "Absolutely. FinovaOS auto-generates a chart of accounts based on your industry when you sign up. You can add, rename, or restructure accounts at any time. Full support for assets, liabilities, equity, income, and expense accounts.",
   },
   {
     cat: "accounting", color: "#818cf8",
@@ -46,7 +46,7 @@ const FAQS = [
   },
   {
     cat: "accounting", color: "#818cf8",
-    q: "What reports does Finova generate?",
+    q: "What reports does FinovaOS generate?",
     a: "P&L statement, balance sheet, trial balance, cash flow statement, ageing reports (receivables & payables), tax summaries, ledger reports, and custom date-range reports. All exportable as PDF or Excel instantly.",
   },
 
@@ -54,24 +54,24 @@ const FAQS = [
   {
     cat: "invoicing", color: "#34d399",
     q: "Can I create both sales and purchase invoices?",
-    a: "Yes. Finova covers the full billing cycle — sales invoices, purchase invoices, credit notes, debit notes, and advance payments. Every invoice automatically updates your ledger and inventory.",
+    a: "Yes. FinovaOS covers the full billing cycle — sales invoices, purchase invoices, credit notes, debit notes, and advance payments. Every invoice automatically updates your ledger and inventory.",
   },
   {
     cat: "invoicing", color: "#34d399",
     q: "How does payment tracking work?",
-    a: "Record full or partial payments against any invoice. Finova automatically calculates outstanding balances, tracks payment history, and generates ageing reports so you always know who owes you and for how long.",
+    a: "Record full or partial payments against any invoice. FinovaOS automatically calculates outstanding balances, tracks payment history, and generates ageing reports so you always know who owes you and for how long.",
   },
   {
     cat: "invoicing", color: "#34d399",
     q: "Can I generate PDF invoices and send them to clients?",
-    a: "Yes. Generate a professional PDF invoice in one click. You can download it, print it, or email it directly to your customer from within Finova. Custom invoice templates are available on Pro and Enterprise plans.",
+    a: "Yes. Generate a professional PDF invoice in one click. You can download it, print it, or email it directly to your customer from within FinovaOS. Custom invoice templates are available on Pro and Enterprise plans.",
   },
 
   // ── Inventory ──
   {
     cat: "inventory", color: "#fbbf24",
     q: "Does inventory sync with invoices automatically?",
-    a: "Yes — this is core to how Finova works. When you create a sales invoice, stock is deducted immediately. When you post a goods received note (GRN), stock is added. No manual stock adjustments needed for routine transactions.",
+    a: "Yes — this is core to how FinovaOS works. When you create a sales invoice, stock is deducted immediately. When you post a goods received note (GRN), stock is added. No manual stock adjustments needed for routine transactions.",
   },
   {
     cat: "inventory", color: "#fbbf24",
@@ -81,19 +81,19 @@ const FAQS = [
   {
     cat: "inventory", color: "#fbbf24",
     q: "Which inventory valuation methods are supported?",
-    a: "Finova supports FIFO (First In First Out), LIFO (Last In First Out), and Weighted Average Cost. The method affects your COGS calculation and is applied automatically to every sale.",
+    a: "FinovaOS supports FIFO (First In First Out), LIFO (Last In First Out), and Weighted Average Cost. The method affects your COGS calculation and is applied automatically to every sale.",
   },
   {
     cat: "inventory", color: "#fbbf24",
     q: "How do low stock alerts work?",
-    a: "Set a reorder level for each product. When stock falls at or below that level, Finova flags it on your dashboard and inventory reports. You can action a purchase order directly from the alert.",
+    a: "Set a reorder level for each product. When stock falls at or below that level, FinovaOS flags it on your dashboard and inventory reports. You can action a purchase order directly from the alert.",
   },
 
   // ── HR & Payroll ──
   {
     cat: "hr", color: "#a78bfa",
-    q: "Does Finova handle salary processing?",
-    a: "Yes. Define employee salaries, allowances, and deductions. Run monthly payroll in one click — Finova calculates net pay, generates payslips, and automatically posts the payroll entry to your accounting ledger.",
+    q: "Does FinovaOS handle salary processing?",
+    a: "Yes. Define employee salaries, allowances, and deductions. Run monthly payroll in one click — FinovaOS calculates net pay, generates payslips, and automatically posts the payroll entry to your accounting ledger.",
   },
   {
     cat: "hr", color: "#a78bfa",
@@ -102,7 +102,7 @@ const FAQS = [
   },
   {
     cat: "hr", color: "#a78bfa",
-    q: "Can employees apply for leave through Finova?",
+    q: "Can employees apply for leave through FinovaOS?",
     a: "Yes. Employees can log leave requests which managers approve or reject. Leave balances (annual, sick, casual) are tracked automatically and deducted from payroll when leaves are taken.",
   },
 
@@ -110,12 +110,12 @@ const FAQS = [
   {
     cat: "branches", color: "#06b6d4",
     q: "Can I manage multiple companies from one login?",
-    a: "Yes — this is one of Finova's core strengths. Add unlimited companies and branches under one account. Switch between them instantly without logging out. Each company's data is fully isolated.",
+    a: "Yes — this is one of FinovaOS's core strengths. Add unlimited companies and branches under one account. Switch between them instantly without logging out. Each company's data is fully isolated.",
   },
   {
     cat: "branches", color: "#06b6d4",
     q: "Can I see consolidated reports across all branches?",
-    a: "Yes. Finova generates consolidated P&L, balance sheets, and cash flow across all your companies or branches. You can also drill into individual branch performance at any time.",
+    a: "Yes. FinovaOS generates consolidated P&L, balance sheets, and cash flow across all your companies or branches. You can also drill into individual branch performance at any time.",
   },
   {
     cat: "branches", color: "#06b6d4",
@@ -126,8 +126,8 @@ const FAQS = [
   // ── Bank & Payments ──
   {
     cat: "banking", color: "#60a5fa",
-    q: "How does bank reconciliation work in Finova?",
-    a: "Import your bank statement (CSV or Excel). Finova auto-matches transactions against your ledger entries by amount, date, and reference. Unmatched items are highlighted for your review. Mark the period reconciled when done.",
+    q: "How does bank reconciliation work in FinovaOS?",
+    a: "Import your bank statement (CSV or Excel). FinovaOS auto-matches transactions against your ledger entries by amount, date, and reference. Unmatched items are highlighted for your review. Mark the period reconciled when done.",
   },
   {
     cat: "banking", color: "#60a5fa",
@@ -136,8 +136,8 @@ const FAQS = [
   },
   {
     cat: "banking", color: "#60a5fa",
-    q: "Does Finova support multi-currency transactions?",
-    a: "Yes. Transact in any of 150+ currencies. Set exchange rates manually or let Finova fetch live rates. Realized and unrealized forex gains and losses are calculated automatically and posted to your ledger.",
+    q: "Does FinovaOS support multi-currency transactions?",
+    a: "Yes. Transact in any of 150+ currencies. Set exchange rates manually or let FinovaOS fetch live rates. Realized and unrealized forex gains and losses are calculated automatically and posted to your ledger.",
   },
 
   // ── Plans & Billing ──
@@ -171,7 +171,7 @@ const FAQS = [
   {
     cat: "security", color: "#10b981",
     q: "Who can see my company's data?",
-    a: "Only users you invite to your company, with the roles you assign. Even Finova support staff cannot access your financial data without your explicit permission. Full audit logs record every action taken by every user.",
+    a: "Only users you invite to your company, with the roles you assign. Even FinovaOS support staff cannot access your financial data without your explicit permission. Full audit logs record every action taken by every user.",
   },
   {
     cat: "security", color: "#10b981",
@@ -296,7 +296,7 @@ export default function FAQSection() {
             </span>
           </h2>
           <p style={{fontSize:15,color:"rgba(255,255,255,.4)",lineHeight:1.8,maxWidth:480,margin:"0 auto"}}>
-            Everything you need to know about Finova — from accounting to payroll to security.
+            Everything you need to know about FinovaOS — from accounting to payroll to security.
           </p>
         </div>
 

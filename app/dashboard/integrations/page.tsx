@@ -59,7 +59,7 @@ export default function IntegrationsPage() {
     <div style={{ minHeight: "100vh", background: "var(--app-bg)", padding: "32px 28px", fontFamily: FONT, color: "var(--text-primary)" }}>
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 6px", letterSpacing: -0.5 }}>Integrations</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>Connect Finova with your bank, payment gateway, and external tools</p>
+        <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>Connect FinovaOS with your bank, payment gateway, and external tools</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>

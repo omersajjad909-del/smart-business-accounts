@@ -179,7 +179,7 @@ export default function AdminNewsletterPage() {
 
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 8 }}>EMAIL SUBJECT *</label>
-                  <input className="nl-input" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Maslan: Finova ka naya feature launch!" />
+                  <input className="nl-input" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Maslan: FinovaOS ka naya feature launch!" />
                 </div>
 
                 <div style={{ marginBottom: 20 }}>

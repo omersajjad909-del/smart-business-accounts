@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 export const metadata: Metadata = {
   title: "Business Finance Blog — Tips, Guides & Updates",
   description:
-    "Expert guides on accounting, bank reconciliation, invoicing, inventory management, and business finance. Written by the Finova team for SME owners, accountants, and finance managers.",
+    "Expert guides on accounting, bank reconciliation, invoicing, inventory management, and business finance. Written by the FinovaOS team for SME owners, accountants, and finance managers.",
   keywords: [
     "accounting blog",
     "business finance tips",
@@ -17,17 +17,17 @@ export const metadata: Metadata = {
     "SME finance advice",
   ],
   openGraph: {
-    title: "Finova Blog — Business Finance & Accounting Guides",
+    title: "FinovaOS Blog — Business Finance & Accounting Guides",
     description:
       "Expert articles on accounting, invoicing, inventory, and business finance for SME owners and accountants.",
     url: `${BASE}/blog`,
-    siteName: "Finova",
-    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "Finova Blog" }],
+    siteName: "FinovaOS",
+    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS Blog" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Finova Blog — Finance & Accounting Guides",
+    title: "FinovaOS Blog — Finance & Accounting Guides",
     description: "Expert articles on accounting, invoicing, inventory, and business finance.",
     images: [`${BASE}/icon.png`],
   },

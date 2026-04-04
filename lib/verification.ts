@@ -176,7 +176,7 @@ export async function sendVerificationCode(params: {
 
   const emailResult = await sendEmail({
     to: params.email,
-    subject: "Your Finova verification code",
+    subject: "Your FinovaOS verification code",
     html: emailTemplates.otp(
       { name: params.name, email: params.email },
       params.code,

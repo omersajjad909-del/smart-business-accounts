@@ -252,7 +252,7 @@ function AIVisual({ vis }: { vis: boolean }) {
     }}>
       <div style={{ padding: "11px 16px", borderBottom: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", display: "flex", alignItems: "center", gap: 8 }}>
         {["#f87171","#fbbf24","#34d399"].map((c,i) => <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: .7 }} />)}
-        <span style={{ flex: 1, textAlign: "center", fontSize: 10, color: "rgba(255,255,255,.25)", letterSpacing: ".04em" }}>Finova AI — Intelligence Center</span>
+        <span style={{ flex: 1, textAlign: "center", fontSize: 10, color: "rgba(255,255,255,.25)", letterSpacing: ".04em" }}>FinovaOS AI — Intelligence Center</span>
         <span style={{ fontSize: 10, color: "#a78bfa", fontWeight: 600 }}>● AI Active</span>
       </div>
       <div style={{ padding: "16px 18px 20px" }}>
@@ -296,7 +296,7 @@ const FEATURES = [
   {
     tag: "Finance", color: "#818cf8",
     title: "Real-Time P&L — Always Live",
-    desc: "Stop waiting for month-end. Finova's accounting engine updates your P&L, balance sheet, and trial balance the moment any transaction is recorded. See exactly where your business stands — right now.",
+    desc: "Stop waiting for month-end. FinovaOS's accounting engine updates your P&L, balance sheet, and trial balance the moment any transaction is recorded. See exactly where your business stands — right now.",
     bullets: ["Instant P&L by date range or branch", "Auto-posted journal entries", "Tax-ready reports in one click"],
     link: "/features/accounting",
     Visual: PLVisual,
@@ -314,7 +314,7 @@ const FEATURES = [
   {
     tag: "Purchasing", color: "#fbbf24",
     title: "Landed Cost & Multi-Warehouse Stock",
-    desc: "Import goods from anywhere and get the true cost — Finova allocates freight, customs, and handling charges across your items automatically. Track stock across multiple warehouses in real time with full lot and batch traceability.",
+    desc: "Import goods from anywhere and get the true cost — FinovaOS allocates freight, customs, and handling charges across your items automatically. Track stock across multiple warehouses in real time with full lot and batch traceability.",
     bullets: ["Landed cost allocation (freight, customs, handling)", "Multi-warehouse with real-time stock levels", "Purchase Order → GRN → Invoice 3-way match"],
     link: "/features/inventory",
     Visual: InventoryVisual,
@@ -323,7 +323,7 @@ const FEATURES = [
   {
     tag: "Scale", color: "#06b6d4",
     title: "One Login. Every Branch. Every Company.",
-    desc: "Whether you have 2 branches or 20 companies, Finova keeps them all under one roof. Switch between entities instantly, run consolidated reports, and manage user access per company — without any confusion.",
+    desc: "Whether you have 2 branches or 20 companies, FinovaOS keeps them all under one roof. Switch between entities instantly, run consolidated reports, and manage user access per company — without any confusion.",
     bullets: ["Unlimited branches & companies", "Consolidated financial reports", "Per-company role & access control"],
     link: "/features/multi-branch",
     Visual: BranchVisual,
@@ -332,7 +332,7 @@ const FEATURES = [
   {
     tag: "AI Intelligence", color: "#a78bfa",
     title: "Your Business Has a Brain Now.",
-    desc: "Finova AI reads your real financial data every day and tells you exactly what to do. Spot overdue invoices, predict next month's revenue, discover what new products to stock, and get a personalized growth plan — all without leaving your dashboard.",
+    desc: "FinovaOS AI reads your real financial data every day and tells you exactly what to do. Spot overdue invoices, predict next month's revenue, discover what new products to stock, and get a personalized growth plan — all without leaving your dashboard.",
     bullets: ["Ask AI anything about your finances", "Smart alerts: overdue, cash risk, expense spikes", "Market Intelligence — what products to add next", "30/60/90-day revenue & cashflow forecast", "AI Business Advisor with step-by-step growth plan"],
     link: "/demo",
     Visual: AIVisual,

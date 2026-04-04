@@ -53,7 +53,7 @@ export default function OnboardingWizard() {
         <div className="max-w-4xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-100">F</div>
-            <span className="text-xl font-extrabold tracking-tight text-slate-800">Finova</span>
+            <span className="text-xl font-extrabold tracking-tight text-slate-800">FinovaOS</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest border border-emerald-100">
@@ -65,7 +65,7 @@ export default function OnboardingWizard() {
 
       <main className="max-w-4xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">Welcome to Finova</h1>
+          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">Welcome to FinovaOS</h1>
           <p className="text-lg text-slate-500 font-medium max-w-2xl mx-auto">Let’s get your workspace ready. Follow these quick steps to set up your business profile.</p>
         </div>
 

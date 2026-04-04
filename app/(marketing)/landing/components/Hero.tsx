@@ -284,7 +284,7 @@ export default function Hero() {
                   </div>
                   <div>
                     <div style={{ fontSize:11.5, fontWeight:700, color:"#fff" }}>AI Insight: Revenue up 22% MoM</div>
-                    <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", marginTop:1 }}>Finova AI • Health score 91/100</div>
+                    <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", marginTop:1 }}>FinovaOS AI • Health score 91/100</div>
                   </div>
                 </div>
               </div>

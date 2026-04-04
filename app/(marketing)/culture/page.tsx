@@ -45,7 +45,7 @@ const VALUES = [
     icon: "❤️", title: "People First",
     color: "#f9a8d4", glow: "rgba(249,168,212,.12)",
     short: "We invest in humans, not headcount.",
-    long: "We care about your career, your wellbeing, and your life outside of work. Finova should make your life better — not just fill your calendar. Burnout is a failure of leadership, not personal weakness.",
+    long: "We care about your career, your wellbeing, and your life outside of work. FinovaOS should make your life better — not just fill your calendar. Burnout is a failure of leadership, not personal weakness.",
     examples: ["Mandatory minimum vacation", "Mental health support", "No meetings Fridays"],
   },
 ];

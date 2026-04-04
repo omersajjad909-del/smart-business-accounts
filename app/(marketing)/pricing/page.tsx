@@ -248,7 +248,7 @@ export default function PricingPage() {
             </span>
           </h1>
           <p style={{ maxWidth: 640, margin: "0 auto", color: "rgba(255,255,255,.48)", fontSize: 17, lineHeight: 1.65 }}>
-            Finova can automatically show prices in a likely local currency, such as PKR for Pakistan, INR for India, AED for UAE, and more.
+            FinovaOS can automatically show prices in a likely local currency, such as PKR for Pakistan, INR for India, AED for UAE, and more.
           </p>
         </div>
 

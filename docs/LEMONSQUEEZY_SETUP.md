@@ -1,6 +1,6 @@
 # LemonSqueezy Setup
 
-Use this checklist to connect Finova billing to LemonSqueezy.
+Use this checklist to connect FinovaOS billing to LemonSqueezy.
 
 ## 1. Create Products And Variants
 
@@ -70,7 +70,7 @@ Copy the webhook signing secret into:
 LEMONSQUEEZY_WEBHOOK_SECRET=
 ```
 
-## 4. What Finova Already Handles
+## 4. What FinovaOS Already Handles
 
 Current backend already supports:
 
@@ -83,7 +83,7 @@ Current backend already supports:
 - invoice summary generation
 - billing dashboard provider-managed UI
 
-## 5. How Checkout Maps To Finova
+## 5. How Checkout Maps To FinovaOS
 
 Checkout sends this custom data:
 
@@ -99,7 +99,7 @@ Webhook uses that data to update the right company.
 ## 6. Quick Test Flow
 
 1. Set `LEMONSQUEEZY_TEST_MODE=true`
-2. Start checkout from Finova billing page
+2. Start checkout from FinovaOS billing page
 3. Complete test purchase in LemonSqueezy
 4. Confirm webhook hits `/api/billing/webhook`
 5. Check:

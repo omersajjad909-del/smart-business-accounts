@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     sentTo = users.length;
 
     // Send emails
-    const fromName = "Finova";
+    const fromName = "FinovaOS";
     const htmlBody = `
       <!DOCTYPE html>
       <html>
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
           <h3 style="color:#111;margin-top:0">${subject}</h3>
           <div style="white-space:pre-wrap">${body}</div>
         </div>
-        <div class="footer">&copy; ${new Date().getFullYear()} Finova &middot; <a href="#" style="color:#4f46e5">Unsubscribe</a></div>
+        <div class="footer">&copy; ${new Date().getFullYear()} FinovaOS &middot; <a href="#" style="color:#4f46e5">Unsubscribe</a></div>
       </body>
       </html>
     `;

@@ -318,7 +318,7 @@ export default function SecurityPage() {
   return (
     <>
       <Head>
-        <title>Security – Finova</title>
+        <title>Security – FinovaOS</title>
         <meta name="description" content="Bank-grade security for your financial data. 256-bit encryption, role-based access, audit trails, and global cloud infrastructure."/>
       </Head>
 
@@ -440,7 +440,7 @@ export default function SecurityPage() {
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
               transition:"all .6s ease .22s",
             }}>
-              Finova is built on a security-first foundation. Your financial data is encrypted, isolated, audited, and stored on world-class servers — never sold, never shared.
+              FinovaOS is built on a security-first foundation. Your financial data is encrypted, isolated, audited, and stored on world-class servers — never sold, never shared.
             </p>
 
             {/* Cert chips */}
@@ -563,7 +563,7 @@ export default function SecurityPage() {
                 Responsible Disclosure
               </h2>
               <p style={{ fontSize:14.5, color:"rgba(255,255,255,.42)", lineHeight:1.8, marginBottom:24 }}>
-                We take all security reports seriously. If you&apos;ve discovered a vulnerability in Finova, please report it directly to our security team. We commit to acknowledging your report within 48 hours and resolving critical issues within 14 days.
+                We take all security reports seriously. If you&apos;ve discovered a vulnerability in FinovaOS, please report it directly to our security team. We commit to acknowledging your report within 48 hours and resolving critical issues within 14 days.
               </p>
               <a href="mailto:finovaos.app@gmail.com" style={{
                 display:"inline-flex", alignItems:"center", gap:8,

@@ -79,7 +79,7 @@ function ResetPasswordForm() {
                   <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                 </svg>
               </div>
-              <span style={{ fontSize:20, fontWeight:800, color:"white", fontFamily:"Lora,serif" }}>Finova</span>
+              <span style={{ fontSize:20, fontWeight:800, color:"white", fontFamily:"Lora,serif" }}>FinovaOS</span>
             </div>
           </Link>
         </div>
@@ -97,7 +97,7 @@ function ResetPasswordForm() {
             <>
               <h1 style={{ fontSize:24, fontWeight:800, color:"white", marginBottom:8 }}>Set new password</h1>
               <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", marginBottom:24, lineHeight:1.6 }}>
-                Choose a strong password for your Finova account.
+                Choose a strong password for your FinovaOS account.
               </p>
 
               {error && (

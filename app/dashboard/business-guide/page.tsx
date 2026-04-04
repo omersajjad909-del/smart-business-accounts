@@ -447,7 +447,7 @@ export default function BusinessGuidePage() {
               {companyInfo?.name || "Your Company"}
             </h1>
             <p style={{ margin: "0 0 20px", fontSize: 15, color: "rgba(255,255,255,.5)", lineHeight: 1.7, maxWidth: 540 }}>
-              {businessMeta.description}. This guide walks you through your complete business workflow, key modules, and how to get the most out of Finova for your {businessMeta.label.toLowerCase()} operations.
+              {businessMeta.description}. This guide walks you through your complete business workflow, key modules, and how to get the most out of FinovaOS for your {businessMeta.label.toLowerCase()} operations.
             </p>
 
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -496,7 +496,7 @@ export default function BusinessGuidePage() {
       {/* ── OVERVIEW TAB ──────────────────────────────────────────────────────── */}
       {activeTab === "overview" && (
         <div style={{ animation: "fadeUp .4s ease", display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* What Finova does for this business */}
+          {/* What FinovaOS does for this business */}
           <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: "28px 30px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", marginBottom: 12 }}>WHAT FINOVA DOES FOR YOUR BUSINESS</div>
             <h2 style={{ margin: "0 0 20px", fontSize: 22, fontWeight: 800 }}>Everything you need to run {businessMeta.label} operations</h2>
@@ -550,7 +550,7 @@ export default function BusinessGuidePage() {
         <div style={{ animation: "fadeUp .4s ease" }}>
           <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: "28px 30px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", marginBottom: 8 }}>STEP-BY-STEP BUSINESS WORKFLOW</div>
-            <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>How {businessMeta.label} businesses operate on Finova</h2>
+            <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>How {businessMeta.label} businesses operate on FinovaOS</h2>
             <p style={{ margin: "0 0 28px", fontSize: 14, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
               Follow this workflow every day to keep your books accurate, customers happy, and business growing.
             </p>
@@ -668,7 +668,7 @@ export default function BusinessGuidePage() {
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
               <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(167,139,250,.2)", border: "1px solid rgba(167,139,250,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>🤖</div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Finova AI Intelligence</div>
+                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>FinovaOS AI Intelligence</div>
                 <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>9 AI-powered features analyzing your real business data 24/7</div>
               </div>
               <Link href="/dashboard/ai" style={{ marginLeft: "auto", padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", textDecoration: "none", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap", boxShadow: "0 8px 24px rgba(99,102,241,.35)" }}>
@@ -715,9 +715,9 @@ export default function BusinessGuidePage() {
         <div style={{ animation: "fadeUp .4s ease" }}>
           <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: "28px 30px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", marginBottom: 8 }}>GETTING STARTED CHECKLIST</div>
-            <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>Set up Finova in 30 minutes</h2>
+            <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 800 }}>Set up FinovaOS in 30 minutes</h2>
             <p style={{ margin: "0 0 24px", fontSize: 14, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
-              Complete these steps to get your business fully operational on Finova.
+              Complete these steps to get your business fully operational on FinovaOS.
             </p>
 
             {/* Progress bar */}

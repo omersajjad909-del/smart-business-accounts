@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   // Generate TOTP secret
   const secret = generateSecret();
-  const appName = "Finova";
+  const appName = "FinovaOS";
   const otpAuthUrl = keyuri(user.email, appName, secret);
 
   // Store secret temporarily (not yet enabled)

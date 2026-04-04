@@ -36,7 +36,7 @@ export default function OnboardingWizard() {
           <div className="text-lg font-bold text-indigo-700">{steps[step].label}</div>
         </div>
         <div className="mb-8">
-          {step === 0 && <div>Welcome to Finova Accounts! Click next to begin setup.</div>}
+          {step === 0 && <div>Welcome to FinovaOS Accounts! Click next to begin setup.</div>}
           {step === 1 && <div>Enter your company profile details here.</div>}
           {step === 2 && <div>Add your business information here.</div>}
           {step === 3 && <div>Invite your team members to collaborate.</div>}

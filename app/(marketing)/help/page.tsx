@@ -12,7 +12,7 @@ const CATEGORIES = [
     title: "Getting Started",
     desc: "Setup your account and first steps",
     articles: [
-      { title: "How to create your Finova account",       time: "3 min", popular: true, slug: "create-account" },
+      { title: "How to create your FinovaOS account",       time: "3 min", popular: true, slug: "create-account" },
       { title: "Choosing the right plan for your business",time: "4 min", popular: true, slug: "choose-plan" },
       { title: "Setting up your company profile",         time: "5 min",               slug: "company-profile" },
       { title: "Inviting team members & setting roles",   time: "3 min",               slug: "invite-team" },
@@ -274,7 +274,7 @@ export default function HelpPage() {
               </span>
             </h1>
             <p style={{ fontSize: 15, color: "rgba(255,255,255,.38)", maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.7 }}>
-              Browse our guides, tutorials, and FAQs to get the most out of Finova.
+              Browse our guides, tutorials, and FAQs to get the most out of FinovaOS.
             </p>
 
             {/* Search bar */}

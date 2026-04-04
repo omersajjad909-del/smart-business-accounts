@@ -36,7 +36,7 @@ export async function GET() {
             letterSpacing: -1,
           }}
         >
-          Finova
+          FinovaOS
         </div>
         <div style={{ height: "16px" }} />
         <div

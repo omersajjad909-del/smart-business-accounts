@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     const emailResult = await sendEmail({
       to: user.email,
-      subject: "Reset your Finova password",
+      subject: "Reset your FinovaOS password",
       html: emailTemplates.passwordReset(
         { name: user.name || user.email },
         resetUrl,

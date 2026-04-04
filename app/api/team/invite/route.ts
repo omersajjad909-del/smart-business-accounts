@@ -50,8 +50,8 @@ export async function POST(req: NextRequest) {
     const inviteLink = `${base}/onboarding/accept-invite?token=${encodeURIComponent(inviteToken)}`;
     const mail = await sendEmail({
       to: emailNormalized,
-      subject: "You're invited to Finova",
-      html: `<p>You have been invited to join Finova as <b>${details.role}</b>.</p>
+      subject: "You're invited to FinovaOS",
+      html: `<p>You have been invited to join FinovaOS as <b>${details.role}</b>.</p>
         <p>Click the link below to accept and set your password:</p>
         <p><a href="${inviteLink}">${inviteLink}</a></p>`,
       companyId,

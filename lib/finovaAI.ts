@@ -1,5 +1,5 @@
 /**
- * Finova AI — Financial Intelligence Engine
+ * FinovaOS AI — Financial Intelligence Engine
  * Uses OpenAI to power a full financial assistant
  * with real DB context injected per request.
  */
@@ -13,17 +13,17 @@ const OPENAI_ORG = process.env.OPENAI_ORG;
 const HAS_OPENAI_KEY = Boolean(OPENAI_API_KEY);
 
 // ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
-// Complete Finova knowledge base — plans, modules, features, navigation, accounting
+// Complete FinovaOS knowledge base — plans, modules, features, navigation, accounting
 
 export const FINOVA_SYSTEM_PROMPT = `
-You are Finova AI — the built-in Financial Intelligence Assistant for Finova, a cloud-based accounting and business management platform for SMEs.
+You are FinovaOS AI — the built-in Financial Intelligence Assistant for FinovaOS, a cloud-based accounting and business management platform for SMEs.
 
 You are NOT just a chatbot. You are a financial analyst, accountant, business advisor, and automation assistant — all in one. You read real company financial data and give precise, actionable answers.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ABOUT FINOVA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Finova is a complete cloud accounting and ERP platform for small and medium businesses.
+FinovaOS is a complete cloud accounting and ERP platform for small and medium businesses.
 - Multi-company, multi-branch, multi-currency support
 - Supports 30+ business types (trading, retail, manufacturing, restaurant, hotel, school, etc.)
 - Available in English and Urdu (Roman & script)
@@ -382,7 +382,7 @@ HOW TO RESPOND
 5. If asked about a feature not in their plan, explain what plan they need to upgrade to.
 6. Give actionable recommendations, not just observations.
 7. For financial questions, show actual numbers from their data.
-8. For "how to" questions, give step-by-step instructions specific to Finova.
+8. For "how to" questions, give step-by-step instructions specific to FinovaOS.
 9. Format currency with the company's currency symbol.
 10. Always end with a follow-up suggestion when relevant.
 
@@ -1010,7 +1010,7 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
   if (!ctx) {
     if (q.includes("ai") || q.includes("feature") || q.includes("kya karta") || q.includes("capabilities")) {
       return [
-        `Finova AI — 9 powerful features built into your dashboard at /dashboard/ai:`,
+        `FinovaOS AI — 9 powerful features built into your dashboard at /dashboard/ai:`,
         `1. ⚡ Overview — Business health score, KPIs, deep analysis`,
         `2. 💬 Ask AI — Chat with your financial data in English or Urdu`,
         `3. 🧠 Insights — Revenue, profitability, inventory & risk analysis`,
@@ -1024,9 +1024,9 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
       ].join("\n");
     }
     return [
-      `Main Finova AI hun — aap ka financial intelligence assistant.`,
+      `Main FinovaOS AI hun — aap ka financial intelligence assistant.`,
       `Company data access ke liye please login karein aur main aap ki real financials ke saath kaam kar sakta hun.`,
-      `Finova AI me 9 features hain: Overview, Chat, Insights, Alerts, Forecast, Recommendations, Monthly Report, Market Intelligence, aur Business Advisor.`,
+      `FinovaOS AI me 9 features hain: Overview, Chat, Insights, Alerts, Forecast, Recommendations, Monthly Report, Market Intelligence, aur Business Advisor.`,
       `Sab features /dashboard/ai pe milte hain.`,
     ].join("\n");
   }
@@ -1177,7 +1177,7 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
   // ── AI Features explanation ────────────────────────────────────────────────
   if (q.includes("ai feature") || q.includes("ai kya") || q.includes("ai kya karta") || q.includes("ai tabs") || q.includes("ai mein") || q.includes("what can ai") || q.includes("ai capabilities")) {
     return [
-      `🤖 Finova AI — 9 Features at /dashboard/ai:`,
+      `🤖 FinovaOS AI — 9 Features at /dashboard/ai:`,
       `⚡ Overview — Health score, KPIs, deep financial analysis`,
       `💬 Ask AI — Chat with your finances in English or Urdu`,
       `🧠 Insights — Revenue analyzer, profitability, inventory, risk, late payments`,
@@ -1244,7 +1244,7 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
   // ── How to / Setup ─────────────────────────────────────────────────────────
   if (q.includes("how to") || q.includes("kaise") || q.includes("setup") || q.includes("start") || q.includes("kahan se") || q.includes("shuru")) {
     return [
-      `🚀 How to get started with Finova:`,
+      `🚀 How to get started with FinovaOS:`,
       `Step 1: Setup company profile → /dashboard/business-settings`,
       `Step 2: Add your accounts (Chart of Accounts) → Dashboard > Accounts`,
       `Step 3: Set opening balances → /dashboard/opening-balances`,
@@ -1312,8 +1312,8 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
   if (q.includes("system") || q.includes("samjhao") || q.includes("finova") || q.includes("modules") || q.includes("features")) {
     const bType = (ctx.company.businessType || "business").replace(/[-_]/g, " ");
     return [
-      `🏢 Finova — ${ctx.company.name} (${bType}, plan: ${ctx.company.plan}):`,
-      `Finova is a complete cloud ERP for SMEs. Main modules:`,
+      `🏢 FinovaOS — ${ctx.company.name} (${bType}, plan: ${ctx.company.plan}):`,
+      `FinovaOS is a complete cloud ERP for SMEs. Main modules:`,
       `📊 Accounting: Ledger, Trial Balance, P&L, Balance Sheet, Cash Flow`,
       `🧾 Sales: Invoices, Quotations, Delivery Challans, Sales Orders`,
       `🛒 Purchases: POs, GRN, Purchase Invoices, Expense Vouchers`,
@@ -1379,7 +1379,7 @@ export async function finovaChat(
         }
       }
     } catch (error) {
-      console.error("Finova chat fell back to local reply:", error);
+      console.error("FinovaOS chat fell back to local reply:", error);
       yield localAIReply(message, ctx);
     }
   })();

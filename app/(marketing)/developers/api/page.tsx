@@ -326,7 +326,7 @@ export default function ApiDocsPage() {
             REST API — v1
           </div>
           <h1 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(28px,4vw,48px)", fontWeight: 700, letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 14 }}>
-            Finova API Reference
+            FinovaOS API Reference
           </h1>
           <p style={{ fontSize: 15, color: "rgba(255,255,255,.42)", lineHeight: 1.8, maxWidth: 620 }}>
             Company-scoped REST API. Generate a key from Dashboard → Integrations → API Access. Send it in every request header.

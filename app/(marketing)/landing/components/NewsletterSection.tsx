@@ -123,7 +123,7 @@ export default function NewsletterSection() {
                 background:"linear-gradient(135deg,#818cf8,#a78bfa,#60a5fa)",
                 WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
               }}>
-                Finova updates
+                FinovaOS updates
               </span>
             </h2>
 

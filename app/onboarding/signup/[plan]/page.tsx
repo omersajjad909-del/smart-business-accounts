@@ -567,7 +567,7 @@ export default function SignupByPlanPage() {
               </svg>
             </div>
             <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", letterSpacing:"-.3px" }}>
-              Finova
+              FinovaOS
             </span>
           </div>
 

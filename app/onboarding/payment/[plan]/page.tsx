@@ -504,7 +504,7 @@ export default function PaymentPage() {
             <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#6366f1,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 14px rgba(99,102,241,.4)" }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
             </div>
-            <span style={{ fontSize:17, fontWeight:700, letterSpacing:"-.3px" }}>Finova</span>
+            <span style={{ fontSize:17, fontWeight:700, letterSpacing:"-.3px" }}>FinovaOS</span>
           </div>
           <div className="pay-steps"><Steps current={step} /></div>
           <button onClick={() => step===1 ? router.back() : setStep(1)}
@@ -958,7 +958,7 @@ export default function PaymentPage() {
                 </div>
               </div>
               <div style={{ animation:"celebSlide .5s ease .3s both" }}>
-                <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:2, color:pm.color, marginBottom:8 }}>Welcome to Finova</div>
+                <div style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:2, color:pm.color, marginBottom:8 }}>Welcome to FinovaOS</div>
                 <h2 style={{ margin:"0 0 6px", fontSize:32, fontWeight:900, background:`linear-gradient(135deg, white 30%, ${pm.color})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>{pm.name} Activated!</h2>
                 <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", margin:"0 0 28px" }}>Your account is ready. Taking you to your dashboard…</p>
               </div>

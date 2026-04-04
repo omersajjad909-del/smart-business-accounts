@@ -11,7 +11,7 @@ const FAQS = [
   { q: "How are transactions categorized?", a: "Our system helps you categorize transactions into ledgers. You can review and manage your Chart of Accounts under the Accounts menu." },
   { q: "Is my financial data secure?", a: "Yes. We use industry-standard encryption for data at rest and in transit. Your financial data is isolated per company and never shared." },
   { q: "How do I invite my accountant?", a: "Go to the Team menu in your dashboard and click 'Add User'. You can assign roles like 'Accountant' or 'Viewer' to give specific access levels." },
-  { q: "Can I manage multiple branches?", a: "Yes. Finova supports multi-branch management. You can track branch-level P&L and consolidate data across all entities from a single dashboard." },
+  { q: "Can I manage multiple branches?", a: "Yes. FinovaOS supports multi-branch management. You can track branch-level P&L and consolidate data across all entities from a single dashboard." },
 ];
 
 const CONTACTS = [

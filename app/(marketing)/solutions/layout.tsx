@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 export const metadata: Metadata = {
   title: "Industry Solutions — Trading, Manufacturing, Services & More",
   description:
-    "Finova is purpose-built for traders, distributors, manufacturers, retail, and service businesses. Explore industry-specific accounting workflows, inventory systems, and financial tools designed for your sector.",
+    "FinovaOS is purpose-built for traders, distributors, manufacturers, retail, and service businesses. Explore industry-specific accounting workflows, inventory systems, and financial tools designed for your sector.",
   keywords: [
     "trading business accounting software",
     "manufacturing accounting",
@@ -17,18 +17,18 @@ export const metadata: Metadata = {
     "wholesale accounting software",
   ],
   openGraph: {
-    title: "Industry Solutions for Every Business Type | Finova",
+    title: "Industry Solutions for Every Business Type | FinovaOS",
     description:
       "Purpose-built for traders, distributors, manufacturers, and service businesses. Industry-specific workflows for better financial management.",
     url: `${BASE}/solutions`,
-    siteName: "Finova",
-    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "Finova Industry Solutions" }],
+    siteName: "FinovaOS",
+    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS Industry Solutions" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Industry Solutions | Finova",
-    description: "Trading, manufacturing, retail, and services — Finova adapts to your industry.",
+    title: "Industry Solutions | FinovaOS",
+    description: "Trading, manufacturing, retail, and services — FinovaOS adapts to your industry.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/solutions` },

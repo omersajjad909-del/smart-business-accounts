@@ -19,7 +19,7 @@ const FALLBACK = [
   { id:"5", type:"bugfix",      version:"v2.2.1", title:"NaN Height Fix in Charts",     body:"Fixed a bug where LineChart and BarChart showed NaN CSS height when data was empty or all-zero.", createdAt:"2025-02-26" },
   { id:"6", type:"feature",     version:"v2.2.0", title:"Email Broadcasts",             body:"Admins can now send email announcements to all users, active subscribers, trial users, or specific plans.", createdAt:"2025-02-20" },
   { id:"7", type:"feature",     version:"v2.1.0", title:"Feature Flags",                body:"Toggle features on/off without deploying. Control rollout percentage per flag.", createdAt:"2025-02-14" },
-  { id:"8", type:"announcement",version:"v2.0.0", title:"Finova 2.0 — The Platform Era",body:"New modular architecture, custom plans, API access tier, and 150+ currency support. Biggest release yet.", createdAt:"2025-02-01" },
+  { id:"8", type:"announcement",version:"v2.0.0", title:"FinovaOS 2.0 — The Platform Era",body:"New modular architecture, custom plans, API access tier, and 150+ currency support. Biggest release yet.", createdAt:"2025-02-01" },
 ];
 
 function useInView() {

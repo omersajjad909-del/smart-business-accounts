@@ -1,5 +1,5 @@
 // FILE: lib/emailTemplates.ts
-// All Finova email templates — HTML branded emails
+// All FinovaOS email templates — HTML branded emails
 // Usage: import { emailTemplates } from "@/lib/emailTemplates"
 
 import { getAppUrl, getMarketingUrl } from "@/lib/domains";
@@ -33,7 +33,7 @@ function baseTemplate(content: string, preheader = "") {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Finova</title>
+  <title>FinovaOS</title>
   <style>${STYLES}</style>
 </head>
 <body>
@@ -46,10 +46,10 @@ function baseTemplate(content: string, preheader = "") {
     <div class="body">${content}</div>
     <div class="footer">
       <p style="font-size:12px;color:#94a3b8;margin:0 0 8px;">
-        © ${new Date().getFullYear()} Finova · <a href="${BASE_URL}/legal/privacy" style="color:#6366f1;">Privacy Policy</a> · <a href="${BASE_URL}/legal/terms" style="color:#6366f1;">Terms</a>
+        © ${new Date().getFullYear()} FinovaOS · <a href="${BASE_URL}/legal/privacy" style="color:#6366f1;">Privacy Policy</a> · <a href="${BASE_URL}/legal/terms" style="color:#6366f1;">Terms</a>
       </p>
       <p style="font-size:11px;color:#cbd5e1;margin:0;">
-        You're receiving this email because you signed up for Finova.<br>
+        You're receiving this email because you signed up for FinovaOS.<br>
         <a href="${BASE_URL}/unsubscribe" style="color:#94a3b8;">Unsubscribe</a>
       </p>
     </div>
@@ -65,21 +65,21 @@ export const emailTemplates = {
     baseTemplate(`
       <h1>Verify your email address</h1>
       <p>Hi <strong>${user.name}</strong>,</p>
-      <p>Welcome to Finova! Enter this code to verify your email and activate your account.</p>
+      <p>Welcome to FinovaOS! Enter this code to verify your email and activate your account.</p>
       <div class="otp-box">
         <div style="font-size:12px;font-weight:700;color:#64748b;letter-spacing:.1em;margin-bottom:8px;">YOUR VERIFICATION CODE</div>
         <div class="otp-code">${code}</div>
         <div style="font-size:12px;color:#94a3b8;margin-top:8px;">Valid for 15 minutes</div>
       </div>
-      <p>If you didn't create a Finova account, you can safely ignore this email.</p>
+      <p>If you didn't create a FinovaOS account, you can safely ignore this email.</p>
       <div class="divider"></div>
-      <p style="font-size:13px;color:#94a3b8;">For security, never share this code with anyone — Finova will never ask for it.</p>
-    `, `Your Finova verification code is ${code}`),
+      <p style="font-size:13px;color:#94a3b8;">For security, never share this code with anyone — FinovaOS will never ask for it.</p>
+    `, `Your FinovaOS verification code is ${code}`),
 
   /* ── 2. Welcome Email ── */
   welcome: (user: { name: string; email: string }, plan: string, companyName: string) =>
     baseTemplate(`
-      <h1>Welcome to Finova, ${user.name.split(" ")[0]}! 🎉</h1>
+      <h1>Welcome to FinovaOS, ${user.name.split(" ")[0]}! 🎉</h1>
       <p>Your <strong>${companyName}</strong> workspace is ready. You're on the <span class="tag">${plan.toUpperCase()}</span> plan.</p>
       <p>Here's what you can do right now:</p>
       <div style="margin:20px 0;">
@@ -93,14 +93,14 @@ export const emailTemplates = {
         <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard →</a>
       </div>
       <p style="font-size:13px;color:#94a3b8;text-align:center;">Need help? Reply to this email or visit our <a href="${BASE_URL}/help" style="color:#6366f1;">Help Centre</a>.</p>
-    `, `Your Finova workspace is ready — let's get started`),
+    `, `Your FinovaOS workspace is ready — let's get started`),
 
   /* ── 3. Password Reset ── */
   passwordReset: (user: { name: string }, resetUrl: string) =>
     baseTemplate(`
       <h1>Reset your password</h1>
       <p>Hi <strong>${user.name}</strong>,</p>
-      <p>We received a request to reset your Finova password. Click the button below to set a new password.</p>
+      <p>We received a request to reset your FinovaOS password. Click the button below to set a new password.</p>
       <div style="text-align:center;margin:32px 0;">
         <a href="${resetUrl}" class="btn">Reset Password →</a>
       </div>
@@ -109,14 +109,14 @@ export const emailTemplates = {
       <p style="font-size:12px;color:#94a3b8;">If the button doesn't work, copy and paste this link:<br>
         <a href="${resetUrl}" style="color:#6366f1;word-break:break-all;">${resetUrl}</a>
       </p>
-    `, "Reset your Finova password"),
+    `, "Reset your FinovaOS password"),
 
   /* ── 4. Team Invite ── */
   teamInvite: (inviter: string, companyName: string, role: string, inviteUrl: string) =>
     baseTemplate(`
       <h1>You've been invited to join ${companyName}</h1>
-      <p><strong>${inviter}</strong> has invited you to collaborate on <strong>${companyName}</strong>'s Finova workspace as a <span class="tag">${role}</span>.</p>
-      <p>Finova is a cloud accounting platform that helps businesses manage invoices, inventory, payroll, and more.</p>
+      <p><strong>${inviter}</strong> has invited you to collaborate on <strong>${companyName}</strong>'s FinovaOS workspace as a <span class="tag">${role}</span>.</p>
+      <p>FinovaOS is a cloud accounting platform that helps businesses manage invoices, inventory, payroll, and more.</p>
       <div style="background:#f8fafc;border-radius:12px;padding:20px;margin:24px 0;border:1px solid #e2e8f0;">
         <div style="font-size:13px;color:#64748b;margin-bottom:8px;">YOU'VE BEEN INVITED TO</div>
         <div style="font-size:18px;font-weight:800;color:#0f172a;">${companyName}</div>
@@ -126,7 +126,7 @@ export const emailTemplates = {
         <a href="${inviteUrl}" class="btn">Accept Invitation →</a>
       </div>
       <p style="font-size:13px;color:#94a3b8;">This invitation expires in 7 days. If you don't know ${inviter}, you can ignore this email.</p>
-    `, `${inviter} invited you to join ${companyName} on Finova`),
+    `, `${inviter} invited you to join ${companyName} on FinovaOS`),
 
   /* ── 5. Invoice Sent (to customer) ── */
   invoiceSent: (customerName: string, invoiceNo: string, amount: string, dueDate: string, companyName: string, viewUrl: string) =>
@@ -196,10 +196,10 @@ export const emailTemplates = {
       <div style="text-align:center;margin:28px 0;">
         <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard →</a>
       </div>
-    `, `Your Finova ${plan} plan is now active`),
+    `, `Your FinovaOS ${plan} plan is now active`),
 
   /* ── 8. Email Broadcast (admin sends to users) ── */
-  broadcast: (subject: string, body: string, _companyName = "Finova") =>
+  broadcast: (subject: string, body: string, _companyName = "FinovaOS") =>
     baseTemplate(`
       <h1>${subject}</h1>
       <div style="white-space:pre-wrap;font-size:15px;line-height:1.75;color:#475569;">${body}</div>
@@ -217,8 +217,8 @@ export const emailTemplates = {
       <p>Thanks for reaching out! We've received your message about <strong>"${subject}"</strong> and will get back to you within 24 hours.</p>
       <p>In the meantime, you might find answers in our <a href="${BASE_URL}/help" style="color:#6366f1;">Help Centre</a>.</p>
       <div class="divider"></div>
-      <p style="font-size:13px;color:#94a3b8;">— The Finova Team</p>
-    `, "We received your message — Finova"),
+      <p style="font-size:13px;color:#94a3b8;">— The FinovaOS Team</p>
+    `, "We received your message — FinovaOS"),
 
   /* ── 10. Payslip Notification ── */
   payslip: (employeeName: string, month: string, netSalary: string, viewUrl: string) =>
@@ -263,7 +263,7 @@ export const emailTemplates = {
       <!-- Hero -->
       <div style="background:${c.bg};padding:36px 40px;text-align:center;margin:-40px -40px 32px;">
         <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">${c.badge}</div>
-        <h1 style="font-size:28px;font-weight:900;color:#ffffff;margin:0 0 10px;line-height:1.2;">Welcome to Finova! 🎉</h1>
+        <h1 style="font-size:28px;font-weight:900;color:#ffffff;margin:0 0 10px;line-height:1.2;">Welcome to FinovaOS! 🎉</h1>
         <p style="font-size:15px;color:rgba(255,255,255,.75);margin:0;">Your subscription is active and ready to use.</p>
       </div>
 
@@ -296,7 +296,7 @@ export const emailTemplates = {
 
       <div class="divider"></div>
       <p style="font-size:13px;color:#94a3b8;">Questions? Reply to this email or visit our <a href="${BASE_URL}/support" style="color:#6366f1;">Help Centre</a>. We're always here.</p>
-      <p style="font-size:13px;color:#94a3b8;">— The Finova Team ✨</p>
-    `, `Welcome to Finova — Your ${plan} plan is active!`);
+      <p style="font-size:13px;color:#94a3b8;">— The FinovaOS Team ✨</p>
+    `, `Welcome to FinovaOS — Your ${plan} plan is active!`);
   },
 };

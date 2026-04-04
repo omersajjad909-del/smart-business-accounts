@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const { channel, phone } = await req.json();
     const companyId = await resolveCompanyId(req);
-    const testMsg = "✅ This is a test notification from Finova. Your notifications are working correctly!";
+    const testMsg = "✅ This is a test notification from FinovaOS. Your notifications are working correctly!";
 
     if (channel === "whatsapp") {
       const ok = await sendWhatsApp({ to: phone, message: testMsg, companyId: companyId || undefined });
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (channel === "email") {
-      const result = await sendEmail({ to: phone, subject: "Finova Test Notification", html: `<p>${testMsg}</p>`, companyId: companyId || undefined });
+      const result = await sendEmail({ to: phone, subject: "FinovaOS Test Notification", html: `<p>${testMsg}</p>`, companyId: companyId || undefined });
       return NextResponse.json({ success: result.success, error: result.error || null });
     }
 

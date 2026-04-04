@@ -11,9 +11,9 @@ type Testimonial = {
 const FALLBACK: Testimonial[] = [
   { id:"1", name:"Thomas Miller",   company:"Miller Trading Co.",        role:"CEO",              message:"Finally, accounting that matches our business reality. Bank reconciliation used to take 3 days — now it's done before lunch.", rating:5, planUsed:"PROFESSIONAL",        featured:true  },
   { id:"2", name:"Alicia Stevens",  company:"Global Distribution Group", role:"CFO",              message:"The dashboard gives us instant clarity across all 5 branches. We scaled from 2 to 5 locations with zero chaos.", rating:5, planUsed:"ENTERPRISE",  featured:true  },
-  { id:"3", name:"Ryan Kennedy",    company:"Apex Supply Chain",         role:"Managing Director",message:"We were running on spreadsheets and prayers. Switching to Finova was the single best operational decision this year.", rating:5, planUsed:"PROFESSIONAL",        featured:true  },
+  { id:"3", name:"Ryan Kennedy",    company:"Apex Supply Chain",         role:"Managing Director",message:"We were running on spreadsheets and prayers. Switching to FinovaOS was the single best operational decision this year.", rating:5, planUsed:"PROFESSIONAL",        featured:true  },
   { id:"4", name:"Fiona Murphy",    company:"Meridian Importers",        role:"Finance Director", message:"Real-time P&L was a game-changer. I can see exactly where every dollar is going before the month closes, not after.", rating:5, planUsed:"PROFESSIONAL",        featured:false },
-  { id:"5", name:"Samir Al-Rashid", company:"Gulf Trade Solutions",      role:"Owner",            message:"Multi-currency support is flawless. We invoice in USD, AED, and PKR — Finova handles exchange rates automatically.", rating:5, planUsed:"ENTERPRISE",  featured:false },
+  { id:"5", name:"Samir Al-Rashid", company:"Gulf Trade Solutions",      role:"Owner",            message:"Multi-currency support is flawless. We invoice in USD, AED, and PKR — FinovaOS handles exchange rates automatically.", rating:5, planUsed:"ENTERPRISE",  featured:false },
   { id:"6", name:"Priya Sharma",    company:"Spark Retail Chain",        role:"Operations Head",  message:"Inventory syncs with sales in real time. No more end-of-day stock counts. Our team saves 8 hours every week.", rating:5, planUsed:"PROFESSIONAL",              featured:false },
   { id:"7", name:"James Okonkwo",   company:"Lagos Supply Co.",          role:"Director",         message:"Finally a system that works for African businesses too. Multi-currency and multi-branch — exactly what we needed.", rating:5, planUsed:"PROFESSIONAL",         featured:false },
   { id:"8", name:"Sofia Reyes",     company:"Reyes Importaciones",       role:"CFO",              message:"The payroll module alone saved us 2 full days every month. Now payslips go out in minutes.", rating:5, planUsed:"ENTERPRISE",                       featured:false },
@@ -130,7 +130,7 @@ export default function TestimonialsPage() {
               🏷️ 75% OFF — FIRST 3 MONTHS
             </div>
             <h3 style={{fontFamily:"'Lora',serif",fontSize:"clamp(18px,2.5vw,26px)",fontWeight:700,color:"white",letterSpacing:"-.4px",marginBottom:6}}>
-              Join thousands of businesses on Finova
+              Join thousands of businesses on FinovaOS
             </h3>
             <p style={{fontSize:14,color:"rgba(255,255,255,.4)",margin:0}}>Any industry. Any size. Anywhere in the world.</p>
           </div>

@@ -148,7 +148,7 @@ export default function AgentDashboard() {
   async function takeOver() {
     if (!activeId) return;
     await updateConversation(activeId, { status: "agent", assignedAgent: AGENT_NAME });
-    await saveMessage(activeId, "agent", `Hi! I'm ${AGENT_NAME} from Finova Support. How can I help you today? 😊`);
+    await saveMessage(activeId, "agent", `Hi! I'm ${AGENT_NAME} from FinovaOS Support. How can I help you today? 😊`);
     loadConversations();
     loadMessages();
   }
@@ -229,7 +229,7 @@ export default function AgentDashboard() {
           </button>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ width:28, height:28, borderRadius:8, background:"linear-gradient(135deg,#6366f1,#818cf8)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💬</div>
-            <span style={{ fontWeight:800, fontSize:15, letterSpacing:"-.02em" }}>Finova <span style={{ color:"#818cf8" }}>Support</span></span>
+            <span style={{ fontWeight:800, fontSize:15, letterSpacing:"-.02em" }}>FinovaOS <span style={{ color:"#818cf8" }}>Support</span></span>
           </div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>

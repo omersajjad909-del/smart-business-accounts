@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const url = `${base}/api/auth/magic/callback?token=${encodeURIComponent(token)}`;
     await sendEmail({
       to: emailNormalized,
-      subject: "Login to Finova",
+      subject: "Login to FinovaOS",
       html: `<p>Click to login: <a href="${url}">${url}</a></p><p>This link expires in 15 minutes.</p>`,
     });
     return NextResponse.json({ ok: true });

@@ -144,7 +144,7 @@ export default function DemoBusinessShowcase({
             {businessMeta.label} operations, explained beautifully.
           </h1>
           <p style={{ margin: "12px 0 0", color: "rgba(255,255,255,0.62)", fontSize: 15, maxWidth: 760, lineHeight: 1.7 }}>
-            {businessMeta.description} This demo shows how Finova fits the flow, reporting style, and decisions that matter for this business.
+            {businessMeta.description} This demo shows how FinovaOS fits the flow, reporting style, and decisions that matter for this business.
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
             {businessFlow.map((step, index) => (

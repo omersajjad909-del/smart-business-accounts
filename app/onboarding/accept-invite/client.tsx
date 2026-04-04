@@ -131,7 +131,7 @@ export default function ClientAcceptInvite() {
               <rect x="6" y="11.5" width="6" height="2.5" rx="1.25" fill="white" opacity=".45"/>
             </svg>
           </div>
-          <span style={{ fontSize: 18, fontWeight: 800, color: "white", letterSpacing: "-.3px" }}>Finova</span>
+          <span style={{ fontSize: 18, fontWeight: 800, color: "white", letterSpacing: "-.3px" }}>FinovaOS</span>
         </div>
 
         <div style={{ marginBottom: 24 }}>

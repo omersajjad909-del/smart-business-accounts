@@ -429,7 +429,7 @@ export default function SocialMediaPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                   <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#a78bfa)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "white" }}>F</div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>Finova</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>FinovaOS</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Just now</div>
                   </div>
                 </div>

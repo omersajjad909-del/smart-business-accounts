@@ -68,7 +68,7 @@ const BUSINESSES: DemoBusiness[] = [
       "📈 Predicts next month revenue based on trend",
       "⚠️ Alerts when margins drop below your threshold",
     ],
-    proof: ["100+ trading businesses active on Finova", "Average invoice-to-collection time reduced by 40%", "Multi-currency support for import goods"],
+    proof: ["100+ trading businesses active on FinovaOS", "Average invoice-to-collection time reduced by 40%", "Multi-currency support for import goods"],
     highlights: [
       { label: "Quotation to Order", value: "1-click", sub: "No re-entry, no duplication" },
       { label: "Receivable Visibility", value: "Real-time", sub: "Outstanding by customer always visible" },
@@ -537,7 +537,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 const CATEGORIES = Array.from(new Set(BUSINESSES.map((b) => b.category)));
 
 const TRUST_STATS = [
-  { value: "18,000+", label: "Businesses on Finova", icon: "🏢" },
+  { value: "18,000+", label: "Businesses on FinovaOS", icon: "🏢" },
   { value: "4.8 / 5", label: "Average rating", icon: "⭐" },
   { value: "99.9%", label: "Uptime SLA", icon: "🔒" },
   { value: "14 Types", label: "Business verticals", icon: "📊" },
@@ -658,7 +658,7 @@ export default function DemoPage() {
           Pick your business type.
           <br />
           <span style={{ background: "linear-gradient(90deg,#a5b4fc,#38bdf8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            See exactly how Finova runs it.
+            See exactly how FinovaOS runs it.
           </span>
         </h1>
         <p style={{ fontSize: 17, color: "rgba(255,255,255,.5)", lineHeight: 1.8, maxWidth: 620, margin: "0 auto 32px" }}>
@@ -914,7 +914,7 @@ export default function DemoPage() {
             {activeTab === "workflow" && (
               <div className="demo-workflow-grid" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 18, animation: "fadeUp .3s ease both" }}>
                 <div style={{ background: "rgba(255,255,255,.025)", border: `1px solid ${biz.color}18`, borderRadius: 22, padding: "24px 24px" }}>
-                  <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 18 }}>How {biz.label} works on Finova</div>
+                  <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 18 }}>How {biz.label} works on FinovaOS</div>
                   <div style={{ display: "grid", gap: 16 }}>
                     {biz.workflow.map((step, i) => (
                       <div key={step.step} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
@@ -968,7 +968,7 @@ export default function DemoPage() {
                   <div style={{ padding: "22px 22px", borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)" }}>
                     <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 4 }}>AI Chat — Ask anything</div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", lineHeight: 1.7, marginBottom: 14 }}>
-                      In the live demo, open the AI Assistant and type any question about your data — revenue trends, best customers, cash flow, what to do next. Finova AI answers with real numbers from your demo data.
+                      In the live demo, open the AI Assistant and type any question about your data — revenue trends, best customers, cash flow, what to do next. FinovaOS AI answers with real numbers from your demo data.
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {["What is my revenue trend this month?", "Which customers owe the most?", "What should I focus on this week?"].map((q) => (

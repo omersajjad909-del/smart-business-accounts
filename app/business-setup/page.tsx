@@ -275,7 +275,7 @@ export default function BusinessSetupPage() {
             <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
           </svg>
         </div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", letterSpacing: ".1em", textTransform: "uppercase" }}>Welcome to Finova</div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", letterSpacing: ".1em", textTransform: "uppercase" }}>Welcome to FinovaOS</div>
       </div>
 
       {/* ── STEP 1: Choose business type ── */}

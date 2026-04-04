@@ -192,8 +192,8 @@ export default function AllPagesPage() {
   return (
     <>
       <Head>
-        <title>Sitemap – Finova</title>
-        <meta name="description" content="Complete sitemap for Finova — all pages organized by category."/>
+        <title>Sitemap – FinovaOS</title>
+        <meta name="description" content="Complete sitemap for FinovaOS — all pages organized by category."/>
       </Head>
 
       <div style={{

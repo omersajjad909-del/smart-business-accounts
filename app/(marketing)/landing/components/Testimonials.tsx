@@ -25,7 +25,7 @@ type Testimonial = {
 const FALLBACK: Testimonial[] = [
   { id:"1", name:"Thomas Miller",  company:"Miller Trading Co.",        role:"CEO",              message:"Finally, accounting that matches our business reality. Bank reconciliation used to take 3 days — now it's done before lunch.", rating:5, planUsed:"PROFESSIONAL",       featured:true },
   { id:"2", name:"Alicia Stevens", company:"Global Distribution Group", role:"CFO",              message:"The dashboard gives us instant clarity across all 5 branches. We scaled from 2 to 5 locations with zero chaos.", rating:5, planUsed:"ENTERPRISE", featured:true },
-  { id:"3", name:"Ryan Kennedy",   company:"Apex Supply Chain",         role:"Managing Director",message:"We were running on spreadsheets and prayers. Switching to Finova was the single best operational decision we made this year.", rating:5, planUsed:"PROFESSIONAL",  featured:true },
+  { id:"3", name:"Ryan Kennedy",   company:"Apex Supply Chain",         role:"Managing Director",message:"We were running on spreadsheets and prayers. Switching to FinovaOS was the single best operational decision we made this year.", rating:5, planUsed:"PROFESSIONAL",  featured:true },
 ];
 
 const COLORS = ["#818cf8","#34d399","#fbbf24","#f87171","#a78bfa","#06b6d4"];

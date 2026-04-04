@@ -1616,10 +1616,10 @@ function PageUsage({ setPage }: { setPage:(p:Page)=>void }) {
   async function sendQuickBroadcast(type: "reengagement"|"upgrade") {
     setSending(true);
     const payload = type === "reengagement"
-      ? { subject:"We miss you! Come back to Finova", audience:"churned",
-          body:"Hi,\n\nWe noticed you haven't logged in for a while. Your Finova workspace is waiting!\n\nA lot has improved — new features, faster reports, and better invoice management.\n\n👉 Log back in and pick up where you left off.\n\nIf you need help, just reply to this email.\n\n— The Finova Team" }
+      ? { subject:"We miss you! Come back to FinovaOS", audience:"churned",
+          body:"Hi,\n\nWe noticed you haven't logged in for a while. Your FinovaOS workspace is waiting!\n\nA lot has improved — new features, faster reports, and better invoice management.\n\n👉 Log back in and pick up where you left off.\n\nIf you need help, just reply to this email.\n\n— The FinovaOS Team" }
       : { subject:"You're a power user — time to upgrade!", audience:"active",
-          body:"Hi,\n\nYour business is generating a lot of invoices on Finova — that's amazing!\n\nYou might be hitting limits soon. Upgrade to Pro or Enterprise to unlock:\n✓ Unlimited invoices & users\n✓ Advanced reports\n✓ Priority support\n✓ Multi-branch support\n\n👉 Upgrade now and keep growing.\n\n— The Finova Team" };
+          body:"Hi,\n\nYour business is generating a lot of invoices on FinovaOS — that's amazing!\n\nYou might be hitting limits soon. Upgrade to Pro or Enterprise to unlock:\n✓ Unlimited invoices & users\n✓ Advanced reports\n✓ Priority support\n✓ Multi-branch support\n\n👉 Upgrade now and keep growing.\n\n— The FinovaOS Team" };
     try {
       await fetch("/api/admin/broadcasts", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({...payload, channel:"email"}) });
       setSent(true);
@@ -1728,8 +1728,8 @@ function PageUsage({ setPage }: { setPage:(p:Page)=>void }) {
             </div>
             <div style={{ background:"rgba(255,255,255,.04)",borderRadius:10,padding:"14px 16px",fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.8,marginBottom:20,maxHeight:160,overflowY:"auto" }}>
               {quickModal.type==="reengagement"
-                ? "Subject: We miss you! Come back to Finova\n\nHi, We noticed you haven't logged in for a while. Your Finova workspace is waiting! A lot has improved — new features, faster reports, and better invoice management.\n\n👉 Log back in and pick up where you left off."
-                : "Subject: You're a power user — time to upgrade!\n\nHi, Your business is generating a lot of invoices on Finova — that's amazing! Upgrade to Pro or Enterprise to unlock unlimited invoices, advanced reports, and priority support."}
+                ? "Subject: We miss you! Come back to FinovaOS\n\nHi, We noticed you haven't logged in for a while. Your FinovaOS workspace is waiting! A lot has improved — new features, faster reports, and better invoice management.\n\n👉 Log back in and pick up where you left off."
+                : "Subject: You're a power user — time to upgrade!\n\nHi, Your business is generating a lot of invoices on FinovaOS — that's amazing! Upgrade to Pro or Enterprise to unlock unlimited invoices, advanced reports, and priority support."}
             </div>
             {sent ? (
               <div style={{ padding:"12px",borderRadius:10,background:"rgba(52,211,153,.15)",border:"1px solid rgba(52,211,153,.3)",color:"#34d399",fontSize:13,fontWeight:700,textAlign:"center" }}>
@@ -2805,7 +2805,7 @@ function PageLiveSupport() {
   async function takeOver() {
     if (!activeId) return;
     await fetch(`/api/chat/conversations/${activeId}`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ status:"agent", assignedAgent:"Admin Agent" }) });
-    await fetch("/api/chat/messages", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ conversationId:activeId, sender:"agent", text:"Hi! I'm an Admin Agent from Finova Support. How can I help you? 😊" }) });
+    await fetch("/api/chat/messages", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ conversationId:activeId, sender:"agent", text:"Hi! I'm an Admin Agent from FinovaOS Support. How can I help you? 😊" }) });
     loadConvs(); loadMsgs();
   }
 
@@ -3038,7 +3038,7 @@ function PageLiveSupport() {
 function PageSettings() {
   const [saved,   setSaved]   = useState<""|"saving"|"ok"|"err">("");
   const [danger,  setDanger]  = useState<Record<string,string>>({});
-  const [form, setForm] = useState({ appName:"Finova", supportEmail:"finovaos.app@gmail.com", maintenanceMode:false, allowSignups:true, maxUsersPerCompany:50, sessionTimeout:30 });
+  const [form, setForm] = useState({ appName:"FinovaOS", supportEmail:"finovaos.app@gmail.com", maintenanceMode:false, allowSignups:true, maxUsersPerCompany:50, sessionTimeout:30 });
 
   useEffect(() => {
     const u = getAdminUser();
@@ -4087,11 +4087,11 @@ function PageBroadcasts() {
               ) : (
                 <div style={{ background:"white", borderRadius:10, padding:"24px", color:"#111", fontFamily:"Arial,sans-serif" }}>
                   <div style={{ borderBottom:"2px solid #4f46e5", paddingBottom:12, marginBottom:16 }}>
-                    <div style={{ fontSize:18, fontWeight:800, color:"#4f46e5" }}>Finova</div>
+                    <div style={{ fontSize:18, fontWeight:800, color:"#4f46e5" }}>FinovaOS</div>
                   </div>
                   <div style={{ fontSize:14, fontWeight:700, color:"#111", marginBottom:12 }}>{form.subject||"(no subject)"}</div>
                   <div style={{ fontSize:13, color:"#444", lineHeight:1.7, whiteSpace:"pre-wrap" }}>{form.body||"(empty)"}</div>
-                  <div style={{ marginTop:20, paddingTop:12, borderTop:"1px solid #eee", fontSize:11, color:"#999" }}>Finova · Unsubscribe</div>
+                  <div style={{ marginTop:20, paddingTop:12, borderTop:"1px solid #eee", fontSize:11, color:"#999" }}>FinovaOS · Unsubscribe</div>
                 </div>
               )
             ) : (
@@ -6416,7 +6416,7 @@ function PageSocial() {
             <div style={{ borderRadius:14, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", padding:"16px 18px" }}>
               <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
                 <div style={{ width:36, height:36, borderRadius:"50%", background:"linear-gradient(135deg,#6366f1,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:800, color:"white" }}>F</div>
-                <div><div style={{ fontSize:13, fontWeight:700, color:"white" }}>Finova</div><div style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>Just now</div></div>
+                <div><div style={{ fontSize:13, fontWeight:700, color:"white" }}>FinovaOS</div><div style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>Just now</div></div>
               </div>
               <div style={{ fontSize:13, color:"rgba(255,255,255,.75)", lineHeight:1.6, whiteSpace:"pre-wrap", marginBottom:mediaUrl?12:0 }}>{postText||<span style={{ color:"rgba(255,255,255,.2)" }}>Your post will appear here…</span>}</div>
               {mediaUrl && <div style={{ borderRadius:10, overflow:"hidden", marginTop:8 }}><img src={mediaUrl} alt="" style={{ width:"100%", objectFit:"cover", maxHeight:240 }} onError={e=>{(e.target as HTMLImageElement).style.display="none";}}/></div>}
@@ -6476,17 +6476,17 @@ function PageSocial() {
 ═══════════════════════════════════════════════════════ */
 function PageSeo() {
   const DEFAULT_CONFIG = {
-    siteTitle: "Finova — Smart Business Accounting",
-    metaDescription: "Manage invoices, expenses, payroll, and more with Finova.",
+    siteTitle: "FinovaOS — Smart Business Accounting",
+    metaDescription: "Manage invoices, expenses, payroll, and more with FinovaOS.",
     ogImage: "",
     twitterHandle: "@finova_io",
     googleAnalyticsId: "",
     gscVerification: "",
     pages: {
-      "/":         { title:"Finova — Home",     description:"" },
-      "/pricing":  { title:"Pricing — Finova",  description:"" },
-      "/features": { title:"Features — Finova", description:"" },
-      "/blog":     { title:"Blog — Finova",     description:"" },
+      "/":         { title:"FinovaOS — Home",     description:"" },
+      "/pricing":  { title:"Pricing — FinovaOS",  description:"" },
+      "/features": { title:"Features — FinovaOS", description:"" },
+      "/blog":     { title:"Blog — FinovaOS",     description:"" },
     },
   };
 
@@ -7183,7 +7183,7 @@ export default function AdminPanel() {
           </div>
           {!collapsed && (
             <div>
-              <div style={{ fontSize:15,fontWeight:800,color:"white",letterSpacing:"-0.02em",lineHeight:1 }}>Finova</div>
+              <div style={{ fontSize:15,fontWeight:800,color:"white",letterSpacing:"-0.02em",lineHeight:1 }}>FinovaOS</div>
               <div style={{ fontSize:9,color:"rgba(255,255,255,.22)",fontWeight:700,letterSpacing:".14em",textTransform:"uppercase",marginTop:3 }}>Admin Console</div>
             </div>
           )}
@@ -7334,7 +7334,7 @@ export default function AdminPanel() {
           {/* Left: breadcrumb + title */}
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ display:"flex", alignItems:"center", gap:5, marginBottom:2 }}>
-              <span style={{ fontSize:10,color:"rgba(255,255,255,.18)",fontWeight:600,letterSpacing:".08em",textTransform:"uppercase" }}>Finova</span>
+              <span style={{ fontSize:10,color:"rgba(255,255,255,.18)",fontWeight:600,letterSpacing:".08em",textTransform:"uppercase" }}>FinovaOS</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
               <span style={{ fontSize:10,color:"rgba(255,255,255,.35)",fontWeight:600,letterSpacing:".06em",textTransform:"uppercase" }}>{PAGE_TITLES[page]}</span>
             </div>

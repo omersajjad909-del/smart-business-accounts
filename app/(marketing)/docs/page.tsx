@@ -340,7 +340,7 @@ export default function DocsPage() {
           }}>
             Everything you need<br/>
             <span style={{ fontStyle: "italic", background: "linear-gradient(135deg,#a5b4fc,#818cf8,#c4b5fd)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              to master Finova.
+              to master FinovaOS.
             </span>
           </h1>
 
@@ -492,10 +492,10 @@ export default function DocsPage() {
               ⚙️ DEVELOPER API
             </div>
             <h3 style={{ fontFamily: "'Lora',serif", fontSize: "clamp(18px,2.5vw,26px)", fontWeight: 700, color: "white", letterSpacing: "-.4px", marginBottom: 8 }}>
-              Build on top of Finova
+              Build on top of FinovaOS
             </h3>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,.42)", margin: 0, maxWidth: 480, lineHeight: 1.7 }}>
-              Use our REST API to sync data, automate workflows, and connect Finova with your existing systems. Company-scoped API keys — no OAuth complexity.
+              Use our REST API to sync data, automate workflows, and connect FinovaOS with your existing systems. Company-scoped API keys — no OAuth complexity.
             </p>
             <div style={{ display: "flex", gap: 20, marginTop: 16, flexWrap: "wrap" }}>
               {[

@@ -349,7 +349,7 @@ function AuthPageInner() {
                 </svg>
               </div>
               <div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px" }}>Finova</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px" }}>FinovaOS</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Cloud accounting platform</div>
               </div>
             </Link>
@@ -421,7 +421,7 @@ function AuthPageInner() {
                     <path d="M2 12l10 5 10-5" opacity=".88"/>
                   </svg>
                 </div>
-                <span style={{ fontSize: 20, fontWeight: 700 }}>Finova</span>
+                <span style={{ fontSize: 20, fontWeight: 700 }}>FinovaOS</span>
               </Link>
 
               {/* Header */}
@@ -433,7 +433,7 @@ function AuthPageInner() {
                   {showOtpForm
                     ? "Enter the 6-digit code"
                     : mode === "signin"
-                    ? "Sign in to Finova"
+                    ? "Sign in to FinovaOS"
                     : "Get started today"}
                 </h2>
                 <p style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(255,255,255,0.5)", margin: 0 }}>
@@ -639,7 +639,7 @@ function AuthPageInner() {
                 <div style={{ marginTop: 24, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "13px 16px", fontSize: 13, color: "rgba(255,255,255,0.55)", textAlign: "center" }}>
                   {mode === "signin" ? (
                     <>
-                      New to Finova?{" "}
+                      New to FinovaOS?{" "}
                       <button
                         type="button"
                         onClick={() => router.push(`/auth?mode=signup${redirectTo ? `&redirect=${encodeURIComponent(redirectTo)}` : ""}`)}

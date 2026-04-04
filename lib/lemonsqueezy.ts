@@ -67,9 +67,9 @@ export async function createLemonCheckout(input: LemonCheckoutInput) {
           : {}),
         product_options: {
           redirect_url: input.successUrl,
-          receipt_button_text: "Open Finova",
+          receipt_button_text: "Open FinovaOS",
           receipt_link_url: input.cancelUrl || input.successUrl,
-          receipt_thank_you_note: "Your Finova subscription is being activated.",
+          receipt_thank_you_note: "Your FinovaOS subscription is being activated.",
           enabled_variants: [Number(variantId)],
         },
         checkout_options: {

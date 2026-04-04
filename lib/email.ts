@@ -16,7 +16,7 @@ const getEmailConfig = async (companyId?: string) => {
           pass: companyConfig.email.pass,
         },
         from: companyConfig.email.from,
-        fromName: companyConfig.email.fromName || "Finova",
+        fromName: companyConfig.email.fromName || "FinovaOS",
       };
     }
   }
@@ -30,7 +30,7 @@ const getEmailConfig = async (companyId?: string) => {
       pass: process.env.SMTP_PASS || '',
     },
     from: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@ustraders.com',
-    fromName: "Finova",
+    fromName: "FinovaOS",
   };
 };
 
@@ -341,7 +341,7 @@ export async function sendEmail(options: {
 
   try {
     const fromEmail = config.from || config.auth.user || 'noreply@ustraders.com';
-    const fromName = config.fromName || "Finova";
+    const fromName = config.fromName || "FinovaOS";
     
     const mailPayload = {
       from: `"${fromName}" <${fromEmail}>`,

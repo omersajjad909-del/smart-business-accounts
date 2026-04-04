@@ -1,5 +1,5 @@
 /**
- * Finova Local Chat AI Engine
+ * FinovaOS Local Chat AI Engine
  * Rule-based NLP engine — no external API needed.
  * Covers 60+ intents in English & Urdu.
  */
@@ -109,10 +109,10 @@ const INTENTS: Intent[] = [
     enKeywords: ["about this system", "about finova", "what is finova", "tell me about", "what does finova", "overview", "what is this", "explain finova", "introduce", "features of finova", "what can finova", "system overview", "about the platform", "about the software"],
     urKeywords: ["is system ke bare", "finova kya hai", "system kya hai", "bata do", "overview", "features batao", "kya hai ye", "is software ke bare", "platform kya hai"],
     enResponses: [
-      "🚀 **Finova** is a complete cloud-based business management platform designed for SMEs.\n\nHere's what it covers:\n\n• 📄 **Accounting** — invoices, vouchers, journal entries, ledger\n• 🏦 **Banking** — bank reconciliation, payment receipts\n• 📊 **Financial Reports** — P&L, Balance Sheet, Cash Flow, Trial Balance, Tax Summary\n• 📦 **Inventory** — items, stock rates, GRN, stock tracking\n• 🛒 **Sales & Purchase** — invoices, quotations, POs, delivery challans\n• 👥 **HR & Payroll** — employees, attendance, leaves, salary\n• 🤝 **CRM** — contacts, interactions, sales pipeline\n• 🔧 **Admin** — users, permissions, roles, audit log, backup\n\nAll in one platform — accessible from any browser, anywhere. What area would you like to know more about?",
+      "🚀 **FinovaOS** is a complete cloud-based business management platform designed for SMEs.\n\nHere's what it covers:\n\n• 📄 **Accounting** — invoices, vouchers, journal entries, ledger\n• 🏦 **Banking** — bank reconciliation, payment receipts\n• 📊 **Financial Reports** — P&L, Balance Sheet, Cash Flow, Trial Balance, Tax Summary\n• 📦 **Inventory** — items, stock rates, GRN, stock tracking\n• 🛒 **Sales & Purchase** — invoices, quotations, POs, delivery challans\n• 👥 **HR & Payroll** — employees, attendance, leaves, salary\n• 🤝 **CRM** — contacts, interactions, sales pipeline\n• 🔧 **Admin** — users, permissions, roles, audit log, backup\n\nAll in one platform — accessible from any browser, anywhere. What area would you like to know more about?",
     ],
     urResponses: [
-      "🚀 **Finova** aik mukammal cloud-based business management platform hai — chhoti aur medium businesses ke liye!\n\nYe sab kuch cover karta hai:\n\n• 📄 **Accounting** — invoices, vouchers, journal entries, ledger\n• 🏦 **Banking** — bank reconciliation, payment receipts\n• 📊 **Financial Reports** — P&L, Balance Sheet, Cash Flow, Trial Balance, Tax\n• 📦 **Inventory** — items, stock, GRN, tracking\n• 🛒 **Sales & Purchase** — invoice, quotation, PO, delivery challan\n• 👥 **HR & Payroll** — employees, attendance, leave, salary\n• 🤝 **CRM** — contacts, pipeline, interactions\n• 🔧 **Admin** — users, permissions, backup\n\nSab kuch ek hi platform mein! Kisi specific module ke baare mein janna chahte ho?",
+      "🚀 **FinovaOS** aik mukammal cloud-based business management platform hai — chhoti aur medium businesses ke liye!\n\nYe sab kuch cover karta hai:\n\n• 📄 **Accounting** — invoices, vouchers, journal entries, ledger\n• 🏦 **Banking** — bank reconciliation, payment receipts\n• 📊 **Financial Reports** — P&L, Balance Sheet, Cash Flow, Trial Balance, Tax\n• 📦 **Inventory** — items, stock, GRN, tracking\n• 🛒 **Sales & Purchase** — invoice, quotation, PO, delivery challan\n• 👥 **HR & Payroll** — employees, attendance, leave, salary\n• 🤝 **CRM** — contacts, pipeline, interactions\n• 🔧 **Admin** — users, permissions, backup\n\nSab kuch ek hi platform mein! Kisi specific module ke baare mein janna chahte ho?",
     ],
     urScriptResponses: [
       "🚀 **فنووا** ایک مکمل کلاؤڈ بیسڈ بزنس مینجمنٹ پلیٹ فارم ہے — چھوٹی اور درمیانی کاروباروں کے لیے!\n\nیہ سب کچھ کور کرتا ہے:\n\n• 📄 **اکاؤنٹنگ** — انوائسز، واؤچرز، جرنل اندراجات، لیجر\n• 🏦 **بینکنگ** — بینک ریکنسلیشن، پیمنٹ رسیدیں\n• 📊 **مالیاتی رپورٹس** — P&L، بیلنس شیٹ، کیش فلو، ٹرائل بیلنس، ٹیکس\n• 📦 **انوینٹری** — آئٹمز، اسٹاک، GRN، ٹریکنگ\n• 🛒 **سیلز اور پرچیز** — انوائس، کوٹیشن، PO، ڈیلیوری چالان\n• 👥 **HR اور پے رول** — ملازمین، حاضری، چھٹی، تنخواہ\n• 🤝 **CRM** — کانٹیکٹس، پائپ لائن، تعاملات\n• 🔧 **ایڈمن** — یوزرز، اجازتیں، بیک اپ\n\nسب کچھ ایک ہی پلیٹ فارم میں! کسی مخصوص ماڈیول کے بارے میں جاننا چاہتے ہیں؟",
@@ -126,12 +126,12 @@ const INTENTS: Intent[] = [
     enKeywords: ["hi", "hello", "hey", "good morning", "good afternoon", "good evening", "howdy", "greetings", "hi there", "hey there"],
     urKeywords: ["salam", "assalamualaikum", "adaab", "helo", "haloo"],
     enResponses: [
-      "Hello! 👋 Welcome to Finova Support. I'm your AI assistant — I can help with invoicing, reports, banking, inventory, HR, and more. What can I help you with today?",
-      "Hi there! 😊 I'm Finova's AI support assistant. Ask me anything about the platform — from setting up invoices to reading your financial reports!",
+      "Hello! 👋 Welcome to FinovaOS Support. I'm your AI assistant — I can help with invoicing, reports, banking, inventory, HR, and more. What can I help you with today?",
+      "Hi there! 😊 I'm FinovaOS's AI support assistant. Ask me anything about the platform — from setting up invoices to reading your financial reports!",
     ],
     urResponses: [
-      "Assalamu Alaikum! 👋 Finova Support mein khush amdeed. Main aapka AI assistant hun — invoicing, reports, banking, inventory, aur bohat kuch mein madad kar sakta hun. Kya chahiye aapko?",
-      "Salam! 😊 Main Finova ka AI assistant hun. Koi bhi sawaal poochein — invoices se le kar financial reports tak, sab kuch bataunga.",
+      "Assalamu Alaikum! 👋 FinovaOS Support mein khush amdeed. Main aapka AI assistant hun — invoicing, reports, banking, inventory, aur bohat kuch mein madad kar sakta hun. Kya chahiye aapko?",
+      "Salam! 😊 Main FinovaOS ka AI assistant hun. Koi bhi sawaal poochein — invoices se le kar financial reports tak, sab kuch bataunga.",
     ],
     urScriptResponses: [
       "السلام علیکم! 👋 فنووا سپورٹ میں خوش آمدید۔ میں آپ کا AI اسسٹنٹ ہوں — انوائسنگ، رپورٹس، بینکنگ، انوینٹری، اور بہت کچھ میں مدد کر سکتا ہوں۔ کیا چاہیے آپ کو؟",
@@ -146,11 +146,11 @@ const INTENTS: Intent[] = [
     enKeywords: ["bye", "goodbye", "thanks", "thank you", "see you", "take care", "done", "that's all"],
     urKeywords: ["shukriya", "shukria", "alvida", "theek hai", "bas", "khuda hafiz", "allah hafiz", "ok bye"],
     enResponses: [
-      "You're welcome! 😊 Have a great day. Feel free to chat again anytime you need help with Finova!",
+      "You're welcome! 😊 Have a great day. Feel free to chat again anytime you need help with FinovaOS!",
       "Goodbye! 👋 Don't hesitate to reach out if you have more questions. Happy to help anytime!",
     ],
     urResponses: [
-      "Shukriya! 😊 Khoob raho. Jab bhi Finova ke baare mein kuch poochna ho, hum yahan hain!",
+      "Shukriya! 😊 Khoob raho. Jab bhi FinovaOS ke baare mein kuch poochna ho, hum yahan hain!",
       "Allah Hafiz! 👋 Koi bhi mushkil ho to dobara poochein. Khush raho!",
     ],
     urScriptResponses: [
@@ -183,11 +183,11 @@ const INTENTS: Intent[] = [
     enKeywords: ["price", "cost", "how much", "pricing", "tariff", "charges", "fees", "rate", "amount", "affordable"],
     urKeywords: ["kitna", "qeemat", "rate", "pricing", "charges", "fees", "mehnga", "sasta", "dam"],
     enResponses: [
-      "Finova offers 4 plans:\n\n🌱 **Starter** — Ideal for small businesses. Core accounting + invoicing.\n🚀 **Professional** — Full suite including HR, CRM, advanced reports.\n💎 **Enterprise** — All modules + priority support + unlimited users.\n⚡ **Custom** — Pick only the modules you need.\n\nPricing is shown on the Plans page. An intro offer may be available for the first 3 months!",
+      "FinovaOS offers 4 plans:\n\n🌱 **Starter** — Ideal for small businesses. Core accounting + invoicing.\n🚀 **Professional** — Full suite including HR, CRM, advanced reports.\n💎 **Enterprise** — All modules + priority support + unlimited users.\n⚡ **Custom** — Pick only the modules you need.\n\nPricing is shown on the Plans page. An intro offer may be available for the first 3 months!",
       "We have plans starting from Starter (basic accounting) all the way to Enterprise (full business suite). Go to the Plans page to see current pricing and compare. An intro discount may apply for new signups!",
     ],
     urResponses: [
-      "Finova ke 4 plans hain:\n\n🌱 **Starter** — Chhoti business ke liye. Core accounting + invoicing.\n🚀 **Professional** — HR, CRM, advanced reports sab kuch.\n💎 **Enterprise** — Sab modules + priority support.\n⚡ **Custom** — Sirf jo modules chahiye wo lo.\n\nPlans page pe pricing dekhein. Pehle 3 mahine intro offer bhi ho sakta hai!",
+      "FinovaOS ke 4 plans hain:\n\n🌱 **Starter** — Chhoti business ke liye. Core accounting + invoicing.\n🚀 **Professional** — HR, CRM, advanced reports sab kuch.\n💎 **Enterprise** — Sab modules + priority support.\n⚡ **Custom** — Sirf jo modules chahiye wo lo.\n\nPlans page pe pricing dekhein. Pehle 3 mahine intro offer bhi ho sakta hai!",
     ],
     urScriptResponses: [
       "فنووا کے 4 پلانز ہیں:\n\n🌱 **اسٹارٹر** — چھوٹی کاروبار کے لیے۔ بنیادی اکاؤنٹنگ + انوائسنگ۔\n🚀 **پروفیشنل** — HR، CRM، ایڈوانسڈ رپورٹس سب کچھ۔\n💎 **انٹرپرائز** — تمام ماڈیولز + ترجیحی سپورٹ۔\n⚡ **کسٹم** — صرف جو ماڈیولز چاہیں وہ لیں۔\n\nقیمتیں پلانز صفحے پر دیکھیں۔ پہلے 3 ماہ کا آفر بھی ہو سکتا ہے!",
@@ -286,10 +286,10 @@ const INTENTS: Intent[] = [
     enKeywords: ["signup", "sign up", "register", "create account", "new account", "get started", "join", "trial"],
     urKeywords: ["account banana", "register", "signup", "shuru karna", "join", "kaise use karun"],
     enResponses: [
-      "Getting started with Finova is easy! 🎉\n\n1. Go to the **Sign Up** page\n2. Enter your name, email & password\n3. Verify your email (OTP sent)\n4. **Choose a plan** (Starter/Pro/Enterprise/Custom)\n5. Review features on the Features page\n6. **Proceed to Payment** and activate your plan\n7. You're in! Access your full dashboard 🚀\n\nNeed help with any specific step?",
+      "Getting started with FinovaOS is easy! 🎉\n\n1. Go to the **Sign Up** page\n2. Enter your name, email & password\n3. Verify your email (OTP sent)\n4. **Choose a plan** (Starter/Pro/Enterprise/Custom)\n5. Review features on the Features page\n6. **Proceed to Payment** and activate your plan\n7. You're in! Access your full dashboard 🚀\n\nNeed help with any specific step?",
     ],
     urResponses: [
-      "Finova shuru karna bohat aasaan hai! 🎉\n\n1. **Sign Up** page pe jao\n2. Naam, email aur password dalo\n3. Email verify karo (OTP aayega)\n4. **Plan choose karo** (Starter/Pro/Enterprise/Custom)\n5. Features dekho\n6. **Payment karo** aur plan activate karo\n7. Dashboard ready! 🚀\n\nKisi step mein mushkil ho to batao!",
+      "FinovaOS shuru karna bohat aasaan hai! 🎉\n\n1. **Sign Up** page pe jao\n2. Naam, email aur password dalo\n3. Email verify karo (OTP aayega)\n4. **Plan choose karo** (Starter/Pro/Enterprise/Custom)\n5. Features dekho\n6. **Payment karo** aur plan activate karo\n7. Dashboard ready! 🚀\n\nKisi step mein mushkil ho to batao!",
     ],
     urScriptResponses: [
       "فنووا شروع کرنا بہت آسان ہے! 🎉\n\n1. **سائن اپ** صفحے پر جائیں\n2. نام، ای میل اور پاس ورڈ داخل کریں\n3. ای میل تصدیق کریں (OTP آئے گا)\n4. **پلان منتخب کریں** (اسٹارٹر/پرو/انٹرپرائز/کسٹم)\n5. فیچرز دیکھیں\n6. **ادائیگی کریں** اور پلان فعال کریں\n7. ڈیش بورڈ تیار! 🚀\n\nکسی قدم میں مشکل ہو تو بتائیں!",
@@ -337,7 +337,7 @@ const INTENTS: Intent[] = [
     enKeywords: ["quotation", "quote", "estimate", "proposal", "proforma"],
     urKeywords: ["quotation", "estimate", "quote", "offer"],
     enResponses: [
-      "📋 **Quotations** in Finova:\n\n1. Go to **Dashboard → Quotation**\n2. Create quotation with customer details, items, prices\n3. Set validity date\n4. Export as PDF and send to customer\n5. Convert to **Sales Invoice** with one click when approved!\n\nThis saves time — no need to re-enter data.",
+      "📋 **Quotations** in FinovaOS:\n\n1. Go to **Dashboard → Quotation**\n2. Create quotation with customer details, items, prices\n3. Set validity date\n4. Export as PDF and send to customer\n5. Convert to **Sales Invoice** with one click when approved!\n\nThis saves time — no need to re-enter data.",
     ],
     urResponses: [
       "📋 **Quotation** banane ke liye:\n\n1. **Dashboard → Quotation** pe jao\n2. Customer, items, prices add karo\n3. Validity date set karo\n4. PDF export karo aur customer ko bhejo\n5. Approve hone pe **Sales Invoice** mein convert karo — ek click mein!\n\nData dobara type nahi karna padta.",
@@ -609,10 +609,10 @@ const INTENTS: Intent[] = [
     enKeywords: ["reports", "report", "reporting", "analytics", "financial statements", "statements", "all reports"],
     urKeywords: ["reports", "report", "rports", "reporting", "financial statements", "tamam reports"],
     enResponses: [
-      "📊 **Reports available in Finova:**\n\n• 📖 **Ledger** — full history of any account\n• ⚖️ **Trial Balance** — all account balances\n• 📈 **Profit & Loss** — income vs expenses\n• 📊 **Balance Sheet** — assets, liabilities, equity\n• 💸 **Cash Flow** — cash in vs out\n• 🧾 **Tax Summary** — GST/Sales tax report\n• 📅 **Ageing Report** — overdue receivables & payables\n• 📦 **Inventory Reports** — stock valuation, movement\n• 📋 **Compliance Reports** — regulatory filings\n\nAll reports can be exported to PDF or Excel. Which report do you need?",
+      "📊 **Reports available in FinovaOS:**\n\n• 📖 **Ledger** — full history of any account\n• ⚖️ **Trial Balance** — all account balances\n• 📈 **Profit & Loss** — income vs expenses\n• 📊 **Balance Sheet** — assets, liabilities, equity\n• 💸 **Cash Flow** — cash in vs out\n• 🧾 **Tax Summary** — GST/Sales tax report\n• 📅 **Ageing Report** — overdue receivables & payables\n• 📦 **Inventory Reports** — stock valuation, movement\n• 📋 **Compliance Reports** — regulatory filings\n\nAll reports can be exported to PDF or Excel. Which report do you need?",
     ],
     urResponses: [
-      "📊 **Finova mein available reports:**\n\n• 📖 **Ledger** — kisi bhi account ki puri history\n• ⚖️ **Trial Balance** — tamam accounts ke balances\n• 📈 **Profit & Loss** — income vs expenses\n• 📊 **Balance Sheet** — assets, liabilities, equity\n• 💸 **Cash Flow** — cash aana jaana\n• 🧾 **Tax Summary** — GST/Sales tax report\n• 📅 **Ageing Report** — overdue receivables & payables\n• 📦 **Inventory Reports** — stock valuation\n• 📋 **Compliance Reports** — regulatory\n\nSab reports PDF ya Excel mein export ho sakte hain. Kaun sa report chahiye?",
+      "📊 **FinovaOS mein available reports:**\n\n• 📖 **Ledger** — kisi bhi account ki puri history\n• ⚖️ **Trial Balance** — tamam accounts ke balances\n• 📈 **Profit & Loss** — income vs expenses\n• 📊 **Balance Sheet** — assets, liabilities, equity\n• 💸 **Cash Flow** — cash aana jaana\n• 🧾 **Tax Summary** — GST/Sales tax report\n• 📅 **Ageing Report** — overdue receivables & payables\n• 📦 **Inventory Reports** — stock valuation\n• 📋 **Compliance Reports** — regulatory\n\nSab reports PDF ya Excel mein export ho sakte hain. Kaun sa report chahiye?",
     ],
     urScriptResponses: [
       "📊 **فنووا میں دستیاب رپورٹس:**\n\n• 📖 **لیجر** — کسی بھی اکاؤنٹ کی پوری تاریخ\n• ⚖️ **ٹرائل بیلنس** — تمام اکاؤنٹس کے بیلنسز\n• 📈 **منافع و نقصان** — آمدن بمقابلہ اخراجات\n• 📊 **بیلنس شیٹ** — اثاثے، ذمہ داریاں، ایکویٹی\n• 💸 **کیش فلو** — نقد آنا جانا\n• 🧾 **ٹیکس خلاصہ** — GST/سیلز ٹیکس رپورٹ\n• 📅 **ایجنگ رپورٹ** — زائد المیعاد وصولیاں اور ادائیگیاں\n• 📦 **انوینٹری رپورٹس** — اسٹاک ویلیویشن\n• 📋 **تعمیل رپورٹس** — ریگولیٹری\n\nتمام رپورٹس PDF یا Excel میں برآمد ہو سکتی ہیں۔ کون سی رپورٹ چاہیے؟",
@@ -643,7 +643,7 @@ const INTENTS: Intent[] = [
     enKeywords: ["inventory", "stock", "items", "product catalog", "warehouse", "stock level", "in stock"],
     urKeywords: ["inventory", "stock", "maal", "items", "product"],
     enResponses: [
-      "📦 **Inventory Management** in Finova:\n\n1. Go to **Dashboard → Inventory / Items**\n2. Add products with SKU, category, unit of measure\n3. Set opening stock and stock rates\n4. Track stock movement through purchases (GRN) and sales (invoices)\n5. View current stock level and valuation anytime\n\nStock is updated automatically with every sales/purchase transaction!",
+      "📦 **Inventory Management** in FinovaOS:\n\n1. Go to **Dashboard → Inventory / Items**\n2. Add products with SKU, category, unit of measure\n3. Set opening stock and stock rates\n4. Track stock movement through purchases (GRN) and sales (invoices)\n5. View current stock level and valuation anytime\n\nStock is updated automatically with every sales/purchase transaction!",
     ],
     urResponses: [
       "📦 **Inventory Management**:\n\n1. **Dashboard → Inventory / Items** pe jao\n2. Products add karo (SKU, category, unit)\n3. Opening stock aur stock rates set karo\n4. Purchases (GRN) aur sales (invoices) se stock automatic track hota hai\n5. Current stock aur valuation kisi bhi waqt dekho\n\nHar transaction pe stock automatically update hota hai!",
@@ -745,10 +745,10 @@ const INTENTS: Intent[] = [
     enKeywords: ["opening balance", "beginning balance", "starting balance", "initial balance", "first time setup"],
     urKeywords: ["opening balance", "shuru ki raqam", "pehla balance", "initial balance"],
     enResponses: [
-      "🔢 **Opening Balances** — when you start using Finova mid-year:\n\n1. Go to **Dashboard → Opening Balances**\n2. Enter balances for all accounts (cash, bank, debtors, creditors, etc.)\n3. Set the opening date (start of your accounting period)\n4. Save — all subsequent transactions build on these balances\n\nGet this right first — it affects all your reports!",
+      "🔢 **Opening Balances** — when you start using FinovaOS mid-year:\n\n1. Go to **Dashboard → Opening Balances**\n2. Enter balances for all accounts (cash, bank, debtors, creditors, etc.)\n3. Set the opening date (start of your accounting period)\n4. Save — all subsequent transactions build on these balances\n\nGet this right first — it affects all your reports!",
     ],
     urResponses: [
-      "🔢 **Opening Balances** — saal ke beech mein Finova shuru karte waqt:\n\n1. **Dashboard → Opening Balances** pe jao\n2. Tamam accounts ke balances enter karo (cash, bank, debtors, creditors)\n3. Opening date set karo (accounting period ka pehla din)\n4. Save — sab future transactions inhi pe build honge\n\nYeh sahi karo sabse pehle — sab reports isi pe depend hain!",
+      "🔢 **Opening Balances** — saal ke beech mein FinovaOS shuru karte waqt:\n\n1. **Dashboard → Opening Balances** pe jao\n2. Tamam accounts ke balances enter karo (cash, bank, debtors, creditors)\n3. Opening date set karo (accounting period ka pehla din)\n4. Save — sab future transactions inhi pe build honge\n\nYeh sahi karo sabse pehle — sab reports isi pe depend hain!",
     ],
     urScriptResponses: [
       "🔢 **ابتدائی بیلنسز** — سال کے درمیان فنووا شروع کرتے وقت:\n\n1. **ڈیش بورڈ ← ابتدائی بیلنسز** پر جائیں\n2. تمام اکاؤنٹس کے بیلنسز داخل کریں (نقد، بینک، مقروضین، قرضداران)\n3. ابتدائی تاریخ مقرر کریں (محاسبہ مدت کا پہلا دن)\n4. محفوظ کریں — تمام آئندہ لین دین انہی پر بنیں گے\n\nیہ سب سے پہلے درست کریں — تمام رپورٹس اسی پر منحصر ہیں!",
@@ -847,10 +847,10 @@ const INTENTS: Intent[] = [
     enKeywords: ["security", "data safe", "encryption", "privacy", "GDPR", "data protection", "who can see", "secure"],
     urKeywords: ["security", "data safe hai", "encryption", "privacy", "kon dekh sakta"],
     enResponses: [
-      "🔒 **Finova Security**:\n\n• All data is **encrypted at rest and in transit** (AES-256 + TLS)\n• **Multi-tenant isolation** — your data is completely separate from other companies\n• **Role-based access** — each user only sees what you permit\n• **Audit log** — every action is logged with timestamp and user\n• Regular **automated backups**\n• **Session management** — automatic logout on inactivity\n\nYour business data is safe with us!",
+      "🔒 **FinovaOS Security**:\n\n• All data is **encrypted at rest and in transit** (AES-256 + TLS)\n• **Multi-tenant isolation** — your data is completely separate from other companies\n• **Role-based access** — each user only sees what you permit\n• **Audit log** — every action is logged with timestamp and user\n• Regular **automated backups**\n• **Session management** — automatic logout on inactivity\n\nYour business data is safe with us!",
     ],
     urResponses: [
-      "🔒 **Finova Security**:\n\n• Data **encrypted** hai — rest mein bhi, transit mein bhi (AES-256 + TLS)\n• **Multi-tenant isolation** — aapka data bilkul alag hai\n• **Role-based access** — har user sirf wo dekhe jo aap allow karo\n• **Audit log** — har action ka record\n• Regular **automated backups**\n• **Session management** — inactive hone pe automatic logout\n\nAapka data bilkul safe hai!",
+      "🔒 **FinovaOS Security**:\n\n• Data **encrypted** hai — rest mein bhi, transit mein bhi (AES-256 + TLS)\n• **Multi-tenant isolation** — aapka data bilkul alag hai\n• **Role-based access** — har user sirf wo dekhe jo aap allow karo\n• **Audit log** — har action ka record\n• Regular **automated backups**\n• **Session management** — inactive hone pe automatic logout\n\nAapka data bilkul safe hai!",
     ],
     urScriptResponses: [
       "🔒 **فنووا سیکیورٹی**:\n\n• ڈیٹا **انکرپٹڈ** ہے — آرام میں بھی، منتقلی میں بھی (AES-256 + TLS)\n• **ملٹی ٹیننٹ الگاؤ** — آپ کا ڈیٹا بالکل الگ ہے\n• **کردار پر مبنی رسائی** — ہر یوزر صرف وہ دیکھے جو آپ اجازت دیں\n• **آڈٹ لاگ** — ہر عمل کا ریکارڈ\n• باقاعدہ **خودکار بیک اپس**\n• **سیشن مینجمنٹ** — غیر فعال ہونے پر خودکار لاگ آؤٹ\n\nآپ کا ڈیٹا بالکل محفوظ ہے!",
@@ -898,10 +898,10 @@ const INTENTS: Intent[] = [
     enKeywords: ["mobile app", "android", "ios", "iphone", "phone app", "mobile"],
     urKeywords: ["mobile app", "android", "iOS", "phone", "mobile"],
     enResponses: [
-      "📱 Finova is a **web-based application** that works on all devices through your browser — no app download needed!\n\nSimply open your browser on mobile and go to the Finova URL. The interface is mobile-responsive.\n\nA dedicated mobile app may be coming in future updates — stay tuned!",
+      "📱 FinovaOS is a **web-based application** that works on all devices through your browser — no app download needed!\n\nSimply open your browser on mobile and go to the FinovaOS URL. The interface is mobile-responsive.\n\nA dedicated mobile app may be coming in future updates — stay tuned!",
     ],
     urResponses: [
-      "📱 Finova ek **web-based application** hai — kisi bhi device ke browser mein kaam karta hai, app download ki zaroorat nahi!\n\nMobile mein browser kholo aur Finova URL pe jao. Interface mobile-friendly hai.\n\nDedicated mobile app future mein aane wali hai — stay tuned!",
+      "📱 FinovaOS ek **web-based application** hai — kisi bhi device ke browser mein kaam karta hai, app download ki zaroorat nahi!\n\nMobile mein browser kholo aur FinovaOS URL pe jao. Interface mobile-friendly hai.\n\nDedicated mobile app future mein aane wali hai — stay tuned!",
     ],
     urScriptResponses: [
       "📱 فنووا ایک **ویب بیسڈ ایپلیکیشن** ہے — کسی بھی ڈیوائس کے براؤزر میں کام کرتا ہے، ایپ ڈاؤن لوڈ کی ضرورت نہیں!\n\nموبائل میں براؤزر کھولیں اور فنووا URL پر جائیں۔ انٹرفیس موبائل دوست ہے۔\n\nمخصوص موبائل ایپ مستقبل میں آنے والی ہے — توجہ رکھیں!",
@@ -949,7 +949,7 @@ const INTENTS: Intent[] = [
     enKeywords: ["compliance", "statutory", "government report", "annual return", "filing", "regulatory"],
     urKeywords: ["compliance", "government report", "filing", "regulatory"],
     enResponses: [
-      "📋 **Compliance Reports** in Finova:\n\n1. Go to **Dashboard → Reports → Compliance**\n2. Available reports: Tax Summary, Withholding Tax, Sales Tax Return data\n3. Export in required format for filing\n\nFinova helps you prepare the data — final filing should be done through FBR/SECP portals or your tax consultant.",
+      "📋 **Compliance Reports** in FinovaOS:\n\n1. Go to **Dashboard → Reports → Compliance**\n2. Available reports: Tax Summary, Withholding Tax, Sales Tax Return data\n3. Export in required format for filing\n\nFinova helps you prepare the data — final filing should be done through FBR/SECP portals or your tax consultant.",
     ],
     urResponses: [
       "📋 **Compliance Reports**:\n\n1. **Dashboard → Reports → Compliance** pe jao\n2. Tax Summary, Withholding Tax, Sales Tax Return data available hai\n3. Filing ke liye required format mein export karo\n\nFinova data tayyar karta hai — filing FBR/SECP portal ya tax consultant se karein.",
@@ -1017,10 +1017,10 @@ const INTENTS: Intent[] = [
     enKeywords: ["integration", "API", "connect", "third party", "external", "Zapier", "webhook"],
     urKeywords: ["integration", "API", "connect", "third party"],
     enResponses: [
-      "🔌 **Integrations** available in Finova:\n\n• **API Access** — use Finova API to connect your own tools\n• **Dashboard → Integrations** — view available integrations\n• Data can be exported and imported for third-party tools\n\nFor custom API integrations, check the API documentation or connect with our support team.",
+      "🔌 **Integrations** available in FinovaOS:\n\n• **API Access** — use FinovaOS API to connect your own tools\n• **Dashboard → Integrations** — view available integrations\n• Data can be exported and imported for third-party tools\n\nFor custom API integrations, check the API documentation or connect with our support team.",
     ],
     urResponses: [
-      "🔌 **Integrations**:\n\n• **API Access** — apne tools connect karo Finova API se\n• **Dashboard → Integrations** — available integrations dekho\n• Data export/import third-party tools ke liye\n\nCustom API ke liye API docs dekho ya support se contact karo.",
+      "🔌 **Integrations**:\n\n• **API Access** — apne tools connect karo FinovaOS API se\n• **Dashboard → Integrations** — available integrations dekho\n• Data export/import third-party tools ke liye\n\nCustom API ke liye API docs dekho ya support se contact karo.",
     ],
     urScriptResponses: [
       "🔌 **انضمامات**:\n\n• **API رسائی** — اپنے ٹولز فنووا API سے جوڑیں\n• **ڈیش بورڈ ← انضمامات** — دستیاب انضمامات دیکھیں\n• ڈیٹا برآمد/درآمد تھرڈ پارٹی ٹولز کے لیے\n\nکسٹم API کے لیے API دستاویزات دیکھیں یا سپورٹ سے رابطہ کریں۔",
@@ -1035,11 +1035,11 @@ const INTENTS: Intent[] = [
     urKeywords: [],
     enResponses: [
       "I'm not sure I fully understand. Here are things I can help with — just type the topic:\n\n• **invoicing** — sales/purchase invoices\n• **banking** — bank reconciliation\n• **reports** — P&L, balance sheet, cash flow, tax\n• **inventory** — stock management\n• **HR** — payroll, attendance, employees\n• **CRM** — contacts, pipeline\n• **plans** — pricing, Starter vs Pro\n• **backup** — data backup & restore\n\nOr click below to talk to a human agent! 👤",
-      "Could you rephrase that? I can help with any Finova feature. Try asking:\n• 'How do I create a sales invoice?'\n• 'What is bank reconciliation?'\n• 'Tell me about Finova'\n• 'What reports are available?'\n\nOr say **'human agent'** to connect with our team.",
+      "Could you rephrase that? I can help with any FinovaOS feature. Try asking:\n• 'How do I create a sales invoice?'\n• 'What is bank reconciliation?'\n• 'Tell me about FinovaOS'\n• 'What reports are available?'\n\nOr say **'human agent'** to connect with our team.",
     ],
     urResponses: [
       "Thora aur detail batao? Main in topics mein madad kar sakta hun — topic type karo:\n\n• **invoicing** — sales/purchase invoice\n• **banking** — bank reconciliation\n• **reports** — P&L, balance sheet, cash flow, tax\n• **inventory** — stock management\n• **HR** — payroll, attendance, employees\n• **CRM** — contacts, pipeline\n• **plans** — pricing, Starter vs Pro\n• **backup** — data backup\n\nYa neeche human agent se baat karo! 👤",
-      "Thora clear karo? Kuch examples:\n• 'Sales invoice kaise banate hain?'\n• 'Bank reconciliation kya hai?'\n• 'Finova ke baare mein batao'\n• 'Kaun kaun se reports hain?'\n\nYa **'human agent'** type karo hamare team se baat karne ke liye.",
+      "Thora clear karo? Kuch examples:\n• 'Sales invoice kaise banate hain?'\n• 'Bank reconciliation kya hai?'\n• 'FinovaOS ke baare mein batao'\n• 'Kaun kaun se reports hain?'\n\nYa **'human agent'** type karo hamare team se baat karne ke liye.",
     ],
     urScriptResponses: [
       "تھوڑی اور تفصیل بتائیں؟ میں ان موضوعات میں مدد کر سکتا ہوں — موضوع لکھیں:\n\n• **انوائسنگ** — سیلز/پرچیز انوائس\n• **بینکنگ** — بینک ریکنسلیشن\n• **رپورٹس** — P&L، بیلنس شیٹ، کیش فلو، ٹیکس\n• **انوینٹری** — اسٹاک مینجمنٹ\n• **HR** — پے رول، حاضری، ملازمین\n• **CRM** — کانٹیکٹس، پائپ لائن\n• **پلانز** — قیمتیں، اسٹارٹر بمقابلہ پرو\n• **بیک اپ** — ڈیٹا بیک اپ\n\nیا نیچے انسانی ایجنٹ سے بات کریں! 👤",
@@ -1051,16 +1051,16 @@ const INTENTS: Intent[] = [
 
 // ─── Graceful replies for languages without full intent coverage ───────────────
 const LANG_GREETING: Record<string, string> = {
-  hi: "नमस्ते! 👋 मैं Finova का AI सहायक हूं। मैं अभी English और Urdu में पूरी मदद कर सकता हूं। Hindi में मैं आपको agent से connect कर सकता हूं। क्या English में पूछ सकते हैं? या **'human agent'** type करें।",
-  ar: "مرحباً! 👋 أنا مساعد Finova الذكي. يمكنني المساعدة باللغة الإنجليزية والأردية بشكل كامل. للعربية، يمكنني توصيلك بوكيل بشري. هل يمكنك السؤال بالإنجليزية؟ أو اكتب **'human agent'**.",
-  es: "¡Hola! 👋 Soy el asistente AI de Finova. Puedo ayudarte completamente en inglés y urdu. Para español, puedo conectarte con un agente humano. ¿Puedes preguntar en inglés? O escribe **'human agent'**.",
-  fr: "Bonjour! 👋 Je suis l'assistant AI de Finova. Je peux vous aider complètement en anglais et en ourdou. Pour le français, je peux vous connecter avec un agent humain. Pouvez-vous poser votre question en anglais? Ou tapez **'human agent'**.",
+  hi: "नमस्ते! 👋 मैं FinovaOS का AI सहायक हूं। मैं अभी English और Urdu में पूरी मदद कर सकता हूं। Hindi में मैं आपको agent से connect कर सकता हूं। क्या English में पूछ सकते हैं? या **'human agent'** type करें।",
+  ar: "مرحباً! 👋 أنا مساعد FinovaOS الذكي. يمكنني المساعدة باللغة الإنجليزية والأردية بشكل كامل. للعربية، يمكنني توصيلك بوكيل بشري. هل يمكنك السؤال بالإنجليزية؟ أو اكتب **'human agent'**.",
+  es: "¡Hola! 👋 Soy el asistente AI de FinovaOS. Puedo ayudarte completamente en inglés y urdu. Para español, puedo conectarte con un agente humano. ¿Puedes preguntar en inglés? O escribe **'human agent'**.",
+  fr: "Bonjour! 👋 Je suis l'assistant AI de FinovaOS. Je peux vous aider complètement en anglais et en ourdou. Pour le français, je peux vous connecter avec un agent humain. Pouvez-vous poser votre question en anglais? Ou tapez **'human agent'**.",
   zh: "您好！👋 我是Finova的AI助手。我可以用英语和乌尔都语完全提供帮助。对于中文，我可以为您联系人工客服。能用英语提问吗？或输入 **'human agent'**。",
   de: "Hallo! 👋 Ich bin Finovas KI-Assistent. Ich kann vollständig auf Englisch und Urdu helfen. Für Deutsch kann ich Sie mit einem menschlichen Agenten verbinden. Können Sie auf Englisch fragen? Oder tippen Sie **'human agent'**.",
-  pt: "Olá! 👋 Sou o assistente AI da Finova. Posso ajudar completamente em inglês e urdu. Para português, posso conectá-lo com um agente humano. Pode perguntar em inglês? Ou escreva **'human agent'**.",
-  ru: "Привет! 👋 Я AI-ассистент Finova. Я могу полностью помочь на английском и урду. Для русского языка я могу связать вас с агентом. Можете спросить по-английски? Или напишите **'human agent'**.",
-  bn: "নমস্কার! 👋 আমি Finova-র AI সহকারী। আমি ইংরেজি ও উর্দুতে সম্পূর্ণ সাহায্য করতে পারি। বাংলার জন্য আমি আপনাকে একজন এজেন্টের সাথে সংযুক্ত করতে পারি। ইংরেজিতে জিজ্ঞেস করতে পারেন? অথবা **'human agent'** টাইপ করুন।",
-  tr: "Merhaba! 👋 Ben Finova'nın AI asistanıyım. İngilizce ve Urduca'da tam yardım sunabiliyorum. Türkçe için sizi bir insan ajanla bağlayabilirim. İngilizce sorabilir misiniz? Ya da **'human agent'** yazın.",
+  pt: "Olá! 👋 Sou o assistente AI da FinovaOS. Posso ajudar completamente em inglês e urdu. Para português, posso conectá-lo com um agente humano. Pode perguntar em inglês? Ou escreva **'human agent'**.",
+  ru: "Привет! 👋 Я AI-ассистент FinovaOS. Я могу полностью помочь на английском и урду. Для русского языка я могу связать вас с агентом. Можете спросить по-английски? Или напишите **'human agent'**.",
+  bn: "নমস্কার! 👋 আমি FinovaOS-র AI সহকারী। আমি ইংরেজি ও উর্দুতে সম্পূর্ণ সাহায্য করতে পারি। বাংলার জন্য আমি আপনাকে একজন এজেন্টের সাথে সংযুক্ত করতে পারি। ইংরেজিতে জিজ্ঞেস করতে পারেন? অথবা **'human agent'** টাইপ করুন।",
+  tr: "Merhaba! 👋 Ben FinovaOS'nın AI asistanıyım. İngilizce ve Urduca'da tam yardım sunabiliyorum. Türkçe için sizi bir insan ajanla bağlayabilirim. İngilizce sorabilir misiniz? Ya da **'human agent'** yazın.",
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════

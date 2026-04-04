@@ -119,7 +119,7 @@ export default function CompaniesPage() {
               <Input 
                 value={form.name} 
                 onChange={(e) => setForm({ ...form, name: e.target.value })} 
-                placeholder="e.g. Finova SME Solutions"
+                placeholder="e.g. FinovaOS SME Solutions"
                 required 
               />
             </FormField>

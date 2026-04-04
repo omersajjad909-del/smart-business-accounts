@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 export const metadata: Metadata = {
   title: "All Features — Accounting, Inventory, HR, CRM & More",
   description:
-    "Explore Finova's complete feature set: general ledger, sales & purchase invoices, inventory management, HR & payroll, CRM, bank reconciliation, audit logs, and 50+ tools built for modern SMEs.",
+    "Explore FinovaOS's complete feature set: general ledger, sales & purchase invoices, inventory management, HR & payroll, CRM, bank reconciliation, audit logs, and 50+ tools built for modern SMEs.",
   keywords: [
     "accounting software features",
     "invoicing software",
@@ -19,17 +19,17 @@ export const metadata: Metadata = {
     "expense management",
   ],
   openGraph: {
-    title: "All Features — Accounting, Inventory, HR, CRM & More | Finova",
+    title: "All Features — Accounting, Inventory, HR, CRM & More | FinovaOS",
     description:
       "50+ tools for modern businesses: invoicing, inventory, payroll, CRM, and real-time financial reporting — all in one cloud platform.",
     url: `${BASE}/features`,
-    siteName: "Finova",
-    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "Finova Features" }],
+    siteName: "FinovaOS",
+    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS Features" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "All Features | Finova",
+    title: "All Features | FinovaOS",
     description: "50+ tools: invoicing, inventory, payroll, CRM, bank reconciliation, and more.",
     images: [`${BASE}/icon.png`],
   },

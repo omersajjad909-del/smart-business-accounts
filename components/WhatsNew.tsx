@@ -150,7 +150,7 @@ export default function WhatsNew() {
                   <span style={{ fontSize: 24 }}>🚀</span>
                   <div>
                     <div style={{ fontSize: 20, fontWeight: 800, color: "white", letterSpacing: "-.02em" }}>
-                      What’s New in Finova
+                      What’s New in FinovaOS
                     </div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>
                       {updates.length} update{updates.length !== 1 ? "s" : ""} · Latest first

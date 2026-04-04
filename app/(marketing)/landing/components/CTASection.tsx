@@ -185,7 +185,7 @@ export default function CTASection() {
           transform: vis ? "translateY(0)" : "translateY(18px)",
           transition: "all .6s ease .18s",
         }}>
-          Join traders, wholesalers, distributors, and import/export businesses using Finova for invoicing, stock control, branches, and trade-ready operations.
+          Join traders, wholesalers, distributors, and import/export businesses using FinovaOS for invoicing, stock control, branches, and trade-ready operations.
         </p>
 
         {/* CTAs */}
@@ -331,7 +331,7 @@ export default function CTASection() {
         opacity: vis ? 1 : 0,
         transition: "opacity .6s ease .65s",
       }}>
-        © {new Date().getFullYear()} Finova · Built for growing businesses worldwide.
+        © {new Date().getFullYear()} FinovaOS · Built for growing businesses worldwide.
       </div>
     </section>
   );

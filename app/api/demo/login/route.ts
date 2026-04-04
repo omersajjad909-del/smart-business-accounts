@@ -9,7 +9,7 @@ const DEMO_NAME = "Demo User";
 const DEMO_ROLE = "ADMIN";
 
 const DEMO_COMPANY = {
-  name: "Finova Demo Co.",
+  name: "FinovaOS Demo Co.",
   country: "PK",
   baseCurrency: "PKR",
   businessType: "trading",

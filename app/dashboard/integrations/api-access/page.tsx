@@ -123,7 +123,7 @@ export default function ApiAccessPage() {
             <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">API Access</div>
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">Manage company API keys</h1>
             <p className="mt-2 text-sm text-[var(--text-muted)]">
-              Generate company-scoped API keys for external integrations. Each key can call the Finova API using
+              Generate company-scoped API keys for external integrations. Each key can call the FinovaOS API using
               `x-api-key` or a bearer token.
             </p>
           </div>

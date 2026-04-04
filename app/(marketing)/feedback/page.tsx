@@ -55,7 +55,7 @@ export default function PublicFeedbackPage() {
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none", marginBottom: 32 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>💬</div>
-            <span style={{ fontSize: 20, fontWeight: 800, color: "white" }}>Finova</span>
+            <span style={{ fontSize: 20, fontWeight: 800, color: "white" }}>FinovaOS</span>
           </Link>
           <h1 style={{ margin: "0 0 12px", fontSize: "clamp(26px,4vw,38px)", fontWeight: 800, letterSpacing: "-0.5px" }}>
             آپ کی بات اہم ہے

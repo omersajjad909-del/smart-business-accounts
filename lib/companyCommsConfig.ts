@@ -34,7 +34,7 @@ export const DEFAULT_COMPANY_COMMS_CONFIG: CompanyCommsConfig = {
     user: "",
     pass: "",
     from: "",
-    fromName: "Finova",
+    fromName: "FinovaOS",
   },
   whatsapp: {
     enabled: false,

@@ -30,8 +30,8 @@ const DATA_CENTRES = [
 ];
 
 const FAQS = [
-  { q:"Who owns my data?", a:"You do — always. Finova is a data processor, not a data controller. We process your data solely to provide the service you've signed up for. We never sell, share, or monetise your data." },
-  { q:"Can Finova employees see my financial data?", a:"No. We use a zero-knowledge architecture where your data is encrypted with keys that even our team cannot access. System administrators can see metadata (login times, feature usage) but never financial content." },
+  { q:"Who owns my data?", a:"You do — always. FinovaOS is a data processor, not a data controller. We process your data solely to provide the service you've signed up for. We never sell, share, or monetise your data." },
+  { q:"Can FinovaOS employees see my financial data?", a:"No. We use a zero-knowledge architecture where your data is encrypted with keys that even our team cannot access. System administrators can see metadata (login times, feature usage) but never financial content." },
   { q:"Where is my data stored?", a:"By default, data is stored in AWS eu-west-1 (Ireland). Enterprise customers can choose their preferred region: US (Virginia), Europe (Ireland), Middle East (Bahrain), Asia Pacific (Singapore), or UK (London)." },
   { q:"What happens to my data if I cancel?", a:"You can export all your data at any time in CSV or JSON format. After cancellation, we retain your data for 90 days so you can retrieve it, then permanently delete it. Deletion certificates are available on request." },
   { q:"Do you support two-factor authentication?", a:"Yes. 2FA is available for all accounts via authenticator app (TOTP) or SMS. Enterprise plans have enforced 2FA for all users." },

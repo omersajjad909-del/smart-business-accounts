@@ -136,7 +136,7 @@ export default function Footer() {
                 </svg>
               </div>
               <span style={{ fontFamily:"'Lora',serif", fontSize:20, fontWeight:700, color:"white", letterSpacing:"-.2px" }}>
-                Finova
+                FinovaOS
               </span>
             </Link>
 
@@ -305,7 +305,7 @@ export default function Footer() {
           {/* Left: copyright */}
           <div style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
             <p style={{ fontSize:11.5, color:"rgba(255,255,255,.22)", margin:0 }}>
-              © {new Date().getFullYear()} Finova. All rights reserved.
+              © {new Date().getFullYear()} FinovaOS. All rights reserved.
             </p>
             <div style={{ display:"flex", alignItems:"center", gap:5 }}>
               <span style={{ width:5, height:5, borderRadius:"50%", background:"#10b981", animation:"blink 2.5s ease infinite", display:"block" }}/>

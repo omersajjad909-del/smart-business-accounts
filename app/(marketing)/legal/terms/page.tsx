@@ -16,7 +16,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Agreement",
-        body: "By accessing or using Finova, you agree to be bound by these Terms, Privacy Policy, and Billing Policy. If you do not agree, you may not use the platform.",
+        body: "By accessing or using FinovaOS, you agree to be bound by these Terms, Privacy Policy, and Billing Policy. If you do not agree, you may not use the platform.",
       },
     ],
   },
@@ -29,8 +29,8 @@ const SECTIONS = [
     title: "Description of Service",
     content: [
       {
-        sub: "What Finova Is",
-        body: "Finova is a cloud-based business software platform that provides accounting, financial management, reporting, and business tools. Finova is software only and does not provide financial, legal, or tax advice.",
+        sub: "What FinovaOS Is",
+        body: "FinovaOS is a cloud-based business software platform that provides accounting, financial management, reporting, and business tools. FinovaOS is software only and does not provide financial, legal, or tax advice.",
       },
     ],
   },
@@ -58,7 +58,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Your Data Belongs to You",
-        body: "All data you enter into Finova remains your property. We do not own your business data. You grant us permission to store, process, and display your data only for the purpose of providing the service.",
+        body: "All data you enter into FinovaOS remains your property. We do not own your business data. You grant us permission to store, process, and display your data only for the purpose of providing the service.",
       },
     ],
   },
@@ -108,7 +108,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Plans & Auto-Renewal",
-        body: "Finova operates on a subscription basis with monthly and yearly plans. Subscriptions renew automatically unless cancelled. You authorize us to charge your payment method on file for recurring subscription fees.",
+        body: "FinovaOS operates on a subscription basis with monthly and yearly plans. Subscriptions renew automatically unless cancelled. You authorize us to charge your payment method on file for recurring subscription fees.",
       },
       {
         sub: "Failed Payments",
@@ -140,7 +140,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Prohibited Activities",
-        body: "You agree NOT to use Finova for: fraud, money laundering, illegal business, hacking or unauthorized access, uploading illegal content, attempting to reverse engineer the software, or reselling the service without permission. We reserve the right to suspend accounts that violate these rules.",
+        body: "You agree NOT to use FinovaOS for: fraud, money laundering, illegal business, hacking or unauthorized access, uploading illegal content, attempting to reverse engineer the software, or reselling the service without permission. We reserve the right to suspend accounts that violate these rules.",
       },
     ],
   },
@@ -154,7 +154,7 @@ const SECTIONS = [
     content: [
       {
         sub: "As-Is Service",
-        body: "Finova is provided \"as is\". We are not responsible for: financial losses, tax errors, accounting mistakes, business decisions made using our software, data loss, or service interruptions. Our total liability shall not exceed the amount you paid in the last 3 months.",
+        body: "FinovaOS is provided \"as is\". We are not responsible for: financial losses, tax errors, accounting mistakes, business decisions made using our software, data loss, or service interruptions. Our total liability shall not exceed the amount you paid in the last 3 months.",
       },
     ],
   },
@@ -210,7 +210,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Get in Touch",
-        body: "For legal, billing, or privacy questions contact: finovaos.app@gmail.com — Finova Technologies, Lahore, Pakistan.",
+        body: "For legal, billing, or privacy questions contact: finovaos.app@gmail.com — FinovaOS Technologies, Lahore, Pakistan.",
       },
     ],
   },
@@ -391,7 +391,7 @@ export default function TermsPage() {
                   opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(12px)",
                   transition:"all .6s ease .16s",
                 }}>
-                  These terms govern your use of Finova. By using the platform, you agree to these terms in full.
+                  These terms govern your use of FinovaOS. By using the platform, you agree to these terms in full.
                 </p>
               </div>
 
@@ -416,7 +416,7 @@ export default function TermsPage() {
                   { icon:"💳", text:"14-day refund on yearly plans" },
                   { icon:"📤", text:"Export data anytime" },
                   { icon:"🚫", text:"We never sell your data" },
-                  { icon:"🇵🇰", text:"Finova Technologies, Lahore" },
+                  { icon:"🇵🇰", text:"FinovaOS Technologies, Lahore" },
                 ].map(({ icon, text }) => (
                   <div key={text} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
                     <span style={{ fontSize:15 }}>{icon}</span>

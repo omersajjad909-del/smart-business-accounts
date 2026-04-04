@@ -34,7 +34,7 @@ function SsoForm() {
         <div className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-indigo-300">Enterprise SSO</div>
         <h1 className="text-3xl font-bold">Sign in with your company identity provider</h1>
         <p className="mt-3 text-sm leading-6 text-slate-300">
-          Enter your work email. Finova will detect your company domain and redirect you to the configured OIDC provider.
+          Enter your work email. FinovaOS will detect your company domain and redirect you to the configured OIDC provider.
         </p>
 
         <div className="mt-6 space-y-4">

@@ -70,7 +70,7 @@ const FOCUSED_INDUSTRIES = [
     slug: "retail",
     color: "#ec4899",
     audience: "For marts, stores, and growing multi-branch retail businesses.",
-    desc: "Finova helps retail teams sell faster, track stock branch-wise, run promotions, manage customer loyalty, and print receipts in the right format.",
+    desc: "FinovaOS helps retail teams sell faster, track stock branch-wise, run promotions, manage customer loyalty, and print receipts in the right format.",
     modules: ["POS Terminal", "Product Catalog", "Stock Transfer", "Branch Reports"],
     flow: ["Receive stock", "Sell at counter", "Control branches", "Review daily performance"],
   },
@@ -233,7 +233,7 @@ export default function SolutionSection() {
               Sound familiar?
             </h2>
             <p style={{ fontSize: 16, color: "rgba(255,255,255,.4)", lineHeight: 1.8, maxWidth: 500, margin: "0 auto" }}>
-              These are the operating problems growing businesses hit first. Finova is designed to remove them.
+              These are the operating problems growing businesses hit first. FinovaOS is designed to remove them.
             </p>
           </div>
 
@@ -299,7 +299,7 @@ export default function SolutionSection() {
                       border: `1px solid ${pain.color}25`,
                     }}
                   >
-                    ↓ Finova fixes this
+                    ↓ FinovaOS fixes this
                   </div>
                   <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,.06)" }} />
                 </div>
@@ -381,7 +381,7 @@ export default function SolutionSection() {
                 marginBottom: 16,
               }}
             >
-              Finova is currently optimized for{" "}
+              FinovaOS is currently optimized for{" "}
               <span
                 style={{
                   background: "linear-gradient(135deg,#818cf8,#6366f1,#a78bfa)",
@@ -683,7 +683,7 @@ export default function SolutionSection() {
               <Link href="/contact?subject=custom-industry" style={{ color: "#818cf8", textDecoration: "none", fontWeight: 600 }}>
                 Request a custom setup
               </Link>{" "}
-              and we&apos;ll extend it with the same Finova structure.
+              and we&apos;ll extend it with the same FinovaOS structure.
             </p>
             <Link
               href="/solutions"

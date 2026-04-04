@@ -65,7 +65,7 @@ async function notifyWaitlist(businessType: string): Promise<number> {
 
   if (!subscribers.length) return 0;
 
-  const subject = `🎉 ${cfg.label} is now live on Finova!`;
+  const subject = `🎉 ${cfg.label} is now live on FinovaOS!`;
   const html = `
     <!DOCTYPE html>
     <html>
@@ -86,7 +86,7 @@ async function notifyWaitlist(businessType: string): Promise<number> {
           <h1>${cfg.label} is now Live!</h1>
         </div>
         <div class="body">
-          <p>Great news! You asked us to notify you when <strong>${cfg.label}</strong> went live on Finova — and it's here!</p>
+          <p>Great news! You asked us to notify you when <strong>${cfg.label}</strong> went live on FinovaOS — and it's here!</p>
           <p>${cfg.description}</p>
           <p>You can now select <strong>${cfg.label}</strong> as your business type and get a fully configured dashboard with accounts, KPIs, and modules — all set up automatically.</p>
           <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app"}/business-setup" class="cta">
@@ -94,7 +94,7 @@ async function notifyWaitlist(businessType: string): Promise<number> {
           </a>
         </div>
         <div class="footer">
-          &copy; ${new Date().getFullYear()} Finova &middot; You received this because you joined the waitlist.
+          &copy; ${new Date().getFullYear()} FinovaOS &middot; You received this because you joined the waitlist.
         </div>
       </div>
     </body>

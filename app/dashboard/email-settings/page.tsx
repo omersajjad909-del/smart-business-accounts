@@ -15,7 +15,7 @@ export default function EmailSettingsPage() {
   const [smtpUser, setSmtpUser] = useState("");
   const [smtpPass, setSmtpPass] = useState("");
   const [smtpFrom, setSmtpFrom] = useState("");
-  const [fromName, setFromName] = useState("Finova");
+  const [fromName, setFromName] = useState("FinovaOS");
   const [smtpSecure, setSmtpSecure] = useState(false);
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -33,7 +33,7 @@ export default function EmailSettingsPage() {
         setSmtpUser(config.user || "");
         setSmtpPass(config.pass || "");
         setSmtpFrom(config.from || "");
-        setFromName(config.fromName || "Finova");
+        setFromName(config.fromName || "FinovaOS");
         setSmtpSecure(Boolean(config.secure));
       })
       .catch(() => {});

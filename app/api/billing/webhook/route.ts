@@ -82,7 +82,7 @@ async function sendWelcomeSubscriptionEmail(companyId: string, planCode: string)
     if (uc?.user?.email) {
       await sendEmail({
         to: uc.user.email,
-        subject: `Welcome to Finova! Your ${planKey.charAt(0).toUpperCase() + planKey.slice(1)} plan is active`,
+        subject: `Welcome to FinovaOS! Your ${planKey.charAt(0).toUpperCase() + planKey.slice(1)} plan is active`,
         html: emailTemplates.welcomeSubscription(uc.user.name || "there", planKey, features, dashboardUrl),
         companyId,
       });

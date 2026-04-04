@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     // Default settings response
     const settings = {
-      appName: "Finova",
+      appName: "FinovaOS",
       supportEmail: "finovaos.app@gmail.com",
       maintenanceMode: false,
       allowSignups: true,

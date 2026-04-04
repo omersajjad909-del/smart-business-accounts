@@ -154,7 +154,7 @@ export default function ChatWidget() {
     setConvId(newConvId);
     setStep("chat");
 
-    const welcomeText = `Hi ${name.split(" ")[0]}! 👋 I'm Finova's AI assistant. I can help with invoicing, reports, banking, inventory, HR, and more. What can I help you with today?`;
+    const welcomeText = `Hi ${name.split(" ")[0]}! 👋 I'm FinovaOS's AI assistant. I can help with invoicing, reports, banking, inventory, HR, and more. What can I help you with today?`;
 
     const welcome: Message = {
       id: "welcome",
@@ -310,7 +310,7 @@ export default function ChatWidget() {
             <div style={{ display:"flex", alignItems:"center", gap:10 }}>
               <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#4f46e5,#818cf8)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🤖</div>
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:13.5, fontWeight:700, color:"white" }}>Finova Support</div>
+                <div style={{ fontSize:13.5, fontWeight:700, color:"white" }}>FinovaOS Support</div>
                 <div style={{ display:"flex", alignItems:"center", gap:5, marginTop:2 }}>
                   <div style={{ width:6, height:6, borderRadius:"50%", background:statusLabel.dot, flexShrink:0 }}/>
                   <span style={{ fontSize:11, color:statusLabel.color, fontWeight:600 }}>{statusLabel.text}</span>
@@ -329,7 +329,7 @@ export default function ChatWidget() {
             <div style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center", padding:"28px 24px", gap:16 }}>
               <div style={{ textAlign:"center", marginBottom:8 }}>
                 <div style={{ fontSize:28, marginBottom:8 }}>👋</div>
-                <div style={{ fontSize:15, fontWeight:700, color:"white", marginBottom:4 }}>Welcome to Finova Support</div>
+                <div style={{ fontSize:15, fontWeight:700, color:"white", marginBottom:4 }}>Welcome to FinovaOS Support</div>
                 <div style={{ fontSize:12.5, color:"rgba(255,255,255,.4)", lineHeight:1.6 }}>Tell us a bit about yourself so we can help you better.</div>
               </div>
 
@@ -460,7 +460,7 @@ export default function ChatWidget() {
                       </svg>
                     </button>
                   </div>
-                  <div style={{ fontSize:10, color:"rgba(255,255,255,.15)", textAlign:"center", marginTop:6 }}>Powered by Finova AI</div>
+                  <div style={{ fontSize:10, color:"rgba(255,255,255,.15)", textAlign:"center", marginTop:6 }}>Powered by FinovaOS AI</div>
                 </div>
               )}
             </>

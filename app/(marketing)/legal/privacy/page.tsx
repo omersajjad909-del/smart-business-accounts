@@ -4,7 +4,7 @@ import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
 const LAST_UPDATED = "1 March 2025";
-const COMPANY = "Finova";
+const COMPANY = "FinovaOS";
 const EMAIL = "finovaos.app@gmail.com";
 const ADDRESS = "Global Operations";
 
@@ -45,7 +45,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Service Delivery",
-        body: "Your data is used solely to operate Finova — to process transactions, generate reports, send notifications, and maintain your account.",
+        body: "Your data is used solely to operate FinovaOS — to process transactions, generate reports, send notifications, and maintain your account.",
       },
       {
         sub: "Security & Fraud Prevention",
@@ -179,7 +179,7 @@ const SECTIONS = [
       },
       {
         sub: "No Third-Party Advertising Cookies",
-        body: "We do not allow any advertising networks or retargeting pixels on our platform. Your browsing behavior within Finova is never shared with advertisers.",
+        body: "We do not allow any advertising networks or retargeting pixels on our platform. Your browsing behavior within FinovaOS is never shared with advertisers.",
       },
     ],
   },
@@ -197,7 +197,7 @@ const SECTIONS = [
       },
       {
         sub: "Continued Use",
-        body: "Your continued use of Finova after the effective date of any changes constitutes your acceptance of the updated policy.",
+        body: "Your continued use of FinovaOS after the effective date of any changes constitutes your acceptance of the updated policy.",
       },
     ],
   },
@@ -290,8 +290,8 @@ export default function PrivacyPage() {
   return (
     <>
       <Head>
-        <title>Privacy Policy – Finova</title>
-        <meta name="description" content="How Finova collects, uses, and protects your data."/>
+        <title>Privacy Policy – FinovaOS</title>
+        <meta name="description" content="How FinovaOS collects, uses, and protects your data."/>
       </Head>
 
       <div style={{

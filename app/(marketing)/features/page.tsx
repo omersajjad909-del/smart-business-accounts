@@ -4,7 +4,7 @@ import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
 /* ══════════════════════════════════════════════════════════
-   DATA — All Finova features with complete data
+   DATA — All FinovaOS features with complete data
 ══════════════════════════════════════════════════════════ */
 const CATEGORIES = [
   {
@@ -42,7 +42,7 @@ const CATEGORIES = [
       },
       {
         name: "Bank Reconciliation",
-        description: "Import bank statement transactions alongside Finova ledger entries, review differences quickly, and close your books with a guided reconciliation workflow.",
+        description: "Import bank statement transactions alongside FinovaOS ledger entries, review differences quickly, and close your books with a guided reconciliation workflow.",
         highlights: ["Statement import", "Discrepancy flagging", "Review workflow"],
         mockType: "reconciliation",
       },
@@ -72,7 +72,7 @@ const CATEGORIES = [
       },
       {
         name: "Recurring Transactions",
-        description: "Automate repeat entries — monthly rent, utility bills, subscriptions, and standing journal entries. Set frequency, end date, and Finova posts them automatically — zero manual effort.",
+        description: "Automate repeat entries — monthly rent, utility bills, subscriptions, and standing journal entries. Set frequency, end date, and FinovaOS posts them automatically — zero manual effort.",
         highlights: ["Auto-posting", "Flexible frequency", "Invoice & JV support"],
         mockType: "recurring",
       },
@@ -95,7 +95,7 @@ const CATEGORIES = [
     items: [
       {
         name: "Professional Sales Invoices",
-        description: "Create and send beautiful, branded invoices in under 2 minutes. Choose from 5 professional templates, add your logo, and send directly from Finova via email or WhatsApp. Track payment status in real time.",
+        description: "Create and send beautiful, branded invoices in under 2 minutes. Choose from 5 professional templates, add your logo, and send directly from FinovaOS via email or WhatsApp. Track payment status in real time.",
         highlights: ["5 branded templates", "Email & WhatsApp send", "Real-time payment tracking"],
         mockType: "invoice",
       },
@@ -230,7 +230,7 @@ const CATEGORIES = [
       },
       {
         name: "Automated Payroll",
-        description: "Run monthly payroll in minutes. Finova automatically calculates basic salary, allowances, deductions, Social Security, gratuity accrual, and Tax Withholding.",
+        description: "Run monthly payroll in minutes. FinovaOS automatically calculates basic salary, allowances, deductions, Social Security, gratuity accrual, and Tax Withholding.",
         highlights: ["Auto tax deductions", "Social Security", "One-click payslips"],
         mockType: "payroll",
       },
@@ -271,7 +271,7 @@ const CATEGORIES = [
       },
       {
         name: "Cash Flow Statement",
-        description: "See exactly where your cash is coming from and where it's going. Finova generates a real-time cash flow statement categorized into operating, investing, and financing activities — no manual preparation.",
+        description: "See exactly where your cash is coming from and where it's going. FinovaOS generates a real-time cash flow statement categorized into operating, investing, and financing activities — no manual preparation.",
         highlights: ["Operating / investing / financing", "Real-time view", "Export-ready"],
         mockType: "cashflow",
       },
@@ -323,13 +323,13 @@ const CATEGORIES = [
       },
       {
         name: "Audit Trails & Activity Logs",
-        description: "Every action in Finova is logged with user identity, timestamp, IP address, and device. See who created, edited, approved, or deleted any record. Full compliance-ready audit trail.",
+        description: "Every action in FinovaOS is logged with user identity, timestamp, IP address, and device. See who created, edited, approved, or deleted any record. Full compliance-ready audit trail.",
         highlights: ["User tracking", "IP & device logs", "Change history"],
         mockType: "audit",
       },
       {
         name: "Multi-Company Management",
-        description: "Manage multiple businesses from a single Finova account. Switch between companies instantly. Complete data isolation between entities — no cross-contamination of financial data.",
+        description: "Manage multiple businesses from a single FinovaOS account. Switch between companies instantly. Complete data isolation between entities — no cross-contamination of financial data.",
         highlights: ["Instant switching", "Data isolation", "Group consolidation"],
         mockType: "multicompany",
       },
@@ -341,7 +341,7 @@ const CATEGORIES = [
       },
       {
         name: "API Access & Integrations",
-        description: "Connect Finova with selected business tools and bank services, with deeper integration support available for custom enterprise deployments.",
+        description: "Connect FinovaOS with selected business tools and bank services, with deeper integration support available for custom enterprise deployments.",
         highlights: ["Bank integrations", "Data exports", "Custom enterprise setup"],
         mockType: "api",
       },
@@ -1630,7 +1630,7 @@ export default function FeaturesPage() {
   return (
     <>
       <Head>
-        <title>Features — Finova</title>
+        <title>Features — FinovaOS</title>
         <meta name="description" content={`${totalFeatures} features for accounting, inventory, HR, CRM and more — built for modern SMEs.`}/>
       </Head>
 
@@ -1742,7 +1742,7 @@ export default function FeaturesPage() {
                 </span>
               </h2>
               <p style={{ fontSize:16, color:"rgba(255,255,255,.5)", marginBottom:40, maxWidth:460, margin:"0 auto 40px", lineHeight:1.8 }}>
-                Join 12,000+ SMEs who trust Finova for their daily operations.
+                Join 12,000+ SMEs who trust FinovaOS for their daily operations.
               </p>
               <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap" }}>
                 <Link href="/pricing" style={{ padding:"14px 36px", borderRadius:14, background:"linear-gradient(135deg,#fbbf24,#f59e0b)", color:"#0f172a", fontWeight:800, fontSize:15, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8, boxShadow:"0 6px 24px rgba(251,191,36,.4)", transition:"all .25s" }}

@@ -102,14 +102,14 @@ export default function NotFoundPage() {
         <div style={{ marginTop:36, opacity:vis?1:0, transition:"opacity .6s ease .4s" }}>
           <p style={{ fontSize:13, color:"rgba(255,255,255,.25)", margin:"0 0 12px" }}>Or search for what you need</p>
           <div style={{ display:"flex", gap:10, maxWidth:380, margin:"0 auto" }}>
-            <input placeholder="Search Finova..." style={{ flex:1, padding:"11px 16px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:13, outline:"none" }}
+            <input placeholder="Search FinovaOS..." style={{ flex:1, padding:"11px 16px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:13, outline:"none" }}
               onKeyDown={e=>{ if (e.key==="Enter") window.location.href=`/help?q=${(e.target as HTMLInputElement).value}`; }}/>
             <button style={{ padding:"11px 18px", borderRadius:10, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", flexShrink:0 }}>Search</button>
           </div>
         </div>
       </div>
 
-      {/* Finova wordmark at bottom */}
+      {/* FinovaOS wordmark at bottom */}
       <div style={{ position:"absolute", bottom:32, left:"50%", transform:"translateX(-50%)", fontSize:13, color:"rgba(255,255,255,.15)", fontWeight:700, letterSpacing:".08em" }}>
         FINOVA
       </div>
