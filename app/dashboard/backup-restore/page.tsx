@@ -2,47 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
-import { PERMISSIONS as _PERMISSIONS } from "@/lib/permissions";
-type AuthUser = {
-  id?: string;
-  role?: string;
-  permissions?: (string | { permission?: string })[];
-  rolePermissions?: (string | { permission?: string })[];
-};
-
-
-function userHasPerm(user: AuthUser | null, perm: string): boolean {
-  if (!user) return false;
-
-  const p = perm.toUpperCase();
-
-  if (user.role === "ADMIN") return true;
-
-  if (
-    user.permissions?.some(
-      (x) =>
-        (typeof x === "string"
-          ? x.toUpperCase()
-          : (x.permission || "").toUpperCase()) === p
-    )
-  ) {
-    return true;
-  }
-
-  if (
-    user.rolePermissions?.some(
-      (x) =>
-        (typeof x === "string"
-          ? x.toUpperCase()
-          : (x.permission || "").toUpperCase()) === p
-    )
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
 
 type Backup = {
   id: string;
@@ -53,214 +12,232 @@ type Backup = {
   createdAt: string;
 };
 
+type AuthUser = {
+  id?: string;
+  role?: string;
+  permissions?: (string | { permission?: string })[];
+  rolePermissions?: (string | { permission?: string })[];
+};
+
+function userHasPerm(user: AuthUser | null, perm: string): boolean {
+  if (!user) return false;
+  if (user.role === "ADMIN") return true;
+  const p = perm.toUpperCase();
+  return !!(
+    user.permissions?.some(x => (typeof x === "string" ? x : x.permission || "").toUpperCase() === p) ||
+    user.rolePermissions?.some(x => (typeof x === "string" ? x : x.permission || "").toUpperCase() === p)
+  );
+}
+
 export default function BackupRestorePage() {
   const [backups, setBackups] = useState<Backup[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
 
   const user = getCurrentUser();
-  const canAccess = userHasPerm(user, 'BACKUP_RESTORE');
+  const canAccess = userHasPerm(user, "BACKUP_RESTORE");
 
-  useEffect(() => {
-    loadBackups();
-  }, []);
+  useEffect(() => { loadBackups(); }, []);
+
+  function flash(text: string, ok = true) {
+    setMsg({ text, ok });
+    setTimeout(() => setMsg(null), 4000);
+  }
 
   async function loadBackups() {
     setLoading(true);
     try {
       const res = await fetch("/api/backup", {
-        headers: {
-          "x-user-role": user?.role || "",
-          "x-user-id": user?.id || "",
-        },
+        headers: { "x-user-role": user?.role || "", "x-user-id": user?.id || "" },
       });
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setBackups(data);
-      }
+      if (Array.isArray(data)) setBackups(data);
     } catch (e) {
-      console.error("Load error:", e);
+      console.error(e);
     } finally {
       setLoading(false);
     }
   }
 
   async function createBackup() {
-    if (!confirm("Create a full backup of all system data?")) {
-      return;
-    }
-
+    if (!confirm("Create a full backup of all company data?")) return;
     setCreating(true);
     try {
       const res = await fetch("/api/backup", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-role": user?.role || "",
-          "x-user-id": user?.id || "",
-        },
+        headers: { "Content-Type": "application/json", "x-user-role": user?.role || "", "x-user-id": user?.id || "" },
         body: JSON.stringify({ backupType: "FULL" }),
       });
-
+      const j = await res.json();
       if (res.ok) {
-        alert("Backup created successfully!");
+        flash("Backup created successfully!");
         await loadBackups();
       } else {
-        const error = await res.json();
-        alert(error.error || "Backup failed");
+        flash(j.error || "Backup failed", false);
       }
-    } catch (_e) {
-      alert("Backup failed");
+    } catch {
+      flash("Backup failed", false);
     } finally {
       setCreating(false);
     }
   }
 
-  async function restoreBackup(backupId: string, fileName: string) {
-    if (!confirm(`Restore from "${fileName}"?\n\nThis will replace ALL current data!`)) {
-      return;
-    }
+  function downloadBackup(id: string, fileName: string) {
+    const url = `/api/backup/download?id=${id}`;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    // Pass auth headers via a fetch + blob approach
+    fetch(url, { headers: { "x-user-role": user?.role || "", "x-user-id": user?.id || "" } })
+      .then(r => r.blob())
+      .then(blob => {
+        const blobUrl = URL.createObjectURL(blob);
+        a.href = blobUrl;
+        a.click();
+        URL.revokeObjectURL(blobUrl);
+      })
+      .catch(() => flash("Download failed", false));
+  }
 
-    setLoading(true);
+  async function restoreBackup(id: string, fileName: string) {
+    if (!confirm(`Restore from "${fileName}"?\n\nThis will REPLACE all current data. Are you sure?`)) return;
+    setRestoringId(id);
     try {
-      console.log("Starting restore from:", backupId);
       const res = await fetch("/api/backup/restore", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-role": user?.role || "",
-          "x-user-id": user?.id || "",
-        },
-        body: JSON.stringify({ backupId }),
+        headers: { "Content-Type": "application/json", "x-user-role": user?.role || "", "x-user-id": user?.id || "" },
+        body: JSON.stringify({ backupId: id }),
       });
-
-      console.log("Restore response status:", res.status);
-      const result = await res.json();
-      console.log("Restore result:", result);
-
+      const j = await res.json();
       if (res.ok) {
-        alert("Data restored successfully! Page will refresh...");
-        // Reload page to show restored data
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        flash("Data restored successfully! Reloading...");
+        setTimeout(() => window.location.reload(), 1500);
       } else {
-        alert("Restore failed: " + (result.error || "Unknown error"));
+        flash(j.error || "Restore failed", false);
       }
-    } catch (e) {
-      console.error("Restore error:", e);
-      alert("Restore failed: " + (e as Error).message);
+    } catch {
+      flash("Restore failed", false);
     } finally {
-      setLoading(false);
+      setRestoringId(null);
     }
   }
 
-  function formatFileSize(bytes?: number): string {
-    if (!bytes) return "N/A";
+  function fmtSize(bytes?: number) {
+    if (!bytes) return "—";
     if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   }
 
-  if (!canAccess) {
-    return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <h2 className="text-xl font-bold text-red-600 mb-2">❌ Access Denied</h2>
-          <p className="text-red-700">You do not have permission to access backup & restore.</p>
-        </div>
-      </div>
-    );
-  }
+  /* ── styles ── */
+  const card: React.CSSProperties = {
+    borderRadius: 14, background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.08)", padding: "20px 24px",
+  };
+  const btn = (color: string, disabled?: boolean): React.CSSProperties => ({
+    padding: "9px 18px", borderRadius: 9, border: "none",
+    background: disabled ? "rgba(255,255,255,0.06)" : color,
+    color: disabled ? "rgba(255,255,255,0.3)" : "white",
+    fontWeight: 700, fontSize: 13, cursor: disabled ? "not-allowed" : "pointer",
+    fontFamily: "inherit", transition: "opacity .15s",
+  });
+
+  if (!canAccess) return (
+    <div style={{ padding: 32, color: "#f87171", textAlign: "center" }}>
+      <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
+      <div style={{ fontWeight: 700 }}>Access Denied</div>
+      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6 }}>You do not have permission to access Backup & Restore.</div>
+    </div>
+  );
+
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Data Backup & Restore</h1>
-        <button
-          onClick={createBackup}
-          disabled={creating}
-          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-        >
-          {creating ? "Creating Backup..." : "+ Create Backup"}
+    <div style={{ padding: 24, maxWidth: 1000, margin: "0 auto", fontFamily: "inherit" }}>
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "white", margin: "0 0 4px" }}>Data Backup & Restore</h1>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: 0 }}>
+            Backups are stored securely in the database. Download as JSON or restore anytime.
+          </p>
+        </div>
+        <button onClick={createBackup} disabled={creating} style={btn("linear-gradient(135deg,#4f46e5,#6366f1)", creating)}>
+          {creating ? "Creating…" : "+ Create Backup"}
         </button>
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded">
-        <p className="text-sm text-yellow-800">
-          <strong>Note:</strong> Backups are stored locally. For production use,
-          configure cloud storage (AWS S3, Google Cloud Storage, etc.) for
-          automatic backups.
-        </p>
+      {/* Message */}
+      {msg && (
+        <div style={{ ...card, background: msg.ok ? "rgba(52,211,153,0.08)" : "rgba(248,113,113,0.08)", border: `1px solid ${msg.ok ? "rgba(52,211,153,0.3)" : "rgba(248,113,113,0.3)"}`, color: msg.ok ? "#34d399" : "#f87171", marginBottom: 16, fontSize: 13, fontWeight: 600 }}>
+          {msg.text}
+        </div>
+      )}
+
+      {/* Info banner */}
+      <div style={{ ...card, background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.2)", marginBottom: 20, display: "flex", gap: 12, alignItems: "flex-start" }}>
+        <span style={{ fontSize: 20 }}>ℹ️</span>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
+          <strong style={{ color: "white" }}>How it works:</strong> Backups include all your accounts, invoices, vouchers, inventory, HR records and more.
+          Stored in the database — no external storage needed. Download the JSON file to keep an offline copy.
+        </div>
       </div>
 
-      <div className="bg-white border rounded overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-3 text-left">File Name</th>
-              <th className="p-3 text-left">Type</th>
-              <th className="p-3 text-right">Size</th>
-              <th className="p-3 text-center">Status</th>
-              <th className="p-3 text-left">Created</th>
-              <th className="p-3 text-center">Action</th>
+      {/* Table */}
+      <div style={card}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead>
+            <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+              {["File Name", "Type", "Size", "Status", "Created", "Actions"].map(h => (
+                <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: ".08em" }}>{h}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan={6} className="p-4 text-center">
-                  Loading...
-                </td>
-              </tr>
+              <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: "rgba(255,255,255,0.3)" }}>Loading…</td></tr>
             ) : backups.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="p-4 text-center text-gray-400">
-                  No backups found
+              <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: "rgba(255,255,255,0.3)" }}>No backups yet. Click "+ Create Backup" to get started.</td></tr>
+            ) : backups.map((b) => (
+              <tr key={b.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                <td style={{ padding: "12px", color: "rgba(255,255,255,0.75)", fontFamily: "monospace", fontSize: 12 }}>{b.fileName}</td>
+                <td style={{ padding: "12px", color: "rgba(255,255,255,0.5)" }}>{b.backupType}</td>
+                <td style={{ padding: "12px", color: "rgba(255,255,255,0.5)" }}>{fmtSize(b.fileSize)}</td>
+                <td style={{ padding: "12px" }}>
+                  <span style={{
+                    padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
+                    background: b.status === "COMPLETED" ? "rgba(52,211,153,0.12)" : b.status === "FAILED" ? "rgba(248,113,113,0.12)" : "rgba(251,191,36,0.12)",
+                    color: b.status === "COMPLETED" ? "#34d399" : b.status === "FAILED" ? "#f87171" : "#fbbf24",
+                  }}>{b.status}</span>
                 </td>
-              </tr>
-            ) : (
-              backups.map((b) => (
-                <tr key={b.id} className="border-t">
-                  <td className="p-3">{b.fileName}</td>
-                  <td className="p-3">{b.backupType}</td>
-                  <td className="p-3 text-right">{formatFileSize(b.fileSize)}</td>
-                  <td className="p-3 text-center">
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        b.status === "COMPLETED"
-                          ? "bg-green-100 text-green-800"
-                          : b.status === "FAILED"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {b.status}
-                    </span>
-                  </td>
-                  <td className="p-3">
-                    {new Date(b.createdAt).toLocaleString()}
-                  </td>
-                  <td className="p-3 text-center">
-                    {b.status === "COMPLETED" && (
+                <td style={{ padding: "12px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
+                  {new Date(b.createdAt).toLocaleString()}
+                </td>
+                <td style={{ padding: "12px" }}>
+                  {b.status === "COMPLETED" && (
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button
+                        onClick={() => downloadBackup(b.id, b.fileName)}
+                        style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(99,102,241,0.4)", background: "rgba(99,102,241,0.1)", color: "#a5b4fc", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}
+                      >
+                        ⬇ Download
+                      </button>
                       <button
                         onClick={() => restoreBackup(b.id, b.fileName)}
-                        disabled={loading}
-                        className="bg-green-600 text-white px-3 py-1 rounded text-sm disabled:opacity-50 hover:bg-green-700"
+                        disabled={restoringId === b.id}
+                        style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(248,113,113,0.3)", background: "rgba(248,113,113,0.08)", color: restoringId === b.id ? "rgba(255,255,255,0.3)" : "#f87171", fontSize: 12, cursor: restoringId === b.id ? "not-allowed" : "pointer", fontFamily: "inherit", fontWeight: 600 }}
                       >
-                        {loading ? "Restoring..." : "Restore"}
+                        {restoringId === b.id ? "Restoring…" : "↺ Restore"}
                       </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
     </div>
   );
 }
-
-
-
-

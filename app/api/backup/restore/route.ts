@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
-import { readFile } from "fs/promises";
 
 export async function POST(req: NextRequest) {
   const userRole = req.headers.get("x-user-role");
@@ -15,30 +14,33 @@ export async function POST(req: NextRequest) {
   const { backupId } = await req.json();
   if (!backupId) return NextResponse.json({ error: "Backup ID required" }, { status: 400 });
 
-  // Only allow restoring backups that belong to this company
+  // Fetch backup including metadata (the stored JSON data)
   const backup = await prisma.systemBackup.findFirst({
     where: { id: backupId, companyId },
   });
 
-  if (!backup || !backup.filePath) {
+  if (!backup) {
     return NextResponse.json({ error: "Backup not found" }, { status: 404 });
+  }
+
+  if (backup.status !== "COMPLETED" || !backup.metadata) {
+    return NextResponse.json({ error: "Backup data is not available or incomplete" }, { status: 400 });
   }
 
   let data: any;
   try {
-    const raw = await readFile(backup.filePath, "utf-8");
-    data = JSON.parse(raw);
-  } catch (err: any) {
-    return NextResponse.json({ error: `Cannot read backup file: ${err.message}` }, { status: 500 });
+    data = JSON.parse(backup.metadata);
+  } catch {
+    return NextResponse.json({ error: "Backup data is corrupted" }, { status: 500 });
   }
 
-  // Safety check - backup must belong to this company
+  // Safety check
   if (data.companyId && data.companyId !== companyId) {
     return NextResponse.json({ error: "Backup belongs to a different company" }, { status: 403 });
   }
 
   try {
-    // Delete ONLY this company's data (company-scoped delete, not global)
+    // Delete current company data (scoped — no other company affected)
     await prisma.voucherEntry.deleteMany({ where: { voucher: { companyId } } });
     await prisma.voucher.deleteMany({ where: { companyId } });
     await prisma.salesInvoiceItem.deleteMany({ where: { invoice: { companyId } } });
@@ -58,7 +60,6 @@ export async function POST(req: NextRequest) {
     await prisma.itemNew.deleteMany({ where: { companyId } });
     await prisma.account.deleteMany({ where: { companyId } });
 
-    // Restore in correct order
     const restore = async (items: any[], creator: (d: any) => Promise<any>) => {
       for (const item of (items || [])) {
         try { await creator(item); } catch (e: any) {
@@ -97,7 +98,7 @@ export async function POST(req: NextRequest) {
       } catch (e: any) { console.warn("Voucher restore skip:", e.message); }
     }
 
-    return NextResponse.json({ success: true, message: "Data restored successfully for your company" });
+    return NextResponse.json({ success: true, message: "Data restored successfully" });
   } catch (error: any) {
     return NextResponse.json({ error: `Restore failed: ${error.message}` }, { status: 500 });
   }

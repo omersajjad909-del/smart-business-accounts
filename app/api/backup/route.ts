@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
 
 export async function GET(req: NextRequest) {
   const userRole = req.headers.get("x-user-role");
@@ -17,6 +15,16 @@ export async function GET(req: NextRequest) {
     where: { companyId },
     orderBy: { createdAt: "desc" },
     take: 50,
+    select: {
+      id: true,
+      fileName: true,
+      fileSize: true,
+      backupType: true,
+      status: true,
+      createdAt: true,
+      createdBy: true,
+      // exclude metadata (can be large) from list view
+    },
   });
 
   return NextResponse.json(backups);
@@ -38,12 +46,13 @@ export async function POST(req: NextRequest) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const fileName = `backup-${companyId.slice(0, 8)}-${timestamp}.json`;
 
+  // Create pending record first
   const backup = await prisma.systemBackup.create({
     data: { companyId, fileName, backupType, status: "PENDING", createdBy: userId || null },
   });
 
   try {
-    // Full company data export
+    // Collect all company data
     const [
       accounts, items, vouchers, salesInvoices, purchaseInvoices,
       purchaseOrders, bankAccounts, budgets, recurringTransactions,
@@ -76,9 +85,10 @@ export async function POST(req: NextRequest) {
       (prisma as any).opportunity?.findMany({ where: { companyId } }).catch(() => []),
     ]);
 
-    const data = {
+    const exportData = {
       companyId,
       exportedAt: new Date().toISOString(),
+      version: "2.0",
       accounts, items, vouchers, salesInvoices, purchaseInvoices,
       purchaseOrders, bankAccounts, budgets, recurringTransactions,
       financialYears, branches, costCenters, currencies, taxConfigs,
@@ -86,40 +96,43 @@ export async function POST(req: NextRequest) {
       pettyCash, fixedAssets, crmContacts, opportunities,
     };
 
-    const backupDir = join(process.cwd(), "backups");
-    await mkdir(backupDir, { recursive: true });
-    const filePath = join(backupDir, fileName);
-    await writeFile(filePath, JSON.stringify(data, null, 2));
-    const stats = await import("fs").then((fs) => fs.promises.stat(filePath));
+    const jsonStr = JSON.stringify(exportData);
+    const fileSize = Buffer.byteLength(jsonStr, "utf8");
 
+    // Store backup data IN the database (works on Vercel — no filesystem needed)
     await prisma.systemBackup.update({
       where: { id: backup.id },
       data: {
         status: "COMPLETED",
-        filePath,
-        fileSize: stats.size,
-        metadata: JSON.stringify({
-          recordCount: {
-            accounts: accounts.length,
-            items: items.length,
-            vouchers: vouchers.length,
-            salesInvoices: salesInvoices.length,
-            purchaseInvoices: purchaseInvoices.length,
-            employees: employees?.length ?? 0,
-            loans: loans?.length ?? 0,
-          },
-        }),
+        fileSize,
+        filePath: null, // no local file
+        metadata: jsonStr, // stored in DB
       },
     });
 
     return NextResponse.json({
       success: true,
-      backup: { ...backup, status: "COMPLETED", filePath, fileSize: stats.size },
+      backup: {
+        id: backup.id,
+        fileName,
+        fileSize,
+        status: "COMPLETED",
+        backupType,
+        createdAt: backup.createdAt,
+        recordCount: {
+          accounts: accounts.length,
+          items: items.length,
+          vouchers: vouchers.length,
+          salesInvoices: salesInvoices.length,
+          purchaseInvoices: purchaseInvoices.length,
+          employees: employees?.length ?? 0,
+        },
+      },
     });
   } catch (error: any) {
     await prisma.systemBackup.update({
       where: { id: backup.id },
-      data: { status: "FAILED", metadata: JSON.stringify({ error: error.message }) },
+      data: { status: "FAILED" },
     });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
