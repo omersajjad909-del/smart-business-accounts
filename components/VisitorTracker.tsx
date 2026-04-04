@@ -2,32 +2,37 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { getOrCreateVisitorSessionId } from "@/lib/visitorSession";
 
-function generateSessionId(): string {
-  const key = "fv_sid";
-  if (typeof window === "undefined") return "";
-
-  let sid = sessionStorage.getItem(key);
-  if (!sid) {
-    sid = `s_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-    sessionStorage.setItem(key, sid);
-  }
-
-  return sid;
-}
+const APP_TRACKED_PREFIXES = [
+  "/auth",
+  "/onboarding",
+  "/billing",
+  "/website-login",
+  "/website-signup",
+  "/login",
+  "/login-email",
+  "/sso",
+];
 
 export default function VisitorTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!pathname || pathname.startsWith("/admin") || pathname.startsWith("/dashboard")) {
+    if (
+      !pathname ||
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/api") ||
+      !APP_TRACKED_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+    ) {
       return;
     }
 
     const payload = JSON.stringify({
       page: pathname,
       referrer: document.referrer || "",
-      sessionId: generateSessionId(),
+      sessionId: getOrCreateVisitorSessionId(),
     });
 
     // Beacon prevents long-running background tracking from keeping the tab loading.

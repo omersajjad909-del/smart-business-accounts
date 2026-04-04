@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, company, phone, subject, message, source } = await req.json();
+    const { name, email, company, phone, subject, message, source, sessionId } = await req.json();
 
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
       return NextResponse.json({ error: "Name, email and message are required" }, { status: 400 });
@@ -18,6 +18,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    let country: string | null = null;
+    if (sessionId) {
+      try {
+        const lastVisit = await (prisma as any).siteVisit.findFirst({
+          where: { sessionId: String(sessionId) },
+          orderBy: { visitedAt: "desc" },
+          select: { countryName: true, country: true },
+        });
+        country = lastVisit?.countryName || lastVisit?.country || null;
+      } catch {}
+    }
+
     // Create a Lead record
     try {
       await (prisma as any).lead.create({
@@ -27,8 +39,11 @@ export async function POST(req: NextRequest) {
           phone: phone?.trim() || null,
           company: company?.trim() || null,
           message: message.trim(),
-          source: source?.trim() || "contact_form",
+          source: source?.trim() || "contact-form",
           status: "new",
+          priority: "medium",
+          country,
+          sessionId: sessionId?.trim() || null,
         },
       });
     } catch {}

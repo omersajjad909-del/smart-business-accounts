@@ -5,6 +5,19 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
+    let country: string | null = null;
+
+    if (data.sessionId) {
+      try {
+        const lastVisit = await (prisma as any).siteVisit.findFirst({
+          where: { sessionId: String(data.sessionId) },
+          orderBy: { visitedAt: "desc" },
+          select: { countryName: true, country: true },
+        });
+        country = lastVisit?.countryName || lastVisit?.country || null;
+      } catch {}
+    }
+
     await prisma.activityLog.create({
       data: { action:"DEMO_REQUEST", details:JSON.stringify({ ...data, requestedAt:new Date() }) },
     });
@@ -16,7 +29,18 @@ export async function POST(req: NextRequest) {
     // Auto-create lead
     try {
       await (prisma as any).lead.create({
-        data: { name: data.name||"Unknown", email: data.email||"", phone: data.phone||null, company: data.company||null, message: `Demo request for ${data.date} at ${data.time}`, source:"demo-request", status:"new", priority:"high" },
+        data: {
+          name: data.name || "Unknown",
+          email: data.email || "",
+          phone: data.phone || null,
+          company: data.company || null,
+          message: `Demo request for ${data.date} at ${data.time}`,
+          source: "demo-request",
+          status: "new",
+          priority: "high",
+          country,
+          sessionId: data.sessionId || null,
+        },
       });
     } catch {}
     return NextResponse.json({ success:true });

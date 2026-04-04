@@ -4,20 +4,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-
-function getOrCreateSessionId(): string {
-  try {
-    const key = "fnv_sid";
-    let sid = localStorage.getItem(key);
-    if (!sid) {
-      sid = crypto.randomUUID();
-      localStorage.setItem(key, sid);
-    }
-    return sid;
-  } catch {
-    return "anon-" + Math.random().toString(36).slice(2);
-  }
-}
+import { getOrCreateVisitorSessionId } from "@/lib/visitorSession";
 
 export default function VisitorTracker() {
   const pathname    = usePathname();
@@ -30,7 +17,7 @@ export default function VisitorTracker() {
     // Don't track admin/dashboard/auth pages
     if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/api")) return;
 
-    const sessionId   = getOrCreateSessionId();
+    const sessionId   = getOrCreateVisitorSessionId();
     const referrer    = document.referrer || undefined;
     const params      = searchParams?.toString() ? Object.fromEntries(new URLSearchParams(searchParams.toString())) : {};
 
@@ -53,10 +40,11 @@ export default function VisitorTracker() {
     return () => {
       const duration = Math.round((Date.now() - enterTime.current) / 1000);
       if (duration < 1) return;
-      navigator.sendBeacon(
-        "/api/public/track",
-        JSON.stringify({ sessionId, page: pathname, duration, _update: true })
+      const payload = new Blob(
+        [JSON.stringify({ sessionId, page: pathname, duration, _update: true })],
+        { type: "application/json" },
       );
+      navigator.sendBeacon("/api/public/track", payload);
     };
   }, [pathname, searchParams]);
 
