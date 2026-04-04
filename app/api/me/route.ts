@@ -14,14 +14,14 @@ export async function GET(req: NextRequest) {
       where: { id: payload.userId },
       select: {
         id: true, name: true, email: true, role: true,
-        companyId: true, defaultCompanyId: true,
+        defaultCompanyId: true,
         permissions: { select: { permission: true, companyId: true } },
       },
     });
 
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const companyId = payload.companyId || user.defaultCompanyId || user.companyId || null;
+    const companyId = payload.companyId || user.defaultCompanyId || null;
 
     const companies = await prisma.userCompany.findMany({
       where: { userId: user.id },
