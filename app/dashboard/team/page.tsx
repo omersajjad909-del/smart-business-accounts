@@ -57,7 +57,14 @@ export default function TeamPage() {
             >
               <option value="ADMIN">Admin</option>
               <option value="MANAGER">Manager</option>
-              <option value="USER">User</option>
+              <option value="ACCOUNTANT">Accountant</option>
+              <option value="HR_MANAGER">HR Manager</option>
+              <option value="SALES">Sales Executive</option>
+              <option value="INVENTORY_MANAGER">Inventory Manager</option>
+              <option value="CASHIER">Cashier</option>
+              <option value="AUDITOR">Auditor</option>
+              <option value="SECURITY">Security / Gate</option>
+              <option value="VIEWER">Viewer (Read Only)</option>
             </select>
           </div>
           <button

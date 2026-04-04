@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     console.log("📊 ALL Role Permissions from DB:", rolePermissions);
 
     // Group by role
-    const roles = ["ADMIN", "ACCOUNTANT", "VIEWER"].map((role: string) => {
+    const roles = ["ADMIN", "MANAGER", "ACCOUNTANT", "HR_MANAGER", "SALES", "INVENTORY_MANAGER", "CASHIER", "AUDITOR", "SECURITY", "VIEWER"].map((role: string) => {
       const perms = rolePermissions
         .filter((rp: any) => rp.role === role)
         .map((rp: any) => rp.permission);

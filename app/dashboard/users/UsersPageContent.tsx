@@ -244,8 +244,15 @@ export default function UsersPage() {
             disabled={atLimit}
           >
             <option value="ADMIN">Admin</option>
+            <option value="MANAGER">Manager</option>
             <option value="ACCOUNTANT">Accountant</option>
-            <option value="VIEWER">Viewer</option>
+            <option value="HR_MANAGER">HR Manager</option>
+            <option value="SALES">Sales Executive</option>
+            <option value="INVENTORY_MANAGER">Inventory Manager</option>
+            <option value="CASHIER">Cashier</option>
+            <option value="AUDITOR">Auditor</option>
+            <option value="SECURITY">Security / Gate</option>
+            <option value="VIEWER">Viewer (Read Only)</option>
           </select>
           <button
             onClick={sendInvite}
@@ -286,8 +293,15 @@ export default function UsersPage() {
           <input type="password" placeholder="Password" style={inputStyle} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
           <select style={inputStyle} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
             <option value="ADMIN">Admin</option>
+            <option value="MANAGER">Manager</option>
             <option value="ACCOUNTANT">Accountant</option>
-            <option value="VIEWER">Viewer</option>
+            <option value="HR_MANAGER">HR Manager</option>
+            <option value="SALES">Sales Executive</option>
+            <option value="INVENTORY_MANAGER">Inventory Manager</option>
+            <option value="CASHIER">Cashier</option>
+            <option value="AUDITOR">Auditor</option>
+            <option value="SECURITY">Security / Gate</option>
+            <option value="VIEWER">Viewer (Read Only)</option>
           </select>
         </div>
 
