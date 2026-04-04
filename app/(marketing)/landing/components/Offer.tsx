@@ -32,7 +32,7 @@ export default function Offer() {
         color: "#fbbf24", letterSpacing: ".06em",
       }}>75% OFF</span>
       <span style={{ color: "rgba(255,255,255,.85)" }}>
-        First 3 months at 75% off — full price from month 4. Use code <strong style={{ color: "#fbbf24" }}>LAUNCH75</strong>
+        75% off for the first 3 months.
       </span>
 
       <Link href="/pricing" style={{
