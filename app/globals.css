@@ -194,6 +194,17 @@ a {
   border-color: rgba(255,255,255,0.1) !important;
 }
 
+/* Fix white-on-white native dropdown options in all dashboard selects */
+.dashboard-root select {
+  color-scheme: dark;
+  background-color: #0d1430 !important;
+}
+.dashboard-root select option,
+.dashboard-root select optgroup {
+  background-color: #0d1430 !important;
+  color: #e8ecf5 !important;
+}
+
 /* Tailwind bg-white / bg-gray-* inside dashboard → dark surfaces */
 .dashboard-root .bg-white    { background-color: #101828 !important; }
 .dashboard-root .bg-gray-50  { background-color: #0f1835 !important; }
