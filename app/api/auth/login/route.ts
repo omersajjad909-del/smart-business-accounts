@@ -74,15 +74,10 @@ export async function POST(req: NextRequest) {
       console.log("🔍 USER SEARCH:", { searchTerm: emailNormalized });
       console.log("🔍 USER FOUND:", user ? { id: user.id, name: user.name, email: user.email, active: user.active } : "NOT FOUND");
     } catch (dbError: any) {
-      console.error("❌ LOGIN DATABASE ERROR:", dbError);
-      console.error("❌ DATABASE ERROR DETAILS:", {
-        message: dbError.message,
-        code: dbError.code,
-        meta: dbError.meta,
-      });
+      console.error("❌ LOGIN DATABASE ERROR:", dbError.message);
       return NextResponse.json(
-        { message: "Database connection error. Please try again.", error: dbError.message },
-        { status: 500 }
+        { error: "Service is temporarily unavailable. Please try again in a moment." },
+        { status: 503 }
       );
     }
 

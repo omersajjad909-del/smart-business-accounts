@@ -560,14 +560,14 @@ export default function DashboardContent() {
         </div>
       </div>
 
-      {/* ── Subscription row ── */}
-      {companyInfo && (
+      {/* ── Subscription row — ADMIN only ── */}
+      {companyInfo && currentUser?.role === "ADMIN" && (
         <div style={{ borderRadius: 14, padding: "14px 20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 24, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: companyInfo.subscriptionStatus === "ACTIVE" ? "#34d399" : "#f87171" }} />
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: companyInfo.subscriptionStatus === "ACTIVE" ? "#34d399" : "#f59e0b" }} />
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Plan: <strong style={{ color: "#a5b4fc" }}>{companyInfo.plan}</strong></span>
           </div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Status: <strong style={{ color: companyInfo.subscriptionStatus === "ACTIVE" ? "#34d399" : "#f87171" }}>{companyInfo.subscriptionStatus}</strong></div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Status: <strong style={{ color: companyInfo.subscriptionStatus === "ACTIVE" ? "#34d399" : "#f59e0b" }}>{companyInfo.subscriptionStatus}</strong></div>
           {companyInfo.plan !== "ENTERPRISE" && (
             <Link href="/dashboard/billing" style={{ marginLeft: "auto", padding: "6px 16px", borderRadius: 8, background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>Upgrade Plan →</Link>
           )}
