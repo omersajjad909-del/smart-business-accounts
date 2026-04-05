@@ -55,24 +55,14 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // If not found, search by name OR email (case-insensitive)
+      // If not found with exact match, retry with case-insensitive email
       if (!user) {
         const allUsers = await prisma.user.findMany({
           where: {
-            OR: [
-              {
-                email: {
-                  equals: emailNormalized,
-                  mode: "insensitive",
-                },
-              },
-              {
-                name: {
-                  equals: email.trim(), // Try exact name match
-                  mode: "insensitive",
-                },
-              },
-            ],
+            email: {
+              equals: emailNormalized,
+              mode: "insensitive",
+            },
           },
           include: {
             permissions: true,
