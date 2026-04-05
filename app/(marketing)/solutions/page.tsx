@@ -969,9 +969,11 @@ export default function SolutionsPage() {
           @media(max-width:900px){
             .industry-grid{grid-template-columns:1fr!important;}
             .cross-grid{grid-template-columns:repeat(2,1fr)!important;}
+            .sol-tabs{flex-wrap:wrap!important;gap:6px!important;}
           }
           @media(max-width:600px){
             .cross-grid{grid-template-columns:1fr!important;}
+            .sol-hero-pad{padding:60px 16px 40px!important;}
           }
         `}</style>
 

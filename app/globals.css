@@ -243,3 +243,137 @@ a {
 .dashboard-root ::-webkit-scrollbar-track { background: transparent; }
 .dashboard-root ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
 .dashboard-root ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+/* ═══════════════════════════════════════════════════════════════
+   MARKETING PAGES — GLOBAL RESPONSIVE CSS
+   Covers: pricing, features, about, contact, blog, solutions,
+           auth, onboarding, and all public pages
+═══════════════════════════════════════════════════════════════ */
+
+/* Base: prevent horizontal overflow on all pages */
+body { overflow-x: hidden; }
+img, video, svg { max-width: 100%; }
+
+/* ── Pricing page ── */
+.pricing-grid { grid-template-columns: repeat(3,1fr) !important; }
+.custom-grid  { grid-template-columns: repeat(2,1fr) !important; }
+
+@media (max-width: 900px) {
+  .pricing-grid { grid-template-columns: 1fr !important; }
+  .custom-grid  { grid-template-columns: 1fr !important; }
+}
+
+/* ── About page ── */
+.about-3col { grid-template-columns: repeat(3,1fr) !important; }
+
+@media (max-width: 768px) {
+  .about-3col { grid-template-columns: 1fr !important; }
+}
+
+/* ── Contact page ── */
+.contact-main { grid-template-columns: 1.4fr 1fr !important; }
+.contact-half { grid-template-columns: 1fr 1fr !important; }
+
+@media (max-width: 768px) {
+  .contact-main { grid-template-columns: 1fr !important; }
+  .contact-half { grid-template-columns: 1fr !important; }
+}
+
+/* ── Features page ── */
+.features-2col { grid-template-columns: 1fr 1fr !important; }
+.features-hero { grid-template-columns: 1fr 1fr !important; gap: 64px !important; }
+
+@media (max-width: 900px) {
+  .features-2col { grid-template-columns: 1fr !important; }
+  .features-hero { grid-template-columns: 1fr !important; gap: 32px !important; }
+}
+
+/* ── Solutions page ── */
+.solutions-grid { grid-template-columns: repeat(3,1fr) !important; }
+.solutions-2col { grid-template-columns: 1fr 1fr !important; }
+
+@media (max-width: 900px) {
+  .solutions-grid { grid-template-columns: 1fr !important; }
+  .solutions-2col { grid-template-columns: 1fr !important; }
+}
+
+/* ── Blog page ── */
+.blog-grid { grid-template-columns: repeat(3,1fr) !important; }
+
+@media (max-width: 900px) {
+  .blog-grid { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 600px) {
+  .blog-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Global marketing section padding on mobile ── */
+@media (max-width: 768px) {
+  /* Section padding */
+  [style*="padding: \"96px"] { padding-top: 56px !important; padding-bottom: 56px !important; }
+
+  /* Hero headings — prevent overflow */
+  h1 { word-break: break-word; }
+  h2 { word-break: break-word; }
+
+  /* Page horizontal padding */
+  .mkt-container {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* ── Auth page responsive (already has media queries but strengthen) ── */
+@media (max-width: 900px) {
+  .auth-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .auth-left-col {
+    display: none !important;
+  }
+  .auth-right-col {
+    padding: 32px 20px !important;
+  }
+}
+
+/* ── Onboarding pages ── */
+.onboarding-grid { grid-template-columns: repeat(3,1fr) !important; }
+
+@media (max-width: 900px) {
+  .onboarding-grid { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 600px) {
+  .onboarding-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Legal pages (terms/privacy) ── */
+.legal-content {
+  max-width: 100% !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+
+/* ── Universal mobile fixes for all marketing pages ── */
+@media (max-width: 480px) {
+  /* Reduce large font sizes on very small screens */
+  .mkt-hero-title { font-size: clamp(28px, 8vw, 48px) !important; }
+  .mkt-section-title { font-size: clamp(22px, 6vw, 36px) !important; }
+
+  /* Full-width buttons on mobile */
+  .mkt-cta-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Stack flex rows */
+  .mkt-flex-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  /* Cards full width */
+  .mkt-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}

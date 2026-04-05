@@ -1531,7 +1531,7 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
   const isReversed = globalIndex % 2 === 1;
 
   return (
-    <div ref={ref} style={{
+    <div ref={ref} className="feat-row" style={{
       display:"grid", gridTemplateColumns:"1fr 1fr", gap:64, alignItems:"center",
       direction: isReversed ? "rtl" : "ltr",
       opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(28px)",
@@ -1644,7 +1644,14 @@ export default function FeaturesPage() {
           @keyframes rotateSlow{to{transform:rotate(360deg)}}
           .feat-tab{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:24px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);transition:all .25s;white-space:nowrap;}
           .feat-tab:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2);}
-          @media(max-width:900px){.feat-row{grid-template-columns:1fr!important;direction:ltr!important;}}
+          @media(max-width:900px){
+            .feat-row{grid-template-columns:1fr!important;direction:ltr!important;}
+            .feat-tabs{flex-wrap:wrap!important;gap:8px!important;}
+          }
+          @media(max-width:600px){
+            .feat-section-pad{padding-left:16px!important;padding-right:16px!important;padding-top:60px!important;}
+            .feat-hero-title{font-size:clamp(28px,8vw,48px)!important;}
+          }
         `}</style>
 
         {/* ── HERO ── */}

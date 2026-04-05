@@ -201,6 +201,10 @@ export default function BusinessSetupPage() {
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
         .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9998;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease; }
         .modal-box { background:#0f1535;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:32px;width:100%;max-width:400px;z-index:9999;animation:fadeUp .2s ease; }
+        @media(max-width:600px){
+          .setup-3col{grid-template-columns:1fr!important;}
+          .modal-box{padding:20px 16px!important;border-radius:14px!important;}
+        }
       `}</style>
 
       {/* Background grid */}
@@ -477,7 +481,7 @@ export default function BusinessSetupPage() {
           {/* What will be configured */}
           <div style={{ marginBottom: 20, padding: "16px 18px", borderRadius: 13, background: `${bt.color}08`, border: `1px solid ${bt.color}20` }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 10 }}>What we'll set up for you</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+            <div className="setup-3col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
               {[
                 { icon: "📊", label: `${bt.defaultAccounts.length} Accounts`, sub: "Chart of Accounts" },
                 { icon: "📈", label: `${bt.kpis.length} KPIs`,                sub: "Dashboard metrics" },

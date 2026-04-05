@@ -259,7 +259,8 @@ export default function ChoosePlanPage() {
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         @keyframes spin { to{transform:rotate(360deg)} }
-        @media(max-width:900px){ .plans-grid{grid-template-columns:1fr!important} }
+        @media(max-width:900px){ .plans-grid{grid-template-columns:1fr 1fr!important} }
+        @media(max-width:600px){ .plans-grid{grid-template-columns:1fr!important} }
       `}</style>
 
       {/* BG grid */}
