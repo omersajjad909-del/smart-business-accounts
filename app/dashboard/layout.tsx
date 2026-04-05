@@ -1539,7 +1539,6 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/users" pathname={pathname}>Users & Permissions</NavLink>
               <NavLink href="/dashboard/roles-permissions" pathname={pathname}>Roles & Permissions</NavLink>
               <NavLink href="/dashboard/team" pathname={pathname}>Team</NavLink>
-              <NavLink href="/dashboard/companies" pathname={pathname}>Companies</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) && <NavLink href="/dashboard/users/logs" pathname={pathname}>System Logs</NavLink>}
             </NavGroup>
           )}
