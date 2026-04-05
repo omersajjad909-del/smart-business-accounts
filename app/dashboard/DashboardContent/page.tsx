@@ -178,7 +178,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
     <div style={{ borderRadius: 16, padding: "16px 20px", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", marginBottom: 18, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
       <div>
         <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.78)", marginBottom: 4 }}>AI Financial Intelligence</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI summary abhi load nahi ho saki. Full AI center se data dekh sakte ho.</div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>The AI-summary has not been loaded yet. You can view the data from the full AI-center..</div>
       </div>
       <Link href="/dashboard/ai" style={{ padding: "8px 14px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
         Open AI →
