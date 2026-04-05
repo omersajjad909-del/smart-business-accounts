@@ -3615,7 +3615,7 @@ function PageVisitors() {
       <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:12 }}>
         {[
           { label:"Total Visits",     value:stats?.totalVisits??0,    icon:"👁",  color:"#818cf8" },
-          { label:"Unique Visitors",  value:stats?.uniqueVisitors??0, icon:"",  color:"#38bdf8" },
+          { label:"Unique Visitors",  value:stats?.uniqueVisitors??0, icon:"👤", color:"#38bdf8" },
           { label:"Countries",        value:stats?.countries??0,       icon:"🌍", color:"#34d399" },
           { label:"Cities",           value:stats?.cities??0,          icon:"🏙", color:"#fbbf24" },
           { label:"Live Now",         value:live.length,               icon:"🔴", color:"#f87171" },
