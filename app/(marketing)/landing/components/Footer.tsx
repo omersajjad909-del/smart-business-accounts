@@ -232,7 +232,7 @@ export default function Footer() {
             <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:26 }}>
               {[
                 { Icon:Mail,    text:"finovaos.app@gmail.com",  color:"#818cf8" },
-                { Icon:Phone,   text:"+1 800 000 0000",     color:"#34d399" },
+                { Icon:Phone,   text:"+92 304 7653693",     color:"#34d399" },
                 { Icon:MapPin,  text:"Global Operations",   color:"#fbbf24" },
               ].map(({ Icon, text, color }) => (
                 <div key={text} style={{ display:"flex", alignItems:"flex-start", gap:10 }}>

@@ -153,7 +153,7 @@ const organizationJsonLd = {
   contactPoint: [
     {
       "@type": "ContactPoint",
-      telephone: "+1-800-000-0000",
+      telephone: "+92-304-7653693",
       contactType: "customer service",
       email: "finovaos.app@gmail.com",
       availableLanguage: ["English", "Arabic", "Urdu"],
