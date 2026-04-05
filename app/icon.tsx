@@ -20,72 +20,34 @@ export default function Icon() {
           background: "transparent",
         }}
       >
+        {/* Purple rounded square background */}
         <div
           style={{
-            width: 420,
-            height: 420,
+            width: 460,
+            height: 460,
             borderRadius: 108,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "linear-gradient(145deg, #4f46e5 0%, #6366f1 55%, #818cf8 100%)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,.22)",
+            background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+            boxShadow: "0 16px 48px rgba(99,102,241,0.45)",
           }}
         >
-          {/* Layers / stack icon — top diamond */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, position: "relative", width: 240, height: 220 }}>
-            {/* Top layer */}
-            <div style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              display: "flex",
-              justifyContent: "center",
-            }}>
-              <div style={{
-                width: 240,
-                height: 52,
-                background: "rgba(255,255,255,1)",
-                borderRadius: 12,
-                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-              }}/>
-            </div>
-            {/* Middle layer */}
-            <div style={{
-              position: "absolute",
-              top: 76,
-              left: 0,
-              right: 0,
-              display: "flex",
-              justifyContent: "center",
-            }}>
-              <div style={{
-                width: 240,
-                height: 52,
-                background: "rgba(255,255,255,.85)",
-                borderRadius: 12,
-                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-              }}/>
-            </div>
-            {/* Bottom layer */}
-            <div style={{
-              position: "absolute",
-              top: 152,
-              left: 0,
-              right: 0,
-              display: "flex",
-              justifyContent: "center",
-            }}>
-              <div style={{
-                width: 240,
-                height: 52,
-                background: "rgba(255,255,255,.65)",
-                borderRadius: 12,
-                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-              }}/>
-            </div>
-          </div>
+          {/* Layers / stack SVG icon — same as sidebar logo */}
+          <svg
+            width="260"
+            height="260"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
         </div>
       </div>
     ),

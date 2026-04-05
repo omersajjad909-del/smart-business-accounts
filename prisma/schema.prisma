@@ -437,6 +437,8 @@ model Company {
   sessions              Session[]
   businessRecords       BusinessRecord[]
   teamInvites           TeamInvite[]
+  bulkPaymentBatches    BulkPaymentBatch[]
+  paymentFollowUpLogs   PaymentFollowUpLog[]
 }
 
 model CreditNote {
@@ -1858,4 +1860,57 @@ model AdminActionLog {
   @@index([adminId, createdAt])
   @@index([companyId, createdAt])
   @@index([action])
+}
+
+// ================= BULK PAYMENTS =================
+
+model BulkPaymentBatch {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+  branchId  String?
+
+  name      String
+  status    String   @default("DRAFT") // DRAFT | SUBMITTED | PROCESSED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rows BulkPaymentRow[]
+
+  @@index([companyId, status])
+}
+
+model BulkPaymentRow {
+  id      String           @id @default(uuid())
+  batchId String
+  batch   BulkPaymentBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  partyName  String
+  partyType  String   @default("other") // supplier | employee | other
+  amount     Float
+  reference  String?
+  method     String   @default("bank") // bank | cash | cheque
+  status     String   @default("PENDING") // PENDING | APPROVED | PROCESSED | FAILED
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([batchId, status])
+}
+
+// ================= PAYMENT FOLLOW-UP =================
+
+model PaymentFollowUpLog {
+  id        String  @id @default(uuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  invoiceId  String  // SalesInvoice.id
+  status     String  @default("PENDING") // PENDING | CONTACTED | PROMISED | PAID
+  note       String? @db.Text
+  updatedBy  String? // User.id
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+
+  @@unique([companyId, invoiceId])
+  @@index([companyId, status])
 }

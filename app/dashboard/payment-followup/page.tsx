@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -12,6 +12,7 @@ interface OverdueInvoice {
   daysOverdue: number;
   lastFollowup: string | null;
   status: "PENDING" | "CONTACTED" | "PROMISED" | "PAID";
+  note: string | null;
 }
 
 const STATUS_PALETTE: Record<string, { bg: string; color: string }> = {
@@ -32,68 +33,70 @@ function Badge({ label }: { label: string }) {
 
 function AgingBadge({ days }: { days: number }) {
   const color = days > 60 ? "#f87171" : days > 30 ? "#fbbf24" : "#a5b4fc";
-  return (
-    <span style={{ fontWeight: 700, color, fontSize: 13 }}>{days}d overdue</span>
-  );
+  return <span style={{ fontWeight: 700, color, fontSize: 13 }}>{days}d overdue</span>;
 }
 
 export default function PaymentFollowupPage() {
-  const [loading, setLoading] = useState(false);
+  const [invoices, setInvoices] = useState<OverdueInvoice[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"ALL" | "PENDING" | "CONTACTED" | "PROMISED" | "PAID">("ALL");
   const [search, setSearch] = useState("");
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [statuses, setStatuses] = useState<Record<string, string>>({});
   const [noteModal, setNoteModal] = useState<OverdueInvoice | null>(null);
   const [noteText, setNoteText] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  // Demo data — in production this would come from /api/reports/ageing
-  const invoices = useMemo<OverdueInvoice[]>(() => [
-    { id: "1", invoiceNo: "INV-1038", customer: "Al Noor Trading Co.",   amount: 18400, dueDate: "2026-02-15", daysOverdue: 40, lastFollowup: "2026-03-01", status: "CONTACTED" },
-    { id: "2", invoiceNo: "INV-1031", customer: "Delta Supplies Ltd.",   amount: 9750,  dueDate: "2026-01-28", daysOverdue: 57, lastFollowup: null,          status: "PENDING"   },
-    { id: "3", invoiceNo: "INV-1027", customer: "Beta Distributors",     amount: 32000, dueDate: "2026-01-10", daysOverdue: 75, lastFollowup: "2026-02-20",  status: "PROMISED"  },
-    { id: "4", invoiceNo: "INV-1019", customer: "Global Imports LLC",    amount: 5600,  dueDate: "2025-12-30", daysOverdue: 86, lastFollowup: null,          status: "PENDING"   },
-    { id: "5", invoiceNo: "INV-1044", customer: "Sunrise Wholesale",     amount: 14200, dueDate: "2026-02-28", daysOverdue: 27, lastFollowup: "2026-03-10",  status: "CONTACTED" },
-    { id: "6", invoiceNo: "INV-1046", customer: "Prime Traders",         amount: 7800,  dueDate: "2026-03-05", daysOverdue: 22, lastFollowup: null,          status: "PENDING"   },
-  ], []);
+  const loadInvoices = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/payment-followup?days=0");
+      const data = await res.json();
+      if (data.invoices) setInvoices(data.invoices);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const liveStatuses = useMemo(() => {
-    const merged: Record<string, string> = {};
-    invoices.forEach(inv => { merged[inv.id] = statuses[inv.id] ?? inv.status; });
-    return merged;
-  }, [invoices, statuses]);
+  useEffect(() => { loadInvoices(); }, [loadInvoices]);
 
   const filtered = useMemo(() => {
     let list = invoices;
-    if (filter !== "ALL") list = list.filter(inv => (liveStatuses[inv.id] || inv.status) === filter);
+    if (filter !== "ALL") list = list.filter(inv => inv.status === filter);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(inv => inv.customer.toLowerCase().includes(q) || inv.invoiceNo.toLowerCase().includes(q));
     }
     return list;
-  }, [invoices, filter, search, liveStatuses]);
+  }, [invoices, filter, search]);
 
   const kpis = useMemo(() => ({
-    total:     invoices.length,
-    pending:   invoices.filter(i => (liveStatuses[i.id] || i.status) === "PENDING").length,
-    contacted: invoices.filter(i => (liveStatuses[i.id] || i.status) === "CONTACTED").length,
-    totalAmt:  invoices.filter(i => (liveStatuses[i.id] || i.status) !== "PAID").reduce((s, i) => s + i.amount, 0),
-  }), [invoices, liveStatuses]);
+    total:    invoices.length,
+    pending:  invoices.filter(i => i.status === "PENDING").length,
+    inProg:   invoices.filter(i => i.status === "CONTACTED" || i.status === "PROMISED").length,
+    totalAmt: invoices.reduce((s, i) => s + i.amount, 0),
+  }), [invoices]);
 
-  const updateStatus = (id: string, newStatus: string) => {
-    setStatuses(prev => ({ ...prev, [id]: newStatus }));
-  };
+  async function updateStatus(id: string, newStatus: string, note?: string) {
+    // Optimistic update
+    setInvoices(prev => prev.map(inv =>
+      inv.id === id
+        ? { ...inv, status: newStatus as OverdueInvoice["status"], ...(note !== undefined ? { note } : {}), lastFollowup: new Date().toISOString().split("T")[0] }
+        : inv
+    ));
 
-  const openNote = (inv: OverdueInvoice) => {
-    setNoteModal(inv);
-    setNoteText(notes[inv.id] || "");
-  };
+    await fetch(`/api/payment-followup/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus, ...(note !== undefined ? { note } : {}) }),
+    });
+  }
 
-  const saveNote = () => {
+  async function saveNote() {
     if (!noteModal) return;
-    setNotes(prev => ({ ...prev, [noteModal.id]: noteText }));
-    updateStatus(noteModal.id, "CONTACTED");
+    setSaving(true);
+    await updateStatus(noteModal.id, "CONTACTED", noteText);
+    setSaving(false);
     setNoteModal(null);
-  };
+  }
 
   const th: React.CSSProperties = { padding: "11px 14px", textAlign: "left", fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.7, borderBottom: "1px solid var(--border)", fontWeight: 600 };
   const td: React.CSSProperties = { padding: "13px 14px", fontSize: 14, borderBottom: "1px solid var(--border)", color: "var(--text-primary)" };
@@ -110,15 +113,18 @@ export default function PaymentFollowupPage() {
           <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 4px", letterSpacing: -0.5 }}>Payment Follow-up</h1>
           <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>Track and chase overdue customer invoices</p>
         </div>
+        <button onClick={loadInvoices} style={{ background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,.7)", fontSize: 12, cursor: "pointer", fontFamily: FONT }}>
+          ↻ Refresh
+        </button>
       </div>
 
       {/* KPI Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
         {[
-          { label: "Overdue Invoices", value: kpis.total,     color: "#6366f1" },
-          { label: "Not Yet Contacted", value: kpis.pending,   color: "#f87171" },
-          { label: "In Progress",       value: kpis.contacted, color: "#fbbf24" },
-          { label: "Total Overdue ($)", value: `$${kpis.totalAmt.toLocaleString()}`, color: "#f87171" },
+          { label: "Overdue Invoices",  value: loading ? "…" : kpis.total,    color: "#6366f1" },
+          { label: "Not Yet Contacted", value: loading ? "…" : kpis.pending,  color: "#f87171" },
+          { label: "In Progress",       value: loading ? "…" : kpis.inProg,   color: "#fbbf24" },
+          { label: "Total Overdue",     value: loading ? "…" : `Rs. ${kpis.totalAmt.toLocaleString()}`, color: "#f87171" },
         ].map(k => (
           <div key={k.label} style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "20px 22px" }}>
             <div style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>{k.label}</div>
@@ -148,49 +154,52 @@ export default function PaymentFollowupPage() {
 
       {/* Table */}
       <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
-        {filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "64px 20px", color: "var(--text-muted)", fontSize: 15 }}>No overdue invoices matching your filter.</div>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "64px 20px", color: "var(--text-muted)", fontSize: 15 }}>Loading invoices…</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "64px 20px", color: "var(--text-muted)", fontSize: 15 }}>
+            {invoices.length === 0 ? "No overdue invoices found. All invoices are up to date!" : "No invoices matching your filter."}
+          </div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                {["Invoice", "Customer", "Amount", "Due Date", "Overdue", "Last Follow-up", "Note", "Status", "Actions"].map(h => (
+                {["Invoice", "Customer", "Amount", "Date", "Overdue", "Last Follow-up", "Note", "Status", "Actions"].map(h => (
                   <th key={h} style={th}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filtered.map((inv, i) => {
-                const currentStatus = (liveStatuses[inv.id] || inv.status) as string;
-                return (
-                  <tr key={inv.id} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.013)" : "transparent" }}>
-                    <td style={{ ...td, fontWeight: 600, fontFamily: "monospace", fontSize: 12 }}>{inv.invoiceNo}</td>
-                    <td style={td}>{inv.customer}</td>
-                    <td style={{ ...td, fontWeight: 700 }}>${inv.amount.toLocaleString()}</td>
-                    <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>{inv.dueDate}</td>
-                    <td style={td}><AgingBadge days={inv.daysOverdue} /></td>
-                    <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>{inv.lastFollowup || <span style={{ color: "#f87171" }}>Never</span>}</td>
-                    <td style={{ ...td, fontSize: 12, color: "var(--text-muted)", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {notes[inv.id] || <span style={{ color: "var(--text-muted)", opacity: 0.5 }}>—</span>}
-                    </td>
-                    <td style={td}><Badge label={currentStatus} /></td>
-                    <td style={td}>
-                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                        <button onClick={() => openNote(inv)} style={btn("#a5b4fc")}>+ Note</button>
-                        {currentStatus === "PENDING" && (
-                          <button onClick={() => updateStatus(inv.id, "CONTACTED")} style={btn("#fbbf24")}>Contacted</button>
-                        )}
-                        {currentStatus === "CONTACTED" && (
-                          <button onClick={() => updateStatus(inv.id, "PROMISED")} style={btn("#6366f1")}>Promised</button>
-                        )}
-                        {currentStatus !== "PAID" && (
-                          <button onClick={() => updateStatus(inv.id, "PAID")} style={btn("#4ade80")}>Mark Paid</button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {filtered.map((inv, i) => (
+                <tr key={inv.id} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.013)" : "transparent" }}>
+                  <td style={{ ...td, fontWeight: 600, fontFamily: "monospace", fontSize: 12 }}>{inv.invoiceNo}</td>
+                  <td style={td}>{inv.customer}</td>
+                  <td style={{ ...td, fontWeight: 700 }}>Rs. {inv.amount.toLocaleString()}</td>
+                  <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>{inv.dueDate}</td>
+                  <td style={td}><AgingBadge days={inv.daysOverdue} /></td>
+                  <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>
+                    {inv.lastFollowup || <span style={{ color: "#f87171" }}>Never</span>}
+                  </td>
+                  <td style={{ ...td, fontSize: 12, color: "var(--text-muted)", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {inv.note || <span style={{ opacity: 0.4 }}>—</span>}
+                  </td>
+                  <td style={td}><Badge label={inv.status} /></td>
+                  <td style={td}>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      <button onClick={() => { setNoteModal(inv); setNoteText(inv.note || ""); }} style={btn("#a5b4fc")}>+ Note</button>
+                      {inv.status === "PENDING" && (
+                        <button onClick={() => updateStatus(inv.id, "CONTACTED")} style={btn("#fbbf24")}>Contacted</button>
+                      )}
+                      {inv.status === "CONTACTED" && (
+                        <button onClick={() => updateStatus(inv.id, "PROMISED")} style={btn("#6366f1")}>Promised</button>
+                      )}
+                      {inv.status !== "PAID" && (
+                        <button onClick={() => updateStatus(inv.id, "PAID")} style={btn("#4ade80")}>Mark Paid</button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         )}
@@ -208,13 +217,15 @@ export default function PaymentFollowupPage() {
             <textarea
               value={noteText}
               onChange={e => setNoteText(e.target.value)}
-              placeholder="e.g. Spoke with Ahmed, promised to pay by March 31…"
+              placeholder="e.g. Spoke with Ahmed, promised to pay by April 30…"
               rows={4}
               style={{ width: "100%", background: "var(--app-bg)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 13px", color: "var(--text-primary)", fontSize: 14, fontFamily: FONT, outline: "none", resize: "vertical", boxSizing: "border-box" }}
             />
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}>
               <button onClick={() => setNoteModal(null)} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 18px", fontSize: 13, cursor: "pointer", color: "var(--text-muted)", fontFamily: FONT }}>Cancel</button>
-              <button onClick={saveNote} style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 9, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: FONT }}>Save Note</button>
+              <button onClick={saveNote} disabled={saving} style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 9, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: FONT, opacity: saving ? 0.7 : 1 }}>
+                {saving ? "Saving…" : "Save Note"}
+              </button>
             </div>
           </div>
         </div>

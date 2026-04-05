@@ -26,10 +26,13 @@
       "Bash(grep -rn \"$12\\\\|$24\\\\|$49\\\\|$62\\\\|$99\\\\|$249\\\\|75.*OFF\\\\|plan-config\" d:/projects/smart-business-accounts/app/\\\\\\(marketing\\\\\\)/landing/ -l)",
       "Bash(ls d:/projects/smart-business-accounts/app/dashboard/*/page.tsx)",
       "Bash(ls d:/projects/smart-business-accounts/app/api/*/route.ts)",
-      "Bash(ls -la \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\chat\"\" 2>/dev/null || echo \"Directory not found \")"
+      "Bash(ls -la \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\chat\"\" 2>/dev/null || echo \"Directory not found \")",
+      "Bash(echo \"Done: $?\")"
     ],
     "additionalDirectories": [
-      "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations"
+      "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
+      "d:\\projects\\smart-business-accounts\\app\\api\\bulk-payments",
+      "d:\\projects\\smart-business-accounts\\app\\api\\payment-followup"
     ]
   }
 }
