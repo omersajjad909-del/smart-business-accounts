@@ -12,4 +12,5 @@ export const prisma =
     log: prismaLogLevels,
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// Always cache the singleton (prevents new client per serverless invocation in production)
+globalForPrisma.prisma = prisma;
