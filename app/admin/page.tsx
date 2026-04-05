@@ -1334,9 +1334,40 @@ function GeoLeafletMap({ rows, title, colorScheme="indigo", liveCount=0 }: {
   const accent = colorScheme === "cyan" ? "#38bdf8" : "#818cf8";
   const accentRgb = colorScheme === "cyan" ? "56,189,248" : "129,140,248";
 
+  // City name → exact lat/lon (used when topCity is available)
+  const CITY_COORDS: Record<string,[number,number]> = {
+    // Pakistan
+    "Faisalabad":[31.418,73.079],"Lahore":[31.558,74.351],"Karachi":[24.861,67.010],
+    "Islamabad":[33.738,73.084],"Rawalpindi":[33.598,73.042],"Multan":[30.196,71.475],
+    "Peshawar":[34.008,71.579],"Quetta":[30.183,66.999],"Gujranwala":[32.161,74.188],
+    "Sialkot":[32.499,74.536],"Hyderabad":[25.396,68.374],"Bahawalpur":[29.395,71.678],
+    "Sargodha":[32.083,72.670],"Sukkur":[27.706,68.857],"Larkana":[27.559,68.225],
+    "Sheikhupura":[31.713,73.988],"Rahim Yar Khan":[28.420,70.296],"Gujrat":[32.573,74.080],
+    "Kasur":[31.117,74.453],"Mardan":[34.198,72.046],"Mingora":[34.773,72.360],
+    // India
+    "Mumbai":[19.076,72.877],"Delhi":[28.613,77.209],"Bangalore":[12.972,77.594],
+    "Chennai":[13.083,80.270],"Hyderabad":[17.385,78.487],"Kolkata":[22.572,88.364],
+    "Pune":[18.520,73.856],"Ahmedabad":[23.023,72.572],
+    // UAE
+    "Dubai":[25.204,55.270],"Abu Dhabi":[24.453,54.377],"Sharjah":[25.346,55.420],
+    // UK
+    "London":[51.507,-0.128],"Manchester":[53.480,-2.244],"Birmingham":[52.486,-1.890],
+    // USA
+    "New York":[40.713,-74.006],"Los Angeles":[34.052,-118.244],"Chicago":[41.878,-87.630],
+    "Houston":[29.760,-95.370],"Phoenix":[33.449,-112.074],
+    // Others
+    "Dhaka":[23.810,90.412],"Riyadh":[24.688,46.722],"Doha":[25.286,51.533],
+    "Istanbul":[41.015,28.980],"Cairo":[30.044,31.236],"Lagos":[6.455,3.384],
+    "Nairobi":[-1.286,36.820],"Singapore":[1.352,103.820],"Kuala Lumpur":[3.140,101.686],
+    "Jakarta":[-6.215,106.845],"Manila":[14.599,120.985],"Bangkok":[13.756,100.502],
+    "Tokyo":[35.689,139.692],"Beijing":[39.905,116.407],"Shanghai":[31.228,121.474],
+    "Seoul":[37.566,126.978],"Sydney":[-33.868,151.209],"Melbourne":[-37.814,144.963],
+    "Toronto":[43.651,-79.383],"Vancouver":[49.283,-123.121],"São Paulo":[-23.550,-46.633],
+  };
+
   // Country ISO2 → lat/lon (approx center)
   const COUNTRY_CENTERS: Record<string,[number,number]> = {
-    PK:[30.3,69.3],AE:[24,54],IN:[20.6,79],SA:[24,45],GB:[55,-3],
+    PK:[30.5,69.5],AE:[24,54],IN:[20.6,79],SA:[24,45],GB:[55,-3],
     US:[38,-97],BD:[23.7,90.4],QA:[25.3,51.2],TR:[39,35],NG:[9,8],
     EG:[26,30],KE:[-1,38],ZA:[-29,25],AU:[-25,134],SG:[1.35,103.8],
     MY:[4,109],ID:[-5,120],PH:[13,122],JP:[36,138],CN:[35,105],
@@ -1416,7 +1447,9 @@ function GeoLeafletMap({ rows, title, colorScheme="indigo", liveCount=0 }: {
     const maxVal = Math.max(...rows.map(r => r.activeUsers30d||0), 1);
 
     rows.forEach(row => {
-      const coords = COUNTRY_CENTERS[row.country];
+      // Prefer city-level coords, fall back to country center
+      const cityKey = (row.topCity || "").trim();
+      const coords = (cityKey && CITY_COORDS[cityKey]) || COUNTRY_CENTERS[row.country];
       if (!coords) return;
 
       const val  = row.activeUsers30d || 0;
