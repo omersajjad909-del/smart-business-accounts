@@ -174,7 +174,7 @@ export default function CulturePage() {
     }}>
 
       {/* ── HERO ── */}
-      <section style={{ position:"relative", overflow:"hidden", padding:"130px 24px 90px", textAlign:"center" }}>
+      <section className="culture-hero" style={{ position:"relative", overflow:"hidden", padding:"130px 24px 90px", textAlign:"center" }}>
         <div style={{ position:"absolute", top:-120, left:"50%", transform:"translateX(-50%)", width:700, height:700, borderRadius:"50%", background:"radial-gradient(circle,rgba(99,102,241,.16) 0%,transparent 70%)", pointerEvents:"none" }}/>
         <div style={{ position:"absolute", bottom:0, left:0, right:0, height:200, background:"linear-gradient(to bottom, transparent, #080c1e)", pointerEvents:"none", zIndex:1 }}/>
 
@@ -411,7 +411,7 @@ export default function CulturePage() {
           </div>
 
           {/* Stats */}
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:32 }}>
+          <div className="culture-4col" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:32 }}>
             {DEI_STATS.map(s=>(
               <div key={s.label} style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", padding:"24px 20px", textAlign:"center" }}>
                 <div style={{ fontSize:32, fontWeight:900, color:s.color, fontFamily:"Lora,serif" }}>{s.value}</div>
@@ -466,6 +466,17 @@ export default function CulturePage() {
       <style>{`
         @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
         * { box-sizing:border-box; }
+        .culture-4col { grid-template-columns:repeat(4,1fr)!important; }
+        @media(max-width:900px){
+          .culture-4col{ grid-template-columns:repeat(2,1fr)!important; }
+          .culture-hero{ padding:60px 20px 40px!important; }
+          .culture-section{ padding:60px 20px!important; }
+        }
+        @media(max-width:480px){
+          .culture-4col{ grid-template-columns:1fr 1fr!important; }
+          .culture-hero{ padding:48px 16px 32px!important; }
+          .culture-section{ padding:48px 16px!important; }
+        }
       `}</style>
     </main>
   );

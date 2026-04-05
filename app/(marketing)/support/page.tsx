@@ -63,6 +63,15 @@ export default function SupportPage() {
 
         .sp-quick-link { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; text-decoration:none; margin-bottom:2px; transition:background .2s; }
         .sp-quick-link:hover { background:rgba(255,255,255,.06) !important; }
+
+        @media(max-width:900px){
+          .sp-fade-2{ grid-template-columns:1fr!important; }
+          .sp-fade-3{ grid-template-columns:1fr!important; }
+          .sp-hero{ padding:64px 20px 48px!important; }
+        }
+        @media(max-width:480px){
+          .sp-hero{ padding:48px 16px 36px!important; }
+        }
       `}</style>
 
       <main style={{

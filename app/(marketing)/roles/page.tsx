@@ -234,7 +234,7 @@ export default function RolesPage() {
       {/* ── ORG OVERVIEW ── */}
       <Section>
         <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 80px" }}>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:12 }}>
+          <div className="roles-5col" style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:12 }}>
             {DEPARTMENTS.map(d=>(
               <div key={d.id} style={{ background:`linear-gradient(135deg,${d.glow},rgba(255,255,255,.02))`, borderRadius:16, border:`1px solid ${d.border}`, padding:"20px 18px", textAlign:"center" }}>
                 <div style={{ fontSize:28, marginBottom:10 }}>{d.icon}</div>
@@ -413,7 +413,8 @@ export default function RolesPage() {
             ))}
           </div>
           {/* Table */}
-          <div style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", overflow:"hidden" }}>
+          <div className="roles-table-wrap">
+          <div style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", overflow:"hidden", minWidth:600 }}>
             <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1.2fr 1fr 100px", gap:0, padding:"10px 20px", borderBottom:"1px solid rgba(255,255,255,.07)", fontSize:10, fontWeight:800, color:"rgba(255,255,255,.3)", letterSpacing:".06em", textTransform:"uppercase" }}>
               <span>Role</span><span>Department</span><span>Location</span><span>Level</span><span style={{textAlign:"right"}}>Apply</span>
             </div>
@@ -434,6 +435,7 @@ export default function RolesPage() {
               </div>
             ))}
           </div>
+          </div>{/* /roles-table-wrap */}
         </div>
       </Section>
 
@@ -457,7 +459,19 @@ export default function RolesPage() {
         </div>
       </Section>
 
-      <style>{`* { box-sizing:border-box; }`}</style>
+      <style>{`
+        * { box-sizing:border-box; }
+        .roles-5col{ grid-template-columns:repeat(5,1fr)!important; }
+        .roles-table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        @media(max-width:900px){
+          .roles-5col{ grid-template-columns:repeat(3,1fr)!important; }
+          .roles-hero{ padding:64px 20px 48px!important; }
+        }
+        @media(max-width:600px){
+          .roles-5col{ grid-template-columns:repeat(2,1fr)!important; }
+          .roles-hero{ padding:48px 16px 36px!important; }
+        }
+      `}</style>
     </main>
   );
 }
