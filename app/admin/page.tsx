@@ -1340,7 +1340,7 @@ function GeoLeafletMap({ rows, title, colorScheme="indigo", liveCount=0 }: {
     "Faisalabad":[31.418,73.079],"Lahore":[31.558,74.351],"Karachi":[24.861,67.010],
     "Islamabad":[33.738,73.084],"Rawalpindi":[33.598,73.042],"Multan":[30.196,71.475],
     "Peshawar":[34.008,71.579],"Quetta":[30.183,66.999],"Gujranwala":[32.161,74.188],
-    "Sialkot":[32.499,74.536],"Hyderabad":[25.396,68.374],"Bahawalpur":[29.395,71.678],
+    "Sialkot":[32.499,74.536],"Hyderabad PK":[25.396,68.374],"Bahawalpur":[29.395,71.678],
     "Sargodha":[32.083,72.670],"Sukkur":[27.706,68.857],"Larkana":[27.559,68.225],
     "Sheikhupura":[31.713,73.988],"Rahim Yar Khan":[28.420,70.296],"Gujrat":[32.573,74.080],
     "Kasur":[31.117,74.453],"Mardan":[34.198,72.046],"Mingora":[34.773,72.360],
