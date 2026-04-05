@@ -7115,12 +7115,13 @@ export default function AdminPanel() {
     testimonials:"Testimonials", leads:"Lead Management", seo:"SEO Settings", social:"Social Media",
     business_modules:"Business Modules",
     newsletter:"Newsletter Subscribers", feedback:"Feedback & Complaints",
+    crm:"CRM Workspace",
   };
 
   const PAGE_ICONS: Partial<Record<Page,string>> = {
     dashboard:"▣", companies:"⬡", subscriptions:"◈", revenue:"◉", geo:"◎",
     usage:"⬡", visitors:"◈", plans:"◆", business_modules:"⬡", coupons:"◈",
-    referrals:"◉", leads:"◎", broadcasts:"◈", testimonials:"◆", updates:"◉",
+    crm:"◈", referrals:"◉", leads:"◎", broadcasts:"◈", testimonials:"◆", updates:"◉",
     seo:"◎", social:"◈", livesupport:"◉", tickets:"◎", system:"◈", logs:"◆",
     emaillogs:"◉", flags:"◎", apikeys:"◈", permissions:"◆", teams:"◉", settings:"◎",
   };
