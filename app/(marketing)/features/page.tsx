@@ -1578,7 +1578,7 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
 function CategorySection({ cat, startIdx }: { cat: typeof CATEGORIES[0]; startIdx: number }) {
   const [headerRef, headerVisible] = useVisible(0.15);
   return (
-    <section id={cat.id} style={{ padding:"90px 24px", borderTop:"1px solid rgba(255,255,255,.05)", position:"relative", overflow:"hidden" }}>
+    <section id={cat.id} className="feat-section" style={{ padding:"90px 24px", borderTop:"1px solid rgba(255,255,255,.05)", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", width:400, height:400, borderRadius:"50%", background:`radial-gradient(circle,${cat.glow},transparent 65%)`, top:-80, right:-80, pointerEvents:"none" }}/>
       <div style={{ maxWidth:1160, margin:"0 auto", position:"relative" }}>
         {/* Header */}
@@ -1597,7 +1597,7 @@ function CategorySection({ cat, startIdx }: { cat: typeof CATEGORIES[0]; startId
           </div>
         </div>
         {/* Feature rows */}
-        <div style={{ display:"flex", flexDirection:"column", gap:80 }}>
+        <div className="feat-items-gap" style={{ display:"flex", flexDirection:"column", gap:80 }}>
           {cat.items.map((item,i)=>(
             <FeatureRow key={item.name} feature={item} globalIndex={startIdx+i} color={cat.color} glow={cat.glow} border={cat.border} dim={cat.dim}/>
           ))}
@@ -1645,17 +1645,24 @@ export default function FeaturesPage() {
           .feat-tab{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:24px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);transition:all .25s;white-space:nowrap;}
           .feat-tab:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2);}
           @media(max-width:900px){
-            .feat-row{grid-template-columns:1fr!important;direction:ltr!important;}
+            .feat-row{grid-template-columns:1fr!important;direction:ltr!important;gap:36px!important;}
             .feat-tabs{flex-wrap:wrap!important;gap:8px!important;}
+            .feat-section{padding:60px 20px!important;}
+            .feat-header-mb{margin-bottom:40px!important;}
+            .feat-items-gap{gap:52px!important;}
+            .feat-cta-inner{padding:48px 24px!important;}
+            .feat-stats{padding:20px 16px!important;gap:0!important;flex-wrap:wrap!important;}
+            .feat-stat-item{padding:16px 20px!important;border-right:none!important;border-bottom:1px solid rgba(255,255,255,.07);flex:1 1 40%!important;min-width:120px!important;}
           }
           @media(max-width:600px){
-            .feat-section-pad{padding-left:16px!important;padding-right:16px!important;padding-top:60px!important;}
-            .feat-hero-title{font-size:clamp(28px,8vw,48px)!important;}
+            .feat-hero{padding:64px 16px 48px!important;}
+            .feat-section{padding:48px 16px!important;}
+            .feat-cta-inner{padding:36px 16px!important;}
           }
         `}</style>
 
         {/* ── HERO ── */}
-        <section style={{ padding:"100px 24px 60px", position:"relative", overflow:"hidden" }}>
+        <section className="feat-hero" style={{ padding:"100px 24px 60px", position:"relative", overflow:"hidden" }}>
           <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
             <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(99,102,241,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.05) 1px,transparent 1px)", backgroundSize:"48px 48px" }}/>
             <div style={{ position:"absolute", width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle,rgba(99,102,241,.13),transparent 65%)", top:-130, right:-100, animation:"orbDrift 14s ease-in-out infinite" }}/>
@@ -1711,14 +1718,14 @@ export default function FeaturesPage() {
 
         {/* ── STATS STRIP ── */}
         <div style={{ borderTop:"1px solid rgba(255,255,255,.05)", borderBottom:"1px solid rgba(255,255,255,.05)", background:"rgba(255,255,255,.02)" }}>
-          <div style={{ maxWidth:1000, margin:"0 auto", padding:"28px 24px", display:"flex", justifyContent:"center", flexWrap:"wrap", gap:0 }}>
+          <div className="feat-stats" style={{ maxWidth:1000, margin:"0 auto", padding:"28px 24px", display:"flex", justifyContent:"center", flexWrap:"wrap", gap:0 }}>
             {[
               { val:`${totalFeatures}+`, label:"Total Features",     color:"#818cf8" },
               { val:"7",                 label:"Core Modules",        color:"#34d399" },
               { val:"12,000+",           label:"Businesses Using It", color:"#fbbf24" },
               { val:"10 min",            label:"To Get Started",      color:"#f87171" },
             ].map(({ val, label, color },i)=>(
-              <div key={label} style={{ padding:"0 36px", textAlign:"center", borderRight:i<3?"1px solid rgba(255,255,255,.07)":"none" }}>
+              <div key={label} className="feat-stat-item" style={{ padding:"0 36px", textAlign:"center", borderRight:i<3?"1px solid rgba(255,255,255,.07)":"none" }}>
                 <div style={{ fontFamily:"'Lora',serif", fontSize:26, fontWeight:700, color, letterSpacing:"-.5px" }}>{val}</div>
                 <div style={{ fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:500, marginTop:3 }}>{label}</div>
               </div>
@@ -1733,7 +1740,7 @@ export default function FeaturesPage() {
 
         {/* ── FINAL CTA ── */}
         <section style={{ padding:"80px 24px", maxWidth:1100, margin:"0 auto" }}>
-          <div ref={ctaRef} style={{ borderRadius:28, overflow:"hidden", position:"relative", background:"linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%)", padding:"72px 48px", textAlign:"center", boxShadow:"0 32px 80px rgba(99,102,241,.35)", border:"1px solid rgba(165,180,252,.2)", opacity:ctaVisible?1:0, transform:ctaVisible?"translateY(0)":"translateY(20px)", transition:"all .7s ease" }}>
+          <div ref={ctaRef} className="feat-cta-inner" style={{ borderRadius:28, overflow:"hidden", position:"relative", background:"linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%)", padding:"72px 48px", textAlign:"center", boxShadow:"0 32px 80px rgba(99,102,241,.35)", border:"1px solid rgba(165,180,252,.2)", opacity:ctaVisible?1:0, transform:ctaVisible?"translateY(0)":"translateY(20px)", transition:"all .7s ease" }}>
             <div style={{ position:"absolute", width:520, height:520, borderRadius:"50%", border:"1px solid rgba(165,180,252,.07)", top:"50%", left:"50%", transform:"translate(-50%,-50%)", animation:"rotateSlow 30s linear infinite", pointerEvents:"none" }}>
               <div style={{ position:"absolute", top:-4, left:"50%", width:8, height:8, borderRadius:"50%", background:"#818cf8", marginLeft:-4, boxShadow:"0 0 12px rgba(129,140,248,.8)" }}/>
             </div>

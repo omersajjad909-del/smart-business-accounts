@@ -698,7 +698,7 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
   const comingSoon = !isLive;
 
   return (
-    <section ref={ref} id={ind.id} style={{
+    <section ref={ref} id={ind.id} className="sol-section" style={{
       padding:"100px 24px",
       background: index % 2 === 0 ? "transparent" : "rgba(255,255,255,.02)",
       borderTop:"1px solid rgba(255,255,255,.05)",
@@ -714,7 +714,7 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
       }}/>
 
       <div style={{ maxWidth:1160, margin:"0 auto", position:"relative" }}>
-        <div style={{
+        <div className="industry-grid" style={{
           display:"grid", gridTemplateColumns:"1fr 1fr", gap:72, alignItems:"start",
           direction: isEven ? "ltr" : "rtl",
         }}>
@@ -786,7 +786,7 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
             </div>
 
             {/* Stats */}
-            <div style={{
+            <div className="ind-features-grid" style={{
               display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12, marginBottom:32,
               opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(16px)",
               transition:"all .55s ease .2s",
@@ -873,7 +873,7 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
 
           {/* ── Right: feature cards ── */}
           <div style={{ direction:"ltr" }}>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+            <div className="ind-links-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
               {ind.features.map((f, fi) => (
                 <div
                   key={f.title}
@@ -967,18 +967,26 @@ export default function SolutionsPage() {
           .tab-pill:hover{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06);}
           .tab-pill.active{color:white;border-color:var(--tab-color,#818cf8);background:color-mix(in srgb,var(--tab-color,#818cf8) 12%,transparent);box-shadow:0 0 12px color-mix(in srgb,var(--tab-color,#818cf8) 20%,transparent);}
           @media(max-width:900px){
-            .industry-grid{grid-template-columns:1fr!important;}
+            .industry-grid{grid-template-columns:1fr!important;gap:36px!important;direction:ltr!important;}
             .cross-grid{grid-template-columns:repeat(2,1fr)!important;}
             .sol-tabs{flex-wrap:wrap!important;gap:6px!important;}
+            .sol-section{padding:60px 20px!important;}
+            .ind-features-grid{grid-template-columns:repeat(2,1fr)!important;}
+            .ind-links-grid{grid-template-columns:1fr 1fr!important;}
+            .sol-cta-inner{padding:48px 24px!important;}
           }
           @media(max-width:600px){
             .cross-grid{grid-template-columns:1fr!important;}
-            .sol-hero-pad{padding:60px 16px 40px!important;}
+            .sol-hero{padding:64px 16px 48px!important;}
+            .sol-section{padding:48px 16px!important;}
+            .ind-features-grid{grid-template-columns:1fr 1fr!important;}
+            .ind-links-grid{grid-template-columns:1fr!important;}
+            .sol-cta-inner{padding:32px 16px!important;}
           }
         `}</style>
 
         {/* ── HERO ── */}
-        <section style={{ padding:"100px 24px 60px", position:"relative", overflow:"hidden" }}>
+        <section className="sol-hero" style={{ padding:"100px 24px 60px", position:"relative", overflow:"hidden" }}>
           <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
             <div style={{ position:"absolute", inset:0,
               backgroundImage:"linear-gradient(rgba(99,102,241,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.05) 1px,transparent 1px)",
@@ -1192,7 +1200,7 @@ export default function SolutionsPage() {
 
         {/* ── FINAL CTA ── */}
         <section style={{ padding:"80px 24px", maxWidth:1100, margin:"0 auto" }}>
-          <div ref={ctaRef} style={{
+          <div ref={ctaRef} className="sol-cta-inner" style={{
             borderRadius:28, overflow:"hidden", position:"relative",
             background:"linear-gradient(135deg,#2d2b6b 0%,#1e1b55 35%,#1a1848 70%,#231548 100%)",
             padding:"72px 48px", textAlign:"center",
