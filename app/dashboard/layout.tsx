@@ -670,6 +670,21 @@ export default function DashboardLayout({
             </div>
           )}
 
+          {/* ── CRM ── */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_CRM) && (
+            <NavGroup
+              title="CRM"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>}
+              open={openSection === "crm"}
+              onToggle={() => toggle("crm")}
+            >
+              <NavLink href="/dashboard/crm" pathname={pathname}>CRM Overview</NavLink>
+              <NavLink href="/dashboard/crm/contacts" pathname={pathname}>Contacts</NavLink>
+              <NavLink href="/dashboard/crm/opportunities" pathname={pathname}>Opportunities</NavLink>
+              <NavLink href="/dashboard/crm/interactions" pathname={pathname}>Interactions</NavLink>
+            </NavGroup>
+          )}
+
           {/* ── SALES & PURCHASE ── (hidden for retail which has its own groups) */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && !hasModule(businessType, "pos") && (
             <NavGroup
@@ -743,6 +758,21 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
+          {/* ── HR & PAYROLL ── */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_HR_PAYROLL) && (
+            <NavGroup
+              title="HR & Payroll"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>}
+              open={openSection === "hr"}
+              onToggle={() => toggle("hr")}
+            >
+              <NavLink href="/dashboard/employees" pathname={pathname}>Employees</NavLink>
+              <NavLink href="/dashboard/attendance" pathname={pathname}>Attendance</NavLink>
+              <NavLink href="/dashboard/payroll" pathname={pathname}>Payroll</NavLink>
+              <NavLink href="/dashboard/advance-salary" pathname={pathname}>Advance Salary</NavLink>
+            </NavGroup>
+          )}
+
           {/* ── FINANCIAL REPORTS ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
             <NavGroup
@@ -775,21 +805,6 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.VIEW_STOCK_SUMMARY) && <NavLink href="/dashboard/reports/stock" pathname={pathname}>Stock Report</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_SALES_REPORT) && <NavLink href="/dashboard/reports/sales" pathname={pathname}>Sales Report</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/audit-trail" pathname={pathname}>Audit Trail</NavLink>}
-            </NavGroup>
-          )}
-
-          {/* ── CRM ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_CRM) && (
-            <NavGroup
-              title="CRM"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>}
-              open={openSection === "crm"}
-              onToggle={() => toggle("crm")}
-            >
-              <NavLink href="/dashboard/crm" pathname={pathname}>CRM Overview</NavLink>
-              <NavLink href="/dashboard/crm/contacts" pathname={pathname}>Contacts</NavLink>
-              <NavLink href="/dashboard/crm/opportunities" pathname={pathname}>Opportunities</NavLink>
-              <NavLink href="/dashboard/crm/interactions" pathname={pathname}>Interactions</NavLink>
             </NavGroup>
           )}
 
@@ -1509,21 +1524,6 @@ export default function DashboardLayout({
               {hasDashboardFeature("TRADING_DISPATCH_BOARD") && <NavLink href="/dashboard/trading/dispatch-board" pathname={pathname}>Dispatch Board</NavLink>}
               {hasDashboardFeature("TRADING_CONVERSION_CENTER") && <NavLink href="/dashboard/trading/conversion-center" pathname={pathname}>Conversion Center</NavLink>}
               {hasDashboardFeature("TRADING_ANALYTICS") && <NavLink href="/dashboard/trading/analytics" pathname={pathname}>Trading Analytics</NavLink>}
-            </NavGroup>
-          )}
-
-          {/* ── HR & PAYROLL ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_HR_PAYROLL) && (
-            <NavGroup
-              title="HR & Payroll"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>}
-              open={openSection === "hr"}
-              onToggle={() => toggle("hr")}
-            >
-              <NavLink href="/dashboard/employees" pathname={pathname}>Employees</NavLink>
-              <NavLink href="/dashboard/attendance" pathname={pathname}>Attendance</NavLink>
-              <NavLink href="/dashboard/payroll" pathname={pathname}>Payroll</NavLink>
-              <NavLink href="/dashboard/advance-salary" pathname={pathname}>Advance Salary</NavLink>
             </NavGroup>
           )}
 
