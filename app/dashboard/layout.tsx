@@ -648,12 +648,12 @@ export default function DashboardLayout({
           {/* Branch selector */}
           {canShowBranchSelector && (
             <select
-              style={{marginTop:8,width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,padding:"6px 8px",fontSize:11,color:"rgba(255,255,255,0.7)",outline:"none"}}
+              style={{marginTop:8,width:"100%",background:"#0d1430",border:"1px solid rgba(255,255,255,0.12)",borderRadius:7,padding:"6px 8px",fontSize:11,color:"rgba(255,255,255,0.8)",outline:"none",colorScheme:"dark"}}
               value={activeBranchId}
               onChange={(e) => setActiveBranchId(e.target.value)}
             >
-              <option value="all">All Branches</option>
-              {branches.map(b => <option key={b.id} value={b.id}>{b.code} - {b.name}</option>)}
+              <option value="all" style={{background:"#0d1430",color:"#e8ecf5"}}>All Branches</option>
+              {branches.map(b => <option key={b.id} value={b.id} style={{background:"#0d1430",color:"#e8ecf5"}}>{b.code} - {b.name}</option>)}
             </select>
           )}
         </div>
@@ -1678,7 +1678,7 @@ export default function DashboardLayout({
           {/* Branch switcher */}
           <div style={{display:"flex",alignItems:"center",gap:8,marginLeft:8}}>
             <select
-              style={{border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"5px 10px",fontSize:12,background:"rgba(255,255,255,0.04)",color:"rgba(255,255,255,0.7)",outline:"none",cursor:"pointer",minWidth:120}}
+              style={{border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"5px 10px",fontSize:12,background:"#0d1430",color:"rgba(255,255,255,0.85)",outline:"none",cursor:"pointer",minWidth:120,colorScheme:"dark"}}
               value={activeBranchId}
               onChange={(e) => {
                 const val = e.target.value;
@@ -1686,9 +1686,9 @@ export default function DashboardLayout({
                 localStorage.setItem("activeBranchId", val);
               }}
             >
-              <option value="all">All Branches</option>
+              <option value="all" style={{background:"#0d1430",color:"#e8ecf5"}}>All Branches</option>
               {branches.map((b) => (
-                <option key={b.id} value={b.id}>{b.name || b.code}</option>
+                <option key={b.id} value={b.id} style={{background:"#0d1430",color:"#e8ecf5"}}>{b.name || b.code}</option>
               ))}
             </select>
             <span style={{fontSize:10,color:"rgba(255,255,255,0.25)"}}>Branch</span>
