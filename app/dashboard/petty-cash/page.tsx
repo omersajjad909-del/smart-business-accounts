@@ -1,5 +1,5 @@
+"use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
-'use client';
 
 import { useState, useEffect } from 'react';
 import { getCurrentUser } from '@/lib/auth';
