@@ -1,8 +1,7 @@
-"use client";
-import { useState, useMemo } from "react";
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`nimport { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
-// ─── Design tokens ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Design tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ff = "'Outfit','Inter',sans-serif";
 const accent = "#6366f1";
 
@@ -15,7 +14,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const STATUS_TABS = ["All", "PENDING", "CONFIRMED", "DELIVERED", "CANCELLED"];
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface LineItem {
   name: string;
   qty: number;
@@ -38,12 +37,12 @@ const EMPTY_FORM = {
   items: [{ name: "", qty: 1, unitPrice: 0 }] as LineItem[],
 };
 
-// ─── Helper ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function fmt(n: number) {
   return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function SalesOrderPage() {
   const { records, loading, create, setStatus, remove } = useBusinessRecords("sales_order");
 
@@ -54,12 +53,12 @@ export default function SalesOrderPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
-  // Map raw records → typed orders
+  // Map raw records â†’ typed orders
   const orders: SalesOrder[] = useMemo(
     () =>
       records.map((r) => ({
         id: r.id,
-        orderNo: (r.data?.orderNo as string) || r.title.split(" · ")[0] || r.title,
+        orderNo: (r.data?.orderNo as string) || r.title.split(" Â· ")[0] || r.title,
         customerName: (r.data?.customerName as string) || r.title,
         date: r.date ? r.date.slice(0, 10) : "",
         amount: r.amount ?? 0,
@@ -85,7 +84,7 @@ export default function SalesOrderPage() {
     return matchTab && matchSearch;
   });
 
-  // ── Form helpers ──
+  // â”€â”€ Form helpers â”€â”€
   function resetForm() {
     setForm({ ...EMPTY_FORM, items: [{ name: "", qty: 1, unitPrice: 0 }] });
     setFormError("");
@@ -131,7 +130,7 @@ export default function SalesOrderPage() {
     setSaving(true);
     try {
       const orderNo = "SO-" + Date.now().toString().slice(-6);
-      const title = orderNo + " · " + form.customerName.trim();
+      const title = orderNo + " Â· " + form.customerName.trim();
       await create({
         title,
         status: "PENDING",
@@ -153,7 +152,7 @@ export default function SalesOrderPage() {
     }
   }
 
-  // ── Status action helpers ──
+  // â”€â”€ Status action helpers â”€â”€
   async function handleConfirm(id: string) {
     await setStatus(id, "CONFIRMED");
   }
@@ -164,10 +163,10 @@ export default function SalesOrderPage() {
     await setStatus(id, "CANCELLED");
   }
   async function handleDelete(id: string) {
-    if (confirm("Delete this sales order?")) await remove(id);
+    if (await confirmToast("Delete this sales order?")) await remove(id);
   }
 
-  // ── Styles ──
+  // â”€â”€ Styles â”€â”€
   const panelStyle: React.CSSProperties = {
     background: "var(--panel-bg)",
     border: "1px solid var(--border)",
@@ -229,7 +228,7 @@ export default function SalesOrderPage() {
         minHeight: "100vh",
       }}
     >
-      {/* ── Header ── */}
+      {/* â”€â”€ Header â”€â”€ */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Sales Orders</h1>
@@ -242,7 +241,7 @@ export default function SalesOrderPage() {
         </button>
       </div>
 
-      {/* ── KPI cards ── */}
+      {/* â”€â”€ KPI cards â”€â”€ */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Orders", value: total, color: accent },
@@ -259,11 +258,11 @@ export default function SalesOrderPage() {
         ))}
       </div>
 
-      {/* ── Search + Tab filters ── */}
+      {/* â”€â”€ Search + Tab filters â”€â”€ */}
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
         <input
           style={{ ...inputStyle, maxWidth: 280 }}
-          placeholder="Search by order no or customer…"
+          placeholder="Search by order no or customerâ€¦"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -291,10 +290,10 @@ export default function SalesOrderPage() {
         </div>
       </div>
 
-      {/* ── Table ── */}
+      {/* â”€â”€ Table â”€â”€ */}
       <div style={{ ...panelStyle, padding: 0, overflow: "hidden" }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</div>
+          <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loadingâ€¦</div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>
             No sales orders found.
@@ -341,7 +340,7 @@ export default function SalesOrderPage() {
                   </td>
                   <td style={{ padding: "13px 16px", fontSize: 14 }}>{order.customerName}</td>
                   <td style={{ padding: "13px 16px", fontSize: 14, color: "var(--text-muted)" }}>
-                    {order.date || "—"}
+                    {order.date || "â€”"}
                   </td>
                   <td style={{ padding: "13px 16px", fontSize: 14, textAlign: "right", fontWeight: 600 }}>
                     {fmt(order.amount)}
@@ -420,7 +419,7 @@ export default function SalesOrderPage() {
                           borderRadius: 6,
                         }}
                       >
-                        ×
+                        Ã—
                       </button>
                     </div>
                   </td>
@@ -431,7 +430,7 @@ export default function SalesOrderPage() {
         )}
       </div>
 
-      {/* ── New Order Modal ── */}
+      {/* â”€â”€ New Order Modal â”€â”€ */}
       {showModal && (
         <div
           style={{
@@ -474,7 +473,7 @@ export default function SalesOrderPage() {
                   lineHeight: 1,
                 }}
               >
-                ×
+                Ã—
               </button>
             </div>
 
@@ -596,7 +595,7 @@ export default function SalesOrderPage() {
                         padding: 0,
                       }}
                     >
-                      ×
+                      Ã—
                     </button>
                   </div>
                 );
@@ -610,7 +609,7 @@ export default function SalesOrderPage() {
               </label>
               <textarea
                 style={{ ...inputStyle, minHeight: 72, resize: "vertical" }}
-                placeholder="Optional notes for this order…"
+                placeholder="Optional notes for this orderâ€¦"
                 value={form.notes}
                 onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
               />
@@ -645,7 +644,7 @@ export default function SalesOrderPage() {
                 Cancel
               </button>
               <button style={{ ...btnPrimary, opacity: saving ? 0.7 : 1 }} onClick={handleSubmit} disabled={saving}>
-                {saving ? "Creating…" : "Create Order"}
+                {saving ? "Creatingâ€¦" : "Create Order"}
               </button>
             </div>
           </div>

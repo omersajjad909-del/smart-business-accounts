@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { toast } from "react-hot-toast";
@@ -271,7 +270,7 @@ export default function JVPage() {
   }
 
   async function deleteVoucher(id: string) {
-    if (!confirm("Are you sure you want to delete this JV?")) {
+    if (!await confirmToast("Are you sure you want to delete this JV?")) {
       return;
     }
 
@@ -474,7 +473,7 @@ export default function JVPage() {
                             onClick={() => removeEntry(entry.id)}
                             className="text-red-600 hover:text-red-800"
                           >
-                            ✕
+                            âœ•
                           </button>
                         )}
                       </td>
@@ -499,7 +498,7 @@ export default function JVPage() {
                             isBalanced ? "text-green-600" : "text-red-600"
                           }
                         >
-                          {isBalanced ? "✓ Balanced" : "✗ Not Balanced"}
+                          {isBalanced ? "âœ“ Balanced" : "âœ— Not Balanced"}
                         </div>
                       </div>
                     </td>

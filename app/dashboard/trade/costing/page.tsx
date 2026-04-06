@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapImportCostingRecords, tradeBg, tradeBorder, tradeFont, tradeMuted } from "../_shared";
@@ -177,7 +176,7 @@ export default function ImportCostingPage() {
   }
 
   async function handleDelete(id: string, shipmentRef: string) {
-    if (!window.confirm(`Delete landed costing for ${shipmentRef}?`)) return;
+    if (!await confirmToast(`Delete landed costing for ${shipmentRef}?`)) return;
     await remove(id);
   }
 

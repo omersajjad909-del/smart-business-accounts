@@ -1,5 +1,4 @@
-"use client";
-import { useEffect, useState } from "react";
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`nimport { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -42,7 +41,7 @@ export default function UsersMasterPage() {
   const [loading, setLoading] = useState(true);
 
   // TAB STATE
-  const [activeTab, setActiveTab] = useState("users"); // "users" یا "permissions"
+  const [activeTab, setActiveTab] = useState("users"); // "users" ÛŒØ§ "permissions"
 
   // USERS STATE
   const [users, setUsers] = useState<any[]>([]);
@@ -78,7 +77,7 @@ export default function UsersMasterPage() {
       return;
     }
 
-    // صرف ADMIN access کر سکتا ہے
+    // ØµØ±Ù ADMIN access Ú©Ø± Ø³Ú©ØªØ§ ÛÛ’
     if (user.role === "ADMIN") {
       setAuthorized(true);
       loadUsers(user);
@@ -194,7 +193,7 @@ export default function UsersMasterPage() {
             }),
           });
         }
-        toast.success(editing ? "✅ User updated!" : "✅ User created!");
+        toast.success(editing ? "âœ… User updated!" : "âœ… User created!");
         resetUserForm();
         loadUsers(me);
         loadBranchAssignments(me);
@@ -208,7 +207,7 @@ export default function UsersMasterPage() {
   };
 
   const deleteUser = async (id: string) => {
-    if (!confirm("Are you sure ?")) return;
+    if (!await confirmToast("Are you sure ?")) return;
     try {
       const res = await fetch("/api/users", {
         method: "DELETE",
@@ -234,7 +233,7 @@ export default function UsersMasterPage() {
           },
           body: JSON.stringify({ branchAssignments: nextAssignments }),
         });
-        toast.success("✅ User deleted!");
+        toast.success("âœ… User deleted!");
         loadUsers(me);
         loadBranchAssignments(me);
       }
@@ -279,7 +278,7 @@ export default function UsersMasterPage() {
         },
       });
       const data = await res.json();
-      console.log("📊 Loaded roles:", data);
+      console.log("ðŸ“Š Loaded roles:", data);
       const list: Role[] = Array.isArray(data) ? data : (Array.isArray(data?.roles) ? data.roles : []);
       setRoles(list);
 
@@ -339,7 +338,7 @@ export default function UsersMasterPage() {
       });
 
       if (res.ok) {
-        toast.success(`✅ ${selectedRole} Permissions saved!`);
+        toast.success(`âœ… ${selectedRole} Permissions saved!`);
         loadRoles(me);
       } else {
         toast.error("Failed to save permissions");
@@ -359,7 +358,7 @@ export default function UsersMasterPage() {
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <h2 className="text-xl font-bold text-red-600 mb-2">
-            ❌ Access Denied
+            âŒ Access Denied
           </h2>
           <p className="text-red-700">You do not have permission to manage users or permissions.</p>
         </div>
@@ -387,7 +386,7 @@ export default function UsersMasterPage() {
               : "text-gray-600 hover:text-gray-800"
           }`}
         >
-          👥 Users
+          ðŸ‘¥ Users
         </button>
         <button
           onClick={() => setActiveTab("permissions")}
@@ -397,19 +396,19 @@ export default function UsersMasterPage() {
               : "text-gray-600 hover:text-gray-800"
           }`}
         >
-          🎭 Permissions
+          ðŸŽ­ Permissions
         </button>
       </div>
 
       {/* ============ USERS TAB ============ */}
       {activeTab === "users" && (
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-6">👥 Users Managment</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-6">ðŸ‘¥ Users Managment</h1>
 
           {/* USER FORM */}
           <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
             <h2 className="text-xl md:text-2xl font-bold mb-4">
-              {editing ? "✏️ Edit User" : "➕ Add New User"}
+              {editing ? "âœï¸ Edit User" : "âž• Add New User"}
             </h2>
 
             <form onSubmit={saveUser}>
@@ -497,7 +496,7 @@ export default function UsersMasterPage() {
                   type="submit"
                   className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 >
-                  {editing ? "✏️ Edit User" : "✅ Add User"}
+                  {editing ? "âœï¸ Edit User" : "âœ… Add User"}
                 </button>
                 {editing && (
                   <button
@@ -505,7 +504,7 @@ export default function UsersMasterPage() {
                     onClick={resetUserForm}
                     className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
                   >
-                    منسوخ کریں
+                    Ù…Ù†Ø³ÙˆØ® Ú©Ø±ÛŒÚº
                   </button>
                 )}
               </div>
@@ -547,9 +546,9 @@ export default function UsersMasterPage() {
                     </td>
                     <td className="p-3">
                       {user.active ? (
-                        <span className="text-green-600">✓ Active</span>
+                        <span className="text-green-600">âœ“ Active</span>
                       ) : (
-                        <span className="text-red-600">✗ Inactive</span>
+                        <span className="text-red-600">âœ— Inactive</span>
                       )}
                     </td>
                     <td className="p-3 space-x-2 whitespace-nowrap">
@@ -557,13 +556,13 @@ export default function UsersMasterPage() {
                         onClick={() => editUser(user)}
                         className="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1 rounded text-xs transition-colors"
                       >
-                        ✏️ Edit
+                        âœï¸ Edit
                       </button>
                       <button
                         onClick={() => deleteUser(user.id)}
                         className="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded text-xs transition-colors"
                       >
-                        🗑️ Delete
+                        ðŸ—‘ï¸ Delete
                       </button>
                     </td>
                   </tr>
@@ -577,7 +576,7 @@ export default function UsersMasterPage() {
       {/* ============ PERMISSIONS TAB ============ */}
       {activeTab === "permissions" && (
         <div>
-          <h1 className="text-3xl font-bold mb-6">🎭 Role Permissions</h1>
+          <h1 className="text-3xl font-bold mb-6">ðŸŽ­ Role Permissions</h1>
 
           {/* ROLE SELECTOR */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -610,13 +609,13 @@ export default function UsersMasterPage() {
                   onClick={selectAllPermissions}
                   className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
                 >
-                  ✓ Select All
+                  âœ“ Select All
                 </button>
                 <button
                   onClick={clearAllPermissions}
                   className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
                 >
-                   Clear All ✗
+                   Clear All âœ—
                 </button>
               </div>
             </div>
@@ -643,7 +642,7 @@ export default function UsersMasterPage() {
               disabled={savingPerms}
               className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
             >
-              {savingPerms ? "Saving..." : "✅ Save Permissions"}
+              {savingPerms ? "Saving..." : "âœ… Save Permissions"}
             </button>
           </div>
         </div>

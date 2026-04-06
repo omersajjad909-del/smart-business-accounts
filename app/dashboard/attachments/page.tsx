@@ -1,5 +1,4 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`nimport { useState, useEffect, useRef } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -16,11 +15,11 @@ interface Attachment {
 }
 
 function fileIcon(type: string): string {
-  if (type.startsWith("image/"))  return "🖼️";
-  if (type === "application/pdf") return "📄";
-  if (type.includes("word"))      return "📝";
-  if (type.includes("excel") || type.includes("sheet") || type === "text/csv") return "📊";
-  return "📎";
+  if (type.startsWith("image/"))  return "ðŸ–¼ï¸";
+  if (type === "application/pdf") return "ðŸ“„";
+  if (type.includes("word"))      return "ðŸ“";
+  if (type.includes("excel") || type.includes("sheet") || type === "text/csv") return "ðŸ“Š";
+  return "ðŸ“Ž";
 }
 
 function formatBytes(bytes: number): string {
@@ -81,7 +80,7 @@ export default function AttachmentsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this attachment?")) return;
+    if (!await confirmToast("Delete this attachment?")) return;
     await fetch(`/api/attachments?id=${id}`, { method: "DELETE", headers: getHeaders() });
     setAttachments(prev => prev.filter(a => a.id !== id));
   };
@@ -150,7 +149,7 @@ export default function AttachmentsPage() {
         </div>
         <input
           value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search files…"
+          placeholder="Search filesâ€¦"
           style={{ flex: 1, minWidth: 200, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 14px", color: "var(--text-primary)", fontSize: 13, fontFamily: FONT, outline: "none" }}
         />
       </div>
@@ -158,10 +157,10 @@ export default function AttachmentsPage() {
       {/* Table */}
       <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
         {loading ? (
-          <div style={{ textAlign: "center", padding: "64px 20px", color: "var(--text-muted)", fontSize: 15 }}>Loading files…</div>
+          <div style={{ textAlign: "center", padding: "64px 20px", color: "var(--text-muted)", fontSize: 15 }}>Loading filesâ€¦</div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "64px 20px", color: "var(--text-muted)", fontSize: 15 }}>
-            {search ? "No files match your search." : "No attachments yet — upload your first file."}
+            {search ? "No files match your search." : "No attachments yet â€” upload your first file."}
           </div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -197,11 +196,11 @@ export default function AttachmentsPage() {
                     <div style={{ display: "flex", gap: 8 }}>
                       <a href={a.fileUrl} target="_blank" rel="noreferrer" download
                         style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 7, padding: "4px 11px", fontSize: 12, color: "var(--text-muted)", textDecoration: "none" }}>
-                        ⬇ Download
+                        â¬‡ Download
                       </a>
                       <button onClick={() => handleDelete(a.id)}
                         style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: "0 4px", lineHeight: 1, fontFamily: FONT }}>
-                        ×
+                        Ã—
                       </button>
                     </div>
                   </td>
@@ -246,12 +245,12 @@ export default function AttachmentsPage() {
               <input ref={fileRef} type="file" multiple style={{ display: "none" }} onChange={e => handleUpload(e.target.files)}
                 accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" />
               {uploading ? (
-                <div style={{ color: "#6366f1", fontWeight: 600 }}>Uploading…</div>
+                <div style={{ color: "#6366f1", fontWeight: 600 }}>Uploadingâ€¦</div>
               ) : (
                 <>
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>📎</div>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>ðŸ“Ž</div>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>Click or drag files here</div>
-                  <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>PDF, Word, Excel, Images — max 10 MB each</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>PDF, Word, Excel, Images â€” max 10 MB each</div>
                 </>
               )}
             </div>

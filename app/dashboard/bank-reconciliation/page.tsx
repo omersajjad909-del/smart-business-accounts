@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from 'react';
@@ -284,7 +283,7 @@ export default function BankReconciliationPage() {
   };
 
   const handleDeleteBank = async (id: string) => {
-    if (!confirm('Are you sure? This cannot be undone.')) return;
+    if (!await confirmToast('Are you sure? This cannot be undone.')) return;
     if (!user) return toast.error("Please login first");
 
     try {
@@ -320,7 +319,7 @@ export default function BankReconciliationPage() {
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
         <div className="text-sm font-semibold text-blue-800">Guided Flow</div>
-        <div className="mt-1 text-xs text-blue-700">Import → Match → Confirm</div>
+        <div className="mt-1 text-xs text-blue-700">Import â†’ Match â†’ Confirm</div>
         <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-blue-800">
           <div className="rounded border border-blue-200 bg-white p-3">
             <div className="font-semibold">1. Import</div>
@@ -348,7 +347,7 @@ export default function BankReconciliationPage() {
           onClick={() => setShowAddBankForm(!showAddBankForm)}
           className="bg-green-500 text-white px-6 py-2 rounded font-semibold hover:bg-green-600"
         >
-          {showAddBankForm ? 'Cancel' : '➕ Add Bank Account'}
+          {showAddBankForm ? 'Cancel' : 'âž• Add Bank Account'}
         </button>
       </div>
 
@@ -515,7 +514,7 @@ export default function BankReconciliationPage() {
       {/* Show Difference */}
       <div className={`p-4 rounded-lg mb-6 text-white font-semibold ${isBalanced ? 'bg-green-500' : 'bg-red-500'
         }`}>
-        Difference: {companyInfo?.baseCurrency || "$"} {difference.toFixed(2)} {isBalanced ? '✓ Balanced' : '✗ Not Balanced'}
+        Difference: {companyInfo?.baseCurrency || "$"} {difference.toFixed(2)} {isBalanced ? 'âœ“ Balanced' : 'âœ— Not Balanced'}
       </div>
 
       {/* Statements List */}

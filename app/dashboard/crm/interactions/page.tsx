@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
@@ -102,7 +101,7 @@ export default function InteractionsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this interaction?")) return;
+    if (!await confirmToast("Are you sure you want to delete this interaction?")) return;
 
     try {
       await fetch(`/api/crm/interactions?id=${id}`, { method: "DELETE" });
@@ -131,7 +130,7 @@ export default function InteractionsPage() {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
-          📞 CRM Interaction History
+          ðŸ“ž CRM Interaction History
         </h1>
 
         {/* Form */}

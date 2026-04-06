@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useCallback, useEffect, useState } from "react";
@@ -280,7 +279,7 @@ export default function SalesReturnPage() {
   }
 
   async function deleteReturn(id: string) {
-    if (!confirm("Are you sure you want to delete this return?")) return;
+    if (!await confirmToast("Are you sure you want to delete this return?")) return;
     try {
       const res = await fetch(`/api/sale-return?id=${id}`, {
         method: "DELETE",
@@ -385,7 +384,7 @@ export default function SalesReturnPage() {
           {!preview ? (
             <div className="space-y-4 border p-6 bg-white rounded shadow">
               <div className="mb-2 text-xs text-gray-500 italic">
-                💡 Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Invoice | <strong>F8</strong> = Search Query
+                ðŸ’¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Invoice | <strong>F8</strong> = Search Query
               </div>
               <div className="flex justify-between items-center border-b pb-2">
                 <h1 className="text-xl font-bold text-red-600">{editing ? "Edit Sales Return" : "Sales Return Form"}</h1>
@@ -445,7 +444,7 @@ export default function SalesReturnPage() {
                       </td>
                       <td className="border p-2 text-center font-mono">{r.rate}</td>
                       <td className="border p-2 text-right font-bold">{(Number(r.qty) * r.rate).toLocaleString()}</td>
-                      <td className="border p-2 text-center text-red-500 cursor-pointer" onClick={() => setRows(rows.filter((_, idx) => idx !== i))}>✕</td>
+                      <td className="border p-2 text-center text-red-500 cursor-pointer" onClick={() => setRows(rows.filter((_, idx) => idx !== i))}>âœ•</td>
                     </tr>
                   ))}
                 </tbody>

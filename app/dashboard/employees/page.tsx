@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
@@ -102,7 +101,7 @@ export default function EmployeesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this employee?")) return;
+    if (!await confirmToast("Delete this employee?")) return;
     try {
       await fetch(`/api/employees?id=${id}`, {
         method: "DELETE",
@@ -158,7 +157,7 @@ export default function EmployeesPage() {
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 800, color: "white", margin: "0 0 4px" }}>Employees</h1>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", margin: 0 }}>
-              Manage your workforce — {employees.length} employee{employees.length !== 1 ? "s" : ""}
+              Manage your workforce â€” {employees.length} employee{employees.length !== 1 ? "s" : ""}
             </p>
           </div>
           <button
@@ -227,7 +226,7 @@ export default function EmployeesPage() {
                     required
                     style={inp}
                   >
-                    <option value="">Select…</option>
+                    <option value="">Selectâ€¦</option>
                     {DEPARTMENTS.map(d => (
                       <option key={d} value={d}>{d.charAt(0) + d.slice(1).toLowerCase()}</option>
                     ))}
@@ -294,7 +293,7 @@ export default function EmployeesPage() {
                     cursor: loading ? "not-allowed" : "pointer",
                   }}
                 >
-                  {loading ? "Saving…" : editing ? "Update Employee" : "Add Employee"}
+                  {loading ? "Savingâ€¦" : editing ? "Update Employee" : "Add Employee"}
                 </button>
                 {editing && (
                   <button
@@ -322,7 +321,7 @@ export default function EmployeesPage() {
         {/* Table */}
         {loading && employees.length === 0 ? (
           <div style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>
-            Loading…
+            Loadingâ€¦
           </div>
         ) : (
           <div
@@ -371,7 +370,7 @@ export default function EmployeesPage() {
                       {emp.email}
                     </td>
                     <td style={{ padding: "13px 16px", color: "rgba(255,255,255,.6)" }}>
-                      {emp.designations || "—"}
+                      {emp.designations || "â€”"}
                     </td>
                     <td style={{ padding: "13px 16px" }}>
                       <span

@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { mapRebateRecords, tradeBg, tradeBorder, tradeFont, tradeMuted } from "../_shared";
@@ -174,7 +173,7 @@ export default function TradeRebatePage() {
   }
 
   async function handleDelete(id: string, claimNo: string) {
-    if (!window.confirm(`Delete rebate claim ${claimNo}?`)) return;
+    if (!await confirmToast(`Delete rebate claim ${claimNo}?`)) return;
     await remove(id);
   }
 

@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { toast } from "react-hot-toast";
@@ -119,7 +118,7 @@ export default function CPVPage() {
         const banksData = await banksRes.json();
 
         if (Array.isArray(accountsData)) {
-          // CPV میں SUPPLIER + BANKS + دوسرے non-customer accounts
+          // CPV Ù…ÛŒÚº SUPPLIER + BANKS + Ø¯ÙˆØ³Ø±Û’ non-customer accounts
           setAccounts(
             accountsData.filter(a =>
               !a.partyType || (a.partyType !== "CUSTOMER")
@@ -233,7 +232,7 @@ export default function CPVPage() {
   }
 
   async function deleteVoucher(id: string) {
-    if (!confirm("Are you sure you want to delete this CPV?")) {
+    if (!await confirmToast("Are you sure you want to delete this CPV?")) {
       return;
     }
 

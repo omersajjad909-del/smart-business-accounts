@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useMemo, useState } from "react";
 import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
 
@@ -116,7 +115,7 @@ export function BusinessRecordWorkspace({
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Delete this record?")) return;
+    if (!await confirmToast("Delete this record?")) return;
     try {
       await remove(id);
     } catch (deleteError) {

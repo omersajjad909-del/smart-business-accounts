@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useMemo, useState } from "react";
@@ -140,7 +139,7 @@ export default function TransportMaintenancePage() {
       toast.success("Completed maintenance jobs should stay in the service history.");
       return;
     }
-    if (!window.confirm(`Delete maintenance job ${row.jobNo}?`)) return;
+    if (!await confirmToast(`Delete maintenance job ${row.jobNo}?`)) return;
     await maintenanceStore.remove(id);
   }
 

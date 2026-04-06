@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -188,7 +187,7 @@ export default function POSPage() {
 
   function clearCart() {
     if (cart.length === 0) return;
-    if (!window.confirm("Clear the current cart?")) return;
+    if (!await confirmToast("Clear the current cart?")) return;
     setCart([]);
     setDiscount("");
     setCheckoutError("");

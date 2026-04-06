@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
@@ -143,7 +142,7 @@ export default function LandedCostPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this landed cost entry?")) return;
+    if (!await confirmToast("Delete this landed cost entry?")) return;
     try { await remove(id); } catch {}
   }
 
@@ -187,7 +186,7 @@ export default function LandedCostPage() {
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
-          Loading landed cost entries…
+          Loading landed cost entriesâ€¦
         </div>
       )}
 
@@ -388,7 +387,7 @@ export default function LandedCostPage() {
                   cursor: saving ? "not-allowed" : "pointer", opacity: saving ? .7 : 1,
                 }}
               >
-                {saving ? "Saving…" : "Create Entry"}
+                {saving ? "Savingâ€¦" : "Create Entry"}
               </button>
             </div>
           </div>

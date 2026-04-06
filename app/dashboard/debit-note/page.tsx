@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useState, useEffect } from 'react';
@@ -131,7 +130,7 @@ export default function DebitNotePage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this debit note?')) return;
+    if (!await confirmToast('Are you sure you want to delete this debit note?')) return;
 
     try {
       const response = await fetch(`/api/debit-note?id=${id}`, {
@@ -196,7 +195,7 @@ export default function DebitNotePage() {
                 onClick={() => setShowForm(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                ✕
+                âœ•
               </button>
             </div>
 
@@ -331,7 +330,7 @@ export default function DebitNotePage() {
                       </div>
                     </td>
                     <td className="py-3 px-4 text-right font-medium text-red-600">
-                      ₹{note.amount.toFixed(2)}
+                      â‚¹{note.amount.toFixed(2)}
                     </td>
                     <td className="py-3 px-4">{getStatusBadge(note.status)}</td>
                     <td className="py-3 px-4">
@@ -367,7 +366,7 @@ export default function DebitNotePage() {
                   )}
                   <MobileCardRow 
                     label="Amount" 
-                    value={`₹${note.amount.toFixed(2)}`}
+                    value={`â‚¹${note.amount.toFixed(2)}`}
                     valueClassName="font-medium text-red-600"
                   />
                   <div className="mt-3 pt-3 border-t">

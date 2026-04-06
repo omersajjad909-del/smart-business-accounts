@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
@@ -166,7 +165,7 @@ export default function AttendancePage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this record?")) return;
+    if (!await confirmToast("Delete this record?")) return;
     const user = getCurrentUser();
     if (!user) return;
 
@@ -218,7 +217,7 @@ export default function AttendancePage() {
       className="flex flex-col md:flex-row overflow-hidden"
       style={{ height: "100%", minHeight: 0, background: "#060918" }}
     >
-      {/* ── SIDEBAR: Employee List ─────────────────────── */}
+      {/* â”€â”€ SIDEBAR: Employee List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div
         className="w-full md:w-72 shrink-0 flex flex-col z-10"
         style={{
@@ -266,7 +265,7 @@ export default function AttendancePage() {
         </div>
       </div>
 
-      {/* ── MAIN CONTENT ───────────────────────────────── */}
+      {/* â”€â”€ MAIN CONTENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
 
         {/* Header */}
@@ -333,7 +332,7 @@ export default function AttendancePage() {
           <div className="flex-1 overflow-auto" style={{ padding: "16px 24px 24px" }}>
             {loading ? (
               <div style={{ paddingTop: 60, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13 }}>
-                Loading…
+                Loadingâ€¦
               </div>
             ) : (
               <div
@@ -441,7 +440,7 @@ export default function AttendancePage() {
                               lineHeight: 1,
                             }}
                           >
-                            ✕
+                            âœ•
                           </button>
                         )}
                       </div>
@@ -466,7 +465,7 @@ export default function AttendancePage() {
                           </span>
                           {(record.checkIn || record.checkOut) && (
                             <div style={{ fontSize: 9, textAlign: "center", color: "rgba(255,255,255,.3)", marginTop: 4, fontFamily: "monospace" }}>
-                              {formatTime(record.checkIn)} – {formatTime(record.checkOut)}
+                              {formatTime(record.checkIn)} â€“ {formatTime(record.checkOut)}
                             </div>
                           )}
                         </div>
@@ -500,14 +499,14 @@ export default function AttendancePage() {
             className="flex-1 flex flex-col items-center justify-center"
             style={{ color: "rgba(255,255,255,.2)" }}
           >
-            <div style={{ fontSize: 48, marginBottom: 16 }}>👈</div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>ðŸ‘ˆ</div>
             <p style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>Select an employee from the sidebar</p>
             <p style={{ fontSize: 12, marginTop: 6 }}>to view and manage their attendance calendar</p>
           </div>
         )}
       </div>
 
-      {/* ── MODAL ──────────────────────────────────────── */}
+      {/* â”€â”€ MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {selectedDate && selectedEmployeeId && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -542,7 +541,7 @@ export default function AttendancePage() {
                 onClick={() => setSelectedDate(null)}
                 style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", cursor: "pointer", fontSize: 16 }}
               >
-                ✕
+                âœ•
               </button>
             </div>
 
@@ -613,7 +612,7 @@ export default function AttendancePage() {
                 </label>
                 <input
                   type="text"
-                  placeholder="Optional note…"
+                  placeholder="Optional noteâ€¦"
                   value={formData.remarks}
                   onChange={e => setFormData({ ...formData, remarks: e.target.value })}
                   style={{
@@ -645,7 +644,7 @@ export default function AttendancePage() {
                   transition: "all .2s",
                 }}
               >
-                {loading ? "Saving…" : "Save Record"}
+                {loading ? "Savingâ€¦" : "Save Record"}
               </button>
             </form>
           </div>

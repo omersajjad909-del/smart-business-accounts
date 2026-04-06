@@ -1,4 +1,4 @@
-'use client';
+import { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n'use client';
 
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -101,7 +101,7 @@ export default function TaxConfigurationPage() {
     setFormData({
       taxType: tax.taxType,
       taxCode: tax.taxCode,
-      taxRate: tax.taxRate.toString(), // ✅ FIX
+      taxRate: tax.taxRate.toString(), // âœ… FIX
       description: tax.description || '',
     });
 
@@ -255,7 +255,7 @@ export default function TaxConfigurationPage() {
                   </button>
                   <button
                     onClick={async () => {
-                      if (!confirm('Are you sure? This cannot be undone.')) return;
+                      if (!await confirmToast('Are you sure? This cannot be undone.')) return;
                       try {
                         const response = await fetch(`/api/tax-configuration?id=${tax.id}`, {
                           method: 'DELETE',

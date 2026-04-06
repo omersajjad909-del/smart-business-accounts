@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useMemo, useState } from "react";
@@ -182,7 +181,7 @@ export default function TransportDispatchPage() {
       toast.success("Dispatched, arrived, or closed rows cannot be deleted.");
       return;
     }
-    if (!window.confirm(`Delete dispatch ${row.dispatchNo}?`)) return;
+    if (!await confirmToast(`Delete dispatch ${row.dispatchNo}?`)) return;
     await dispatchStore.remove(id);
   }
 

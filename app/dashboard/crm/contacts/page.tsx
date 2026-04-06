@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
@@ -85,7 +84,7 @@ export default function CrmContactsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this contact?")) return;
+    if (!await confirmToast("Are you sure you want to delete this contact?")) return;
 
     try {
       await fetch(`/api/crm/contacts?id=${id}`, { method: "DELETE" });
@@ -138,7 +137,7 @@ export default function CrmContactsPage() {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
-          📇 CRM Contacts Management
+          ðŸ“‡ CRM Contacts Management
         </h1>
 
         {/* Form */}

@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useMemo, useState } from "react";
@@ -206,7 +205,7 @@ export default function RestaurantOrdersPage() {
       toast.success("Only draft orders can be deleted.");
       return;
     }
-    if (!window.confirm(`Delete ${order.orderNo}?`)) return;
+    if (!await confirmToast(`Delete ${order.orderNo}?`)) return;
     await orderStore.remove(order.id);
   }
 

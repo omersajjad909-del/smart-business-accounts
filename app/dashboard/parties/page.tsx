@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useEffect, useState } from "react";
 import { getCurrentUser } from '@/lib/auth';
 
@@ -95,7 +94,7 @@ export default function PartyAccounts() {
   }
 
   async function deleteParty(id: string) {
-    if (!confirm("Delete this party? This cannot be undone.")) return;
+    if (!await confirmToast("Delete this party? This cannot be undone.")) return;
 
     await fetch(`/api/accounts?id=${id}`, {
       method: "DELETE",

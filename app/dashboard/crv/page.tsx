@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { toast } from "react-hot-toast";
@@ -118,7 +117,7 @@ export default function CRVPage() {
         const banksData = await banksRes.json();
 
         if (Array.isArray(accountsData)) {
-          // CRV میں CUSTOMER + BANKS دونوں ہونے چاہیے
+          // CRV Ù…ÛŒÚº CUSTOMER + BANKS Ø¯ÙˆÙ†ÙˆÚº ÛÙˆÙ†Û’ Ú†Ø§ÛÛŒÛ’
           const filtered = accountsData.filter(a => 
             a.partyType === "CUSTOMER" || a.partyType === "BANKS" || !a.partyType
           );
@@ -229,7 +228,7 @@ export default function CRVPage() {
   }
 
   async function deleteVoucher(id: string) {
-    if (!confirm("Are you sure you want to delete this CRV?")) {
+    if (!await confirmToast("Are you sure you want to delete this CRV?")) {
       return;
     }
 

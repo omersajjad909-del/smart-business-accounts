@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
@@ -97,7 +96,7 @@ export default function FinancialYearPage() {
   }
 
   async function closeYear(id: string) {
-    if (!confirm("Are you sure you want to close this financial year? This action cannot be undone.")) {
+    if (!await confirmToast("Are you sure you want to close this financial year? This action cannot be undone.")) {
       return;
     }
 

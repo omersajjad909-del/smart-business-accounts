@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
@@ -247,7 +246,7 @@ export default function OutwardPage() {
   }
 
   async function deleteOutward(id: string) {
-    if (!confirm("Are you sure you want to delete this outward?")) return;
+    if (!await confirmToast("Are you sure you want to delete this outward?")) return;
     try {
       const res = await fetch(`/api/outward?id=${id}`, {
         method: "DELETE",
@@ -397,7 +396,7 @@ export default function OutwardPage() {
       {showForm && (
         <>
           <div className="mb-2 text-xs text-gray-500 italic">
-            💡 Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
+            ðŸ’¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
           </div>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="flex flex-col">

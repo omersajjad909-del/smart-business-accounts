@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import toast from "react-hot-toast";
@@ -94,7 +93,7 @@ export default function StockRatePage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this rate?")) {
+    if (!await confirmToast("Are you sure you want to delete this rate?")) {
       return;
     }
 

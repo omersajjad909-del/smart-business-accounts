@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
@@ -225,7 +224,7 @@ export default function PayrollPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this payroll record?") || !user) return;
+    if (!await confirmToast("Delete this payroll record?") || !user) return;
     await fetch(`/api/payroll?id=${id}`, {
       method: "DELETE",
       headers: { "x-user-role": user.role, "x-user-id": user.id },
@@ -332,7 +331,7 @@ export default function PayrollPage() {
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-black text-gray-800">💰 Payroll</h1>
+            <h1 className="text-3xl font-black text-gray-800">ðŸ’° Payroll</h1>
             <input
               type="month"
               value={monthYear}
@@ -345,13 +344,13 @@ export default function PayrollPage() {
               onClick={() => setShowPreview(true)}
               className="bg-gray-800 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-black transition-all"
             >
-              👁️ Show Preview
+              ðŸ‘ï¸ Show Preview
             </button>
             <button
               onClick={() => window.print()}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow-md transition-all"
             >
-              🖨️ Print Now
+              ðŸ–¨ï¸ Print Now
             </button>
           </div>
         </div>

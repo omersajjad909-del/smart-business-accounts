@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
@@ -142,7 +141,7 @@ export default function CreditLimitsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this credit limit record?")) return;
+    if (!await confirmToast("Delete this credit limit record?")) return;
     try { await remove(id); } catch {}
   }
 
@@ -200,7 +199,7 @@ export default function CreditLimitsPage() {
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
-          Loading credit limits…
+          Loading credit limitsâ€¦
         </div>
       )}
 
@@ -349,7 +348,7 @@ export default function CreditLimitsPage() {
                   cursor: saving ? "not-allowed" : "pointer", opacity: saving ? .7 : 1,
                 }}
               >
-                {saving ? "Saving…" : editId ? "Update" : "Save Limit"}
+                {saving ? "Savingâ€¦" : editId ? "Update" : "Save Limit"}
               </button>
             </div>
           </div>

@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
@@ -124,7 +123,7 @@ export default function ItemsNewPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure? This cannot be undone.")) return;
+    if (!await confirmToast("Are you sure? This cannot be undone.")) return;
 
     try {
       const res = await fetch(`/api/items-new?id=${id}`, {
@@ -214,7 +213,7 @@ export default function ItemsNewPage() {
           onChange={(e) => setRate(e.target.value)}
         />
 
-        {/* 📉 MIN STOCK INPUT */}
+        {/* ðŸ“‰ MIN STOCK INPUT */}
         <input
           className="border p-2 rounded bg-yellow-50"
           type="number"
@@ -223,7 +222,7 @@ export default function ItemsNewPage() {
           onChange={(e) => setMinStock(e.target.value)}
         />
 
-        {/* 📟 BARCODE INPUT */}
+        {/* ðŸ“Ÿ BARCODE INPUT */}
         <input
           className="border p-2 rounded bg-gray-50"
           placeholder="Scan Barcode / SKU"

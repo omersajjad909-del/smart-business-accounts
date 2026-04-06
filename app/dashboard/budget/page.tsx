@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
@@ -116,7 +115,7 @@ export default function BudgetPage() {
   }
 
   async function deleteBudget(id: string) {
-    if (!confirm("Are you sure you want to delete this budget?")) return;
+    if (!await confirmToast("Are you sure you want to delete this budget?")) return;
 
     try {
       const user = getCurrentUser();
@@ -171,7 +170,7 @@ export default function BudgetPage() {
             onClick={exportBudgets}
             className="bg-green-600 text-white px-6 py-2 rounded font-bold"
           >
-            📥 Export CSV
+            ðŸ“¥ Export CSV
           </button>
         )}
       </div>

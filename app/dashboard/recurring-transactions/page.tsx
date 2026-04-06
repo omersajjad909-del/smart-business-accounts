@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
@@ -174,7 +173,7 @@ export default function RecurringTransactionsPage() {
   }
 
   async function deleteTransaction(id: string) {
-    if (!confirm("Are you sure you want to delete this recurring transaction?")) {
+    if (!await confirmToast("Are you sure you want to delete this recurring transaction?")) {
       return;
     }
 

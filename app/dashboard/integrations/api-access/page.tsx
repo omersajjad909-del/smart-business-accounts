@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useEffect, useMemo, useState } from "react";
 
 type ApiKeyRecord = {
@@ -81,7 +80,7 @@ export default function ApiAccessPage() {
   }
 
   async function revokeKey(keyId: string) {
-    if (!confirm("Revoke this API key? Existing integrations using it will stop working.")) return;
+    if (!await confirmToast("Revoke this API key? Existing integrations using it will stop working.")) return;
     setRevokingId(keyId);
     setError(null);
     try {

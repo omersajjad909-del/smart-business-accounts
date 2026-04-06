@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useMemo, useState } from "react";
@@ -246,7 +245,7 @@ export default function DeliveryPage() {
       return;
     }
 
-    const confirmed = window.confirm(
+    const confirmed = await confirmToast(
       nextStatus === "delivered"
         ? `Mark ${delivery.customer} as delivered?`
         : nextStatus === "failed"
@@ -267,7 +266,7 @@ export default function DeliveryPage() {
       toast.error("Mark the delivery failed before deleting a dispatched record.");
       return;
     }
-    if (!window.confirm(`Delete delivery for ${delivery.customer}?`)) return;
+    if (!await confirmToast(`Delete delivery for ${delivery.customer}?`)) return;
     await deliveryRecords.remove(delivery.id);
   }
 

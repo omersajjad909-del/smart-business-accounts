@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -80,7 +79,7 @@ export default function PatientsPage() {
       toast("Resolve linked appointments, prescriptions, and lab tests before removing this patient.");
       return;
     }
-    if (!window.confirm(`Remove ${patientName}?`)) return;
+    if (!await confirmToast(`Remove ${patientName}?`)) return;
     await remove(patientId);
   }
 
@@ -156,7 +155,7 @@ export default function PatientsPage() {
                     <span style={{ background: `${statusColor[p.status]}22`, color: statusColor[p.status], padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600 }}>{statusLabel[p.status] || p.status}</span>
                   </td>
                   <td style={{ padding: "13px 16px" }}>
-                    <span style={{ color: p.insurance ? "#22c55e" : "rgba(255,255,255,0.3)", fontSize: 16 }}>{p.insurance ? "✓" : "✗"}</span>
+                    <span style={{ color: p.insurance ? "#22c55e" : "rgba(255,255,255,0.3)", fontSize: 16 }}>{p.insurance ? "âœ“" : "âœ—"}</span>
                   </td>
                 </tr>
               ))}
@@ -167,7 +166,7 @@ export default function PatientsPage() {
         {/* Detail Panel */}
         {selectedPatient && (
           <div style={{ ...card, position: "relative" }}>
-            <button onClick={() => setSelected(null)} style={{ position: "absolute", top: 16, right: 16, background: "transparent", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 18, cursor: "pointer" }}>✕</button>
+            <button onClick={() => setSelected(null)} style={{ position: "absolute", top: 16, right: 16, background: "transparent", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 18, cursor: "pointer" }}>âœ•</button>
             <div style={{ marginBottom: 16 }}>
               <span style={{ background: `${statusColor[selectedPatient.status]}22`, color: statusColor[selectedPatient.status], padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600 }}>{statusLabel[selectedPatient.status]}</span>
               {selectedPatient.insurance && <span style={{ marginLeft: 8, background: "rgba(34,197,94,0.15)", color: "#22c55e", padding: "4px 10px", borderRadius: 20, fontSize: 12 }}>Insured</span>}
@@ -204,7 +203,7 @@ export default function PatientsPage() {
           <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 540, maxHeight: "85vh", overflowY: "auto", fontFamily: ff }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>{form.id ? "Edit Patient" : "Add Patient"}</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
+              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer" }}>âœ•</button>
             </div>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>

@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -23,7 +22,7 @@ export default function YearEndClosingPage() {
   const [error, setError] = useState("");
 
   async function runClosing() {
-    if (!confirm("Year end closing is irreversible. All Income & Expense account balances will be zeroed and the net result transferred to Capital / Retained Earnings. Are you sure?")) return;
+    if (!await confirmToast("Year end closing is irreversible. All Income & Expense account balances will be zeroed and the net result transferred to Capital / Retained Earnings. Are you sure?")) return;
 
     setLoading(true);
     setError("");
@@ -86,7 +85,7 @@ export default function YearEndClosingPage() {
           lineHeight: 1.7,
         }}
       >
-        <strong>Warning — this action is irreversible.</strong>
+        <strong>Warning â€” this action is irreversible.</strong>
         <br />
         Running year-end closing will zero all Income &amp; Expense account balances for the period and post the net profit or loss as a journal entry to Capital / Retained Earnings.
         Ensure all transactions for the year have been posted and reconciled before proceeding.

@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useMemo, useState } from "react";
@@ -160,7 +159,7 @@ export default function TransportExpensesPage() {
       toast.success("Posted expenses cannot be deleted.");
       return;
     }
-    if (!window.confirm(`Delete expense ${row.expenseNo}?`)) return;
+    if (!await confirmToast(`Delete expense ${row.expenseNo}?`)) return;
     await expenseStore.remove(id);
   }
 

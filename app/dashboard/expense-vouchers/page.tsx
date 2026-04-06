@@ -1,4 +1,4 @@
-'use client';
+import { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n'use client';
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -187,7 +187,7 @@ export default function ExpenseVouchersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure? This cannot be undone.')) return;
+    if (!await confirmToast('Are you sure? This cannot be undone.')) return;
 
     try {
       const response = await fetch(`/api/expense-vouchers?id=${id}`, {

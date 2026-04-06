@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
@@ -165,7 +164,7 @@ export default function DistributionRoutesPage() {
                   <button onClick={() => update(route.id, { status: route.status === "active" ? "inactive" : "active" })} style={{ padding: "6px 10px", background: "rgba(249,115,22,.15)", border: "1px solid rgba(249,115,22,.3)", color: "#f97316", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     {route.status === "active" ? "Pause" : "Activate"}
                   </button>
-                  <button onClick={() => { if (window.confirm(`Delete route ${route.name}?`)) void remove(route.id); }} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                  <button onClick={() => { if (await confirmToast(`Delete route ${route.name}?`)) void remove(route.id); }} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Delete
                   </button>
                 </td>

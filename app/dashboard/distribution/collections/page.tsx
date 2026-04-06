@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useMemo, useState } from "react";
@@ -153,7 +152,7 @@ export default function DistributionCollectionsPage() {
 
   async function reconcileCollection(row: (typeof collections)[number]) {
     if (row.status === "reconciled") return;
-    if (!window.confirm(`Mark collection for ${row.customerName} as reconciled?`)) return;
+    if (!await confirmToast(`Mark collection for ${row.customerName} as reconciled?`)) return;
     await collectionRecords.update(row.id, { status: "reconciled" });
   }
 
@@ -162,7 +161,7 @@ export default function DistributionCollectionsPage() {
       toast.success("Reconciled collections cannot be deleted.");
       return;
     }
-    if (!window.confirm(`Delete collection for ${row.customerName}?`)) return;
+    if (!await confirmToast(`Delete collection for ${row.customerName}?`)) return;
     await collectionRecords.remove(row.id);
   }
 

@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
@@ -123,7 +122,7 @@ export default function PriceListsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this price list?")) return;
+    if (!await confirmToast("Delete this price list?")) return;
     try { await remove(id); } catch {}
   }
 
@@ -165,7 +164,7 @@ export default function PriceListsPage() {
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
-          Loading price lists…
+          Loading price listsâ€¦
         </div>
       )}
 
@@ -304,7 +303,7 @@ export default function PriceListsPage() {
                 <label style={labelStyle}>Notes</label>
                 <textarea
                   style={{ ...inputStyle, minHeight: 72, resize: "vertical" }}
-                  placeholder="Optional notes…"
+                  placeholder="Optional notesâ€¦"
                   value={form.notes}
                   onChange={(e) => setField("notes", e.target.value)}
                 />
@@ -330,7 +329,7 @@ export default function PriceListsPage() {
                   cursor: saving ? "not-allowed" : "pointer", opacity: saving ? .7 : 1,
                 }}
               >
-                {saving ? "Saving…" : "Create List"}
+                {saving ? "Savingâ€¦" : "Create List"}
               </button>
             </div>
           </div>

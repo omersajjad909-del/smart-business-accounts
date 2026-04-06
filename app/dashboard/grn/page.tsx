@@ -1,5 +1,4 @@
-"use client";
-import { useEffect, useState } from "react";
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`nimport { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -167,7 +166,7 @@ export default function GRNPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this GRN?")) return;
+    if (!await confirmToast("Delete this GRN?")) return;
     const res = await fetch(`/api/grn?id=${id}`, { method: "DELETE", headers: buildHeaders() });
     if (res.ok) {
       toast.success("Deleted");
@@ -291,7 +290,7 @@ export default function GRNPage() {
                   <option value="">-- Select PO (optional) --</option>
                   {pos.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.poNo} — {p.supplier.name}
+                      {p.poNo} â€” {p.supplier.name}
                     </option>
                   ))}
                 </select>
@@ -414,7 +413,7 @@ export default function GRNPage() {
                           onClick={() => removeRow(idx)}
                           className="text-red-400 hover:text-red-600 text-lg leading-none"
                         >
-                          ×
+                          Ã—
                         </button>
                       </td>
                     </tr>

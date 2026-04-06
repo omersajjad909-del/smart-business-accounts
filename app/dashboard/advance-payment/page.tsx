@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
@@ -247,7 +246,7 @@ export default function AdvancePaymentPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this advance payment?")) return;
+    if (!await confirmToast("Are you sure you want to delete this advance payment?")) return;
 
     try {
       const res = await fetch(`/api/advance-payment?id=${id}`, {
@@ -297,7 +296,7 @@ function getStatusBadge(status: string) {
   return (
     <ResponsiveContainer>
       <PageHeader
-        title="💰 Advance Payment to Suppliers"
+        title="ðŸ’° Advance Payment to Suppliers"
         description="Track supplier advances and adjust against invoices"
         action={{
           label: showForm ? "Cancel" : "+ New Advance Payment",

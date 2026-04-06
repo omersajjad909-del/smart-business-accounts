@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from 'react';
@@ -213,7 +212,7 @@ export default function PaymentReceiptsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure? This cannot be undone.')) return;
+    if (!await confirmToast('Are you sure? This cannot be undone.')) return;
     
     try {
       const response = await fetch(`/api/payment-receipts?id=${id}`, {
@@ -233,7 +232,7 @@ export default function PaymentReceiptsPage() {
   };
 
   const handleClearCheque = async (receipt: PaymentReceipt) => {
-    if (!confirm(`Clear cheque ${receipt.referenceNo || receipt.receiptNo}?`)) return;
+    if (!await confirmToast(`Clear cheque ${receipt.referenceNo || receipt.receiptNo}?`)) return;
     
     try {
       const response = await fetch(`/api/payment-receipts?id=${receipt.id}`, {
@@ -515,7 +514,7 @@ export default function PaymentReceiptsPage() {
                         onClick={() => handleClearCheque(receipt)}
                         className="text-green-600 hover:text-green-800 font-medium text-sm"
                       >
-                        Clear ✓
+                        Clear âœ“
                       </button>
                     )}
                     <button

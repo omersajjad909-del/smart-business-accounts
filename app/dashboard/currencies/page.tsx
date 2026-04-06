@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -89,14 +88,14 @@ export default function CurrenciesPage() {
         showToast("Error: " + (data.error || "Failed to save"));
       }
     } catch {
-      showToast("Network error — please try again");
+      showToast("Network error â€” please try again");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this currency?")) return;
+    if (!await confirmToast("Delete this currency?")) return;
     try {
       const response = await fetch(`/api/currencies?id=${id}`, {
         method: "DELETE",
@@ -111,7 +110,7 @@ export default function CurrenciesPage() {
         showToast("Error: " + (data.error || "Failed to delete"));
       }
     } catch {
-      showToast("Network error — please try again");
+      showToast("Network error â€” please try again");
     }
   };
 

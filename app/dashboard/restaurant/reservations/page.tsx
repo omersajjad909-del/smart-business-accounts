@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useMemo, useState } from "react";
@@ -127,7 +126,7 @@ export default function RestaurantReservationsPage() {
       toast.success("Only confirmed reservations can be marked arrived.");
       return;
     }
-    if (!window.confirm(`Change ${reservation.guestName} to ${nextStatus}?`)) return;
+    if (!await confirmToast(`Change ${reservation.guestName} to ${nextStatus}?`)) return;
 
     if (nextStatus === "confirmed") {
       if (hasOpenOrders(reservation.tableRef)) {
@@ -157,7 +156,7 @@ export default function RestaurantReservationsPage() {
       toast.success("Arrived reservations cannot be deleted.");
       return;
     }
-    if (!window.confirm(`Delete reservation for ${reservation.guestName}?`)) return;
+    if (!await confirmToast(`Delete reservation for ${reservation.guestName}?`)) return;
     await reservationStore.remove(reservation.id);
     await releaseTableIfFree(reservation.tableRef, reservation.id);
   }

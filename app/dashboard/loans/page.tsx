@@ -1,5 +1,4 @@
-"use client";
-
+"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
 import toast from "react-hot-toast";
 
 import { useState, useEffect } from 'react';
@@ -207,7 +206,7 @@ export default function LoansPage() {
   };
 
   const handleDeleteLoan = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this loan?')) return;
+    if (!await confirmToast('Are you sure you want to delete this loan?')) return;
 
     try {
       const response = await fetch(`/api/loans?id=${id}`, {
@@ -280,7 +279,7 @@ export default function LoansPage() {
                 onClick={() => setShowLoanForm(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                ✕
+                âœ•
               </button>
             </div>
 
@@ -388,7 +387,7 @@ export default function LoansPage() {
                 onClick={() => setShowPaymentForm(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                ✕
+                âœ•
               </button>
             </div>
 
@@ -403,7 +402,7 @@ export default function LoansPage() {
                   <option value="">Select Loan</option>
                   {loans.filter(l => l.status === 'ACTIVE').map((loan) => (
                     <option key={loan.id} value={loan.id}>
-                      {loan.loanNumber} - {loan.loanType} (EMI: ₹{loan.emi.toFixed(2)})
+                      {loan.loanNumber} - {loan.loanType} (EMI: â‚¹{loan.emi.toFixed(2)})
                     </option>
                   ))}
                 </select>
@@ -487,10 +486,10 @@ export default function LoansPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4">{loan.loanType.replace('_', ' ')}</td>
-                      <td className="py-3 px-4 text-right">₹{loan.principalAmount.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right font-medium">₹{loan.emi.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right">â‚¹{loan.principalAmount.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right font-medium">â‚¹{loan.emi.toFixed(2)}</td>
                       <td className="py-3 px-4 text-right text-red-600 font-medium">
-                        ₹{loan.outstandingAmount.toFixed(2)}
+                        â‚¹{loan.outstandingAmount.toFixed(2)}
                       </td>
                       <td className="py-3 px-4">
                         <div className="text-sm">
@@ -524,15 +523,15 @@ export default function LoansPage() {
                       {getStatusBadge(loan.status)}
                     </div>
                     <MobileCardRow label="Lender" value={loan.account?.name || 'N/A'} />
-                    <MobileCardRow label="Principal" value={`₹${loan.principalAmount.toFixed(2)}`} />
+                    <MobileCardRow label="Principal" value={`â‚¹${loan.principalAmount.toFixed(2)}`} />
                     <MobileCardRow 
                       label="EMI" 
-                      value={`₹${loan.emi.toFixed(2)}`}
+                      value={`â‚¹${loan.emi.toFixed(2)}`}
                       valueClassName="font-medium"
                     />
                     <MobileCardRow 
                       label="Outstanding" 
-                      value={`₹${loan.outstandingAmount.toFixed(2)}`}
+                      value={`â‚¹${loan.outstandingAmount.toFixed(2)}`}
                       valueClassName="font-medium text-red-600"
                     />
                     <MobileCardRow label="Tenure" value={`${loan.tenure} months @ ${loan.interestRate}%`} />
@@ -572,7 +571,7 @@ export default function LoansPage() {
                 }}
                 className="text-blue-600 hover:text-blue-800 mb-2"
               >
-                ← Back to Loans
+                â† Back to Loans
               </button>
               <h2 className="text-lg font-semibold">
                 Payment History - {loans.find(l => l.id === selectedLoan)?.loanNumber}
@@ -609,11 +608,11 @@ export default function LoansPage() {
                   {payments.map((payment) => (
                     <tr key={payment.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 px-4">{new Date(payment.paymentDate).toLocaleDateString()}</td>
-                      <td className="py-3 px-4 text-right font-medium">₹{payment.amount.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right">₹{payment.principalPaid.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right">₹{payment.interestPaid.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right font-medium">â‚¹{payment.amount.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right">â‚¹{payment.principalPaid.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right">â‚¹{payment.interestPaid.toFixed(2)}</td>
                       <td className="py-3 px-4 text-right text-red-600 font-medium">
-                        ₹{payment.outstandingBalance.toFixed(2)}
+                        â‚¹{payment.outstandingBalance.toFixed(2)}
                       </td>
                     </tr>
                   ))}
@@ -627,14 +626,14 @@ export default function LoansPage() {
                     <MobileCardRow label="Date" value={new Date(payment.paymentDate).toLocaleDateString()} />
                     <MobileCardRow 
                       label="Amount Paid" 
-                      value={`₹${payment.amount.toFixed(2)}`}
+                      value={`â‚¹${payment.amount.toFixed(2)}`}
                       valueClassName="font-medium"
                     />
-                    <MobileCardRow label="Principal" value={`₹${payment.principalPaid.toFixed(2)}`} />
-                    <MobileCardRow label="Interest" value={`₹${payment.interestPaid.toFixed(2)}`} />
+                    <MobileCardRow label="Principal" value={`â‚¹${payment.principalPaid.toFixed(2)}`} />
+                    <MobileCardRow label="Interest" value={`â‚¹${payment.interestPaid.toFixed(2)}`} />
                     <MobileCardRow 
                       label="Outstanding" 
-                      value={`₹${payment.outstandingBalance.toFixed(2)}`}
+                      value={`â‚¹${payment.outstandingBalance.toFixed(2)}`}
                       valueClassName="font-medium text-red-600"
                     />
                   </MobileCard>

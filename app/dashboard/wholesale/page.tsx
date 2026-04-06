@@ -1,209 +1,254 @@
 "use client";
-import { useEffect, useState } from "react";
+
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
 
-type Stat = { label: string; value: string; color: string };
+const wholesaleBg = "rgba(255,255,255,.035)";
+const wholesaleBorder = "rgba(255,255,255,.08)";
+const wholesaleMuted = "rgba(255,255,255,.56)";
+const wholesaleFont = "'Outfit','Inter',sans-serif";
 
-const QUICK_LINKS = [
-  { label: "Sales Invoice", href: "/dashboard/sales-invoice", icon: "🧾" },
-  { label: "Purchase Order", href: "/dashboard/purchase-order", icon: "📋" },
-  { label: "Purchase Invoice", href: "/dashboard/purchase-invoice", icon: "📦" },
-  { label: "Inventory", href: "/dashboard/inventory", icon: "🏭" },
-  { label: "GRN", href: "/dashboard/grn", icon: "✅" },
-  { label: "Parties", href: "/dashboard/parties", icon: "👥" },
-  { label: "Ageing Report", href: "/dashboard/reports/ageing", icon: "⏰" },
-  { label: "Stock Report", href: "/dashboard/stock-report", icon: "📊" },
-];
+type Summary = {
+  totalRevenue?: number;
+  totalPurchases?: number;
+  totalReceivable?: number;
+  totalPayable?: number;
+};
 
-const MODULES = [
-  {
-    title: "Procurement",
-    icon: "📦",
-    desc: "Manage supplier orders, goods receipt, and purchase invoicing",
-    links: [
-      { label: "Purchase Orders", href: "/dashboard/purchase-order" },
-      { label: "Goods Receipt Note (GRN)", href: "/dashboard/grn" },
-      { label: "Purchase Invoices", href: "/dashboard/purchase-invoice" },
-      { label: "Debit Notes", href: "/dashboard/debit-note" },
-    ],
-  },
-  {
-    title: "Sales & Distribution",
-    icon: "🚚",
-    desc: "Handle bulk sales, quotations, and delivery",
-    links: [
-      { label: "Sales Invoices", href: "/dashboard/sales-invoice" },
-      { label: "Quotations", href: "/dashboard/quotation" },
-      { label: "Delivery Challan", href: "/dashboard/delivery-challan" },
-      { label: "Sale Returns", href: "/dashboard/sale-return" },
-      { label: "Credit Notes", href: "/dashboard/credit-note" },
-    ],
-  },
-  {
-    title: "Inventory & Warehouse",
-    icon: "🏭",
-    desc: "Stock management, reordering, and location tracking",
-    links: [
-      { label: "Inventory Overview", href: "/dashboard/inventory" },
-      { label: "Stock Rates", href: "/dashboard/stock-rate" },
-      { label: "Stock Report", href: "/dashboard/stock-report" },
-      { label: "Outward Register", href: "/dashboard/outward" },
-      { label: "Barcode", href: "/dashboard/barcode" },
-    ],
-  },
-  {
-    title: "Parties & Accounts",
-    icon: "👥",
-    desc: "Suppliers, customers, and outstanding management",
-    links: [
-      { label: "Parties", href: "/dashboard/parties" },
-      { label: "Chart of Accounts", href: "/dashboard/accounts" },
-      { label: "Ageing Report", href: "/dashboard/reports/ageing" },
-      { label: "Advance Payments", href: "/dashboard/advance-payment" },
-    ],
-  },
-  {
-    title: "Financials",
-    icon: "💰",
-    desc: "Full accounting suite for wholesale operations",
-    links: [
-      { label: "Ledger Report", href: "/dashboard/reports/ledger" },
-      { label: "Trial Balance", href: "/dashboard/trial-balance" },
-      { label: "Profit & Loss", href: "/dashboard/reports/profit-loss" },
-      { label: "Journal Voucher", href: "/dashboard/jv" },
-    ],
-  },
-  {
-    title: "Banking & Cash",
-    icon: "🏦",
-    desc: "Cash payments, receipts, and bank reconciliation",
-    links: [
-      { label: "Payment Receipts", href: "/dashboard/payment-receipts" },
-      { label: "CPV", href: "/dashboard/cpv" },
-      { label: "CRV", href: "/dashboard/crv" },
-      { label: "Bank Reconciliation", href: "/dashboard/bank-reconciliation" },
-    ],
-  },
-  {
-    title: "Reports",
-    icon: "📊",
-    desc: "Sales, purchase, and inventory analytics",
-    links: [
-      { label: "Sales Report", href: "/dashboard/reports/sales" },
-      { label: "Stock Summary", href: "/dashboard/reports/inventory/stock-summary" },
-      { label: "Low Stock Alerts", href: "/dashboard/reports/stock/low" },
-      { label: "Cash Flow", href: "/dashboard/reports/cash-flow" },
-    ],
-  },
-  {
-    title: "Operations",
-    icon: "⚙️",
-    desc: "Employees, branches, and business settings",
-    links: [
-      { label: "Employees", href: "/dashboard/employees" },
-      { label: "Branches", href: "/dashboard/branches" },
-      { label: "Department Budgets", href: "/dashboard/department-budgets" },
-      { label: "Import Wizard", href: "/dashboard/import-wizard" },
-    ],
-  },
-];
+function formatCompact(value: number) {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toLocaleString();
+}
+
+function formatMoney(value: number) {
+  return `Rs. ${value.toLocaleString()}`;
+}
+
+function mapWarehouse(record: BusinessRecord) {
+  return {
+    id: record.id,
+    name: record.title,
+    location: (record.data.location as string) || "Unassigned",
+    status: record.status || "ACTIVE",
+    itemsCount: Number(record.data.itemsCount || 0),
+    stockValue: Number(record.amount || 0),
+    capacity: Number(record.data.capacity || 0),
+    capacityUsed: Number(record.data.capacityUsed || 0),
+  };
+}
+
+function mapTransfer(record: BusinessRecord) {
+  return {
+    id: record.id,
+    item: (record.data.item as string) || record.title,
+    from: (record.data.from as string) || "Unknown",
+    to: (record.data.to as string) || "Unknown",
+    qty: Number(record.data.qty || 0),
+    status: record.status || "COMPLETED",
+    date: record.date || record.createdAt,
+  };
+}
+
+function StatCard({ label, value, tone, sub }: { label: string; value: string | number; tone: string; sub?: string }) {
+  return (
+    <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 18, padding: "20px 22px" }}>
+      <div style={{ fontSize: 12, color: wholesaleMuted, marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</div>
+      <div style={{ fontSize: 28, fontWeight: 800, color: tone }}>{value}</div>
+      {sub ? <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", marginTop: 8 }}>{sub}</div> : null}
+    </div>
+  );
+}
 
 export default function WholesaleDashboard() {
-  const [stats, setStats] = useState<Stat[]>([
-    { label: "Revenue (This Month)", value: "—", color: "#22c55e" },
-    { label: "Purchases (This Month)", value: "—", color: "#818cf8" },
-    { label: "Outstanding Receivable", value: "—", color: "#f59e0b" },
-    { label: "Outstanding Payable", value: "—", color: "#f87171" },
-  ]);
+  const warehouseStore = useBusinessRecords("warehouse");
+  const transferStore = useBusinessRecords("stock_transfer");
+  const [summary, setSummary] = useState<Summary>({});
 
   useEffect(() => {
+    let active = true;
     fetch("/api/reports/dashboard-summary")
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (!d) return;
-        const fmt = (n: number) => n >= 1000000
-          ? `${(n / 1000000).toFixed(1)}M`
-          : n >= 1000
-          ? `${(n / 1000).toFixed(1)}K`
-          : String(n ?? 0);
-        setStats([
-          { label: "Revenue (This Month)", value: fmt(d.totalRevenue ?? 0), color: "#22c55e" },
-          { label: "Purchases (This Month)", value: fmt(d.totalPurchases ?? 0), color: "#818cf8" },
-          { label: "Outstanding Receivable", value: fmt(d.totalReceivable ?? 0), color: "#f59e0b" },
-          { label: "Outstanding Payable", value: fmt(d.totalPayable ?? 0), color: "#f87171" },
-        ]);
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active || !data) return;
+        setSummary({
+          totalRevenue: Number(data.totalRevenue || 0),
+          totalPurchases: Number(data.totalPurchases || 0),
+          totalReceivable: Number(data.totalReceivable || 0),
+          totalPayable: Number(data.totalPayable || 0),
+        });
       })
       .catch(() => {});
+    return () => {
+      active = false;
+    };
   }, []);
 
+  const warehouses = useMemo(() => warehouseStore.records.map(mapWarehouse), [warehouseStore.records]);
+  const transfers = useMemo(() => transferStore.records.map(mapTransfer), [transferStore.records]);
+
+  const activeWarehouses = warehouses.filter((row) => row.status === "ACTIVE").length;
+  const totalStockValue = warehouses.reduce((sum, row) => sum + row.stockValue, 0);
+  const totalSkuCoverage = warehouses.reduce((sum, row) => sum + row.itemsCount, 0);
+  const activeTransfers = transfers.filter((row) => row.status === "PENDING" || row.status === "IN_TRANSIT").length;
+  const highUtilization = warehouses.filter((row) => row.capacity > 0 && row.capacityUsed / row.capacity >= 0.8).length;
+
+  const warehouseWatchlist = [...warehouses]
+    .sort((a, b) => b.stockValue - a.stockValue)
+    .slice(0, 5);
+
+  const transferWatchlist = [...transfers]
+    .sort((a, b) => new Date(b.date || "").getTime() - new Date(a.date || "").getTime())
+    .slice(0, 6);
+
   return (
-    <div style={{ padding: "28px 32px", fontFamily: "'Inter',sans-serif", color: "#e2e8f0" }}>
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-          <span style={{ fontSize: 24 }}>🏭</span>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: "white", margin: 0 }}>Wholesale Dashboard</h1>
-        </div>
-        <p style={{ color: "rgba(255,255,255,.45)", fontSize: 14, margin: 0 }}>
-          Bulk trading, distribution & wholesale business management
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14, marginBottom: 32 }}>
-        {stats.map(s => (
-          <div key={s.label} style={{
-            background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
-            borderRadius: 14, padding: "18px 20px",
-          }}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{s.label}</div>
-            <div style={{ fontSize: 28, fontWeight: 800, color: s.color }}>{s.value}</div>
+    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: wholesaleFont }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
+        <div>
+          <div style={{ fontSize: 12, color: "#fbbf24", fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>
+            Wholesale / Distribution
           </div>
-        ))}
-      </div>
-
-      {/* Quick Links */}
-      <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.5)", marginBottom: 12, letterSpacing: ".06em" }}>QUICK ACTIONS</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-          {QUICK_LINKS.map(q => (
-            <Link key={q.label} href={q.href} style={{
-              display: "flex", alignItems: "center", gap: 8,
-              padding: "10px 16px", borderRadius: 10,
-              background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)",
-              color: "#c7d2fe", fontSize: 13, fontWeight: 600, textDecoration: "none",
-            }}>
-              <span>{q.icon}</span> {q.label}
+          <h1 style={{ margin: "0 0 8px", fontSize: 30, fontWeight: 900 }}>Wholesale Command Center</h1>
+          <p style={{ margin: 0, fontSize: 14, color: wholesaleMuted, maxWidth: 760 }}>
+            Procurement, warehousing, bulk sales, and receivable pressure in one live overview for high-volume trading teams.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {[
+            { label: "Sales Invoice", href: "/dashboard/sales-invoice" },
+            { label: "Purchase Order", href: "/dashboard/purchase-order" },
+            { label: "Inventory", href: "/dashboard/inventory" },
+            { label: "Warehouses", href: "/dashboard/warehouses" },
+            { label: "Parties", href: "/dashboard/parties" },
+            { label: "Stock Report", href: "/dashboard/stock-report" },
+            { label: "Ageing", href: "/dashboard/reports/ageing" },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                padding: "10px 14px",
+                borderRadius: 10,
+                border: `1px solid ${wholesaleBorder}`,
+                background: wholesaleBg,
+                color: "#fde68a",
+                textDecoration: "none",
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+            >
+              {item.label}
             </Link>
           ))}
         </div>
       </div>
 
-      {/* Modules Grid */}
-      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.5)", marginBottom: 14, letterSpacing: ".06em" }}>ALL MODULES</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 14 }}>
-        {MODULES.map(m => (
-          <div key={m.title} style={{
-            background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
-            borderRadius: 14, padding: "20px 22px",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 18 }}>{m.icon}</span>
-              <span style={{ fontSize: 15, fontWeight: 700, color: "white" }}>{m.title}</span>
-            </div>
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)", margin: "0 0 12px" }}>{m.desc}</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {m.links.map(l => (
-                <Link key={l.href} href={l.href} style={{
-                  fontSize: 13, color: "#a5b4fc", textDecoration: "none",
-                  padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,.05)",
-                }}>
-                  → {l.label}
-                </Link>
-              ))}
-            </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 14, marginBottom: 26 }}>
+        <StatCard label="Revenue" value={formatCompact(summary.totalRevenue || 0)} tone="#34d399" sub="This month" />
+        <StatCard label="Purchases" value={formatCompact(summary.totalPurchases || 0)} tone="#818cf8" sub="This month" />
+        <StatCard label="Receivable" value={formatCompact(summary.totalReceivable || 0)} tone="#f59e0b" sub="Outstanding" />
+        <StatCard label="Payable" value={formatCompact(summary.totalPayable || 0)} tone="#f87171" sub="Outstanding" />
+        <StatCard label="Stock Value" value={formatCompact(totalStockValue)} tone="#38bdf8" sub={`${activeWarehouses} active warehouses`} />
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
+        <div style={{ background: "linear-gradient(135deg, rgba(245,158,11,.14), rgba(59,130,246,.10))", border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 24 }}>
+          <div style={{ fontSize: 13, color: "#fde68a", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
+            Operating Flow
           </div>
-        ))}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
+            {[
+              { title: "Procure", body: "Purchase orders, GRN, and supplier billing stay aligned." },
+              { title: "Store", body: "Warehouse capacity, stock value, and SKU spread remain visible." },
+              { title: "Distribute", body: "Delivery and stock movement keep dispatch smooth." },
+              { title: "Recover Cash", body: "Receivable, payable, and ageing pressure stay monitored." },
+            ].map((step, index) => (
+              <div key={step.title} style={{ background: "rgba(8,12,30,.34)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(251,191,36,.18)", color: "#fde68a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>
+                  {index + 1}
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,.62)", lineHeight: 1.55 }}>{step.body}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 24 }}>
+          <div style={{ fontSize: 13, color: "#93c5fd", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>
+            Operations Snapshot
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {[
+              { label: "Warehouses live", value: activeWarehouses, tone: "#34d399" },
+              { label: "SKU coverage", value: totalSkuCoverage.toLocaleString(), tone: "#fde68a" },
+              { label: "Transfer jobs open", value: activeTransfers, tone: "#60a5fa" },
+              { label: "High utilization sites", value: highUtilization, tone: "#f59e0b" },
+              { label: "Total stock value", value: formatMoney(totalStockValue), tone: "#38bdf8" },
+            ].map((row) => (
+              <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
+                <div style={{ fontSize: 13, color: wholesaleMuted }}>{row.label}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: row.tone }}>{row.value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+        <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
+          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+            Warehouse Watchlist
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {warehouseWatchlist.length === 0 ? (
+              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No warehouses added yet. Start with warehouse setup to unlock the wholesale control view.</div>
+            ) : (
+              warehouseWatchlist.map((warehouse) => {
+                const utilization = warehouse.capacity > 0 ? Math.round((warehouse.capacityUsed / warehouse.capacity) * 100) : 0;
+                return (
+                  <div key={warehouse.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>{warehouse.name}</div>
+                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{warehouse.location} | {warehouse.itemsCount} SKUs</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#38bdf8" }}>{formatMoney(warehouse.stockValue)}</div>
+                      <div style={{ fontSize: 12, color: utilization >= 80 ? "#f59e0b" : wholesaleMuted }}>{warehouse.capacity ? `${utilization}% utilized` : warehouse.status}</div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
+          <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+            Stock Movement Desk
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {transferWatchlist.length === 0 ? (
+              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No stock transfers yet. Internal warehouse movement will appear here once logged.</div>
+            ) : (
+              transferWatchlist.map((transfer) => (
+                <div key={transfer.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>{transfer.item}</div>
+                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{transfer.from} {"->"} {transfer.to}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#fde68a" }}>{transfer.qty}</div>
+                      <div style={{ fontSize: 12, color: transfer.status === "COMPLETED" ? "#34d399" : "#60a5fa" }}>{transfer.status}</div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
