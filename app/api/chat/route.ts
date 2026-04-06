@@ -4,6 +4,7 @@ import { runChatEngine } from "@/lib/chatEngine";
 import { openAITextResponse } from "@/lib/finovaAI";
 
 export const runtime = "nodejs";
+const OPENAI_REPLY_TIMEOUT_MS = 6000;
 
 const SUPPORT_SYSTEM_PROMPT = `
 You are FinovaOS AI — the official intelligent assistant for FinovaOS, a world-class cloud-based accounting, ERP, and business management platform.
@@ -329,11 +330,16 @@ export async function POST(req: NextRequest) {
         content: item.text,
       }));
 
-      const openAiReply = await openAITextResponse(
-        SUPPORT_SYSTEM_PROMPT,
-        [...aiHistory, { role: "user", content: String(message) }],
-        800,
-      );
+      const openAiReply = await Promise.race<string | null>([
+        openAITextResponse(
+          SUPPORT_SYSTEM_PROMPT,
+          [...aiHistory, { role: "user", content: String(message) }],
+          800,
+        ),
+        new Promise<null>((resolve) => {
+          setTimeout(() => resolve(null), OPENAI_REPLY_TIMEOUT_MS);
+        }),
+      ]);
 
       if (openAiReply?.trim()) {
         reply = openAiReply.trim();
@@ -361,15 +367,16 @@ export async function POST(req: NextRequest) {
 
     // Final safety net — should never happen but just in case
     if (!reply) {
-      reply = "Main abhi ek technical issue face kar raha hun. Kripya dobara try karein ya 'human agent' type karein. 🙏";
+      reply = "I am having a technical issue right now. Please try again or type 'human agent' to connect with support.";
     }
 
     return NextResponse.json({ reply });
   } catch (error) {
     console.error("Chat API error:", error);
     return NextResponse.json(
-      { reply: "Kuch masla aa gaya. Kripya dobara try karein ya 'human agent' type karein hamare team se baat karne ke liye. 🙏" },
+      { reply: "Something went wrong. Please try again or type 'human agent' to connect with our support team." },
       { status: 200 }
     );
   }
 }
+
