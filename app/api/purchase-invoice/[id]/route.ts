@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 
@@ -17,12 +17,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+    const branchId = await resolveBranchId(req, companyId);
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_PURCHASE_INVOICE, companyId);
     if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const invoice = await prisma.purchaseInvoice.findFirst({
-      where: { id, companyId },
+      where: { id, companyId, ...(branchId ? { branchId } : {}) },
       include: {
         supplier: true,
         items: { include: { item: true } },
@@ -44,6 +45,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+    const branchId = await resolveBranchId(req, companyId);
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_PURCHASE_INVOICE, companyId);
     if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -57,7 +59,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (notes  !== undefined) data.notes  = notes;
 
     const updated = await prisma.purchaseInvoice.update({
-      where: { id, companyId },
+      where: { id, companyId, ...(branchId ? { branchId } : {}) },
       data,
     });
 
@@ -75,12 +77,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+    const branchId = await resolveBranchId(req, companyId);
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_PURCHASE_INVOICE, companyId);
     if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     await prisma.purchaseInvoice.update({
-      where: { id, companyId },
+      where: { id, companyId, ...(branchId ? { branchId } : {}) },
       data: { deletedAt: new Date() },
     });
 

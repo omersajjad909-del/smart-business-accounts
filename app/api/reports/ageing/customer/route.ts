@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient ,Prisma} from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 type CreditEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const customerId = req.nextUrl.searchParams.get("customerId");
     const asOnParam = req.nextUrl.searchParams.get("date");
@@ -44,6 +45,7 @@ export async function GET(req: NextRequest) {
         customerId,
         date: { lte: asOn },
         companyId,
+        ...(branchId ? { branchId } : {}),
       },
       orderBy: { date: "asc" },
     });
@@ -53,7 +55,7 @@ export async function GET(req: NextRequest) {
       where: {
         accountId: customerId,
         amount: { lt: 0 },
-        voucher: { date: { lte: asOn }, companyId },
+        voucher: { date: { lte: asOn }, companyId, ...(branchId ? { branchId } : {}) },
       },
     });
 

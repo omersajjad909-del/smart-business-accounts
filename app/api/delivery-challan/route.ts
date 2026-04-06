@@ -1,7 +1,7 @@
 ﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 
 // VALIDATION SCHEMA
 const challanSchema = z.object({
@@ -27,13 +27,14 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (id) {
-      const challan = await prisma.deliveryChallan.findUnique({
-        where: { id, companyId },
+      const challan = await prisma.deliveryChallan.findFirst({
+        where: { id, companyId, ...(branchId ? { branchId } : {}) },
         include: {
           customer: true,
           items: {
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
     }
 
     const challans = await prisma.deliveryChallan.findMany({
-      where: { companyId },
+      where: { companyId, ...(branchId ? { branchId } : {}) },
       include: {
         customer: true,
         items: true,
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
 
     const body = await req.json();
     const data = challanSchema.parse(body);
@@ -77,6 +79,7 @@ export async function POST(req: NextRequest) {
     const challan = await prisma.deliveryChallan.create({
       data: {
         companyId,
+        branchId,
         challanNo,
         date: new Date(data.date),
         customerId: data.customerId,
@@ -118,6 +121,7 @@ export async function PUT(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const body = await req.json();
     const data = challanSchema.parse(body);
@@ -133,7 +137,7 @@ export async function PUT(req: NextRequest) {
 
       // 2. Update Challan
       return await tx.deliveryChallan.update({
-        where: { id: data.id, companyId },
+        where: { id: data.id, companyId, ...(branchId ? { branchId } : {}) },
         data: {
           date: new Date(data.date),
           customerId: data.customerId,

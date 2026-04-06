@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { requireEntitlement } from "@/lib/subscriptionGuard";
@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT, companyId);
     if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
 
     const entries = await prisma.voucherEntry.findMany({
       where: {
-        voucher: { date: { gte: fromDate, lte: toDate }, companyId },
+        voucher: { date: { gte: fromDate, lte: toDate }, companyId, ...(branchId ? { branchId } : {}) },
         account: {
           type: { in: ["INCOME", "EXPENSE", "REVENUE", "COST"] },
           companyId,

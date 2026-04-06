@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 
 type SaleReturnWithItems = Prisma.SaleReturnGetPayload<{
   include: {
@@ -52,13 +52,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     if (!id) {
       return NextResponse.json({ error: "Invoice ID is missing" }, { status: 400 });
     }
 
     const invoice = await prisma.salesInvoice.findFirst({
-      where: { id, companyId },
+      where: { id, companyId, ...(branchId ? { branchId } : {}) },
       include: {
         customer: true,
         items: { include: { item: true } },
@@ -118,13 +119,14 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
 
     const body = await req.json();
     const { customerId, invoiceId, date, freight = 0, items } = body;
 
     if (invoiceId) {
       const invoice = await prisma.salesInvoice.findFirst({
-        where: { id: invoiceId, companyId },
+        where: { id: invoiceId, companyId, ...(branchId ? { branchId } : {}) },
         select: { id: true },
       });
       if (!invoice) {
@@ -161,6 +163,7 @@ export async function POST(req: NextRequest) {
           customerId,
           invoiceId,
           companyId,
+          branchId,
           total: total,
           items: {
             create: items.map((i: any) => ({
@@ -197,6 +200,7 @@ export async function POST(req: NextRequest) {
           date: new Date(date),
           narration: `Sales Return ${nextNo} against Invoice ID ${invoiceId}`,
           companyId,
+          branchId,
           entries: {
             create: [
               { accountId: "SALES_RETURN_ACC_ID", amount: total, companyId }, // Debit (Replace with real ID)

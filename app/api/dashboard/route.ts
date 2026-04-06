@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 
@@ -11,6 +11,7 @@ export async function GET(req: Request) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req as any, companyId);
     const userId = (req as any).headers.get("x-user-id");
     const userRole = (req as any).headers.get("x-user-role");
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_DASHBOARD, companyId);
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
 
     // ================= TOTAL SALES =================
     const sales = await prisma.salesInvoice.aggregate({
-      where: { companyId },
+      where: { companyId, ...(branchId ? { branchId } : {}) },
       _sum: { total: true },
     });
 

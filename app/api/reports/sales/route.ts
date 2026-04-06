@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 type SalesInvoiceWithItems = Prisma.SalesInvoiceGetPayload<{
   include: {
     items: true;
@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     // 📅 FILTERS
     const { searchParams } = new URL(req.url);
@@ -44,6 +45,7 @@ export async function GET(req: NextRequest) {
         date: { gte: fromDate, lte: toDate },
         customerId: customerId === "all" ? undefined : customerId,
         companyId,
+        ...(branchId ? { branchId } : {}),
       },
       include: {
         customer: { select: { name: true } },

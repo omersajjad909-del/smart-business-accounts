@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient , Prisma} from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 type SaleReturn = Prisma.SaleReturnGetPayload<{
   select: {
     returnNo: true;
@@ -29,9 +29,10 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const returns = await prisma.saleReturn.findMany({
-      where: { companyId },
+      where: { companyId, ...(branchId ? { branchId } : {}) },
       include: {
         customer: true,
         invoice: true,
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchIdOrDefault(req, companyId);
 
     const { customerId, invoiceId, date, items, freight = 0 } = await req.json();
 
@@ -119,6 +121,7 @@ export async function POST(req: NextRequest) {
       customerId,
       invoiceId: invoiceId || null,
       companyId,
+      branchId,
       total,
       items: {
         create: items.map((i: any) => ({
@@ -155,6 +158,7 @@ export async function POST(req: NextRequest) {
           date: new Date(date),
           narration: `Sales Return ${nextNo} (Invoice: ${invoiceId || 'N/A'})`,
           companyId,
+          branchId,
           entries: {
             create: [
               { accountId: salesReturnAcc.id, amount: total, companyId }, // Debit

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
 const prisma =
   (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
@@ -22,40 +22,41 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const [sales, purchases, payments, expenses, orders, quotations, challans] = await Promise.all([
       prisma.salesInvoice.findMany({
-        where: { companyId, approvalStatus: "PENDING" },
+        where: { companyId, approvalStatus: "PENDING", ...(branchId ? { branchId } : {}) },
         select: { id: true, invoiceNo: true, total: true, date: true },
         orderBy: { date: "desc" },
       }),
       prisma.purchaseInvoice.findMany({
-        where: { companyId, approvalStatus: "PENDING" },
+        where: { companyId, approvalStatus: "PENDING", ...(branchId ? { branchId } : {}) },
         select: { id: true, invoiceNo: true, total: true, date: true },
         orderBy: { date: "desc" },
       }),
       prisma.paymentReceipt.findMany({
-        where: { companyId, approvalStatus: "PENDING" },
+        where: { companyId, approvalStatus: "PENDING", ...(branchId ? { branchId } : {}) },
         select: { id: true, receiptNo: true, amount: true, date: true },
         orderBy: { date: "desc" },
       }),
       prisma.expenseVoucher.findMany({
-        where: { companyId, approvalStatus: "PENDING" },
+        where: { companyId, approvalStatus: "PENDING", ...(branchId ? { branchId } : {}) },
         select: { id: true, voucherNo: true, totalAmount: true, date: true },
         orderBy: { date: "desc" },
       }),
       prisma.purchaseOrder.findMany({
-        where: { companyId, approvalStatus: "PENDING" },
+        where: { companyId, approvalStatus: "PENDING", ...(branchId ? { branchId } : {}) },
         select: { id: true, poNo: true, status: true, date: true },
         orderBy: { date: "desc" },
       }),
       prisma.quotation.findMany({
-        where: { companyId, approvalStatus: "PENDING" },
+        where: { companyId, approvalStatus: "PENDING", ...(branchId ? { branchId } : {}) },
         select: { id: true, quotationNo: true, total: true, date: true },
         orderBy: { date: "desc" },
       }),
       prisma.deliveryChallan.findMany({
-        where: { companyId, approvalStatus: "PENDING" },
+        where: { companyId, approvalStatus: "PENDING", ...(branchId ? { branchId } : {}) },
         select: { id: true, challanNo: true, status: true, date: true },
         orderBy: { date: "desc" },
       }),

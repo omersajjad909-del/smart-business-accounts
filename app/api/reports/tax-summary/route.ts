@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const allowed = await apiHasPermission(
       userId,
@@ -50,6 +51,7 @@ export async function GET(req: NextRequest) {
         ...where,
         taxConfigId: { not: null },
         companyId,
+        ...(branchId ? { branchId } : {}),
       },
       include: {
         taxConfig: true,
@@ -62,6 +64,7 @@ export async function GET(req: NextRequest) {
         ...where,
         taxConfigId: { not: null },
         companyId,
+        ...(branchId ? { branchId } : {}),
       },
       include: {
         taxConfig: true,

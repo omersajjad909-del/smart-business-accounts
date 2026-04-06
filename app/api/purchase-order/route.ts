@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
   // If ID provided, return single PO
   if (id) {
     const po = await prisma.purchaseOrder.findFirst({
-      where: { id, companyId },
+      where: { id, companyId, ...(branchId ? { branchId } : {}) },
       include: {
         supplier: true,
         items: {

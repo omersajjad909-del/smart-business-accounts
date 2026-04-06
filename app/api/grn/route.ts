@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { resolveCompanyId, resolveBranchIdOrDefault } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 
 export async function GET(req: NextRequest) {
   const companyId = await resolveCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+  const branchId = await resolveBranchId(req, companyId);
 
   const { searchParams } = new URL(req.url);
   const poId = searchParams.get("poId");
 
   const grns = await prisma.goodsReceiptNote.findMany({
-    where: { companyId, deletedAt: null, ...(poId ? { poId } : {}) },
+    where: { companyId, deletedAt: null, ...(poId ? { poId } : {}), ...(branchId ? { branchId } : {}) },
     include: {
       supplier: { select: { id: true, name: true } },
       po: { select: { id: true, poNo: true } },
@@ -91,9 +92,10 @@ export async function DELETE(req: NextRequest) {
 
   const companyId = await resolveCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+  const branchId = await resolveBranchId(req, companyId);
 
   await prisma.goodsReceiptNote.update({
-    where: { id },
+    where: { id, companyId, ...(branchId ? { branchId } : {}) },
     data: { deletedAt: new Date(), deletedBy: req.headers.get("x-user-id") || undefined },
   });
 

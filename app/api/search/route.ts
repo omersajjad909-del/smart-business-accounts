@@ -1,5 +1,6 @@
 ﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, Prisma } from "@prisma/client";
+import { resolveBranchId } from "@/lib/tenant";
 
 type AccountSearch = Prisma.AccountGetPayload<{
   select: {
@@ -37,6 +38,7 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const branchId = await resolveBranchId(req, companyId);
 
     const { searchParams } = new URL(req.url);
     const query = searchParams.get("q")?.trim();
@@ -93,6 +95,7 @@ export async function GET(req: NextRequest) {
         companyId,
         deletedAt: null,
         invoiceNo: { contains: query, mode: "insensitive" },
+        ...(branchId ? { branchId } : {}),
       },
       take: 10,
       select: {
@@ -109,6 +112,7 @@ export async function GET(req: NextRequest) {
         companyId,
         deletedAt: null,
         invoiceNo: { contains: query, mode: "insensitive" },
+        ...(branchId ? { branchId } : {}),
       },
       take: 10,
       select: {
@@ -128,6 +132,7 @@ export async function GET(req: NextRequest) {
           { voucherNo: { contains: query, mode: "insensitive" } },
           { narration: { contains: query, mode: "insensitive" } },
         ],
+        ...(branchId ? { branchId } : {}),
       },
       take: 10,
       select: {
