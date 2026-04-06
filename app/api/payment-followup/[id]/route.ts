@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // PATCH /api/payment-followup/[id] — update status/note for an invoice
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const companyId = req.headers.get("x-company-id");
   const userId = req.headers.get("x-user-id");
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -10,12 +11,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const body = await req.json();
   const { status, note } = body;
 
-  // Upsert: create or update the follow-up log for this invoice
   const log = await (prisma as any).paymentFollowUpLog.upsert({
     where: {
       companyId_invoiceId: {
         companyId,
-        invoiceId: params.id,
+        invoiceId: id,
       },
     },
     update: {
@@ -26,7 +26,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     },
     create: {
       companyId,
-      invoiceId: params.id,
+      invoiceId: id,
       status: status || "PENDING",
       note: note || null,
       updatedBy: userId ?? null,
