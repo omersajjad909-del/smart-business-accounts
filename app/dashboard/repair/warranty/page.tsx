@@ -1,24 +1,53 @@
-export default function Page() {
+"use client";
+
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { mapRepairWarranty, repairAccent } from "../_shared";
+
+const statusOptions = ["covered", "claimed", "expired"];
+
+export default function RepairWarrantyPage() {
   return (
-    <div style={{ padding: "32px 24px", color: "var(--text-primary)", fontFamily: "inherit" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 10 }}>
-          <span>✅</span> Warranty Tracking
-        </h1>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: 0 }}>Track warranty periods and distinguish warranty vs chargeable jobs.</p>
-      </div>
-      <div style={{
-        padding: "48px 32px", borderRadius: 16,
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        textAlign: "center",
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 8 }}>Warranty Tracking</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", maxWidth: 400, margin: "0 auto" }}>
-          Track warranty periods and distinguish warranty vs chargeable jobs.
-        </div>
-      </div>
-    </div>
+    <BusinessRecordWorkspace
+      title="Warranty Tracking"
+      subtitle="Track warranty periods, covered jobs, and repeat repair liability."
+      accent={repairAccent}
+      category="repair_warranty"
+      emptyState="No warranty records yet. Add the first covered repair."
+      fields={[
+        { key: "claim", label: "Claim Ref", placeholder: "RW-2007", required: true },
+        { key: "customer", label: "Customer", placeholder: "TechZone Mall", required: true },
+        { key: "device", label: "Device", placeholder: "MacBook Pro", required: true },
+        { key: "expiryDate", label: "Expiry Date", type: "date", required: true },
+        { key: "amount", label: "Coverage Value", type: "number", placeholder: "15000", required: true },
+        { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+      ]}
+      defaultValues={{ status: "covered" }}
+      columns={[
+        { key: "claim", label: "Claim" },
+        { key: "customer", label: "Customer" },
+        { key: "device", label: "Device" },
+        { key: "expiryDate", label: "Expiry" },
+        { key: "amount", label: "Coverage" },
+        { key: "status", label: "Status" },
+      ]}
+      statusOptions={statusOptions}
+      mapRecord={mapRepairWarranty}
+      buildCreatePayload={(form) => ({
+        title: form.claim,
+        status: form.status,
+        amount: Number(form.amount || 0),
+        date: form.expiryDate,
+        data: {
+          customer: form.customer,
+          device: form.device,
+        },
+      })}
+      summarize={(rows) => [
+        { label: "Claims", value: rows.length, color: repairAccent },
+        { label: "Covered", value: rows.filter((row) => String(row.status) === "covered").length, color: "#34d399" },
+        { label: "Claimed", value: rows.filter((row) => String(row.status) === "claimed").length, color: "#60a5fa" },
+        { label: "Expired", value: rows.filter((row) => String(row.status) === "expired").length, color: "#94a3b8" },
+      ]}
+    />
   );
 }

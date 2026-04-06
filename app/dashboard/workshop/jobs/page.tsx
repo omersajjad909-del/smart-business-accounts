@@ -1,24 +1,53 @@
-export default function Page() {
+"use client";
+
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { mapWorkshopJob, workshopAccent } from "../_shared";
+
+const statusOptions = ["open", "in_progress", "ready"];
+
+export default function WorkshopJobsPage() {
   return (
-    <div style={{ padding: "32px 24px", color: "var(--text-primary)", fontFamily: "inherit" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 10 }}>
-          <span>🔧</span> Job Cards
-        </h1>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: 0 }}>Create and manage vehicle service and repair job cards.</p>
-      </div>
-      <div style={{
-        padding: "48px 32px", borderRadius: 16,
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        textAlign: "center",
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🔧</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 8 }}>Job Cards</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", maxWidth: 400, margin: "0 auto" }}>
-          Create and manage vehicle service and repair job cards.
-        </div>
-      </div>
-    </div>
+    <BusinessRecordWorkspace
+      title="Job Cards"
+      subtitle="Track service intake, vehicle diagnosis, and promised delivery dates."
+      accent={workshopAccent}
+      category="workshop_job"
+      emptyState="No workshop jobs yet. Create the first job card."
+      fields={[
+        { key: "job", label: "Job Card", placeholder: "JOB-24041", required: true },
+        { key: "customer", label: "Customer", placeholder: "Ali Motors", required: true },
+        { key: "vehicle", label: "Vehicle", placeholder: "Civic 2022 / LEA-987", required: true },
+        { key: "promisedDate", label: "Promised Date", type: "date", required: true },
+        { key: "amount", label: "Estimated Value", type: "number", placeholder: "35000", required: true },
+        { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+      ]}
+      defaultValues={{ status: "open" }}
+      columns={[
+        { key: "job", label: "Job" },
+        { key: "customer", label: "Customer" },
+        { key: "vehicle", label: "Vehicle" },
+        { key: "promisedDate", label: "Promised" },
+        { key: "amount", label: "Value" },
+        { key: "status", label: "Status" },
+      ]}
+      statusOptions={statusOptions}
+      mapRecord={mapWorkshopJob}
+      buildCreatePayload={(form) => ({
+        title: form.job,
+        status: form.status,
+        amount: Number(form.amount || 0),
+        date: form.promisedDate,
+        data: {
+          customer: form.customer,
+          vehicle: form.vehicle,
+        },
+      })}
+      summarize={(rows) => [
+        { label: "Jobs", value: rows.length, color: workshopAccent },
+        { label: "Open", value: rows.filter((row) => String(row.status) === "open").length, color: "#fbbf24" },
+        { label: "In Progress", value: rows.filter((row) => String(row.status) === "in_progress").length, color: "#60a5fa" },
+        { label: "Ready", value: rows.filter((row) => String(row.status) === "ready").length, color: "#34d399" },
+      ]}
+    />
   );
 }

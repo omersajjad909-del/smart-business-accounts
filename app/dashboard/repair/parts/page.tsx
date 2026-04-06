@@ -1,24 +1,56 @@
-export default function Page() {
+"use client";
+
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { mapRepairPart, repairAccent } from "../_shared";
+
+const statusOptions = ["available", "issued", "ordered"];
+
+export default function RepairPartsPage() {
   return (
-    <div style={{ padding: "32px 24px", color: "var(--text-primary)", fontFamily: "inherit" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 10 }}>
-          <span>📦</span> Spare Parts
-        </h1>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: 0 }}>Manage spare parts inventory with usage tracking and alerts.</p>
-      </div>
-      <div style={{
-        padding: "48px 32px", borderRadius: 16,
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        textAlign: "center",
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📦</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 8 }}>Spare Parts</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", maxWidth: 400, margin: "0 auto" }}>
-          Manage spare parts inventory with usage tracking and alerts.
-        </div>
-      </div>
-    </div>
+    <BusinessRecordWorkspace
+      title="Spare Parts"
+      subtitle="Manage replacement parts, supplier visibility, and repair cost allocation."
+      accent={repairAccent}
+      category="repair_part"
+      emptyState="No spare parts yet. Add the first part line."
+      fields={[
+        { key: "part", label: "Part", placeholder: "LCD panel", required: true },
+        { key: "job", label: "Job Card", placeholder: "RP-24018", required: true },
+        { key: "quantity", label: "Quantity", type: "number", placeholder: "1", required: true },
+        { key: "supplier", label: "Supplier", placeholder: "Tech Parts Hub", required: true },
+        { key: "cost", label: "Cost", type: "number", placeholder: "6500", required: true },
+        { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+      ]}
+      defaultValues={{ status: "available" }}
+      columns={[
+        { key: "part", label: "Part" },
+        { key: "job", label: "Job" },
+        { key: "quantity", label: "Qty" },
+        { key: "supplier", label: "Supplier" },
+        { key: "cost", label: "Cost" },
+        { key: "status", label: "Status" },
+      ]}
+      statusOptions={statusOptions}
+      mapRecord={mapRepairPart}
+      buildCreatePayload={(form) => ({
+        title: form.part,
+        status: form.status,
+        amount: Number(form.cost || 0),
+        data: {
+          job: form.job,
+          quantity: Number(form.quantity || 0),
+          supplier: form.supplier,
+        },
+      })}
+      summarize={(rows) => {
+        const cost = rows.reduce((sum, row) => sum + Number(row.cost || 0), 0);
+        return [
+          { label: "Part Lines", value: rows.length, color: repairAccent },
+          { label: "Available", value: rows.filter((row) => String(row.status) === "available").length, color: "#34d399" },
+          { label: "Issued", value: rows.filter((row) => String(row.status) === "issued").length, color: "#60a5fa" },
+          { label: "Parts Cost", value: cost.toLocaleString(), color: "#fbbf24" },
+        ];
+      }}
+    />
   );
 }
