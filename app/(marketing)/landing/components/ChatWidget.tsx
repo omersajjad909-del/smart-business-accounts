@@ -376,7 +376,7 @@ export default function ChatWidget() {
               <div style={{ textAlign:"center", marginBottom:4 }}>
                 <div style={{ fontSize:36, marginBottom:12 }}>👋</div>
                 <div style={{ fontSize:17, fontWeight:800, color:"white", marginBottom:6, letterSpacing:"-.3px" }}>Welcome to FinovaOS!</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.6 }}>Apna naam batao — main aapki puri madad karunga.</div>
+                <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.6 }}>Tell us your name and we will help you get started.</div>
               </div>
 
               {/* Feature chips preview */}
