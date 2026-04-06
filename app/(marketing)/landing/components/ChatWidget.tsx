@@ -12,20 +12,20 @@ type Message = {
 /* ─── Quick reply suggestions ─────────────────────────────────────────────── */
 const WELCOME_SUGGESTIONS = [
   "What is FinovaOS?",
-  "Pricing plans batao",
-  "Sales invoice kaise banate hain?",
-  "Free trial hai?",
-  "Inventory management",
+  "Explain pricing plans",
+  "How do I create a sales invoice?",
+  "Is there a free trial?",
+  "Inventory management features",
   "HR & Payroll features",
 ];
 
 const TOPIC_MAP: Record<string, string[]> = {
-  pricing:    ["Starter plan kya hai?", "Enterprise vs Professional?", "Custom plan kya hota hai?"],
-  invoice:    ["Purchase invoice kaise banate hain?", "Invoice PDF kaise send karein?", "Sales return kaise karein?"],
-  inventory:  ["Stock report kaise dekhein?", "GRN kya hota hai?", "Multi-warehouse support hai?"],
-  hr:         ["Payroll process kaise karte hain?", "Attendance track kaise hoti hai?", "Leave management"],
-  banking:    ["Bank reconciliation kaise karein?", "Expense voucher kya hota hai?", "Bulk payments kya hai?"],
-  reports:    ["P&L report kahan milti hai?", "Balance sheet kaise dekhein?", "Tax report available hai?"],
+  pricing:    ["What is included in Starter?", "Enterprise vs Professional", "Do you offer a custom plan?"],
+  invoice:    ["How do I create a purchase invoice?", "How do I send an invoice PDF?", "How do I process a sales return?"],
+  inventory:  ["How do I view the stock report?", "What is a GRN?", "Do you support multi-warehouse operations?"],
+  hr:         ["How does payroll work?", "How is attendance tracked?", "Do you support leave management?"],
+  banking:    ["How do I do bank reconciliation?", "What is an expense voucher?", "How do bulk payments work?"],
+  reports:    ["Where can I find the P&L report?", "How do I view the balance sheet?", "Is a tax report available?"],
 };
 
 /* ─── API helpers ─────────────────────────────────────────────────────────── */
@@ -74,9 +74,9 @@ async function askBot(conversationId: string, userMessage: string): Promise<stri
       body: JSON.stringify({ conversationId, message: userMessage }),
     });
     const data = await res.json();
-    return data.reply || "Kuch masla aa gaya. Kripya dobara try karein ya 'human agent' type karein. 🙏";
+    return data.reply || "Something went wrong. Please try again or type 'human agent' to connect with support.";
   } catch {
-    return "Network error. Kripya internet check karein ya dobara try karein. 🙏";
+    return "Network error. Please check your internet connection and try again.";
   }
 }
 
@@ -193,7 +193,7 @@ export default function ChatWidget() {
     setStep("chat");
 
     const firstName = name.split(" ")[0];
-    const welcomeText = `Hi ${firstName}! 👋 Main **FinovaOS AI Assistant** hun.\n\nMujhe FinovaOS ke har feature ke baare mein pata hai — accounting, invoicing, inventory, HR, payroll, banking, reports, aur bahut kuch.\n\nAap kisi bhi cheez ke baare mein pooch sakte hain! 😊`;
+    const welcomeText = `Hi ${firstName}! I am **FinovaOS AI Assistant**.\n\nI can help you with FinovaOS features including accounting, invoicing, inventory, HR, payroll, banking, reports, and more.\n\nAsk me anything and I will guide you.`;
 
     const welcome: Message = {
       id: "welcome",
@@ -266,7 +266,7 @@ export default function ChatWidget() {
     if (!cid.startsWith("demo-")) {
       apiUpdateConversation(cid, { status: "waiting" }).catch(() => {});
     }
-    const waitText = "Aapko ek human agent se connect kar raha hun. Thodi der mein koi aapke saath baat karega. ⏳\n\nYa email karein: **finovaos.app@gmail.com**";
+    const waitText = "Connecting you to a human agent. Someone from our team will join shortly.\n\nYou can also email us at **finovaos.app@gmail.com**.";
     const waitMsg: Message = { id: makeId("w"), sender: "bot", text: waitText, created_at: new Date().toISOString() };
     setMessages(prev => [...prev, waitMsg]);
     if (!cid.startsWith("demo-")) {
@@ -385,9 +385,9 @@ export default function ChatWidget() {
                   <span key={f} style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,.4)", padding:"4px 10px", borderRadius:20, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)" }}>{f}</span>
                 ))}
               </div>
-
               <div>
                 <label style={{ fontSize:11.5, fontWeight:700, color:"rgba(255,255,255,.4)", letterSpacing:".07em", textTransform:"uppercase", display:"block", marginBottom:7 }}>Your Name *</label>
+                <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.6, marginBottom:10 }}>Tell us your name and we will get the conversation started.</div>
                 <input
                   value={name} onChange={e => setName(e.target.value)} onKeyDown={handleStartKey}
                   placeholder="e.g. Ali Raza"
@@ -396,7 +396,6 @@ export default function ChatWidget() {
                   onBlur={e=>(e.target.style.borderColor="rgba(255,255,255,.1)")}
                 />
               </div>
-
               <div>
                 <label style={{ fontSize:11.5, fontWeight:700, color:"rgba(255,255,255,.4)", letterSpacing:".07em", textTransform:"uppercase", display:"block", marginBottom:7 }}>
                   Email <span style={{ color:"rgba(255,255,255,.2)", fontWeight:400, fontSize:11 }}>(optional)</span>
@@ -500,13 +499,13 @@ export default function ChatWidget() {
 
                 {status === "waiting" && (
                   <div style={{ textAlign:"center", padding:"10px 14px", borderRadius:12, background:"rgba(251,191,36,.07)", border:"1px solid rgba(251,191,36,.18)", fontSize:12, color:"#fbbf24", fontWeight:600 }}>
-                    ⏳ Human agent se connect ho raha hai…
+                    Connecting to a human agent...
                   </div>
                 )}
 
                 {status === "agent" && agentName && (
                   <div style={{ textAlign:"center", padding:"10px 14px", borderRadius:12, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.18)", fontSize:12, color:"#34d399", fontWeight:600 }}>
-                    ✅ {agentName} ne chat join kar liya
+                    {agentName} has joined the chat
                   </div>
                 )}
 
@@ -539,7 +538,7 @@ export default function ChatWidget() {
                       value={inputVal}
                       onChange={e => setInputVal(e.target.value)}
                       onKeyDown={handleKey}
-                      placeholder={status === "waiting" ? "Agent ka wait karein…" : "Kuch bhi poochein…"}
+                      placeholder={status === "waiting" ? "Please wait for the agent..." : "Ask anything about FinovaOS..."}
                       disabled={status === "waiting"}
                       style={{ flex:1, background:"none", border:"none", color:"white", fontSize:14, fontFamily:"inherit", padding:"3px 0" }}
                     />
