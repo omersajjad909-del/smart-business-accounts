@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { getBaseAmounts, resolveAmount, sumWithCurrency } from "@/lib/currencyHelper";
 
 function daysBetween(a: Date, b: Date): number {
   return Math.floor((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
@@ -34,18 +35,20 @@ export async function GET(req: NextRequest) {
     });
     if (!customer) return NextResponse.json({ error: "Customer not found" }, { status: 404 });
 
-    // Opening balance = invoices - payments BEFORE fromDate
-    const [prevInvAgg, prevPmtAgg] = await Promise.all([
-      prisma.salesInvoice.aggregate({
+    // Opening balance = invoices - payments BEFORE fromDate (currency-aware)
+    const [prevInvoices, prevPmtAgg] = await Promise.all([
+      prisma.salesInvoice.findMany({
         where: { customerId, companyId, date: { lt: fromDate }, deletedAt: null },
-        _sum: { total: true },
+        select: { id: true, total: true },
       }),
       prisma.paymentReceipt.aggregate({
         where: { partyId: customerId, companyId, date: { lt: fromDate }, deletedAt: null },
         _sum: { amount: true },
       }),
     ]);
-    const openingBalance = Number(prevInvAgg._sum.total || 0) - Number(prevPmtAgg._sum.amount || 0);
+    const prevBaseAmounts = await getBaseAmounts(prevInvoices.map((i) => i.id));
+    const prevInvTotal = sumWithCurrency(prevInvoices, prevBaseAmounts);
+    const openingBalance = prevInvTotal - Number(prevPmtAgg._sum.amount || 0);
 
     // Period transactions
     const [invoices, payments] = await Promise.all([
@@ -59,29 +62,33 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
+    // Resolve base-currency amounts for period invoices
+    const periodBaseAmounts = await getBaseAmounts(invoices.map((i) => i.id));
+
     type RawRow = { date: string; ref: string; type: "Invoice" | "Payment"; description: string; debit: number; credit: number };
     const raw: RawRow[] = [
-      ...invoices.map(inv => ({ date: new Date(inv.date).toISOString().slice(0, 10), ref: inv.invoiceNo, type: "Invoice" as const, description: "Sales Invoice", debit: Number(inv.total), credit: 0 })),
-      ...payments.map(pmt => ({ date: new Date(pmt.date).toISOString().slice(0, 10), ref: pmt.receiptNo, type: "Payment" as const, description: pmt.narration || "Payment Received", debit: 0, credit: Number(pmt.amount) })),
+      ...invoices.map((inv) => ({ date: new Date(inv.date).toISOString().slice(0, 10), ref: inv.invoiceNo, type: "Invoice" as const, description: "Sales Invoice", debit: resolveAmount(inv.id, Number(inv.total), periodBaseAmounts), credit: 0 })),
+      ...payments.map((pmt) => ({ date: new Date(pmt.date).toISOString().slice(0, 10), ref: pmt.receiptNo, type: "Payment" as const, description: pmt.narration || "Payment Received", debit: 0, credit: Number(pmt.amount) })),
     ];
     raw.sort((a, b) => a.date.localeCompare(b.date));
 
     let running = openingBalance;
-    const rows = raw.map(r => { running += r.debit - r.credit; return { ...r, balance: running }; });
+    const rows = raw.map((r) => { running += r.debit - r.credit; return { ...r, balance: running }; });
 
-    const totalInvoiced = invoices.reduce((s, i) => s + Number(i.total), 0);
+    const totalInvoiced = sumWithCurrency(invoices, periodBaseAmounts);
     const totalReceived = payments.reduce((s, p) => s + Number(p.amount), 0);
 
-    // Ageing (FIFO allocation across all time)
+    // Ageing (FIFO allocation across all time, currency-aware)
     const [allInv, allPmt] = await Promise.all([
       prisma.salesInvoice.findMany({ where: { customerId, companyId, deletedAt: null }, orderBy: { date: "asc" } }),
       prisma.paymentReceipt.findMany({ where: { partyId: customerId, companyId, deletedAt: null }, orderBy: { date: "asc" } }),
     ]);
+    const allBaseAmounts = await getBaseAmounts(allInv.map((i) => i.id));
     let remainingCredit = allPmt.reduce((s, p) => s + Number(p.amount), 0);
     const ageing = { current: 0, days30: 0, days60: 0, days90plus: 0 };
     const today  = new Date();
     for (const inv of allInv) {
-      const invAmt    = Number(inv.total);
+      const invAmt    = resolveAmount(inv.id, Number(inv.total), allBaseAmounts);
       const applied   = Math.min(remainingCredit, invAmt);
       remainingCredit = Math.max(0, remainingCredit - invAmt);
       const outstanding = invAmt - applied;

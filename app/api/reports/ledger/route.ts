@@ -3,6 +3,7 @@ import { PrismaClient, Prisma } from "@prisma/client";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
+import { getBaseAmounts, sumWithCurrency } from "@/lib/currencyHelper";
 type VoucherWithEntries = Prisma.VoucherGetPayload<{
   include: {
     entries: true;
@@ -75,19 +76,21 @@ export async function GET(req: NextRequest) {
     );
 
 
-    // Previous Sales
-    const prevSales = await prisma.salesInvoice.aggregate({
-      where: { date: { lt: fromDate }, customerId: accountId, companyId, ...(branchId ? { branchId } : {}) },
-      _sum: { total: true }
+    // Previous Sales (currency-aware)
+    const prevSalesInvs = await prisma.salesInvoice.findMany({
+      where: { date: { lt: fromDate }, customerId: accountId, companyId, ...(branchId ? { branchId } : {}), deletedAt: null },
+      select: { id: true, total: true },
     });
-    openingBal += Number(prevSales._sum.total || 0);
+    const prevSalesBase = await getBaseAmounts(prevSalesInvs.map((i) => i.id));
+    openingBal += sumWithCurrency(prevSalesInvs, prevSalesBase);
 
-    // Previous Purchases
-    const prevPurchases = await prisma.purchaseInvoice.aggregate({
-      where: { date: { lt: fromDate }, supplierId: accountId, companyId, ...(branchId ? { branchId } : {}) },
-      _sum: { total: true }
+    // Previous Purchases (currency-aware)
+    const prevPurchaseInvs = await prisma.purchaseInvoice.findMany({
+      where: { date: { lt: fromDate }, supplierId: accountId, companyId, ...(branchId ? { branchId } : {}), deletedAt: null },
+      select: { id: true, total: true },
     });
-    openingBal -= Number(prevPurchases._sum.total || 0);
+    const prevPurchaseBase = await getBaseAmounts(prevPurchaseInvs.map((i) => i.id));
+    openingBal -= sumWithCurrency(prevPurchaseInvs, prevPurchaseBase);
 
     // Previous Returns
     const prevReturns = await prisma.saleReturn.aggregate({
