@@ -231,7 +231,7 @@ const res = await fetch(`/api/accounts?id=${id}`, {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={async () => {
-              if (!confirm("Trading business ke liye 20 default accounts add kiye jayenge (jo already hain wo skip honge). Continue?")) return;
+              if (!confirm("There will be 20 default accounts for trading business (those that are already active will be skipped). Continue?")) return;
               setSeeding(true);
               try {
                 const user = getCurrentUser();
