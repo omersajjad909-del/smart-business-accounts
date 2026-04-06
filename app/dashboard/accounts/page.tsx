@@ -44,6 +44,7 @@ export default function ChartOfAccounts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showImport, setShowImport] = useState(false);
   const [importCsv, setImportCsv] = useState("");
+  const [seeding, setSeeding] = useState(false);
 
 
   const [form, setForm] = useState({
@@ -228,6 +229,30 @@ const res = await fetch(`/api/accounts?id=${id}`, {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <h1 className="text-2xl font-black border-b-4 border-black pb-2 uppercase italic">Chart of Accounts</h1>
         <div className="flex flex-wrap gap-2">
+          <button
+            onClick={async () => {
+              if (!confirm("Trading business ke liye 20 default accounts add kiye jayenge (jo already hain wo skip honge). Continue?")) return;
+              setSeeding(true);
+              try {
+                const user = getCurrentUser();
+                const res = await fetch("/api/accounts/seed-defaults", {
+                  method: "POST",
+                  headers: {
+                    ...(user?.id ? { "x-user-id": user.id } : {}),
+                    ...(user?.role ? { "x-user-role": user.role } : {}),
+                  },
+                });
+                const data = await res.json();
+                alert(data.added > 0 ? `✅ ${data.added} default accounts add ho gaye!` : "✅ Sare default accounts already exist hain.");
+                loadAccounts();
+              } catch { alert("Error — dobara try karo."); }
+              finally { setSeeding(false); }
+            }}
+            disabled={seeding}
+            className="bg-green-600 text-white px-4 py-2 rounded text-sm font-bold"
+          >
+            {seeding ? "Adding..." : "⚡ Quick Setup (Default Accounts)"}
+          </button>
           <button
             onClick={() => window.open("/api/accounts?format=csv", "_blank")}
             className="bg-black text-white px-4 py-2 rounded text-sm"
