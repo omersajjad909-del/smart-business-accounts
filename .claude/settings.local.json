@@ -79,7 +79,8 @@
       "Bash(ls d:/projects/smart-business-accounts/app/favicon*)",
       "Bash(ls d:/projects/smart-business-accounts/public/favicon*)",
       "Bash(ls d:/projects/smart-business-accounts/*.ts)",
-      "Bash(ls d:/projects/smart-business-accounts/.next/server/middleware*)"
+      "Bash(ls d:/projects/smart-business-accounts/.next/server/middleware*)",
+      "Bash(grep -n \"resolveBranchId\" app/api/sales-invoice/[id]/route.ts app/api/purchase-invoice/[id]/route.ts app/api/quotation/route.ts app/api/delivery-challan/route.ts app/api/sale-return/route.ts app/api/grn/route.ts app/api/purchase-order/route.ts app/api/approvals/route.ts app/api/dashboard/route.ts app/api/search/route.ts app/api/reports/profit-loss/route.ts app/api/reports/sales/route.ts \"app/api/reports/ageing/customer/route.ts\" app/api/reports/tax-summary/route.ts app/api/reports/inventory/inward/route.ts)"
     ]
   }
 }
