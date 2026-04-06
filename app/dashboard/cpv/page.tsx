@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { toast } from "react-hot-toast";
@@ -118,7 +120,7 @@ export default function CPVPage() {
         const banksData = await banksRes.json();
 
         if (Array.isArray(accountsData)) {
-          // CPV Ù…ÛŒÚº SUPPLIER + BANKS + Ø¯ÙˆØ³Ø±Û’ non-customer accounts
+          // CPV Ã™â€¦Ã›Å’ÃšÂº SUPPLIER + BANKS + Ã˜Â¯Ã™Ë†Ã˜Â³Ã˜Â±Ã›â€™ non-customer accounts
           setAccounts(
             accountsData.filter(a =>
               !a.partyType || (a.partyType !== "CUSTOMER")

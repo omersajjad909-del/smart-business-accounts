@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
@@ -152,7 +154,7 @@ export default function OpportunitiesPage() {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
-          ðŸ’¼ CRM Opportunities
+          Ã°Å¸â€™Â¼ CRM Opportunities
         </h1>
 
         {/* Stats */}

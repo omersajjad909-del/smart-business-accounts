@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
@@ -164,7 +166,7 @@ export default function PriceListsPage() {
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
-          Loading price listsâ€¦
+          Loading price listsÃ¢â‚¬Â¦
         </div>
       )}
 
@@ -303,7 +305,7 @@ export default function PriceListsPage() {
                 <label style={labelStyle}>Notes</label>
                 <textarea
                   style={{ ...inputStyle, minHeight: 72, resize: "vertical" }}
-                  placeholder="Optional notesâ€¦"
+                  placeholder="Optional notesÃ¢â‚¬Â¦"
                   value={form.notes}
                   onChange={(e) => setField("notes", e.target.value)}
                 />
@@ -329,7 +331,7 @@ export default function PriceListsPage() {
                   cursor: saving ? "not-allowed" : "pointer", opacity: saving ? .7 : 1,
                 }}
               >
-                {saving ? "Savingâ€¦" : "Create List"}
+                {saving ? "SavingÃ¢â‚¬Â¦" : "Create List"}
               </button>
             </div>
           </div>

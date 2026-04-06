@@ -1,4 +1,5 @@
-import { confirmToast, alertToast } from "@/lib/toast-feedback";`r`nimport toast from "react-hot-toast";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+import toast from "react-hot-toast";
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -68,7 +69,7 @@ export default function UsersPage() {
       ]).then(([companyData, planConfig]) => {
         const planCode = String(companyData?.plan || "STARTER").toUpperCase();
         setPlan(planCode);
-        // Dynamic limit from admin config â€” overrides hardcoded
+        // Dynamic limit from admin config Ã¢â‚¬â€ overrides hardcoded
         if (planConfig?.planLimits) {
           const key = planCode.toLowerCase();
           const limit = planConfig.planLimits[key];
@@ -152,7 +153,7 @@ export default function UsersPage() {
   if (!currentUser || currentUser.role !== "ADMIN") return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"50vh" }}>
       <div style={{ padding:32, borderRadius:16, background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)", textAlign:"center" }}>
-        <div style={{ fontSize:32, marginBottom:12 }}>âš ï¸</div>
+        <div style={{ fontSize:32, marginBottom:12 }}>Ã¢Å¡Â Ã¯Â¸Â</div>
         <div style={{ fontSize:16, fontWeight:700, color:"#f87171" }}>Access Denied</div>
         <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", marginTop:6 }}>Only ADMIN can manage users.</div>
       </div>
@@ -203,10 +204,10 @@ export default function UsersPage() {
             border: `1px solid ${atLimit ? "rgba(248,113,113,0.3)" : "rgba(99,102,241,0.25)"}`,
           }}>
             <div style={{ fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:".06em", color:"rgba(255,255,255,0.4)", marginBottom:2 }}>
-              {plan} Plan â€” Users
+              {plan} Plan Ã¢â‚¬â€ Users
             </div>
             <div style={{ fontSize:16, fontWeight:800, color: atLimit ? "#f87171" : "#a5b4fc" }}>
-              {users.length} / {maxUsers === null ? "âˆž" : maxUsers}
+              {users.length} / {maxUsers === null ? "Ã¢Ë†Å¾" : maxUsers}
             </div>
           </div>
         </div>
@@ -215,7 +216,7 @@ export default function UsersPage() {
       {/* Limit warning banner */}
       {atLimit && (
         <div style={{ ...card, background:"rgba(248,113,113,0.08)", border:"1px solid rgba(248,113,113,0.25)", marginBottom:16, display:"flex", alignItems:"center", gap:14 }}>
-          <span style={{ fontSize:22 }}>ðŸš«</span>
+          <span style={{ fontSize:22 }}>Ã°Å¸Å¡Â«</span>
           <div>
             <div style={{ fontWeight:700, color:"#f87171", fontSize:13 }}>User Limit Reached</div>
             <div style={{ fontSize:12, color:"rgba(255,255,255,0.45)", marginTop:2 }}>
@@ -260,7 +261,7 @@ export default function UsersPage() {
             disabled={inviting || atLimit}
             style={{ ...btnPrimary, opacity: (inviting || atLimit) ? 0.5 : 1, cursor: atLimit ? "not-allowed" : "pointer", whiteSpace:"nowrap" }}
           >
-            {inviting ? "Sendingâ€¦" : "Send Invite"}
+            {inviting ? "SendingÃ¢â‚¬Â¦" : "Send Invite"}
           </button>
         </div>
         {inviteMsg && <div style={{ marginTop:10, fontSize:12, color: inviteMsg.includes("sent") ? "#34d399" : "#f87171" }}>{inviteMsg}</div>}

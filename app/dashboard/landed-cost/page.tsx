@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
@@ -186,7 +188,7 @@ export default function LandedCostPage() {
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
-          Loading landed cost entriesâ€¦
+          Loading landed cost entriesÃ¢â‚¬Â¦
         </div>
       )}
 
@@ -387,7 +389,7 @@ export default function LandedCostPage() {
                   cursor: saving ? "not-allowed" : "pointer", opacity: saving ? .7 : 1,
                 }}
               >
-                {saving ? "Savingâ€¦" : "Create Entry"}
+                {saving ? "SavingÃ¢â‚¬Â¦" : "Create Entry"}
               </button>
             </div>
           </div>

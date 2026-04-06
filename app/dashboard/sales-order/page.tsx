@@ -1,7 +1,9 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`nimport { useState, useMemo } from "react";
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
-// â”€â”€â”€ Design tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Design tokens Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 const ff = "'Outfit','Inter',sans-serif";
 const accent = "#6366f1";
 
@@ -14,7 +16,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const STATUS_TABS = ["All", "PENDING", "CONFIRMED", "DELIVERED", "CANCELLED"];
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Types Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 interface LineItem {
   name: string;
   qty: number;
@@ -37,12 +39,12 @@ const EMPTY_FORM = {
   items: [{ name: "", qty: 1, unitPrice: 0 }] as LineItem[],
 };
 
-// â”€â”€â”€ Helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Helper Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 function fmt(n: number) {
   return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Page Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export default function SalesOrderPage() {
   const { records, loading, create, setStatus, remove } = useBusinessRecords("sales_order");
 
@@ -53,12 +55,12 @@ export default function SalesOrderPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
-  // Map raw records â†’ typed orders
+  // Map raw records Ã¢â€ â€™ typed orders
   const orders: SalesOrder[] = useMemo(
     () =>
       records.map((r) => ({
         id: r.id,
-        orderNo: (r.data?.orderNo as string) || r.title.split(" Â· ")[0] || r.title,
+        orderNo: (r.data?.orderNo as string) || r.title.split(" Ã‚Â· ")[0] || r.title,
         customerName: (r.data?.customerName as string) || r.title,
         date: r.date ? r.date.slice(0, 10) : "",
         amount: r.amount ?? 0,
@@ -84,7 +86,7 @@ export default function SalesOrderPage() {
     return matchTab && matchSearch;
   });
 
-  // â”€â”€ Form helpers â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Form helpers Ã¢â€â‚¬Ã¢â€â‚¬
   function resetForm() {
     setForm({ ...EMPTY_FORM, items: [{ name: "", qty: 1, unitPrice: 0 }] });
     setFormError("");
@@ -130,7 +132,7 @@ export default function SalesOrderPage() {
     setSaving(true);
     try {
       const orderNo = "SO-" + Date.now().toString().slice(-6);
-      const title = orderNo + " Â· " + form.customerName.trim();
+      const title = orderNo + " Ã‚Â· " + form.customerName.trim();
       await create({
         title,
         status: "PENDING",
@@ -152,7 +154,7 @@ export default function SalesOrderPage() {
     }
   }
 
-  // â”€â”€ Status action helpers â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Status action helpers Ã¢â€â‚¬Ã¢â€â‚¬
   async function handleConfirm(id: string) {
     await setStatus(id, "CONFIRMED");
   }
@@ -166,7 +168,7 @@ export default function SalesOrderPage() {
     if (await confirmToast("Delete this sales order?")) await remove(id);
   }
 
-  // â”€â”€ Styles â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Styles Ã¢â€â‚¬Ã¢â€â‚¬
   const panelStyle: React.CSSProperties = {
     background: "var(--panel-bg)",
     border: "1px solid var(--border)",
@@ -228,7 +230,7 @@ export default function SalesOrderPage() {
         minHeight: "100vh",
       }}
     >
-      {/* â”€â”€ Header â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Header Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700 }}>Sales Orders</h1>
@@ -241,7 +243,7 @@ export default function SalesOrderPage() {
         </button>
       </div>
 
-      {/* â”€â”€ KPI cards â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ KPI cards Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
         {[
           { label: "Total Orders", value: total, color: accent },
@@ -258,11 +260,11 @@ export default function SalesOrderPage() {
         ))}
       </div>
 
-      {/* â”€â”€ Search + Tab filters â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Search + Tab filters Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
         <input
           style={{ ...inputStyle, maxWidth: 280 }}
-          placeholder="Search by order no or customerâ€¦"
+          placeholder="Search by order no or customerÃ¢â‚¬Â¦"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -290,10 +292,10 @@ export default function SalesOrderPage() {
         </div>
       </div>
 
-      {/* â”€â”€ Table â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Table Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ ...panelStyle, padding: 0, overflow: "hidden" }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loadingâ€¦</div>
+          <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>LoadingÃ¢â‚¬Â¦</div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>
             No sales orders found.
@@ -340,7 +342,7 @@ export default function SalesOrderPage() {
                   </td>
                   <td style={{ padding: "13px 16px", fontSize: 14 }}>{order.customerName}</td>
                   <td style={{ padding: "13px 16px", fontSize: 14, color: "var(--text-muted)" }}>
-                    {order.date || "â€”"}
+                    {order.date || "Ã¢â‚¬â€"}
                   </td>
                   <td style={{ padding: "13px 16px", fontSize: 14, textAlign: "right", fontWeight: 600 }}>
                     {fmt(order.amount)}
@@ -419,7 +421,7 @@ export default function SalesOrderPage() {
                           borderRadius: 6,
                         }}
                       >
-                        Ã—
+                        Ãƒâ€”
                       </button>
                     </div>
                   </td>
@@ -430,7 +432,7 @@ export default function SalesOrderPage() {
         )}
       </div>
 
-      {/* â”€â”€ New Order Modal â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ New Order Modal Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {showModal && (
         <div
           style={{
@@ -473,7 +475,7 @@ export default function SalesOrderPage() {
                   lineHeight: 1,
                 }}
               >
-                Ã—
+                Ãƒâ€”
               </button>
             </div>
 
@@ -595,7 +597,7 @@ export default function SalesOrderPage() {
                         padding: 0,
                       }}
                     >
-                      Ã—
+                      Ãƒâ€”
                     </button>
                   </div>
                 );
@@ -609,7 +611,7 @@ export default function SalesOrderPage() {
               </label>
               <textarea
                 style={{ ...inputStyle, minHeight: 72, resize: "vertical" }}
-                placeholder="Optional notes for this orderâ€¦"
+                placeholder="Optional notes for this orderÃ¢â‚¬Â¦"
                 value={form.notes}
                 onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
               />
@@ -644,7 +646,7 @@ export default function SalesOrderPage() {
                 Cancel
               </button>
               <button style={{ ...btnPrimary, opacity: saving ? 0.7 : 1 }} onClick={handleSubmit} disabled={saving}>
-                {saving ? "Creatingâ€¦" : "Create Order"}
+                {saving ? "CreatingÃ¢â‚¬Â¦" : "Create Order"}
               </button>
             </div>
           </div>

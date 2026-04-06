@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -185,7 +187,7 @@ export default function POSPage() {
     setDiscount("");
   }
 
-  function clearCart() {
+  async function clearCart() {
     if (cart.length === 0) return;
     if (!await confirmToast("Clear the current cart?")) return;
     setCart([]);

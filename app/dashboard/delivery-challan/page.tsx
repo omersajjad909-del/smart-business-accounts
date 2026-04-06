@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
@@ -443,8 +445,8 @@ const [searchTerm, _setSearchTerm] = useState("");
                     <td className="p-3">{new Date(c.date).toLocaleDateString()}</td>
                     <td className="p-3">{c.customer?.name || "N/A"}</td>
                     <td className="p-3">
-                        {c.vehicleNo && <span className="block text-xs">ðŸš— {c.vehicleNo}</span>}
-                        {c.driverName && <span className="block text-xs">ðŸ‘¤ {c.driverName}</span>}
+                        {c.vehicleNo && <span className="block text-xs">Ã°Å¸Å¡â€” {c.vehicleNo}</span>}
+                        {c.driverName && <span className="block text-xs">Ã°Å¸â€˜Â¤ {c.driverName}</span>}
                     </td>
                     <td className="p-3">
                       <span className={`px-2 py-1 rounded text-xs ${c.status === 'DELIVERED' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
@@ -496,13 +498,13 @@ const [searchTerm, _setSearchTerm] = useState("");
                   onClick={shareOnWhatsApp}
                   className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 flex-1 md:flex-none"
                 >
-                  ðŸ“± WhatsApp
+                  Ã°Å¸â€œÂ± WhatsApp
                 </button>
                 <button 
                   onClick={shareOnSMS}
                   className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 flex-1 md:flex-none"
                 >
-                  ðŸ’¬ SMS
+                  Ã°Å¸â€™Â¬ SMS
                 </button>
                 <button onClick={() => setPreview(false)} className="bg-yellow-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
                   Edit
@@ -517,7 +519,7 @@ const [searchTerm, _setSearchTerm] = useState("");
           {!preview && (
             <div className="bg-white border p-6 rounded space-y-4">
               <div className="mb-2 text-xs text-gray-500 italic">
-                ðŸ’¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Form | <strong>F8</strong> = Search Customer
+                Ã°Å¸â€™Â¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Form | <strong>F8</strong> = Search Customer
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <input value={challanNo} readOnly className="border p-2 bg-gray-100" placeholder="Challan No (Auto)" />

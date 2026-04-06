@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -85,7 +87,7 @@ export default function YearEndClosingPage() {
           lineHeight: 1.7,
         }}
       >
-        <strong>Warning â€” this action is irreversible.</strong>
+        <strong>Warning Ã¢â‚¬â€ this action is irreversible.</strong>
         <br />
         Running year-end closing will zero all Income &amp; Expense account balances for the period and post the net profit or loss as a journal entry to Capital / Retained Earnings.
         Ensure all transactions for the year have been posted and reconciled before proceeding.

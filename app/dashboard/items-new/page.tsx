@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
@@ -213,7 +215,7 @@ export default function ItemsNewPage() {
           onChange={(e) => setRate(e.target.value)}
         />
 
-        {/* ðŸ“‰ MIN STOCK INPUT */}
+        {/* Ã°Å¸â€œâ€° MIN STOCK INPUT */}
         <input
           className="border p-2 rounded bg-yellow-50"
           type="number"
@@ -222,7 +224,7 @@ export default function ItemsNewPage() {
           onChange={(e) => setMinStock(e.target.value)}
         />
 
-        {/* ðŸ“Ÿ BARCODE INPUT */}
+        {/* Ã°Å¸â€œÅ¸ BARCODE INPUT */}
         <input
           className="border p-2 rounded bg-gray-50"
           placeholder="Scan Barcode / SKU"

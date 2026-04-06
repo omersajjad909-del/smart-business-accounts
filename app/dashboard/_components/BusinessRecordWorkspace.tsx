@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useMemo, useState } from "react";
 import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
 

@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -411,12 +413,12 @@ const [searchTerm, setSearchTerm] = useState("");
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("âœ… Email sent successfully!");
+        toast.success("Ã¢Å“â€¦ Email sent successfully!");
       } else {
-        toast.error(`âŒ Failed to send email: ${data.error || "Unknown error"}`);
+        toast.error(`Ã¢ÂÅ’ Failed to send email: ${data.error || "Unknown error"}`);
       }
     } catch (_error) {
-      toast.error("âŒ Failed to send email. Please check email configuration.");
+      toast.error("Ã¢ÂÅ’ Failed to send email. Please check email configuration.");
     } finally {
       setSendingEmail(false);
     }
@@ -540,7 +542,7 @@ const [searchTerm, setSearchTerm] = useState("");
                     disabled={sendingEmail}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold shadow-md disabled:bg-gray-400"
                   >
-                    {sendingEmail ? "Sending..." : "ðŸ“§ Email"}
+                    {sendingEmail ? "Sending..." : "Ã°Å¸â€œÂ§ Email"}
                   </button>
                   <button onClick={() => setShowPreview(false)} className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded border font-bold">
                     Back to Edit
@@ -556,7 +558,7 @@ const [searchTerm, setSearchTerm] = useState("");
           {!showPreview && (
             <div className="bg-white border p-6 rounded space-y-6 shadow-sm">
               <div className="mb-2 text-xs text-gray-500 italic">
-                ðŸ’¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Supplier | <strong>F8</strong> = Search Query
+                Ã°Å¸â€™Â¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Supplier | <strong>F8</strong> = Search Query
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
@@ -676,7 +678,7 @@ const [searchTerm, setSearchTerm] = useState("");
                         applyTax ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
                       }`}
                     >
-                      {applyTax ? "âœ“ Tax Applied" : "+ Add Tax"}
+                      {applyTax ? "Ã¢Å“â€œ Tax Applied" : "+ Add Tax"}
                     </button>
                     
                     {applyTax && (

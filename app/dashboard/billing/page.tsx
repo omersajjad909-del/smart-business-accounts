@@ -1,10 +1,12 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 
-/* â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Types Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 type PaymentMethod = {
   id: string; brand: string; last4: string;
   expMonth: number; expYear: number; holderName: string; isDefault: boolean;
@@ -18,29 +20,29 @@ type Subscription = {
   amount: number; currency: string; introOfferClaimed: boolean; billingCycle?: string;
 };
 
-/* â”€â”€â”€ Plan definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Plan definitions Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 const PLANS = [
   {
-    code: "STARTER", name: "Starter", monthlyPrice: 49, icon: "ðŸŒ±", color: "#818cf8",
+    code: "STARTER", name: "Starter", monthlyPrice: 49, icon: "Ã°Å¸Å’Â±", color: "#818cf8",
     gradFrom: "#6366f1", gradTo: "#4f46e5",
     features: ["Up to 5 users","Core Accounting","Sales & Purchase Invoices","Bank Reconciliation","Basic Reports","Email Support"],
     notIncluded: ["HR & Payroll","Advanced Reports","Multi-Branch","API Access"],
   },
   {
-    code: "PROFESSIONAL", name: "Professional", monthlyPrice: 99, icon: "ðŸš€", color: "#34d399", popular: true,
+    code: "PROFESSIONAL", name: "Professional", monthlyPrice: 99, icon: "Ã°Å¸Å¡â‚¬", color: "#34d399", popular: true,
     gradFrom: "#10b981", gradTo: "#059669",
     features: ["Up to 20 users","Everything in Starter","CRM & Sales Pipeline","Inventory Management","Multi-Branch Support","Advanced Reports","Backup & Restore","Priority Support"],
     notIncluded: ["HR & Payroll","API Access","Dedicated Account Manager"],
   },
   {
-    code: "ENTERPRISE", name: "Enterprise", monthlyPrice: 249, icon: "ðŸ’Ž", color: "#fbbf24",
+    code: "ENTERPRISE", name: "Enterprise", monthlyPrice: 249, icon: "Ã°Å¸â€™Å½", color: "#fbbf24",
     gradFrom: "#f59e0b", gradTo: "#d97706",
     features: ["Unlimited users","Everything in Pro","HR & Payroll","API Access & Webhooks","Custom Integrations","Dedicated Account Manager","SLA Support","Custom Modules"],
     notIncluded: [],
   },
 ];
 
-/* â”€â”€â”€ Card brand config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Card brand config Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 const CARD_BRANDS: Record<string, { label: string; grad: string }> = {
   visa:       { label: "VISA",       grad: "linear-gradient(135deg,#1a1f71,#1e3a8a)" },
   mastercard: { label: "MASTERCARD", grad: "linear-gradient(135deg,#2d1b69,#c2185b)" },
@@ -60,7 +62,7 @@ function detectBrand(num: string): string {
   return "unknown";
 }
 
-/* â”€â”€â”€ Status Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Status Badge Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { bg: string; color: string; label: string }> = {
     paid:     { bg:"rgba(52,211,153,.12)",  color:"#34d399", label:"Paid" },
@@ -81,13 +83,13 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-/* â”€â”€â”€ Cancel Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Cancel Modal Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 function CancelModal({ onClose, onConfirm, planName }: { onClose:()=>void; onConfirm:(r:string)=>Promise<void>; planName:string }) {
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const reasons = ["Too expensive","Missing features I need","Switching to another tool","Business closed / paused","Just testing","Other"];
 
-  async function await confirmToast() {
+  async function confirmCancellation() {
     if (!reason) return;
     setLoading(true);
     await onConfirm(reason);
@@ -100,7 +102,7 @@ function CancelModal({ onClose, onConfirm, planName }: { onClose:()=>void; onCon
       <div style={{ position:"relative", width:"100%", maxWidth:480, background:"#0f1630", borderRadius:24, border:"1px solid rgba(239,68,68,.22)", boxShadow:"0 32px 80px rgba(0,0,0,.5)", overflow:"hidden" }}>
         <div style={{ height:3, background:"linear-gradient(90deg,#ef4444,#dc2626)" }}/>
         <div style={{ padding:"28px 32px 32px" }}>
-          <div style={{ width:52, height:52, borderRadius:16, background:"rgba(239,68,68,.1)", border:"1px solid rgba(239,68,68,.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:18 }}>âš ï¸</div>
+          <div style={{ width:52, height:52, borderRadius:16, background:"rgba(239,68,68,.1)", border:"1px solid rgba(239,68,68,.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, marginBottom:18 }}>Ã¢Å¡Â Ã¯Â¸Â</div>
           <h2 style={{ margin:"0 0 8px", fontSize:20, fontWeight:800, color:"white" }}>Cancel {planName} Plan?</h2>
           <p style={{ margin:"0 0 24px", fontSize:13, color:"rgba(255,255,255,.5)", lineHeight:1.65 }}>
             Your plan stays active until the end of the billing period. You can reactivate at any time.
@@ -122,8 +124,8 @@ function CancelModal({ onClose, onConfirm, planName }: { onClose:()=>void; onCon
             <button onClick={onClose} style={{ flex:1, padding:"12px", borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
               Keep my plan
             </button>
-            <button onClick={confirm} disabled={!reason||loading} style={{ flex:1, padding:"12px", borderRadius:12, background:(!reason||loading)?"rgba(255,255,255,.05)":"linear-gradient(135deg,#ef4444,#dc2626)", border:"none", color:(!reason||loading)?"rgba(255,255,255,.3)":"white", fontSize:13, fontWeight:700, cursor:(!reason||loading)?"not-allowed":"pointer", fontFamily:"inherit", transition:"all .2s" }}>
-              {loading ? "Cancelingâ€¦" : "Yes, Cancel"}
+            <button onClick={confirmCancellation} disabled={!reason||loading} style={{ flex:1, padding:"12px", borderRadius:12, background:(!reason||loading)?"rgba(255,255,255,.05)":"linear-gradient(135deg,#ef4444,#dc2626)", border:"none", color:(!reason||loading)?"rgba(255,255,255,.3)":"white", fontSize:13, fontWeight:700, cursor:(!reason||loading)?"not-allowed":"pointer", fontFamily:"inherit", transition:"all .2s" }}>
+              {loading ? "CancelingÃ¢â‚¬Â¦" : "Yes, Cancel"}
             </button>
           </div>
         </div>
@@ -132,7 +134,7 @@ function CancelModal({ onClose, onConfirm, planName }: { onClose:()=>void; onCon
   );
 }
 
-/* â”€â”€â”€ Add Card Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Add Card Modal Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(card:PaymentMethod)=>void }) {
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry]         = useState("");
@@ -171,15 +173,15 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
         <div style={{ padding:"22px 28px", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div>
             <h2 style={{ margin:0, fontSize:17, fontWeight:800, color:"white" }}>Add Payment Method</h2>
-            <p style={{ margin:"3px 0 0", fontSize:12, color:"rgba(255,255,255,.4)" }}>Encrypted &amp; secure â€” we never store full card numbers</p>
+            <p style={{ margin:"3px 0 0", fontSize:12, color:"rgba(255,255,255,.4)" }}>Encrypted &amp; secure Ã¢â‚¬â€ we never store full card numbers</p>
           </div>
-          <button onClick={onClose} style={{ width:32, height:32, borderRadius:8, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", cursor:"pointer", fontSize:16, color:"rgba(255,255,255,.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>âœ•</button>
+          <button onClick={onClose} style={{ width:32, height:32, borderRadius:8, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", cursor:"pointer", fontSize:16, color:"rgba(255,255,255,.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>Ã¢Å“â€¢</button>
         </div>
         <div style={{ padding:"22px 28px 28px" }}>
           <div style={{ display:"flex", gap:5, marginBottom:22, padding:4, background:"rgba(255,255,255,.05)", borderRadius:12 }}>
             {(["card","billing"] as const).map(s => (
               <button key={s} onClick={() => setStep(s)} style={{ flex:1, padding:"8px", borderRadius:9, border:"none", cursor:"pointer", fontSize:12, fontWeight:700, fontFamily:"inherit", transition:"all .15s", background:step===s?"rgba(255,255,255,.1)":"transparent", color:step===s?"white":"rgba(255,255,255,.35)" }}>
-                {s==="card" ? "ðŸ’³ Card Details" : "ðŸ“ Billing Address"}
+                {s==="card" ? "Ã°Å¸â€™Â³ Card Details" : "Ã°Å¸â€œÂ Billing Address"}
               </button>
             ))}
           </div>
@@ -191,7 +193,7 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
                 <div style={{ width:28, height:20, borderRadius:4, background:"linear-gradient(135deg,#fbbf24,#d97706)", marginBottom:10 }}/>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end" }}>
                   <div>
-                    <div style={{ fontSize:13, color:"rgba(255,255,255,.9)", fontFamily:"monospace", letterSpacing:2 }}>{cardNumber || "â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢"}</div>
+                    <div style={{ fontSize:13, color:"rgba(255,255,255,.9)", fontFamily:"monospace", letterSpacing:2 }}>{cardNumber || "Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢ Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢ Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢ Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢"}</div>
                     <div style={{ fontSize:11, color:"rgba(255,255,255,.5)", marginTop:4 }}>{name || "CARDHOLDER NAME"} &nbsp; {expiry || "MM/YY"}</div>
                   </div>
                   <div style={{ fontSize:9, fontWeight:900, color:"rgba(255,255,255,.45)", letterSpacing:1 }}>{brandCfg.label}</div>
@@ -200,11 +202,11 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
               <div><label style={lbl}>Card Number</label><input value={cardNumber} onChange={e=>setCardNumber(formatCardNumber(e.target.value))} placeholder="1234 5678 9012 3456" maxLength={19} style={{...inp,fontFamily:"monospace",letterSpacing:2}}/></div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
                 <div><label style={lbl}>Expiry Date</label><input value={expiry} onChange={e=>setExpiry(formatExpiry(e.target.value))} placeholder="MM/YY" maxLength={5} style={inp}/></div>
-                <div><label style={lbl}>CVC / CVV</label><input value={cvc} onChange={e=>setCvc(e.target.value.replace(/\D/g,"").slice(0,4))} placeholder="â€¢â€¢â€¢" type="password" maxLength={4} style={inp}/></div>
+                <div><label style={lbl}>CVC / CVV</label><input value={cvc} onChange={e=>setCvc(e.target.value.replace(/\D/g,"").slice(0,4))} placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢" type="password" maxLength={4} style={inp}/></div>
               </div>
               <div><label style={lbl}>Cardholder Name</label><input value={name} onChange={e=>setName(e.target.value.toUpperCase())} placeholder="AS IT APPEARS ON CARD" style={{...inp,textTransform:"uppercase"}}/></div>
               <button onClick={() => setStep("billing")} style={{ width:"100%", padding:"12px", borderRadius:12, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                Continue to Billing Address â†’
+                Continue to Billing Address Ã¢â€ â€™
               </button>
             </div>
           )}
@@ -224,12 +226,12 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
                 </select>
               </div>
               <div style={{ padding:"12px 14px", borderRadius:12, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.18)", display:"flex", alignItems:"center", gap:10, fontSize:11, color:"#6ee7b7" }}>
-                ðŸ”’ 256-bit SSL â€” we never store your full card number
+                Ã°Å¸â€â€™ 256-bit SSL Ã¢â‚¬â€ we never store your full card number
               </div>
               <div style={{ display:"flex", gap:10 }}>
-                <button onClick={() => setStep("card")} style={{ flex:1, padding:"12px", borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>â† Back</button>
+                <button onClick={() => setStep("card")} style={{ flex:1, padding:"12px", borderRadius:12, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Ã¢â€ Â Back</button>
                 <button onClick={handleSave} disabled={saving} style={{ flex:2, padding:"12px", borderRadius:12, background:saving?"rgba(255,255,255,.06)":"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:saving?"rgba(255,255,255,.3)":"white", fontSize:13, fontWeight:700, cursor:saving?"wait":"pointer", fontFamily:"inherit" }}>
-                  {saving ? "Savingâ€¦" : "Save Payment Method"}
+                  {saving ? "SavingÃ¢â‚¬Â¦" : "Save Payment Method"}
                 </button>
               </div>
             </div>
@@ -240,9 +242,9 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    MAIN PAGE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function BillingPage() {
   const searchParams = useSearchParams();
   const upgraded = searchParams?.get("upgrade") === "success";
@@ -372,19 +374,19 @@ function BillingPage() {
         @media(max-width:540px){.bill-stats{grid-template-columns:1fr!important}}
       `}</style>
 
-      {/* â”€â”€ Success Banner â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Success Banner Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {showUpgradeBanner && (
         <div style={{ marginBottom:20, padding:"16px 20px", borderRadius:16, background:"rgba(52,211,153,.08)", border:"1.5px solid rgba(52,211,153,.22)", display:"flex", alignItems:"center", gap:14, animation:"fadeUp .4s ease" }}>
-          <div style={{ width:42, height:42, borderRadius:12, background:"rgba(52,211,153,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>ðŸŽ‰</div>
+          <div style={{ width:42, height:42, borderRadius:12, background:"rgba(52,211,153,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>Ã°Å¸Å½â€°</div>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:15, fontWeight:800, color:"#34d399" }}>Plan activated successfully!</div>
             <div style={{ fontSize:12, color:"rgba(52,211,153,.7)", marginTop:2 }}>Your subscription is now active. Add a payment method below for uninterrupted service.</div>
           </div>
-          <button onClick={() => setShowUpgradeBanner(false)} style={{ width:28, height:28, borderRadius:8, border:"1px solid rgba(52,211,153,.22)", background:"transparent", cursor:"pointer", fontSize:14, color:"#34d399" }}>âœ•</button>
+          <button onClick={() => setShowUpgradeBanner(false)} style={{ width:28, height:28, borderRadius:8, border:"1px solid rgba(52,211,153,.22)", background:"transparent", cursor:"pointer", fontSize:14, color:"#34d399" }}>Ã¢Å“â€¢</button>
         </div>
       )}
 
-      {/* â”€â”€ Page header â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Page header Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:12 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:800, letterSpacing:"-0.6px" }}>Billing &amp; Payments</h1>
@@ -395,13 +397,13 @@ function BillingPage() {
         </button>
       </div>
 
-      {/* â”€â”€ Stats row â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Stats row Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div className="bill-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:24 }}>
         {[
           { label:"Current Plan",   value: currentPlan.name,                          icon: currentPlan.icon, color: currentPlan.color },
-          { label:"Status",         value: subscription?.status||"â€”",                 icon: "â—",              color: "#34d399", isStatus:true },
-          { label:"Next Renewal",   value: subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}) : "â€”", icon:"ðŸ“…", color:"#fbbf24" },
-          { label:"Monthly Amount", value: subscription ? `$${subscription.amount}/mo` : "â€”",                 icon: "ðŸ’°",             color: "#38bdf8" },
+          { label:"Status",         value: subscription?.status||"Ã¢â‚¬â€",                 icon: "Ã¢â€”Â",              color: "#34d399", isStatus:true },
+          { label:"Next Renewal",   value: subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}) : "Ã¢â‚¬â€", icon:"Ã°Å¸â€œâ€¦", color:"#fbbf24" },
+          { label:"Monthly Amount", value: subscription ? `$${subscription.amount}/mo` : "Ã¢â‚¬â€",                 icon: "Ã°Å¸â€™Â°",             color: "#38bdf8" },
         ].map(s => (
           <div key={s.label} style={{ padding:"17px 18px", borderRadius:16, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:14 }}>
             <div style={{ width:40, height:40, borderRadius:12, background:`${s.color}18`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{s.icon}</div>
@@ -415,19 +417,19 @@ function BillingPage() {
         ))}
       </div>
 
-      {/* â”€â”€ Tabs â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Tabs Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ display:"flex", gap:4, marginBottom:24, padding:5, borderRadius:14, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", width:"fit-content", overflowX:"auto" }}>
         {([
-          { id:"overview", label:"ðŸ“Š Overview" },
-          { id:"plans",    label:"ðŸš€ Plans" },
-          { id:"methods",  label:"ðŸ’³ Payment Methods" },
-          { id:"invoices", label:"ðŸ§¾ Invoices" },
+          { id:"overview", label:"Ã°Å¸â€œÅ  Overview" },
+          { id:"plans",    label:"Ã°Å¸Å¡â‚¬ Plans" },
+          { id:"methods",  label:"Ã°Å¸â€™Â³ Payment Methods" },
+          { id:"invoices", label:"Ã°Å¸Â§Â¾ Invoices" },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setActiveTab(t.id)} style={tabBtn(activeTab===t.id)}>{t.label}</button>
         ))}
       </div>
 
-      {/* â•â• OVERVIEW TAB â•â• */}
+      {/* Ã¢â€¢ÂÃ¢â€¢Â OVERVIEW TAB Ã¢â€¢ÂÃ¢â€¢Â */}
       {activeTab === "overview" && (
         <div style={{ display:"flex", flexDirection:"column", gap:20, animation:"fadeUp .35s ease" }}>
 
@@ -448,7 +450,7 @@ function BillingPage() {
                   {[
                     { label:"Status",        node: <StatusBadge status={subscription?.status?.toLowerCase()||"active"} /> },
                     { label:"Billing Cycle", node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.billingCycle==="yearly"?"Yearly":"Monthly"}</span> },
-                    { label:"Renewal Date",  node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}) : "â€”"}</span> },
+                    { label:"Renewal Date",  node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}) : "Ã¢â‚¬â€"}</span> },
                     { label:"Currency",      node: <span style={{ fontSize:14, fontWeight:800 }}>USD</span> },
                   ].map(r => (
                     <div key={r.label}>
@@ -463,7 +465,7 @@ function BillingPage() {
                     <>
                       <button onClick={() => handleCheckout(currentPlanCode==="ENTERPRISE"?"PROFESSIONAL":currentPlanCode==="PROFESSIONAL"?"ENTERPRISE":"PROFESSIONAL")} disabled={!!checkingOut}
                         style={{ padding:"11px 20px", borderRadius:12, background:`linear-gradient(135deg,${currentPlan.gradFrom},${currentPlan.gradTo})`, border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:checkingOut?.5:1 }}>
-                        {checkingOut ? "Processingâ€¦" : currentPlanCode==="ENTERPRISE" ? "Manage Plan" : `Upgrade to ${currentPlanCode==="PROFESSIONAL"?"Enterprise":"Professional"} â†’`}
+                        {checkingOut ? "ProcessingÃ¢â‚¬Â¦" : currentPlanCode==="ENTERPRISE" ? "Manage Plan" : `Upgrade to ${currentPlanCode==="PROFESSIONAL"?"Enterprise":"Professional"} Ã¢â€ â€™`}
                       </button>
                       <button onClick={() => setActiveTab("plans")} style={{ padding:"10px 20px", borderRadius:12, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.09)", color:"rgba(255,255,255,.6)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
                         View all plans
@@ -474,7 +476,7 @@ function BillingPage() {
                     </>
                   ) : (
                     <button onClick={() => handleCheckout(currentPlanCode)} style={{ padding:"12px 20px", borderRadius:12, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                      Reactivate Plan â†’
+                      Reactivate Plan Ã¢â€ â€™
                     </button>
                   )}
                 </div>
@@ -486,11 +488,11 @@ function BillingPage() {
           <div style={{ ...card }}>
             <div style={{ padding:"18px 24px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <div style={{ fontSize:15, fontWeight:800 }}>Recent Invoices</div>
-              <button onClick={() => setActiveTab("invoices")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>View all â†’</button>
+              <button onClick={() => setActiveTab("invoices")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>View all Ã¢â€ â€™</button>
             </div>
             {invoices.length === 0 ? (
               <div style={{ padding:"32px 24px", textAlign:"center", color:"rgba(255,255,255,.3)" }}>
-                <div style={{ fontSize:28, marginBottom:8 }}>ðŸ§¾</div>
+                <div style={{ fontSize:28, marginBottom:8 }}>Ã°Å¸Â§Â¾</div>
                 <div style={{ fontSize:13, fontWeight:600 }}>No invoices yet</div>
               </div>
             ) : (
@@ -507,7 +509,7 @@ function BillingPage() {
                         <td style={{ padding:"13px 20px", fontSize:12, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
                         <td style={{ padding:"13px 20px", fontSize:12, fontWeight:700 }}>${inv.amount}.00</td>
                         <td style={{ padding:"13px 20px" }}><StatusBadge status={inv.status}/></td>
-                        <td style={{ padding:"13px 20px" }}><button onClick={() => toast("PDF download coming soon.")} style={{ padding:"4px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>â¬‡ PDF</button></td>
+                        <td style={{ padding:"13px 20px" }}><button onClick={() => toast("PDF download coming soon.")} style={{ padding:"4px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>Ã¢Â¬â€¡ PDF</button></td>
                       </tr>
                     ))}
                   </tbody>
@@ -520,11 +522,11 @@ function BillingPage() {
           <div style={{ ...card }}>
             <div style={{ padding:"18px 24px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
               <div style={{ fontSize:15, fontWeight:800 }}>Payment Methods</div>
-              <button onClick={() => setActiveTab("methods")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>Manage â†’</button>
+              <button onClick={() => setActiveTab("methods")} style={{ fontSize:12, fontWeight:600, color:"#a5b4fc", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>Manage Ã¢â€ â€™</button>
             </div>
             {paymentMethods.length === 0 ? (
               <div style={{ padding:"28px 24px", textAlign:"center" }}>
-                <div style={{ fontSize:26, marginBottom:8 }}>ðŸ’³</div>
+                <div style={{ fontSize:26, marginBottom:8 }}>Ã°Å¸â€™Â³</div>
                 <div style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,.4)", marginBottom:12 }}>No payment methods saved</div>
                 <button onClick={() => setShowAddCard(true)} style={{ padding:"9px 20px", borderRadius:10, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.3)", color:"#a5b4fc", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>+ Add Card</button>
               </div>
@@ -534,7 +536,7 @@ function BillingPage() {
                 <div key={pm.id} className="row-hover" style={{ padding:"14px 24px", display:"flex", alignItems:"center", gap:16, borderBottom:"1px solid rgba(255,255,255,.04)" }}>
                   <div style={{ width:52, height:34, borderRadius:8, background:cfg.grad, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, fontWeight:900, color:"rgba(255,255,255,.5)", letterSpacing:1, flexShrink:0 }}>{cfg.label}</div>
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:13, fontWeight:700 }}>{cfg.label} â€¢â€¢â€¢â€¢ {pm.last4}</div>
+                    <div style={{ fontSize:13, fontWeight:700 }}>{cfg.label} Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢ {pm.last4}</div>
                     <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:2 }}>Expires {String(pm.expMonth).padStart(2,"0")}/{pm.expYear}</div>
                   </div>
                   {pm.isDefault && <span style={{ padding:"2px 8px", borderRadius:8, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.28)", fontSize:10, fontWeight:700, color:"#a5b4fc" }}>DEFAULT</span>}
@@ -545,7 +547,7 @@ function BillingPage() {
         </div>
       )}
 
-      {/* â•â• PLANS TAB â•â• */}
+      {/* Ã¢â€¢ÂÃ¢â€¢Â PLANS TAB Ã¢â€¢ÂÃ¢â€¢Â */}
       {activeTab === "plans" && (
         <div style={{ animation:"fadeUp .35s ease" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22, flexWrap:"wrap", gap:12 }}>
@@ -573,22 +575,22 @@ function BillingPage() {
 
               return (
                 <div key={plan.code} className="plan-card" style={{ border:isCurrent?`2px solid ${plan.color}40`:plan.popular?`2px solid ${plan.color}28`:undefined }}>
-                  {plan.popular && !isCurrent && <div style={{ position:"absolute", top:-10, left:"50%", transform:"translateX(-50%)", padding:"3px 12px", borderRadius:99, background:`linear-gradient(135deg,${plan.gradFrom},${plan.gradTo})`, fontSize:10, fontWeight:800, color:"white", whiteSpace:"nowrap" }}>â­ Most Popular</div>}
-                  {isCurrent && <div style={{ marginBottom:12 }}><span style={{ padding:"3px 10px", borderRadius:99, background:`${plan.color}18`, color:plan.color, fontSize:10, fontWeight:800 }}>âœ“ Current Plan</span></div>}
+                  {plan.popular && !isCurrent && <div style={{ position:"absolute", top:-10, left:"50%", transform:"translateX(-50%)", padding:"3px 12px", borderRadius:99, background:`linear-gradient(135deg,${plan.gradFrom},${plan.gradTo})`, fontSize:10, fontWeight:800, color:"white", whiteSpace:"nowrap" }}>Ã¢Â­Â Most Popular</div>}
+                  {isCurrent && <div style={{ marginBottom:12 }}><span style={{ padding:"3px 10px", borderRadius:99, background:`${plan.color}18`, color:plan.color, fontSize:10, fontWeight:800 }}>Ã¢Å“â€œ Current Plan</span></div>}
                   <div style={{ fontSize:28, marginBottom:8 }}>{plan.icon}</div>
                   <h3 style={{ margin:"0 0 4px", fontSize:18, fontWeight:800 }}>{plan.name}</h3>
                   <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:4 }}>
                     <span style={{ fontSize:30, fontWeight:900, color:plan.color }}>${price}</span>
-                    <span style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>/ mo{billing==="annual"?" Â· billed annually":""}</span>
+                    <span style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>/ mo{billing==="annual"?" Ã‚Â· billed annually":""}</span>
                   </div>
                   {billing==="annual" && <div style={{ fontSize:11, color:"rgba(52,211,153,.7)", marginBottom:14, fontWeight:600 }}>Save ${Math.round(plan.monthlyPrice*12 - plan.monthlyPrice*0.8*12)}/year</div>}
                   <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom:22, marginTop:billing==="annual"?0:14 }}>
-                    {plan.features.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.7)" }}><span style={{ color:"#34d399", flexShrink:0 }}>âœ“</span>{f}</div>)}
-                    {plan.notIncluded.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.22)" }}><span style={{ flexShrink:0, opacity:.4 }}>âœ•</span>{f}</div>)}
+                    {plan.features.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.7)" }}><span style={{ color:"#34d399", flexShrink:0 }}>Ã¢Å“â€œ</span>{f}</div>)}
+                    {plan.notIncluded.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.22)" }}><span style={{ flexShrink:0, opacity:.4 }}>Ã¢Å“â€¢</span>{f}</div>)}
                   </div>
                   <button onClick={() => !isCurrent && handleCheckout(plan.code, billing==="annual"?"yearly":"monthly")} disabled={isCurrent||!!checkingOut}
                     style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", fontSize:13, fontWeight:700, cursor:isCurrent?"default":"pointer", fontFamily:"inherit", transition:"all .2s", background:isCurrent?"rgba(255,255,255,.06)":`linear-gradient(135deg,${plan.gradFrom},${plan.gradTo})`, color:isCurrent?"rgba(255,255,255,.3)":"white", boxShadow:isCurrent?"none":`0 4px 20px ${plan.color}28`, opacity:checkingOut&&checkingOut!==plan.code?.5:1 }}>
-                    {checkingOut===plan.code ? "Processingâ€¦" : isCurrent ? "Current Plan" : isHigher ? `Upgrade to ${plan.name} â†’` : isLower ? `Downgrade to ${plan.name}` : `Select ${plan.name}`}
+                    {checkingOut===plan.code ? "ProcessingÃ¢â‚¬Â¦" : isCurrent ? "Current Plan" : isHigher ? `Upgrade to ${plan.name} Ã¢â€ â€™` : isLower ? `Downgrade to ${plan.name}` : `Select ${plan.name}`}
                   </button>
                 </div>
               );
@@ -597,7 +599,7 @@ function BillingPage() {
         </div>
       )}
 
-      {/* â•â• PAYMENT METHODS TAB â•â• */}
+      {/* Ã¢â€¢ÂÃ¢â€¢Â PAYMENT METHODS TAB Ã¢â€¢ÂÃ¢â€¢Â */}
       {activeTab === "methods" && (
         <div style={{ animation:"fadeUp .35s ease" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
@@ -610,7 +612,7 @@ function BillingPage() {
           <div style={{ ...card }}>
             {paymentMethods.length === 0 ? (
               <div style={{ padding:"52px 24px", textAlign:"center" }}>
-                <div style={{ fontSize:40, marginBottom:12 }}>ðŸ’³</div>
+                <div style={{ fontSize:40, marginBottom:12 }}>Ã°Å¸â€™Â³</div>
                 <div style={{ fontSize:15, fontWeight:700, marginBottom:6 }}>No payment methods</div>
                 <div style={{ fontSize:13, color:"rgba(255,255,255,.35)", marginBottom:20 }}>Add a card for uninterrupted service</div>
                 <button onClick={() => setShowAddCard(true)} style={{ padding:"10px 24px", borderRadius:12, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>+ Add Payment Method</button>
@@ -621,14 +623,14 @@ function BillingPage() {
                 <div key={pm.id} className="row-hover" style={{ padding:"18px 24px", display:"flex", alignItems:"center", gap:18, borderBottom:i<paymentMethods.length-1?"1px solid rgba(255,255,255,.05)":"none" }}>
                   <div style={{ width:72, height:46, borderRadius:10, background:cfg.grad, padding:"8px 12px", position:"relative", flexShrink:0, boxShadow:"0 4px 16px rgba(0,0,0,.25)" }}>
                     <div style={{ width:18, height:13, borderRadius:3, background:"linear-gradient(135deg,#fbbf24,#d97706)", marginBottom:5, opacity:.9 }}/>
-                    <div style={{ fontSize:8, color:"rgba(255,255,255,.75)", fontFamily:"monospace", letterSpacing:1.5 }}>â€¢â€¢â€¢â€¢ {pm.last4}</div>
+                    <div style={{ fontSize:8, color:"rgba(255,255,255,.75)", fontFamily:"monospace", letterSpacing:1.5 }}>Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢ {pm.last4}</div>
                   </div>
                   <div style={{ flex:1 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                       <span style={{ fontWeight:700, fontSize:14 }}>{cfg.label} ending in {pm.last4}</span>
                       {pm.isDefault && <span style={{ padding:"2px 8px", borderRadius:8, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.28)", fontSize:10, fontWeight:700, color:"#a5b4fc" }}>DEFAULT</span>}
                     </div>
-                    <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:3 }}>{pm.holderName} Â· Expires {String(pm.expMonth).padStart(2,"0")}/{pm.expYear}</div>
+                    <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:3 }}>{pm.holderName} Ã‚Â· Expires {String(pm.expMonth).padStart(2,"0")}/{pm.expYear}</div>
                   </div>
                   <div style={{ display:"flex", gap:8 }}>
                     {!pm.isDefault && <button onClick={() => setDefaultCard(pm.id)} style={{ fontSize:11, fontWeight:600, padding:"6px 14px", borderRadius:9, border:"1px solid rgba(255,255,255,.09)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.55)", cursor:"pointer", fontFamily:"inherit" }}>Set Default</button>}
@@ -650,7 +652,7 @@ function BillingPage() {
         </div>
       )}
 
-      {/* â•â• INVOICES TAB â•â• */}
+      {/* Ã¢â€¢ÂÃ¢â€¢Â INVOICES TAB Ã¢â€¢ÂÃ¢â€¢Â */}
       {activeTab === "invoices" && (
         <div style={{ animation:"fadeUp .35s ease" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
@@ -658,12 +660,12 @@ function BillingPage() {
               <h2 style={{ margin:0, fontSize:18, fontWeight:800 }}>Invoice History</h2>
               <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(255,255,255,.4)" }}>All past and upcoming billing records</p>
             </div>
-            <button onClick={() => toast("CSV export coming soon.")} style={{ padding:"9px 16px", borderRadius:11, border:"1px solid rgba(255,255,255,.09)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.55)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>â¬‡ Export CSV</button>
+            <button onClick={() => toast("CSV export coming soon.")} style={{ padding:"9px 16px", borderRadius:11, border:"1px solid rgba(255,255,255,.09)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.55)", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>Ã¢Â¬â€¡ Export CSV</button>
           </div>
           <div style={{ ...card }}>
             {invoices.length === 0 ? (
               <div style={{ padding:"52px 24px", textAlign:"center" }}>
-                <div style={{ fontSize:40, marginBottom:12 }}>ðŸ§¾</div>
+                <div style={{ fontSize:40, marginBottom:12 }}>Ã°Å¸Â§Â¾</div>
                 <div style={{ fontSize:15, fontWeight:700, marginBottom:6 }}>No invoices yet</div>
                 <div style={{ fontSize:13, color:"rgba(255,255,255,.35)" }}>Billing history will appear here once you have an active subscription</div>
               </div>
@@ -681,7 +683,7 @@ function BillingPage() {
                         <td style={{ padding:"14px 20px", fontSize:13, color:"rgba(255,255,255,.65)" }}>{inv.plan}</td>
                         <td style={{ padding:"14px 20px", fontSize:13, fontWeight:700 }}>${inv.amount}.00 {inv.currency}</td>
                         <td style={{ padding:"14px 20px" }}><StatusBadge status={inv.status}/></td>
-                        <td style={{ padding:"14px 20px" }}><button onClick={() => toast("PDF download coming soon.")} style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>â¬‡ PDF</button></td>
+                        <td style={{ padding:"14px 20px" }}><button onClick={() => toast("PDF download coming soon.")} style={{ display:"flex", alignItems:"center", gap:5, padding:"5px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>Ã¢Â¬â€¡ PDF</button></td>
                       </tr>
                     ))}
                   </tbody>
@@ -692,7 +694,7 @@ function BillingPage() {
         </div>
       )}
 
-      {/* â”€â”€ Modals â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Modals Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {showAddCard && <AddCardModal onClose={() => setShowAddCard(false)} onSuccess={c => setPaymentMethods(prev => [...prev, c])} />}
       {showCancel  && <CancelModal planName={currentPlan.name} onClose={() => setShowCancel(false)} onConfirm={handleCancel} />}
     </div>

@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useEffect, useMemo, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
@@ -225,7 +227,7 @@ export default function StockOnVanPage() {
                   <button onClick={() => editLoad(load)} style={{ padding: "6px 10px", background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.3)", color: "#a5b4fc", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Edit
                   </button>
-                  <button onClick={() => { if (await confirmToast(`Delete van load for ${load.itemName}?`)) void stockRecords.remove(load.id); }} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
+                  <button onClick={async () => { if (await confirmToast(`Delete van load for ${load.itemName}?`)) void stockRecords.remove(load.id); }} style={{ padding: "6px 10px", background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>
                     Delete
                   </button>
                 </td>

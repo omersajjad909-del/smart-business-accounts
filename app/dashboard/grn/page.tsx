@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`nimport { useEffect, useState } from "react";
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -290,7 +292,7 @@ export default function GRNPage() {
                   <option value="">-- Select PO (optional) --</option>
                   {pos.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.poNo} â€” {p.supplier.name}
+                      {p.poNo} Ã¢â‚¬â€ {p.supplier.name}
                     </option>
                   ))}
                 </select>
@@ -413,7 +415,7 @@ export default function GRNPage() {
                           onClick={() => removeRow(idx)}
                           className="text-red-400 hover:text-red-600 text-lg leading-none"
                         >
-                          Ã—
+                          Ãƒâ€”
                         </button>
                       </td>
                     </tr>

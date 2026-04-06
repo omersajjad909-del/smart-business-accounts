@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
@@ -296,7 +298,7 @@ function getStatusBadge(status: string) {
   return (
     <ResponsiveContainer>
       <PageHeader
-        title="ðŸ’° Advance Payment to Suppliers"
+        title="Ã°Å¸â€™Â° Advance Payment to Suppliers"
         description="Track supplier advances and adjust against invoices"
         action={{
           label: showForm ? "Cancel" : "+ New Advance Payment",

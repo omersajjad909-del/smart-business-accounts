@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from 'react';
@@ -514,7 +516,7 @@ export default function PaymentReceiptsPage() {
                         onClick={() => handleClearCheque(receipt)}
                         className="text-green-600 hover:text-green-800 font-medium text-sm"
                       >
-                        Clear âœ“
+                        Clear Ã¢Å“â€œ
                       </button>
                     )}
                     <button

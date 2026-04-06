@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
@@ -229,7 +231,7 @@ export default function AdminControlPage() {
 
   return (
     <ResponsiveContainer className="space-y-6 py-6">
-      <PageHeader title="Admin Control Center" description="Manage branches, team access, permissions, branding and print formats â€” all in one place." />
+      <PageHeader title="Admin Control Center" description="Manage branches, team access, permissions, branding and print formats Ã¢â‚¬â€ all in one place." />
 
       {message && (
         <div className={`rounded-lg border px-4 py-3 text-sm ${message.ok ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-red-500/30 bg-red-500/10 text-red-300"}`}>
@@ -341,8 +343,8 @@ export default function AdminControlPage() {
                 {branches.map((branch) => (
                   <div key={branch.id} className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-bg-2)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <div className="text-sm font-semibold text-[var(--text-primary)]">{branch.code} Â· {branch.name}</div>
-                      <div className="text-xs text-[var(--text-muted)]">{branch.city || "No city"} Â· {branch.isActive ? "Active" : "Inactive"}</div>
+                      <div className="text-sm font-semibold text-[var(--text-primary)]">{branch.code} Ã‚Â· {branch.name}</div>
+                      <div className="text-xs text-[var(--text-muted)]">{branch.city || "No city"} Ã‚Â· {branch.isActive ? "Active" : "Inactive"}</div>
                     </div>
                     <div className="flex gap-2">
                       <Button type="button" variant="secondary" onClick={() => setBranchForm({ id: branch.id, code: branch.code, name: branch.name, city: branch.city || "", isActive: branch.isActive })}>Edit</Button>
@@ -370,7 +372,7 @@ export default function AdminControlPage() {
                       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <div className="text-sm font-semibold text-[var(--text-primary)]">{user.name}</div>
-                          <div className="text-xs text-[var(--text-muted)]">{user.email} Â· {user.role} Â· {user.active ? "Active" : "Inactive"}</div>
+                          <div className="text-xs text-[var(--text-muted)]">{user.email} Ã‚Â· {user.role} Ã‚Â· {user.active ? "Active" : "Inactive"}</div>
                         </div>
                         <div className="text-xs text-[var(--text-muted)]">{user.role === "ADMIN" ? "Admin defaults to full access" : `${assigned.length || 0} branch(es) assigned`}</div>
                       </div>

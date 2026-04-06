@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { Suspense, useEffect, useRef as _useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -515,12 +517,12 @@ function SalesInvoiceContent() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("âœ… Email sent successfully!");
+        toast.success("Ã¢Å“â€¦ Email sent successfully!");
       } else {
-        toast.error(`âŒ Failed to send email: ${data.error || "Unknown error"}`);
+        toast.error(`Ã¢ÂÅ’ Failed to send email: ${data.error || "Unknown error"}`);
       }
     } catch (_error) {
-      toast.error("âŒ Failed to send email. Please check email configuration.");
+      toast.error("Ã¢ÂÅ’ Failed to send email. Please check email configuration.");
     } finally {
       setSendingEmail(false);
     }
@@ -681,13 +683,13 @@ function SalesInvoiceContent() {
                   disabled={sendingEmail}
                   className="bg-blue-600 text-white px-6 py-2 rounded disabled:bg-gray-400 flex-1 md:flex-none"
                 >
-                  {sendingEmail ? "Sending..." : "ðŸ“§ Email"}
+                  {sendingEmail ? "Sending..." : "Ã°Å¸â€œÂ§ Email"}
                 </button>
                 <button
                   onClick={shareOnWhatsApp}
                   className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 flex-1 md:flex-none"
                 >
-                  ðŸ“± WhatsApp
+                  Ã°Å¸â€œÂ± WhatsApp
                 </button>
                 <button onClick={() => setPreview(false)} className="bg-yellow-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
                   Edit
@@ -702,7 +704,7 @@ function SalesInvoiceContent() {
           {!preview && (
             <div className="bg-white border p-6 rounded space-y-4">
               <div className="mb-2 text-xs text-gray-500 italic">
-                ðŸ’¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
+                Ã°Å¸â€™Â¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <input value={invoiceNo} readOnly className="border p-2 bg-gray-100" />
@@ -766,9 +768,9 @@ function SalesInvoiceContent() {
                 </div>
               </div>
 
-              {/* ðŸ“Ÿ BARCODE SCANNER SECTION */}
+              {/* Ã°Å¸â€œÅ¸ BARCODE SCANNER SECTION */}
               <div className="flex items-center gap-4 bg-blue-50 p-4 rounded border border-blue-200 shadow-sm">
-                <span className="text-3xl">ðŸ“Ÿ</span>
+                <span className="text-3xl">Ã°Å¸â€œÅ¸</span>
                 <div className="flex-1">
                   <label className="text-xs font-bold text-blue-800 block mb-1">SCAN BARCODE / SKU TO ADD ITEM</label>
                   <input
@@ -799,7 +801,7 @@ function SalesInvoiceContent() {
                             <option value="">Select Item</option>
                             {items.map(it => (
                               <option key={it.id} value={it.id}>
-                                {it.name} ({it.description}) â€” Stock {it.availableQty}
+                                {it.name} ({it.description}) Ã¢â‚¬â€ Stock {it.availableQty}
                               </option>
                             ))}
                           </select>
@@ -839,7 +841,7 @@ function SalesInvoiceContent() {
                       className={`w-full py-1 px-2 rounded font-semibold text-sm ${applyTax ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
                         }`}
                     >
-                      {applyTax ? "âœ“ Tax Applied" : "+ Add Tax"}
+                      {applyTax ? "Ã¢Å“â€œ Tax Applied" : "+ Add Tax"}
                     </button>
 
                     {applyTax && (

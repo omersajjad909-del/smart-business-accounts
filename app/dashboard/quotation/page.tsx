@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
@@ -522,13 +524,13 @@ export default function QuotationPage() {
                   onClick={shareOnWhatsApp}
                   className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 flex-1 md:flex-none"
                 >
-                  ðŸ“± WhatsApp
+                  Ã°Å¸â€œÂ± WhatsApp
                 </button>
                 <button 
                   onClick={shareOnSMS}
                   className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 flex-1 md:flex-none"
                 >
-                  ðŸ’¬ SMS
+                  Ã°Å¸â€™Â¬ SMS
                 </button>
                 <button onClick={() => setPreview(false)} className="bg-yellow-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
                   Edit
@@ -543,7 +545,7 @@ export default function QuotationPage() {
           {!preview && (
             <div className="bg-white border p-6 rounded space-y-4">
               <div className="mb-2 text-xs text-gray-500 italic">
-                ðŸ’¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
+                Ã°Å¸â€™Â¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <input value={quotationNo} readOnly className="border p-2 bg-gray-100" placeholder="Quotation No" />
@@ -622,7 +624,7 @@ export default function QuotationPage() {
                         applyTax ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
                       }`}
                     >
-                      {applyTax ? "âœ“ Tax Applied" : "+ Add Tax"}
+                      {applyTax ? "Ã¢Å“â€œ Tax Applied" : "+ Add Tax"}
                     </button>
                     
                     {applyTax && (

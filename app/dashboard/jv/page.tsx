@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { toast } from "react-hot-toast";
@@ -473,7 +475,7 @@ export default function JVPage() {
                             onClick={() => removeEntry(entry.id)}
                             className="text-red-600 hover:text-red-800"
                           >
-                            âœ•
+                            Ã¢Å“â€¢
                           </button>
                         )}
                       </td>
@@ -498,7 +500,7 @@ export default function JVPage() {
                             isBalanced ? "text-green-600" : "text-red-600"
                           }
                         >
-                          {isBalanced ? "âœ“ Balanced" : "âœ— Not Balanced"}
+                          {isBalanced ? "Ã¢Å“â€œ Balanced" : "Ã¢Å“â€” Not Balanced"}
                         </div>
                       </div>
                     </td>

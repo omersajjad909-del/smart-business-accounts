@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { confirmToast } from "@/lib/toast-feedback";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -56,74 +57,6 @@ const EMPTY_FORM = {
   openDate: new Date().toISOString().slice(0, 10),
   openDebit: "", openCredit: "", creditDays: "", creditLimit: "",
 };
-
-function confirmToast(message: string) {
-  return new Promise<boolean>((resolve) => {
-    const toastId = toast.custom(
-      (t) => (
-        <div
-          style={{
-            minWidth: 320,
-            maxWidth: 420,
-            padding: 16,
-            borderRadius: 14,
-            background: PANEL,
-            border: `1px solid ${BORDER}`,
-            boxShadow: "0 20px 50px rgba(2,6,23,.45)",
-            color: TEXT,
-            fontFamily: FONT,
-          }}
-        >
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Please confirm</div>
-          <div style={{ fontSize: 13, color: MUTED, lineHeight: 1.6, marginBottom: 14 }}>{message}</div>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                resolve(false);
-              }}
-              style={{
-                padding: "8px 14px",
-                borderRadius: 8,
-                border: `1px solid ${BORDER}`,
-                background: "transparent",
-                color: MUTED,
-                fontFamily: FONT,
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                resolve(true);
-              }}
-              style={{
-                padding: "8px 14px",
-                borderRadius: 8,
-                border: "none",
-                background: "linear-gradient(135deg,#ef4444,#dc2626)",
-                color: "#fff",
-                fontFamily: FONT,
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-            >
-              Confirm
-            </button>
-          </div>
-        </div>
-      ),
-      { duration: Infinity }
-    );
-
-    void toastId;
-  });
-}
 
 function inp(style?: React.CSSProperties): React.CSSProperties {
   return {

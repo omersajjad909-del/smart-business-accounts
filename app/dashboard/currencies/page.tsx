@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -88,7 +90,7 @@ export default function CurrenciesPage() {
         showToast("Error: " + (data.error || "Failed to save"));
       }
     } catch {
-      showToast("Network error â€” please try again");
+      showToast("Network error Ã¢â‚¬â€ please try again");
     } finally {
       setLoading(false);
     }
@@ -110,7 +112,7 @@ export default function CurrenciesPage() {
         showToast("Error: " + (data.error || "Failed to delete"));
       }
     } catch {
-      showToast("Network error â€” please try again");
+      showToast("Network error Ã¢â‚¬â€ please try again");
     }
   };
 

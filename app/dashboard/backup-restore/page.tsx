@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -124,13 +126,13 @@ export default function BackupRestorePage() {
   }
 
   function fmtSize(bytes?: number) {
-    if (!bytes) return "â€”";
+    if (!bytes) return "Ã¢â‚¬â€";
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   }
 
-  /* â”€â”€ styles â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ styles Ã¢â€â‚¬Ã¢â€â‚¬ */
   const card: React.CSSProperties = {
     borderRadius: 14, background: "rgba(255,255,255,0.04)",
     border: "1px solid rgba(255,255,255,0.08)", padding: "20px 24px",
@@ -145,7 +147,7 @@ export default function BackupRestorePage() {
 
   if (!canAccess) return (
     <div style={{ padding: 32, color: "#f87171", textAlign: "center" }}>
-      <div style={{ fontSize: 32, marginBottom: 12 }}>ðŸ”’</div>
+      <div style={{ fontSize: 32, marginBottom: 12 }}>Ã°Å¸â€â€™</div>
       <div style={{ fontWeight: 700 }}>Access Denied</div>
       <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 6 }}>You do not have permission to access Backup & Restore.</div>
     </div>
@@ -163,7 +165,7 @@ export default function BackupRestorePage() {
           </p>
         </div>
         <button onClick={createBackup} disabled={creating} style={btn("linear-gradient(135deg,#4f46e5,#6366f1)", creating)}>
-          {creating ? "Creatingâ€¦" : "+ Create Backup"}
+          {creating ? "CreatingÃ¢â‚¬Â¦" : "+ Create Backup"}
         </button>
       </div>
 
@@ -176,10 +178,10 @@ export default function BackupRestorePage() {
 
       {/* Info banner */}
       <div style={{ ...card, background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.2)", marginBottom: 20, display: "flex", gap: 12, alignItems: "flex-start" }}>
-        <span style={{ fontSize: 20 }}>â„¹ï¸</span>
+        <span style={{ fontSize: 20 }}>Ã¢â€žÂ¹Ã¯Â¸Â</span>
         <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
           <strong style={{ color: "white" }}>How it works:</strong> Backups include all your accounts, invoices, vouchers, inventory, HR records and more.
-          Stored in the database â€” no external storage needed. Download the JSON file to keep an offline copy.
+          Stored in the database Ã¢â‚¬â€ no external storage needed. Download the JSON file to keep an offline copy.
         </div>
       </div>
 
@@ -195,7 +197,7 @@ export default function BackupRestorePage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: "rgba(255,255,255,0.3)" }}>Loadingâ€¦</td></tr>
+              <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: "rgba(255,255,255,0.3)" }}>LoadingÃ¢â‚¬Â¦</td></tr>
             ) : backups.length === 0 ? (
               <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: "rgba(255,255,255,0.3)" }}>No backups yet. Click "+ Create Backup" to get started.</td></tr>
             ) : backups.map((b) => (
@@ -220,14 +222,14 @@ export default function BackupRestorePage() {
                         onClick={() => downloadBackup(b.id, b.fileName)}
                         style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(99,102,241,0.4)", background: "rgba(99,102,241,0.1)", color: "#a5b4fc", fontSize: 12, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}
                       >
-                        â¬‡ Download
+                        Ã¢Â¬â€¡ Download
                       </button>
                       <button
                         onClick={() => restoreBackup(b.id, b.fileName)}
                         disabled={restoringId === b.id}
                         style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(248,113,113,0.3)", background: "rgba(248,113,113,0.08)", color: restoringId === b.id ? "rgba(255,255,255,0.3)" : "#f87171", fontSize: 12, cursor: restoringId === b.id ? "not-allowed" : "pointer", fontFamily: "inherit", fontWeight: 600 }}
                       >
-                        {restoringId === b.id ? "Restoringâ€¦" : "â†º Restore"}
+                        {restoringId === b.id ? "RestoringÃ¢â‚¬Â¦" : "Ã¢â€ Âº Restore"}
                       </button>
                     </div>
                   )}

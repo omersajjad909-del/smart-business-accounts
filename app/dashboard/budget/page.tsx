@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
@@ -170,7 +172,7 @@ export default function BudgetPage() {
             onClick={exportBudgets}
             className="bg-green-600 text-white px-6 py-2 rounded font-bold"
           >
-            ðŸ“¥ Export CSV
+            Ã°Å¸â€œÂ¥ Export CSV
           </button>
         )}
       </div>

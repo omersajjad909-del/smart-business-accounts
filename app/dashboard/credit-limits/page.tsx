@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
@@ -199,7 +201,7 @@ export default function CreditLimitsPage() {
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
-          Loading credit limitsâ€¦
+          Loading credit limitsÃ¢â‚¬Â¦
         </div>
       )}
 
@@ -348,7 +350,7 @@ export default function CreditLimitsPage() {
                   cursor: saving ? "not-allowed" : "pointer", opacity: saving ? .7 : 1,
                 }}
               >
-                {saving ? "Savingâ€¦" : editId ? "Update" : "Save Limit"}
+                {saving ? "SavingÃ¢â‚¬Â¦" : editId ? "Update" : "Save Limit"}
               </button>
             </div>
           </div>

@@ -1,4 +1,6 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`nimport { useState, useEffect, useRef } from "react";
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+import { useState, useEffect, useRef } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -15,11 +17,11 @@ interface Attachment {
 }
 
 function fileIcon(type: string): string {
-  if (type.startsWith("image/"))  return "ðŸ–¼ï¸";
-  if (type === "application/pdf") return "ðŸ“„";
-  if (type.includes("word"))      return "ðŸ“";
-  if (type.includes("excel") || type.includes("sheet") || type === "text/csv") return "ðŸ“Š";
-  return "ðŸ“Ž";
+  if (type.startsWith("image/"))  return "Ã°Å¸â€“Â¼Ã¯Â¸Â";
+  if (type === "application/pdf") return "Ã°Å¸â€œâ€ž";
+  if (type.includes("word"))      return "Ã°Å¸â€œÂ";
+  if (type.includes("excel") || type.includes("sheet") || type === "text/csv") return "Ã°Å¸â€œÅ ";
+  return "Ã°Å¸â€œÅ½";
 }
 
 function formatBytes(bytes: number): string {
@@ -149,7 +151,7 @@ export default function AttachmentsPage() {
         </div>
         <input
           value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search filesâ€¦"
+          placeholder="Search filesÃ¢â‚¬Â¦"
           style={{ flex: 1, minWidth: 200, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 14px", color: "var(--text-primary)", fontSize: 13, fontFamily: FONT, outline: "none" }}
         />
       </div>
@@ -157,10 +159,10 @@ export default function AttachmentsPage() {
       {/* Table */}
       <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
         {loading ? (
-          <div style={{ textAlign: "center", padding: "64px 20px", color: "var(--text-muted)", fontSize: 15 }}>Loading filesâ€¦</div>
+          <div style={{ textAlign: "center", padding: "64px 20px", color: "var(--text-muted)", fontSize: 15 }}>Loading filesÃ¢â‚¬Â¦</div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "64px 20px", color: "var(--text-muted)", fontSize: 15 }}>
-            {search ? "No files match your search." : "No attachments yet â€” upload your first file."}
+            {search ? "No files match your search." : "No attachments yet Ã¢â‚¬â€ upload your first file."}
           </div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -196,11 +198,11 @@ export default function AttachmentsPage() {
                     <div style={{ display: "flex", gap: 8 }}>
                       <a href={a.fileUrl} target="_blank" rel="noreferrer" download
                         style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 7, padding: "4px 11px", fontSize: 12, color: "var(--text-muted)", textDecoration: "none" }}>
-                        â¬‡ Download
+                        Ã¢Â¬â€¡ Download
                       </a>
                       <button onClick={() => handleDelete(a.id)}
                         style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: "0 4px", lineHeight: 1, fontFamily: FONT }}>
-                        Ã—
+                        Ãƒâ€”
                       </button>
                     </div>
                   </td>
@@ -245,12 +247,12 @@ export default function AttachmentsPage() {
               <input ref={fileRef} type="file" multiple style={{ display: "none" }} onChange={e => handleUpload(e.target.files)}
                 accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" />
               {uploading ? (
-                <div style={{ color: "#6366f1", fontWeight: 600 }}>Uploadingâ€¦</div>
+                <div style={{ color: "#6366f1", fontWeight: 600 }}>UploadingÃ¢â‚¬Â¦</div>
               ) : (
                 <>
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>ðŸ“Ž</div>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>Ã°Å¸â€œÅ½</div>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>Click or drag files here</div>
-                  <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>PDF, Word, Excel, Images â€” max 10 MB each</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>PDF, Word, Excel, Images Ã¢â‚¬â€ max 10 MB each</div>
                 </>
               )}
             </div>

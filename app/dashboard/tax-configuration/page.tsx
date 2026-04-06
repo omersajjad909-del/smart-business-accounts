@@ -1,4 +1,5 @@
-import { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n'use client';
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+'use client';
 
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -101,7 +102,7 @@ export default function TaxConfigurationPage() {
     setFormData({
       taxType: tax.taxType,
       taxCode: tax.taxCode,
-      taxRate: tax.taxRate.toString(), // âœ… FIX
+      taxRate: tax.taxRate.toString(), // Ã¢Å“â€¦ FIX
       description: tax.description || '',
     });
 

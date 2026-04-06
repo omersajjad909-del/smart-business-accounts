@@ -1,9 +1,11 @@
-"use client";`r`nimport { confirmToast, alertToast } from "@/lib/toast-feedback";`r`n// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  FINOVA â€” COMPLETE ADMIN PANEL
+"use client";
+import { confirmToast, alertToast } from "@/lib/toast-feedback";
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+//  FINOVA Ã¢â‚¬â€ COMPLETE ADMIN PANEL
 //  FILE: app/admin/page.tsx  (or wrap in your admin layout)
-//  All sections: Dashboard Â· Companies Â· Users Â· Revenue Â·
-//  Geo Â· Usage Â· Plans Â· System Â· Logs Â· Permissions Â· Settings
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  All sections: Dashboard Ã‚Â· Companies Ã‚Â· Users Ã‚Â· Revenue Ã‚Â·
+//  Geo Ã‚Â· Usage Ã‚Â· Plans Ã‚Â· System Ã‚Â· Logs Ã‚Â· Permissions Ã‚Â· Settings
+// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
@@ -19,26 +21,26 @@ type Notif = {
 };
 
 const NOTIF_CONFIG: Record<string,{ icon:string; color:string; bg:string }> = {
-  new_signup:           { icon:"âœ¦", color:"#34d399", bg:"rgba(52,211,153,.12)"  },
-  subscription_past_due:{ icon:"âš ", color:"#f87171", bg:"rgba(248,113,113,.12)" },
-  plan_upgraded:        { icon:"â¬†", color:"#818cf8", bg:"rgba(129,140,248,.12)" },
-  at_risk_company:      { icon:"âš ï¸", color:"#fbbf24", bg:"rgba(251,191,36,.12)"  },
-  system_error:         { icon:"âš¡", color:"#f87171", bg:"rgba(248,113,113,.12)" },
-  new_chat:             { icon:"ðŸ’¬", color:"#38bdf8", bg:"rgba(56,189,248,.12)"  },
-  stripe_failed:        { icon:"ðŸ’³", color:"#f87171", bg:"rgba(248,113,113,.12)" },
-  INFO:                 { icon:"â„¹ï¸", color:"#818cf8", bg:"rgba(129,140,248,.12)" },
-  WARNING:              { icon:"âš ", color:"#fbbf24", bg:"rgba(251,191,36,.12)"  },
-  ERROR:                { icon:"âš¡", color:"#f87171", bg:"rgba(248,113,113,.12)" },
-  SUCCESS:              { icon:"âœ“", color:"#34d399", bg:"rgba(52,211,153,.12)"  },
+  new_signup:           { icon:"Ã¢Å“Â¦", color:"#34d399", bg:"rgba(52,211,153,.12)"  },
+  subscription_past_due:{ icon:"Ã¢Å¡Â ", color:"#f87171", bg:"rgba(248,113,113,.12)" },
+  plan_upgraded:        { icon:"Ã¢Â¬â€ ", color:"#818cf8", bg:"rgba(129,140,248,.12)" },
+  at_risk_company:      { icon:"Ã¢Å¡Â Ã¯Â¸Â", color:"#fbbf24", bg:"rgba(251,191,36,.12)"  },
+  system_error:         { icon:"Ã¢Å¡Â¡", color:"#f87171", bg:"rgba(248,113,113,.12)" },
+  new_chat:             { icon:"Ã°Å¸â€™Â¬", color:"#38bdf8", bg:"rgba(56,189,248,.12)"  },
+  stripe_failed:        { icon:"Ã°Å¸â€™Â³", color:"#f87171", bg:"rgba(248,113,113,.12)" },
+  INFO:                 { icon:"Ã¢â€žÂ¹Ã¯Â¸Â", color:"#818cf8", bg:"rgba(129,140,248,.12)" },
+  WARNING:              { icon:"Ã¢Å¡Â ", color:"#fbbf24", bg:"rgba(251,191,36,.12)"  },
+  ERROR:                { icon:"Ã¢Å¡Â¡", color:"#f87171", bg:"rgba(248,113,113,.12)" },
+  SUCCESS:              { icon:"Ã¢Å“â€œ", color:"#34d399", bg:"rgba(52,211,153,.12)"  },
 };
 
 function getAdminUser(): any {
   return getCurrentUser() || {};
 }
 
-/* â”€â”€ tiny helpers â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ tiny helpers Ã¢â€â‚¬Ã¢â€â‚¬ */
 function fmt(n: number | undefined | null, prefix = "") {
-  if (n == null) return "â€”";
+  if (n == null) return "Ã¢â‚¬â€";
   if (n >= 1_000_000) return prefix + (n / 1_000_000).toFixed(1) + "M";
   if (n >= 1_000)     return prefix + (n / 1_000).toFixed(1) + "K";
   return prefix + n.toString();
@@ -59,9 +61,9 @@ const PERMISSIONS_LIST = [
   "users.invite","users.manage","admin.access",
 ];
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    NAV CONFIG
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 type Page = "dashboard"|"companies"|"users"|"revenue"|"geo"|"usage"|"plans"|"system"|"logs"|"permissions"|"settings"|"profile"|"tickets"|"broadcasts"|"flags"|"apikeys"|"visitors"|"updates"|"livesupport"|"subscriptions"|"coupons"|"emaillogs"|"referrals"|"teams"|"testimonials"|"leads"|"seo"|"social"|"business_modules"|"newsletter"|"feedback"|"crm";
 
 // SVG icon paths per nav item (14x14 viewBox, stroke-based)
@@ -141,9 +143,9 @@ const NAV_GROUPS: { label: string; pages: Page[] }[] = [
   { label: "Access",     pages: ["permissions","teams","settings"] },
 ];
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    MINI CHART COMPONENTS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function LineChart({ data, height=80 }: { data:{label:string;value:number}[]; height?:number }) {
   if (!data || data.length < 2) return (
     <div style={{ height, display:"flex", alignItems:"center", justifyContent:"center", color:"rgba(255,255,255,.15)", fontSize:11 }}>
@@ -214,18 +216,18 @@ function MiniDonut({ value, max, color="#6366f1", size=56 }: { value:number; max
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    SHARED UI ATOMS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function Badge({ status }: { status:string }) {
   const map: Record<string,[string,string,string]> = {
     active:   ["#34d399","rgba(52,211,153,.12)",""],
     trial:    ["#fbbf24","rgba(251,191,36,.12)",""],
-    past_due: ["#f87171","rgba(248,113,113,.12)","âš "],
-    cancelled:["#6b7280","rgba(107,114,128,.12)","âœ•"],
+    past_due: ["#f87171","rgba(248,113,113,.12)","Ã¢Å¡Â "],
+    cancelled:["#6b7280","rgba(107,114,128,.12)","Ã¢Å“â€¢"],
     OK:       ["#34d399","rgba(52,211,153,.12)",""],
-    WARNING:  ["#fbbf24","rgba(251,191,36,.12)","âš "],
-    ERROR:    ["#f87171","rgba(248,113,113,.12)","âœ•"],
+    WARNING:  ["#fbbf24","rgba(251,191,36,.12)","Ã¢Å¡Â "],
+    ERROR:    ["#f87171","rgba(248,113,113,.12)","Ã¢Å“â€¢"],
   };
   const [c,bg,dot] = map[status] || ["#818cf8","rgba(129,140,248,.12)",""];
   return (
@@ -263,7 +265,7 @@ function KPICard({ label, value, sub, icon, color="#6366f1", trend }: {
         <div style={{ width:42, height:42, borderRadius:12, background:`linear-gradient(135deg, ${color}25, ${color}10)`, border:`1px solid ${color}35`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{icon}</div>
         {trend !== undefined && (
           <div style={{ display:"flex", alignItems:"center", gap:4, padding:"4px 10px", borderRadius:20, background: trend>=0?"rgba(52,211,153,.1)":"rgba(248,113,113,.1)", border:`1px solid ${trend>=0?"rgba(52,211,153,.2)":"rgba(248,113,113,.2)"}` }}>
-            <span style={{ fontSize:11, fontWeight:700, color: trend>=0?"#34d399":"#f87171" }}>{trend>=0?"â†‘":"â†“"} {Math.abs(trend)}%</span>
+            <span style={{ fontSize:11, fontWeight:700, color: trend>=0?"#34d399":"#f87171" }}>{trend>=0?"Ã¢â€ â€˜":"Ã¢â€ â€œ"} {Math.abs(trend)}%</span>
           </div>
         )}
       </div>
@@ -293,7 +295,7 @@ function DataTable({ cols, rows, empty="No data" }: {
         </thead>
         <tbody>
           {!rows ? (
-            <tr><td colSpan={cols.length} style={{ padding:"32px 14px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>Loadingâ€¦</td></tr>
+            <tr><td colSpan={cols.length} style={{ padding:"32px 14px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>LoadingÃ¢â‚¬Â¦</td></tr>
           ) : rows.length === 0 ? (
             <tr><td colSpan={cols.length} style={{ padding:"36px 14px", textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>{empty}</td></tr>
           ) : rows.map((row,i) => (
@@ -302,7 +304,7 @@ function DataTable({ cols, rows, empty="No data" }: {
               onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
               {cols.map(c => (
                 <td key={c.key} style={{ padding:"11px 14px", color:"rgba(255,255,255,.75)", textAlign:c.align||"left" }}>
-                  {c.render ? c.render(row[c.key], row) : (row[c.key] ?? "â€”")}
+                  {c.render ? c.render(row[c.key], row) : (row[c.key] ?? "Ã¢â‚¬â€")}
                 </td>
               ))}
             </tr>
@@ -313,9 +315,9 @@ function DataTable({ cols, rows, empty="No data" }: {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: DASHBOARD
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageDashboard({ setPage }: { setPage:(p:Page)=>void }) {
   const [kpis,    setKpis]    = useState<any>(null);
   const [revenue, setRevenue] = useState<any>(null);
@@ -360,7 +362,7 @@ function PageDashboard({ setPage }: { setPage:(p:Page)=>void }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
 
-      {/* â”€â”€ KPI Cards â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ KPI Cards Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
         {statCards.map(card => (
           <div key={card.label} style={{
@@ -405,7 +407,7 @@ function PageDashboard({ setPage }: { setPage:(p:Page)=>void }) {
         ))}
       </div>
 
-      {/* â”€â”€ Charts row â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Charts row Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ display:"grid", gridTemplateColumns:"3fr 2fr", gap:14 }}>
 
         {/* MRR Growth */}
@@ -428,7 +430,7 @@ function PageDashboard({ setPage }: { setPage:(p:Page)=>void }) {
               { label:"Companies",  value: fmt(kpis?.totalCompanies), color:"#6366f1" },
             ].map(s=>(
               <div key={s.label}>
-                <div style={{ fontSize:16, fontWeight:800, color:s.color, letterSpacing:"-0.02em" }}>{loading?"â€”":s.value}</div>
+                <div style={{ fontSize:16, fontWeight:800, color:s.color, letterSpacing:"-0.02em" }}>{loading?"Ã¢â‚¬â€":s.value}</div>
                 <div style={{ fontSize:10.5, color:"rgba(255,255,255,.3)", marginTop:2 }}>{s.label}</div>
               </div>
             ))}
@@ -462,7 +464,7 @@ function PageDashboard({ setPage }: { setPage:(p:Page)=>void }) {
         </div>
       </div>
 
-      {/* â”€â”€ Bottom row â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Bottom row Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ display:"grid", gridTemplateColumns:"3fr 2fr", gap:14 }}>
 
         {/* Recent Activity */}
@@ -506,11 +508,11 @@ function PageDashboard({ setPage }: { setPage:(p:Page)=>void }) {
                       {actionStr.replace(/_/g," ").toLowerCase().replace(/^\w/,c=>c.toUpperCase())}
                     </div>
                     <div style={{ fontSize:10.5, color:"rgba(255,255,255,.25)", marginTop:2 }}>
-                      {l.userId ? l.userId.slice(0,8)+"â€¦" : "System"}{l.companyId ? " Â· "+l.companyId.slice(0,8)+"â€¦" : ""}
+                      {l.userId ? l.userId.slice(0,8)+"Ã¢â‚¬Â¦" : "System"}{l.companyId ? " Ã‚Â· "+l.companyId.slice(0,8)+"Ã¢â‚¬Â¦" : ""}
                     </div>
                   </div>
                   <span style={{ fontSize:10.5, color:"rgba(255,255,255,.2)", flexShrink:0, whiteSpace:"nowrap" }}>
-                    {l.createdAt ? timeAgo(l.createdAt) : "â€”"}
+                    {l.createdAt ? timeAgo(l.createdAt) : "Ã¢â‚¬â€"}
                   </span>
                 </div>
               );
@@ -546,7 +548,7 @@ function PageDashboard({ setPage }: { setPage:(p:Page)=>void }) {
                 <div style={{ width:8, height:8, borderRadius:"50%", background:isGood?"#34d399":"#f87171", flexShrink:0, boxShadow:isGood?"0 0 6px rgba(52,211,153,.5)":"0 0 6px rgba(248,113,113,.5)" }}/>
                 <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", flex:1 }}>{s.label}</span>
                 <span style={{ fontSize:14, fontWeight:800, color:isGood?"rgba(255,255,255,.8)":"#f87171", letterSpacing:"-0.02em" }}>
-                  {s.value !== null ? s.value : "â€”"}
+                  {s.value !== null ? s.value : "Ã¢â‚¬â€"}
                 </span>
               </div>
             );
@@ -565,24 +567,24 @@ function PageDashboard({ setPage }: { setPage:(p:Page)=>void }) {
     </div>
   );
 }
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: COMPANIES & USERS (combined)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageCompaniesUsers() {
   const [tab, setTab] = useState<"companies"|"users">("companies");
 
-  // â”€â”€ Companies state â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Companies state Ã¢â€â‚¬Ã¢â€â‚¬
   const [cq,       setCq]       = useState("");
   const [planF,    setPlanF]    = useState("all");
   const [bizTypeF, setBizTypeF] = useState("all");
   const [rows,     setRows]     = useState<any[]|null>(null);
   const [busy,     setBusy]     = useState<string|null>(null);
 
-  // â”€â”€ Company detail modal â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Company detail modal Ã¢â€â‚¬Ã¢â€â‚¬
   const [detail,       setDetail]       = useState<any|null>(null);
   const [detailLoading,setDetailLoading]= useState(false);
 
-  // â”€â”€ Users state â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Users state Ã¢â€â‚¬Ã¢â€â‚¬
   const [uq,          setUq]          = useState("");
   const [roleF,       setRoleF]       = useState("all");
   const [users,       setUsers]       = useState<any[]|null>(null);
@@ -616,7 +618,7 @@ function PageCompaniesUsers() {
       const r = await fetch("/api/admin/users/cleanup", { method:"POST", headers: adminHeaders() });
       const d = await r.json();
       if (r.ok) {
-        setCleanMsg({ text:`âœ“ Deleted ${d.deleted} orphan users`, ok:true });
+        setCleanMsg({ text:`Ã¢Å“â€œ Deleted ${d.deleted} orphan users`, ok:true });
         setOrphanCount(0);
         loadUsers(adminHeaders());
       } else {
@@ -769,7 +771,7 @@ function PageCompaniesUsers() {
     );
   };
 
-  /* â”€â”€ Company Detail Modal â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Company Detail Modal Ã¢â€â‚¬Ã¢â€â‚¬ */
   const ROLE_COLORS: Record<string,string> = { ADMIN:"#f87171", MANAGER:"#fbbf24", ACCOUNTANT:"#34d399", USER:"#818cf8" };
 
   function CompanyDetailModal() {
@@ -823,17 +825,17 @@ function PageCompaniesUsers() {
         onClick={e=>{if(e.target===e.currentTarget)setDetail(null);}}>
         <div style={{ width:"100%",maxWidth:780,background:"#0e1120",border:"1px solid rgba(255,255,255,.1)",borderRadius:20,padding:"32px 36px",position:"relative",boxShadow:"0 40px 100px rgba(0,0,0,.7)",maxHeight:"88vh",overflowY:"auto" }}>
           {/* Close */}
-          <button onClick={()=>setDetail(null)} style={{ position:"absolute",top:18,right:20,background:"none",border:"none",color:"rgba(255,255,255,.4)",cursor:"pointer",fontSize:22,lineHeight:1,fontFamily:"inherit" }}>âœ•</button>
+          <button onClick={()=>setDetail(null)} style={{ position:"absolute",top:18,right:20,background:"none",border:"none",color:"rgba(255,255,255,.4)",cursor:"pointer",fontSize:22,lineHeight:1,fontFamily:"inherit" }}>Ã¢Å“â€¢</button>
 
           {isLoading ? (
-            <div style={{ textAlign:"center",padding:"60px 0",color:"rgba(255,255,255,.3)",fontSize:14 }}>Loading company detailsâ€¦</div>
+            <div style={{ textAlign:"center",padding:"60px 0",color:"rgba(255,255,255,.3)",fontSize:14 }}>Loading company detailsÃ¢â‚¬Â¦</div>
           ) : (
             <>
               {/* Header */}
               <div style={{ display:"flex",alignItems:"flex-start",gap:16,marginBottom:28 }}>
-                <div style={{ width:52,height:52,borderRadius:14,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>ðŸ¢</div>
+                <div style={{ width:52,height:52,borderRadius:14,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>Ã°Å¸ÂÂ¢</div>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontSize:20,fontWeight:800,color:"white",marginBottom:4 }}>{c.name || "â€”"}</div>
+                  <div style={{ fontSize:20,fontWeight:800,color:"white",marginBottom:4 }}>{c.name || "Ã¢â‚¬â€"}</div>
                   <div style={{ display:"flex",gap:10,flexWrap:"wrap",alignItems:"center" }}>
                     <Badge status={c.plan}/>
                     <Badge status={c.subscriptionStatus}/>
@@ -842,7 +844,7 @@ function PageCompaniesUsers() {
                 </div>
                 <button onClick={()=>goDashboard(c.id,c.name)}
                   style={{ padding:"8px 18px",borderRadius:10,background:"linear-gradient(135deg,#6366f1,#4f46e5)",border:"none",color:"white",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap",boxShadow:"0 4px 14px rgba(99,102,241,.3)" }}>
-                  Open Dashboard â†’
+                  Open Dashboard Ã¢â€ â€™
                 </button>
               </div>
 
@@ -854,7 +856,7 @@ function PageCompaniesUsers() {
                   { label:"Managers",      value:roleCounts.MANAGER||0,          color:"#fbbf24" },
                   { label:"Accountants",   value:roleCounts.ACCOUNTANT||0,       color:"#34d399" },
                   { label:"Regular Users", value:roleCounts.USER||0,             color:"#94a3b8" },
-                  { label:"Plan",          value:c.plan||"â€”",                    color:"#a5b4fc" },
+                  { label:"Plan",          value:c.plan||"Ã¢â‚¬â€",                    color:"#a5b4fc" },
                 ].map(s=>(
                   <div key={s.label} style={{ padding:"14px 16px",borderRadius:12,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",position:"relative",overflow:"hidden" }}>
                     <div style={{ position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,${s.color},transparent)` }}/>
@@ -869,12 +871,12 @@ function PageCompaniesUsers() {
                 <div style={{ padding:"16px",borderRadius:12,background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.06)" }}>
                   <div style={{ fontSize:11,fontWeight:800,color:"rgba(255,255,255,.35)",textTransform:"uppercase",letterSpacing:".07em",marginBottom:12 }}>Company Info</div>
                   {[
-                    { k:"Business Type", v: c.businessType ? c.businessType.replace(/_/g," ").replace(/\b\w/g,(l:string)=>l.toUpperCase()) : "â€”" },
-                    { k:"Country",  v: c.country||"â€”" },
-                    { k:"Currency", v: c.baseCurrency||"â€”" },
-                    { k:"Setup Done", v: c.businessSetupDone ? "âœ… Yes" : "â³ Pending" },
-                    { k:"Joined",   v: c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "â€”" },
-                    { k:"Renews",   v: c.currentPeriodEnd ? new Date(c.currentPeriodEnd).toLocaleDateString() : "â€”" },
+                    { k:"Business Type", v: c.businessType ? c.businessType.replace(/_/g," ").replace(/\b\w/g,(l:string)=>l.toUpperCase()) : "Ã¢â‚¬â€" },
+                    { k:"Country",  v: c.country||"Ã¢â‚¬â€" },
+                    { k:"Currency", v: c.baseCurrency||"Ã¢â‚¬â€" },
+                    { k:"Setup Done", v: c.businessSetupDone ? "Ã¢Å“â€¦ Yes" : "Ã¢ÂÂ³ Pending" },
+                    { k:"Joined",   v: c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "Ã¢â‚¬â€" },
+                    { k:"Renews",   v: c.currentPeriodEnd ? new Date(c.currentPeriodEnd).toLocaleDateString() : "Ã¢â‚¬â€" },
                   ].map(row=>(
                     <div key={row.k} style={{ display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid rgba(255,255,255,.04)" }}>
                       <span style={{ fontSize:11.5,color:"rgba(255,255,255,.35)",fontWeight:600 }}>{row.k}</span>
@@ -889,7 +891,7 @@ function PageCompaniesUsers() {
                 <div style={{ padding:"16px",borderRadius:12,background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.06)" }}>
                   <div style={{ fontSize:11,fontWeight:800,color:"rgba(255,255,255,.35)",textTransform:"uppercase",letterSpacing:".07em",marginBottom:12 }}>User Limit</div>
                   <div style={{ fontSize:22,fontWeight:900,color:"#818cf8",marginBottom:8 }}>
-                    {usedU} <span style={{ fontSize:14,color:"rgba(255,255,255,.3)" }}>/ {maxU===null?"âˆž":maxU}</span>
+                    {usedU} <span style={{ fontSize:14,color:"rgba(255,255,255,.3)" }}>/ {maxU===null?"Ã¢Ë†Å¾":maxU}</span>
                   </div>
                   {maxU !== null && (
                     <div style={{ height:7,borderRadius:10,background:"rgba(255,255,255,.06)",overflow:"hidden",marginBottom:8 }}>
@@ -950,14 +952,14 @@ function PageCompaniesUsers() {
                     </select>
                   </div>
                 </div>
-                <input value={planNote} onChange={e=>setPlanNote(e.target.value)} placeholder="Optional note (reason for change)â€¦"
+                <input value={planNote} onChange={e=>setPlanNote(e.target.value)} placeholder="Optional note (reason for change)Ã¢â‚¬Â¦"
                   style={{ width:"100%",padding:"8px 12px",borderRadius:8,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"white",fontSize:12,fontFamily:"inherit",outline:"none",boxSizing:"border-box",marginBottom:10 }}/>
                 <div style={{ display:"flex",alignItems:"center",gap:10 }}>
                   <button onClick={changePlan} disabled={planSaving}
                     style={{ padding:"8px 20px",borderRadius:9,background:"linear-gradient(135deg,#6366f1,#4f46e5)",border:"none",color:"white",fontWeight:700,fontSize:12,cursor:planSaving?"not-allowed":"pointer",fontFamily:"inherit",opacity:planSaving?.7:1 }}>
-                    {planSaving?"Savingâ€¦":"Apply Changes"}
+                    {planSaving?"SavingÃ¢â‚¬Â¦":"Apply Changes"}
                   </button>
-                  {planMsg && <span style={{ fontSize:12,fontWeight:600,color:planMsg.ok?"#34d399":"#f87171" }}>{planMsg.ok?"âœ“":"âœ•"} {planMsg.text}</span>}
+                  {planMsg && <span style={{ fontSize:12,fontWeight:600,color:planMsg.ok?"#34d399":"#f87171" }}>{planMsg.ok?"Ã¢Å“â€œ":"Ã¢Å“â€¢"} {planMsg.text}</span>}
                 </div>
               </div>
 
@@ -992,7 +994,7 @@ function PageCompaniesUsers() {
                     {detail.recentActivity.slice(0,5).map((a:any,i:number)=>(
                       <div key={i} style={{ display:"flex",gap:10,alignItems:"center",fontSize:12,color:"rgba(255,255,255,.5)",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,.04)" }}>
                         <span style={{ color:"#818cf8",fontWeight:700,fontFamily:"monospace" }}>{a.action}</span>
-                        <span style={{ marginLeft:"auto",flexShrink:0 }}>{a.createdAt?timeAgo(a.createdAt):"â€”"}</span>
+                        <span style={{ marginLeft:"auto",flexShrink:0 }}>{a.createdAt?timeAgo(a.createdAt):"Ã¢â‚¬â€"}</span>
                       </div>
                     ))}
                   </div>
@@ -1015,7 +1017,7 @@ function PageCompaniesUsers() {
         <div style={{ position:"fixed",inset:0,zIndex:9000,background:"rgba(0,0,0,.75)",backdropFilter:"blur(12px)",display:"flex",alignItems:"center",justifyContent:"center",padding:24 }}
           onClick={e=>{if(e.target===e.currentTarget)setManagingUser(null);}}>
           <div style={{ width:"100%",maxWidth:480,background:"#0e1120",border:"1px solid rgba(255,255,255,.1)",borderRadius:20,padding:"32px 36px",position:"relative",boxShadow:"0 40px 100px rgba(0,0,0,.7)" }}>
-            <button onClick={()=>setManagingUser(null)} style={{ position:"absolute",top:18,right:20,background:"none",border:"none",color:"rgba(255,255,255,.4)",cursor:"pointer",fontSize:22,lineHeight:1 }}>âœ•</button>
+            <button onClick={()=>setManagingUser(null)} style={{ position:"absolute",top:18,right:20,background:"none",border:"none",color:"rgba(255,255,255,.4)",cursor:"pointer",fontSize:22,lineHeight:1 }}>Ã¢Å“â€¢</button>
 
             <div style={{ display:"flex",alignItems:"center",gap:14,marginBottom:24 }}>
               <div style={{ width:48,height:48,borderRadius:13,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:700,color:"white" }}>
@@ -1072,14 +1074,14 @@ function PageCompaniesUsers() {
 
       {/* Tab switcher */}
       <div style={{ display:"flex", gap:10, alignItems:"center", flexWrap:"wrap" }}>
-        {tabBtn("companies", "Companies", "ðŸ¢", rows ? rows.length : null)}
-        {tabBtn("users",     "Users",     "ðŸ‘¥", users ? users.length : null)}
+        {tabBtn("companies", "Companies", "Ã°Å¸ÂÂ¢", rows ? rows.length : null)}
+        {tabBtn("users",     "Users",     "Ã°Å¸â€˜Â¥", users ? users.length : null)}
         <div style={{ marginLeft:"auto", fontSize:12, color:"rgba(255,255,255,.25)", fontStyle:"italic" }}>
-          Companies = tenants Â· Users = individual accounts
+          Companies = tenants Ã‚Â· Users = individual accounts
         </div>
       </div>
 
-      {/* â”€â”€ COMPANIES TAB â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ COMPANIES TAB Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {tab === "companies" && (
         <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
           <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
@@ -1088,7 +1090,7 @@ function PageCompaniesUsers() {
                 style={{ position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none" }}>
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
-              <input value={cq} onChange={e=>setCq(e.target.value)} placeholder="Search companiesâ€¦"
+              <input value={cq} onChange={e=>setCq(e.target.value)} placeholder="Search companiesÃ¢â‚¬Â¦"
                 style={{ width:"100%",padding:"9px 12px 9px 34px",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"white",fontSize:13,fontFamily:"inherit",outline:"none",boxSizing:"border-box" }}
                 onFocus={e=>e.target.style.borderColor="rgba(129,140,248,.5)"}
                 onBlur={e=>e.target.style.borderColor="rgba(255,255,255,.1)"}
@@ -1123,13 +1125,13 @@ function PageCompaniesUsers() {
                 )},
                 { key:"businessType", label:"Business Type", render:v=>(
                   <span style={{ padding:"2px 9px",borderRadius:20,background:"rgba(56,189,248,.1)",border:"1px solid rgba(56,189,248,.18)",color:"#7dd3fc",fontSize:11,fontWeight:700,whiteSpace:"nowrap" }}>
-                    {BIZ_LABEL_MAP[v||""]||v||"â€”"}
+                    {BIZ_LABEL_MAP[v||""]||v||"Ã¢â‚¬â€"}
                   </span>
                 )},
                 { key:"plan",    label:"Plan",    render:v=><Badge status={v}/> },
                 { key:"subscriptionStatus", label:"Status", render:v=><Badge status={v}/> },
                 { key:"aiScore", label:"AI Health", render:(v,r)=>{
-                  if(v==null) return <span style={{color:"rgba(255,255,255,.2)",fontSize:12}}>â€”</span>;
+                  if(v==null) return <span style={{color:"rgba(255,255,255,.2)",fontSize:12}}>Ã¢â‚¬â€</span>;
                   const color = v>=75?"#10b981":v>=50?"#f59e0b":"#ef4444";
                   const label = r.aiHealth||(v>=75?"Healthy":v>=50?"At Risk":"Critical");
                   return (
@@ -1145,12 +1147,12 @@ function PageCompaniesUsers() {
                   );
                 }},
                 { key:"usersCount", label:"Users",    align:"right", render:v=><span style={{ fontWeight:700,color:"#818cf8" }}>{v}</span> },
-                { key:"lastLogin",  label:"Last Active", render:v=>v?timeAgo(v):"â€”" },
+                { key:"lastLogin",  label:"Last Active", render:v=>v?timeAgo(v):"Ã¢â‚¬â€" },
                 { key:"id", label:"", render:(id,r)=>(
                   <div style={{ display:"flex",gap:8,justifyContent:"flex-end" }}>
                     <button onClick={()=>openDetail(id)}
                       style={{ padding:"5px 12px",borderRadius:7,background:"rgba(99,102,241,.15)",border:"1px solid rgba(99,102,241,.3)",color:"#a5b4fc",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap" }}>
-                      View â†’
+                      View Ã¢â€ â€™
                     </button>
                     <button onClick={()=>deleteCompany(id)} disabled={busy===id}
                       style={{ padding:"5px 12px",borderRadius:7,background:"rgba(248,113,113,.1)",border:"1px solid rgba(248,113,113,.25)",color:"#f87171",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",opacity:busy===id?0.5:1 }}>
@@ -1164,7 +1166,7 @@ function PageCompaniesUsers() {
         </div>
       )}
 
-      {/* â”€â”€ USERS TAB â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ USERS TAB Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {tab === "users" && (
         <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
           {/* Invite */}
@@ -1184,24 +1186,24 @@ function PageCompaniesUsers() {
               </select>
               <button onClick={sendInvite} disabled={inviteBusy||!inviteEmail.trim()}
                 style={{ padding:"9px 22px",borderRadius:10,background:"linear-gradient(135deg,#6366f1,#4f46e5)",border:"none",color:"white",fontSize:13,fontWeight:700,cursor:inviteBusy?"default":"pointer",fontFamily:"inherit",boxShadow:"0 4px 14px rgba(99,102,241,.35)",opacity:inviteBusy||!inviteEmail.trim()?.7:1 }}>
-                {inviteBusy?"Sendingâ€¦":"Send Invite"}
+                {inviteBusy?"SendingÃ¢â‚¬Â¦":"Send Invite"}
               </button>
-              {inviteMsg && <span style={{ alignSelf:"center",fontSize:12,color:inviteMsg.ok?"#34d399":"#f87171",fontWeight:600 }}>{inviteMsg.ok?"âœ“":"âœ•"} {inviteMsg.text}</span>}
+              {inviteMsg && <span style={{ alignSelf:"center",fontSize:12,color:inviteMsg.ok?"#34d399":"#f87171",fontWeight:600 }}>{inviteMsg.ok?"Ã¢Å“â€œ":"Ã¢Å“â€¢"} {inviteMsg.text}</span>}
             </div>
           </SectionCard>
 
           {/* Orphan cleanup banner */}
           {orphanCount > 0 && (
             <div style={{ display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderRadius:12,background:"rgba(248,113,113,.08)",border:"1px solid rgba(248,113,113,.25)" }}>
-              <span style={{ fontSize:18 }}>âš ï¸</span>
+              <span style={{ fontSize:18 }}>Ã¢Å¡Â Ã¯Â¸Â</span>
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:13,fontWeight:700,color:"#f87171" }}>{orphanCount} orphan {orphanCount===1?"user":"users"} found</div>
-                <div style={{ fontSize:11,color:"rgba(255,255,255,.4)" }}>Inki company delete ho chuki hai â€” yeh users kisi company se linked nahi hain</div>
+                <div style={{ fontSize:11,color:"rgba(255,255,255,.4)" }}>Inki company delete ho chuki hai Ã¢â‚¬â€ yeh users kisi company se linked nahi hain</div>
               </div>
               {cleanMsg && <span style={{ fontSize:12,fontWeight:600,color:cleanMsg.ok?"#34d399":"#f87171" }}>{cleanMsg.text}</span>}
               <button onClick={cleanOrphans} disabled={cleanBusy}
                 style={{ padding:"8px 18px",borderRadius:9,background:"rgba(248,113,113,.2)",border:"1px solid rgba(248,113,113,.4)",color:"#f87171",fontSize:12,fontWeight:700,cursor:cleanBusy?"not-allowed":"pointer",fontFamily:"inherit",whiteSpace:"nowrap" }}>
-                {cleanBusy ? "Deletingâ€¦" : `ï¸ Delete ${orphanCount} Orphans`}
+                {cleanBusy ? "DeletingÃ¢â‚¬Â¦" : `Ã¯Â¸Â Delete ${orphanCount} Orphans`}
               </button>
             </div>
           )}
@@ -1218,7 +1220,7 @@ function PageCompaniesUsers() {
                 style={{ position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",pointerEvents:"none" }}>
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
-              <input value={uq} onChange={e=>setUq(e.target.value)} placeholder="Search usersâ€¦"
+              <input value={uq} onChange={e=>setUq(e.target.value)} placeholder="Search usersÃ¢â‚¬Â¦"
                 style={{ width:"100%",padding:"9px 12px 9px 34px",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"white",fontSize:13,fontFamily:"inherit",outline:"none",boxSizing:"border-box" }}
                 onFocus={e=>e.target.style.borderColor="rgba(129,140,248,.5)"}
                 onBlur={e=>e.target.style.borderColor="rgba(255,255,255,.1)"}
@@ -1244,14 +1246,14 @@ function PageCompaniesUsers() {
                       <div style={{ fontWeight:700,color:"white",fontSize:13 }}>{v}</div>
                       {(r.companyName||r.company)
                         ? <div style={{ fontSize:10.5,color:"rgba(255,255,255,.3)" }}>{r.companyName||r.company}</div>
-                        : <div style={{ fontSize:10.5,color:"#f87171",fontWeight:600 }}>âš  No Company</div>
+                        : <div style={{ fontSize:10.5,color:"#f87171",fontWeight:600 }}>Ã¢Å¡Â  No Company</div>
                       }
                     </div>
                   </div>
                 )},
                 { key:"email",     label:"Email" },
                 { key:"role",      label:"Role",       render:v=><Badge status={v}/> },
-                { key:"lastLogin", label:"Last Login",  render:v=>v?timeAgo(v):"â€”" },
+                { key:"lastLogin", label:"Last Login",  render:v=>v?timeAgo(v):"Ã¢â‚¬â€" },
                 { key:"id", label:"", render:(id)=>(
                   <button onClick={()=>manageUser(id)} style={{ padding:"5px 12px",borderRadius:7,background:"rgba(99,102,241,.15)",border:"1px solid rgba(99,102,241,.3)",color:"#a5b4fc",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit" }}>
                     Manage
@@ -1266,9 +1268,9 @@ function PageCompaniesUsers() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: REVENUE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageRevenue() {
   const [metrics, setMetrics] = useState<any>(null);
   const [revenue, setRevenue] = useState<any>(null);
@@ -1289,13 +1291,13 @@ function PageRevenue() {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
       <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))", gap:14 }}>
-        <KPICard label="MRR"         value={fmt(mrr,"$")}                  icon="ðŸ’°" color="#34d399" trend={12}/>
-        <KPICard label="ARR"         value={fmt(arr,"$")}                  icon="ðŸ“ˆ" color="#818cf8" trend={12}/>
+        <KPICard label="MRR"         value={fmt(mrr,"$")}                  icon="Ã°Å¸â€™Â°" color="#34d399" trend={12}/>
+        <KPICard label="ARR"         value={fmt(arr,"$")}                  icon="Ã°Å¸â€œË†" color="#818cf8" trend={12}/>
         <KPICard label="Active Paid" value={fmt(metrics?.activeSubs)}      icon=""  color="#6366f1" trend={metrics?.trends?.activeSubs}/>
-        <KPICard label="Churn Rate"  value={Math.round((metrics?.churnThisMonth/Math.max(metrics?.totalCompanies||1,1))*100)+"%"} icon="ðŸ“‰" color="#f87171" trend={metrics?.trends?.churnThisMonth}/>
+        <KPICard label="Churn Rate"  value={Math.round((metrics?.churnThisMonth/Math.max(metrics?.totalCompanies||1,1))*100)+"%"} icon="Ã°Å¸â€œâ€°" color="#f87171" trend={metrics?.trends?.churnThisMonth}/>
       </div>
       <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr", gap:14 }}>
-        <SectionCard title="MRR Growth â€” Last 6 Months">
+        <SectionCard title="MRR Growth Ã¢â‚¬â€ Last 6 Months">
           <LineChart data={revenue?.mrrSeries||[]} height={120}/>
         </SectionCard>
         <SectionCard title="Plan Split">
@@ -1316,10 +1318,10 @@ function PageRevenue() {
     </div>
   );
 }
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    SHARED: REAL WORLD MAP (Leaflet.js)
    Used by PageGeo and PageVisitors
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function GeoLeafletMap({ rows, title, colorScheme="indigo", liveCount=0 }: {
   rows: { country:string; countryName?:string; activeUsers30d?:number; companies?:number; topCity?:string; flag?:string }[];
   title: string;
@@ -1333,7 +1335,7 @@ function GeoLeafletMap({ rows, title, colorScheme="indigo", liveCount=0 }: {
   const accent = colorScheme === "cyan" ? "#38bdf8" : "#818cf8";
   const accentRgb = colorScheme === "cyan" ? "56,189,248" : "129,140,248";
 
-  // City name â†’ exact lat/lon (used when topCity is available)
+  // City name Ã¢â€ â€™ exact lat/lon (used when topCity is available)
   const CITY_COORDS: Record<string,[number,number]> = {
     // Pakistan
     "Faisalabad":[31.418,73.079],"Lahore":[31.558,74.351],"Karachi":[24.861,67.010],
@@ -1361,10 +1363,10 @@ function GeoLeafletMap({ rows, title, colorScheme="indigo", liveCount=0 }: {
     "Jakarta":[-6.215,106.845],"Manila":[14.599,120.985],"Bangkok":[13.756,100.502],
     "Tokyo":[35.689,139.692],"Beijing":[39.905,116.407],"Shanghai":[31.228,121.474],
     "Seoul":[37.566,126.978],"Sydney":[-33.868,151.209],"Melbourne":[-37.814,144.963],
-    "Toronto":[43.651,-79.383],"Vancouver":[49.283,-123.121],"SÃ£o Paulo":[-23.550,-46.633],
+    "Toronto":[43.651,-79.383],"Vancouver":[49.283,-123.121],"SÃƒÂ£o Paulo":[-23.550,-46.633],
   };
 
-  // Country ISO2 â†’ lat/lon (approx center)
+  // Country ISO2 Ã¢â€ â€™ lat/lon (approx center)
   const COUNTRY_CENTERS: Record<string,[number,number]> = {
     PK:[30.5,69.5],AE:[24,54],IN:[20.6,79],SA:[24,45],GB:[55,-3],
     US:[38,-97],BD:[23.7,90.4],QA:[25.3,51.2],TR:[39,35],NG:[9,8],
@@ -1413,7 +1415,7 @@ function GeoLeafletMap({ rows, title, colorScheme="indigo", liveCount=0 }: {
         attributionControl: false,
       });
 
-      // Dark tile layer â€” CartoDB Dark Matter (free, no API key)
+      // Dark tile layer Ã¢â‚¬â€ CartoDB Dark Matter (free, no API key)
       L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
         subdomains: "abcd",
         maxZoom: 19,
@@ -1492,11 +1494,11 @@ function GeoLeafletMap({ rows, title, colorScheme="indigo", liveCount=0 }: {
       marker.bindPopup(`
         <div style="font-family:system-ui;min-width:160px;">
           <div style="font-size:15px;font-weight:800;color:#1e1b4b;margin-bottom:6px;">
-            ${row.flag||"ðŸŒ"} ${row.countryName||row.country}
+            ${row.flag||"Ã°Å¸Å’Â"} ${row.countryName||row.country}
           </div>
-          ${row.topCity ? `<div style="font-size:12px;color:#6366f1;margin-bottom:4px;">ðŸ“ ${row.topCity}</div>` : ""}
-          <div style="font-size:12px;color:#374151;">ðŸ‘¥ <b>${val.toLocaleString()}</b> active users</div>
-          <div style="font-size:12px;color:#374151;margin-top:2px;">â¬¡ <b>${row.companies||0}</b> companies</div>
+          ${row.topCity ? `<div style="font-size:12px;color:#6366f1;margin-bottom:4px;">Ã°Å¸â€œÂ ${row.topCity}</div>` : ""}
+          <div style="font-size:12px;color:#374151;">Ã°Å¸â€˜Â¥ <b>${val.toLocaleString()}</b> active users</div>
+          <div style="font-size:12px;color:#374151;margin-top:2px;">Ã¢Â¬Â¡ <b>${row.companies||0}</b> companies</div>
         </div>
       `, { maxWidth: 220 });
 
@@ -1592,9 +1594,9 @@ function PageGeo() {
     <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
       {/* KPI row */}
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14 }}>
-        <KPICard label="Countries"       value={rows?.length??0}           icon="ðŸŒ" color="#38bdf8"/>
-        <KPICard label="Total Companies" value={total}                     icon="â¬¡"  color="#6366f1"/>
-        <KPICard label="Top Market"      value={topCountry?.country||"â€”"}  icon="ðŸ†" color="#fbbf24" sub={`${topCountry?.companies||0} companies`}/>
+        <KPICard label="Countries"       value={rows?.length??0}           icon="Ã°Å¸Å’Â" color="#38bdf8"/>
+        <KPICard label="Total Companies" value={total}                     icon="Ã¢Â¬Â¡"  color="#6366f1"/>
+        <KPICard label="Top Market"      value={topCountry?.country||"Ã¢â‚¬â€"}  icon="Ã°Å¸Ââ€ " color="#fbbf24" sub={`${topCountry?.companies||0} companies`}/>
       </div>
 
       {/* Real Leaflet Map */}
@@ -1650,9 +1652,9 @@ function PageUsage({ setPage }: { setPage:(p:Page)=>void }) {
     setSending(true);
     const payload = type === "reengagement"
       ? { subject:"We miss you! Come back to FinovaOS", audience:"churned",
-          body:"Hi,\n\nWe noticed you haven't logged in for a while. Your FinovaOS workspace is waiting!\n\nA lot has improved â€” new features, faster reports, and better invoice management.\n\nðŸ‘‰ Log back in and pick up where you left off.\n\nIf you need help, just reply to this email.\n\nâ€” The FinovaOS Team" }
-      : { subject:"You're a power user â€” time to upgrade!", audience:"active",
-          body:"Hi,\n\nYour business is generating a lot of invoices on FinovaOS â€” that's amazing!\n\nYou might be hitting limits soon. Upgrade to Pro or Enterprise to unlock:\nâœ“ Unlimited invoices & users\nâœ“ Advanced reports\nâœ“ Priority support\nâœ“ Multi-branch support\n\nðŸ‘‰ Upgrade now and keep growing.\n\nâ€” The FinovaOS Team" };
+          body:"Hi,\n\nWe noticed you haven't logged in for a while. Your FinovaOS workspace is waiting!\n\nA lot has improved Ã¢â‚¬â€ new features, faster reports, and better invoice management.\n\nÃ°Å¸â€˜â€° Log back in and pick up where you left off.\n\nIf you need help, just reply to this email.\n\nÃ¢â‚¬â€ The FinovaOS Team" }
+      : { subject:"You're a power user Ã¢â‚¬â€ time to upgrade!", audience:"active",
+          body:"Hi,\n\nYour business is generating a lot of invoices on FinovaOS Ã¢â‚¬â€ that's amazing!\n\nYou might be hitting limits soon. Upgrade to Pro or Enterprise to unlock:\nÃ¢Å“â€œ Unlimited invoices & users\nÃ¢Å“â€œ Advanced reports\nÃ¢Å“â€œ Priority support\nÃ¢Å“â€œ Multi-branch support\n\nÃ°Å¸â€˜â€° Upgrade now and keep growing.\n\nÃ¢â‚¬â€ The FinovaOS Team" };
     try {
       await fetch("/api/admin/broadcasts", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({...payload, channel:"email"}) });
       setSent(true);
@@ -1671,22 +1673,22 @@ function PageUsage({ setPage }: { setPage:(p:Page)=>void }) {
 
       {/* Quick action info bar */}
       <div style={{ background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", borderRadius:12, padding:"12px 18px", display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
-        <span style={{ fontSize:12, color:"rgba(255,255,255,.5)" }}>ðŸ“Š Usage data helps you act fast:</span>
+        <span style={{ fontSize:12, color:"rgba(255,255,255,.5)" }}>Ã°Å¸â€œÅ  Usage data helps you act fast:</span>
         <button onClick={()=>setQuickModal({type:"reengagement", count:atRisk?.length||0})} style={btnStyle("#f87171")}>
-          ðŸ“§ Re-engage At-Risk ({atRisk?.length||0})
+          Ã°Å¸â€œÂ§ Re-engage At-Risk ({atRisk?.length||0})
         </button>
         <button onClick={()=>setQuickModal({type:"upgrade", count:highInvoice?.length||0})} style={btnStyle("#34d399")}>
-          â¬†ï¸ Upgrade Offer to Power Users ({highInvoice?.length||0})
+          Ã¢Â¬â€ Ã¯Â¸Â Upgrade Offer to Power Users ({highInvoice?.length||0})
         </button>
         <button onClick={()=>setPage("broadcasts")} style={btnStyle("#818cf8")}>
-          âœ‰ Open Broadcasts â†’
+          Ã¢Å“â€° Open Broadcasts Ã¢â€ â€™
         </button>
       </div>
 
       <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
 
         {/* Most Active */}
-        <SectionCard title="ðŸ”¥ Top Active (7d)">
+        <SectionCard title="Ã°Å¸â€Â¥ Top Active (7d)">
           <DataTable rows={topActive} cols={[
             { key:"name",    label:"Company" },
             { key:"country", label:"Country" },
@@ -1695,11 +1697,11 @@ function PageUsage({ setPage }: { setPage:(p:Page)=>void }) {
         </SectionCard>
 
         {/* At Risk */}
-        <SectionCard title="âš ï¸ At Risk (no login 14d+)">
+        <SectionCard title="Ã¢Å¡Â Ã¯Â¸Â At Risk (no login 14d+)">
           <div style={{ marginBottom:10 }}>
             <button onClick={()=>setQuickModal({type:"reengagement", count:atRisk?.length||0})}
               style={{ width:"100%", padding:"8px", borderRadius:8, background:"rgba(248,113,113,.12)", border:"1px solid rgba(248,113,113,.3)", color:"#f87171", fontSize:11, fontWeight:700, cursor:"pointer" }}>
-              ðŸ“§ Email Bhejo â€” Wapas Bulao
+              Ã°Å¸â€œÂ§ Email Bhejo Ã¢â‚¬â€ Wapas Bulao
             </button>
           </div>
           <DataTable rows={atRisk} cols={[
@@ -1707,15 +1709,15 @@ function PageUsage({ setPage }: { setPage:(p:Page)=>void }) {
             { key:"plan",      label:"Plan",   render:(v:any)=><Badge status={String(v||"").toLowerCase()}/> },
             { key:"lastLogin", label:"Last Login", render:(v:any)=>v?timeAgo(v):"Never" },
           ]}/>
-          {atRisk && atRisk.length === 0 && <div style={{ fontSize:12,color:"#34d399",textAlign:"center",padding:"12px 0" }}>âœ“ All Activated!</div>}
+          {atRisk && atRisk.length === 0 && <div style={{ fontSize:12,color:"#34d399",textAlign:"center",padding:"12px 0" }}>Ã¢Å“â€œ All Activated!</div>}
         </SectionCard>
 
         {/* High Invoice */}
-        <SectionCard title="ðŸ“Š High Invoice Volume (30d)">
+        <SectionCard title="Ã°Å¸â€œÅ  High Invoice Volume (30d)">
           <div style={{ marginBottom:10 }}>
             <button onClick={()=>setQuickModal({type:"upgrade", count:highInvoice?.length||0})}
               style={{ width:"100%", padding:"8px", borderRadius:8, background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.3)", color:"#34d399", fontSize:11, fontWeight:700, cursor:"pointer" }}>
-              â¬†ï¸ Upgrade Offer Bhejo
+              Ã¢Â¬â€ Ã¯Â¸Â Upgrade Offer Bhejo
             </button>
           </div>
           <DataTable rows={highInvoice} cols={[
@@ -1752,7 +1754,7 @@ function PageUsage({ setPage }: { setPage:(p:Page)=>void }) {
           <div style={{ background:"#10142a",borderRadius:20,padding:"32px 28px",width:460,border:"1px solid rgba(255,255,255,.1)",boxShadow:"0 24px 60px rgba(0,0,0,.6)" }}
             onClick={e=>e.stopPropagation()}>
             <div style={{ fontSize:16,fontWeight:800,color:"white",marginBottom:6 }}>
-              {quickModal.type==="reengagement" ? "ðŸ“§ Re-engagement Email" : "â¬†ï¸ Upgrade Offer Email"}
+              {quickModal.type==="reengagement" ? "Ã°Å¸â€œÂ§ Re-engagement Email" : "Ã¢Â¬â€ Ã¯Â¸Â Upgrade Offer Email"}
             </div>
             <div style={{ fontSize:12,color:"rgba(255,255,255,.4)",marginBottom:20 }}>
               {quickModal.type==="reengagement"
@@ -1761,12 +1763,12 @@ function PageUsage({ setPage }: { setPage:(p:Page)=>void }) {
             </div>
             <div style={{ background:"rgba(255,255,255,.04)",borderRadius:10,padding:"14px 16px",fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.8,marginBottom:20,maxHeight:160,overflowY:"auto" }}>
               {quickModal.type==="reengagement"
-                ? "Subject: We miss you! Come back to FinovaOS\n\nHi, We noticed you haven't logged in for a while. Your FinovaOS workspace is waiting! A lot has improved â€” new features, faster reports, and better invoice management.\n\nðŸ‘‰ Log back in and pick up where you left off."
-                : "Subject: You're a power user â€” time to upgrade!\n\nHi, Your business is generating a lot of invoices on FinovaOS â€” that's amazing! Upgrade to Pro or Enterprise to unlock unlimited invoices, advanced reports, and priority support."}
+                ? "Subject: We miss you! Come back to FinovaOS\n\nHi, We noticed you haven't logged in for a while. Your FinovaOS workspace is waiting! A lot has improved Ã¢â‚¬â€ new features, faster reports, and better invoice management.\n\nÃ°Å¸â€˜â€° Log back in and pick up where you left off."
+                : "Subject: You're a power user Ã¢â‚¬â€ time to upgrade!\n\nHi, Your business is generating a lot of invoices on FinovaOS Ã¢â‚¬â€ that's amazing! Upgrade to Pro or Enterprise to unlock unlimited invoices, advanced reports, and priority support."}
             </div>
             {sent ? (
               <div style={{ padding:"12px",borderRadius:10,background:"rgba(52,211,153,.15)",border:"1px solid rgba(52,211,153,.3)",color:"#34d399",fontSize:13,fontWeight:700,textAlign:"center" }}>
-                âœ“ Email campaign successfully sent!
+                Ã¢Å“â€œ Email campaign successfully sent!
               </div>
             ) : (
               <div style={{ display:"flex",gap:10 }}>
@@ -1776,7 +1778,7 @@ function PageUsage({ setPage }: { setPage:(p:Page)=>void }) {
                 </button>
                 <button onClick={()=>sendQuickBroadcast(quickModal.type)} disabled={sending}
                   style={{ flex:2,padding:"11px",borderRadius:10,background:sending?"rgba(99,102,241,.3)":"linear-gradient(135deg,#4f46e5,#7c3aed)",border:"none",color:"white",fontSize:13,fontWeight:700,cursor:sending?"not-allowed":"pointer" }}>
-                  {sending ? "Sending..." : "ðŸ“£ Send Now"}
+                  {sending ? "Sending..." : "Ã°Å¸â€œÂ£ Send Now"}
                 </button>
               </div>
             )}
@@ -1886,7 +1888,7 @@ function PagePlans() {
     <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
       {/* Tab bar */}
       <div style={{ display:"flex", gap:0, background:"rgba(255,255,255,.04)", borderRadius:12, padding:4, width:"fit-content", border:"1px solid rgba(255,255,255,.07)" }}>
-        {([["config","âš™ Plan Config"],["custom","âœ¦ Custom Orders"],["modules","ðŸ“¦ Module Prices"]] as const).map(([t,l])=>(
+        {([["config","Ã¢Å¡â„¢ Plan Config"],["custom","Ã¢Å“Â¦ Custom Orders"],["modules","Ã°Å¸â€œÂ¦ Module Prices"]] as const).map(([t,l])=>(
           <button key={t} onClick={()=>setPlansTab(t)}
             style={{ padding:"8px 18px", borderRadius:9, fontSize:12, fontWeight:700, cursor:"pointer", border:"none",
               background: plansTab===t?"linear-gradient(135deg,#4f46e5,#7c3aed)":"transparent",
@@ -1919,7 +1921,7 @@ function PagePlans() {
 
 function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, toggle, defaultFeatures, addFeature, removeFeature, planLimits, setPlanLimits }: any) {
   const plans = ["starter","pro","enterprise"] as const;
-  const saveLabel = saved==="saving"?"Savingâ€¦":saved==="ok"?"âœ“ Saved!":saved==="err"?"âœ• Error":"Save Changes";
+  const saveLabel = saved==="saving"?"SavingÃ¢â‚¬Â¦":saved==="ok"?"Ã¢Å“â€œ Saved!":saved==="err"?"Ã¢Å“â€¢ Error":"Save Changes";
   const [newFeat, setNewFeat] = useState("");
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
@@ -1998,7 +2000,7 @@ function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, tog
                             style={{ background:"none", border:"none", cursor:"pointer", color:"rgba(248,113,113,.5)", fontSize:14, lineHeight:1, padding:"0 2px", display:"flex", alignItems:"center" }}
                             onMouseEnter={e=>(e.currentTarget.style.color="#f87171")}
                             onMouseLeave={e=>(e.currentTarget.style.color="rgba(248,113,113,.5)")}>
-                            âœ•
+                            Ã¢Å“â€¢
                           </button>
                         )}
                       </div>
@@ -2007,8 +2009,8 @@ function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, tog
                       <td key={plan} style={{ padding:"10px 16px", textAlign:"center" }}>
                         <button onClick={()=>toggle(plan,feat)} style={{ background:"none",border:"none",cursor:"pointer",fontSize:16 }}>
                           {pf[plan].includes(feat)
-                            ? <span style={{ color:"#34d399" }}>âœ“</span>
-                            : <span style={{ color:"rgba(255,255,255,.15)" }}>âœ•</span>
+                            ? <span style={{ color:"#34d399" }}>Ã¢Å“â€œ</span>
+                            : <span style={{ color:"rgba(255,255,255,.15)" }}>Ã¢Å“â€¢</span>
                           }
                         </button>
                       </td>
@@ -2024,7 +2026,7 @@ function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, tog
                       value={newFeat}
                       onChange={e=>setNewFeat(e.target.value)}
                       onKeyDown={e=>{ if(e.key==="Enter"){ addFeature(newFeat); setNewFeat(""); } }}
-                      placeholder="Add a custom featureâ€¦"
+                      placeholder="Add a custom featureÃ¢â‚¬Â¦"
                       style={{ flex:1, padding:"7px 12px", borderRadius:8, background:"rgba(99,102,241,.08)", border:"1px dashed rgba(99,102,241,.35)", color:"white", fontSize:12.5, fontFamily:"inherit", outline:"none" }}
                     />
                     <button
@@ -2047,9 +2049,9 @@ function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, tog
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   CUSTOM ORDERS â€” Admin view of custom plan signups
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   CUSTOM ORDERS Ã¢â‚¬â€ Admin view of custom plan signups
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageCustomOrders() {
   const [orders, setOrders]   = useState<any[]|null>(null);
   const [selected, setSelected] = useState<any|null>(null);
@@ -2101,9 +2103,9 @@ function PageCustomOrders() {
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
       {/* KPIs */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
-        <KPICard label="Total Requests"  value={orders?.length??0} icon="âœ¦" color="#818cf8"/>
-        <KPICard label="Pending Review"  value={pending}           icon="â³" color="#fbbf24"/>
-        <KPICard label="Approved"        value={(orders||[]).filter(o=>o.status==="approved"||o.status==="active").length} icon="âœ“" color="#34d399"/>
+        <KPICard label="Total Requests"  value={orders?.length??0} icon="Ã¢Å“Â¦" color="#818cf8"/>
+        <KPICard label="Pending Review"  value={pending}           icon="Ã¢ÂÂ³" color="#fbbf24"/>
+        <KPICard label="Approved"        value={(orders||[]).filter(o=>o.status==="approved"||o.status==="active").length} icon="Ã¢Å“â€œ" color="#34d399"/>
         <KPICard label="Rejected"        value={(orders||[]).filter(o=>o.status==="rejected").length} icon="" color="#f87171"/>
       </div>
 
@@ -2125,7 +2127,7 @@ function PageCustomOrders() {
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                     <div>
                       <div style={{ fontSize:13, fontWeight:600, color:"white" }}>{o.companyName||"New Company"}</div>
-                      <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>{o.email} Â· {o.createdAt?.slice(0,10)}</div>
+                      <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>{o.email} Ã‚Â· {o.createdAt?.slice(0,10)}</div>
                     </div>
                     <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
                       <span style={{ padding:"2px 8px", borderRadius:20, background:sb, color:sc, fontSize:10, fontWeight:700 }}>{o.status}</span>
@@ -2147,7 +2149,7 @@ function PageCustomOrders() {
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
                 <div>
                   <div style={{ fontSize:16, fontWeight:700, color:"white" }}>{selected.companyName||"New Company"}</div>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>{selected.email} Â· #{selected.id?.slice(0,8)}</div>
+                  <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>{selected.email} Ã‚Â· #{selected.id?.slice(0,8)}</div>
                 </div>
                 <div style={{ fontSize:20, fontWeight:900, color:"#fbbf24" }}>${selected.finalPrice||selected.requestedPrice||0}<span style={{ fontSize:11, color:"rgba(255,255,255,.3)", fontWeight:500 }}>/mo</span></div>
               </div>
@@ -2169,7 +2171,7 @@ function PageCustomOrders() {
                   <input type="number" defaultValue={selected.requestedPrice||0}
                     onChange={e=>setSelected((o:any)=>({...o,finalPrice:Number(e.target.value)}))}
                     style={{ width:"100%", padding:"10px 14px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" }}/>
-                  <div style={{ fontSize:10, color:"rgba(255,255,255,.25)", marginTop:4 }}>Auto-calculated: ${selected.requestedPrice||0}/mo Â· You can adjust if needed</div>
+                  <div style={{ fontSize:10, color:"rgba(255,255,255,.25)", marginTop:4 }}>Auto-calculated: ${selected.requestedPrice||0}/mo Ã‚Â· You can adjust if needed</div>
                 </div>
               )}
 
@@ -2182,7 +2184,7 @@ function PageCustomOrders() {
                   </button>
                   <button onClick={()=>approve(selected.id, selected.finalPrice||selected.requestedPrice||0)} disabled={approving===selected.id}
                     style={{ flex:2, padding:"10px", borderRadius:10, background:"linear-gradient(135deg,#059669,#34d399)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-                    {approving===selected.id ? "Approving..." : "âœ“ Approve & Activate"}
+                    {approving===selected.id ? "Approving..." : "Ã¢Å“â€œ Approve & Activate"}
                   </button>
                 </div>
               )}
@@ -2199,21 +2201,21 @@ function PageCustomOrders() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   MODULE PRICES â€” Admin can edit per-module pricing
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   MODULE PRICES Ã¢â‚¬â€ Admin can edit per-module pricing
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageModulePrices() {
-  // Import MODULES from lib â€” here we inline for admin override
+  // Import MODULES from lib Ã¢â‚¬â€ here we inline for admin override
   const DEFAULT_MODULES = [
-    { key:"accounting",         name:"Accounting & Invoicing", icon:"ðŸ“Š", price:15, category:"core" },
-    { key:"crm",                name:"CRM",                    icon:"ðŸ‘¥", price:15, category:"core" },
-    { key:"hr_payroll",         name:"HR & Payroll",           icon:"ðŸ‘¨â€ðŸ’¼", price:20, category:"core" },
-    { key:"bank_reconciliation",name:"Bank Reconciliation",    icon:"ðŸ¦", price:10, category:"finance" },
-    { key:"tax_filing",         name:"Tax Filing",             icon:"ðŸ§¾", price:10, category:"finance" },
-    { key:"inventory",          name:"Inventory",              icon:"ðŸ“¦", price:12, category:"operations" },
-    { key:"reports",            name:"Advanced Reports",       icon:"ðŸ“ˆ", price:8,  category:"operations" },
-    { key:"multi_branch",       name:"Multi-Branch",           icon:"ðŸ¢", price:15, category:"operations" },
-    { key:"whatsapp",           name:"WhatsApp / Slack",       icon:"ðŸ’¬", price:8,  category:"integrations" },
+    { key:"accounting",         name:"Accounting & Invoicing", icon:"Ã°Å¸â€œÅ ", price:15, category:"core" },
+    { key:"crm",                name:"CRM",                    icon:"Ã°Å¸â€˜Â¥", price:15, category:"core" },
+    { key:"hr_payroll",         name:"HR & Payroll",           icon:"Ã°Å¸â€˜Â¨Ã¢â‚¬ÂÃ°Å¸â€™Â¼", price:20, category:"core" },
+    { key:"bank_reconciliation",name:"Bank Reconciliation",    icon:"Ã°Å¸ÂÂ¦", price:10, category:"finance" },
+    { key:"tax_filing",         name:"Tax Filing",             icon:"Ã°Å¸Â§Â¾", price:10, category:"finance" },
+    { key:"inventory",          name:"Inventory",              icon:"Ã°Å¸â€œÂ¦", price:12, category:"operations" },
+    { key:"reports",            name:"Advanced Reports",       icon:"Ã°Å¸â€œË†", price:8,  category:"operations" },
+    { key:"multi_branch",       name:"Multi-Branch",           icon:"Ã°Å¸ÂÂ¢", price:15, category:"operations" },
+    { key:"whatsapp",           name:"WhatsApp / Slack",       icon:"Ã°Å¸â€™Â¬", price:8,  category:"integrations" },
     { key:"api_access",         name:"API Access",             icon:"", price:20, category:"integrations" },
   ];
 
@@ -2251,7 +2253,7 @@ function PageModulePrices() {
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>Set price per module for Custom plan. Changes reflect live on pricing page.</div>
         <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-          {saved && <span style={{ color:"#34d399", fontSize:12, fontWeight:600 }}>âœ“ Saved</span>}
+          {saved && <span style={{ color:"#34d399", fontSize:12, fontWeight:600 }}>Ã¢Å“â€œ Saved</span>}
           <button onClick={save} disabled={saving}
             style={{ padding:"9px 22px", borderRadius:10, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer" }}>
             {saving?"Saving...":"Save Prices"}
@@ -2292,9 +2294,9 @@ function PageModulePrices() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: SYSTEM HEALTH
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageSystem() {
   const [h, setH] = useState<any>(null);
 
@@ -2306,12 +2308,12 @@ function PageSystem() {
   }, []);
 
   const metrics = [
-    { label:"API Errors (24h)",    value:h?.apiErrors24h??0,     icon:"âš¡", good:(h?.apiErrors24h??0)<10  },
-    { label:"Failed Logins (24h)", value:h?.failedLogins24h??0,  icon:"ðŸ”", good:(h?.failedLogins24h??0)<20 },
-    { label:"Queue Failures (24h)",value:h?.queueFailures24h??0, icon:"ðŸ“‹", good:(h?.queueFailures24h??0)===0 },
-    { label:"Uptime",              value:h?.uptime??"â€”",          icon:"ðŸ“¡", good:true },
-    { label:"DB Latency",          value:h?.dbLatency??"â€”",       icon:"", good:true },
-    { label:"Backup Status",       value:h?.backupStatus??"â€”",    icon:"ðŸ’¾", good:h?.backupStatus==="OK" },
+    { label:"API Errors (24h)",    value:h?.apiErrors24h??0,     icon:"Ã¢Å¡Â¡", good:(h?.apiErrors24h??0)<10  },
+    { label:"Failed Logins (24h)", value:h?.failedLogins24h??0,  icon:"Ã°Å¸â€Â", good:(h?.failedLogins24h??0)<20 },
+    { label:"Queue Failures (24h)",value:h?.queueFailures24h??0, icon:"Ã°Å¸â€œâ€¹", good:(h?.queueFailures24h??0)===0 },
+    { label:"Uptime",              value:h?.uptime??"Ã¢â‚¬â€",          icon:"Ã°Å¸â€œÂ¡", good:true },
+    { label:"DB Latency",          value:h?.dbLatency??"Ã¢â‚¬â€",       icon:"", good:true },
+    { label:"Backup Status",       value:h?.backupStatus??"Ã¢â‚¬â€",    icon:"Ã°Å¸â€™Â¾", good:h?.backupStatus==="OK" },
   ];
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
@@ -2326,11 +2328,11 @@ function PageSystem() {
       </div>
       <SectionCard title="Last Backup">
         <div style={{ padding:"16px", borderRadius:12, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)", display:"flex", alignItems:"center", gap:12 }}>
-          <div style={{ fontSize:28 }}>ðŸ’¾</div>
+          <div style={{ fontSize:28 }}>Ã°Å¸â€™Â¾</div>
           <div>
             <div style={{ fontSize:14, fontWeight:700, color:"#34d399" }}>Backup completed successfully</div>
             <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>
-              {h?.lastBackupAt ? new Date(h.lastBackupAt).toLocaleString()+" Â· "+timeAgo(h.lastBackupAt) : "No backup info"}
+              {h?.lastBackupAt ? new Date(h.lastBackupAt).toLocaleString()+" Ã‚Â· "+timeAgo(h.lastBackupAt) : "No backup info"}
             </div>
           </div>
         </div>
@@ -2376,12 +2378,12 @@ function PageLogs() {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
       <div style={{ display:"flex", gap:10 }}>
-        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search by user or companyâ€¦"
+        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search by user or companyÃ¢â‚¬Â¦"
           style={{ flex:2,padding:"9px 14px",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"white",fontSize:13,fontFamily:"inherit",outline:"none" }}
           onFocus={e=>e.target.style.borderColor="rgba(129,140,248,.5)"}
           onBlur={e=>e.target.style.borderColor="rgba(255,255,255,.1)"}
         />
-        <input value={actionF} onChange={e=>setActionF(e.target.value)} placeholder="Filter by actionâ€¦"
+        <input value={actionF} onChange={e=>setActionF(e.target.value)} placeholder="Filter by actionÃ¢â‚¬Â¦"
           style={{ flex:1,padding:"9px 14px",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"white",fontSize:13,fontFamily:"inherit",outline:"none" }}
           onFocus={e=>e.target.style.borderColor="rgba(129,140,248,.5)"}
           onBlur={e=>e.target.style.borderColor="rgba(255,255,255,.1)"}
@@ -2417,10 +2419,10 @@ function PageLogs() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: PERMISSIONS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-/* â”€â”€ Plan features for permissions page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Plan features for permissions page Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 const PLAN_FEATURES = [
   // Core
   { key:"VIEW_DASHBOARD",          label:"Dashboard Home",           route:"/dashboard",                  category:"Core" },
@@ -2435,8 +2437,8 @@ const PLAN_FEATURES = [
   { key:"TAX_CONFIGURATION",       label:"Tax Configuration",        route:"/dashboard/tax-configuration",category:"Banking & Payment" },
   // Accounts
   { key:"VIEW_ACCOUNTS",           label:"Accounts Overview",        route:"/dashboard/accounts",         category:"Accounts" },
-  { key:"CREATE_CPV",              label:"CPV â€” Cash Payment",       route:"/dashboard/cpv",              category:"Accounts" },
-  { key:"CREATE_CRV",              label:"CRV â€” Cash Receipt",       route:"/dashboard/crv",              category:"Accounts" },
+  { key:"CREATE_CPV",              label:"CPV Ã¢â‚¬â€ Cash Payment",       route:"/dashboard/cpv",              category:"Accounts" },
+  { key:"CREATE_CRV",              label:"CRV Ã¢â‚¬â€ Cash Receipt",       route:"/dashboard/crv",              category:"Accounts" },
   { key:"VIEW_ACCOUNTING",         label:"Accounting Module",        route:"/dashboard/contra",           category:"Accounts" },
   // Inventory
   { key:"VIEW_CATALOG",            label:"Inventory Catalog",        route:"/dashboard/items-new",        category:"Inventory" },
@@ -2476,10 +2478,10 @@ const PLAN_DEFAULTS: Record<string, string[]> = {
 };
 
 const PLAN_UI = {
-  STARTER:    { icon:"ðŸŒ±", name:"Starter",      color:"#818cf8", glow:"rgba(129,140,248,.2)", border:"rgba(129,140,248,.3)" },
-  PRO:        { icon:"ðŸš€", name:"Professional", color:"#34d399", glow:"rgba(52,211,153,.2)",  border:"rgba(52,211,153,.3)"  },
-  ENTERPRISE: { icon:"ðŸ’Ž", name:"Enterprise",   color:"#fbbf24", glow:"rgba(251,191,36,.2)",  border:"rgba(251,191,36,.3)"  },
-  CUSTOM:     { icon:"âš¡", name:"Custom",       color:"#38bdf8", glow:"rgba(56,189,248,.2)",  border:"rgba(56,189,248,.3)"  },
+  STARTER:    { icon:"Ã°Å¸Å’Â±", name:"Starter",      color:"#818cf8", glow:"rgba(129,140,248,.2)", border:"rgba(129,140,248,.3)" },
+  PRO:        { icon:"Ã°Å¸Å¡â‚¬", name:"Professional", color:"#34d399", glow:"rgba(52,211,153,.2)",  border:"rgba(52,211,153,.3)"  },
+  ENTERPRISE: { icon:"Ã°Å¸â€™Å½", name:"Enterprise",   color:"#fbbf24", glow:"rgba(251,191,36,.2)",  border:"rgba(251,191,36,.3)"  },
+  CUSTOM:     { icon:"Ã¢Å¡Â¡", name:"Custom",       color:"#38bdf8", glow:"rgba(56,189,248,.2)",  border:"rgba(56,189,248,.3)"  },
 } as const;
 
 type PlanKey = keyof typeof PLAN_UI;
@@ -2584,20 +2586,20 @@ function PagePermissions() {
       {/* Header row */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20, flexWrap:"wrap", gap:12 }}>
         <div>
-          <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:4 }}>Select a plan â†’ toggle modules â†’ save</div>
+          <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:4 }}>Select a plan Ã¢â€ â€™ toggle modules Ã¢â€ â€™ save</div>
         </div>
         <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-          {savedMsg && <span style={{ fontSize:12, fontWeight:700, color:savedMsg==="Error!"?"#f87171":"#34d399", padding:"6px 14px", borderRadius:8, background:savedMsg==="Error!"?"rgba(248,113,113,.12)":"rgba(52,211,153,.12)" }}>{savedMsg==="Error!"?"":"âœ“"} {savedMsg}</span>}
+          {savedMsg && <span style={{ fontSize:12, fontWeight:700, color:savedMsg==="Error!"?"#f87171":"#34d399", padding:"6px 14px", borderRadius:8, background:savedMsg==="Error!"?"rgba(248,113,113,.12)":"rgba(52,211,153,.12)" }}>{savedMsg==="Error!"?"":"Ã¢Å“â€œ"} {savedMsg}</span>}
           <button onClick={save} disabled={saving}
             style={{ padding:"10px 24px",borderRadius:10,background:saving?"rgba(99,102,241,.4)":"linear-gradient(135deg,#6366f1,#4f46e5)",border:"none",color:"white",fontSize:13,fontWeight:700,cursor:saving?"default":"pointer",fontFamily:"inherit",boxShadow:"0 4px 14px rgba(99,102,241,.35)" }}>
-            {saving?"Savingâ€¦":"ðŸ’¾ Save Changes"}
+            {saving?"SavingÃ¢â‚¬Â¦":"Ã°Å¸â€™Â¾ Save Changes"}
           </button>
         </div>
       </div>
 
       <div style={{ display:"grid", gridTemplateColumns:"240px 1fr", gap:16, alignItems:"start" }}>
 
-        {/* â”€â”€ Left: Plan cards â”€â”€ */}
+        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Left: Plan cards Ã¢â€â‚¬Ã¢â€â‚¬ */}
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {(Object.keys(PLAN_UI) as PlanKey[]).map(plan => {
             const m = PLAN_UI[plan];
@@ -2635,21 +2637,21 @@ function PagePermissions() {
           })}
         </div>
 
-        {/* â”€â”€ Right: permissions â”€â”€ */}
+        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Right: permissions Ã¢â€â‚¬Ã¢â€â‚¬ */}
         <div style={{ animation:"pf-slide .3s ease" }} key={selectedPlan}>
           {/* Plan banner */}
           <div style={{ padding:"14px 18px", borderRadius:14, background:meta.glow, border:`1.5px solid ${meta.border}`, marginBottom:14, display:"flex", alignItems:"center", gap:14 }}>
             <span style={{ fontSize:26 }}>{meta.icon}</span>
             <div>
               <div style={{ fontSize:15, fontWeight:800, color:meta.color }}>{meta.name} Plan</div>
-              <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>{cur.length + curDashboard.length} of {totalItems} items enabled â€” applies to all users on this plan immediately after save</div>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>{cur.length + curDashboard.length} of {totalItems} items enabled Ã¢â‚¬â€ applies to all users on this plan immediately after save</div>
             </div>
           </div>
 
           {/* Search */}
           <div style={{ position:"relative", marginBottom:14 }}>
-            <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:13, color:"rgba(255,255,255,.3)" }}>ðŸ”</span>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search modulesâ€¦"
+            <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:13, color:"rgba(255,255,255,.3)" }}>Ã°Å¸â€Â</span>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search modulesÃ¢â‚¬Â¦"
               style={{ width:"100%", padding:"9px 12px 9px 36px", borderRadius:10, border:"1.5px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", color:"white", fontSize:13, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}/>
           </div>
 
@@ -2692,7 +2694,7 @@ function PagePermissions() {
                           />
                           <div style={{ flex:1 }}>
                             <div style={{ fontSize:13, fontWeight:600, color: checked ? "white" : "rgba(255,255,255,.45)" }}>{feature.label}</div>
-                            <div style={{ fontSize:11, color:"rgba(255,255,255,.28)", marginTop:2 }}>{feature.section} â€¢ {feature.route}</div>
+                            <div style={{ fontSize:11, color:"rgba(255,255,255,.28)", marginTop:2 }}>{feature.section} Ã¢â‚¬Â¢ {feature.route}</div>
                           </div>
                           <div style={{ padding:"2px 8px", borderRadius:8, fontSize:10, fontWeight:700, background: checked ? meta.glow : "rgba(255,255,255,.06)", color: checked ? meta.color : "rgba(255,255,255,.4)" }}>
                             {checked ? "ON" : "OFF"}
@@ -2764,9 +2766,9 @@ function PagePermissions() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: LIVE SUPPORT
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 type ConvStatus = "bot"|"waiting"|"agent"|"closed";
 type AdminConv = {
   id: string; customer_name: string; customer_email: string|null;
@@ -2838,7 +2840,7 @@ function PageLiveSupport() {
   async function takeOver() {
     if (!activeId) return;
     await fetch(`/api/chat/conversations/${activeId}`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ status:"agent", assignedAgent:"Admin Agent" }) });
-    await fetch("/api/chat/messages", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ conversationId:activeId, sender:"agent", text:"Hi! I'm an Admin Agent from FinovaOS Support. How can I help you? ðŸ˜Š" }) });
+    await fetch("/api/chat/messages", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ conversationId:activeId, sender:"agent", text:"Hi! I'm an Admin Agent from FinovaOS Support. How can I help you? Ã°Å¸ËœÅ " }) });
     loadConvs(); loadMsgs();
   }
 
@@ -2876,7 +2878,7 @@ function PageLiveSupport() {
   return (
     <div style={{ display:"flex", height:"calc(100vh - 120px)", gap:0, borderRadius:16, overflow:"hidden", border:"1px solid rgba(255,255,255,.08)" }}>
 
-      {/* â”€â”€ LEFT: Conversation list â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ LEFT: Conversation list Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ width:280, flexShrink:0, borderRight:"1px solid rgba(255,255,255,.07)", display:"flex", flexDirection:"column", background:"rgba(255,255,255,.01)" }}>
 
         {/* Header */}
@@ -2885,11 +2887,11 @@ function PageLiveSupport() {
             <div style={{ fontSize:13, fontWeight:800, color:"white" }}>Live Chats</div>
             {waitingCount > 0 && (
               <div style={{ padding:"2px 8px", borderRadius:99, background:"rgba(251,191,36,.15)", border:"1px solid rgba(251,191,36,.3)", fontSize:10, fontWeight:800, color:"#fbbf24" }}>
-                â³ {waitingCount} waiting
+                Ã¢ÂÂ³ {waitingCount} waiting
               </div>
             )}
           </div>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Searchâ€¦"
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="SearchÃ¢â‚¬Â¦"
             style={{ width:"100%", padding:"7px 10px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", color:"white", fontSize:12, fontFamily:"inherit", outline:"none", boxSizing:"border-box" }}/>
           <div style={{ display:"flex", gap:4, marginTop:8, flexWrap:"wrap" }}>
             {(["all","waiting","agent","bot","closed"] as const).map(f => (
@@ -2898,7 +2900,7 @@ function PageLiveSupport() {
                 background: filter===f ? (f==="waiting"?"#fbbf24":f==="agent"?"#34d399":f==="bot"?"#818cf8":f==="closed"?"#6b7280":"#6366f1") : "rgba(255,255,255,.06)",
                 color: filter===f ? (f==="all"?"white":"#080c1e") : "rgba(255,255,255,.35)",
               }}>
-                {f==="all"?`All(${convs.length})`:f==="waiting"?`â³${convs.filter(c=>c.status===f).length}`:f}
+                {f==="all"?`All(${convs.length})`:f==="waiting"?`Ã¢ÂÂ³${convs.filter(c=>c.status===f).length}`:f}
               </button>
             ))}
           </div>
@@ -2937,11 +2939,11 @@ function PageLiveSupport() {
         </div>
       </div>
 
-      {/* â”€â”€ RIGHT: Chat area â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ RIGHT: Chat area Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
         {!activeId ? (
           <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:10, color:"rgba(255,255,255,.2)" }}>
-            <div style={{ fontSize:40 }}>ðŸ’¬</div>
+            <div style={{ fontSize:40 }}>Ã°Å¸â€™Â¬</div>
             <div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.35)" }}>Select a conversation</div>
             <div style={{ fontSize:12, color:"rgba(255,255,255,.2)", textAlign:"center", maxWidth:280, lineHeight:1.7 }}>
               Conversations from your website chat widget appear here automatically. New chats refresh every 3 seconds.
@@ -2958,18 +2960,18 @@ function PageLiveSupport() {
                   </div>
                   <div>
                     <div style={{ fontSize:13, fontWeight:700 }}>{activeConv.customer_name}</div>
-                    <div style={{ fontSize:10.5, color:"rgba(255,255,255,.3)" }}>{activeConv.customer_email||"No email"} Â· {timeAgo(activeConv.created_at)}</div>
+                    <div style={{ fontSize:10.5, color:"rgba(255,255,255,.3)" }}>{activeConv.customer_email||"No email"} Ã‚Â· {timeAgo(activeConv.created_at)}</div>
                   </div>
                 </div>
                 <div style={{ display:"flex", gap:7 }}>
                   {(activeConv.status==="bot"||activeConv.status==="waiting") && (
                     <button onClick={takeOver} style={{ padding:"6px 14px", borderRadius:8, background:"linear-gradient(135deg,#34d399,#059669)", border:"none", color:"white", fontSize:11.5, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                      ðŸ‘¤ Take Over
+                      Ã°Å¸â€˜Â¤ Take Over
                     </button>
                   )}
                   {activeConv.status!=="closed" && (
                     <button onClick={closeConv} style={{ padding:"6px 12px", borderRadius:8, background:"rgba(239,68,68,.12)", border:"1px solid rgba(239,68,68,.3)", color:"#f87171", fontSize:11.5, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-                      âœ• Close
+                      Ã¢Å“â€¢ Close
                     </button>
                   )}
                 </div>
@@ -2982,7 +2984,7 @@ function PageLiveSupport() {
                 <div key={msg.id||i} style={{ display:"flex", justifyContent:msg.sender==="customer"?"flex-end":"flex-start", gap:7, alignItems:"flex-end" }}>
                   {msg.sender!=="customer" && (
                     <div style={{ width:26, height:26, borderRadius:8, flexShrink:0, background:msg.sender==="agent"?"linear-gradient(135deg,#34d399,#059669)":"linear-gradient(135deg,#6366f1,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12 }}>
-                      {msg.sender==="agent"?"ðŸ‘¤":"ðŸ¤–"}
+                      {msg.sender==="agent"?"Ã°Å¸â€˜Â¤":"Ã°Å¸Â¤â€“"}
                     </div>
                   )}
                   <div style={{
@@ -2994,7 +2996,7 @@ function PageLiveSupport() {
                   }}>
                     {msg.sender!=="customer" && (
                       <div style={{ fontSize:9.5, fontWeight:700, color:msg.sender==="agent"?"#34d399":"#818cf8", marginBottom:3 }}>
-                        {msg.sender==="agent"?`ðŸ‘¤ ${activeConv?.assigned_agent||"Agent"}`:"ðŸ¤– AI Bot"}
+                        {msg.sender==="agent"?`Ã°Å¸â€˜Â¤ ${activeConv?.assigned_agent||"Agent"}`:"Ã°Å¸Â¤â€“ AI Bot"}
                       </div>
                     )}
                     {msg.text}
@@ -3019,7 +3021,7 @@ function PageLiveSupport() {
                   <button key={i} onClick={()=>sendReply(qr)} style={{ fontSize:10, padding:"2px 9px", borderRadius:99, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.2)", color:"#818cf8", cursor:"pointer", fontFamily:"inherit", fontWeight:600, transition:"all .15s" }}
                     onMouseEnter={e=>{e.currentTarget.style.background="rgba(99,102,241,.22)";e.currentTarget.style.color="white";}}
                     onMouseLeave={e=>{e.currentTarget.style.background="rgba(99,102,241,.1)";e.currentTarget.style.color="#818cf8";}}>
-                    {qr.length>35?qr.slice(0,35)+"â€¦":qr}
+                    {qr.length>35?qr.slice(0,35)+"Ã¢â‚¬Â¦":qr}
                   </button>
                 ))}
               </div>
@@ -3030,7 +3032,7 @@ function PageLiveSupport() {
               <div style={{ padding:"10px 16px 14px", flexShrink:0, borderTop:"1px solid rgba(255,255,255,.07)" }}>
                 {activeConv.status!=="agent" ? (
                   <div style={{ padding:12, borderRadius:10, background:"rgba(251,191,36,.06)", border:"1px solid rgba(251,191,36,.2)", fontSize:12, color:"#fbbf24", textAlign:"center" }}>
-                    {activeConv.status==="waiting" ? "â³ Customer is waiting. Click \"Take Over\" to join." : "ðŸ¤– AI bot is handling this. Click \"Take Over\" to take control."}
+                    {activeConv.status==="waiting" ? "Ã¢ÂÂ³ Customer is waiting. Click \"Take Over\" to join." : "Ã°Å¸Â¤â€“ AI bot is handling this. Click \"Take Over\" to take control."}
                   </div>
                 ) : (
                   <div style={{ display:"flex", gap:8, alignItems:"flex-end", background:"rgba(255,255,255,.04)", borderRadius:12, border:"1.5px solid rgba(255,255,255,.08)", padding:"8px 10px", transition:"border .2s" }}
@@ -3038,7 +3040,7 @@ function PageLiveSupport() {
                     onBlurCapture={e=>(e.currentTarget.style.borderColor="rgba(255,255,255,.08)")}>
                     <textarea ref={inputRef} value={replyText} onChange={e=>setReplyText(e.target.value)}
                       onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendReply();}}}
-                      rows={2} placeholder="Type your replyâ€¦ (Enter to send)"
+                      rows={2} placeholder="Type your replyÃ¢â‚¬Â¦ (Enter to send)"
                       style={{ flex:1, background:"none", border:"none", color:"white", fontSize:13, fontFamily:"inherit", lineHeight:1.6, resize:"none", outline:"none" }}/>
                     <button onClick={()=>sendReply()} disabled={!replyText.trim()||sending} style={{
                       width:34, height:34, borderRadius:9, border:"none", flexShrink:0,
@@ -3055,7 +3057,7 @@ function PageLiveSupport() {
             )}
             {activeConv?.status==="closed" && (
               <div style={{ padding:"12px 16px", flexShrink:0, borderTop:"1px solid rgba(255,255,255,.06)" }}>
-                <div style={{ textAlign:"center", padding:10, borderRadius:10, background:"rgba(107,114,128,.08)", border:"1px solid rgba(107,114,128,.2)", fontSize:12, color:"#9ca3af" }}>âœ• Conversation closed</div>
+                <div style={{ textAlign:"center", padding:10, borderRadius:10, background:"rgba(107,114,128,.08)", border:"1px solid rgba(107,114,128,.2)", fontSize:12, color:"#9ca3af" }}>Ã¢Å“â€¢ Conversation closed</div>
               </div>
             )}
           </>
@@ -3065,9 +3067,9 @@ function PageLiveSupport() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: SETTINGS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageSettings() {
   const [saved,   setSaved]   = useState<""|"saving"|"ok"|"err">("");
   const [danger,  setDanger]  = useState<Record<string,string>>({});
@@ -3103,7 +3105,7 @@ function PageSettings() {
     } catch { setDanger(d=>({...d,[key]:"err"})); setTimeout(()=>setDanger(d=>({...d,[key]:""})),2500); }
   }
 
-  const saveLabel = saved==="saving"?"Savingâ€¦":saved==="ok"?"âœ“ Saved!":saved==="err"?"âœ• Error":"Save Settings";
+  const saveLabel = saved==="saving"?"SavingÃ¢â‚¬Â¦":saved==="ok"?"Ã¢Å“â€œ Saved!":saved==="err"?"Ã¢Å“â€¢ Error":"Save Settings";
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
@@ -3159,7 +3161,7 @@ function PageSettings() {
             { label:"Broadcast Alert",    desc:"Send a system-wide notification to all active users.",        btn:"Send Alert",  key:"alert",   action:"BROADCAST",     color:"#a78bfa" },
           ].map(d => {
             const st = danger[d.key]||"";
-            const btnLabel = st==="running"?"Runningâ€¦":st==="done"?"âœ“ Done":st==="err"?"âœ• Error":d.btn;
+            const btnLabel = st==="running"?"RunningÃ¢â‚¬Â¦":st==="done"?"Ã¢Å“â€œ Done":st==="err"?"Ã¢Å“â€¢ Error":d.btn;
             return (
               <div key={d.label} style={{ display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderRadius:12,background:"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.06)" }}>
                 <div>
@@ -3179,12 +3181,12 @@ function PageSettings() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   ROOT â€” LAYOUT + ROUTER
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+   ROOT Ã¢â‚¬â€ LAYOUT + ROUTER
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    NOTIFICATIONS DROPDOWN COMPONENT
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function NotificationsDropdown({ notifs, onMarkRead, onMarkAllRead, onClear }: {
   notifs: Notif[];
   onMarkRead: (id:string) => void;
@@ -3222,7 +3224,7 @@ function NotificationsDropdown({ notifs, onMarkRead, onMarkAllRead, onClear }: {
       <div style={{ overflowY:"auto", flex:1 }}>
         {notifs.length === 0 ? (
           <div style={{ padding:"40px 20px", textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:13 }}>
-            <div style={{ fontSize:28, marginBottom:8 }}>ðŸ””</div>
+            <div style={{ fontSize:28, marginBottom:8 }}>Ã°Å¸â€â€</div>
             No notifications yet
           </div>
         ) : notifs.map(n => {
@@ -3264,7 +3266,7 @@ function NotificationsDropdown({ notifs, onMarkRead, onMarkAllRead, onClear }: {
                 style={{ background:"none", border:"none", cursor:"pointer", color:"rgba(255,255,255,.2)", fontSize:14, padding:"2px 4px", borderRadius:5, transition:"color .15s", flexShrink:0 }}
                 onMouseEnter={e=>(e.currentTarget.style.color="rgba(255,255,255,.7)")}
                 onMouseLeave={e=>(e.currentTarget.style.color="rgba(255,255,255,.2)")}>
-                âœ•
+                Ã¢Å“â€¢
               </button>
             </div>
           );
@@ -3285,20 +3287,20 @@ function NotificationsDropdown({ notifs, onMarkRead, onMarkAllRead, onClear }: {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: PROFILE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: SUPPORT TICKETS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: VISITOR ANALYTICS
-   Real-time website visitors â€” country, city, device
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Real-time website visitors Ã¢â‚¬â€ country, city, device
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: PRODUCT UPDATES
-   Admin posts updates â†’ users see them in dashboard
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   Admin posts updates Ã¢â€ â€™ users see them in dashboard
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageUpdates() {
   type Update = {
     id: string; title: string; body: string; type: string;
@@ -3313,11 +3315,11 @@ function PageUpdates() {
   const [saved,    setSaved]    = useState(false);
 
   const TYPE_CONFIG: Record<string,{label:string;icon:string;color:string;bg:string}> = {
-    feature:     { label:"New Feature",   icon:"âœ¨", color:"#818cf8", bg:"rgba(129,140,248,.12)" },
-    improvement: { label:"Improvement",   icon:"âš¡", color:"#38bdf8", bg:"rgba(56,189,248,.12)"  },
-    bugfix:      { label:"Bug Fix",       icon:"ðŸ›", color:"#34d399", bg:"rgba(52,211,153,.12)"  },
-    announcement:{ label:"Announcement",  icon:"ðŸ“£", color:"#fbbf24", bg:"rgba(251,191,36,.12)"  },
-    maintenance: { label:"Maintenance",   icon:"ðŸ”§", color:"#f87171", bg:"rgba(248,113,113,.12)" },
+    feature:     { label:"New Feature",   icon:"Ã¢Å“Â¨", color:"#818cf8", bg:"rgba(129,140,248,.12)" },
+    improvement: { label:"Improvement",   icon:"Ã¢Å¡Â¡", color:"#38bdf8", bg:"rgba(56,189,248,.12)"  },
+    bugfix:      { label:"Bug Fix",       icon:"Ã°Å¸Ââ€º", color:"#34d399", bg:"rgba(52,211,153,.12)"  },
+    announcement:{ label:"Announcement",  icon:"Ã°Å¸â€œÂ£", color:"#fbbf24", bg:"rgba(251,191,36,.12)"  },
+    maintenance: { label:"Maintenance",   icon:"Ã°Å¸â€Â§", color:"#f87171", bg:"rgba(248,113,113,.12)" },
   };
 
   useEffect(()=>{
@@ -3417,23 +3419,23 @@ function PageUpdates() {
 
       {/* KPIs */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
-        <KPICard label="Total Updates"  value={updates?.length??0} icon="ðŸš€" color="#818cf8"/>
-        <KPICard label="Published"      value={published}           icon="âœ“"  color="#34d399"/>
+        <KPICard label="Total Updates"  value={updates?.length??0} icon="Ã°Å¸Å¡â‚¬" color="#818cf8"/>
+        <KPICard label="Published"      value={published}           icon="Ã¢Å“â€œ"  color="#34d399"/>
         <KPICard label="Drafts"         value={drafts}              icon=""  color="#fbbf24"/>
-        <KPICard label="Users Notified" value={published*0}         icon="ðŸ‘¥" color="#38bdf8"/>
+        <KPICard label="Users Notified" value={published*0}         icon="Ã°Å¸â€˜Â¥" color="#38bdf8"/>
       </div>
 
       {/* Header */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-          {saved && <span style={{ fontSize:12, color:"#34d399", fontWeight:700 }}>âœ“ Saved successfully</span>}
+          {saved && <span style={{ fontSize:12, color:"#34d399", fontWeight:700 }}>Ã¢Å“â€œ Saved successfully</span>}
           <Link href="/changelog" target="_blank" style={{ fontSize:12, fontWeight:600, color:"#818cf8", textDecoration:"none" }}>
             View public changelog 
           </Link>
         </div>
         <button onClick={()=>{ setShowForm(v=>!v); setEditing(null); setForm({ title:"", body:"", type:"feature", version:"", published:true }); }}
           style={{ padding:"9px 20px", borderRadius:10, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-          {showForm ? "âœ• Cancel" : "+ New Update"}
+          {showForm ? "Ã¢Å“â€¢ Cancel" : "+ New Update"}
         </button>
       </div>
 
@@ -3441,7 +3443,7 @@ function PageUpdates() {
       {showForm && (
         <div style={{ background:"rgba(99,102,241,.06)", borderRadius:16, border:"1.5px solid rgba(99,102,241,.25)", padding:"22px 24px" }}>
           <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.7)", letterSpacing:".04em", textTransform:"uppercase", marginBottom:18 }}>
-            {editing ? "âœŽ Edit Update" : "âœ¦ New Update"}
+            {editing ? "Ã¢Å“Å½ Edit Update" : "Ã¢Å“Â¦ New Update"}
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:14 }}>
             {/* Title */}
@@ -3503,8 +3505,8 @@ function PageUpdates() {
           <div style={{ padding:32, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>Loading...</div>
         ) : updates.length===0 ? (
           <div style={{ padding:40, textAlign:"center", color:"rgba(255,255,255,.15)", fontSize:13 }}>
-            <div style={{ fontSize:32, marginBottom:10 }}>ðŸš€</div>
-            No updates yet â€” create your first one!
+            <div style={{ fontSize:32, marginBottom:10 }}>Ã°Å¸Å¡â‚¬</div>
+            No updates yet Ã¢â‚¬â€ create your first one!
           </div>
         ) : updates.map(u=>{
           const tc = TYPE_CONFIG[u.type] || TYPE_CONFIG.feature;
@@ -3544,17 +3546,17 @@ function PageUpdates() {
                     style={{ padding:"6px 14px", borderRadius:8, fontSize:11, fontWeight:700, cursor:"pointer", border:"none",
                       background:u.published?"rgba(52,211,153,.12)":"rgba(251,191,36,.12)",
                       color:u.published?"#34d399":"#fbbf24" }}>
-                    {u.published?"âœ“ Published":" Draft"}
+                    {u.published?"Ã¢Å“â€œ Published":" Draft"}
                   </button>
                   <button onClick={()=>startEdit(u)}
                     style={{ padding:"6px 14px", borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer",
                       background:"rgba(99,102,241,.12)", border:"1px solid rgba(99,102,241,.2)", color:"#818cf8" }}>
-                    âœŽ Edit
+                    Ã¢Å“Å½ Edit
                   </button>
                   <button onClick={()=>deleteUpdate(u.id)}
                     style={{ padding:"6px 14px", borderRadius:8, fontSize:11, fontWeight:600, cursor:"pointer",
                       background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171" }}>
-                    âœ• Delete
+                    Ã¢Å“â€¢ Delete
                   </button>
                 </div>
               </div>
@@ -3593,7 +3595,7 @@ function PageVisitors() {
     return ()=>clearInterval(t);
   }, []);
 
-  // Country â†’ SVG map coords
+  // Country Ã¢â€ â€™ SVG map coords
   const COORDS: Record<string,[number,number]> = {
     PK:[640,220],AE:[610,235],IN:[660,230],SA:[590,240],GB:[470,140],
     US:[200,190],BD:[680,225],QA:[600,240],TR:[555,195],NG:[490,270],
@@ -3604,7 +3606,7 @@ function PageVisitors() {
     RU:[620,150],KZ:[630,190],IR:[605,215],IQ:[590,215],
   };
 
-  const DEVICE_ICON: Record<string,string> = { mobile:"ðŸ“±", desktop:"ðŸ’»", tablet:"ðŸ“Ÿ" };
+  const DEVICE_ICON: Record<string,string> = { mobile:"Ã°Å¸â€œÂ±", desktop:"Ã°Å¸â€™Â»", tablet:"Ã°Å¸â€œÅ¸" };
   const maxVisitors = Math.max(...(visitors||[]).map((r:any)=>r.visitors||0), 1);
 
   return (
@@ -3613,11 +3615,11 @@ function PageVisitors() {
       {/* KPI row */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:12 }}>
         {[
-          { label:"Total Visits",     value:stats?.totalVisits??0,    icon:"ðŸ‘",  color:"#818cf8" },
-          { label:"Unique Visitors",  value:stats?.uniqueVisitors??0, icon:"ðŸ‘¤", color:"#38bdf8" },
-          { label:"Countries",        value:stats?.countries??0,       icon:"ðŸŒ", color:"#34d399" },
-          { label:"Cities",           value:stats?.cities??0,          icon:"ðŸ™", color:"#fbbf24" },
-          { label:"Live Now",         value:live.length,               icon:"ðŸ”´", color:"#f87171" },
+          { label:"Total Visits",     value:stats?.totalVisits??0,    icon:"Ã°Å¸â€˜Â",  color:"#818cf8" },
+          { label:"Unique Visitors",  value:stats?.uniqueVisitors??0, icon:"Ã°Å¸â€˜Â¤", color:"#38bdf8" },
+          { label:"Countries",        value:stats?.countries??0,       icon:"Ã°Å¸Å’Â", color:"#34d399" },
+          { label:"Cities",           value:stats?.cities??0,          icon:"Ã°Å¸Ââ„¢", color:"#fbbf24" },
+          { label:"Live Now",         value:live.length,               icon:"Ã°Å¸â€Â´", color:"#f87171" },
         ].map(k=>(
           <div key={k.label} style={{ background:"rgba(255,255,255,.03)", borderRadius:14, border:"1px solid rgba(255,255,255,.07)", padding:"16px 18px" }}>
             <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
@@ -3641,7 +3643,7 @@ function PageVisitors() {
               style={{ padding:"7px 18px", borderRadius:9, fontSize:12, fontWeight:700, cursor:"pointer", border:"none", textTransform:"capitalize",
                 background:tab===t?"linear-gradient(135deg,#4f46e5,#7c3aed)":"transparent",
                 color:tab===t?"white":"rgba(255,255,255,.4)" }}>
-              {t==="map"?" Map":t==="table"?"ðŸ“‹ Table":"ðŸ”´ Live"}
+              {t==="map"?" Map":t==="table"?"Ã°Å¸â€œâ€¹ Table":"Ã°Å¸â€Â´ Live"}
             </button>
           ))}
         </div>
@@ -3682,10 +3684,10 @@ function PageVisitors() {
                 <div style={{ padding:24, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:12 }}>No visitor data yet</div>
               ) : (visitors||[]).map((row:any,i:number)=>(
                 <div key={row.country} style={{ padding:"12px 18px", borderBottom:"1px solid rgba(255,255,255,.04)", display:"flex", alignItems:"center", gap:12 }}>
-                  <span style={{ fontSize:20, width:28 }}>{row.flag||"ðŸŒ"}</span>
+                  <span style={{ fontSize:20, width:28 }}>{row.flag||"Ã°Å¸Å’Â"}</span>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:13, fontWeight:600, color:"white" }}>{row.countryName||row.country}</div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:1 }}>ðŸ“ {row.topCity||"â€”"}</div>
+                    <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:1 }}>Ã°Å¸â€œÂ {row.topCity||"Ã¢â‚¬â€"}</div>
                   </div>
                   <div style={{ textAlign:"right" }}>
                     <div style={{ fontSize:13, fontWeight:700, color:"#38bdf8" }}>{(row.visitors||0).toLocaleString()}</div>
@@ -3710,9 +3712,9 @@ function PageVisitors() {
             <div style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", padding:"18px 20px" }}>
               <div style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.5)", textTransform:"uppercase", letterSpacing:".05em", marginBottom:14 }}>Device Type</div>
               {[
-                { type:"mobile",  label:"Mobile",  icon:"ðŸ“±", pct: stats?.deviceBreakdown?.mobile||0,  color:"#818cf8" },
-                { type:"desktop", label:"Desktop", icon:"ðŸ’»", pct: stats?.deviceBreakdown?.desktop||0, color:"#38bdf8" },
-                { type:"tablet",  label:"Tablet",  icon:"ðŸ“Ÿ", pct: stats?.deviceBreakdown?.tablet||0,  color:"#fbbf24" },
+                { type:"mobile",  label:"Mobile",  icon:"Ã°Å¸â€œÂ±", pct: stats?.deviceBreakdown?.mobile||0,  color:"#818cf8" },
+                { type:"desktop", label:"Desktop", icon:"Ã°Å¸â€™Â»", pct: stats?.deviceBreakdown?.desktop||0, color:"#38bdf8" },
+                { type:"tablet",  label:"Tablet",  icon:"Ã°Å¸â€œÅ¸", pct: stats?.deviceBreakdown?.tablet||0,  color:"#fbbf24" },
               ].map(d=>(
                 <div key={d.type} style={{ marginBottom:12 }}>
                   <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
@@ -3760,7 +3762,7 @@ function PageVisitors() {
 
           {live.length===0 ? (
             <div style={{ padding:40, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>
-              <div style={{ fontSize:32, marginBottom:10 }}>ðŸ‘</div>
+              <div style={{ fontSize:32, marginBottom:10 }}>Ã°Å¸â€˜Â</div>
               No active visitors right now
             </div>
           ) : (
@@ -3771,12 +3773,12 @@ function PageVisitors() {
                   <div style={{ flex:1 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                       <span style={{ fontSize:13, fontWeight:600, color:"white" }}>{v.countryName||v.country||"Unknown"}</span>
-                      {v.city && <span style={{ fontSize:11, color:"rgba(255,255,255,.4)" }}>ðŸ“ {v.city}</span>}
+                      {v.city && <span style={{ fontSize:11, color:"rgba(255,255,255,.4)" }}>Ã°Å¸â€œÂ {v.city}</span>}
                     </div>
                     <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:2, fontFamily:"monospace" }}>{v.page||"/"}</div>
                   </div>
                   <div style={{ textAlign:"right" }}>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.4)" }}>{DEVICE_ICON[v.device]||"ðŸ’»"} {v.device||"desktop"}</div>
+                    <div style={{ fontSize:11, color:"rgba(255,255,255,.4)" }}>{DEVICE_ICON[v.device]||"Ã°Å¸â€™Â»"} {v.device||"desktop"}</div>
                     <div style={{ fontSize:10, color:"rgba(255,255,255,.2)", marginTop:2 }}>{v.duration||"0s"} on page</div>
                   </div>
                 </div>
@@ -3789,15 +3791,15 @@ function PageVisitors() {
       {/* Ad targeting suggestion box */}
       {(visitors||[]).length > 0 && (
         <div style={{ background:"rgba(251,191,36,.05)", borderRadius:14, border:"1px solid rgba(251,191,36,.2)", padding:"16px 20px" }}>
-          <div style={{ fontSize:12, fontWeight:700, color:"#fbbf24", textTransform:"uppercase", letterSpacing:".05em", marginBottom:10 }}>ðŸ’¡ Ad Targeting Suggestion</div>
+          <div style={{ fontSize:12, fontWeight:700, color:"#fbbf24", textTransform:"uppercase", letterSpacing:".05em", marginBottom:10 }}>Ã°Å¸â€™Â¡ Ad Targeting Suggestion</div>
           <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
             {(visitors||[]).slice(0,5).map((row:any)=>(
               <div key={row.country} style={{ padding:"6px 14px", borderRadius:20, background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.2)", fontSize:12, color:"rgba(255,255,255,.7)" }}>
-                ðŸ“ {row.topCity&&`${row.topCity}, `}{row.countryName||row.country} â€” <strong style={{ color:"#fbbf24" }}>{row.visitors} visits</strong>
+                Ã°Å¸â€œÂ {row.topCity&&`${row.topCity}, `}{row.countryName||row.country} Ã¢â‚¬â€ <strong style={{ color:"#fbbf24" }}>{row.visitors} visits</strong>
               </div>
             ))}
           </div>
-          <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:10 }}>These are your highest traffic locations â€” ideal for targeted ads on Google/Meta</div>
+          <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginTop:10 }}>These are your highest traffic locations Ã¢â‚¬â€ ideal for targeted ads on Google/Meta</div>
         </div>
       )}
 
@@ -3906,7 +3908,7 @@ function PageTickets() {
                     <span style={{ fontSize:13, fontWeight:600, color:"white", lineHeight:1.3 }}>{t.subject||"(no subject)"}</span>
                     <span style={{ padding:"2px 8px", borderRadius:20, background:sb, color:sc, fontSize:10, fontWeight:700, flexShrink:0 }}>{t.status}</span>
                   </div>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:5 }}>{t.userEmail||t.companyName||"Unknown"} Â· {t.createdAt?.slice(0,10)||""}</div>
+                  <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:5 }}>{t.userEmail||t.companyName||"Unknown"} Ã‚Â· {t.createdAt?.slice(0,10)||""}</div>
                 </div>
               );
             })}
@@ -3924,7 +3926,7 @@ function PageTickets() {
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
                 <div>
                   <div style={{ fontSize:15, fontWeight:700, color:"white" }}>{selected.subject}</div>
-                  <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:3 }}>{selected.userEmail} Â· #{selected.id?.slice(0,8)}</div>
+                  <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:3 }}>{selected.userEmail} Ã‚Â· #{selected.id?.slice(0,8)}</div>
                 </div>
                 <div style={{ display:"flex", gap:8 }}>
                   {["open","answered","closed"].map(s=>(
@@ -3959,9 +3961,9 @@ function PageTickets() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: EMAIL BROADCASTS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageBroadcasts() {
   const [tab, setTab]           = useState<"compose"|"history">("compose");
   const [form, setForm]         = useState({ subject:"", body:"", audience:"all", plan:"", channel:"email" });
@@ -3998,10 +4000,10 @@ function PageBroadcasts() {
 
   const AUDIENCE_OPTS = [
     { value:"all",        label:"All Users",          icon:"", desc:"Every registered user" },
-    { value:"active",     label:"Active Subscribers", icon:"âœ¦", desc:"Paid plan users only" },
+    { value:"active",     label:"Active Subscribers", icon:"Ã¢Å“Â¦", desc:"Paid plan users only" },
     { value:"trial",      label:"Trial Users",        icon:"", desc:"Currently on trial" },
-    { value:"churned",    label:"Churned Users",      icon:"âš ", desc:"Cancelled subscriptions" },
-    { value:"plan",       label:"By Plan",            icon:"â¬¡", desc:"Specific plan only" },
+    { value:"churned",    label:"Churned Users",      icon:"Ã¢Å¡Â ", desc:"Cancelled subscriptions" },
+    { value:"plan",       label:"By Plan",            icon:"Ã¢Â¬Â¡", desc:"Specific plan only" },
   ];
 
   return (
@@ -4013,7 +4015,7 @@ function PageBroadcasts() {
             style={{ padding:"8px 22px", borderRadius:9, fontSize:12, fontWeight:700, cursor:"pointer", border:"none", textTransform:"capitalize",
               background: tab===t ? "linear-gradient(135deg,#4f46e5,#7c3aed)" : "transparent",
               color: tab===t ? "white" : "rgba(255,255,255,.4)" }}>
-            {t==="compose" ? "âœ‰ Compose" : "ðŸ“‹ History"}
+            {t==="compose" ? "Ã¢Å“â€° Compose" : "Ã°Å¸â€œâ€¹ History"}
           </button>
         ))}
       </div>
@@ -4028,7 +4030,7 @@ function PageBroadcasts() {
               <div>
                 <label style={{ fontSize:11, color:"rgba(255,255,255,.4)", fontWeight:600, letterSpacing:".05em", textTransform:"uppercase", display:"block", marginBottom:8 }}>Channel</label>
                 <div style={{ display:"flex", gap:6 }}>
-                  {[{val:"email",icon:"ðŸ“§",label:"Email"},{val:"whatsapp",icon:"ðŸ’¬",label:"WhatsApp"},{val:"sms",icon:"ðŸ“±",label:"SMS"}].map(ch=>(
+                  {[{val:"email",icon:"Ã°Å¸â€œÂ§",label:"Email"},{val:"whatsapp",icon:"Ã°Å¸â€™Â¬",label:"WhatsApp"},{val:"sms",icon:"Ã°Å¸â€œÂ±",label:"SMS"}].map(ch=>(
                     <button key={ch.val} onClick={()=>setForm(f=>({...f,channel:ch.val}))}
                       style={{ flex:1, padding:"8px 10px", borderRadius:9, border:`1px solid ${form.channel===ch.val?"rgba(99,102,241,.5)":"rgba(255,255,255,.08)"}`,
                         background:form.channel===ch.val?"rgba(99,102,241,.18)":"rgba(255,255,255,.03)", color:form.channel===ch.val?"#818cf8":"rgba(255,255,255,.4)",
@@ -4062,7 +4064,7 @@ function PageBroadcasts() {
                         <div style={{ fontSize:12, fontWeight:600, color:"white" }}>{o.label}</div>
                         <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>{o.desc}</div>
                       </div>
-                      {form.audience===o.value && <span style={{ fontSize:12, color:"#6366f1" }}>âœ“</span>}
+                      {form.audience===o.value && <span style={{ fontSize:12, color:"#6366f1" }}>Ã¢Å“â€œ</span>}
                     </div>
                   ))}
                 </div>
@@ -4076,7 +4078,7 @@ function PageBroadcasts() {
                   </select>
                 )}
               </div>
-              {/* Subject â€” email only */}
+              {/* Subject Ã¢â‚¬â€ email only */}
               {form.channel==="email" && (
                 <div>
                   <label style={{ fontSize:11, color:"rgba(255,255,255,.4)", fontWeight:600, letterSpacing:".05em", textTransform:"uppercase", display:"block", marginBottom:6 }}>Subject</label>
@@ -4093,7 +4095,7 @@ function PageBroadcasts() {
                   placeholder={form.channel==="email" ? "Write your email message..." : form.channel==="whatsapp" ? "Write your WhatsApp message..." : "Write your SMS message..."}
                   style={{ width:"100%", padding:"10px 14px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:13, resize:"vertical", outline:"none", boxSizing:"border-box" }}/>
               </div>
-              {sent && <div style={{ padding:"10px 14px", borderRadius:9, background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.3)", color:"#34d399", fontSize:12, fontWeight:600 }}>âœ“ Broadcast sent successfully!</div>}
+              {sent && <div style={{ padding:"10px 14px", borderRadius:9, background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.3)", color:"#34d399", fontSize:12, fontWeight:600 }}>Ã¢Å“â€œ Broadcast sent successfully!</div>}
               <div style={{ display:"flex", gap:10 }}>
                 {form.channel==="email" && (
                   <button onClick={()=>setPreview(v=>!v)}
@@ -4103,7 +4105,7 @@ function PageBroadcasts() {
                 )}
                 <button onClick={handleSend} disabled={sending||(form.channel==="email"&&!form.subject.trim())||!form.body.trim()}
                   style={{ flex:1, padding:"9px 18px", borderRadius:10, background:sending?"rgba(99,102,241,.2)":"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:sending?"not-allowed":"pointer" }}>
-                  {sending ? "Sending..." : form.channel==="email" ? "ðŸ“£ Send Email Broadcast" : form.channel==="whatsapp" ? "ðŸ’¬ Send WhatsApp" : "ðŸ“± Send SMS"}
+                  {sending ? "Sending..." : form.channel==="email" ? "Ã°Å¸â€œÂ£ Send Email Broadcast" : form.channel==="whatsapp" ? "Ã°Å¸â€™Â¬ Send WhatsApp" : "Ã°Å¸â€œÂ± Send SMS"}
                 </button>
               </div>
             </div>
@@ -4124,13 +4126,13 @@ function PageBroadcasts() {
                   </div>
                   <div style={{ fontSize:14, fontWeight:700, color:"#111", marginBottom:12 }}>{form.subject||"(no subject)"}</div>
                   <div style={{ fontSize:13, color:"#444", lineHeight:1.7, whiteSpace:"pre-wrap" }}>{form.body||"(empty)"}</div>
-                  <div style={{ marginTop:20, paddingTop:12, borderTop:"1px solid #eee", fontSize:11, color:"#999" }}>FinovaOS Â· Unsubscribe</div>
+                  <div style={{ marginTop:20, paddingTop:12, borderTop:"1px solid #eee", fontSize:11, color:"#999" }}>FinovaOS Ã‚Â· Unsubscribe</div>
                 </div>
               )
             ) : (
               <div style={{ background:"rgba(37,211,102,.06)", border:"1px solid rgba(37,211,102,.2)", borderRadius:12, padding:16, maxWidth:320 }}>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,.3)", marginBottom:8 }}>
-                  {form.channel==="whatsapp" ? "ðŸ’¬ WhatsApp Business" : "ðŸ“± SMS"}
+                  {form.channel==="whatsapp" ? "Ã°Å¸â€™Â¬ WhatsApp Business" : "Ã°Å¸â€œÂ± SMS"}
                 </div>
                 <div style={{ background:"rgba(255,255,255,.07)", borderRadius:10, padding:"10px 14px", fontSize:13, color:"rgba(255,255,255,.8)", lineHeight:1.6, whiteSpace:"pre-wrap" }}>
                   {form.body||"(empty message)"}
@@ -4149,7 +4151,7 @@ function PageBroadcasts() {
               { key:"audience",   label:"Audience",  render:(v:any)=><span style={{ color:"#818cf8", textTransform:"capitalize" }}>{v}</span> },
               { key:"sentTo",     label:"Recipients",align:"right" },
               { key:"openRate",   label:"Open Rate", align:"right", render:(v:any)=><span style={{ color:"#34d399", fontWeight:700 }}>{v||0}%</span> },
-              { key:"createdAt",  label:"Sent",      render:(v:any)=>v?.slice(0,10)||"â€”" },
+              { key:"createdAt",  label:"Sent",      render:(v:any)=>v?.slice(0,10)||"Ã¢â‚¬â€" },
             ]}
           />
         </div>
@@ -4158,9 +4160,9 @@ function PageBroadcasts() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: FEATURE FLAGS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageFlags() {
   const [flags, setFlags]       = useState<any[]|null>(null);
   const [saving, setSaving]     = useState<string|null>(null);
@@ -4225,8 +4227,8 @@ function PageFlags() {
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
       {/* KPIs */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
-        <KPICard label="Total Flags"   value={flags?.length??0}        icon="âš‘" color="#818cf8"/>
-        <KPICard label="Enabled"       value={enabled}                  icon="âœ“" color="#34d399"/>
+        <KPICard label="Total Flags"   value={flags?.length??0}        icon="Ã¢Å¡â€˜" color="#818cf8"/>
+        <KPICard label="Enabled"       value={enabled}                  icon="Ã¢Å“â€œ" color="#34d399"/>
         <KPICard label="Disabled"      value={(flags?.length??0)-enabled} icon="" color="#f87171"/>
       </div>
 
@@ -4294,10 +4296,10 @@ function PageFlags() {
               <div style={{ fontSize:10, color:"rgba(255,255,255,.25)" }}>rollout</div>
             </div>
             {/* Updated */}
-            <div style={{ fontSize:11, color:"rgba(255,255,255,.2)", width:80, textAlign:"right", flexShrink:0 }}>{f.updatedAt?.slice(0,10)||f.createdAt?.slice(0,10)||"â€”"}</div>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,.2)", width:80, textAlign:"right", flexShrink:0 }}>{f.updatedAt?.slice(0,10)||f.createdAt?.slice(0,10)||"Ã¢â‚¬â€"}</div>
             {/* Delete */}
             <button onClick={()=>deleteFlag(f.id)}
-              style={{ padding:"5px 10px", borderRadius:7, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", flexShrink:0 }}>âœ•</button>
+              style={{ padding:"5px 10px", borderRadius:7, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", flexShrink:0 }}>Ã¢Å“â€¢</button>
           </div>
         ))}
       </div>
@@ -4305,9 +4307,9 @@ function PageFlags() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: API KEYS MANAGER
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageApiKeys() {
   const [keys, setKeys]         = useState<any[]|null>(null);
   const [search, setSearch]     = useState("");
@@ -4361,8 +4363,8 @@ function PageApiKeys() {
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
       {/* KPIs */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
-        <KPICard label="Total Keys"  value={keys?.length??0} icon="ðŸ”‘" color="#818cf8"/>
-        <KPICard label="Active"      value={active}          icon="âœ“"  color="#34d399"/>
+        <KPICard label="Total Keys"  value={keys?.length??0} icon="Ã°Å¸â€â€˜" color="#818cf8"/>
+        <KPICard label="Active"      value={active}          icon="Ã¢Å“â€œ"  color="#34d399"/>
         <KPICard label="Revoked"     value={revoked}         icon=""  color="#f87171"/>
       </div>
 
@@ -4384,7 +4386,7 @@ function PageApiKeys() {
           const [sc,sb] = STATUS_STYLE[k.status]||["#818cf8","rgba(129,140,248,.12)"];
           return (
             <div key={k.id} style={{ display:"grid", gridTemplateColumns:"2fr 2fr 1fr 1fr 1fr 80px", gap:0, padding:"13px 18px", borderBottom: i<filtered.length-1?"1px solid rgba(255,255,255,.04)":"none", alignItems:"center" }}>
-              <span style={{ fontSize:13, fontWeight:600, color:"white" }}>{k.companyName||"â€”"}</span>
+              <span style={{ fontSize:13, fontWeight:600, color:"white" }}>{k.companyName||"Ã¢â‚¬â€"}</span>
               {/* Key with copy */}
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                 <code style={{ fontSize:11, color:"rgba(255,255,255,.4)", fontFamily:"monospace", background:"rgba(255,255,255,.05)", padding:"3px 8px", borderRadius:6 }}>
@@ -4392,12 +4394,12 @@ function PageApiKeys() {
                 </code>
                 <button onClick={()=>copyKey(k.key||k.keyPreview||"", k.id)}
                   style={{ padding:"3px 8px", borderRadius:6, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.25)", color:"#818cf8", fontSize:10, cursor:"pointer" }}>
-                  {copied===k.id ? "âœ“" : "Copy"}
+                  {copied===k.id ? "Ã¢Å“â€œ" : "Copy"}
                 </button>
               </div>
               <span style={{ padding:"3px 10px", borderRadius:20, background:sb, color:sc, fontSize:10, fontWeight:700, width:"fit-content" }}>{k.status}</span>
               <span style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>{k.lastUsed?.slice(0,10)||"Never"}</span>
-              <span style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>{k.createdAt?.slice(0,10)||"â€”"}</span>
+              <span style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>{k.createdAt?.slice(0,10)||"Ã¢â‚¬â€"}</span>
               <div style={{ display:"flex", justifyContent:"flex-end" }}>
                 {k.status==="active" ? (
                   <button onClick={()=>revoke(k.id, k.companyName||"this company")} disabled={revoking===k.id}
@@ -4405,7 +4407,7 @@ function PageApiKeys() {
                     {revoking===k.id ? "..." : "Revoke"}
                   </button>
                 ) : (
-                  <span style={{ fontSize:11, color:"rgba(255,255,255,.2)" }}>â€”</span>
+                  <span style={{ fontSize:11, color:"rgba(255,255,255,.2)" }}>Ã¢â‚¬â€</span>
                 )}
               </div>
             </div>
@@ -4451,7 +4453,7 @@ function PageProfile({ setPage }: { setPage:(p:any)=>void }) {
     { label:"Role",        value:"Super Admin",  icon:"", color:"#818cf8" },
     { label:"Status",      value:"Active",        icon:"", color:"#34d399" },
     { label:"Last Login",  value:"Just now",      icon:"", color:"#38bdf8" },
-    { label:"Member Since",value:admin.joined.slice(0,7), icon:"âœ¦", color:"#fbbf24" },
+    { label:"Member Since",value:admin.joined.slice(0,7), icon:"Ã¢Å“Â¦", color:"#fbbf24" },
   ];
 
   return (
@@ -4469,7 +4471,7 @@ function PageProfile({ setPage }: { setPage:(p:any)=>void }) {
             <div style={{ width:72, height:72, borderRadius:18, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, fontWeight:800, color:"white", border:"3px solid #080c1e", flexShrink:0 }}>A</div>
             <div style={{ display:"flex", gap:10, marginBottom:4 }}>
               {saved && (
-                <div style={{ padding:"6px 14px", borderRadius:8, background:"rgba(52,211,153,.15)", border:"1px solid rgba(52,211,153,.3)", color:"#34d399", fontSize:12, fontWeight:600 }}>âœ“ Saved</div>
+                <div style={{ padding:"6px 14px", borderRadius:8, background:"rgba(52,211,153,.15)", border:"1px solid rgba(52,211,153,.3)", color:"#34d399", fontSize:12, fontWeight:600 }}>Ã¢Å“â€œ Saved</div>
               )}
               {editing ? (
                 <>
@@ -4485,7 +4487,7 @@ function PageProfile({ setPage }: { setPage:(p:any)=>void }) {
               ) : (
                 <button onClick={()=>{ setEditing(true); setForm({ name:admin.name, email:admin.email }); }}
                   style={{ padding:"7px 18px", borderRadius:9, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.3)", color:"#818cf8", fontSize:12, fontWeight:600, cursor:"pointer" }}>
-                  âœŽ Edit Profile
+                  Ã¢Å“Å½ Edit Profile
                 </button>
               )}
             </div>
@@ -4560,7 +4562,7 @@ function PageProfile({ setPage }: { setPage:(p:any)=>void }) {
         <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", margin:"0 0 14px" }}>Sign out from all devices and end your current admin session.</p>
         <button onClick={()=>{ clearCurrentUser(); window.location.href="/admin/login"; }}
           style={{ padding:"9px 22px", borderRadius:10, background:"rgba(248,113,113,.12)", border:"1px solid rgba(248,113,113,.3)", color:"#f87171", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-          âŽ‹ Sign Out
+          Ã¢Å½â€¹ Sign Out
         </button>
       </div>
 
@@ -4569,9 +4571,9 @@ function PageProfile({ setPage }: { setPage:(p:any)=>void }) {
 }
 
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: SUBSCRIPTIONS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageSubscriptions() {
   const [subs,    setSubs]    = useState<any[]|null>(null);
   const [search,  setSearch]  = useState("");
@@ -4638,7 +4640,7 @@ function PageSubscriptions() {
       <SectionCard title="All Subscriptions">
         {/* Toolbar */}
         <div style={{ display:"flex", gap:10, marginBottom:14, flexWrap:"wrap" }}>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search companyâ€¦"
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search companyÃ¢â‚¬Â¦"
             style={{ flex:1, minWidth:160, padding:"7px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", color:"white", fontSize:12.5, outline:"none", fontFamily:"inherit" }}/>
           <div style={{ display:"flex", gap:4 }}>
             {(["all","ACTIVE","TRIALING","PAST_DUE","CANCELLED"] as const).map(f=>(
@@ -4652,7 +4654,7 @@ function PageSubscriptions() {
         </div>
 
         {subs===null ? (
-          <div style={{ textAlign:"center", padding:30, color:"rgba(255,255,255,.2)", fontSize:13 }}>Loadingâ€¦</div>
+          <div style={{ textAlign:"center", padding:30, color:"rgba(255,255,255,.2)", fontSize:13 }}>LoadingÃ¢â‚¬Â¦</div>
         ) : filtered.length===0 ? (
           <div style={{ textAlign:"center", padding:30, color:"rgba(255,255,255,.2)", fontSize:13 }}>No subscriptions found.</div>
         ) : (
@@ -4672,7 +4674,7 @@ function PageSubscriptions() {
                     <tr key={s.id} style={{ borderBottom:"1px solid rgba(255,255,255,.04)" }}>
                       <td style={{ padding:"10px 12px", color:"white", fontWeight:600 }}>{s.name}</td>
                       <td style={{ padding:"10px 12px" }}>
-                        <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(129,140,248,.12)", color:"#818cf8", fontSize:11, fontWeight:700, textTransform:"capitalize" }}>{s.plan||"â€”"}</span>
+                        <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(129,140,248,.12)", color:"#818cf8", fontSize:11, fontWeight:700, textTransform:"capitalize" }}>{s.plan||"Ã¢â‚¬â€"}</span>
                       </td>
                       <td style={{ padding:"10px 12px" }}>
                         <span style={{ padding:"2px 8px", borderRadius:6, background:bc, color:tc, fontSize:11, fontWeight:700 }}>{s.status}</span>
@@ -4680,19 +4682,19 @@ function PageSubscriptions() {
                       <td style={{ padding:"10px 12px", color:"#34d399", fontWeight:700 }}>${s.mrr}/mo</td>
                       <td style={{ padding:"10px 12px", color:"rgba(255,255,255,.5)" }}>{s.userCount}</td>
                       <td style={{ padding:"10px 12px", color:"rgba(255,255,255,.4)", fontSize:11.5 }}>
-                        {s.currentPeriodEnd ? new Date(s.currentPeriodEnd).toLocaleDateString() : "â€”"}
+                        {s.currentPeriodEnd ? new Date(s.currentPeriodEnd).toLocaleDateString() : "Ã¢â‚¬â€"}
                       </td>
                       <td style={{ padding:"10px 12px" }}>
                         <div style={{ display:"flex", gap:6 }}>
                           {s.status!=="CANCELLED" ? (
                             <button onClick={()=>doAction(s.id,"cancel")} disabled={acting===s.id}
                               style={{ padding:"4px 10px", borderRadius:6, border:"1px solid rgba(248,113,113,.3)", background:"rgba(248,113,113,.1)", color:"#f87171", fontSize:11, fontWeight:700, cursor:"pointer", opacity:acting===s.id?.6:1 }}>
-                              {acting===s.id?"â€¦":"Cancel"}
+                              {acting===s.id?"Ã¢â‚¬Â¦":"Cancel"}
                             </button>
                           ) : (
                             <button onClick={()=>doAction(s.id,"activate")} disabled={acting===s.id}
                               style={{ padding:"4px 10px", borderRadius:6, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.1)", color:"#34d399", fontSize:11, fontWeight:700, cursor:"pointer", opacity:acting===s.id?.6:1 }}>
-                              {acting===s.id?"â€¦":"Activate"}
+                              {acting===s.id?"Ã¢â‚¬Â¦":"Activate"}
                             </button>
                           )}
                         </div>
@@ -4709,14 +4711,14 @@ function PageSubscriptions() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: BUSINESS MODULES
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 const PHASE_META: Record<number,{label:string;color:string;bg:string}> = {
-  1: { label:"Phase 1 â€” Live",        color:"#34d399", bg:"rgba(52,211,153,.1)"  },
-  2: { label:"Phase 2 â€” Commerce+",   color:"#60a5fa", bg:"rgba(96,165,250,.1)"  },
-  3: { label:"Phase 3 â€” Services",    color:"#a78bfa", bg:"rgba(167,139,250,.1)" },
-  4: { label:"Phase 4 â€” Specialised", color:"#f59e0b", bg:"rgba(245,158,11,.1)"  },
+  1: { label:"Phase 1 Ã¢â‚¬â€ Live",        color:"#34d399", bg:"rgba(52,211,153,.1)"  },
+  2: { label:"Phase 2 Ã¢â‚¬â€ Commerce+",   color:"#60a5fa", bg:"rgba(96,165,250,.1)"  },
+  3: { label:"Phase 3 Ã¢â‚¬â€ Services",    color:"#a78bfa", bg:"rgba(167,139,250,.1)" },
+  4: { label:"Phase 4 Ã¢â‚¬â€ Specialised", color:"#f59e0b", bg:"rgba(245,158,11,.1)"  },
 };
 
 function PageBusinessModules() {
@@ -4762,8 +4764,8 @@ function PageBusinessModules() {
       if (r.ok) {
         const d = await r.json();
         setModules(prev=>prev.map(m=>m.id===id ? {...m, enabled:!currentEnabled, status:!currentEnabled?"live":"coming_soon", adminOverride:true, waitlistCount:0} : m));
-        const notifMsg = d.notified > 0 ? ` â€” ðŸ“§ ${d.notified} waitlist notified` : "";
-        showMsg(`${!currentEnabled?"âœ… Enabled":"â¸ Disabled"}: ${id}${notifMsg}`);
+        const notifMsg = d.notified > 0 ? ` Ã¢â‚¬â€ Ã°Å¸â€œÂ§ ${d.notified} waitlist notified` : "";
+        showMsg(`${!currentEnabled?"Ã¢Å“â€¦ Enabled":"Ã¢ÂÂ¸ Disabled"}: ${id}${notifMsg}`);
       }
     } finally { setSaving(null); }
   }
@@ -4779,7 +4781,7 @@ function PageBusinessModules() {
         const d = await r.json();
         if (d.notified > 0) {
           setModules(prev=>prev.map(m=>m.id===id ? {...m, waitlistCount:0} : m));
-          showMsg(`ðŸ“§ ${d.notified} emails sent to ${label} waitlist`);
+          showMsg(`Ã°Å¸â€œÂ§ ${d.notified} emails sent to ${label} waitlist`);
         } else {
           showMsg(`No pending waitlist entries for ${label}`, false);
         }
@@ -4801,8 +4803,8 @@ function PageBusinessModules() {
       if (r.ok) {
         const d = await r.json();
         await load();
-        const notifMsg = d.notified > 0 ? `, ðŸ“§ ${d.notified} waitlist emails sent` : "";
-        showMsg(`ðŸš€ Phase ${phase} released: ${d.newlyEnabled} types enabled${notifMsg}`);
+        const notifMsg = d.notified > 0 ? `, Ã°Å¸â€œÂ§ ${d.notified} waitlist emails sent` : "";
+        showMsg(`Ã°Å¸Å¡â‚¬ Phase ${phase} released: ${d.newlyEnabled} types enabled${notifMsg}`);
       }
     } finally { setReleasing(null); }
   }
@@ -4852,7 +4854,7 @@ function PageBusinessModules() {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
         <div>
           <h2 style={{ fontSize:20, fontWeight:800, color:"white", margin:0 }}>Business Modules</h2>
-          <p style={{ fontSize:12.5, color:"rgba(255,255,255,.35)", marginTop:4 }}>Toggle business types live â€” affects signup page, website & dashboard sidebar. Waitlist users are auto-notified.</p>
+          <p style={{ fontSize:12.5, color:"rgba(255,255,255,.35)", marginTop:4 }}>Toggle business types live Ã¢â‚¬â€ affects signup page, website & dashboard sidebar. Waitlist users are auto-notified.</p>
         </div>
         <button onClick={resetAll} style={{ padding:"7px 16px", borderRadius:8, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.45)", fontSize:12, fontWeight:600, cursor:"pointer" }}>
           Reset All Overrides
@@ -4878,7 +4880,7 @@ function PageBusinessModules() {
       {/* Phase Release Buttons */}
       <div style={{ padding:"14px 18px", borderRadius:12, background:"rgba(99,102,241,.05)", border:"1px solid rgba(99,102,241,.12)" }}>
         <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:10 }}>
-          ðŸš€ Bulk Phase Release â€” Enable all types in a phase at once + auto-notify waitlist
+          Ã°Å¸Å¡â‚¬ Bulk Phase Release Ã¢â‚¬â€ Enable all types in a phase at once + auto-notify waitlist
         </div>
         <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
           {([1,2,3,4] as const).map(phase=>{
@@ -4898,8 +4900,8 @@ function PageBusinessModules() {
                   fontSize:12, fontWeight:700, cursor: allLive?"not-allowed":"pointer", fontFamily:"inherit",
                   opacity: releasing===phase ? .6 : 1,
                 }}>
-                {releasing===phase ? "Releasingâ€¦" : allLive ? `${ph.label} âœ“ All Live` : `Release ${ph.label} (${liveCount}/${phTypes.length})`}
-                {waitlisted > 0 && !allLive && <span style={{ marginLeft:6, fontSize:10.5, color:"#fb923c" }}>Â· {waitlisted} waiting</span>}
+                {releasing===phase ? "ReleasingÃ¢â‚¬Â¦" : allLive ? `${ph.label} Ã¢Å“â€œ All Live` : `Release ${ph.label} (${liveCount}/${phTypes.length})`}
+                {waitlisted > 0 && !allLive && <span style={{ marginLeft:6, fontSize:10.5, color:"#fb923c" }}>Ã‚Â· {waitlisted} waiting</span>}
               </button>
             );
           })}
@@ -4908,7 +4910,7 @@ function PageBusinessModules() {
 
       {/* Filters + message */}
       <div style={{ display:"flex", gap:8, flexWrap:"wrap", alignItems:"center" }}>
-        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search business typeâ€¦"
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search business typeÃ¢â‚¬Â¦"
           style={{ padding:"7px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.05)", color:"white", fontSize:12.5, outline:"none", width:200 }}/>
         {(["all","live","coming_soon"] as const).map(f=>(
           <button key={f} onClick={()=>setFilter(f)} style={{
@@ -4917,7 +4919,7 @@ function PageBusinessModules() {
             background:  filter===f ? "rgba(99,102,241,.18)" : "rgba(255,255,255,.04)",
             color:       filter===f ? "#a5b4fc" : "rgba(255,255,255,.4)",
           }}>
-            {f==="all"?"All":f==="live"?"ðŸŸ¢ Live":"â³ Coming Soon"}
+            {f==="all"?"All":f==="live"?"Ã°Å¸Å¸Â¢ Live":"Ã¢ÂÂ³ Coming Soon"}
           </button>
         ))}
         {msg && <span style={{ fontSize:12, color: msg.ok?"#34d399":"#fbbf24", fontWeight:600 }}>{msg.text}</span>}
@@ -4925,7 +4927,7 @@ function PageBusinessModules() {
 
       {/* Tables per phase */}
       {loading ? (
-        <div style={{ padding:40, textAlign:"center", color:"rgba(255,255,255,.25)" }}>Loadingâ€¦</div>
+        <div style={{ padding:40, textAlign:"center", color:"rgba(255,255,255,.25)" }}>LoadingÃ¢â‚¬Â¦</div>
       ) : (
         <div style={{ display:"flex", flexDirection:"column", gap:22 }}>
           {([1,2,3,4] as const).map(phase=>{
@@ -4961,7 +4963,7 @@ function PageBusinessModules() {
                               background:m.enabled?"rgba(52,211,153,.14)":"rgba(251,191,36,.09)",
                               color:m.enabled?"#34d399":"#fbbf24",
                               border:`1px solid ${m.enabled?"rgba(52,211,153,.28)":"rgba(251,191,36,.22)"}` }}>
-                              {m.enabled?"ðŸŸ¢ Live":"â³ Soon"}
+                              {m.enabled?"Ã°Å¸Å¸Â¢ Live":"Ã¢ÂÂ³ Soon"}
                             </span>
                           </td>
                           <td style={td}>
@@ -4971,10 +4973,10 @@ function PageBusinessModules() {
                                 disabled={saving===m.id+"_notify"}
                                 title={`Send email to ${m.waitlistCount} waiting`}
                                 style={{ padding:"3px 9px", borderRadius:6, border:"1px solid rgba(251,146,60,.35)", background:"rgba(251,146,60,.1)", color:"#fb923c", fontSize:11, fontWeight:700, cursor:"pointer" }}>
-                                {saving===m.id+"_notify" ? "â€¦" : `ðŸ“§ ${m.waitlistCount}`}
+                                {saving===m.id+"_notify" ? "Ã¢â‚¬Â¦" : `Ã°Å¸â€œÂ§ ${m.waitlistCount}`}
                               </button>
                             ) : (
-                              <span style={{ color:"rgba(255,255,255,.18)", fontSize:12 }}>â€”</span>
+                              <span style={{ color:"rgba(255,255,255,.18)", fontSize:12 }}>Ã¢â‚¬â€</span>
                             )}
                           </td>
                           <td style={{ ...td, fontSize:12 }}>
@@ -4986,7 +4988,7 @@ function PageBusinessModules() {
                                   Reset
                                 </button>
                               </div>
-                            ) : <span style={{ color:"rgba(255,255,255,.18)" }}>â€”</span>}
+                            ) : <span style={{ color:"rgba(255,255,255,.18)" }}>Ã¢â‚¬â€</span>}
                           </td>
                           <td style={td}>
                             <button onClick={()=>toggle(m.id, m.enabled)} disabled={!!saving && saving===m.id}
@@ -5011,17 +5013,17 @@ function PageBusinessModules() {
 
       {/* Info */}
       <div style={{ padding:"14px 18px", borderRadius:10, background:"rgba(99,102,241,.06)", border:"1px solid rgba(99,102,241,.15)", fontSize:12, color:"rgba(255,255,255,.38)", lineHeight:1.8 }}>
-        <strong style={{ color:"#a5b4fc" }}>Toggle ON</strong> â†’ Business type appears on signup page + website as Live + dashboard modules unlock + waitlist auto-notified. &nbsp;
-        <strong style={{ color:"#a5b4fc" }}>Toggle OFF</strong> â†’ Removed from signup, shows "Coming Soon" on website. &nbsp;
-        <strong style={{ color:"#a5b4fc" }}>ðŸ“§ Waitlist</strong> â†’ Click to manually send notifications to pending subscribers.
+        <strong style={{ color:"#a5b4fc" }}>Toggle ON</strong> Ã¢â€ â€™ Business type appears on signup page + website as Live + dashboard modules unlock + waitlist auto-notified. &nbsp;
+        <strong style={{ color:"#a5b4fc" }}>Toggle OFF</strong> Ã¢â€ â€™ Removed from signup, shows "Coming Soon" on website. &nbsp;
+        <strong style={{ color:"#a5b4fc" }}>Ã°Å¸â€œÂ§ Waitlist</strong> Ã¢â€ â€™ Click to manually send notifications to pending subscribers.
       </div>
     </div>
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: COUPON CODES
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageCoupons() {
   const EMPTY_FORM = { code:"", type:"percent", value:"", maxUses:"", expiresAt:"", applicableTo:"",
                        allowedEmails:"", allowedCompanyIds:"", allowedBusinessTypes:"", allowedCountries:"" };
@@ -5090,7 +5092,7 @@ function PageCoupons() {
 
   // Helper: parse stored JSON array back to display string
   function displayList(val: string|null): string {
-    if (!val) return "â€”";
+    if (!val) return "Ã¢â‚¬â€";
     try { const a = JSON.parse(val); return Array.isArray(a) ? a.join(", ") : val; } catch { return val; }
   }
 
@@ -5120,7 +5122,7 @@ function PageCoupons() {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
 
-      {/* â”€â”€ Create form â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Create form Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <SectionCard title="Create Coupon">
         {/* Basic fields */}
         <div style={{ marginBottom:8, fontSize:11, fontWeight:700, color:"rgba(255,255,255,.25)", textTransform:"uppercase", letterSpacing:".07em" }}>Basic</div>
@@ -5150,7 +5152,7 @@ function PageCoupons() {
         {/* Targeting fields */}
         <div style={{ padding:"14px 16px", borderRadius:10, border:"1px solid rgba(99,102,241,.2)", background:"rgba(99,102,241,.05)", marginBottom:14 }}>
           <div style={{ fontSize:11, fontWeight:700, color:"#a5b4fc", letterSpacing:".07em", textTransform:"uppercase", marginBottom:12 }}>
-            ðŸŽ¯ Targeting â€” leave blank to give to everyone
+            Ã°Å¸Å½Â¯ Targeting Ã¢â‚¬â€ leave blank to give to everyone
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:12 }}>
 
@@ -5201,7 +5203,7 @@ function PageCoupons() {
                 placeholder="PK, AE, Saudi Arabia"
                 style={inputStyle}/>
               <div style={{ display:"flex", flexWrap:"wrap", gap:4, marginTop:4 }}>
-                {[{l:"ðŸ‡µðŸ‡° PK",v:"pk"},{l:"ðŸ‡¦ðŸ‡ª UAE",v:"ae"},{l:"ðŸ‡¸ðŸ‡¦ KSA",v:"sa"},{l:"ðŸ‡¬ðŸ‡§ UK",v:"gb"},{l:"ðŸ‡ºðŸ‡¸ US",v:"us"},{l:"ðŸ‡§ðŸ‡© BD",v:"bd"}].map(({l,v})=>(
+                {[{l:"Ã°Å¸â€¡ÂµÃ°Å¸â€¡Â° PK",v:"pk"},{l:"Ã°Å¸â€¡Â¦Ã°Å¸â€¡Âª UAE",v:"ae"},{l:"Ã°Å¸â€¡Â¸Ã°Å¸â€¡Â¦ KSA",v:"sa"},{l:"Ã°Å¸â€¡Â¬Ã°Å¸â€¡Â§ UK",v:"gb"},{l:"Ã°Å¸â€¡ÂºÃ°Å¸â€¡Â¸ US",v:"us"},{l:"Ã°Å¸â€¡Â§Ã°Å¸â€¡Â© BD",v:"bd"}].map(({l,v})=>(
                   <button key={v} onClick={()=>{
                     const cur = form.allowedCountries.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
                     const next = cur.includes(v) ? cur.filter(s=>s!==v) : [...cur, v];
@@ -5221,16 +5223,16 @@ function PageCoupons() {
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
           <button onClick={createCoupon} disabled={saving}
             style={{ padding:"8px 22px", borderRadius:9, background:"linear-gradient(135deg,#6366f1,#4f46e5)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", opacity:saving?.7:1, fontFamily:"inherit" }}>
-            {saving?"Creatingâ€¦":"+ Create Coupon"}
+            {saving?"CreatingÃ¢â‚¬Â¦":"+ Create Coupon"}
           </button>
           {msg && <span style={{ fontSize:12, color:msg.ok?"#34d399":"#f87171", fontWeight:600 }}>{msg.text}</span>}
         </div>
       </SectionCard>
 
-      {/* â”€â”€ List â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ List Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <SectionCard title={`Active Coupons (${(coupons||[]).length})`}>
         {coupons===null ? (
-          <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>Loadingâ€¦</div>
+          <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>LoadingÃ¢â‚¬Â¦</div>
         ) : coupons.length===0 ? (
           <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>No coupons yet.</div>
         ) : (
@@ -5252,7 +5254,7 @@ function PageCoupons() {
                       {c.type==="percent"?`${c.value}%`:`$${c.value}`}
                     </td>
                     <td style={{ padding:"9px 12px", color:"rgba(255,255,255,.5)" }}>
-                      {c.usedCount}{c.maxUses?` / ${c.maxUses}`:" / âˆž"}
+                      {c.usedCount}{c.maxUses?` / ${c.maxUses}`:" / Ã¢Ë†Å¾"}
                     </td>
                     <td style={{ padding:"9px 12px", color:"rgba(255,255,255,.4)", fontSize:11.5 }}>
                       {c.expiresAt?new Date(c.expiresAt).toLocaleDateString():"Never"}
@@ -5266,7 +5268,7 @@ function PageCoupons() {
                         <button onClick={()=>setExpanded(expanded===c.id?null:c.id)} style={{
                           padding:"2px 9px", borderRadius:6, border:"1px solid rgba(99,102,241,.4)",
                           background:"rgba(99,102,241,.12)", color:"#a5b4fc", fontSize:10.5, fontWeight:700, cursor:"pointer" }}>
-                          ðŸŽ¯ Targeted {expanded===c.id?"â–²":"â–¼"}
+                          Ã°Å¸Å½Â¯ Targeted {expanded===c.id?"Ã¢â€“Â²":"Ã¢â€“Â¼"}
                         </button>
                       ) : (
                         <span style={{ color:"rgba(255,255,255,.2)", fontSize:11 }}>Everyone</span>
@@ -5285,7 +5287,7 @@ function PageCoupons() {
                         </button>
                         <button onClick={()=>deleteCoupon(c.id)} disabled={deleting===c.id}
                           style={{ padding:"3px 9px", borderRadius:6, border:"1px solid rgba(248,113,113,.3)", background:"rgba(248,113,113,.1)", color:"#f87171", fontSize:11, fontWeight:700, cursor:"pointer" }}>
-                          {deleting===c.id?"â€¦":"Delete"}
+                          {deleting===c.id?"Ã¢â‚¬Â¦":"Delete"}
                         </button>
                       </div>
                     </td>
@@ -5296,14 +5298,14 @@ function PageCoupons() {
                       <td colSpan={8} style={{ padding:"12px 16px", borderBottom:"1px solid rgba(255,255,255,.07)" }}>
                         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:12 }}>
                           {[
-                            { label:"ðŸ‘¤ Users (emails)",     val: displayList(c.allowedEmails) },
-                            { label:"ðŸ¢ Companies (IDs)",    val: displayList(c.allowedCompanyIds) },
-                            { label:"ðŸª Business Types",     val: displayList(c.allowedBusinessTypes) },
-                            { label:"ðŸŒ Countries",          val: displayList(c.allowedCountries) },
+                            { label:"Ã°Å¸â€˜Â¤ Users (emails)",     val: displayList(c.allowedEmails) },
+                            { label:"Ã°Å¸ÂÂ¢ Companies (IDs)",    val: displayList(c.allowedCompanyIds) },
+                            { label:"Ã°Å¸ÂÂª Business Types",     val: displayList(c.allowedBusinessTypes) },
+                            { label:"Ã°Å¸Å’Â Countries",          val: displayList(c.allowedCountries) },
                           ].map(({label,val})=>(
                             <div key={label}>
                               <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em", marginBottom:3 }}>{label}</div>
-                              <div style={{ fontSize:12, color: val==="â€”"?"rgba(255,255,255,.15)":"rgba(255,255,255,.75)", fontStyle: val==="â€”"?"italic":"normal" }}>{val}</div>
+                              <div style={{ fontSize:12, color: val==="Ã¢â‚¬â€"?"rgba(255,255,255,.15)":"rgba(255,255,255,.75)", fontStyle: val==="Ã¢â‚¬â€"?"italic":"normal" }}>{val}</div>
                             </div>
                           ))}
                         </div>
@@ -5321,9 +5323,9 @@ function PageCoupons() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: EMAIL LOGS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageEmailLogs() {
   const [logs,   setLogs]   = useState<any[]|null>(null);
   const [filter, setFilter] = useState<"all"|"sent"|"failed">("all");
@@ -5370,7 +5372,7 @@ function PageEmailLogs() {
 
       <SectionCard title="Email Log">
         <div style={{ display:"flex", gap:10, marginBottom:14, flexWrap:"wrap" }}>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by email or subjectâ€¦"
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by email or subjectÃ¢â‚¬Â¦"
             style={{ flex:1, minWidth:200, padding:"7px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", color:"white", fontSize:12.5, outline:"none", fontFamily:"inherit" }}/>
           <div style={{ display:"flex", gap:4 }}>
             {(["all","sent","failed"] as const).map(f=>(
@@ -5384,7 +5386,7 @@ function PageEmailLogs() {
         </div>
 
         {logs===null ? (
-          <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>Loadingâ€¦</div>
+          <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>LoadingÃ¢â‚¬Â¦</div>
         ) : filtered.length===0 ? (
           <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>No email logs yet. Emails appear here after being sent.</div>
         ) : (
@@ -5407,7 +5409,7 @@ function PageEmailLogs() {
                         {l.status}
                       </span>
                     </td>
-                    <td style={{ padding:"9px 12px", color:"#f87171", fontSize:11.5, maxWidth:200, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{l.error||"â€”"}</td>
+                    <td style={{ padding:"9px 12px", color:"#f87171", fontSize:11.5, maxWidth:200, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{l.error||"Ã¢â‚¬â€"}</td>
                     <td style={{ padding:"9px 12px", color:"rgba(255,255,255,.35)", fontSize:11.5, whiteSpace:"nowrap" }}>{new Date(l.createdAt).toLocaleString()}</td>
                   </tr>
                 ))}
@@ -5420,9 +5422,9 @@ function PageEmailLogs() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: REFERRALS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageReferrals() {
   const [referrals, setReferrals] = useState<any[]|null>(null);
   const [form, setForm]           = useState({ referrerId:"", refereeEmail:"" });
@@ -5501,7 +5503,7 @@ function PageReferrals() {
           ))}
           <button onClick={createReferral} disabled={saving}
             style={{ padding:"8px 18px", borderRadius:9, background:"linear-gradient(135deg,#6366f1,#4f46e5)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:saving?.7:1, flexShrink:0 }}>
-            {saving?"Addingâ€¦":"+ Add"}
+            {saving?"AddingÃ¢â‚¬Â¦":"+ Add"}
           </button>
           {msg && <span style={{ fontSize:12, color:msg.ok?"#34d399":"#f87171", fontWeight:600 }}>{msg.text}</span>}
         </div>
@@ -5520,7 +5522,7 @@ function PageReferrals() {
         </div>
 
         {referrals===null ? (
-          <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>Loadingâ€¦</div>
+          <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>LoadingÃ¢â‚¬Â¦</div>
         ) : filtered.length===0 ? (
           <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>No referrals yet.</div>
         ) : (
@@ -5545,7 +5547,7 @@ function PageReferrals() {
                           {r.status.replace("_"," ")}
                         </span>
                       </td>
-                      <td style={{ padding:"9px 12px", color:"#34d399", fontWeight:700 }}>{r.reward?`$${r.reward}`:"â€”"}</td>
+                      <td style={{ padding:"9px 12px", color:"#34d399", fontWeight:700 }}>{r.reward?`$${r.reward}`:"Ã¢â‚¬â€"}</td>
                       <td style={{ padding:"9px 12px", color:"rgba(255,255,255,.35)", fontSize:11.5, whiteSpace:"nowrap" }}>{new Date(r.createdAt).toLocaleDateString()}</td>
                       <td style={{ padding:"9px 12px" }}>
                         <select value={r.status} onChange={e=>updateStatus(r.id,e.target.value)}
@@ -5567,34 +5569,34 @@ function PageReferrals() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: TEAM ACCESS CONTROL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 const ALL_PAGES: { page: string; label: string; icon: string }[] = [
-  { page:"dashboard",     label:"Dashboard",        icon:"ðŸ " },
-  { page:"companies",     label:"Companies & Users", icon:"ðŸ¢" },
-  { page:"subscriptions", label:"Subscriptions",    icon:"ðŸ’³" },
-  { page:"revenue",       label:"Revenue",          icon:"ðŸ’°" },
-  { page:"geo",           label:"Geo Analytics",    icon:"ðŸŒ" },
-  { page:"usage",         label:"Usage Insights",   icon:"ðŸ“Š" },
-  { page:"plans",         label:"Plans & Billing",  icon:"ðŸ’Ž" },
-  { page:"coupons",       label:"Coupon Codes",     icon:"ðŸ·ï¸" },
+  { page:"dashboard",     label:"Dashboard",        icon:"Ã°Å¸ÂÂ " },
+  { page:"companies",     label:"Companies & Users", icon:"Ã°Å¸ÂÂ¢" },
+  { page:"subscriptions", label:"Subscriptions",    icon:"Ã°Å¸â€™Â³" },
+  { page:"revenue",       label:"Revenue",          icon:"Ã°Å¸â€™Â°" },
+  { page:"geo",           label:"Geo Analytics",    icon:"Ã°Å¸Å’Â" },
+  { page:"usage",         label:"Usage Insights",   icon:"Ã°Å¸â€œÅ " },
+  { page:"plans",         label:"Plans & Billing",  icon:"Ã°Å¸â€™Å½" },
+  { page:"coupons",       label:"Coupon Codes",     icon:"Ã°Å¸ÂÂ·Ã¯Â¸Â" },
   { page:"referrals",     label:"Referrals",        icon:"" },
-  { page:"system",        label:"System Health",    icon:"âš¡" },
-  { page:"logs",          label:"Audit Logs",       icon:"ðŸ“‹" },
-  { page:"emaillogs",     label:"Email Logs",       icon:"ðŸ“§" },
-  { page:"permissions",   label:"Permissions",      icon:"ðŸ”" },
-  { page:"livesupport",   label:"Live Support",     icon:"ðŸ’¬" },
-  { page:"settings",      label:"Settings",         icon:"âš™ï¸" },
-  { page:"updates",       label:"Product Updates",  icon:"ðŸš€" },
-  { page:"tickets",       label:"Support Tickets",  icon:"ðŸŽ«" },
-  { page:"broadcasts",    label:"Broadcasts",       icon:"ðŸ“£" },
-  { page:"visitors",      label:"Visitors",         icon:"ðŸ‘ï¸" },
-  { page:"apikeys",       label:"API Keys",         icon:"ðŸ”‘" },
-  { page:"flags",         label:"Feature Flags",    icon:"ðŸš©" },
-  { page:"testimonials",  label:"Testimonials",     icon:"â­" },
-  { page:"leads",         label:"Lead Management",  icon:"ðŸŽ¯" },
-  { page:"seo",           label:"SEO Settings",     icon:"ðŸ”" },
+  { page:"system",        label:"System Health",    icon:"Ã¢Å¡Â¡" },
+  { page:"logs",          label:"Audit Logs",       icon:"Ã°Å¸â€œâ€¹" },
+  { page:"emaillogs",     label:"Email Logs",       icon:"Ã°Å¸â€œÂ§" },
+  { page:"permissions",   label:"Permissions",      icon:"Ã°Å¸â€Â" },
+  { page:"livesupport",   label:"Live Support",     icon:"Ã°Å¸â€™Â¬" },
+  { page:"settings",      label:"Settings",         icon:"Ã¢Å¡â„¢Ã¯Â¸Â" },
+  { page:"updates",       label:"Product Updates",  icon:"Ã°Å¸Å¡â‚¬" },
+  { page:"tickets",       label:"Support Tickets",  icon:"Ã°Å¸Å½Â«" },
+  { page:"broadcasts",    label:"Broadcasts",       icon:"Ã°Å¸â€œÂ£" },
+  { page:"visitors",      label:"Visitors",         icon:"Ã°Å¸â€˜ÂÃ¯Â¸Â" },
+  { page:"apikeys",       label:"API Keys",         icon:"Ã°Å¸â€â€˜" },
+  { page:"flags",         label:"Feature Flags",    icon:"Ã°Å¸Å¡Â©" },
+  { page:"testimonials",  label:"Testimonials",     icon:"Ã¢Â­Â" },
+  { page:"leads",         label:"Lead Management",  icon:"Ã°Å¸Å½Â¯" },
+  { page:"seo",           label:"SEO Settings",     icon:"Ã°Å¸â€Â" },
 ];
 
 function PageTeams() {
@@ -5686,16 +5688,16 @@ function PageTeams() {
 
       {/* Info banner */}
       <div style={{ padding:"14px 18px", borderRadius:12, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", display:"flex", alignItems:"center", gap:12 }}>
-        <span style={{ fontSize:20 }}>ðŸ”’</span>
+        <span style={{ fontSize:20 }}>Ã°Å¸â€â€™</span>
         <div style={{ fontSize:13, color:"rgba(255,255,255,.6)", lineHeight:1.6 }}>
-          <strong style={{ color:"white" }}>You are the Super Admin</strong> â€” full access to everything. Team members you create here will only see the pages you allow. They log in via the same <code style={{ color:"#818cf8" }}>/admin/login</code> page.
+          <strong style={{ color:"white" }}>You are the Super Admin</strong> Ã¢â‚¬â€ full access to everything. Team members you create here will only see the pages you allow. They log in via the same <code style={{ color:"#818cf8" }}>/admin/login</code> page.
         </div>
       </div>
 
       {/* Create / Edit Form */}
       {showForm && (
         <SectionCard title={editing ? `Edit: ${editing.name}` : "Add Team Member"} action={
-          <button onClick={()=>{ setCreating(false); setEditing(null); }} style={{ fontSize:12, color:"rgba(255,255,255,.4)", background:"none", border:"none", cursor:"pointer" }}>âœ• Close</button>
+          <button onClick={()=>{ setCreating(false); setEditing(null); }} style={{ fontSize:12, color:"rgba(255,255,255,.4)", background:"none", border:"none", cursor:"pointer" }}>Ã¢Å“â€¢ Close</button>
         }>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:14 }}>
             {[["Full Name","name","text"],["Email","email","email"],["Password (leave blank to keep)","password","password"]].map(([label,key,type])=>(
@@ -5750,7 +5752,7 @@ function PageTeams() {
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <button onClick={save} disabled={saving}
               style={{ padding:"8px 22px", borderRadius:9, background:"linear-gradient(135deg,#6366f1,#4f46e5)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", opacity:saving?.7:1, fontFamily:"inherit" }}>
-              {saving?"Savingâ€¦":editing?"Save Changes":"Create Member"}
+              {saving?"SavingÃ¢â‚¬Â¦":editing?"Save Changes":"Create Member"}
             </button>
             {msg && <span style={{ fontSize:12, color:msg.ok?"#34d399":"#f87171", fontWeight:600 }}>{msg.text}</span>}
           </div>
@@ -5767,7 +5769,7 @@ function PageTeams() {
         ) : undefined
       }>
         {members===null ? (
-          <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>Loadingâ€¦</div>
+          <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13 }}>LoadingÃ¢â‚¬Â¦</div>
         ) : members.length===0 ? (
           <div style={{ textAlign:"center", padding:24, color:"rgba(255,255,255,.2)", fontSize:13, lineHeight:1.7 }}>
             No team members yet.<br/>
@@ -5820,7 +5822,7 @@ function PageTeams() {
                     </button>
                     <button onClick={()=>deleteMember(m.id)} disabled={deleting===m.id}
                       style={{ padding:"5px 12px", borderRadius:7, border:"1px solid rgba(248,113,113,.3)", background:"rgba(248,113,113,.08)", color:"#f87171", fontSize:11, fontWeight:700, cursor:"pointer" }}>
-                      {deleting===m.id?"â€¦":"Remove"}
+                      {deleting===m.id?"Ã¢â‚¬Â¦":"Remove"}
                     </button>
                   </div>
                 </div>
@@ -5833,9 +5835,9 @@ function PageTeams() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: TESTIMONIALS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageTestimonials() {
   const [testimonials, setTestimonials] = useState<any[]|null>(null);
   const [pending, setPending]   = useState<any[]>([]);
@@ -5912,7 +5914,7 @@ function PageTestimonials() {
         <div style={{ fontSize:14, color:"rgba(255,255,255,.5)" }}>{testimonials?.length||0} testimonials</div>
         <button onClick={()=>setAdding(a=>!a)}
           style={{ padding:"8px 18px", borderRadius:9, background:"linear-gradient(135deg,#f59e0b,#d97706)", border:"none", color:"white", fontSize:12, fontWeight:700, cursor:"pointer" }}>
-          {adding ? "âœ• Cancel" : "+ Add Testimonial"}
+          {adding ? "Ã¢Å“â€¢ Cancel" : "+ Add Testimonial"}
         </button>
       </div>
 
@@ -5922,9 +5924,9 @@ function PageTestimonials() {
       {pending.length > 0 && (
         <div style={{ background:"rgba(251,191,36,.04)", borderRadius:16, border:"1px solid rgba(251,191,36,.2)", overflow:"hidden" }}>
           <div style={{ padding:"12px 18px", borderBottom:"1px solid rgba(251,191,36,.12)", display:"flex", alignItems:"center", gap:10 }}>
-            <span style={{ fontSize:13, fontWeight:700, color:"#fbbf24" }}>â³ Pending Reviews</span>
+            <span style={{ fontSize:13, fontWeight:700, color:"#fbbf24" }}>Ã¢ÂÂ³ Pending Reviews</span>
             <span style={{ padding:"2px 9px", borderRadius:20, background:"rgba(251,191,36,.15)", color:"#fbbf24", fontSize:11, fontWeight:700 }}>{pending.length}</span>
-            <span style={{ fontSize:11.5, color:"rgba(255,255,255,.3)", marginLeft:4 }}>Submitted by users â€” approve to publish on website</span>
+            <span style={{ fontSize:11.5, color:"rgba(255,255,255,.3)", marginLeft:4 }}>Submitted by users Ã¢â‚¬â€ approve to publish on website</span>
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
             {pending.map((t,i)=>(
@@ -5936,9 +5938,9 @@ function PageTestimonials() {
                   <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
                     <span style={{ fontSize:13, fontWeight:700, color:"white" }}>{t.name}</span>
                     {t.role && <span style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>{t.role}</span>}
-                    {t.company && <span style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>Â· {t.company}</span>}
+                    {t.company && <span style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>Ã‚Â· {t.company}</span>}
                     <span style={{ display:"flex", gap:2 }}>
-                      {[1,2,3,4,5].map(n=><span key={n} style={{ fontSize:12, color:n<=t.rating?"#fbbf24":"rgba(255,255,255,.12)" }}>â˜…</span>)}
+                      {[1,2,3,4,5].map(n=><span key={n} style={{ fontSize:12, color:n<=t.rating?"#fbbf24":"rgba(255,255,255,.12)" }}>Ã¢Ëœâ€¦</span>)}
                     </span>
                     {t.planUsed && <span style={{ padding:"1px 7px", borderRadius:5, background:"rgba(99,102,241,.12)", color:"#818cf8", fontSize:10, fontWeight:700 }}>{t.planUsed}</span>}
                   </div>
@@ -5950,11 +5952,11 @@ function PageTestimonials() {
                 <div style={{ display:"flex", gap:8, flexShrink:0 }}>
                   <button onClick={()=>changeStatus(t.id,"PUBLISH")} disabled={!!actionBusy}
                     style={{ padding:"7px 16px", borderRadius:8, background:"rgba(52,211,153,.15)", border:"1px solid rgba(52,211,153,.3)", color:"#34d399", fontSize:12, fontWeight:700, cursor:actionBusy?"not-allowed":"pointer", opacity:actionBusy?.startsWith(t.id)?.7:1 }}>
-                    âœ“ Approve
+                    Ã¢Å“â€œ Approve
                   </button>
                   <button onClick={()=>changeStatus(t.id,"REJECT")} disabled={!!actionBusy}
                     style={{ padding:"7px 16px", borderRadius:8, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.25)", color:"#f87171", fontSize:12, fontWeight:700, cursor:actionBusy?"not-allowed":"pointer", opacity:actionBusy?.startsWith(t.id)?.7:1 }}>
-                    âœ• Reject
+                    Ã¢Å“â€¢ Reject
                   </button>
                 </div>
               </div>
@@ -5998,7 +6000,7 @@ function PageTestimonials() {
             <div style={{ display:"flex", gap:6 }}>
               {[1,2,3,4,5].map(n=>(
                 <button key={n} onClick={()=>setForm(f=>({...f,rating:n}))}
-                  style={{ fontSize:22, background:"none", border:"none", cursor:"pointer", opacity:n<=form.rating?1:.25, color:STAR_COLORS[n-1] }}>â˜…</button>
+                  style={{ fontSize:22, background:"none", border:"none", cursor:"pointer", opacity:n<=form.rating?1:.25, color:STAR_COLORS[n-1] }}>Ã¢Ëœâ€¦</button>
               ))}
               <span style={{ fontSize:12, color:"rgba(255,255,255,.4)", alignSelf:"center", marginLeft:4 }}>{form.rating}/5</span>
             </div>
@@ -6010,7 +6012,7 @@ function PageTestimonials() {
           </div>
           <button onClick={handleCreate} disabled={saving}
             style={{ padding:"9px 24px", borderRadius:9, background:"linear-gradient(135deg,#f59e0b,#d97706)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-            {saving ? "Savingâ€¦" : "Save Testimonial"}
+            {saving ? "SavingÃ¢â‚¬Â¦" : "Save Testimonial"}
           </button>
         </div>
       )}
@@ -6018,7 +6020,7 @@ function PageTestimonials() {
       {/* Table */}
       <div style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", overflow:"hidden" }}>
         {testimonials===null ? (
-          <div style={{ padding:24, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>Loadingâ€¦</div>
+          <div style={{ padding:24, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>LoadingÃ¢â‚¬Â¦</div>
         ) : testimonials.length===0 ? (
           <div style={{ padding:24, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>No testimonials yet. Add your first one above.</div>
         ) : (
@@ -6043,16 +6045,16 @@ function PageTestimonials() {
                       </div>
                     </div>
                   </td>
-                  <td style={{ padding:"12px 14px", fontSize:12, color:"rgba(255,255,255,.5)" }}>{t.company||"â€”"}</td>
+                  <td style={{ padding:"12px 14px", fontSize:12, color:"rgba(255,255,255,.5)" }}>{t.company||"Ã¢â‚¬â€"}</td>
                   <td style={{ padding:"12px 14px" }}>
                     <div style={{ display:"flex", gap:2 }}>
                       {[1,2,3,4,5].map(n=>(
-                        <span key={n} style={{ fontSize:14, color:n<=t.rating?STAR_COLORS[n-1]:"rgba(255,255,255,.12)" }}>â˜…</span>
+                        <span key={n} style={{ fontSize:14, color:n<=t.rating?STAR_COLORS[n-1]:"rgba(255,255,255,.12)" }}>Ã¢Ëœâ€¦</span>
                       ))}
                     </div>
                   </td>
                   <td style={{ padding:"12px 14px" }}>
-                    {t.planUsed ? <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(99,102,241,.12)", color:"#818cf8", fontSize:11, fontWeight:700 }}>{t.planUsed}</span> : <span style={{ color:"rgba(255,255,255,.2)", fontSize:12 }}>â€”</span>}
+                    {t.planUsed ? <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(99,102,241,.12)", color:"#818cf8", fontSize:11, fontWeight:700 }}>{t.planUsed}</span> : <span style={{ color:"rgba(255,255,255,.2)", fontSize:12 }}>Ã¢â‚¬â€</span>}
                   </td>
                   <td style={{ padding:"12px 14px" }}>
                     <button onClick={()=>toggleField(t.id,"active",!t.active)}
@@ -6086,15 +6088,15 @@ function PageTestimonials() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: LEAD MANAGEMENT
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageCRM() {
   return (
     <div style={{ padding: 24, fontFamily: "inherit" }}>
       <div style={{ marginBottom: 20 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: "white", margin: "0 0 4px" }}>CRM Workspace</h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: 0 }}>Visitors, leads, and pipeline â€” full CRM view.</p>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: 0 }}>Visitors, leads, and pipeline Ã¢â‚¬â€ full CRM view.</p>
       </div>
       <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
         <iframe
@@ -6187,7 +6189,7 @@ function PageLeads() {
       {/* Table */}
       <div style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", overflow:"auto" }}>
         {leads===null ? (
-          <div style={{ padding:24, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>Loadingâ€¦</div>
+          <div style={{ padding:24, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>LoadingÃ¢â‚¬Â¦</div>
         ) : leads.length===0 ? (
           <div style={{ padding:24, textAlign:"center", color:"rgba(255,255,255,.2)", fontSize:13 }}>No leads found.</div>
         ) : (
@@ -6204,10 +6206,10 @@ function PageLeads() {
                 <tr key={l.id} style={{ borderBottom:"1px solid rgba(255,255,255,.04)" }}>
                   <td style={{ padding:"11px 14px", fontSize:13, fontWeight:600, color:"white", whiteSpace:"nowrap" }}>{l.name}</td>
                   <td style={{ padding:"11px 14px", fontSize:12, color:"rgba(255,255,255,.5)" }}>{l.email}</td>
-                  <td style={{ padding:"11px 14px", fontSize:12, color:"rgba(255,255,255,.4)" }}>{l.phone||"â€”"}</td>
-                  <td style={{ padding:"11px 14px", fontSize:12, color:"rgba(255,255,255,.4)" }}>{l.company||"â€”"}</td>
+                  <td style={{ padding:"11px 14px", fontSize:12, color:"rgba(255,255,255,.4)" }}>{l.phone||"Ã¢â‚¬â€"}</td>
+                  <td style={{ padding:"11px 14px", fontSize:12, color:"rgba(255,255,255,.4)" }}>{l.company||"Ã¢â‚¬â€"}</td>
                   <td style={{ padding:"11px 14px" }}>
-                    {l.source ? <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.5)", fontSize:11 }}>{l.source}</span> : <span style={{ color:"rgba(255,255,255,.2)", fontSize:12 }}>â€”</span>}
+                    {l.source ? <span style={{ padding:"2px 8px", borderRadius:6, background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.5)", fontSize:11 }}>{l.source}</span> : <span style={{ color:"rgba(255,255,255,.2)", fontSize:12 }}>Ã¢â‚¬â€</span>}
                   </td>
                   <td style={{ padding:"11px 14px" }}>
                     <select value={l.status} onChange={e=>updateStatus(l.id,e.target.value)}
@@ -6218,7 +6220,7 @@ function PageLeads() {
                     </select>
                   </td>
                   <td style={{ padding:"11px 14px", fontSize:11, color:"rgba(255,255,255,.3)", whiteSpace:"nowrap" }}>
-                    {l.createdAt ? new Date(l.createdAt).toLocaleDateString() : "â€”"}
+                    {l.createdAt ? new Date(l.createdAt).toLocaleDateString() : "Ã¢â‚¬â€"}
                   </td>
                   <td style={{ padding:"11px 14px", minWidth:160 }}>
                     {editingNote===l.id ? (
@@ -6230,7 +6232,7 @@ function PageLeads() {
                       </div>
                     ) : (
                       <div onClick={()=>{ setEditingNote(l.id); setNoteVal(l.notes||""); }} style={{ cursor:"text", fontSize:11, color:l.notes?"rgba(255,255,255,.6)":"rgba(255,255,255,.2)", fontStyle:l.notes?"normal":"italic", minHeight:20 }}>
-                        {l.notes||"Click to add notesâ€¦"}
+                        {l.notes||"Click to add notesÃ¢â‚¬Â¦"}
                       </div>
                     )}
                   </td>
@@ -6250,9 +6252,9 @@ function PageLeads() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: SOCIAL MEDIA MARKETING
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 type SocialPlatform = "facebook"|"instagram"|"twitter"|"linkedin"|"tiktok"|"youtube";
 type SocialPlatSettings = { enabled:boolean; pageUrl:string; pageId?:string; accessToken?:string; igUserId?:string; bearerToken?:string; apiKey?:string; apiSecret?:string; accessTokenSecret?:string; orgId?:string; channelId?:string };
 type SocialSettings2 = Record<SocialPlatform, SocialPlatSettings>;
@@ -6262,17 +6264,17 @@ type SocialPostItem = { id:string; createdAt:string; text:string; mediaUrl?:stri
 const SOCIAL_PLATFORMS: { id:SocialPlatform; name:string; icon:string; color:string; bg:string; fields:{key:string;label:string;type?:string;placeholder:string;help?:string}[] }[] = [
   { id:"facebook", name:"Facebook", icon:"f", color:"#1877F2", bg:"rgba(24,119,242,.12)", fields:[
     { key:"pageUrl", label:"Page URL", placeholder:"https://facebook.com/yourpage" },
-    { key:"pageId", label:"Page ID", placeholder:"1234567890", help:"Found in Facebook Page settings â†’ About" },
-    { key:"accessToken", label:"Page Access Token", type:"password", placeholder:"EAAxâ€¦", help:"Generate in Meta Developer Console â†’ Graph API Explorer" },
+    { key:"pageId", label:"Page ID", placeholder:"1234567890", help:"Found in Facebook Page settings Ã¢â€ â€™ About" },
+    { key:"accessToken", label:"Page Access Token", type:"password", placeholder:"EAAxÃ¢â‚¬Â¦", help:"Generate in Meta Developer Console Ã¢â€ â€™ Graph API Explorer" },
   ]},
   { id:"instagram", name:"Instagram", icon:"", color:"#E1306C", bg:"rgba(225,48,108,.12)", fields:[
     { key:"pageUrl", label:"Profile URL", placeholder:"https://instagram.com/yourhandle" },
-    { key:"igUserId", label:"IG User ID", placeholder:"17841400â€¦", help:"Connected Instagram Business Account ID via Facebook" },
-    { key:"accessToken", label:"Access Token", type:"password", placeholder:"EAAxâ€¦", help:"Same Page Access Token as Facebook" },
+    { key:"igUserId", label:"IG User ID", placeholder:"17841400Ã¢â‚¬Â¦", help:"Connected Instagram Business Account ID via Facebook" },
+    { key:"accessToken", label:"Access Token", type:"password", placeholder:"EAAxÃ¢â‚¬Â¦", help:"Same Page Access Token as Facebook" },
   ]},
-  { id:"twitter", name:"Twitter / X", icon:"ð•", color:"#000", bg:"rgba(255,255,255,.06)", fields:[
+  { id:"twitter", name:"Twitter / X", icon:"Ã°Ââ€¢Â", color:"#000", bg:"rgba(255,255,255,.06)", fields:[
     { key:"pageUrl", label:"Profile URL", placeholder:"https://twitter.com/yourhandle" },
-    { key:"bearerToken", label:"Bearer Token", type:"password", placeholder:"AAAAâ€¦", help:"Twitter Developer Portal â†’ Project â†’ Bearer Token" },
+    { key:"bearerToken", label:"Bearer Token", type:"password", placeholder:"AAAAÃ¢â‚¬Â¦", help:"Twitter Developer Portal Ã¢â€ â€™ Project Ã¢â€ â€™ Bearer Token" },
     { key:"apiKey", label:"API Key", type:"password", placeholder:"xxxx" },
     { key:"apiSecret", label:"API Secret", type:"password", placeholder:"xxxx" },
     { key:"accessToken", label:"Access Token", type:"password", placeholder:"xxxx" },
@@ -6281,14 +6283,14 @@ const SOCIAL_PLATFORMS: { id:SocialPlatform; name:string; icon:string; color:str
   { id:"linkedin", name:"LinkedIn", icon:"in", color:"#0A66C2", bg:"rgba(10,102,194,.12)", fields:[
     { key:"pageUrl", label:"Company Page URL", placeholder:"https://linkedin.com/company/yourco" },
     { key:"orgId", label:"Organization ID", placeholder:"1234567", help:"Found in LinkedIn Company Page URL" },
-    { key:"accessToken", label:"Access Token", type:"password", placeholder:"AQVFâ€¦" },
+    { key:"accessToken", label:"Access Token", type:"password", placeholder:"AQVFÃ¢â‚¬Â¦" },
   ]},
-  { id:"tiktok", name:"TikTok", icon:"â™ª", color:"#010101", bg:"rgba(255,255,255,.04)", fields:[
+  { id:"tiktok", name:"TikTok", icon:"Ã¢â„¢Âª", color:"#010101", bg:"rgba(255,255,255,.04)", fields:[
     { key:"pageUrl", label:"Profile URL", placeholder:"https://tiktok.com/@yourhandle" },
   ]},
-  { id:"youtube", name:"YouTube", icon:"â–¶", color:"#FF0000", bg:"rgba(255,0,0,.1)", fields:[
+  { id:"youtube", name:"YouTube", icon:"Ã¢â€“Â¶", color:"#FF0000", bg:"rgba(255,0,0,.1)", fields:[
     { key:"pageUrl", label:"Channel URL", placeholder:"https://youtube.com/@yourchannel" },
-    { key:"channelId", label:"Channel ID", placeholder:"UCxxxxx", help:"Found in YouTube Studio â†’ Settings â†’ Channel" },
+    { key:"channelId", label:"Channel ID", placeholder:"UCxxxxx", help:"Found in YouTube Studio Ã¢â€ â€™ Settings Ã¢â€ â€™ Channel" },
   ]},
 ];
 const SOCIAL_DEFAULT: SocialSettings2 = {
@@ -6357,7 +6359,7 @@ function PageSocial() {
       {/* Page header */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
         <div>
-          <div style={{ fontSize:20, fontWeight:800, color:"white" }}>ðŸ“£ Social Media Marketing</div>
+          <div style={{ fontSize:20, fontWeight:800, color:"white" }}>Ã°Å¸â€œÂ£ Social Media Marketing</div>
           <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginTop:3 }}>Connect accounts, compose posts, and publish to all platforms at once</div>
         </div>
         <div style={{ display:"flex", gap:6 }}>
@@ -6372,12 +6374,12 @@ function PageSocial() {
       <div style={{ display:"flex", gap:4, borderBottom:"1px solid rgba(255,255,255,.07)", marginBottom:24 }}>
         {(["settings","compose","history"] as const).map(t=>(
           <button key={t} style={tabBtn(socialTab===t)} onClick={()=>setSocialTab(t)}>
-            {t==="settings"?"âš™ Platform Settings":t==="compose"?"âœ Post Composer":"ðŸ“‹ Post History"}
+            {t==="settings"?"Ã¢Å¡â„¢ Platform Settings":t==="compose"?"Ã¢Å“Â Post Composer":"Ã°Å¸â€œâ€¹ Post History"}
           </button>
         ))}
       </div>
 
-      {/* â”€â”€ Settings â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Settings Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {socialTab==="settings" && (
         <>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
@@ -6385,9 +6387,9 @@ function PageSocial() {
               <div style={{ fontSize:15, fontWeight:700, color:"white" }}>Platform Connections</div>
               <div style={{ fontSize:12.5, color:"rgba(255,255,255,.4)", marginTop:3 }}>Enable platforms and enter API credentials to start posting</div>
             </div>
-            <button onClick={saveSocial} disabled={saving} style={btn(saved?"rgba(52,211,153,.2)":undefined)}>{saving?"Savingâ€¦":saved?"âœ“ Saved!":"Save Settings"}</button>
+            <button onClick={saveSocial} disabled={saving} style={btn(saved?"rgba(52,211,153,.2)":undefined)}>{saving?"SavingÃ¢â‚¬Â¦":saved?"Ã¢Å“â€œ Saved!":"Save Settings"}</button>
           </div>
-          {loading?<div style={{ textAlign:"center", padding:60, color:"rgba(255,255,255,.3)" }}>Loadingâ€¦</div>:SOCIAL_PLATFORMS.map(plat=>(
+          {loading?<div style={{ textAlign:"center", padding:60, color:"rgba(255,255,255,.3)" }}>LoadingÃ¢â‚¬Â¦</div>:SOCIAL_PLATFORMS.map(plat=>(
             <div key={plat.id} style={{ ...card, border:`1px solid ${settings[plat.id]?.enabled?plat.color+"30":"rgba(255,255,255,.07)"}` }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:settings[plat.id]?.enabled?20:0 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:12 }}>
@@ -6414,11 +6416,11 @@ function PageSocial() {
               )}
             </div>
           ))}
-          <button onClick={saveSocial} disabled={saving} style={{ ...btn(), marginTop:8, width:"100%", padding:"13px" }}>{saving?"Savingâ€¦":saved?"âœ“ Saved!":"Save All Settings"}</button>
+          <button onClick={saveSocial} disabled={saving} style={{ ...btn(), marginTop:8, width:"100%", padding:"13px" }}>{saving?"SavingÃ¢â‚¬Â¦":saved?"Ã¢Å“â€œ Saved!":"Save All Settings"}</button>
         </>
       )}
 
-      {/* â”€â”€ Compose â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Compose Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {socialTab==="compose" && (
         <div style={{ display:"grid", gridTemplateColumns:"1fr 360px", gap:24 }}>
           <div>
@@ -6433,11 +6435,11 @@ function PageSocial() {
                   </button>;
                 })}
               </div>
-              {SOCIAL_PLATFORMS.filter(p=>settings[p.id]?.enabled).length===0 && <div style={{ marginTop:8, fontSize:12, color:"#fbbf24" }}>âš  No platforms connected. Go to Platform Settings first.</div>}
+              {SOCIAL_PLATFORMS.filter(p=>settings[p.id]?.enabled).length===0 && <div style={{ marginTop:8, fontSize:12, color:"#fbbf24" }}>Ã¢Å¡Â  No platforms connected. Go to Platform Settings first.</div>}
             </div>
             <div style={{ marginBottom:12 }}>
               <label style={lbl}>Caption / Post Text</label>
-              <textarea value={postText} onChange={e=>setPostText(e.target.value)} placeholder="Write your postâ€¦" rows={6} style={{ ...inp, resize:"vertical", lineHeight:1.6 }}/>
+              <textarea value={postText} onChange={e=>setPostText(e.target.value)} placeholder="Write your postÃ¢â‚¬Â¦" rows={6} style={{ ...inp, resize:"vertical", lineHeight:1.6 }}/>
               <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:"rgba(255,255,255,.25)", marginTop:4 }}>
                 <span>Twitter limit: 280 chars</span>
                 <span style={{ color:postText.length>280?"#f87171":"rgba(255,255,255,.25)" }}>{postText.length} chars</span>
@@ -6449,14 +6451,14 @@ function PageSocial() {
               {mediaUrl && <div style={{ marginTop:8, borderRadius:10, overflow:"hidden", border:"1px solid rgba(255,255,255,.1)", maxHeight:200 }}><img src={mediaUrl} alt="Preview" style={{ width:"100%", objectFit:"cover", maxHeight:200 }} onError={e=>{(e.target as HTMLImageElement).style.display="none";}}/></div>}
             </div>
             {postError && <div style={{ marginBottom:12, padding:"10px 14px", borderRadius:9, background:"rgba(248,113,113,.1)", border:"1px solid rgba(248,113,113,.25)", fontSize:12.5, color:"#f87171" }}>{postError}</div>}
-            <button onClick={createPost} disabled={posting||!selPlats.length} style={{ ...btn(), width:"100%", padding:"13px", fontSize:14, opacity:posting||!selPlats.length?0.5:1 }}>{posting?"Postingâ€¦":`Post to ${selPlats.length||0} Platform${selPlats.length!==1?"s":""} â†’`}</button>
+            <button onClick={createPost} disabled={posting||!selPlats.length} style={{ ...btn(), width:"100%", padding:"13px", fontSize:14, opacity:posting||!selPlats.length?0.5:1 }}>{posting?"PostingÃ¢â‚¬Â¦":`Post to ${selPlats.length||0} Platform${selPlats.length!==1?"s":""} Ã¢â€ â€™`}</button>
             {postResults && (
               <div style={{ marginTop:16, padding:"16px 20px", borderRadius:12, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.2)" }}>
                 <div style={{ fontSize:13, fontWeight:700, color:"#34d399", marginBottom:12 }}>Post Results</div>
                 {Object.entries(postResults).map(([platform,result])=>(
                   <div key={platform} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8, fontSize:12.5 }}>
                     <span style={{ fontWeight:700, color:"rgba(255,255,255,.7)", width:80, textTransform:"capitalize" }}>{platform}</span>
-                    {result.success?<span style={{ color:"#34d399" }}>âœ“ Published {result.id?`(ID: ${result.id})`:""}</span>:<span style={{ color:"#f87171" }}> {result.error}</span>}
+                    {result.success?<span style={{ color:"#34d399" }}>Ã¢Å“â€œ Published {result.id?`(ID: ${result.id})`:""}</span>:<span style={{ color:"#f87171" }}> {result.error}</span>}
                   </div>
                 ))}
               </div>
@@ -6469,13 +6471,13 @@ function PageSocial() {
                 <div style={{ width:36, height:36, borderRadius:"50%", background:"linear-gradient(135deg,#6366f1,#a78bfa)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:800, color:"white" }}>F</div>
                 <div><div style={{ fontSize:13, fontWeight:700, color:"white" }}>FinovaOS</div><div style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>Just now</div></div>
               </div>
-              <div style={{ fontSize:13, color:"rgba(255,255,255,.75)", lineHeight:1.6, whiteSpace:"pre-wrap", marginBottom:mediaUrl?12:0 }}>{postText||<span style={{ color:"rgba(255,255,255,.2)" }}>Your post will appear hereâ€¦</span>}</div>
+              <div style={{ fontSize:13, color:"rgba(255,255,255,.75)", lineHeight:1.6, whiteSpace:"pre-wrap", marginBottom:mediaUrl?12:0 }}>{postText||<span style={{ color:"rgba(255,255,255,.2)" }}>Your post will appear hereÃ¢â‚¬Â¦</span>}</div>
               {mediaUrl && <div style={{ borderRadius:10, overflow:"hidden", marginTop:8 }}><img src={mediaUrl} alt="" style={{ width:"100%", objectFit:"cover", maxHeight:240 }} onError={e=>{(e.target as HTMLImageElement).style.display="none";}}/></div>}
-              <div style={{ marginTop:14, paddingTop:12, borderTop:"1px solid rgba(255,255,255,.06)", display:"flex", gap:16, fontSize:12, color:"rgba(255,255,255,.3)" }}><span>ðŸ‘ Like</span><span>ðŸ’¬ Comment</span><span> Share</span></div>
+              <div style={{ marginTop:14, paddingTop:12, borderTop:"1px solid rgba(255,255,255,.06)", display:"flex", gap:16, fontSize:12, color:"rgba(255,255,255,.3)" }}><span>Ã°Å¸â€˜Â Like</span><span>Ã°Å¸â€™Â¬ Comment</span><span> Share</span></div>
             </div>
             <div style={{ marginTop:14, borderRadius:12, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)", padding:"12px 16px" }}>
               <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".05em", marginBottom:10 }}>Character Limits</div>
-              {[{platform:"Twitter/X",limit:280,icon:"ð•"},{platform:"LinkedIn",limit:3000,icon:"in"},{platform:"Facebook",limit:63206,icon:"f"},{platform:"Instagram",limit:2200,icon:""}].map(({platform,limit,icon})=>(
+              {[{platform:"Twitter/X",limit:280,icon:"Ã°Ââ€¢Â"},{platform:"LinkedIn",limit:3000,icon:"in"},{platform:"Facebook",limit:63206,icon:"f"},{platform:"Instagram",limit:2200,icon:""}].map(({platform,limit,icon})=>(
                 <div key={platform} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:7, fontSize:12 }}>
                   <span style={{ width:20, fontWeight:800, color:"rgba(255,255,255,.4)", fontSize:11 }}>{icon}</span>
                   <span style={{ flex:1, color:"rgba(255,255,255,.5)" }}>{platform}</span>
@@ -6487,14 +6489,14 @@ function PageSocial() {
         </div>
       )}
 
-      {/* â”€â”€ History â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ History Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {socialTab==="history" && (
         <>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
             <div style={{ fontSize:15, fontWeight:700, color:"white" }}>Post History</div>
-            <button onClick={loadHistory} style={{ ...btn("rgba(99,102,241,.15)"), border:"1px solid rgba(99,102,241,.3)", color:"#a5b4fc" }}>â†» Refresh</button>
+            <button onClick={loadHistory} style={{ ...btn("rgba(99,102,241,.15)"), border:"1px solid rgba(99,102,241,.3)", color:"#a5b4fc" }}>Ã¢â€ Â» Refresh</button>
           </div>
-          {histLoading?<div style={{ textAlign:"center", padding:60, color:"rgba(255,255,255,.3)" }}>Loadingâ€¦</div>:posts.length===0?
+          {histLoading?<div style={{ textAlign:"center", padding:60, color:"rgba(255,255,255,.3)" }}>LoadingÃ¢â‚¬Â¦</div>:posts.length===0?
             <div style={{ textAlign:"center", padding:"60px 20px", color:"rgba(255,255,255,.25)", fontSize:13 }}>No posts yet. Use Post Composer to create your first post.</div>:
             posts.map(post=>{
               const allOk=Object.values(post.results||{}).every(r=>r.success); const anyOk=Object.values(post.results||{}).some(r=>r.success);
@@ -6502,7 +6504,7 @@ function PageSocial() {
                 <div key={post.id} style={{ ...card, marginBottom:12 }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:10 }}>
                     <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                      {(post.platforms||[]).map(p=>{ const meta=SOCIAL_PLATFORMS.find(x=>x.id===p); const res=(post.results||{})[p]; return <span key={p} style={{ padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700, background:res?.success?`${meta?.color}18`:"rgba(248,113,113,.12)", color:res?.success?meta?.color:"#f87171" }}>{res?.success?"âœ“":""} {meta?.name||p}</span>; })}
+                      {(post.platforms||[]).map(p=>{ const meta=SOCIAL_PLATFORMS.find(x=>x.id===p); const res=(post.results||{})[p]; return <span key={p} style={{ padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:700, background:res?.success?`${meta?.color}18`:"rgba(248,113,113,.12)", color:res?.success?meta?.color:"#f87171" }}>{res?.success?"Ã¢Å“â€œ":""} {meta?.name||p}</span>; })}
                     </div>
                     <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
                       <span style={{ fontSize:11, padding:"3px 10px", borderRadius:20, background:allOk?"rgba(52,211,153,.1)":anyOk?"rgba(251,191,36,.1)":"rgba(248,113,113,.1)", color:allOk?"#34d399":anyOk?"#fbbf24":"#f87171", fontWeight:700 }}>{allOk?"All Sent":anyOk?"Partial":"Failed"}</span>
@@ -6510,7 +6512,7 @@ function PageSocial() {
                     </div>
                   </div>
                   <div style={{ fontSize:13, color:"rgba(255,255,255,.7)", lineHeight:1.6, whiteSpace:"pre-wrap" }}>{post.text}</div>
-                  {post.mediaUrl && <div style={{ marginTop:8, fontSize:12, color:"#818cf8" }}>ðŸ–¼ <a href={post.mediaUrl} target="_blank" rel="noopener noreferrer" style={{ color:"#818cf8" }}>Media attached</a></div>}
+                  {post.mediaUrl && <div style={{ marginTop:8, fontSize:12, color:"#818cf8" }}>Ã°Å¸â€“Â¼ <a href={post.mediaUrl} target="_blank" rel="noopener noreferrer" style={{ color:"#818cf8" }}>Media attached</a></div>}
                   {Object.entries(post.results||{}).filter(([,r])=>!r.success).map(([p,r])=><div key={p} style={{ marginTop:6, fontSize:11, color:"#f87171" }}>{p}: {r.error}</div>)}
                 </div>
               );
@@ -6522,22 +6524,22 @@ function PageSocial() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: SEO SETTINGS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageSeo() {
   const DEFAULT_CONFIG = {
-    siteTitle: "FinovaOS â€” Smart Business Accounting",
+    siteTitle: "FinovaOS Ã¢â‚¬â€ Smart Business Accounting",
     metaDescription: "Manage invoices, expenses, payroll, and more with FinovaOS.",
     ogImage: "",
     twitterHandle: "@finova_io",
     googleAnalyticsId: "",
     gscVerification: "",
     pages: {
-      "/":         { title:"FinovaOS â€” Home",     description:"" },
-      "/pricing":  { title:"Pricing â€” FinovaOS",  description:"" },
-      "/features": { title:"Features â€” FinovaOS", description:"" },
-      "/blog":     { title:"Blog â€” FinovaOS",     description:"" },
+      "/":         { title:"FinovaOS Ã¢â‚¬â€ Home",     description:"" },
+      "/pricing":  { title:"Pricing Ã¢â‚¬â€ FinovaOS",  description:"" },
+      "/features": { title:"Features Ã¢â‚¬â€ FinovaOS", description:"" },
+      "/blog":     { title:"Blog Ã¢â‚¬â€ FinovaOS",     description:"" },
     },
   };
 
@@ -6586,7 +6588,7 @@ function PageSeo() {
   const inputStyle = { width:"100%", padding:"9px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.04)", color:"white", fontSize:12.5, outline:"none", boxSizing:"border-box" as const };
   const labelStyle = { fontSize:10.5, fontWeight:700 as const, color:"rgba(255,255,255,.35)", textTransform:"uppercase" as const, letterSpacing:".05em", display:"block" as const, marginBottom:5 };
 
-  if (loading) return <div style={{ textAlign:"center", padding:40, color:"rgba(255,255,255,.2)" }}>Loadingâ€¦</div>;
+  if (loading) return <div style={{ textAlign:"center", padding:40, color:"rgba(255,255,255,.2)" }}>LoadingÃ¢â‚¬Â¦</div>;
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16, maxWidth:900 }}>
@@ -6651,15 +6653,15 @@ function PageSeo() {
 
       <button onClick={handleSave} disabled={saving}
         style={{ padding:"11px 28px", borderRadius:10, background:saving?"rgba(99,102,241,.3)":"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:saving?"not-allowed":"pointer", alignSelf:"flex-start" }}>
-        {saving ? "Savingâ€¦" : "ðŸ’¾ Save SEO Settings"}
+        {saving ? "SavingÃ¢â‚¬Â¦" : "Ã°Å¸â€™Â¾ Save SEO Settings"}
       </button>
     </div>
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: NEWSLETTER SUBSCRIBERS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageNewsletter() {
   function adminH(json=false) {
     const uu = getAdminUser();
@@ -6720,10 +6722,10 @@ function PageNewsletter() {
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24,flexWrap:"wrap",gap:12}}>
         <div>
           <h1 style={{margin:"0 0 4px",fontSize:24,fontWeight:800}}>Newsletter Subscribers</h1>
-          <p style={{margin:0,fontSize:13,color:"rgba(255,255,255,.4)"}}>Ø¬Ù† Ù„ÙˆÚ¯ÙˆÚº Ù†Û’ subscribe Ú©ÛŒØ§ ÛÛ’</p>
+          <p style={{margin:0,fontSize:13,color:"rgba(255,255,255,.4)"}}>Ã˜Â¬Ã™â€  Ã™â€žÃ™Ë†ÃšÂ¯Ã™Ë†ÃšÂº Ã™â€ Ã›â€™ subscribe ÃšÂ©Ã›Å’Ã˜Â§ Ã›ÂÃ›â€™</p>
         </div>
         <button onClick={()=>{setShowBcast(true);setSent(null);setPreview(null);}} style={{padding:"10px 22px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontFamily:"inherit",fontSize:13,fontWeight:700,cursor:"pointer"}}>
-          ðŸ“§ Broadcast Email
+          Ã°Å¸â€œÂ§ Broadcast Email
         </button>
       </div>
 
@@ -6748,11 +6750,11 @@ function PageNewsletter() {
           </tr></thead>
           <tbody>
             {loading ? <tr><td colSpan={5} style={{padding:40,textAlign:"center",color:"rgba(255,255,255,.3)"}}>Loading...</td></tr>
-            : items.length===0 ? <tr><td colSpan={5} style={{padding:40,textAlign:"center",color:"rgba(255,255,255,.3)"}}>Ú©ÙˆØ¦ÛŒ subscriber Ù†ÛÛŒÚº</td></tr>
+            : items.length===0 ? <tr><td colSpan={5} style={{padding:40,textAlign:"center",color:"rgba(255,255,255,.3)"}}>ÃšÂ©Ã™Ë†Ã˜Â¦Ã›Å’ subscriber Ã™â€ Ã›ÂÃ›Å’ÃšÂº</td></tr>
             : items.map((s:any)=>(
               <tr key={s.id} style={{borderBottom:"1px solid rgba(255,255,255,.04)"}}>
                 <td style={{padding:"13px 16px",fontSize:13,fontWeight:600}}>{s.email}</td>
-                <td style={{padding:"13px 16px",fontSize:13,color:"rgba(255,255,255,.55)"}}>{s.name||"â€”"}</td>
+                <td style={{padding:"13px 16px",fontSize:13,color:"rgba(255,255,255,.55)"}}>{s.name||"Ã¢â‚¬â€"}</td>
                 <td style={{padding:"13px 16px"}}><span style={{padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:"rgba(99,102,241,.15)",color:"#a5b4fc"}}>{s.source||"website"}</span></td>
                 <td style={{padding:"13px 16px"}}><span style={{padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:s.status==="active"?"rgba(52,211,153,.15)":"rgba(248,113,113,.15)",color:s.status==="active"?"#34d399":"#f87171"}}>{s.status}</span></td>
                 <td style={{padding:"13px 16px",fontSize:12,color:"rgba(255,255,255,.4)"}}>{new Date(s.createdAt).toLocaleDateString()}</td>
@@ -6767,12 +6769,12 @@ function PageNewsletter() {
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.65)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:24}} onClick={e=>e.target===e.currentTarget&&setShowBcast(false)}>
           <div style={{background:"#0f1629",border:"1px solid rgba(255,255,255,.1)",borderRadius:20,padding:32,width:"100%",maxWidth:520,maxHeight:"88vh",overflowY:"auto"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-              <h2 style={{margin:0,fontSize:18,fontWeight:800}}>ðŸ“§ Broadcast Email</h2>
-              <button onClick={()=>setShowBcast(false)} style={{background:"transparent",border:"none",color:"rgba(255,255,255,.4)",fontSize:20,cursor:"pointer"}}>âœ•</button>
+              <h2 style={{margin:0,fontSize:18,fontWeight:800}}>Ã°Å¸â€œÂ§ Broadcast Email</h2>
+              <button onClick={()=>setShowBcast(false)} style={{background:"transparent",border:"none",color:"rgba(255,255,255,.4)",fontSize:20,cursor:"pointer"}}>Ã¢Å“â€¢</button>
             </div>
             {sent ? (
               <div style={{textAlign:"center",padding:"24px 0"}}>
-                <div style={{fontSize:48,marginBottom:12}}>âœ…</div>
+                <div style={{fontSize:48,marginBottom:12}}>Ã¢Å“â€¦</div>
                 <h3 style={{margin:"0 0 8px",color:"#34d399"}}>Bhej Di Gayi!</h3>
                 <p style={{color:"rgba(255,255,255,.5)",fontSize:14}}>{sent.sent}/{sent.total} subscribers ko deliver hua</p>
                 <button onClick={()=>setShowBcast(false)} style={{marginTop:16,padding:"9px 24px",borderRadius:10,border:"none",background:"#6366f1",color:"white",fontFamily:"inherit",fontWeight:700,cursor:"pointer"}}>Close</button>
@@ -6780,7 +6782,7 @@ function PageNewsletter() {
             ):(
               <>
                 <div style={{background:"rgba(99,102,241,.08)",border:"1px solid rgba(99,102,241,.2)",borderRadius:10,padding:"10px 14px",marginBottom:16,fontSize:13,color:"#a5b4fc"}}>
-                  ðŸ“Š {active} active subscribers ko jayegi
+                  Ã°Å¸â€œÅ  {active} active subscribers ko jayegi
                 </div>
                 <div style={{marginBottom:12}}>
                   <label style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.35)",display:"block",marginBottom:6}}>SUBJECT *</label>
@@ -6790,7 +6792,7 @@ function PageNewsletter() {
                   <label style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.35)",display:"block",marginBottom:6}}>MESSAGE / HTML *</label>
                   <textarea value={body} onChange={e=>setBody(e.target.value)} rows={7} style={{width:"100%",background:"rgba(255,255,255,.04)",border:"1.5px solid rgba(255,255,255,.1)",borderRadius:10,padding:"11px 14px",color:"white",fontFamily:"inherit",fontSize:13,outline:"none",resize:"vertical",boxSizing:"border-box"}} placeholder="Email content (plain text ya HTML)..." />
                 </div>
-                {preview!==null && <div style={{background:"rgba(251,191,36,.08)",border:"1px solid rgba(251,191,36,.25)",borderRadius:10,padding:"9px 14px",marginBottom:12,fontSize:13,color:"#fbbf24"}}>âœ… {preview} subscribers ko jayegi â€” confirm karein?</div>}
+                {preview!==null && <div style={{background:"rgba(251,191,36,.08)",border:"1px solid rgba(251,191,36,.25)",borderRadius:10,padding:"9px 14px",marginBottom:12,fontSize:13,color:"#fbbf24"}}>Ã¢Å“â€¦ {preview} subscribers ko jayegi Ã¢â‚¬â€ confirm karein?</div>}
                 <div style={{display:"flex",gap:10}}>
                   {preview===null ? (
                     <button onClick={()=>doBroadcast(true)} disabled={!subj||!body||sending} style={{flex:1,padding:"10px",borderRadius:10,border:"1px solid rgba(251,191,36,.3)",background:"rgba(251,191,36,.1)",color:"#fbbf24",fontFamily:"inherit",fontWeight:700,cursor:"pointer"}}>
@@ -6798,7 +6800,7 @@ function PageNewsletter() {
                     </button>
                   ):(
                     <button onClick={()=>doBroadcast(false)} disabled={sending} style={{flex:1,padding:"10px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontFamily:"inherit",fontWeight:700,cursor:"pointer"}}>
-                      {sending?"Bhej raha hai...":"âœ… Send Karo"}
+                      {sending?"Bhej raha hai...":"Ã¢Å“â€¦ Send Karo"}
                     </button>
                   )}
                   <button onClick={()=>setPreview(null)} style={{padding:"10px 18px",borderRadius:10,border:"1px solid rgba(255,255,255,.1)",background:"transparent",color:"rgba(255,255,255,.5)",fontFamily:"inherit",cursor:"pointer"}}>Cancel</button>
@@ -6812,9 +6814,9 @@ function PageNewsletter() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    PAGE: FEEDBACK & COMPLAINTS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 function PageFeedback() {
   function adminH(json=false) {
     const uu = getAdminUser();
@@ -6869,7 +6871,7 @@ function PageFeedback() {
     <div style={{fontFamily:"'Outfit',sans-serif",color:"white",paddingBottom:60}}>
       <div style={{marginBottom:24}}>
         <h1 style={{margin:"0 0 4px",fontSize:24,fontWeight:800}}>Feedback & Complaints</h1>
-        <p style={{margin:0,fontSize:13,color:"rgba(255,255,255,.4)"}}>Users Ø§ÙˆØ± visitors Ú©ÛŒ complaintsØŒ suggestionsØŒ Ø§ÙˆØ± bug reports</p>
+        <p style={{margin:0,fontSize:13,color:"rgba(255,255,255,.4)"}}>Users Ã˜Â§Ã™Ë†Ã˜Â± visitors ÃšÂ©Ã›Å’ complaintsÃ˜Å’ suggestionsÃ˜Å’ Ã˜Â§Ã™Ë†Ã˜Â± bug reports</p>
       </div>
 
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:14,marginBottom:20}}>
@@ -6909,14 +6911,14 @@ function PageFeedback() {
           </tr></thead>
           <tbody>
             {loading ? <tr><td colSpan={6} style={{padding:40,textAlign:"center",color:"rgba(255,255,255,.3)"}}>Loading...</td></tr>
-            : items.length===0 ? <tr><td colSpan={6} style={{padding:40,textAlign:"center",color:"rgba(255,255,255,.3)"}}>Ú©ÙˆØ¦ÛŒ feedback Ù†ÛÛŒÚº</td></tr>
+            : items.length===0 ? <tr><td colSpan={6} style={{padding:40,textAlign:"center",color:"rgba(255,255,255,.3)"}}>ÃšÂ©Ã™Ë†Ã˜Â¦Ã›Å’ feedback Ã™â€ Ã›ÂÃ›Å’ÃšÂº</td></tr>
             : items.map((fb:any)=>(
               <tr key={fb.id} onClick={()=>{setSel(fb);setNote(fb.adminNote||"");}} style={{borderBottom:"1px solid rgba(255,255,255,.04)",cursor:"pointer",transition:"background .15s"}}
                 onMouseEnter={e=>(e.currentTarget.style.background="rgba(255,255,255,.03)")}
                 onMouseLeave={e=>(e.currentTarget.style.background="")}>
                 <td style={{padding:"13px 16px"}}><span style={{padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:`${TYPE_C[fb.type]||"#818cf8"}18`,color:TYPE_C[fb.type]||"#818cf8"}}>{fb.type}</span></td>
                 <td style={{padding:"13px 16px",fontSize:13,fontWeight:600,maxWidth:180}}>{fb.subject}</td>
-                <td style={{padding:"13px 16px",fontSize:12,color:"rgba(255,255,255,.5)"}}>{fb.name||fb.email||"â€”"}</td>
+                <td style={{padding:"13px 16px",fontSize:12,color:"rgba(255,255,255,.5)"}}>{fb.name||fb.email||"Ã¢â‚¬â€"}</td>
                 <td style={{padding:"13px 16px"}}><span style={{padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:`${PRI_C[fb.priority]}18`,color:PRI_C[fb.priority]}}>{fb.priority}</span></td>
                 <td style={{padding:"13px 16px"}}><span style={{padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:`${STATUS_C[fb.status]}18`,color:STATUS_C[fb.status]}}>{fb.status.replace("_"," ")}</span></td>
                 <td style={{padding:"13px 16px",fontSize:12,color:"rgba(255,255,255,.4)"}}>{new Date(fb.createdAt).toLocaleDateString()}</td>
@@ -6941,7 +6943,7 @@ function PageFeedback() {
                 </div>
                 <h2 style={{margin:0,fontSize:17,fontWeight:800}}>{sel.subject}</h2>
               </div>
-              <button onClick={()=>setSel(null)} style={{background:"transparent",border:"none",color:"rgba(255,255,255,.4)",fontSize:20,cursor:"pointer"}}>âœ•</button>
+              <button onClick={()=>setSel(null)} style={{background:"transparent",border:"none",color:"rgba(255,255,255,.4)",fontSize:20,cursor:"pointer"}}>Ã¢Å“â€¢</button>
             </div>
 
             <div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.07)",borderRadius:12,padding:16,marginBottom:16}}>
@@ -6950,9 +6952,9 @@ function PageFeedback() {
 
             {(sel.name||sel.email) && (
               <div style={{display:"flex",gap:14,marginBottom:16,fontSize:12,color:"rgba(255,255,255,.4)"}}>
-                {sel.name&&<span>ðŸ‘¤ {sel.name}</span>}
-                {sel.email&&<span>âœ‰ï¸ {sel.email}</span>}
-                <span>ðŸ“… {new Date(sel.createdAt).toLocaleString()}</span>
+                {sel.name&&<span>Ã°Å¸â€˜Â¤ {sel.name}</span>}
+                {sel.email&&<span>Ã¢Å“â€°Ã¯Â¸Â {sel.email}</span>}
+                <span>Ã°Å¸â€œâ€¦ {new Date(sel.createdAt).toLocaleString()}</span>
               </div>
             )}
 
@@ -6985,15 +6987,15 @@ function PageFeedback() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
    MAIN ADMIN PANEL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 export default function AdminPanel() {
   const [page,        setPage]        = useState<Page>("dashboard");
   const [avatarOpen,  setAvatarOpen]  = useState(false);
   const avatarRef = useRef<HTMLDivElement>(null);
 
-  // â”€â”€ Team member access control â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Team member access control Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const adminUser = getAdminUser();
   const isSuperAdmin: boolean = adminUser.isSuperAdmin !== false; // true if undefined (legacy) or explicitly true
   const allowedPages: string[] | null = isSuperAdmin ? null : (adminUser.allowedPages || []);
@@ -7009,7 +7011,7 @@ export default function AdminPanel() {
   const [collapsed,   setCollapsed]   = useState(false);
   const [mobileOpen,  setMobileOpen]  = useState(false);
 
-  /* â”€â”€ Live support waiting count (nav badge) â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Live support waiting count (nav badge) Ã¢â€â‚¬Ã¢â€â‚¬ */
   const [waitingChats, setWaitingChats] = useState(0);
   useEffect(() => {
     const poll = async () => {
@@ -7025,13 +7027,13 @@ export default function AdminPanel() {
     return () => clearInterval(t);
   }, []);
 
-  /* â”€â”€ Notifications state â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Notifications state Ã¢â€â‚¬Ã¢â€â‚¬ */
   const [notifs,      setNotifs]      = useState<Notif[]>([]);
   const [notifOpen,   setNotifOpen]   = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const unreadCount = notifs.filter(n=>!n.isRead).length;
 
-  /* â”€â”€ Load notifications from /api/admin/notifications â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Load notifications from /api/admin/notifications Ã¢â€â‚¬Ã¢â€â‚¬ */
   const loadNotifs = useCallback(async () => {
     try {
       const u = getAdminUser();
@@ -7043,7 +7045,7 @@ export default function AdminPanel() {
       const data = await res.json();
       if (data.notifications) setNotifs(data.notifications as Notif[]);
     } catch {
-      // Silently ignore â€” non-critical
+      // Silently ignore Ã¢â‚¬â€ non-critical
     }
   }, []);
 
@@ -7055,7 +7057,7 @@ export default function AdminPanel() {
     return () => clearInterval(interval);
   }, [loadNotifs]);
 
-  /* â”€â”€ Close dropdown on outside click â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Close dropdown on outside click Ã¢â€â‚¬Ã¢â€â‚¬ */
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
@@ -7075,7 +7077,7 @@ export default function AdminPanel() {
     return h;
   }
 
-  /* â”€â”€ Mark one as read â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Mark one as read Ã¢â€â‚¬Ã¢â€â‚¬ */
   async function markRead(id: string) {
     setNotifs(prev => prev.map(n => n.id===id ? {...n, isRead:true} : n));
     await fetch("/api/admin/notifications", {
@@ -7085,7 +7087,7 @@ export default function AdminPanel() {
     });
   }
 
-  /* â”€â”€ Mark all read â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Mark all read Ã¢â€â‚¬Ã¢â€â‚¬ */
   async function markAllRead() {
     setNotifs(prev => prev.map(n => ({...n, isRead:true})));
     await fetch("/api/admin/notifications", {
@@ -7095,7 +7097,7 @@ export default function AdminPanel() {
     });
   }
 
-  /* â”€â”€ Dismiss / clear one â”€â”€ */
+  /* Ã¢â€â‚¬Ã¢â€â‚¬ Dismiss / clear one Ã¢â€â‚¬Ã¢â€â‚¬ */
   async function clearNotif(id: string) {
     setNotifs(prev => prev.filter(n => n.id!==id));
     // No delete API needed - just mark read
@@ -7118,11 +7120,11 @@ export default function AdminPanel() {
   };
 
   const PAGE_ICONS: Partial<Record<Page,string>> = {
-    dashboard:"â–£", companies:"â¬¡", subscriptions:"â—ˆ", revenue:"â—‰", geo:"â—Ž",
-    usage:"â¬¡", visitors:"â—ˆ", plans:"â—†", business_modules:"â¬¡", coupons:"â—ˆ",
-    crm:"â—ˆ", referrals:"â—‰", leads:"â—Ž", broadcasts:"â—ˆ", testimonials:"â—†", updates:"â—‰",
-    seo:"â—Ž", social:"â—ˆ", livesupport:"â—‰", tickets:"â—Ž", system:"â—ˆ", logs:"â—†",
-    emaillogs:"â—‰", flags:"â—Ž", apikeys:"â—ˆ", permissions:"â—†", teams:"â—‰", settings:"â—Ž",
+    dashboard:"Ã¢â€“Â£", companies:"Ã¢Â¬Â¡", subscriptions:"Ã¢â€”Ë†", revenue:"Ã¢â€”â€°", geo:"Ã¢â€”Å½",
+    usage:"Ã¢Â¬Â¡", visitors:"Ã¢â€”Ë†", plans:"Ã¢â€”â€ ", business_modules:"Ã¢Â¬Â¡", coupons:"Ã¢â€”Ë†",
+    crm:"Ã¢â€”Ë†", referrals:"Ã¢â€”â€°", leads:"Ã¢â€”Å½", broadcasts:"Ã¢â€”Ë†", testimonials:"Ã¢â€”â€ ", updates:"Ã¢â€”â€°",
+    seo:"Ã¢â€”Å½", social:"Ã¢â€”Ë†", livesupport:"Ã¢â€”â€°", tickets:"Ã¢â€”Å½", system:"Ã¢â€”Ë†", logs:"Ã¢â€”â€ ",
+    emaillogs:"Ã¢â€”â€°", flags:"Ã¢â€”Å½", apikeys:"Ã¢â€”Ë†", permissions:"Ã¢â€”â€ ", teams:"Ã¢â€”â€°", settings:"Ã¢â€”Å½",
   };
 
   const renderPage = () => {
@@ -7130,7 +7132,7 @@ export default function AdminPanel() {
     if (allowedPages && page !== "dashboard" && !allowedPages.includes(page)) {
       return (
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"60vh", gap:12 }}>
-          <div style={{ fontSize:48 }}>ðŸ”’</div>
+          <div style={{ fontSize:48 }}>Ã°Å¸â€â€™</div>
           <div style={{ fontSize:18, fontWeight:700, color:"white" }}>Access Restricted</div>
           <div style={{ fontSize:13, color:"rgba(255,255,255,.4)" }}>You don't have permission to view this page.</div>
           <button onClick={()=>setPage("dashboard")} style={{ marginTop:8, padding:"8px 20px", borderRadius:9, background:"rgba(99,102,241,.6)", border:"none", color:"white", fontWeight:700, fontSize:13, cursor:"pointer" }}>Go to Dashboard</button>
@@ -7198,9 +7200,9 @@ export default function AdminPanel() {
         .nav-btn:hover .nav-label{color:rgba(255,255,255,.9)!important;}
       `}</style>
 
-      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+      {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
           SIDEBAR
-      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
       <aside style={{
         width: collapsed ? 64 : 256,
         minHeight:"100vh",
@@ -7214,7 +7216,7 @@ export default function AdminPanel() {
         {/* Top glow line */}
         <div style={{ position:"absolute",top:0,left:0,right:0,height:1,background:"linear-gradient(90deg,transparent 0%,#6366f1 40%,#a78bfa 60%,transparent 100%)",opacity:.6 }}/>
 
-        {/* â”€â”€ Logo â”€â”€ */}
+        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Logo Ã¢â€â‚¬Ã¢â€â‚¬ */}
         <div style={{
           height:64, display:"flex", alignItems:"center",
           padding: collapsed ? "0" : "0 18px", gap:12,
@@ -7242,7 +7244,7 @@ export default function AdminPanel() {
           )}
         </div>
 
-        {/* â”€â”€ Grouped Nav â”€â”€ */}
+        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Grouped Nav Ã¢â€â‚¬Ã¢â€â‚¬ */}
         <nav style={{ flex:1, padding:"10px 8px", overflowY:"auto", overflowX:"hidden" }}>
           {NAV_GROUPS.map(group => {
             const groupItems = visibleNav.filter(n => group.pages.includes(n.page));
@@ -7329,7 +7331,7 @@ export default function AdminPanel() {
 
         </nav>
 
-        {/* â”€â”€ Bottom: User + Collapse â”€â”€ */}
+        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Bottom: User + Collapse Ã¢â€â‚¬Ã¢â€â‚¬ */}
         <div style={{ borderTop:"1px solid rgba(255,255,255,.05)", padding:"10px 8px", flexShrink:0 }}>
           {/* User profile strip */}
           {!collapsed && (
@@ -7373,12 +7375,12 @@ export default function AdminPanel() {
         </div>
       </aside>
 
-      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+      {/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
           MAIN AREA
-      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */}
       <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0, overflow:"hidden" }}>
 
-        {/* â”€â”€ Top Header â”€â”€ */}
+        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Top Header Ã¢â€â‚¬Ã¢â€â‚¬ */}
         <header style={{
           height:64, flexShrink:0, position:"sticky", top:0, zIndex:30,
           background:"rgba(6,10,20,.9)", backdropFilter:"blur(20px)",
@@ -7500,7 +7502,7 @@ export default function AdminPanel() {
           </div>
         </header>
 
-        {/* â”€â”€ Page Content â”€â”€ */}
+        {/* Ã¢â€â‚¬Ã¢â€â‚¬ Page Content Ã¢â€â‚¬Ã¢â€â‚¬ */}
         <main style={{ flex:1, overflowY:"auto", padding:"28px 28px 56px", background:"#060a14" }}>
           <div style={{ animation:"fadeUp .25s ease both", maxWidth:1420 }}>
             {renderPage()}
