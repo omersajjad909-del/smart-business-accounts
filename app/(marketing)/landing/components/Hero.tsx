@@ -182,14 +182,14 @@ export default function Hero() {
                 lineHeight:1.06, letterSpacing:"-2px",
                 color:"#fff", marginBottom:22,
               }}>
-                The smartest way<br/>to run your{" "}
+                Run Your Business.{" "}
                 <span style={{
                   background:"linear-gradient(135deg,#818cf8,#a78bfa,#60a5fa)",
                   backgroundSize:"200% auto",
                   WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
                   animation:"gradShift 4s ease infinite",
                 }}>
-                  trade business.
+                  Let AI Handle the Numbers.
                 </span>
               </h1>
 
@@ -199,7 +199,7 @@ export default function Hero() {
                 color:"rgba(255,255,255,.48)", marginBottom:32,
                 maxWidth:430,
               }}>
-                Sales invoices, purchase orders, warehouse stock, landed cost, and customer statements, with AI that watches your numbers so you do not have to.
+                From accounting and inventory to payroll and CRM — FinovaOS manages your entire business while AI monitors your numbers and tells you exactly what to do next.
               </p>
 
               {/* Feature tags */}
