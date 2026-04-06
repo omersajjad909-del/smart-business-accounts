@@ -27,7 +27,13 @@
       "Bash(ls d:/projects/smart-business-accounts/app/dashboard/*/page.tsx)",
       "Bash(ls d:/projects/smart-business-accounts/app/api/*/route.ts)",
       "Bash(ls -la \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\chat\"\" 2>/dev/null || echo \"Directory not found \")",
-      "Bash(echo \"Done: $?\")"
+      "Bash(echo \"Done: $?\")",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(grep -l \"TODO\\\\|FIXME\\\\|XXX\\\\|BROKEN\\\\|WIP\" /d/projects/smart-business-accounts/app/dashboard/*/*page.tsx)",
+      "Bash(ls -1d /d/projects/smart-business-accounts/app/dashboard/*/)",
+      "Bash(ls -d /d/projects/smart-business-accounts/app/dashboard/*/)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
