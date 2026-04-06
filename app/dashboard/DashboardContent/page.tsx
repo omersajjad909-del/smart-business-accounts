@@ -562,15 +562,63 @@ export default function DashboardContent() {
 
       {/* ── Subscription row — ADMIN only ── */}
       {companyInfo && currentUser?.role === "ADMIN" && (
-        <div style={{ borderRadius: 14, padding: "14px 20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 24, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+        <div style={{
+          borderRadius: 14, padding: "14px 20px", marginBottom: 24,
+          display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" as const,
+          background: companyInfo.subscriptionStatus === "TRIALING"
+            ? "rgba(251,191,36,0.06)"
+            : "rgba(255,255,255,0.03)",
+          border: companyInfo.subscriptionStatus === "TRIALING"
+            ? "1px solid rgba(251,191,36,0.25)"
+            : "1px solid rgba(255,255,255,0.07)",
+        }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: companyInfo.subscriptionStatus === "ACTIVE" ? "#34d399" : "#f59e0b" }} />
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Plan: <strong style={{ color: "#a5b4fc" }}>{companyInfo.plan}</strong></span>
           </div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Status: <strong style={{ color: companyInfo.subscriptionStatus === "ACTIVE" ? "#34d399" : "#f59e0b" }}>{companyInfo.subscriptionStatus}</strong></div>
-          {companyInfo.plan !== "ENTERPRISE" && (
-            <Link href="/dashboard/billing" style={{ marginLeft: "auto", padding: "6px 16px", borderRadius: 8, background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>Upgrade Plan →</Link>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+            Status: <strong style={{ color: companyInfo.subscriptionStatus === "ACTIVE" ? "#34d399" : "#f59e0b" }}>{companyInfo.subscriptionStatus}</strong>
+          </div>
+          {companyInfo.subscriptionStatus === "TRIALING" && (
+            <span style={{ fontSize: 11, color: "rgba(251,191,36,0.7)" }}>
+              ⚠️ Trial active — activate karo full access ke liye
+            </span>
           )}
+          <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+            {companyInfo.subscriptionStatus === "TRIALING" && (
+              <Link href="/dashboard/billing" style={{
+                padding: "7px 18px", borderRadius: 8,
+                background: "linear-gradient(135deg,#f59e0b,#d97706)",
+                color: "white", fontSize: 12, fontWeight: 700,
+                textDecoration: "none", whiteSpace: "nowrap" as const,
+                boxShadow: "0 4px 12px rgba(245,158,11,0.35)",
+              }}>
+                🚀 Activate Now →
+              </Link>
+            )}
+            {companyInfo.plan !== "ENTERPRISE" && companyInfo.subscriptionStatus !== "TRIALING" && (
+              <Link href="/dashboard/billing" style={{
+                padding: "6px 16px", borderRadius: 8,
+                background: "rgba(99,102,241,0.15)",
+                border: "1px solid rgba(99,102,241,0.3)",
+                color: "#a5b4fc", fontSize: 11, fontWeight: 700,
+                textDecoration: "none",
+              }}>
+                Upgrade Plan →
+              </Link>
+            )}
+            {companyInfo.subscriptionStatus === "ACTIVE" && companyInfo.plan !== "ENTERPRISE" && (
+              <Link href="/dashboard/billing" style={{
+                padding: "6px 16px", borderRadius: 8,
+                background: "rgba(99,102,241,0.15)",
+                border: "1px solid rgba(99,102,241,0.3)",
+                color: "#a5b4fc", fontSize: 11, fontWeight: 700,
+                textDecoration: "none",
+              }}>
+                Upgrade Plan →
+              </Link>
+            )}
+          </div>
         </div>
       )}
 
