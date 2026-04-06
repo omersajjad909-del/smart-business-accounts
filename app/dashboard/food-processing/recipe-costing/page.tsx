@@ -1,31 +1,49 @@
 "use client";
 
-import { BusinessVerticalShell } from "../../_components/BusinessVerticalShell";
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { foodProcessingAccent, mapFoodRecipe } from "../_shared";
+
+const statusOptions = ["draft", "approved", "live"];
 
 export default function FoodProcessingRecipeCostingPage() {
   return (
-    <BusinessVerticalShell
+    <BusinessRecordWorkspace
       title="Recipe Costing"
-      subtitle="Ingredient, packaging, and batch-yield costing for packaged-food operations."
-      mode="overview"
-      accent="#f97316"
-      links={[
-        { label: "Overview", href: "/dashboard/food-processing" },
-        { label: "BOM", href: "/dashboard/manufacturing/bom" },
-        { label: "Production Orders", href: "/dashboard/manufacturing/production-orders" },
-        { label: "Analytics", href: "/dashboard/food-processing/analytics" },
+      subtitle="Capture recipe yield, unit cost, and SKU readiness before production."
+      accent={foodProcessingAccent}
+      category="food_recipe"
+      emptyState="No recipes yet. Add the first product formula."
+      fields={[
+        { key: "recipe", label: "Recipe", placeholder: "Spicy ketchup 500ml", required: true },
+        { key: "sku", label: "SKU", placeholder: "KETCH-500-SP", required: true },
+        { key: "batchYield", label: "Batch Yield", type: "number", placeholder: "850", required: true },
+        { key: "unitCost", label: "Unit Cost", type: "number", placeholder: "145", required: true },
+        { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
       ]}
-      highlights={[
-        { title: "Ingredient Costing", description: "Track formula cost against current raw-material assumptions." },
-        { title: "Packaging Impact", description: "Include packaging material in final unit economics before release." },
-        { title: "Yield Planning", description: "Estimate expected output and understand loss-sensitive batches." },
-        { title: "Margin Readiness", description: "Prepare production-ready cost lines before commercial pricing." },
+      defaultValues={{ status: "draft" }}
+      columns={[
+        { key: "recipe", label: "Recipe" },
+        { key: "sku", label: "SKU" },
+        { key: "batchYield", label: "Batch Yield" },
+        { key: "unitCost", label: "Unit Cost" },
+        { key: "status", label: "Status" },
       ]}
-      workflow={[
-        "Ingredients and packaging values are assembled into a production recipe.",
-        "Expected yield translates formula cost into practical unit economics.",
-        "Commercial teams price finished goods with better margin awareness.",
-        "Production then runs from an approved and understood cost baseline.",
+      statusOptions={statusOptions}
+      mapRecord={mapFoodRecipe}
+      buildCreatePayload={(form) => ({
+        title: form.recipe,
+        status: form.status,
+        amount: Number(form.unitCost || 0),
+        data: {
+          sku: form.sku,
+          batchYield: Number(form.batchYield || 0),
+        },
+      })}
+      summarize={(rows) => [
+        { label: "Recipes", value: rows.length, color: "#f97316" },
+        { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "#34d399" },
+        { label: "Live", value: rows.filter((row) => String(row.status) === "live").length, color: "#60a5fa" },
+        { label: "Avg Unit Cost", value: rows.length ? Math.round(rows.reduce((sum, row) => sum + Number(row.unitCost || 0), 0) / rows.length).toLocaleString() : "0", color: "#fbbf24" },
       ]}
     />
   );

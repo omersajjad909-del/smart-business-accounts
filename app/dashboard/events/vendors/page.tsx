@@ -1,24 +1,50 @@
-export default function Page() {
+"use client";
+
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { eventsAccent, mapEventVendor } from "../_shared";
+
+const statusOptions = ["active", "standby", "blocked"];
+
+export default function EventVendorsPage() {
   return (
-    <div style={{ padding: "32px 24px", color: "var(--text-primary)", fontFamily: "inherit" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 10 }}>
-          <span>🤝</span> Vendors
-        </h1>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: 0 }}>Manage caterers, decorators, photographers and other vendors.</p>
-      </div>
-      <div style={{
-        padding: "48px 32px", borderRadius: 16,
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        textAlign: "center",
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🤝</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 8 }}>Vendors</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", maxWidth: 400, margin: "0 auto" }}>
-          Manage caterers, decorators, photographers and other vendors.
-        </div>
-      </div>
-    </div>
+    <BusinessRecordWorkspace
+      title="Vendors"
+      subtitle="Manage caterers, decorators, photographers, and outsourced execution partners."
+      accent={eventsAccent}
+      category="event_vendor"
+      emptyState="No vendors yet. Add the first partner to your event network."
+      fields={[
+        { key: "vendor", label: "Vendor", placeholder: "Pearl Catering", required: true },
+        { key: "service", label: "Service", placeholder: "Catering / Decor / Photography", required: true },
+        { key: "contact", label: "Contact", placeholder: "+92 300 1234567", required: true },
+        { key: "city", label: "City", placeholder: "Lahore", required: true },
+        { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+      ]}
+      defaultValues={{ status: "active" }}
+      columns={[
+        { key: "vendor", label: "Vendor" },
+        { key: "service", label: "Service" },
+        { key: "contact", label: "Contact" },
+        { key: "city", label: "City" },
+        { key: "status", label: "Status" },
+      ]}
+      statusOptions={statusOptions}
+      mapRecord={mapEventVendor}
+      buildCreatePayload={(form) => ({
+        title: form.vendor,
+        status: form.status,
+        data: {
+          service: form.service,
+          contact: form.contact,
+          city: form.city,
+        },
+      })}
+      summarize={(rows) => [
+        { label: "Vendors", value: rows.length, color: "#fb7185" },
+        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "#34d399" },
+        { label: "Standby", value: rows.filter((row) => String(row.status) === "standby").length, color: "#fbbf24" },
+        { label: "Blocked", value: rows.filter((row) => String(row.status) === "blocked").length, color: "#f87171" },
+      ]}
+    />
   );
 }

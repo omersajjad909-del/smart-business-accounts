@@ -1,24 +1,56 @@
-export default function Page() {
+"use client";
+
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { eventsAccent, mapEventBudget } from "../_shared";
+
+const statusOptions = ["planned", "approved", "spent"];
+
+export default function EventBudgetPage() {
   return (
-    <div style={{ padding: "32px 24px", color: "var(--text-primary)", fontFamily: "inherit" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 10 }}>
-          <span>💰</span> Event Budget
-        </h1>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: 0 }}>Set and track budget vs actual cost for each event.</p>
-      </div>
-      <div style={{
-        padding: "48px 32px", borderRadius: 16,
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        textAlign: "center",
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>💰</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 8 }}>Event Budget</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", maxWidth: 400, margin: "0 auto" }}>
-          Set and track budget vs actual cost for each event.
-        </div>
-      </div>
-    </div>
+    <BusinessRecordWorkspace
+      title="Event Budget"
+      subtitle="Control planned spend, owners, and budget approvals for each live event."
+      accent={eventsAccent}
+      category="event_budget"
+      emptyState="No event budgets yet. Add a budget line for the next event."
+      fields={[
+        { key: "event", label: "Event", placeholder: "Corporate launch night", required: true },
+        { key: "category", label: "Category", placeholder: "Decor / Venue / Sound", required: true },
+        { key: "owner", label: "Owner", placeholder: "Areeba Khan", required: true },
+        { key: "dueDate", label: "Due Date", type: "date", required: true },
+        { key: "amount", label: "Budget Amount", type: "number", placeholder: "125000", required: true },
+        { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+      ]}
+      defaultValues={{ status: "planned" }}
+      columns={[
+        { key: "event", label: "Event" },
+        { key: "category", label: "Category" },
+        { key: "owner", label: "Owner" },
+        { key: "dueDate", label: "Due Date" },
+        { key: "amount", label: "Amount" },
+        { key: "status", label: "Status" },
+      ]}
+      statusOptions={statusOptions}
+      mapRecord={mapEventBudget}
+      buildCreatePayload={(form) => ({
+        title: form.event,
+        status: form.status,
+        amount: Number(form.amount || 0),
+        date: form.dueDate,
+        data: {
+          category: form.category,
+          owner: form.owner,
+        },
+      })}
+      summarize={(rows) => {
+        const totalBudget = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+        return [
+          { label: "Budget Lines", value: rows.length, color: "#fb7185" },
+          { label: "Approved", value: rows.filter((row) => String(row.status) === "approved").length, color: "#34d399" },
+          { label: "Spent", value: rows.filter((row) => String(row.status) === "spent").length, color: "#60a5fa" },
+          { label: "Planned Value", value: totalBudget.toLocaleString(), color: "#fbbf24" },
+        ];
+      }}
+    />
   );
 }
