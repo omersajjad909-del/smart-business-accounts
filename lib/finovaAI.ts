@@ -1004,7 +1004,24 @@ export async function openAITextResponse(
 }
 
 function localAIReply(message: string, ctx: FinancialContext | null): string {
-  const q = message.toLowerCase();
+  const q = message.toLowerCase().trim();
+
+  // ── Greeting ───────────────────────────────────────────────────────────────
+  if (/^(hi|hello|hey|salam|assalam|assalamualaikum|adaab|helo|good morning|good afternoon|good evening|howdy|greetings|hii|helo|helloo|namaste)[\s!?.]*$/.test(q)) {
+    const name = ctx?.company.name ? ` for ${ctx.company.name}` : "";
+    return [
+      `👋 Assalam o Alaikum! I am FinovaOS AI — your financial intelligence assistant${name}.`,
+      ``,
+      `Ask me anything about your business:`,
+      `• "What is my profit this month?"`,
+      `• "Show my top expenses"`,
+      `• "Any overdue invoices?"`,
+      `• "Cash flow forecast"`,
+      `• "Business recommendations"`,
+      ``,
+      `Just type your question and I will answer with real data from your books! 📊`,
+    ].join("\n");
+  }
 
   // ── No company context ─────────────────────────────────────────────────────
   if (!ctx) {
