@@ -251,7 +251,7 @@ export default function Hero() {
                   </span>
                 </div>
                 <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>
-                <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>No credit card required</span>
+                <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>14-day money-back guarantee</span>
                 <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>
                 <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>Cancel anytime</span>
               </div>
