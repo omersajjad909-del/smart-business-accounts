@@ -54,7 +54,7 @@ async function askBot(conversationId: string, userMessage: string): Promise<stri
     body: JSON.stringify({ conversationId, message: userMessage }),
   });
   const data = await res.json();
-  return data.reply || "Sorry, I couldn't process that. Let me connect you with a human agent.";
+  return data.reply || "Thoda masla aa gaya — kripya dobara poochein ya **'human agent'** type karein hamare team se baat karne ke liye. 👤";
 }
 
 /* ─── Main Widget ─────────────────────────────────────────────────────────── */
