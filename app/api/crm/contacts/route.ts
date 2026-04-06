@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
 async function ensureContactScopedUniqueIndexes() {
   await prisma.$executeRawUnsafe(`DROP INDEX IF EXISTS "Contact_email_key"`);
@@ -21,6 +21,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
+    const branchId = await resolveBranchId(req, companyId);
+
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
     const company = searchParams.get("company");
@@ -33,6 +35,7 @@ export async function GET(req: NextRequest) {
     const contacts = await prisma.contact.findMany({
       where: {
         companyId,
+        ...(branchId ? { branchId } : {}),
         ...(type && { type }),
         ...(company && { companyName: { contains: company, mode: "insensitive" } }),
         ...(isActive !== undefined && { isActive }),
@@ -62,6 +65,8 @@ export async function POST(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+
+    const branchId = await resolveBranchId(req, companyId);
 
     const body = await req.json();
     const { name, email, phone, company, position, type } = body;
@@ -94,6 +99,7 @@ export async function POST(req: NextRequest) {
     const contact = await prisma.contact.create({
       data: {
         companyId,
+        ...(branchId ? { branchId } : {}),
         name,
         email: normalizedEmail,
         phone,

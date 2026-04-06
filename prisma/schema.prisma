@@ -934,6 +934,7 @@ model Branch {
   quotations        Quotation[]
   deliveryChallans  DeliveryChallan[]
   goodsReceiptNotes GoodsReceiptNote[]
+  contacts          Contact[]
 
   @@unique([companyId, code])
   @@index([companyId, isActive])
@@ -1172,6 +1173,8 @@ model Contact {
   id        String  @id @default(uuid())
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
 
   name        String
   email       String?
@@ -1194,6 +1197,7 @@ model Contact {
 
   @@index([type, isActive])
   @@index([email, phone])
+  @@index([branchId])
   @@unique([companyId, email])
 }
 
