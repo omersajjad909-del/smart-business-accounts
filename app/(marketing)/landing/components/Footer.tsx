@@ -322,11 +322,7 @@ export default function Footer() {
 
           {/* Right: Global notice */}
           <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
-            </svg>
+            <span style={{ fontSize:16, lineHeight:1 }}>🌍</span>
             <span style={{ fontSize:11.5, color:"rgba(255,255,255,.22)", fontWeight:600 }}>Global service</span>
           </div>
         </div>
