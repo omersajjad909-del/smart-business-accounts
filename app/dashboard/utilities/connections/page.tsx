@@ -1,31 +1,49 @@
 "use client";
 
-import { BusinessVerticalShell } from "../../_components/BusinessVerticalShell";
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { mapUtilityConnection, utilityAccent } from "../_shared";
+
+const statusOptions = ["pending", "active", "suspended"];
 
 export default function UtilityConnectionsPage() {
   return (
-    <BusinessVerticalShell
+    <BusinessRecordWorkspace
       title="Connections"
-      subtitle="Utility customer base, new activations, and service-account visibility."
-      mode="overview"
-      accent="#38bdf8"
-      links={[
-        { label: "Overview", href: "/dashboard/utilities" },
-        { label: "Utility Billing", href: "/dashboard/utilities/billing" },
-        { label: "Meter Readings", href: "/dashboard/utilities/meters" },
-        { label: "Analytics", href: "/dashboard/utilities/analytics" },
+      subtitle="Manage customer accounts, tariff classes, and activation status for utility operations."
+      accent={utilityAccent}
+      category="utility_connection"
+      emptyState="No utility connections yet. Add the first service account."
+      fields={[
+        { key: "account", label: "Account No", placeholder: "UT-000124", required: true },
+        { key: "customer", label: "Customer", placeholder: "Blue Town Residency", required: true },
+        { key: "area", label: "Area", placeholder: "Sector B / Zone 4", required: true },
+        { key: "tariff", label: "Tariff", placeholder: "Commercial / Domestic", required: true },
+        { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
       ]}
-      highlights={[
-        { title: "Active Accounts", description: "Keep a visible base of active and pending service connections." },
-        { title: "New Activations", description: "Track newly added service relationships entering the billing cycle." },
-        { title: "Coverage Map", description: "Understand the operating footprint and service-account spread." },
-        { title: "Operational Readiness", description: "Ensure account setup is complete before billing and field follow-up." },
+      defaultValues={{ status: "pending" }}
+      columns={[
+        { key: "account", label: "Account" },
+        { key: "customer", label: "Customer" },
+        { key: "area", label: "Area" },
+        { key: "tariff", label: "Tariff" },
+        { key: "status", label: "Status" },
       ]}
-      workflow={[
-        "Connection setup creates a service relationship and customer account.",
-        "Field readiness and account readiness are checked before activation.",
-        "Active connections then move into billing and service support cycles.",
-        "Any weak onboarding becomes visible before it becomes a revenue leak.",
+      statusOptions={statusOptions}
+      mapRecord={mapUtilityConnection}
+      buildCreatePayload={(form) => ({
+        title: form.account,
+        status: form.status,
+        data: {
+          customer: form.customer,
+          area: form.area,
+          tariff: form.tariff,
+        },
+      })}
+      summarize={(rows) => [
+        { label: "Accounts", value: rows.length, color: "#38bdf8" },
+        { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "#34d399" },
+        { label: "Pending", value: rows.filter((row) => String(row.status) === "pending").length, color: "#fbbf24" },
+        { label: "Suspended", value: rows.filter((row) => String(row.status) === "suspended").length, color: "#f87171" },
       ]}
     />
   );

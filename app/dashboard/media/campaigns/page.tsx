@@ -1,24 +1,56 @@
-export default function Page() {
+"use client";
+
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { mapMediaCampaign, mediaAccent } from "../_shared";
+
+const statusOptions = ["planning", "active", "completed"];
+
+export default function MediaCampaignsPage() {
   return (
-    <div style={{ padding: "32px 24px", color: "var(--text-primary)", fontFamily: "inherit" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 10 }}>
-          <span>📢</span> Campaigns
-        </h1>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: 0 }}>Track advertising campaigns, clients, budgets, and deliverables.</p>
-      </div>
-      <div style={{
-        padding: "48px 32px", borderRadius: 16,
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        textAlign: "center",
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📢</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 8 }}>Campaigns</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", maxWidth: 400, margin: "0 auto" }}>
-          Track advertising campaigns, clients, budgets, and deliverables.
-        </div>
-      </div>
-    </div>
+    <BusinessRecordWorkspace
+      title="Campaigns"
+      subtitle="Track campaign delivery, channel mix, and budget visibility across client work."
+      accent={mediaAccent}
+      category="media_campaign"
+      emptyState="No campaigns yet. Create the first campaign brief."
+      fields={[
+        { key: "campaign", label: "Campaign", placeholder: "Summer launch burst", required: true },
+        { key: "client", label: "Client", placeholder: "Northwind Beverages", required: true },
+        { key: "channel", label: "Channel", placeholder: "Digital / TV / Outdoor", required: true },
+        { key: "budget", label: "Budget", type: "number", placeholder: "350000", required: true },
+        { key: "dueDate", label: "Due Date", type: "date", required: true },
+        { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+      ]}
+      defaultValues={{ status: "planning" }}
+      columns={[
+        { key: "campaign", label: "Campaign" },
+        { key: "client", label: "Client" },
+        { key: "channel", label: "Channel" },
+        { key: "dueDate", label: "Due Date" },
+        { key: "budget", label: "Budget" },
+        { key: "status", label: "Status" },
+      ]}
+      statusOptions={statusOptions}
+      mapRecord={mapMediaCampaign}
+      buildCreatePayload={(form) => ({
+        title: form.campaign,
+        status: form.status,
+        amount: Number(form.budget || 0),
+        date: form.dueDate,
+        data: {
+          client: form.client,
+          channel: form.channel,
+        },
+      })}
+      summarize={(rows) => {
+        const budget = rows.reduce((sum, row) => sum + Number(row.budget || 0), 0);
+        return [
+          { label: "Campaigns", value: rows.length, color: "#a78bfa" },
+          { label: "Active", value: rows.filter((row) => String(row.status) === "active").length, color: "#60a5fa" },
+          { label: "Completed", value: rows.filter((row) => String(row.status) === "completed").length, color: "#34d399" },
+          { label: "Budget", value: budget.toLocaleString(), color: "#fbbf24" },
+        ];
+      }}
+    />
   );
 }
