@@ -25,7 +25,7 @@ export default function ItemsNewPage() {
   const [description, setDescription] = useState("");
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const _UNITS = ["PCS", "KG", "GM", "LTR", "ML", "MTR", "FT", "BOX", "PACK"];
+  const _UNITS = ["PCS","KG","GM","TON","QTL","MND","LTR","ML","BTL","DRM","MTR","CM","FT","YD","IN","SFT","SQM","BOX","PACK","CTN","BAG","ROLL","SHEET","BDL","DOZ","PAIR","SET","UNIT","NO"];
 
 
   async function loadItems() {
@@ -164,15 +164,43 @@ export default function ItemsNewPage() {
   onChange={(e) => setUnit(e.target.value)}
 >
   <option value="">Select Unit</option>
-  <option value="PCS">Pieces</option>
-  <option value="KG">Kilogram</option>
-  <option value="GM">Gram</option>
-  <option value="LTR">Liter</option>
-  <option value="ML">Milliliter</option>
-  <option value="MTR">Meter</option>
-  <option value="FT">Feet</option>
-  <option value="BOX">Box</option>
-  <option value="PACK">Pack</option>
+  <optgroup label="Weight">
+    <option value="KG">Kilogram (KG)</option>
+    <option value="GM">Gram (GM)</option>
+    <option value="TON">Ton / Tonne</option>
+    <option value="QTL">Quintal (100 KG)</option>
+    <option value="MND">Mound / Mann (40 KG)</option>
+  </optgroup>
+  <optgroup label="Volume / Liquid">
+    <option value="LTR">Liter</option>
+    <option value="ML">Milliliter</option>
+    <option value="BTL">Bottle</option>
+    <option value="DRM">Drum</option>
+  </optgroup>
+  <optgroup label="Length / Area">
+    <option value="MTR">Meter</option>
+    <option value="CM">Centimeter</option>
+    <option value="FT">Feet</option>
+    <option value="IN">Inch</option>
+    <option value="YD">Yard</option>
+    <option value="SFT">Square Feet</option>
+    <option value="SQM">Square Meter</option>
+  </optgroup>
+  <optgroup label="Counting / Packing">
+    <option value="PCS">Pieces</option>
+    <option value="DOZ">Dozen (12 pcs)</option>
+    <option value="PAIR">Pair</option>
+    <option value="SET">Set</option>
+    <option value="BOX">Box</option>
+    <option value="PACK">Pack</option>
+    <option value="CTN">Carton</option>
+    <option value="BAG">Bag</option>
+    <option value="ROLL">Roll</option>
+    <option value="SHEET">Sheet</option>
+    <option value="BDL">Bundle</option>
+    <option value="NO">Number (No.)</option>
+    <option value="UNIT">Unit</option>
+  </optgroup>
 </select>
 
 
