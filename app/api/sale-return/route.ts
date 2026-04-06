@@ -121,7 +121,6 @@ export async function POST(req: NextRequest) {
       customerId,
       invoiceId: invoiceId || null,
       companyId,
-      branchId,
       total,
       items: {
         create: items.map((i: any) => ({
