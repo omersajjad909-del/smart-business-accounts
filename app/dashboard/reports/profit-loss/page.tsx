@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -96,12 +97,12 @@ export default function ProfitLossPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Email sent successfully");
+        toast.success("Email sent successfully");
       } else {
-        alert(data.error || "Failed to send email");
+        toast.error(data.error || "Failed to send email");
       }
     } catch {
-      alert("Error sending email");
+      toast.error("Error sending email");
     } finally {
       setSendingEmail(false);
     }

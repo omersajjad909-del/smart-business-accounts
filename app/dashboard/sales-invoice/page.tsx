@@ -488,13 +488,13 @@ function SalesInvoiceContent() {
 
   async function sendInvoiceEmail() {
     if (!savedInvoice || !savedInvoice.id) {
-      alert("Please save the invoice first");
+      toast.error("Please save the invoice first");
       return;
     }
 
     const customerEmail = prompt("Enter customer email address:");
     if (!customerEmail || !customerEmail.includes("@")) {
-      alert("Please enter a valid email address");
+      toast.error("Please enter a valid email address");
       return;
     }
 
@@ -516,12 +516,12 @@ function SalesInvoiceContent() {
 
       const data = await res.json();
       if (res.ok) {
-        alert("✅ Email sent successfully!");
+        toast.success("✅ Email sent successfully!");
       } else {
-        alert(`❌ Failed to send email: ${data.error || "Unknown error"}`);
+        toast.error(`❌ Failed to send email: ${data.error || "Unknown error"}`);
       }
     } catch (_error) {
-      alert("❌ Failed to send email. Please check email configuration.");
+      toast.error("❌ Failed to send email. Please check email configuration.");
     } finally {
       setSendingEmail(false);
     }

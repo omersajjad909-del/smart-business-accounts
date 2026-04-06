@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 
@@ -16,7 +17,7 @@ export default function AddUserPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    alert("User created");
+    toast.success("User created");
   }
 
   return (

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -184,7 +185,7 @@ export default function PayrollPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!user) return alert("Login required");
+    if (!user) return toast.error("Login required");
     setLoading(true);
     await fetch(editingId ? `/api/payroll?id=${editingId}` : "/api/payroll", {
       method: editingId ? "PUT" : "POST",
@@ -235,7 +236,7 @@ export default function PayrollPage() {
 
   function handlePrintPayslip(p: Payroll) {
     const printWindow = window.open("", "_blank");
-    if (!printWindow) return alert("Please allow popups");
+    if (!printWindow) return toast.error("Please allow popups");
 
     const html = `
       <html>

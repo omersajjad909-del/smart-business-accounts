@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -80,7 +81,7 @@ export default function UsersPage() {
   }, [currentUser, reload]);
 
   async function save() {
-    if (!form.name || !form.email) return alert("Please fill required fields");
+    if (!form.name || !form.email) return toast.error("Please fill required fields");
     setSaveError(null);
 
     const res = await fetch("/api/users", {
@@ -100,7 +101,7 @@ export default function UsersPage() {
   }
 
   async function sendInvite() {
-    if (!inviteEmail.trim()) return alert("Please enter an email");
+    if (!inviteEmail.trim()) return toast.error("Please enter an email");
     setInviting(true);
     setInviteMsg(null);
     setInviteLink(null);

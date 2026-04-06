@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -52,7 +53,7 @@ export default function ItemsNewPage() {
 
   async function saveItem() {
     if (!name || !unit) {
-      alert("Item name aur unit zaroori hai");
+      toast("Item name aur unit zaroori hai");
       return;
     }
 
@@ -93,9 +94,9 @@ export default function ItemsNewPage() {
       setEditingId(null);
 
       await loadItems();
-      alert(editingId ? "Item updated successfully" : "Item saved successfully");
+      toast.success(editingId ? "Item updated successfully" : "Item saved successfully");
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message);
     } finally {
       setSaving(false);
     }
@@ -139,9 +140,9 @@ export default function ItemsNewPage() {
       }
 
       await loadItems();
-      alert("Item deleted successfully");
+      toast.success("Item deleted successfully");
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message);
     }
   }
 

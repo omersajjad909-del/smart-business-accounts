@@ -195,18 +195,18 @@ export default function CPVPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(`Error: ${data?.error || "Save failed"}`);
+        toast.error(`Error: ${data?.error || "Save failed"}`);
         return;
       }
 
       setVoucher(data);
-      alert(editing ? "CPV updated successfully!" : "CPV saved successfully!");
+      toast.success(editing ? "CPV updated successfully!" : "CPV saved successfully!");
       await loadVouchers();
       resetForm();
       setShowForm(false);
       setEditing(null);
     } catch (e: any) {
-      alert(`Error: ${e.message || "Failed to save"}`);
+      toast.error(`Error: ${e.message || "Failed to save"}`);
     } finally {
       setSaving(false);
     }
@@ -247,14 +247,14 @@ export default function CPVPage() {
       });
 
       if (res.ok) {
-        alert("CPV deleted successfully!");
+        toast.success("CPV deleted successfully!");
         await loadVouchers();
       } else {
         const data = await res.json();
-        alert(data.error || "Delete failed");
+        toast.error(data.error || "Delete failed");
       }
     } catch (_e) {
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   }
 

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -120,11 +121,11 @@ export default function DebitNotePage() {
         fetchDebitNotes();
       } else {
         const errorData = await response.json();
-        alert(`Error: ${errorData.error || 'Failed to create debit note'}`);
+        toast.error(`Error: ${errorData.error || 'Failed to create debit note'}`);
       }
     } catch (error) {
       console.error('Error creating debit note:', error);
-      alert('An unexpected error occurred');
+      toast.error('An unexpected error occurred');
     }
   };
 

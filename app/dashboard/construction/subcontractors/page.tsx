@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -70,7 +71,7 @@ export default function SubcontractorsPage() {
     const row = subs.find((sub) => sub.id === id);
     if (!row) return;
     if (row.paid < row.contractValue) {
-      window.alert("Close the contract only after clearing subcontractor dues.");
+      toast.error("Close the contract only after clearing subcontractor dues.");
       return;
     }
     await update(id, { status: "closed" });

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -114,8 +115,8 @@ export default function ChartOfAccounts() {
 
   async function saveAccount() {
     const user = getCurrentUser();
-    if (!user) return alert("Session expired");
-    if (!form.code || !form.name) return alert("Code aur name zaroori hai");
+    if (!user) { toast.error("Session expired"); return; }
+    if (!form.code || !form.name) { toast.error("Code aur name zaroori hai"); return; }
 
     const method = editingId ? "PUT" : "POST";
     const payload = editingId ? { ...form, id: editingId } : form;
@@ -133,16 +134,16 @@ export default function ChartOfAccounts() {
     if (res.ok) {
       resetForm();
       loadAccounts();
-      alert(editingId ? "Account updated!" : "Account saved!");
+      toast.success(editingId ? "Account updated!" : "Account saved!");
     } else {
-      alert("Failed to save account");
+      toast.error("Failed to save account");
     }
   }
 
   async function importAccounts() {
     const user = getCurrentUser();
-    if (!user) return alert("Session expired");
-    if (!importCsv.trim()) return alert("Paste CSV first");
+    if (!user) { toast.error("Session expired"); return; }
+    if (!importCsv.trim()) { toast.error("Paste CSV first"); return; }
 
     const res = await fetch("/api/accounts/import", {
       method: "POST",
@@ -157,33 +158,30 @@ export default function ChartOfAccounts() {
 
     const data = await res.json();
     if (res.ok) {
-      alert(`Imported: ${data.created}, Skipped: ${data.skipped}`);
+      toast.success(`Imported: ${data.created}, Skipped: ${data.skipped}`);
       setImportCsv("");
       setShowImport(false);
       loadAccounts();
     } else {
-      alert(data.error || "Import failed");
+      toast.error(data.error || "Import failed");
     }
   }
 
   async function deleteAccount(id: string) {
     if (!confirm("Are you sure?")) return;
     const user = getCurrentUser();
-    if (!user) {
-  alert("User not logged in");
-  return;
-}
+    if (!user) { toast.error("User not logged in"); return; }
 
-const res = await fetch(`/api/accounts?id=${id}`, {
-  method: "DELETE",
-  headers: { 
-    "x-user-role": user.role,
-    "x-company-id": user.companyId
-  },
-});
+    const res = await fetch(`/api/accounts?id=${id}`, {
+      method: "DELETE",
+      headers: {
+        "x-user-role": user.role,
+        "x-company-id": user.companyId
+      },
+    });
 
     if (res.ok) loadAccounts();
-    else alert("Failed to delete");
+    else toast.error("Failed to delete");
   }
 
   function handleEdit(a: Account) {
@@ -243,9 +241,10 @@ const res = await fetch(`/api/accounts?id=${id}`, {
                   },
                 });
                 const data = await res.json();
-                alert(data.added > 0 ? `✅ ${data.added} default accounts add ho gaye!` : "✅ Sare default accounts already exist hain.");
+                if (data.added > 0) toast.success(`${data.added} default accounts add ho gaye!`);
+                else toast("Sare default accounts already exist hain.");
                 loadAccounts();
-              } catch { alert("Error — dobara try karo."); }
+              } catch { toast.error("Error — dobara try karo."); }
               finally { setSeeding(false); }
             }}
             disabled={seeding}

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -45,13 +46,13 @@ export default function IspBillingPage() {
 
   const generateBill = async () => {
     const connection = connections.find((item) => item.id === connectionId);
-    if (!connection) return alert("Connection select karein.");
+    if (!connection) return toast.error("Connection select karein.");
     if (bills.some((item) => item.connectionId === connection.id && item.status !== "paid" && item.status !== "waived")) {
-      return alert("Is connection ka open bill already maujood hai.");
+      return toast.error("Is connection ka open bill already maujood hai.");
     }
     const pack = packages.find((item) => item.id === connection.packageId);
     const amount = Number(pack?.price || 0);
-    if (amount <= 0) return alert("Assigned package price valid nahi hai.");
+    if (amount <= 0) return toast.success("Assigned package price valid nahi hai.");
     await create({
       title: connection.customer,
       status: "generated",

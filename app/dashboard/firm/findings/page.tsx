@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -77,11 +78,11 @@ export default function AuditFindingsPage() {
     const issue = form.issue.trim();
     const duplicateFinding = findings.some((f) => f.engagement.toLowerCase() === engagement.toLowerCase() && f.area.toLowerCase() === area.toLowerCase() && f.issue.toLowerCase() === issue.toLowerCase() && f.status !== "Cleared");
     if (!engagement || !area || !issue) {
-      alert("Engagement, area, aur issue detail required hain.");
+      toast.error("Engagement, area, aur issue detail required hain.");
       return;
     }
     if (duplicateFinding) {
-      alert("Yeh finding already open hai.");
+      toast.error("Yeh finding already open hai.");
       return;
     }
     setSaving(true);

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useState, useEffect } from "react";
@@ -90,7 +91,7 @@ export default function InteractionsPage() {
         resetForm();
       } else {
         const error = await response.json();
-        alert(error.error);
+        toast.error(error.error);
       }
     } catch (error) {
       console.error("Error saving interaction:", error);

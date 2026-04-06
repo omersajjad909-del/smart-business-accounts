@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -31,7 +32,7 @@ export default function WorkOrdersPage() {
     if (linkedProductionOrderId) {
       const production = productionOrders.find((item) => item.orderId === linkedProductionOrderId);
       if (!production || production.status !== "in_progress") {
-        alert("Start the linked production order before starting this work order.");
+        toast("Start the linked production order before starting this work order.");
         return;
       }
     }
@@ -42,7 +43,7 @@ export default function WorkOrdersPage() {
     if (linkedProductionOrderId) {
       const production = productionOrders.find((item) => item.orderId === linkedProductionOrderId);
       if (!production || (production.status !== "in_progress" && production.status !== "completed")) {
-        alert("Linked production order is not ready for work-order completion.");
+        toast("Linked production order is not ready for work-order completion.");
         return;
       }
     }

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -35,7 +36,7 @@ export default function StockLedgerPage() {
 
   async function loadLedger() {
     if (!itemId) {
-      alert("Please select an item first");
+      toast.error("Please select an item first");
       return;
     }
     setLoading(true);

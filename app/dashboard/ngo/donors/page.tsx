@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -43,11 +44,11 @@ export default function DonorsPage() {
   const addDonor = async () => {
     const name = form.name.trim();
     if (!name) {
-      alert("Donor name required hai.");
+      toast.error("Donor name required hai.");
       return;
     }
     if (donors.some(d => d.name.trim().toLowerCase() === name.toLowerCase() || (form.email && d.email.trim().toLowerCase() === form.email.trim().toLowerCase()))) {
-      alert("Is donor ka record already maujood hai.");
+      toast.error("Is donor ka record already maujood hai.");
       return;
     }
     await create({ title: form.name, status: "active", data: { donorId: form.donorId || `DON-${String(records.length + 1).padStart(3, '0')}`, phone: form.phone, email: form.email, type: form.type, totalDonated: 0, lastDonation: 0, frequency: form.frequency, category: form.category } });

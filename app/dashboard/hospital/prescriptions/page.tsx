@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -76,7 +77,7 @@ export default function PrescriptionsPage() {
     const prescription = prescriptions.find((row) => row.id === id);
     if (!prescription) return;
     if (prescription.status !== "active") {
-      alert("Only active prescriptions can be updated.");
+      toast.success("Only active prescriptions can be updated.");
       return;
     }
     if (!window.confirm(`Mark prescription ${prescription.rxNo} as ${nextStatus}?`)) return;

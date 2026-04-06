@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -30,11 +31,11 @@ export default function HarvestPage() {
     const crop = form.crop.trim();
     const field = form.field.trim();
     if (!crop || !field || !form.date || form.quantity <= 0 || form.salePrice <= 0) {
-      alert("Crop, field, date, quantity, aur sale price required hain.");
+      toast.error("Crop, field, date, quantity, aur sale price required hain.");
       return;
     }
     if (harvests.some(h => h.crop.trim().toLowerCase() === crop.toLowerCase() && h.field.trim().toLowerCase() === field.toLowerCase() && h.date === form.date)) {
-      alert("Is crop aur field ka harvest is date par already recorded hai.");
+      toast.error("Is crop aur field ka harvest is date par already recorded hai.");
       return;
     }
     await create({ title: form.crop, status: "sold", amount: form.salePrice, date: form.date, data: { field: form.field, quantity: form.quantity, unit: form.unit, buyer: form.buyer } });

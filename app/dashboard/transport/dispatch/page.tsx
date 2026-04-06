@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -167,7 +168,7 @@ export default function TransportDispatchPage() {
     if (!row) return;
     if (row.status === "closed" || row.status === "cancelled") return;
     if (nextStatus === "closed" && row.status !== "arrived") {
-      alert("Only arrived dispatches can be closed.");
+      toast.error("Only arrived dispatches can be closed.");
       return;
     }
     await dispatchStore.update(id, { status: nextStatus });
@@ -177,7 +178,7 @@ export default function TransportDispatchPage() {
     const row = dispatches.find((entry) => entry.id === id);
     if (!row) return;
     if (row.status === "dispatched" || row.status === "arrived" || row.status === "closed") {
-      alert("Dispatched, arrived, or closed rows cannot be deleted.");
+      toast.success("Dispatched, arrived, or closed rows cannot be deleted.");
       return;
     }
     if (!window.confirm(`Delete dispatch ${row.dispatchNo}?`)) return;

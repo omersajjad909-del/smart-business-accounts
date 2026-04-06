@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -78,11 +79,11 @@ export default function CompaniesPage() {
         window.location.reload(); 
       } else {
         const err = await res.json();
-        alert("Error: " + (err.error || "Failed to create company"));
+        toast.error("Error: " + (err.error || "Failed to create company"));
       }
     } catch (error) {
       console.error("Error creating company", error);
-      alert("Failed to create company");
+      toast.error("Failed to create company");
     } finally {
       setLoading(false);
     }

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -196,11 +197,11 @@ export default function LoansPage() {
         }
       } else {
         const errorData = await response.json();
-        alert(`Error: ${errorData.error || 'Failed to record payment'}`);
+        toast.error(`Error: ${errorData.error || 'Failed to record payment'}`);
       }
     } catch (error) {
       console.error('Error creating payment:', error);
-      alert('An unexpected error occurred');
+      toast.error('An unexpected error occurred');
     }
   };
 

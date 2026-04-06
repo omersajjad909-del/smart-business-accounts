@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -45,11 +46,11 @@ export default function DealsPage() {
     const customer = form.customer.trim();
     const vehicle = vehicles.find((item) => item.id === form.vehicleId);
     const amount = Number(form.amount);
-    if (!customer) return alert("Customer required hai.");
-    if (!vehicle) return alert("Vehicle select karein.");
-    if (amount <= 0) return alert("Deal amount valid honi chahiye.");
+    if (!customer) return toast.error("Customer required hai.");
+    if (!vehicle) return toast.error("Vehicle select karein.");
+    if (amount <= 0) return toast("Deal amount valid honi chahiye.");
     if (deals.some((item) => item.customer.trim().toLowerCase() === customer.toLowerCase() && item.vehicleId === vehicle.id && item.status !== "lost")) {
-      return alert("Is customer ka same vehicle ke liye active deal already hai.");
+      return toast.error("Is customer ka same vehicle ke liye active deal already hai.");
     }
     await create({
       title: customer,

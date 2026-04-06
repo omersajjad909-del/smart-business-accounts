@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -26,7 +27,7 @@ export default function LivestockPage() {
 
   async function save() {
     if (!form.type || !form.breed.trim() || form.count <= 0) {
-      alert("Animal type, breed, aur valid count required hain.");
+      toast.error("Animal type, breed, aur valid count required hain.");
       return;
     }
     await create({ title: form.type, status: "healthy", date: form.dob, data: { breed: form.breed, count: form.count, weight: form.weight, notes: form.notes } });

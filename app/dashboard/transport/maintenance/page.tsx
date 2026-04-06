@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -125,7 +126,7 @@ export default function TransportMaintenancePage() {
     const row = jobs.find((entry) => entry.id === id);
     if (!row) return;
     if (nextStatus === "completed" && !row.completionDate) {
-      alert("Edit the job and add a completion date before marking it complete.");
+      toast("Edit the job and add a completion date before marking it complete.");
       return;
     }
     await maintenanceStore.update(id, { status: nextStatus });
@@ -135,7 +136,7 @@ export default function TransportMaintenancePage() {
     const row = jobs.find((entry) => entry.id === id);
     if (!row) return;
     if (row.status === "completed") {
-      alert("Completed maintenance jobs should stay in the service history.");
+      toast.success("Completed maintenance jobs should stay in the service history.");
       return;
     }
     if (!window.confirm(`Delete maintenance job ${row.jobNo}?`)) return;

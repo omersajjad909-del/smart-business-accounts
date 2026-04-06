@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -82,7 +83,7 @@ export default function ProductionOrdersPage() {
   async function completeOrder(order: ReturnType<typeof mapProductionOrderRecord>) {
     const linkedWorkOrders = workOrders.filter((item) => item.linkedProductionOrderId === order.orderId);
     if (linkedWorkOrders.some((item) => item.status !== "completed")) {
-      alert("Complete linked work orders before finishing this production order.");
+      toast("Complete linked work orders before finishing this production order.");
       return;
     }
     await orderStore.update(order.id, {

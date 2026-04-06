@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -129,7 +130,7 @@ export default function DistributionCollectionsPage() {
 
   function editCollection(row: (typeof collections)[number]) {
     if (row.status === "reconciled") {
-      alert("Reconciled collections are locked to preserve ledger consistency.");
+      toast("Reconciled collections are locked to preserve ledger consistency.");
       return;
     }
     const route = routes.find((entry) => entry.name === row.routeName);
@@ -157,7 +158,7 @@ export default function DistributionCollectionsPage() {
 
   async function removeCollection(row: (typeof collections)[number]) {
     if (row.status === "reconciled") {
-      alert("Reconciled collections cannot be deleted.");
+      toast.success("Reconciled collections cannot be deleted.");
       return;
     }
     if (!window.confirm(`Delete collection for ${row.customerName}?`)) return;
@@ -212,7 +213,7 @@ export default function DistributionCollectionsPage() {
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        alert(data?.error || "Failed to post payment receipt");
+        toast.error(data?.error || "Failed to post payment receipt");
         return;
       }
       receiptNo = String(data?.receiptNo || "");

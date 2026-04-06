@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -75,7 +76,7 @@ export default function PatientsPage() {
     const hasLinkedPrescriptions = prescriptionStore.records.some(record => record.title === patientName && String(record.status || "") === "active");
     const hasLinkedLabs = labStore.records.some(record => record.title === patientName && String(record.status || "") !== "completed");
     if (hasLinkedAppointments || hasLinkedPrescriptions || hasLinkedLabs) {
-      alert("Resolve linked appointments, prescriptions, and lab tests before removing this patient.");
+      toast("Resolve linked appointments, prescriptions, and lab tests before removing this patient.");
       return;
     }
     if (!window.confirm(`Remove ${patientName}?`)) return;

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -59,7 +60,7 @@ export default function FinancialYearPage() {
 
   async function saveYear() {
     if (!formData.year || !formData.startDate || !formData.endDate) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
 
@@ -85,10 +86,10 @@ export default function FinancialYearPage() {
         });
       } else {
         const error = await res.json();
-        alert(error.error || "Save failed");
+        toast.error(error.error || "Save failed");
       }
     } catch (_e) {
-      alert("Save failed");
+      toast.error("Save failed");
     } finally {
       setLoading(false);
     }
@@ -114,7 +115,7 @@ export default function FinancialYearPage() {
         await loadYears();
       }
     } catch (_e) {
-      alert("Close failed");
+      toast.error("Close failed");
     }
   }
 

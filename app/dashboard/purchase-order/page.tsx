@@ -225,9 +225,9 @@ export default function PurchaseOrderPage() {
       }
       else {
         const err = await res.json();
-        alert(err.error || "Saving failed");
+        toast.error(err.error || "Saving failed");
       }
-    } catch (_err) { alert("Error saving PO"); }
+    } catch (_err) { toast.error("Error saving PO"); }
     finally { setSaving(false); }
   }
 
@@ -262,14 +262,14 @@ export default function PurchaseOrderPage() {
         },
       });
       if (res.ok) {
-        alert("PO deleted successfully");
+        toast.success("PO deleted successfully");
         await loadPOs();
       } else {
         const err = await res.json();
-        alert(err.error || "Delete failed");
+        toast.error(err.error || "Delete failed");
       }
     } catch (_e) {
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   }
 

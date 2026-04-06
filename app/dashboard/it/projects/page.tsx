@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -73,19 +74,19 @@ export default function ITProjectsPage() {
     const budget = Number(form.budget);
     const duplicateProject = projects.some(p => p.name.toLowerCase() === name.toLowerCase() && p.client.toLowerCase() === client.toLowerCase());
     if (!name || !client || !form.startDate || !form.deadline) {
-      alert('Project name, client, start date, aur deadline required hain.');
+      toast.error('Project name, client, start date, aur deadline required hain.');
       return;
     }
     if (teamSize <= 0 || budget <= 0 || techStack.length === 0) {
-      alert('Team size, budget, aur tech stack valid honi chahiye.');
+      toast('Team size, budget, aur tech stack valid honi chahiye.');
       return;
     }
     if (new Date(form.deadline) < new Date(form.startDate)) {
-      alert('Deadline start date se pehle nahi ho sakti.');
+      toast('Deadline start date se pehle nahi ho sakti.');
       return;
     }
     if (duplicateProject) {
-      alert('Yeh project is client ke liye pehle se maujood hai.');
+      toast('Yeh project is client ke liye pehle se maujood hai.');
       return;
     }
     await create({ title: form.name, status: form.status, date: form.startDate, amount: budget, data: { projectId: `PROJ-${String(records.length + 1).padStart(3, '0')}`, client: form.client, techStack, teamSize, startDate: form.startDate, deadline: form.deadline, progress: 0, budget, spent: 0 } });

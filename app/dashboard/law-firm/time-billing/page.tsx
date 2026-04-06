@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -74,15 +75,15 @@ export default function TimeBillingPage() {
     const billable = form.billable === 'Yes';
     const duplicateEntry = entries.some(e => e.lawyer === form.lawyer && e.caseId.toLowerCase() === caseId.toLowerCase() && e.task.toLowerCase() === task.toLowerCase() && e.date === new Date().toISOString().split('T')[0]);
     if (!caseId || !caseTitle || !task) {
-      alert('Case ID, case title, aur task required hain.');
+      toast.error('Case ID, case title, aur task required hain.');
       return;
     }
     if (hours <= 0 || rate <= 0) {
-      alert('Hours aur rate positive honay chahiye.');
+      toast('Hours aur rate positive honay chahiye.');
       return;
     }
     if (duplicateEntry) {
-      alert('Aaj ke din yeh time entry pehle se logged hai.');
+      toast('Aaj ke din yeh time entry pehle se logged hai.');
       return;
     }
     const today = new Date().toISOString().split('T')[0];

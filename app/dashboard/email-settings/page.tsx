@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -86,9 +87,9 @@ export default function EmailSettingsPage() {
         throw new Error("Failed to save email configuration");
       }
 
-      alert("Email configuration saved securely for this company.");
+      toast.success("Email configuration saved securely for this company.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Failed to save email configuration");
+      toast.error(error instanceof Error ? error.message : "Failed to save email configuration");
     } finally {
       setSaving(false);
     }

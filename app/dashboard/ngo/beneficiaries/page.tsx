@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -40,11 +41,11 @@ export default function BeneficiariesPage() {
   const addBeneficiary = async () => {
     const name = form.name.trim();
     if (!name || !form.cnic.trim() || !form.monthlyAid) {
-      alert("Beneficiary name, CNIC, aur monthly aid required hain.");
+      toast.error("Beneficiary name, CNIC, aur monthly aid required hain.");
       return;
     }
     if (beneficiaries.some(b => b.cnic.trim() === form.cnic.trim() || b.name.trim().toLowerCase() === name.toLowerCase())) {
-      alert("Is beneficiary ka record already maujood hai.");
+      toast.error("Is beneficiary ka record already maujood hai.");
       return;
     }
     await create({ title: form.name, status: "active", date: todayStr, amount: Number(form.monthlyAid), data: { benefId: form.benefId || `BNF-${String(records.length + 1).padStart(3, '0')}`, cnic: form.cnic, phone: form.phone, address: form.address, category: form.category, assistance: form.assistance.split(",").map(s=>s.trim()), monthlyAid: Number(form.monthlyAid), enrollDate: todayStr } });

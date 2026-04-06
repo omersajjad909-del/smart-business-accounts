@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -58,7 +59,7 @@ export default function HotelFoliosPage() {
     if (!row) return;
     const total = row.charges + row.serviceCharges + row.taxes;
     if (row.paid < total) {
-      window.alert("Folio can only close after full payment.");
+      toast.error("Folio can only close after full payment.");
       return;
     }
     await update(id, { status: "closed" });

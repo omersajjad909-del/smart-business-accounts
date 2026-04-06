@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -45,10 +46,10 @@ export default function TestDrivesPage() {
     const customer = form.customer.trim();
     const phone = form.phone.trim();
     const vehicle = vehicles.find((item) => item.id === form.vehicleId);
-    if (!customer || !phone) return alert("Customer aur phone required hain.");
-    if (!vehicle) return alert("Vehicle select karein.");
+    if (!customer || !phone) return toast.error("Customer aur phone required hain.");
+    if (!vehicle) return toast.error("Vehicle select karein.");
     if (drives.some((item) => item.phone === phone && item.vehicleId === vehicle.id && item.status !== "cancelled")) {
-      return alert("Is customer ka same vehicle ke liye active test drive already hai.");
+      return toast.error("Is customer ka same vehicle ke liye active test drive already hai.");
     }
     await create({
       title: customer,

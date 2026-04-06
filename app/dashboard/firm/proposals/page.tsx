@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -71,15 +72,15 @@ export default function ConsultancyProposalsPage() {
     const value = Number(form.value);
     const duplicateProposal = proposalNo && proposals.some((p) => p.proposalNo.trim().toLowerCase() === proposalNo.toLowerCase());
     if (!client || !proposalNo || !form.dueDate) {
-      alert("Client, proposal number, aur due date required hain.");
+      toast.error("Client, proposal number, aur due date required hain.");
       return;
     }
     if (value <= 0) {
-      alert("Proposal value positive honi chahiye.");
+      toast("Proposal value positive honi chahiye.");
       return;
     }
     if (duplicateProposal) {
-      alert("Yeh proposal number pehle se maujood hai.");
+      toast("Yeh proposal number pehle se maujood hai.");
       return;
     }
     setSaving(true);

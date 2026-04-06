@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -46,12 +47,12 @@ export default function SubscriptionPlansPage() {
     const price = Number(form.price);
     const trialDays = Number(form.trialDays);
     const seats = Number(form.seats);
-    if (!name) return alert("Plan name required hai.");
+    if (!name) return toast.error("Plan name required hai.");
     if (plans.some((plan) => plan.name.trim().toLowerCase() === name.toLowerCase() && plan.status !== "retired")) {
-      return alert("Is name ka plan already maujood hai.");
+      return toast.error("Is name ka plan already maujood hai.");
     }
-    if (price <= 0) return alert("Plan price zero se zyada honi chahiye.");
-    if (trialDays < 0 || seats <= 0) return alert("Trial days aur seat limit valid honi chahiye.");
+    if (price <= 0) return toast("Plan price zero se zyada honi chahiye.");
+    if (trialDays < 0 || seats <= 0) return toast("Trial days aur seat limit valid honi chahiye.");
     await create({
       title: name,
       status: "active",

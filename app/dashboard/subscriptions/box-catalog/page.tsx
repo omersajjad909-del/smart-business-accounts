@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -54,12 +55,12 @@ export default function SubscriptionBoxCatalogPage() {
     const plan = plans.find((item) => item.id === form.planId);
     const items = form.items.split(",").map((item) => item.trim()).filter(Boolean);
     const price = Number(form.price);
-    if (!title) return alert("Box name required hai.");
-    if (!plan) return alert("Active plan select karein.");
-    if (!items.length) return alert("Kam az kam aik curated item add karein.");
-    if (price <= 0) return alert("Box price valid honi chahiye.");
+    if (!title) return toast.error("Box name required hai.");
+    if (!plan) return toast.error("Active plan select karein.");
+    if (!items.length) return toast("Kam az kam aik curated item add karein.");
+    if (price <= 0) return toast("Box price valid honi chahiye.");
     if (boxes.some((item) => item.title.trim().toLowerCase() === title.toLowerCase() && item.status !== "archived")) {
-      return alert("Is naam ka box already maujood hai.");
+      return toast.error("Is naam ka box already maujood hai.");
     }
     await create({
       title,

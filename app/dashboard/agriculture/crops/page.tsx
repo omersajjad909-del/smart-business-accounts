@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -27,11 +28,11 @@ export default function CropsPage() {
     const name = form.name.trim();
     const field = form.field.trim();
     if (!name || !field || !form.plantDate) {
-      alert("Crop name, field, aur plant date required hain.");
+      toast.error("Crop name, field, aur plant date required hain.");
       return;
     }
     if (crops.some(c => c.name.trim().toLowerCase() === name.toLowerCase() && c.field.trim().toLowerCase() === field.toLowerCase() && c.status !== "harvested" && c.status !== "failed")) {
-      alert("Is field me ye crop cycle already active hai.");
+      toast.error("Is field me ye crop cycle already active hai.");
       return;
     }
     await create({ title: form.name, status: "planted", date: form.plantDate, data: { field: form.field, area: form.area, harvestDate: form.harvestDate, expectedYield: form.expectedYield } });

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -124,7 +125,7 @@ export default function DeliveryPage() {
 
   function editDelivery(delivery: (typeof deliveries)[number]) {
     if (delivery.status === "delivered") {
-      alert("Delivered orders are locked. Create a new delivery or mark a separate exception record.");
+      toast("Delivered orders are locked. Create a new delivery or mark a separate exception record.");
       return;
     }
     setEditingId(delivery.id);
@@ -232,15 +233,15 @@ export default function DeliveryPage() {
 
   async function moveDeliveryStatus(delivery: (typeof deliveries)[number], nextStatus: DeliveryStatus) {
     if (nextStatus === "dispatched" && (!delivery.driver.trim() || !delivery.vehicle.trim() || !delivery.routeId)) {
-      alert("Route, driver, and vehicle must be assigned before dispatch.");
+      toast.success("Route, driver, and vehicle must be assigned before dispatch.");
       return;
     }
     if (nextStatus === "delivered" && delivery.status !== "dispatched") {
-      alert("Only dispatched deliveries can be completed.");
+      toast.success("Only dispatched deliveries can be completed.");
       return;
     }
     if (nextStatus === "failed" && delivery.status === "delivered") {
-      alert("Delivered orders cannot be marked failed.");
+      toast.error("Delivered orders cannot be marked failed.");
       return;
     }
 
@@ -258,11 +259,11 @@ export default function DeliveryPage() {
 
   async function removeDelivery(delivery: (typeof deliveries)[number]) {
     if (delivery.status === "delivered") {
-      alert("Delivered records are locked and cannot be deleted.");
+      toast.success("Delivered records are locked and cannot be deleted.");
       return;
     }
     if (delivery.status === "dispatched") {
-      alert("Mark the delivery failed before deleting a dispatched record.");
+      toast.error("Mark the delivery failed before deleting a dispatched record.");
       return;
     }
     if (!window.confirm(`Delete delivery for ${delivery.customer}?`)) return;

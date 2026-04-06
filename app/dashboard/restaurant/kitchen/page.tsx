@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -108,7 +109,7 @@ export default function KitchenPage() {
   async function moveKitchenOrder(id: string, nextStatus: string, table: string) {
     const linkedOrder = orderStore.records.find((record) => String(record.data?.tableRef || "") === `Table ${table}` && String(record.status || "") !== "closed");
     if (nextStatus === "preparing" && linkedOrder && String(linkedOrder.status || "") !== "in_kitchen") {
-      alert("Send the linked restaurant order to kitchen first.");
+      toast("Send the linked restaurant order to kitchen first.");
       return;
     }
     if (nextStatus === "served" && linkedOrder && String(linkedOrder.status || "") !== "served") {

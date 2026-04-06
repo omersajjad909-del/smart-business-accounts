@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -150,14 +151,14 @@ export default function AttendancePage() {
 
       if (!res.ok) {
         const err = await res.json();
-        alert(err.error || "Failed to save");
+        toast.error(err.error || "Failed to save");
       } else {
         fetchAttendance(selectedEmployeeId, month);
         setSelectedDate(null);
       }
     } catch (err) {
       console.error(err);
-      alert("Error saving");
+      toast.error("Error saving");
     } finally {
       setLoading(false);
     }

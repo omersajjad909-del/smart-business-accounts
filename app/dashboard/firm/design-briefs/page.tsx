@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -72,11 +73,11 @@ export default function DesignBriefsPage() {
     const scope = form.scope.trim();
     const duplicateBrief = briefNo && briefs.some((b) => b.briefNo.trim().toLowerCase() === briefNo.toLowerCase());
     if (!client || !project || !briefNo || !scope || !form.dueDate) {
-      alert("Client, project, brief no, scope, aur due date required hain.");
+      toast.error("Client, project, brief no, scope, aur due date required hain.");
       return;
     }
     if (duplicateBrief) {
-      alert("Yeh brief number pehle se maujood hai.");
+      toast("Yeh brief number pehle se maujood hai.");
       return;
     }
     setSaving(true);

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -73,7 +74,7 @@ export default function BudgetPage() {
 
   async function saveBudget() {
     if (!selectedAccount || !amount) {
-      alert("Account and amount required");
+      toast.error("Account and amount required");
       return;
     }
 
@@ -97,17 +98,17 @@ export default function BudgetPage() {
 
       const data = await res.json();
       if (res.ok) {
-        alert("Budget saved successfully!");
+        toast.success("Budget saved successfully!");
         setSelectedAccount("");
         setAmount("");
         setNotes("");
         loadBudgets();
       } else {
-        alert(data.error || "Failed to save budget");
+        toast.error(data.error || "Failed to save budget");
       }
     } catch (e) {
       console.error("Error saving budget:", e);
-      alert("Error saving budget");
+      toast.error("Error saving budget");
     } finally {
       setLoading(false);
     }
@@ -124,15 +125,15 @@ export default function BudgetPage() {
       });
 
       if (res.ok) {
-        alert("Budget deleted successfully!");
+        toast.success("Budget deleted successfully!");
         loadBudgets();
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to delete budget");
+        toast.error(data.error || "Failed to delete budget");
       }
     } catch (e) {
       console.error("Error deleting budget:", e);
-      alert("Error deleting budget");
+      toast.error("Error deleting budget");
     }
   }
 

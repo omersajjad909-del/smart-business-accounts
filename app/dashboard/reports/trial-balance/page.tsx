@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -110,12 +111,12 @@ export default function CategorizedTrialBalance() {
               });
               const data = await res.json();
               if (res.ok) {
-                alert("Email bhej di gayi hai");
+                toast("Email bhej di gayi hai");
               } else {
-                alert(data.error || "Email send nahi ho saki");
+                toast.error(data.error || "Email send nahi ho saki");
               }
             } catch (_e) {
-              alert("Email send karte waqt error aayi");
+              toast.error("Email send karte waqt error aayi");
             } finally {
               setSendingEmail(false);
             }

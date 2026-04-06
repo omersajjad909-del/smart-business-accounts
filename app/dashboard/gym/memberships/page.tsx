@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -62,11 +63,11 @@ export default function MembershipsPage() {
   const handleAdd = async () => {
     const name = form.name.trim();
     if (!name) {
-      alert('Member name required hai.');
+      toast.error('Member name required hai.');
       return;
     }
     if (members.some(m => m.name.trim().toLowerCase() === name.toLowerCase() && m.status !== 'Expired')) {
-      alert('Is member ka active record already maujood hai.');
+      toast.error('Is member ka active record already maujood hai.');
       return;
     }
     const fee = PLAN_FEE[form.plan];

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -44,10 +45,10 @@ export default function IspPackagesPage() {
     const speed = form.speed.trim();
     const quota = form.quota.trim();
     const price = Number(form.price);
-    if (!name || !speed) return alert("Package name aur speed required hain.");
-    if (price <= 0) return alert("Package price valid honi chahiye.");
+    if (!name || !speed) return toast.error("Package name aur speed required hain.");
+    if (price <= 0) return toast("Package price valid honi chahiye.");
     if (packages.some((item) => item.name.trim().toLowerCase() === name.toLowerCase() && item.status !== "retired")) {
-      return alert("Is naam ka package already maujood hai.");
+      return toast.error("Is naam ka package already maujood hai.");
     }
     await create({ title: name, status: "active", amount: price, data: { speed, quota } });
     setForm({ name: "", speed: "", quota: "Unlimited", price: "" });

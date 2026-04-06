@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -51,7 +52,7 @@ export default function ConstructionSitesPage() {
     if (!site) return;
     const linkedActiveProjects = projects.filter((project) => project.site === site.name && project.status !== "completed");
     if (status === "inactive" && linkedActiveProjects.length > 0) {
-      window.alert("Complete or reassign active projects before deactivating this site.");
+      toast("Complete or reassign active projects before deactivating this site.");
       return;
     }
     await update(id, { status });

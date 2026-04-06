@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -64,15 +65,15 @@ export default function TrainersPage() {
     const name = form.name.trim();
     const salary = Number(form.salary);
     if (!name) {
-      alert('Trainer name required hai.');
+      toast.error('Trainer name required hai.');
       return;
     }
     if (!salary || salary <= 0) {
-      alert('Monthly salary valid honi chahiye.');
+      toast('Monthly salary valid honi chahiye.');
       return;
     }
     if (trainers.some(t => t.name.trim().toLowerCase() === name.toLowerCase())) {
-      alert('Ye trainer already list me maujood hai.');
+      toast.error('Ye trainer already list me maujood hai.');
       return;
     }
     await create({ title: name, status: form.status, amount: salary, data: { trainerId: `TRN-${String(records.length + 1).padStart(3, '0')}`, specialization: form.specialization, certifications: [], activeClients: 0, salary, rating: 4 } });

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -171,7 +172,7 @@ export default function FeeCollectionPage() {
                 <td style={S.td}>
                   {f.status !== "paid"
                     ? <button style={S.actionBtn("rgba(34,197,94,.7)")} onClick={() => markPaid(f.id)}>Mark Paid</button>
-                    : <button style={S.actionBtn("rgba(99,102,241,.6)")} onClick={() => alert("Receipt printed!")}>Receipt</button>}
+                    : <button style={S.actionBtn("rgba(99,102,241,.6)")} onClick={() => toast.success("Receipt printed!")}>Receipt</button>}
                 </td>
               </tr>
             ))}

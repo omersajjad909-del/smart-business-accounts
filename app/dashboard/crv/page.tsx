@@ -191,18 +191,18 @@ export default function CRVPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(`Error: ${data?.error || "Save failed"}`);
+        toast.error(`Error: ${data?.error || "Save failed"}`);
         return;
       }
 
       setVoucher(data);
-      alert(editing ? "CRV updated successfully!" : "CRV saved successfully!");
+      toast.success(editing ? "CRV updated successfully!" : "CRV saved successfully!");
       await loadVouchers();
       resetForm();
       setShowForm(false);
       setEditing(null);
     } catch (e: any) {
-      alert(`Error: ${e.message || "Failed to save"}`);
+      toast.error(`Error: ${e.message || "Failed to save"}`);
     } finally {
       setSaving(false);
     }
@@ -240,14 +240,14 @@ export default function CRVPage() {
       });
 
       if (res.ok) {
-        alert("CRV deleted successfully!");
+        toast.success("CRV deleted successfully!");
         await loadVouchers();
       } else {
         const data = await res.json();
-        alert(data.error || "Delete failed");
+        toast.error(data.error || "Delete failed");
       }
     } catch (_e) {
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   }
 

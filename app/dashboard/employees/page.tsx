@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useState, useEffect } from "react";
@@ -90,7 +91,7 @@ export default function EmployeesPage() {
         setShowForm(false);
       } else {
         const err = await res.json();
-        alert(err.error || "Failed to save employee");
+        toast.error(err.error || "Failed to save employee");
       }
     } catch (err) {
       console.error("Error saving employee:", err);

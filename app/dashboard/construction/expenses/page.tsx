@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -69,7 +70,7 @@ export default function ConstructionExpensesPage() {
     const row = expenses.find((entry) => entry.id === id);
     if (!row) return;
     if (status === "posted" && row.status !== "approved") {
-      window.alert("Only approved expenses can be posted.");
+      toast.success("Only approved expenses can be posted.");
       return;
     }
     await update(id, { status });

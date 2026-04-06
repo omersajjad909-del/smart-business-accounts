@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -46,10 +47,10 @@ export default function IspConnectionsPage() {
     const phone = form.phone.trim();
     const address = form.address.trim();
     const selectedPackage = packages.find((item) => item.id === form.packageId);
-    if (!customer || !phone || !address) return alert("Customer, phone, aur address required hain.");
-    if (!selectedPackage) return alert("Active package select karein.");
+    if (!customer || !phone || !address) return toast.error("Customer, phone, aur address required hain.");
+    if (!selectedPackage) return toast.error("Active package select karein.");
     if (connections.some((item) => item.phone.trim() === phone && item.status !== "closed")) {
-      return alert("Is phone ka active connection already maujood hai.");
+      return toast.error("Is phone ka active connection already maujood hai.");
     }
     await create({
       title: customer,

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -26,11 +27,11 @@ export default function FieldsPage() {
   async function save() {
     const name = form.name.trim();
     if (!name || !form.area || !form.location.trim()) {
-      alert("Field name, area, aur location required hain.");
+      toast.error("Field name, area, aur location required hain.");
       return;
     }
     if (fields.some(f => f.name.trim().toLowerCase() === name.toLowerCase())) {
-      alert("Ye field already maujood hai.");
+      toast.error("Ye field already maujood hai.");
       return;
     }
     await create({ title: form.name, status: "active", data: { area: form.area, soilType: form.soilType, irrigationType: form.irrigationType, location: form.location } });

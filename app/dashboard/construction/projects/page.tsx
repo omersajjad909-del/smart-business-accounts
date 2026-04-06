@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -98,11 +99,11 @@ export default function ConstructionProjectsPage() {
     const project = projects.find((row) => row.id === id);
     if (!project) return;
     if (nextStatus === "active" && !project.site) {
-      window.alert("Assign a site before starting the project.");
+      toast("Assign a site before starting the project.");
       return;
     }
     if (nextStatus === "completed" && project.progress < 100) {
-      window.alert("Project progress must reach 100% before completion.");
+      toast.error("Project progress must reach 100% before completion.");
       return;
     }
     await update(id, { status: nextStatus });

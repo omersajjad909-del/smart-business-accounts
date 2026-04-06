@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -69,19 +70,19 @@ export default function SprintsPage() {
     const total = Number(form.total);
     const duplicateSprint = sprints.some(s => s.projectName.toLowerCase() === projectName.toLowerCase() && s.name.toLowerCase() === name.toLowerCase());
     if (!projectName || !name || !form.start || !form.end) {
-      alert('Project name, sprint name, start, aur end date required hain.');
+      toast.error('Project name, sprint name, start, aur end date required hain.');
       return;
     }
     if (new Date(form.end) < new Date(form.start)) {
-      alert('Sprint end date start se pehle nahi ho sakti.');
+      toast('Sprint end date start se pehle nahi ho sakti.');
       return;
     }
     if (total <= 0) {
-      alert('Total stories/points positive hone chahiye.');
+      toast('Total stories/points positive hone chahiye.');
       return;
     }
     if (duplicateSprint) {
-      alert('Yeh sprint is project ke liye pehle se maujood hai.');
+      toast('Yeh sprint is project ke liye pehle se maujood hai.');
       return;
     }
     await create({ title: form.name, status: form.status, date: form.start, data: { sprintId: `SPR-${String(records.length + 1).padStart(3, '0')}`, projectName: form.projectName, start: form.start, end: form.end, total, completed: 0, inProgress: 0, blocked: 0, velocity: 0, team: [] } });

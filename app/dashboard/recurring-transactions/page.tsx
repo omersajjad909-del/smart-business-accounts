@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -89,7 +90,7 @@ export default function RecurringTransactionsPage() {
 
   async function saveTransaction() {
     if (!formData.accountId || !formData.amount || !formData.description) {
-      alert("Please fill all required fields");
+      toast.error("Please fill all required fields");
       return;
     }
 
@@ -106,7 +107,7 @@ export default function RecurringTransactionsPage() {
         try {
           metadata = JSON.parse(payload.metadataText);
         } catch (_e) {
-          alert("Invalid metadata JSON");
+          toast.error("Invalid metadata JSON");
           setLoading(false);
           return;
         }
@@ -142,10 +143,10 @@ export default function RecurringTransactionsPage() {
         });
       } else {
         const error = await res.json();
-        alert(error.error || "Save failed");
+        toast.error(error.error || "Save failed");
       }
     } catch (_e) {
-      alert("Save failed");
+      toast.error("Save failed");
     } finally {
       setLoading(false);
     }
@@ -167,7 +168,7 @@ export default function RecurringTransactionsPage() {
         await loadTransactions();
       }
     } catch (_e) {
-      alert("Update failed");
+      toast.error("Update failed");
     }
   }
 
@@ -190,7 +191,7 @@ export default function RecurringTransactionsPage() {
         await loadTransactions();
       }
     } catch (_e) {
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   }
 

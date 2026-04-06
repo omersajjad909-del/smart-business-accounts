@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -48,7 +49,7 @@ export default function UsersPage() {
   }, []);
 
   async function save() {
-    if (!form.name || !form.email) return alert("Fields missing!");
+    if (!form.name || !form.email) return toast.error("Fields missing!");
     const method = editing ? "PUT" : "POST";
     await fetch("/api/users", {
       method,

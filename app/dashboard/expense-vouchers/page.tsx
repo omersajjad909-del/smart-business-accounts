@@ -145,7 +145,7 @@ export default function ExpenseVouchersPage() {
       });
 
       if (response.ok) {
-        alert(editingId ? 'Expense voucher updated successfully' : 'Expense voucher saved successfully');
+        toast.success(editingId ? 'Expense voucher updated successfully' : 'Expense voucher saved successfully');
         setFormData({
           voucherNo: '',
           date: new Date().toISOString().split('T')[0],
@@ -160,7 +160,7 @@ export default function ExpenseVouchersPage() {
       }
     } catch (error) {
       console.error('Error saving voucher:', error);
-      alert('Error: Failed to save voucher');
+      toast.error('Error: Failed to save voucher');
     } finally {
       setLoading(false);
     }
@@ -195,14 +195,14 @@ export default function ExpenseVouchersPage() {
       });
 
       if (response.ok) {
-        alert('Expense voucher deleted successfully');
+        toast.success('Expense voucher deleted successfully');
         fetchVouchers();
       } else {
-        alert('Error: Failed to delete voucher');
+        toast.error('Error: Failed to delete voucher');
       }
     } catch (error) {
       console.error('Error deleting voucher:', error);
-      alert('Error: Failed to delete voucher');
+      toast.error('Error: Failed to delete voucher');
     }
   };
 

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -51,8 +52,8 @@ export default function TablesPage() {
     const tableRef = `Table ${table.number}`;
     const hasOpenOrder = orderStore.records.some((record) => String(record.data?.tableRef || "") === tableRef && String(record.status || "") !== "closed");
     const hasActiveReservation = reservationStore.records.some((record) => String(record.data?.tableRef || "") === tableRef && ["booked", "confirmed"].includes(String(record.status || "")));
-    if (nextStatus === "available" && hasOpenOrder) return alert("Close the active order before making this table available.");
-    if (nextStatus === "cleaning" && hasActiveReservation) return alert("This table has an active reservation.");
+    if (nextStatus === "available" && hasOpenOrder) return toast("Close the active order before making this table available.");
+    if (nextStatus === "cleaning" && hasActiveReservation) return toast("This table has an active reservation.");
     await update(tableId, { status: nextStatus });
   }
 

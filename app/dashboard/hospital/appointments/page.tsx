@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -49,11 +50,11 @@ export default function AppointmentsPage() {
     const appointment = appointments.find(a => a.id === id);
     if (!appointment) return;
     if (status === "completed" && appointment.status !== "confirmed") {
-      alert("Only confirmed appointments can be completed.");
+      toast.success("Only confirmed appointments can be completed.");
       return;
     }
     if ((status === "cancelled" || status === "no_show") && appointment.status === "completed") {
-      alert("Completed appointments are locked.");
+      toast.success("Completed appointments are locked.");
       return;
     }
     await update(id, { status });

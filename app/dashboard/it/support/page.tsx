@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -75,7 +76,7 @@ export default function SupportPage() {
     const ticket = tickets.find(t => t.id === id);
     if (!ticket) return;
     if (ticket.status === 'Closed') {
-      alert('Closed ticket ko directly change nahi kiya ja sakta.');
+      toast('Closed ticket ko directly change nahi kiya ja sakta.');
       return;
     }
     await update(id, { status, data: { updated: today } });
@@ -87,11 +88,11 @@ export default function SupportPage() {
     const project = form.project.trim();
     const duplicateTicket = tickets.some(t => t.title.toLowerCase() === title.toLowerCase() && t.client.toLowerCase() === client.toLowerCase() && t.status !== 'Closed');
     if (!title || !client || !project) {
-      alert('Title, client, aur project required hain.');
+      toast.error('Title, client, aur project required hain.');
       return;
     }
     if (duplicateTicket) {
-      alert('Yeh ticket already open hai.');
+      toast.error('Yeh ticket already open hai.');
       return;
     }
     await create({ title: form.title, status: 'Open', date: today, data: { ticketId: `TKT-${String(records.length + 1).padStart(3, '0')}`, client: form.client, project: form.project, priority: form.priority, category: form.category, assigned: form.assigned, created: today, updated: today } });

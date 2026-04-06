@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -78,19 +79,19 @@ export default function FirmProjectsPage() {
     const fee = Number(form.fee);
     const duplicateProject = projects.some(p => p.name.toLowerCase() === name.toLowerCase() && p.client.toLowerCase() === client.toLowerCase());
     if (!name || !client || !form.startDate || !form.endDate) {
-      alert("Project name, client, start, aur end date required hain.");
+      toast.error("Project name, client, start, aur end date required hain.");
       return;
     }
     if (new Date(form.endDate) < new Date(form.startDate)) {
-      alert("End date start date se pehle nahi ho sakti.");
+      toast("End date start date se pehle nahi ho sakti.");
       return;
     }
     if (fee < 0) {
-      alert("Project fee negative nahi ho sakti.");
+      toast("Project fee negative nahi ho sakti.");
       return;
     }
     if (duplicateProject) {
-      alert("Yeh engagement is client ke liye pehle se maujood hai.");
+      toast("Yeh engagement is client ke liye pehle se maujood hai.");
       return;
     }
     setSaving(true);

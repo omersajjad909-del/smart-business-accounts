@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -55,11 +56,11 @@ export default function MembershipContentTiersPage() {
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean);
-    if (!title) return alert("Tier title required hai.");
-    if (!plan) return alert("Active plan select karein.");
-    if (!modules.length) return alert("Kam az kam aik content/module access required hai.");
+    if (!title) return toast.error("Tier title required hai.");
+    if (!plan) return toast.error("Active plan select karein.");
+    if (!modules.length) return toast.error("Kam az kam aik content/module access required hai.");
     if (tiers.some((item) => item.title.trim().toLowerCase() === title.toLowerCase() && item.status !== "inactive")) {
-      return alert("Is naam ka content tier already maujood hai.");
+      return toast.error("Is naam ka content tier already maujood hai.");
     }
 
     await create({

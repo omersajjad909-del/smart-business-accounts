@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -49,7 +50,7 @@ export default function LabPage() {
     if (!lab) return;
     const next = NEXT_STATUS[currentStatus];
     if (next === "completed" && !lab.results.trim()) {
-      alert("Add lab results before marking this request complete.");
+      toast("Add lab results before marking this request complete.");
       return;
     }
     await update(id, { status: next });
@@ -57,7 +58,7 @@ export default function LabPage() {
 
   async function saveResults(id: string, results: string) {
     if (!results.trim()) {
-      alert("Results text is required.");
+      toast.error("Results text is required.");
       return;
     }
     await update(id, { data: { results: results.trim() } });

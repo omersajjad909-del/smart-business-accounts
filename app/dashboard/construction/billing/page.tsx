@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -71,7 +72,7 @@ export default function ConstructionBillingPage() {
     const row = billings.find((entry) => entry.id === id);
     if (!row) return;
     if (status === "paid" && row.status !== "approved") {
-      window.alert("Only approved bills can be marked paid.");
+      toast.success("Only approved bills can be marked paid.");
       return;
     }
     await update(id, { status });

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -74,15 +75,15 @@ export default function FirmBillingPage() {
     const amount = Number(form.amount);
     const duplicateInvoice = invoiceNo && invoices.some(i => i.invoiceNo.trim().toLowerCase() === invoiceNo.toLowerCase());
     if (!client || !invoiceNo || !form.dueDate) {
-      alert("Client, invoice number, aur due date required hain.");
+      toast.error("Client, invoice number, aur due date required hain.");
       return;
     }
     if (amount <= 0) {
-      alert("Invoice amount positive hona chahiye.");
+      toast("Invoice amount positive hona chahiye.");
       return;
     }
     if (duplicateInvoice) {
-      alert("Yeh invoice number pehle se maujood hai.");
+      toast("Yeh invoice number pehle se maujood hai.");
       return;
     }
     setSaving(true);

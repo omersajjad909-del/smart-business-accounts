@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -43,9 +44,9 @@ export default function RecurringBillingPage() {
 
   const createRun = async () => {
     const subscriber = subscribers.find((item) => item.id === subscriberId);
-    if (!subscriber) return alert("Subscriber select karein.");
+    if (!subscriber) return toast.error("Subscriber select karein.");
     if (billings.some((item) => item.subscriberId === subscriber.id && item.status !== "failed" && item.status !== "paid")) {
-      return alert("Is subscriber ka open billing run already maujood hai.");
+      return toast.error("Is subscriber ka open billing run already maujood hai.");
     }
     await create({
       title: subscriber.company,

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -67,15 +68,15 @@ export default function BillingPage() {
     const hours = Number(form.hours); const rate = Number(form.rate); const disb = Number(form.disbursements);
     const duplicateInvoice = invoices.some(i => i.client.toLowerCase() === client.toLowerCase() && i.caseId.toLowerCase() === caseId.toLowerCase() && i.description.toLowerCase() === description.toLowerCase() && i.dueDate === form.dueDate);
     if (!client || !caseId || !description || !form.dueDate) {
-      alert('Client, case ID, description, aur due date required hain.');
+      toast.error('Client, case ID, description, aur due date required hain.');
       return;
     }
     if (hours <= 0 || rate <= 0 || disb < 0) {
-      alert('Hours aur rate positive hon, aur disbursements negative na hon.');
+      toast('Hours aur rate positive hon, aur disbursements negative na hon.');
       return;
     }
     if (duplicateInvoice) {
-      alert('Yeh invoice is case ke liye already draft ho chuki hai.');
+      toast.error('Yeh invoice is case ke liye already draft ho chuki hai.');
       return;
     }
     const amount = hours * rate; const total = amount + disb;
@@ -87,7 +88,7 @@ export default function BillingPage() {
   const markPaid = async (id: string) => {
     const invoice = invoices.find(i => i.id === id);
     if (!invoice || invoice.status === 'Draft') {
-      alert('Draft invoice ko pehle send karein, phir paid mark karein.');
+      toast.success('Draft invoice ko pehle send karein, phir paid mark karein.');
       return;
     }
     await update(id, { status: 'Paid' });
@@ -95,7 +96,7 @@ export default function BillingPage() {
   const sendInvoice = async (id: string) => {
     const invoice = invoices.find(i => i.id === id);
     if (!invoice || invoice.total <= 0) {
-      alert('Invalid invoice total ke saath send nahi ki ja sakti.');
+      toast.error('Invalid invoice total ke saath send nahi ki ja sakti.');
       return;
     }
     await update(id, { status: 'Sent' });

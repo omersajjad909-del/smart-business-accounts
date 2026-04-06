@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -71,11 +72,11 @@ export default function ConsultancyDeliverablesPage() {
     const deliverable = form.deliverable.trim();
     const duplicateItem = items.some((i) => i.client.toLowerCase() === client.toLowerCase() && i.project.toLowerCase() === project.toLowerCase() && i.deliverable.toLowerCase() === deliverable.toLowerCase() && i.status !== "Approved");
     if (!client || !project || !deliverable || !form.dueDate) {
-      alert("Client, project, deliverable, aur due date required hain.");
+      toast.error("Client, project, deliverable, aur due date required hain.");
       return;
     }
     if (duplicateItem) {
-      alert("Yeh deliverable already pipeline me hai.");
+      toast.error("Yeh deliverable already pipeline me hai.");
       return;
     }
     setSaving(true);

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -39,7 +40,7 @@ export default function SchoolAdmissionsPage() {
     const row = admissions.find((entry) => entry.id === id);
     if (!row) return;
     if (status === "approved" && students.some((student) => student.name.toLowerCase() === row.applicant.toLowerCase() && student.className === row.className)) {
-      window.alert("Student already exists in this class.");
+      toast.error("Student already exists in this class.");
       return;
     }
     await update(id, { status });

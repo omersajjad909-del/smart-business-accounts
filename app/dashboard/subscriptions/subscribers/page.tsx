@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -44,10 +45,10 @@ export default function SubscribersPage() {
   const selectedPlan = plans.find((plan) => plan.id === form.planId);
 
   const addSubscriber = async () => {
-    if (!form.company.trim() || !form.contact.trim() || !form.email.trim()) return alert("Company, contact, aur email required hain.");
-    if (!selectedPlan) return alert("Active plan select karein.");
+    if (!form.company.trim() || !form.contact.trim() || !form.email.trim()) return toast.error("Company, contact, aur email required hain.");
+    if (!selectedPlan) return toast.error("Active plan select karein.");
     if (subscribers.some((row) => row.email.trim().toLowerCase() === form.email.trim().toLowerCase() && row.status !== "cancelled")) {
-      return alert("Is email ka active subscriber already maujood hai.");
+      return toast.error("Is email ka active subscriber already maujood hai.");
     }
     await create({
       title: form.company.trim(),

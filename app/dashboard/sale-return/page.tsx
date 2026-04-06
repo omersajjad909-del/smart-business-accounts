@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
@@ -93,7 +94,7 @@ export default function SalesReturnPage() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        alert(errorData.error || "Failed to load invoice details");
+        toast.error(errorData.error || "Failed to load invoice details");
         setInvoiceId("");
         setRows([]);
         return;
@@ -102,7 +103,7 @@ export default function SalesReturnPage() {
       const data = await res.json();
 
       if (data.items && data.items.length === 0) {
-        alert("Ye Invoice pehle hi mukammal return ho chuki hai!");
+        toast("Ye Invoice pehle hi mukammal return ho chuki hai!");
         setInvoiceId("");
         setRows([]);
         return;
@@ -114,7 +115,7 @@ export default function SalesReturnPage() {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Unknown error";
       console.error("Load error:", err);
-      alert(`Error loading invoice: ${message}`);
+      toast.error(`Error loading invoice: ${message}`);
     }
   }, [invoices]);
 
@@ -145,7 +146,7 @@ export default function SalesReturnPage() {
             if (foundInvoice) {
               handleInvoiceChange(foundInvoice.id);
             } else {
-              alert(`No invoice found matching "${query}"`);
+              toast(`No invoice found matching "${query}"`);
             }
           }
         }
@@ -160,7 +161,7 @@ export default function SalesReturnPage() {
     loadReturns();
     const user = getCurrentUser();
     if (!user) {
-      alert("Session expired. Please login again.");
+      toast.error("Session expired. Please login again.");
       return;
     }
 
@@ -173,7 +174,7 @@ export default function SalesReturnPage() {
       .then((r) => {
         if (!r.ok) {
           if (r.status === 403) {
-            alert("You don't have permission to view sales invoices");
+            toast("You don't have permission to view sales invoices");
             return { invoices: [] };
           }
           throw new Error(`Failed to load invoices: ${r.status}`);
@@ -187,7 +188,7 @@ export default function SalesReturnPage() {
           );
           setInvoices(activeInvoices);
         } else if (d?.error) {
-          alert(`Error: ${d.error}`);
+          toast.error(`Error: ${d.error}`);
         } else {
           console.error("Unexpected response format:", d);
         }
@@ -195,7 +196,7 @@ export default function SalesReturnPage() {
       .catch((err: unknown) => {
         const message = err instanceof Error ? err.message : "Unknown error";
         console.error("Load invoices error:", err);
-        alert(`Failed to load invoices: ${message}`);
+        toast.error(`Failed to load invoices: ${message}`);
       });
   }, [loadReturns]);
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -224,7 +225,7 @@ export default function SalesReturnPage() {
         ...r,
         qty: Number(r.qty),
       }));
-    if (!invoiceId || !clean.length) return alert("Select items to return");
+    if (!invoiceId || !clean.length) return toast.error("Select items to return");
 
     const method = editing ? "PUT" : "POST";
     const body = editing
@@ -256,7 +257,7 @@ export default function SalesReturnPage() {
         setShowForm(false);
         setShowList(true);
       }
-    } else alert(data.error);
+    } else toast.error(data.error);
   }
 
   function startEdit(ret: SaleReturn) {
@@ -285,14 +286,14 @@ export default function SalesReturnPage() {
         headers: { "x-user-role": user?.role || "ADMIN" },
       });
       if (res.ok) {
-        alert("Return deleted successfully");
+        toast.success("Return deleted successfully");
         await loadReturns();
       } else {
         const err = await res.json();
-        alert(err.error || "Delete failed");
+        toast.error(err.error || "Delete failed");
       }
     } catch (_e) {
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   }
 

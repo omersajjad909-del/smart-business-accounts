@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -83,19 +84,19 @@ export default function ContractsPage() {
     const value = Number(form.value);
     const duplicateContract = contracts.some(c => c.client.toLowerCase() === client.toLowerCase() && c.project.toLowerCase() === project.toLowerCase() && c.status !== 'Terminated');
     if (!client || !project || !form.start || !form.end) {
-      alert('Client, project, start, aur end date required hain.');
+      toast.error('Client, project, start, aur end date required hain.');
       return;
     }
     if (new Date(form.end) < new Date(form.start)) {
-      alert('Contract end date start se pehle nahi ho sakti.');
+      toast('Contract end date start se pehle nahi ho sakti.');
       return;
     }
     if (value <= 0) {
-      alert('Contract value positive honi chahiye.');
+      toast('Contract value positive honi chahiye.');
       return;
     }
     if (duplicateContract) {
-      alert('Is client project ke liye active contract already maujood hai.');
+      toast.error('Is client project ke liye active contract already maujood hai.');
       return;
     }
     const days = form.end ? Math.round((new Date(form.end).getTime() - todayTs) / 86400000) : 0;

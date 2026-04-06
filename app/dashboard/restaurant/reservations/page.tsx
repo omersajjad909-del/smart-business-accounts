@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -49,7 +50,7 @@ export default function RestaurantReservationsPage() {
 
   function editReservation(reservation: (typeof reservations)[number]) {
     if (reservation.status === "cancelled") {
-      alert("Cancelled reservations are locked.");
+      toast("Cancelled reservations are locked.");
       return;
     }
     setEditingId(reservation.id);
@@ -122,18 +123,18 @@ export default function RestaurantReservationsPage() {
 
   async function moveReservation(reservation: (typeof reservations)[number], nextStatus: ReservationStatus) {
     if (nextStatus === "arrived" && reservation.status !== "confirmed") {
-      alert("Only confirmed reservations can be marked arrived.");
+      toast.success("Only confirmed reservations can be marked arrived.");
       return;
     }
     if (!window.confirm(`Change ${reservation.guestName} to ${nextStatus}?`)) return;
 
     if (nextStatus === "confirmed") {
       if (hasOpenOrders(reservation.tableRef)) {
-        alert("This table already has an active order.");
+        toast.error("This table already has an active order.");
         return;
       }
       if (hasOtherActiveReservations(reservation.tableRef, reservation.id)) {
-        alert("This table already has another active reservation.");
+        toast.error("This table already has another active reservation.");
         return;
       }
       await updateTableStatus(reservation.tableRef, "reserved");
@@ -152,7 +153,7 @@ export default function RestaurantReservationsPage() {
 
   async function removeReservation(reservation: (typeof reservations)[number]) {
     if (reservation.status === "arrived") {
-      alert("Arrived reservations cannot be deleted.");
+      toast.success("Arrived reservations cannot be deleted.");
       return;
     }
     if (!window.confirm(`Delete reservation for ${reservation.guestName}?`)) return;

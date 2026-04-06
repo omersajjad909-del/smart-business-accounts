@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -180,9 +181,9 @@ export default function BankReconciliationPage() {
   };
 
   const handleReconcile = async () => {
-    if (!user) return alert("Please login first");
+    if (!user) return toast.error("Please login first");
     if (!selectedAccount || selectedStatements.length === 0) {
-      alert('Please select bank account and statements');
+      toast.error('Please select bank account and statements');
       return;
     }
 
@@ -207,7 +208,7 @@ export default function BankReconciliationPage() {
       });
 
       if (response.ok) {
-        alert('Reconciliation completed successfully');
+        toast.success('Reconciliation completed successfully');
         setSelectedStatements([]);
         setSystemBalance(0);
         setBankBalance(0);
@@ -215,7 +216,7 @@ export default function BankReconciliationPage() {
       }
     } catch (error) {
       console.error('Error reconciling:', error);
-      alert('Error: Reconciliation failed');
+      toast.error('Error: Reconciliation failed');
     } finally {
       setLoading(false);
     }
@@ -223,11 +224,11 @@ export default function BankReconciliationPage() {
 
   const handleAddBank = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return alert("Please login first");
-    if (!user.companyId) return alert("Please select a company first");
+    if (!user) return toast.error("Please login first");
+    if (!user.companyId) return toast.error("Please select a company first");
 
     if (!newBankForm.bankName || !newBankForm.accountNo || !newBankForm.accountName) {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
       return;
     }
 
@@ -248,7 +249,7 @@ export default function BankReconciliationPage() {
       });
 
       if (response.ok) {
-        alert(editingBankId ? 'Bank account updated successfully' : 'Bank account added successfully');
+        toast.success(editingBankId ? 'Bank account updated successfully' : 'Bank account added successfully');
         setNewBankForm({
           bankName: '',
           accountNo: '',
@@ -259,11 +260,11 @@ export default function BankReconciliationPage() {
         setShowAddBankForm(false);
         fetchBankAccounts();
       } else {
-        alert('Error saving bank account');
+        toast.error('Error saving bank account');
       }
     } catch (error) {
       console.error('Error saving bank:', error);
-      alert('Error: Unable to save bank account');
+      toast.error('Error: Unable to save bank account');
     } finally {
       setLoading(false);
     }
@@ -283,7 +284,7 @@ export default function BankReconciliationPage() {
 
   const handleDeleteBank = async (id: string) => {
     if (!confirm('Are you sure? This cannot be undone.')) return;
-    if (!user) return alert("Please login first");
+    if (!user) return toast.error("Please login first");
 
     try {
       const response = await fetch(`/api/bank-accounts?id=${id}`, {
@@ -296,18 +297,18 @@ export default function BankReconciliationPage() {
       });
 
       if (response.ok) {
-        alert('Bank account deleted successfully');
+        toast.success('Bank account deleted successfully');
         fetchBankAccounts();
         if (selectedAccount === id) {
           setSelectedAccount('');
         }
       } else {
         const err = await response.json();
-        alert(err.error || 'Error: Failed to delete bank account');
+        toast.error(err.error || 'Error: Failed to delete bank account');
       }
     } catch (error) {
       console.error('Error deleting bank:', error);
-      alert('Error: Failed to delete bank account');
+      toast.error('Error: Failed to delete bank account');
     }
   };
 

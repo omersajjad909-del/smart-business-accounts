@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -69,15 +70,15 @@ export default function CasesPage() {
     const lawyer = form.lawyer.trim();
     const duplicateCase = cases.some(c => c.title.toLowerCase() === title.toLowerCase() && c.client.toLowerCase() === client.toLowerCase());
     if (!title || !client || !court || !form.fileDate || !lawyer) {
-      alert('Case title, client, court, file date, aur assigned lawyer required hain.');
+      toast.success('Case title, client, court, file date, aur assigned lawyer required hain.');
       return;
     }
     if (duplicateCase) {
-      alert('Is client ke liye yeh case pehle se maujood hai.');
+      toast('Is client ke liye yeh case pehle se maujood hai.');
       return;
     }
     if (form.nextHearing && new Date(form.nextHearing) < new Date(form.fileDate)) {
-      alert('Next hearing file date se pehle nahi ho sakti.');
+      toast('Next hearing file date se pehle nahi ho sakti.');
       return;
     }
     await create({ title: form.title, status: form.status, date: form.fileDate, data: { caseNo: `CASE-${String(records.length + 1).padStart(3, '0')}`, client: form.client, type: form.type, court: form.court, fileDate: form.fileDate, nextHearing: form.nextHearing, lawyer: form.lawyer } });

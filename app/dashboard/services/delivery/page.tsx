@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -20,7 +21,7 @@ export default function ServiceDeliveryPage() {
   async function moveDeliveryStatus(id: string, nextStatus: "in_review" | "completed", projectCode: string) {
     const project = projects.find((item) => item.projectCode === projectCode);
     if (!project || project.status !== "active") {
-      alert("Only active projects can progress delivery milestones.");
+      toast.error("Only active projects can progress delivery milestones.");
       return;
     }
     await deliveryStore.update(id, { status: nextStatus });

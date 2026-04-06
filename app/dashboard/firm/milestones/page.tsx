@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -46,8 +47,8 @@ export default function MilestonesPage() {
     const project = form.project.trim();
     const milestone = form.milestone.trim();
     const duplicateMilestone = milestones.some((m) => m.project.toLowerCase() === project.toLowerCase() && m.milestone.toLowerCase() === milestone.toLowerCase() && m.status !== "Approved");
-    if (!project || !milestone || !form.dueDate) return alert("Project, milestone, aur due date required hain.");
-    if (duplicateMilestone) return alert("Yeh milestone already active hai.");
+    if (!project || !milestone || !form.dueDate) return toast.error("Project, milestone, aur due date required hain.");
+    if (duplicateMilestone) return toast.error("Yeh milestone already active hai.");
     setSaving(true);
     try {
       await create({ title: milestone, status: form.status, date: form.dueDate, data: { project, milestone, owner: form.owner, dueDate: form.dueDate } });

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -53,7 +54,7 @@ export default function AdminPermissionsPage() {
   };
 
   const save = async () => {
-    if (!selected) return alert("Select a user");
+    if (!selected) return toast.error("Select a user");
 
     await fetch("/api/admin/user-permissions", {
       method: "POST",
@@ -68,7 +69,7 @@ export default function AdminPermissionsPage() {
       }),
     });
 
-    alert("Permissions saved");
+    toast.success("Permissions saved");
   };
 
   // ================= UI =================

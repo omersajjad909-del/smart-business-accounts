@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -528,9 +529,9 @@ export default function AICommandCenter() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to send reminder");
-      window.alert(data?.message || "Reminder sent.");
+      toast.success(data?.message || "Reminder sent.");
     } catch (error) {
-      window.alert(error instanceof Error ? error.message : "Failed to send reminder.");
+      toast.error(error instanceof Error ? error.message : "Failed to send reminder.");
     } finally {
       setSendingReminderRef(null);
     }

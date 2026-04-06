@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -61,7 +62,7 @@ export default function ConstructionContractorPaymentsPage() {
     const row = payments.find((entry) => entry.id === id);
     if (!row) return;
     if (status === "cleared" && row.status !== "released") {
-      window.alert("Only released payments can be cleared.");
+      toast.success("Only released payments can be cleared.");
       return;
     }
     await update(id, { status });

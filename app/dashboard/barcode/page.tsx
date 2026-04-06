@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -84,10 +85,10 @@ export default function BarcodePage() {
         setItems(prev => prev.map(i => i.id === item.id ? { ...i, barcode: data.item.barcode } : i));
         setAssignInput(prev => ({ ...prev, [item.id]: "" }));
       } else {
-        alert(data.error || "Failed to assign barcode");
+        toast.error(data.error || "Failed to assign barcode");
       }
     } catch {
-      alert("Error assigning barcode");
+      toast.error("Error assigning barcode");
     } finally {
       setAssigning(null);
     }

@@ -178,18 +178,18 @@ export default function JVPage() {
 
   async function saveJV() {
     if (!isBalanced) {
-      alert(`Debit (${totalDebit}) and Credit (${totalCredit}) must be equal`);
+      toast.error(`Debit (${totalDebit}) and Credit (${totalCredit}) must be equal`);
       return;
     }
 
     for (const entry of entries) {
       if (!entry.accountId) {
-        alert("All entries must have an account");
+        toast.error("All entries must have an account");
         return;
       }
       const amount = Number(entry.amount);
       if (isNaN(amount) || amount === 0) {
-        alert("All entries must have non-zero amount");
+        toast.error("All entries must have non-zero amount");
         return;
       }
     }
@@ -227,18 +227,18 @@ export default function JVPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(`Error: ${data?.error || "Save failed"}`);
+        toast.error(`Error: ${data?.error || "Save failed"}`);
         return;
       }
 
       setVoucher(data);
-      alert(editing ? "JV updated successfully!" : "Journal Voucher saved successfully!");
+      toast.success(editing ? "JV updated successfully!" : "Journal Voucher saved successfully!");
       await loadVouchers();
       resetForm();
       setShowForm(false);
       setEditing(null);
     } catch (error: any) {
-      alert(`Error: ${error.message || "Failed to save JV"}`);
+      toast.error(`Error: ${error.message || "Failed to save JV"}`);
     } finally {
       setSaving(false);
     }

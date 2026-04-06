@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -38,11 +39,11 @@ export default function GrantsPage() {
   const addGrant = async () => {
     const title = form.title.trim();
     if (!title || !form.donor.trim() || !form.amount) {
-      alert("Grant title, donor, aur amount required hain.");
+      toast.error("Grant title, donor, aur amount required hain.");
       return;
     }
     if (grants.some(g => g.title.trim().toLowerCase() === title.toLowerCase() || (form.grantNo && g.grantNo.trim().toLowerCase() === form.grantNo.trim().toLowerCase()))) {
-      alert("Ye grant already registered hai.");
+      toast.error("Ye grant already registered hai.");
       return;
     }
     await create({ title: form.title, status: "active", date: form.startDate, amount: Number(form.amount), data: { grantNo: form.grantNo || `GRT-${String(records.length + 1).padStart(3, '0')}`, donor: form.donor, currency: form.currency, startDate: form.startDate, endDate: form.endDate, purpose: form.purpose, spent: 0, reportDue: form.reportDue || undefined } });

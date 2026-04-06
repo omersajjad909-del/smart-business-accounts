@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -145,7 +146,7 @@ export default function TransportExpensesPage() {
     if (!row) return;
     if (row.status === "posted") return;
     if (nextStatus === "posted" && row.status !== "approved") {
-      alert("Approve an expense before posting it.");
+      toast("Approve an expense before posting it.");
       return;
     }
     await expenseStore.update(id, { status: nextStatus });
@@ -155,7 +156,7 @@ export default function TransportExpensesPage() {
     const row = expenses.find((entry) => entry.id === id);
     if (!row) return;
     if (row.status === "posted") {
-      alert("Posted expenses cannot be deleted.");
+      toast.success("Posted expenses cannot be deleted.");
       return;
     }
     if (!window.confirm(`Delete expense ${row.expenseNo}?`)) return;

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -77,15 +78,15 @@ export default function FirmClientsPage() {
     const phone = form.phone.trim();
     const duplicateClient = clients.some(c => c.name.toLowerCase() === name.toLowerCase() || (email && c.email.trim().toLowerCase() === email) || (phone && c.phone.trim() === phone));
     if (!name) {
-      alert("Client name required hai.");
+      toast.error("Client name required hai.");
       return;
     }
     if (form.retainerAmt && Number(form.retainerAmt) < 0) {
-      alert("Retainer negative nahi ho sakta.");
+      toast("Retainer negative nahi ho sakta.");
       return;
     }
     if (duplicateClient) {
-      alert("Yeh client name, phone, ya email pehle se maujood hai.");
+      toast("Yeh client name, phone, ya email pehle se maujood hai.");
       return;
     }
     setSaving(true);

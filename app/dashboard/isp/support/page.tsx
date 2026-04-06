@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -43,10 +44,10 @@ export default function IspSupportPage() {
 
   const saveTicket = async () => {
     const connection = connections.find((item) => item.id === form.connectionId);
-    if (!connection) return alert("Connection select karein.");
-    if (!form.issue.trim()) return alert("Issue detail required hai.");
+    if (!connection) return toast.error("Connection select karein.");
+    if (!form.issue.trim()) return toast.error("Issue detail required hai.");
     if (tickets.some((item) => item.connectionId === connection.id && item.issue.trim().toLowerCase() === form.issue.trim().toLowerCase() && item.status !== "closed")) {
-      return alert("Same issue ka open ticket already maujood hai.");
+      return toast.error("Same issue ka open ticket already maujood hai.");
     }
     await create({
       title: connection.customer,

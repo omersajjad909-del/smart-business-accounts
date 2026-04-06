@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -91,7 +92,7 @@ export default function NotificationsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prefs }),
       });
-      alert("Notification preferences saved.");
+      toast.success("Notification preferences saved.");
     } finally {
       setSavingPrefs(false);
     }
@@ -116,9 +117,9 @@ export default function NotificationsPage() {
       if (!res.ok) throw new Error("Failed to save WhatsApp configuration");
       const latest = await fetch("/api/notifications/status").then((r) => r.json()).catch(() => null);
       if (latest) setStatus(latest);
-      alert("WhatsApp configuration saved securely for this company.");
+      toast.success("WhatsApp configuration saved securely for this company.");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Failed to save WhatsApp configuration");
+      toast.error(error instanceof Error ? error.message : "Failed to save WhatsApp configuration");
     } finally {
       setSavingComms(false);
     }

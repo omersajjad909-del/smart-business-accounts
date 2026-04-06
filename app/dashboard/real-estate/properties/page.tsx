@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -58,7 +59,7 @@ export default function PropertiesPage() {
     if (!property) return;
     const linkedLease = leaseStore.records.some(record => String(record.data?.property || "") === property.name && String(record.status || "") === "active");
     if (linkedLease && (nextStatus === "vacant" || nextStatus === "for_sale" || nextStatus === "maintenance")) {
-      alert("Terminate the active lease before changing this property out of rented status.");
+      toast("Terminate the active lease before changing this property out of rented status.");
       return;
     }
     await update(propertyId, { status: nextStatus });

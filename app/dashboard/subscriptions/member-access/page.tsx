@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -54,10 +55,10 @@ export default function MemberAccessPage() {
   const saveAccess = async () => {
     const subscriber = subscribers.find((item) => item.id === form.subscriberId);
     const tier = tiers.find((item) => item.id === form.tierId);
-    if (!subscriber) return alert("Subscriber select karein.");
-    if (!tier) return alert("Content tier select karein.");
+    if (!subscriber) return toast.error("Subscriber select karein.");
+    if (!tier) return toast.error("Content tier select karein.");
     if (accessRows.some((row) => row.data?.subscriberId === subscriber.id && row.data?.tierId === tier.id && row.status !== "revoked")) {
-      return alert("Is subscriber ka ye access pehle se active hai.");
+      return toast("Is subscriber ka ye access pehle se active hai.");
     }
     await create({
       title: subscriber.company,

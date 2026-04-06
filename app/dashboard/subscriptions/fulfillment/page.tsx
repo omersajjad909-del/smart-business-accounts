@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -54,11 +55,11 @@ export default function SubscriptionFulfillmentPage() {
   const saveRun = async () => {
     const subscriber = subscribers.find((item) => item.id === form.subscriberId);
     const box = boxes.find((item) => item.id === form.boxId);
-    if (!subscriber) return alert("Subscriber select karein.");
-    if (!box) return alert("Curated box select karein.");
-    if (!form.courier.trim()) return alert("Courier required hai.");
+    if (!subscriber) return toast.error("Subscriber select karein.");
+    if (!box) return toast.error("Curated box select karein.");
+    if (!form.courier.trim()) return toast.error("Courier required hai.");
     if (rows.some((item) => item.data?.subscriberId === subscriber.id && item.data?.boxId === box.id && item.status !== "delivered")) {
-      return alert("Is member ke liye is box ka active fulfillment run already hai.");
+      return toast.error("Is member ke liye is box ka active fulfillment run already hai.");
     }
     await create({
       title: subscriber.company,

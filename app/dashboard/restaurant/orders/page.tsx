@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -55,7 +56,7 @@ export default function RestaurantOrdersPage() {
 
   function editOrder(order: (typeof orders)[number]) {
     if (order.status === "closed") {
-      alert("Closed orders are locked.");
+      toast("Closed orders are locked.");
       return;
     }
     setEditingId(order.id);
@@ -155,30 +156,30 @@ export default function RestaurantOrdersPage() {
   async function moveOrder(order: (typeof orders)[number], nextStatus: RestaurantOrderStatus) {
     const isDineIn = order.serviceMode === "dine_in" && order.tableRef;
     if (nextStatus === "in_kitchen" && order.status !== "confirmed") {
-      alert("Only confirmed orders can move to kitchen.");
+      toast.success("Only confirmed orders can move to kitchen.");
       return;
     }
     if (nextStatus === "served" && order.status !== "in_kitchen") {
-      alert("Only kitchen orders can be marked served.");
+      toast.error("Only kitchen orders can be marked served.");
       return;
     }
     if (nextStatus === "closed" && order.status !== "served") {
-      alert("Only served orders can be closed.");
+      toast.error("Only served orders can be closed.");
       return;
     }
 
     if (nextStatus === "confirmed" && isDineIn) {
       const table = tables.find((row) => `Table ${row.number}` === order.tableRef);
       if (!table) {
-        alert("Linked table no longer exists.");
+        toast("Linked table no longer exists.");
         return;
       }
       if (table.status === "cleaning") {
-        alert("This table is under cleaning.");
+        toast("This table is under cleaning.");
         return;
       }
       if (hasBlockingReservation(order.tableRef)) {
-        alert("This table has an active reservation. Resolve it before confirming the order.");
+        toast("This table has an active reservation. Resolve it before confirming the order.");
         return;
       }
       await updateTableStatus(order.tableRef, "occupied");
@@ -201,7 +202,7 @@ export default function RestaurantOrdersPage() {
 
   async function removeOrder(order: (typeof orders)[number]) {
     if (order.status !== "draft") {
-      alert("Only draft orders can be deleted.");
+      toast.success("Only draft orders can be deleted.");
       return;
     }
     if (!window.confirm(`Delete ${order.orderNo}?`)) return;

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 import { useState } from 'react';
 import { useBusinessRecords } from '@/lib/useBusinessRecords';
@@ -62,11 +63,11 @@ export default function ClientsPage() {
     const duplicatePhone = phone && clients.some(c => c.phone.trim() === phone);
     const duplicateEmail = email && clients.some(c => c.email.trim().toLowerCase() === email);
     if (!name || !phone || !city) {
-      alert('Client name, phone, aur city required hain.');
+      toast.error('Client name, phone, aur city required hain.');
       return;
     }
     if (duplicateName || duplicatePhone || duplicateEmail) {
-      alert('Yeh client name, phone, ya email pehle se maujood hai.');
+      toast('Yeh client name, phone, ya email pehle se maujood hai.');
       return;
     }
     const today = new Date().toISOString().split('T')[0];

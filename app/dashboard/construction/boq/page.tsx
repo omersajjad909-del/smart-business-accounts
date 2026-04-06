@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useMemo, useState } from "react";
@@ -61,7 +62,7 @@ export default function ConstructionBoqPage() {
     const row = boqs.find((entry) => entry.id === id);
     if (!row) return;
     if (row.billedQuantity < row.quantity) {
-      window.alert("BOQ item can only close after full billed quantity is reached.");
+      toast.error("BOQ item can only close after full billed quantity is reached.");
       return;
     }
     await update(id, { status: "closed" });

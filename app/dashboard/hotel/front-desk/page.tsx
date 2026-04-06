@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -90,7 +91,7 @@ export default function FrontDeskPage() {
                   {r.status === "reserved" && <button onClick={async () => {
                     const room = rooms.find(roomRow => roomRow.number === r.room);
                     if (!room || room.status === "maintenance") {
-                      window.alert("Room is unavailable for check-in.");
+                      toast("Room is unavailable for check-in.");
                       return;
                     }
                     await update(r.id, { status: "checked_in" });

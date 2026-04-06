@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -170,7 +171,7 @@ export default function PaymentReceiptsPage() {
       });
 
       if (response.ok) {
-        alert(editingId ? 'Payment receipt updated successfully' : 'Payment receipt saved successfully');
+        toast.success(editingId ? 'Payment receipt updated successfully' : 'Payment receipt saved successfully');
         setFormData({
           receiptNo: '',
           date: new Date().toISOString().split('T')[0],
@@ -188,7 +189,7 @@ export default function PaymentReceiptsPage() {
       }
     } catch (error) {
       console.error('Error saving receipt:', error);
-      alert('Error: Failed to save receipt');
+      toast.error('Error: Failed to save receipt');
     } finally {
       setLoading(false);
     }
@@ -219,14 +220,14 @@ export default function PaymentReceiptsPage() {
       });
 
       if (response.ok) {
-        alert('Payment receipt deleted successfully');
+        toast.success('Payment receipt deleted successfully');
         fetchReceipts();
       } else {
-        alert('Error: Failed to delete receipt');
+        toast.error('Error: Failed to delete receipt');
       }
     } catch (error) {
       console.error('Error deleting receipt:', error);
-      alert('Error: Failed to delete receipt');
+      toast.error('Error: Failed to delete receipt');
     }
   };
 
@@ -254,14 +255,14 @@ export default function PaymentReceiptsPage() {
       });
 
       if (response.ok) {
-        alert('Cheque marked as cleared');
+        toast.success('Cheque marked as cleared');
         fetchReceipts();
       } else {
-        alert('Error: Failed to clear cheque');
+        toast.error('Error: Failed to clear cheque');
       }
     } catch (error) {
       console.error('Error clearing cheque:', error);
-      alert('Error: Failed to clear cheque');
+      toast.error('Error: Failed to clear cheque');
     }
   };
 

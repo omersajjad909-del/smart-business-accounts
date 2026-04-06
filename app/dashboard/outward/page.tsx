@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -72,7 +73,7 @@ export default function OutwardPage() {
                 setCustomerId(foundInvoice.customerId);
                 handleInvoiceChange(foundInvoice.id);
               } else {
-                alert(`No customer or invoice found matching "${query}"`);
+                toast(`No customer or invoice found matching "${query}"`);
               }
             }
           }
@@ -98,7 +99,7 @@ export default function OutwardPage() {
       })
       .catch(err => {
         console.error("Error loading customers:", err);
-        alert("Failed to load customers");
+        toast.error("Failed to load customers");
       });
   }, []);
 
@@ -124,7 +125,7 @@ export default function OutwardPage() {
 
     const user = getCurrentUser();
     if (!user) {
-      alert("Session expired. Please login again.");
+      toast.error("Session expired. Please login again.");
       return;
     }
 
@@ -137,7 +138,7 @@ export default function OutwardPage() {
       .then(r => {
         if (!r.ok) {
           if (r.status === 403) {
-            alert("You don't have permission to view sales invoices");
+            toast("You don't have permission to view sales invoices");
             return { invoices: [] };
           }
           throw new Error(`Failed to load invoices: ${r.status}`);
@@ -151,7 +152,7 @@ export default function OutwardPage() {
           );
           setCustomerInvoices(filtered);
         } else if (d?.error) {
-          alert(`Error: ${d.error}`);
+          toast.error(`Error: ${d.error}`);
         } else {
           console.error("Unexpected response format:", d);
           setCustomerInvoices([]);
@@ -159,7 +160,7 @@ export default function OutwardPage() {
       })
       .catch(err => {
         console.error("Error loading invoices:", err);
-        alert(`Failed to load invoices: ${err.message || "Unknown error"}`);
+        toast.error(`Failed to load invoices: ${err.message || "Unknown error"}`);
         setCustomerInvoices([]);
       });
   }, [customerId]);
@@ -182,7 +183,7 @@ export default function OutwardPage() {
       setRows(autoRows);
     } else {
       console.error("Invoice not found or items missing:", inv);
-      alert("Invoice items not found. Please try selecting the invoice again.");
+      toast.error("Invoice items not found. Please try selecting the invoice again.");
     }
   }
 
@@ -194,7 +195,7 @@ export default function OutwardPage() {
 
   async function saveOutward() {
     const clean = rows.filter(r => r.itemId && Number(r.qty) > 0);
-    if (!customerId || clean.length === 0) return alert("Select Customer and Items");
+    if (!customerId || clean.length === 0) return toast.error("Select Customer and Items");
 
     setSaving(true);
     try {
@@ -221,7 +222,7 @@ export default function OutwardPage() {
         setShowList(true);
       }
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message);
     } finally {
       setSaving(false);
     }
@@ -252,14 +253,14 @@ export default function OutwardPage() {
         headers: { "x-user-role": user?.role || "ADMIN" },
       });
       if (res.ok) {
-        alert("Outward deleted successfully");
+        toast.success("Outward deleted successfully");
         await loadOutwards();
       } else {
         const err = await res.json();
-        alert(err.error || "Delete failed");
+        toast.error(err.error || "Delete failed");
       }
     } catch (_e) {
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   }
 

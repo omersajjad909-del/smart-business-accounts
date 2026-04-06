@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -54,7 +55,7 @@ export default function AdminPermissionsPage() {
   }
 
   async function save() {
-    if (!selectedUser) return alert("Please select a user first");
+    if (!selectedUser) return toast.error("Please select a user first");
     setLoading(true);
     try {
       const res = await fetch("/api/admin/user-permissions", {
@@ -63,13 +64,13 @@ export default function AdminPermissionsPage() {
         body: JSON.stringify({ userId: selectedUser.id, permissions }),
       });
       if (res.ok) {
-        alert("Permissions saved ✅");
+        toast.success("Permissions saved ✅");
       } else {
         const err = await res.json();
-        alert("Error: " + (err.error || "Failed to save"));
+        toast.error("Error: " + (err.error || "Failed to save"));
       }
     } catch {
-      alert("Network error");
+      toast.error("Network error");
     } finally {
       setLoading(false);
     }

@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 "use client";
 import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
@@ -82,15 +83,15 @@ export default function FirmTimesheetsPage() {
     const rate = parseFloat(form.rate) || 0;
     const duplicateEntry = entries.some(e => e.staffName.toLowerCase() === staffName.toLowerCase() && e.project.trim().toLowerCase() === form.project.trim().toLowerCase() && e.date === date);
     if (!staffName || !date) {
-      alert("Staff name aur date required hain.");
+      toast.error("Staff name aur date required hain.");
       return;
     }
     if (hours <= 0 || rate < 0) {
-      alert("Hours positive hon, aur rate negative na ho.");
+      toast("Hours positive hon, aur rate negative na ho.");
       return;
     }
     if (duplicateEntry) {
-      alert("Is staff ke liye isi project aur date par entry already maujood hai.");
+      toast.error("Is staff ke liye isi project aur date par entry already maujood hai.");
       return;
     }
     setSaving(true);
