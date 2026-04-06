@@ -30,9 +30,9 @@ export default function Offer() {
         background: "rgba(251,191,36,.2)", border: "1px solid rgba(251,191,36,.4)",
         borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 800,
         color: "#fbbf24", letterSpacing: ".06em",
-      }}>75% OFF</span>
+      }}>Launch Offer</span>
       <span style={{ color: "rgba(255,255,255,.85)" }}>
-        75% off for the first 3 months.
+       — 75% Off for the First 3 Months. Limited Time.
       </span>
 
       <Link href="/pricing" style={{
