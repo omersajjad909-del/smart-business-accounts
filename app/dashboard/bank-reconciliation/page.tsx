@@ -1,5 +1,6 @@
+"use client";
+
 import toast from "react-hot-toast";
-'use client';
 
 import { useEffect, useState } from 'react';
 import { getCurrentUser } from '@/lib/auth';
