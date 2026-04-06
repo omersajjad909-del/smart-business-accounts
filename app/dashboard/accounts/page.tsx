@@ -345,7 +345,7 @@ const res = await fetch(`/api/accounts?id=${id}`, {
           </thead>
           <tbody className="font-bold uppercase text-[12px]">
             {filteredAccounts.map((a) => (
-              <tr key={a.id} className="border-b-2 border-black hover:bg-blue-50">
+              <tr key={a.id} className="border-b-2 border-black" style={{transition:"background 0.15s"}} onMouseEnter={e=>(e.currentTarget as HTMLElement).style.background="rgba(99,102,241,0.18)"} onMouseLeave={e=>(e.currentTarget as HTMLElement).style.background=""}>
                 <td className="p-3 border-r-2 border-black text-blue-700">{a.code}</td>
                 <td className="p-3 border-r-2 border-black">{a.name}</td>
                 <td className="p-3 border-r-2 border-black text-[9px]">{a.partyType}</td>
