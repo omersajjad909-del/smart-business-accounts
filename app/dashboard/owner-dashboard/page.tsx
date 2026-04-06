@@ -15,6 +15,8 @@ interface Summary {
   revenueGrowth: number;
   invoicesPending: number;
   overdueAmount: number;
+  revenueHistory: number[];
+  expensesHistory: number[];
 }
 
 interface TopCustomer { name: string; revenue: number; }
@@ -65,15 +67,17 @@ export default function OwnerDashboardPage() {
     ]).then(([sum, co]) => {
       if (sum) {
         setSummary({
-          revenue:        sum.revenue        || 0,
-          expenses:       sum.expenses       || 0,
-          profit:         (sum.revenue || 0) - (sum.expenses || 0),
-          receivables:    sum.receivables    || 0,
-          payables:       sum.payables       || 0,
-          cashBalance:    sum.cashBalance    || 0,
-          revenueGrowth:  sum.revenueGrowth  || 0,
+          revenue:         sum.revenue         || 0,
+          expenses:        sum.expenses        || 0,
+          profit:          sum.profit          || (sum.revenue || 0) - (sum.expenses || 0),
+          receivables:     sum.receivables     || 0,
+          payables:        sum.payables        || 0,
+          cashBalance:     sum.cashBalance     || 0,
+          revenueGrowth:   sum.revenueGrowth   || 0,
           invoicesPending: sum.invoicesPending || 0,
-          overdueAmount:  sum.overdueAmount  || 0,
+          overdueAmount:   sum.overdueAmount   || 0,
+          revenueHistory:  Array.isArray(sum.revenueHistory)  ? sum.revenueHistory  : [],
+          expensesHistory: Array.isArray(sum.expensesHistory) ? sum.expensesHistory : [],
         });
         setTopCustomers(sum.topCustomers || []);
         setRecent(sum.recentActivity || []);
@@ -84,8 +88,6 @@ export default function OwnerDashboardPage() {
 
   const fmt = (n: number) => n >= 1000000 ? `$${(n / 1000000).toFixed(1)}M` : n >= 1000 ? `$${(n / 1000).toFixed(1)}k` : `$${n.toFixed(0)}`;
   const fmtFull = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-  const MOCK_SPARK = [42, 58, 51, 73, 68, 82, 75, 91, 85, 100, 95, 112];
 
   const QUICK_LINKS = [
     { label: "New Invoice",       href: "/dashboard/sales-invoice",   icon: "🧾", color: "#6366f1" },
@@ -130,9 +132,9 @@ export default function OwnerDashboardPage() {
         <>
           {/* Primary KPI row */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 16 }}>
-            <KPICard label="Revenue" value={fmt(summary?.revenue ?? 0)} sub={summary?.revenueGrowth ? `${summary.revenueGrowth > 0 ? "+" : ""}${summary.revenueGrowth.toFixed(1)}% vs last period` : undefined} color="#10b981" spark={MOCK_SPARK} href="/dashboard/reports/profit-loss" />
-            <KPICard label="Expenses" value={fmt(summary?.expenses ?? 0)} color="#f87171" spark={[38,48,42,55,50,58,52,60,55,62,58,65]} href="/dashboard/expense-vouchers" />
-            <KPICard label="Net Profit" value={fmt(summary?.profit ?? 0)} sub={summary ? `${((summary.profit / (summary.revenue || 1)) * 100).toFixed(1)}% margin` : undefined} color="#a5b4fc" spark={[20,28,22,36,30,40,34,44,38,50,45,55]} href="/dashboard/reports/profit-loss" />
+            <KPICard label="Revenue" value={fmt(summary?.revenue ?? 0)} sub={summary?.revenueGrowth ? `${summary.revenueGrowth > 0 ? "+" : ""}${summary.revenueGrowth.toFixed(1)}% vs last period` : undefined} color="#10b981" spark={summary?.revenueHistory?.length ? summary.revenueHistory : undefined} href="/dashboard/reports/profit-loss" />
+            <KPICard label="Expenses" value={fmt(summary?.expenses ?? 0)} color="#f87171" spark={summary?.expensesHistory?.length ? summary.expensesHistory : undefined} href="/dashboard/expense-vouchers" />
+            <KPICard label="Net Profit" value={fmt(summary?.profit ?? 0)} sub={summary ? `${((summary.profit / (summary.revenue || 1)) * 100).toFixed(1)}% margin` : undefined} color="#a5b4fc" spark={summary?.revenueHistory?.length ? summary.revenueHistory.map((r, i) => r - (summary.expensesHistory[i] || 0)) : undefined} href="/dashboard/reports/profit-loss" />
           </div>
 
           {/* Secondary KPI row */}

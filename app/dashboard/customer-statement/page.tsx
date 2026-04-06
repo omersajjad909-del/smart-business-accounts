@@ -35,16 +35,10 @@ type Statement = {
   closingBalance: number;
 };
 
-const MOCK_STATEMENT: Statement = {
+const EMPTY_STATEMENT: Statement = {
   openingBalance: 0,
-  transactions: [
-    { date: "2026-03-01", description: "Sales Invoice #INV-1001", debit: 15000, credit: 0, balance: 15000 },
-    { date: "2026-03-05", description: "Sales Invoice #INV-1002", debit: 8500,  credit: 0, balance: 23500 },
-    { date: "2026-03-10", description: "Payment Receipt #REC-201",  debit: 0,     credit: 10000, balance: 13500 },
-    { date: "2026-03-18", description: "Sales Invoice #INV-1003", debit: 6200,  credit: 0, balance: 19700 },
-    { date: "2026-03-22", description: "Payment Receipt #REC-202",  debit: 0,     credit: 5000, balance: 14700 },
-  ],
-  closingBalance: 14700,
+  transactions: [],
+  closingBalance: 0,
 };
 
 function fmt(n: number) {
@@ -60,7 +54,6 @@ export default function CustomerStatementPage() {
   const [dateTo, setDateTo] = useState(todayStr());
   const [statement, setStatement] = useState<Statement | null>(null);
   const [stmtLoading, setStmtLoading] = useState(false);
-  const [usedMock, setUsedMock] = useState(false);
 
   useEffect(() => {
     setContactsLoading(true);
@@ -84,7 +77,6 @@ export default function CustomerStatementPage() {
   const fetchStatement = useCallback(
     (customer: Contact, from: string, to: string) => {
       setStmtLoading(true);
-      setUsedMock(false);
       const user = typeof window !== "undefined" ? (() => { try { const s = localStorage.getItem("user"); return s ? JSON.parse(s) : null; } catch { return null; } })() : null;
       fetch(
         `/api/reports/customer-statement?customerId=${customer.id}&from=${from}&to=${to}`,
@@ -98,7 +90,6 @@ export default function CustomerStatementPage() {
       )
         .then((r) => r.json())
         .then((data) => {
-          // API returns { rows, openingBalance, closingBalance, ... }
           if (data && Array.isArray(data.rows)) {
             setStatement({
               openingBalance: data.openingBalance ?? 0,
@@ -112,13 +103,11 @@ export default function CustomerStatementPage() {
               closingBalance: data.closingBalance ?? 0,
             });
           } else {
-            setStatement(MOCK_STATEMENT);
-            setUsedMock(true);
+            setStatement(EMPTY_STATEMENT);
           }
         })
         .catch(() => {
-          setStatement(MOCK_STATEMENT);
-          setUsedMock(true);
+          setStatement(EMPTY_STATEMENT);
         })
         .finally(() => setStmtLoading(false));
     },
@@ -317,7 +306,6 @@ export default function CustomerStatementPage() {
               dateFrom={dateFrom}
               dateTo={dateTo}
               statement={statement}
-              usedMock={usedMock}
               accent={ACCENT}
               accentLight={ACCENT_LIGHT}
               debitLabel="Invoice Amount"
@@ -346,7 +334,6 @@ function StatementPanel({
   dateFrom,
   dateTo,
   statement,
-  usedMock,
   accent,
   accentLight,
   debitLabel,
@@ -356,7 +343,6 @@ function StatementPanel({
   dateFrom: string;
   dateTo: string;
   statement: Statement;
-  usedMock: boolean;
   accent: string;
   accentLight: string;
   debitLabel: string;
@@ -395,22 +381,6 @@ function StatementPanel({
         </div>
         <div style={{ textAlign: "right", fontSize: 13, color: "var(--text-muted)" }}>
           <div>Period: {dateFrom} &rarr; {dateTo}</div>
-          {usedMock && (
-            <div
-              style={{
-                marginTop: 6,
-                padding: "3px 10px",
-                borderRadius: 20,
-                background: "rgba(251,191,36,0.12)",
-                color: "#fbbf24",
-                fontSize: 11,
-                fontWeight: 600,
-                display: "inline-block",
-              }}
-            >
-              Demo Data
-            </div>
-          )}
         </div>
       </div>
 

@@ -36,16 +36,10 @@ type Statement = {
   closingBalance: number;
 };
 
-const MOCK_STATEMENT: Statement = {
+const EMPTY_STATEMENT: Statement = {
   openingBalance: 0,
-  transactions: [
-    { date: "2026-03-02", description: "Purchase Invoice #PUR-3001", debit: 22000, credit: 0,     balance: 22000 },
-    { date: "2026-03-07", description: "Purchase Invoice #PUR-3002", debit: 11500, credit: 0,     balance: 33500 },
-    { date: "2026-03-12", description: "Payment Voucher #PAY-401",   debit: 0,     credit: 15000, balance: 18500 },
-    { date: "2026-03-20", description: "Purchase Invoice #PUR-3003", debit: 8800,  credit: 0,     balance: 27300 },
-    { date: "2026-03-25", description: "Payment Voucher #PAY-402",   debit: 0,     credit: 10000, balance: 17300 },
-  ],
-  closingBalance: 17300,
+  transactions: [],
+  closingBalance: 0,
 };
 
 function fmt(n: number) {
@@ -61,7 +55,6 @@ export default function SupplierStatementPage() {
   const [dateTo, setDateTo] = useState(todayStr());
   const [statement, setStatement] = useState<Statement | null>(null);
   const [stmtLoading, setStmtLoading] = useState(false);
-  const [usedMock, setUsedMock] = useState(false);
 
   useEffect(() => {
     setSuppliersLoading(true);
@@ -86,7 +79,6 @@ export default function SupplierStatementPage() {
   const fetchStatement = useCallback(
     (supplier: Supplier, from: string, to: string) => {
       setStmtLoading(true);
-      setUsedMock(false);
       const user = typeof window !== "undefined" ? (() => { try { const s = localStorage.getItem("user"); return s ? JSON.parse(s) : null; } catch { return null; } })() : null;
       fetch(
         `/api/reports/supplier-statement?supplierId=${supplier.id}&from=${from}&to=${to}`,
@@ -100,7 +92,6 @@ export default function SupplierStatementPage() {
       )
         .then((r) => r.json())
         .then((data) => {
-          // API returns { rows, openingBalance, closingBalance, ... }
           if (data && Array.isArray(data.rows)) {
             setStatement({
               openingBalance: data.openingBalance ?? 0,
@@ -114,13 +105,11 @@ export default function SupplierStatementPage() {
               closingBalance: data.closingBalance ?? 0,
             });
           } else {
-            setStatement(MOCK_STATEMENT);
-            setUsedMock(true);
+            setStatement(EMPTY_STATEMENT);
           }
         })
         .catch(() => {
-          setStatement(MOCK_STATEMENT);
-          setUsedMock(true);
+          setStatement(EMPTY_STATEMENT);
         })
         .finally(() => setStmtLoading(false));
     },
@@ -319,7 +308,6 @@ export default function SupplierStatementPage() {
               dateFrom={dateFrom}
               dateTo={dateTo}
               statement={statement}
-              usedMock={usedMock}
               accent={ACCENT}
               accentLight={ACCENT_LIGHT}
               debitLabel="Purchase Amount"
@@ -348,7 +336,6 @@ function StatementPanel({
   dateFrom,
   dateTo,
   statement,
-  usedMock,
   accent,
   accentLight,
   debitLabel,
@@ -358,7 +345,6 @@ function StatementPanel({
   dateFrom: string;
   dateTo: string;
   statement: Statement;
-  usedMock: boolean;
   accent: string;
   accentLight: string;
   debitLabel: string;
@@ -397,22 +383,6 @@ function StatementPanel({
         </div>
         <div style={{ textAlign: "right", fontSize: 13, color: "var(--text-muted)" }}>
           <div>Period: {dateFrom} &rarr; {dateTo}</div>
-          {usedMock && (
-            <div
-              style={{
-                marginTop: 6,
-                padding: "3px 10px",
-                borderRadius: 20,
-                background: "rgba(251,191,36,0.12)",
-                color: "#fbbf24",
-                fontSize: 11,
-                fontWeight: 600,
-                display: "inline-block",
-              }}
-            >
-              Demo Data
-            </div>
-          )}
         </div>
       </div>
 
