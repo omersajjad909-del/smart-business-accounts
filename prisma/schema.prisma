@@ -24,6 +24,11 @@ model Account {
   city        String?
   phone       String?
   email       String?
+  address     String?
+  ntn         String?   // National Tax Number
+  strn        String?   // Sales Tax Reg. No.
+  bankIban    String?   // IBAN / Bank Account No.
+  description String?   // Internal notes
   openDate    DateTime?
   openDebit   Float     @default(0)
   openCredit  Float     @default(0)
