@@ -1,11 +1,19 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const agricultureFont = "'Outfit','Inter',sans-serif";
 export const agricultureBg = "rgba(255,255,255,.03)";
 export const agricultureBorder = "rgba(255,255,255,.07)";
 export const agricultureMuted = "rgba(255,255,255,.58)";
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export type CropStatus = "planted" | "growing" | "harvested" | "failed";
 export type FieldStatus = "active" | "fallow";
@@ -53,6 +61,27 @@ export type HarvestRow = {
   date: string;
   buyer: string;
   revenue: number;
+};
+
+export type AgricultureControlCenter = {
+  summary: {
+    fields: number;
+    activeFields: number;
+    totalArea: number;
+    crops: number;
+    growingCrops: number;
+    failedCrops: number;
+    harvests: number;
+    harvestQuantity: number;
+    harvestRevenue: number;
+    livestockGroups: number;
+    livestockCount: number;
+    healthyAnimals: number;
+  };
+  crops: CropRow[];
+  fields: FieldRow[];
+  livestock: LivestockRow[];
+  harvests: HarvestRow[];
 };
 
 export function mapCrops(records: BusinessRecord[]): CropRow[] {

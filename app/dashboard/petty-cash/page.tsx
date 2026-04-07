@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import { useState, useEffect } from 'react';
@@ -569,7 +570,7 @@ export default function PettyCashPage() {
                 <tbody>
                   {expenses.map((expense) => (
                     <tr key={expense.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4">{new Date(expense.date).toLocaleDateString()}</td>
+                      <td className="py-3 px-4">{fmtDate(expense.date)}</td>
                       <td className="py-3 px-4">{expense.voucherNumber}</td>
                       <td className="py-3 px-4">{expense.description}</td>
                       <td className="py-3 px-4">
@@ -600,7 +601,7 @@ export default function PettyCashPage() {
                       </div>
                       <span className="px-2 py-1 bg-gray-100 rounded text-xs">{expense.category}</span>
                     </div>
-                    <MobileCardRow label="Date" value={new Date(expense.date).toLocaleDateString()} />
+                    <MobileCardRow label="Date" value={fmtDate(expense.date)} />
                     <MobileCardRow 
                       label="Amount" 
                       value={`Ã¢â€šÂ¹${expense.amount.toFixed(2)}`}

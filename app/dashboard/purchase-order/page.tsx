@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
@@ -375,7 +376,7 @@ export default function PurchaseOrderPage() {
                 pos.map(po => (
                   <tr key={po.id} className="border-t hover:bg-gray-50">
                     <td className="p-3 font-bold">{po.poNo}</td>
-                    <td className="p-3">{new Date(po.date).toLocaleDateString()}</td>
+                    <td className="p-3">{fmtDate(po.date)}</td>
                     <td className="p-3">{po.supplier?.name || "N/A"}</td>
                     <td className="p-3 text-right">{po.items?.length || 0}</td>
                     <td className="p-3 text-center space-x-2">

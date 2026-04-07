@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
@@ -1799,8 +1800,8 @@ export default function DashboardLayout({
                 { icon:"💱", label:"Currency",      value: companyDetail?.baseCurrency || "—" },
                 { icon:"👥", label:"Total Users",   value: companyDetail?.totalUsers ?? "—" },
                 { icon:"📊", label:"Accounts",      value: companyDetail?.totalAccounts ?? "—" },
-                { icon:"📅", label:"Joined",        value: companyDetail?.createdAt ? new Date(companyDetail.createdAt).toLocaleDateString("en-PK",{year:"numeric",month:"short",day:"numeric"}) : "—" },
-                { icon:"🔄", label:"Renews",        value: companyDetail?.currentPeriodEnd ? new Date(companyDetail.currentPeriodEnd).toLocaleDateString("en-PK",{year:"numeric",month:"short",day:"numeric"}) : "—" },
+                { icon:"📅", label:"Joined",        value: companyDetail?.createdAt ? fmtDate(companyDetail.createdAt) : "—" },
+                { icon:"🔄", label:"Renews",        value: companyDetail?.currentPeriodEnd ? fmtDate(companyDetail.currentPeriodEnd) : "—" },
               ].map(row => (
                 <div key={row.label} style={{ padding:"12px 14px",borderRadius:10,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.06)" }}>
                   <div style={{ fontSize:10,color:"rgba(255,255,255,.3)",fontWeight:700,textTransform:"uppercase",letterSpacing:".05em",marginBottom:5 }}>{row.icon} {row.label}</div>

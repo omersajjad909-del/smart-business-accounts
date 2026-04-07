@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 
 import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
@@ -177,7 +178,7 @@ export default function EcommerceOrdersPage() {
                   <td style={tdStyle}>{order.quantity}</td>
                   <td style={{ ...tdStyle, color: "#34d399", fontWeight: 800 }}>Rs. {order.amount.toLocaleString()}</td>
                   <td style={tdStyle}>{order.platform}</td>
-                  <td style={tdStyle}>{new Date(order.createdAt).toLocaleDateString("en-PK")}</td>
+                  <td style={tdStyle}>{fmtDate(order.createdAt)}</td>
                   <td style={tdStyle}>
                     <span style={{ display: "inline-block", borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700, color: ecommerceStatusColor(order.status), background: `${ecommerceStatusColor(order.status)}20` }}>
                       {order.status}

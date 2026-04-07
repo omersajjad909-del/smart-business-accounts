@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -535,9 +536,7 @@ export default function AttendancePage() {
               }}
             >
               <span style={{ fontWeight: 800, color: "white", fontSize: 14 }}>
-                {new Date(selectedDate + "T12:00:00").toLocaleDateString(undefined, {
-                  weekday: "long", year: "numeric", month: "long", day: "numeric",
-                })}
+                {fmtDate(selectedDate + "T12:00:00")}
               </span>
               <button
                 onClick={() => setSelectedDate(null)}

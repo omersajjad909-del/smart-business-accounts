@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -110,7 +111,7 @@ export default function ApprovalsPage() {
               {item.invoiceNo || item.poNo || item.quotationNo || item.challanNo || item.voucherNo || item.receiptNo || item.id}
             </div>
             <div className="text-sm text-gray-600">
-              Date: {new Date(item.date).toLocaleDateString()}
+              Date: {fmtDate(item.date)}
             </div>
             <div className="text-sm font-bold">
               Amount: {(item.total ?? item.totalAmount ?? item.amount ?? 0).toLocaleString()}

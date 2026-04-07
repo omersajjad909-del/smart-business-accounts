@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 
 import { useSearchParams } from "next/navigation";
@@ -57,7 +58,7 @@ function PurchasePrintContent() {
             <div className="font-bold">Supplier: {data.supplier.name}</div>
         </div>
         <div className="text-right flex flex-col items-end">
-            <div>Date: {new Date(data.date).toLocaleDateString()}</div>
+            <div>Date: {fmtDate(data.date)}</div>
             <div className="font-bold">Invoice #: {data.invoiceNo}</div>
             {data.invoiceNo && (
                 <div className="mt-1 flex flex-col items-end gap-2">

@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 
 import { useState, useMemo } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
@@ -510,7 +511,7 @@ export default function WarehousesPage() {
                 <div style={{ textAlign: "right" }}>
                   <StatusBadge status={tx.status} />
                   <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>
-                    {tx.date ? new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}
+                    {tx.date ? fmtDate(tx.date) : ""}
                   </div>
                 </div>
               </div>

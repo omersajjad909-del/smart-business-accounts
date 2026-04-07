@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -373,7 +374,7 @@ export default function QuotationPage() {
     
     // Construct a message
     let message = `*Quotation: ${savedQuotation.quotationNo}*\n`;
-    message += `Date: ${new Date(savedQuotation.date).toLocaleDateString()}\n`;
+    message += `Date: ${fmtDate(savedQuotation.date)}\n`;
     message += `Customer: ${customerName}\n\n`;
     message += `*Items:*\n`;
     
@@ -396,7 +397,7 @@ export default function QuotationPage() {
     
     // Construct a message (shorter for SMS)
     let message = `Quotation: ${savedQuotation.quotationNo}\n`;
-    message += `Date: ${new Date(savedQuotation.date).toLocaleDateString()}\n`;
+    message += `Date: ${fmtDate(savedQuotation.date)}\n`;
     message += `Customer: ${customerName}\n`;
     message += `Total: ${savedQuotation.total.toLocaleString()}`;
     
@@ -465,7 +466,7 @@ export default function QuotationPage() {
                 filteredQuotations.map(q => (
                   <tr key={q.id} className="border-t hover:bg-gray-50">
                     <td className="p-3 font-bold">{q.quotationNo}</td>
-                    <td className="p-3">{new Date(q.date).toLocaleDateString()}</td>
+                    <td className="p-3">{fmtDate(q.date)}</td>
                     <td className="p-3">{q.customer?.name || "N/A"}</td>
                     <td className="p-3 text-right">{q.total.toLocaleString()}</td>
                     <td className="p-3">
@@ -668,7 +669,7 @@ export default function QuotationPage() {
                 {printPrefs.showLogo && printPrefs.logoUrl && <img src={printPrefs.logoUrl} alt="Company logo" style={{ width: isThermalPrint ? 44 : 70, margin: "0 auto 8px" }} />}
                 <h1 className="text-3xl font-bold uppercase tracking-wider">Quotation</h1>
                 <p className="text-gray-700 font-semibold">{companyName}</p>
-                <p className="text-gray-500">Date: {new Date(savedQuotation.date).toLocaleDateString()}</p>
+                <p className="text-gray-500">Date: {fmtDate(savedQuotation.date)}</p>
                 <p className="text-gray-500 font-bold">#{savedQuotation.quotationNo}</p>
               </div>
 
@@ -680,7 +681,7 @@ export default function QuotationPage() {
                 <div className="text-right">
                   <h3 className="font-bold text-gray-700">Details:</h3>
                   {savedQuotation.validUntil && (
-                     <p>Valid Until: {new Date(savedQuotation.validUntil).toLocaleDateString()}</p>
+                     <p>Valid Until: {fmtDate(savedQuotation.validUntil)}</p>
                   )}
                 </div>
               </div>

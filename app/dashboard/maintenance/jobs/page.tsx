@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { useState } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 
@@ -66,7 +67,7 @@ export default function MaintenanceJobsPage() {
     total:          records.length,
     pending:        records.filter(r => r.status === "Pending").length,
     inProgress:     records.filter(r => r.status === "In-Progress").length,
-    completedToday: records.filter(r => r.status === "Completed" && r.date?.slice(0, 10) === today).length,
+    completedToday: records.filter(r => r.status === "Completed" && fmtDate(r.date) === today).length,
   };
 
   const q = search.toLowerCase();
@@ -87,7 +88,7 @@ export default function MaintenanceJobsPage() {
       issue:         String(r.data.issue ?? ""),
       assignedTo:    String(r.data.assignedTo ?? ""),
       priority:      String(r.data.priority ?? "Medium"),
-      scheduledDate: r.date?.slice(0, 10) ?? "",
+      scheduledDate: fmtDate(r.date) ?? "",
       status:        r.status,
     });
     setShowModal(true);
@@ -173,7 +174,7 @@ export default function MaintenanceJobsPage() {
                 <td style={{ ...S.td, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{String(r.data.issue || "—")}</td>
                 <td style={S.td}>{String(r.data.assignedTo || "—")}</td>
                 <td style={S.td}>{badge(String(r.data.priority ?? ""), priorityColor)}</td>
-                <td style={{ ...S.td, color: "var(--text-muted)", fontSize: 13 }}>{r.date?.slice(0, 10) || "—"}</td>
+                <td style={{ ...S.td, color: "var(--text-muted)", fontSize: 13 }}>{fmtDate(r.date) || "—"}</td>
                 <td style={S.td}>{badge(r.status, statusColor)}</td>
                 <td style={{ ...S.td, whiteSpace: "nowrap" }}>
                   <button onClick={() => openEdit(r)} style={S.editBtn}>Edit</button>

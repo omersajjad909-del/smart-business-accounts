@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -536,7 +537,7 @@ function SalesInvoiceContent() {
 
     // Construct a message
     let message = `*Sales Invoice: ${savedInvoice.invoiceNo}*\n`;
-    message += `Date: ${new Date(savedInvoice.date).toLocaleDateString()}\n`;
+    message += `Date: ${fmtDate(savedInvoice.date)}\n`;
     message += `Customer: ${customerName}\n\n`;
     message += `*Items:*\n`;
 
@@ -558,7 +559,7 @@ function SalesInvoiceContent() {
 
     // Construct a message (shorter for SMS)
     let message = `Invoice: ${savedInvoice.invoiceNo}\n`;
-    message += `Date: ${new Date(savedInvoice.date).toLocaleDateString()}\n`;
+    message += `Date: ${fmtDate(savedInvoice.date)}\n`;
     message += `Customer: ${customerName}\n`;
     message += `Total: ${savedInvoice.total.toLocaleString()}`;
 
@@ -621,7 +622,7 @@ function SalesInvoiceContent() {
                 filteredInvoices.map(inv => (
                   <tr key={inv.id} className="border-t hover:bg-gray-50">
                     <td className="p-3 font-bold">{inv.invoiceNo}</td>
-                    <td className="p-3">{new Date(inv.date).toLocaleDateString()}</td>
+                    <td className="p-3">{fmtDate(inv.date)}</td>
                     <td className="p-3">{inv.customer?.name || "N/A"}</td>
                     <td className="p-3 text-right">{inv.total.toLocaleString()}</td>
                     <td className="p-3 text-center space-x-2">

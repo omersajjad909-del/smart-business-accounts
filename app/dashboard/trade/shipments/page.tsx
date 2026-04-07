@@ -1,5 +1,4 @@
 "use client";
-
 import { useMemo, useState } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 
@@ -166,7 +165,7 @@ function genRef(count: number) {
 
 function fmtDate(iso: string) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  return fmtDate(iso);
 }
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────

@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -402,7 +403,7 @@ function BillingPage() {
         {[
           { label:"Current Plan",   value: currentPlan.name,                          icon: currentPlan.icon, color: currentPlan.color },
           { label:"Status",         value: subscription?.status||"Ã¢â‚¬â€",                 icon: "Ã¢â€”Â",              color: "#34d399", isStatus:true },
-          { label:"Next Renewal",   value: subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}) : "Ã¢â‚¬â€", icon:"Ã°Å¸â€œâ€¦", color:"#fbbf24" },
+          { label:"Next Renewal",   value: subscription?.currentPeriodEnd ? fmtDate(subscription.currentPeriodEnd) : "Ã¢â‚¬â€", icon:"Ã°Å¸â€œâ€¦", color:"#fbbf24" },
           { label:"Monthly Amount", value: subscription ? `$${subscription.amount}/mo` : "Ã¢â‚¬â€",                 icon: "Ã°Å¸â€™Â°",             color: "#38bdf8" },
         ].map(s => (
           <div key={s.label} style={{ padding:"17px 18px", borderRadius:16, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:14 }}>
@@ -450,7 +451,7 @@ function BillingPage() {
                   {[
                     { label:"Status",        node: <StatusBadge status={subscription?.status?.toLowerCase()||"active"} /> },
                     { label:"Billing Cycle", node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.billingCycle==="yearly"?"Yearly":"Monthly"}</span> },
-                    { label:"Renewal Date",  node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}) : "Ã¢â‚¬â€"}</span> },
+                    { label:"Renewal Date",  node: <span style={{ fontSize:14, fontWeight:800 }}>{subscription?.currentPeriodEnd ? fmtDate(subscription.currentPeriodEnd) : "Ã¢â‚¬â€"}</span> },
                     { label:"Currency",      node: <span style={{ fontSize:14, fontWeight:800 }}>USD</span> },
                   ].map(r => (
                     <div key={r.label}>

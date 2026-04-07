@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -354,7 +355,7 @@ export default function SalesReturnPage() {
                 returns.map(ret => (
                   <tr key={ret.id} className="border-t hover:bg-gray-50">
                     <td className="p-3 font-bold">{ret.returnNo}</td>
-                    <td className="p-3">{new Date(ret.date).toLocaleDateString()}</td>
+                    <td className="p-3">{fmtDate(ret.date)}</td>
                     <td className="p-3">{ret.customer?.name || "N/A"}</td>
                     <td className="p-3">{ret.invoice?.invoiceNo || "N/A"}</td>
                     <td className="p-3 text-right">{ret.total.toLocaleString()}</td>

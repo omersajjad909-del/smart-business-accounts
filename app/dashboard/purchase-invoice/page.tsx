@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -478,7 +479,7 @@ const [searchTerm, setSearchTerm] = useState("");
                 filteredInvoices.map(inv => (
                   <tr key={inv.id} className="border-t hover:bg-gray-50">
                     <td className="p-3 font-bold">{inv.invoiceNo}</td>
-                    <td className="p-3">{new Date(inv.date).toLocaleDateString()}</td>
+                    <td className="p-3">{fmtDate(inv.date)}</td>
                     <td className="p-3">{inv.supplier?.name || "N/A"}</td>
                     <td className="p-3 text-right">{inv.total.toLocaleString()}</td>
                     <td className="p-3 text-center space-x-2">

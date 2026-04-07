@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import { useEffect, useState } from 'react';
@@ -500,7 +501,7 @@ export default function ExpenseVouchersPage() {
               <tr key={voucher.id} className="border-b hover:bg-gray-50">
                 <td className="px-6 py-3 font-semibold">{voucher.voucherNo}</td>
                 <td className="px-6 py-3">
-                  {new Date(voucher.date).toLocaleDateString()}
+                  {fmtDate(voucher.date)}
                 </td>
                 <td className="px-6 py-3">{voucher.totalAmount.toFixed(2)}</td>
                 <td className="px-6 py-3">

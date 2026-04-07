@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
@@ -112,7 +113,7 @@ export default function CompanyProfilePage() {
 
   const planCode = String(company.plan || "STARTER").toUpperCase();
   const statusActive = String(company.subscriptionStatus || "").toUpperCase() === "ACTIVE";
-  const periodEnd = company.currentPeriodEnd ? new Date(company.currentPeriodEnd).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"}) : null;
+  const periodEnd = company.currentPeriodEnd ? fmtDate(company.currentPeriodEnd) : null;
   const planColors: Record<string,string> = { STARTER:"#818cf8", PRO:"#a78bfa", ENTERPRISE:"#34d399", CUSTOM:"#fbbf24" };
   const planColor = planColors[planCode] || "#818cf8";
 

@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -359,9 +360,7 @@ export default function OpportunitiesPage() {
                     </td>
                     <td className="px-6 py-3">{opp.stage}</td>
                     <td className="px-6 py-3">
-                      {new Date(opp.expectedCloseDate).toLocaleDateString(
-                        "ur-PK"
-                      )}
+                      {fmtDate(opp.expectedCloseDate)}
                     </td>
                     <td className="px-6 py-3 text-center space-x-2">
                       <button

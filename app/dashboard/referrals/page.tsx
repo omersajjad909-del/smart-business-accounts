@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -173,7 +174,7 @@ export default function ReferralsPage() {
                       {r.reward ? `$${r.reward}` : "—"}
                     </td>
                     <td style={{ padding: "12px 20px", color: "rgba(255,255,255,.35)" }}>
-                      {new Date(r.createdAt).toLocaleDateString()}
+                      {fmtDate(r.createdAt)}
                     </td>
                   </tr>
                 );

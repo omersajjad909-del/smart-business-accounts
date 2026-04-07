@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -225,10 +226,10 @@ export default function FinancialYearPage() {
                 <tr key={y.id} className="border-t">
                   <td className="p-3 font-bold">{y.year}</td>
                   <td className="p-3">
-                    {new Date(y.startDate).toLocaleDateString()}
+                    {fmtDate(y.startDate)}
                   </td>
                   <td className="p-3">
-                    {new Date(y.endDate).toLocaleDateString()}
+                    {fmtDate(y.endDate)}
                   </td>
                   <td className="p-3 text-center">
                     <span

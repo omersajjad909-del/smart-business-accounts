@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -423,11 +424,11 @@ export default function RecurringTransactionsPage() {
                   </td>
                   <td className="p-3">{t.description}</td>
                   <td className="p-3">
-                    {new Date(t.nextDate).toLocaleDateString()}
+                    {fmtDate(t.nextDate)}
                   </td>
                   <td className="p-3">
                     {t.lastRun
-                      ? new Date(t.lastRun).toLocaleDateString()
+                      ? fmtDate(t.lastRun)
                       : "Never"}
                   </td>
                   <td className="p-3 text-center">

@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -369,7 +370,7 @@ export default function OutwardPage() {
                 outwards.map(out => (
                   <tr key={out.id} className="border-t hover:bg-gray-50">
                     <td className="p-3 font-bold">#{out.outwardNo}</td>
-                    <td className="p-3">{new Date(out.date).toLocaleDateString()}</td>
+                    <td className="p-3">{fmtDate(out.date)}</td>
                     <td className="p-3">{out.customer?.name || "N/A"}</td>
                     <td className="p-3">{out.vehicleNo || "N/A"}</td>
                     <td className="p-3 text-center space-x-2">

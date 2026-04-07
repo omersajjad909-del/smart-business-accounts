@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -488,7 +489,7 @@ function getStatusBadge(status: string) {
                       {adv.advanceNo}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
-                      {new Date(adv.date).toLocaleDateString()}
+                      {fmtDate(adv.date)}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
                       {adv.supplier.name}
@@ -541,7 +542,7 @@ function getStatusBadge(status: string) {
                 <MobileCardRow label="Advance No" value={adv.advanceNo} />
                 <MobileCardRow
                   label="Date"
-                  value={new Date(adv.date).toLocaleDateString()}
+                  value={fmtDate(adv.date)}
                 />
                 <MobileCardRow label="Supplier" value={adv.supplier.name} />
                 <MobileCardRow

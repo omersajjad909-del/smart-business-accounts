@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useState, useEffect, useRef } from "react";
@@ -193,7 +194,7 @@ export default function AttachmentsPage() {
                       </span>
                     ) : <span style={{ color: "var(--text-muted)", fontSize: 12 }}>General</span>}
                   </td>
-                  <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>{new Date(a.uploadedAt).toLocaleDateString()}</td>
+                  <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>{fmtDate(a.uploadedAt)}</td>
                   <td style={td}>
                     <div style={{ display: "flex", gap: 8 }}>
                       <a href={a.fileUrl} target="_blank" rel="noreferrer" download

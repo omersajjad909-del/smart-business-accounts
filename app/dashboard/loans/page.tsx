@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -483,7 +484,7 @@ export default function LoansPage() {
                           <div className="font-medium">{loan.loanNumber}</div>
                           <div className="text-sm text-gray-500">{loan.account?.name}</div>
                           <div className="text-xs text-gray-400">
-                            {new Date(loan.startDate).toLocaleDateString()} - {new Date(loan.endDate).toLocaleDateString()}
+                            {fmtDate(loan.startDate)} - {fmtDate(loan.endDate)}
                           </div>
                         </div>
                       </td>
@@ -539,7 +540,7 @@ export default function LoansPage() {
                     <MobileCardRow label="Tenure" value={`${loan.tenure} months @ ${loan.interestRate}%`} />
                     <MobileCardRow 
                       label="Period" 
-                      value={`${new Date(loan.startDate).toLocaleDateString()} - ${new Date(loan.endDate).toLocaleDateString()}`}
+                      value={`${fmtDate(loan.startDate)} - ${fmtDate(loan.endDate)}`}
                     />
                     <div className="mt-3 pt-3 border-t flex gap-2">
                       <button
@@ -609,7 +610,7 @@ export default function LoansPage() {
                 <tbody>
                   {payments.map((payment) => (
                     <tr key={payment.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4">{new Date(payment.paymentDate).toLocaleDateString()}</td>
+                      <td className="py-3 px-4">{fmtDate(payment.paymentDate)}</td>
                       <td className="py-3 px-4 text-right font-medium">Ã¢â€šÂ¹{payment.amount.toFixed(2)}</td>
                       <td className="py-3 px-4 text-right">Ã¢â€šÂ¹{payment.principalPaid.toFixed(2)}</td>
                       <td className="py-3 px-4 text-right">Ã¢â€šÂ¹{payment.interestPaid.toFixed(2)}</td>
@@ -625,7 +626,7 @@ export default function LoansPage() {
               <MobileTable>
                 {payments.map((payment) => (
                   <MobileCard key={payment.id}>
-                    <MobileCardRow label="Date" value={new Date(payment.paymentDate).toLocaleDateString()} />
+                    <MobileCardRow label="Date" value={fmtDate(payment.paymentDate)} />
                     <MobileCardRow 
                       label="Amount Paid" 
                       value={`Ã¢â€šÂ¹${payment.amount.toFixed(2)}`}

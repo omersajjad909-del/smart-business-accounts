@@ -5,6 +5,16 @@ export const autoBg = "rgba(255,255,255,.03)";
 export const autoBorder = "rgba(255,255,255,.07)";
 export const autoMuted = "rgba(255,255,255,.56)";
 
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export type ShowroomVehicleStatus = "Available" | "Reserved" | "Sold";
 export type TestDriveStatus = "scheduled" | "completed" | "cancelled";
 export type DealStatus = "lead" | "negotiation" | "financed" | "won" | "lost";
@@ -39,6 +49,26 @@ export type ShowroomDeal = {
   amount: number;
   financier: string;
   status: DealStatus;
+};
+
+export type AutomotiveControlCenter = {
+  summary: {
+    vehicles: number;
+    availableVehicles: number;
+    reservedVehicles: number;
+    soldVehicles: number;
+    inventoryValue: number;
+    soldValue: number;
+    openDeals: number;
+    wonDeals: number;
+    lostDeals: number;
+    completedDrives: number;
+    scheduledDrives: number;
+    conversionRate: number;
+  };
+  vehicles: ShowroomVehicle[];
+  testDrives: ShowroomTestDrive[];
+  deals: ShowroomDeal[];
 };
 
 export function todayIso() {

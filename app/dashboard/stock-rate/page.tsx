@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -193,7 +194,7 @@ export default function StockRatePage() {
               rates.map(r => (
                 <tr key={r.id} className="border-t hover:bg-gray-50">
                   <td className="border p-2">
-                    {new Date(r.date).toLocaleDateString()}
+                    {fmtDate(r.date)}
                   </td>
                   <td className="border p-2">
                     {r.item.name} {r.item.description ? `(${r.item.description})` : ""}

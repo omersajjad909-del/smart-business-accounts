@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState, useCallback } from "react";
 
 type PaymentRow = {
@@ -196,7 +197,7 @@ export default function BulkPaymentsPage() {
           {/* Batch Info */}
           <div style={{ padding: "12px 18px", borderRadius: 12, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", marginBottom: 20, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" as const }}>
             <div style={{ fontWeight: 700, color: "#818cf8", fontSize: 14 }}>{activeBatch.name}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Created: {new Date(activeBatch.createdAt).toLocaleDateString()}</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Created: {fmtDate(activeBatch.createdAt)}</div>
             <div style={{ marginLeft: "auto", padding: "3px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(129,140,248,.2)", color: "#818cf8" }}>{activeBatch.status}</div>
           </div>
 

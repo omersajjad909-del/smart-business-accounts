@@ -1,4 +1,5 @@
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import { useState, useEffect } from 'react';
@@ -607,7 +608,7 @@ export default function FixedAssetsPage() {
                 <tbody>
                   {depreciations.map((dep) => (
                     <tr key={dep.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4">{new Date(dep.date).toLocaleDateString()}</td>
+                      <td className="py-3 px-4">{fmtDate(dep.date)}</td>
                       <td className="py-3 px-4 text-right text-red-600">Ã¢â€šÂ¹{dep.amount.toFixed(2)}</td>
                       <td className="py-3 px-4 text-right">Ã¢â€šÂ¹{dep.accumulatedDepreciation.toFixed(2)}</td>
                       <td className="py-3 px-4 text-right font-medium">Ã¢â€šÂ¹{dep.bookValue.toFixed(2)}</td>
@@ -620,7 +621,7 @@ export default function FixedAssetsPage() {
               <MobileTable>
                 {depreciations.map((dep) => (
                   <MobileCard key={dep.id}>
-                    <MobileCardRow label="Date" value={new Date(dep.date).toLocaleDateString()} />
+                    <MobileCardRow label="Date" value={fmtDate(dep.date)} />
                     <MobileCardRow 
                       label="Depreciation Amount" 
                       value={`Ã¢â€šÂ¹${dep.amount.toFixed(2)}`}

@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -314,7 +315,7 @@ export default function DebitNotePage() {
                 {debitNotes.map((note) => (
                   <tr key={note.id} className="border-b hover:bg-gray-50">
                     <td className="py-3 px-4 font-medium">{note.debitNoteNumber}</td>
-                    <td className="py-3 px-4">{new Date(note.date).toLocaleDateString()}</td>
+                    <td className="py-3 px-4">{fmtDate(note.date)}</td>
                     <td className="py-3 px-4">
                       <div>
                         <div className="font-medium">{note.account?.name || 'N/A'}</div>
@@ -354,7 +355,7 @@ export default function DebitNotePage() {
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <div className="font-medium">{note.debitNoteNumber}</div>
-                      <div className="text-sm text-gray-500">{new Date(note.date).toLocaleDateString()}</div>
+                      <div className="text-sm text-gray-500">{fmtDate(note.date)}</div>
                     </div>
                     {getStatusBadge(note.status)}
                   </div>

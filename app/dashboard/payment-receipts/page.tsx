@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -496,7 +497,7 @@ export default function PaymentReceiptsPage() {
                 <tr key={receipt.id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-3 font-semibold">{receipt.receiptNo}</td>
                   <td className="px-6 py-3">
-                    {new Date(receipt.date).toLocaleDateString()}
+                    {fmtDate(receipt.date)}
                   </td>
                   <td className="px-6 py-3">{receipt.amount.toFixed(2)}</td>
                   <td className="px-6 py-3">{receipt.paymentMode}</td>

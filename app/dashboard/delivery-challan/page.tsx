@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -360,7 +361,7 @@ const [searchTerm, _setSearchTerm] = useState("");
     
     // Construct a message
     let message = `*Delivery Challan: ${savedChallan.challanNo}*\n`;
-    message += `Date: ${new Date(savedChallan.date).toLocaleDateString()}\n`;
+    message += `Date: ${fmtDate(savedChallan.date)}\n`;
     message += `Customer: ${customerName}\n`;
     if (savedChallan.driverName) message += `Driver: ${savedChallan.driverName}\n`;
     if (savedChallan.vehicleNo) message += `Vehicle: ${savedChallan.vehicleNo}\n`;
@@ -442,7 +443,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                 filteredChallans.map(c => (
                   <tr key={c.id} className="border-t hover:bg-gray-50">
                     <td className="p-3 font-bold">{c.challanNo}</td>
-                    <td className="p-3">{new Date(c.date).toLocaleDateString()}</td>
+                    <td className="p-3">{fmtDate(c.date)}</td>
                     <td className="p-3">{c.customer?.name || "N/A"}</td>
                     <td className="p-3">
                         {c.vehicleNo && <span className="block text-xs">Ã°Å¸Å¡â€” {c.vehicleNo}</span>}
@@ -618,7 +619,7 @@ const [searchTerm, _setSearchTerm] = useState("");
                 </div>
                 <div className="text-right">
                   <h3 className="font-bold text-gray-700">Details:</h3>
-                  <p>Date: {new Date(date).toLocaleDateString()}</p>
+                  <p>Date: {fmtDate(date)}</p>
                   {driverName && <p>Driver: {driverName}</p>}
                   {vehicleNo && <p>Vehicle: {vehicleNo}</p>}
                 </div>

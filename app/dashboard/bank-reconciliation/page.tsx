@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -545,7 +546,7 @@ export default function BankReconciliationPage() {
                   />
                 </td>
                 <td className="px-6 py-3">
-                  {new Date(statement.date).toLocaleDateString()}
+                  {fmtDate(statement.date)}
                 </td>
                 <td className="px-6 py-3 font-semibold">
                   {statement.amount.toFixed(2)}

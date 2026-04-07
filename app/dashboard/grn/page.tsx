@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
@@ -223,7 +224,7 @@ export default function GRNPage() {
                 grns.map((grn) => (
                   <tr key={grn.id} className="border-t hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium">{grn.grnNo}</td>
-                    <td className="px-4 py-3">{new Date(grn.date).toLocaleDateString()}</td>
+                    <td className="px-4 py-3">{fmtDate(grn.date)}</td>
                     <td className="px-4 py-3">{grn.supplier?.name || "-"}</td>
                     <td className="px-4 py-3">{grn.po?.poNo || "-"}</td>
                     <td className="px-4 py-3">

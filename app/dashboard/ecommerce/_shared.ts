@@ -9,6 +9,16 @@ export const platformOptions = ["Website", "Daraz", "Amazon", "Instagram", "Face
 export const returnReasons = ["Damaged", "Wrong Item", "Quality Issue", "Changed Mind", "Size Issue"];
 export const courierOptions = ["TCS", "Leopards", "Rider", "Pakistan Post", "BlueEx", "Trax"];
 
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export type EcommerceProductStatus = "active" | "inactive";
 export type EcommerceOrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "returned";
 export type EcommerceReturnStatus = "pending" | "approved" | "rejected" | "refunded";
@@ -67,6 +77,30 @@ export type EcommerceShipment = {
   expected: string;
   status: EcommerceShipmentStatus;
   createdAt: string;
+};
+
+export type EcommerceControlCenter = {
+  summary: {
+    products: number;
+    activeProducts: number;
+    lowStockProducts: number;
+    orders: number;
+    activeOrders: number;
+    deliveredOrders: number;
+    deliveredRevenue: number;
+    grossSales: number;
+    returns: number;
+    openReturns: number;
+    refundValue: number;
+    shipments: number;
+    inTransitShipments: number;
+    deliveryRate: number;
+    returnRate: number;
+  };
+  products: EcommerceProduct[];
+  orders: EcommerceOrder[];
+  returns: EcommerceReturn[];
+  shipments: EcommerceShipment[];
 };
 
 export function toPkDate(value?: string | null) {

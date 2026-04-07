@@ -1,3 +1,4 @@
+import { fmtDate } from "@/lib/dateUtils";
 "use client";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
@@ -291,7 +292,7 @@ export default function InteractionsPage() {
                     <td className="px-6 py-3">{interaction.type}</td>
                     <td className="px-6 py-3">{interaction.subject}</td>
                     <td className="px-6 py-3">
-                      {new Date(interaction.date).toLocaleDateString("ur-PK")}
+                      {fmtDate(interaction.date)}
                     </td>
                     <td className="px-6 py-3">
                       <span
@@ -308,9 +309,7 @@ export default function InteractionsPage() {
                     </td>
                     <td className="px-6 py-3">
                       {interaction.nextFollowUp
-                        ? new Date(interaction.nextFollowUp).toLocaleDateString(
-                            undefined
-                          )
+                        ? fmtDate(interaction.nextFollowUp)
                         : "-"}
                     </td>
                     <td className="px-6 py-3 text-center space-x-2">
