@@ -319,6 +319,7 @@ export default function PayrollPage() {
           <div class="footer">
             <p>System Generated Payslip</p>
           </div>
+          <div style="margin-top:32px;border-top:1px solid #e5e7eb;padding-top:8px;text-align:center;font-size:10px;color:#aaa;letter-spacing:.04em">Powered by FinovaOS</div>
           <script>window.print();</script>
         </body>
       </html>

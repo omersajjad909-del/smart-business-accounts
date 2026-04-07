@@ -1672,7 +1672,7 @@ export default function AICommandCenter() {
                       if (!printContent) return;
                       const w = window.open("", "_blank");
                       if (!w) return;
-                      w.document.write(`<html><head><title>Monthly Report</title><style>body{font-family:sans-serif;padding:40px;line-height:1.7}h1,h2,h3{margin-top:24px}</style></head><body>${printContent.innerHTML}</body></html>`);
+                      w.document.write(`<html><head><title>Monthly Report</title><style>body{font-family:sans-serif;padding:40px;line-height:1.7}h1,h2,h3{margin-top:24px}.finova-footer{margin-top:48px;border-top:1px solid #e5e7eb;padding-top:8px;text-align:center;font-size:10px;color:#aaa;letter-spacing:.04em}</style></head><body>${printContent.innerHTML}<div class="finova-footer">Powered by FinovaOS</div></body></html>`);
                       w.document.close();
                       w.print();
                     }} style={{ padding: "8px 16px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 4px 14px rgba(99,102,241,.3)" }}>

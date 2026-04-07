@@ -388,3 +388,25 @@ img, video, svg { max-width: 100%; }
     max-width: 100% !important;
   }
 }
+
+/* ── Print footer: Powered by FinovaOS ──────────────────────────────────── */
+@media print {
+  @page {
+    margin-bottom: 28mm;
+  }
+  body::after {
+    content: "Powered by FinovaOS";
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10px;
+    color: #aaa;
+    padding: 6px 0 10px;
+    border-top: 1px solid #e5e7eb;
+    font-family: 'Outfit', 'Inter', Arial, sans-serif;
+    letter-spacing: 0.04em;
+  }
+}
+
