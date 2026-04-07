@@ -47,11 +47,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   // Login page — render as-is
   if (isLoginPage) {
-    return (
-      <>
-        {children}
-      </>
-    );
+    return <>{children}</>;
   }
 
   // Auth check chal raha hai
@@ -85,9 +81,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   // Authorized — sirf children render karo (AdminPanel.tsx apna layout khud handle karta hai)
   return (
-    <>
-      <Toaster position="top-center" />
-      {children}
-    </>
+    <>{children}</>
   );
 }
