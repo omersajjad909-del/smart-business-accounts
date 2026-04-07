@@ -524,12 +524,12 @@ function SalesInvoiceContent() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Ã¢Å"â€¦ Email sent successfully!");
+        toast.success("Email sent successfully!");
       } else {
-        toast.error(`Ã¢ÂÅ' Failed to send email: ${data.error || "Unknown error"}`);
+        toast.error(`Failed to send email: ${data.error || "Unknown error"}`);
       }
     } catch (_error) {
-      toast.error("Ã¢ÂÅ' Failed to send email. Please check email configuration.");
+      toast.error("Failed to send email. Please check email configuration.");
     } finally {
       setSendingEmail(false);
     }
@@ -690,13 +690,13 @@ function SalesInvoiceContent() {
                   disabled={sendingEmail}
                   className="bg-blue-600 text-white px-6 py-2 rounded disabled:bg-gray-400 flex-1 md:flex-none"
                 >
-                  {sendingEmail ? "Sending..." : "Ã°Å¸â€œÂ§ Email"}
+                  {sendingEmail ? "Sending..." : "Email"}
                 </button>
                 <button
                   onClick={shareOnWhatsApp}
                   className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 flex-1 md:flex-none"
                 >
-                  Ã°Å¸â€œÂ± WhatsApp
+                  WhatsApp
                 </button>
                 <button onClick={() => setPreview(false)} className="bg-yellow-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
                   Edit
@@ -842,7 +842,7 @@ function SalesInvoiceContent() {
                             <option value="">Select Item</option>
                             {items.map(it => (
                               <option key={it.id} value={it.id}>
-                                {it.name} ({it.description}) Ã¢â‚¬â€ Stock {it.availableQty}
+                                {it.name} ({it.description}) — Stock {it.availableQty}
                               </option>
                             ))}
                           </select>
