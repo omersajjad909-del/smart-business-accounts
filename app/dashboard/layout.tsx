@@ -10,7 +10,6 @@ import { PERMISSIONS } from "@/lib/permissions";
 import GlobalSearch from "@/components/GlobalSearch";
 import { useGlobalEnterNavigation } from "@/hooks/useGlobalEnterNavigation";
 import { ModeToggle } from "@/components/mode-toggle";
-import { Toaster } from "react-hot-toast";
 import WhatsNew from "@/components/WhatsNew";
 import { resolvePlanPermissions } from "@/lib/planPermissions";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
@@ -1833,24 +1832,6 @@ export default function DashboardLayout({
           </div>
         </div>
       )}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 3500,
-          style: {
-            background: "#1a1f3a",
-            color: "#e8ecf5",
-            border: "1px solid rgba(99,102,241,0.3)",
-            borderRadius: "10px",
-            fontFamily: "'Outfit','Inter',sans-serif",
-            fontSize: "13px",
-            fontWeight: 600,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-          },
-          success: { iconTheme: { primary: "#34d399", secondary: "#1a1f3a" } },
-          error:   { iconTheme: { primary: "#f87171", secondary: "#1a1f3a" } },
-        }}
-      />
     </div>
   );
 }

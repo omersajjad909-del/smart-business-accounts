@@ -6,7 +6,6 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Toaster } from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -49,7 +48,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   if (isLoginPage) {
     return (
       <>
-        <Toaster position="top-center" />
         {children}
       </>
     );

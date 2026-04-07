@@ -57,8 +57,23 @@ function toastFrame(
   );
 }
 
+let _confirmActive = false;
+
 export function confirmToast(message: string, title = "Please confirm") {
+  // Prevent duplicate confirm dialogs
+  if (_confirmActive) return Promise.resolve(false);
+  _confirmActive = true;
+
+  // Dismiss any lingering toasts first
+  toast.dismiss();
+
   return new Promise<boolean>((resolve) => {
+    function done(value: boolean, id: string) {
+      _confirmActive = false;
+      toast.dismiss(id);
+      resolve(value);
+    }
+
     toast.custom(
       (t) =>
         toastFrame(
@@ -66,10 +81,7 @@ export function confirmToast(message: string, title = "Please confirm") {
           message,
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                resolve(false);
-              }}
+              onClick={() => done(false, t.id)}
               style={{
                 padding: "8px 14px",
                 borderRadius: 10,
@@ -85,10 +97,7 @@ export function confirmToast(message: string, title = "Please confirm") {
               Cancel
             </button>
             <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                resolve(true);
-              }}
+              onClick={() => done(true, t.id)}
               style={{
                 padding: "8px 14px",
                 borderRadius: 10,
