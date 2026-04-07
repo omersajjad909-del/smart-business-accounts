@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useEffect, useRef, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { useCurrency } from "@/lib/useCurrency";
 
 type Item = { id: string; name: string; code?: string; barcode?: string; unit?: string; salePrice?: number; stockQty?: number };
 
@@ -47,6 +48,7 @@ export default function BarcodePage() {
   const [assigning, setAssigning]       = useState<string | null>(null);
   const [assignInput, setAssignInput]   = useState<Record<string, string>>({});
   const scanRef = useRef<HTMLInputElement>(null);
+  const currency = useCurrency();
 
   const headers = () => {
     const user = getCurrentUser();
@@ -137,7 +139,7 @@ export default function BarcodePage() {
         <div className="print-label" style={{ display: "none", padding: 24, textAlign: "center" }}>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{printItem.name}</div>
           {printItem.barcode && <BarcodeDisplay value={printItem.barcode} label={printItem.code || ""} />}
-          {printItem.salePrice && <div style={{ fontSize: 14, marginTop: 8 }}>Price: ${printItem.salePrice}</div>}
+          {printItem.salePrice && <div style={{ fontSize: 14, marginTop: 8 }}>Price: {currency}{printItem.salePrice}</div>}
         </div>
       )}
 
@@ -178,7 +180,7 @@ export default function BarcodePage() {
                 <div style={{ fontSize: 14, fontWeight: 700, color: "white" }}>{scanned.name}</div>
                 <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginTop: 4 }}>
                   Code: {scanned.code || "—"} · Barcode: {scanned.barcode || "—"}
-                  {scanned.salePrice != null && ` · Price: $${scanned.salePrice}`}
+                  {scanned.salePrice != null && ` · Price: ${currency}${scanned.salePrice}`}
                   {scanned.stockQty  != null && ` · Stock: ${scanned.stockQty} ${scanned.unit || ""}`}
                 </div>
                 <button onClick={() => printLabel(scanned)} style={{ marginTop: 10, padding: "7px 14px", borderRadius: 8, background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
@@ -242,7 +244,7 @@ export default function BarcodePage() {
                       }
                     </td>
                     <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.4)" }}>{item.unit || "—"}</td>
-                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.6)" }}>{item.salePrice != null ? `$${item.salePrice}` : "—"}</td>
+                    <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.6)" }}>{item.salePrice != null ? `${currency}${item.salePrice}` : "—"}</td>
                     <td style={{ padding: "8px 16px" }}>
                       {item.barcode ? (
                         <button onClick={() => printLabel(item)} style={{ padding: "5px 12px", borderRadius: 7, background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", fontSize: 11.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>

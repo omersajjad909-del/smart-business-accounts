@@ -85,7 +85,10 @@
       "Bash(git commit -m ':*)",
       "Bash(git commit:*)",
       "Bash(sed -i 's/String\\(r\\\\.date || \"\"\\)\\\\.slice\\(0, 10\\)/String\\(r.date||\"\"\\).replace\\(\\\\/\\(\\\\\\\\\\\\d{4}\\)-\\(\\\\\\\\d{2}\\)-\\(\\\\\\\\d{2}\\)\\\\/,\"$3-$2-$1\"\\)/g' \"d:/projects/smart-business-accounts/app/dashboard/commercial-invoice/page.tsx\")",
-      "Bash(sed -i 's/String\\(r\\\\.date || \"\"\\)\\\\.slice\\(0, 10\\)/String\\(r.date||\"\"\\).replace\\(\\\\/\\(\\\\\\\\\\\\d{4}\\)-\\(\\\\\\\\d{2}\\)-\\(\\\\\\\\d{2}\\)\\\\/,\"$3-$2-$1\"\\)/g' \"d:/projects/smart-business-accounts/app/dashboard/packing-list/page.tsx\")"
+      "Bash(sed -i 's/String\\(r\\\\.date || \"\"\\)\\\\.slice\\(0, 10\\)/String\\(r.date||\"\"\\).replace\\(\\\\/\\(\\\\\\\\\\\\d{4}\\)-\\(\\\\\\\\d{2}\\)-\\(\\\\\\\\d{2}\\)\\\\/,\"$3-$2-$1\"\\)/g' \"d:/projects/smart-business-accounts/app/dashboard/packing-list/page.tsx\")",
+      "Bash(grep -n \"\\\\$\\\\|currency\\\\|Rs\\\\|PKR\\\\|USD\" \"d:/projects/smart-business-accounts/app/dashboard/barcode/page.tsx\")",
+      "Bash(grep -n \"salePrice\\\\|\\\\$\\\\|currency\\\\|rate\\\\|Rate\" \"d:/projects/smart-business-accounts/app/dashboard/barcode/page.tsx\")",
+      "Bash(grep -n \"\\\\$\\\\|salePrice\\\\|SALE PRICE\\\\|Sale Price\" \"d:/projects/smart-business-accounts/app/dashboard/barcode/page.tsx\")"
     ]
   }
 }

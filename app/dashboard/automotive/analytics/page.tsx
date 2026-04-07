@@ -1,36 +1,66 @@
 "use client";
 
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { autoBg, autoBorder, autoFont, autoMuted, mapShowroomDeals, mapShowroomTestDrives, mapShowroomVehicles } from "../_shared";
+import { useEffect, useMemo, useState } from "react";
+import { AutomotiveControlCenter, autoBg, autoBorder, autoFont, autoMuted, fetchJson } from "../_shared";
+
+const emptyState: AutomotiveControlCenter = {
+  summary: {
+    vehicles: 0,
+    availableVehicles: 0,
+    reservedVehicles: 0,
+    soldVehicles: 0,
+    inventoryValue: 0,
+    soldValue: 0,
+    openDeals: 0,
+    wonDeals: 0,
+    lostDeals: 0,
+    completedDrives: 0,
+    scheduledDrives: 0,
+    conversionRate: 0,
+  },
+  vehicles: [],
+  testDrives: [],
+  deals: [],
+};
 
 export default function AutomotiveAnalyticsPage() {
-  const vehicles = mapShowroomVehicles(useBusinessRecords("auto_vehicle").records);
-  const testDrives = mapShowroomTestDrives(useBusinessRecords("showroom_test_drive").records);
-  const deals = mapShowroomDeals(useBusinessRecords("showroom_deal").records);
+  const [data, setData] = useState<AutomotiveControlCenter>(emptyState);
 
-  const soldValue = vehicles.filter((item) => item.status === "Sold").reduce((sum, item) => sum + item.price, 0);
-  const availableByType = Array.from(new Set(vehicles.map((item) => item.type))).map((type) => ({
-    type,
-    count: vehicles.filter((item) => item.type === type && item.status !== "Sold").length,
-  }));
-  const dealsByStatus = Array.from(new Set(deals.map((item) => item.status))).map((status) => ({
-    status,
-    count: deals.filter((item) => item.status === status).length,
-  }));
+  useEffect(() => {
+    fetchJson("/api/automotive/control-center", emptyState).then(setData);
+  }, []);
+
+  const availableByType = useMemo(
+    () =>
+      Array.from(new Set(data.vehicles.map((item) => item.type))).map((type) => ({
+        type,
+        count: data.vehicles.filter((item) => item.type === type && item.status !== "Sold").length,
+      })),
+    [data.vehicles]
+  );
+
+  const dealsByStatus = useMemo(
+    () =>
+      Array.from(new Set(data.deals.map((item) => item.status))).map((status) => ({
+        status,
+        count: data.deals.filter((item) => item.status === status).length,
+      })),
+    [data.deals]
+  );
 
   return (
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: autoFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Showroom Analytics</h1>
-        <p style={{ margin: 0, fontSize: 14, color: autoMuted }}>Inventory composition, drive completion, aur deal pipeline ki high-level picture.</p>
+        <p style={{ margin: 0, fontSize: 14, color: autoMuted }}>Inventory composition, drive completion, and deal pipeline performance from the live automotive feed.</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Sold Value", value: `$${soldValue.toLocaleString()}`, color: "#34d399" },
-          { label: "Scheduled Drives", value: testDrives.filter((item) => item.status === "scheduled").length, color: "#60a5fa" },
-          { label: "Won Deals", value: deals.filter((item) => item.status === "won").length, color: "#22c55e" },
-          { label: "Lost Deals", value: deals.filter((item) => item.status === "lost").length, color: "#ef4444" },
+          { label: "Sold Value", value: `$${data.summary.soldValue.toLocaleString()}`, color: "#34d399" },
+          { label: "Scheduled Drives", value: data.summary.scheduledDrives, color: "#60a5fa" },
+          { label: "Won Deals", value: data.summary.wonDeals, color: "#22c55e" },
+          { label: "Lost Deals", value: data.summary.lostDeals, color: "#ef4444" },
         ].map((card) => (
           <div key={card.label} style={{ background: autoBg, border: `1px solid ${autoBorder}`, borderRadius: 16, padding: "18px 20px" }}>
             <div style={{ fontSize: 12, color: autoMuted, marginBottom: 8 }}>{card.label}</div>
@@ -49,6 +79,7 @@ export default function AutomotiveAnalyticsPage() {
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#93c5fd" }}>{row.count}</span>
               </div>
             ))}
+            {!availableByType.length ? <div style={{ color: autoMuted, fontSize: 13 }}>No vehicle stock yet.</div> : null}
           </div>
         </div>
 
@@ -61,6 +92,7 @@ export default function AutomotiveAnalyticsPage() {
                 <span style={{ fontSize: 14, fontWeight: 800, color: "#c084fc" }}>{row.count}</span>
               </div>
             ))}
+            {!dealsByStatus.length ? <div style={{ color: autoMuted, fontSize: 13 }}>No deal pipeline yet.</div> : null}
           </div>
         </div>
       </div>

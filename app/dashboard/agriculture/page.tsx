@@ -1,17 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  agricultureBg,
-  agricultureBorder,
-  agricultureFont,
-  agricultureMuted,
-  mapCrops,
-  mapFields,
-  mapHarvest,
-  mapLivestock,
-} from "./_shared";
+import { useEffect, useMemo, useState } from "react";
+import { AgricultureControlCenter, agricultureBg, agricultureBorder, agricultureFont, agricultureMuted, fetchJson } from "./_shared";
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
@@ -22,19 +13,35 @@ function StatCard({ label, value, tone }: { label: string; value: string | numbe
   );
 }
 
+const emptyState: AgricultureControlCenter = {
+  summary: {
+    fields: 0,
+    activeFields: 0,
+    totalArea: 0,
+    crops: 0,
+    growingCrops: 0,
+    failedCrops: 0,
+    harvests: 0,
+    harvestQuantity: 0,
+    harvestRevenue: 0,
+    livestockGroups: 0,
+    livestockCount: 0,
+    healthyAnimals: 0,
+  },
+  crops: [],
+  fields: [],
+  livestock: [],
+  harvests: [],
+};
+
 export default function AgricultureOverviewPage() {
-  const crops = mapCrops(useBusinessRecords("crop").records);
-  const fields = mapFields(useBusinessRecords("field").records);
-  const livestock = mapLivestock(useBusinessRecords("livestock").records);
-  const harvests = mapHarvest(useBusinessRecords("harvest").records);
+  const [data, setData] = useState<AgricultureControlCenter>(emptyState);
 
-  const totalArea = fields.reduce((sum, field) => sum + field.area, 0);
-  const totalAnimals = livestock.reduce((sum, animal) => sum + animal.count, 0);
-  const totalRevenue = harvests.reduce((sum, harvest) => sum + harvest.revenue, 0);
-  const growingCrops = crops.filter((crop) => crop.status === "growing").length;
-  const harvestQty = harvests.reduce((sum, harvest) => sum + harvest.quantity, 0);
+  useEffect(() => {
+    fetchJson("/api/agriculture/control-center", emptyState).then(setData);
+  }, []);
 
-  const topFields = [...fields].sort((a, b) => b.area - a.area).slice(0, 4);
+  const topFields = useMemo(() => [...data.fields].sort((a, b) => b.area - a.area).slice(0, 4), [data.fields]);
 
   return (
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: agricultureFont }}>
@@ -42,16 +49,16 @@ export default function AgricultureOverviewPage() {
         <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Agriculture / Farm</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Farm Control Center</h1>
         <p style={{ margin: 0, fontSize: 14, color: agricultureMuted, maxWidth: 760 }}>
-          Field planning, crop cycles, livestock records, aur harvest sales ko ek hi agricultural workspace se monitor karein.
+          Field planning, crop cycles, livestock records, and harvest sales now roll up through one agriculture control center.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0,1fr))", gap: 14, marginBottom: 26 }}>
-        <StatCard label="Fields" value={fields.length} tone="#34d399" />
-        <StatCard label="Total Area" value={`${totalArea.toFixed(1)} acres`} tone="#f59e0b" />
-        <StatCard label="Growing Crops" value={growingCrops} tone="#60a5fa" />
-        <StatCard label="Livestock" value={totalAnimals} tone="#a78bfa" />
-        <StatCard label="Harvest Revenue" value={`Rs. ${totalRevenue.toLocaleString()}`} tone="#22c55e" />
+        <StatCard label="Fields" value={data.summary.fields} tone="#34d399" />
+        <StatCard label="Total Area" value={`${data.summary.totalArea.toFixed(1)} acres`} tone="#f59e0b" />
+        <StatCard label="Growing Crops" value={data.summary.growingCrops} tone="#60a5fa" />
+        <StatCard label="Livestock" value={data.summary.livestockCount} tone="#a78bfa" />
+        <StatCard label="Harvest Revenue" value={`Rs. ${data.summary.harvestRevenue.toLocaleString()}`} tone="#22c55e" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
@@ -59,10 +66,10 @@ export default function AgricultureOverviewPage() {
           <div style={{ fontSize: 13, color: "#dcfce7", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
             {[
-              { title: "Prepare Field", body: "Area, soil type, irrigation, aur active/fallow status define karein." },
-              { title: "Plant Crop", body: "Crop cycle, field assignment, aur expected yield set karein." },
-              { title: "Track Livestock", body: "Animal type, count, weight, aur health records maintain karein." },
-              { title: "Record Harvest", body: "Yield, buyer, quantity, aur sale revenue capture karein." },
+              { title: "Prepare Field", body: `${data.summary.activeFields} active field blocks are in current rotation.` },
+              { title: "Plant Crop", body: `${data.summary.crops} crop cycles are recorded across the farm.` },
+              { title: "Track Livestock", body: `${data.summary.healthyAnimals} healthy animals are currently on the books.` },
+              { title: "Record Harvest", body: `${data.summary.harvests} harvest records have produced Rs. ${data.summary.harvestRevenue.toLocaleString()}.` },
             ].map((step, index) => (
               <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(134,239,172,.16)", color: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>{index + 1}</div>
@@ -97,12 +104,12 @@ export default function AgricultureOverviewPage() {
           <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Largest Active Fields</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topFields.length === 0 ? (
-              <div style={{ color: agricultureMuted, fontSize: 13 }}>Fields add karne ke baad yahan top land blocks show honge.</div>
+              <div style={{ color: agricultureMuted, fontSize: 13 }}>Top land blocks will appear here once fields are added.</div>
             ) : topFields.map((field) => (
               <div key={field.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{field.name}</div>
-                  <div style={{ fontSize: 12, color: agricultureMuted }}>{field.soilType} • {field.irrigationType}</div>
+                  <div style={{ fontSize: 12, color: agricultureMuted }}>{field.soilType} | {field.irrigationType}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 15, fontWeight: 800, color: field.status === "active" ? "#34d399" : "#94a3b8" }}>{field.area.toFixed(1)} acres</div>
@@ -117,10 +124,10 @@ export default function AgricultureOverviewPage() {
           <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
-              { label: "Harvest quantity", value: `${harvestQty.toLocaleString()} total units`, tone: "#60a5fa" },
-              { label: "Active crop cycles", value: `${crops.filter((crop) => crop.status !== "harvested" && crop.status !== "failed").length} running`, tone: "#34d399" },
-              { label: "Failed crops", value: `${crops.filter((crop) => crop.status === "failed").length} at risk`, tone: "#f87171" },
-              { label: "Animal groups", value: `${new Set(livestock.map((animal) => animal.type)).size} types recorded`, tone: "#f59e0b" },
+              { label: "Harvest quantity", value: `${data.summary.harvestQuantity.toLocaleString()} total units`, tone: "#60a5fa" },
+              { label: "Active crop cycles", value: `${data.summary.growingCrops} running`, tone: "#34d399" },
+              { label: "Failed crops", value: `${data.summary.failedCrops} at risk`, tone: "#f87171" },
+              { label: "Animal groups", value: `${data.summary.livestockGroups} types recorded`, tone: "#f59e0b" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
                 <span style={{ fontSize: 13, color: agricultureMuted }}>{row.label}</span>
