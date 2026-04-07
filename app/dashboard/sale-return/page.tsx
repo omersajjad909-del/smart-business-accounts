@@ -1,5 +1,5 @@
-import { fmtDate } from "@/lib/dateUtils";
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import toast from "react-hot-toast";
@@ -387,7 +387,7 @@ export default function SalesReturnPage() {
           {!preview ? (
             <div className="space-y-4 border p-6 bg-white rounded shadow">
               <div className="mb-2 text-xs text-gray-500 italic">
-                Ã°Å¸â€™Â¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Invoice | <strong>F8</strong> = Search Query
+                Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Invoice | <strong>F8</strong> = Search Query
               </div>
               <div className="flex justify-between items-center border-b pb-2">
                 <h1 className="text-xl font-bold text-red-600">{editing ? "Edit Sales Return" : "Sales Return Form"}</h1>

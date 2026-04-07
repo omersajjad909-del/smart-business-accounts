@@ -3791,7 +3791,7 @@ function PageVisitors() {
       {/* Ad targeting suggestion box */}
       {(visitors||[]).length > 0 && (
         <div style={{ background:"rgba(251,191,36,.05)", borderRadius:14, border:"1px solid rgba(251,191,36,.2)", padding:"16px 20px" }}>
-          <div style={{ fontSize:12, fontWeight:700, color:"#fbbf24", textTransform:"uppercase", letterSpacing:".05em", marginBottom:10 }}>Ã°Å¸â€™Â¡ Ad Targeting Suggestion</div>
+          <div style={{ fontSize:12, fontWeight:700, color:"#fbbf24", textTransform:"uppercase", letterSpacing:".05em", marginBottom:10 }}>Ad Targeting Suggestion</div>
           <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
             {(visitors||[]).slice(0,5).map((row:any)=>(
               <div key={row.country} style={{ padding:"6px 14px", borderRadius:20, background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.2)", fontSize:12, color:"rgba(255,255,255,.7)" }}>

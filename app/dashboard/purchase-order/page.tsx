@@ -1,5 +1,5 @@
-import { fmtDate } from "@/lib/dateUtils";
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -454,7 +454,7 @@ export default function PurchaseOrderPage() {
           {!preview && (
             <div className="bg-white border p-8 rounded-xl shadow-sm space-y-6">
               <div className="mb-2 text-xs text-gray-500 italic">
-                Ã°Å¸â€™Â¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Supplier | <strong>F8</strong> = Search Query
+                Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Supplier | <strong>F8</strong> = Search Query
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
                 <div><label className="text-xs font-bold uppercase text-gray-500">PO Number</label><input className="border w-full p-2 bg-gray-50 rounded font-bold" value={poNo} disabled /></div>

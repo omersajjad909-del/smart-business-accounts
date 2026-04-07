@@ -1,5 +1,5 @@
-import { fmtDate } from "@/lib/dateUtils";
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";

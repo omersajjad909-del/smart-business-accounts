@@ -1,5 +1,5 @@
-import { fmtDate } from "@/lib/dateUtils";
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { getMaxUsersForPlan } from "@/lib/planLimits";

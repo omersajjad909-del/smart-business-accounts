@@ -1,5 +1,5 @@
-import { fmtDate } from "@/lib/dateUtils";
 "use client";
+import { fmtDate } from "@/lib/dateUtils";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import toast from "react-hot-toast";
@@ -399,7 +399,7 @@ export default function OutwardPage() {
       {showForm && (
         <>
           <div className="mb-2 text-xs text-gray-500 italic">
-            Ã°Å¸â€™Â¡ Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
+            Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
           </div>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="flex flex-col">

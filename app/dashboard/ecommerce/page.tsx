@@ -1,17 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  ecommerceBg,
-  ecommerceBorder,
-  ecommerceFont,
-  ecommerceMuted,
-  mapEcommerceOrders,
-  mapEcommerceProducts,
-  mapEcommerceReturns,
-  mapEcommerceShipments,
-} from "./_shared";
+import { useEffect, useMemo, useState } from "react";
+import { EcommerceControlCenter, ecommerceBg, ecommerceBorder, ecommerceFont, ecommerceMuted, fetchJson } from "./_shared";
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
@@ -22,24 +13,38 @@ function StatCard({ label, value, tone }: { label: string; value: string | numbe
   );
 }
 
+const emptyState: EcommerceControlCenter = {
+  summary: {
+    products: 0,
+    activeProducts: 0,
+    lowStockProducts: 0,
+    orders: 0,
+    activeOrders: 0,
+    deliveredOrders: 0,
+    deliveredRevenue: 0,
+    grossSales: 0,
+    returns: 0,
+    openReturns: 0,
+    refundValue: 0,
+    shipments: 0,
+    inTransitShipments: 0,
+    deliveryRate: 0,
+    returnRate: 0,
+  },
+  products: [],
+  orders: [],
+  returns: [],
+  shipments: [],
+};
+
 export default function EcommerceOverviewPage() {
-  const productsHook = useBusinessRecords("ecommerce_product");
-  const ordersHook = useBusinessRecords("ecommerce_order");
-  const returnsHook = useBusinessRecords("ecommerce_return");
-  const shippingHook = useBusinessRecords("ecommerce_shipment");
+  const [data, setData] = useState<EcommerceControlCenter>(emptyState);
 
-  const products = mapEcommerceProducts(productsHook.records);
-  const orders = mapEcommerceOrders(ordersHook.records);
-  const returns = mapEcommerceReturns(returnsHook.records);
-  const shipments = mapEcommerceShipments(shippingHook.records);
+  useEffect(() => {
+    fetchJson("/api/ecommerce/control-center", emptyState).then(setData);
+  }, []);
 
-  const deliveredRevenue = orders.filter((order) => order.status === "delivered").reduce((sum, order) => sum + order.amount, 0);
-  const activeProducts = products.filter((product) => product.status === "active").length;
-  const pendingOrders = orders.filter((order) => order.status === "pending" || order.status === "processing").length;
-  const openReturns = returns.filter((record) => record.status === "pending" || record.status === "approved").length;
-  const inTransit = shipments.filter((shipment) => shipment.status === "processing" || shipment.status === "dispatched" || shipment.status === "in_transit").length;
-
-  const topProducts = [...products].sort((a, b) => b.sales - a.sales).slice(0, 4);
+  const topProducts = useMemo(() => [...data.products].sort((a, b) => b.sales - a.sales).slice(0, 4), [data.products]);
 
   return (
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: ecommerceFont }}>
@@ -47,16 +52,16 @@ export default function EcommerceOverviewPage() {
         <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>E-Commerce / Online Store</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Command Center</h1>
         <p style={{ margin: 0, fontSize: 14, color: ecommerceMuted, maxWidth: 720 }}>
-          Catalog se order, return, aur shipping tak poora online commerce flow ek jagah se manage karein. Marketplace aur direct store dono ke liye ye desk built hai.
+          Catalog, orders, returns, and shipping are now unified through one dedicated ecommerce control center.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0,1fr))", gap: 14, marginBottom: 26 }}>
-        <StatCard label="Active Products" value={activeProducts} tone="#34d399" />
-        <StatCard label="Pending Orders" value={pendingOrders} tone="#f59e0b" />
-        <StatCard label="In Transit" value={inTransit} tone="#60a5fa" />
-        <StatCard label="Open Returns" value={openReturns} tone="#f87171" />
-        <StatCard label="Delivered Revenue" value={`Rs. ${deliveredRevenue.toLocaleString()}`} tone="#a78bfa" />
+        <StatCard label="Active Products" value={data.summary.activeProducts} tone="#34d399" />
+        <StatCard label="Pending Orders" value={data.summary.activeOrders} tone="#f59e0b" />
+        <StatCard label="In Transit" value={data.summary.inTransitShipments} tone="#60a5fa" />
+        <StatCard label="Open Returns" value={data.summary.openReturns} tone="#f87171" />
+        <StatCard label="Delivered Revenue" value={`Rs. ${data.summary.deliveredRevenue.toLocaleString()}`} tone="#a78bfa" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: 18, marginBottom: 18 }}>
@@ -64,10 +69,10 @@ export default function EcommerceOverviewPage() {
           <div style={{ fontSize: 13, color: "#c7d2fe", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
             {[
-              { title: "Catalog Ready", body: "SKU, price, stock, aur platform listing control." },
-              { title: "Orders Control", body: "Marketplace aur direct store orders ka live desk." },
-              { title: "Returns Desk", body: "Approval, rejection, aur refund status discipline." },
-              { title: "Shipping Ops", body: "Courier, city, ETA, aur dispatch closure tracking." },
+              { title: "Catalog Ready", body: `${data.summary.activeProducts} active listings are currently available.` },
+              { title: "Orders Control", body: `${data.summary.activeOrders} orders are live across pending and processing.` },
+              { title: "Returns Desk", body: `${data.summary.openReturns} return cases need action.` },
+              { title: "Shipping Ops", body: `${data.summary.inTransitShipments} shipments are currently moving.` },
             ].map((step, index) => (
               <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(99,102,241,.2)", color: "#c7d2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>{index + 1}</div>
@@ -102,12 +107,12 @@ export default function EcommerceOverviewPage() {
           <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Selling Products</div>
           <div style={{ display: "grid", gap: 10 }}>
             {topProducts.length === 0 ? (
-              <div style={{ color: ecommerceMuted, fontSize: 13 }}>Abhi products add nahi hue. Pehle catalog build karein, phir top sellers yahan show honge.</div>
+              <div style={{ color: ecommerceMuted, fontSize: 13 }}>No products have been added yet.</div>
             ) : topProducts.map((product) => (
               <div key={product.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{product.name}</div>
-                  <div style={{ fontSize: 12, color: ecommerceMuted }}>{product.sku || "No SKU"} • {product.platform}</div>
+                  <div style={{ fontSize: 12, color: ecommerceMuted }}>{product.sku || "No SKU"} | {product.platform}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>{product.sales} sold</div>
@@ -122,10 +127,10 @@ export default function EcommerceOverviewPage() {
           <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operations Snapshot</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
-              { label: "Catalog Health", value: `${activeProducts}/${products.length || 0} active products`, tone: "#c7d2fe" },
-              { label: "Order Conversion", value: `${orders.filter((order) => order.status === "delivered").length} delivered orders`, tone: "#34d399" },
-              { label: "Customer Service", value: `${openReturns} active return cases`, tone: "#f59e0b" },
-              { label: "Fulfillment Readiness", value: `${inTransit} shipments in motion`, tone: "#60a5fa" },
+              { label: "Catalog Health", value: `${data.summary.activeProducts}/${data.summary.products || 0} active products`, tone: "#c7d2fe" },
+              { label: "Order Conversion", value: `${data.summary.deliveredOrders} delivered orders`, tone: "#34d399" },
+              { label: "Customer Service", value: `${data.summary.openReturns} active return cases`, tone: "#f59e0b" },
+              { label: "Fulfillment Readiness", value: `${data.summary.inTransitShipments} shipments in motion`, tone: "#60a5fa" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
                 <div style={{ fontSize: 13, color: ecommerceMuted }}>{row.label}</div>
