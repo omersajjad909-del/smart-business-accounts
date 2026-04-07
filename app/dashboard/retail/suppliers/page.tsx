@@ -2,28 +2,22 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-interface Supplier { id: string; name: string; phone: string; email: string; city: string; balance: number; totalPurchases: number; status: string; }
-
-const DEMO: Supplier[] = [
-  { id: "s1", name: "Al-Madina Wholesale", phone: "+92 300 1111111", email: "almadina@wp.com", city: "Lahore", balance: 45000, totalPurchases: 380000, status: "active" },
-  { id: "s2", name: "Pak Agro Suppliers", phone: "+92 321 2222222", email: "pakagro@supplier.pk", city: "Multan", balance: 0, totalPurchases: 210000, status: "active" },
-  { id: "s3", name: "National Distributors", phone: "+92 333 3333333", email: "national@dist.pk", city: "Karachi", balance: 92000, totalPurchases: 650000, status: "active" },
-  { id: "s4", name: "City Trading Co.", phone: "+92 312 4444444", email: "city@trading.pk", city: "Islamabad", balance: 12000, totalPurchases: 95000, status: "active" },
-  { id: "s5", name: "Fast Movers Ltd", phone: "+92 346 5555555", email: "fast@movers.pk", city: "Faisalabad", balance: 0, totalPurchases: 45000, status: "inactive" },
-];
+interface Supplier { id: string; code?: string; name: string; phone: string; email: string; city: string; balance: number; totalPurchases: number; transactions?: number; status: string; }
 
 export default function RetailSuppliersPage() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>(DEMO);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", city: "" });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetch("/api/accounts?type=PAYABLE&limit=100")
+    fetch("/api/retail/suppliers", { cache: "no-store" })
       .then(r => r.json())
-      .then(d => { if (Array.isArray(d.accounts) && d.accounts.length) setSuppliers(d.accounts.map((a: any) => ({ id: a.id, name: a.name, phone: a.phone || "", email: a.email || "", city: a.city || "", balance: (a.openCredit || 0) - (a.openDebit || 0), totalPurchases: 0, status: a.isActive !== false ? "active" : "inactive" }))); })
-      .catch(() => {});
+      .then(d => { if (Array.isArray(d.suppliers)) setSuppliers(d.suppliers); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = suppliers.filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.city.toLowerCase().includes(search.toLowerCase()));
@@ -32,8 +26,11 @@ export default function RetailSuppliersPage() {
     if (!form.name) return;
     setSaving(true);
     try {
-      await fetch("/api/accounts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, city: form.city, type: "PAYABLE", partyType: "SUPPLIER" }) });
-      setSuppliers(p => [{ id: Date.now().toString(), ...form, balance: 0, totalPurchases: 0, status: "active" }, ...p]);
+      const res = await fetch("/api/retail/suppliers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, city: form.city }) });
+      if (res.ok) {
+        const created = await res.json();
+        setSuppliers(p => [created, ...p]);
+      }
     } catch {}
     setSaving(false);
     setShowModal(false);
@@ -84,7 +81,11 @@ export default function RetailSuppliersPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((sup, i) => (
+            {loading ? (
+              <tr><td colSpan={7} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>Loading suppliers...</td></tr>
+            ) : filtered.length === 0 ? (
+              <tr><td colSpan={7} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>No suppliers found</td></tr>
+            ) : filtered.map((sup, i) => (
               <tr key={sup.id} style={{ borderTop: "1px solid var(--border)", background: i % 2 === 0 ? "transparent" : "rgba(99,102,241,.02)" }}>
                 <td style={{ padding: "11px 14px" }}>
                   <div style={{ fontWeight: 600 }}>{sup.name}</div>

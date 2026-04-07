@@ -2,28 +2,22 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-interface Customer { id: string; name: string; phone: string; email: string; city: string; creditLimit: number; balance: number; totalSales: number; loyaltyPoints: number; status: string; }
-
-const DEMO: Customer[] = [
-  { id: "c1", name: "Ahmed Traders", phone: "+92 300 1234567", email: "ahmed@example.com", city: "Lahore", creditLimit: 50000, balance: 12500, totalSales: 185000, loyaltyPoints: 925, status: "active" },
-  { id: "c2", name: "Sara General Store", phone: "+92 321 9876543", email: "sara@store.com", city: "Karachi", creditLimit: 30000, balance: 0, totalSales: 92000, loyaltyPoints: 460, status: "active" },
-  { id: "c3", name: "Khan Wholesale", phone: "+92 333 5551234", email: "khan@wholesale.pk", city: "Islamabad", creditLimit: 100000, balance: 75000, totalSales: 420000, loyaltyPoints: 2100, status: "active" },
-  { id: "c4", name: "Fatima Boutique", phone: "+92 312 4449876", email: "fatima@boutique.pk", city: "Lahore", creditLimit: 15000, balance: 3200, totalSales: 38000, loyaltyPoints: 190, status: "active" },
-  { id: "c5", name: "Zafar Electronics", phone: "+92 346 7773210", email: "zafar@elec.pk", city: "Faisalabad", creditLimit: 0, balance: 0, totalSales: 67000, loyaltyPoints: 335, status: "inactive" },
-];
+interface Customer { id: string; code?: string; name: string; phone: string; email: string; city: string; creditLimit: number; balance: number; totalSales: number; transactions?: number; loyaltyPoints: number; status: string; }
 
 export default function RetailCustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>(DEMO);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", city: "", creditLimit: "" });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetch("/api/accounts?type=CUSTOMER&limit=100")
+    fetch("/api/retail/customers", { cache: "no-store" })
       .then(r => r.json())
-      .then(d => { if (Array.isArray(d.accounts) && d.accounts.length) setCustomers(d.accounts.map((a: any) => ({ id: a.id, name: a.name, phone: a.phone || "", email: a.email || "", city: a.city || "", creditLimit: a.creditLimit || 0, balance: (a.openDebit || 0) - (a.openCredit || 0), totalSales: 0, loyaltyPoints: 0, status: a.isActive !== false ? "active" : "inactive" }))); })
-      .catch(() => {});
+      .then(d => { if (Array.isArray(d.customers)) setCustomers(d.customers); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = customers.filter(c =>
@@ -34,8 +28,11 @@ export default function RetailCustomersPage() {
     if (!form.name) return;
     setSaving(true);
     try {
-      const res = await fetch("/api/accounts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, city: form.city, creditLimit: Number(form.creditLimit) || 0, type: "RECEIVABLE", partyType: "CUSTOMER" }) });
-      if (res.ok) { const d = await res.json(); setCustomers(p => [{ id: d.id || Date.now().toString(), name: form.name, phone: form.phone, email: form.email, city: form.city, creditLimit: Number(form.creditLimit) || 0, balance: 0, totalSales: 0, loyaltyPoints: 0, status: "active" }, ...p]); }
+      const res = await fetch("/api/retail/customers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, city: form.city, creditLimit: Number(form.creditLimit) || 0 }) });
+      if (res.ok) {
+        const d = await res.json();
+        setCustomers(p => [d, ...p]);
+      }
     } catch {}
     setSaving(false);
     setShowModal(false);
@@ -93,7 +90,9 @@ export default function RetailCustomersPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {loading ? (
+              <tr><td colSpan={9} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>Loading customers...</td></tr>
+            ) : filtered.length === 0 ? (
               <tr><td colSpan={9} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>No customers found</td></tr>
             ) : filtered.map((c, i) => (
               <tr key={c.id} style={{ borderTop: "1px solid var(--border)", background: i % 2 === 0 ? "transparent" : "rgba(99,102,241,.02)" }}>

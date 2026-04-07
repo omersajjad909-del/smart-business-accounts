@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { alertToast } from "@/lib/toast-feedback";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -18,6 +19,7 @@ export default function LoyaltyPage() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", points: 0 });
   const [formError, setFormError] = useState("");
+  const [pointsModal, setPointsModal] = useState({ open: false, id: "", name: "", current: 0, value: "" });
 
   const members = records.map(r => {
     const points = r.amount || 0;
@@ -59,9 +61,14 @@ export default function LoyaltyPage() {
     setFormError("");
   }
 
-  async function addPoints(id: string, current: number) {
-    const pts = Number(prompt("Add points:") || 0);
-    if (pts > 0) await update(id, { amount: current + pts });
+  async function addPoints() {
+    const pts = Number(pointsModal.value || 0);
+    if (!pts || pts < 1) {
+      await alertToast("Enter a valid points amount.");
+      return;
+    }
+    await update(pointsModal.id, { amount: pointsModal.current + pts });
+    setPointsModal({ open: false, id: "", name: "", current: 0, value: "" });
   }
 
   return (
@@ -96,7 +103,7 @@ export default function LoyaltyPage() {
                 </td>
                 <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{m.visits}</td>
                 <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
-                  <button onClick={() => addPoints(m.id, m.points)} style={{ padding: "5px 10px", background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>+ Points</button>
+                  <button onClick={() => setPointsModal({ open: true, id: m.id, name: m.name, current: m.points, value: "" })} style={{ padding: "5px 10px", background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>+ Points</button>
                 </td>
               </tr>
             ))}
@@ -125,6 +132,28 @@ export default function LoyaltyPage() {
             <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
               <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f59e0b", border: "none", borderRadius: 8, color: "#0f1117", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Member</button>
               <button onClick={() => { setShowModal(false); setFormError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {pointsModal.open && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 55, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 28, width: 400, fontFamily: ff }}>
+            <h2 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 700 }}>Add Loyalty Points</h2>
+            <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,.5)", fontSize: 13 }}>
+              Update points for {pointsModal.name}. Current balance: {pointsModal.current.toLocaleString()} points.
+            </p>
+            <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Points to Add</label>
+            <input
+              type="number"
+              min="1"
+              value={pointsModal.value}
+              onChange={(e) => setPointsModal((prev) => ({ ...prev, value: e.target.value }))}
+              style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }}
+            />
+            <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
+              <button onClick={addPoints} style={{ flex: 1, padding: "11px 0", background: "#f59e0b", border: "none", borderRadius: 8, color: "#0f1117", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Apply Points</button>
+              <button onClick={() => setPointsModal({ open: false, id: "", name: "", current: 0, value: "" })} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         </div>
