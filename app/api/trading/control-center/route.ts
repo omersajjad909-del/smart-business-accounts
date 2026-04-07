@@ -54,7 +54,6 @@ export async function GET(req: NextRequest) {
         total: true,
         driverName: true,
         vehicleNo: true,
-        customerName: true,
         customer: { select: { name: true } },
       },
     }),
@@ -215,7 +214,7 @@ export async function GET(req: NextRequest) {
     quotations: quotations.map((row) => ({ ...row, date: normalizeDate(row.date) })),
     salesInvoices: salesInvoices.map((row) => ({
       ...row,
-      customerName: row.customerName || row.customer?.name || "",
+      customerName: row.customer?.name || "",
       date: normalizeDate(row.date),
     })),
     purchaseOrders: purchaseOrders.map((row) => ({ ...row, date: normalizeDate(row.date) })),
