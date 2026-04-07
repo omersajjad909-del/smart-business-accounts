@@ -107,6 +107,10 @@ function SalesInvoiceContent() {
   const [previewMode, setPreviewMode] = useState<"INVOICE" | "DELIVERY">("INVOICE");
   const [searchTerm, _setSearchTerm] = useState("");
   const [scanCode, setScanCode] = useState("");
+  const [scanActive, setScanActive] = useState(false);
+  const [discount, setDiscount] = useState<number | "">("");
+  const [discountType, setDiscountType] = useState<"flat" | "percent">("flat");
+  const [notes, setNotes] = useState("");
   const [origin, setOrigin] = useState("");
   const [loading, setLoading] = useState(true);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
@@ -353,9 +357,11 @@ function SalesInvoiceContent() {
   }
 
   const total = rows.reduce((s, r) => s + (Number(r.qty) * Number(r.rate) || 0), 0);
+  const discountAmount = discount === "" ? 0 : discountType === "percent" ? (total * Number(discount) / 100) : Number(discount);
+  const afterDiscount = total - discountAmount;
   const selectedTax = taxes.find(t => t.id === selectedTaxId);
-  const taxAmount = applyTax && selectedTax ? (total * (selectedTax.taxRate / 100)) : 0;
-  const netTotal = total + (freight === "" ? 0 : Number(freight)) + taxAmount;
+  const taxAmount = applyTax && selectedTax ? (afterDiscount * (selectedTax.taxRate / 100)) : 0;
+  const netTotal = afterDiscount + (freight === "" ? 0 : Number(freight)) + taxAmount;
 
   const filteredInvoices = invoices.filter(inv => {
     const term = searchTerm.toLowerCase();
@@ -518,12 +524,12 @@ function SalesInvoiceContent() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Ã¢Å“â€¦ Email sent successfully!");
+        toast.success("Ã¢Å"â€¦ Email sent successfully!");
       } else {
-        toast.error(`Ã¢ÂÅ’ Failed to send email: ${data.error || "Unknown error"}`);
+        toast.error(`Ã¢ÂÅ' Failed to send email: ${data.error || "Unknown error"}`);
       }
     } catch (_error) {
-      toast.error("Ã¢ÂÅ’ Failed to send email. Please check email configuration.");
+      toast.error("Ã¢ÂÅ' Failed to send email. Please check email configuration.");
     } finally {
       setSendingEmail(false);
     }
@@ -769,18 +775,52 @@ function SalesInvoiceContent() {
                 </div>
               </div>
 
-              {/* Ã°Å¸â€œÅ¸ BARCODE SCANNER SECTION */}
-              <div className="flex items-center gap-4 bg-blue-50 p-4 rounded border border-blue-200 shadow-sm">
-                <span className="text-3xl">Ã°Å¸â€œÅ¸</span>
-                <div className="flex-1">
-                  <label className="text-xs font-bold text-blue-800 block mb-1">SCAN BARCODE / SKU TO ADD ITEM</label>
+              {/* BARCODE SCANNER SECTION */}
+              <div
+                onClick={() => setScanActive(true)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 16,
+                  background: scanActive
+                    ? "linear-gradient(135deg, rgba(99,102,241,.18) 0%, rgba(79,70,229,.12) 100%)"
+                    : "rgba(99,102,241,.07)",
+                  border: scanActive ? "1.5px solid rgba(99,102,241,.55)" : "1.5px dashed rgba(99,102,241,.25)",
+                  borderRadius: 12, padding: "14px 18px", cursor: "pointer",
+                  transition: "all .2s", boxShadow: scanActive ? "0 0 0 3px rgba(99,102,241,.12)" : "none",
+                }}
+              >
+                <div style={{
+                  width: 44, height: 44, borderRadius: 10, flexShrink: 0,
+                  background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: "0 4px 12px rgba(99,102,241,.35)",
+                }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="14"/>
+                    <line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="10" x2="14" y2="14"/>
+                    <line x1="18" y1="9" x2="18" y2="15"/>
+                  </svg>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>
+                    Scan Barcode / SKU to Add Item
+                  </div>
                   <input
                     value={scanCode}
                     onChange={(e) => setScanCode(e.target.value)}
                     onKeyDown={handleScan}
-                    placeholder="Click here and scan barcode..."
-                    className="border-2 border-blue-400 p-2 w-full rounded text-lg font-mono focus:ring-4 focus:ring-blue-200 outline-none transition-all"
+                    onFocus={() => setScanActive(true)}
+                    onBlur={() => setScanActive(false)}
+                    placeholder="Click here and scan barcode or type SKU..."
+                    style={{
+                      width: "100%", padding: "9px 14px", borderRadius: 8,
+                      background: "rgba(255,255,255,.06)", border: "1px solid rgba(99,102,241,.3)",
+                      color: "white", fontSize: 14, fontFamily: "monospace", outline: "none",
+                      letterSpacing: ".04em",
+                    }}
                   />
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", textAlign: "center", lineHeight: 1.5, flexShrink: 0 }}>
+                  Press<br/><span style={{ color: "#a5b4fc", fontWeight: 700 }}>Enter</span><br/>to add
                 </div>
               </div>
 
@@ -823,12 +863,53 @@ function SalesInvoiceContent() {
               </div>
               <button onClick={addRow} className="bg-gray-100 px-4 py-1 rounded">+ Add Row</button>
 
+              {/* Notes */}
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1">Notes / Remarks (optional)</label>
+                <textarea
+                  value={notes}
+                  onChange={e => setNotes(e.target.value)}
+                  placeholder="Add any notes or terms for this invoice..."
+                  rows={2}
+                  className="border w-full p-2 rounded text-sm resize-none"
+                />
+              </div>
+
               <div className="flex justify-end pt-4">
-                <div className="w-full md:w-64 space-y-2">
-                  <div className="flex justify-between"><span>Total</span><span>{total.toLocaleString()}</span></div>
+                <div className="w-full md:w-72 space-y-2">
+                  <div className="flex justify-between"><span>Subtotal</span><span>{total.toLocaleString()}</span></div>
+
+                  {/* Discount */}
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="shrink-0">Discount</span>
+                    <div className="flex gap-1 items-center">
+                      <select
+                        value={discountType}
+                        onChange={e => setDiscountType(e.target.value as "flat" | "percent")}
+                        className="border p-1 text-xs rounded"
+                      >
+                        <option value="flat">Flat</option>
+                        <option value="percent">%</option>
+                      </select>
+                      <input
+                        type="number"
+                        value={discount}
+                        onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))}
+                        placeholder="0"
+                        className="border w-24 text-right p-1 rounded"
+                      />
+                    </div>
+                  </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-sm text-red-500">
+                      <span>Discount ({discountType === "percent" ? `${discount}%` : "flat"})</span>
+                      <span>- {discountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between items-center">
                     <span>Freight</span>
-                    <input type="number" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} className="border w-32 text-right p-1" />
+                    <input type="number" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} className="border w-32 text-right p-1 rounded" />
                   </div>
 
                   {/* Tax Section */}
@@ -839,12 +920,10 @@ function SalesInvoiceContent() {
                         setApplyTax(!applyTax);
                         if (!applyTax) setSelectedTaxId("");
                       }}
-                      className={`w-full py-1 px-2 rounded font-semibold text-sm ${applyTax ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
-                        }`}
+                      className={`w-full py-1 px-2 rounded font-semibold text-sm ${applyTax ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}
                     >
-                      {applyTax ? "Ã¢Å“â€œ Tax Applied" : "+ Add Tax"}
+                      {applyTax ? "✔ Tax Applied" : "+ Add Tax"}
                     </button>
-
                     {applyTax && (
                       <div className="space-y-2">
                         <select
