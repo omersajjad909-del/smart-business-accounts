@@ -321,12 +321,22 @@ export default function WarehousesPage() {
               {/* Card header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 3 }}>
-                    {wh.name}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)" }}>{wh.name}</div>
+                    {wh.isDefault && (
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
+                        background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.4)",
+                        color: "#818cf8", letterSpacing: ".04em" }}>DEFAULT</span>
+                    )}
                   </div>
                   {wh.location && (
                     <div style={{ fontSize: 13, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 4 }}>
                       <span>📍</span> {wh.location}
+                    </div>
+                  )}
+                  {wh.manager && (
+                    <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 3, display: "flex", alignItems: "center", gap: 4 }}>
+                      <span>👤</span> {wh.manager}{wh.phone ? ` · ${wh.phone}` : ""}
                     </div>
                   )}
                 </div>
@@ -566,6 +576,26 @@ export default function WarehousesPage() {
                   onChange={e => setWhForm(f => ({ ...f, address: e.target.value }))}
                 />
               </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>Manager / Contact Person</label>
+                  <input
+                    style={inputStyle}
+                    placeholder="e.g. Ahmed Ali"
+                    value={whForm.manager}
+                    onChange={e => setWhForm(f => ({ ...f, manager: e.target.value }))}
+                  />
+                </div>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>Phone</label>
+                  <input
+                    style={inputStyle}
+                    placeholder="e.g. 0300-1234567"
+                    value={whForm.phone}
+                    onChange={e => setWhForm(f => ({ ...f, phone: e.target.value }))}
+                  />
+                </div>
+              </div>
               <div style={fieldStyle}>
                 <label style={labelStyle}>Capacity (sq ft or units)</label>
                 <input
@@ -577,10 +607,33 @@ export default function WarehousesPage() {
                   onChange={e => setWhForm(f => ({ ...f, capacity: e.target.value }))}
                 />
               </div>
+              <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "10px 14px", borderRadius: 8,
+                background: whForm.isDefault ? "rgba(99,102,241,0.08)" : "var(--app-bg)",
+                border: `1px solid ${whForm.isDefault ? "rgba(99,102,241,0.35)" : "var(--border)"}`,
+                cursor: "pointer",
+              }} onClick={() => setWhForm(f => ({ ...f, isDefault: !f.isDefault }))}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>Set as Default Warehouse</div>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Auto-selected in GRN & Purchase Invoice</div>
+                </div>
+                <div style={{
+                  width: 40, height: 22, borderRadius: 11,
+                  background: whForm.isDefault ? "#6366f1" : "var(--border)",
+                  position: "relative", transition: "background 0.2s", flexShrink: 0,
+                }}>
+                  <div style={{
+                    position: "absolute", top: 3, left: whForm.isDefault ? 21 : 3,
+                    width: 16, height: 16, borderRadius: "50%", background: "#fff",
+                    transition: "left 0.2s",
+                  }} />
+                </div>
+              </div>
               <div style={fieldStyle}>
                 <label style={labelStyle}>Notes</label>
                 <textarea
-                  style={{ ...inputStyle, resize: "vertical", minHeight: 70 }}
+                  style={{ ...inputStyle, resize: "vertical", minHeight: 60 }}
                   placeholder="Any additional info…"
                   value={whForm.notes}
                   onChange={e => setWhForm(f => ({ ...f, notes: e.target.value }))}
