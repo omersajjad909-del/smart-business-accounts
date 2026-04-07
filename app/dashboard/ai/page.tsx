@@ -672,13 +672,16 @@ export default function AICommandCenter() {
         .kpi-card:hover { border-color:rgba(99,102,241,.3); background:rgba(99,102,241,.06); }
         .q-pill { background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.22); color:#c7d2fe; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .2s; text-align:left; }
         .q-pill:hover { background:rgba(99,102,241,.18); color:#ffffff; border-color:rgba(99,102,241,.36); transform:translateY(-1px); }
-        .chat-shell { background:radial-gradient(circle at top right, rgba(99,102,241,.12), transparent 36%), linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:22px; overflow:hidden; }
-        .chat-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:18px 18px 16px; border-bottom:1px solid rgba(255,255,255,.06); background:rgba(8,12,28,.36); }
-        .chat-msg-user { background:linear-gradient(135deg,#6366f1,#4f46e5); border:1px solid rgba(165,180,252,.18); box-shadow:0 10px 28px rgba(79,70,229,.18); border-radius:20px 20px 6px 20px; padding:14px 16px; font-size:13.5px; line-height:1.68; max-width:76%; }
-        .chat-msg-bot { background:linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.05)); border:1px solid rgba(255,255,255,.08); box-shadow:0 10px 24px rgba(0,0,0,.14); border-radius:20px 20px 20px 6px; padding:14px 16px; font-size:13.5px; line-height:1.68; max-width:82%; }
-        .chat-role { display:block; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; opacity:.72; }
-        .chat-composer { padding:14px 16px 16px; border-top:1px solid rgba(255,255,255,.06); background:rgba(8,12,28,.28); }
-        .cursor-blink { display:inline-block; width:2px; height:14px; background:#6366f1; animation:pulse .8s ease infinite; margin-left:2px; vertical-align:middle; }
+        .chat-shell { display:flex; flex-direction:column; border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,.07); background:rgba(255,255,255,.02); }
+        .chat-msg-user { background:linear-gradient(135deg,#6366f1,#4f46e5); border:1px solid rgba(165,180,252,.18); box-shadow:0 8px 24px rgba(79,70,229,.2); border-radius:18px 18px 4px 18px; padding:12px 16px; font-size:13.5px; line-height:1.7; max-width:72%; }
+        .chat-msg-bot { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.09); border-radius:18px 18px 18px 4px; padding:12px 16px; font-size:13.5px; line-height:1.7; max-width:80%; }
+        .chat-role { display:block; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; opacity:.6; }
+        .chat-composer { padding:12px 16px 14px; border-top:1px solid rgba(255,255,255,.06); background:rgba(6,9,20,.5); }
+        .cursor-blink { display:inline-block; width:2px; height:13px; background:#6366f1; animation:pulse .8s ease infinite; margin-left:2px; vertical-align:middle; }
+        .suggest-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px 16px; cursor:pointer; font-family:inherit; color:rgba(255,255,255,.72); font-size:12.5px; font-weight:500; text-align:left; transition:all .18s; line-height:1.45; }
+        .suggest-card:hover { background:rgba(99,102,241,.1); border-color:rgba(99,102,241,.3); color:#fff; transform:translateY(-1px); }
+        .suggest-card .sq-icon { font-size:18px; display:block; margin-bottom:6px; }
+        .suggest-card .sq-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.35); display:block; margin-bottom:3px; }
         .insight-block h1,h2,h3 { color:inherit }
       `}</style>
 
@@ -1063,113 +1066,114 @@ export default function AICommandCenter() {
 
         {/* ══ CHAT ════════════════════════════════════════════════════════ */}
         {tab === "chat" && (
-          <div className="chat-shell" style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 300px)", minHeight: 460, animation: "fadeUp .4s ease both" }}>
-            <div className="chat-panel-head">
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 14, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 12px 30px rgba(79,70,229,.24)", flexShrink: 0 }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                      <path d="M2 12l10 5 10-5" />
-                      <path d="M2 17l10 5 10-5" />
+          <div className="chat-shell" style={{ height: "calc(100vh - 240px)", minHeight: 520, animation: "fadeUp .35s ease both" }}>
+
+            {/* ── Messages area ── */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px 8px", display: "flex", flexDirection: "column", gap: 18 }}>
+
+              {/* Empty / welcome state */}
+              {messages.length <= 1 && messages[0]?.role !== "user" && (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, padding: "24px 16px 8px", textAlign: "center" }}>
+                  <div style={{ width: 56, height: 56, borderRadius: 18, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 16px 40px rgba(79,70,229,.3)", marginBottom: 18 }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
                     </svg>
                   </div>
-                  <div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: "white" }}>FinovaOS AI Assistant</div>
-                    <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.48)" }}>
-                      Ask about profit, cash flow, expenses, inventory, customers, and business performance.
-                    </div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: "white", marginBottom: 6 }}>FinovaOS AI Assistant</div>
+                  <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", marginBottom: 28, maxWidth: 380, lineHeight: 1.6 }}>
+                    Ask anything about your business — profit, expenses, customers, stock, or cash flow. Urdu ya English dono chalti hain.
+                  </div>
+
+                  {/* Suggestion cards 2x2 */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%", maxWidth: 560 }}>
+                    {[
+                      { icon: "📊", label: "Profit", q: "What is my profit this month?" },
+                      { icon: "👥", label: "Customers", q: "Which customers owe me money?" },
+                      { icon: "💸", label: "Expenses", q: "Why are my expenses high this month?" },
+                      { icon: "📦", label: "Inventory", q: "Which items are running low on stock?" },
+                      { icon: "💰", label: "Cash Flow", q: "How can I improve my cash flow?" },
+                      { icon: "🏆", label: "Top Sales", q: "Which products are selling the most?" },
+                      { icon: "🔔", label: "Reminders", q: "Which invoices need reminders now?" },
+                      { icon: "📈", label: "Forecast", q: "Predict my revenue next month" },
+                    ].map(s => (
+                      <button key={s.q} className="suggest-card" onClick={() => sendChat(s.q)}>
+                        <span className="sq-icon">{s.icon}</span>
+                        <span className="sq-label">{s.label}</span>
+                        {s.q}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Provider badge */}
+                  <div style={{ marginTop: 28, display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 999, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.18)", color: "#6ee7b7", fontSize: 11.5, fontWeight: 700 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
+                    {aiProviderLabel} · Connected to your live data
                   </div>
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {["Financial analysis", "Live company context", "English + Urdu", "Practical actions"].map((item) => (
-                    <span key={item} style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.74)", padding: "6px 10px", borderRadius: 999, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.08)" }}>
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div style={{ textAlign: "right", minWidth: 160 }}>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 999, background: "rgba(16,185,129,.1)", border: "1px solid rgba(16,185,129,.24)", color: "#86efac", fontSize: 11.5, fontWeight: 800 }}>
-                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
-                  {aiProviderLabel}
-                </div>
-                <div style={{ marginTop: 10, fontSize: 11.5, color: "rgba(255,255,255,.42)" }}>
-                  Connected to your live company data
-                </div>
-              </div>
-            </div>
+              )}
 
-            {/* Messages */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "18px", display: "flex", flexDirection: "column", gap: 16 }}>
-              {messages.map((m, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", flexDirection: m.role === "user" ? "row-reverse" : "row" }}>
+              {/* Message bubbles */}
+              {messages.filter(m => m.content).map((m, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-end", flexDirection: m.role === "user" ? "row-reverse" : "row" }}>
                   {m.role === "assistant" ? (
-                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginBottom: 2 }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
                         <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
                       </svg>
                     </div>
                   ) : (
-                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#34d399,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{companyInitial}</div>
+                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#34d399,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, flexShrink: 0, marginBottom: 2 }}>{companyInitial}</div>
                   )}
                   <div className={m.role === "user" ? "chat-msg-user" : "chat-msg-bot"}>
-                    <span className="chat-role" style={{ color: m.role === "user" ? "rgba(255,255,255,.82)" : "#a5b4fc" }}>
-                      {m.role === "user" ? "You" : "FinovaOS AI"}
-                    </span>
                     {m.role === "assistant" ? (
-                      <div>{renderMarkdown(m.content)}{streaming && i === messages.length - 1 && m.content && <span className="cursor-blink" />}</div>
+                      <div>{renderMarkdown(m.content)}{streaming && i === messages.filter(x => x.content).length - 1 && m.content && <span className="cursor-blink" />}</div>
                     ) : (
-                      <span>{m.content}</span>
+                      <span style={{ color: "white" }}>{m.content}</span>
                     )}
                   </div>
                 </div>
               ))}
+
+              {/* Typing indicator */}
               {chatLoading && messages[messages.length - 1]?.content === "" && (
-                <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>
+                <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
+                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>
                   </div>
-                  <div className="chat-msg-bot" style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                    {[0, 1, 2].map(j => <div key={j} style={{ width: 7, height: 7, borderRadius: "50%", background: "rgba(99,102,241,.6)", animation: `pulse 1.2s ease ${j * .2}s infinite` }} />)}
+                  <div className="chat-msg-bot" style={{ display: "flex", gap: 5, alignItems: "center", padding: "14px 18px" }}>
+                    {[0, 1, 2].map(j => <div key={j} style={{ width: 7, height: 7, borderRadius: "50%", background: "rgba(99,102,241,.7)", animation: `pulse 1.1s ease ${j * .18}s infinite` }} />)}
                   </div>
                 </div>
               )}
               <div ref={chatBottomRef} />
             </div>
 
-            {/* Quick pills */}
-            {messages.length <= 1 && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: "0 18px 14px" }}>
-                {QUICK_QUESTIONS.slice(0, 4).map(q => (
-                  <button key={q} className="q-pill" onClick={() => sendChat(q)}>{q}</button>
-                ))}
-              </div>
-            )}
-
-            {/* Input */}
+            {/* ── Input composer ── */}
             <div className="chat-composer">
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 10, flexWrap: "wrap" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.58)" }}>Ask a business question</div>
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)" }}>Examples: profit, late payments, stock, cash flow, top customers</div>
-              </div>
-              <div style={{ display: "flex", gap: 10, alignItems: "center", background: "linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.045))", border: "1px solid rgba(255,255,255,.1)", borderRadius: 16, padding: "10px 10px 10px 16px", boxShadow: "inset 0 1px 0 rgba(255,255,255,.03)" }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "10px 10px 10px 18px", transition: "border-color .2s" }}>
                 <input
                   ref={chatInputRef}
                   value={chatInput}
                   onChange={e => setChatInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } }}
-                  placeholder="Ask about your finances… (Urdu or English)"
-                  style={{ flex: 1, background: "none", border: "none", color: "white", fontSize: 13.5, fontFamily: "inherit", outline: "none" }}
+                  placeholder="Koi bhi business sawal poochein… (Urdu or English)"
+                  style={{ flex: 1, background: "none", border: "none", color: "white", fontSize: 13.5, fontFamily: "inherit", outline: "none", padding: "2px 0" }}
                 />
-                <button onClick={() => sendChat()} disabled={!chatInput.trim() || chatLoading} style={{
-                  width: 42, height: 42, borderRadius: 12, border: "none", cursor: chatInput.trim() && !chatLoading ? "pointer" : "not-allowed",
-                  background: chatInput.trim() && !chatLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.08)",
-                  display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s", boxShadow: chatInput.trim() && !chatLoading ? "0 10px 24px rgba(79,70,229,.24)" : "none",
-                }}>
-                  {chatLoading ? <Spinner size={16} /> : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
-                  )}
+                <button
+                  onClick={() => sendChat()}
+                  disabled={!chatInput.trim() || chatLoading}
+                  style={{
+                    width: 40, height: 40, borderRadius: 11, border: "none", flexShrink: 0,
+                    cursor: chatInput.trim() && !chatLoading ? "pointer" : "not-allowed",
+                    background: chatInput.trim() && !chatLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.07)",
+                    display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s",
+                    boxShadow: chatInput.trim() && !chatLoading ? "0 8px 20px rgba(79,70,229,.28)" : "none",
+                  }}
+                >
+                  {chatLoading
+                    ? <Spinner size={15} />
+                    : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+                  }
                 </button>
               </div>
             </div>
