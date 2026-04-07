@@ -1156,7 +1156,7 @@ export default function AICommandCenter() {
                   value={chatInput}
                   onChange={e => setChatInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } }}
-                  placeholder="Koi bhi business sawal poochein… (Urdu or English)"
+                  placeholder="Ask any Question about your business..."
                   style={{ flex: 1, background: "none", border: "none", color: "white", fontSize: 13.5, fontFamily: "inherit", outline: "none", padding: "2px 0" }}
                 />
                 <button
