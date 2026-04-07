@@ -305,7 +305,7 @@ export default function PriceListsPage() {
                 <label style={labelStyle}>Notes</label>
                 <textarea
                   style={{ ...inputStyle, minHeight: 72, resize: "vertical" }}
-                  placeholder="Optional notesÃ¢â‚¬Â¦"
+                  placeholder="Optional notes..."
                   value={form.notes}
                   onChange={(e) => setField("notes", e.target.value)}
                 />

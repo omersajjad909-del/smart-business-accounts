@@ -44,6 +44,9 @@ function mapWarehouse(r: BusinessRecord) {
     itemsCount: (r.data.itemsCount as number) || 0,
     capacity: (r.data.capacity as number) || 0,
     capacityUsed: (r.data.capacityUsed as number) || 0,
+    manager: (r.data.manager as string) || "",
+    phone: (r.data.phone as string) || "",
+    isDefault: (r.data.isDefault as boolean) || false,
     notes: (r.data.notes as string) || "",
   };
 }
