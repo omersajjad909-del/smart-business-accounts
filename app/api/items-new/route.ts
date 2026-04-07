@@ -20,12 +20,15 @@ export async function GET(req: NextRequest) {
     });
 
     if (format === "csv") {
-      const header = ["code", "name", "unit", "rate", "minStock", "barcode", "description"].join(",");
+      const header = ["code","name","category","unit","rate","purchaseRate","taxRate","minStock","barcode","description"].join(",");
       const rows = items.map((i) => [
         JSON.stringify(i.code || ""),
         JSON.stringify(i.name || ""),
+        JSON.stringify(i.category || "TRADING"),
         JSON.stringify(i.unit || ""),
         i.rate ?? "",
+        i.purchaseRate ?? "",
+        i.taxRate ?? "",
         i.minStock ?? "",
         JSON.stringify(i.barcode || ""),
         JSON.stringify(i.description || ""),
@@ -80,8 +83,11 @@ export async function POST(req: NextRequest) {
         companyId,
         code: `I-${nextNumber}`,
         name: body.name,
+        category: body.category || "TRADING",
         unit: body.unit,
         rate: Number(body.rate) || 0,
+        purchaseRate: Number(body.purchaseRate) || 0,
+        taxRate: Number(body.taxRate) || 0,
         minStock: Number(body.minStock) || 0,
         barcode: body.barcode ? String(body.barcode).trim() : null,
         description: body.description || "",
@@ -118,7 +124,7 @@ export async function PUT(req: NextRequest) {
     }
     const userId = req.headers.get("x-user-id");
     const body = await req.json();
-    const { id, name, unit, rate, minStock, barcode, description } = body;
+    const { id, name, category, unit, rate, purchaseRate, taxRate, minStock, barcode, description } = body;
 
     if (!id || !name || !unit) {
       return NextResponse.json({ error: "ID, Name & Unit required" }, { status: 400 });
@@ -128,8 +134,11 @@ export async function PUT(req: NextRequest) {
       where: { id, companyId },
       data: {
         name,
+        category: category || "TRADING",
         unit,
         rate: Number(rate) || 0,
+        purchaseRate: Number(purchaseRate) || 0,
+        taxRate: Number(taxRate) || 0,
         minStock: Number(minStock) || 0,
         barcode: barcode ? String(barcode).trim() : null,
         description: description || "",

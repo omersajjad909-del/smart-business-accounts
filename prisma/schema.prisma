@@ -74,14 +74,17 @@ model ItemNew {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  code        String
-  name        String
-  unit        String
-  rate        Float    @default(0)
-  minStock    Int      @default(0)
-  barcode     String?  @unique
-  description String?
-  createdAt   DateTime @default(now())
+  code         String
+  name         String
+  category     String   @default("TRADING")  // TRADING | RAW_MATERIAL | FINISHED | SERVICE
+  unit         String
+  rate         Float    @default(0)           // Sale Rate
+  purchaseRate Float    @default(0)           // Cost / Purchase Rate
+  taxRate      Float    @default(0)           // GST / Sales Tax %
+  minStock     Int      @default(0)
+  barcode      String?  @unique
+  description  String?
+  createdAt    DateTime @default(now())
 
   stockRates   StockRate[]
   outwardItems OutwardItem[]
