@@ -10,6 +10,9 @@ interface WarehouseForm {
   location: string;
   address: string;
   capacity: string;
+  manager: string;
+  phone: string;
+  isDefault: boolean;
   notes: string;
 }
 
@@ -21,7 +24,7 @@ interface TransferForm {
   notes: string;
 }
 
-const EMPTY_WH_FORM: WarehouseForm = { name: "", location: "", address: "", capacity: "", notes: "" };
+const EMPTY_WH_FORM: WarehouseForm = { name: "", location: "", address: "", capacity: "", manager: "", phone: "", isDefault: false, notes: "" };
 const EMPTY_TX_FORM: TransferForm = { fromId: "", toId: "", item: "", qty: "", notes: "" };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

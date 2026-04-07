@@ -166,7 +166,7 @@ export default function PriceListsPage() {
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
-          Loading price listsÃ¢â‚¬Â¦
+          Loading price lists...
         </div>
       )}
 
