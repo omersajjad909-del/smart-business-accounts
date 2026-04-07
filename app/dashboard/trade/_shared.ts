@@ -7,6 +7,42 @@ export const tradeBg = "rgba(255,255,255,.03)";
 export const tradeBorder = "rgba(255,255,255,.07)";
 export const tradeMuted = "rgba(255,255,255,.45)";
 
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+export type TradeShipment = ReturnType<typeof mapShipmentRecords>[number];
+export type TradeLc = ReturnType<typeof mapTradeLcRecords>[number];
+export type TradeCustoms = ReturnType<typeof mapCustomsRecords>[number];
+export type TradeCosting = ReturnType<typeof mapImportCostingRecords>[number];
+export type TradeRebate = ReturnType<typeof mapRebateRecords>[number];
+
+export type TradeControlCenter = {
+  summary: {
+    shipmentCount: number;
+    activeLcCount: number;
+    openCustomsCount: number;
+    rebateCount: number;
+    shipmentValue: number;
+    lcValue: number;
+    landedCost: number;
+    rebateValue: number;
+    openCustomsPayable: number;
+    shipmentFreight: number;
+  };
+  shipments: TradeShipment[];
+  lcs: TradeLc[];
+  customs: TradeCustoms[];
+  costings: TradeCosting[];
+  rebates: TradeRebate[];
+};
+
 export function mapShipmentRecords(records: BusinessRecord[]) {
   return records.map((record) => ({
     id: record.id,

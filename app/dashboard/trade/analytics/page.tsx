@@ -1,21 +1,56 @@
 "use client";
 
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { mapCustomsRecords, mapImportCostingRecords, mapRebateRecords, mapShipmentRecords, mapTradeLcRecords, tradeBg, tradeBorder, tradeFont, tradeMuted } from "../_shared";
+import { useEffect, useMemo, useState } from "react";
+import { fetchJson, tradeBg, tradeBorder, tradeFont, tradeMuted, type TradeControlCenter } from "../_shared";
 
 export default function TradeAnalyticsPage() {
-  const shipmentStore = useBusinessRecords("shipment");
-  const lcStore = useBusinessRecords("lc_tt");
-  const customsStore = useBusinessRecords("customs_clearance");
-  const costingStore = useBusinessRecords("import_costing");
-  const rebateStore = useBusinessRecords("export_rebate");
+  const [data, setData] = useState<TradeControlCenter>({
+    summary: {
+      shipmentCount: 0,
+      activeLcCount: 0,
+      openCustomsCount: 0,
+      rebateCount: 0,
+      shipmentValue: 0,
+      lcValue: 0,
+      landedCost: 0,
+      rebateValue: 0,
+      openCustomsPayable: 0,
+      shipmentFreight: 0,
+    },
+    shipments: [],
+    lcs: [],
+    customs: [],
+    costings: [],
+    rebates: [],
+  });
 
-  const shipments = useMemo(() => mapShipmentRecords(shipmentStore.records), [shipmentStore.records]);
-  const lcs = useMemo(() => mapTradeLcRecords(lcStore.records), [lcStore.records]);
-  const customs = useMemo(() => mapCustomsRecords(customsStore.records), [customsStore.records]);
-  const costings = useMemo(() => mapImportCostingRecords(costingStore.records), [costingStore.records]);
-  const rebates = useMemo(() => mapRebateRecords(rebateStore.records), [rebateStore.records]);
+  useEffect(() => {
+    fetchJson<TradeControlCenter>("/api/trade/control-center", {
+      summary: {
+        shipmentCount: 0,
+        activeLcCount: 0,
+        openCustomsCount: 0,
+        rebateCount: 0,
+        shipmentValue: 0,
+        lcValue: 0,
+        landedCost: 0,
+        rebateValue: 0,
+        openCustomsPayable: 0,
+        shipmentFreight: 0,
+      },
+      shipments: [],
+      lcs: [],
+      customs: [],
+      costings: [],
+      rebates: [],
+    }).then(setData);
+  }, []);
+
+  const shipments = data.shipments;
+  const lcs = data.lcs;
+  const customs = data.customs;
+  const costings = data.costings;
+  const rebates = data.rebates;
 
   const routeRows = useMemo(() => {
     const bucket = new Map<string, number>();
@@ -47,10 +82,10 @@ export default function TradeAnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Shipment Value", value: `USD ${shipments.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}`, color: "#38bdf8" },
-          { label: "LC / TT Value", value: `USD ${lcs.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}`, color: "#a78bfa" },
-          { label: "Landed Cost", value: `USD ${costings.reduce((sum, row) => sum + row.landedCost, 0).toLocaleString()}`, color: "#f59e0b" },
-          { label: "Rebate Value", value: `USD ${rebates.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}`, color: "#22c55e" },
+          { label: "Shipment Value", value: `USD ${data.summary.shipmentValue.toLocaleString()}`, color: "#38bdf8" },
+          { label: "LC / TT Value", value: `USD ${data.summary.lcValue.toLocaleString()}`, color: "#a78bfa" },
+          { label: "Landed Cost", value: `USD ${data.summary.landedCost.toLocaleString()}`, color: "#f59e0b" },
+          { label: "Rebate Value", value: `USD ${data.summary.rebateValue.toLocaleString()}`, color: "#22c55e" },
         ].map((card) => (
           <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradeMuted, marginBottom: 8 }}>{card.label}</div>

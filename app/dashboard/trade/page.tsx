@@ -1,22 +1,57 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { mapCustomsRecords, mapImportCostingRecords, mapRebateRecords, mapShipmentRecords, mapTradeLcRecords, tradeBg, tradeBorder, tradeFont, tradeMuted } from "./_shared";
+import { useEffect, useMemo, useState } from "react";
+import { fetchJson, tradeBg, tradeBorder, tradeFont, tradeMuted, type TradeControlCenter } from "./_shared";
 
 export default function TradeOverviewPage() {
-  const shipmentStore = useBusinessRecords("shipment");
-  const lcStore = useBusinessRecords("lc_tt");
-  const customsStore = useBusinessRecords("customs_clearance");
-  const costingStore = useBusinessRecords("import_costing");
-  const rebateStore = useBusinessRecords("export_rebate");
+  const [data, setData] = useState<TradeControlCenter>({
+    summary: {
+      shipmentCount: 0,
+      activeLcCount: 0,
+      openCustomsCount: 0,
+      rebateCount: 0,
+      shipmentValue: 0,
+      lcValue: 0,
+      landedCost: 0,
+      rebateValue: 0,
+      openCustomsPayable: 0,
+      shipmentFreight: 0,
+    },
+    shipments: [],
+    lcs: [],
+    customs: [],
+    costings: [],
+    rebates: [],
+  });
 
-  const shipments = useMemo(() => mapShipmentRecords(shipmentStore.records), [shipmentStore.records]);
-  const lcs = useMemo(() => mapTradeLcRecords(lcStore.records), [lcStore.records]);
-  const customs = useMemo(() => mapCustomsRecords(customsStore.records), [customsStore.records]);
-  const costings = useMemo(() => mapImportCostingRecords(costingStore.records), [costingStore.records]);
-  const rebates = useMemo(() => mapRebateRecords(rebateStore.records), [rebateStore.records]);
+  useEffect(() => {
+    fetchJson<TradeControlCenter>("/api/trade/control-center", {
+      summary: {
+        shipmentCount: 0,
+        activeLcCount: 0,
+        openCustomsCount: 0,
+        rebateCount: 0,
+        shipmentValue: 0,
+        lcValue: 0,
+        landedCost: 0,
+        rebateValue: 0,
+        openCustomsPayable: 0,
+        shipmentFreight: 0,
+      },
+      shipments: [],
+      lcs: [],
+      customs: [],
+      costings: [],
+      rebates: [],
+    }).then(setData);
+  }, []);
+
+  const shipments = data.shipments;
+  const lcs = data.lcs;
+  const customs = data.customs;
+  const costings = data.costings;
+  const rebates = data.rebates;
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: tradeFont }}>
@@ -44,11 +79,11 @@ export default function TradeOverviewPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
-        {[
-          { label: "Shipments", value: shipments.length, color: "#38bdf8" },
-          { label: "Active LC / TT", value: lcs.filter((row) => !["SETTLED", "EXPIRED", "CANCELLED"].includes(row.status)).length, color: "#a78bfa" },
-          { label: "Customs Open", value: customs.filter((row) => row.status !== "CLEARED").length, color: "#f59e0b" },
-          { label: "Rebate Claims", value: rebates.length, color: "#22c55e" },
+        {[ 
+          { label: "Shipments", value: data.summary.shipmentCount, color: "#38bdf8" },
+          { label: "Active LC / TT", value: data.summary.activeLcCount, color: "#a78bfa" },
+          { label: "Customs Open", value: data.summary.openCustomsCount, color: "#f59e0b" },
+          { label: "Rebate Claims", value: data.summary.rebateCount, color: "#22c55e" },
         ].map((card) => (
           <div key={card.label} style={{ background: tradeBg, border: `1px solid ${tradeBorder}`, borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 12, color: tradeMuted, marginBottom: 8 }}>{card.label}</div>
@@ -75,10 +110,10 @@ export default function TradeOverviewPage() {
           <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradeBorder}`, fontSize: 15, fontWeight: 800 }}>Financial Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
-              { label: "Open customs payable", value: `USD ${customs.filter((row) => row.status !== "CLEARED").reduce((sum, row) => sum + row.totalPayable, 0).toLocaleString()}`, color: "#f59e0b" },
-              { label: "Import costing booked", value: `USD ${costings.reduce((sum, row) => sum + row.landedCost, 0).toLocaleString()}`, color: "#60a5fa" },
-              { label: "Export rebate claimed", value: `USD ${rebates.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}`, color: "#34d399" },
-              { label: "Shipment freight", value: `USD ${shipments.reduce((sum, row) => sum + row.freightCost, 0).toLocaleString()}`, color: "#f87171" },
+              { label: "Open customs payable", value: `USD ${data.summary.openCustomsPayable.toLocaleString()}`, color: "#f59e0b" },
+              { label: "Import costing booked", value: `USD ${data.summary.landedCost.toLocaleString()}`, color: "#60a5fa" },
+              { label: "Export rebate claimed", value: `USD ${data.summary.rebateValue.toLocaleString()}`, color: "#34d399" },
+              { label: "Shipment freight", value: `USD ${data.summary.shipmentFreight.toLocaleString()}`, color: "#f87171" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13, color: tradeMuted }}>{row.label}</span>

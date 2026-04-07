@@ -630,7 +630,7 @@ export default function AICommandCenter() {
   const risk = riskLevel(score);
   const currency = ctx?.company.currency || "PKR";
   const companyInitial = ctx?.company.name?.trim()?.charAt(0)?.toUpperCase() || "U";
-  const aiProviderLabel = "OpenAI · gpt-4o-mini";
+  const aiProviderLabel = "FinovaOS AI v1.0";
 
   const QUICK_QUESTIONS = [
     "What is my profit this month?",
