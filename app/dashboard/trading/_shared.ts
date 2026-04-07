@@ -135,6 +135,21 @@ export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
   }
 }
 
+export type TradingControlCenter = {
+  summary: DashboardSummary;
+  quotations: QuotationLite[];
+  salesInvoices: SalesInvoiceLite[];
+  purchaseOrders: PurchaseOrderLite[];
+  purchaseInvoices: PurchaseInvoiceLite[];
+  challans: DeliveryChallanLite[];
+  saleReturns: SaleReturnLite[];
+  outwards: OutwardLite[];
+  grns: GrnLite[];
+  receipts: PaymentReceiptLite[];
+  accounts: AccountLite[];
+  stock: StockRow[];
+};
+
 export function formatMoney(value: number | null | undefined) {
   return `Rs. ${Number(value || 0).toLocaleString()}`;
 }

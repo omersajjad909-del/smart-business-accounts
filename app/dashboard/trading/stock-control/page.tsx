@@ -12,6 +12,7 @@ import {
   tradingMuted,
   type OutwardLite,
   type StockRow,
+  type TradingControlCenter,
 } from "../_shared";
 
 export default function TradingStockControlPage() {
@@ -19,12 +20,22 @@ export default function TradingStockControlPage() {
   const [outward, setOutward] = useState<OutwardLite[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetchJson<StockRow[]>("/api/reports/stock", []),
-      fetchJson<OutwardLite[]>("/api/outward", []),
-    ]).then(([stockData, outwardData]) => {
-      setStock(stockData);
-      setOutward(outwardData);
+    fetchJson<TradingControlCenter>("/api/trading/control-center", {
+      summary: {},
+      quotations: [],
+      salesInvoices: [],
+      purchaseOrders: [],
+      purchaseInvoices: [],
+      challans: [],
+      saleReturns: [],
+      outwards: [],
+      grns: [],
+      receipts: [],
+      accounts: [],
+      stock: [],
+    }).then((result) => {
+      setStock(result.stock || []);
+      setOutward(result.outwards || []);
     });
   }, []);
 

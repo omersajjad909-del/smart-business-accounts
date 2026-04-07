@@ -12,6 +12,7 @@ import {
   type DeliveryChallanLite,
   type OutwardLite,
   type SalesInvoiceLite,
+  type TradingControlCenter,
 } from "../_shared";
 
 export default function TradingDispatchBoardPage() {
@@ -20,14 +21,23 @@ export default function TradingDispatchBoardPage() {
   const [salesInvoices, setSalesInvoices] = useState<SalesInvoiceLite[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetchJson<DeliveryChallanLite[]>("/api/delivery-challan", []),
-      fetchJson<OutwardLite[]>("/api/outward", []),
-      fetchJson<{ invoices?: SalesInvoiceLite[] }>("/api/sales-invoice", { invoices: [] }),
-    ]).then(([challanData, outwardData, salesData]) => {
-      setChallans(challanData);
-      setOutward(outwardData);
-      setSalesInvoices(salesData.invoices || []);
+    fetchJson<TradingControlCenter>("/api/trading/control-center", {
+      summary: {},
+      quotations: [],
+      salesInvoices: [],
+      purchaseOrders: [],
+      purchaseInvoices: [],
+      challans: [],
+      saleReturns: [],
+      outwards: [],
+      grns: [],
+      receipts: [],
+      accounts: [],
+      stock: [],
+    }).then((result) => {
+      setChallans(result.challans || []);
+      setOutward(result.outwards || []);
+      setSalesInvoices(result.salesInvoices || []);
     });
   }, []);
 

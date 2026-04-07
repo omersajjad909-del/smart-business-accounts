@@ -12,6 +12,7 @@ import {
   tradingMuted,
   type AccountLite,
   type PaymentReceiptLite,
+  type TradingControlCenter,
 } from "../_shared";
 
 export default function TradingOutstandingsPage() {
@@ -19,12 +20,22 @@ export default function TradingOutstandingsPage() {
   const [receipts, setReceipts] = useState<PaymentReceiptLite[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetchJson<AccountLite[]>("/api/accounts", []),
-      fetchJson<PaymentReceiptLite[]>("/api/payment-receipts", []),
-    ]).then(([accountData, receiptData]) => {
-      setAccounts(accountData);
-      setReceipts(receiptData);
+    fetchJson<TradingControlCenter>("/api/trading/control-center", {
+      summary: {},
+      quotations: [],
+      salesInvoices: [],
+      purchaseOrders: [],
+      purchaseInvoices: [],
+      challans: [],
+      saleReturns: [],
+      outwards: [],
+      grns: [],
+      receipts: [],
+      accounts: [],
+      stock: [],
+    }).then((result) => {
+      setAccounts(result.accounts || []);
+      setReceipts(result.receipts || []);
     });
   }, []);
 

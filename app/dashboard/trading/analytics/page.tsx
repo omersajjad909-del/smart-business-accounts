@@ -16,6 +16,7 @@ import {
   type PurchaseOrderLite,
   type SalesInvoiceLite,
   type StockRow,
+  type TradingControlCenter,
 } from "../_shared";
 
 export default function TradingAnalyticsPage() {
@@ -27,20 +28,26 @@ export default function TradingAnalyticsPage() {
   const [accounts, setAccounts] = useState<AccountLite[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetchJson<{ invoices?: SalesInvoiceLite[] }>("/api/sales-invoice", { invoices: [] }),
-      fetchJson<PurchaseOrderLite[]>("/api/purchase-order", []),
-      fetchJson<PurchaseInvoiceLite[]>("/api/purchase-invoice?type=invoices", []),
-      fetchJson<DeliveryChallanLite[]>("/api/delivery-challan", []),
-      fetchJson<StockRow[]>("/api/reports/stock", []),
-      fetchJson<AccountLite[]>("/api/accounts", []),
-    ]).then(([salesData, poData, piData, challanData, stockData, accountData]) => {
-      setSalesInvoices(salesData.invoices || []);
-      setPurchaseOrders(poData);
-      setPurchaseInvoices(piData);
-      setChallans(challanData);
-      setStock(stockData);
-      setAccounts(accountData);
+    fetchJson<TradingControlCenter>("/api/trading/control-center", {
+      summary: {},
+      quotations: [],
+      salesInvoices: [],
+      purchaseOrders: [],
+      purchaseInvoices: [],
+      challans: [],
+      saleReturns: [],
+      outwards: [],
+      grns: [],
+      receipts: [],
+      accounts: [],
+      stock: [],
+    }).then((result) => {
+      setSalesInvoices(result.salesInvoices || []);
+      setPurchaseOrders(result.purchaseOrders || []);
+      setPurchaseInvoices(result.purchaseInvoices || []);
+      setChallans(result.challans || []);
+      setStock(result.stock || []);
+      setAccounts(result.accounts || []);
     });
   }, []);
 

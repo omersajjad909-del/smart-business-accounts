@@ -14,6 +14,7 @@ import {
   type GrnLite,
   type PurchaseInvoiceLite,
   type PurchaseOrderLite,
+  type TradingControlCenter,
 } from "../_shared";
 
 export default function TradingProcurementPage() {
@@ -22,14 +23,23 @@ export default function TradingProcurementPage() {
   const [grns, setGrns] = useState<GrnLite[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetchJson<PurchaseOrderLite[]>("/api/purchase-order", []),
-      fetchJson<PurchaseInvoiceLite[]>("/api/purchase-invoice?type=invoices", []),
-      fetchJson<GrnLite[]>("/api/grn", []),
-    ]).then(([poData, invoiceData, grnData]) => {
-      setPurchaseOrders(poData);
-      setPurchaseInvoices(invoiceData);
-      setGrns(grnData);
+    fetchJson<TradingControlCenter>("/api/trading/control-center", {
+      summary: {},
+      quotations: [],
+      salesInvoices: [],
+      purchaseOrders: [],
+      purchaseInvoices: [],
+      challans: [],
+      saleReturns: [],
+      outwards: [],
+      grns: [],
+      receipts: [],
+      accounts: [],
+      stock: [],
+    }).then((result) => {
+      setPurchaseOrders(result.purchaseOrders || []);
+      setPurchaseInvoices(result.purchaseInvoices || []);
+      setGrns(result.grns || []);
     });
   }, []);
 

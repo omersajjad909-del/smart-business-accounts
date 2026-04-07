@@ -201,7 +201,7 @@ export default function CreditLimitsPage() {
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
-          Loading credit limitsÃ¢â‚¬Â¦
+          Loading credit limits...
         </div>
       )}
 

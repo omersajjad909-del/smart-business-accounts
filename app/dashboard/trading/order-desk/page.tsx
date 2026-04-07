@@ -14,6 +14,7 @@ import {
   type QuotationLite,
   type SaleReturnLite,
   type SalesInvoiceLite,
+  type TradingControlCenter,
 } from "../_shared";
 
 export default function TradingOrderDeskPage() {
@@ -23,16 +24,24 @@ export default function TradingOrderDeskPage() {
   const [saleReturns, setSaleReturns] = useState<SaleReturnLite[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetchJson<{ quotations?: QuotationLite[] }>("/api/quotation", { quotations: [] }),
-      fetchJson<{ invoices?: SalesInvoiceLite[] }>("/api/sales-invoice", { invoices: [] }),
-      fetchJson<DeliveryChallanLite[]>("/api/delivery-challan", []),
-      fetchJson<SaleReturnLite[]>("/api/sale-return", []),
-    ]).then(([quotationData, salesData, challanData, returnData]) => {
-      setQuotations(quotationData.quotations || []);
-      setSalesInvoices(salesData.invoices || []);
-      setChallans(challanData);
-      setSaleReturns(returnData);
+    fetchJson<TradingControlCenter>("/api/trading/control-center", {
+      summary: {},
+      quotations: [],
+      salesInvoices: [],
+      purchaseOrders: [],
+      purchaseInvoices: [],
+      challans: [],
+      saleReturns: [],
+      outwards: [],
+      grns: [],
+      receipts: [],
+      accounts: [],
+      stock: [],
+    }).then((result) => {
+      setQuotations(result.quotations || []);
+      setSalesInvoices(result.salesInvoices || []);
+      setChallans(result.challans || []);
+      setSaleReturns(result.saleReturns || []);
     });
   }, []);
 

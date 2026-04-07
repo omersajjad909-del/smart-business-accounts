@@ -11,7 +11,7 @@ import {
   tradingBorder,
   tradingFont,
   tradingMuted,
-  type DashboardSummary,
+  type TradingControlCenter,
   type DeliveryChallanLite,
   type PurchaseInvoiceLite,
   type PurchaseOrderLite,
@@ -21,7 +21,7 @@ import {
 } from "./_shared";
 
 type OverviewState = {
-  summary: DashboardSummary;
+  summary: TradingControlCenter["summary"];
   quotations: QuotationLite[];
   salesInvoices: SalesInvoiceLite[];
   purchaseOrders: PurchaseOrderLite[];
@@ -52,23 +52,28 @@ export default function TradingOverviewPage() {
   });
 
   useEffect(() => {
-    Promise.all([
-      fetchJson<DashboardSummary>("/api/reports/dashboard-summary", {}),
-      fetchJson<{ quotations?: QuotationLite[] }>("/api/quotation", { quotations: [] }),
-      fetchJson<{ invoices?: SalesInvoiceLite[] }>("/api/sales-invoice", { invoices: [] }),
-      fetchJson<PurchaseOrderLite[]>("/api/purchase-order", []),
-      fetchJson<PurchaseInvoiceLite[]>("/api/purchase-invoice?type=invoices", []),
-      fetchJson<DeliveryChallanLite[]>("/api/delivery-challan", []),
-      fetchJson<StockRow[]>("/api/reports/stock", []),
-    ]).then(([summary, quotationData, salesData, purchaseOrders, purchaseInvoices, challans, stock]) => {
+    fetchJson<TradingControlCenter>("/api/trading/control-center", {
+      summary: {},
+      quotations: [],
+      salesInvoices: [],
+      purchaseOrders: [],
+      purchaseInvoices: [],
+      challans: [],
+      saleReturns: [],
+      outwards: [],
+      grns: [],
+      receipts: [],
+      accounts: [],
+      stock: [],
+    }).then((result) => {
       setData({
-        summary,
-        quotations: quotationData.quotations || [],
-        salesInvoices: salesData.invoices || [],
-        purchaseOrders,
-        purchaseInvoices,
-        challans,
-        stock,
+        summary: result.summary || {},
+        quotations: result.quotations || [],
+        salesInvoices: result.salesInvoices || [],
+        purchaseOrders: result.purchaseOrders || [],
+        purchaseInvoices: result.purchaseInvoices || [],
+        challans: result.challans || [],
+        stock: result.stock || [],
       });
     });
   }, []);

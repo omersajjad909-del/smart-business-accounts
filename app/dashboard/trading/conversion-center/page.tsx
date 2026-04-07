@@ -18,6 +18,7 @@ import {
   type PurchaseOrderLite,
   type QuotationLite,
   type SalesInvoiceLite,
+  type TradingControlCenter,
 } from "../_shared";
 
 export default function TradingConversionCenterPage() {
@@ -29,20 +30,26 @@ export default function TradingConversionCenterPage() {
   const [challans, setChallans] = useState<DeliveryChallanLite[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetchJson<{ quotations?: QuotationLite[] }>("/api/quotation", { quotations: [] }),
-      fetchJson<{ invoices?: SalesInvoiceLite[] }>("/api/sales-invoice", { invoices: [] }),
-      fetchJson<PurchaseOrderLite[]>("/api/purchase-order", []),
-      fetchJson<PurchaseInvoiceLite[]>("/api/purchase-invoice?type=invoices", []),
-      fetchJson<GrnLite[]>("/api/grn", []),
-      fetchJson<DeliveryChallanLite[]>("/api/delivery-challan", []),
-    ]).then(([quotationData, salesData, poData, piData, grnData, challanData]) => {
-      setQuotations(quotationData.quotations || []);
-      setSalesInvoices(salesData.invoices || []);
-      setPurchaseOrders(poData);
-      setPurchaseInvoices(piData);
-      setGrns(grnData);
-      setChallans(challanData);
+    fetchJson<TradingControlCenter>("/api/trading/control-center", {
+      summary: {},
+      quotations: [],
+      salesInvoices: [],
+      purchaseOrders: [],
+      purchaseInvoices: [],
+      challans: [],
+      saleReturns: [],
+      outwards: [],
+      grns: [],
+      receipts: [],
+      accounts: [],
+      stock: [],
+    }).then((result) => {
+      setQuotations(result.quotations || []);
+      setSalesInvoices(result.salesInvoices || []);
+      setPurchaseOrders(result.purchaseOrders || []);
+      setPurchaseInvoices(result.purchaseInvoices || []);
+      setGrns(result.grns || []);
+      setChallans(result.challans || []);
     });
   }, []);
 
