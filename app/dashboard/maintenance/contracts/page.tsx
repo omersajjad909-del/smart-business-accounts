@@ -1,24 +1,56 @@
-export default function Page() {
+"use client";
+
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { maintenanceAccent, mapMaintenanceContract } from "../_shared";
+
+const statusOptions = ["active", "renewal_due", "paused", "expired"];
+
+export default function MaintenanceContractsPage() {
   return (
-    <div style={{ padding: "32px 24px", color: "var(--text-primary)", fontFamily: "inherit" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 10 }}>
-          <span>📋</span> AMC Contracts
-        </h1>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: 0 }}>Annual maintenance contracts — clients, scope, and renewal dates.</p>
-      </div>
-      <div style={{
-        padding: "48px 32px", borderRadius: 16,
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        textAlign: "center",
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 8 }}>AMC Contracts</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", maxWidth: 400, margin: "0 auto" }}>
-          Annual maintenance contracts — clients, scope, and renewal dates.
-        </div>
-      </div>
-    </div>
+    <BusinessRecordWorkspace
+      title="AMC Contracts"
+      subtitle="Track client maintenance agreements, visit obligations, and renewal dates."
+      accent={maintenanceAccent}
+      category="maintenance_contract"
+      emptyState="No maintenance contracts yet. Add the first AMC agreement to start tracking renewals."
+      fields={[
+        { key: "contract", label: "Contract Name", required: true, placeholder: "Corporate AMC - Tower A" },
+        { key: "client", label: "Client", required: true, placeholder: "Blue Heights" },
+        { key: "asset", label: "Covered Asset", placeholder: "HVAC, lifts, generators" },
+        { key: "visitsPerYear", label: "Visits / Year", type: "number", placeholder: "12" },
+        { key: "value", label: "Annual Value", type: "number", placeholder: "250000" },
+        { key: "renewalDate", label: "Renewal Date", type: "date" },
+        { key: "status", label: "Status", type: "select", options: statusOptions },
+      ]}
+      defaultValues={{ status: "active" }}
+      columns={[
+        { key: "contract", label: "Contract" },
+        { key: "client", label: "Client" },
+        { key: "asset", label: "Asset" },
+        { key: "visitsPerYear", label: "Visits / Year" },
+        { key: "value", label: "Annual Value", render: (row) => `Rs. ${Number(row.value || 0).toLocaleString()}` },
+        { key: "renewalDate", label: "Renewal" },
+        { key: "status", label: "Status" },
+      ]}
+      statusOptions={statusOptions}
+      mapRecord={mapMaintenanceContract}
+      buildCreatePayload={(form) => ({
+        title: form.contract,
+        status: form.status || "active",
+        amount: Number(form.value || 0),
+        date: form.renewalDate || undefined,
+        data: {
+          client: form.client,
+          asset: form.asset,
+          visitsPerYear: Number(form.visitsPerYear || 0),
+        },
+      })}
+      summarize={(rows) => [
+        { label: "Contracts", value: rows.length, color: "#34d399" },
+        { label: "Active", value: rows.filter((row) => row.status === "active").length, color: "#22c55e" },
+        { label: "Renewal Due", value: rows.filter((row) => row.status === "renewal_due").length, color: "#f59e0b" },
+        { label: "Annual Value", value: `Rs. ${rows.reduce((sum, row) => sum + Number(row.value || 0), 0).toLocaleString()}`, color: "#60a5fa" },
+      ]}
+    />
   );
 }
