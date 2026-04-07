@@ -91,9 +91,10 @@ export default function PriceListsPage() {
     "x-company-id": user?.companyId || "",
   }), [user]);
 
-  const [lists,   setLists]   = useState<PriceList[]>([]);
-  const [items,   setItems]   = useState<RawItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [lists,       setLists]       = useState<PriceList[]>([]);
+  const [items,       setItems]       = useState<RawItem[]>([]);
+  const [loading,     setLoading]     = useState(true);
+  const [companyName, setCompanyName] = useState("Company");
 
   // Modals
   const [showCreate,  setShowCreate]  = useState(false);
@@ -117,6 +118,14 @@ export default function PriceListsPage() {
       fetch("/api/items-new", { headers })
         .then(r => r.ok ? r.json() : [])
         .then(d => setItems(Array.isArray(d) ? d : [])),
+      fetch("/api/companies", { headers: { ...headers, "x-user-id": user?.id || "" } })
+        .then(r => r.ok ? r.json() : [])
+        .then((d: { name: string; isDefault?: boolean }[]) => {
+          if (!Array.isArray(d) || !d.length) return;
+          const def = d.find(c => c.isDefault) || d[0];
+          if (def?.name) setCompanyName(def.name);
+        })
+        .catch(() => {}),
     ]).finally(() => setLoading(false));
   }, []);
 
@@ -212,7 +221,7 @@ export default function PriceListsPage() {
 
   // ── Print price list ──────────────────────────────────────────────────────
   function handlePrint(pl: PriceList) {
-    const companyName = user?.companyName || user?.company || "Company";
+    // companyName is loaded from /api/companies in useEffect
     const date = new Date().toLocaleDateString("en-PK", { day:"2-digit", month:"short", year:"numeric" });
     const rows = pl.items.map(i => `
       <tr>
