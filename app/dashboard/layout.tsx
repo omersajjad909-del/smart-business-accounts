@@ -701,6 +701,7 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/grn" pathname={pathname}>GRN (Goods Receipt)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALE_RETURN) && <NavLink href="/dashboard/sale-return" pathname={pathname}>Sale Return</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/parties" pathname={pathname}>Customers & Vendors</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/payment-receipts" pathname={pathname}>Payment Receipts</NavLink>}
             </NavGroup>
           )}
@@ -717,7 +718,6 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_ITEMS) && <NavLink href="/dashboard/items-new" pathname={pathname}>Inventory Items</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/warehouses" pathname={pathname}>Warehouses</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/price-lists" pathname={pathname}>Price Lists</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_STOCK_RATE) && <NavLink href="/dashboard/stock-rate" pathname={pathname}>Stock Rates</NavLink>}
               <NavLink href="/dashboard/barcode" pathname={pathname}>Barcode</NavLink>
             </NavGroup>
@@ -992,6 +992,7 @@ export default function DashboardLayout({
               onToggle={() => toggle("retailCustomers")}
             >
               {hasDashboardFeature("RETAIL_CUSTOMERS") && <NavLink href="/dashboard/retail/customers" pathname={pathname}>Customer List</NavLink>}
+              <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>
               <NavLink href="/dashboard/reports/ledger" pathname={pathname}>📒 Customer Ledger</NavLink>
               <NavLink href="/dashboard/reports/ageing" pathname={pathname}>📅 Ageing Report</NavLink>
               {hasDashboardFeature("RETAIL_LOYALTY") && <NavLink href="/dashboard/retail/loyalty" pathname={pathname}>Loyalty Points</NavLink>}
