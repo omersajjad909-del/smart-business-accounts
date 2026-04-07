@@ -2,18 +2,137 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useBusinessRecords, type BusinessRecord } from "@/lib/useBusinessRecords";
 
 const wholesaleBg = "rgba(255,255,255,.035)";
 const wholesaleBorder = "rgba(255,255,255,.08)";
 const wholesaleMuted = "rgba(255,255,255,.56)";
 const wholesaleFont = "'Outfit','Inter',sans-serif";
 
-type Summary = {
-  totalRevenue?: number;
-  totalPurchases?: number;
-  totalReceivable?: number;
-  totalPayable?: number;
+type WholesaleWarehouse = {
+  id: string;
+  name: string;
+  location: string;
+  status: string;
+  itemsCount: number;
+  stockValue: number;
+  capacity: number;
+  capacityUsed: number;
+};
+
+type WholesaleTransfer = {
+  id: string;
+  item: string;
+  from: string;
+  to: string;
+  qty: number;
+  status: string;
+  date: string;
+};
+
+type WholesaleSalesOrder = {
+  id: string;
+  orderNo: string;
+  customerName: string;
+  amount: number;
+  status: string;
+  date: string;
+};
+
+type WholesaleInvoice = {
+  id: string;
+  invoiceNo: string;
+  date: string;
+  total: number;
+  customerName?: string;
+  supplierName?: string;
+};
+
+type WholesalePriceList = {
+  id: string;
+  name: string;
+  type: string;
+  discount: number;
+  status: string;
+  itemCount: number;
+};
+
+type WholesaleCreditLimit = {
+  id: string;
+  customerName: string;
+  limit: number;
+  used: number;
+  available: number;
+  utilization: number;
+  status: "OK" | "WARNING" | "EXCEEDED";
+};
+
+type WholesalePartyExposure = {
+  id: string;
+  name: string;
+  city: string | null;
+  phone: string | null;
+  creditDays: number | null;
+  creditLimit: number | null;
+  receivable?: number;
+  payable?: number;
+};
+
+type WholesaleControlCenter = {
+  summary: {
+    totalRevenue: number;
+    totalPurchases: number;
+    totalReceivable: number;
+    totalPayable: number;
+    totalSalesInvoices: number;
+    totalPurchaseInvoices: number;
+    totalSalesOrders: number;
+    pendingSalesOrders: number;
+    activeWarehouses: number;
+    totalStockValue: number;
+    totalSkuCoverage: number;
+    activeTransfers: number;
+    highUtilizationSites: number;
+    activePriceLists: number;
+    customersOverLimit: number;
+  };
+  warehouses: WholesaleWarehouse[];
+  transfers: WholesaleTransfer[];
+  salesOrders: WholesaleSalesOrder[];
+  salesInvoices: WholesaleInvoice[];
+  purchaseInvoices: WholesaleInvoice[];
+  priceLists: WholesalePriceList[];
+  creditLimits: WholesaleCreditLimit[];
+  topCustomers: WholesalePartyExposure[];
+  topSuppliers: WholesalePartyExposure[];
+};
+
+const emptyState: WholesaleControlCenter = {
+  summary: {
+    totalRevenue: 0,
+    totalPurchases: 0,
+    totalReceivable: 0,
+    totalPayable: 0,
+    totalSalesInvoices: 0,
+    totalPurchaseInvoices: 0,
+    totalSalesOrders: 0,
+    pendingSalesOrders: 0,
+    activeWarehouses: 0,
+    totalStockValue: 0,
+    totalSkuCoverage: 0,
+    activeTransfers: 0,
+    highUtilizationSites: 0,
+    activePriceLists: 0,
+    customersOverLimit: 0,
+  },
+  warehouses: [],
+  transfers: [],
+  salesOrders: [],
+  salesInvoices: [],
+  purchaseInvoices: [],
+  priceLists: [],
+  creditLimits: [],
+  topCustomers: [],
+  topSuppliers: [],
 };
 
 function formatCompact(value: number) {
@@ -23,32 +142,15 @@ function formatCompact(value: number) {
 }
 
 function formatMoney(value: number) {
-  return `Rs. ${value.toLocaleString()}`;
+  return `Rs. ${Number(value || 0).toLocaleString()}`;
 }
 
-function mapWarehouse(record: BusinessRecord) {
-  return {
-    id: record.id,
-    name: record.title,
-    location: (record.data.location as string) || "Unassigned",
-    status: record.status || "ACTIVE",
-    itemsCount: Number(record.data.itemsCount || 0),
-    stockValue: Number(record.amount || 0),
-    capacity: Number(record.data.capacity || 0),
-    capacityUsed: Number(record.data.capacityUsed || 0),
-  };
-}
-
-function mapTransfer(record: BusinessRecord) {
-  return {
-    id: record.id,
-    item: (record.data.item as string) || record.title,
-    from: (record.data.from as string) || "Unknown",
-    to: (record.data.to as string) || "Unknown",
-    qty: Number(record.data.qty || 0),
-    status: record.status || "COMPLETED",
-    date: record.date || record.createdAt,
-  };
+function formatDate(value: string) {
+  if (!value) return "-";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? value
+    : date.toLocaleDateString("en-PK", { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function StatCard({ label, value, tone, sub }: { label: string; value: string | number; tone: string; sub?: string }) {
@@ -62,45 +164,30 @@ function StatCard({ label, value, tone, sub }: { label: string; value: string | 
 }
 
 export default function WholesaleDashboard() {
-  const warehouseStore = useBusinessRecords("warehouse");
-  const transferStore = useBusinessRecords("stock_transfer");
-  const [summary, setSummary] = useState<Summary>({});
+  const [data, setData] = useState<WholesaleControlCenter>(emptyState);
 
   useEffect(() => {
-    let active = true;
-    fetch("/api/reports/dashboard-summary")
+    fetch("/api/wholesale/control-center", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!active || !data) return;
-        setSummary({
-          totalRevenue: Number(data.totalRevenue || 0),
-          totalPurchases: Number(data.totalPurchases || 0),
-          totalReceivable: Number(data.totalReceivable || 0),
-          totalPayable: Number(data.totalPayable || 0),
-        });
+      .then((result) => {
+        if (result) setData(result);
       })
       .catch(() => {});
-    return () => {
-      active = false;
-    };
   }, []);
 
-  const warehouses = useMemo(() => warehouseStore.records.map(mapWarehouse), [warehouseStore.records]);
-  const transfers = useMemo(() => transferStore.records.map(mapTransfer), [transferStore.records]);
-
-  const activeWarehouses = warehouses.filter((row) => row.status === "ACTIVE").length;
-  const totalStockValue = warehouses.reduce((sum, row) => sum + row.stockValue, 0);
-  const totalSkuCoverage = warehouses.reduce((sum, row) => sum + row.itemsCount, 0);
-  const activeTransfers = transfers.filter((row) => row.status === "PENDING" || row.status === "IN_TRANSIT").length;
-  const highUtilization = warehouses.filter((row) => row.capacity > 0 && row.capacityUsed / row.capacity >= 0.8).length;
-
-  const warehouseWatchlist = [...warehouses]
-    .sort((a, b) => b.stockValue - a.stockValue)
-    .slice(0, 5);
-
-  const transferWatchlist = [...transfers]
-    .sort((a, b) => new Date(b.date || "").getTime() - new Date(a.date || "").getTime())
-    .slice(0, 6);
+  const warehouseWatchlist = useMemo(
+    () => [...data.warehouses].sort((a, b) => b.stockValue - a.stockValue).slice(0, 5),
+    [data.warehouses]
+  );
+  const transferWatchlist = useMemo(
+    () => [...data.transfers].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 6),
+    [data.transfers]
+  );
+  const pricingWatchlist = useMemo(() => data.priceLists.slice(0, 6), [data.priceLists]);
+  const creditWatchlist = useMemo(
+    () => [...data.creditLimits].sort((a, b) => b.utilization - a.utilization).slice(0, 6),
+    [data.creditLimits]
+  );
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: wholesaleFont }}>
@@ -111,17 +198,17 @@ export default function WholesaleDashboard() {
           </div>
           <h1 style={{ margin: "0 0 8px", fontSize: 30, fontWeight: 900 }}>Wholesale Command Center</h1>
           <p style={{ margin: 0, fontSize: 14, color: wholesaleMuted, maxWidth: 760 }}>
-            Procurement, warehousing, bulk sales, and receivable pressure in one live overview for high-volume trading teams.
+            Bulk commercial control across orders, warehouse load, pricing discipline, and customer credit exposure.
           </p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
+            { label: "Sales Order", href: "/dashboard/sales-order" },
             { label: "Sales Invoice", href: "/dashboard/sales-invoice" },
             { label: "Purchase Order", href: "/dashboard/purchase-order" },
-            { label: "Inventory", href: "/dashboard/inventory" },
+            { label: "Price Lists", href: "/dashboard/price-lists" },
+            { label: "Credit Limits", href: "/dashboard/credit-limits" },
             { label: "Warehouses", href: "/dashboard/warehouses" },
-            { label: "Parties", href: "/dashboard/parties" },
-            { label: "Stock Report", href: "/dashboard/stock-report" },
             { label: "Ageing", href: "/dashboard/reports/ageing" },
           ].map((item) => (
             <Link
@@ -145,11 +232,11 @@ export default function WholesaleDashboard() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 14, marginBottom: 26 }}>
-        <StatCard label="Revenue" value={formatCompact(summary.totalRevenue || 0)} tone="#34d399" sub="This month" />
-        <StatCard label="Purchases" value={formatCompact(summary.totalPurchases || 0)} tone="#818cf8" sub="This month" />
-        <StatCard label="Receivable" value={formatCompact(summary.totalReceivable || 0)} tone="#f59e0b" sub="Outstanding" />
-        <StatCard label="Payable" value={formatCompact(summary.totalPayable || 0)} tone="#f87171" sub="Outstanding" />
-        <StatCard label="Stock Value" value={formatCompact(totalStockValue)} tone="#38bdf8" sub={`${activeWarehouses} active warehouses`} />
+        <StatCard label="Revenue" value={formatCompact(data.summary.totalRevenue)} tone="#34d399" sub={`${data.summary.totalSalesInvoices} sales invoices`} />
+        <StatCard label="Purchases" value={formatCompact(data.summary.totalPurchases)} tone="#818cf8" sub={`${data.summary.totalPurchaseInvoices} purchase invoices`} />
+        <StatCard label="Receivable" value={formatCompact(data.summary.totalReceivable)} tone="#f59e0b" sub="Outstanding customer exposure" />
+        <StatCard label="Payable" value={formatCompact(data.summary.totalPayable)} tone="#f87171" sub="Outstanding supplier exposure" />
+        <StatCard label="Stock Value" value={formatCompact(data.summary.totalStockValue)} tone="#38bdf8" sub={`${data.summary.activeWarehouses} active warehouses`} />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
@@ -159,10 +246,10 @@ export default function WholesaleDashboard() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
             {[
-              { title: "Procure", body: "Purchase orders, GRN, and supplier billing stay aligned." },
-              { title: "Store", body: "Warehouse capacity, stock value, and SKU spread remain visible." },
-              { title: "Distribute", body: "Delivery and stock movement keep dispatch smooth." },
-              { title: "Recover Cash", body: "Receivable, payable, and ageing pressure stay monitored." },
+              { title: "Quote & Order", body: `${data.summary.totalSalesOrders} sales orders tracked with ${data.summary.pendingSalesOrders} still pending.` },
+              { title: "Procure & Receive", body: `${data.summary.totalPurchaseInvoices} purchase invoices already booked for supply continuity.` },
+              { title: "Store & Move", body: `${data.summary.totalSkuCoverage.toLocaleString()} SKU coverage with ${data.summary.activeTransfers} live transfer jobs.` },
+              { title: "Price & Recover", body: `${data.summary.activePriceLists} active price lists and ${data.summary.customersOverLimit} customer(s) already over limit.` },
             ].map((step, index) => (
               <div key={step.title} style={{ background: "rgba(8,12,30,.34)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(251,191,36,.18)", color: "#fde68a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>
@@ -181,11 +268,12 @@ export default function WholesaleDashboard() {
           </div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { label: "Warehouses live", value: activeWarehouses, tone: "#34d399" },
-              { label: "SKU coverage", value: totalSkuCoverage.toLocaleString(), tone: "#fde68a" },
-              { label: "Transfer jobs open", value: activeTransfers, tone: "#60a5fa" },
-              { label: "High utilization sites", value: highUtilization, tone: "#f59e0b" },
-              { label: "Total stock value", value: formatMoney(totalStockValue), tone: "#38bdf8" },
+              { label: "Warehouses live", value: data.summary.activeWarehouses, tone: "#34d399" },
+              { label: "SKU coverage", value: data.summary.totalSkuCoverage.toLocaleString(), tone: "#fde68a" },
+              { label: "Transfer jobs open", value: data.summary.activeTransfers, tone: "#60a5fa" },
+              { label: "High utilization sites", value: data.summary.highUtilizationSites, tone: "#f59e0b" },
+              { label: "Price lists active", value: data.summary.activePriceLists, tone: "#a78bfa" },
+              { label: "Customers over limit", value: data.summary.customersOverLimit, tone: "#f87171" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>
                 <div style={{ fontSize: 13, color: wholesaleMuted }}>{row.label}</div>
@@ -196,14 +284,14 @@ export default function WholesaleDashboard() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 18 }}>
         <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
           <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Warehouse Watchlist
           </div>
           <div style={{ display: "grid", gap: 10 }}>
             {warehouseWatchlist.length === 0 ? (
-              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No warehouses added yet. Start with warehouse setup to unlock the wholesale control view.</div>
+              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No warehouses added yet.</div>
             ) : (
               warehouseWatchlist.map((warehouse) => {
                 const utilization = warehouse.capacity > 0 ? Math.round((warehouse.capacityUsed / warehouse.capacity) * 100) : 0;
@@ -211,7 +299,7 @@ export default function WholesaleDashboard() {
                   <div key={warehouse.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700 }}>{warehouse.name}</div>
-                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{warehouse.location} | {warehouse.itemsCount} SKUs</div>
+                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{warehouse.location || "Unassigned"} | {warehouse.itemsCount} SKUs</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <div style={{ fontSize: 15, fontWeight: 800, color: "#38bdf8" }}>{formatMoney(warehouse.stockValue)}</div>
@@ -226,11 +314,67 @@ export default function WholesaleDashboard() {
 
         <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
           <div style={{ fontSize: 13, color: "#f87171", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+            Credit Watch
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {creditWatchlist.length === 0 ? (
+              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No customer credit limits configured yet.</div>
+            ) : (
+              creditWatchlist.map((row) => (
+                <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>{row.customerName}</div>
+                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{formatMoney(row.used)} used of {formatMoney(row.limit)}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: row.status === "EXCEEDED" ? "#f87171" : row.status === "WARNING" ? "#f59e0b" : "#34d399" }}>
+                        {row.utilization.toFixed(1)}%
+                      </div>
+                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.status}</div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 18 }}>
+        <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
+          <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+            Sales Order Desk
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {data.salesOrders.length === 0 ? (
+              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No sales orders posted yet.</div>
+            ) : (
+              data.salesOrders.slice(0, 6).map((row) => (
+                <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>{row.orderNo}</div>
+                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.customerName || "Customer not linked"} | {formatDate(row.date)}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#60a5fa" }}>{formatMoney(row.amount)}</div>
+                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.status}</div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
+          <div style={{ fontSize: 13, color: "#f97316", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
             Stock Movement Desk
           </div>
           <div style={{ display: "grid", gap: 10 }}>
             {transferWatchlist.length === 0 ? (
-              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No stock transfers yet. Internal warehouse movement will appear here once logged.</div>
+              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No stock transfers yet.</div>
             ) : (
               transferWatchlist.map((transfer) => (
                 <div key={transfer.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
@@ -247,6 +391,73 @@ export default function WholesaleDashboard() {
                 </div>
               ))
             )}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+        <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
+          <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+            Pricing Discipline
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {pricingWatchlist.length === 0 ? (
+              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No price lists configured yet.</div>
+            ) : (
+              pricingWatchlist.map((row) => (
+                <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>{row.name}</div>
+                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.type} | {row.itemCount} items</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#a78bfa" }}>{row.discount ? `${row.discount}%` : "Custom"}</div>
+                      <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.status}</div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div style={{ background: wholesaleBg, border: `1px solid ${wholesaleBorder}`, borderRadius: 20, padding: 22 }}>
+          <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>
+            Party Exposure
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {data.topCustomers.slice(0, 3).map((row) => (
+              <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{row.name}</div>
+                    <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.city || row.phone || "Customer account"}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>{formatMoney(Number(row.receivable || 0))}</div>
+                    <div style={{ fontSize: 12, color: wholesaleMuted }}>Receivable</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {data.topSuppliers.slice(0, 3).map((row) => (
+              <div key={row.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{row.name}</div>
+                    <div style={{ fontSize: 12, color: wholesaleMuted }}>{row.city || row.phone || "Supplier account"}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "#f87171" }}>{formatMoney(Number(row.payable || 0))}</div>
+                    <div style={{ fontSize: 12, color: wholesaleMuted }}>Payable</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {data.topCustomers.length === 0 && data.topSuppliers.length === 0 ? (
+              <div style={{ color: wholesaleMuted, fontSize: 13 }}>No customer or supplier exposure to show yet.</div>
+            ) : null}
           </div>
         </div>
       </div>

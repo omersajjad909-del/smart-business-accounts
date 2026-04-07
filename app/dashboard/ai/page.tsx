@@ -615,6 +615,7 @@ export default function AICommandCenter() {
       if (line.startsWith("# ")) return <h1 key={i} style={{ fontSize: 18, fontWeight: 800, color: "white", margin: "16px 0 8px", borderBottom: "1px solid rgba(255,255,255,.1)", paddingBottom: 8 }}>{line.slice(2)}</h1>;
       if (line.startsWith("## ")) return <h2 key={i} style={{ fontSize: 15, fontWeight: 700, color: "#a5b4fc", margin: "14px 0 6px" }}>{line.slice(3)}</h2>;
       if (line.startsWith("### ")) return <h3 key={i} style={{ fontSize: 13, fontWeight: 700, color: "#c7d2fe", margin: "10px 0 4px" }}>{line.slice(4)}</h3>;
+      if (line.startsWith("#### ")) return <h4 key={i} style={{ fontSize: 12.5, fontWeight: 700, color: "#e0e7ff", margin: "8px 0 3px" }}>{line.slice(5)}</h4>;
       if (line.startsWith("• ") || line.startsWith("- ")) return <div key={i} style={{ paddingLeft: 16, color: "rgba(255,255,255,.8)", fontSize: 13, lineHeight: 1.7, display: "flex", gap: 8 }}><span style={{ color: "#6366f1", flexShrink: 0 }}>•</span>{line.slice(2)}</div>;
       if (line.startsWith("**") && line.endsWith("**")) return <div key={i} style={{ fontWeight: 700, color: "white", fontSize: 13, margin: "4px 0" }}>{line.slice(2, -2)}</div>;
       if (line.trim() === "") return <div key={i} style={{ height: 8 }} />;
@@ -1171,7 +1172,6 @@ export default function AICommandCenter() {
                   )}
                 </button>
               </div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.2)", textAlign: "center", marginTop: 7 }}>AI reads your real financial data · Verify with your accountant</div>
             </div>
           </div>
         )}
