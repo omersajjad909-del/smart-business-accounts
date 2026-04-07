@@ -31,10 +31,14 @@ export async function GET(req: NextRequest) {
   });
 
   const stock = items.map((item: ItemWithTxns) => ({
-  itemId: item.id,
-  name: item.name,
-  qty: item.inventoryTxns.reduce((s, t) => s + t.qty, 0),
-}));
+    itemId:   item.id,
+    code:     item.code,
+    name:     item.name,
+    unit:     item.unit,
+    rate:     item.rate,
+    minStock: item.minStock,
+    qty:      item.inventoryTxns.reduce((s, t) => s + t.qty, 0),
+  }));
 
 
   return NextResponse.json(stock);
