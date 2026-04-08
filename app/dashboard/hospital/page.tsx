@@ -1,52 +1,31 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  hospitalBg,
-  hospitalBorder,
-  hospitalFont,
-  hospitalMuted,
-  mapAppointmentRecords,
-  mapLabRecords,
-  mapPatientRecords,
-  mapPrescriptionRecords,
-} from "./_shared";
+import { useEffect, useState } from "react";
+import { HospitalControlCenter, fetchJson, hospitalBg, hospitalBorder, hospitalFont, hospitalMuted } from "./_shared";
+
+const emptyState: HospitalControlCenter = {
+  summary: { patients: 0, activePatients: 0, todayAppointments: 0, completedAppointments: 0, activePrescriptions: 0, completedPrescriptions: 0, pendingLabs: 0, urgentPendingLabs: 0, icuPatients: 0 },
+  patients: [],
+  appointments: [],
+  prescriptions: [],
+  labs: [],
+};
 
 export default function HospitalOverviewPage() {
-  const patientStore = useBusinessRecords("patient");
-  const appointmentStore = useBusinessRecords("appointment");
-  const prescriptionStore = useBusinessRecords("prescription");
-  const labStore = useBusinessRecords("lab_test");
+  const [data, setData] = useState(emptyState);
 
-  const patients = useMemo(() => mapPatientRecords(patientStore.records), [patientStore.records]);
-  const appointments = useMemo(() => mapAppointmentRecords(appointmentStore.records), [appointmentStore.records]);
-  const prescriptions = useMemo(() => mapPrescriptionRecords(prescriptionStore.records), [prescriptionStore.records]);
-  const labs = useMemo(() => mapLabRecords(labStore.records), [labStore.records]);
+  useEffect(() => {
+    fetchJson("/api/hospital/control-center", emptyState).then(setData);
+  }, []);
 
+  const { summary, patients, appointments, prescriptions, labs } = data;
   const today = new Date().toISOString().slice(0, 10);
   const todayAppointments = appointments.filter((row) => row.date.startsWith(today));
-  const activePatients = patients.filter((row) => row.status === "admitted" || row.status === "icu").length;
-  const activePrescriptions = prescriptions.filter((row) => row.status === "active").length;
-  const pendingLabs = labs.filter((row) => row.status !== "completed").length;
-
-  const upcomingAppointments = [...todayAppointments]
-    .filter((row) => row.status === "scheduled" || row.status === "confirmed")
-    .sort((a, b) => a.time.localeCompare(b.time))
-    .slice(0, 5);
-
+  const upcomingAppointments = [...todayAppointments].filter((row) => row.status === "scheduled" || row.status === "confirmed").sort((a, b) => a.time.localeCompare(b.time)).slice(0, 5);
   const highRiskQueue = [
-    ...patients.filter((row) => row.status === "icu").map((row) => ({
-      label: row.name,
-      meta: `ICU · ${row.doctor || "Unassigned doctor"}`,
-      tone: "#ef4444",
-    })),
-    ...labs.filter((row) => row.urgent && row.status !== "completed").map((row) => ({
-      label: row.patient,
-      meta: `Urgent lab · ${row.tests.join(", ") || "Tests pending"}`,
-      tone: "#f59e0b",
-    })),
+    ...patients.filter((row) => row.status === "icu").map((row) => ({ label: row.name, meta: `ICU · ${row.doctor || "Unassigned doctor"}`, tone: "#ef4444" })),
+    ...labs.filter((row) => row.urgent && row.status !== "completed").map((row) => ({ label: row.patient, meta: `Urgent lab · ${row.tests.join(", ") || "Tests pending"}`, tone: "#f59e0b" })),
   ].slice(0, 6);
 
   return (
@@ -63,11 +42,7 @@ export default function HospitalOverviewPage() {
             { label: "Prescriptions", href: "/dashboard/hospital/prescriptions" },
             { label: "Lab Tests", href: "/dashboard/hospital/lab" },
           ].map((action) => (
-            <Link
-              key={action.href}
-              href={action.href}
-              style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${hospitalBorder}`, background: hospitalBg, color: "#c7d2fe", textDecoration: "none", fontSize: 12, fontWeight: 700 }}
-            >
+            <Link key={action.href} href={action.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${hospitalBorder}`, background: hospitalBg, color: "#c7d2fe", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {action.label}
             </Link>
           ))}
@@ -76,10 +51,10 @@ export default function HospitalOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Active Patients", value: activePatients, color: "#3b82f6" },
-          { label: "Today's Appointments", value: todayAppointments.length, color: "#a78bfa" },
-          { label: "Active Prescriptions", value: activePrescriptions, color: "#22c55e" },
-          { label: "Pending Labs", value: pendingLabs, color: "#f59e0b" },
+          { label: "Active Patients", value: summary.activePatients, color: "#3b82f6" },
+          { label: "Today's Appointments", value: summary.todayAppointments, color: "#a78bfa" },
+          { label: "Active Prescriptions", value: summary.activePrescriptions, color: "#22c55e" },
+          { label: "Pending Labs", value: summary.pendingLabs, color: "#f59e0b" },
         ].map((card) => (
           <div key={card.label} style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 12, color: hospitalMuted, marginBottom: 8 }}>{card.label}</div>
@@ -91,7 +66,7 @@ export default function HospitalOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: 18, alignItems: "start" }}>
         <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, overflow: "hidden" }}>
           <div style={{ padding: "16px 18px", borderBottom: `1px solid ${hospitalBorder}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontSize: 15, fontWeight: 800 }}>Today&apos;s Front Desk Queue</div>
+            <div style={{ fontSize: 15, fontWeight: 800 }}>Today's Front Desk Queue</div>
             <Link href="/dashboard/hospital/appointments" style={{ color: "#93c5fd", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>Open schedule</Link>
           </div>
           <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 10 }}>
@@ -127,9 +102,9 @@ export default function HospitalOverviewPage() {
             <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>Throughput Snapshot</div>
             <div style={{ display: "grid", gap: 10 }}>
               {[
-                { label: "Completed appointments", value: appointments.filter((row) => row.status === "completed").length, color: "#22c55e" },
+                { label: "Completed appointments", value: summary.completedAppointments, color: "#22c55e" },
                 { label: "Lab processing", value: labs.filter((row) => row.status === "processing").length, color: "#3b82f6" },
-                { label: "Prescriptions dispensed", value: prescriptions.filter((row) => row.status === "completed").length, color: "#a78bfa" },
+                { label: "Prescriptions dispensed", value: summary.completedPrescriptions, color: "#a78bfa" },
               ].map((row) => (
                 <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                   <span style={{ fontSize: 13, color: hospitalMuted }}>{row.label}</span>

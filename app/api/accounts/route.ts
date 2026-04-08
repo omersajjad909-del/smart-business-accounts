@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const nextCode = `${prefix}-${String(nextNumber).padStart(3, "0")}`;
+    const nextCode = `${prefix}-${String(nextNumber).padStart(4, "0")}`;
     return NextResponse.json({ nextCode });
   }
 

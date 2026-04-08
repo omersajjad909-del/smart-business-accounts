@@ -1,40 +1,34 @@
 "use client";
 
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  hospitalBg,
-  hospitalBorder,
-  hospitalFont,
-  hospitalMuted,
-  mapAppointmentRecords,
-  mapLabRecords,
-  mapPatientRecords,
-  mapPrescriptionRecords,
-} from "../_shared";
+import { useEffect, useMemo, useState } from "react";
+import { HospitalControlCenter, fetchJson, hospitalBg, hospitalBorder, hospitalFont, hospitalMuted } from "../_shared";
+
+const emptyState: HospitalControlCenter = {
+  summary: { patients: 0, activePatients: 0, todayAppointments: 0, completedAppointments: 0, activePrescriptions: 0, completedPrescriptions: 0, pendingLabs: 0, urgentPendingLabs: 0, icuPatients: 0 },
+  patients: [],
+  appointments: [],
+  prescriptions: [],
+  labs: [],
+};
 
 export default function HospitalAnalyticsPage() {
-  const patientStore = useBusinessRecords("patient");
-  const appointmentStore = useBusinessRecords("appointment");
-  const prescriptionStore = useBusinessRecords("prescription");
-  const labStore = useBusinessRecords("lab_test");
+  const [data, setData] = useState(emptyState);
 
-  const patients = useMemo(() => mapPatientRecords(patientStore.records), [patientStore.records]);
-  const appointments = useMemo(() => mapAppointmentRecords(appointmentStore.records), [appointmentStore.records]);
-  const prescriptions = useMemo(() => mapPrescriptionRecords(prescriptionStore.records), [prescriptionStore.records]);
-  const labs = useMemo(() => mapLabRecords(labStore.records), [labStore.records]);
+  useEffect(() => {
+    fetchJson("/api/hospital/control-center", emptyState).then(setData);
+  }, []);
 
-  const departmentLoad = appointments.reduce<Record<string, number>>((acc, row) => {
+  const { patients, appointments, prescriptions, labs } = data;
+  const departmentLoad = useMemo(() => appointments.reduce<Record<string, number>>((acc, row) => {
     const key = row.department || "General";
     acc[key] = (acc[key] || 0) + 1;
     return acc;
-  }, {});
-
-  const doctorLoad = appointments.reduce<Record<string, number>>((acc, row) => {
+  }, {}), [appointments]);
+  const doctorLoad = useMemo(() => appointments.reduce<Record<string, number>>((acc, row) => {
     const key = row.doctor || "Unassigned";
     acc[key] = (acc[key] || 0) + 1;
     return acc;
-  }, {});
+  }, {}), [appointments]);
 
   const statusBars = [
     { label: "Patient occupancy", value: patients.filter((row) => row.status === "admitted" || row.status === "icu").length, total: Math.max(patients.length, 1), color: "#3b82f6" },

@@ -102,6 +102,14 @@ export default function ChartOfAccounts() {
 
   useEffect(() => { loadAccounts(); }, []);
 
+  // Auto-generate code for default category on first load
+  useEffect(() => {
+    if (!loading && !editingId && !form.code) {
+      handleCategoryChange(form.partyType);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
+
   async function handleCategoryChange(cat: string) {
     if (editingId) { f("partyType", cat); return; }
     const prefix = PREFIX_MAP[cat] || "ACC";
