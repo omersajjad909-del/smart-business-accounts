@@ -1,24 +1,53 @@
-export default function Page() {
+"use client";
+
+import { BusinessRecordWorkspace } from "../../_components/BusinessRecordWorkspace";
+import { mapRentalMaintenance, rentalsAccent } from "../_shared";
+
+const statusOptions = ["scheduled", "in_progress", "done"];
+
+export default function RentalsMaintenancePage() {
   return (
-    <div style={{ padding: "32px 24px", color: "var(--text-primary)", fontFamily: "inherit" }}>
-      <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 10 }}>
-          <span>🔧</span> Maintenance
-        </h1>
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: 0 }}>Schedule and track maintenance for rental equipment.</p>
-      </div>
-      <div style={{
-        padding: "48px 32px", borderRadius: 16,
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid rgba(255,255,255,0.06)",
-        textAlign: "center",
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🔧</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 8 }}>Maintenance</div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", maxWidth: 400, margin: "0 auto" }}>
-          Schedule and track maintenance for rental equipment.
-        </div>
-      </div>
-    </div>
+    <BusinessRecordWorkspace
+      title="Maintenance"
+      subtitle="Schedule and track maintenance for rental equipment."
+      accent={rentalsAccent}
+      category="rental_maintenance"
+      emptyState="No maintenance jobs yet. Add the first service task."
+      fields={[
+        { key: "job", label: "Job", placeholder: "Quarterly engine service", required: true },
+        { key: "asset", label: "Asset", placeholder: "Generator set A-12", required: true },
+        { key: "technician", label: "Technician", placeholder: "Usman", required: true },
+        { key: "cost", label: "Cost", type: "number", placeholder: "8000", required: true },
+        { key: "dueDate", label: "Due Date", type: "date", required: true },
+        { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+      ]}
+      defaultValues={{ status: "scheduled" }}
+      columns={[
+        { key: "job", label: "Job" },
+        { key: "asset", label: "Asset" },
+        { key: "technician", label: "Technician" },
+        { key: "dueDate", label: "Due" },
+        { key: "cost", label: "Cost" },
+        { key: "status", label: "Status" },
+      ]}
+      statusOptions={statusOptions}
+      mapRecord={mapRentalMaintenance}
+      buildCreatePayload={(form) => ({
+        title: form.job,
+        status: form.status,
+        amount: Number(form.cost || 0),
+        date: form.dueDate,
+        data: {
+          asset: form.asset,
+          technician: form.technician,
+        },
+      })}
+      summarize={(rows) => [
+        { label: "Maintenance", value: rows.length, color: rentalsAccent },
+        { label: "Scheduled", value: rows.filter((row) => String(row.status) === "scheduled").length, color: "#60a5fa" },
+        { label: "In Progress", value: rows.filter((row) => String(row.status) === "in_progress").length, color: "#fbbf24" },
+        { label: "Done", value: rows.filter((row) => String(row.status) === "done").length, color: "#34d399" },
+      ]}
+    />
   );
 }

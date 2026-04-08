@@ -68,10 +68,19 @@ export default function GRNPage() {
       setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER"));
     }).catch(() => {});
     loadGRNs();
+    loadNextGrnNo();
   }, []);
 
   function loadGRNs() {
     fetch("/api/grn", { headers: bh() }).then(r => r.json()).then(d => setGrns(Array.isArray(d) ? d : [])).catch(() => {});
+  }
+
+  async function loadNextGrnNo() {
+    try {
+      const r = await fetch("/api/grn?nextNo=true", { headers: bh() });
+      const d = await r.json();
+      if (d?.grnNo) setGrnNo(d.grnNo);
+    } catch {}
   }
 
   function handlePOSelect(id: string) {
@@ -91,9 +100,10 @@ export default function GRNPage() {
   }
 
   function resetForm() {
-    setGrnNo(""); setDate(today); setPoId(""); setSupplierId(""); setRemarks("");
+    setDate(today); setPoId(""); setSupplierId(""); setRemarks("");
     setRows([{ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" }]);
     setPreview(false);
+    loadNextGrnNo();
   }
 
   async function handleSubmit() {
@@ -110,6 +120,7 @@ export default function GRNPage() {
       toast.success("GRN saved successfully!");
       setPreview(true);
       loadGRNs();
+      loadNextGrnNo();
     } catch (e: any) { toast.error(e.message); }
     finally { setSaving(false); }
   }
@@ -239,8 +250,8 @@ export default function GRNPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
                 <div>
                   <Label>GRN Number *</Label>
-                  <input value={grnNo} onChange={e => setGrnNo(e.target.value)} placeholder="GRN-001"
-                    style={{ ...inp(), fontFamily: "monospace", fontWeight: 700, color: ACCENT }} />
+                  <input value={grnNo} disabled placeholder="Auto..."
+                    style={{ ...inp(), fontFamily: "monospace", fontWeight: 700, color: ACCENT, background: "rgba(99,102,241,0.06)", cursor: "not-allowed" }} />
                 </div>
                 <div>
                   <Label>Receipt Date *</Label>

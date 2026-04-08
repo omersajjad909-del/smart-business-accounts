@@ -8,6 +8,23 @@ export async function GET(req: NextRequest) {
   const branchId = await resolveBranchId(req, companyId);
 
   const { searchParams } = new URL(req.url);
+
+  // Auto-generate next GRN number
+  if (searchParams.get("nextNo") === "true") {
+    const last = await prisma.goodsReceiptNote.findFirst({
+      where: { companyId },
+      orderBy: { createdAt: "desc" },
+      select: { grnNo: true },
+    });
+    let nextNum = 1;
+    if (last?.grnNo) {
+      const match = last.grnNo.match(/\d+$/);
+      if (match) nextNum = parseInt(match[0]) + 1;
+    }
+    const grnNo = `GRN-${String(nextNum).padStart(3, "0")}`;
+    return NextResponse.json({ grnNo });
+  }
+
   const poId = searchParams.get("poId");
 
   const grns = await prisma.goodsReceiptNote.findMany({
