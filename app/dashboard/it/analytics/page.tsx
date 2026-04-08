@@ -1,16 +1,7 @@
 "use client";
 
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  itBg,
-  itBorder,
-  itFont,
-  itMuted,
-  mapItContracts,
-  mapItProjects,
-  mapItSprints,
-  mapSupportTickets,
-} from "../_shared";
+import { useEffect, useState } from "react";
+import { ItControlCenter, fetchJson, itBg, itBorder, itFont, itMuted } from "../_shared";
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
@@ -22,15 +13,35 @@ function Metric({ title, value, note, color }: { title: string; value: string; n
   );
 }
 
-export default function ITAnalyticsPage() {
-  const projects = mapItProjects(useBusinessRecords("it_project").records);
-  const sprints = mapItSprints(useBusinessRecords("sprint").records);
-  const contracts = mapItContracts(useBusinessRecords("contract").records);
-  const tickets = mapSupportTickets(useBusinessRecords("support_ticket").records);
+const emptyState: ItControlCenter = {
+  summary: {
+    projects: 0,
+    activeProjects: 0,
+    averageProgress: 0,
+    sprints: 0,
+    activeSprints: 0,
+    contracts: 0,
+    activeContractValue: 0,
+    activeMrr: 0,
+    tickets: 0,
+    openTickets: 0,
+    criticalTickets: 0,
+  },
+  projects: [],
+  sprints: [],
+  contracts: [],
+  tickets: [],
+};
 
-  const activeRevenue = contracts.filter((contract) => contract.status === "Active").reduce((sum, contract) => sum + contract.value, 0);
+export default function ITAnalyticsPage() {
+  const [data, setData] = useState(emptyState);
+
+  useEffect(() => {
+    fetchJson("/api/it/control-center", emptyState).then(setData);
+  }, []);
+
+  const { summary, projects, sprints, tickets } = data;
   const totalSpent = projects.reduce((sum, project) => sum + project.spent, 0);
-  const avgProgress = projects.length ? Math.round(projects.reduce((sum, project) => sum + project.progress, 0) / projects.length) : 0;
   const avgVelocity = sprints.length ? Math.round(sprints.reduce((sum, sprint) => sum + sprint.velocity, 0) / sprints.length) : 0;
 
   const stackMap = new Map<string, number>();
@@ -46,17 +57,17 @@ export default function ITAnalyticsPage() {
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: itFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>IT Analytics</div>
-        <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Delivery health, stack mix, aur support pressure</h1>
+        <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Delivery health, stack mix, and support pressure</h1>
         <p style={{ margin: 0, fontSize: 14, color: itMuted, maxWidth: 760 }}>
-          Is analytics board se project portfolio performance, contract value, sprint pace, aur support backlog ko ek hi jagah dekh sakte hain.
+          Project portfolio performance, contract value, sprint pace, and support backlog ko ek hi jagah dekh sakte hain.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
-        <Metric title="Active Revenue" value={`Rs. ${activeRevenue.toLocaleString()}`} note="Active contracts only" color="#60a5fa" />
+        <Metric title="Active Revenue" value={`Rs. ${summary.activeContractValue.toLocaleString()}`} note="Active contracts only" color="#60a5fa" />
         <Metric title="Project Spend" value={`Rs. ${totalSpent.toLocaleString()}`} note="Tracked delivery burn" color="#f59e0b" />
-        <Metric title="Average Progress" value={`${avgProgress}%`} note={`${projects.length} projects tracked`} color="#8b5cf6" />
-        <Metric title="Average Velocity" value={`${avgVelocity} pts`} note={`${sprints.length} sprints logged`} color="#34d399" />
+        <Metric title="Average Progress" value={`${summary.averageProgress}%`} note={`${summary.projects} projects tracked`} color="#8b5cf6" />
+        <Metric title="Average Velocity" value={`${avgVelocity} pts`} note={`${summary.sprints} sprints logged`} color="#34d399" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>

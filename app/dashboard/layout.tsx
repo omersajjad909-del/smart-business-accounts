@@ -160,6 +160,8 @@ export default function DashboardLayout({
   // SIDEBAR STATES — single accordion state for top-level sections
   const [openSection, setOpenSection] = useState<string | null>(null);
   const toggle = (id: string) => setOpenSection(p => p === id ? null : id);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const SW = sidebarCollapsed ? 64 : 260;
   // Sub-group states (independent within their parent section)
   const [openCatalog, setOpenCatalog] = useState(false);
   const [openInventory, setOpenInventory] = useState(false);
