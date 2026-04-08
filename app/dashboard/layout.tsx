@@ -472,6 +472,17 @@ export default function DashboardLayout({
     }
   }, [ready, currentUser?.companyId, router]);
 
+  // Paywall: block dashboard until subscription is ACTIVE
+  useEffect(() => {
+    if (!ready || !subInfo) return;
+    const status = subInfo.status.toUpperCase();
+    const isActive = status === "ACTIVE";
+    const onBilling = pathname.startsWith("/dashboard/billing");
+    if (!isActive && !onBilling) {
+      router.replace("/dashboard/billing?required=1");
+    }
+  }, [ready, subInfo, pathname, router]);
+
   useEffect(() => {
     if (!currentUser?.companyId) return;
     const originalFetch = window.fetch;
@@ -693,8 +704,8 @@ export default function DashboardLayout({
               open={openSection === "sales"}
               onToggle={() => toggle("sales")}
             >
-              {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoice</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-order" pathname={pathname}>Sales Order</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoice</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_QUOTATION) && <NavLink href="/dashboard/quotation" pathname={pathname}>Quotation / Estimate</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_DELIVERY_CHALLAN) && <NavLink href="/dashboard/delivery-challan" pathname={pathname}>Delivery Challan</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>Purchase Invoice</NavLink>}

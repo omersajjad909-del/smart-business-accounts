@@ -249,6 +249,7 @@ function AddCardModal({ onClose, onSuccess }: { onClose:()=>void; onSuccess?:(ca
 function BillingPage() {
   const searchParams = useSearchParams();
   const upgraded = searchParams?.get("upgrade") === "success";
+  const isRequired = searchParams?.get("required") === "1";
 
   const [subscription,      setSubscription]      = useState<Subscription | null>(null);
   const [paymentMethods,    setPaymentMethods]    = useState<PaymentMethod[]>([]);
@@ -259,7 +260,7 @@ function BillingPage() {
   const [loading,           setLoading]            = useState(true);
   const [checkingOut,       setCheckingOut]        = useState<string | null>(null);
   const [showUpgradeBanner, setShowUpgradeBanner]  = useState(upgraded);
-  const [activeTab,         setActiveTab]          = useState<"overview"|"methods"|"invoices"|"plans">("overview");
+  const [activeTab,         setActiveTab]          = useState<"overview"|"methods"|"invoices"|"plans">(isRequired ? "plans" : "overview");
 
   useEffect(() => {
     (async () => {
@@ -374,6 +375,19 @@ function BillingPage() {
         @media(max-width:860px){.bill-stats{grid-template-columns:repeat(2,1fr)!important}.bill-plans{grid-template-columns:1fr!important}.bill-sub-inner{flex-direction:column!important}}
         @media(max-width:540px){.bill-stats{grid-template-columns:1fr!important}}
       `}</style>
+
+      {/* ── Paywall Banner (shown when redirected without active subscription) ── */}
+      {isRequired && (
+        <div style={{ marginBottom:24, borderRadius:20, background:"linear-gradient(135deg,rgba(239,68,68,.1),rgba(220,38,38,.06))", border:"1.5px solid rgba(239,68,68,.35)", padding:"24px 28px", display:"flex", alignItems:"center", gap:20 }}>
+          <div style={{ width:52, height:52, borderRadius:14, background:"rgba(239,68,68,.15)", border:"1px solid rgba(239,68,68,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>🔒</div>
+          <div>
+            <div style={{ fontSize:17, fontWeight:800, color:"#fca5a5", marginBottom:4 }}>Active subscription required</div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,.55)", lineHeight:1.6 }}>
+              Dashboard access is locked until your subscription is active. Please select a plan and add a payment method below to continue.
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Success Banner ── */}
       {showUpgradeBanner && (
