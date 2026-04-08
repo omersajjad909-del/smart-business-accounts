@@ -24,74 +24,90 @@ export async function GET(req: NextRequest) {
     prisma.businessRecord.findMany({ where: { companyId, category: "quality_check" }, orderBy: { createdAt: "desc" } }),
   ]);
 
-  const boms = bom.map((record) => ({
-    id: record.id,
-    product: record.title,
-    version: String((record.data || {})["version"] || "v1.0"),
-    materials: String((record.data || {})["materials"] || "").split(",").map((item) => item.trim()).filter(Boolean),
-    unitCost: Number(record.amount || 0),
-    yieldUnits: Number((record.data || {})["yield"] || 1),
-  }));
-  const mappedProduction = production.map((record) => ({
-    id: record.id,
-    orderId: String((record.data || {})["orderId"] || record.title),
-    product: record.title,
-    quantity: Number((record.data || {})["quantity"] || 1),
-    completed: Number((record.data || {})["completed"] || 0),
-    plannedDate: record.date?.split("T")[0] || "",
-    assignedTo: String((record.data || {})["assignedTo"] || ""),
-    notes: String((record.data || {})["notes"] || ""),
-    status: String(record.status || "planned"),
-    bomId: String((record.data || {})["bomId"] || ""),
-    bomVersion: String((record.data || {})["bomVersion"] || ""),
-  }));
-  const mappedWorkOrders = workOrders.map((record) => ({
-    id: record.id,
-    workOrderId: String((record.data || {})["workOrderId"] || record.title),
-    title: record.title,
-    machine: String((record.data || {})["machine"] || ""),
-    operator: String((record.data || {})["operator"] || ""),
-    priority: String((record.data || {})["priority"] || "medium"),
-    scheduledDate: record.date?.split("T")[0] || "",
-    estimatedHours: Number((record.data || {})["estimatedHours"] || 1),
-    status: String(record.status || "open"),
-    linkedProductionOrderId: String((record.data || {})["linkedProductionOrderId"] || ""),
-  }));
+  const boms = bom.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id,
+      product: record.title,
+      version: String(data.version || "v1.0"),
+      materials: String(data.materials || "").split(",").map((item) => item.trim()).filter(Boolean),
+      unitCost: Number(record.amount || 0),
+      yieldUnits: Number(data.yield || 1),
+    };
+  });
+  const mappedProduction = production.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id,
+      orderId: String(data.orderId || record.title),
+      product: record.title,
+      quantity: Number(data.quantity || 1),
+      completed: Number(data.completed || 0),
+      plannedDate: String(record.date || "").slice(0, 10),
+      assignedTo: String(data.assignedTo || ""),
+      notes: String(data.notes || ""),
+      status: String(record.status || "planned"),
+      bomId: String(data.bomId || ""),
+      bomVersion: String(data.bomVersion || ""),
+    };
+  });
+  const mappedWorkOrders = workOrders.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id,
+      workOrderId: String(data.workOrderId || record.title),
+      title: record.title,
+      machine: String(data.machine || ""),
+      operator: String(data.operator || ""),
+      priority: String(data.priority || "medium"),
+      scheduledDate: String(record.date || "").slice(0, 10),
+      estimatedHours: Number(data.estimatedHours || 1),
+      status: String(record.status || "open"),
+      linkedProductionOrderId: String(data.linkedProductionOrderId || ""),
+    };
+  });
   const mappedMaterials = materials.map((record) => {
-    const currentStock = Number((record.data || {})["currentStock"] || 0);
-    const minStock = Number((record.data || {})["minStock"] || 10);
+    const data = (record.data || {}) as Record<string, unknown>;
+    const currentStock = Number(data.currentStock || 0);
+    const minStock = Number(data.minStock || 10);
     return {
       id: record.id,
       name: record.title,
-      unit: String((record.data || {})["unit"] || "kg"),
+      unit: String(data.unit || "kg"),
       currentStock,
       minStock,
       unitCost: Number(record.amount || 0),
-      supplier: String((record.data || {})["supplier"] || ""),
+      supplier: String(data.supplier || ""),
       status: String(record.status || "available"),
       isLow: currentStock <= minStock,
     };
   });
-  const mappedFinishedGoods = finishedGoods.map((record) => ({
-    id: record.id,
-    batchNo: String((record.data || {})["batchNo"] || record.title),
-    product: record.title,
-    quantity: Number((record.data || {})["quantity"] || 0),
-    warehouse: String((record.data || {})["warehouse"] || "Main Warehouse"),
-    productionOrderId: String((record.data || {})["productionOrderId"] || ""),
-    productionDate: record.date?.split("T")[0] || "",
-    status: String(record.status || "available"),
-  }));
-  const mappedQualityChecks = qualityChecks.map((record) => ({
-    id: record.id,
-    inspectionNo: String((record.data || {})["inspectionNo"] || record.title),
-    itemName: record.title,
-    stage: String((record.data || {})["stage"] || "final"),
-    inspector: String((record.data || {})["inspector"] || ""),
-    result: String(record.status || "pending"),
-    notes: String((record.data || {})["notes"] || ""),
-    checkedDate: record.date?.split("T")[0] || "",
-  }));
+  const mappedFinishedGoods = finishedGoods.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id,
+      batchNo: String(data.batchNo || record.title),
+      product: record.title,
+      quantity: Number(data.quantity || 0),
+      warehouse: String(data.warehouse || "Main Warehouse"),
+      productionOrderId: String(data.productionOrderId || ""),
+      productionDate: String(record.date || "").slice(0, 10),
+      status: String(record.status || "available"),
+    };
+  });
+  const mappedQualityChecks = qualityChecks.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id,
+      inspectionNo: String(data.inspectionNo || record.title),
+      itemName: record.title,
+      stage: String(data.stage || "final"),
+      inspector: String(data.inspector || ""),
+      result: String(record.status || "pending"),
+      notes: String(data.notes || ""),
+      checkedDate: String(record.date || "").slice(0, 10),
+    };
+  });
 
   return NextResponse.json({
     summary: {

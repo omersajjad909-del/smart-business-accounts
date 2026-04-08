@@ -19,32 +19,33 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    // Get all items for this company (regardless of stock level)
-    const items = await prisma.itemNew.findMany({
-      where: { companyId },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        barcode: true,
-        salePrice: true,
-        rate: true,
-      },
-    });
-
-    if (!items.length) return NextResponse.json([]);
-
-    // Get current stock quantities
     const txns = await prisma.inventoryTxn.groupBy({
       by: ["itemId"],
       where: { companyId },
       _sum: { qty: true },
     });
 
-    const stockMap = new Map<string, number>();
-    txns.forEach((t: StockAggRow) => {
-      stockMap.set(t.itemId, t._sum.qty ?? 0);
+    // Only items with qty > 0
+    const inStock = txns.filter((t: StockAggRow) => (t._sum.qty ?? 0) > 0);
+
+    if (!inStock.length) return NextResponse.json([]);
+
+    const items = await prisma.itemNew.findMany({
+      where: {
+        companyId,
+        id: { in: inStock.map((t: StockAggRow) => t.itemId) },
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        barcode: true,
+        rate: true,
+      },
     });
+
+    const stockMap = new Map<string, number>();
+    inStock.forEach((t: StockAggRow) => stockMap.set(t.itemId, t._sum.qty ?? 0));
 
     return NextResponse.json(
       items.map((i) => ({
@@ -52,7 +53,7 @@ export async function GET(req: NextRequest) {
         name: i.name,
         description: i.description,
         barcode: i.barcode,
-        salePrice: i.salePrice ?? i.rate ?? 0,
+        salePrice: i.rate ?? 0,
         availableQty: stockMap.get(i.id) ?? 0,
       }))
     );

@@ -29,15 +29,15 @@ export async function GET(req: NextRequest) {
   });
 
   const routeMetrics = routes.map((route) => {
-    const deliveries = deliveryRecords.filter((record) => String((record.data || {})["routeId"] || "") === route.id);
-    const vanSales = vanSalesRecords.filter((record) => String((record.data || {})["routeId"] || "") === route.id);
-    const stockLoads = stockRecords.filter((record) => String((record.data || {})["routeId"] || "") === route.id);
-    const collections = collectionRecords.filter((record) => String((record.data || {})["routeId"] || "") === route.id);
+    const deliveries = deliveryRecords.filter((record) => String(((record.data || {}) as Record<string, unknown>).routeId || "") === route.id);
+    const vanSales = vanSalesRecords.filter((record) => String(((record.data || {}) as Record<string, unknown>).routeId || "") === route.id);
+    const stockLoads = stockRecords.filter((record) => String(((record.data || {}) as Record<string, unknown>).routeId || "") === route.id);
+    const collections = collectionRecords.filter((record) => String(((record.data || {}) as Record<string, unknown>).routeId || "") === route.id);
 
     const revenue = vanSales.reduce((sum, sale) => sum + Number(sale.amount || 0), 0);
     const collected = collections.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
-    const loadedQty = stockLoads.reduce((sum, load) => sum + Number((load.data || {})["loadQty"] || 0), 0);
-    const soldQty = stockLoads.reduce((sum, load) => sum + Number((load.data || {})["soldQty"] || 0), 0);
+    const loadedQty = stockLoads.reduce((sum, load) => sum + Number((((load.data || {}) as Record<string, unknown>).loadQty) || 0), 0);
+    const soldQty = stockLoads.reduce((sum, load) => sum + Number((((load.data || {}) as Record<string, unknown>).soldQty) || 0), 0);
     const failed = deliveries.filter((record) => record.status === "failed").length;
 
     return {
@@ -58,8 +58,8 @@ export async function GET(req: NextRequest) {
 
   const vanRevenue = vanSalesRecords.reduce((sum, sale) => sum + Number(sale.amount || 0), 0);
   const collections = collectionRecords.reduce((sum, row) => sum + Number(row.amount || 0), 0);
-  const loadedQty = stockRecords.reduce((sum, load) => sum + Number((load.data || {})["loadQty"] || 0), 0);
-  const soldQty = stockRecords.reduce((sum, load) => sum + Number((load.data || {})["soldQty"] || 0), 0);
+  const loadedQty = stockRecords.reduce((sum, load) => sum + Number((((load.data || {}) as Record<string, unknown>).loadQty) || 0), 0);
+  const soldQty = stockRecords.reduce((sum, load) => sum + Number((((load.data || {}) as Record<string, unknown>).soldQty) || 0), 0);
 
   return NextResponse.json({
     summary: {

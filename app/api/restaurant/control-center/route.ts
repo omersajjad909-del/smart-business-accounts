@@ -24,16 +24,32 @@ export async function GET(req: NextRequest) {
     prisma.businessRecord.findMany({ where: { companyId, category: "restaurant_reservation" }, orderBy: { createdAt: "desc" } }),
   ]);
 
-  const mappedMenu = menu.map((record) => ({ id: record.id, name: record.title, category: String((record.data || {})["category"] || "Mains"), price: Number(record.amount || 0), cost: Number((record.data || {})["cost"] || 0), available: record.status !== "inactive" }));
-  const mappedTables = tables.map((record) => ({ id: record.id, number: Number((record.data || {})["number"] || 0), capacity: Number((record.data || {})["capacity"] || 4), status: String(record.status || "available") }));
-  const mappedKitchenOrders = kitchenOrders.map((record) => ({ id: record.id, orderId: String((record.data || {})["orderId"] || record.title), table: String((record.data || {})["table"] || ""), priority: String((record.data || {})["priority"] || "medium"), status: String(record.status || "pending"), items: String((record.data || {})["items"] || "").split(",").map((item) => item.trim()).filter(Boolean) }));
-  const mappedRecipes = recipes.map((record) => {
-    const totalCost = Number((record.data || {})["totalCost"] || 0);
-    const sellingPrice = Number(record.amount || 0);
-    return { id: record.id, name: record.title, category: String((record.data || {})["category"] || "Mains"), servings: Number((record.data || {})["servings"] || 1), totalCost, sellingPrice, margin: sellingPrice > 0 ? Math.round(((sellingPrice - totalCost) / sellingPrice) * 100) : 0 };
+  const mappedMenu = menu.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return { id: record.id, name: record.title, category: String(data.category || "Mains"), price: Number(record.amount || 0), cost: Number(data.cost || 0), available: record.status !== "inactive" };
   });
-  const mappedOrders = orders.map((record) => ({ id: record.id, orderNo: String((record.data || {})["orderNo"] || record.title), tableRef: String((record.data || {})["tableRef"] || ""), serviceMode: String((record.data || {})["serviceMode"] || "dine_in"), itemsSummary: String((record.data || {})["itemsSummary"] || ""), total: Number(record.amount || 0), status: String(record.status || "draft"), guests: Number((record.data || {})["guests"] || 1), date: record.date?.split("T")[0] || "" }));
-  const mappedReservations = reservations.map((record) => ({ id: record.id, guestName: record.title, phone: String((record.data || {})["phone"] || ""), tableRef: String((record.data || {})["tableRef"] || ""), guests: Number((record.data || {})["guests"] || 1), reservationDate: record.date?.split("T")[0] || "", status: String(record.status || "booked") }));
+  const mappedTables = tables.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return { id: record.id, number: Number(data.number || 0), capacity: Number(data.capacity || 4), status: String(record.status || "available") };
+  });
+  const mappedKitchenOrders = kitchenOrders.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return { id: record.id, orderId: String(data.orderId || record.title), table: String(data.table || ""), priority: String(data.priority || "medium"), status: String(record.status || "pending"), items: String(data.items || "").split(",").map((item) => item.trim()).filter(Boolean) };
+  });
+  const mappedRecipes = recipes.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    const totalCost = Number(data.totalCost || 0);
+    const sellingPrice = Number(record.amount || 0);
+    return { id: record.id, name: record.title, category: String(data.category || "Mains"), servings: Number(data.servings || 1), totalCost, sellingPrice, margin: sellingPrice > 0 ? Math.round(((sellingPrice - totalCost) / sellingPrice) * 100) : 0 };
+  });
+  const mappedOrders = orders.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return { id: record.id, orderNo: String(data.orderNo || record.title), tableRef: String(data.tableRef || ""), serviceMode: String(data.serviceMode || "dine_in"), itemsSummary: String(data.itemsSummary || ""), total: Number(record.amount || 0), status: String(record.status || "draft"), guests: Number(data.guests || 1), date: String(record.date || "").slice(0, 10) };
+  });
+  const mappedReservations = reservations.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return { id: record.id, guestName: record.title, phone: String(data.phone || ""), tableRef: String(data.tableRef || ""), guests: Number(data.guests || 1), reservationDate: String(record.date || "").slice(0, 10), status: String(record.status || "booked") };
+  });
 
   const salesValue = mappedOrders.reduce((sum, order) => sum + order.total, 0);
   const avgRecipeMargin = mappedRecipes.length ? Math.round(mappedRecipes.reduce((sum, item) => sum + item.margin, 0) / mappedRecipes.length) : 0;
