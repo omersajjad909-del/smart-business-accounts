@@ -1,33 +1,115 @@
 "use client";
 
-import { BusinessVerticalShell } from "../_components/BusinessVerticalShell";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { fetchJson, workshopAccent, type WorkshopControlCenter } from "./_shared";
+
+const emptyState: WorkshopControlCenter = {
+  summary: { jobs: 0, openJobs: 0, readyJobs: 0, mechanics: 0, activeMechanics: 0, partsCost: 0, warrantyClaims: 0, warrantyExposure: 0 },
+  jobs: [],
+  mechanics: [],
+  parts: [],
+  warranties: [],
+};
 
 export default function WorkshopOverviewPage() {
+  const [data, setData] = useState(emptyState);
+
+  useEffect(() => {
+    fetchJson("/api/workshop/control-center", emptyState).then(setData);
+  }, []);
+
+  const { summary, jobs, mechanics, warranties } = data;
+
   return (
-    <BusinessVerticalShell
-      title="Workshop Overview"
-      subtitle="Vehicle service jobs, parts consumption, mechanics coverage, and warranty exposure."
-      mode="overview"
-      accent="#f59e0b"
-      links={[
-        { label: "Job Cards", href: "/dashboard/workshop/jobs" },
-        { label: "Parts Used", href: "/dashboard/workshop/parts" },
-        { label: "Mechanics", href: "/dashboard/workshop/mechanics" },
-        { label: "Warranty", href: "/dashboard/workshop/warranty" },
-        { label: "Analytics", href: "/dashboard/workshop/analytics" },
-      ]}
-      highlights={[
-        { title: "Job Desk", description: "Track incoming service jobs, inspection notes, and delivery commitments." },
-        { title: "Parts Control", description: "Monitor job-level parts usage, parts recovery, and stock-impact visibility." },
-        { title: "Mechanic Capacity", description: "Understand team workload, specialist coverage, and open bay allocation." },
-        { title: "Warranty Discipline", description: "Keep warranty claims, repeat repairs, and liability follow-up under control." },
-      ]}
-      workflow={[
-        "Vehicle is received, diagnosed, and converted into a tracked job card.",
-        "Required spare parts and labour are attached against the active service job.",
-        "Mechanics complete work and warranty-sensitive items stay flagged for follow-up.",
-        "Job closes only after commercial, service, and delivery handoff are aligned.",
-      ]}
-    />
+    <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
+        <div>
+          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "white" }}>Workshop Command Center</h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.45)" }}>Service jobs, mechanic coverage, parts burn, and warranty exposure from live workshop records.</p>
+        </div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {[
+            { label: "Job Cards", href: "/dashboard/workshop/jobs" },
+            { label: "Parts Used", href: "/dashboard/workshop/parts" },
+            { label: "Mechanics", href: "/dashboard/workshop/mechanics" },
+            { label: "Warranty", href: "/dashboard/workshop/warranty" },
+            { label: "Analytics", href: "/dashboard/workshop/analytics" },
+          ].map((item) => (
+            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#fde68a", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+        {[
+          { label: "Jobs", value: summary.jobs, color: workshopAccent },
+          { label: "Open Jobs", value: summary.openJobs, color: "#60a5fa" },
+          { label: "Ready Jobs", value: summary.readyJobs, color: "#34d399" },
+          { label: "Active Mechanics", value: summary.activeMechanics, color: "#fbbf24" },
+          { label: "Parts Cost", value: summary.partsCost.toLocaleString(), color: "#f97316" },
+        ].map((card) => (
+          <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "18px 20px" }}>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 16 }}>
+        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 20 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 14 }}>Service Watchlist</div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {jobs.slice(0, 6).map((item) => (
+              <div key={item.id} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>{item.job}</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginTop: 4 }}>{item.customer || "-"} | {item.vehicle || "-"}</div>
+                <div style={{ fontSize: 12, color: "#fdba74", marginTop: 6 }}>Promised {item.promisedDate || "-"} | {item.status}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gap: 16 }}>
+          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 12 }}>Mechanic Desk</div>
+            <div style={{ display: "grid", gap: 10 }}>
+              {mechanics.slice(0, 5).map((item) => (
+                <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{item.mechanic}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{item.specialty || "-"}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{item.bay || "-"}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{item.status}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 12 }}>Warranty Watch</div>
+            <div style={{ display: "grid", gap: 10 }}>
+              {warranties.slice(0, 5).map((item) => (
+                <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{item.claim}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{item.vehicle || "-"}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{item.amount.toLocaleString()}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{item.status}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

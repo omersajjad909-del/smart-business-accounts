@@ -53,9 +53,12 @@ export default function PurchaseOrderPage() {
   const [supplierName, setSupplierName] = useState("");
   const [date, setDate] = useState(today);
   const [remarks, setRemarks] = useState("");
+  const [freight, setFreight] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("PENDING");
   const [rows, setRows] = useState([{ itemId: "", name: "", desc: "", qty: "", rate: "" }]);
   const [saving, setSaving] = useState(false);
+  // "none" | "a4" | "58mm"
+  const [printMode, setPrintMode] = useState<"none" | "a4" | "58mm">("none");
   const [preview, setPreview] = useState(false);
   const [savedPO, setSavedPO] = useState<PO | null>(null);
   const [sendingEmail, setSendingEmail] = useState(false);
@@ -111,7 +114,10 @@ export default function PurchaseOrderPage() {
   function removeRow(i: number) { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }
   function addRow() { setRows([...rows, { itemId: "", name: "", desc: "", qty: "", rate: "" }]); }
 
-  const total = rows.reduce((s, r) => s + (r.qty && r.rate ? Number(r.qty) * Number(r.rate) : 0), 0);
+  const subTotal = rows.reduce((s, r) => s + (r.qty && r.rate ? Number(r.qty) * Number(r.rate) : 0), 0);
+  const freightAmt = Number(freight) || 0;
+  const grandTotal = subTotal + freightAmt;
+  const cur = companyInfo?.baseCurrency || "Rs.";
 
   async function savePO() {
     const clean = rows.filter(r => r.itemId && r.qty);
@@ -119,8 +125,9 @@ export default function PurchaseOrderPage() {
     setSaving(true);
     try {
       const method = editing ? "PUT" : "POST";
-      const body = editing ? { id: editing.id, poNo, supplierId, date, remarks, approvalStatus, items: clean }
-                           : { poNo, supplierId, date, remarks, approvalStatus, items: clean };
+      const body = editing
+        ? { id: editing.id, poNo, supplierId, date, remarks, approvalStatus, items: clean }
+        : { poNo, supplierId, date, remarks, approvalStatus, items: clean };
       const res = await fetch("/api/purchase-order", {
         method, headers: { "Content-Type": "application/json", "x-user-role": user?.role || "ADMIN" },
         body: JSON.stringify(body),
@@ -138,7 +145,7 @@ export default function PurchaseOrderPage() {
     setSupplierName(po.supplier?.name || ""); setDate(new Date(po.date).toISOString().slice(0, 10));
     setRemarks(po.remarks || ""); setApprovalStatus(po.approvalStatus || "PENDING");
     setRows(po.items.map((it: any) => ({ itemId: it.itemId || "", name: it.item?.name || "", desc: it.item?.description || "", qty: it.qty.toString(), rate: it.rate.toString() })));
-    setShowForm(true); setShowList(false); setPreview(false);
+    setShowForm(true); setShowList(false); setPreview(false); setPrintMode("none");
   }
 
   async function deletePO(id: string) {
@@ -150,8 +157,14 @@ export default function PurchaseOrderPage() {
 
   function resetForm() {
     setEditing(null); setPoNo(""); setSupplierId(""); setSupplierName("");
-    setDate(today); setRemarks(""); setApprovalStatus("PENDING");
-    setRows([{ itemId: "", name: "", desc: "", qty: "", rate: "" }]); setPreview(false);
+    setDate(today); setRemarks(""); setFreight(""); setApprovalStatus("PENDING");
+    setRows([{ itemId: "", name: "", desc: "", qty: "", rate: "" }]);
+    setPreview(false); setPrintMode("none");
+  }
+
+  function doPrint(mode: "a4" | "58mm") {
+    setPrintMode(mode);
+    setTimeout(() => { window.print(); }, 150);
   }
 
   async function confirmSendEmail() {
@@ -170,17 +183,30 @@ export default function PurchaseOrderPage() {
   }
 
   const sc = STATUS_COLORS[approvalStatus] || STATUS_COLORS.PENDING;
+  const filledRows = rows.filter(r => r.name && r.qty);
 
   return (
     <div style={{ fontFamily: FONT, color: TEXT, minHeight: "100vh" }}>
 
-      {/* Print styles */}
+      {/* ─── Print CSS ─── */}
       <style>{`
         @media print {
           body * { visibility: hidden !important; }
           .po-print, .po-print * { visibility: visible !important; }
-          .po-print { position: fixed !important; inset: 0 !important; background: white !important; padding: 32px !important; }
-          .no-print { display: none !important; }
+          .po-print {
+            position: fixed !important; inset: 0 !important;
+            background: white !important; color: black !important;
+            filter: grayscale(100%) !important;
+          }
+          .po-print.a4-print {
+            padding: 28px 36px !important;
+            font-size: 12px !important;
+          }
+          .po-print.thermal-print {
+            padding: 8px 10px !important;
+            width: 55mm !important;
+            font-size: 9px !important;
+          }
         }
       `}</style>
 
@@ -217,7 +243,7 @@ export default function PurchaseOrderPage() {
               <tbody>
                 {pos.length === 0 ? (
                   <tr><td colSpan={6} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No purchase orders yet</td></tr>
-                ) : pos.map((po, i) => {
+                ) : pos.map((po) => {
                   const sc2 = STATUS_COLORS[po.approvalStatus || "PENDING"] || STATUS_COLORS.PENDING;
                   return (
                     <tr key={po.id} style={{ borderBottom: `1px solid ${BORDER}`, transition: "background .12s" }}
@@ -244,17 +270,15 @@ export default function PurchaseOrderPage() {
               </tbody>
             </table>
           </div>
-          <div style={{ padding: "11px 18px", borderTop: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>
-            {pos.length} purchase orders
-          </div>
+          <div style={{ padding: "11px 18px", borderTop: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{pos.length} purchase orders</div>
         </div>
       )}
 
       {/* ── Form ── */}
       {showForm && !preview && (
         <div className="no-print">
-          {/* Form Header */}
           <div style={{ background: PANEL, border: `1.5px solid ${BORDER}`, borderRadius: 16, overflow: "hidden", marginBottom: 16 }}>
+            {/* Form Header */}
             <div style={{ padding: "16px 22px", borderBottom: `1px solid ${BORDER}`, background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(99,102,241,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -274,7 +298,7 @@ export default function PurchaseOrderPage() {
             </div>
 
             <div style={{ padding: "22px 22px" }}>
-              {/* Row 1: PO No, Date, Status */}
+              {/* Row 1 */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
                 <div>
                   <Label>PO Number</Label>
@@ -309,12 +333,9 @@ export default function PurchaseOrderPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
-                      <th style={{ padding: "10px 14px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.5 }}>#</th>
-                      <th style={{ padding: "10px 14px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.5 }}>Item</th>
-                      <th style={{ padding: "10px 14px", textAlign: "center", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.5, width: 100 }}>Qty</th>
-                      <th style={{ padding: "10px 14px", textAlign: "right", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.5, width: 130 }}>Rate</th>
-                      <th style={{ padding: "10px 14px", textAlign: "right", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.5, width: 130 }}>Amount</th>
-                      <th style={{ width: 40 }}></th>
+                      {["#", "Item", "Qty", "Rate", "Amount", ""].map((h, i) => (
+                        <th key={i} style={{ padding: "10px 14px", textAlign: i >= 2 && i <= 4 ? "center" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.5, width: i === 0 ? 36 : i === 2 ? 90 : i === 3 ? 120 : i === 4 ? 120 : i === 5 ? 36 : "auto" }}>{h}</th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
@@ -349,24 +370,31 @@ export default function PurchaseOrderPage() {
                     ))}
                   </tbody>
                 </table>
-                <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between" }}>
                   <button onClick={addRow} style={{ background: "none", border: "none", cursor: "pointer", color: ACCENT, fontFamily: FONT, fontSize: 13, fontWeight: 700, padding: 0 }}>+ Add Row</button>
-                  <div style={{ fontSize: 13, color: MUTED }}>
-                    {rows.filter(r => r.itemId && r.qty).length} of {rows.length} rows filled
-                  </div>
+                  <div style={{ fontSize: 12, color: MUTED }}>{rows.filter(r => r.itemId && r.qty).length} of {rows.length} rows filled</div>
                 </div>
               </div>
 
-              {/* Remarks + Total */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 20, alignItems: "end" }}>
+              {/* Freight + Remarks + Total */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 16, alignItems: "end" }}>
                 <div>
                   <Label>Remarks / Notes</Label>
                   <textarea value={remarks} onChange={e => setRemarks(e.target.value)} placeholder="Any special instructions or terms..." style={{ ...inp({ height: 80, resize: "none" as const, display: "block" }) }} />
                 </div>
-                <div style={{ background: "rgba(99,102,241,0.08)", border: `1px solid rgba(99,102,241,0.2)`, borderRadius: 12, padding: "16px 24px", textAlign: "right", minWidth: 200 }}>
-                  <div style={{ fontSize: 11, color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Total Amount</div>
-                  <div style={{ fontSize: 28, fontWeight: 800, color: ACCENT, letterSpacing: -1 }}>
-                    {companyInfo?.baseCurrency || "Rs."} {total.toLocaleString()}
+                <div>
+                  <Label>Freight / Delivery Charges</Label>
+                  <input type="number" value={freight} onChange={e => setFreight(e.target.value)} placeholder="0.00" style={inp()} />
+                  {freightAmt > 0 && (
+                    <div style={{ fontSize: 11, color: MUTED, marginTop: 4 }}>
+                      Sub Total: {cur} {subTotal.toLocaleString()} + Freight: {cur} {freightAmt.toLocaleString()}
+                    </div>
+                  )}
+                </div>
+                <div style={{ background: "rgba(99,102,241,0.08)", border: `1px solid rgba(99,102,241,0.2)`, borderRadius: 12, padding: "16px 24px", textAlign: "right", minWidth: 190 }}>
+                  <div style={{ fontSize: 11, color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>Grand Total</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: ACCENT, letterSpacing: -1 }}>
+                    {cur} {grandTotal.toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -377,97 +405,92 @@ export default function PurchaseOrderPage() {
 
       {/* ── Preview Action Bar ── */}
       {showForm && preview && (
-        <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => window.print()} style={{ padding: "10px 22px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#10b981,#059669)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(16,185,129,0.35)" }}>
-            🖨️ Print / PDF
+        <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+          {/* A4 Print */}
+          <button onClick={() => doPrint("a4")} style={{ padding: "10px 20px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
+            Print A4
           </button>
-          <button onClick={() => { const s = suppliers.find(s => s.id === supplierId); setRecipientEmail(s?.email || ""); setEmailModalOpen(true); }} style={{ padding: "10px 22px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+          {/* 58mm / Thermal Print */}
+          <button onClick={() => doPrint("58mm")} style={{ padding: "10px 20px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print 58mm
+          </button>
+          <button onClick={() => { const s = suppliers.find(s => s.id === supplierId); setRecipientEmail(s?.email || ""); setEmailModalOpen(true); }}
+            style={{ padding: "10px 20px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             📧 Send Email
           </button>
-          <button onClick={() => setPreview(false)} style={{ padding: "10px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: TEXT, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>
-            ✏️ Edit
-          </button>
-          <button onClick={() => { resetForm(); loadPOs(); }} style={{ padding: "10px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>
-            + New PO
-          </button>
+          <button onClick={() => setPreview(false)} style={{ padding: "10px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: TEXT, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>✏️ Edit</button>
+          <button onClick={() => { resetForm(); loadPOs(); }} style={{ padding: "10px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>+ New PO</button>
         </div>
       )}
 
-      {/* ── PRINT PREVIEW ── */}
-      {showForm && preview && (
-        <div className="po-print" style={{
-          background: "white", color: "#111", fontFamily: "'Outfit','Inter',sans-serif",
-          borderRadius: 16, overflow: "hidden",
-          boxShadow: "0 8px 60px rgba(0,0,0,0.3)",
-          maxWidth: 860, margin: "0 auto",
+      {/* ══════════════════════════════════════════
+          A4 PREVIEW
+      ══════════════════════════════════════════ */}
+      {showForm && preview && (printMode === "none" || printMode === "a4") && (
+        <div className={`po-print a4-print`} style={{
+          background: "white", color: "#111",
+          fontFamily: "'Outfit','Inter',sans-serif",
+          borderRadius: 14, overflow: "hidden",
+          boxShadow: "0 8px 50px rgba(0,0,0,0.25)",
+          maxWidth: 860, margin: "0 auto 32px",
+          filter: "none",
         }}>
-          {/* Top color bar */}
-          <div style={{ height: 6, background: "linear-gradient(90deg,#6366f1,#818cf8,#4f46e5)" }} />
+          {/* Top bar */}
+          <div style={{ height: 5, background: "#111" }} />
 
           {/* Header */}
-          <div style={{ padding: "32px 40px 24px", borderBottom: "2px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div style={{ padding: "28px 36px 20px", borderBottom: "1.5px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <div style={{ fontSize: 28, fontWeight: 900, color: "#0f172a", letterSpacing: -1, lineHeight: 1 }}>{companyInfo?.name || "Company Name"}</div>
-              {companyInfo?.address && <div style={{ fontSize: 12, color: "#64748b", marginTop: 6 }}>{companyInfo.address}</div>}
-              {companyInfo?.phone && <div style={{ fontSize: 12, color: "#64748b" }}>{companyInfo.phone}</div>}
-              {companyInfo?.email && <div style={{ fontSize: 12, color: "#64748b" }}>{companyInfo.email}</div>}
+              <div style={{ fontSize: 26, fontWeight: 900, color: "#0f172a", letterSpacing: -0.8, lineHeight: 1 }}>{companyInfo?.name || "Company Name"}</div>
+              {companyInfo?.address && <div style={{ fontSize: 11, color: "#64748b", marginTop: 5 }}>{companyInfo.address}</div>}
+              {companyInfo?.phone  && <div style={{ fontSize: 11, color: "#64748b" }}>{companyInfo.phone}</div>}
+              {companyInfo?.email  && <div style={{ fontSize: 11, color: "#64748b" }}>{companyInfo.email}</div>}
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ display: "inline-block", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", padding: "6px 18px", borderRadius: 8, fontSize: 13, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>
-                Purchase Order
-              </div>
-              <div style={{ fontSize: 13, color: "#475569" }}>
-                <div style={{ display: "flex", gap: 16, justifyContent: "flex-end", marginBottom: 4 }}>
-                  <span style={{ color: "#94a3b8", fontWeight: 600 }}>PO Number</span>
-                  <span style={{ fontWeight: 800, color: "#0f172a", fontFamily: "monospace", fontSize: 14 }}>{poNo}</span>
-                </div>
-                <div style={{ display: "flex", gap: 16, justifyContent: "flex-end", marginBottom: 4 }}>
-                  <span style={{ color: "#94a3b8", fontWeight: 600 }}>Date</span>
-                  <span style={{ fontWeight: 700, color: "#0f172a" }}>{fmtDate(date)}</span>
-                </div>
-                <div style={{ display: "flex", gap: 16, justifyContent: "flex-end" }}>
-                  <span style={{ color: "#94a3b8", fontWeight: 600 }}>Status</span>
-                  <span style={{ fontWeight: 800, color: approvalStatus === "APPROVED" ? "#059669" : approvalStatus === "REJECTED" ? "#dc2626" : "#d97706" }}>{approvalStatus}</span>
-                </div>
-              </div>
+              <div style={{ background: "#0f172a", color: "white", padding: "5px 16px", borderRadius: 6, fontSize: 11, fontWeight: 800, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 10, display: "inline-block" }}>Purchase Order</div>
+              <table style={{ fontSize: 12, borderCollapse: "collapse", marginLeft: "auto" }}>
+                {[["PO Number", poNo], ["Date", fmtDate(date)], ["Status", approvalStatus]].map(([k, v]) => (
+                  <tr key={k}>
+                    <td style={{ padding: "2px 12px 2px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right" }}>{k}</td>
+                    <td style={{ padding: "2px 0", fontWeight: 800, color: "#0f172a", fontFamily: k === "PO Number" ? "monospace" : "inherit" }}>{v}</td>
+                  </tr>
+                ))}
+              </table>
             </div>
           </div>
 
-          {/* Supplier Info */}
-          <div style={{ padding: "20px 40px", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-            <div style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Bill To / Supplier</div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#0f172a" }}>{supplierName}</div>
-            {(() => { const s = suppliers.find(x => x.id === supplierId); return s ? (
-              <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>
-                {s.phone && <span>{s.phone} &nbsp; </span>}
-                {s.city && <span>{s.city}</span>}
-              </div>
+          {/* Supplier */}
+          <div style={{ padding: "14px 36px", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+            <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Supplier / Vendor</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>{supplierName || "—"}</div>
+            {(() => { const s = suppliers.find(x => x.id === supplierId); return s?.phone || s?.city ? (
+              <div style={{ fontSize: 11, color: "#64748b", marginTop: 3 }}>{[s.phone, s.city].filter(Boolean).join("  ·  ")}</div>
             ) : null; })()}
           </div>
 
-          {/* Items Table */}
-          <div style={{ padding: "0 40px" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 0 }}>
+          {/* Items */}
+          <div style={{ padding: "0 36px" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ borderBottom: "2px solid #0f172a" }}>
-                  <th style={{ padding: "14px 0 10px", textAlign: "left", fontSize: 10, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 36 }}>#</th>
-                  <th style={{ padding: "14px 0 10px", textAlign: "left", fontSize: 10, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8 }}>Item Description</th>
-                  <th style={{ padding: "14px 0 10px", textAlign: "center", fontSize: 10, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 80 }}>Qty</th>
-                  <th style={{ padding: "14px 0 10px", textAlign: "right", fontSize: 10, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 110 }}>Unit Rate</th>
-                  <th style={{ padding: "14px 0 10px", textAlign: "right", fontSize: 10, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 120 }}>Amount</th>
+                  {[["#","left",30],["Item Description","left","auto"],["Qty","center",70],["Unit Rate","right",110],["Amount","right",120]].map(([label, align, w]) => (
+                    <th key={label as string} style={{ padding: "12px 0 8px", textAlign: align as any, fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: w as any }}>{label}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {rows.filter(r => r.name && r.qty).map((r, i) => (
+                {filledRows.map((r, i) => (
                   <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                    <td style={{ padding: "13px 0", fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>{i + 1}</td>
-                    <td style={{ padding: "13px 0" }}>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{r.name}</div>
-                      {r.desc && <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{r.desc}</div>}
+                    <td style={{ padding: "11px 0", fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{i + 1}</td>
+                    <td style={{ padding: "11px 0" }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{r.name}</div>
+                      {r.desc && <div style={{ fontSize: 10, color: "#64748b", marginTop: 1 }}>{r.desc}</div>}
                     </td>
-                    <td style={{ padding: "13px 0", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{r.qty}</td>
-                    <td style={{ padding: "13px 0", textAlign: "right", fontSize: 13, color: "#475569" }}>{Number(r.rate).toLocaleString()}</td>
-                    <td style={{ padding: "13px 0", textAlign: "right", fontSize: 14, fontWeight: 800, color: "#0f172a" }}>{(Number(r.qty) * Number(r.rate)).toLocaleString()}</td>
+                    <td style={{ padding: "11px 0", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{r.qty}</td>
+                    <td style={{ padding: "11px 0", textAlign: "right", fontSize: 12, color: "#475569" }}>{Number(r.rate).toLocaleString()}</td>
+                    <td style={{ padding: "11px 0", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{(Number(r.qty) * Number(r.rate)).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -475,44 +498,121 @@ export default function PurchaseOrderPage() {
           </div>
 
           {/* Totals + Remarks */}
-          <div style={{ padding: "20px 40px 32px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 24, borderTop: "2px solid #f1f5f9", marginTop: 4 }}>
+          <div style={{ padding: "16px 36px 28px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24, borderTop: "1.5px solid #e2e8f0", marginTop: 4 }}>
             <div style={{ flex: 1 }}>
               {remarks && (
-                <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderLeft: "4px solid #6366f1", borderRadius: "0 8px 8px 0", padding: "12px 16px" }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>Remarks</div>
-                  <div style={{ fontSize: 13, color: "#475569" }}>{remarks}</div>
+                <div style={{ borderLeft: "3px solid #cbd5e1", paddingLeft: 12, marginBottom: 12 }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 3 }}>Remarks</div>
+                  <div style={{ fontSize: 12, color: "#475569" }}>{remarks}</div>
                 </div>
               )}
             </div>
-            <div style={{ minWidth: 240 }}>
-              <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, overflow: "hidden" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 16px", borderBottom: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>Sub Total</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "#0f172a" }}>{total.toLocaleString()}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", padding: "14px 16px", background: "linear-gradient(135deg,#6366f1,#4f46e5)" }}>
-                  <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", fontWeight: 700 }}>NET TOTAL</span>
-                  <span style={{ fontSize: 16, fontWeight: 900, color: "white" }}>{companyInfo?.baseCurrency || "Rs."} {total.toLocaleString()}</span>
-                </div>
-              </div>
+            <div style={{ minWidth: 230 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                <tbody>
+                  <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
+                    <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>Sub Total</td>
+                    <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{cur} {subTotal.toLocaleString()}</td>
+                  </tr>
+                  {freightAmt > 0 && (
+                    <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
+                      <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>Freight</td>
+                      <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{cur} {freightAmt.toLocaleString()}</td>
+                    </tr>
+                  )}
+                  <tr style={{ background: "#0f172a" }}>
+                    <td style={{ padding: "10px 12px", color: "white", fontWeight: 800, fontSize: 13, borderRadius: "4px 0 0 4px" }}>NET TOTAL</td>
+                    <td style={{ padding: "10px 12px", textAlign: "right", color: "white", fontWeight: 900, fontSize: 15, borderRadius: "0 4px 4px 0" }}>{cur} {grandTotal.toLocaleString()}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
-          {/* Signature Lines */}
-          <div style={{ padding: "0 40px 32px", display: "flex", gap: 40 }}>
+          {/* Signatures */}
+          <div style={{ padding: "0 36px 28px", display: "flex", gap: 32 }}>
             {["Prepared By", "Checked By", "Authorized By"].map(label => (
-              <div key={label} style={{ flex: 1, textAlign: "center" }}>
-                <div style={{ borderTop: "1.5px solid #cbd5e1", paddingTop: 8, marginTop: 48 }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
-                </div>
+              <div key={label} style={{ flex: 1, textAlign: "center", borderTop: "1.5px solid #cbd5e1", paddingTop: 7, marginTop: 40 }}>
+                <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
               </div>
             ))}
           </div>
 
           {/* Footer */}
-          <div style={{ padding: "14px 40px", background: "#f8fafc", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontSize: 11, color: "#94a3b8" }}>Generated by FinovaOS · {fmtDate(new Date())}</div>
-            <div style={{ fontSize: 11, color: "#94a3b8" }}>This is a computer generated document</div>
+          <div style={{ padding: "10px 36px", background: "#f8fafc", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between" }}>
+            <div style={{ fontSize: 10, color: "#94a3b8" }}>Generated by FinovaOS · {fmtDate(new Date())}</div>
+            <div style={{ fontSize: 10, color: "#94a3b8" }}>Computer generated document</div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════
+          58mm THERMAL PREVIEW
+      ══════════════════════════════════════════ */}
+      {showForm && preview && (
+        <div className={`po-print thermal-print`} style={{
+          background: "white", color: "#000",
+          fontFamily: "'Courier New',Courier,monospace",
+          width: 220, margin: "0 auto",
+          padding: "10px 12px",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+          borderRadius: 4,
+          display: printMode === "58mm" ? "block" : "none",
+        }}>
+          {/* Company */}
+          <div style={{ textAlign: "center", borderBottom: "1px dashed #555", paddingBottom: 6, marginBottom: 6 }}>
+            <div style={{ fontSize: 12, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>{companyInfo?.name || "Company"}</div>
+            {companyInfo?.phone && <div style={{ fontSize: 9, marginTop: 2 }}>{companyInfo.phone}</div>}
+          </div>
+          {/* Title */}
+          <div style={{ textAlign: "center", fontSize: 10, fontWeight: 900, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>
+            *** PURCHASE ORDER ***
+          </div>
+          {/* Info */}
+          <div style={{ fontSize: 9, marginBottom: 5 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>PO No:</span><span style={{ fontWeight: 700 }}>{poNo}</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Date:</span><span>{fmtDate(date)}</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Status:</span><span style={{ fontWeight: 700 }}>{approvalStatus}</span></div>
+          </div>
+          {/* Supplier */}
+          <div style={{ fontSize: 9, borderTop: "1px dashed #555", borderBottom: "1px dashed #555", padding: "4px 0", marginBottom: 5 }}>
+            <div style={{ fontWeight: 700 }}>Supplier: {supplierName}</div>
+          </div>
+          {/* Items */}
+          <div style={{ fontSize: 9, marginBottom: 5 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderBottom: "1px solid #000", paddingBottom: 2, marginBottom: 3 }}>
+              <span style={{ flex: 2 }}>Item</span>
+              <span style={{ width: 28, textAlign: "right" }}>Qty</span>
+              <span style={{ width: 40, textAlign: "right" }}>Rate</span>
+              <span style={{ width: 44, textAlign: "right" }}>Amt</span>
+            </div>
+            {filledRows.map((r, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                <span style={{ flex: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 80 }}>{r.name}</span>
+                <span style={{ width: 28, textAlign: "right" }}>{r.qty}</span>
+                <span style={{ width: 40, textAlign: "right" }}>{Number(r.rate).toLocaleString()}</span>
+                <span style={{ width: 44, textAlign: "right", fontWeight: 700 }}>{(Number(r.qty)*Number(r.rate)).toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+          {/* Totals */}
+          <div style={{ fontSize: 9, borderTop: "1px dashed #555", paddingTop: 4, marginBottom: 4 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>Sub Total:</span><span>{cur} {subTotal.toLocaleString()}</span></div>
+            {freightAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between" }}><span>Freight:</span><span>{cur} {freightAmt.toLocaleString()}</span></div>}
+            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid #000", marginTop: 3, paddingTop: 3 }}>
+              <span>TOTAL:</span><span>{cur} {grandTotal.toLocaleString()}</span>
+            </div>
+          </div>
+          {/* Remarks */}
+          {remarks && (
+            <div style={{ fontSize: 8, borderTop: "1px dashed #555", paddingTop: 4, marginBottom: 4 }}>
+              <span style={{ fontWeight: 700 }}>Note: </span>{remarks}
+            </div>
+          )}
+          {/* Footer */}
+          <div style={{ textAlign: "center", fontSize: 8, borderTop: "1px dashed #555", paddingTop: 4, marginTop: 4 }}>
+            <div>FinovaOS · {fmtDate(new Date())}</div>
+            <div>Thank You</div>
           </div>
         </div>
       )}
