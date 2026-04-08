@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fmtDate } from "@/lib/dateUtils";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
 
@@ -156,7 +157,7 @@ export default function LedgerReportPage() {
                         </div>
                         <div className="text-right">
                             <p className="text-[10px] font-bold text-gray-400 uppercase">System Date</p>
-                            <p className="text-sm font-black italic">{new Date().toLocaleDateString()}</p>
+                            <p className="text-sm font-black italic">{fmtDate(new Date())}</p>
                         </div>
                     </div>
                 </div>

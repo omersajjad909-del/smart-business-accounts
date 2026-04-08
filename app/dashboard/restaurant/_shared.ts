@@ -1,5 +1,3 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const restaurantFont = "'Outfit','Inter',sans-serif";
@@ -68,6 +66,37 @@ export type RestaurantReservation = {
   reservationDate: string;
   status: ReservationStatus;
 };
+
+export type RestaurantControlCenter = {
+  summary: {
+    menuItems: number;
+    activeTables: number;
+    occupiedTables: number;
+    kitchenOrders: number;
+    readyOrders: number;
+    openOrders: number;
+    salesValue: number;
+    avgRecipeMargin: number;
+    reservations: number;
+    cancellationRate: number;
+  };
+  menu: RestaurantMenuItem[];
+  tables: RestaurantTable[];
+  kitchenOrders: KitchenOrder[];
+  recipes: RecipeCosting[];
+  orders: RestaurantOrder[];
+  reservations: RestaurantReservation[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);

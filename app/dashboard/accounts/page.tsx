@@ -356,7 +356,7 @@ export default function ChartOfAccounts() {
                 value={form.name}
                 onChange={e => f("name", e.target.value)}
                 placeholder="Enter full account name"
-                style={inp()}
+                style={{ ...inp(), textTransform: "uppercase" }}
               />
             </Field>
           </div>

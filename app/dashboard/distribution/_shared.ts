@@ -20,6 +20,46 @@ export type DistributionRoute = {
   status: RouteStatus;
 };
 
+export type DistributionControlCenter = {
+  summary: {
+    routes: number;
+    activeRoutes: number;
+    deliveries: number;
+    delivered: number;
+    failed: number;
+    vanRevenue: number;
+    collections: number;
+    loadedQty: number;
+    soldQty: number;
+    recoveryRate: number;
+  };
+  routes: DistributionRoute[];
+  routeMetrics: Array<{
+    id: string;
+    route: string;
+    area: string;
+    driver: string;
+    deliveries: number;
+    delivered: number;
+    revenue: number;
+    collected: number;
+    loadedQty: number;
+    soldQty: number;
+    failed: number;
+    recoveryRate: number;
+  }>;
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function mapDistributionRoutes(records: BusinessRecord[]): DistributionRoute[] {
   return records.map((record) => ({
     id: record.id,

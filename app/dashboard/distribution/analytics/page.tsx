@@ -1,60 +1,28 @@
 "use client";
 
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  distributionBg,
-  distributionBorder,
-  distributionFont,
-  mapDistributionRoutes,
-} from "../_shared";
+import { useEffect, useState } from "react";
+import { DistributionControlCenter, distributionBg, distributionBorder, distributionFont, fetchJson } from "../_shared";
+
+const emptyState: DistributionControlCenter = {
+  summary: { routes: 0, activeRoutes: 0, deliveries: 0, delivered: 0, failed: 0, vanRevenue: 0, collections: 0, loadedQty: 0, soldQty: 0, recoveryRate: 0 },
+  routes: [],
+  routeMetrics: [],
+};
 
 export default function DistributionAnalyticsPage() {
-  const routeRecords = useBusinessRecords("distribution_route");
-  const deliveryRecords = useBusinessRecords("delivery");
-  const vanSalesRecords = useBusinessRecords("van_sale");
-  const stockRecords = useBusinessRecords("van_stock");
-  const collectionRecords = useBusinessRecords("distribution_collection");
+  const [data, setData] = useState(emptyState);
 
-  const routes = useMemo(() => mapDistributionRoutes(routeRecords.records), [routeRecords.records]);
-
-  const routeMetrics = useMemo(() => {
-    return routes.map((route) => {
-      const deliveries = deliveryRecords.records.filter((record) => String(record.data?.routeId || "") === route.id);
-      const vanSales = vanSalesRecords.records.filter((record) => String(record.data?.routeId || "") === route.id);
-      const stockLoads = stockRecords.records.filter((record) => String(record.data?.routeId || "") === route.id);
-      const collections = collectionRecords.records.filter((record) => String(record.data?.routeId || "") === route.id);
-
-      const revenue = vanSales.reduce((sum, sale) => sum + Number(sale.amount || 0), 0);
-      const collected = collections.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
-      const loadedQty = stockLoads.reduce((sum, load) => sum + Number(load.data?.loadQty || 0), 0);
-      const soldQty = stockLoads.reduce((sum, load) => sum + Number(load.data?.soldQty || 0), 0);
-      const failed = deliveries.filter((record) => record.status === "failed").length;
-
-      return {
-        id: route.id,
-        route: route.name,
-        area: route.area,
-        driver: route.driver,
-        deliveries: deliveries.length,
-        delivered: deliveries.filter((record) => record.status === "delivered").length,
-        revenue,
-        collected,
-        loadedQty,
-        soldQty,
-        failed,
-        recoveryRate: revenue > 0 ? Math.round((collected / revenue) * 100) : 0,
-      };
-    });
-  }, [collectionRecords.records, deliveryRecords.records, routes, stockRecords.records, vanSalesRecords.records]);
+  useEffect(() => {
+    fetchJson("/api/distribution/control-center", emptyState).then(setData);
+  }, []);
 
   const cards = [
-    { label: "Routes", value: routes.length, color: "#f97316" },
-    { label: "Deliveries", value: deliveryRecords.records.length, color: "#38bdf8" },
-    { label: "Van Revenue", value: `Rs. ${vanSalesRecords.records.reduce((sum, sale) => sum + Number(sale.amount || 0), 0).toLocaleString()}`, color: "#34d399" },
-    { label: "Collections", value: `Rs. ${collectionRecords.records.reduce((sum, row) => sum + Number(row.amount || 0), 0).toLocaleString()}`, color: "#a78bfa" },
-    { label: "Failed Deliveries", value: deliveryRecords.records.filter((row) => row.status === "failed").length, color: "#ef4444" },
-    { label: "Recovery Rate", value: `${routeMetrics.length ? Math.round(routeMetrics.reduce((sum, item) => sum + item.recoveryRate, 0) / routeMetrics.length) : 0}%`, color: "#f59e0b" },
+    { label: "Routes", value: data.summary.routes, color: "#f97316" },
+    { label: "Deliveries", value: data.summary.deliveries, color: "#38bdf8" },
+    { label: "Van Revenue", value: `Rs. ${data.summary.vanRevenue.toLocaleString()}`, color: "#34d399" },
+    { label: "Collections", value: `Rs. ${data.summary.collections.toLocaleString()}`, color: "#a78bfa" },
+    { label: "Failed Deliveries", value: data.summary.failed, color: "#ef4444" },
+    { label: "Recovery Rate", value: `${data.summary.recoveryRate}%`, color: "#f59e0b" },
   ];
 
   return (
@@ -87,7 +55,7 @@ export default function DistributionAnalyticsPage() {
             </tr>
           </thead>
           <tbody>
-            {routeMetrics.map((metric) => (
+            {data.routeMetrics.map((metric) => (
               <tr key={metric.id}>
                 <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700 }}>{metric.route}</td>
                 <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{metric.area || "-"}</td>
@@ -102,7 +70,7 @@ export default function DistributionAnalyticsPage() {
                 <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#38bdf8", fontWeight: 700 }}>Rs. {metric.collected.toLocaleString()}</td>
               </tr>
             ))}
-            {routeMetrics.length === 0 && (
+            {data.routeMetrics.length === 0 && (
               <tr>
                 <td colSpan={11} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>
                   No route analytics available yet.

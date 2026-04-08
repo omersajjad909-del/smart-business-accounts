@@ -1,6 +1,36 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
+
+export type ManufacturingControlCenter = {
+  summary: {
+    bomCount: number;
+    plannedProduction: number;
+    runningProduction: number;
+    completedProduction: number;
+    openWorkOrders: number;
+    blockedProduction: number;
+    lowMaterials: number;
+    materialValue: number;
+    finishedQuantity: number;
+    passedChecks: number;
+    rejectedChecks: number;
+  };
+  boms: ManufacturingBom[];
+  production: ManufacturingProductionOrder[];
+  workOrders: ManufacturingWorkOrder[];
+  materials: ManufacturingRawMaterial[];
+  finishedGoods: ManufacturingFinishedGood[];
+  qualityChecks: ManufacturingQualityCheck[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export type ManufacturingBom = {
   id: string;

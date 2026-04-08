@@ -1,5 +1,3 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const constructionFont = "'Outfit','Inter',sans-serif";
@@ -14,6 +12,41 @@ export type SubcontractorStatus = "active" | "closed" | "on_hold";
 export type ConstructionBillingStatus = "draft" | "submitted" | "approved" | "paid";
 export type ConstructionExpenseStatus = "open" | "approved" | "posted";
 export type ConstructionPaymentStatus = "scheduled" | "released" | "cleared";
+
+export type ConstructionControlCenter = {
+  summary: {
+    projects: number;
+    activeProjects: number;
+    sites: number;
+    activeSites: number;
+    materialValue: number;
+    lowStockMaterials: number;
+    subcontractors: number;
+    contractExposure: number;
+    boqItems: number;
+    certifiedBilling: number;
+    expenses: number;
+    contractorPayments: number;
+  };
+  projects: ReturnType<typeof mapConstructionProjects>;
+  sites: ReturnType<typeof mapConstructionSites>;
+  materials: ReturnType<typeof mapConstructionMaterials>;
+  subcontractors: ReturnType<typeof mapSubcontractors>;
+  boq: ReturnType<typeof mapBoqRecords>;
+  billing: ReturnType<typeof mapConstructionBilling>;
+  expenses: ReturnType<typeof mapConstructionExpenses>;
+  payments: ReturnType<typeof mapConstructionPayments>;
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);
