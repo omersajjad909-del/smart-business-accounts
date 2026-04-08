@@ -90,7 +90,8 @@
       "Bash(grep -n \"salePrice\\\\|\\\\$\\\\|currency\\\\|rate\\\\|Rate\" \"d:/projects/smart-business-accounts/app/dashboard/barcode/page.tsx\")",
       "Bash(grep -n \"\\\\$\\\\|salePrice\\\\|SALE PRICE\\\\|Sale Price\" \"d:/projects/smart-business-accounts/app/dashboard/barcode/page.tsx\")",
       "Bash(grep -v \"^\\\\s*//\")",
-      "Bash(node)"
+      "Bash(node)",
+      "Read(//c/Users/Standard Laptop/AppData/Local/Temp/claude/**)"
     ]
   }
 }

@@ -619,14 +619,15 @@ export default function DashboardLayout({
       <aside style={{
         position:"fixed",
         top:0, left:0, bottom:0,
-        width:260,
+        width: SW,
         background:"var(--panel-bg)",
         borderRight:"1px solid var(--border)",
         display:"flex",
         flexDirection:"column",
         zIndex:30,
         transform: isMobileMenuOpen ? "translateX(0)" : undefined,
-        transition:"transform .3s ease",
+        transition:"width .25s ease, transform .3s ease",
+        overflow:"hidden",
       }}
       className={!isMobileMenuOpen ? "max-md:hidden" : ""}
       >
@@ -653,13 +654,15 @@ export default function DashboardLayout({
                 <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
               </svg>
             </div>
-            <div>
-              <div style={{fontSize:14,fontWeight:700,color:"white",letterSpacing:"-.2px",lineHeight:1}}>FinovaOS</div>
-              <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",letterSpacing:".04em",marginTop:2}}>Business Suite</div>
-            </div>
+            {!sidebarCollapsed && (
+              <div>
+                <div style={{fontSize:14,fontWeight:700,color:"white",letterSpacing:"-.2px",lineHeight:1}}>FinovaOS</div>
+                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",letterSpacing:".04em",marginTop:2}}>Business Suite</div>
+              </div>
+            )}
           </Link>
           {/* Branch selector */}
-          {canShowBranchSelector && (
+          {canShowBranchSelector && !sidebarCollapsed && (
             <select
               style={{marginTop:8,width:"100%",background:"#0d1430",border:"1px solid rgba(255,255,255,0.12)",borderRadius:7,padding:"6px 8px",fontSize:11,color:"rgba(255,255,255,0.8)",outline:"none",colorScheme:"dark"}}
               value={activeBranchId}
@@ -672,7 +675,7 @@ export default function DashboardLayout({
         </div>
 
         {/* ---- NAV ---- */}
-        <nav style={{flex:1,overflowY:"auto",padding:"10px 10px",paddingBottom:80}}>
+        <nav style={{flex:1,overflowY:"auto",padding:"10px 10px",paddingBottom:80,display: sidebarCollapsed ? "none" : "block"}}>
 
           {/* Dashboard utilities */}
           {canShowDashboardUtilities && hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
@@ -1582,6 +1585,30 @@ export default function DashboardLayout({
         {/* ---- SIDEBAR FOOTER ---- */}
         <div style={{borderTop:"1px solid var(--border)",background:"var(--panel-bg-2)",position:"relative"}}>
 
+          {/* Collapse Toggle Button */}
+          <div style={{borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
+            <button
+              onClick={() => setSidebarCollapsed(v => !v)}
+              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              style={{
+                display:"flex", alignItems:"center", gap:8,
+                width:"100%", padding:"10px 14px",
+                background:"transparent", border:"none", cursor:"pointer",
+                color:"rgba(255,255,255,0.4)", fontFamily:"inherit", fontSize:12,
+                transition:"background .15s, color .15s",
+                justifyContent: sidebarCollapsed ? "center" : "flex-start",
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.05)";e.currentTarget.style.color="rgba(255,255,255,0.7)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(255,255,255,0.4)";}}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                style={{flexShrink:0, transform: sidebarCollapsed ? "rotate(180deg)" : "rotate(0deg)", transition:"transform .25s"}}>
+                <path d="M11 19l-7-7 7-7"/><path d="M21 19l-7-7 7-7"/>
+              </svg>
+              {!sidebarCollapsed && <span>Collapse</span>}
+            </button>
+          </div>
+
           {/* ── User Menu Popup ── */}
           {showUserMenu && (
             <>
@@ -1642,7 +1669,10 @@ export default function DashboardLayout({
           <div
             onClick={()=>setShowUserMenu(v=>!v)}
             style={{
-              display:"flex",alignItems:"center",gap:10,padding:"12px 14px",cursor:"pointer",
+              display:"flex",alignItems:"center",gap:10,
+              padding: sidebarCollapsed ? "12px 0" : "12px 14px",
+              justifyContent: sidebarCollapsed ? "center" : "flex-start",
+              cursor:"pointer",
               transition:"background .15s",
               background: showUserMenu ? "rgba(255,255,255,0.05)" : "transparent",
             }}
@@ -1654,21 +1684,25 @@ export default function DashboardLayout({
               {(currentUser.name || currentUser.email || "U")[0].toUpperCase()}
             </div>
             {/* Name + company */}
-            <div style={{minWidth:0,flex:1}}>
-              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.85)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{currentUser.name || "User"}</div>
-              <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{companyName}</div>
-            </div>
+            {!sidebarCollapsed && (
+              <div style={{minWidth:0,flex:1}}>
+                <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.85)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{currentUser.name || "User"}</div>
+                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{companyName}</div>
+              </div>
+            )}
             {/* Chevron up/down */}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2.5" style={{flexShrink:0,transform:showUserMenu?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s"}}>
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
+            {!sidebarCollapsed && (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2.5" style={{flexShrink:0,transform:showUserMenu?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s"}}>
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            )}
           </div>
         </div>
 
       </aside>
 
       {/* ═══════════════ MAIN AREA ═══════════════ */}
-      <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:260}} className="max-md:ml-0">
+      <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:SW,transition:"margin-left .25s ease"}} className="max-md:ml-0">
 
         {/* ---- TOPBAR ---- */}
         <div style={{background:"var(--panel-bg)",borderBottom:"1px solid var(--border)",padding:"0 16px",height:56,display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:10}} className="print:hidden">
