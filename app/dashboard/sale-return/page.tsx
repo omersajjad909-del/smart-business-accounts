@@ -447,7 +447,7 @@ export default function SalesReturnPage() {
                       </td>
                       <td className="border p-2 text-center font-mono">{r.rate}</td>
                       <td className="border p-2 text-right font-bold">{(Number(r.qty) * r.rate).toLocaleString()}</td>
-                      <td className="border p-2 text-center text-red-500 cursor-pointer" onClick={() => setRows(rows.filter((_, idx) => idx !== i))}>Ã¢Å“â€¢</td>
+                      <td className="border p-2 text-center text-red-500 cursor-pointer" onClick={() => setRows(rows.filter((_, idx) => idx !== i))}>✕</td>
                     </tr>
                   ))}
                 </tbody>

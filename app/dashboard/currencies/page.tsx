@@ -90,7 +90,7 @@ export default function CurrenciesPage() {
         showToast("Error: " + (data.error || "Failed to save"));
       }
     } catch {
-      showToast("Network error Ã¢â‚¬â€ please try again");
+      showToast("Network error — please try again");
     } finally {
       setLoading(false);
     }
@@ -112,7 +112,7 @@ export default function CurrenciesPage() {
         showToast("Error: " + (data.error || "Failed to delete"));
       }
     } catch {
-      showToast("Network error Ã¢â‚¬â€ please try again");
+      showToast("Network error — please try again");
     }
   };
 

@@ -198,7 +198,7 @@ export default function DebitNotePage() {
                 onClick={() => setShowForm(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                Ã¢Å“â€¢
+                ✕
               </button>
             </div>
 
@@ -333,7 +333,7 @@ export default function DebitNotePage() {
                       </div>
                     </td>
                     <td className="py-3 px-4 text-right font-medium text-red-600">
-                      Ã¢â€šÂ¹{note.amount.toFixed(2)}
+                      ₹{note.amount.toFixed(2)}
                     </td>
                     <td className="py-3 px-4">{getStatusBadge(note.status)}</td>
                     <td className="py-3 px-4">
@@ -369,7 +369,7 @@ export default function DebitNotePage() {
                   )}
                   <MobileCardRow 
                     label="Amount" 
-                    value={`Ã¢â€šÂ¹${note.amount.toFixed(2)}`}
+                    value={`₹${note.amount.toFixed(2)}`}
                     valueClassName="font-medium text-red-600"
                   />
                   <div className="mt-3 pt-3 border-t">

@@ -334,7 +334,7 @@ export default function PayrollPage() {
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-black text-gray-800">Ã°Å¸â€™Â° Payroll</h1>
+            <h1 className="text-3xl font-black text-gray-800">💰 Payroll</h1>
             <input
               type="month"
               value={monthYear}
@@ -347,13 +347,13 @@ export default function PayrollPage() {
               onClick={() => setShowPreview(true)}
               className="bg-gray-800 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-black transition-all"
             >
-              Ã°Å¸â€˜ÂÃ¯Â¸Â Show Preview
+              👁️ Show Preview
             </button>
             <button
               onClick={() => window.print()}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow-md transition-all"
             >
-              Ã°Å¸â€“Â¨Ã¯Â¸Â Print Now
+              🖨️ Print Now
             </button>
           </div>
         </div>

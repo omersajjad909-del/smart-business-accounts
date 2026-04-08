@@ -293,7 +293,7 @@ export default function GRNPage() {
                   <option value="">-- Select PO (optional) --</option>
                   {pos.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.poNo} Ã¢â‚¬â€ {p.supplier.name}
+                      {p.poNo} — {p.supplier.name}
                     </option>
                   ))}
                 </select>
@@ -416,7 +416,7 @@ export default function GRNPage() {
                           onClick={() => removeRow(idx)}
                           className="text-red-400 hover:text-red-600 text-lg leading-none"
                         >
-                          Ãƒâ€”
+                          ×
                         </button>
                       </td>
                     </tr>

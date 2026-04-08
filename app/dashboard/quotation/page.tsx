@@ -525,13 +525,13 @@ export default function QuotationPage() {
                   onClick={shareOnWhatsApp}
                   className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 flex-1 md:flex-none"
                 >
-                  Ã°Å¸â€œÂ± WhatsApp
+                  📱 WhatsApp
                 </button>
                 <button 
                   onClick={shareOnSMS}
                   className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 flex-1 md:flex-none"
                 >
-                  Ã°Å¸â€™Â¬ SMS
+                  💬 SMS
                 </button>
                 <button onClick={() => setPreview(false)} className="bg-yellow-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
                   Edit
@@ -625,7 +625,7 @@ export default function QuotationPage() {
                         applyTax ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
                       }`}
                     >
-                      {applyTax ? "Ã¢Å“â€œ Tax Applied" : "+ Add Tax"}
+                      {applyTax ? "✓ Tax Applied" : "+ Add Tax"}
                     </button>
                     
                     {applyTax && (

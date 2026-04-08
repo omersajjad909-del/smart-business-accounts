@@ -119,7 +119,7 @@ export default function CRVPage() {
         const banksData = await banksRes.json();
 
         if (Array.isArray(accountsData)) {
-          // CRV Ã™â€¦Ã›Å’ÃšÂº CUSTOMER + BANKS Ã˜Â¯Ã™Ë†Ã™â€ Ã™Ë†ÃšÂº Ã›ÂÃ™Ë†Ã™â€ Ã›â€™ Ãšâ€ Ã˜Â§Ã›ÂÃ›Å’Ã›â€™
+          // CRV میں CUSTOMER + BANKS دونوں ہونے چاہیے
           const filtered = accountsData.filter(a => 
             a.partyType === "CUSTOMER" || a.partyType === "BANKS" || !a.partyType
           );

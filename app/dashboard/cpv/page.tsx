@@ -120,7 +120,7 @@ export default function CPVPage() {
         const banksData = await banksRes.json();
 
         if (Array.isArray(accountsData)) {
-          // CPV Ã™â€¦Ã›Å’ÃšÂº SUPPLIER + BANKS + Ã˜Â¯Ã™Ë†Ã˜Â³Ã˜Â±Ã›â€™ non-customer accounts
+          // CPV میں SUPPLIER + BANKS + دوسرے non-customer accounts
           setAccounts(
             accountsData.filter(a =>
               !a.partyType || (a.partyType !== "CUSTOMER")

@@ -446,8 +446,8 @@ const [searchTerm, _setSearchTerm] = useState("");
                     <td className="p-3">{fmtDate(c.date)}</td>
                     <td className="p-3">{c.customer?.name || "N/A"}</td>
                     <td className="p-3">
-                        {c.vehicleNo && <span className="block text-xs">Ã°Å¸Å¡â€” {c.vehicleNo}</span>}
-                        {c.driverName && <span className="block text-xs">Ã°Å¸â€˜Â¤ {c.driverName}</span>}
+                        {c.vehicleNo && <span className="block text-xs">🚗 {c.vehicleNo}</span>}
+                        {c.driverName && <span className="block text-xs">👤 {c.driverName}</span>}
                     </td>
                     <td className="p-3">
                       <span className={`px-2 py-1 rounded text-xs ${c.status === 'DELIVERED' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
@@ -499,13 +499,13 @@ const [searchTerm, _setSearchTerm] = useState("");
                   onClick={shareOnWhatsApp}
                   className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 flex-1 md:flex-none"
                 >
-                  Ã°Å¸â€œÂ± WhatsApp
+                  📱 WhatsApp
                 </button>
                 <button 
                   onClick={shareOnSMS}
                   className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 flex-1 md:flex-none"
                 >
-                  Ã°Å¸â€™Â¬ SMS
+                  💬 SMS
                 </button>
                 <button onClick={() => setPreview(false)} className="bg-yellow-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
                   Edit

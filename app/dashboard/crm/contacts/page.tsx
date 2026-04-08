@@ -139,7 +139,7 @@ export default function CrmContactsPage() {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
-          Ã°Å¸â€œâ€¡ CRM Contacts Management
+          📇 CRM Contacts Management
         </h1>
 
         {/* Form */}

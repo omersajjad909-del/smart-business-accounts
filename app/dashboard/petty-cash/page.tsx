@@ -268,7 +268,7 @@ export default function PettyCashPage() {
                 onClick={() => setShowAccountForm(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                Ã¢Å“â€¢
+                ✕
               </button>
             </div>
 
@@ -334,7 +334,7 @@ export default function PettyCashPage() {
                 onClick={() => setShowExpenseForm(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                Ã¢Å“â€¢
+                ✕
               </button>
             </div>
 
@@ -349,7 +349,7 @@ export default function PettyCashPage() {
                   <option value="">Select Account</option>
                   {pettyCashAccounts.filter(acc => acc.isActive).map((account) => (
                     <option key={account.id} value={account.id}>
-                      {account.accountName} (Balance: Ã¢â€šÂ¹{account.currentBalance.toFixed(2)})
+                      {account.accountName} (Balance: ₹{account.currentBalance.toFixed(2)})
                     </option>
                   ))}
                 </select>
@@ -449,8 +449,8 @@ export default function PettyCashPage() {
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-right">Ã¢â€šÂ¹{account.openingBalance.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right font-medium">Ã¢â€šÂ¹{account.currentBalance.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right">₹{account.openingBalance.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right font-medium">₹{account.currentBalance.toFixed(2)}</td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded-full text-xs ${
                           account.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
@@ -489,10 +489,10 @@ export default function PettyCashPage() {
                         {account.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
-                    <MobileCardRow label="Opening Balance" value={`Ã¢â€šÂ¹${account.openingBalance.toFixed(2)}`} />
+                    <MobileCardRow label="Opening Balance" value={`₹${account.openingBalance.toFixed(2)}`} />
                     <MobileCardRow 
                       label="Current Balance" 
-                      value={`Ã¢â€šÂ¹${account.currentBalance.toFixed(2)}`}
+                      value={`₹${account.currentBalance.toFixed(2)}`}
                       valueClassName="font-medium"
                     />
                     <div className="mt-3 pt-3 border-t flex gap-2">
@@ -533,7 +533,7 @@ export default function PettyCashPage() {
                 }}
                 className="text-blue-600 hover:text-blue-800 mb-2"
               >
-                Ã¢â€ Â Back to Accounts
+                ← Back to Accounts
               </button>
               <h2 className="text-lg font-semibold">
                 Expenses - {pettyCashAccounts.find(a => a.id === selectedAccount)?.accountName}
@@ -576,7 +576,7 @@ export default function PettyCashPage() {
                       <td className="py-3 px-4">
                         <span className="px-2 py-1 bg-gray-100 rounded text-xs">{expense.category}</span>
                       </td>
-                      <td className="py-3 px-4 text-right font-medium">Ã¢â€šÂ¹{expense.amount.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right font-medium">₹{expense.amount.toFixed(2)}</td>
                       <td className="py-3 px-4 text-right">
                         <button
                           onClick={() => handleDeleteExpense(expense.id)}
@@ -604,7 +604,7 @@ export default function PettyCashPage() {
                     <MobileCardRow label="Date" value={fmtDate(expense.date)} />
                     <MobileCardRow 
                       label="Amount" 
-                      value={`Ã¢â€šÂ¹${expense.amount.toFixed(2)}`}
+                      value={`₹${expense.amount.toFixed(2)}`}
                       valueClassName="font-medium text-red-600"
                     />
                     <div className="mt-3 pt-3 border-t">

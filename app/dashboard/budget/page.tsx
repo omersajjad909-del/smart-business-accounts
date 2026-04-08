@@ -172,7 +172,7 @@ export default function BudgetPage() {
             onClick={exportBudgets}
             className="bg-green-600 text-white px-6 py-2 rounded font-bold"
           >
-            Ã°Å¸â€œÂ¥ Export CSV
+            📥 Export CSV
           </button>
         )}
       </div>

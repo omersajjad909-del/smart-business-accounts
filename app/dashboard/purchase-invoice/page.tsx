@@ -414,12 +414,12 @@ const [searchTerm, setSearchTerm] = useState("");
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Ã¢Å“â€¦ Email sent successfully!");
+        toast.success("✅ Email sent successfully!");
       } else {
-        toast.error(`Ã¢ÂÅ’ Failed to send email: ${data.error || "Unknown error"}`);
+        toast.error(`❌ Failed to send email: ${data.error || "Unknown error"}`);
       }
     } catch (_error) {
-      toast.error("Ã¢ÂÅ’ Failed to send email. Please check email configuration.");
+      toast.error("❌ Failed to send email. Please check email configuration.");
     } finally {
       setSendingEmail(false);
     }
@@ -543,7 +543,7 @@ const [searchTerm, setSearchTerm] = useState("");
                     disabled={sendingEmail}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold shadow-md disabled:bg-gray-400"
                   >
-                    {sendingEmail ? "Sending..." : "Ã°Å¸â€œÂ§ Email"}
+                    {sendingEmail ? "Sending..." : "📧 Email"}
                   </button>
                   <button onClick={() => setShowPreview(false)} className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded border font-bold">
                     Back to Edit
@@ -679,7 +679,7 @@ const [searchTerm, setSearchTerm] = useState("");
                         applyTax ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
                       }`}
                     >
-                      {applyTax ? "Ã¢Å“â€œ Tax Applied" : "+ Add Tax"}
+                      {applyTax ? "✓ Tax Applied" : "+ Add Tax"}
                     </button>
                     
                     {applyTax && (

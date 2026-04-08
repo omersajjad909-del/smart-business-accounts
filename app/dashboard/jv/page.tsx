@@ -475,7 +475,7 @@ export default function JVPage() {
                             onClick={() => removeEntry(entry.id)}
                             className="text-red-600 hover:text-red-800"
                           >
-                            Ã¢Å“â€¢
+                            ✕
                           </button>
                         )}
                       </td>
@@ -500,7 +500,7 @@ export default function JVPage() {
                             isBalanced ? "text-green-600" : "text-red-600"
                           }
                         >
-                          {isBalanced ? "Ã¢Å“â€œ Balanced" : "Ã¢Å“â€” Not Balanced"}
+                          {isBalanced ? "✓ Balanced" : "✗ Not Balanced"}
                         </div>
                       </div>
                     </td>

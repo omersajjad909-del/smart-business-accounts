@@ -149,7 +149,7 @@ export default function TestimonialsAdminPage() {
                   <button key={n} onClick={() => setForm(p=>({...p,rating:n}))} style={{
                     fontSize:18, cursor:"pointer", background:"none", border:"none", padding:0,
                     opacity: n <= form.rating ? 1 : 0.25, transition:"opacity .15s",
-                  }}>Ã¢Â­Â</button>
+                  }}>⭐</button>
                 ))}
               </div>
             </div>
@@ -162,7 +162,7 @@ export default function TestimonialsAdminPage() {
                 color: form.featured ? "#fbbf24" : "rgba(255,255,255,.4)",
                 border: `1px solid ${form.featured ? "rgba(251,191,36,.3)" : "rgba(255,255,255,.1)"}`,
               }}>
-                {form.featured ? "Ã¢Â­Â Featured" : "Not Featured"}
+                {form.featured ? "⭐ Featured" : "Not Featured"}
               </button>
             </div>
           </div>
@@ -171,7 +171,7 @@ export default function TestimonialsAdminPage() {
               padding:"10px 24px", borderRadius:9, fontSize:13, fontWeight:700, cursor:"pointer",
               background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"white", border:"none",
               opacity: saving ? .6 : 1,
-            }}>{saving ? "SavingÃ¢â‚¬Â¦" : editing ? "Update" : "Add & Publish"}</button>
+            }}>{saving ? "Saving…" : editing ? "Update" : "Add & Publish"}</button>
             <button onClick={() => { setShowForm(false); setEditing(null); setForm(EMPTY); }} style={{
               padding:"10px 20px", borderRadius:9, fontSize:13, fontWeight:600, cursor:"pointer",
               background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.6)", border:"1px solid rgba(255,255,255,.1)",
@@ -182,7 +182,7 @@ export default function TestimonialsAdminPage() {
 
       {/* Table */}
       {loading ? (
-        <div style={{ textAlign:"center", padding:60, color:"rgba(255,255,255,.3)", fontSize:14 }}>LoadingÃ¢â‚¬Â¦</div>
+        <div style={{ textAlign:"center", padding:60, color:"rgba(255,255,255,.3)", fontSize:14 }}>Loading…</div>
       ) : list.length === 0 ? (
         <div style={{ textAlign:"center", padding:60, color:"rgba(255,255,255,.3)", fontSize:14 }}>No testimonials found.</div>
       ) : (
@@ -210,8 +210,8 @@ export default function TestimonialsAdminPage() {
                   <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4, flexWrap:"wrap" }}>
                     <span style={{ fontSize:14, fontWeight:700, color:"white" }}>{t.name}</span>
                     {t.role && <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>{t.role}</span>}
-                    {t.company && <span style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>Ã‚Â· {t.company}</span>}
-                    {t.featured && <span style={{ fontSize:9, fontWeight:700, color:"#fbbf24", padding:"1px 6px", borderRadius:10, background:"rgba(251,191,36,.12)", border:"1px solid rgba(251,191,36,.2)" }}>Ã¢Ëœâ€¦ FEATURED</span>}
+                    {t.company && <span style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>· {t.company}</span>}
+                    {t.featured && <span style={{ fontSize:9, fontWeight:700, color:"#fbbf24", padding:"1px 6px", borderRadius:10, background:"rgba(251,191,36,.12)", border:"1px solid rgba(251,191,36,.2)" }}>★ FEATURED</span>}
                   </div>
                   {/* Stars */}
                   <div style={{ display:"flex", gap:1, marginBottom:6 }}>

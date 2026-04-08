@@ -17,10 +17,10 @@ type Module = {
 };
 
 const PHASE_LABELS: Record<number, { label: string; color: string; bg: string }> = {
-  1: { label: "Phase 1 Ã¢â‚¬â€ Live",        color: "#34d399", bg: "rgba(52,211,153,.12)"  },
-  2: { label: "Phase 2 Ã¢â‚¬â€ Commerce+",   color: "#60a5fa", bg: "rgba(96,165,250,.12)"  },
-  3: { label: "Phase 3 Ã¢â‚¬â€ Services",    color: "#a78bfa", bg: "rgba(167,139,250,.12)" },
-  4: { label: "Phase 4 Ã¢â‚¬â€ Specialised", color: "#f59e0b", bg: "rgba(245,158,11,.12)"  },
+  1: { label: "Phase 1 — Live",        color: "#34d399", bg: "rgba(52,211,153,.12)"  },
+  2: { label: "Phase 2 — Commerce+",   color: "#60a5fa", bg: "rgba(96,165,250,.12)"  },
+  3: { label: "Phase 3 — Services",    color: "#a78bfa", bg: "rgba(167,139,250,.12)" },
+  4: { label: "Phase 4 — Specialised", color: "#f59e0b", bg: "rgba(245,158,11,.12)"  },
 };
 
 function headers() {
@@ -65,7 +65,7 @@ export default function BusinessModulesPage() {
       });
       if (r.ok) {
         setModules(prev => prev.map(m => m.id === id ? { ...m, enabled: !currentEnabled, status: !currentEnabled ? "live" : "coming_soon", adminOverride: true } : m));
-        setMsg(`${!currentEnabled ? "Ã¢Å“â€¦ Enabled" : "Ã¢ÂÂ¸ Disabled"}: ${id}`);
+        setMsg(`${!currentEnabled ? "✅ Enabled" : "⏸ Disabled"}: ${id}`);
       }
     } finally {
       setSaving(null);
@@ -166,7 +166,7 @@ export default function BusinessModulesPage() {
             background:  filter === f ? "rgba(99,102,241,.2)" : "rgba(255,255,255,.04)",
             color:       filter === f ? "#a5b4fc" : "rgba(255,255,255,.4)",
           }}>
-            {f === "all" ? "All" : f === "live" ? "Ã°Å¸Å¸Â¢ Live" : "Ã¢ÂÂ³ Coming Soon"}
+            {f === "all" ? "All" : f === "live" ? "🟢 Live" : "⏳ Coming Soon"}
           </button>
         ))}
         {msg && <span style={{ fontSize: 12, color: "#34d399", fontWeight: 600, marginLeft: 8 }}>{msg}</span>}
@@ -174,7 +174,7 @@ export default function BusinessModulesPage() {
 
       {/* Tables per phase */}
       {loading ? (
-        <div style={{ padding: 60, textAlign: "center", color: "rgba(255,255,255,.3)" }}>LoadingÃ¢â‚¬Â¦</div>
+        <div style={{ padding: 60, textAlign: "center", color: "rgba(255,255,255,.3)" }}>Loading…</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
           {([1,2,3,4] as const).map(phase => {
@@ -223,11 +223,11 @@ export default function BusinessModulesPage() {
                               color:      m.enabled ? "#34d399"              : "#fbbf24",
                               border:     `1px solid ${m.enabled ? "rgba(52,211,153,.3)" : "rgba(251,191,36,.25)"}`,
                             }}>
-                              {m.enabled ? "Ã°Å¸Å¸Â¢ Live" : "Ã¢ÂÂ³ Coming Soon"}
+                              {m.enabled ? "🟢 Live" : "⏳ Coming Soon"}
                             </span>
                           </td>
                           <td style={{ ...s.td, fontSize: 12, color: "rgba(255,255,255,.35)" }}>
-                            {m.defaultStatus === "live" ? "Ã°Å¸Å¸Â¢ Live" : "Ã¢ÂÂ³ Coming Soon"}
+                            {m.defaultStatus === "live" ? "🟢 Live" : "⏳ Coming Soon"}
                           </td>
                           <td style={{ ...s.td, fontSize: 12 }}>
                             {m.adminOverride ? (
@@ -242,7 +242,7 @@ export default function BusinessModulesPage() {
                                 </button>
                               </div>
                             ) : (
-                              <span style={{ color: "rgba(255,255,255,.2)" }}>Ã¢â‚¬â€</span>
+                              <span style={{ color: "rgba(255,255,255,.2)" }}>—</span>
                             )}
                           </td>
                           <td style={s.td}>
@@ -282,10 +282,10 @@ export default function BusinessModulesPage() {
       <div style={{ marginTop: 32, padding: "16px 20px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)" }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc", marginBottom: 8 }}>How it works</div>
         <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
-          Ã¢â‚¬Â¢ <strong style={{ color: "rgba(255,255,255,.65)" }}>Toggle ON</strong> Ã¢â€ â€™ Business type appears as "Live" on the website. Companies of this type see all their dashboard modules.<br/>
-          Ã¢â‚¬Â¢ <strong style={{ color: "rgba(255,255,255,.65)" }}>Toggle OFF</strong> Ã¢â€ â€™ Shows "Coming Soon" on website. Dashboard still works for existing companies but won't be marketed.<br/>
-          Ã¢â‚¬Â¢ <strong style={{ color: "rgba(255,255,255,.65)" }}>Reset</strong> Ã¢â€ â€™ Removes admin override and goes back to the default phase setting from the codebase.<br/>
-          Ã¢â‚¬Â¢ To enable specific modules for a company Ã¢â€ â€™ go to <strong style={{ color: "#a5b4fc" }}>Companies</strong> page and change their Business Type.
+          • <strong style={{ color: "rgba(255,255,255,.65)" }}>Toggle ON</strong> → Business type appears as "Live" on the website. Companies of this type see all their dashboard modules.<br/>
+          • <strong style={{ color: "rgba(255,255,255,.65)" }}>Toggle OFF</strong> → Shows "Coming Soon" on website. Dashboard still works for existing companies but won't be marketed.<br/>
+          • <strong style={{ color: "rgba(255,255,255,.65)" }}>Reset</strong> → Removes admin override and goes back to the default phase setting from the codebase.<br/>
+          • To enable specific modules for a company → go to <strong style={{ color: "#a5b4fc" }}>Companies</strong> page and change their Business Type.
         </div>
       </div>
     </div>

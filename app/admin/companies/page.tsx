@@ -80,7 +80,7 @@ function StatusBadge({ status }: { status?: string | null }) {
 }
 
 function AIScoreBadge({ score, health }: { score?: number; health?: string }) {
-  if (score === undefined) return <span style={{ color: "#334155", fontSize: 12 }}>Ã¢â‚¬â€</span>;
+  if (score === undefined) return <span style={{ color: "#334155", fontSize: 12 }}>—</span>;
   const color = score >= 75 ? "#10b981" : score >= 50 ? "#f59e0b" : "#ef4444";
   const label = health || (score >= 75 ? "Healthy" : score >= 50 ? "At Risk" : "Critical");
   return (
@@ -97,7 +97,7 @@ function AIScoreBadge({ score, health }: { score?: number; health?: string }) {
   );
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Change Plan Modal Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Change Plan Modal ──────────────────────────────── */
 function ChangePlanModal({ company, onClose, onSaved }: {
   company: Row;
   onClose: () => void;
@@ -119,7 +119,7 @@ function ChangePlanModal({ company, onClose, onSaved }: {
       });
       const j = await r.json();
       if (r.ok) {
-        toast.success(`Plan updated: ${company.name} Ã¢â€ â€™ ${plan}`);
+        toast.success(`Plan updated: ${company.name} → ${plan}`);
         onSaved(company.id, plan, status);
         onClose();
       } else {
@@ -147,7 +147,7 @@ function ChangePlanModal({ company, onClose, onSaved }: {
             <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "white" }}>Change Plan</h3>
             <p style={{ margin: "4px 0 0", fontSize: 12, color: "#64748b" }}>{company.name}</p>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: 14 }}>Ã¢Å“â€¢</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: 14 }}>✕</button>
         </div>
         <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)", display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -173,7 +173,7 @@ function ChangePlanModal({ company, onClose, onSaved }: {
               style={{ ...selectStyle, resize: "none", height: "auto" }} />
           </div>
           <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(251,191,36,.06)", border: "1px solid rgba(251,191,36,.2)", fontSize: 12, color: "#fbbf24", lineHeight: 1.6 }}>
-            Ã¢Å¡Â Ã¯Â¸Â This changes the plan immediately in the database. Stripe billing is not affected Ã¢â‚¬â€ handle billing separately.
+            ⚠️ This changes the plan immediately in the database. Stripe billing is not affected — handle billing separately.
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
@@ -187,7 +187,7 @@ function ChangePlanModal({ company, onClose, onSaved }: {
   );
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Detail Row Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Detail Row ─────────────────────────────────────── */
 function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (id: string) => void }) {
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -199,13 +199,13 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
   }
 
   const items = [
-    { label: "Owner Name",         value: company.ownerName    || "Ã¢â‚¬â€", mono: false, key: "name"   },
-    { label: "Owner Email",        value: company.ownerEmail   || "Ã¢â‚¬â€", mono: true,  key: "email"  },
-    { label: "Business Type",      value: BIZ_LABELS[company.businessType || ""] || company.businessType || "Ã¢â‚¬â€", mono: false, key: "biztype" },
-    { label: "Stripe Customer ID", value: company.stripeCustomerId || "Ã¢â‚¬â€", mono: true, key: "stripe" },
-    { label: "Renewal Date",       value: company.currentPeriodEnd ? new Date(company.currentPeriodEnd).toLocaleDateString(undefined, { day:"numeric", month:"short", year:"numeric" }) : "Ã¢â‚¬â€", mono: false, key: "renewal" },
+    { label: "Owner Name",         value: company.ownerName    || "—", mono: false, key: "name"   },
+    { label: "Owner Email",        value: company.ownerEmail   || "—", mono: true,  key: "email"  },
+    { label: "Business Type",      value: BIZ_LABELS[company.businessType || ""] || company.businessType || "—", mono: false, key: "biztype" },
+    { label: "Stripe Customer ID", value: company.stripeCustomerId || "—", mono: true, key: "stripe" },
+    { label: "Renewal Date",       value: company.currentPeriodEnd ? new Date(company.currentPeriodEnd).toLocaleDateString(undefined, { day:"numeric", month:"short", year:"numeric" }) : "—", mono: false, key: "renewal" },
     { label: "Last Login",         value: company.lastLogin ? new Date(company.lastLogin).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "Never", mono: false, key: "login" },
-    { label: "Country",            value: company.country      || "Ã¢â‚¬â€", mono: false, key: "country" },
+    { label: "Country",            value: company.country      || "—", mono: false, key: "country" },
     { label: "Account Status",     value: company.isActive === false ? "Suspended" : "Active", mono: false, key: "actstatus" },
   ];
 
@@ -222,10 +222,10 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
                   <span style={{ fontSize: 13, color: item.mono ? "#38bdf8" : "#cbd5e1", fontFamily: item.mono ? "monospace" : "inherit", wordBreak: "break-all" }}>
                     {item.value}
                   </span>
-                  {item.value !== "Ã¢â‚¬â€" && (
+                  {item.value !== "—" && (
                     <button onClick={() => copy(item.value, item.key)}
                       style={{ background: "none", border: "none", cursor: "pointer", color: copied === item.key ? "#22c55e" : "#475569", fontSize: 11, padding: "2px 4px", flexShrink: 0 }}>
-                      {copied === item.key ? "Ã¢Å“â€œ" : "Ã¢Å½Ëœ"}
+                      {copied === item.key ? "✓" : "⎘"}
                     </button>
                   )}
                 </div>
@@ -246,7 +246,7 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
           {/* Impersonate */}
           <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(245,158,11,.05)", border: "1px solid rgba(245,158,11,.2)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "#f59e0b", marginBottom: 4 }}>Ã°Å¸â€â€˜ Login as Company User</div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: "#f59e0b", marginBottom: 4 }}>🔑 Login as Company User</div>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", lineHeight: 1.6 }}>
                 Open the dashboard as the owner of this company. This action is logged in the audit trail.
               </div>
@@ -254,7 +254,7 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
             <button
               onClick={() => onImpersonate(company.id)}
               style={{ padding: "8px 18px", borderRadius: 10, background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", fontSize: 12, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap" }}>
-              Open as Owner Ã¢â€ â€™
+              Open as Owner →
             </button>
           </div>
         </div>
@@ -263,9 +263,9 @@ function DetailRow({ company, onImpersonate }: { company: Row; onImpersonate: (i
   );
 }
 
-/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+/* ═══════════════════════════════════════════════════════
    MAIN PAGE
-Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
+═══════════════════════════════════════════════════════ */
 export default function AdminCompaniesPage() {
   const [rows,         setRows]         = useState<Row[] | null>(null);
   const [q,            setQ]            = useState("");
@@ -333,7 +333,7 @@ export default function AdminCompaniesPage() {
       const j = await r.json();
       if (r.ok && j.user) {
         setCurrentUser(j.user);
-        toast.success(`Logged in as ${j.user.name || j.user.email} Ã¢â‚¬â€ opening dashboard`);
+        toast.success(`Logged in as ${j.user.name || j.user.email} — opening dashboard`);
         setTimeout(() => { window.open("/dashboard", "_blank"); }, 500);
       } else {
         toast.error(j.error || "Impersonation failed");
@@ -390,10 +390,10 @@ export default function AdminCompaniesPage() {
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <a href="/admin/audit-trail" style={{ padding: "9px 16px", borderRadius: 10, background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.2)", color: "#f59e0b", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
-            Ã°Å¸â€œâ€¹ Audit Trail
+            📋 Audit Trail
           </a>
           <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-            Ã¢â€ Â» Refresh
+            ↻ Refresh
           </button>
         </div>
       </div>
@@ -407,10 +407,10 @@ export default function AdminCompaniesPage() {
           { label: "Past Due",    value: stats.pastDue,    color: "#f97316" },
           { label: "Enterprise",  value: stats.enterprise, color: "#c4b5fd" },
           { label: "AI: At Risk", value: stats.atRisk,     color: "#ef4444" },
-          { label: "Avg AI Score",value: loading ? "Ã¢â‚¬â€" : avgScore, color: avgScore >= 75 ? "#10b981" : avgScore >= 50 ? "#f59e0b" : "#ef4444" },
+          { label: "Avg AI Score",value: loading ? "—" : avgScore, color: avgScore >= 75 ? "#10b981" : avgScore >= 50 ? "#f59e0b" : "#ef4444" },
         ].map(s => (
           <div key={s.label} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>
-            <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{loading ? "Ã¢â‚¬â€" : s.value}</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{loading ? "—" : s.value}</div>
             <div style={{ fontSize: 11, color: "#475569", fontWeight: 700, marginTop: 2 }}>{s.label}</div>
           </div>
         ))}
@@ -418,7 +418,7 @@ export default function AdminCompaniesPage() {
 
       {/* Filters */}
       <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Ã°Å¸â€Â  Search company, email, country, Stripe ID..."
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="🔍  Search company, email, country, Stripe ID..."
           style={{ flex: 1, minWidth: 220, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 13, outline: "none" }} />
         <select value={filterPlan} onChange={e => setFilterPlan(e.target.value)}
           style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 13, outline: "none", cursor: "pointer" }}>
@@ -456,7 +456,7 @@ export default function AdminCompaniesPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={10} style={{ padding: "60px 0", textAlign: "center", color: "#475569", fontSize: 14 }}>Loading companiesÃ¢â‚¬Â¦</td></tr>
+              <tr><td colSpan={10} style={{ padding: "60px 0", textAlign: "center", color: "#475569", fontSize: 14 }}>Loading companies…</td></tr>
             ) : filtered.length === 0 ? (
               <tr><td colSpan={10} style={{ padding: "60px 0", textAlign: "center", color: "#475569", fontSize: 14 }}>No companies found</td></tr>
             ) : (
@@ -466,7 +466,7 @@ export default function AdminCompaniesPage() {
                     <td style={{ padding: "14px 8px 14px 16px", width: 32 }}>
                       <button onClick={() => setExpanded(expanded === c.id ? null : c.id)}
                         style={{ background: "none", border: "none", cursor: "pointer", color: "#475569", fontSize: 14, width: 24, height: 24, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", transition: "transform .15s", transform: expanded === c.id ? "rotate(90deg)" : "none" }}>
-                        Ã¢â€“Â¶
+                        ▶
                       </button>
                     </td>
                     <td style={{ padding: "14px 16px" }}>
@@ -478,27 +478,27 @@ export default function AdminCompaniesPage() {
                         {BIZ_LABELS[c.businessType || ""] || c.businessType || "Trading"}
                       </span>
                     </td>
-                    <td style={{ padding: "14px 16px", fontSize: 13, color: "#94a3b8" }}>{c.country || "Ã¢â‚¬â€"}</td>
+                    <td style={{ padding: "14px 16px", fontSize: 13, color: "#94a3b8" }}>{c.country || "—"}</td>
                     <td style={{ padding: "14px 16px" }}><PlanBadge plan={c.plan} /></td>
                     <td style={{ padding: "14px 16px" }}><StatusBadge status={c.subscriptionStatus} /></td>
                     <td style={{ padding: "14px 16px" }}><AIScoreBadge score={c.aiScore} health={c.aiHealth} /></td>
                     <td style={{ padding: "14px 16px", fontSize: 13, color: "#94a3b8", textAlign: "center" }}>{c.usersCount}</td>
                     <td style={{ padding: "14px 16px", fontSize: 12, color: "#475569" }}>
-                      {c.currentPeriodEnd ? new Date(c.currentPeriodEnd).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "Ã¢â‚¬â€"}
+                      {c.currentPeriodEnd ? new Date(c.currentPeriodEnd).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "—"}
                     </td>
                     <td style={{ padding: "14px 16px", textAlign: "right" }}>
                       <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
                         <button onClick={() => setChanging(c)} disabled={busy === c.id}
                           style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-                          Ã¢Å“Â¦ Plan
+                          ✦ Plan
                         </button>
                         <button onClick={() => toggleStatus(c)} disabled={busy === c.id}
                           style={{ padding: "5px 12px", borderRadius: 8, background: c.isActive === false ? "rgba(34,197,94,.12)" : "rgba(245,158,11,.12)", border: `1px solid ${c.isActive === false ? "rgba(34,197,94,.25)" : "rgba(245,158,11,.25)"}`, color: c.isActive === false ? "#22c55e" : "#f59e0b", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-                          {busy === c.id ? "Ã¢â‚¬Â¦" : c.isActive === false ? "Activate" : "Suspend"}
+                          {busy === c.id ? "…" : c.isActive === false ? "Activate" : "Suspend"}
                         </button>
                         <button onClick={() => deleteCompany(c.id)} disabled={busy === c.id}
                           style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
-                          {busy === c.id ? "Ã¢â‚¬Â¦" : "Delete"}
+                          {busy === c.id ? "…" : "Delete"}
                         </button>
                       </div>
                     </td>
@@ -514,7 +514,7 @@ export default function AdminCompaniesPage() {
       </div>
 
       <div style={{ marginTop: 12, fontSize: 11, color: "#334155" }}>
-        Showing {filtered.length} of {(rows || []).length} companies Ã‚Â· AI scores refresh on page load
+        Showing {filtered.length} of {(rows || []).length} companies · AI scores refresh on page load
       </div>
 
       {changing && (

@@ -159,7 +159,7 @@ export default function EmployeesPage() {
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 800, color: "white", margin: "0 0 4px" }}>Employees</h1>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", margin: 0 }}>
-              Manage your workforce Ã¢â‚¬â€ {employees.length} employee{employees.length !== 1 ? "s" : ""}
+              Manage your workforce — {employees.length} employee{employees.length !== 1 ? "s" : ""}
             </p>
           </div>
           <button
@@ -228,7 +228,7 @@ export default function EmployeesPage() {
                     required
                     style={inp}
                   >
-                    <option value="">SelectÃ¢â‚¬Â¦</option>
+                    <option value="">Select…</option>
                     {DEPARTMENTS.map(d => (
                       <option key={d} value={d}>{d.charAt(0) + d.slice(1).toLowerCase()}</option>
                     ))}
@@ -295,7 +295,7 @@ export default function EmployeesPage() {
                     cursor: loading ? "not-allowed" : "pointer",
                   }}
                 >
-                  {loading ? "SavingÃ¢â‚¬Â¦" : editing ? "Update Employee" : "Add Employee"}
+                  {loading ? "Saving…" : editing ? "Update Employee" : "Add Employee"}
                 </button>
                 {editing && (
                   <button
@@ -323,7 +323,7 @@ export default function EmployeesPage() {
         {/* Table */}
         {loading && employees.length === 0 ? (
           <div style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>
-            LoadingÃ¢â‚¬Â¦
+            Loading…
           </div>
         ) : (
           <div
@@ -372,7 +372,7 @@ export default function EmployeesPage() {
                       {emp.email}
                     </td>
                     <td style={{ padding: "13px 16px", color: "rgba(255,255,255,.6)" }}>
-                      {emp.designations || "Ã¢â‚¬â€"}
+                      {emp.designations || "—"}
                     </td>
                     <td style={{ padding: "13px 16px" }}>
                       <span

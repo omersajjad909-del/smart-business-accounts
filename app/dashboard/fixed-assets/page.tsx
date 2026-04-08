@@ -258,7 +258,7 @@ export default function FixedAssetsPage() {
                 onClick={() => setShowAssetForm(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                Ã¢Å“â€¢
+                ✕
               </button>
             </div>
 
@@ -398,7 +398,7 @@ export default function FixedAssetsPage() {
                 onClick={() => setShowDepreciationForm(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                Ã¢Å“â€¢
+                ✕
               </button>
             </div>
 
@@ -413,7 +413,7 @@ export default function FixedAssetsPage() {
                   <option value="">Select Asset</option>
                   {assets.filter(a => a.status === 'ACTIVE').map((asset) => (
                     <option key={asset.id} value={asset.id}>
-                      {asset.assetName} ({asset.assetCode}) - Current Value: Ã¢â€šÂ¹{asset.currentValue.toFixed(2)}
+                      {asset.assetName} ({asset.assetCode}) - Current Value: ₹{asset.currentValue.toFixed(2)}
                     </option>
                   ))}
                 </select>
@@ -491,13 +491,13 @@ export default function FixedAssetsPage() {
                           <div className="font-medium">{asset.assetName}</div>
                           <div className="text-sm text-gray-500">{asset.assetCode}</div>
                           {asset.location && (
-                            <div className="text-xs text-gray-400">Ã°Å¸â€œÂ {asset.location}</div>
+                            <div className="text-xs text-gray-400">📍 {asset.location}</div>
                           )}
                         </div>
                       </td>
                       <td className="py-3 px-4">{asset.category}</td>
-                      <td className="py-3 px-4 text-right">Ã¢â€šÂ¹{asset.purchaseValue.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right font-medium">Ã¢â€šÂ¹{asset.currentValue.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right">₹{asset.purchaseValue.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right font-medium">₹{asset.currentValue.toFixed(2)}</td>
                       <td className="py-3 px-4">
                         <div className="text-sm">
                           <div>{asset.depreciationMethod.replace('_', ' ')}</div>
@@ -531,10 +531,10 @@ export default function FixedAssetsPage() {
                     </div>
                     <MobileCardRow label="Category" value={asset.category} />
                     {asset.location && <MobileCardRow label="Location" value={asset.location} />}
-                    <MobileCardRow label="Purchase Value" value={`Ã¢â€šÂ¹${asset.purchaseValue.toFixed(2)}`} />
+                    <MobileCardRow label="Purchase Value" value={`₹${asset.purchaseValue.toFixed(2)}`} />
                     <MobileCardRow 
                       label="Current Value" 
-                      value={`Ã¢â€šÂ¹${asset.currentValue.toFixed(2)}`}
+                      value={`₹${asset.currentValue.toFixed(2)}`}
                       valueClassName="font-medium"
                     />
                     <MobileCardRow 
@@ -573,7 +573,7 @@ export default function FixedAssetsPage() {
                 }}
                 className="text-blue-600 hover:text-blue-800 mb-2"
               >
-                Ã¢â€ Â Back to Assets
+                ← Back to Assets
               </button>
               <h2 className="text-lg font-semibold">
                 Depreciation History - {assets.find(a => a.id === selectedAsset)?.assetName}
@@ -609,9 +609,9 @@ export default function FixedAssetsPage() {
                   {depreciations.map((dep) => (
                     <tr key={dep.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 px-4">{fmtDate(dep.date)}</td>
-                      <td className="py-3 px-4 text-right text-red-600">Ã¢â€šÂ¹{dep.amount.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right">Ã¢â€šÂ¹{dep.accumulatedDepreciation.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right font-medium">Ã¢â€šÂ¹{dep.bookValue.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right text-red-600">₹{dep.amount.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right">₹{dep.accumulatedDepreciation.toFixed(2)}</td>
+                      <td className="py-3 px-4 text-right font-medium">₹{dep.bookValue.toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -624,16 +624,16 @@ export default function FixedAssetsPage() {
                     <MobileCardRow label="Date" value={fmtDate(dep.date)} />
                     <MobileCardRow 
                       label="Depreciation Amount" 
-                      value={`Ã¢â€šÂ¹${dep.amount.toFixed(2)}`}
+                      value={`₹${dep.amount.toFixed(2)}`}
                       valueClassName="text-red-600"
                     />
                     <MobileCardRow 
                       label="Accumulated" 
-                      value={`Ã¢â€šÂ¹${dep.accumulatedDepreciation.toFixed(2)}`}
+                      value={`₹${dep.accumulatedDepreciation.toFixed(2)}`}
                     />
                     <MobileCardRow 
                       label="Book Value" 
-                      value={`Ã¢â€šÂ¹${dep.bookValue.toFixed(2)}`}
+                      value={`₹${dep.bookValue.toFixed(2)}`}
                       valueClassName="font-medium"
                     />
                   </MobileCard>

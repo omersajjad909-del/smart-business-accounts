@@ -517,7 +517,7 @@ export default function PaymentReceiptsPage() {
                         onClick={() => handleClearCheque(receipt)}
                         className="text-green-600 hover:text-green-800 font-medium text-sm"
                       >
-                        Clear Ã¢Å“â€œ
+                        Clear ✓
                       </button>
                     )}
                     <button

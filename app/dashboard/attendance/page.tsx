@@ -220,7 +220,7 @@ export default function AttendancePage() {
       className="flex flex-col md:flex-row overflow-hidden"
       style={{ height: "100%", minHeight: 0, background: "#060918" }}
     >
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ SIDEBAR: Employee List Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* ── SIDEBAR: Employee List ─────────────────────── */}
       <div
         className="w-full md:w-72 shrink-0 flex flex-col z-10"
         style={{
@@ -268,7 +268,7 @@ export default function AttendancePage() {
         </div>
       </div>
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ MAIN CONTENT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* ── MAIN CONTENT ───────────────────────────────── */}
       <div className="flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
 
         {/* Header */}
@@ -335,7 +335,7 @@ export default function AttendancePage() {
           <div className="flex-1 overflow-auto" style={{ padding: "16px 24px 24px" }}>
             {loading ? (
               <div style={{ paddingTop: 60, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13 }}>
-                LoadingÃ¢â‚¬Â¦
+                Loading…
               </div>
             ) : (
               <div
@@ -443,7 +443,7 @@ export default function AttendancePage() {
                               lineHeight: 1,
                             }}
                           >
-                            Ã¢Å“â€¢
+                            ✕
                           </button>
                         )}
                       </div>
@@ -468,7 +468,7 @@ export default function AttendancePage() {
                           </span>
                           {(record.checkIn || record.checkOut) && (
                             <div style={{ fontSize: 9, textAlign: "center", color: "rgba(255,255,255,.3)", marginTop: 4, fontFamily: "monospace" }}>
-                              {formatTime(record.checkIn)} Ã¢â‚¬â€œ {formatTime(record.checkOut)}
+                              {formatTime(record.checkIn)} – {formatTime(record.checkOut)}
                             </div>
                           )}
                         </div>
@@ -502,14 +502,14 @@ export default function AttendancePage() {
             className="flex-1 flex flex-col items-center justify-center"
             style={{ color: "rgba(255,255,255,.2)" }}
           >
-            <div style={{ fontSize: 48, marginBottom: 16 }}>Ã°Å¸â€˜Ë†</div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>👈</div>
             <p style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>Select an employee from the sidebar</p>
             <p style={{ fontSize: 12, marginTop: 6 }}>to view and manage their attendance calendar</p>
           </div>
         )}
       </div>
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ MODAL Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */}
+      {/* ── MODAL ──────────────────────────────────────── */}
       {selectedDate && selectedEmployeeId && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -542,7 +542,7 @@ export default function AttendancePage() {
                 onClick={() => setSelectedDate(null)}
                 style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", cursor: "pointer", fontSize: 16 }}
               >
-                Ã¢Å“â€¢
+                ✕
               </button>
             </div>
 
@@ -613,7 +613,7 @@ export default function AttendancePage() {
                 </label>
                 <input
                   type="text"
-                  placeholder="Optional noteÃ¢â‚¬Â¦"
+                  placeholder="Optional note…"
                   value={formData.remarks}
                   onChange={e => setFormData({ ...formData, remarks: e.target.value })}
                   style={{
@@ -645,7 +645,7 @@ export default function AttendancePage() {
                   transition: "all .2s",
                 }}
               >
-                {loading ? "SavingÃ¢â‚¬Â¦" : "Save Record"}
+                {loading ? "Saving…" : "Save Record"}
               </button>
             </form>
           </div>

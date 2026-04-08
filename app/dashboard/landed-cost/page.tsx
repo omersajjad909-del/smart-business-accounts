@@ -188,7 +188,7 @@ export default function LandedCostPage() {
       {/* Loading */}
       {loading && (
         <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
-          Loading landed cost entriesÃ¢â‚¬Â¦
+          Loading landed cost entries…
         </div>
       )}
 
@@ -389,7 +389,7 @@ export default function LandedCostPage() {
                   cursor: saving ? "not-allowed" : "pointer", opacity: saving ? .7 : 1,
                 }}
               >
-                {saving ? "SavingÃ¢â‚¬Â¦" : "Create Entry"}
+                {saving ? "Saving…" : "Create Entry"}
               </button>
             </div>
           </div>

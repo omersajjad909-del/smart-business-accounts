@@ -102,7 +102,7 @@ export default function TaxConfigurationPage() {
     setFormData({
       taxType: tax.taxType,
       taxCode: tax.taxCode,
-      taxRate: tax.taxRate.toString(), // Ã¢Å“â€¦ FIX
+      taxRate: tax.taxRate.toString(), // ✅ FIX
       description: tax.description || '',
     });
 

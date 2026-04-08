@@ -299,7 +299,7 @@ function getStatusBadge(status: string) {
   return (
     <ResponsiveContainer>
       <PageHeader
-        title="Ã°Å¸â€™Â° Advance Payment to Suppliers"
+        title="💰 Advance Payment to Suppliers"
         description="Track supplier advances and adjust against invoices"
         action={{
           label: showForm ? "Cancel" : "+ New Advance Payment",

@@ -350,7 +350,7 @@ export default function CreditLimitsPage() {
                   cursor: saving ? "not-allowed" : "pointer", opacity: saving ? .7 : 1,
                 }}
               >
-                {saving ? "SavingÃ¢â‚¬Â¦" : editId ? "Update" : "Save Limit"}
+                {saving ? "Saving…" : editId ? "Update" : "Save Limit"}
               </button>
             </div>
           </div>

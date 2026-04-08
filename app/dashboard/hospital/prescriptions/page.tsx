@@ -145,7 +145,7 @@ export default function PrescriptionsPage() {
                   {rx.medicines.length} medicine{rx.medicines.length !== 1 ? "s" : ""}
                 </span>
                 <span style={{ background: `${statusColors[rx.status]}22`, color: statusColors[rx.status], padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600, textTransform: "capitalize" }}>{rx.status}</span>
-                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 16 }}>{expanded === rx.id ? "Ã¢â€“Â²" : "Ã¢â€“Â¼"}</span>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 16 }}>{expanded === rx.id ? "▲" : "▼"}</span>
               </div>
             </div>
 
@@ -197,7 +197,7 @@ export default function PrescriptionsPage() {
           <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 620, maxHeight: "88vh", overflowY: "auto", fontFamily: ff }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Create Prescription</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer" }}>Ã¢Å“â€¢</button>
+              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.26)", borderRadius: 8, color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
@@ -228,7 +228,7 @@ export default function PrescriptionsPage() {
                 ))}
                 <input type="number" value={m.qty} onChange={e => updateMed(i, "qty", Number(e.target.value))} placeholder="Qty"
                   style={{ background: bg, border: `1px solid ${border}`, borderRadius: 6, padding: "7px 8px", color: "#fff", fontFamily: ff, fontSize: 13, boxSizing: "border-box" }} />
-                <button onClick={() => removeMed(i)} style={{ background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>Ã¢Å“â€¢</button>
+                <button onClick={() => removeMed(i)} style={{ background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>✕</button>
               </div>
             ))}
 

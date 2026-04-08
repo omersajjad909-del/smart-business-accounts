@@ -214,7 +214,7 @@ export default function PurchaseOrderPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setSavedPO(data);   // Ã°Å¸â€Â¥ IMPORTANT
+        setSavedPO(data);   // 🔥 IMPORTANT
         setPreview(true);
         await loadPOs();
 
@@ -322,7 +322,7 @@ export default function PurchaseOrderPage() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Ã¢Å“â€¦ Email sent successfully!");
+        toast.success("✅ Email sent successfully!");
         setEmailModalOpen(false);
       } else {
         toast.error(data.error || "Failed to send email");
@@ -428,7 +428,7 @@ export default function PurchaseOrderPage() {
                     disabled={sendingEmail}
                     className="bg-blue-600 text-white px-6 py-2 rounded font-bold uppercase disabled:bg-gray-400"
                   >
-                    {sendingEmail ? "Sending..." : "Ã°Å¸â€œÂ§ Email"}
+                    {sendingEmail ? "Sending..." : "📧 Email"}
                   </button>
                   <button
                     onClick={() => setPreview(false)}
