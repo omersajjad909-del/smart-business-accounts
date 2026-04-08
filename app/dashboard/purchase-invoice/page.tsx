@@ -69,6 +69,41 @@ type Currency = {
   exchangeRate: number;
 };
 
+const FONT = "'Outfit','Inter',sans-serif";
+const ACCENT = "#6366f1";
+const PANEL = "var(--panel-bg)";
+const BORDER = "var(--border)";
+const TEXT = "var(--text-primary)";
+const MUTED = "var(--text-muted)";
+const BG = "var(--app-bg)";
+
+function inp(extra?: React.CSSProperties): React.CSSProperties {
+  return {
+    padding: "9px 13px",
+    borderRadius: 8,
+    border: `1.5px solid ${BORDER}`,
+    background: BG,
+    color: TEXT,
+    fontFamily: FONT,
+    fontSize: 13.5,
+    outline: "none",
+    width: "100%",
+    boxSizing: "border-box" as const,
+    ...extra,
+  };
+}
+
+function labelStyle(): React.CSSProperties {
+  return {
+    fontSize: 10.5,
+    color: MUTED,
+    fontWeight: 700,
+    marginBottom: 5,
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  };
+}
+
 function PurchaseInvoiceContent() {
   const searchParams = useSearchParams();
   const queryId = searchParams.get("id");
@@ -438,19 +473,22 @@ const [searchTerm, setSearchTerm] = useState("");
 
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold">Purchase Invoice</h1>
-        <div className="flex gap-2">
+    <div style={{ padding: 24, maxWidth: 1380, margin: "0 auto", fontFamily: FONT, color: TEXT }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
+        <div>
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Purchase Invoice</h1>
+          <p style={{ margin: "3px 0 0", fontSize: 13, color: MUTED }}>{invoices.length} total purchase invoices</p>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
           <button
-            onClick={() => { setShowList(!showList); setShowForm(!showForm); setEditing(null); }}
-            className="bg-gray-600 text-white px-4 py-2 rounded"
+            onClick={() => { setShowList(!showList); setShowForm(showList); setEditing(null); }}
+            style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(99,102,241,0.12)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}
           >
             {showList ? "Hide List" : "Show List"}
           </button>
           <button
             onClick={() => { setShowForm(true); setShowList(false); resetForm(); }}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(37,99,235,0.35)" }}
           >
             + New Invoice
           </button>
@@ -459,68 +497,63 @@ const [searchTerm, setSearchTerm] = useState("");
 
       {/* LIST VIEW */}
       {showList && (
-        <div className="bg-white border rounded overflow-x-auto">
-          <table className="w-full text-sm min-w-[800px]">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3 text-left">Invoice No</th>
-                <th className="p-3 text-left">Date</th>
-                <th className="p-3 text-left">Supplier</th>
-                <th className="p-3 text-right">Total</th>
-                <th className="p-3 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredInvoices.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="p-4 text-center text-gray-400">No invoices found</td>
+        <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden" }}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 800 }}>
+              <thead>
+                <tr style={{ background: "rgba(99,102,241,0.07)" }}>
+                  <th style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Invoice No</th>
+                  <th style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Date</th>
+                  <th style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Supplier</th>
+                  <th style={{ padding: "12px 16px", textAlign: "right", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Total</th>
+                  <th style={{ padding: "12px 16px", textAlign: "center", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Actions</th>
                 </tr>
-              ) : (
-                filteredInvoices.map(inv => (
-                  <tr key={inv.id} className="border-t hover:bg-gray-50">
-                    <td className="p-3 font-bold">{inv.invoiceNo}</td>
-                    <td className="p-3">{fmtDate(inv.date)}</td>
-                    <td className="p-3">{inv.supplier?.name || "N/A"}</td>
-                    <td className="p-3 text-right">{inv.total.toLocaleString()}</td>
-                    <td className="p-3 text-center space-x-2">
-                      <button
-                        onClick={() => startEdit(inv)}
-                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => deleteInvoice(inv.id)}
-                        className="text-red-600 hover:text-red-800 font-medium text-sm"
-                      >
-                        Delete
-                      </button>
-                    </td>
+              </thead>
+              <tbody>
+                {filteredInvoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No invoices found</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  filteredInvoices.map(inv => (
+                    <tr key={inv.id} style={{ borderTop: `1px solid ${BORDER}` }}>
+                      <td style={{ padding: "13px 16px", fontWeight: 700, color: ACCENT, fontFamily: "monospace", fontSize: 13 }}>{inv.invoiceNo}</td>
+                      <td style={{ padding: "13px 16px", color: MUTED }}>{fmtDate(inv.date)}</td>
+                      <td style={{ padding: "13px 16px", fontWeight: 600 }}>{inv.supplier?.name || "N/A"}</td>
+                      <td style={{ padding: "13px 16px", textAlign: "right", fontWeight: 700 }}>{inv.total.toLocaleString()}</td>
+                      <td style={{ padding: "13px 16px", textAlign: "center", whiteSpace: "nowrap" }}>
+                        <button onClick={() => startEdit(inv)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(99,102,241,0.35)", background: "rgba(99,102,241,0.08)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer", marginRight: 8 }}>Edit</button>
+                        <button onClick={() => deleteInvoice(inv.id)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ padding: "11px 18px", borderTop: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{filteredInvoices.length} invoices in view</div>
         </div>
       )}
 
       {/* FORM */}
       {showForm && (
         <>
-          <div className="flex justify-between items-center bg-gray-50 p-4 border rounded print:hidden">
-            <div>
-              <h1 className="text-xl font-bold">
-                {editing ? "Edit Invoice" : "Purchase Invoice"}
-              </h1>
-              {invoiceId && (
-                <div className="mt-1">
-                   <Barcode value={invoiceId} width={1} height={30} fontSize={12} displayValue={true} />
+          <div className="print:hidden" style={{ background: PANEL, border: `1.5px solid ${BORDER}`, borderRadius: 16, overflow: "hidden", marginTop: showList ? 24 : 0 }}>
+            <div style={{ padding: "16px 22px", borderBottom: `1px solid ${BORDER}`, background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10, width: "100%" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(37,99,235,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
+                    <path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M8 9h3"/>
+                  </svg>
                 </div>
-              )}
-            </div>
-            <div className="flex gap-3">
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 15 }}>{editing ? "Edit Purchase Invoice" : "New Purchase Invoice"}</div>
+                  <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>Follow the same clean workflow as PO and GRN, with faster matching and clearer totals</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
               {!showPreview ? (
-                <button onClick={saveInvoice} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold shadow-md transition-all">
+                <button onClick={saveInvoice} disabled={saving} style={{ padding: "9px 22px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1, boxShadow: "0 4px 14px rgba(37,99,235,0.35)" }}>
                   {saving ? "Saving..." : editing ? "Update Invoice" : "Save & Preview"}
                 </button>
               ) : (
@@ -532,57 +565,60 @@ const [searchTerm, setSearchTerm] = useState("");
   placeholder="Search invoices..."
   value={searchTerm}
   onChange={(e) => setSearchTerm(e.target.value)}
-  className="border px-3 py-2 rounded w-full md:w-64"
+  style={{ ...inp({ width: 220 }) }}
 />
 
-                  <button onClick={() => window.print()} className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold shadow-md">
-                    Print / Download PDF
+                  <button onClick={() => window.print()} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#16a34a,#22c55e)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                    Print / PDF
                   </button>
                   <button 
                     onClick={sendInvoiceEmail} 
                     disabled={sendingEmail}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold shadow-md disabled:bg-gray-400"
+                    style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "rgba(99,102,241,0.14)", color: TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: sendingEmail ? "not-allowed" : "pointer", opacity: sendingEmail ? 0.7 : 1 }}
                   >
-                    {sendingEmail ? "Sending..." : "📧 Email"}
+                    {sendingEmail ? "Sending..." : "Email Invoice"}
                   </button>
-                  <button onClick={() => setShowPreview(false)} className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded border font-bold">
+                  <button onClick={() => setShowPreview(false)} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                     Back to Edit
                   </button>
                 </>
               )}
-              <button onClick={() => { setShowForm(false); setEditing(null); resetForm(); }} className="bg-gray-600 text-white px-6 py-2 rounded font-bold">
+              <button onClick={() => { setShowForm(false); setEditing(null); resetForm(); }} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>
                 Cancel
               </button>
             </div>
           </div>
 
           {!showPreview && (
-            <div className="bg-white border p-6 rounded space-y-6 shadow-sm">
-              <div className="mb-2 text-xs text-gray-500 italic">
-              Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Supplier | <strong>F8</strong> = Search Query
+            <div style={{ padding: 22 }}>
+              <div style={{ marginBottom: 16, fontSize: 12, color: MUTED, fontStyle: "italic" }}>
+                Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Supplier | <strong>F8</strong> = Search Query
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 14, marginBottom: 18 }}>
                 <div>
-                  <label className="text-xs font-bold">Supplier (F7: Clear, F8: Query)</label>
-                  <select ref={supplierRef} className="border p-2 rounded w-full" value={supplierId} onChange={e => handleSupplierChange(e.target.value)}>
+                  <div style={labelStyle()}>Supplier (F7 / F8)</div>
+                  <select ref={supplierRef} value={supplierId} onChange={e => handleSupplierChange(e.target.value)} style={inp()}>
                     <option value="">Select Supplier</option>
                     {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
                 </div>
 
-                <select className="border p-2 bg-yellow-50 rounded" value={selectedPoId} onChange={e => handlePoSelection(e.target.value)}>
-                  <option value="">-- Select PO --</option>
-                  {filteredPOs.map(p => <option key={p.id} value={p.id}>{p.poNo}</option>)}
-                </select>
+                <div>
+                  <div style={labelStyle()}>Against Purchase Order</div>
+                  <select value={selectedPoId} onChange={e => handlePoSelection(e.target.value)} style={inp()}>
+                    <option value="">-- Select PO --</option>
+                    {filteredPOs.map(p => <option key={p.id} value={p.id}>{p.poNo}</option>)}
+                  </select>
+                </div>
 
                 <div>
-                  <label className="text-xs font-bold">Date (F7: Clear)</label>
-                  <input type="date" className="border p-2 rounded w-full" value={date} onChange={e => setDate(e.target.value)} />
+                  <div style={labelStyle()}>Invoice Date</div>
+                  <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{ ...inp(), colorScheme: "dark" }} />
                 </div>
-                <div className="flex flex-col">
-                  <label className="text-xs font-bold">Currency</label>
+                <div>
+                  <div style={labelStyle()}>Currency</div>
                   <select
-                    className="border p-2 rounded"
+                    style={inp()}
                     value={currencyId}
                     onChange={(e) => {
                       const nextId = e.target.value;
@@ -599,20 +635,20 @@ const [searchTerm, setSearchTerm] = useState("");
                     ))}
                   </select>
                 </div>
-                <div className="flex flex-col">
-                  <label className="text-xs font-bold">Exchange Rate</label>
+                <div>
+                  <div style={labelStyle()}>Exchange Rate</div>
                   <input
                     type="number"
-                    className="border p-2 rounded"
+                    style={inp()}
                     value={exchangeRate}
                     onChange={(e) => setExchangeRate(Number(e.target.value) || 1)}
                   />
                 </div>
 
-                <div className="flex flex-col">
-                  <label className="text-xs font-bold">Approval Status</label>
+                <div>
+                  <div style={labelStyle()}>Approval Status</div>
                   <select
-                    className="border p-2 rounded"
+                    style={inp()}
                     value={approvalStatus}
                     onChange={(e) => setApprovalStatus(e.target.value)}
                   >
@@ -623,71 +659,89 @@ const [searchTerm, setSearchTerm] = useState("");
                   </select>
                 </div>
 
-                <select className="border p-2 rounded" value={location} onChange={e => setLocation(e.target.value)}>
-                  <option value="MAIN">Main</option>
-                  <option value="SHOP">Shop</option>
-                </select>
+                <div>
+                  <div style={labelStyle()}>Location</div>
+                  <select value={location} onChange={e => setLocation(e.target.value)} style={inp()}>
+                    <option value="MAIN">Main</option>
+                    <option value="SHOP">Shop</option>
+                  </select>
+                </div>
+                <div>
+                  <div style={labelStyle()}>Invoice Code</div>
+                  <div style={{ ...inp({ fontFamily: "monospace", fontWeight: 700, color: ACCENT, background: "rgba(99,102,241,0.06)" }) }}>{invoiceId || "Auto-generated after save"}</div>
+                </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full border text-sm min-w-[600px]">
-                  <thead className="bg-gray-100 font-bold">
-                  <tr>
-                    <th className="border p-2 text-left">Item</th>
-                    <th className="border p-2 w-24 text-center">Qty</th>
-                    <th className="border p-2 w-32 text-center">Rate</th>
-                    <th className="border p-2 w-32 text-right">Amount</th>
+              <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 330px", gap: 18, alignItems: "start" }}>
+                <div style={{ background: "rgba(255,255,255,0.02)", border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden" }}>
+                  <div style={{ padding: "14px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>Invoice Items</div>
+                      <div style={{ fontSize: 11, color: MUTED }}>Pulled from PO or adjusted before posting</div>
+                    </div>
+                    <div style={{ fontSize: 12, color: MUTED }}>{rows.length} line items</div>
+                  </div>
+                  <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
+                  <thead>
+                  <tr style={{ background: "rgba(99,102,241,0.07)" }}>
+                    <th style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Item</th>
+                    <th style={{ padding: "12px 16px", textAlign: "center", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7, width: 110 }}>Qty</th>
+                    <th style={{ padding: "12px 16px", textAlign: "center", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7, width: 140 }}>Rate</th>
+                    <th style={{ padding: "12px 16px", textAlign: "right", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7, width: 150 }}>Amount</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r, i) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                      <td className="border p-2">
-                        <div className="font-medium uppercase">{r.name}</div>
-                        {r.description && <div className="text-xs text-gray-500">{r.description}</div>}
+                    <tr key={i} style={{ borderTop: `1px solid ${BORDER}` }}>
+                      <td style={{ padding: "14px 16px" }}>
+                        <div style={{ fontWeight: 700, color: TEXT }}>{r.name || "Unselected Item"}</div>
+                        {r.description && <div style={{ fontSize: 12, color: MUTED, marginTop: 3 }}>{r.description}</div>}
                       </td>
-                      <td className="border p-2">
-                        <input type="number" className="w-full text-center outline-none" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} />
+                      <td style={{ padding: "12px 10px" }}>
+                        <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ ...inp({ textAlign: "center", padding: "8px 10px" }) }} />
                       </td>
-                      <td className="border p-2">
-                        <input type="number" className="w-full text-center outline-none" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} />
+                      <td style={{ padding: "12px 10px" }}>
+                        <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={{ ...inp({ textAlign: "center", padding: "8px 10px" }) }} />
                       </td>
-                      <td className="border p-2 text-right font-mono font-bold">{(Number(r.qty) * Number(r.rate) || 0).toLocaleString()}</td>
+                      <td style={{ padding: "14px 16px", textAlign: "right", fontFamily: "monospace", fontWeight: 700 }}>{(Number(r.qty) * Number(r.rate) || 0).toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
                 </table>
-              </div>
+                  </div>
+                </div>
 
-              <div className="flex justify-end">
-                <div className="w-80 p-4 border bg-gray-50 rounded space-y-2">
-                  <div className="flex justify-between text-sm"><span>Gross Total:</span><span>{total.toLocaleString()}</span></div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span>Freight:</span>
-                    <input type="number" className="border w-32 text-right p-1 rounded" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} />
+                <div style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18, position: "sticky", top: 24 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Totals & Charges</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 12 }}>
+                    <span style={{ color: MUTED }}>Gross Total</span>
+                    <strong>{total.toLocaleString()}</strong>
+                  </div>
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={labelStyle()}>Freight</div>
+                    <input type="number" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} style={{ ...inp({ textAlign: "right" }) }} />
                   </div>
                   
                   {/* Tax Section */}
-                  <div className="border-t pt-2 space-y-2">
+                  <div style={{ paddingTop: 14, borderTop: `1px solid ${BORDER}`, marginBottom: 14 }}>
                     <button
                       type="button"
                       onClick={() => {
                         setApplyTax(!applyTax);
                         if (!applyTax) setSelectedTaxId("");
                       }}
-                      className={`w-full py-1 px-2 rounded font-semibold text-sm ${
-                        applyTax ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
-                      }`}
+                      style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "none", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", background: applyTax ? "linear-gradient(135deg,#2563eb,#3b82f6)" : "rgba(255,255,255,0.06)", color: applyTax ? "#fff" : TEXT }}
                     >
-                      {applyTax ? "✓ Tax Applied" : "+ Add Tax"}
+                      {applyTax ? "Tax Applied" : "+ Add Tax"}
                     </button>
                     
                     {applyTax && (
-                      <div className="space-y-2">
+                      <div style={{ marginTop: 12 }}>
                         <select
                           value={selectedTaxId}
                           onChange={e => setSelectedTaxId(e.target.value)}
-                          className="w-full border p-1 text-sm"
+                          style={inp()}
                         >
                           <option value="">Select Tax</option>
                           {taxes.map(tax => (
@@ -697,16 +751,22 @@ const [searchTerm, setSearchTerm] = useState("");
                           ))}
                         </select>
                         {selectedTax && (
-                          <div className="flex justify-between text-sm text-blue-600">
+                          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, fontSize: 13, color: "#60a5fa" }}>
                             <span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span>
-                            <span>{taxAmount.toLocaleString()}</span>
+                            <strong>{taxAmount.toLocaleString()}</strong>
                           </div>
                         )}
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex justify-between font-black text-lg border-t pt-2 text-blue-900 uppercase"><span>Net Payable:</span><span>{netTotal.toLocaleString()}</span></div>
+                  <div style={{ paddingTop: 14, borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, letterSpacing: 0.7, textTransform: "uppercase" }}>Net Payable</div>
+                      <div style={{ fontSize: 22, fontWeight: 800, marginTop: 3 }}>{netTotal.toLocaleString()}</div>
+                    </div>
+                    <div style={{ fontSize: 12, color: MUTED, textAlign: "right" }}>{supplierName || "No supplier selected"}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -797,6 +857,7 @@ const [searchTerm, setSearchTerm] = useState("");
               </div>
             </div>
           )}
+          </div>
         </>
       )}
     </div>
