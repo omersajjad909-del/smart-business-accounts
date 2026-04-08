@@ -281,12 +281,13 @@ function AuthPageInner() {
         .auth-right-panel { animation: auth-fade-up 0.6s 0.1s ease both; }
         @media (max-width: 900px) {
           .auth-left-col { display: none !important; }
-          .auth-grid { grid-template-columns: 1fr !important; }
-          .auth-right-col { padding: 24px 16px !important; }
+          .auth-page { height: 100dvh !important; min-height: unset !important; overflow: hidden !important; }
+          .auth-grid { grid-template-columns: 1fr !important; height: 100dvh !important; min-height: unset !important; }
+          .auth-right-col { padding: 16px !important; height: 100dvh !important; overflow-y: auto !important; align-items: center !important; justify-content: center !important; }
           .auth-mobile-logo { display: inline-flex !important; }
         }
         @media (max-width: 480px) {
-          .auth-card { padding: 24px 20px !important; border-radius: 24px !important; }
+          .auth-card { padding: 20px 18px !important; border-radius: 20px !important; }
           .auth-otp-row { gap: 8px !important; }
           .auth-otp-box { width: 42px !important; height: 52px !important; font-size: 20px !important; }
         }
