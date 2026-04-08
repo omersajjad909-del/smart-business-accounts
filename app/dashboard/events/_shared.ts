@@ -4,6 +4,32 @@ import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const eventsAccent = "#fb7185";
 
+export type EventsControlCenter = {
+  summary: {
+    bookings: number;
+    confirmedBookings: number;
+    tentativeBookings: number;
+    vendors: number;
+    activeVendors: number;
+    budgetLines: number;
+    plannedSpend: number;
+    pipelineValue: number;
+  };
+  bookings: ReturnType<typeof mapEventBooking>[];
+  vendors: ReturnType<typeof mapEventVendor>[];
+  budgets: ReturnType<typeof mapEventBudget>[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function mapEventBooking(record: BusinessRecord) {
   return {
     id: record.id,

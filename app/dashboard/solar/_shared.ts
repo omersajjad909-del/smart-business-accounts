@@ -4,6 +4,32 @@ import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const solarAccent = "#fbbf24";
 
+export type SolarControlCenter = {
+  summary: {
+    projects: number;
+    liveProjects: number;
+    commissionedProjects: number;
+    equipmentItems: number;
+    lowStockEquipment: number;
+    amcContracts: number;
+    pendingVisits: number;
+    pipelineBudget: number;
+  };
+  projects: ReturnType<typeof mapSolarProject>[];
+  equipment: ReturnType<typeof mapSolarEquipment>[];
+  amc: ReturnType<typeof mapSolarAmc>[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function mapSolarProject(record: BusinessRecord) {
   return {
     id: record.id,
