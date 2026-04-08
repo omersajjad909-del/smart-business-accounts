@@ -1,34 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  hotelBg,
-  hotelBorder,
-  hotelFont,
-  hotelMuted,
-  mapHousekeepingRecords,
-  mapReservationRecords,
-  mapRoomRecords,
-  mapRoomServiceRecords,
-} from "./_shared";
+import { useEffect, useState } from "react";
+import { HotelControlCenter, fetchJson, hotelBg, hotelBorder, hotelFont, hotelMuted } from "./_shared";
+
+const emptyState: HotelControlCenter = {
+  summary: { rooms: 0, occupiedRooms: 0, occupancyRate: 0, checkedInGuests: 0, reservedGuests: 0, serviceRevenue: 0, pendingHousekeeping: 0, maintenanceRooms: 0 },
+  rooms: [],
+  reservations: [],
+  housekeeping: [],
+  serviceOrders: [],
+};
 
 export default function HotelOverviewPage() {
-  const roomStore = useBusinessRecords("hotel_room");
-  const reservationStore = useBusinessRecords("hotel_reservation");
-  const housekeepingStore = useBusinessRecords("housekeeping_task");
-  const serviceStore = useBusinessRecords("room_service_order");
+  const [data, setData] = useState(emptyState);
 
-  const rooms = useMemo(() => mapRoomRecords(roomStore.records), [roomStore.records]);
-  const reservations = useMemo(() => mapReservationRecords(reservationStore.records), [reservationStore.records]);
-  const housekeeping = useMemo(() => mapHousekeepingRecords(housekeepingStore.records), [housekeepingStore.records]);
-  const serviceOrders = useMemo(() => mapRoomServiceRecords(serviceStore.records), [serviceStore.records]);
+  useEffect(() => {
+    fetchJson("/api/hotel/control-center", emptyState).then(setData);
+  }, []);
 
-  const occupied = rooms.filter((row) => row.status === "occupied").length;
-  const occupancyRate = rooms.length ? Math.round((occupied / rooms.length) * 100) : 0;
-  const checkedIn = reservations.filter((row) => row.status === "checked_in").length;
-  const serviceRevenue = serviceOrders.filter((row) => row.status === "delivered").reduce((sum, row) => sum + row.amount, 0);
+  const { summary, rooms, reservations, housekeeping, serviceOrders } = data;
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: hotelFont }}>
@@ -54,10 +45,10 @@ export default function HotelOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Rooms", value: rooms.length, color: "#fb923c" },
-          { label: "Occupancy", value: `${occupancyRate}%`, color: "#34d399" },
-          { label: "Checked-In Guests", value: checkedIn, color: "#60a5fa" },
-          { label: "Room Service Revenue", value: `Rs. ${serviceRevenue.toLocaleString()}`, color: "#f59e0b" },
+          { label: "Rooms", value: summary.rooms, color: "#fb923c" },
+          { label: "Occupancy", value: `${summary.occupancyRate}%`, color: "#34d399" },
+          { label: "Checked-In Guests", value: summary.checkedInGuests, color: "#60a5fa" },
+          { label: "Room Service Revenue", value: `Rs. ${summary.serviceRevenue.toLocaleString()}`, color: "#f59e0b" },
         ].map((card) => (
           <div key={card.label} style={{ background: hotelBg, border: `1px solid ${hotelBorder}`, borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 12, color: hotelMuted, marginBottom: 8 }}>{card.label}</div>
@@ -86,9 +77,9 @@ export default function HotelOverviewPage() {
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
               { label: "Available rooms", value: rooms.filter((row) => row.status === "available").length, color: "#34d399" },
-              { label: "Cleaning tasks", value: housekeeping.filter((row) => row.status !== "completed").length, color: "#f59e0b" },
+              { label: "Cleaning tasks", value: summary.pendingHousekeeping, color: "#f59e0b" },
               { label: "Preparing room service", value: serviceOrders.filter((row) => row.status === "preparing").length, color: "#60a5fa" },
-              { label: "Maintenance rooms", value: rooms.filter((row) => row.status === "maintenance").length, color: "#f87171" },
+              { label: "Maintenance rooms", value: summary.maintenanceRooms, color: "#f87171" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13, color: hotelMuted }}>{row.label}</span>

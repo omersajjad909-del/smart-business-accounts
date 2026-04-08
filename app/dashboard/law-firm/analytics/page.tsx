@@ -1,16 +1,7 @@
 "use client";
 
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  lawBg,
-  lawBorder,
-  lawFont,
-  lawMuted,
-  mapLawBilling,
-  mapLawCases,
-  mapLawClients,
-  mapTimeEntries,
-} from "../_shared";
+import { useEffect, useMemo, useState } from "react";
+import { LawControlCenter, fetchJson, lawBg, lawBorder, lawFont, lawMuted } from "../_shared";
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
@@ -22,24 +13,32 @@ function Metric({ title, value, note, color }: { title: string; value: string; n
   );
 }
 
+const emptyState: LawControlCenter = {
+  summary: { cases: 0, activeCases: 0, hearingsThisWeek: 0, clients: 0, outstanding: 0, paidRevenue: 0, totalBilled: 0, billableHours: 0, unbilledTime: 0 },
+  cases: [],
+  clients: [],
+  invoices: [],
+  entries: [],
+};
+
 export default function LawAnalyticsPage() {
-  const cases = mapLawCases(useBusinessRecords("legal_case").records);
-  const clients = mapLawClients(useBusinessRecords("legal_client").records);
-  const invoices = mapLawBilling(useBusinessRecords("legal_invoice").records);
-  const entries = mapTimeEntries(useBusinessRecords("time_entry").records);
+  const [data, setData] = useState(emptyState);
 
-  const totalBilled = invoices.reduce((sum, invoice) => sum + invoice.total, 0);
-  const totalCollected = invoices.filter((invoice) => invoice.status === "Paid").reduce((sum, invoice) => sum + invoice.total, 0);
-  const totalOutstanding = clients.reduce((sum, client) => sum + client.outstanding, 0);
-  const billableHours = entries.filter((entry) => entry.billable).reduce((sum, entry) => sum + entry.hours, 0);
+  useEffect(() => {
+    fetchJson("/api/law-firm/control-center", emptyState).then(setData);
+  }, []);
 
-  const caseTypeMap = new Map<string, number>();
-  cases.forEach((legalCase) => caseTypeMap.set(legalCase.type, (caseTypeMap.get(legalCase.type) || 0) + 1));
-  const caseMix = [...caseTypeMap.entries()].sort((a, b) => b[1] - a[1]);
-
-  const lawyerMap = new Map<string, number>();
-  entries.forEach((entry) => lawyerMap.set(entry.lawyer, (lawyerMap.get(entry.lawyer) || 0) + entry.hours));
-  const lawyerLoad = [...lawyerMap.entries()].sort((a, b) => b[1] - a[1]);
+  const { summary, cases, invoices, entries } = data;
+  const caseMix = useMemo(() => {
+    const caseTypeMap = new Map<string, number>();
+    cases.forEach((legalCase) => caseTypeMap.set(legalCase.type, (caseTypeMap.get(legalCase.type) || 0) + 1));
+    return [...caseTypeMap.entries()].sort((a, b) => b[1] - a[1]);
+  }, [cases]);
+  const lawyerLoad = useMemo(() => {
+    const lawyerMap = new Map<string, number>();
+    entries.forEach((entry) => lawyerMap.set(entry.lawyer, (lawyerMap.get(entry.lawyer) || 0) + entry.hours));
+    return [...lawyerMap.entries()].sort((a, b) => b[1] - a[1]);
+  }, [entries]);
 
   return (
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: lawFont }}>
@@ -52,10 +51,10 @@ export default function LawAnalyticsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
-        <Metric title="Total Billed" value={`Rs. ${totalBilled.toLocaleString()}`} note="All legal invoices" color="#60a5fa" />
-        <Metric title="Collected" value={`Rs. ${totalCollected.toLocaleString()}`} note="Paid invoices only" color="#34d399" />
-        <Metric title="Outstanding" value={`Rs. ${totalOutstanding.toLocaleString()}`} note="Client receivables" color="#f87171" />
-        <Metric title="Billable Hours" value={`${billableHours}h`} note={`${entries.length} time entries logged`} color="#f59e0b" />
+        <Metric title="Total Billed" value={`Rs. ${summary.totalBilled.toLocaleString()}`} note="All legal invoices" color="#60a5fa" />
+        <Metric title="Collected" value={`Rs. ${summary.paidRevenue.toLocaleString()}`} note="Paid invoices only" color="#34d399" />
+        <Metric title="Outstanding" value={`Rs. ${summary.outstanding.toLocaleString()}`} note="Client receivables" color="#f87171" />
+        <Metric title="Billable Hours" value={`${summary.billableHours}h`} note={`${entries.length} time entries logged`} color="#f59e0b" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>

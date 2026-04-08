@@ -1,17 +1,7 @@
 "use client";
 
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  ngoBg,
-  ngoBorder,
-  ngoFont,
-  ngoMuted,
-  mapBeneficiaries,
-  mapDonors,
-  mapFunds,
-  mapFundTransactions,
-  mapGrants,
-} from "../_shared";
+import { useEffect, useMemo, useState } from "react";
+import { NgoControlCenter, fetchJson, ngoBg, ngoBorder, ngoFont, ngoMuted } from "../_shared";
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
@@ -23,26 +13,33 @@ function Metric({ title, value, note, color }: { title: string; value: string; n
   );
 }
 
+const emptyState: NgoControlCenter = {
+  summary: { donors: 0, beneficiaries: 0, totalRaised: 0, donorRaised: 0, grantBook: 0, fundBalance: 0, pendingReports: 0, activeGrants: 0, monthlyAid: 0, transactions: 0 },
+  donors: [],
+  grants: [],
+  beneficiaries: [],
+  funds: [],
+  transactions: [],
+};
+
 export default function NgoAnalyticsPage() {
-  const donors = mapDonors(useBusinessRecords("donor").records);
-  const grants = mapGrants(useBusinessRecords("grant").records);
-  const beneficiaries = mapBeneficiaries(useBusinessRecords("beneficiary").records);
-  const funds = mapFunds(useBusinessRecords("fund").records);
-  const transactions = mapFundTransactions(useBusinessRecords("fund_transaction").records);
+  const [data, setData] = useState(emptyState);
 
-  const totalRaised = donors.reduce((sum, donor) => sum + donor.totalDonated, 0);
-  const totalGrants = grants.reduce((sum, grant) => sum + grant.amount, 0);
-  const monthlyAid = beneficiaries.filter((beneficiary) => beneficiary.status === "active").reduce((sum, beneficiary) => sum + beneficiary.monthlyAid, 0);
-  const totalBalance = funds.reduce((sum, fund) => sum + fund.balance, 0);
+  useEffect(() => {
+    fetchJson("/api/ngo/control-center", emptyState).then(setData);
+  }, []);
 
-  const donorTypeMap = new Map<string, number>();
-  donors.forEach((donor) => donorTypeMap.set(donor.type, (donorTypeMap.get(donor.type) || 0) + 1));
-  const donorMix = [...donorTypeMap.entries()].sort((a, b) => b[1] - a[1]);
-
-  const beneficiaryMap = new Map<string, number>();
-  beneficiaries.forEach((beneficiary) => beneficiaryMap.set(beneficiary.category, (beneficiaryMap.get(beneficiary.category) || 0) + 1));
-  const beneficiaryMix = [...beneficiaryMap.entries()].sort((a, b) => b[1] - a[1]);
-
+  const { summary, donors, beneficiaries, transactions } = data;
+  const donorMix = useMemo(() => {
+    const donorTypeMap = new Map<string, number>();
+    donors.forEach((donor) => donorTypeMap.set(donor.type, (donorTypeMap.get(donor.type) || 0) + 1));
+    return [...donorTypeMap.entries()].sort((a, b) => b[1] - a[1]);
+  }, [donors]);
+  const beneficiaryMix = useMemo(() => {
+    const beneficiaryMap = new Map<string, number>();
+    beneficiaries.forEach((beneficiary) => beneficiaryMap.set(beneficiary.category, (beneficiaryMap.get(beneficiary.category) || 0) + 1));
+    return [...beneficiaryMap.entries()].sort((a, b) => b[1] - a[1]);
+  }, [beneficiaries]);
   const receiptVolume = transactions.filter((transaction) => transaction.type === "receipt").reduce((sum, transaction) => sum + transaction.amount, 0);
   const expenseVolume = transactions.filter((transaction) => transaction.type === "expense").reduce((sum, transaction) => sum + transaction.amount, 0);
 
@@ -57,10 +54,10 @@ export default function NgoAnalyticsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
-        <Metric title="Donor Raised" value={`Rs. ${totalRaised.toLocaleString()}`} note="Direct donor contributions" color="#34d399" />
-        <Metric title="Grant Book" value={`Rs. ${totalGrants.toLocaleString()}`} note="Approved grant portfolio" color="#60a5fa" />
-        <Metric title="Monthly Aid" value={`Rs. ${monthlyAid.toLocaleString()}`} note="Active beneficiary commitment" color="#f59e0b" />
-        <Metric title="Fund Balance" value={`Rs. ${totalBalance.toLocaleString()}`} note={`Receipts ${receiptVolume.toLocaleString()} / Expenses ${expenseVolume.toLocaleString()}`} color="#a78bfa" />
+        <Metric title="Donor Raised" value={`Rs. ${summary.donorRaised.toLocaleString()}`} note="Direct donor contributions" color="#34d399" />
+        <Metric title="Grant Book" value={`Rs. ${summary.grantBook.toLocaleString()}`} note="Approved grant portfolio" color="#60a5fa" />
+        <Metric title="Monthly Aid" value={`Rs. ${summary.monthlyAid.toLocaleString()}`} note="Active beneficiary commitment" color="#f59e0b" />
+        <Metric title="Fund Balance" value={`Rs. ${summary.fundBalance.toLocaleString()}`} note={`Receipts ${receiptVolume.toLocaleString()} / Expenses ${expenseVolume.toLocaleString()}`} color="#a78bfa" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>

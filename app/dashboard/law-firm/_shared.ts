@@ -66,6 +66,34 @@ export type TimeEntry = {
   billed: boolean;
 };
 
+export type LawControlCenter = {
+  summary: {
+    cases: number;
+    activeCases: number;
+    hearingsThisWeek: number;
+    clients: number;
+    outstanding: number;
+    paidRevenue: number;
+    totalBilled: number;
+    billableHours: number;
+    unbilledTime: number;
+  };
+  cases: LawCase[];
+  clients: LawClient[];
+  invoices: LegalInvoice[];
+  entries: TimeEntry[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function mapLawCases(records: BusinessRecord[]): LawCase[] {
   return records.map((record) => ({
     id: record.id,

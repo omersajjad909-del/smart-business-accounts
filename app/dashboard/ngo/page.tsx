@@ -1,18 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  ngoBg,
-  ngoBorder,
-  ngoFont,
-  ngoMuted,
-  mapBeneficiaries,
-  mapDonors,
-  mapFunds,
-  mapFundTransactions,
-  mapGrants,
-} from "./_shared";
+import { useEffect, useState } from "react";
+import { NgoControlCenter, fetchJson, ngoBg, ngoBorder, ngoFont, ngoMuted } from "./_shared";
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
@@ -23,18 +13,23 @@ function StatCard({ label, value, tone }: { label: string; value: string | numbe
   );
 }
 
+const emptyState: NgoControlCenter = {
+  summary: { donors: 0, beneficiaries: 0, totalRaised: 0, donorRaised: 0, grantBook: 0, fundBalance: 0, pendingReports: 0, activeGrants: 0, monthlyAid: 0, transactions: 0 },
+  donors: [],
+  grants: [],
+  beneficiaries: [],
+  funds: [],
+  transactions: [],
+};
+
 export default function NgoOverviewPage() {
-  const donors = mapDonors(useBusinessRecords("donor").records);
-  const grants = mapGrants(useBusinessRecords("grant").records);
-  const beneficiaries = mapBeneficiaries(useBusinessRecords("beneficiary").records);
-  const funds = mapFunds(useBusinessRecords("fund").records);
-  const txns = mapFundTransactions(useBusinessRecords("fund_transaction").records);
+  const [data, setData] = useState(emptyState);
 
-  const totalRaised = donors.reduce((sum, donor) => sum + donor.totalDonated, 0) + grants.reduce((sum, grant) => sum + grant.amount, 0);
-  const monthlyAid = beneficiaries.filter((beneficiary) => beneficiary.status === "active").reduce((sum, beneficiary) => sum + beneficiary.monthlyAid, 0);
-  const totalFundBalance = funds.reduce((sum, fund) => sum + fund.balance, 0);
-  const pendingReports = grants.filter((grant) => grant.status === "pending_report").length;
+  useEffect(() => {
+    fetchJson("/api/ngo/control-center", emptyState).then(setData);
+  }, []);
 
+  const { summary, donors, grants, beneficiaries, transactions } = data;
   const topDonors = [...donors].sort((a, b) => b.totalDonated - a.totalDonated).slice(0, 4);
 
   return (
@@ -48,11 +43,11 @@ export default function NgoOverviewPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0,1fr))", gap: 14, marginBottom: 26 }}>
-        <StatCard label="Donors" value={donors.length} tone="#818cf8" />
-        <StatCard label="Beneficiaries" value={beneficiaries.length} tone="#34d399" />
-        <StatCard label="Funds Raised" value={`Rs. ${totalRaised.toLocaleString()}`} tone="#60a5fa" />
-        <StatCard label="Fund Balance" value={`Rs. ${totalFundBalance.toLocaleString()}`} tone="#f59e0b" />
-        <StatCard label="Pending Reports" value={pendingReports} tone="#f87171" />
+        <StatCard label="Donors" value={summary.donors} tone="#818cf8" />
+        <StatCard label="Beneficiaries" value={summary.beneficiaries} tone="#34d399" />
+        <StatCard label="Funds Raised" value={`Rs. ${summary.totalRaised.toLocaleString()}`} tone="#60a5fa" />
+        <StatCard label="Fund Balance" value={`Rs. ${summary.fundBalance.toLocaleString()}`} tone="#f59e0b" />
+        <StatCard label="Pending Reports" value={summary.pendingReports} tone="#f87171" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
@@ -103,7 +98,7 @@ export default function NgoOverviewPage() {
               <div key={donor.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{donor.name}</div>
-                  <div style={{ fontSize: 12, color: ngoMuted }}>{donor.type} • {donor.frequency}</div>
+                  <div style={{ fontSize: 12, color: ngoMuted }}>{donor.type} · {donor.frequency}</div>
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: "#34d399" }}>Rs. {donor.totalDonated.toLocaleString()}</div>
               </div>
@@ -115,9 +110,9 @@ export default function NgoOverviewPage() {
           <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
-              { label: "Monthly aid commitment", value: `Rs. ${monthlyAid.toLocaleString()}`, tone: "#60a5fa" },
-              { label: "Active grants", value: `${grants.filter((grant) => grant.status === "active").length} running`, tone: "#34d399" },
-              { label: "Fund transactions", value: `${txns.length} entries on record`, tone: "#f59e0b" },
+              { label: "Monthly aid commitment", value: `Rs. ${summary.monthlyAid.toLocaleString()}`, tone: "#60a5fa" },
+              { label: "Active grants", value: `${summary.activeGrants} running`, tone: "#34d399" },
+              { label: "Fund transactions", value: `${summary.transactions} entries on record`, tone: "#f59e0b" },
               { label: "Inactive beneficiaries", value: `${beneficiaries.filter((beneficiary) => beneficiary.status !== "active").length} paused`, tone: "#f87171" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>

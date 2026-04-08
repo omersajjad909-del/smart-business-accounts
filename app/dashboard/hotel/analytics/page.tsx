@@ -1,38 +1,32 @@
 "use client";
 
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  hotelBg,
-  hotelBorder,
-  hotelFont,
-  hotelMuted,
-  mapHousekeepingRecords,
-  mapReservationRecords,
-  mapRoomRecords,
-  mapRoomServiceRecords,
-} from "../_shared";
+import { useEffect, useMemo, useState } from "react";
+import { HotelControlCenter, fetchJson, hotelBg, hotelBorder, hotelFont, hotelMuted } from "../_shared";
+
+const emptyState: HotelControlCenter = {
+  summary: { rooms: 0, occupiedRooms: 0, occupancyRate: 0, checkedInGuests: 0, reservedGuests: 0, serviceRevenue: 0, pendingHousekeeping: 0, maintenanceRooms: 0 },
+  rooms: [],
+  reservations: [],
+  housekeeping: [],
+  serviceOrders: [],
+};
 
 export default function HotelAnalyticsPage() {
-  const roomStore = useBusinessRecords("hotel_room");
-  const reservationStore = useBusinessRecords("hotel_reservation");
-  const housekeepingStore = useBusinessRecords("housekeeping_task");
-  const serviceStore = useBusinessRecords("room_service_order");
+  const [data, setData] = useState(emptyState);
 
-  const rooms = useMemo(() => mapRoomRecords(roomStore.records), [roomStore.records]);
-  const reservations = useMemo(() => mapReservationRecords(reservationStore.records), [reservationStore.records]);
-  const housekeeping = useMemo(() => mapHousekeepingRecords(housekeepingStore.records), [housekeepingStore.records]);
-  const serviceOrders = useMemo(() => mapRoomServiceRecords(serviceStore.records), [serviceStore.records]);
+  useEffect(() => {
+    fetchJson("/api/hotel/control-center", emptyState).then(setData);
+  }, []);
 
-  const roomMix = rooms.reduce<Record<string, number>>((acc, row) => {
+  const { rooms, reservations, housekeeping, serviceOrders } = data;
+  const roomMix = useMemo(() => rooms.reduce<Record<string, number>>((acc, row) => {
     acc[row.type] = (acc[row.type] || 0) + 1;
     return acc;
-  }, {});
-
-  const serviceByRoom = serviceOrders.reduce<Record<string, number>>((acc, row) => {
+  }, {}), [rooms]);
+  const serviceByRoom = useMemo(() => serviceOrders.reduce<Record<string, number>>((acc, row) => {
     acc[row.room] = (acc[row.room] || 0) + row.amount;
     return acc;
-  }, {});
+  }, {}), [serviceOrders]);
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: hotelFont }}>

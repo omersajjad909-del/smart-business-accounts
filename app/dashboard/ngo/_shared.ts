@@ -71,6 +71,36 @@ export type FundTransactionRow = {
   reference: string;
 };
 
+export type NgoControlCenter = {
+  summary: {
+    donors: number;
+    beneficiaries: number;
+    totalRaised: number;
+    donorRaised: number;
+    grantBook: number;
+    fundBalance: number;
+    pendingReports: number;
+    activeGrants: number;
+    monthlyAid: number;
+    transactions: number;
+  };
+  donors: DonorRow[];
+  grants: GrantRow[];
+  beneficiaries: BeneficiaryRow[];
+  funds: FundRow[];
+  transactions: FundTransactionRow[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function mapDonors(records: BusinessRecord[]): DonorRow[] {
   return records.map((record) => ({
     id: record.id,

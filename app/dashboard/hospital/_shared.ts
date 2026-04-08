@@ -67,6 +67,34 @@ export type LabRow = {
   results: string;
 };
 
+export type HospitalControlCenter = {
+  summary: {
+    patients: number;
+    activePatients: number;
+    todayAppointments: number;
+    completedAppointments: number;
+    activePrescriptions: number;
+    completedPrescriptions: number;
+    pendingLabs: number;
+    urgentPendingLabs: number;
+    icuPatients: number;
+  };
+  patients: PatientRow[];
+  appointments: AppointmentRow[];
+  prescriptions: PrescriptionRow[];
+  labs: LabRow[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }

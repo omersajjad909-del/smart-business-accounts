@@ -1,17 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  lawBg,
-  lawBorder,
-  lawFont,
-  lawMuted,
-  mapLawBilling,
-  mapLawCases,
-  mapLawClients,
-  mapTimeEntries,
-} from "./_shared";
+import { useEffect, useState } from "react";
+import { LawControlCenter, fetchJson, lawBg, lawBorder, lawFont, lawMuted } from "./_shared";
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
@@ -22,24 +13,22 @@ function StatCard({ label, value, tone }: { label: string; value: string | numbe
   );
 }
 
+const emptyState: LawControlCenter = {
+  summary: { cases: 0, activeCases: 0, hearingsThisWeek: 0, clients: 0, outstanding: 0, paidRevenue: 0, totalBilled: 0, billableHours: 0, unbilledTime: 0 },
+  cases: [],
+  clients: [],
+  invoices: [],
+  entries: [],
+};
+
 export default function LawFirmOverviewPage() {
-  const cases = mapLawCases(useBusinessRecords("legal_case").records);
-  const clients = mapLawClients(useBusinessRecords("legal_client").records);
-  const invoices = mapLawBilling(useBusinessRecords("legal_invoice").records);
-  const entries = mapTimeEntries(useBusinessRecords("time_entry").records);
-  const now = new Date();
-  const todayTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const [data, setData] = useState(emptyState);
 
-  const activeCases = cases.filter((legalCase) => legalCase.status === "Active").length;
-  const pendingHearings = cases.filter((legalCase) => {
-    if (!legalCase.nextHearing) return false;
-    const diff = new Date(legalCase.nextHearing).getTime() - todayTs;
-    return diff >= 0 && diff <= 7 * 86400000;
-  }).length;
-  const outstanding = clients.reduce((sum, client) => sum + client.outstanding, 0);
-  const unbilledTime = entries.filter((entry) => entry.billable && !entry.billed).reduce((sum, entry) => sum + entry.amount, 0);
-  const billedRevenue = invoices.filter((invoice) => invoice.status === "Paid").reduce((sum, invoice) => sum + invoice.total, 0);
+  useEffect(() => {
+    fetchJson("/api/law-firm/control-center", emptyState).then(setData);
+  }, []);
 
+  const { summary, cases, invoices } = data;
   const topMatters = [...cases].slice(0, 4);
 
   return (
@@ -53,11 +42,11 @@ export default function LawFirmOverviewPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0,1fr))", gap: 14, marginBottom: 26 }}>
-        <StatCard label="Active Cases" value={activeCases} tone="#34d399" />
-        <StatCard label="Hearings This Week" value={pendingHearings} tone="#fbbf24" />
-        <StatCard label="Clients" value={clients.length} tone="#60a5fa" />
-        <StatCard label="Outstanding" value={`Rs. ${outstanding.toLocaleString()}`} tone="#f87171" />
-        <StatCard label="Paid Revenue" value={`Rs. ${billedRevenue.toLocaleString()}`} tone="#a78bfa" />
+        <StatCard label="Active Cases" value={summary.activeCases} tone="#34d399" />
+        <StatCard label="Hearings This Week" value={summary.hearingsThisWeek} tone="#fbbf24" />
+        <StatCard label="Clients" value={summary.clients} tone="#60a5fa" />
+        <StatCard label="Outstanding" value={`Rs. ${summary.outstanding.toLocaleString()}`} tone="#f87171" />
+        <StatCard label="Paid Revenue" value={`Rs. ${summary.paidRevenue.toLocaleString()}`} tone="#a78bfa" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
@@ -108,7 +97,7 @@ export default function LawFirmOverviewPage() {
               <div key={legalCase.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{legalCase.title}</div>
-                  <div style={{ fontSize: 12, color: lawMuted }}>{legalCase.client} • {legalCase.court}</div>
+                  <div style={{ fontSize: 12, color: lawMuted }}>{legalCase.client} · {legalCase.court}</div>
                 </div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: legalCase.status === "Active" ? "#34d399" : "#94a3b8" }}>{legalCase.status}</div>
               </div>
@@ -120,7 +109,7 @@ export default function LawFirmOverviewPage() {
           <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
-              { label: "Unbilled time", value: `Rs. ${unbilledTime.toLocaleString()}`, tone: "#60a5fa" },
+              { label: "Unbilled time", value: `Rs. ${summary.unbilledTime.toLocaleString()}`, tone: "#60a5fa" },
               { label: "Paid invoices", value: `${invoices.filter((invoice) => invoice.status === "Paid").length} settled`, tone: "#34d399" },
               { label: "Sent invoices", value: `${invoices.filter((invoice) => invoice.status === "Sent").length} awaiting payment`, tone: "#fbbf24" },
               { label: "Closed cases", value: `${cases.filter((legalCase) => legalCase.status === "Closed" || legalCase.status === "Won" || legalCase.status === "Lost").length} archived`, tone: "#a78bfa" },

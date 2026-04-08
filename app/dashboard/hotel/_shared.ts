@@ -88,3 +88,30 @@ export function mapGuestHistoryRecords(records: BusinessRecord[]) {
     notes: String(record.data?.notes || ""),
   }));
 }
+
+export type HotelControlCenter = {
+  summary: {
+    rooms: number;
+    occupiedRooms: number;
+    occupancyRate: number;
+    checkedInGuests: number;
+    reservedGuests: number;
+    serviceRevenue: number;
+    pendingHousekeeping: number;
+    maintenanceRooms: number;
+  };
+  rooms: ReturnType<typeof mapRoomRecords>;
+  reservations: ReturnType<typeof mapReservationRecords>;
+  housekeeping: ReturnType<typeof mapHousekeepingRecords>;
+  serviceOrders: ReturnType<typeof mapRoomServiceRecords>;
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
