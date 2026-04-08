@@ -4,6 +4,32 @@ import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const mediaAccent = "#a78bfa";
 
+export type MediaControlCenter = {
+  summary: {
+    campaigns: number;
+    activeCampaigns: number;
+    clients: number;
+    activeClients: number;
+    approvedPlans: number;
+    campaignBudget: number;
+    retainers: number;
+    plannedSpend: number;
+  };
+  campaigns: ReturnType<typeof mapMediaCampaign>[];
+  clients: ReturnType<typeof mapMediaClient>[];
+  plans: ReturnType<typeof mapMediaPlan>[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function mapMediaCampaign(record: BusinessRecord) {
   return {
     id: record.id,

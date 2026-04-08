@@ -4,6 +4,33 @@ import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const workshopAccent = "#f59e0b";
 
+export type WorkshopControlCenter = {
+  summary: {
+    jobs: number;
+    openJobs: number;
+    readyJobs: number;
+    mechanics: number;
+    activeMechanics: number;
+    partsCost: number;
+    warrantyClaims: number;
+    warrantyExposure: number;
+  };
+  jobs: ReturnType<typeof mapWorkshopJob>[];
+  mechanics: ReturnType<typeof mapWorkshopMechanic>[];
+  parts: ReturnType<typeof mapWorkshopPart>[];
+  warranties: ReturnType<typeof mapWorkshopWarranty>[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function mapWorkshopJob(record: BusinessRecord) {
   return {
     id: record.id,

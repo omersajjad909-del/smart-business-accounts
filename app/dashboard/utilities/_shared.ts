@@ -4,6 +4,32 @@ import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const utilityAccent = "#38bdf8";
 
+export type UtilityControlCenter = {
+  summary: {
+    activeAccounts: number;
+    pendingAccounts: number;
+    suspendedAccounts: number;
+    meters: number;
+    verifiedReadings: number;
+    openBills: number;
+    billedValue: number;
+    unitsLogged: number;
+  };
+  connections: ReturnType<typeof mapUtilityConnection>[];
+  meters: ReturnType<typeof mapUtilityMeter>[];
+  bills: ReturnType<typeof mapUtilityBilling>[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function mapUtilityConnection(record: BusinessRecord) {
   return {
     id: record.id,
