@@ -1,7 +1,7 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, createContext, useContext } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { getCurrentUser, setCurrentUser as storeUser, updateStoredUser } from "@/lib/auth";
@@ -15,6 +15,9 @@ import WhatsNew from "@/components/WhatsNew";
 import { resolvePlanPermissions } from "@/lib/planPermissions";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
+
+// Context to pass sidebarCollapsed + expand function to nav components
+const SidebarCtx = createContext<{ collapsed: boolean; expand: () => void }>({ collapsed: false, expand: () => {} });
 
 /* ── FinovaOS branded loading screen ─────────────────────── */
 function FinovaLoader() {
@@ -633,17 +636,18 @@ export default function DashboardLayout({
       >
 
         {/* ---- SIDEBAR HEADER ---- */}
-        <div style={{padding:"16px 16px 12px",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+        <div style={{padding: sidebarCollapsed ? "12px 8px" : "16px 16px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", alignItems: sidebarCollapsed ? "center" : "stretch"}}>
           {/* Logo + Brand */}
           <Link
             href="/dashboard"
             style={{
               display:"flex",
               alignItems:"center",
+              justifyContent: sidebarCollapsed ? "center" : "flex-start",
               gap:10,
-              marginBottom:12,
+              marginBottom: sidebarCollapsed ? 0 : 12,
               textDecoration:"none",
-              padding:"6px 4px",
+              padding: sidebarCollapsed ? "4px" : "6px 4px",
               borderRadius:12,
               background: pathname === "/dashboard" ? "rgba(99,102,241,0.12)" : "transparent",
               border: pathname === "/dashboard" ? "1px solid rgba(99,102,241,0.22)" : "1px solid transparent",
@@ -675,7 +679,8 @@ export default function DashboardLayout({
         </div>
 
         {/* ---- NAV ---- */}
-        <nav style={{flex:1,overflowY:"auto",padding:"10px 10px",paddingBottom:80,display: sidebarCollapsed ? "none" : "block"}}>
+        <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setSidebarCollapsed(false) }}>
+        <nav style={{flex:1,overflowY:"auto",padding:"10px 10px",paddingBottom:80}}>
 
           {/* Dashboard utilities */}
           {canShowDashboardUtilities && hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
@@ -1581,6 +1586,7 @@ export default function DashboardLayout({
           )}
 
         </nav>
+        </SidebarCtx.Provider>
 
         {/* ---- SIDEBAR FOOTER ---- */}
         <div style={{borderTop:"1px solid var(--border)",background:"var(--panel-bg-2)",position:"relative"}}>
@@ -1898,7 +1904,30 @@ function NavGroup({ title, icon, open, onToggle, children }: {
   onToggle: () => void;
   children: React.ReactNode;
 }) {
+  const { collapsed, expand } = useContext(SidebarCtx);
   const displayTitle = cleanNavLabel(title);
+
+  // Collapsed mode: show only icon, centered, with tooltip
+  if (collapsed) {
+    return (
+      <div
+        title={displayTitle}
+        onClick={() => { expand(); onToggle(); }}
+        style={{
+          display:"flex", alignItems:"center", justifyContent:"center",
+          width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
+          color: open ? "#818cf8" : "rgba(255,255,255,0.4)",
+          background: open ? "rgba(99,102,241,0.15)" : "transparent",
+          transition:"all .15s",
+        }}
+        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=open?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=open?"#818cf8":"rgba(255,255,255,0.4)";}}
+      >
+        <span style={{display:"flex",fontSize:16}}>{icon}</span>
+      </div>
+    );
+  }
+
   return (
     <div style={{marginBottom:1}}>
       {/* Section header button */}
@@ -1968,9 +1997,13 @@ function NavLink({ href, children, pathname }: {
   children: React.ReactNode;
   pathname: string;
 }) {
+  const { collapsed } = useContext(SidebarCtx);
   const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
   const displayChildren = typeof children === "string" ? cleanNavLabel(children) : children;
   const isAiAssistant = displayChildren === "AI Intelligence" || displayChildren === "AI Assistant";
+
+  // In collapsed mode, hide nav links (they are accessed via NavGroup icon → expand)
+  if (collapsed) return null;
   return (
     <Link
       href={href}

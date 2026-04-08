@@ -91,7 +91,9 @@
       "Bash(grep -n \"\\\\$\\\\|salePrice\\\\|SALE PRICE\\\\|Sale Price\" \"d:/projects/smart-business-accounts/app/dashboard/barcode/page.tsx\")",
       "Bash(grep -v \"^\\\\s*//\")",
       "Bash(node)",
-      "Read(//c/Users/Standard Laptop/AppData/Local/Temp/claude/**)"
+      "Read(//c/Users/Standard Laptop/AppData/Local/Temp/claude/**)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }
