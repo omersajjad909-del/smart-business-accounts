@@ -580,7 +580,7 @@ function BillingPage() {
                   <h3 style={{ margin:"0 0 4px", fontSize:18, fontWeight:800 }}>{plan.name}</h3>
                   <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:4 }}>
                     <span style={{ fontSize:30, fontWeight:900, color:plan.color }}>${price}</span>
-                    <span style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>/ mo{billing==="annual"?·  billed annually":""}</span>
+                    <span style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>/ mo{billing==="annual"?" · billed annually":""}</span>
                   </div>
                   {billing==="annual" && <div style={{ fontSize:11, color:"rgba(52,211,153,.7)", marginBottom:14, fontWeight:600 }}>Save ${Math.round(plan.monthlyPrice*12 - plan.monthlyPrice*0.8*12)}/year</div>}
                   <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom:22, marginTop:billing==="annual"?0:14 }}>
