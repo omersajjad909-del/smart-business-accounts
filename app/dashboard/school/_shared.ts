@@ -1,11 +1,51 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const schoolFont = "'Outfit','Inter',sans-serif";
 export const schoolBg = "rgba(255,255,255,0.03)";
 export const schoolBorder = "rgba(255,255,255,0.07)";
 export const schoolMuted = "rgba(255,255,255,0.45)";
+
+export type SchoolStudent = ReturnType<typeof mapStudentRecords>[number];
+export type SchoolFee = ReturnType<typeof mapFeeRecords>[number];
+export type SchoolSchedule = ReturnType<typeof mapScheduleRecords>[number];
+export type SchoolExam = ReturnType<typeof mapExamRecords>[number];
+export type SchoolAdmission = ReturnType<typeof mapAdmissionRecords>[number];
+export type SchoolAttendance = ReturnType<typeof mapAttendanceRecords>[number];
+export type SchoolTeacher = ReturnType<typeof mapTeacherRecords>[number];
+
+export type SchoolControlCenter = {
+  summary: {
+    students: number;
+    activeStudents: number;
+    defaulters: number;
+    collectedFees: number;
+    pendingFees: number;
+    schedules: number;
+    exams: number;
+    passRate: number;
+    pendingAdmissions: number;
+    teachers: number;
+    attendancePresent: number;
+    attendanceTotal: number;
+  };
+  students: SchoolStudent[];
+  fees: SchoolFee[];
+  schedules: SchoolSchedule[];
+  exams: SchoolExam[];
+  admissions: SchoolAdmission[];
+  attendance: SchoolAttendance[];
+  teachers: SchoolTeacher[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);

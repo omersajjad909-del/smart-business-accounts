@@ -1,53 +1,51 @@
 "use client";
 
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  mapExamRecords,
-  mapFeeRecords,
-  mapScheduleRecords,
-  mapStudentRecords,
-  schoolBg,
-  schoolBorder,
-  schoolFont,
-  schoolMuted,
-} from "../_shared";
+import { useEffect, useMemo, useState } from "react";
+import { fetchJson, schoolBg, schoolBorder, schoolFont, schoolMuted, type SchoolControlCenter } from "../_shared";
+
+const emptyState: SchoolControlCenter = {
+  summary: { students: 0, activeStudents: 0, defaulters: 0, collectedFees: 0, pendingFees: 0, schedules: 0, exams: 0, passRate: 0, pendingAdmissions: 0, teachers: 0, attendancePresent: 0, attendanceTotal: 0 },
+  students: [],
+  fees: [],
+  schedules: [],
+  exams: [],
+  admissions: [],
+  attendance: [],
+  teachers: [],
+};
 
 export default function SchoolAnalyticsPage() {
-  const studentStore = useBusinessRecords("student");
-  const feeStore = useBusinessRecords("fee_record");
-  const scheduleStore = useBusinessRecords("class_period");
-  const examStore = useBusinessRecords("exam_result");
+  const [data, setData] = useState(emptyState);
 
-  const students = useMemo(() => mapStudentRecords(studentStore.records), [studentStore.records]);
-  const fees = useMemo(() => mapFeeRecords(feeStore.records), [feeStore.records]);
-  const periods = useMemo(() => mapScheduleRecords(scheduleStore.records), [scheduleStore.records]);
-  const exams = useMemo(() => mapExamRecords(examStore.records), [examStore.records]);
+  useEffect(() => {
+    fetchJson("/api/school/control-center", emptyState).then(setData);
+  }, []);
 
-  const classMix = students.reduce<Record<string, number>>((acc, row) => {
+  const { students, fees, schedules, exams } = data;
+
+  const classMix = useMemo(() => students.reduce<Record<string, number>>((acc, row) => {
     const key = row.className || "Unassigned";
     acc[key] = (acc[key] || 0) + 1;
     return acc;
-  }, {});
+  }, {}), [students]);
 
-  const feeByMonth = fees.reduce<Record<string, number>>((acc, row) => {
+  const feeByMonth = useMemo(() => fees.reduce<Record<string, number>>((acc, row) => {
     const key = row.month || "Unknown";
     acc[key] = (acc[key] || 0) + row.amount;
     return acc;
-  }, {});
+  }, {}), [fees]);
 
-  const examByClass = exams.reduce<Record<string, number>>((acc, row) => {
+  const examByClass = useMemo(() => exams.reduce<Record<string, number>>((acc, row) => {
     const key = row.className || "Unassigned";
-    acc[key] = acc[key] || 0;
-    acc[key] += row.percentage;
+    acc[key] = (acc[key] || 0) + row.percentage;
     return acc;
-  }, {});
+  }, {}), [exams]);
 
-  const examCountByClass = exams.reduce<Record<string, number>>((acc, row) => {
+  const examCountByClass = useMemo(() => exams.reduce<Record<string, number>>((acc, row) => {
     const key = row.className || "Unassigned";
     acc[key] = (acc[key] || 0) + 1;
     return acc;
-  }, {});
+  }, {}), [exams]);
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: schoolFont }}>
@@ -74,7 +72,7 @@ export default function SchoolAnalyticsPage() {
           <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 14 }}>Timetable Load</div>
           <div style={{ display: "grid", gap: 10 }}>
             {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => {
-              const count = periods.filter((row) => row.day === day).length;
+              const count = schedules.filter((row) => row.day === day).length;
               return (
                 <div key={day} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                   <span style={{ fontSize: 13 }}>{day}</span>

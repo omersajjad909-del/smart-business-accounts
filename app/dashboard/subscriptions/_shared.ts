@@ -47,6 +47,35 @@ export type SaaSBillingRun = {
   status: SaaSBillingStatus;
 };
 
+export type SubscriptionsControlCenter = {
+  summary: {
+    plans: number;
+    activePlans: number;
+    subscribers: number;
+    activeSubscribers: number;
+    trialSubscribers: number;
+    pastDueSubscribers: number;
+    cancelledSubscribers: number;
+    mrr: number;
+    arr: number;
+    collectedThisCycle: number;
+    failedBillings: number;
+  };
+  plans: SaaSPlan[];
+  subscribers: SaaSSubscriber[];
+  billings: SaaSBillingRun[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }

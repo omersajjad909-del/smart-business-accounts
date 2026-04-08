@@ -714,14 +714,17 @@ export default function DashboardLayout({
               open={openSection === "sales"}
               onToggle={() => toggle("sales")}
             >
-              {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-order" pathname={pathname}>Sales Order</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoice</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_QUOTATION) && <NavLink href="/dashboard/quotation" pathname={pathname}>Quotation / Estimate</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_DELIVERY_CHALLAN) && <NavLink href="/dashboard/delivery-challan" pathname={pathname}>Delivery Challan</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>Purchase Invoice</NavLink>}
+              {/* ── Purchase Flow ── */}
               {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_ORDER) && <NavLink href="/dashboard/purchase-order" pathname={pathname}>Purchase Order</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/grn" pathname={pathname}>GRN (Goods Receipt)</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>Purchase Invoice</NavLink>}
+              {/* ── Sales Flow ── */}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_QUOTATION) && <NavLink href="/dashboard/quotation" pathname={pathname}>Quotation / Estimate</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-order" pathname={pathname}>Sales Order</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_DELIVERY_CHALLAN) && <NavLink href="/dashboard/delivery-challan" pathname={pathname}>Delivery Challan</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoice</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALE_RETURN) && <NavLink href="/dashboard/sale-return" pathname={pathname}>Sale Return</NavLink>}
+              {/* ── Admin ── */}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/parties" pathname={pathname}>Customers & Vendors</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/payment-receipts" pathname={pathname}>Payment Receipts</NavLink>}

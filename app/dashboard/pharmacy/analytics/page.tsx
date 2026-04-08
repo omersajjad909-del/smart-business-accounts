@@ -1,25 +1,32 @@
 "use client";
 
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useEffect, useMemo, useState } from "react";
 import {
-  mapCounterSaleRecords,
-  mapDrugRecords,
-  mapPrescriptionRecords,
+  fetchJson,
   pharmacyBg,
   pharmacyBorder,
   pharmacyFont,
   pharmacyMuted,
+  type PharmacyControlCenter,
 } from "../_shared";
 
-export default function PharmacyAnalyticsPage() {
-  const inventoryStore = useBusinessRecords("drug");
-  const prescriptionStore = useBusinessRecords("pharmacy_prescription");
-  const salesStore = useBusinessRecords("pharmacy_sale");
+const emptyState: PharmacyControlCenter = {
+  summary: { medicines: 0, lowStock: 0, expired: 0, inventoryValue: 0, pendingPrescriptions: 0, dispensedPrescriptions: 0, counterSales: 0, counterRevenue: 0, purchaseSpend: 0, activeBatches: 0 },
+  drugs: [],
+  prescriptions: [],
+  batches: [],
+  purchases: [],
+  sales: [],
+};
 
-  const drugs = useMemo(() => mapDrugRecords(inventoryStore.records), [inventoryStore.records]);
-  const prescriptions = useMemo(() => mapPrescriptionRecords(prescriptionStore.records), [prescriptionStore.records]);
-  const sales = useMemo(() => mapCounterSaleRecords(salesStore.records), [salesStore.records]);
+export default function PharmacyAnalyticsPage() {
+  const [data, setData] = useState(emptyState);
+
+  useEffect(() => {
+    fetchJson("/api/pharmacy/control-center", emptyState).then(setData);
+  }, []);
+
+  const { drugs, prescriptions, sales } = data;
 
   const categoryRows = useMemo(() => {
     const bucket = new Map<string, { stock: number; value: number }>();

@@ -1,19 +1,37 @@
 "use client";
 
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { formatMoney, mapSaaSBillingRuns, mapSaaSSubscribers, saasBg, saasBorder, saasFont, saasMuted } from "../_shared";
+import { useEffect, useMemo, useState } from "react";
+import { fetchJson, formatMoney, saasBg, saasBorder, saasFont, saasMuted, type SubscriptionsControlCenter } from "../_shared";
+
+const emptyState: SubscriptionsControlCenter = {
+  summary: {
+    plans: 0,
+    activePlans: 0,
+    subscribers: 0,
+    activeSubscribers: 0,
+    trialSubscribers: 0,
+    pastDueSubscribers: 0,
+    cancelledSubscribers: 0,
+    mrr: 0,
+    arr: 0,
+    collectedThisCycle: 0,
+    failedBillings: 0,
+  },
+  plans: [],
+  subscribers: [],
+  billings: [],
+};
 
 export default function MrrArrPage() {
-  const subscriberStore = useBusinessRecords("subscription_subscriber");
-  const billingStore = useBusinessRecords("subscription_billing");
-  const subscribers = useMemo(() => mapSaaSSubscribers(subscriberStore.records), [subscriberStore.records]);
-  const billings = useMemo(() => mapSaaSBillingRuns(billingStore.records), [billingStore.records]);
+  const [data, setData] = useState(emptyState);
 
-  const mrr = subscribers
-    .filter((item) => item.status === "active" || item.status === "past_due")
-    .reduce((sum, item) => sum + (item.interval === "Yearly" ? item.amount / 12 : item.interval === "Quarterly" ? item.amount / 3 : item.amount), 0);
-  const arr = mrr * 12;
+  useEffect(() => {
+    fetchJson("/api/subscriptions/control-center", emptyState).then(setData);
+  }, []);
+
+  const { summary, subscribers, billings } = data;
+  const mrr = summary.mrr;
+  const arr = summary.arr;
   const churn = subscribers.length ? Math.round((subscribers.filter((item) => item.status === "cancelled").length / subscribers.length) * 100) : 0;
   const collected = billings.filter((item) => item.status === "paid").reduce((sum, item) => sum + item.amount, 0);
   const overdue = subscribers.filter((item) => item.status === "past_due").reduce((sum, item) => sum + item.amount, 0);

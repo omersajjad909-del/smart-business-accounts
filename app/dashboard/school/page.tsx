@@ -1,34 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  mapExamRecords,
-  mapFeeRecords,
-  mapScheduleRecords,
-  mapStudentRecords,
-  schoolBg,
-  schoolBorder,
-  schoolFont,
-  schoolMuted,
-} from "./_shared";
+import { useEffect, useState } from "react";
+import { fetchJson, schoolBg, schoolBorder, schoolFont, schoolMuted, type SchoolControlCenter } from "./_shared";
+
+const emptyState: SchoolControlCenter = {
+  summary: { students: 0, activeStudents: 0, defaulters: 0, collectedFees: 0, pendingFees: 0, schedules: 0, exams: 0, passRate: 0, pendingAdmissions: 0, teachers: 0, attendancePresent: 0, attendanceTotal: 0 },
+  students: [],
+  fees: [],
+  schedules: [],
+  exams: [],
+  admissions: [],
+  attendance: [],
+  teachers: [],
+};
 
 export default function SchoolOverviewPage() {
-  const studentStore = useBusinessRecords("student");
-  const feeStore = useBusinessRecords("fee_record");
-  const scheduleStore = useBusinessRecords("class_period");
-  const examStore = useBusinessRecords("exam_result");
+  const [data, setData] = useState(emptyState);
 
-  const students = useMemo(() => mapStudentRecords(studentStore.records), [studentStore.records]);
-  const fees = useMemo(() => mapFeeRecords(feeStore.records), [feeStore.records]);
-  const periods = useMemo(() => mapScheduleRecords(scheduleStore.records), [scheduleStore.records]);
-  const exams = useMemo(() => mapExamRecords(examStore.records), [examStore.records]);
+  useEffect(() => {
+    fetchJson("/api/school/control-center", emptyState).then(setData);
+  }, []);
 
-  const activeStudents = students.filter((row) => row.studentStatus === "active").length;
-  const defaulters = students.filter((row) => row.feeStatus === "overdue").length;
-  const collected = fees.filter((row) => row.status === "paid").reduce((sum, row) => sum + row.amount, 0);
-  const passRate = exams.length ? Math.round((exams.filter((row) => row.status === "pass").length / exams.length) * 100) : 0;
+  const { summary, students } = data;
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: schoolFont }}>
@@ -52,12 +46,13 @@ export default function SchoolOverviewPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Students", value: students.length, color: "#818cf8" },
-          { label: "Active Students", value: activeStudents, color: "#34d399" },
-          { label: "Collected Fees", value: `Rs. ${collected.toLocaleString()}`, color: "#60a5fa" },
-          { label: "Pass Rate", value: `${passRate}%`, color: "#f59e0b" },
+          { label: "Students", value: summary.students, color: "#818cf8" },
+          { label: "Active Students", value: summary.activeStudents, color: "#34d399" },
+          { label: "Collected Fees", value: `Rs. ${summary.collectedFees.toLocaleString()}`, color: "#60a5fa" },
+          { label: "Pending Fees", value: `Rs. ${summary.pendingFees.toLocaleString()}`, color: "#f87171" },
+          { label: "Pass Rate", value: `${summary.passRate}%`, color: "#f59e0b" },
         ].map((card) => (
           <div key={card.label} style={{ background: schoolBg, border: `1px solid ${schoolBorder}`, borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 12, color: schoolMuted, marginBottom: 8 }}>{card.label}</div>
@@ -71,10 +66,11 @@ export default function SchoolOverviewPage() {
           <div style={{ padding: "16px 18px", borderBottom: `1px solid ${schoolBorder}`, fontSize: 15, fontWeight: 800 }}>Academic Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
-              { label: "Scheduled periods", value: periods.length, color: "#a5b4fc" },
-              { label: "Fee defaulters", value: defaulters, color: "#f87171" },
-              { label: "Pending fee records", value: fees.filter((row) => row.status !== "paid").length, color: "#f59e0b" },
-              { label: "Exam records", value: exams.length, color: "#34d399" },
+              { label: "Scheduled periods", value: summary.schedules, color: "#a5b4fc" },
+              { label: "Fee defaulters", value: summary.defaulters, color: "#f87171" },
+              { label: "Pending admissions", value: summary.pendingAdmissions, color: "#f59e0b" },
+              { label: "Teachers", value: summary.teachers, color: "#34d399" },
+              { label: "Attendance today", value: `${summary.attendancePresent}/${summary.attendanceTotal}`, color: "#60a5fa" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13, color: schoolMuted }}>{row.label}</span>
@@ -90,7 +86,7 @@ export default function SchoolOverviewPage() {
             {students.filter((row) => row.feeStatus === "overdue").slice(0, 5).map((student) => (
               <div key={student.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{student.name}</div>
-                <div style={{ fontSize: 12, color: schoolMuted, marginTop: 4 }}>Roll {student.rollNo} · Class {student.className}{student.section ? `-${student.section}` : ""}</div>
+                <div style={{ fontSize: 12, color: schoolMuted, marginTop: 4 }}>Roll {student.rollNo} | Class {student.className}{student.section ? `-${student.section}` : ""}</div>
                 <div style={{ fontSize: 12, color: "#fca5a5", marginTop: 6 }}>Fee status: {student.feeStatus}</div>
               </div>
             ))}

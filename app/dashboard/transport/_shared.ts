@@ -1,11 +1,53 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const transportFont = "'Outfit','Inter',sans-serif";
 export const transportBg = "rgba(255,255,255,.03)";
 export const transportBorder = "rgba(255,255,255,.07)";
 export const transportMuted = "rgba(255,255,255,.45)";
+
+export type TransportVehicle = ReturnType<typeof mapVehicleRecords>[number];
+export type TransportDriver = ReturnType<typeof mapDriverRecords>[number];
+export type TransportTrip = ReturnType<typeof mapTripRecords>[number];
+export type TransportFuel = ReturnType<typeof mapFuelRecords>[number];
+export type TransportDispatch = ReturnType<typeof mapDispatchRecords>[number];
+export type TransportMaintenance = ReturnType<typeof mapMaintenanceRecords>[number];
+export type TransportExpense = ReturnType<typeof mapTransportExpenseRecords>[number];
+
+export type TransportControlCenter = {
+  summary: {
+    fleetSize: number;
+    availableVehicles: number;
+    maintenanceVehicles: number;
+    drivers: number;
+    driversOnDuty: number;
+    trips: number;
+    activeTrips: number;
+    completedTrips: number;
+    dispatches: number;
+    activeDispatches: number;
+    fuelCost: number;
+    maintenanceCost: number;
+    expenseBooked: number;
+    netRevenue: number;
+  };
+  vehicles: TransportVehicle[];
+  drivers: TransportDriver[];
+  trips: TransportTrip[];
+  fuelLogs: TransportFuel[];
+  dispatches: TransportDispatch[];
+  maintenance: TransportMaintenance[];
+  expenses: TransportExpense[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);

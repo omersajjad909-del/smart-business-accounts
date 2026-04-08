@@ -1,30 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useEffect, useState } from "react";
 import {
-  mapCounterSaleRecords,
-  mapDrugRecords,
-  mapPrescriptionRecords,
+  fetchJson,
   pharmacyBg,
   pharmacyBorder,
   pharmacyFont,
   pharmacyMuted,
+  type PharmacyControlCenter,
 } from "./_shared";
 
+const emptyState: PharmacyControlCenter = {
+  summary: { medicines: 0, lowStock: 0, expired: 0, inventoryValue: 0, pendingPrescriptions: 0, dispensedPrescriptions: 0, counterSales: 0, counterRevenue: 0, purchaseSpend: 0, activeBatches: 0 },
+  drugs: [],
+  prescriptions: [],
+  batches: [],
+  purchases: [],
+  sales: [],
+};
+
 export default function PharmacyOverviewPage() {
-  const inventoryStore = useBusinessRecords("drug");
-  const prescriptionStore = useBusinessRecords("pharmacy_prescription");
-  const salesStore = useBusinessRecords("pharmacy_sale");
+  const [data, setData] = useState(emptyState);
 
-  const drugs = useMemo(() => mapDrugRecords(inventoryStore.records), [inventoryStore.records]);
-  const prescriptions = useMemo(() => mapPrescriptionRecords(prescriptionStore.records), [prescriptionStore.records]);
-  const sales = useMemo(() => mapCounterSaleRecords(salesStore.records), [salesStore.records]);
+  useEffect(() => {
+    fetchJson("/api/pharmacy/control-center", emptyState).then(setData);
+  }, []);
 
-  const lowStock = drugs.filter((row) => row.isLow).length;
-  const expired = drugs.filter((row) => row.isExpired).length;
-  const revenue = sales.reduce((sum, row) => sum + row.amount, 0);
+  const { summary, prescriptions } = data;
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: pharmacyFont }}>
@@ -48,12 +51,13 @@ export default function PharmacyOverviewPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Medicines", value: drugs.length, color: "#fb7185" },
-          { label: "Low Stock", value: lowStock, color: "#f59e0b" },
-          { label: "Expired", value: expired, color: "#f87171" },
-          { label: "Counter Revenue", value: `Rs. ${revenue.toLocaleString()}`, color: "#34d399" },
+          { label: "Medicines", value: summary.medicines, color: "#fb7185" },
+          { label: "Low Stock", value: summary.lowStock, color: "#f59e0b" },
+          { label: "Expired", value: summary.expired, color: "#f87171" },
+          { label: "Counter Revenue", value: `Rs. ${summary.counterRevenue.toLocaleString()}`, color: "#34d399" },
+          { label: "Purchase Spend", value: `Rs. ${summary.purchaseSpend.toLocaleString()}`, color: "#60a5fa" },
         ].map((card) => (
           <div key={card.label} style={{ background: pharmacyBg, border: `1px solid ${pharmacyBorder}`, borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 12, color: pharmacyMuted, marginBottom: 8 }}>{card.label}</div>
@@ -81,10 +85,11 @@ export default function PharmacyOverviewPage() {
           <div style={{ padding: "16px 18px", borderBottom: `1px solid ${pharmacyBorder}`, fontSize: 15, fontWeight: 800 }}>Operations Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
-              { label: "Dispensed prescriptions", value: prescriptions.filter((row) => row.status === "dispensed").length, color: "#34d399" },
-              { label: "Pending prescriptions", value: prescriptions.filter((row) => row.status === "pending").length, color: "#f59e0b" },
-              { label: "Counter sales", value: sales.length, color: "#60a5fa" },
-              { label: "Low stock items", value: lowStock, color: "#f87171" },
+              { label: "Inventory value", value: `Rs. ${summary.inventoryValue.toLocaleString()}`, color: "#60a5fa" },
+              { label: "Dispensed prescriptions", value: summary.dispensedPrescriptions, color: "#34d399" },
+              { label: "Pending prescriptions", value: summary.pendingPrescriptions, color: "#f59e0b" },
+              { label: "Counter sales", value: summary.counterSales, color: "#fb7185" },
+              { label: "Active batches", value: summary.activeBatches, color: "#c084fc" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13, color: pharmacyMuted }}>{row.label}</span>

@@ -1,11 +1,45 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const pharmacyFont = "'Outfit','Inter',sans-serif";
 export const pharmacyBg = "rgba(255,255,255,0.03)";
 export const pharmacyBorder = "rgba(255,255,255,0.07)";
 export const pharmacyMuted = "rgba(255,255,255,0.45)";
+
+export type PharmacyDrug = ReturnType<typeof mapDrugRecords>[number];
+export type PharmacyPrescription = ReturnType<typeof mapPrescriptionRecords>[number];
+export type PharmacyBatch = ReturnType<typeof mapBatchRecords>[number];
+export type PharmacyPurchase = ReturnType<typeof mapPurchaseRecords>[number];
+export type PharmacyCounterSale = ReturnType<typeof mapCounterSaleRecords>[number];
+
+export type PharmacyControlCenter = {
+  summary: {
+    medicines: number;
+    lowStock: number;
+    expired: number;
+    inventoryValue: number;
+    pendingPrescriptions: number;
+    dispensedPrescriptions: number;
+    counterSales: number;
+    counterRevenue: number;
+    purchaseSpend: number;
+    activeBatches: number;
+  };
+  drugs: PharmacyDrug[];
+  prescriptions: PharmacyPrescription[];
+  batches: PharmacyBatch[];
+  purchases: PharmacyPurchase[];
+  sales: PharmacyCounterSale[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);

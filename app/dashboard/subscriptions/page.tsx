@@ -1,38 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useEffect, useState } from "react";
 import {
+  fetchJson,
   formatMoney,
-  mapSaaSBillingRuns,
-  mapSaaSPlans,
-  mapSaaSSubscribers,
   saasBg,
   saasBorder,
   saasFont,
   saasMuted,
+  type SubscriptionsControlCenter,
 } from "./_shared";
 import type { BusinessType } from "@/lib/businessModules";
 
+const emptyState: SubscriptionsControlCenter = {
+  summary: {
+    plans: 0,
+    activePlans: 0,
+    subscribers: 0,
+    activeSubscribers: 0,
+    trialSubscribers: 0,
+    pastDueSubscribers: 0,
+    cancelledSubscribers: 0,
+    mrr: 0,
+    arr: 0,
+    collectedThisCycle: 0,
+    failedBillings: 0,
+  },
+  plans: [],
+  subscribers: [],
+  billings: [],
+};
+
 export default function SubscriptionsOverviewPage() {
   const [businessType, setBusinessType] = useState<BusinessType>("saas_company");
-  const planStore = useBusinessRecords("subscription_plan");
-  const subscriberStore = useBusinessRecords("subscription_subscriber");
-  const billingStore = useBusinessRecords("subscription_billing");
-
-  const plans = useMemo(() => mapSaaSPlans(planStore.records), [planStore.records]);
-  const subscribers = useMemo(() => mapSaaSSubscribers(subscriberStore.records), [subscriberStore.records]);
-  const billings = useMemo(() => mapSaaSBillingRuns(billingStore.records), [billingStore.records]);
-
-  const activeSubscribers = subscribers.filter((item) => item.status === "active").length;
-  const trialSubscribers = subscribers.filter((item) => item.status === "trial").length;
-  const pastDueSubscribers = subscribers.filter((item) => item.status === "past_due").length;
-  const mrr = subscribers
-    .filter((item) => item.status === "active" || item.status === "past_due")
-    .reduce((sum, item) => sum + (item.interval === "Yearly" ? item.amount / 12 : item.interval === "Quarterly" ? item.amount / 3 : item.amount), 0);
-  const arr = mrr * 12;
-  const paidThisCycle = billings.filter((item) => item.status === "paid").reduce((sum, item) => sum + item.amount, 0);
+  const [data, setData] = useState(emptyState);
 
   useEffect(() => {
     (async () => {
@@ -45,8 +47,13 @@ export default function SubscriptionsOverviewPage() {
     })();
   }, []);
 
+  useEffect(() => {
+    fetchJson("/api/subscriptions/control-center", emptyState).then(setData);
+  }, []);
+
   const isMembershipWebsite = businessType === "membership_website";
   const isSubscriptionBox = businessType === "subscription_box";
+  const { summary, plans, subscribers } = data;
   const title = isMembershipWebsite
     ? "Members, access tiers, and recurring revenue command center"
     : isSubscriptionBox
@@ -123,11 +130,11 @@ export default function SubscriptionsOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Plans", value: plans.length, color: "#60a5fa" },
-          { label: "Active Subscribers", value: activeSubscribers, color: "#34d399" },
-          { label: "Trials", value: trialSubscribers, color: "#f59e0b" },
-          { label: "MRR", value: formatMoney(Math.round(mrr)), color: "#c084fc" },
-          { label: "ARR", value: formatMoney(Math.round(arr)), color: "#22c55e" },
+          { label: "Plans", value: summary.plans, color: "#60a5fa" },
+          { label: "Active Subscribers", value: summary.activeSubscribers, color: "#34d399" },
+          { label: "Trials", value: summary.trialSubscribers, color: "#f59e0b" },
+          { label: "MRR", value: formatMoney(Math.round(summary.mrr)), color: "#c084fc" },
+          { label: "ARR", value: formatMoney(Math.round(summary.arr)), color: "#22c55e" },
         ].map((card) => (
           <div key={card.label} style={{ background: saasBg, border: `1px solid ${saasBorder}`, borderRadius: 16, padding: "18px 20px" }}>
             <div style={{ fontSize: 12, color: saasMuted, marginBottom: 8 }}>{card.label}</div>
@@ -157,9 +164,9 @@ export default function SubscriptionsOverviewPage() {
             <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 12 }}>Revenue Snapshot</div>
             <div style={{ display: "grid", gap: 10 }}>
               {[
-                { label: "Collected this cycle", value: formatMoney(paidThisCycle), color: "#34d399" },
-                { label: "Past due subscribers", value: pastDueSubscribers, color: "#f97316" },
-                { label: "Cancelled subscribers", value: subscribers.filter((item) => item.status === "cancelled").length, color: "#f87171" },
+                { label: "Collected this cycle", value: formatMoney(summary.collectedThisCycle), color: "#34d399" },
+                { label: "Past due subscribers", value: summary.pastDueSubscribers, color: "#f97316" },
+                { label: "Cancelled subscribers", value: summary.cancelledSubscribers, color: "#f87171" },
                 { label: "Draft or retired plans", value: plans.filter((item) => item.status !== "active").length, color: "#fbbf24" },
               ].map((row) => (
                 <div key={row.label} style={{ display: "flex", justifyContent: "space-between", border: "1px solid rgba(255,255,255,.06)", background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "10px 12px" }}>

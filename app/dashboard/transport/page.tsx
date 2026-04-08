@@ -1,45 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import {
-  mapDispatchRecords,
-  mapDriverRecords,
-  mapFuelRecords,
-  mapMaintenanceRecords,
-  mapTransportExpenseRecords,
-  mapTripRecords,
-  mapVehicleRecords,
-  transportBg,
-  transportBorder,
-  transportFont,
-  transportMuted,
-} from "./_shared";
+import { useEffect, useState } from "react";
+import { fetchJson, transportBg, transportBorder, transportFont, transportMuted, type TransportControlCenter } from "./_shared";
+
+const emptyState: TransportControlCenter = {
+  summary: { fleetSize: 0, availableVehicles: 0, maintenanceVehicles: 0, drivers: 0, driversOnDuty: 0, trips: 0, activeTrips: 0, completedTrips: 0, dispatches: 0, activeDispatches: 0, fuelCost: 0, maintenanceCost: 0, expenseBooked: 0, netRevenue: 0 },
+  vehicles: [],
+  drivers: [],
+  trips: [],
+  fuelLogs: [],
+  dispatches: [],
+  maintenance: [],
+  expenses: [],
+};
 
 export default function TransportOverviewPage() {
-  const fleetStore = useBusinessRecords("vehicle");
-  const tripStore = useBusinessRecords("trip");
-  const driverStore = useBusinessRecords("driver");
-  const fuelStore = useBusinessRecords("fuel_log");
-  const dispatchStore = useBusinessRecords("transport_dispatch");
-  const maintenanceStore = useBusinessRecords("vehicle_maintenance");
-  const expenseStore = useBusinessRecords("transport_expense");
+  const [data, setData] = useState(emptyState);
 
-  const vehicles = useMemo(() => mapVehicleRecords(fleetStore.records), [fleetStore.records]);
-  const trips = useMemo(() => mapTripRecords(tripStore.records), [tripStore.records]);
-  const drivers = useMemo(() => mapDriverRecords(driverStore.records), [driverStore.records]);
-  const fuelLogs = useMemo(() => mapFuelRecords(fuelStore.records), [fuelStore.records]);
-  const dispatches = useMemo(() => mapDispatchRecords(dispatchStore.records), [dispatchStore.records]);
-  const maintenance = useMemo(() => mapMaintenanceRecords(maintenanceStore.records), [maintenanceStore.records]);
-  const expenses = useMemo(() => mapTransportExpenseRecords(expenseStore.records), [expenseStore.records]);
+  useEffect(() => {
+    fetchJson("/api/transport/control-center", emptyState).then(setData);
+  }, []);
 
-  const activeTrips = trips.filter((row) => row.status === "in_transit").length;
-  const revenue = trips.filter((row) => row.status === "completed").reduce((sum, row) => sum + row.fare - row.expenses, 0);
-  const fuelCost = fuelLogs.reduce((sum, row) => sum + row.totalCost, 0);
-  const activeDispatches = dispatches.filter((row) => row.status === "planned" || row.status === "dispatched").length;
-  const openMaintenance = maintenance.filter((row) => row.status === "scheduled" || row.status === "in_progress").length;
-  const expenseBooked = expenses.reduce((sum, row) => sum + row.amount, 0);
+  const { summary, trips } = data;
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: transportFont }}>
@@ -66,12 +49,13 @@ export default function TransportOverviewPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Fleet Size", value: vehicles.length, color: "#60a5fa" },
-          { label: "Active Trips", value: activeTrips, color: "#22c55e" },
-          { label: "Drivers", value: drivers.length, color: "#f59e0b" },
-          { label: "Net Revenue", value: `Rs. ${revenue.toLocaleString()}`, color: "#34d399" },
+          { label: "Fleet Size", value: summary.fleetSize, color: "#60a5fa" },
+          { label: "Active Trips", value: summary.activeTrips, color: "#22c55e" },
+          { label: "Drivers", value: summary.drivers, color: "#f59e0b" },
+          { label: "Fuel Cost", value: `Rs. ${summary.fuelCost.toLocaleString()}`, color: "#f87171" },
+          { label: "Net Revenue", value: `Rs. ${summary.netRevenue.toLocaleString()}`, color: "#34d399" },
         ].map((card) => (
           <div key={card.label} style={{ background: transportBg, border: `1px solid ${transportBorder}`, borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 12, color: transportMuted, marginBottom: 8 }}>{card.label}</div>
@@ -87,7 +71,7 @@ export default function TransportOverviewPage() {
             {trips.filter((row) => row.status !== "completed" && row.status !== "cancelled").slice(0, 6).map((row) => (
               <div key={row.id} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{row.tripNo}</div>
-                <div style={{ fontSize: 12, color: transportMuted, marginTop: 4 }}>{row.vehicle || "-"} | {row.driver || "-"} </div>
+                <div style={{ fontSize: 12, color: transportMuted, marginTop: 4 }}>{row.vehicle || "-"} | {row.driver || "-"}</div>
                 <div style={{ fontSize: 12, color: "#93c5fd", marginTop: 6 }}>{row.from} to {row.to}</div>
               </div>
             ))}
@@ -99,13 +83,12 @@ export default function TransportOverviewPage() {
           <div style={{ padding: "16px 18px", borderBottom: `1px solid ${transportBorder}`, fontSize: 15, fontWeight: 800 }}>Operations Snapshot</div>
           <div style={{ padding: 18, display: "grid", gap: 10 }}>
             {[
-              { label: "Vehicles available", value: vehicles.filter((row) => row.status === "available").length, color: "#22c55e" },
-              { label: "Vehicles in maintenance", value: vehicles.filter((row) => row.status === "maintenance").length, color: "#f59e0b" },
-              { label: "Drivers on duty", value: drivers.filter((row) => row.status === "on_duty").length, color: "#60a5fa" },
-              { label: "Fuel cost booked", value: `Rs. ${fuelCost.toLocaleString()}`, color: "#f87171" },
-              { label: "Active dispatches", value: activeDispatches, color: "#38bdf8" },
-              { label: "Open maintenance jobs", value: openMaintenance, color: "#f59e0b" },
-              { label: "Trip expenses booked", value: `Rs. ${expenseBooked.toLocaleString()}`, color: "#fb7185" },
+              { label: "Vehicles available", value: summary.availableVehicles, color: "#22c55e" },
+              { label: "Vehicles in maintenance", value: summary.maintenanceVehicles, color: "#f59e0b" },
+              { label: "Drivers on duty", value: summary.driversOnDuty, color: "#60a5fa" },
+              { label: "Active dispatches", value: summary.activeDispatches, color: "#38bdf8" },
+              { label: "Maintenance cost", value: `Rs. ${summary.maintenanceCost.toLocaleString()}`, color: "#fb7185" },
+              { label: "Trip expenses booked", value: `Rs. ${summary.expenseBooked.toLocaleString()}`, color: "#f97316" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <span style={{ fontSize: 13, color: transportMuted }}>{row.label}</span>
