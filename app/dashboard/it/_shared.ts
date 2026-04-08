@@ -1,5 +1,3 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const itFont = "'Outfit','Inter',sans-serif";
@@ -65,6 +63,36 @@ export type SupportTicket = {
   updated: string;
   status: string;
 };
+
+export type ItControlCenter = {
+  summary: {
+    projects: number;
+    activeProjects: number;
+    averageProgress: number;
+    sprints: number;
+    activeSprints: number;
+    contracts: number;
+    activeContractValue: number;
+    activeMrr: number;
+    tickets: number;
+    openTickets: number;
+    criticalTickets: number;
+  };
+  projects: ItProject[];
+  sprints: ItSprint[];
+  contracts: ItContract[];
+  tickets: SupportTicket[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function mapItProjects(records: BusinessRecord[]): ItProject[] {
   return records.map((record) => ({

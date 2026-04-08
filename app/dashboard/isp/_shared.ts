@@ -51,6 +51,35 @@ export type IspTicket = {
   openedAt: string;
 };
 
+export type IspControlCenter = {
+  summary: {
+    packages: number;
+    activePackages: number;
+    connections: number;
+    activeConnections: number;
+    suspendedConnections: number;
+    bills: number;
+    overdueBills: number;
+    paidRevenue: number;
+    tickets: number;
+    openTickets: number;
+  };
+  packages: IspPackage[];
+  connections: IspConnection[];
+  bills: IspBill[];
+  tickets: IspTicket[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }

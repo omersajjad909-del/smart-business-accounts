@@ -1,5 +1,3 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const realEstateFont = "'Outfit','Inter',sans-serif";
@@ -8,6 +6,36 @@ export const realEstateBorder = "rgba(255,255,255,0.07)";
 export const realEstateMuted = "rgba(255,255,255,0.45)";
 
 export type PropertyStatus = "vacant" | "rented" | "maintenance" | "for_sale";
+
+export type RealEstateControlCenter = {
+  summary: {
+    properties: number;
+    rentedProperties: number;
+    vacantProperties: number;
+    maintenanceProperties: number;
+    tenants: number;
+    activeTenants: number;
+    leases: number;
+    activeLeases: number;
+    occupancyRate: number;
+    collectedRent: number;
+    pendingRent: number;
+  };
+  properties: ReturnType<typeof mapPropertyRecords>;
+  tenants: ReturnType<typeof mapTenantRecords>;
+  leases: ReturnType<typeof mapLeaseRecords>;
+  rents: ReturnType<typeof mapRentRecords>;
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function todayIso() {
   return new Date().toISOString().slice(0, 10);

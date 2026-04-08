@@ -1,5 +1,3 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const maintenanceAccent = "#34d399";
@@ -7,6 +5,42 @@ export const maintenanceBg = "rgba(15,23,42,.72)";
 export const maintenanceBorder = "rgba(52,211,153,.18)";
 export const maintenanceMuted = "rgba(226,232,240,.65)";
 export const maintenanceFont = "'Outfit','Inter',sans-serif";
+
+export type MaintenanceContract = ReturnType<typeof mapMaintenanceContract>;
+export type MaintenanceSchedule = ReturnType<typeof mapMaintenanceSchedule>;
+export type MaintenancePart = ReturnType<typeof mapMaintenancePart>;
+export type MaintenanceJob = ReturnType<typeof mapMaintenanceJob>;
+
+export type MaintenanceControlCenter = {
+  summary: {
+    contracts: number;
+    activeContracts: number;
+    renewalDue: number;
+    schedules: number;
+    scheduledVisits: number;
+    completedVisits: number;
+    jobs: number;
+    openJobs: number;
+    urgentJobs: number;
+    parts: number;
+    lowStockParts: number;
+    contractValue: number;
+  };
+  contracts: MaintenanceContract[];
+  schedules: MaintenanceSchedule[];
+  jobs: MaintenanceJob[];
+  parts: MaintenancePart[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function mapMaintenanceContract(record: BusinessRecord) {
   return {
