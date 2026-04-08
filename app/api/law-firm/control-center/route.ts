@@ -21,61 +21,73 @@ export async function GET(req: NextRequest) {
     prisma.businessRecord.findMany({ where: { companyId, category: "time_entry" }, orderBy: { createdAt: "desc" } }),
   ]);
 
-  const cases = caseRecords.map((record) => ({
-    id: record.id,
-    caseNo: String(record.data?.caseNo || record.id),
-    title: record.title,
-    client: String(record.data?.client || ""),
-    type: String(record.data?.type || "Civil"),
-    court: String(record.data?.court || ""),
-    fileDate: String(record.date || record.data?.fileDate || ""),
-    nextHearing: String(record.data?.nextHearing || ""),
-    status: String(record.status || "Active"),
-    lawyer: String(record.data?.lawyer || ""),
-  }));
-  const clients = clientRecords.map((record) => ({
-    id: record.id,
-    clientId: String(record.data?.clientId || record.id),
-    name: record.title,
-    type: String(record.data?.type || "Individual"),
-    phone: String(record.data?.phone || ""),
-    email: String(record.data?.email || ""),
-    city: String(record.data?.city || ""),
-    totalCases: Number(record.data?.totalCases || 0),
-    activeCases: Number(record.data?.activeCases || 0),
-    totalBilled: Number(record.amount || record.data?.totalBilled || 0),
-    outstanding: Number(record.data?.outstanding || 0),
-    joined: String(record.date || record.data?.joined || ""),
-    status: String(record.status || "Active"),
-  }));
-  const invoices = invoiceRecords.map((record) => ({
-    id: record.id,
-    invoiceId: String(record.data?.invoiceId || record.id),
-    caseId: String(record.data?.caseId || ""),
-    client: record.title,
-    description: String(record.data?.description || ""),
-    hours: Number(record.data?.hours || 0),
-    rate: Number(record.data?.rate || 0),
-    amount: Number(record.data?.amount || 0),
-    disbursements: Number(record.data?.disbursements || 0),
-    total: Number(record.amount || record.data?.total || 0),
-    status: String(record.status || "Draft"),
-    dueDate: String(record.date || record.data?.dueDate || ""),
-  }));
-  const entries = timeRecords.map((record) => ({
-    id: record.id,
-    entryId: String(record.data?.entryId || record.id),
-    date: String(record.date || record.data?.date || ""),
-    lawyer: record.title,
-    caseId: String(record.data?.caseId || ""),
-    caseTitle: String(record.data?.caseTitle || ""),
-    task: String(record.data?.task || ""),
-    hours: Number(record.data?.hours || 0),
-    rate: Number(record.data?.rate || 0),
-    amount: Number(record.amount || record.data?.amount || 0),
-    billable: Boolean(record.data?.billable),
-    billed: String(record.status || "pending") === "billed",
-  }));
+  const cases = caseRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id,
+      caseNo: String(data.caseNo || record.id),
+      title: record.title,
+      client: String(data.client || ""),
+      type: String(data.type || "Civil"),
+      court: String(data.court || ""),
+      fileDate: String(record.date || data.fileDate || ""),
+      nextHearing: String(data.nextHearing || ""),
+      status: String(record.status || "Active"),
+      lawyer: String(data.lawyer || ""),
+    };
+  });
+  const clients = clientRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id,
+      clientId: String(data.clientId || record.id),
+      name: record.title,
+      type: String(data.type || "Individual"),
+      phone: String(data.phone || ""),
+      email: String(data.email || ""),
+      city: String(data.city || ""),
+      totalCases: Number(data.totalCases || 0),
+      activeCases: Number(data.activeCases || 0),
+      totalBilled: Number(record.amount || data.totalBilled || 0),
+      outstanding: Number(data.outstanding || 0),
+      joined: String(record.date || data.joined || ""),
+      status: String(record.status || "Active"),
+    };
+  });
+  const invoices = invoiceRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id,
+      invoiceId: String(data.invoiceId || record.id),
+      caseId: String(data.caseId || ""),
+      client: record.title,
+      description: String(data.description || ""),
+      hours: Number(data.hours || 0),
+      rate: Number(data.rate || 0),
+      amount: Number(data.amount || 0),
+      disbursements: Number(data.disbursements || 0),
+      total: Number(record.amount || data.total || 0),
+      status: String(record.status || "Draft"),
+      dueDate: String(record.date || data.dueDate || ""),
+    };
+  });
+  const entries = timeRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id,
+      entryId: String(data.entryId || record.id),
+      date: String(record.date || data.date || ""),
+      lawyer: record.title,
+      caseId: String(data.caseId || ""),
+      caseTitle: String(data.caseTitle || ""),
+      task: String(data.task || ""),
+      hours: Number(data.hours || 0),
+      rate: Number(data.rate || 0),
+      amount: Number(record.amount || data.amount || 0),
+      billable: Boolean(data.billable),
+      billed: String(record.status || "pending") === "billed",
+    };
+  });
 
   const now = new Date();
   const todayTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();

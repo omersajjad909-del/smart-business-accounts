@@ -21,26 +21,38 @@ export async function GET(req: NextRequest) {
     prisma.businessRecord.findMany({ where: { companyId, category: "lab_test" }, orderBy: { createdAt: "desc" } }),
   ]);
 
-  const patients = patientRecords.map((record) => ({
-    id: record.id, mrNo: String(record.data?.mrNo || record.title), name: record.title, age: Number(record.data?.age || 0),
-    doctor: String(record.data?.doctor || ""), diagnosis: String(record.data?.diagnosis || ""), phone: String(record.data?.phone || ""),
-    status: String(record.status || "opd"), admitDate: String(record.date || record.data?.admitDate || ""),
-  }));
-  const appointments = appointmentRecords.map((record) => ({
-    id: record.id, apptNo: String(record.data?.apptNo || record.title), patient: record.title, doctor: String(record.data?.doctor || ""),
-    department: String(record.data?.department || ""), date: String(record.date || record.data?.date || ""), time: String(record.data?.time || ""),
-    type: String(record.data?.type || "consultation"), status: String(record.status || "scheduled"),
-  }));
-  const prescriptions = prescriptionRecords.map((record) => ({
-    id: record.id, rxNo: String(record.data?.rxNo || record.title), patient: record.title, doctor: String(record.data?.doctor || ""),
-    date: String(record.date || record.data?.date || ""), diagnosis: String(record.data?.diagnosis || ""),
-    medicines: Array.isArray(record.data?.medicines) ? (record.data?.medicines as unknown[]) : [], status: String(record.status || "active"),
-  }));
-  const labs = labRecords.map((record) => ({
-    id: record.id, labNo: String(record.data?.labNo || record.title), patient: record.title, doctor: String(record.data?.doctor || ""),
-    requestDate: String(record.date || record.data?.requestDate || ""), tests: Array.isArray(record.data?.tests) ? (record.data?.tests as string[]) : [],
-    urgent: Boolean(record.data?.urgent), status: String(record.status || "requested"), results: String(record.data?.results || ""),
-  }));
+  const patients = patientRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id, mrNo: String(data.mrNo || record.title), name: record.title, age: Number(data.age || 0),
+      doctor: String(data.doctor || ""), diagnosis: String(data.diagnosis || ""), phone: String(data.phone || ""),
+      status: String(record.status || "opd"), admitDate: String(record.date || data.admitDate || ""),
+    };
+  });
+  const appointments = appointmentRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id, apptNo: String(data.apptNo || record.title), patient: record.title, doctor: String(data.doctor || ""),
+      department: String(data.department || ""), date: String(record.date || data.date || ""), time: String(data.time || ""),
+      type: String(data.type || "consultation"), status: String(record.status || "scheduled"),
+    };
+  });
+  const prescriptions = prescriptionRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id, rxNo: String(data.rxNo || record.title), patient: record.title, doctor: String(data.doctor || ""),
+      date: String(record.date || data.date || ""), diagnosis: String(data.diagnosis || ""),
+      medicines: Array.isArray(data.medicines) ? (data.medicines as unknown[]) : [], status: String(record.status || "active"),
+    };
+  });
+  const labs = labRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id, labNo: String(data.labNo || record.title), patient: record.title, doctor: String(data.doctor || ""),
+      requestDate: String(record.date || data.requestDate || ""), tests: Array.isArray(data.tests) ? (data.tests as string[]) : [],
+      urgent: Boolean(data.urgent), status: String(record.status || "requested"), results: String(data.results || ""),
+    };
+  });
 
   const today = new Date().toISOString().slice(0, 10);
   return NextResponse.json({

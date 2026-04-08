@@ -25,6 +25,8 @@ export default function LabPage() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [formError, setFormError] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [resultsDraft, setResultsDraft] = useState("");
 
   const tests = records.map(r => ({
     id: r.id,
@@ -63,6 +65,8 @@ export default function LabPage() {
       return;
     }
     await update(id, { data: { results: results.trim() } });
+    setEditingId(null);
+    setResultsDraft("");
   }
 
   function addTestItem() {
@@ -175,16 +179,37 @@ export default function LabPage() {
             )}
             {expandedId === t.id && t.status !== "completed" && (
               <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
-                <button
-                  onClick={() => {
-                    const nextResults = window.prompt("Enter lab results", t.results || "");
-                    if (nextResults === null) return;
-                    void saveResults(t.id, nextResults);
-                  }}
-                  style={{ padding: "7px 14px", background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#3b82f6", borderRadius: 7, cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 600 }}
-                >
-                  {t.results ? "Update Results" : "Add Results"}
-                </button>
+                {editingId === t.id ? (
+                  <div style={{ width: "100%", display: "grid", gap: 8 }}>
+                    <textarea
+                      value={resultsDraft}
+                      onChange={(e) => setResultsDraft(e.target.value)}
+                      placeholder="Enter lab results"
+                      style={{ width: "100%", minHeight: 88, resize: "vertical", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontFamily: ff, fontSize: 13, boxSizing: "border-box" }}
+                    />
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        onClick={() => void saveResults(t.id, resultsDraft)}
+                        style={{ padding: "7px 14px", background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", color: "#22c55e", borderRadius: 7, cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 600 }}
+                      >
+                        Save Results
+                      </button>
+                      <button
+                        onClick={() => { setEditingId(null); setResultsDraft(""); }}
+                        style={{ padding: "7px 14px", background: bg, border: `1px solid ${border}`, color: "rgba(255,255,255,0.6)", borderRadius: 7, cursor: "pointer", fontFamily: ff, fontSize: 12 }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { setEditingId(t.id); setResultsDraft(t.results || ""); }}
+                    style={{ padding: "7px 14px", background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#3b82f6", borderRadius: 7, cursor: "pointer", fontFamily: ff, fontSize: 12, fontWeight: 600 }}
+                  >
+                    {t.results ? "Update Results" : "Add Results"}
+                  </button>
+                )}
               </div>
             )}
           </div>

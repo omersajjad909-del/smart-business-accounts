@@ -22,33 +22,48 @@ export async function GET(req: NextRequest) {
     prisma.businessRecord.findMany({ where: { companyId, category: "fund_transaction" }, orderBy: { createdAt: "desc" } }),
   ]);
 
-  const donors = donorRecords.map((record) => ({
-    id: record.id, donorId: String(record.data?.donorId || record.id), name: record.title,
-    phone: String(record.data?.phone || ""), email: String(record.data?.email || ""), type: String(record.data?.type || "individual"),
-    totalDonated: Number(record.amount || record.data?.totalDonated || 0), lastDonation: Number(record.data?.lastDonation || 0),
-    frequency: String(record.data?.frequency || "monthly"), status: String(record.status || "active"), category: String(record.data?.category || ""),
-  }));
-  const grants = grantRecords.map((record) => ({
-    id: record.id, grantNo: String(record.data?.grantNo || record.id), title: record.title, donor: String(record.data?.donor || ""),
-    amount: Number(record.amount || record.data?.amount || 0), currency: String(record.data?.currency || "PKR"), startDate: String(record.date || record.data?.startDate || ""),
-    endDate: String(record.data?.endDate || ""), purpose: String(record.data?.purpose || ""), spent: Number(record.data?.spent || 0),
-    status: String(record.status || "active"), reportDue: record.data?.reportDue ? String(record.data.reportDue) : undefined,
-  }));
-  const beneficiaries = beneficiaryRecords.map((record) => ({
-    id: record.id, benefId: String(record.data?.benefId || record.id), name: record.title, cnic: String(record.data?.cnic || ""),
-    phone: String(record.data?.phone || ""), address: String(record.data?.address || ""), category: String(record.data?.category || "family"),
-    assistance: Array.isArray(record.data?.assistance) ? (record.data?.assistance as string[]) : [],
-    monthlyAid: Number(record.amount || record.data?.monthlyAid || 0), status: String(record.status || "active"), enrollDate: String(record.date || record.data?.enrollDate || ""),
-  }));
-  const funds = fundRecords.map((record) => ({
-    id: record.id, name: record.title, purpose: String(record.data?.purpose || ""), balance: Number(record.amount || record.data?.balance || 0),
-    totalReceived: Number(record.data?.totalReceived || 0), totalSpent: Number(record.data?.totalSpent || 0), donors: Number(record.data?.donors || 0),
-    status: String(record.status || "active"),
-  }));
-  const transactions = transactionRecords.map((record) => ({
-    id: record.id, fund: String(record.data?.fund || ""), type: String(record.status || "receipt"), amount: Number(record.amount || 0),
-    description: record.title, date: String(record.date || ""), reference: String(record.data?.reference || ""),
-  }));
+  const donors = donorRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id, donorId: String(data.donorId || record.id), name: record.title,
+      phone: String(data.phone || ""), email: String(data.email || ""), type: String(data.type || "individual"),
+      totalDonated: Number(record.amount || data.totalDonated || 0), lastDonation: Number(data.lastDonation || 0),
+      frequency: String(data.frequency || "monthly"), status: String(record.status || "active"), category: String(data.category || ""),
+    };
+  });
+  const grants = grantRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id, grantNo: String(data.grantNo || record.id), title: record.title, donor: String(data.donor || ""),
+      amount: Number(record.amount || data.amount || 0), currency: String(data.currency || "PKR"), startDate: String(record.date || data.startDate || ""),
+      endDate: String(data.endDate || ""), purpose: String(data.purpose || ""), spent: Number(data.spent || 0),
+      status: String(record.status || "active"), reportDue: data.reportDue ? String(data.reportDue) : undefined,
+    };
+  });
+  const beneficiaries = beneficiaryRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id, benefId: String(data.benefId || record.id), name: record.title, cnic: String(data.cnic || ""),
+      phone: String(data.phone || ""), address: String(data.address || ""), category: String(data.category || "family"),
+      assistance: Array.isArray(data.assistance) ? (data.assistance as string[]) : [],
+      monthlyAid: Number(record.amount || data.monthlyAid || 0), status: String(record.status || "active"), enrollDate: String(record.date || data.enrollDate || ""),
+    };
+  });
+  const funds = fundRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id, name: record.title, purpose: String(data.purpose || ""), balance: Number(record.amount || data.balance || 0),
+      totalReceived: Number(data.totalReceived || 0), totalSpent: Number(data.totalSpent || 0), donors: Number(data.donors || 0),
+      status: String(record.status || "active"),
+    };
+  });
+  const transactions = transactionRecords.map((record) => {
+    const data = (record.data || {}) as Record<string, unknown>;
+    return {
+      id: record.id, fund: String(data.fund || ""), type: String(record.status || "receipt"), amount: Number(record.amount || 0),
+      description: record.title, date: String(record.date || ""), reference: String(data.reference || ""),
+    };
+  });
 
   const donorRaised = donors.reduce((sum, item) => sum + item.totalDonated, 0);
   const grantBook = grants.reduce((sum, item) => sum + item.amount, 0);
