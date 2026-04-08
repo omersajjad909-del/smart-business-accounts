@@ -1,5 +1,3 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const gymFont = "'Outfit','Inter',sans-serif";
@@ -47,6 +45,37 @@ export type GymTrainer = {
   status: GymTrainerStatus;
   rating: number;
 };
+
+export type GymControlCenter = {
+  summary: {
+    members: number;
+    activeMembers: number;
+    expiringMembers: number;
+    expiredMembers: number;
+    classes: number;
+    openClasses: number;
+    cancelledClasses: number;
+    trainers: number;
+    activeTrainers: number;
+    paidRevenue: number;
+    overdueMembers: number;
+    occupancyRate: number;
+    trainerUtilization: number;
+  };
+  memberships: GymMembership[];
+  classes: GymClass[];
+  trainers: GymTrainer[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function mapGymMemberships(records: BusinessRecord[]): GymMembership[] {
   return records.map((record) => ({

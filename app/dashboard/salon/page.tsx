@@ -1,16 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useEffect, useState } from "react";
 import {
+  SalonControlCenter,
+  fetchJson,
   salonBg,
   salonBorder,
   salonFont,
   salonMuted,
-  mapSalonAppointments,
-  mapSalonServices,
-  mapSalonStylists,
 } from "./_shared";
+
+const emptyState: SalonControlCenter = {
+  summary: {
+    appointments: 0,
+    appointmentsToday: 0,
+    openQueue: 0,
+    completedAppointments: 0,
+    cancellationRate: 0,
+    stylists: 0,
+    activeStylists: 0,
+    leaveStylists: 0,
+    services: 0,
+    activeServices: 0,
+    popularServices: 0,
+    completedRevenue: 0,
+  },
+  appointments: [],
+  stylists: [],
+  services: [],
+};
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
@@ -22,21 +41,13 @@ function StatCard({ label, value, tone }: { label: string; value: string | numbe
 }
 
 export default function SalonOverviewPage() {
-  const appointmentsHook = useBusinessRecords("salon_appointment");
-  const stylistsHook = useBusinessRecords("stylist");
-  const servicesHook = useBusinessRecords("salon_service");
+  const [data, setData] = useState(emptyState);
 
-  const appointments = mapSalonAppointments(appointmentsHook.records);
-  const stylists = mapSalonStylists(stylistsHook.records);
-  const services = mapSalonServices(servicesHook.records);
+  useEffect(() => {
+    fetchJson("/api/salon/control-center", emptyState).then(setData);
+  }, []);
 
-  const activeStylists = stylists.filter((stylist) => stylist.status === "Active").length;
-  const todayKey = new Date().toISOString().slice(0, 10);
-  const todayAppointments = appointments.filter((appointment) => appointment.date === todayKey);
-  const completedRevenue = appointments.filter((appointment) => appointment.status === "completed").reduce((sum, appointment) => sum + appointment.price, 0);
-  const openAppointments = appointments.filter((appointment) => appointment.status === "booked" || appointment.status === "confirmed" || appointment.status === "in_progress").length;
-  const activeServices = services.filter((service) => service.status === "Active").length;
-
+  const { summary, appointments, stylists, services } = data;
   const topServices = [...services].sort((a, b) => Number(b.popular) - Number(a.popular) || b.price - a.price).slice(0, 4);
 
   return (
@@ -50,11 +61,11 @@ export default function SalonOverviewPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0,1fr))", gap: 14, marginBottom: 26 }}>
-        <StatCard label="Appointments Today" value={todayAppointments.length} tone="#f472b6" />
-        <StatCard label="Open Queue" value={openAppointments} tone="#60a5fa" />
-        <StatCard label="Active Stylists" value={activeStylists} tone="#34d399" />
-        <StatCard label="Active Services" value={activeServices} tone="#fbbf24" />
-        <StatCard label="Completed Revenue" value={`Rs. ${completedRevenue.toLocaleString()}`} tone="#a78bfa" />
+        <StatCard label="Appointments Today" value={summary.appointmentsToday} tone="#f472b6" />
+        <StatCard label="Open Queue" value={summary.openQueue} tone="#60a5fa" />
+        <StatCard label="Active Stylists" value={summary.activeStylists} tone="#34d399" />
+        <StatCard label="Active Services" value={summary.activeServices} tone="#fbbf24" />
+        <StatCard label="Completed Revenue" value={`Rs. ${summary.completedRevenue.toLocaleString()}`} tone="#a78bfa" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
@@ -105,7 +116,7 @@ export default function SalonOverviewPage() {
               <div key={service.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{service.name}</div>
-                  <div style={{ fontSize: 12, color: salonMuted }}>{service.category} • {service.duration} min</div>
+                  <div style={{ fontSize: 12, color: salonMuted }}>{service.category} · {service.duration} min</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 15, fontWeight: 800, color: "#34d399" }}>Rs. {service.price.toLocaleString()}</div>
@@ -122,7 +133,7 @@ export default function SalonOverviewPage() {
             {[
               { label: "Confirmed queue", value: `${appointments.filter((appointment) => appointment.status === "confirmed").length} ready to start`, tone: "#60a5fa" },
               { label: "In progress now", value: `${appointments.filter((appointment) => appointment.status === "in_progress").length} clients on chair`, tone: "#f472b6" },
-              { label: "Leave pressure", value: `${stylists.filter((stylist) => stylist.status === "On Leave").length} team members away`, tone: "#f59e0b" },
+              { label: "Leave pressure", value: `${summary.leaveStylists} team members away`, tone: "#f59e0b" },
               { label: "Inactive services", value: `${services.filter((service) => service.status !== "Active").length} cards paused`, tone: "#94a3b8" },
             ].map((row) => (
               <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "14px 16px" }}>

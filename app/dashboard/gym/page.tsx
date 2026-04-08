@@ -1,17 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useEffect, useState } from "react";
 import {
+  GymControlCenter,
+  fetchJson,
   gymBg,
   gymBorder,
   gymFont,
   gymMuted,
   gymStatusColor,
-  mapGymClasses,
-  mapGymMemberships,
-  mapGymTrainers,
 } from "./_shared";
+
+const emptyState: GymControlCenter = {
+  summary: {
+    members: 0,
+    activeMembers: 0,
+    expiringMembers: 0,
+    expiredMembers: 0,
+    classes: 0,
+    openClasses: 0,
+    cancelledClasses: 0,
+    trainers: 0,
+    activeTrainers: 0,
+    paidRevenue: 0,
+    overdueMembers: 0,
+    occupancyRate: 0,
+    trainerUtilization: 0,
+  },
+  memberships: [],
+  classes: [],
+  trainers: [],
+};
 
 function StatCard({ label, value, tone }: { label: string; value: string | number; tone: string }) {
   return (
@@ -23,19 +43,13 @@ function StatCard({ label, value, tone }: { label: string; value: string | numbe
 }
 
 export default function GymOverviewPage() {
-  const memberships = mapGymMemberships(useBusinessRecords("gym_member").records);
-  const classes = mapGymClasses(useBusinessRecords("gym_class").records);
-  const trainers = mapGymTrainers(useBusinessRecords("trainer").records);
+  const [data, setData] = useState(emptyState);
 
-  const activeMembers = memberships.filter((member) => member.status === "Active").length;
-  const expiringMembers = memberships.filter((member) => member.status === "Expiring").length;
-  const openClasses = classes.filter((gymClass) => gymClass.status === "Open").length;
-  const occupancy = classes.reduce((sum, gymClass) => sum + gymClass.enrolled, 0);
-  const capacity = classes.reduce((sum, gymClass) => sum + gymClass.capacity, 0);
-  const occupancyRate = capacity ? Math.round((occupancy / capacity) * 100) : 0;
-  const paidRevenue = memberships.filter((member) => member.paymentStatus === "Paid").reduce((sum, member) => sum + member.fee, 0);
-  const activeTrainers = trainers.filter((trainer) => trainer.status === "Active").length;
+  useEffect(() => {
+    fetchJson("/api/gym/control-center", emptyState).then(setData);
+  }, []);
 
+  const { summary, classes, trainers } = data;
   const topClasses = [...classes].sort((a, b) => b.enrolled - a.enrolled).slice(0, 4);
 
   return (
@@ -49,11 +63,11 @@ export default function GymOverviewPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0,1fr))", gap: 14, marginBottom: 26 }}>
-        <StatCard label="Active Members" value={activeMembers} tone="#34d399" />
-        <StatCard label="Expiring Soon" value={expiringMembers} tone="#fbbf24" />
-        <StatCard label="Open Classes" value={openClasses} tone="#60a5fa" />
-        <StatCard label="Active Trainers" value={activeTrainers} tone="#a78bfa" />
-        <StatCard label="Paid Revenue" value={`Rs. ${paidRevenue.toLocaleString()}`} tone="#f97316" />
+        <StatCard label="Active Members" value={summary.activeMembers} tone="#34d399" />
+        <StatCard label="Expiring Soon" value={summary.expiringMembers} tone="#fbbf24" />
+        <StatCard label="Open Classes" value={summary.openClasses} tone="#60a5fa" />
+        <StatCard label="Active Trainers" value={summary.activeTrainers} tone="#a78bfa" />
+        <StatCard label="Paid Revenue" value={`Rs. ${summary.paidRevenue.toLocaleString()}`} tone="#f97316" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr .85fr", gap: 18, marginBottom: 18 }}>
@@ -104,7 +118,7 @@ export default function GymOverviewPage() {
               <div key={gymClass.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{gymClass.name}</div>
-                  <div style={{ fontSize: 12, color: gymMuted }}>{gymClass.days} • {gymClass.time}</div>
+                  <div style={{ fontSize: 12, color: gymMuted }}>{gymClass.days} · {gymClass.time}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 15, fontWeight: 800, color: gymStatusColor(gymClass.status) }}>{gymClass.enrolled}/{gymClass.capacity}</div>
@@ -119,8 +133,8 @@ export default function GymOverviewPage() {
           <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Operational Reading</div>
           <div style={{ display: "grid", gap: 12 }}>
             {[
-              { label: "Class occupancy", value: `${occupancyRate}% seats engaged`, tone: "#60a5fa" },
-              { label: "Renewal pressure", value: `${expiringMembers} memberships need follow-up`, tone: "#fbbf24" },
+              { label: "Class occupancy", value: `${summary.occupancyRate}% seats engaged`, tone: "#60a5fa" },
+              { label: "Renewal pressure", value: `${summary.expiringMembers} memberships need follow-up`, tone: "#fbbf24" },
               { label: "Trainer load", value: `${trainers.reduce((sum, trainer) => sum + trainer.activeClients, 0)} active clients handled`, tone: "#34d399" },
               { label: "Off-duty staff", value: `${trainers.filter((trainer) => trainer.status === "Off Duty").length} trainers unavailable`, tone: "#f97316" },
             ].map((row) => (

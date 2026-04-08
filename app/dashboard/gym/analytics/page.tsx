@@ -1,15 +1,35 @@
 "use client";
 
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useEffect, useMemo, useState } from "react";
 import {
+  GymControlCenter,
+  fetchJson,
   gymBg,
   gymBorder,
   gymFont,
   gymMuted,
-  mapGymClasses,
-  mapGymMemberships,
-  mapGymTrainers,
 } from "../_shared";
+
+const emptyState: GymControlCenter = {
+  summary: {
+    members: 0,
+    activeMembers: 0,
+    expiringMembers: 0,
+    expiredMembers: 0,
+    classes: 0,
+    openClasses: 0,
+    cancelledClasses: 0,
+    trainers: 0,
+    activeTrainers: 0,
+    paidRevenue: 0,
+    overdueMembers: 0,
+    occupancyRate: 0,
+    trainerUtilization: 0,
+  },
+  memberships: [],
+  classes: [],
+  trainers: [],
+};
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
@@ -22,32 +42,36 @@ function Metric({ title, value, note, color }: { title: string; value: string; n
 }
 
 export default function GymAnalyticsPage() {
-  const memberships = mapGymMemberships(useBusinessRecords("gym_member").records);
-  const classes = mapGymClasses(useBusinessRecords("gym_class").records);
-  const trainers = mapGymTrainers(useBusinessRecords("trainer").records);
+  const [data, setData] = useState(emptyState);
 
-  const revenue = memberships.filter((member) => member.paymentStatus === "Paid").reduce((sum, member) => sum + member.fee, 0);
-  const activeMembers = memberships.filter((member) => member.status === "Active").length;
+  useEffect(() => {
+    fetchJson("/api/gym/control-center", emptyState).then(setData);
+  }, []);
+
+  const { summary, memberships, classes, trainers } = data;
   const expiredMembers = memberships.filter((member) => member.status === "Expired").length;
-  const overdueMembers = memberships.filter((member) => member.paymentStatus !== "Paid").length;
-  const totalClients = trainers.reduce((sum, trainer) => sum + trainer.activeClients, 0);
-  const trainerUtilization = trainers.length ? Math.round(totalClients / trainers.length) : 0;
 
-  const planMixMap = new Map<string, number>();
-  memberships.forEach((member) => {
-    planMixMap.set(member.plan, (planMixMap.get(member.plan) || 0) + 1);
-  });
-  const planMix = [...planMixMap.entries()].sort((a, b) => b[1] - a[1]);
+  const planMix = useMemo(() => {
+    const planMixMap = new Map<string, number>();
+    memberships.forEach((member) => {
+      planMixMap.set(member.plan, (planMixMap.get(member.plan) || 0) + 1);
+    });
+    return [...planMixMap.entries()].sort((a, b) => b[1] - a[1]);
+  }, [memberships]);
 
-  const classLoad = [...classes]
-    .map((gymClass) => ({
-      ...gymClass,
-      pct: gymClass.capacity ? Math.round((gymClass.enrolled / gymClass.capacity) * 100) : 0,
-    }))
-    .sort((a, b) => b.pct - a.pct)
-    .slice(0, 5);
+  const classLoad = useMemo(() => {
+    return [...classes]
+      .map((gymClass) => ({
+        ...gymClass,
+        pct: gymClass.capacity ? Math.round((gymClass.enrolled / gymClass.capacity) * 100) : 0,
+      }))
+      .sort((a, b) => b.pct - a.pct)
+      .slice(0, 5);
+  }, [classes]);
 
-  const trainerLoad = [...trainers].sort((a, b) => b.activeClients - a.activeClients).slice(0, 5);
+  const trainerLoad = useMemo(() => {
+    return [...trainers].sort((a, b) => b.activeClients - a.activeClients).slice(0, 5);
+  }, [trainers]);
 
   return (
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: gymFont }}>
@@ -60,10 +84,10 @@ export default function GymAnalyticsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
-        <Metric title="Paid Revenue" value={`Rs. ${revenue.toLocaleString()}`} note="Paid memberships only" color="#34d399" />
-        <Metric title="Active Members" value={String(activeMembers)} note={`${expiredMembers} memberships expired`} color="#60a5fa" />
-        <Metric title="Payment Risk" value={String(overdueMembers)} note="Pending fee follow-ups" color="#f87171" />
-        <Metric title="Trainer Utilization" value={`${trainerUtilization}`} note="Average active clients per trainer" color="#f59e0b" />
+        <Metric title="Paid Revenue" value={`Rs. ${summary.paidRevenue.toLocaleString()}`} note="Paid memberships only" color="#34d399" />
+        <Metric title="Active Members" value={String(summary.activeMembers)} note={`${expiredMembers} memberships expired`} color="#60a5fa" />
+        <Metric title="Payment Risk" value={String(summary.overdueMembers)} note="Pending fee follow-ups" color="#f87171" />
+        <Metric title="Trainer Utilization" value={`${summary.trainerUtilization}`} note="Average active clients per trainer" color="#f59e0b" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>

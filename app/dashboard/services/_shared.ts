@@ -1,6 +1,9 @@
-"use client";
-
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
+
+export const serviceFont = "'Outfit','Inter',sans-serif";
+export const serviceBg = "rgba(255,255,255,0.03)";
+export const serviceBorder = "rgba(255,255,255,0.07)";
+export const serviceMuted = "rgba(255,255,255,.55)";
 
 export type ServiceCatalogItem = {
   id: string;
@@ -42,6 +45,36 @@ export type ServiceTimesheet = {
   workDate: string;
   status: string;
 };
+
+export type ServicesControlCenter = {
+  summary: {
+    catalog: number;
+    activeProjects: number;
+    completedProjects: number;
+    deliveries: number;
+    overdueDeliveries: number;
+    reviewDeliveries: number;
+    timesheets: number;
+    draftTimesheets: number;
+    billableHours: number;
+    billableValue: number;
+    activeClients: number;
+  };
+  catalog: ServiceCatalogItem[];
+  projects: ServiceProject[];
+  deliveries: ServiceDelivery[];
+  timesheets: ServiceTimesheet[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function mapServiceCatalogRecord(record: BusinessRecord): ServiceCatalogItem {
   return {

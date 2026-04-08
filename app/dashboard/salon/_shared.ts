@@ -48,6 +48,36 @@ export type SalonService = {
   popular: boolean;
 };
 
+export type SalonControlCenter = {
+  summary: {
+    appointments: number;
+    appointmentsToday: number;
+    openQueue: number;
+    completedAppointments: number;
+    cancellationRate: number;
+    stylists: number;
+    activeStylists: number;
+    leaveStylists: number;
+    services: number;
+    activeServices: number;
+    popularServices: number;
+    completedRevenue: number;
+  };
+  appointments: SalonAppointment[];
+  stylists: SalonStylist[];
+  services: SalonService[];
+};
+
+export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) return fallback;
+    return (await response.json()) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function salonStatusColor(status: string) {
   const colors: Record<string, string> = {
     booked: "#f59e0b",

@@ -1,7 +1,8 @@
 "use client";
-import { confirmToast, alertToast } from "@/lib/toast-feedback";
-import { useState, useMemo } from "react";
+import { confirmToast } from "@/lib/toast-feedback";
+import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { getCurrentUser } from "@/lib/auth";
 
 // ─── Design tokens ───────────────────────────────────────────────────────────
 const ff = "'Outfit','Inter',sans-serif";
@@ -54,6 +55,32 @@ export default function SalesOrderPage() {
   const [form, setForm] = useState<typeof EMPTY_FORM>({ ...EMPTY_FORM });
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
+
+  // Saved customers + items
+  const [customers, setCustomers] = useState<{ id: string; name: string }[]>([]);
+  const [itemList,  setItemList]  = useState<{ id: string; name: string; salePrice?: number }[]>([]);
+
+  useEffect(() => {
+    const u = getCurrentUser();
+    const h: Record<string, string> = {};
+    if (u?.id)        h["x-user-id"]    = u.id;
+    if (u?.role)      h["x-user-role"]  = u.role;
+    if (u?.companyId) h["x-company-id"] = u.companyId;
+
+    fetch("/api/accounts", { headers: h })
+      .then(r => r.ok ? r.json() : [])
+      .then(d => {
+        const list = Array.isArray(d) ? d : d.accounts || [];
+        setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER").map((a: any) => ({ id: a.id, name: a.name })));
+      }).catch(() => {});
+
+    fetch("/api/stock-available-for-sale", { headers: h })
+      .then(r => r.ok ? r.json() : [])
+      .then(d => {
+        const list = Array.isArray(d) ? d : [];
+        setItemList(list.map((i: any) => ({ id: i.id, name: i.name, salePrice: i.salePrice ?? i.rate ?? 0 })));
+      }).catch(() => {});
+  }, []);
 
   // Map raw records → typed orders
   const orders: SalesOrder[] = useMemo(
@@ -485,12 +512,16 @@ export default function SalesOrderPage() {
                 <label style={{ display: "block", fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>
                   Customer Name *
                 </label>
-                <input
+                <select
                   style={inputStyle}
-                  placeholder="e.g. Acme Corp"
                   value={form.customerName}
                   onChange={(e) => setForm((f) => ({ ...f, customerName: e.target.value }))}
-                />
+                >
+                  <option value="">— Select Customer —</option>
+                  {customers.map(c => (
+                    <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>
@@ -552,12 +583,25 @@ export default function SalesOrderPage() {
                       alignItems: "center",
                     }}
                   >
-                    <input
+                    <select
                       style={inputStyle}
-                      placeholder="Item name"
                       value={item.name}
-                      onChange={(e) => updateItem(idx, "name", e.target.value)}
-                    />
+                      onChange={(e) => {
+                        const selected = itemList.find(i => i.name === e.target.value);
+                        setForm(prev => {
+                          const items = prev.items.map((it, i) => i === idx
+                            ? { ...it, name: e.target.value, unitPrice: selected?.salePrice ?? it.unitPrice }
+                            : it
+                          );
+                          return { ...prev, items };
+                        });
+                      }}
+                    >
+                      <option value="">— Select Item —</option>
+                      {itemList.map(i => (
+                        <option key={i.id} value={i.name}>{i.name}</option>
+                      ))}
+                    </select>
                     <input
                       type="number"
                       min={1}

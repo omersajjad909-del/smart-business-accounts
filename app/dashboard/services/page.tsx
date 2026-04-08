@@ -1,62 +1,70 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useEffect, useState } from "react";
 import {
-  mapServiceCatalogRecord,
-  mapServiceDeliveryRecord,
-  mapServiceProjectRecord,
-  mapServiceTimesheetRecord,
+  ServicesControlCenter,
+  fetchJson,
+  serviceBg,
+  serviceBorder,
+  serviceFont,
+  serviceMuted,
 } from "./_shared";
 
-const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
-const TODAY_KEY = new Date().toISOString().slice(0, 10);
+const emptyState: ServicesControlCenter = {
+  summary: {
+    catalog: 0,
+    activeProjects: 0,
+    completedProjects: 0,
+    deliveries: 0,
+    overdueDeliveries: 0,
+    reviewDeliveries: 0,
+    timesheets: 0,
+    draftTimesheets: 0,
+    billableHours: 0,
+    billableValue: 0,
+    activeClients: 0,
+  },
+  catalog: [],
+  projects: [],
+  deliveries: [],
+  timesheets: [],
+};
 
 export default function ServicesDashboard() {
-  const catalogStore = useBusinessRecords("service_catalog");
-  const projectStore = useBusinessRecords("service_project");
-  const deliveryStore = useBusinessRecords("service_delivery");
-  const timesheetStore = useBusinessRecords("service_timesheet");
+  const [data, setData] = useState(emptyState);
 
-  const catalog = useMemo(() => catalogStore.records.map(mapServiceCatalogRecord), [catalogStore.records]);
-  const projects = useMemo(() => projectStore.records.map(mapServiceProjectRecord), [projectStore.records]);
-  const deliveries = useMemo(() => deliveryStore.records.map(mapServiceDeliveryRecord), [deliveryStore.records]);
-  const timesheets = useMemo(() => timesheetStore.records.map(mapServiceTimesheetRecord), [timesheetStore.records]);
+  useEffect(() => {
+    fetchJson("/api/services/control-center", emptyState).then(setData);
+  }, []);
 
-  const billableValue = timesheets.reduce((sum, item) => sum + item.billableHours * item.billingRate, 0);
-  const overdueDeliveries = deliveries.filter((item) => item.status !== "completed" && item.dueDate && item.dueDate < TODAY_KEY).length;
-  const reviewDeliveries = deliveries.filter((item) => item.status === "in_review").length;
-  const draftTimesheets = timesheets.filter((item) => item.status === "draft").length;
-
+  const { summary, deliveries } = data;
   const quickLinks = [
     { label: "Service Catalog", href: "/dashboard/services/catalog" },
     { label: "Client Projects", href: "/dashboard/services/projects" },
     { label: "Delivery Tracker", href: "/dashboard/services/delivery" },
     { label: "Time Billing", href: "/dashboard/services/time-billing" },
-    { label: "Quotation", href: "/dashboard/quotation" },
+    { label: "Service Analytics", href: "/dashboard/services/analytics" },
     { label: "Sales Invoice", href: "/dashboard/sales-invoice" },
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: ff, color: "#e2e8f0" }}>
+    <div style={{ padding: "28px 32px", fontFamily: serviceFont, color: "#e2e8f0" }}>
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, color: "white", margin: 0 }}>Service Command Center</h1>
-        <p style={{ color: "rgba(255,255,255,.45)", fontSize: 14, marginTop: 6 }}>
+        <p style={{ color: serviceMuted, fontSize: 14, marginTop: 6 }}>
           Service catalog, client delivery, billable hours, aur project tracking aik workspace me.
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(210px,1fr))", gap: 14, marginBottom: 28 }}>
         {[
-          { label: "Catalog Services", value: catalog.length, color: "#34d399" },
-          { label: "Active Projects", value: projects.filter((item) => item.status !== "completed").length, color: "#38bdf8" },
-          { label: "Open Deliveries", value: deliveries.filter((item) => item.status !== "completed").length, color: "#f59e0b" },
-          { label: "Billable Value", value: `Rs. ${billableValue.toLocaleString()}`, color: "#f97316" },
+          { label: "Catalog Services", value: summary.catalog, color: "#34d399" },
+          { label: "Active Projects", value: summary.activeProjects, color: "#38bdf8" },
+          { label: "Open Deliveries", value: summary.deliveries - summary.completedProjects, color: "#f59e0b" },
+          { label: "Billable Value", value: `Rs. ${summary.billableValue.toLocaleString()}`, color: "#f97316" },
         ].map((card) => (
-          <div key={card.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: "18px 20px" }}>
+          <div key={card.label} style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 14, padding: "18px 20px" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>{card.label}</div>
             <div style={{ fontSize: 24, fontWeight: 800, color: card.color }}>{card.value}</div>
           </div>
@@ -75,14 +83,14 @@ export default function ServicesDashboard() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 16 }}>
-        <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 20 }}>
+        <div style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 14, padding: 20 }}>
           <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Live Delivery Board</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {deliveries.slice(0, 5).map((delivery) => (
-              <div key={delivery.id} style={{ border: `1px solid ${border}`, borderRadius: 12, padding: "12px 14px", background: "rgba(255,255,255,.02)" }}>
+              <div key={delivery.id} style={{ border: `1px solid ${serviceBorder}`, borderRadius: 12, padding: "12px 14px", background: "rgba(255,255,255,.02)" }}>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>{delivery.milestone}</div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,.45)", marginTop: 4 }}>
-                  {delivery.projectCode || "No project"} • {delivery.client || "No client"} • {delivery.status}
+                  {delivery.projectCode || "No project"} · {delivery.client || "No client"} · {delivery.status}
                 </div>
               </div>
             ))}
@@ -90,16 +98,18 @@ export default function ServicesDashboard() {
           </div>
         </div>
 
-        <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 20 }}>
+        <div style={{ background: serviceBg, border: `1px solid ${serviceBorder}`, borderRadius: 14, padding: 20 }}>
           <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Enterprise Summary</div>
           <div style={{ fontSize: 13, lineHeight: 1.8, color: "rgba(255,255,255,.55)" }}>
-            Overdue Deliveries: <span style={{ color: overdueDeliveries ? "#f87171" : "#22c55e" }}>{overdueDeliveries}</span>
+            Overdue Deliveries: <span style={{ color: summary.overdueDeliveries ? "#f87171" : "#22c55e" }}>{summary.overdueDeliveries}</span>
             <br />
-            Waiting Review: <span style={{ color: reviewDeliveries ? "#f59e0b" : "#22c55e" }}>{reviewDeliveries}</span>
+            Waiting Review: <span style={{ color: summary.reviewDeliveries ? "#f59e0b" : "#22c55e" }}>{summary.reviewDeliveries}</span>
             <br />
-            Draft Timesheets: <span style={{ color: draftTimesheets ? "#f59e0b" : "#22c55e" }}>{draftTimesheets}</span>
+            Draft Timesheets: <span style={{ color: summary.draftTimesheets ? "#f59e0b" : "#22c55e" }}>{summary.draftTimesheets}</span>
             <br />
-            Active Projects: <span style={{ color: "#38bdf8" }}>{projects.filter((item) => item.status !== "completed").length}</span>
+            Active Projects: <span style={{ color: "#38bdf8" }}>{summary.activeProjects}</span>
+            <br />
+            Active Clients: <span style={{ color: "#34d399" }}>{summary.activeClients}</span>
           </div>
         </div>
       </div>

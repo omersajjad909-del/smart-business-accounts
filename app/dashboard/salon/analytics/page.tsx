@@ -1,15 +1,34 @@
 "use client";
 
-import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { useEffect, useMemo, useState } from "react";
 import {
+  SalonControlCenter,
+  fetchJson,
   salonBg,
   salonBorder,
   salonFont,
   salonMuted,
-  mapSalonAppointments,
-  mapSalonServices,
-  mapSalonStylists,
 } from "../_shared";
+
+const emptyState: SalonControlCenter = {
+  summary: {
+    appointments: 0,
+    appointmentsToday: 0,
+    openQueue: 0,
+    completedAppointments: 0,
+    cancellationRate: 0,
+    stylists: 0,
+    activeStylists: 0,
+    leaveStylists: 0,
+    services: 0,
+    activeServices: 0,
+    popularServices: 0,
+    completedRevenue: 0,
+  },
+  appointments: [],
+  stylists: [],
+  services: [],
+};
 
 function Metric({ title, value, note, color }: { title: string; value: string; note: string; color: string }) {
   return (
@@ -22,33 +41,36 @@ function Metric({ title, value, note, color }: { title: string; value: string; n
 }
 
 export default function SalonAnalyticsPage() {
-  const appointments = mapSalonAppointments(useBusinessRecords("salon_appointment").records);
-  const stylists = mapSalonStylists(useBusinessRecords("stylist").records);
-  const services = mapSalonServices(useBusinessRecords("salon_service").records);
+  const [data, setData] = useState(emptyState);
 
+  useEffect(() => {
+    fetchJson("/api/salon/control-center", emptyState).then(setData);
+  }, []);
+
+  const { summary, appointments, services } = data;
   const completed = appointments.filter((appointment) => appointment.status === "completed");
-  const grossRevenue = completed.reduce((sum, appointment) => sum + appointment.price, 0);
-  const completionRate = appointments.length ? Math.round((completed.length / appointments.length) * 100) : 0;
-  const cancellationRate = appointments.length ? Math.round((appointments.filter((appointment) => appointment.status === "cancelled").length / appointments.length) * 100) : 0;
-  const activeStylists = stylists.filter((stylist) => stylist.status === "Active").length;
 
-  const serviceTotals = new Map<string, number>();
-  for (const appointment of completed) {
-    const key = appointment.service || "Unassigned";
-    serviceTotals.set(key, (serviceTotals.get(key) || 0) + appointment.price);
-  }
-  const serviceMix = [...serviceTotals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const serviceMix = useMemo(() => {
+    const serviceTotals = new Map<string, number>();
+    for (const appointment of completed) {
+      const key = appointment.service || "Unassigned";
+      serviceTotals.set(key, (serviceTotals.get(key) || 0) + appointment.price);
+    }
+    return [...serviceTotals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  }, [completed]);
 
-  const stylistTotals = new Map<string, { count: number; revenue: number }>();
-  for (const appointment of appointments) {
-    const key = appointment.stylist || "Unassigned";
-    const current = stylistTotals.get(key) || { count: 0, revenue: 0 };
-    stylistTotals.set(key, {
-      count: current.count + 1,
-      revenue: current.revenue + (appointment.status === "completed" ? appointment.price : 0),
-    });
-  }
-  const stylistLoad = [...stylistTotals.entries()].sort((a, b) => b[1].revenue - a[1].revenue).slice(0, 5);
+  const stylistLoad = useMemo(() => {
+    const stylistTotals = new Map<string, { count: number; revenue: number }>();
+    for (const appointment of appointments) {
+      const key = appointment.stylist || "Unassigned";
+      const current = stylistTotals.get(key) || { count: 0, revenue: 0 };
+      stylistTotals.set(key, {
+        count: current.count + 1,
+        revenue: current.revenue + (appointment.status === "completed" ? appointment.price : 0),
+      });
+    }
+    return [...stylistTotals.entries()].sort((a, b) => b[1].revenue - a[1].revenue).slice(0, 5);
+  }, [appointments]);
 
   return (
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: salonFont }}>
@@ -61,10 +83,10 @@ export default function SalonAnalyticsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
-        <Metric title="Gross Revenue" value={`Rs. ${grossRevenue.toLocaleString()}`} note="Completed appointments" color="#34d399" />
-        <Metric title="Completion Rate" value={`${completionRate}%`} note="Completed vs total bookings" color="#60a5fa" />
-        <Metric title="Cancellation Rate" value={`${cancellationRate}%`} note="Cancelled bookings ratio" color="#f87171" />
-        <Metric title="Active Stylists" value={String(activeStylists)} note={`${services.filter((service) => service.status === "Active").length} active services live`} color="#f59e0b" />
+        <Metric title="Gross Revenue" value={`Rs. ${summary.completedRevenue.toLocaleString()}`} note="Completed appointments" color="#34d399" />
+        <Metric title="Completion Rate" value={`${appointments.length ? Math.round((summary.completedAppointments / appointments.length) * 100) : 0}%`} note="Completed vs total bookings" color="#60a5fa" />
+        <Metric title="Cancellation Rate" value={`${summary.cancellationRate}%`} note="Cancelled bookings ratio" color="#f87171" />
+        <Metric title="Active Stylists" value={String(summary.activeStylists)} note={`${summary.activeServices} active services live`} color="#f59e0b" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
@@ -74,7 +96,7 @@ export default function SalonAnalyticsPage() {
             {serviceMix.length === 0 ? (
               <div style={{ color: salonMuted, fontSize: 13 }}>Abhi completed service revenue data available nahi hai.</div>
             ) : serviceMix.map(([service, total]) => {
-              const width = grossRevenue ? Math.max(10, Math.round((total / grossRevenue) * 100)) : 10;
+              const width = summary.completedRevenue ? Math.max(10, Math.round((total / summary.completedRevenue) * 100)) : 10;
               return (
                 <div key={service}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
