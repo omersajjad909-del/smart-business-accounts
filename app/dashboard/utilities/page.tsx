@@ -13,25 +13,53 @@ const emptyState: UtilityControlCenter = {
 
 export default function UtilitiesOverviewPage() {
   const [data, setData] = useState(emptyState);
+  const [businessType, setBusinessType] = useState("electric_company");
 
   useEffect(() => {
     fetchJson("/api/utilities/control-center", emptyState).then(setData);
+    fetchJson<{ businessType?: string }>("/api/company/business-type", { businessType: "electric_company" }).then((company) => {
+      if (company.businessType) setBusinessType(company.businessType);
+    });
   }, []);
 
   const { summary, connections, meters, bills } = data;
+  const utilityConfig =
+    businessType === "gas_distribution"
+      ? {
+          title: "Gas Distribution Command Center",
+          description: "Monitor subscriber accounts, cylinder and meter coverage, route billing, and service recovery from live gas operations.",
+          connectionLabel: "Customer Accounts",
+          billingLabel: "Gas Billing",
+          meterLabel: "Meter & Delivery Readings",
+        }
+      : businessType === "water_supply"
+        ? {
+            title: "Water Supply Command Center",
+            description: "Track water customer accounts, meter readings, billing cycles, and service continuity from one live utility workspace.",
+            connectionLabel: "Consumer Connections",
+            billingLabel: "Water Billing",
+            meterLabel: "Meter Readings",
+          }
+        : {
+            title: "Electric Utility Command Center",
+            description: "Connections, billing cycles, and meter coverage from live utility operations records.",
+            connectionLabel: "Connections",
+            billingLabel: "Utility Billing",
+            meterLabel: "Meter Readings",
+          };
 
   return (
     <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "white" }}>Utility Command Center</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.45)" }}>Connections, billing cycles, and meter coverage from live utility operations records.</p>
+          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "white" }}>{utilityConfig.title}</h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.45)" }}>{utilityConfig.description}</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
-            { label: "Connections", href: "/dashboard/utilities/connections" },
-            { label: "Utility Billing", href: "/dashboard/utilities/billing" },
-            { label: "Meter Readings", href: "/dashboard/utilities/meters" },
+            { label: utilityConfig.connectionLabel, href: "/dashboard/utilities/connections" },
+            { label: utilityConfig.billingLabel, href: "/dashboard/utilities/billing" },
+            { label: utilityConfig.meterLabel, href: "/dashboard/utilities/meters" },
             { label: "Analytics", href: "/dashboard/utilities/analytics" },
           ].map((item) => (
             <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#bae6fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>

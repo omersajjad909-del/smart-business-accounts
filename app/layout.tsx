@@ -9,6 +9,7 @@ import VisitorTracker from "@/components/VisitorTracker";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
+const BRAND_ICON_PATH = "/icon1.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
       "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM - all in one platform.",
     images: [
       {
-        url: `${BASE_URL}/icon.png`,
+        url: `${BASE_URL}${BRAND_ICON_PATH}`,
         alt: "FinovaOS - Global Accounting Platform",
       },
     ],
@@ -70,15 +71,15 @@ export const metadata: Metadata = {
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
       "Cloud accounting software for modern SMEs. Used by 12,000+ businesses in 40+ countries.",
-    images: [`${BASE_URL}/icon.png`],
+    images: [`${BASE_URL}${BRAND_ICON_PATH}`],
   },
   applicationName: "FinovaOS",
   generator: "Next.js",
   referrer: "origin-when-cross-origin",
   icons: {
-    icon: "/icon",
-    apple: "/icon",
-    shortcut: "/icon",
+    icon: BRAND_ICON_PATH,
+    apple: BRAND_ICON_PATH,
+    shortcut: BRAND_ICON_PATH,
   },
   manifest: "/manifest.json",
   appleWebApp: {
@@ -109,7 +110,7 @@ const softwareApplicationJsonLd = {
   operatingSystem: "Web",
   description: "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM.",
   url: BASE_URL,
-  screenshot: `${BASE_URL}/icon.png`,
+  screenshot: `${BASE_URL}${BRAND_ICON_PATH}`,
   offers: {
     "@type": "AggregateOffer",
     lowPrice: "49",
@@ -143,7 +144,7 @@ const organizationJsonLd = {
   url: BASE_URL,
   logo: {
     "@type": "ImageObject",
-    url: `${BASE_URL}/icon.png`,
+    url: `${BASE_URL}${BRAND_ICON_PATH}`,
     width: 512,
     height: 512,
   },

@@ -14,25 +14,53 @@ const emptyState: RentalsControlCenter = {
 
 export default function RentalsOverviewPage() {
   const [data, setData] = useState(emptyState);
+  const [businessType, setBusinessType] = useState("equipment_rental");
 
   useEffect(() => {
     fetchJson("/api/rentals/control-center", emptyState).then(setData);
+    fetchJson<{ businessType?: string }>("/api/company/business-type", { businessType: "equipment_rental" }).then((company) => {
+      if (company.businessType) setBusinessType(company.businessType);
+    });
   }, []);
 
   const { summary, items, bookings, maintenance } = data;
+  const rentalsConfig =
+    businessType === "property_rental"
+      ? {
+          title: "Property Rental Command Center",
+          description: "Oversee rentable units, tenant bookings, agreements, and maintenance readiness from live property rental records.",
+          itemsLabel: "Units",
+          bookingsLabel: "Bookings",
+          agreementsLabel: "Lease Agreements",
+        }
+      : businessType === "generator_rental"
+        ? {
+            title: "Generator Rental Command Center",
+            description: "Track generator availability, dispatch bookings, rental agreements, and maintenance schedules from live operations.",
+            itemsLabel: "Generator Fleet",
+            bookingsLabel: "Dispatch Bookings",
+            agreementsLabel: "Rental Agreements",
+          }
+        : {
+            title: "Equipment Rental Command Center",
+            description: "Items, bookings, agreements, and maintenance readiness from live rental operations.",
+            itemsLabel: "Rental Items",
+            bookingsLabel: "Bookings",
+            agreementsLabel: "Agreements",
+          };
 
   return (
     <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "white" }}>Rentals Command Center</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.45)" }}>Items, bookings, agreements, and maintenance readiness from live rental operations.</p>
+          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "white" }}>{rentalsConfig.title}</h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.45)" }}>{rentalsConfig.description}</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
-            { label: "Rental Items", href: "/dashboard/rentals/items" },
-            { label: "Bookings", href: "/dashboard/rentals/bookings" },
-            { label: "Agreements", href: "/dashboard/rentals/agreements" },
+            { label: rentalsConfig.itemsLabel, href: "/dashboard/rentals/items" },
+            { label: rentalsConfig.bookingsLabel, href: "/dashboard/rentals/bookings" },
+            { label: rentalsConfig.agreementsLabel, href: "/dashboard/rentals/agreements" },
             { label: "Maintenance", href: "/dashboard/rentals/maintenance" },
             { label: "Analytics", href: "/dashboard/rentals/analytics" },
           ].map((item) => (

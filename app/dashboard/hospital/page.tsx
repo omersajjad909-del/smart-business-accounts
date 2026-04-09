@@ -14,34 +14,59 @@ const emptyState: HospitalControlCenter = {
 
 export default function HospitalOverviewPage() {
   const [data, setData] = useState(emptyState);
+  const [businessType, setBusinessType] = useState("hospital");
 
   useEffect(() => {
     fetchJson("/api/hospital/control-center", emptyState).then(setData);
+    fetchJson<{ businessType?: string }>("/api/company/business-type", { businessType: "hospital" }).then((company) => {
+      if (company.businessType) setBusinessType(company.businessType);
+    });
   }, []);
 
-  const { summary, patients, appointments, prescriptions, labs } = data;
+  const { summary, patients, appointments, labs } = data;
   const today = new Date().toISOString().slice(0, 10);
   const todayAppointments = appointments.filter((row) => row.date.startsWith(today));
-  const upcomingAppointments = [...todayAppointments].filter((row) => row.status === "scheduled" || row.status === "confirmed").sort((a, b) => a.time.localeCompare(b.time)).slice(0, 5);
+  const upcomingAppointments = [...todayAppointments]
+    .filter((row) => row.status === "scheduled" || row.status === "confirmed")
+    .sort((a, b) => a.time.localeCompare(b.time))
+    .slice(0, 5);
   const highRiskQueue = [
-    ...patients.filter((row) => row.status === "icu").map((row) => ({ label: row.name, meta: `ICU · ${row.doctor || "Unassigned doctor"}`, tone: "#ef4444" })),
-    ...labs.filter((row) => row.urgent && row.status !== "completed").map((row) => ({ label: row.patient, meta: `Urgent lab · ${row.tests.join(", ") || "Tests pending"}`, tone: "#f59e0b" })),
+    ...patients
+      .filter((row) => row.status === "icu")
+      .map((row) => ({ label: row.name, meta: `ICU · ${row.doctor || "Unassigned doctor"}`, tone: "#ef4444" })),
+    ...labs
+      .filter((row) => row.urgent && row.status !== "completed")
+      .map((row) => ({ label: row.patient, meta: `Urgent lab · ${row.tests.join(", ") || "Tests pending"}`, tone: "#f59e0b" })),
   ].slice(0, 6);
+
+  const isClinic = businessType === "clinic";
+  const heroTitle = isClinic ? "Clinic Command Center" : "Healthcare Command Center";
+  const heroDescription = isClinic
+    ? "Manage OPD visits, clinic appointments, prescriptions, and urgent lab work from one shared front-desk workspace."
+    : "Monitor patients, front desk load, prescriptions, and lab processing from one place.";
+  const actionItems = isClinic
+    ? [
+        { label: "Clinic Patients", href: "/dashboard/hospital/patients" },
+        { label: "OPD Schedule", href: "/dashboard/hospital/appointments" },
+        { label: "Prescriptions", href: "/dashboard/hospital/prescriptions" },
+        { label: "Lab Desk", href: "/dashboard/hospital/lab" },
+      ]
+    : [
+        { label: "Patient Records", href: "/dashboard/hospital/patients" },
+        { label: "Appointments", href: "/dashboard/hospital/appointments" },
+        { label: "Prescriptions", href: "/dashboard/hospital/prescriptions" },
+        { label: "Lab Tests", href: "/dashboard/hospital/lab" },
+      ];
 
   return (
     <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: hospitalFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26, gap: 20, flexWrap: "wrap" }}>
         <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Healthcare Command Center</h1>
-          <p style={{ margin: 0, fontSize: 13, color: hospitalMuted }}>Monitor patients, front desk load, prescriptions, and lab processing from one place.</p>
+          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>{heroTitle}</h1>
+          <p style={{ margin: 0, fontSize: 13, color: hospitalMuted }}>{heroDescription}</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {[
-            { label: "Patient Records", href: "/dashboard/hospital/patients" },
-            { label: "Appointments", href: "/dashboard/hospital/appointments" },
-            { label: "Prescriptions", href: "/dashboard/hospital/prescriptions" },
-            { label: "Lab Tests", href: "/dashboard/hospital/lab" },
-          ].map((action) => (
+          {actionItems.map((action) => (
             <Link key={action.href} href={action.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${hospitalBorder}`, background: hospitalBg, color: "#c7d2fe", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {action.label}
             </Link>
@@ -66,8 +91,10 @@ export default function HospitalOverviewPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: 18, alignItems: "start" }}>
         <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, overflow: "hidden" }}>
           <div style={{ padding: "16px 18px", borderBottom: `1px solid ${hospitalBorder}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontSize: 15, fontWeight: 800 }}>Today's Front Desk Queue</div>
-            <Link href="/dashboard/hospital/appointments" style={{ color: "#93c5fd", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>Open schedule</Link>
+            <div style={{ fontSize: 15, fontWeight: 800 }}>{isClinic ? "Today's OPD Queue" : "Today's Front Desk Queue"}</div>
+            <Link href="/dashboard/hospital/appointments" style={{ color: "#93c5fd", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+              Open schedule
+            </Link>
           </div>
           <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 10 }}>
             {upcomingAppointments.length === 0 && <div style={{ color: "rgba(255,255,255,.28)", textAlign: "center", padding: 24 }}>No active appointments for today.</div>}
@@ -86,7 +113,7 @@ export default function HospitalOverviewPage() {
 
         <div style={{ display: "grid", gap: 18 }}>
           <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, padding: 18 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>Clinical Risk Watchlist</div>
+            <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>{isClinic ? "Urgent Care Watchlist" : "Clinical Risk Watchlist"}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {highRiskQueue.length === 0 && <div style={{ color: "rgba(255,255,255,.28)", padding: "8px 0" }}>No urgent cases in queue.</div>}
               {highRiskQueue.map((row, index) => (
@@ -99,7 +126,7 @@ export default function HospitalOverviewPage() {
           </div>
 
           <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, padding: 18 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>Throughput Snapshot</div>
+            <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12 }}>{isClinic ? "OPD Throughput Snapshot" : "Throughput Snapshot"}</div>
             <div style={{ display: "grid", gap: 10 }}>
               {[
                 { label: "Completed appointments", value: summary.completedAppointments, color: "#22c55e" },
