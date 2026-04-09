@@ -54,12 +54,21 @@ export default function PaymentReceiptsPage() {
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
   const [editingId, setEditingId] = useState('');
+  const [savedReceiptId, setSavedReceiptId] = useState('');
 
   useEffect(() => {
     fetchReceipts();
     fetchParties();
     fetchBankAccounts();
   }, [statusFilter]);
+
+  const openPreview = (id: string) => {
+    if (!id) {
+      toast.error('Receipt preview not available yet');
+      return;
+    }
+    window.open(`/view/payment-receipt?id=${id}`, '_blank');
+  };
 
   const fetchBankAccounts = async () => {
     try {
@@ -174,7 +183,9 @@ export default function PaymentReceiptsPage() {
       });
 
       if (response.ok) {
+        const saved = await response.json();
         toast.success(editingId ? 'Payment receipt updated successfully' : 'Payment receipt saved successfully');
+        setSavedReceiptId(saved?.id || '');
         setFormData({
           receiptNo: '',
           date: new Date().toISOString().split('T')[0],
@@ -189,6 +200,9 @@ export default function PaymentReceiptsPage() {
         setShowForm(true);
         setShowList(false);
         fetchReceipts();
+        if (saved?.id) {
+          openPreview(saved.id);
+        }
       }
     } catch (error) {
       console.error('Error saving receipt:', error);
@@ -200,6 +214,7 @@ export default function PaymentReceiptsPage() {
 
   const handleEdit = (receipt: PaymentReceipt) => {
     setEditingId(receipt.id);
+    setSavedReceiptId(receipt.id);
     setFormData({
       receiptNo: receipt.receiptNo,
       date: new Date(receipt.date).toISOString().split('T')[0],
@@ -282,6 +297,14 @@ export default function PaymentReceiptsPage() {
         >
           {showList ? "Back to Form" : "View List"}
         </button>
+        {showForm && savedReceiptId && (
+          <button
+            onClick={() => openPreview(savedReceiptId)}
+            className="bg-green-600 text-white px-6 py-2 rounded font-semibold hover:bg-green-700"
+          >
+            Print Preview
+          </button>
+        )}
         {showList && receipts.length > 0 && (
           <button
             onClick={() =>
@@ -436,6 +459,15 @@ export default function PaymentReceiptsPage() {
             >
               {loading ? 'Saving...' : editingId ? 'Update' : 'Save'}
             </button>
+            {savedReceiptId && (
+              <button
+                type="button"
+                onClick={() => openPreview(savedReceiptId)}
+                className="bg-green-600 text-white px-6 py-2 rounded font-semibold hover:bg-green-700"
+              >
+                Print Preview
+              </button>
+            )}
             <button
               type="button"
               onClick={() => {
@@ -452,6 +484,7 @@ export default function PaymentReceiptsPage() {
                   referenceNo: '',
                   narration: '',
                 });
+                setSavedReceiptId('');
               }}
               className="bg-gray-500 text-white px-6 py-2 rounded font-semibold hover:bg-gray-600"
             >
@@ -520,6 +553,12 @@ export default function PaymentReceiptsPage() {
                         Clear ✓
                       </button>
                     )}
+                    <button
+                      onClick={() => openPreview(receipt.id)}
+                      className="text-green-600 hover:text-green-800 font-medium text-sm"
+                    >
+                      Preview
+                    </button>
                     <button
                       onClick={() => handleEdit(receipt)}
                       className="text-blue-600 hover:text-blue-800 font-medium text-sm"
