@@ -2005,6 +2005,10 @@ function NavLink({ href, children, pathname }: {
   const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
   const displayChildren = typeof children === "string" ? cleanNavLabel(children) : children;
   const isAiAssistant = displayChildren === "AI Intelligence" || displayChildren === "AI Assistant";
+  const isBusinessGuide = displayChildren === "Business Guide";
+  const isOwnerDashboard = displayChildren === "Owner Dashboard";
+  const isBusinessOperator = displayChildren === "Business Operator";
+  const showUtilityIcon = isAiAssistant || isBusinessGuide || isOwnerDashboard || isBusinessOperator;
 
   // In collapsed mode, hide nav links (they are accessed via NavGroup icon → expand)
   if (collapsed) return null;
@@ -2032,23 +2036,41 @@ function NavLink({ href, children, pathname }: {
         }
       }}
     >
-      {isAiAssistant && (
+      {showUtilityIcon && (
         <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",color:"inherit",flexShrink:0}}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="7" y="8" width="10" height="8" rx="2" />
-            <path d="M9 8V6a3 3 0 0 1 6 0v2" />
-            <path d="M12 2v2" />
-            <path d="M10 12h.01" />
-            <path d="M14 12h.01" />
-            <path d="M9.5 19h5" />
-          </svg>
+          {isAiAssistant ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="7" y="8" width="10" height="8" rx="2" />
+              <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+              <path d="M12 2v2" />
+              <path d="M10 12h.01" />
+              <path d="M14 12h.01" />
+              <path d="M9.5 19h5" />
+            </svg>
+          ) : isBusinessGuide ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+          ) : isOwnerDashboard ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 13h8V3H3z" />
+              <path d="M13 21h8V11h-8z" />
+              <path d="M13 3h8v4h-8z" />
+              <path d="M3 17h8v4H3z" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 3l7 4v5c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V7l7-4z" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+          )}
         </span>
       )}
       <span>{displayChildren}</span>
     </Link>
   );
 }
-
 
 
 
