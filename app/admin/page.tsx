@@ -4854,7 +4854,7 @@ function PageBusinessModules() {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10 }}>
         <div>
           <h2 style={{ fontSize:20, fontWeight:800, color:"white", margin:0 }}>Business Modules</h2>
-          <p style={{ fontSize:12.5, color:"rgba(255,255,255,.35)", marginTop:4 }}>Toggle business types live — affects signup page, website & dashboard sidebar. Waitlist users are auto-notified.</p>
+          <p style={{ fontSize:12.5, color:"rgba(255,255,255,.35)", marginTop:4 }}>All audited business types are launch-ready by default. Use overrides only when you want to temporarily hide a type from signup, website, or dashboard access.</p>
         </div>
         <button onClick={resetAll} style={{ padding:"7px 16px", borderRadius:8, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.45)", fontSize:12, fontWeight:600, cursor:"pointer" }}>
           Reset All Overrides
@@ -4866,7 +4866,7 @@ function PageBusinessModules() {
         {[
           { label:"Total Types",     val:modules.length,                            color:"#818cf8" },
           { label:"Live",            val:totalLive,                                 color:"#34d399" },
-          { label:"Coming Soon",     val:modules.length - totalLive,                color:"#fbbf24" },
+          { label:"Hidden",          val:modules.length - totalLive,                color:"#fbbf24" },
           { label:"Waitlist",        val:totalWaitlist,                             color:"#fb923c" },
           { label:"Admin Overrides", val:modules.filter(m=>m.adminOverride).length, color:"#f87171" },
         ].map(k=>(
@@ -4880,7 +4880,7 @@ function PageBusinessModules() {
       {/* Phase Release Buttons */}
       <div style={{ padding:"14px 18px", borderRadius:12, background:"rgba(99,102,241,.05)", border:"1px solid rgba(99,102,241,.12)" }}>
         <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:10 }}>
-          🚀 Bulk Phase Release — Enable all types in a phase at once + auto-notify waitlist
+          🚀 Bulk Phase Controls — keep every type launch-ready or temporarily hide a whole phase
         </div>
         <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
           {([1,2,3,4] as const).map(phase=>{
@@ -4900,7 +4900,7 @@ function PageBusinessModules() {
                   fontSize:12, fontWeight:700, cursor: allLive?"not-allowed":"pointer", fontFamily:"inherit",
                   opacity: releasing===phase ? .6 : 1,
                 }}>
-                {releasing===phase ? "Releasing…" : allLive ? `${ph.label} ✓ All Live` : `Release ${ph.label} (${liveCount}/${phTypes.length})`}
+                {releasing===phase ? "Updating…" : allLive ? `${ph.label} ✓ All Launch-Ready` : `Enable ${ph.label} (${liveCount}/${phTypes.length})`}
                 {waitlisted > 0 && !allLive && <span style={{ marginLeft:6, fontSize:10.5, color:"#fb923c" }}>· {waitlisted} waiting</span>}
               </button>
             );
@@ -4919,7 +4919,7 @@ function PageBusinessModules() {
             background:  filter===f ? "rgba(99,102,241,.18)" : "rgba(255,255,255,.04)",
             color:       filter===f ? "#a5b4fc" : "rgba(255,255,255,.4)",
           }}>
-            {f==="all"?"All":f==="live"?"🟢 Live":"⏳ Coming Soon"}
+            {f==="all"?"All":f==="live"?"🟢 Launch-Ready":"🙈 Hidden"}
           </button>
         ))}
         {msg && <span style={{ fontSize:12, color: msg.ok?"#34d399":"#fbbf24", fontWeight:600 }}>{msg.text}</span>}
@@ -4938,7 +4938,7 @@ function PageBusinessModules() {
               <div key={phase}>
                 <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
                   <span style={{ padding:"3px 11px", borderRadius:20, fontSize:10.5, fontWeight:700, background:ph.bg, color:ph.color, border:`1px solid ${ph.color}30` }}>{ph.label}</span>
-                  <span style={{ fontSize:11.5, color:"rgba(255,255,255,.25)" }}>{rows.filter(r=>r.enabled).length}/{rows.length} enabled</span>
+                  <span style={{ fontSize:11.5, color:"rgba(255,255,255,.25)" }}>{rows.filter(r=>r.enabled).length}/{rows.length} launch-ready</span>
                 </div>
                 <div style={{ border:"1px solid rgba(255,255,255,.07)", borderRadius:12, overflow:"hidden" }}>
                   <table style={{ width:"100%", borderCollapse:"collapse" }}>
@@ -4963,7 +4963,7 @@ function PageBusinessModules() {
                               background:m.enabled?"rgba(52,211,153,.14)":"rgba(251,191,36,.09)",
                               color:m.enabled?"#34d399":"#fbbf24",
                               border:`1px solid ${m.enabled?"rgba(52,211,153,.28)":"rgba(251,191,36,.22)"}` }}>
-                              {m.enabled?"🟢 Live":"⏳ Soon"}
+                              {m.enabled?"🟢 Launch-Ready":"🙈 Hidden"}
                             </span>
                           </td>
                           <td style={td}>
@@ -5013,8 +5013,8 @@ function PageBusinessModules() {
 
       {/* Info */}
       <div style={{ padding:"14px 18px", borderRadius:10, background:"rgba(99,102,241,.06)", border:"1px solid rgba(99,102,241,.15)", fontSize:12, color:"rgba(255,255,255,.38)", lineHeight:1.8 }}>
-        <strong style={{ color:"#a5b4fc" }}>Toggle ON</strong> → Business type appears on signup page + website as Live + dashboard modules unlock + waitlist auto-notified. &nbsp;
-        <strong style={{ color:"#a5b4fc" }}>Toggle OFF</strong> → Removed from signup, shows "Coming Soon" on website. &nbsp;
+        <strong style={{ color:"#a5b4fc" }}>Toggle ON</strong> → Business type stays visible on signup page + website and remains launch-ready. &nbsp;
+        <strong style={{ color:"#a5b4fc" }}>Toggle OFF</strong> → Business type is temporarily hidden from signup and public selection. &nbsp;
         <strong style={{ color:"#a5b4fc" }}>📧 Waitlist</strong> → Click to manually send notifications to pending subscribers.
       </div>
     </div>

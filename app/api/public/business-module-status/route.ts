@@ -31,7 +31,9 @@ export async function GET(_req: NextRequest) {
   const enabledTypes: string[] = [];
 
   for (const [id, cfg] of Object.entries(BUSINESS_PHASE_CONFIG)) {
-    const effective = (overrides[id] || cfg.status) as "live" | "coming_soon" | "beta";
+    // Default all audited business types to live unless an admin override
+    // explicitly turns a business back off.
+    const effective = (overrides[id] || "live") as "live" | "coming_soon" | "beta";
     const isLive = effective === "live" || effective === "beta";
     statusMap[id] = isLive ? "live" : "coming_soon";
     if (isLive) enabledTypes.push(id);

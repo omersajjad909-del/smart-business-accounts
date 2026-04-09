@@ -142,7 +142,7 @@ export async function GET(req: NextRequest) {
 
   const modules = Object.entries(BUSINESS_PHASE_CONFIG).map(([id, cfg]) => {
     const adminStatus    = overrides[id];
-    const effectiveStatus = adminStatus || cfg.status;
+    const effectiveStatus = adminStatus || "live";
     return {
       id,
       label:         cfg.label,
@@ -205,7 +205,7 @@ export async function POST(req: NextRequest) {
     // Only enable those not already live
     const newlyEnabled: string[] = [];
     for (const tid of typeIds) {
-      const alreadyLive = (overrides[tid] || BUSINESS_PHASE_CONFIG[tid].status) === "live";
+      const alreadyLive = (overrides[tid] || "live") === "live";
       if (!alreadyLive) {
         overrides[tid] = "live";
         newlyEnabled.push(tid);

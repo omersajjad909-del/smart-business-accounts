@@ -77,10 +77,9 @@ export default function BusinessSetupPage() {
       .then(r => r.json())
       .then(d => setLiveTypes(new Set<string>(d.enabledTypes || [])))
       .catch(() => {
-        // Fallback: only Phase 1 types are live by default
-        const defaultLive = Object.entries(BUSINESS_PHASE_CONFIG)
-          .filter(([, cfg]) => cfg.status === "live")
-          .map(([id]) => id);
+        // Fallback: all audited business types are live by default unless
+        // admin overrides are loaded from the public status endpoint.
+        const defaultLive = Object.keys(BUSINESS_PHASE_CONFIG);
         setLiveTypes(new Set(defaultLive));
       });
   }, []);
@@ -119,6 +118,7 @@ export default function BusinessSetupPage() {
   // Separate live and coming-soon
   const liveFiltered       = filtered.filter(b => isLive(b.id));
   const comingSoonFiltered = filtered.filter(b => !isLive(b.id));
+  const allAuditedLive = comingSoonFiltered.length === 0;
 
   async function save() {
     if (!selected) return;
@@ -294,6 +294,20 @@ export default function BusinessSetupPage() {
             </p>
           </div>
 
+          {allAuditedLive && (
+            <div style={{ maxWidth: 760, margin: "0 auto 24px", padding: "14px 18px", borderRadius: 14, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#34d399", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>All Business Types Live</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,.62)" }}>
+                  All audited businesses are now available for setup and launch-prep.
+                </div>
+              </div>
+              <div style={{ padding: "7px 12px", borderRadius: 999, background: "rgba(52,211,153,.14)", color: "#34d399", fontSize: 12, fontWeight: 800 }}>
+                {liveFiltered.length} ready now
+              </div>
+            </div>
+          )}
+
           {/* Search */}
           <div style={{ position: "relative", maxWidth: 400, margin: "0 auto 24px" }}>
             <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, opacity: .4 }}>🔍</span>
@@ -328,7 +342,7 @@ export default function BusinessSetupPage() {
           {liveFiltered.length > 0 && (
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399", textTransform: "uppercase", letterSpacing: ".08em" }}>🟢 Available Now</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399", textTransform: "uppercase", letterSpacing: ".08em" }}>{allAuditedLive ? "Launch-Ready Business Types" : "🟢 Available Now"}</span>
                 <span style={{ fontSize: 11, color: "rgba(255,255,255,.2)" }}>{liveFiltered.length} business types</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 12, marginBottom: 32 }}>
