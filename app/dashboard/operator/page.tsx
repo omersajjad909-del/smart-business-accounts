@@ -4,32 +4,262 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
-import type { OperatorPayload, OperatorAction, OperatorDecision } from "@/lib/businessOperator";
+import type { OperatorAction, OperatorDecision, OperatorPayload } from "@/lib/businessOperator";
 
-const surface = "#141c3a";
-const line = "rgba(255,255,255,0.08)";
-const soft = "rgba(255,255,255,0.62)";
-const dim = "rgba(255,255,255,0.38)";
+const shell = {
+  bg: "#0a1026",
+  panel: "rgba(16, 24, 54, 0.88)",
+  panelSoft: "rgba(20, 29, 64, 0.72)",
+  line: "rgba(255,255,255,0.08)",
+  lineStrong: "rgba(255,255,255,0.14)",
+  text: "rgba(255,255,255,0.95)",
+  soft: "rgba(226,232,240,0.72)",
+  dim: "rgba(148,163,184,0.72)",
+  blue: "#5ea2ff",
+  cyan: "#4de3d6",
+  glow: "rgba(94,162,255,0.24)",
+};
 
 function priorityTone(priority: string) {
   switch (priority) {
     case "urgent":
-      return { bg: "rgba(239,68,68,.14)", border: "rgba(239,68,68,.35)", color: "#fda4af" };
+      return { bg: "rgba(239,68,68,.14)", border: "rgba(248,113,113,.34)", color: "#fda4af" };
     case "high":
-      return { bg: "rgba(245,158,11,.14)", border: "rgba(245,158,11,.35)", color: "#fcd34d" };
+      return { bg: "rgba(245,158,11,.14)", border: "rgba(251,191,36,.34)", color: "#fde68a" };
     case "medium":
-      return { bg: "rgba(59,130,246,.14)", border: "rgba(59,130,246,.35)", color: "#93c5fd" };
+      return { bg: "rgba(59,130,246,.14)", border: "rgba(96,165,250,.34)", color: "#93c5fd" };
     default:
-      return { bg: "rgba(34,197,94,.14)", border: "rgba(34,197,94,.35)", color: "#86efac" };
+      return { bg: "rgba(34,197,94,.14)", border: "rgba(74,222,128,.34)", color: "#86efac" };
   }
 }
 
-function StatCard({ label, value, note }: { label: string; value: string; note: string }) {
+function money(value: number, currency: string) {
+  return `${currency} ${Math.round(value || 0).toLocaleString("en-PK")}`;
+}
+
+function StatCard({ label, value, note, accent }: { label: string; value: string; note: string; accent: string }) {
   return (
-    <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 18, padding: 18 }}>
-      <div style={{ fontSize: 12, color: dim, textTransform: "uppercase", letterSpacing: ".08em" }}>{label}</div>
-      <div style={{ marginTop: 10, fontSize: 28, fontWeight: 800, color: "white", letterSpacing: "-.03em" }}>{value}</div>
-      <div style={{ marginTop: 8, fontSize: 13, color: soft }}>{note}</div>
+    <div
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        background: `linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)), ${shell.panel}`,
+        border: `1px solid ${shell.line}`,
+        borderRadius: 24,
+        padding: 20,
+        boxShadow: "0 18px 42px rgba(0,0,0,0.22)",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: "0 auto auto 0",
+          width: 120,
+          height: 120,
+          background: `radial-gradient(circle, ${accent}33 0%, transparent 68%)`,
+          pointerEvents: "none",
+        }}
+      />
+      <div style={{ fontSize: 11, color: shell.dim, textTransform: "uppercase", letterSpacing: ".14em", fontWeight: 700 }}>{label}</div>
+      <div style={{ marginTop: 14, fontSize: 30, fontWeight: 900, letterSpacing: "-0.04em", color: shell.text }}>{value}</div>
+      <div style={{ marginTop: 10, fontSize: 13, color: shell.soft, lineHeight: 1.65 }}>{note}</div>
+    </div>
+  );
+}
+
+function SectionTitle({ eyebrow, title, note }: { eyebrow: string; title: string; note: string }) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ fontSize: 11, color: shell.blue, textTransform: "uppercase", letterSpacing: ".16em", fontWeight: 800 }}>{eyebrow}</div>
+      <div style={{ marginTop: 8, fontSize: 24, fontWeight: 900, color: shell.text, letterSpacing: "-0.03em" }}>{title}</div>
+      <div style={{ marginTop: 6, fontSize: 14, color: shell.soft, lineHeight: 1.65 }}>{note}</div>
+    </div>
+  );
+}
+
+function DecisionCard({
+  decision,
+  queueingId,
+  onQueue,
+}: {
+  decision: OperatorDecision;
+  queueingId: string | null;
+  onQueue: (action: OperatorDecision) => void;
+}) {
+  const tone = priorityTone(decision.priority);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        background: `linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)), ${shell.panelSoft}`,
+        border: `1px solid ${shell.line}`,
+        borderRadius: 24,
+        padding: 22,
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: -40,
+          right: -30,
+          width: 150,
+          height: 150,
+          background: `radial-gradient(circle, ${tone.color}22 0%, transparent 68%)`,
+          pointerEvents: "none",
+        }}
+      />
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: 260 }}>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "5px 11px",
+              borderRadius: 999,
+              background: tone.bg,
+              border: `1px solid ${tone.border}`,
+              color: tone.color,
+              fontSize: 11,
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: ".12em",
+            }}
+          >
+            {decision.priority}
+          </div>
+          <div style={{ marginTop: 14, fontSize: 24, fontWeight: 900, color: shell.text, letterSpacing: "-0.03em" }}>{decision.title}</div>
+          <div style={{ marginTop: 12, fontSize: 14, color: shell.soft, lineHeight: 1.75 }}>{decision.reason}</div>
+          <div style={{ marginTop: 14, padding: 12, borderRadius: 16, background: "rgba(94,162,255,0.08)", border: `1px solid rgba(94,162,255,0.18)` }}>
+            <div style={{ fontSize: 11, color: shell.dim, textTransform: "uppercase", letterSpacing: ".12em", fontWeight: 700 }}>Next Action</div>
+            <div style={{ marginTop: 8, fontSize: 14, color: shell.text, lineHeight: 1.7 }}>{decision.action}</div>
+          </div>
+          <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 10, color: shell.dim, fontSize: 12 }}>
+            <span>Impact: {decision.impact}</span>
+            <span>Source: {decision.source}</span>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, minWidth: 140 }}>
+          {decision.href ? (
+            <Link
+              href={decision.href}
+              style={{
+                textDecoration: "none",
+                padding: "12px 14px",
+                borderRadius: 14,
+                background: "linear-gradient(135deg,#3b82f6,#2563eb)",
+                color: "white",
+                fontWeight: 800,
+                textAlign: "center",
+                boxShadow: `0 12px 28px ${shell.glow}`,
+              }}
+            >
+              Open Workspace
+            </Link>
+          ) : null}
+          <button
+            onClick={() => onQueue(decision)}
+            disabled={queueingId === decision.id}
+            style={{
+              padding: "12px 14px",
+              borderRadius: 14,
+              background: "rgba(255,255,255,0.02)",
+              color: "white",
+              fontWeight: 800,
+              border: `1px solid ${shell.lineStrong}`,
+              cursor: "pointer",
+            }}
+          >
+            {queueingId === decision.id ? "Queueing..." : "Queue Action"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionCard({
+  action,
+  queueingId,
+  buttonLabel,
+  onQueue,
+}: {
+  action: OperatorAction;
+  queueingId: string | null;
+  buttonLabel: string;
+  onQueue: (action: OperatorAction) => void;
+}) {
+  const tone = priorityTone(action.priority);
+  const watchOnly = action.state === "watch";
+
+  return (
+    <div
+      style={{
+        background: `linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.012)), ${shell.panelSoft}`,
+        border: `1px solid ${shell.line}`,
+        borderRadius: 22,
+        padding: 18,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "start" }}>
+        <div>
+          <div
+            style={{
+              display: "inline-flex",
+              padding: "4px 10px",
+              borderRadius: 999,
+              background: tone.bg,
+              border: `1px solid ${tone.border}`,
+              color: tone.color,
+              fontSize: 10,
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: ".12em",
+            }}
+          >
+            {action.priority}
+          </div>
+          <div style={{ marginTop: 12, fontSize: 18, fontWeight: 800, color: shell.text }}>{action.title}</div>
+        </div>
+        <div style={{ fontSize: 11, color: shell.dim, textTransform: "uppercase", letterSpacing: ".1em", fontWeight: 700 }}>{action.automationLevel}</div>
+      </div>
+      <div style={{ marginTop: 10, fontSize: 14, color: shell.soft, lineHeight: 1.7 }}>{action.description}</div>
+      <div style={{ marginTop: 14, display: "flex", gap: 10, flexWrap: "wrap" }}>
+        {action.href ? (
+          <Link
+            href={action.href}
+            style={{
+              textDecoration: "none",
+              padding: "10px 12px",
+              borderRadius: 12,
+              background: "rgba(94,162,255,0.12)",
+              border: "1px solid rgba(94,162,255,0.2)",
+              color: "white",
+              fontWeight: 700,
+            }}
+          >
+            {action.actionLabel}
+          </Link>
+        ) : null}
+        <button
+          onClick={() => onQueue(action)}
+          disabled={queueingId === action.id || watchOnly}
+          style={{
+            padding: "10px 12px",
+            borderRadius: 12,
+            background: watchOnly ? "rgba(255,255,255,0.04)" : "transparent",
+            border: `1px solid ${shell.lineStrong}`,
+            color: "white",
+            fontWeight: 700,
+            cursor: watchOnly ? "not-allowed" : "pointer",
+            opacity: watchOnly ? 0.5 : 1,
+          }}
+        >
+          {queueingId === action.id ? "Queueing..." : buttonLabel}
+        </button>
+      </div>
     </div>
   );
 }
@@ -106,131 +336,249 @@ export default function BusinessOperatorPage() {
   }
 
   if (loading) {
-    return <div style={{ padding: 24, color: "white" }}>Loading Business Operator...</div>;
-  }
-
-  if (!data) {
     return (
-      <div style={{ padding: 24, color: "white" }}>
-        <div style={{ fontSize: 28, fontWeight: 800 }}>FinovaOS Business Operator</div>
-        <div style={{ marginTop: 10, color: soft }}>We could not load your operator workspace right now.</div>
+      <div style={{ minHeight: "70vh", padding: 24, color: "white" }}>
+        <div
+          style={{
+            borderRadius: 28,
+            border: `1px solid ${shell.line}`,
+            background: `linear-gradient(180deg, rgba(94,162,255,0.08), rgba(12,18,41,0.96))`,
+            padding: 28,
+          }}
+        >
+          <div style={{ fontSize: 12, color: shell.blue, textTransform: "uppercase", letterSpacing: ".16em", fontWeight: 800 }}>
+            FinovaOS Business Operator
+          </div>
+          <div style={{ marginTop: 14, fontSize: 30, fontWeight: 900 }}>Loading your operator workspace...</div>
+        </div>
       </div>
     );
   }
 
-  const currency = data.company.currency;
+  if (!data) {
+    return (
+      <div style={{ minHeight: "70vh", padding: 24, color: "white" }}>
+        <div
+          style={{
+            borderRadius: 28,
+            border: `1px solid ${shell.line}`,
+            background: shell.panel,
+            padding: 28,
+          }}
+        >
+          <div style={{ fontSize: 30, fontWeight: 900 }}>FinovaOS Business Operator</div>
+          <div style={{ marginTop: 10, color: shell.soft }}>We could not load your operator workspace right now.</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: 24, color: "white", fontFamily: "'Outfit','Inter',sans-serif" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 18, flexWrap: "wrap", alignItems: "center" }}>
-        <div>
-          <div style={{ fontSize: 12, color: "#8aa1ff", textTransform: "uppercase", letterSpacing: ".12em", fontWeight: 700 }}>
-            FinovaOS Business Operator
-          </div>
-          <div style={{ marginTop: 8, fontSize: 34, fontWeight: 900, letterSpacing: "-.04em" }}>
-            Today&apos;s Decisions for {data.company.name}
-          </div>
-          <div style={{ marginTop: 10, maxWidth: 820, color: soft, fontSize: 15, lineHeight: 1.7 }}>
-            This operator view watches cash, inventory, documents, and active business records for your {data.company.businessLabel.toLowerCase()} workflow,
-            then ranks what needs attention first.
-          </div>
-        </div>
-        <div style={{ minWidth: 260, background: "linear-gradient(135deg,#1a2550,#101938)", border: `1px solid ${line}`, borderRadius: 20, padding: 18 }}>
-          <div style={{ fontSize: 12, color: dim, textTransform: "uppercase", letterSpacing: ".08em" }}>Operator Health</div>
-          <div style={{ marginTop: 10, fontSize: 40, fontWeight: 900 }}>{data.overview.healthScore}/100</div>
-          <div style={{ marginTop: 8, fontSize: 13, color: soft }}>
-            Plan: {data.company.plan} · Generated {new Date(data.generatedAt).toLocaleString()}
-          </div>
-        </div>
-      </div>
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: 24,
+        color: "white",
+        fontFamily: "'Outfit','Inter',sans-serif",
+        background:
+          "radial-gradient(circle at top left, rgba(77,227,214,0.08), transparent 22%), radial-gradient(circle at top right, rgba(94,162,255,0.12), transparent 26%)",
+      }}
+    >
+      <style>{`
+        .operator-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+        .operator-main-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.95fr);gap:18px;align-items:start}
+        .operator-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+        .operator-shell-card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.012)),rgba(16,24,54,.88);border:1px solid rgba(255,255,255,.08);border-radius:28px;box-shadow:0 24px 60px rgba(0,0,0,.24)}
+        @media (max-width: 1180px){
+          .operator-grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+          .operator-main-grid,.operator-bottom-grid{grid-template-columns:1fr}
+        }
+        @media (max-width: 720px){
+          .operator-grid-4{grid-template-columns:1fr}
+        }
+      `}</style>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: 14, marginTop: 22 }}>
-        <StatCard label="Cash Position" value={`${currency} ${Math.round(data.overview.cashPosition).toLocaleString("en-PK")}`} note={`${currency} ${Math.round(data.overview.overdueReceivables).toLocaleString("en-PK")} overdue receivables`} />
-        <StatCard label="Inventory Pressure" value={String(data.overview.lowStockItems)} note={`${data.overview.goodsReceivedPendingInvoice} GRN receipt(s) waiting for invoice`} />
-        <StatCard label="Operational Queue" value={String(data.overview.openBusinessRecords)} note={`${data.overview.openPurchaseOrders} active purchase orders in flow`} />
-        <StatCard label="Month Momentum" value={`${data.overview.revenueChange >= 0 ? "+" : ""}${data.overview.revenueChange}%`} note={`Profit ${data.overview.profitChange >= 0 ? "+" : ""}${data.overview.profitChange}% vs last month`} />
-      </div>
+      <div
+        className="operator-shell-card"
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          padding: 28,
+          background:
+            "linear-gradient(135deg, rgba(14,24,58,.96), rgba(10,16,38,.96) 54%, rgba(10,16,38,.88)), radial-gradient(circle at top right, rgba(94,162,255,.22), transparent 30%)",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage:
+              "linear-gradient(rgba(94,162,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(94,162,255,.05) 1px, transparent 1px)",
+            backgroundSize: "42px 42px",
+            maskImage: "linear-gradient(180deg, rgba(255,255,255,.5), transparent)",
+            pointerEvents: "none",
+          }}
+        />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.35fr .95fr", gap: 18, marginTop: 22, alignItems: "start" }}>
-        <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 22, overflow: "hidden" }}>
-          <div style={{ padding: 20, borderBottom: `1px solid ${line}`, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800 }}>Today&apos;s Decisions</div>
-              <div style={{ marginTop: 6, color: soft, fontSize: 14 }}>These are the highest-impact actions your business should not ignore today.</div>
+        <div style={{ position: "relative", display: "flex", justifyContent: "space-between", gap: 20, flexWrap: "wrap", alignItems: "stretch" }}>
+          <div style={{ flex: 1, minWidth: 280 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "7px 14px", borderRadius: 999, background: "rgba(94,162,255,.12)", border: "1px solid rgba(94,162,255,.2)" }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: shell.cyan, boxShadow: "0 0 14px rgba(77,227,214,.65)" }} />
+              <span style={{ fontSize: 11, color: "#bfdbfe", textTransform: "uppercase", letterSpacing: ".16em", fontWeight: 800 }}>
+                FinovaOS Business Operator
+              </span>
             </div>
-            <div style={{ fontSize: 13, color: dim }}>{data.todaysDecisions.length} ranked items</div>
+            <div style={{ marginTop: 18, fontSize: "clamp(32px,4vw,54px)", lineHeight: 1.02, fontWeight: 900, letterSpacing: "-.06em", maxWidth: 880 }}>
+              Today&apos;s decisions for {data.company.name}
+            </div>
+            <div style={{ marginTop: 16, maxWidth: 820, fontSize: 15, lineHeight: 1.8, color: shell.soft }}>
+              A live operating layer for your {data.company.businessLabel.toLowerCase()} business. It watches cash, inventory, pending documents, and active
+              workflows, then turns them into ranked actions instead of passive dashboards.
+            </div>
+            <div style={{ marginTop: 18, display: "flex", flexWrap: "wrap", gap: 10 }}>
+              <div style={{ padding: "10px 14px", borderRadius: 14, background: "rgba(255,255,255,.04)", border: `1px solid ${shell.line}`, fontSize: 13, color: shell.soft }}>
+                Business Type: <strong style={{ color: shell.text }}>{data.company.businessLabel}</strong>
+              </div>
+              <div style={{ padding: "10px 14px", borderRadius: 14, background: "rgba(255,255,255,.04)", border: `1px solid ${shell.line}`, fontSize: 13, color: shell.soft }}>
+                Plan: <strong style={{ color: shell.text }}>{data.company.plan}</strong>
+              </div>
+              <div style={{ padding: "10px 14px", borderRadius: 14, background: "rgba(255,255,255,.04)", border: `1px solid ${shell.line}`, fontSize: 13, color: shell.soft }}>
+                Generated: <strong style={{ color: shell.text }}>{new Date(data.generatedAt).toLocaleString()}</strong>
+              </div>
+            </div>
           </div>
-          <div style={{ padding: 16, display: "grid", gap: 14 }}>
-            {data.todaysDecisions.map((decision) => {
-              const tone = priorityTone(decision.priority);
-              return (
-                <div key={decision.id} style={{ background: "rgba(255,255,255,0.02)", border: `1px solid ${line}`, borderRadius: 18, padding: 18 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "start", flexWrap: "wrap" }}>
-                    <div style={{ flex: 1, minWidth: 260 }}>
-                      <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "4px 10px", borderRadius: 999, background: tone.bg, border: `1px solid ${tone.border}`, color: tone.color, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em" }}>
-                        {decision.priority}
-                      </div>
-                      <div style={{ marginTop: 12, fontSize: 22, fontWeight: 800 }}>{decision.title}</div>
-                      <div style={{ marginTop: 10, fontSize: 14, color: soft, lineHeight: 1.7 }}>{decision.reason}</div>
-                      <div style={{ marginTop: 10, fontSize: 14, color: "rgba(191,219,254,.95)" }}>
-                        <strong>Action:</strong> {decision.action}
-                      </div>
-                      <div style={{ marginTop: 8, fontSize: 13, color: dim }}>
-                        Impact: {decision.impact} · Source: {decision.source}
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                      {decision.href ? (
-                        <Link href={decision.href} style={{ textDecoration: "none", background: "#2563eb", color: "white", padding: "10px 14px", borderRadius: 12, fontWeight: 700 }}>
-                          Open
-                        </Link>
-                      ) : null}
-                      <button
-                        onClick={() => queueAction(decision)}
-                        disabled={queueingId === decision.id}
-                        style={{ background: "transparent", color: "white", padding: "10px 14px", borderRadius: 12, fontWeight: 700, border: `1px solid ${line}`, cursor: "pointer" }}
-                      >
-                        {queueingId === decision.id ? "Queueing..." : "Queue"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+
+          <div
+            style={{
+              width: 300,
+              maxWidth: "100%",
+              borderRadius: 24,
+              padding: 22,
+              background: "linear-gradient(180deg, rgba(94,162,255,.12), rgba(255,255,255,.03))",
+              border: "1px solid rgba(94,162,255,.18)",
+              boxShadow: `0 24px 50px ${shell.glow}`,
+            }}
+          >
+            <div style={{ fontSize: 12, color: shell.dim, textTransform: "uppercase", letterSpacing: ".16em", fontWeight: 700 }}>Operator Health</div>
+            <div style={{ marginTop: 12, display: "flex", alignItems: "baseline", gap: 8 }}>
+              <div style={{ fontSize: 52, fontWeight: 900, lineHeight: 1 }}>{data.overview.healthScore}</div>
+              <div style={{ fontSize: 18, color: shell.soft }}>/100</div>
+            </div>
+            <div style={{ marginTop: 12, fontSize: 14, color: shell.soft, lineHeight: 1.7 }}>
+              Revenue {data.overview.revenueChange >= 0 ? "+" : ""}
+              {data.overview.revenueChange}% vs last month, with {money(data.overview.overdueReceivables, data.company.currency)} overdue.
+            </div>
+            <div style={{ marginTop: 18, display: "grid", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", color: shell.soft, fontSize: 13 }}>
+                <span>Cash Position</span>
+                <strong style={{ color: shell.text }}>{money(data.overview.cashPosition, data.company.currency)}</strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", color: shell.soft, fontSize: 13 }}>
+                <span>Pending GRN Billing</span>
+                <strong style={{ color: shell.text }}>{data.overview.goodsReceivedPendingInvoice}</strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", color: shell.soft, fontSize: 13 }}>
+                <span>Low Stock Watch</span>
+                <strong style={{ color: shell.text }}>{data.overview.lowStockItems}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="operator-grid-4" style={{ marginTop: 18 }}>
+        <StatCard label="Cash Position" value={money(data.overview.cashPosition, data.company.currency)} note={`${money(data.overview.overdueReceivables, data.company.currency)} overdue receivables need attention`} accent="#5ea2ff" />
+        <StatCard label="Inventory Pressure" value={String(data.overview.lowStockItems)} note={`${data.overview.goodsReceivedPendingInvoice} GRN receipt(s) waiting for supplier invoice`} accent="#4de3d6" />
+        <StatCard label="Operational Queue" value={String(data.overview.openBusinessRecords)} note={`${data.overview.openPurchaseOrders} active purchase orders still moving in flow`} accent="#f59e0b" />
+        <StatCard label="Month Momentum" value={`${data.overview.revenueChange >= 0 ? "+" : ""}${data.overview.revenueChange}%`} note={`Profit ${data.overview.profitChange >= 0 ? "+" : ""}${data.overview.profitChange}% vs last month`} accent="#8b5cf6" />
+      </div>
+
+      <div className="operator-main-grid" style={{ marginTop: 18 }}>
+        <section className="operator-shell-card" style={{ padding: 20 }}>
+          <SectionTitle
+            eyebrow="Execution Queue"
+            title="Today's Decisions"
+            note="The most important actions your business should take today, ranked by urgency and impact."
+          />
+          <div style={{ display: "grid", gap: 14 }}>
+            {data.todaysDecisions.map((decision) => (
+              <DecisionCard key={decision.id} decision={decision} queueingId={queueingId} onQueue={queueAction} />
+            ))}
           </div>
         </section>
 
         <div style={{ display: "grid", gap: 18 }}>
-          <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 22, padding: 20 }}>
-            <div style={{ fontSize: 22, fontWeight: 800 }}>Detected Problems</div>
-            <div style={{ marginTop: 6, color: soft, fontSize: 14 }}>Live operational and financial issues currently on watch.</div>
-            <div style={{ marginTop: 16, display: "grid", gap: 12 }}>
+          <section className="operator-shell-card" style={{ padding: 20 }}>
+            <SectionTitle
+              eyebrow="Live Watch"
+              title="Detected Problems"
+              note="Signals pulled from your actual data, surfaced as operator-ready issues."
+            />
+            <div style={{ display: "grid", gap: 12 }}>
               {data.detectedProblems.slice(0, 5).map((problem, index) => {
                 const tone = priorityTone(problem.severity === "critical" ? "urgent" : problem.severity === "warning" ? "high" : "medium");
                 return (
-                  <div key={`${problem.title}-${index}`} style={{ borderRadius: 16, padding: 14, background: tone.bg, border: `1px solid ${tone.border}` }}>
+                  <div
+                    key={`${problem.title}-${index}`}
+                    style={{
+                      borderRadius: 18,
+                      padding: 16,
+                      background: tone.bg,
+                      border: `1px solid ${tone.border}`,
+                    }}
+                  >
                     <div style={{ fontSize: 14, fontWeight: 800, color: tone.color }}>{problem.title}</div>
-                    <div style={{ marginTop: 8, fontSize: 13, color: "rgba(255,255,255,.82)", lineHeight: 1.6 }}>{problem.description}</div>
-                    <div style={{ marginTop: 8, fontSize: 12, color: soft }}>{problem.action}</div>
+                    <div style={{ marginTop: 8, fontSize: 13, color: "rgba(255,255,255,.86)", lineHeight: 1.65 }}>{problem.description}</div>
+                    <div style={{ marginTop: 10, fontSize: 12, color: shell.soft }}>{problem.action}</div>
                   </div>
                 );
               })}
             </div>
           </section>
 
-          <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 22, padding: 20 }}>
-            <div style={{ fontSize: 22, fontWeight: 800 }}>Business Playbook</div>
-            <div style={{ marginTop: 6, color: soft, fontSize: 14 }}>Operator routine tailored for your {data.company.businessLabel.toLowerCase()} business.</div>
-            <div style={{ marginTop: 16, display: "grid", gap: 14 }}>
+          <section className="operator-shell-card" style={{ padding: 20 }}>
+            <SectionTitle
+              eyebrow="Business Rhythm"
+              title="Operator Playbook"
+              note={`A practical operating routine for your ${data.company.businessLabel.toLowerCase()} setup.`}
+            />
+            <div style={{ display: "grid", gap: 14 }}>
               {data.playbook.map((playbook) => (
-                <div key={playbook.title} style={{ borderRadius: 16, border: `1px solid ${line}`, padding: 16, background: "rgba(255,255,255,.02)" }}>
-                  <div style={{ fontSize: 18, fontWeight: 800 }}>{playbook.title}</div>
-                  <div style={{ marginTop: 8, fontSize: 14, color: soft, lineHeight: 1.7 }}>{playbook.summary}</div>
-                  <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
-                    {playbook.steps.map((step) => (
-                      <div key={step.label} style={{ borderLeft: "3px solid rgba(96,165,250,.7)", paddingLeft: 12 }}>
-                        <div style={{ fontWeight: 700 }}>{step.label}</div>
-                        <div style={{ marginTop: 5, fontSize: 13, color: soft, lineHeight: 1.6 }}>{step.description}</div>
+                <div
+                  key={playbook.title}
+                  style={{
+                    borderRadius: 22,
+                    padding: 18,
+                    background: "linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.012))",
+                    border: `1px solid ${shell.line}`,
+                  }}
+                >
+                  <div style={{ fontSize: 19, fontWeight: 800, color: shell.text }}>{playbook.title}</div>
+                  <div style={{ marginTop: 8, fontSize: 14, color: shell.soft, lineHeight: 1.7 }}>{playbook.summary}</div>
+                  <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
+                    {playbook.steps.map((step, index) => (
+                      <div key={step.label} style={{ display: "grid", gridTemplateColumns: "28px 1fr", gap: 12, alignItems: "start" }}>
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: "50%",
+                            background: "rgba(94,162,255,.12)",
+                            border: "1px solid rgba(94,162,255,.22)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#bfdbfe",
+                            fontSize: 12,
+                            fontWeight: 800,
+                          }}
+                        >
+                          {index + 1}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 800, color: shell.text }}>{step.label}</div>
+                          <div style={{ marginTop: 5, fontSize: 13, color: shell.soft, lineHeight: 1.65 }}>{step.description}</div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -241,77 +589,30 @@ export default function BusinessOperatorPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 22 }}>
-        <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 22, padding: 20 }}>
-          <div style={{ fontSize: 22, fontWeight: 800 }}>Recommended Actions</div>
-          <div style={{ marginTop: 6, color: soft, fontSize: 14 }}>Operator-suggested actions you can review and run today.</div>
-          <div style={{ marginTop: 16, display: "grid", gap: 12 }}>
-            {data.recommendedActions.map((action) => {
-              const tone = priorityTone(action.priority);
-              return (
-                <div key={action.id} style={{ borderRadius: 16, border: `1px solid ${line}`, padding: 16, background: "rgba(255,255,255,.02)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "start" }}>
-                    <div>
-                      <div style={{ display: "inline-flex", padding: "4px 10px", borderRadius: 999, background: tone.bg, border: `1px solid ${tone.border}`, color: tone.color, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em" }}>
-                        {action.priority}
-                      </div>
-                      <div style={{ marginTop: 10, fontSize: 17, fontWeight: 800 }}>{action.title}</div>
-                    </div>
-                    <div style={{ fontSize: 12, color: dim }}>{action.automationLevel}</div>
-                  </div>
-                  <div style={{ marginTop: 10, fontSize: 14, color: soft, lineHeight: 1.7 }}>{action.description}</div>
-                  <div style={{ marginTop: 12, display: "flex", gap: 10 }}>
-                    {action.href ? (
-                      <Link href={action.href} style={{ textDecoration: "none", padding: "9px 12px", borderRadius: 12, background: "#2563eb", color: "white", fontWeight: 700 }}>
-                        {action.actionLabel}
-                      </Link>
-                    ) : null}
-                    <button
-                      onClick={() => queueAction(action)}
-                      disabled={queueingId === action.id || action.state === "watch"}
-                      style={{ padding: "9px 12px", borderRadius: 12, border: `1px solid ${line}`, background: "transparent", color: "white", fontWeight: 700, cursor: action.state === "watch" ? "not-allowed" : "pointer", opacity: action.state === "watch" ? 0.6 : 1 }}
-                    >
-                      {queueingId === action.id ? "Queueing..." : "Queue"}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+      <div className="operator-bottom-grid" style={{ marginTop: 18 }}>
+        <section className="operator-shell-card" style={{ padding: 20 }}>
+          <SectionTitle
+            eyebrow="Action Layer"
+            title="Recommended Actions"
+            note="Suggested next steps you can review, open, or queue right away."
+          />
+          <div style={{ display: "grid", gap: 12 }}>
+            {data.recommendedActions.map((action) => (
+              <ActionCard key={action.id} action={action} queueingId={queueingId} buttonLabel="Queue Action" onQueue={queueAction} />
+            ))}
           </div>
         </section>
 
-        <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 22, padding: 20 }}>
-          <div style={{ fontSize: 22, fontWeight: 800 }}>Auto-Run Suggestions</div>
-          <div style={{ marginTop: 6, color: soft, fontSize: 14 }}>Lightweight operator automations that are safe to enable next.</div>
-          <div style={{ marginTop: 16, display: "grid", gap: 12 }}>
-            {data.autoRunSuggestions.map((action) => {
-              const tone = priorityTone(action.priority);
-              return (
-                <div key={action.id} style={{ borderRadius: 16, padding: 16, background: tone.bg, border: `1px solid ${tone.border}` }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-                    <div style={{ fontSize: 17, fontWeight: 800 }}>{action.title}</div>
-                    <div style={{ fontSize: 11, color: tone.color, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em" }}>
-                      {action.automationLevel}
-                    </div>
-                  </div>
-                  <div style={{ marginTop: 10, fontSize: 14, color: "rgba(255,255,255,.82)", lineHeight: 1.7 }}>{action.description}</div>
-                  <div style={{ marginTop: 12, display: "flex", gap: 10 }}>
-                    {action.href ? (
-                      <Link href={action.href} style={{ textDecoration: "none", padding: "9px 12px", borderRadius: 12, background: "rgba(255,255,255,.1)", color: "white", fontWeight: 700 }}>
-                        {action.actionLabel}
-                      </Link>
-                    ) : null}
-                    <button
-                      onClick={() => queueAction(action)}
-                      disabled={queueingId === action.id || action.state === "watch"}
-                      style={{ padding: "9px 12px", borderRadius: 12, border: "1px solid rgba(255,255,255,.18)", background: "transparent", color: "white", fontWeight: 700, cursor: action.state === "watch" ? "not-allowed" : "pointer", opacity: action.state === "watch" ? 0.6 : 1 }}
-                    >
-                      {queueingId === action.id ? "Queueing..." : "Enable"}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+        <section className="operator-shell-card" style={{ padding: 20 }}>
+          <SectionTitle
+            eyebrow="Automation Layer"
+            title="Auto-Run Suggestions"
+            note="Safe automation starters that can become your daily operating assistant."
+          />
+          <div style={{ display: "grid", gap: 12 }}>
+            {data.autoRunSuggestions.map((action) => (
+              <ActionCard key={action.id} action={action} queueingId={queueingId} buttonLabel="Enable Flow" onQueue={queueAction} />
+            ))}
           </div>
         </section>
       </div>
