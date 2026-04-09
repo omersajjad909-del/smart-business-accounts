@@ -32,6 +32,7 @@ type PurchaseOrder = {
   id: string;
   poNo: string;
   supplierId: string;
+  supplier?: { id: string; name: string } | null;
   items: POItem[];
 };
 
@@ -233,7 +234,7 @@ const [searchTerm, setSearchTerm] = useState("");
       .then(d => setTaxes(Array.isArray(d) ? d : []))
       .catch(err => console.log("Tax config error:", err));
 
-    fetch("/api/purchase-invoice", {
+    fetch("/api/purchase-order", {
       headers: requestHeaders,
     })
       .then(r => r.json())
@@ -280,21 +281,8 @@ const [searchTerm, setSearchTerm] = useState("");
     }
   }
 
-  function handleSupplierChange(id: string) {
-    setSupplierId(id);
-    const s = suppliers.find(x => x.id === id);
-    setSupplierName(s?.name || "");
-    const pos = allPOs.filter(p => p.supplierId === id);
-    setFilteredPOs(pos);
-    setSelectedPoId("");
-    setRows([{ itemId: "", name: "", description: "", qty: "", rate: "" }]);
-  }
-
-  function handlePoSelection(poId: string) {
-    setSelectedPoId(poId);
-    const po = filteredPOs.find(p => p.id === poId);
-    if (!po) return;
-    const linkedGrns = allGrns.filter((grn) => grn.po?.id === poId);
+  function getInvoiceableRowsForPo(po: PurchaseOrder) {
+    const linkedGrns = allGrns.filter((grn) => grn.po?.id === po.id);
 
     if (linkedGrns.length > 0) {
       const receivedByItem = new Map<string, { qty: number; rate: number; name: string; description: string }>();
@@ -314,7 +302,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
       const invoicedByItem = new Map<string, number>();
       invoices
-        .filter((invoice) => invoice.poId === poId && (!editing || invoice.id !== editing.id))
+        .filter((invoice) => invoice.poId === po.id && (!editing || invoice.id !== editing.id))
         .forEach((invoice) => {
           invoice.items.forEach((item) => {
             if (!item.itemId) return;
@@ -322,7 +310,7 @@ const [searchTerm, setSearchTerm] = useState("");
           });
         });
 
-      const nextRows = Array.from(receivedByItem.entries())
+      return Array.from(receivedByItem.entries())
         .map(([itemId, item]) => {
           const remainingQty = Math.max(0, item.qty - (invoicedByItem.get(itemId) || 0));
           return {
@@ -334,12 +322,9 @@ const [searchTerm, setSearchTerm] = useState("");
           };
         })
         .filter((row) => row.qty > 0);
-
-      setRows(nextRows.length > 0 ? nextRows : [{ itemId: "", name: "", description: "", qty: "", rate: "" }]);
-      return;
     }
 
-    const nextRows = po.items
+    return po.items
       .map((pi) => ({
         itemId: pi.itemId,
         name: pi.item.name,
@@ -347,8 +332,42 @@ const [searchTerm, setSearchTerm] = useState("");
         qty: Math.max(0, pi.qty - pi.invoicedQty),
         rate: pi.rate,
       }))
-      .filter((r) => r.qty > 0);
+      .filter((row) => row.qty > 0);
+  }
 
+  function handleSupplierChange(id: string) {
+    setSupplierId(id);
+    const s = suppliers.find(x => x.id === id);
+    setSupplierName(s?.name || "");
+    setSelectedPoId("");
+    setRows([{ itemId: "", name: "", description: "", qty: "", rate: "" }]);
+  }
+
+  useEffect(() => {
+    if (!supplierId) {
+      setFilteredPOs([]);
+      return;
+    }
+
+    const pos = allPOs.filter((po) => {
+      const poSupplierId = po.supplierId || po.supplier?.id || "";
+      if (poSupplierId !== supplierId) return false;
+      return getInvoiceableRowsForPo(po).length > 0;
+    });
+
+    setFilteredPOs(pos);
+
+    if (selectedPoId && !pos.some((po) => po.id === selectedPoId)) {
+      setSelectedPoId("");
+      setRows([{ itemId: "", name: "", description: "", qty: "", rate: "" }]);
+    }
+  }, [supplierId, allPOs, allGrns, invoices, editing, selectedPoId]);
+
+  function handlePoSelection(poId: string) {
+    setSelectedPoId(poId);
+    const po = filteredPOs.find(p => p.id === poId);
+    if (!po) return;
+    const nextRows = getInvoiceableRowsForPo(po);
     setRows(nextRows.length > 0 ? nextRows : [{ itemId: "", name: "", description: "", qty: "", rate: "" }]);
   }
 
