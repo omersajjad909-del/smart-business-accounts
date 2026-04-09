@@ -121,6 +121,11 @@ function PurchaseInvoiceContent() {
   const queryId = searchParams.get("id");
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
+  const requestHeaders = {
+    "x-user-role": user?.role || "ADMIN",
+    "x-user-id": user?.id || "",
+    "x-company-id": user?.companyId || "",
+  };
 
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [allPOs, setAllPOs] = useState<PurchaseOrder[]>([]);
@@ -215,7 +220,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     loadInvoices();
-    fetch("/api/accounts", { headers: { "x-user-role": user?.role || "ADMIN" } })
+    fetch("/api/accounts", { headers: requestHeaders })
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts;
@@ -223,13 +228,13 @@ const [searchTerm, setSearchTerm] = useState("");
       });
 
     // Load tax configurations
-    fetch("/api/tax-configuration", { headers: { "x-user-role": user?.role || "ADMIN" } })
+    fetch("/api/tax-configuration", { headers: requestHeaders })
       .then(r => r.json())
       .then(d => setTaxes(Array.isArray(d) ? d : []))
       .catch(err => console.log("Tax config error:", err));
 
     fetch("/api/purchase-invoice", {
-      headers: { "x-user-role": user?.role || "ADMIN" },
+      headers: requestHeaders,
     })
       .then(r => r.json())
       .then(data => {
@@ -237,7 +242,7 @@ const [searchTerm, setSearchTerm] = useState("");
       });
 
     fetch("/api/grn", {
-      headers: { "x-user-role": user?.role || "ADMIN" },
+      headers: requestHeaders,
     })
       .then(r => r.json())
       .then(data => {
@@ -249,7 +254,7 @@ const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     if (queryId) {
       fetch(`/api/purchase-invoice?id=${queryId}`, {
-         headers: { "x-user-role": user?.role || "ADMIN" }
+         headers: requestHeaders
       })
       .then(r => r.json())
       .then(data => {
@@ -264,7 +269,7 @@ const [searchTerm, setSearchTerm] = useState("");
   async function loadInvoices() {
     try {
       const res = await fetch("/api/purchase-invoice?type=invoices", {
-        headers: { "x-user-role": user?.role || "ADMIN" },
+        headers: requestHeaders,
       });
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -385,7 +390,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
       const res = await fetch("/api/purchase-invoice", {
         method,
-        headers: { "Content-Type": "application/json", "x-user-role": user?.role || "ADMIN" },
+        headers: { "Content-Type": "application/json", ...requestHeaders },
         body: JSON.stringify(body),
       });
 
@@ -455,7 +460,7 @@ const [searchTerm, setSearchTerm] = useState("");
     try {
       const res = await fetch(`/api/purchase-invoice?id=${id}`, {
         method: "DELETE",
-        headers: { "x-user-role": user?.role || "ADMIN" },
+        headers: requestHeaders,
       });
       if (res.ok) {
         toast.success("Invoice deleted successfully");

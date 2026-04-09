@@ -64,9 +64,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(invoices);
     }
 
-    // Default: return pending POs
+    // Default: return available POs for invoice matching.
+    // Do not hard-filter to only PENDING status because older flows
+    // may have already moved the PO status forward while it still has
+    // GRN-received or invoiceable lines remaining.
     const pos = await prisma.purchaseOrder.findMany({
-      where: { status: "PENDING", companyId, ...(branchId ? { branchId } : {}) },
+      where: {
+        companyId,
+        ...(branchId ? { branchId } : {}),
+        status: { not: "CANCELLED" },
+      },
       include: {
         supplier: true,
         items: {
