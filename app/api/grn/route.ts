@@ -86,16 +86,6 @@ export async function POST(req: NextRequest) {
     include: { items: true },
   });
 
-  // Update PO received qty if linked
-  if (poId) {
-    for (const grnItem of grn.items) {
-      await prisma.purchaseOrderItem.updateMany({
-        where: { poId, itemId: grnItem.itemId },
-        data: { invoicedQty: { increment: grnItem.receivedQty } },
-      });
-    }
-  }
-
   return NextResponse.json(grn, { status: 201 });
 }
 

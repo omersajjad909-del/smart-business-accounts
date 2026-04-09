@@ -40,10 +40,22 @@ type PurchaseInvoice = {
   invoiceNo: string;
   date: string;
   supplierId: string;
+  poId?: string | null;
   supplier?: { name: string };
   total: number;
   approvalStatus?: string;
-  items: Array<{ item: { name: string }; qty: number; rate: number }>;
+  items: Array<{ itemId?: string; item: { name: string; description?: string | null }; qty: number; rate: number }>;
+};
+
+type GRN = {
+  id: string;
+  po?: { id: string; poNo: string } | null;
+  items: Array<{
+    itemId: string;
+    receivedQty: number;
+    rate: number;
+    item?: { id: string; name: string; description?: string | null } | null;
+  }>;
 };
 
 type Row = {
@@ -112,6 +124,7 @@ function PurchaseInvoiceContent() {
 
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [allPOs, setAllPOs] = useState<PurchaseOrder[]>([]);
+  const [allGrns, setAllGrns] = useState<GRN[]>([]);
   const [filteredPOs, setFilteredPOs] = useState<PurchaseOrder[]>([]);
   const [invoices, setInvoices] = useState<PurchaseInvoice[]>([]);
   const [showList, setShowList] = useState(false);
@@ -222,6 +235,15 @@ const [searchTerm, setSearchTerm] = useState("");
       .then(data => {
         if (Array.isArray(data)) setAllPOs(data);
       });
+
+    fetch("/api/grn", {
+      headers: { "x-user-role": user?.role || "ADMIN" },
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) setAllGrns(data);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -267,18 +289,62 @@ const [searchTerm, setSearchTerm] = useState("");
     setSelectedPoId(poId);
     const po = filteredPOs.find(p => p.id === poId);
     if (!po) return;
+    const linkedGrns = allGrns.filter((grn) => grn.po?.id === poId);
 
-    setRows(
-      po.items
-        .map(pi => ({
-          itemId: pi.itemId,
-          name: pi.item.name,
-          description: pi.item.description || "",
-          qty: Math.max(0, pi.qty - pi.invoicedQty),
-          rate: pi.rate,
-        }))
-        .filter(r => r.qty > 0)
-    );
+    if (linkedGrns.length > 0) {
+      const receivedByItem = new Map<string, { qty: number; rate: number; name: string; description: string }>();
+      linkedGrns.forEach((grn) => {
+        grn.items.forEach((item) => {
+          const current = receivedByItem.get(item.itemId) || {
+            qty: 0,
+            rate: item.rate,
+            name: item.item?.name || po.items.find((pi) => pi.itemId === item.itemId)?.item.name || "",
+            description: item.item?.description || po.items.find((pi) => pi.itemId === item.itemId)?.item.description || "",
+          };
+          current.qty += Number(item.receivedQty || 0);
+          if (!current.rate && item.rate) current.rate = item.rate;
+          receivedByItem.set(item.itemId, current);
+        });
+      });
+
+      const invoicedByItem = new Map<string, number>();
+      invoices
+        .filter((invoice) => invoice.poId === poId && (!editing || invoice.id !== editing.id))
+        .forEach((invoice) => {
+          invoice.items.forEach((item) => {
+            if (!item.itemId) return;
+            invoicedByItem.set(item.itemId, (invoicedByItem.get(item.itemId) || 0) + Number(item.qty || 0));
+          });
+        });
+
+      const nextRows = Array.from(receivedByItem.entries())
+        .map(([itemId, item]) => {
+          const remainingQty = Math.max(0, item.qty - (invoicedByItem.get(itemId) || 0));
+          return {
+            itemId,
+            name: item.name,
+            description: item.description || "",
+            qty: remainingQty,
+            rate: item.rate,
+          };
+        })
+        .filter((row) => row.qty > 0);
+
+      setRows(nextRows.length > 0 ? nextRows : [{ itemId: "", name: "", description: "", qty: "", rate: "" }]);
+      return;
+    }
+
+    const nextRows = po.items
+      .map((pi) => ({
+        itemId: pi.itemId,
+        name: pi.item.name,
+        description: pi.item.description || "",
+        qty: Math.max(0, pi.qty - pi.invoicedQty),
+        rate: pi.rate,
+      }))
+      .filter((r) => r.qty > 0);
+
+    setRows(nextRows.length > 0 ? nextRows : [{ itemId: "", name: "", description: "", qty: "", rate: "" }]);
   }
 
   function updateRow(index: number, key: "qty" | "rate", value: string) {

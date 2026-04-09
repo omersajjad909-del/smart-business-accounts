@@ -23,30 +23,58 @@ const emptyState: FranchiseControlCenter = {
 
 export default function FranchiseOverviewPage() {
   const [data, setData] = useState(emptyState);
+  const [businessType, setBusinessType] = useState("franchise_brand");
 
   useEffect(() => {
     fetch("/api/franchise/control-center", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : emptyState))
       .then(setData)
       .catch(() => setData(emptyState));
+    fetch("/api/company/business-type", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : { businessType: "franchise_brand" }))
+      .then((company) => {
+        if (company.businessType) setBusinessType(company.businessType);
+      })
+      .catch(() => setBusinessType("franchise_brand"));
   }, []);
 
   const { summary, outlets, royalties } = data;
+  const franchiseConfig =
+    businessType === "chain_store"
+      ? {
+          title: "Chain Store Command Center",
+          description: "Monitor store network growth, outlet health, royalty flows, and network performance from live chain-store records.",
+          outletLabel: "Stores",
+          tone: "#86efac",
+        }
+      : businessType === "franchise_restaurant"
+        ? {
+            title: "Franchise Restaurant Command Center",
+            description: "Track outlet expansion, royalty control, and restaurant network performance from live franchise operations.",
+            outletLabel: "Restaurant Outlets",
+            tone: "#fbbf24",
+          }
+        : {
+            title: "Franchise Command Center",
+            description: "Outlet expansion, royalty control, and network performance from live franchise records.",
+            outletLabel: "Outlets",
+            tone: "#86efac",
+          };
 
   return (
     <div style={{ padding: "28px 32px", color: "#e2e8f0", fontFamily: "'Outfit','Inter',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
-          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "white" }}>Franchise Command Center</h1>
-          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.45)" }}>Outlet expansion, royalty control, and network performance from live franchise records.</p>
+          <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800, color: "white" }}>{franchiseConfig.title}</h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.45)" }}>{franchiseConfig.description}</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
-            { label: "Outlets", href: "/dashboard/franchise/outlets" },
+            { label: franchiseConfig.outletLabel, href: "/dashboard/franchise/outlets" },
             { label: "Royalty", href: "/dashboard/franchise/royalty" },
             { label: "Analytics", href: "/dashboard/franchise/analytics" },
           ].map((item) => (
-            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#86efac", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: franchiseConfig.tone, textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}
@@ -55,7 +83,7 @@ export default function FranchiseOverviewPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12, marginBottom: 24 }}>
         {[
-          { label: "Outlets", value: summary.outlets, color: "#22c55e" },
+          { label: franchiseConfig.outletLabel, value: summary.outlets, color: "#22c55e" },
           { label: "Active Outlets", value: summary.activeOutlets, color: "#60a5fa" },
           { label: "Monthly Sales", value: summary.monthlySales.toLocaleString(), color: "#fbbf24" },
           { label: "Royalty Value", value: summary.royaltyValue.toLocaleString(), color: "#a78bfa" },
@@ -76,7 +104,7 @@ export default function FranchiseOverviewPage() {
               <div key={item.id} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)" }}>
                 <div style={{ fontSize: 14, fontWeight: 700 }}>{item.outletName}</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginTop: 4 }}>{item.location || "-"} | {item.franchisee || "-"}</div>
-                <div style={{ fontSize: 12, color: "#86efac", marginTop: 6 }}>{item.monthlySales.toLocaleString()} | {item.status}</div>
+                <div style={{ fontSize: 12, color: franchiseConfig.tone, marginTop: 6 }}>{item.monthlySales.toLocaleString()} | {item.status}</div>
               </div>
             ))}
           </div>

@@ -9,7 +9,7 @@ import VisitorTracker from "@/components/VisitorTracker";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
-const BRAND_ICON_PATH = "/icon1.png";
+const BRAND_ICON_PATH = "/icon1-transparent.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

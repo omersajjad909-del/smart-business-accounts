@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import {
   firmBg,
@@ -23,24 +24,81 @@ function StatCard({ label, value, tone }: { label: string; value: string | numbe
 }
 
 export default function FirmOverviewPage() {
+  const [businessType, setBusinessType] = useState("accounting_firm");
   const clients = mapFirmClients(useBusinessRecords("firm_client").records);
   const projects = mapFirmProjects(useBusinessRecords("firm_project").records);
   const invoices = mapFirmBilling(useBusinessRecords("firm_billing").records);
   const timesheets = mapFirmTimesheets(useBusinessRecords("firm_timesheet").records);
+
+  useEffect(() => {
+    fetch("/api/company/business-type", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : { businessType: "accounting_firm" }))
+      .then((company) => {
+        if (company.businessType) setBusinessType(company.businessType);
+      })
+      .catch(() => setBusinessType("accounting_firm"));
+  }, []);
 
   const activeClients = clients.filter((client) => client.status === "Active").length;
   const activeEngagements = projects.filter((project) => project.status === "Active").length;
   const billedRevenue = invoices.reduce((sum, invoice) => sum + invoice.amount, 0);
   const billableHours = timesheets.filter((entry) => entry.billable === "Yes").reduce((sum, entry) => sum + entry.hours, 0);
 
+  const firmConfig =
+    businessType === "audit_firm"
+      ? {
+          eyebrow: "Audit Firm",
+          title: "Audit planning, fieldwork, and fee recovery command center",
+          description: "Monitor audit clients, active engagements, billable effort, and fee realization from one professional-services workspace.",
+          workflow: [
+            { title: "Engagement Setup", body: "Capture client, risk areas, deadlines, and team ownership for each audit assignment." },
+            { title: "Fieldwork Planning", body: "Organize testing areas, findings, and completion timelines across active jobs." },
+            { title: "Timesheets", body: "Track billable and non-billable staff effort for utilization and recovery analysis." },
+            { title: "Fee Recovery", body: "Monitor invoice cycles, collections, and backlog before sign-off season closes." },
+          ],
+        }
+      : businessType === "consultancy_firm"
+        ? {
+            eyebrow: "Consultancy Firm",
+            title: "Client delivery, consulting engagements, and fee control center",
+            description: "Track advisory clients, scoped projects, consultant effort, and billing realization from a single operations view.",
+            workflow: [
+              { title: "Client Intake", body: "Record advisory clients, retainer terms, and solution scope for each mandate." },
+              { title: "Project Delivery", body: "Convert proposals into active consulting engagements with milestones and owners." },
+              { title: "Timesheets", body: "Measure consultant effort and billable utilization across active client work." },
+              { title: "Fee Billing", body: "Raise invoices, monitor dues, and protect margin across advisory workstreams." },
+            ],
+          }
+        : businessType === "architecture_firm"
+          ? {
+              eyebrow: "Architecture Firm",
+              title: "Design delivery, project milestones, and fee billing command center",
+              description: "Manage design clients, active projects, team effort, and billing from one architecture operations workspace.",
+              workflow: [
+                { title: "Client Briefing", body: "Capture site requirements, design scope, and project expectations in the client desk." },
+                { title: "Project Staging", body: "Track design milestones, deliverables, and owner accountability across engagements." },
+                { title: "Timesheets", body: "Log architect and drafter effort against active design packages and revisions." },
+                { title: "Fee Billing", body: "Monitor invoice stages, collection health, and realization across the design pipeline." },
+              ],
+            }
+          : {
+              eyebrow: "Accounting Firm",
+              title: "Client servicing, engagements, and fee control center",
+              description: "Monitor client portfolio, active engagements, fee billing, and staff time from one professional-services dashboard.",
+              workflow: [
+                { title: "Client Onboarding", body: "Capture industry, contacts, and retainer expectations in the client desk." },
+                { title: "Engagement Planning", body: "Convert bookkeeping, tax, audit, or advisory work into active engagements." },
+                { title: "Timesheets", body: "Track staff effort with billable and non-billable visibility across client work." },
+                { title: "Fee Billing", body: "Raise invoices, monitor dues, and keep monthly realization under control." },
+              ],
+            };
+
   return (
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: firmFont }}>
       <div style={{ marginBottom: 26 }}>
-        <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Accounting Firm</div>
-        <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Client servicing, engagements, aur fee control center</h1>
-        <p style={{ margin: 0, fontSize: 14, color: firmMuted, maxWidth: 760 }}>
-          Client portfolio, active engagements, fee billing, aur staff time ko ek hi professional-services dashboard se monitor karein.
-        </p>
+        <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>{firmConfig.eyebrow}</div>
+        <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>{firmConfig.title}</h1>
+        <p style={{ margin: 0, fontSize: 14, color: firmMuted, maxWidth: 760 }}>{firmConfig.description}</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14, marginBottom: 24 }}>
@@ -54,12 +112,7 @@ export default function FirmOverviewPage() {
         <div style={{ background: "linear-gradient(135deg, rgba(99,102,241,.14), rgba(56,189,248,.08))", border: `1px solid ${firmBorder}`, borderRadius: 20, padding: 24 }}>
           <div style={{ fontSize: 13, color: "#c7d2fe", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Firm Workflow</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
-            {[
-              { title: "Client Onboarding", body: "Industry, contact, aur retainer expectations ko client desk me capture karein." },
-              { title: "Engagement Planning", body: "Audit, tax, consulting, ya advisory work ko scoped engagement me convert karein." },
-              { title: "Timesheets", body: "Staff effort ko billable/non-billable split ke saath log karein." },
-              { title: "Fee Billing", body: "Invoices raise karein, dues monitor karein, aur monthly realization track karein." },
-            ].map((step, index) => (
+            {firmConfig.workflow.map((step, index) => (
               <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(129,140,248,.16)", color: "#c7d2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>{index + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8 }}>{step.title}</div>
@@ -73,8 +126,8 @@ export default function FirmOverviewPage() {
           <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".07em" }}>Quick Actions</div>
           <div style={{ display: "grid", gap: 10 }}>
             {[
-              { href: "/dashboard/firm/clients", label: "Client Desk", hint: "Portfolio, status, aur retainers" },
-              { href: "/dashboard/firm/projects", label: "Engagements", hint: "Audit/tax/consulting work planning" },
+              { href: "/dashboard/firm/clients", label: "Client Desk", hint: "Portfolio, status, and retainers" },
+              { href: "/dashboard/firm/projects", label: "Engagements", hint: "Audit, advisory, and design work planning" },
               { href: "/dashboard/firm/timesheets", label: "Timesheets", hint: "Staff effort and utilization" },
               { href: "/dashboard/firm/billing", label: "Fee Billing", hint: "Invoice lifecycle and collection control" },
               { href: "/dashboard/firm/analytics", label: "Firm Analytics", hint: "Revenue mix, utilization, and backlog" },
