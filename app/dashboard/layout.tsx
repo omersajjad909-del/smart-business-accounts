@@ -688,6 +688,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/business-guide" pathname={pathname}>Business Guide</NavLink>
               <NavLink href="/dashboard/owner-dashboard" pathname={pathname}>Owner Dashboard</NavLink>
               <NavLink href="/dashboard/ai" pathname={pathname}>AI Intelligence</NavLink>
+              <NavLink href="/dashboard/operator" pathname={pathname}>Business Operator</NavLink>
             </div>
           )}
 
@@ -2047,7 +2048,6 @@ function NavLink({ href, children, pathname }: {
     </Link>
   );
 }
-
 
 
 
