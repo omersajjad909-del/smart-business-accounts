@@ -574,16 +574,6 @@ export default function QuotationPage() {
                   <label className="text-xs font-bold">Valid Until</label>
                   <input type="date" className="border p-2 w-full" value={validUntil} onChange={e => setValidUntil(e.target.value)} />
                 </div>
-                <div className="col-span-2">
-                  <label className="text-xs font-bold">Remarks / Notes</label>
-                  <textarea
-                    className="border p-2 w-full text-sm"
-                    rows={2}
-                    placeholder="Optional remarks or terms..."
-                    value={remarks}
-                    onChange={e => setRemarks(e.target.value)}
-                  />
-                </div>
               </div>
 
               <div className="overflow-x-auto">
@@ -625,7 +615,20 @@ export default function QuotationPage() {
               </div>
               <button onClick={addRow} className="bg-gray-100 px-4 py-1 rounded">+ Add Row</button>
 
-              <div className="flex justify-end pt-4">
+              <div className="flex flex-col md:flex-row justify-between gap-4 pt-4">
+                {/* Remarks - left side */}
+                <div className="flex-1">
+                  <label className="text-xs font-bold block mb-1">Remarks / Notes</label>
+                  <textarea
+                    className="border p-2 w-full text-sm"
+                    rows={3}
+                    placeholder="Optional remarks or terms..."
+                    value={remarks}
+                    onChange={e => setRemarks(e.target.value)}
+                  />
+                </div>
+
+                {/* Totals - right side */}
                 <div className="w-full md:w-64 space-y-2">
                   <div className="flex justify-between"><span>Total</span><span>{total.toLocaleString()}</span></div>
 
@@ -656,7 +659,7 @@ export default function QuotationPage() {
                     >
                       {applyTax ? "✓ Tax Applied" : "+ Add Tax"}
                     </button>
-                    
+
                     {applyTax && (
                       <div className="space-y-2">
                         <select
@@ -672,10 +675,10 @@ export default function QuotationPage() {
                           ))}
                         </select>
                         {selectedTax && (
-                           <div className="flex justify-between text-sm">
-                             <span>Tax ({selectedTax.taxRate}%)</span>
-                             <span>{taxAmount.toLocaleString()}</span>
-                           </div>
+                          <div className="flex justify-between text-sm">
+                            <span>Tax ({selectedTax.taxRate}%)</span>
+                            <span>{taxAmount.toLocaleString()}</span>
+                          </div>
                         )}
                       </div>
                     )}
