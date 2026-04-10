@@ -251,9 +251,11 @@ export async function POST(req: NextRequest) {
       if (poId) {
         const allItems = await tx.purchaseOrderItem.findMany({ where: { poId } });
         const isDone = allItems.every((pi: any) => pi.invoicedQty >= pi.qty);
+        const hasAny = allItems.some((pi: any) => pi.invoicedQty > 0);
+        const newStatus = isDone ? "COMPLETED" : hasAny ? "PARTIALLY_INVOICED" : "PENDING";
         await tx.purchaseOrder.update({
           where: { id: poId },
-          data: { status: isDone ? "COMPLETED" : "PENDING" },
+          data: { status: newStatus },
         });
       }
 
