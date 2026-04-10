@@ -155,6 +155,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
   const [saving, setSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [printMode, setPrintMode] = useState<"none" | "a4" | "55mm">("none");
   const [origin, setOrigin] = useState("");
 
   useEffect(() => {
@@ -647,26 +648,21 @@ const [searchTerm, setSearchTerm] = useState("");
                   {saving ? "Saving..." : editing ? "Update Invoice" : "Save & Preview"}
                 </button>
               ) : (
-              
                 <>
-
-                <input
-  type="text"
-  placeholder="Search invoices..."
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-  style={{ ...inp({ width: 220 }) }}
-/>
-
-                  <button onClick={() => window.print()} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#16a34a,#22c55e)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                    Print / PDF
+                  <button onClick={() => { setPrintMode("a4"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
+                    Print A4
                   </button>
-                  <button 
-                    onClick={sendInvoiceEmail} 
+                  <button onClick={() => { setPrintMode("55mm"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    Print 55mm
+                  </button>
+                  <button
+                    onClick={sendInvoiceEmail}
                     disabled={sendingEmail}
-                    style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "rgba(99,102,241,0.14)", color: TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: sendingEmail ? "not-allowed" : "pointer", opacity: sendingEmail ? 0.7 : 1 }}
+                    style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: sendingEmail ? "not-allowed" : "pointer", opacity: sendingEmail ? 0.7 : 1 }}
                   >
-                    {sendingEmail ? "Sending..." : "Email Invoice"}
+                    {sendingEmail ? "Sending..." : "📧 Email Invoice"}
                   </button>
                   <button onClick={() => setShowPreview(false)} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                     Back to Edit
@@ -862,29 +858,64 @@ const [searchTerm, setSearchTerm] = useState("");
             </div>
           )}
 
-          {/* PREVIEW */}
+          {/* ── PRINT STYLES ── */}
           {showPreview && (
-            <div className="invoice-print bg-white mx-auto text-black">
-              <div className="flex justify-between border-b-4 border-black pb-4 mb-6">
+            <style>{`
+              @media print {
+                body * { visibility: hidden !important; }
+                .pi-print, .pi-print * { visibility: visible !important; }
+                .pi-print { position: fixed !important; inset: 0 !important; }
+                .pi-print.pi-a4 { width: 210mm !important; padding: 18mm 18mm 14mm !important; font-size: 11pt !important; }
+                .pi-print.pi-55mm { width: 55mm !important; padding: 4mm 3mm !important; font-size: 7pt !important; }
+                .no-print, .print\\:hidden { display: none !important; }
+              }
+            `}</style>
+          )}
+
+          {/* ── A4 PREVIEW ── */}
+          {showPreview && (printMode === "none" || printMode === "a4") && (
+            <div className="pi-print pi-a4" style={{
+              background: "white", color: "#111",
+              fontFamily: "'Outfit','Inter',sans-serif",
+              borderRadius: 14, overflow: "hidden",
+              boxShadow: "0 8px 50px rgba(0,0,0,0.25)",
+              maxWidth: 860, margin: "0 auto 32px",
+            }}>
+              {/* Top bar */}
+              <div style={{ height: 5, background: "#111" }} />
+
+              {/* Header */}
+              <div style={{ padding: "28px 36px 20px", borderBottom: "1.5px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20 }}>
                 <div>
-                  <h1 className="text-4xl font-black italic tracking-tighter">US TRADERS</h1>
-                  <p className="text-[10px] font-bold uppercase tracking-[3px] text-gray-600">Industrial Goods & Services</p>
+                  <div style={{ fontSize: 26, fontWeight: 900, color: "#0f172a", letterSpacing: -0.8, lineHeight: 1 }}>{supplierName ? supplierName : "—"}</div>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginTop: 5 }}>Vendor / Supplier</div>
+                  {location && <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>Location: {location}</div>}
                 </div>
-                <div className="text-right">
-                  <h2 className="text-2xl font-black uppercase underline">Purchase Invoice</h2>
-                  <p className="text-sm font-bold mt-1">INV #: {invoiceId}</p>
-                  <p className="text-sm">Date: {date}</p>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ background: "#0f172a", color: "white", padding: "5px 16px", borderRadius: 6, fontSize: 11, fontWeight: 800, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 10, display: "inline-block" }}>
+                    Purchase Invoice
+                  </div>
+                  <table style={{ fontSize: 12, borderCollapse: "collapse", marginLeft: "auto" }}>
+                    <tbody>
+                      {[["Invoice #", invoiceId], ["Date", fmtDate(date)], ["Status", approvalStatus]].map(([k, v]) => (
+                        <tr key={k}>
+                          <td style={{ padding: "2px 12px 2px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right" }}>{k}</td>
+                          <td style={{ padding: "2px 0", fontWeight: 800, color: "#0f172a", fontFamily: k === "Invoice #" ? "monospace" : "inherit" }}>{v}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {/* Barcode + QR */}
                   {invoiceId && (
-                    <div className="flex flex-col items-end gap-2 mt-2">
-                      <div className="text-center">
-                        <Barcode value={invoiceId} width={1.5} height={40} fontSize={14} displayValue={false} />
-                        <span className="text-[10px] font-bold">INV ID: {invoiceId}</span>
+                    <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+                      <div style={{ textAlign: "center" }}>
+                        <Barcode value={invoiceId} width={1.2} height={36} fontSize={10} displayValue={false} background="white" lineColor="#111" />
+                        <div style={{ fontSize: 9, fontWeight: 700, color: "#475569" }}>INV: {invoiceId}</div>
                       </div>
-                      
                       {origin && (
-                        <div className="flex flex-col items-center mt-2 border-t pt-2">
-                          <QRCodeSVG value={`${origin}/view/purchase-invoice?id=${invoiceId}`} size={80} />
-                          <span className="text-[10px] font-bold mt-1 bg-black text-white px-1">SCAN FOR ONLINE BILL</span>
+                        <div style={{ textAlign: "center", borderTop: "1px solid #e2e8f0", paddingTop: 6 }}>
+                          <QRCodeSVG value={`${origin}/view/purchase-invoice?id=${savedInvoiceId || invoiceId}`} size={64} />
+                          <div style={{ fontSize: 8, fontWeight: 800, background: "#111", color: "white", padding: "1px 4px", marginTop: 3 }}>SCAN FOR ONLINE BILL</div>
                         </div>
                       )}
                     </div>
@@ -892,59 +923,136 @@ const [searchTerm, setSearchTerm] = useState("");
                 </div>
               </div>
 
-              <div className="mb-6">
-                <p className="text-[10px] uppercase font-bold text-gray-400">Vendor / Supplier:</p>
-                <p className="text-xl font-black uppercase">{supplierName}</p>
-                <p className="text-xs font-bold italic">Location: {location}</p>
+              {/* Items Table */}
+              <div style={{ padding: "0 36px" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "2px solid #0f172a" }}>
+                      {[["#","left",30],["Item Description","left","auto"],["Qty","center",70],["Rate","right",110],["Amount","right",120]].map(([label, align, w]) => (
+                        <th key={label as string} style={{ padding: "12px 0 8px", textAlign: align as any, fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: w as any }}>{label}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.filter(r => r.name).map((r, i) => (
+                      <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                        <td style={{ padding: "11px 0", fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{i + 1}</td>
+                        <td style={{ padding: "11px 0" }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{r.name}</div>
+                          {r.description && <div style={{ fontSize: 10, color: "#64748b", marginTop: 1 }}>{r.description}</div>}
+                        </td>
+                        <td style={{ padding: "11px 0", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{r.qty}</td>
+                        <td style={{ padding: "11px 0", textAlign: "right", fontSize: 12, color: "#475569" }}>{Number(r.rate).toLocaleString()}</td>
+                        <td style={{ padding: "11px 0", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{(Number(r.qty) * Number(r.rate)).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
-              <table className="w-full text-sm border-collapse border border-black">
-                <thead>
-                  <tr className="bg-black text-white border border-black uppercase text-[10px]">
-                    <th className="p-2 border border-black text-center w-12">Sr.</th>
-                    <th className="p-2 border border-black text-left">Description of Items</th>
-                    <th className="p-2 border border-black text-center w-24">Qty</th>
-                    <th className="p-2 border border-black text-center w-32">Rate</th>
-                    <th className="p-2 border border-black text-right w-36">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r, i) => (
-                    <tr key={i} className="border border-black font-bold">
-                      <td className="p-3 border border-black text-center">{i + 1}</td>
-                      <td className="p-3 border border-black">
-                        <div className="uppercase">{r.name}</div>
-                        {r.description && <div className="text-[10px] font-normal leading-tight lowercase text-gray-600">{r.description}</div>}
-                      </td>
-                      <td className="p-3 border border-black text-center">{r.qty}</td>
-                      <td className="p-3 border border-black text-center">{Number(r.rate).toLocaleString()}</td>
-                      <td className="p-3 border border-black text-right font-mono">{(Number(r.qty) * Number(r.rate)).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              <div className="flex justify-end mt-4">
-                <div className="w-72 space-y-1">
-                  <div className="flex justify-between text-[11px] font-bold border-b border-black pb-1"><span>SUB-TOTAL:</span><span>{total.toLocaleString()}</span></div>
-                  <div className="flex justify-between text-[11px] font-bold border-b border-black pb-1"><span>FREIGHT:</span><span>{Number(freight || 0).toLocaleString()}</span></div>
-                  {selectedTax && (
-                    <div className="flex justify-between text-[11px] font-bold border-b border-black pb-1">
-                      <span>{selectedTax.taxType.toUpperCase()} ({selectedTax.taxRate}%):</span>
-                      <span>{taxAmount.toLocaleString()}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-2xl font-black border-t-2 border-black pt-1 bg-gray-50 p-2">
-                    <span>NET:</span>
-                    <span>{netTotal.toLocaleString()}</span>
-                  </div>
+              {/* Totals */}
+              <div style={{ padding: "16px 36px 28px", display: "flex", justifyContent: "flex-end", borderTop: "1.5px solid #e2e8f0", marginTop: 4 }}>
+                <div style={{ minWidth: 240 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                    <tbody>
+                      <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
+                        <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>Sub Total</td>
+                        <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{total.toLocaleString()}</td>
+                      </tr>
+                      {Number(freight) > 0 && (
+                        <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
+                          <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>Freight</td>
+                          <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{Number(freight).toLocaleString()}</td>
+                        </tr>
+                      )}
+                      {selectedTax && (
+                        <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
+                          <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>{selectedTax.taxType} ({selectedTax.taxRate}%)</td>
+                          <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{taxAmount.toLocaleString()}</td>
+                        </tr>
+                      )}
+                      <tr style={{ background: "#0f172a" }}>
+                        <td style={{ padding: "10px 12px", color: "white", fontWeight: 800, fontSize: 13, borderRadius: "4px 0 0 4px" }}>NET PAYABLE</td>
+                        <td style={{ padding: "10px 12px", textAlign: "right", color: "white", fontWeight: 900, fontSize: 15, borderRadius: "0 4px 4px 0" }}>{netTotal.toLocaleString()}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
-              <div className="mt-32 flex justify-between px-10">
-                <div className="text-center w-48 border-t-2 border-black pt-1 text-[10px] font-bold uppercase">Prepared By</div>
-                <div className="text-center w-48 border-t-2 border-black pt-1 text-[10px] font-bold uppercase">Authorized Sign</div>
+              {/* Signatures */}
+              <div style={{ padding: "0 36px 28px", display: "flex", gap: 32 }}>
+                {["Prepared By", "Checked By", "Authorized By"].map(label => (
+                  <div key={label} style={{ flex: 1, textAlign: "center", borderTop: "1.5px solid #cbd5e1", paddingTop: 7, marginTop: 40 }}>
+                    <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
+                  </div>
+                ))}
               </div>
+
+              {/* Footer */}
+              <div style={{ padding: "10px 36px", background: "#f8fafc", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between" }}>
+                <div style={{ fontSize: 10, color: "#94a3b8" }}>Generated by FinovaOS · {fmtDate(new Date().toISOString())}</div>
+                <div style={{ fontSize: 10, color: "#94a3b8" }}>Computer generated document</div>
+              </div>
+            </div>
+          )}
+
+          {/* ── 55mm THERMAL PREVIEW ── */}
+          {showPreview && (
+            <div className="pi-print pi-55mm" style={{
+              background: "white", color: "#000",
+              fontFamily: "'Courier New',Courier,monospace",
+              width: 220, margin: "0 auto 32px",
+              padding: "10px 12px",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+              borderRadius: 4,
+              display: printMode === "55mm" ? "block" : "none",
+            }}>
+              {/* Header */}
+              <div style={{ textAlign: "center", borderBottom: "1px dashed #555", paddingBottom: 6, marginBottom: 6 }}>
+                <div style={{ fontSize: 12, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>{supplierName || "Supplier"}</div>
+                <div style={{ fontSize: 8, marginTop: 2, color: "#444" }}>PURCHASE INVOICE</div>
+              </div>
+              {/* Invoice info */}
+              <div style={{ fontSize: 9, marginBottom: 5 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}><span>INV#:</span><strong>{invoiceId}</strong></div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}><span>Date:</span><span>{fmtDate(date)}</span></div>
+              </div>
+              {/* Items */}
+              <div style={{ borderTop: "1px dashed #555", borderBottom: "1px dashed #555", padding: "5px 0", marginBottom: 5 }}>
+                {rows.filter(r => r.name).map((r, i) => (
+                  <div key={i} style={{ marginBottom: 4 }}>
+                    <div style={{ fontSize: 9, fontWeight: 700 }}>{r.name}</div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, color: "#444" }}>
+                      <span>{r.qty} x {Number(r.rate).toLocaleString()}</span>
+                      <strong>{(Number(r.qty) * Number(r.rate)).toLocaleString()}</strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Totals */}
+              <div style={{ fontSize: 9 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}><span>Sub Total:</span><span>{total.toLocaleString()}</span></div>
+                {Number(freight) > 0 && <div style={{ display: "flex", justifyContent: "space-between" }}><span>Freight:</span><span>{Number(freight).toLocaleString()}</span></div>}
+                {selectedTax && <div style={{ display: "flex", justifyContent: "space-between" }}><span>{selectedTax.taxType}:</span><span>{taxAmount.toLocaleString()}</span></div>}
+                <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid #000", paddingTop: 3, marginTop: 3 }}>
+                  <span>NET:</span><span>{netTotal.toLocaleString()}</span>
+                </div>
+              </div>
+              {/* Barcode */}
+              {invoiceId && (
+                <div style={{ textAlign: "center", marginTop: 8, borderTop: "1px dashed #555", paddingTop: 6 }}>
+                  <Barcode value={invoiceId} width={1} height={28} fontSize={8} displayValue={true} background="white" lineColor="#000" />
+                </div>
+              )}
+              {/* QR */}
+              {origin && invoiceId && (
+                <div style={{ textAlign: "center", marginTop: 6 }}>
+                  <QRCodeSVG value={`${origin}/view/purchase-invoice?id=${savedInvoiceId || invoiceId}`} size={56} />
+                  <div style={{ fontSize: 7, marginTop: 2 }}>Scan for online bill</div>
+                </div>
+              )}
+              <div style={{ textAlign: "center", fontSize: 7, marginTop: 8, color: "#666" }}>FinovaOS · Computer generated</div>
             </div>
           )}
           </div>
