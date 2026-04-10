@@ -20,10 +20,15 @@ type PO = {
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  DRAFT:    { bg: "rgba(148,163,184,0.12)", text: "#94a3b8", border: "rgba(148,163,184,0.3)" },
-  PENDING:  { bg: "rgba(251,191,36,0.12)",  text: "#fbbf24", border: "rgba(251,191,36,0.3)" },
-  APPROVED: { bg: "rgba(52,211,153,0.12)",  text: "#34d399", border: "rgba(52,211,153,0.3)" },
-  REJECTED: { bg: "rgba(248,113,113,0.12)", text: "#f87171", border: "rgba(248,113,113,0.3)" },
+  DRAFT:               { bg: "rgba(148,163,184,0.12)", text: "#94a3b8", border: "rgba(148,163,184,0.3)" },
+  PENDING:             { bg: "rgba(251,191,36,0.12)",  text: "#fbbf24", border: "rgba(251,191,36,0.3)" },
+  APPROVED:            { bg: "rgba(52,211,153,0.12)",  text: "#34d399", border: "rgba(52,211,153,0.3)" },
+  REJECTED:            { bg: "rgba(248,113,113,0.12)", text: "#f87171", border: "rgba(248,113,113,0.3)" },
+  RECEIVED:            { bg: "rgba(99,102,241,0.14)",  text: "#818cf8", border: "rgba(99,102,241,0.3)" },
+  PARTIALLY_RECEIVED:  { bg: "rgba(14,165,233,0.12)",  text: "#38bdf8", border: "rgba(14,165,233,0.3)" },
+  PARTIALLY_INVOICED:  { bg: "rgba(168,85,247,0.12)",  text: "#c084fc", border: "rgba(168,85,247,0.3)" },
+  COMPLETED:           { bg: "rgba(16,185,129,0.12)",  text: "#10b981", border: "rgba(16,185,129,0.3)" },
+  CANCELLED:           { bg: "rgba(248,113,113,0.12)", text: "#f87171", border: "rgba(248,113,113,0.3)" },
 };
 
 function inp(extra?: React.CSSProperties): React.CSSProperties {
@@ -235,16 +240,17 @@ export default function PurchaseOrderPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
-                  {["PO Number", "Date", "Supplier", "Status", "Items", "Actions"].map(h => (
+                  {["PO Number", "Date", "Supplier", "Approval", "GRN Status", "Items", "Actions"].map(h => (
                     <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7, whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {pos.length === 0 ? (
-                  <tr><td colSpan={6} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No purchase orders yet</td></tr>
+                  <tr><td colSpan={7} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No purchase orders yet</td></tr>
                 ) : pos.map((po) => {
-                  const sc2 = STATUS_COLORS[po.approvalStatus || "PENDING"] || STATUS_COLORS.PENDING;
+                  const scApproval = STATUS_COLORS[po.approvalStatus || "PENDING"] || STATUS_COLORS.PENDING;
+                  const scGrn = STATUS_COLORS[po.status || "PENDING"] || STATUS_COLORS.PENDING;
                   return (
                     <tr key={po.id} style={{ borderBottom: `1px solid ${BORDER}`, transition: "background .12s" }}
                       onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "rgba(99,102,241,0.05)"}
@@ -253,8 +259,13 @@ export default function PurchaseOrderPage() {
                       <td style={{ padding: "13px 16px", color: MUTED, fontSize: 12 }}>{fmtDate(po.date)}</td>
                       <td style={{ padding: "13px 16px", fontWeight: 600 }}>{po.supplier?.name || "—"}</td>
                       <td style={{ padding: "13px 16px" }}>
-                        <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: sc2.bg, color: sc2.text, border: `1px solid ${sc2.border}` }}>
+                        <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: scApproval.bg, color: scApproval.text, border: `1px solid ${scApproval.border}` }}>
                           {po.approvalStatus || "PENDING"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "13px 16px" }}>
+                        <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: scGrn.bg, color: scGrn.text, border: `1px solid ${scGrn.border}` }}>
+                          {po.status || "PENDING"}
                         </span>
                       </td>
                       <td style={{ padding: "13px 16px", color: MUTED }}>{po.items?.length || 0} items</td>

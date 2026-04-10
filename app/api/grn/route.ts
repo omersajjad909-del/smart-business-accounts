@@ -61,29 +61,75 @@ export async function POST(req: NextRequest) {
   const supplier = await prisma.account.findFirst({ where: { id: supplierId, companyId } });
   if (!supplier) return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
 
-  const grn = await prisma.goodsReceiptNote.create({
-    data: {
-      companyId,
-      branchId,
-      grnNo,
-      date: new Date(date),
-      poId: poId || null,
-      supplierId,
-      remarks,
-      status: "RECEIVED",
-      createdBy: userId,
-      items: {
-        create: items.map((i: { itemId: string; orderedQty: number; receivedQty: number; rate: number; remarks?: string }) => ({
-          itemId: i.itemId,
-          orderedQty: i.orderedQty,
-          receivedQty: i.receivedQty,
-          rate: i.rate,
-          amount: i.receivedQty * i.rate,
-          remarks: i.remarks,
-        })),
+  const grn = await prisma.$transaction(async (tx) => {
+    const created = await tx.goodsReceiptNote.create({
+      data: {
+        companyId,
+        branchId,
+        grnNo,
+        date: new Date(date),
+        poId: poId || null,
+        supplierId,
+        remarks,
+        status: "RECEIVED",
+        createdBy: userId,
+        items: {
+          create: items.map((i: { itemId: string; orderedQty: number; receivedQty: number; rate: number; remarks?: string }) => ({
+            itemId: i.itemId,
+            orderedQty: i.orderedQty,
+            receivedQty: i.receivedQty,
+            rate: i.rate,
+            amount: i.receivedQty * i.rate,
+            remarks: i.remarks,
+          })),
+        },
       },
-    },
-    include: { items: true },
+      include: { items: true },
+    });
+
+    // GRN ke against PO ka status update karo
+    if (poId) {
+      const po = await tx.purchaseOrder.findFirst({
+        where: { id: poId, companyId },
+        include: { items: true },
+      });
+
+      if (po) {
+        // PO ke total ordered qty vs total GRN received qty compare karo
+        const allGrns = await tx.goodsReceiptNote.findMany({
+          where: { poId, companyId, deletedAt: null },
+          include: { items: true },
+        });
+
+        // Har item ki total received qty calculate karo (naya GRN bhi include)
+        const receivedMap: Record<string, number> = {};
+        for (const g of allGrns) {
+          for (const gi of g.items) {
+            receivedMap[gi.itemId] = (receivedMap[gi.itemId] || 0) + gi.receivedQty;
+          }
+        }
+
+        const allFullyReceived = po.items.every(
+          (pi) => (receivedMap[pi.itemId] || 0) >= pi.qty
+        );
+        const anyReceived = po.items.some(
+          (pi) => (receivedMap[pi.itemId] || 0) > 0
+        );
+
+        const newStatus = allFullyReceived
+          ? "RECEIVED"
+          : anyReceived
+          ? "PARTIALLY_RECEIVED"
+          : "PENDING";
+
+        await tx.purchaseOrder.update({
+          where: { id: poId },
+          data: { status: newStatus },
+        });
+      }
+    }
+
+    return created;
   });
 
   return NextResponse.json(grn, { status: 201 });
