@@ -9,7 +9,7 @@ import VisitorTracker from "@/components/VisitorTracker";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
-const BRAND_ICON_PATH = "/icon1-transparent.png";
+const BRAND_ICON_PATH = "/icon1-tight.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -77,9 +77,14 @@ export const metadata: Metadata = {
   generator: "Next.js",
   referrer: "origin-when-cross-origin",
   icons: {
-    icon: BRAND_ICON_PATH,
-    apple: BRAND_ICON_PATH,
-    shortcut: BRAND_ICON_PATH,
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon1-tight-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon1-tight-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icon1-tight-192.png", sizes: "192x192", type: "image/png" }],
+    shortcut: "/favicon-32x32.png",
   },
   manifest: "/manifest.json",
   appleWebApp: {
