@@ -24,11 +24,13 @@ type _QuotationInput = {
 // VALIDATION SCHEMA
 const quotationSchema = z.object({
   id: z.string().optional(),
-  quotationNo: z.string().optional(), // ✅ ADD THIS
+  quotationNo: z.string().optional(),
   date: z.string(),
   validUntil: z.string().optional().nullable(),
   customerId: z.string().optional().nullable(),
   customerName: z.string().optional().nullable(),
+  freight: z.number().optional().default(0),
+  remarks: z.string().optional().nullable(),
   items: z.array(
     z.object({
       itemId: z.string(),
@@ -139,12 +141,14 @@ export async function POST(req: NextRequest) {
       data: {
         companyId,
         branchId,
-        quotationNo, // Use the one we decided on
+        quotationNo,
         date: new Date(data.date),
         validUntil: data.validUntil ? new Date(data.validUntil) : null,
         customerId: data.customerId || null,
         customerName: data.customerName || null,
         status: data.status || "DRAFT",
+        freight: data.freight || 0,
+        remarks: data.remarks || null,
         total: data.items.reduce((sum, item) => sum + item.amount, 0),
         items: {
           create: data.items.map((item) => ({
@@ -204,6 +208,8 @@ export async function PUT(req: NextRequest) {
           customerId: data.customerId || null,
           customerName: data.customerName || null,
           status: data.status || "DRAFT",
+          freight: data.freight || 0,
+          remarks: data.remarks || null,
           total: data.items.reduce((sum, item) => sum + item.amount, 0),
           items: {
             create: data.items.map((item) => ({

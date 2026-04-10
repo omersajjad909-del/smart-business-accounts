@@ -73,6 +73,8 @@ export default function QuotationPage() {
   const [customerName, setCustomerName] = useState("");
   const [date, setDate] = useState(today);
   const [validUntil, setValidUntil] = useState("");
+  const [freight, setFreight] = useState<number | "">("");
+  const [remarks, setRemarks] = useState("");
   const [rows, setRows] = useState<Row[]>([{
     itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "",
   }]);
@@ -248,7 +250,7 @@ export default function QuotationPage() {
   const total = rows.reduce((s, r) => s + (Number(r.qty) * Number(r.rate) || 0), 0);
   const selectedTax = taxes.find(t => t.id === selectedTaxId);
   const taxAmount = applyTax && selectedTax ? (total * (selectedTax.taxRate / 100)) : 0;
-  const netTotal = total + taxAmount;
+  const netTotal = total + taxAmount + (Number(freight) || 0);
 
   async function saveQuotation() {
     const clean = rows.filter(r => r.itemId && r.qty && r.rate);
@@ -265,6 +267,8 @@ export default function QuotationPage() {
         customerId,
         date,
         validUntil: validUntil || null,
+        freight: Number(freight) || 0,
+        remarks: remarks || null,
         items: clean.map(r => {
           const qty = Number(r.qty);
           const rate = Number(r.rate);
@@ -319,6 +323,8 @@ export default function QuotationPage() {
     setCustomerId(q.customerId);
     setCustomerName(q.customer?.name || "");
     setDate(new Date(q.date).toISOString().slice(0, 10));
+    setFreight((q as any).freight || "");
+    setRemarks((q as any).remarks || "");
     setRows(q.items.map((it: any) => ({
       itemId: it.itemId || "",
       name: it.item?.name || "",
@@ -568,6 +574,16 @@ export default function QuotationPage() {
                   <label className="text-xs font-bold">Valid Until</label>
                   <input type="date" className="border p-2 w-full" value={validUntil} onChange={e => setValidUntil(e.target.value)} />
                 </div>
+                <div className="col-span-2">
+                  <label className="text-xs font-bold">Remarks / Notes</label>
+                  <textarea
+                    className="border p-2 w-full text-sm"
+                    rows={2}
+                    placeholder="Optional remarks or terms..."
+                    value={remarks}
+                    onChange={e => setRemarks(e.target.value)}
+                  />
+                </div>
               </div>
 
               <div className="overflow-x-auto">
@@ -612,7 +628,20 @@ export default function QuotationPage() {
               <div className="flex justify-end pt-4">
                 <div className="w-full md:w-64 space-y-2">
                   <div className="flex justify-between"><span>Total</span><span>{total.toLocaleString()}</span></div>
-                  
+
+                  {/* Freight */}
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-sm font-semibold">Freight</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={freight}
+                      onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))}
+                      placeholder="0"
+                      className="border p-1 text-sm w-28 text-right"
+                    />
+                  </div>
+
                   {/* Tax Section */}
                   <div className="border-t pt-2 space-y-2">
                     <button
