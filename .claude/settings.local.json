@@ -93,7 +93,9 @@
       "Bash(node)",
       "Read(//c/Users/Standard Laptop/AppData/Local/Temp/claude/**)",
       "Bash(node_modules/.bin/tsc --noEmit)",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(curl -I \"https://finovaos.app/sitemap.xml\")",
+      "Bash(curl -I \"https://www.finovaos.app/sitemap.xml\")"
     ]
   }
 }

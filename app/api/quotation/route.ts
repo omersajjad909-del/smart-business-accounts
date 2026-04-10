@@ -133,8 +133,30 @@ export async function POST(req: NextRequest) {
     
     let quotationNo = data.quotationNo;
     if (!quotationNo) {
-       const count = await prisma.quotation.count({ where: { companyId } });
-       quotationNo = `QT-${String(count + 1).padStart(4, "0")}`;
+      const last = await prisma.quotation.findFirst({
+        where: { companyId, quotationNo: { startsWith: "QT-" } },
+        orderBy: { createdAt: "desc" },
+        select: { quotationNo: true },
+      });
+      let next = 1;
+      if (last?.quotationNo) {
+        const n = parseInt(last.quotationNo.replace("QT-", ""));
+        if (!isNaN(n)) next = n + 1;
+      }
+      quotationNo = `QT-${String(next).padStart(4, "0")}`;
+    }
+
+    // Ensure uniqueness — if conflict, increment until free
+    let attempts = 0;
+    while (attempts < 20) {
+      const exists = await prisma.quotation.findFirst({
+        where: { companyId, quotationNo },
+        select: { id: true },
+      });
+      if (!exists) break;
+      const n = parseInt(quotationNo.replace("QT-", ""));
+      quotationNo = `QT-${String(n + 1).padStart(4, "0")}`;
+      attempts++;
     }
 
     const quotation = await prisma.quotation.create({
