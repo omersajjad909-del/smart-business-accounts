@@ -2010,8 +2010,53 @@ function NavLink({ href, children, pathname }: {
   const isBusinessOperator = displayChildren === "Business Operator";
   const showUtilityIcon = isAiAssistant || isBusinessGuide || isOwnerDashboard || isBusinessOperator;
 
-  // In collapsed mode, hide nav links (they are accessed via NavGroup icon → expand)
-  if (collapsed) return null;
+  // Collapsed mode: show icon-only for utility links, hide regular sub-links
+  if (collapsed) {
+    if (!showUtilityIcon) return null;
+    const collapsedIcon = isAiAssistant ? (
+      // Sparkles / AI icon
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+      </svg>
+    ) : isBusinessGuide ? (
+      // Compass / guide icon
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+      </svg>
+    ) : isOwnerDashboard ? (
+      // Layout dashboard icon
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="14" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    ) : (
+      // Operator / lightning bolt icon
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    );
+    return (
+      <Link
+        href={href}
+        title={typeof displayChildren === "string" ? displayChildren : ""}
+        style={{
+          display:"flex", alignItems:"center", justifyContent:"center",
+          width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
+          color: active ? "#818cf8" : "rgba(255,255,255,0.4)",
+          background: active ? "rgba(99,102,241,0.15)" : "transparent",
+          textDecoration:"none", transition:"all .15s",
+        }}
+        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=active?"#818cf8":"rgba(255,255,255,0.4)";}}
+      >
+        <span style={{display:"flex",fontSize:16}}>{collapsedIcon}</span>
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={href}
@@ -2039,30 +2084,28 @@ function NavLink({ href, children, pathname }: {
       {showUtilityIcon && (
         <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",color:"inherit",flexShrink:0}}>
           {isAiAssistant ? (
+            // Sparkles / AI
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="7" y="8" width="10" height="8" rx="2" />
-              <path d="M9 8V6a3 3 0 0 1 6 0v2" />
-              <path d="M12 2v2" />
-              <path d="M10 12h.01" />
-              <path d="M14 12h.01" />
-              <path d="M9.5 19h5" />
+              <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
             </svg>
           ) : isBusinessGuide ? (
+            // Compass
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+              <circle cx="12" cy="12" r="10"/>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
             </svg>
           ) : isOwnerDashboard ? (
+            // 4-grid layout
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 13h8V3H3z" />
-              <path d="M13 21h8V11h-8z" />
-              <path d="M13 3h8v4h-8z" />
-              <path d="M3 17h8v4H3z" />
+              <rect x="3" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="14" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/>
             </svg>
           ) : (
+            // Lightning bolt (operator)
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 3l7 4v5c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V7l7-4z" />
-              <path d="M9 12l2 2 4-4" />
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
             </svg>
           )}
         </span>
