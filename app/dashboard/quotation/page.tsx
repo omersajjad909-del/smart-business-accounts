@@ -299,7 +299,7 @@ export default function QuotationPage() {
       
       if (data.quotation) {
         setSavedQuotation(data.quotation);
-        setQuotationNo(data.quotationNo || quotationNo);
+        setQuotationNo(data.quotation.quotationNo || quotationNo);
         setCustomerName(data.quotation.customer?.name || customerName);
       }
       
@@ -507,7 +507,7 @@ export default function QuotationPage() {
       {showForm && (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center bg-gray-50 p-4 border rounded print:hidden gap-4">
-            <h1 className="text-2xl font-bold">Quotation ({quotationNo})</h1>
+            <h1 className="text-2xl font-bold">Quotation ({preview && savedQuotation ? savedQuotation.quotationNo : quotationNo})</h1>
             {!preview ? (
               <div className="flex flex-wrap gap-2">
                 <button onClick={saveQuotation} disabled={saving} className="bg-blue-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
@@ -518,29 +518,29 @@ export default function QuotationPage() {
                 </button>
               </div>
             ) : (
-              <div className="flex flex-wrap gap-2">
-                <button onClick={() => { setPrintMode("a4"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, fontSize: 13 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                <button onClick={() => { setPrintMode("a4"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#16a34a", color: "white", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, fontSize: 13 }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
                   Print A4
                 </button>
-                <button onClick={() => { setPrintMode("55mm"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, fontSize: 13 }}>
+                <button onClick={() => { setPrintMode("55mm"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#0891b2", color: "white", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, fontSize: 13 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                   Print 55mm
                 </button>
-                <button onClick={() => setHideRates(!hideRates)} className="bg-purple-600 text-white px-4 py-2 rounded flex-1 md:flex-none">
+                <button onClick={() => setHideRates(!hideRates)} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#7c3aed", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
                   {hideRates ? "Show Rates" : "Hide Rates"}
                 </button>
-                <button onClick={shareOnWhatsApp} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex-1 md:flex-none">
+                <button onClick={shareOnWhatsApp} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#25D366", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
                   📱 WhatsApp
                 </button>
-                <button onClick={shareOnSMS} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex-1 md:flex-none">
+                <button onClick={shareOnSMS} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#3b82f6", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
                   💬 SMS
                 </button>
-                <button onClick={() => setPreview(false)} className="bg-yellow-600 text-white px-4 py-2 rounded flex-1 md:flex-none">
+                <button onClick={() => setPreview(false)} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#d97706", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
                   ✏️ Edit
                 </button>
-                <button onClick={() => { setPreview(false); resetForm(); }} className="bg-gray-600 text-white px-4 py-2 rounded flex-1 md:flex-none">
-                  + New
+                <button onClick={() => { setPreview(false); resetForm(); loadQuotations(); }} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#475569", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
+                  + New Quotation
                 </button>
               </div>
             )}
@@ -696,57 +696,68 @@ export default function QuotationPage() {
               @media print {
                 body * { visibility: hidden !important; }
                 .qt-print, .qt-print * { visibility: visible !important; }
-                .qt-print { position: fixed !important; inset: 0 !important; }
-                .qt-print.qt-a4 { width: 210mm !important; padding: 18mm 18mm 14mm !important; font-size: 11pt !important; }
-                .qt-print.qt-55mm { width: 55mm !important; padding: 4mm 3mm !important; font-size: 7pt !important; }
-                .no-print, .print\\:hidden { display: none !important; }
+                .qt-print { position: fixed !important; inset: 0 !important; margin: 0 !important; }
+                .qt-print.qt-a4 { width: 210mm !important; padding: 14mm 16mm 12mm !important; font-size: 10.5pt !important; }
+                .qt-print.qt-55mm { width: 55mm !important; padding: 3mm 2.5mm !important; font-size: 7pt !important; }
+                .no-print, .print-hidden { display: none !important; }
               }
             `}</style>
           )}
 
           {/* ── A4 PREVIEW ── */}
-          {preview && savedQuotation && (printMode === "none" || printMode === "a4") && (
+          {preview && savedQuotation && printMode !== "55mm" && (
             <div className="qt-print qt-a4" style={{
               background: "white", color: "#111",
               fontFamily: "'Outfit','Inter',sans-serif",
-              borderRadius: 14, overflow: "hidden",
-              boxShadow: "0 8px 50px rgba(0,0,0,0.25)",
+              borderRadius: 12, overflow: "hidden",
+              boxShadow: "0 8px 50px rgba(0,0,0,0.28)",
               maxWidth: 860, margin: "0 auto 32px",
             }}>
-              {/* Top bar */}
-              <div style={{ height: 5, background: "#111" }} />
+              {/* Top accent bar */}
+              <div style={{ height: 6, background: "linear-gradient(90deg,#0f172a,#334155)" }} />
 
               {/* Header */}
-              <div style={{ padding: "28px 36px 20px", borderBottom: "1.5px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 20 }}>
+              <div style={{ padding: "26px 36px 18px", borderBottom: "1.5px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
                 <div>
-                  <div style={{ fontSize: 26, fontWeight: 900, color: "#0f172a", letterSpacing: -0.8, lineHeight: 1 }}>{companyName}</div>
-                  <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginTop: 5 }}>Quotation / Estimate</div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: "#0f172a", letterSpacing: -0.8, lineHeight: 1 }}>{companyName}</div>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1.2, marginTop: 6 }}>Quotation / Estimate</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ background: "#0f172a", color: "white", padding: "5px 16px", borderRadius: 6, fontSize: 11, fontWeight: 800, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 10, display: "inline-block" }}>
-                    Quotation
+                  <div style={{
+                    background: "#0f172a", color: "white",
+                    padding: "6px 18px", borderRadius: 6,
+                    fontSize: 11, fontWeight: 800, letterSpacing: 3,
+                    textTransform: "uppercase", marginBottom: 12, display: "inline-block"
+                  }}>
+                    QUOTATION
                   </div>
                   <table style={{ fontSize: 12, borderCollapse: "collapse", marginLeft: "auto" }}>
                     <tbody>
-                      {[
-                        ["QT #", savedQuotation.quotationNo],
-                        ["Date", fmtDate(savedQuotation.date)],
-                        ...(savedQuotation.validUntil ? [["Valid Until", fmtDate(savedQuotation.validUntil)]] : []),
-                      ].map(([k, v]) => (
-                        <tr key={k}>
-                          <td style={{ padding: "2px 12px 2px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right" }}>{k}</td>
-                          <td style={{ padding: "2px 0", fontWeight: 800, color: "#0f172a", fontFamily: k === "QT #" ? "monospace" : "inherit" }}>{v}</td>
+                      <tr>
+                        <td style={{ padding: "3px 14px 3px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right", fontSize: 11 }}>QT #</td>
+                        <td style={{ padding: "3px 0", fontWeight: 900, color: "#0f172a", fontFamily: "monospace", fontSize: 14, letterSpacing: 0.5 }}>{savedQuotation.quotationNo}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: "3px 14px 3px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right", fontSize: 11 }}>Date</td>
+                        <td style={{ padding: "3px 0", fontWeight: 700, color: "#0f172a", fontSize: 12 }}>{fmtDate(savedQuotation.date)}</td>
+                      </tr>
+                      {savedQuotation.validUntil && (
+                        <tr>
+                          <td style={{ padding: "3px 14px 3px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right", fontSize: 11 }}>Valid Until</td>
+                          <td style={{ padding: "3px 0", fontWeight: 700, color: "#0f172a", fontSize: 12 }}>{fmtDate(savedQuotation.validUntil)}</td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
               </div>
 
               {/* Bill To */}
-              <div style={{ padding: "14px 36px", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Bill To</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>{customerName}</div>
+              <div style={{ padding: "14px 36px 14px", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+                <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 5 }}>Bill To</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>
+                  {savedQuotation.customer?.name || customerName || "—"}
+                </div>
               </div>
 
               {/* Items Table */}
@@ -754,24 +765,24 @@ export default function QuotationPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
                     <tr style={{ borderBottom: "2px solid #0f172a" }}>
-                      <th style={{ padding: "12px 0 8px", textAlign: "left", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8 }}>#</th>
-                      <th style={{ padding: "12px 0 8px", textAlign: "left", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8 }}>Item Description</th>
-                      <th style={{ padding: "12px 0 8px", textAlign: "center", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 70 }}>Qty</th>
-                      {!hideRates && <th style={{ padding: "12px 0 8px", textAlign: "right", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 110 }}>Rate</th>}
-                      {!hideRates && <th style={{ padding: "12px 0 8px", textAlign: "right", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 120 }}>Amount</th>}
+                      <th style={{ padding: "12px 6px 8px 0", textAlign: "left", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 28 }}>#</th>
+                      <th style={{ padding: "12px 6px 8px", textAlign: "left", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8 }}>Item Description</th>
+                      <th style={{ padding: "12px 6px 8px", textAlign: "center", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 70 }}>Qty</th>
+                      {!hideRates && <th style={{ padding: "12px 6px 8px", textAlign: "right", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 110 }}>Rate</th>}
+                      {!hideRates && <th style={{ padding: "12px 0 8px 6px", textAlign: "right", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 120 }}>Amount</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {savedQuotation.items.map((item: any, i: number) => (
                       <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                        <td style={{ padding: "11px 0", fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{i + 1}</td>
-                        <td style={{ padding: "11px 0" }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{item.item.name}</div>
-                          {item.item.description && <div style={{ fontSize: 10, color: "#64748b", marginTop: 1 }}>{item.item.description}</div>}
+                        <td style={{ padding: "11px 6px 11px 0", fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{i + 1}</td>
+                        <td style={{ padding: "11px 6px" }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{item.item?.name || item.itemId}</div>
+                          {item.item?.description && <div style={{ fontSize: 10, color: "#64748b", marginTop: 1 }}>{item.item.description}</div>}
                         </td>
-                        <td style={{ padding: "11px 0", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{item.qty}</td>
-                        {!hideRates && <td style={{ padding: "11px 0", textAlign: "right", fontSize: 12, color: "#475569" }}>{item.rate.toLocaleString()}</td>}
-                        {!hideRates && <td style={{ padding: "11px 0", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{(item.qty * item.rate).toLocaleString()}</td>}
+                        <td style={{ padding: "11px 6px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{item.qty}</td>
+                        {!hideRates && <td style={{ padding: "11px 6px", textAlign: "right", fontSize: 12, color: "#475569" }}>{Number(item.rate).toLocaleString()}</td>}
+                        {!hideRates && <td style={{ padding: "11px 0 11px 6px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{(item.qty * item.rate).toLocaleString()}</td>}
                       </tr>
                     ))}
                   </tbody>
@@ -779,35 +790,44 @@ export default function QuotationPage() {
               </div>
 
               {/* Totals + Remarks */}
-              <div style={{ padding: "16px 36px 28px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24, borderTop: "1.5px solid #e2e8f0", marginTop: 4 }}>
+              <div style={{ padding: "18px 36px 24px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24, borderTop: "1.5px solid #e2e8f0", marginTop: 6 }}>
                 {/* Remarks left */}
                 <div style={{ flex: 1 }}>
-                  {savedQuotation.remarks && (
+                  {savedQuotation.remarks ? (
                     <div style={{ borderLeft: "3px solid #cbd5e1", paddingLeft: 12 }}>
-                      <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 3 }}>Remarks / Notes</div>
+                      <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>Remarks / Notes</div>
                       <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.7 }}>{savedQuotation.remarks}</div>
+                    </div>
+                  ) : (
+                    <div style={{ borderLeft: "3px solid #e2e8f0", paddingLeft: 12 }}>
+                      <div style={{ fontSize: 9, fontWeight: 800, color: "#cbd5e1", textTransform: "uppercase", letterSpacing: 0.8 }}>Remarks / Notes</div>
+                      <div style={{ fontSize: 11, color: "#e2e8f0", marginTop: 3 }}>—</div>
                     </div>
                   )}
                 </div>
                 {/* Totals right */}
                 {!hideRates && (
-                  <div style={{ minWidth: 240 }}>
+                  <div style={{ minWidth: 250 }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                       <tbody>
                         <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
                           <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>Sub Total</td>
-                          <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{savedQuotation.total.toLocaleString()}</td>
+                          <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{Number(savedQuotation.total).toLocaleString()}</td>
                         </tr>
-                        {(savedQuotation.freight > 0) && (
+                        {Number(savedQuotation.freight) > 0 && (
                           <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
                             <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>Freight</td>
-                            <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{savedQuotation.freight.toLocaleString()}</td>
+                            <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{Number(savedQuotation.freight).toLocaleString()}</td>
                           </tr>
                         )}
-                        <tr style={{ background: "#0f172a" }}>
-                          <td style={{ padding: "10px 12px", color: "white", fontWeight: 800, fontSize: 13, borderRadius: "4px 0 0 4px" }}>NET TOTAL</td>
-                          <td style={{ padding: "10px 12px", textAlign: "right", color: "white", fontWeight: 900, fontSize: 15, borderRadius: "0 4px 4px 0" }}>
-                            {(savedQuotation.total + (savedQuotation.freight || 0)).toLocaleString()}
+                        <tr>
+                          <td colSpan={2} style={{ padding: 0 }}>
+                            <div style={{ background: "#0f172a", borderRadius: 6, marginTop: 4, display: "flex", justifyContent: "space-between", padding: "10px 14px" }}>
+                              <span style={{ color: "white", fontWeight: 800, fontSize: 13 }}>NET TOTAL</span>
+                              <span style={{ color: "white", fontWeight: 900, fontSize: 15 }}>
+                                {(Number(savedQuotation.total) + Number(savedQuotation.freight || 0)).toLocaleString()}
+                              </span>
+                            </div>
                           </td>
                         </tr>
                       </tbody>
@@ -819,16 +839,16 @@ export default function QuotationPage() {
               {/* Signatures */}
               <div style={{ padding: "0 36px 28px", display: "flex", gap: 32 }}>
                 {["Prepared By", "Checked By", "Authorized By"].map(label => (
-                  <div key={label} style={{ flex: 1, textAlign: "center", borderTop: "1.5px solid #cbd5e1", paddingTop: 7, marginTop: 40 }}>
+                  <div key={label} style={{ flex: 1, textAlign: "center", borderTop: "1.5px solid #cbd5e1", paddingTop: 8, marginTop: 44 }}>
                     <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
                   </div>
                 ))}
               </div>
 
               {/* Footer */}
-              <div style={{ padding: "10px 36px", background: "#f8fafc", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between" }}>
+              <div style={{ padding: "10px 36px", background: "#f8fafc", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div style={{ fontSize: 10, color: "#94a3b8" }}>{printPrefs.footerNote || "Thank you for your business!"}</div>
-                <div style={{ fontSize: 10, color: "#94a3b8" }}>Generated by FinovaOS</div>
+                <div style={{ fontSize: 10, color: "#cbd5e1" }}>Generated by FinovaOS</div>
               </div>
             </div>
           )}
@@ -840,30 +860,42 @@ export default function QuotationPage() {
               fontFamily: "'Courier New',Courier,monospace",
               width: 220, margin: "0 auto 32px",
               padding: "10px 12px",
-              boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.18)",
               borderRadius: 4,
               display: printMode === "55mm" ? "block" : "none",
             }}>
               {/* Header */}
-              <div style={{ textAlign: "center", borderBottom: "1px dashed #555", paddingBottom: 6, marginBottom: 6 }}>
-                <div style={{ fontSize: 12, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>{companyName}</div>
-                <div style={{ fontSize: 8, marginTop: 2 }}>QUOTATION</div>
+              <div style={{ textAlign: "center", borderBottom: "1px dashed #555", paddingBottom: 7, marginBottom: 7 }}>
+                <div style={{ fontSize: 13, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1.5 }}>{companyName}</div>
+                <div style={{ fontSize: 8, marginTop: 2, letterSpacing: 2, textTransform: "uppercase" }}>Quotation</div>
               </div>
               {/* Info */}
-              <div style={{ fontSize: 9, marginBottom: 5 }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}><span>QT#:</span><strong>{savedQuotation.quotationNo}</strong></div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}><span>Date:</span><span>{fmtDate(savedQuotation.date)}</span></div>
-                {savedQuotation.validUntil && <div style={{ display: "flex", justifyContent: "space-between" }}><span>Valid:</span><span>{fmtDate(savedQuotation.validUntil)}</span></div>}
-                <div style={{ display: "flex", justifyContent: "space-between" }}><span>To:</span><strong>{customerName}</strong></div>
+              <div style={{ fontSize: 9, marginBottom: 6 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                  <span>QT#:</span>
+                  <strong style={{ fontFamily: "monospace" }}>{savedQuotation.quotationNo}</strong>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                  <span>Date:</span><span>{fmtDate(savedQuotation.date)}</span>
+                </div>
+                {savedQuotation.validUntil && (
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                    <span>Valid:</span><span>{fmtDate(savedQuotation.validUntil)}</span>
+                  </div>
+                )}
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span>To:</span>
+                  <strong>{savedQuotation.customer?.name || customerName}</strong>
+                </div>
               </div>
               {/* Items */}
               <div style={{ borderTop: "1px dashed #555", borderBottom: "1px dashed #555", padding: "5px 0", marginBottom: 5 }}>
                 {savedQuotation.items.map((item: any, i: number) => (
-                  <div key={i} style={{ marginBottom: 4 }}>
-                    <div style={{ fontSize: 9, fontWeight: 700 }}>{item.item.name}</div>
+                  <div key={i} style={{ marginBottom: 5 }}>
+                    <div style={{ fontSize: 9, fontWeight: 700 }}>{item.item?.name || item.itemId}</div>
                     {!hideRates ? (
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, color: "#444" }}>
-                        <span>{item.qty} x {item.rate.toLocaleString()}</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, color: "#333" }}>
+                        <span>{item.qty} x {Number(item.rate).toLocaleString()}</span>
                         <strong>{(item.qty * item.rate).toLocaleString()}</strong>
                       </div>
                     ) : (
@@ -875,21 +907,31 @@ export default function QuotationPage() {
               {/* Totals */}
               {!hideRates && (
                 <div style={{ fontSize: 9 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}><span>Sub Total:</span><span>{savedQuotation.total.toLocaleString()}</span></div>
-                  {savedQuotation.freight > 0 && <div style={{ display: "flex", justifyContent: "space-between" }}><span>Freight:</span><span>{savedQuotation.freight.toLocaleString()}</span></div>}
-                  <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid #000", paddingTop: 3, marginTop: 3 }}>
-                    <span>NET:</span><span>{(savedQuotation.total + (savedQuotation.freight || 0)).toLocaleString()}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                    <span>Sub Total:</span><span>{Number(savedQuotation.total).toLocaleString()}</span>
+                  </div>
+                  {Number(savedQuotation.freight) > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                      <span>Freight:</span><span>{Number(savedQuotation.freight).toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid #000", paddingTop: 4, marginTop: 3 }}>
+                    <span>NET TOTAL:</span>
+                    <span>{(Number(savedQuotation.total) + Number(savedQuotation.freight || 0)).toLocaleString()}</span>
                   </div>
                 </div>
               )}
               {/* Remarks */}
               {savedQuotation.remarks && (
-                <div style={{ marginTop: 6, fontSize: 8, borderTop: "1px dashed #555", paddingTop: 4, color: "#444" }}>
-                  <div style={{ fontWeight: 700 }}>Remarks:</div>
-                  <div>{savedQuotation.remarks}</div>
+                <div style={{ marginTop: 7, fontSize: 8, borderTop: "1px dashed #555", paddingTop: 5, color: "#333" }}>
+                  <div style={{ fontWeight: 700, marginBottom: 2 }}>Remarks:</div>
+                  <div style={{ lineHeight: 1.4 }}>{savedQuotation.remarks}</div>
                 </div>
               )}
-              <div style={{ textAlign: "center", fontSize: 7, marginTop: 8, color: "#666" }}>FinovaOS · Thank you!</div>
+              {/* Footer */}
+              <div style={{ textAlign: "center", fontSize: 7, marginTop: 10, paddingTop: 6, borderTop: "1px dashed #555", color: "#666" }}>
+                FinovaOS · Thank you for your business!
+              </div>
             </div>
           )}
         </>
