@@ -15,7 +15,7 @@ const BG = "var(--app-bg)";
 
 type PO = {
   id: string; poNo: string; date: string; supplierId: string;
-  supplier?: { name: string }; remarks?: string; approvalStatus?: string;
+  supplier?: { name: string }; remarks?: string; approvalStatus?: string; status?: string;
   items: Array<{ item: { name: string }; qty: number; rate: number }>;
 };
 
