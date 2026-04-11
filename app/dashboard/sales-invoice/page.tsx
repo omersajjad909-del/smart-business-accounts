@@ -213,24 +213,32 @@ function SalesInvoiceContent() {
   useEffect(() => {
     if (!user || !user.id) return;
     loadInvoices();
-    fetch("/api/accounts", {
-      headers: { "x-user-role": user.role },
-    })
+    const commonHeaders: Record<string, string> = {
+      "x-user-role": user.role || "",
+      "x-user-id": user.id || "",
+      ...(user.companyId ? { "x-company-id": user.companyId } : {}),
+    };
+
+    fetch("/api/accounts", { headers: commonHeaders })
       .then(r => r.json())
       .then(d => {
         const list = Array.isArray(d) ? d : d.accounts || [];
         setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
       });
 
-    fetch("/api/stock-available-for-sale", {
-      headers: {
-        "x-user-role": user.role || "",
-        "x-user-id": user.id || "",
-        ...(user.companyId ? { "x-company-id": user.companyId } : {}),
-      },
-    })
+    fetch("/api/items-new", { headers: commonHeaders })
       .then(r => r.json())
-      .then(d => setItems(Array.isArray(d) ? d : []));
+      .then(d => {
+        const list = Array.isArray(d) ? d : [];
+        setItems(list.map((i: any) => ({
+          id: i.id,
+          name: i.name,
+          description: i.description || "",
+          availableQty: 0,
+          barcode: i.barcode || "",
+          salePrice: i.rate ?? 0,
+        })));
+      });
 
     // Load tax configurations
     fetch("/api/tax-configuration")

@@ -81,11 +81,11 @@ export default function SalesOrderPage() {
         setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER").map((a: any) => ({ id: a.id, name: a.name })));
       }).catch(() => {});
 
-    fetch("/api/stock-available-for-sale", { headers: h })
+    fetch("/api/items-new", { headers: h })
       .then(r => r.ok ? r.json() : [])
       .then(d => {
         const list = Array.isArray(d) ? d : [];
-        setItemList(list.map((i: any) => ({ id: i.id, name: i.name, salePrice: i.salePrice ?? i.rate ?? 0 })));
+        setItemList(list.map((i: any) => ({ id: i.id, name: i.name, salePrice: i.rate ?? i.salePrice ?? 0 })));
       }).catch(() => {});
   }, []);
 
