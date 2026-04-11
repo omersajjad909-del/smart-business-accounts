@@ -9,10 +9,10 @@
 
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f0f4f8;
-      color: #1a1a2e;
+      background: #ffffff;
+      color: #000000;
       font-size: 11.5px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .page-wrapper {
@@ -23,26 +23,16 @@
 
     /* ── Cover ── */
     .cover {
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%);
-      border-radius: 12px;
-      padding: 28px 32px 24px;
+      background: #111111;
+      border-radius: 10px;
+      padding: 24px 28px 20px;
       color: white;
-      margin-bottom: 18px;
-      position: relative;
-      overflow: hidden;
-    }
-    .cover::before {
-      content: '';
-      position: absolute;
-      top: -50px; right: -50px;
-      width: 200px; height: 200px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.05);
+      margin-bottom: 16px;
     }
     .cover-badge {
       display: inline-block;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.35);
       border-radius: 999px;
       padding: 3px 12px;
       font-size: 10px;
@@ -52,46 +42,43 @@
       margin-bottom: 10px;
     }
     .cover h1 {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 900;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.02em;
       line-height: 1.15;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
     .cover p {
-      font-size: 12px;
-      color: rgba(255,255,255,0.72);
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.78);
       max-width: 560px;
-      line-height: 1.6;
+      line-height: 1.55;
     }
     .cover-meta {
-      margin-top: 14px;
+      margin-top: 12px;
       display: flex;
-      gap: 16px;
+      gap: 18px;
       flex-wrap: wrap;
+      border-top: 1px solid rgba(255,255,255,0.18);
+      padding-top: 10px;
     }
-    .cover-meta span {
-      font-size: 11px;
-      color: rgba(255,255,255,0.6);
-    }
+    .cover-meta span { font-size: 11px; color: rgba(255,255,255,0.65); }
     .cover-meta strong { color: white; }
 
-    /* ── Two-column grid for sections ── */
+    /* ── Two-column grid ── */
     .sections-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
     }
-    .section-full {
-      grid-column: 1 / -1;
-    }
+    .section-full { grid-column: 1 / -1; }
 
     /* ── Section ── */
     .section {
       background: white;
-      border-radius: 10px;
+      border: 2px solid #111111;
+      border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
       page-break-inside: avoid;
       break-inside: avoid;
     }
@@ -100,15 +87,15 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
-      background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+      padding: 7px 11px;
+      background: #111111;
       color: white;
     }
-    .section-header .emoji { font-size: 14px; flex-shrink: 0; }
+    .section-header .emoji { font-size: 13px; flex-shrink: 0; }
     .section-header h2 { font-size: 11.5px; font-weight: 800; letter-spacing: -0.01em; }
     .section-header .count {
       margin-left: auto;
-      background: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.2);
       border-radius: 999px;
       padding: 1px 8px;
       font-size: 10px;
@@ -119,8 +106,8 @@
     /* ── Questions ── */
     .questions { padding: 2px 0; }
     .q-item {
-      padding: 6px 12px 5px;
-      border-bottom: 1px solid #f1f5f9;
+      padding: 5px 11px 4px;
+      border-bottom: 1px solid #d1d5db;
     }
     .q-item:last-child { border-bottom: none; }
     .q-label {
@@ -130,8 +117,8 @@
       margin-bottom: 4px;
     }
     .q-num {
-      background: #eff6ff;
-      color: #1d4ed8;
+      background: #111111;
+      color: white;
       border-radius: 4px;
       font-size: 9px;
       font-weight: 800;
@@ -141,91 +128,102 @@
     }
     .q-text {
       font-size: 11px;
-      font-weight: 600;
-      color: #1e293b;
+      font-weight: 700;
+      color: #111111;
       line-height: 1.45;
     }
     .answer-line {
       margin-left: 30px;
-      border-bottom: 1.5px dashed #cbd5e1;
+      border-bottom: 1.5px solid #9ca3af;
       height: 18px;
     }
 
     /* ── Notes ── */
     .notes-section {
       background: white;
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-top: 14px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      border: 2px solid #111111;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
       grid-column: 1 / -1;
     }
     .notes-section h2 {
       font-size: 13px;
-      font-weight: 800;
-      color: #1e293b;
+      font-weight: 900;
+      color: #111111;
       margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 7px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #111111;
     }
     .notes-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0 24px;
+      gap: 0 28px;
     }
     .note-line {
-      border-bottom: 1.5px dashed #cbd5e1;
+      border-bottom: 1.5px solid #9ca3af;
       height: 26px;
       margin-bottom: 6px;
     }
 
     /* ── Footer ── */
     .footer {
-      margin-top: 16px;
+      margin-top: 14px;
       text-align: center;
       font-size: 10px;
-      color: #94a3b8;
+      color: #4b5563;
+      border-top: 1px solid #d1d5db;
+      padding-top: 10px;
     }
-    .footer strong { color: #475569; }
+    .footer strong { color: #111111; }
 
     /* ── Print Button ── */
     .print-btn {
       position: fixed;
       bottom: 22px;
       right: 22px;
-      background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+      background: #111111;
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       padding: 12px 20px;
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 6px 24px rgba(29,78,216,0.38);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.35);
       z-index: 999;
     }
-    .print-btn:hover { opacity: 0.92; }
+    .print-btn:hover { background: #333333; }
 
-    /* ── Print ── */
+    /* ── Print Styles ── */
+    @page { margin: 8mm 10mm; }
     @media print {
-      body { background: white; font-size: 10.5px; }
-      .page-wrapper { padding: 0; max-width: 100%; }
-      .cover { border-radius: 0; margin-bottom: 14px; padding: 18px 24px; }
-      .cover h1 { font-size: 20px; }
-      .section { box-shadow: none; border: 1px solid #e2e8f0; }
-      .notes-section { box-shadow: none; border: 1px solid #e2e8f0; }
+      body { background: white; font-size: 10.5px; margin: 0; padding: 0; }
+      .page-wrapper { padding: 0; margin: 0; max-width: 100%; }
+      .cover { border-radius: 0; margin-top: 0; margin-bottom: 10px; padding: 14px 18px; }
+      .cover h1 { font-size: 18px; }
+      .cover p { font-size: 10.5px; }
+      .cover-meta { margin-top: 8px; padding-top: 7px; }
+      .section { border: 1.5px solid #000000; }
+      .notes-section { border: 1.5px solid #000000; margin-top: 8px; }
       .print-btn { display: none !important; }
-      .sections-grid { gap: 8px; }
-      .q-item { padding: 4px 10px 3px; }
-      .answer-line { height: 16px; }
-      .section-header { padding: 6px 10px; }
+      .sections-grid { gap: 6px; }
+      .q-item { padding: 3px 9px 2px; }
+      .answer-line { height: 15px; border-bottom-color: #888888; }
+      .note-line { border-bottom-color: #888888; height: 22px; }
+      .section-header { padding: 5px 9px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .q-num { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .footer { margin-top: 8px; padding-top: 6px; }
     }
   </style>
 </head>
 <body>
 
-<button class="print-btn" onclick="window.print()">🖨️ Save as PDF</button>
+<button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
 
 <div class="page-wrapper">
 
@@ -233,42 +231,33 @@
   <div class="cover">
     <div class="cover-badge">⚖️ Confidential — Legal Consultation</div>
     <h1>FinovaOS — Lawyer Meeting Sheet</h1>
-    <p>Complete question guide for legal consultation regarding company setup, banking, taxes, compliance, and SaaS launch readiness.</p>
+    <p>Complete question guide for legal consultation: company setup, banking, taxes, compliance &amp; SaaS launch readiness.</p>
     <div class="cover-meta">
       <span>Product: <strong>FinovaOS — Global Accounting SaaS</strong></span>
       <span>Domains: <strong>finovaos.app &amp; usefinova.app</strong></span>
-      <span>Date: <strong>____________</strong></span>
-      <span>Lawyer: <strong>____________</strong></span>
+      <span>Date: <strong>________________________</strong></span>
+      <span>Lawyer: <strong>________________________</strong></span>
     </div>
   </div>
 
-  <!-- Two-column grid -->
   <div class="sections-grid">
 
-    <!-- Section 1 -->
+    <!-- Sec 1 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">🏢</span>
-        <h2>1. Company Structure &amp; Jurisdiction</h2>
-        <span class="count">6 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">🏢</span><h2>1. Company Structure &amp; Jurisdiction</h2><span class="count">6 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q1</span><span class="q-text">Best structure kya hai? (Sole Proprietor / SMC / Pvt Ltd)</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q2</span><span class="q-text">Kya SECP registration zaroori hai aur process kya hai?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q2</span><span class="q-text">SECP registration zaroori hai aur process kya hai?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q3</span><span class="q-text">Pakistan vs UK vs US vs UAE — best jurisdiction mere case ke liye?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q4</span><span class="q-text">Pakistan company se global payments legally receive ho sakti hain?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q5</span><span class="q-text">Hybrid structure possible? (Pakistan entity + foreign entity)</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q6</span><span class="q-text">Investor ke liye ab se konsa structure rakhna chahiye?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q5</span><span class="q-text">Hybrid structure possible? (Pakistan + foreign entity simultaneously)</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q6</span><span class="q-text">Future investor ke liye ab se konsa structure rakhna chahiye?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
-    <!-- Section 2 -->
+    <!-- Sec 2 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">🌐</span>
-        <h2>2. Global SaaS Legality</h2>
-        <span class="count">4 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">🌐</span><h2>2. Global SaaS Legality</h2><span class="count">4 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q7</span><span class="q-text">Pakistan se global SaaS legally run ho sakta hai without foreign entity?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q8</span><span class="q-text">Stripe / Wise use ke liye foreign company banana zaroori hai?</span></div><div class="answer-line"></div></div>
@@ -277,51 +266,39 @@
       </div>
     </div>
 
-    <!-- Section 3 -->
+    <!-- Sec 3 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">💳</span>
-        <h2>3. Payments &amp; Banking</h2>
-        <span class="count">8 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">💳</span><h2>3. Payments &amp; Banking</h2><span class="count">8 Qs</span></div>
       <div class="questions">
-        <div class="q-item"><div class="q-label"><span class="q-num">Q11</span><span class="q-text">International payments receive karne ka safest tareeqa?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q11</span><span class="q-text">International payments receive karne ka safest legal tareeqa?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q12</span><span class="q-text">SaaS ke liye best bank? (Meezan / HBL / SC / UBL)</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q13</span><span class="q-text">USD / foreign currency business account — process kya hai?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q13</span><span class="q-text">USD / foreign currency business account — process aur requirements?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q14</span><span class="q-text">SBP se koi approval required hai foreign currency ke liye?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q15</span><span class="q-text">Stripe Pakistan mein directly use ho sakta hai? Restrictions?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q16</span><span class="q-text">Wise / Payoneer Pakistan mein legally use ho sakti hai business ke liye?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q16</span><span class="q-text">Wise / Payoneer Pakistan mein legally business ke liye use?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q17</span><span class="q-text">Payment gateway setup ke liye legal requirements ya registration?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q18</span><span class="q-text">Refunds, disputes, chargebacks ka legal handling kaise karte hain?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q18</span><span class="q-text">Refunds, disputes, chargebacks ka legal handling kaise karein?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
-    <!-- Section 4 -->
+    <!-- Sec 4 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">💰</span>
-        <h2>4. Taxes &amp; Compliance</h2>
-        <span class="count">8 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">💰</span><h2>4. Taxes &amp; Compliance</h2><span class="count">8 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q19</span><span class="q-text">SaaS software income par Pakistan mein kaun se taxes lagte hain?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q20</span><span class="q-text">Income tax ka approximate rate kya hoga mere case mein?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q21</span><span class="q-text">GST / Sales Tax / VAT collect karke submit karna hoga?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q22</span><span class="q-text">FBR registration aur NTN number kab zaroori hota hai?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q23</span><span class="q-text">UAE, UK, USA se aane wali payments ka Pakistan mein tax treatment?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q24</span><span class="q-text">Double taxation ka issue hota hai? Koi treaty protection hai?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q23</span><span class="q-text">UAE, UK, USA se payments ka Pakistan mein tax treatment?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q24</span><span class="q-text">Double taxation ka issue? Koi treaty protection available hai?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q25</span><span class="q-text">Software export income par koi tax exemption available hai?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q26</span><span class="q-text">Monthly / quarterly tax filings ka schedule? Accountant zaroori?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q26</span><span class="q-text">Monthly/quarterly tax filings ka schedule? Accountant zaroori?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
-    <!-- Section 5 -->
+    <!-- Sec 5 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">🧾</span>
-        <h2>5. PSEB — Software Export Board</h2>
-        <span class="count">3 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">🧾</span><h2>5. PSEB — Software Export Board</h2><span class="count">3 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q27</span><span class="q-text">PSEB registration ka practical faida kya hai mere SaaS ke liye?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q28</span><span class="q-text">PSEB se konse specific tax benefits milte hain?</span></div><div class="answer-line"></div></div>
@@ -329,13 +306,9 @@
       </div>
     </div>
 
-    <!-- Section 6 -->
+    <!-- Sec 6 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">📄</span>
-        <h2>6. Legal Documents Required</h2>
-        <span class="count">7 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">📄</span><h2>6. Legal Documents Required</h2><span class="count">7 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q30</span><span class="q-text">Terms of Service mein must-have clauses kya hain SaaS ke liye?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q31</span><span class="q-text">Privacy Policy mein kya include karna legally required hai?</span></div><div class="answer-line"></div></div>
@@ -343,51 +316,39 @@
         <div class="q-item"><div class="q-label"><span class="q-num">Q33</span><span class="q-text">Subscription agreement / billing terms ka legal format?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q34</span><span class="q-text">Cookie Policy alag banana zaroori ya Privacy Policy mein cover?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q35</span><span class="q-text">Data Processing Addendum (DPA) enterprise clients ke liye?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q36</span><span class="q-text">AI features ke liye special disclaimer ya wording chahiye?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q36</span><span class="q-text">AI features ke liye special disclaimer ya legal wording chahiye?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
-    <!-- Section 7 -->
+    <!-- Sec 7 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">🔒</span>
-        <h2>7. Data Protection &amp; Privacy</h2>
-        <span class="count">7 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">🔒</span><h2>7. Data Protection &amp; Privacy</h2><span class="count">7 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q37</span><span class="q-text">GDPR follow karna zaroori hai international users ke liye?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q38</span><span class="q-text">Main data controller hoon ya processor? Legally kya farq hai?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q39</span><span class="q-text">User data store karne ke legal rules aur requirements kya hain?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q40</span><span class="q-text">Data retention policy — kitne time tak data rakhna legal hai?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q40</span><span class="q-text">Data retention — kitne time tak data rakhna legal hai?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q41</span><span class="q-text">Data breach hone par legally kya karna hoga? Notification?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q42</span><span class="q-text">Cross-border data transfer (Pakistan to EU/US servers) ke rules?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q43</span><span class="q-text">User rights (delete / export / access request) kaise handle karein?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
-    <!-- Section 8 -->
+    <!-- Sec 8 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">💼</span>
-        <h2>8. SaaS Subscription &amp; Billing</h2>
-        <span class="count">5 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">💼</span><h2>8. SaaS Subscription &amp; Billing</h2><span class="count">5 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q44</span><span class="q-text">Monthly subscription model legally kaise structure honi chahiye?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q45</span><span class="q-text">Auto-renewal ke liye legal wording aur notice period?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q45</span><span class="q-text">Auto-renewal ke liye legal wording aur notice period required?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q46</span><span class="q-text">Cancellation aur refund rules legally kya hone chahiye?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q47</span><span class="q-text">Free trial offer karne ke legal risks ya requirements kya hain?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q48</span><span class="q-text">Invoice format aur billing compliance Pakistan mein?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q47</span><span class="q-text">Free trial offer karne ke legal risks ya requirements?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q48</span><span class="q-text">Invoice format aur billing compliance requirements Pakistan mein?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
-    <!-- Section 9 -->
+    <!-- Sec 9 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">👨‍💼</span>
-        <h2>9. Team &amp; Hiring</h2>
-        <span class="count">5 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">👨‍💼</span><h2>9. Team &amp; Hiring</h2><span class="count">5 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q49</span><span class="q-text">Freelancers vs full-time employees — legal aur tax difference?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q50</span><span class="q-text">Employment contracts mein kya hona chahiye Pakistan mein?</span></div><div class="answer-line"></div></div>
@@ -397,60 +358,44 @@
       </div>
     </div>
 
-    <!-- Section 10 -->
+    <!-- Sec 10 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">🛡️</span>
-        <h2>10. Intellectual Property</h2>
-        <span class="count">5 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">🛡️</span><h2>10. Intellectual Property</h2><span class="count">5 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q54</span><span class="q-text">Software ka copyright automatically mera hota hai ya register?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q55</span><span class="q-text">IP formally register karna zaroori hai? Process kya hai?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q56</span><span class="q-text">"FinovaOS" naam aur logo trademark — Pakistan mein process aur cost?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q57</span><span class="q-text">Pakistan trademark vs international (Madrid Protocol) — kya better?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q58</span><span class="q-text">Koi mera software copy kare ya naam use kare toh legal action?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q56</span><span class="q-text">"FinovaOS" naam aur logo trademark — Pakistan mein cost aur process?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q57</span><span class="q-text">Pakistan trademark vs International (Madrid Protocol) — kya better?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q58</span><span class="q-text">Koi software copy kare ya naam use kare toh legal action kya?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
-    <!-- Section 11 -->
+    <!-- Sec 11 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">⚠️</span>
-        <h2>11. Risk &amp; Liability</h2>
-        <span class="count">4 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">⚠️</span><h2>11. Risk &amp; Liability</h2><span class="count">4 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q59</span><span class="q-text">Software bug ya downtime se client ka nuqsan — meri liability?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q60</span><span class="q-text">Limitation of Liability clause Terms mein kaise likhna chahiye?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q61</span><span class="q-text">SaaS business ke liye professional liability insurance?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q61</span><span class="q-text">SaaS business ke liye professional liability insurance leni chahiye?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q62</span><span class="q-text">Legal risk se best protection ka overall setup kya hona chahiye?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
-    <!-- Section 12 -->
+    <!-- Sec 12 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">📋</span>
-        <h2>12. Enterprise Contracts &amp; SLA</h2>
-        <span class="count">5 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">📋</span><h2>12. Enterprise Contracts &amp; SLA</h2><span class="count">5 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q63</span><span class="q-text">Master Service Agreement (MSA) banana chahiye enterprise ke liye?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q64</span><span class="q-text">SLA mein uptime kitna commit karna legally safe hai?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q65</span><span class="q-text">International contracts kis country ki jurisdiction mein hone chahiye?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q66</span><span class="q-text">Client payment default kare toh legal recourse kya hai?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q67</span><span class="q-text">Affiliate / reseller agreements — legal requirements kya hain?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q67</span><span class="q-text">Affiliate / reseller agreements banana chahiye? Legal requirements?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
-    <!-- Section 13 -->
+    <!-- Sec 13 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">🌍</span>
-        <h2>13. International Expansion</h2>
-        <span class="count">4 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">🌍</span><h2>13. International Expansion</h2><span class="count">4 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q68</span><span class="q-text">UAE Freezone vs UK Ltd vs US LLC — best option konsa aur kyun?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q69</span><span class="q-text">Foreign company banane ka process, cost aur timeline?</span></div><div class="answer-line"></div></div>
@@ -459,13 +404,9 @@
       </div>
     </div>
 
-    <!-- Section 14 -->
+    <!-- Sec 14 -->
     <div class="section">
-      <div class="section-header">
-        <span class="emoji">🚀</span>
-        <h2>14. Launch Readiness</h2>
-        <span class="count">5 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">🚀</span><h2>14. Launch Readiness</h2><span class="count">5 Qs</span></div>
       <div class="questions">
         <div class="q-item"><div class="q-label"><span class="q-num">Q72</span><span class="q-text">Bina company register kiye beta launch kar sakta hoon? Risk?</span></div><div class="answer-line"></div></div>
         <div class="q-item"><div class="q-label"><span class="q-num">Q73</span><span class="q-text">Launch se pehle minimum legal requirements kya hain?</span></div><div class="answer-line"></div></div>
@@ -475,18 +416,14 @@
       </div>
     </div>
 
-    <!-- Section 15 -->
+    <!-- Sec 15 Full Width -->
     <div class="section section-full">
-      <div class="section-header">
-        <span class="emoji">🧠</span>
-        <h2>15. Bonus — Fintech &amp; AI</h2>
-        <span class="count">4 Qs</span>
-      </div>
+      <div class="section-header"><span class="emoji">🧠</span><h2>15. Bonus — Fintech &amp; AI</h2><span class="count">4 Qs</span></div>
       <div class="questions" style="display:grid;grid-template-columns:1fr 1fr;">
-        <div class="q-item"><div class="q-label"><span class="q-num">Q77</span><span class="q-text">Accounting + payments + AI — fintech category? Special license?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q78</span><span class="q-text">AI features ke liye "not financial advice" disclaimer zaroori?</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q79</span><span class="q-text">Kuch countries ko service deny karni chahiye? (OFAC sanctions)</span></div><div class="answer-line"></div></div>
-        <div class="q-item"><div class="q-label"><span class="q-num">Q80</span><span class="q-text">"Secure / compliant / audit-ready" marketing claims legally safe?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q77</span><span class="q-text">Accounting + payments + AI — fintech category mein aata hai? Special license?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q78</span><span class="q-text">AI features ke liye "not financial advice" disclaimer zaroori hai?</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q79</span><span class="q-text">Kuch countries ko service deny karni chahiye? (OFAC sanctions, etc.)</span></div><div class="answer-line"></div></div>
+        <div class="q-item"><div class="q-label"><span class="q-num">Q80</span><span class="q-text">"Secure / compliant / audit-ready" marketing claims site par legally safe?</span></div><div class="answer-line"></div></div>
       </div>
     </div>
 
@@ -509,14 +446,12 @@
       </div>
     </div>
 
-  </div><!-- end sections-grid -->
+  </div>
 
   <div class="footer">
-    <p><strong>FinovaOS</strong> — Confidential Legal Consultation Document &nbsp;|&nbsp; finovaos.app &nbsp;|&nbsp; usefinova.app</p>
-    <p style="margin-top:4px">80 Questions · 15 Categories · Generated for Launch Planning</p>
+    <p><strong>FinovaOS</strong> — Confidential Legal Consultation Document &nbsp;|&nbsp; finovaos.app &nbsp;|&nbsp; usefinova.app &nbsp;|&nbsp; 80 Questions · 15 Categories</p>
   </div>
 
 </div>
-
 </body>
 </html>

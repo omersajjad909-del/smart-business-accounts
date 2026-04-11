@@ -452,6 +452,7 @@ function AuthPageInner() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        autoFocus
                         placeholder="you@company.com"
                         style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 14, color: "#fff", fontFamily: "inherit" }}
                       />
