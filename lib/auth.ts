@@ -23,6 +23,10 @@ function normalizeBrowserUser(raw: string | null) {
     rolePermissions: Array.isArray(user.rolePermissions) ? user.rolePermissions : [],
     companyId: user.companyId || user.defaultCompanyId || null,
     companies: Array.isArray(user.companies) ? user.companies : [],
+    // Admin panel fields — preserved for team member access control
+    isSuperAdmin: user.isSuperAdmin !== undefined ? user.isSuperAdmin : undefined,
+    allowedPages: Array.isArray(user.allowedPages) ? user.allowedPages : (user.allowedPages ?? null),
+    team: user.team || null,
   };
 }
 

@@ -95,7 +95,9 @@
       "Bash(node_modules/.bin/tsc --noEmit)",
       "Bash(echo \"EXIT:$?\")",
       "Bash(curl -I \"https://finovaos.app/sitemap.xml\")",
-      "Bash(curl -I \"https://www.finovaos.app/sitemap.xml\")"
+      "Bash(curl -I \"https://www.finovaos.app/sitemap.xml\")",
+      "Bash(node -e \"const ts = require\\('typescript'\\); const prog = ts.createProgram\\(['app/dashboard/sales-invoice/page.tsx'], {noEmit: true, strict: false, skipLibCheck: true, jsx: 1}\\); const diag = ts.getPreEmitDiagnostics\\(prog\\); console.log\\(diag.length, 'errors'\\);\")",
+      "Bash(node -e \"const ts = require\\('typescript'\\); const prog = ts.createProgram\\(['app/dashboard/sales-invoice/page.tsx'], {noEmit: true, strict: false, skipLibCheck: true, jsx: 1}\\); const diag = ts.getPreEmitDiagnostics\\(prog\\); diag.forEach\\(d => console.log\\(d.messageText\\)\\);\")"
     ]
   }
 }
