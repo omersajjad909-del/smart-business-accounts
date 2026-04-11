@@ -165,6 +165,7 @@ export async function POST(req: NextRequest) {
       vehicleNo = null,
       currencyId = null,
       exchangeRate = 1,
+      soId = null,
     } = body;
 
     await ensureOpenPeriod(prisma, companyId, new Date(date));
@@ -261,6 +262,14 @@ export async function POST(req: NextRequest) {
           amount: i.qty * i.rate,
           location,
         },
+      });
+    }
+
+    // If invoice is linked to a Sales Order, mark SO as CONFIRMED
+    if (soId) {
+      await prisma.businessRecord.updateMany({
+        where: { id: soId, companyId, category: "sales_order" },
+        data: { status: "CONFIRMED" },
       });
     }
 

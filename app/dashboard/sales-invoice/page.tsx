@@ -90,6 +90,8 @@ function SalesInvoiceContent() {
   const [editing, setEditing] = useState<SalesInvoice | null>(null);
 
   const [invoiceNo, setInvoiceNo] = useState("");
+  const [linkedSoId, setLinkedSoId] = useState<string>("");
+  const [linkedSoNo, setLinkedSoNo] = useState<string>("");
   const [customerId, setCustomerId] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [date, setDate] = useState(today);
@@ -269,6 +271,9 @@ function SalesInvoiceContent() {
     try {
       const so = JSON.parse(draft);
       sessionStorage.removeItem("draft_invoice_from_so");
+      // Link to Sales Order
+      if (so.soId) setLinkedSoId(so.soId);
+      if (so.soNo) setLinkedSoNo(so.soNo);
       // Pre-fill customer
       if (so.customerId) setCustomerId(so.customerId);
       if (so.customerName) setCustomerName(so.customerName);
@@ -438,6 +443,7 @@ function SalesInvoiceContent() {
         taxConfigId: applyTax ? selectedTaxId : null,
         currencyId: currencyId || null,
         exchangeRate,
+        soId: (!editing && linkedSoId) ? linkedSoId : undefined,
       };
       const body = editing ? { id: editing.id, ...baseBody } : baseBody;
 
@@ -526,6 +532,8 @@ function SalesInvoiceContent() {
     setEditing(null);
     setCustomerId("");
     setCustomerName("");
+    setLinkedSoId("");
+    setLinkedSoNo("");
     setDate(today);
     setLocation("MAIN");
     setDriverName("");
@@ -757,7 +765,14 @@ function SalesInvoiceContent() {
                 Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <input value={invoiceNo} readOnly className="border p-2 bg-gray-100" />
+                <div>
+                  <input value={invoiceNo} readOnly className="border p-2 bg-gray-100 w-full" />
+                  {linkedSoNo && (
+                    <div style={{ fontSize: 11, marginTop: 4, color: "#6366f1", fontWeight: 600 }}>
+                      Linked to Sales Order: {linkedSoNo}
+                    </div>
+                  )}
+                </div>
                 <div>
                   <label className="text-xs font-bold">Customer (F7: Clear, F8: Query)</label>
                   <select className="border p-2 w-full" value={customerId} onChange={e => {
