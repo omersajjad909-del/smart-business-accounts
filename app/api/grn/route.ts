@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
 
         await tx.purchaseOrder.update({
           where: { id: poId },
-          data: { status: newStatus },
+          data: { status: newStatus, approvalStatus: "APPROVED" },
         });
       }
     }

@@ -160,6 +160,24 @@ export default function PurchaseOrderPage() {
     else toast.error("Delete failed");
   }
 
+  async function approvePO(po: PO) {
+    try {
+      const res = await fetch("/api/purchase-order", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-user-role": user?.role || "ADMIN", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" },
+        body: JSON.stringify({
+          id: po.id,
+          supplierId: po.supplierId,
+          date: po.date,
+          approvalStatus: "APPROVED",
+          items: po.items?.map((it: any) => ({ itemId: it.itemId || it.item?.id, qty: it.qty, rate: it.rate, amount: it.amount })) || [],
+        }),
+      });
+      if (res.ok) { toast.success("PO Approved!"); await loadPOs(); }
+      else toast.error("Approval failed");
+    } catch { toast.error("Approval failed"); }
+  }
+
   function resetForm() {
     setEditing(null); setPoNo(""); setSupplierId(""); setSupplierName("");
     setDate(today); setRemarks(""); setFreight(""); setApprovalStatus("PENDING");
@@ -270,7 +288,10 @@ export default function PurchaseOrderPage() {
                       </td>
                       <td style={{ padding: "13px 16px", color: MUTED }}>{po.items?.length || 0} items</td>
                       <td style={{ padding: "13px 16px" }}>
-                        <div style={{ display: "flex", gap: 6 }}>
+                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                          {(!po.approvalStatus || po.approvalStatus === "PENDING") && (
+                            <button onClick={() => approvePO(po)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(52,211,153,0.4)", background: "rgba(52,211,153,0.1)", color: "#34d399", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>✓ Approve</button>
+                          )}
                           <button onClick={() => startEdit(po)} style={{ padding: "5px 13px", borderRadius: 6, border: `1px solid ${ACCENT}`, background: "rgba(99,102,241,0.1)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Edit</button>
                           <button onClick={() => deletePO(po.id)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Del</button>
                         </div>
