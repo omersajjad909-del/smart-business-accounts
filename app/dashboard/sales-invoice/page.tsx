@@ -222,7 +222,13 @@ function SalesInvoiceContent() {
         setCustomers(list.filter((a: any) => a.partyType === "CUSTOMER"));
       });
 
-    fetch("/api/stock-available-for-sale")
+    fetch("/api/stock-available-for-sale", {
+      headers: {
+        "x-user-role": user.role || "",
+        "x-user-id": user.id || "",
+        ...(user.companyId ? { "x-company-id": user.companyId } : {}),
+      },
+    })
       .then(r => r.json())
       .then(d => setItems(Array.isArray(d) ? d : []));
 
