@@ -248,6 +248,35 @@ function SalesInvoiceContent() {
       .catch (_err => console.log("Access Denied or Error"));
   }, []);
 
+  // ── Pre-fill from Sales Order ──
+  useEffect(() => {
+    const draft = sessionStorage.getItem("draft_invoice_from_so");
+    if (!draft) return;
+    try {
+      const so = JSON.parse(draft);
+      sessionStorage.removeItem("draft_invoice_from_so");
+      // Pre-fill customer
+      if (so.customerId) setCustomerId(so.customerId);
+      if (so.customerName) setCustomerName(so.customerName);
+      if (so.date) setDate(so.date);
+      if (so.notes) setNotes(so.notes + (so.soNo ? `\nRef: Sales Order ${so.soNo}` : ""));
+      // Pre-fill rows from SO items (match by itemId if available)
+      if (so.items?.length) {
+        const mappedRows = so.items
+          .filter((i: any) => i.name || i.itemId)
+          .map((i: any) => ({
+            itemId: i.itemId || "",
+            name: i.name || "",
+            description: "",
+            availableQty: 0,
+            qty: i.qty || 1,
+            rate: i.unitPrice || 0,
+          }));
+        if (mappedRows.length > 0) setRows(mappedRows);
+      }
+    } catch {}
+  }, []);
+
   useEffect(() => {
     if (!queryId || !user) return;
     fetch(`/api/sales-invoice?id=${queryId}`, {

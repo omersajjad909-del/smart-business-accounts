@@ -1,6 +1,7 @@
 "use client";
 import { confirmToast } from "@/lib/toast-feedback";
 import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -19,6 +20,7 @@ const STATUS_TABS = ["All", "PENDING", "CONFIRMED", "DELIVERED", "CANCELLED"];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface LineItem {
+  itemId?: string;
   name: string;
   qty: number;
   unitPrice: number;
@@ -27,17 +29,21 @@ interface LineItem {
 interface SalesOrder {
   id: string;
   orderNo: string;
+  customerId?: string;
   customerName: string;
   date: string;
   amount: number;
   status: string;
+  items?: LineItem[];
+  notes?: string;
 }
 
 const EMPTY_FORM = {
+  customerId: "",
   customerName: "",
   date: new Date().toISOString().slice(0, 10),
   notes: "",
-  items: [{ name: "", qty: 1, unitPrice: 0 }] as LineItem[],
+  items: [{ itemId: "", name: "", qty: 1, unitPrice: 0 }] as LineItem[],
 };
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
@@ -47,6 +53,7 @@ function fmt(n: number) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function SalesOrderPage() {
+  const router = useRouter();
   const { records, loading, create, setStatus, remove } = useBusinessRecords("sales_order");
 
   const [search, setSearch] = useState("");
@@ -88,10 +95,13 @@ export default function SalesOrderPage() {
       records.map((r) => ({
         id: r.id,
         orderNo: (r.data?.orderNo as string) || r.title.split(" · ")[0] || r.title,
+        customerId: (r.data?.customerId as string) || "",
         customerName: (r.data?.customerName as string) || r.title,
         date: r.date ? r.date.slice(0, 10) : "",
         amount: r.amount ?? 0,
         status: (r.status || "PENDING").toUpperCase(),
+        items: (r.data?.items as LineItem[]) || [],
+        notes: (r.data?.notes as string) || "",
       })),
     [records]
   );
@@ -173,6 +183,7 @@ export default function SalesOrderPage() {
         date: form.date,
         data: {
           orderNo,
+          customerId: form.customerId || "",
           customerName: form.customerName.trim(),
           items: form.items,
           notes: form.notes,
@@ -199,6 +210,21 @@ export default function SalesOrderPage() {
   }
   async function handleDelete(id: string) {
     if (await confirmToast("Delete this sales order?")) await remove(id);
+  }
+
+  function createInvoiceFromSO(order: SalesOrder) {
+    // Store SO data in sessionStorage for Sales Invoice to pick up
+    sessionStorage.setItem("draft_invoice_from_so", JSON.stringify({
+      soId: order.id,
+      soNo: order.orderNo,
+      customerId: order.customerId || "",
+      customerName: order.customerName,
+      date: order.date,
+      items: order.items || [],
+      notes: order.notes || "",
+      amount: order.amount,
+    }));
+    router.push("/dashboard/sales-invoice");
   }
 
   // ── Styles ──
@@ -427,17 +453,45 @@ export default function SalesOrderPage() {
                         </>
                       )}
                       {order.status === "CONFIRMED" && (
+                        <>
+                          <button
+                            onClick={() => handleDeliver(order.id)}
+                            style={{
+                              ...btnGhost,
+                              color: STATUS_COLORS.DELIVERED,
+                              borderColor: STATUS_COLORS.DELIVERED + "55",
+                              padding: "4px 10px",
+                              fontSize: 12,
+                            }}
+                          >
+                            Mark Delivered
+                          </button>
+                          <button
+                            onClick={() => createInvoiceFromSO(order)}
+                            style={{
+                              ...btnGhost,
+                              color: "#34d399",
+                              borderColor: "#34d39955",
+                              padding: "4px 10px",
+                              fontSize: 12,
+                            }}
+                          >
+                            + Invoice
+                          </button>
+                        </>
+                      )}
+                      {order.status === "DELIVERED" && (
                         <button
-                          onClick={() => handleDeliver(order.id)}
+                          onClick={() => createInvoiceFromSO(order)}
                           style={{
                             ...btnGhost,
-                            color: STATUS_COLORS.DELIVERED,
-                            borderColor: STATUS_COLORS.DELIVERED + "55",
+                            color: "#34d399",
+                            borderColor: "#34d39955",
                             padding: "4px 10px",
                             fontSize: 12,
                           }}
                         >
-                          Mark Delivered
+                          + Invoice
                         </button>
                       )}
                       <button
@@ -520,12 +574,19 @@ export default function SalesOrderPage() {
                 </label>
                 <select
                   style={inputStyle}
-                  value={form.customerName}
-                  onChange={(e) => setForm((f) => ({ ...f, customerName: e.target.value }))}
+                  value={form.customerId || form.customerName}
+                  onChange={(e) => {
+                    const selected = customers.find(c => c.id === e.target.value);
+                    setForm((f) => ({
+                      ...f,
+                      customerId: selected?.id || "",
+                      customerName: selected?.name || e.target.value,
+                    }));
+                  }}
                 >
                   <option value="">— Select Customer —</option>
                   {customers.map(c => (
-                    <option key={c.id} value={c.name}>{c.name}</option>
+                    <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
               </div>
@@ -591,12 +652,12 @@ export default function SalesOrderPage() {
                   >
                     <select
                       style={inputStyle}
-                      value={item.name}
+                      value={item.itemId || item.name}
                       onChange={(e) => {
-                        const selected = itemList.find(i => i.name === e.target.value);
+                        const selected = itemList.find(i => i.id === e.target.value);
                         setForm(prev => {
                           const items = prev.items.map((it, i) => i === idx
-                            ? { ...it, name: e.target.value, unitPrice: selected?.salePrice ?? it.unitPrice }
+                            ? { ...it, itemId: selected?.id || "", name: selected?.name || e.target.value, unitPrice: selected?.salePrice ?? it.unitPrice }
                             : it
                           );
                           return { ...prev, items };
@@ -605,7 +666,7 @@ export default function SalesOrderPage() {
                     >
                       <option value="">— Select Item —</option>
                       {itemList.map(i => (
-                        <option key={i.id} value={i.name}>{i.name}</option>
+                        <option key={i.id} value={i.id}>{i.name}</option>
                       ))}
                     </select>
                     <input
