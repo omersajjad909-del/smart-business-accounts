@@ -91,7 +91,7 @@ export default function SalesOrderPage() {
         customerName: (r.data?.customerName as string) || r.title,
         date: r.date ? r.date.slice(0, 10) : "",
         amount: r.amount ?? 0,
-        status: r.status || "PENDING",
+        status: (r.status || "PENDING").toUpperCase(),
       })),
     [records]
   );
