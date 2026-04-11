@@ -158,7 +158,13 @@ export default function SalesOrderPage() {
 
     setSaving(true);
     try {
-      const orderNo = "SO-" + Date.now().toString().slice(-6);
+      // Sequential SO number: SO-000001 format
+      const existingNums = orders.map(o => {
+        const m = o.orderNo.match(/SO-(\d+)/i);
+        return m ? parseInt(m[1]) : 0;
+      });
+      const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1;
+      const orderNo = "SO-" + String(nextNum).padStart(6, "0");
       const title = orderNo + " · " + form.customerName.trim();
       await create({
         title,
