@@ -778,8 +778,6 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_CPV) && <NavLink href="/dashboard/jv" pathname={pathname}>Journal Voucher (JV)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/opening-balances" pathname={pathname}>Opening Balances</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/advance-payment" pathname={pathname}>Advance Payment</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/credit-note" pathname={pathname}>Credit Notes</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/debit-note" pathname={pathname}>Debit Notes</NavLink>}
             </NavGroup>
           )}
 
@@ -974,7 +972,6 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/quotation" pathname={pathname}>📄 Quotations</NavLink>
               <NavLink href="/dashboard/delivery-challan" pathname={pathname}>🚚 Delivery Challan</NavLink>
               <NavLink href="/dashboard/payment-receipts" pathname={pathname}>💳 Payment Collection</NavLink>
-              <NavLink href="/dashboard/credit-note" pathname={pathname}>📝 Credit Notes</NavLink>
             </NavGroup>
 
             {/* ── 3. Purchases ── */}
@@ -989,7 +986,6 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>🧾 Purchase Invoices</NavLink>
               <NavLink href="/dashboard/purchase-return" pathname={pathname}>↩️ Purchase Returns</NavLink>
               <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>💸 Supplier Payments</NavLink>
-              <NavLink href="/dashboard/debit-note" pathname={pathname}>📝 Debit Notes</NavLink>
             </NavGroup>
 
             {/* ── 4. Inventory ── */}
