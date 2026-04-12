@@ -217,13 +217,11 @@ export default function AttendancePage() {
 
   return (
     <div
-      className="flex flex-col md:flex-row overflow-hidden"
-      style={{ height: "100%", minHeight: 0, background: "#060918" }}
+      style={{ display: "flex", flexDirection: "row", overflow: "hidden", height: "100%", minHeight: 0, background: "#060918" }}
     >
       {/* ── SIDEBAR: Employee List ─────────────────────── */}
       <div
-        className="w-full md:w-72 shrink-0 flex flex-col z-10"
-        style={{
+        style={{ width: 288, flexShrink: 0, display: "flex", flexDirection: "column", zIndex: 10,
           background: "rgba(255,255,255,.02)",
           borderRight: "1px solid rgba(255,255,255,.06)",
           height: "100%",
@@ -235,7 +233,7 @@ export default function AttendancePage() {
           <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>Select to view calendar</div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div style={{ flex: 1, overflowY: "auto" }}>
           {employees.map(emp => {
             const active = selectedEmployeeId === emp.id;
             return (
@@ -269,7 +267,7 @@ export default function AttendancePage() {
       </div>
 
       {/* ── MAIN CONTENT ───────────────────────────────── */}
-      <div className="flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
 
         {/* Header */}
         <div
@@ -332,7 +330,7 @@ export default function AttendancePage() {
 
         {/* Calendar or empty state */}
         {selectedEmployeeId ? (
-          <div className="flex-1 overflow-auto" style={{ padding: "16px 24px 24px" }}>
+          <div style={{ flex: 1, overflow: "auto", padding: "16px 24px 24px" }}>
             {loading ? (
               <div style={{ paddingTop: 60, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13 }}>
                 Loading…
@@ -499,8 +497,7 @@ export default function AttendancePage() {
           </div>
         ) : (
           <div
-            className="flex-1 flex flex-col items-center justify-center"
-            style={{ color: "rgba(255,255,255,.2)" }}
+            style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.2)" }}
           >
             <div style={{ fontSize: 48, marginBottom: 16 }}>👈</div>
             <p style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>Select an employee from the sidebar</p>
@@ -512,8 +509,7 @@ export default function AttendancePage() {
       {/* ── MODAL ──────────────────────────────────────── */}
       {selectedDate && selectedEmployeeId && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,.7)" }}
+          style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "rgba(0,0,0,.7)" }}
         >
           <div
             style={{

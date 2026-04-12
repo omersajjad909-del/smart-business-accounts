@@ -1,574 +1,328 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
-import { confirmToast, alertToast } from "@/lib/toast-feedback";
-
+import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
 
-import { useEffect, useState } from 'react';
-import { getCurrentUser } from '@/lib/auth';
+// ─── Design tokens ────────────────────────────────────────────────────────────
+const ff     = "'Outfit','Inter',sans-serif";
+const accent = "#3b82f6";
 
 interface BankAccount {
-  id: string;
-  accountNo?: string;
-  bankName?: string;
-  accountName?: string;
-  balance?: number;
-  accountId?: string | null;
-  source?: 'BankAccount' | 'Account';
-
-  account?: {
-    openDebit?: number;
-  };
+  id: string; accountNo?: string; bankName?: string;
+  accountName?: string; balance?: number;
+  accountId?: string | null; source?: "BankAccount" | "Account";
+  account?: { openDebit?: number };
 }
-
 interface BankStatement {
-  id: string;
-  statementNo: string;
-  date: string;
-  amount: number;
-  description: string;
-  referenceNo?: string;
-  isReconciled: boolean;
+  id: string; statementNo: string; date: string; amount: number;
+  description: string; referenceNo?: string; isReconciled: boolean;
 }
 
-
+function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
 export default function BankReconciliationPage() {
   const user = getCurrentUser();
-  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
-  const [statements, setStatements] = useState<BankStatement[]>([]);
-  const [selectedAccount, setSelectedAccount] = useState('');
+
+  const [bankAccounts,       setBankAccounts]       = useState<BankAccount[]>([]);
+  const [statements,         setStatements]         = useState<BankStatement[]>([]);
+  const [selectedAccount,    setSelectedAccount]    = useState("");
   const [selectedStatements, setSelectedStatements] = useState<string[]>([]);
-  const [systemBalance, setSystemBalance] = useState(0);
-  const [bankBalance, setBankBalance] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [showAddBankForm, setShowAddBankForm] = useState(false);
-  const [editingBankId, setEditingBankId] = useState('');
-  const [companyInfo, setCompanyInfo] = useState<any>(null);
-  const [newBankForm, setNewBankForm] = useState({
-    bankName: '',
-    accountNo: '',
-    accountName: '',
-    balance: 0,
+  const [systemBalance,      setSystemBalance]      = useState(0);
+  const [bankBalance,        setBankBalance]        = useState(0);
+  const [loading,            setLoading]            = useState(false);
+  const [showBankForm,       setShowBankForm]       = useState(false);
+  const [editingBankId,      setEditingBankId]      = useState("");
+  const [companyInfo,        setCompanyInfo]        = useState<any>(null);
+  const [bankForm,           setBankForm]           = useState({ bankName: "", accountNo: "", accountName: "", balance: 0 });
+
+  const h = (json = false): Record<string, string> => ({
+    "x-user-role":  user?.role      || "",
+    "x-user-id":    user?.id        || "",
+    "x-company-id": user?.companyId || "",
+    ...(json ? { "Content-Type": "application/json" } : {}),
   });
 
-  useEffect(() => {
-    fetchBankAccounts();
-    loadCompany();
-  }, []);
-
-  async function loadCompany() {
-    try {
-      const user = getCurrentUser();
-      const res = await fetch("/api/me/company", {
-        headers: { 
-          "x-user-role": user?.role || "",
-          "x-company-id": user?.companyId || ""
-        },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setCompanyInfo(data);
-      }
-    } catch (e) {}
-  }
+  useEffect(() => { fetchBankAccounts(); loadCompany(); }, []);
 
   useEffect(() => {
     if (selectedAccount) {
       fetchStatements(selectedAccount);
-      // Auto-load system balance from selected account
-      const account = bankAccounts.find(a =>
-        a.id === selectedAccount ||
-        a.accountId === selectedAccount ||
-        (a.source === 'Account' && a.accountId === selectedAccount)
-      );
-      if (account) {
-        // Use balance from BankAccount if available, otherwise from Account
-        if (account.source === 'BankAccount') {
-          setSystemBalance(account.balance || 0);
-        } else {
-          // For Account table banks, use openDebit from account
-          setSystemBalance(account.account?.openDebit || 0);
-        }
-      }
+      const acct = bankAccounts.find(a => a.id === selectedAccount || a.accountId === selectedAccount);
+      if (acct) setSystemBalance(acct.source === "BankAccount" ? (acct.balance || 0) : (acct.account?.openDebit || 0));
     } else {
-      setSystemBalance(0);
-      setBankBalance(0);
+      setSystemBalance(0); setBankBalance(0);
     }
   }, [selectedAccount, bankAccounts]);
 
-  const fetchBankAccounts = async () => {
-    if (!user) return;
-    if (!user.companyId) {
-      console.warn("No company selected, skipping bank accounts fetch");
-      return;
-    }
-
+  async function loadCompany() {
     try {
-      const response = await fetch('/api/bank-accounts', {
-        headers: {
-          "x-user-role": user.role || "ADMIN",
-          "x-user-id": user.id || "",
-          "x-company-id": user.companyId || ""
-        }
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("Bank Accounts API Error:", errorData);
-        throw new Error(errorData.details || errorData.error || 'Failed to fetch bank accounts');
-      }
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setBankAccounts(data);
-      } else {
-        console.error('Bank accounts API returned non-array:', data);
-        setBankAccounts([]);
-      }
-    } catch (error) {
-      console.error('Error fetching bank accounts:', error);
-      setBankAccounts([]);
-    }
-  };
+      const res = await fetch("/api/me/company", { headers: h() });
+      if (res.ok) setCompanyInfo(await res.json());
+    } catch {}
+  }
 
-  const fetchStatements = async (accountId: string) => {
-    if (!user) return;
-    if (!user.companyId) return;
+  async function fetchBankAccounts() {
+    if (!user?.companyId) { setBankAccounts([]); return; }
     try {
-      // Check if this is a BankAccount ID or Account ID
-      const bankAccount = bankAccounts.find(ba => ba.id === accountId || ba.accountId === accountId);
+      const res  = await fetch("/api/bank-accounts", { headers: h() });
+      const data = await res.json();
+      setBankAccounts(Array.isArray(data) ? data : []);
+    } catch { setBankAccounts([]); }
+  }
 
-      let url = '';
-      if (bankAccount && bankAccount.source === 'BankAccount') {
-        // This is from BankAccount table, use bankAccountId
+  async function fetchStatements(accountId: string) {
+    if (!user?.companyId) return;
+    try {
+      const ba = bankAccounts.find(a => a.id === accountId || a.accountId === accountId);
+      let url = "";
+      if (ba?.source === "BankAccount") {
         url = `/api/bank-statements?bankAccountId=${accountId}&isReconciled=false`;
       } else {
-        // This is from Account table, find BankAccount by accountId
-        const bankAcc = bankAccounts.find(ba => ba.accountId === accountId);
-        if (bankAcc && bankAcc.source === 'BankAccount') {
-          url = `/api/bank-statements?bankAccountId=${bankAcc.id}&isReconciled=false`;
-        } else {
-          // No BankAccount entry, no statements
-          setStatements([]);
-          return;
-        }
+        const linked = bankAccounts.find(a => a.accountId === accountId);
+        if (linked?.source === "BankAccount") url = `/api/bank-statements?bankAccountId=${linked.id}&isReconciled=false`;
+        else { setStatements([]); return; }
       }
+      const res  = await fetch(url, { headers: h() });
+      const data = await res.json();
+      setStatements(Array.isArray(data) ? data : []);
+    } catch { setStatements([]); }
+  }
 
-      const response = await fetch(url, {
-        headers: {
-          "x-user-role": user.role || "ADMIN",
-          "x-user-id": user.id || "",
-          "x-company-id": user.companyId || ""
-        }
-      });
-      if (!response.ok) {
-         throw new Error('Failed to fetch statements');
-      }
-      const data = await response.json();
-      
-      if (Array.isArray(data)) {
-        setStatements(data);
-      } else {
-        console.error('Statements API returned non-array:', data);
-        setStatements([]);
-      }
-    } catch (error) {
-      console.error('Error fetching statements:', error);
-      setStatements([]);
-    }
-  };
-
-  const toggleStatement = (id: string) => {
-    setSelectedStatements((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    );
-  };
-
-  const handleReconcile = async () => {
-    if (!user) return toast.error("Please login first");
-    if (!selectedAccount || selectedStatements.length === 0) {
-      toast.error('Please select bank account and statements');
-      return;
-    }
-
+  async function handleAddBank(e: React.FormEvent) {
+    e.preventDefault();
+    if (!bankForm.bankName || !bankForm.accountNo || !bankForm.accountName) { toast.error("Fill all required fields"); return; }
     setLoading(true);
     try {
-      const response = await fetch('/api/bank-reconciliation', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          "x-user-role": user.role || "ADMIN",
-          "x-user-id": user.id || "",
-          "x-company-id": user.companyId || ""
-        },
+      const method = editingBankId ? "PUT" : "POST";
+      const body   = editingBankId ? { id: editingBankId, ...bankForm } : bankForm;
+      const res    = await fetch("/api/bank-accounts", { method, headers: h(true), body: JSON.stringify(body) });
+      if (res.ok) {
+        toast.success(editingBankId ? "Bank account updated!" : "Bank account added!");
+        setBankForm({ bankName: "", accountNo: "", accountName: "", balance: 0 });
+        setEditingBankId(""); setShowBankForm(false);
+        fetchBankAccounts();
+      } else toast.error("Failed to save bank account");
+    } catch { toast.error("Failed"); }
+    finally { setLoading(false); }
+  }
+
+  function handleEditBank(a: BankAccount) {
+    setEditingBankId(a.id);
+    setBankForm({ bankName: a.bankName || "", accountNo: a.accountNo || "", accountName: a.accountName || "", balance: a.balance || 0 });
+    setShowBankForm(true);
+  }
+
+  async function handleDeleteBank(id: string) {
+    if (!await confirmToast("Delete this bank account?")) return;
+    const res = await fetch(`/api/bank-accounts?id=${id}`, { method: "DELETE", headers: h() });
+    if (res.ok) {
+      toast.success("Deleted!"); fetchBankAccounts();
+      if (selectedAccount === id) setSelectedAccount("");
+    } else {
+      const err = await res.json(); toast.error(err.error || "Delete failed");
+    }
+  }
+
+  async function handleReconcile() {
+    if (!selectedAccount || selectedStatements.length === 0) { toast.error("Select a bank account and statements"); return; }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/bank-reconciliation", {
+        method: "POST", headers: h(true),
         body: JSON.stringify({
-          bankAccountId: selectedAccount,
-          reconcileDate: new Date(),
-          systemBalance,
-          bankBalance,
+          bankAccountId: selectedAccount, reconcileDate: new Date(),
+          systemBalance, bankBalance,
           statementIds: selectedStatements,
           narration: `Reconciliation for ${selectedStatements.length} statements`,
         }),
       });
-
-      if (response.ok) {
-        toast.success('Reconciliation completed successfully');
-        setSelectedStatements([]);
-        setSystemBalance(0);
-        setBankBalance(0);
+      if (res.ok) {
+        toast.success("Reconciliation completed!");
+        setSelectedStatements([]); setSystemBalance(0); setBankBalance(0);
         fetchStatements(selectedAccount);
-      }
-    } catch (error) {
-      console.error('Error reconciling:', error);
-      toast.error('Error: Reconciliation failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+      } else toast.error("Reconciliation failed");
+    } catch { toast.error("Failed"); }
+    finally { setLoading(false); }
+  }
 
-  const handleAddBank = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return toast.error("Please login first");
-    if (!user.companyId) return toast.error("Please select a company first");
+  const difference  = Math.abs((systemBalance || 0) - (bankBalance || 0));
+  const isBalanced  = difference < 0.01;
+  const currency    = companyInfo?.baseCurrency || "PKR";
 
-    if (!newBankForm.bankName || !newBankForm.accountNo || !newBankForm.accountName) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const method = editingBankId ? 'PUT' : 'POST';
-      const body = editingBankId ? { id: editingBankId, ...newBankForm } : newBankForm;
-
-      const response = await fetch('/api/bank-accounts', {
-        method,
-        headers: { 
-          'Content-Type': 'application/json',
-          "x-user-role": user.role || "ADMIN",
-          "x-user-id": user.id || "",
-          "x-company-id": user.companyId || ""
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (response.ok) {
-        toast.success(editingBankId ? 'Bank account updated successfully' : 'Bank account added successfully');
-        setNewBankForm({
-          bankName: '',
-          accountNo: '',
-          accountName: '',
-          balance: 0,
-        });
-        setEditingBankId('');
-        setShowAddBankForm(false);
-        fetchBankAccounts();
-      } else {
-        toast.error('Error saving bank account');
-      }
-    } catch (error) {
-      console.error('Error saving bank:', error);
-      toast.error('Error: Unable to save bank account');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEditBank = (account: BankAccount) => {
-    setEditingBankId(account.id);
-    setNewBankForm({
-      bankName: account.bankName ?? '',
-      accountNo: account.accountNo ?? '',
-      accountName: account.accountName ?? '',
-      balance: account.balance ?? 0,
-    });
-
-    setShowAddBankForm(true);
-  };
-
-  const handleDeleteBank = async (id: string) => {
-    if (!await confirmToast('Are you sure? This cannot be undone.')) return;
-    if (!user) return toast.error("Please login first");
-
-    try {
-      const response = await fetch(`/api/bank-accounts?id=${id}`, {
-        method: 'DELETE',
-        headers: {
-          "x-user-role": user.role || "ADMIN",
-          "x-user-id": user.id || "",
-          "x-company-id": user.companyId || ""
-        }
-      });
-
-      if (response.ok) {
-        toast.success('Bank account deleted successfully');
-        fetchBankAccounts();
-        if (selectedAccount === id) {
-          setSelectedAccount('');
-        }
-      } else {
-        const err = await response.json();
-        toast.error(err.error || 'Error: Failed to delete bank account');
-      }
-    } catch (error) {
-      console.error('Error deleting bank:', error);
-      toast.error('Error: Failed to delete bank account');
-    }
-  };
-
-  const difference = Math.abs((systemBalance || 0) - (bankBalance || 0));
-  const isBalanced = difference < 0.01;
+  const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
+  const inp:   React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
+  const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <div className="text-sm font-semibold text-blue-800">Guided Flow</div>
-        <div className="mt-1 text-xs text-blue-700">Import → Match → Confirm</div>
-        <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-blue-800">
-          <div className="rounded border border-blue-200 bg-white p-3">
-            <div className="font-semibold">1. Import</div>
-            <div>Upload bank statements to populate unreconciled entries.</div>
-          </div>
-          <div className="rounded border border-blue-200 bg-white p-3">
-            <div className="font-semibold">2. Match</div>
-            <div>Select statements and align with system balance.</div>
-          </div>
-          <div className="rounded border border-blue-200 bg-white p-3">
-            <div className="font-semibold">3. Confirm</div>
-            <div>When difference is 0.00, click Reconcile to lock.</div>
-          </div>
+    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+
+      {/* Guided Flow */}
+      <div style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", borderRadius: 12, padding: "14px 18px", marginBottom: 24 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: accent, marginBottom: 8 }}>Guided Flow</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+          {[
+            { step: "1. Import", desc: "Upload bank statements to populate unreconciled entries." },
+            { step: "2. Match",  desc: "Select statements and align with system balance." },
+            { step: "3. Confirm", desc: "When difference is 0.00, click Reconcile to lock." },
+          ].map(s => (
+            <div key={s.step} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(59,130,246,0.15)", borderRadius: 8, padding: "10px 14px" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: accent, marginBottom: 4 }}>{s.step}</div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.desc}</div>
+            </div>
+          ))}
         </div>
       </div>
-      {user && !user.companyId && (
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
-          <p className="font-bold">Attention</p>
-          <p>Please select a company from the top menu to view and manage bank accounts.</p>
+
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: accent }}>Bank Reconciliation</h1>
+          <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-muted)" }}>Match your bank statements with system records</p>
         </div>
-      )}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Bank Reconciliation</h1>
-        <button
-          onClick={() => setShowAddBankForm(!showAddBankForm)}
-          className="bg-green-500 text-white px-6 py-2 rounded font-semibold hover:bg-green-600"
-        >
-          {showAddBankForm ? 'Cancel' : '➕ Add Bank Account'}
+        <button onClick={() => { if (showBankForm) { setShowBankForm(false); setEditingBankId(""); setBankForm({ bankName: "", accountNo: "", accountName: "", balance: 0 }); } else { setShowBankForm(true); } }}
+          style={{ background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+          {showBankForm ? "Cancel" : "+ Add Bank Account"}
         </button>
       </div>
 
       {/* Add/Edit Bank Form */}
-      {showAddBankForm && (
-        <form onSubmit={handleAddBank} className="bg-white p-6 rounded-lg shadow mb-6">
-          <h2 className="text-xl font-bold mb-4">{editingBankId ? 'Edit Bank Account' : 'Add New Bank Account'}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      {showBankForm && (
+        <form onSubmit={handleAddBank} style={{ ...panel, marginBottom: 24 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: accent, marginBottom: 18 }}>{editingBankId ? "Edit Bank Account" : "New Bank Account"}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
             <div>
-              <label className="block text-sm font-semibold mb-2">Bank Name</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g., Chase, Barclays, HBL"
-                value={newBankForm.bankName}
-                onChange={(e) => setNewBankForm({ ...newBankForm, bankName: e.target.value })}
-                className="w-full border border-gray-300 rounded px-3 py-2"
-              />
+              <label style={lbl}>Bank Name *</label>
+              <input style={inp} placeholder="e.g. HBL, MCB" value={bankForm.bankName} onChange={e => setBankForm(f => ({ ...f, bankName: e.target.value }))} required />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-2">Account Number</label>
-              <input
-                type="text"
-                required
-                placeholder="IBAN or Account Number"
-                value={newBankForm.accountNo}
-                onChange={(e) => setNewBankForm({ ...newBankForm, accountNo: e.target.value })}
-                className="w-full border border-gray-300 rounded px-3 py-2"
-              />
+              <label style={lbl}>Account Number *</label>
+              <input style={inp} placeholder="IBAN or Account No" value={bankForm.accountNo} onChange={e => setBankForm(f => ({ ...f, accountNo: e.target.value }))} required />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-2">Account Name</label>
-              <input
-                type="text"
-                required
-                placeholder="Account Title"
-                value={newBankForm.accountName}
-                onChange={(e) => setNewBankForm({ ...newBankForm, accountName: e.target.value })}
-                className="w-full border border-gray-300 rounded px-3 py-2"
-              />
+              <label style={lbl}>Account Name *</label>
+              <input style={inp} placeholder="Account Title" value={bankForm.accountName} onChange={e => setBankForm(f => ({ ...f, accountName: e.target.value }))} required />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-2">Initial Balance ({companyInfo?.baseCurrency || "$"})</label>
-              <input
-                type="number"
-                required
-                placeholder="Opening Balance"
-                value={newBankForm.balance}
-                onChange={(e) => setNewBankForm({ ...newBankForm, balance: Number(e.target.value) })}
-                className="w-full border border-gray-300 rounded px-3 py-2"
-              />
+              <label style={lbl}>Initial Balance ({currency})</label>
+              <input type="number" style={inp} placeholder="0.00" value={bankForm.balance} onChange={e => setBankForm(f => ({ ...f, balance: Number(e.target.value) }))} />
             </div>
           </div>
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-blue-500 text-white px-6 py-2 rounded font-semibold hover:bg-blue-600 disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : editingBankId ? 'Update Bank Account' : 'Save Bank Account'}
+          <div style={{ display: "flex", gap: 10 }}>
+            <button type="submit" disabled={loading} style={{ background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1 }}>
+              {loading ? "Saving…" : editingBankId ? "Update Account" : "Save Account"}
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setShowAddBankForm(false);
-                setEditingBankId('');
-                setNewBankForm({
-                  bankName: '',
-                  accountNo: '',
-                  accountName: '',
-                  balance: 0,
-                });
-              }}
-              className="bg-gray-500 text-white px-6 py-2 rounded font-semibold hover:bg-gray-600"
-            >
-              Cancel
-            </button>
+            <button type="button" onClick={() => { setShowBankForm(false); setEditingBankId(""); setBankForm({ bankName: "", accountNo: "", accountName: "", balance: 0 }); }}
+              style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 20px", fontFamily: ff, fontSize: 14, color: "var(--text-muted)", cursor: "pointer" }}>Cancel</button>
           </div>
         </form>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Bank Account Selection */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <label className="block text-sm font-semibold mb-2">Bank Account</label>
-          <div className="space-y-2">
-            <select
-              value={selectedAccount}
-              onChange={(e) => setSelectedAccount(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            >
-              <option value="">Select Account</option>
-              {bankAccounts.map((account) => (
-                <option
-                  key={account.id}
-                  value={
-                    account.source === 'BankAccount'
-                      ? account.id
-                      : account.accountId ?? ''
-                  }
-                >
-
-                  {account.bankName} - {account.accountNo}
-                </option>
-              ))}
-            </select>
-            {bankAccounts.length > 0 && (
-              <div className="flex gap-2 text-sm">
-                {bankAccounts.map((account) => (
-                  <div key={account.id} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
-                    <span className="text-xs">{account.bankName} - {account.accountNo}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleEditBank(account)}
-                      className="text-blue-600 hover:text-blue-800 text-xs font-medium"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteBank(account.id)}
-                      className="text-red-500 hover:text-red-700 text-xs font-medium"
-                    >
-                      Delete
-                    </button>
+      {/* Balance Controls */}
+      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+        {/* Bank Account Selector */}
+        <div style={panel}>
+          <label style={lbl}>Bank Account</label>
+          <select style={inp} value={selectedAccount} onChange={e => setSelectedAccount(e.target.value)}>
+            <option value="">— Select Account —</option>
+            {bankAccounts.map(a => (
+              <option key={a.id} value={a.source === "BankAccount" ? a.id : (a.accountId || "")}>
+                {a.bankName} — {a.accountNo}
+              </option>
+            ))}
+          </select>
+          {bankAccounts.length > 0 && (
+            <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+              {bankAccounts.map(a => (
+                <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: 6, padding: "7px 10px" }}>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{a.bankName} — {a.accountNo}</span>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button type="button" onClick={() => handleEditBank(a)} style={{ background: "transparent", border: "none", color: "#818cf8", cursor: "pointer", fontSize: 12, fontFamily: ff }}>Edit</button>
+                    <button type="button" onClick={() => handleDeleteBank(a.id)} style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 12, fontFamily: ff }}>Delete</button>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* System Balance */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <label className="block text-sm font-semibold mb-2">System Balance</label>
-          <input
-            type="number"
-            step="0.01"
-            value={systemBalance || ''}
-            onChange={(e) => {
-              const val = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0;
-              setSystemBalance(val);
-            }}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-          />
+        <div style={panel}>
+          <label style={lbl}>System Balance ({currency})</label>
+          <input type="number" step="0.01" style={inp} value={systemBalance || ""} placeholder="0.00"
+            onChange={e => setSystemBalance(e.target.value === "" ? 0 : parseFloat(e.target.value) || 0)} />
+          <div style={{ marginTop: 8, fontSize: 11, color: "var(--text-muted)" }}>Auto-loaded from selected account</div>
         </div>
 
         {/* Bank Balance */}
-        <div className="bg-white p-4 rounded-lg shadow">
-          <label className="block text-sm font-semibold mb-2">Bank Balance</label>
-          <input
-            type="number"
-            step="0.01"
-            value={bankBalance || ''}
-            onChange={(e) => {
-              const val = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0;
-              setBankBalance(val);
-            }}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-          />
+        <div style={panel}>
+          <label style={lbl}>Bank Balance ({currency})</label>
+          <input type="number" step="0.01" style={inp} value={bankBalance || ""} placeholder="0.00"
+            onChange={e => setBankBalance(e.target.value === "" ? 0 : parseFloat(e.target.value) || 0)} />
+          <div style={{ marginTop: 8, fontSize: 11, color: "var(--text-muted)" }}>Enter balance from bank statement</div>
         </div>
       </div>
 
-      {/* Show Difference */}
-      <div className={`p-4 rounded-lg mb-6 text-white font-semibold ${isBalanced ? 'bg-green-500' : 'bg-red-500'
-        }`}>
-        Difference: {companyInfo?.baseCurrency || "$"} {difference.toFixed(2)} {isBalanced ? '✓ Balanced' : '✗ Not Balanced'}
+      {/* Difference Banner */}
+      <div style={{ background: isBalanced ? "rgba(34,197,94,0.12)" : "rgba(248,113,113,0.12)", border: `1px solid ${isBalanced ? "rgba(34,197,94,0.3)" : "rgba(248,113,113,0.3)"}`, borderRadius: 10, padding: "12px 18px", marginBottom: 20, display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{ fontSize: 20 }}>{isBalanced ? "✓" : "✗"}</span>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: isBalanced ? "#22c55e" : "#f87171" }}>
+            Difference: {currency} {fmt(difference)} — {isBalanced ? "Balanced" : "Not Balanced"}
+          </div>
+          {!isBalanced && <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Adjust System Balance or Bank Balance until difference is 0.00</div>}
+        </div>
       </div>
 
-      {/* Statements List */}
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <div className="px-6 py-4 bg-gray-50 border-b">
-          <h2 className="font-semibold">Bank Statements ({statements.length})</h2>
+      {/* Statements Table */}
+      <div style={{ ...panel, padding: 0, overflow: "hidden", marginBottom: 20 }}>
+        <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>Unreconciled Bank Statements ({statements.length})</div>
+          {selectedStatements.length > 0 && (
+            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>{selectedStatements.length} selected</div>
+          )}
         </div>
-        <table className="w-full min-w-[800px]">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-6 py-3 text-left">Select</th>
-              <th className="px-6 py-3 text-left">Date</th>
-              <th className="px-6 py-3 text-left">Amount</th>
-              <th className="px-6 py-3 text-left">Description</th>
-              <th className="px-6 py-3 text-left">Reference</th>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ borderBottom: "1px solid var(--border)" }}>
+              {["", "Date", "Statement No", "Description", "Reference", "Amount"].map(h => (
+                <th key={h} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, textAlign: h === "Amount" ? "right" : "left" }}>{h}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {statements.map((statement) => (
-              <tr key={statement.id} className="border-b hover:bg-gray-50">
-                <td className="px-6 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedStatements.includes(statement.id)}
-                    onChange={() => toggleStatement(statement.id)}
-                  />
-                </td>
-                <td className="px-6 py-3">
-                  {fmtDate(statement.date)}
-                </td>
-                <td className="px-6 py-3 font-semibold">
-                  {statement.amount.toFixed(2)}
-                </td>
-                <td className="px-6 py-3">{statement.description}</td>
-                <td className="px-6 py-3">{statement.referenceNo || '-'}</td>
-              </tr>
-            ))}
+            {statements.length === 0 ? (
+              <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>
+                {selectedAccount ? "No unreconciled statements found." : "Select a bank account to view statements."}
+              </td></tr>
+            ) : statements.map((s, idx) => {
+              const checked = selectedStatements.includes(s.id);
+              return (
+                <tr key={s.id} style={{ borderBottom: idx < statements.length - 1 ? "1px solid var(--border)" : "none", background: checked ? "rgba(59,130,246,0.06)" : "transparent", cursor: "pointer" }}
+                  onClick={() => setSelectedStatements(prev => prev.includes(s.id) ? prev.filter(x => x !== s.id) : [...prev, s.id])}
+                  onMouseEnter={e => { if (!checked) (e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.03)"; }}
+                  onMouseLeave={e => { if (!checked) (e.currentTarget as HTMLTableRowElement).style.background = "transparent"; }}>
+                  <td style={{ padding: "13px 16px" }}>
+                    <input type="checkbox" checked={checked} onChange={() => {}} style={{ cursor: "pointer", accentColor: accent }} />
+                  </td>
+                  <td style={{ padding: "13px 16px", fontSize: 13, color: "var(--text-muted)" }}>{fmtDate(s.date)}</td>
+                  <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 600, color: accent }}>{s.statementNo}</td>
+                  <td style={{ padding: "13px 16px", fontSize: 13 }}>{s.description}</td>
+                  <td style={{ padding: "13px 16px", fontSize: 13, color: "var(--text-muted)" }}>{s.referenceNo || "—"}</td>
+                  <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 600, textAlign: "right" }}>{fmt(s.amount)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
       {/* Reconcile Button */}
-      <div className="mt-6 flex gap-4">
-        <button
-          onClick={handleReconcile}
-          disabled={loading || !isBalanced}
-          className="bg-blue-500 text-white px-6 py-2 rounded font-semibold hover:bg-blue-600 disabled:opacity-50"
-        >
-          {loading ? 'Processing...' : 'Reconcile'}
-        </button>
-      </div>
+      <button onClick={handleReconcile} disabled={loading || !isBalanced}
+        style={{ background: isBalanced ? accent : "rgba(59,130,246,0.3)", color: "#fff", border: "none", borderRadius: 8, padding: "11px 28px", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: (loading || !isBalanced) ? "not-allowed" : "pointer", opacity: (loading || !isBalanced) ? 0.6 : 1 }}>
+        {loading ? "Processing…" : "Reconcile Selected Statements"}
+      </button>
     </div>
   );
 }
