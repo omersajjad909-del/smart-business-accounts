@@ -254,7 +254,7 @@ function MegaPanel({
       }}/>
 
       <div style={{ maxWidth:1200, margin:"0 auto", padding:"32px 24px 24px", position:"relative" }}>
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:36 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr 240px", gap:36 }}>
 
           {/* 3 link columns */}
           {cols.map(col => (
