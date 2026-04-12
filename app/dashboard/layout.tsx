@@ -726,7 +726,7 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoice</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALE_RETURN) && <NavLink href="/dashboard/sale-return" pathname={pathname}>Sale Return</NavLink>}
               {/* ── Admin ── */}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/parties" pathname={pathname}>Customers & Vendors</NavLink>}
+
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/payment-receipts" pathname={pathname}>Payment Receipts</NavLink>}
             </NavGroup>
@@ -1033,7 +1033,6 @@ export default function DashboardLayout({
               onToggle={() => toggle("retailSuppliers")}
             >
               {hasDashboardFeature("RETAIL_SUPPLIERS") && <NavLink href="/dashboard/retail/suppliers" pathname={pathname}>Supplier List</NavLink>}
-              <NavLink href="/dashboard/parties" pathname={pathname}>📒 Supplier Ledger</NavLink>
               <NavLink href="/dashboard/reports/ageing" pathname={pathname}>📅 Supplier Ageing</NavLink>
             </NavGroup>
 

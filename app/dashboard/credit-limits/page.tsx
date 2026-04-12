@@ -1,8 +1,8 @@
 "use client";
-import { confirmToast, alertToast } from "@/lib/toast-feedback";
-
-import { useState, useMemo } from "react";
+import { confirmToast } from "@/lib/toast-feedback";
+import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { getCurrentUser } from "@/lib/auth";
 
 const ACCENT = "#f59e0b";
 const FONT = "'Outfit','Inter',sans-serif";
@@ -60,13 +60,30 @@ const inputStyle: React.CSSProperties = {
   fontFamily: FONT, outline: "none",
 };
 
+interface Customer { id: string; name: string; }
+
 export default function CreditLimitsPage() {
+  const user = getCurrentUser();
   const { records, loading, create, update, remove } = useBusinessRecords("credit_limit");
   const [showModal, setShowModal]   = useState(false);
   const [editId, setEditId]         = useState<string | null>(null);
   const [form, setForm]             = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving]         = useState(false);
   const [error, setError]           = useState("");
+  const [customers, setCustomers]   = useState<Customer[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/accounts", {
+      headers: { "x-user-role": user.role || "", "x-user-id": user.id || "", "x-company-id": user.companyId || "" },
+    })
+      .then(r => r.json())
+      .then(d => {
+        const list: any[] = Array.isArray(d) ? d : d.accounts || [];
+        setCustomers(list.filter(a => a.partyType === "CUSTOMER").map(a => ({ id: a.id, name: a.name })));
+      })
+      .catch(() => {});
+  }, []);
 
   const rows = useMemo(() =>
     records.map((r) => {
@@ -296,12 +313,16 @@ export default function CreditLimitsPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <label style={labelStyle}>Customer Name *</label>
-                <input
+                <select
                   style={inputStyle}
-                  placeholder="e.g. Acme Corp"
                   value={form.customerName}
                   onChange={(e) => setField("customerName", e.target.value)}
-                />
+                >
+                  <option value="">— Select Customer —</option>
+                  {customers.map(c => (
+                    <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
