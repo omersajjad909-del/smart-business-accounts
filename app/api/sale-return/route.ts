@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     }
     const branchId = await resolveBranchIdOrDefault(req, companyId);
 
-    const { customerId, invoiceId, date, items, freight = 0 } = await req.json();
+    const { customerId, invoiceId, date, items, freight = 0, driverName, vehicleNo, remarks } = await req.json();
 
     if (!customerId || !date || !items?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -122,6 +122,9 @@ export async function POST(req: NextRequest) {
       invoiceId: invoiceId || null,
       companyId,
       total,
+      driverName: driverName || null,
+      vehicleNo: vehicleNo || null,
+      remarks: remarks || null,
       items: {
         create: items.map((i: any) => ({
           itemId: i.itemId,
@@ -191,7 +194,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, customerId: _customerId, invoiceId: _invoiceId, date, items, freight = 0 } = body;
+    const { id, customerId: _customerId, invoiceId: _invoiceId, date, items, freight = 0, driverName, vehicleNo, remarks } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Return ID required" }, { status: 400 });
@@ -218,6 +221,9 @@ export async function PUT(req: NextRequest) {
         data: {
           date: new Date(date),
           total: total,
+          driverName: driverName || null,
+          vehicleNo: vehicleNo || null,
+          remarks: remarks || null,
           items: {
             create: items.map((i: any) => ({
               itemId: i.itemId,

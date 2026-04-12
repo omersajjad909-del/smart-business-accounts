@@ -325,8 +325,11 @@ model SaleReturn {
   customerId String
   customer   Account @relation("SaleReturnCustomer", fields: [customerId], references: [id])
 
-  total Float
-  items SaleReturnItem[]
+  total      Float
+  driverName String?
+  vehicleNo  String?
+  remarks    String?
+  items      SaleReturnItem[]
 
   createdAt DateTime @default(now())
 }

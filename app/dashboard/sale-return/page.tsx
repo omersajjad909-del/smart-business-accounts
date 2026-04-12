@@ -16,10 +16,15 @@ type SaleReturn = {
   id: string; returnNo: string; date: string;
   customerId: string; customer?: { name: string };
   invoiceId: string; invoice?: { invoiceNo: string };
-  total: number;
+  total: number; driverName?: string; vehicleNo?: string; remarks?: string;
   items: Array<{ itemId?: string; item?: { name: string }; qty: number; rate: number }>;
 };
-type SavedData = { returnNo: string; date: string; customerName: string; invoiceNo: string; items: { name: string; qty: number; rate: number }[]; total: number; freight: number; netTotal: number };
+type SavedData = {
+  returnNo: string; date: string; customerName: string; invoiceNo: string;
+  items: { name: string; qty: number; rate: number }[];
+  total: number; freight: number; netTotal: number;
+  driverName: string; vehicleNo: string; remarks: string;
+};
 
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
@@ -41,6 +46,9 @@ export default function SalesReturnPage() {
   const [rows,             setRows]             = useState<Row[]>([]);
   const [date,             setDate]             = useState(today);
   const [freight,          setFreight]          = useState<number | "">("");
+  const [driverName,       setDriverName]       = useState("");
+  const [vehicleNo,        setVehicleNo]        = useState("");
+  const [remarks,          setRemarks]          = useState("");
   const [saving,           setSaving]           = useState(false);
   const [preview,          setPreview]          = useState(false);
   const [savedData,        setSavedData]        = useState<SavedData | null>(null);
@@ -113,12 +121,12 @@ export default function SalesReturnPage() {
     try {
       const method = editing ? "PUT" : "POST";
       const body = editing
-        ? { id: editing.id, customerId, invoiceId, date, freight: freight || 0, items: clean }
-        : { customerId, invoiceId, date, freight: freight || 0, items: clean };
+        ? { id: editing.id, customerId, invoiceId, date, freight: freight || 0, items: clean, driverName, vehicleNo, remarks }
+        : { customerId, invoiceId, date, freight: freight || 0, items: clean, driverName, vehicleNo, remarks };
       const res = await fetch("/api/sale-return", { method, headers: { "Content-Type": "application/json", "x-user-role": user?.role || "ADMIN" }, body: JSON.stringify(body) });
       const data = await res.json();
       if (data.success) {
-        setSavedData({ returnNo: data.returnNo, date, customerName, invoiceNo: displayInvoiceNo, items: clean, total, freight: freight || 0, netTotal });
+        setSavedData({ returnNo: data.returnNo, date, customerName, invoiceNo: displayInvoiceNo, items: clean, total, freight: freight || 0, netTotal, driverName, vehicleNo, remarks });
         setPreview(true);
         await loadReturns();
         if (editing) { setEditing(null); setShowForm(false); setShowList(true); }
@@ -131,6 +139,7 @@ export default function SalesReturnPage() {
     setEditing(ret); setInvoiceId(ret.invoiceId); setDisplayInvoiceNo(ret.invoice?.invoiceNo || "");
     setCustomerId(ret.customerId); setCustomerName(ret.customer?.name || "");
     setDate(new Date(ret.date).toISOString().slice(0, 10));
+    setDriverName(ret.driverName || ""); setVehicleNo(ret.vehicleNo || ""); setRemarks(ret.remarks || "");
     setRows(ret.items.map(it => ({ itemId: it.itemId || "", name: it.item?.name || "", qty: it.qty, rate: it.rate, maxQty: it.qty })));
     setShowForm(true); setShowList(false);
   }
@@ -143,7 +152,8 @@ export default function SalesReturnPage() {
 
   function resetForm() {
     setEditing(null); setInvoiceId(""); setDisplayInvoiceNo(""); setCustomerId(""); setCustomerName("");
-    setDate(today); setFreight(""); setRows([]); setPreview(false); setSavedData(null);
+    setDate(today); setFreight(""); setDriverName(""); setVehicleNo(""); setRemarks("");
+    setRows([]); setPreview(false); setSavedData(null);
   }
 
   // ── Styles ──
@@ -259,6 +269,22 @@ export default function SalesReturnPage() {
                   <div style={{ background: customerName ? "rgba(248,113,113,0.08)" : "rgba(255,255,255,0.03)", border: `1px solid ${customerName ? danger + "44" : "var(--border)"}`, borderRadius: 8, padding: "10px 14px", fontSize: 14, fontWeight: 600, color: customerName ? danger : "var(--text-muted)" }}>
                     {customerName ? `Customer: ${customerName}` : "Customer: Not Selected"}
                   </div>
+
+                  {/* Driver / Vehicle / Remarks */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 16 }}>
+                    <div>
+                      <label style={lbl}>Driver / Person Name</label>
+                      <input style={inp} value={driverName} onChange={e => setDriverName(e.target.value)} placeholder="e.g. Ali Rikshaw wala" />
+                    </div>
+                    <div>
+                      <label style={lbl}>Vehicle No / Rikshaw No</label>
+                      <input style={inp} value={vehicleNo} onChange={e => setVehicleNo(e.target.value)} placeholder="e.g. LEA-1234" />
+                    </div>
+                    <div>
+                      <label style={lbl}>Return Reason / Remarks</label>
+                      <input style={inp} value={remarks} onChange={e => setRemarks(e.target.value)} placeholder="e.g. Damaged goods, Wrong item" />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Items */}
@@ -343,9 +369,12 @@ export default function SalesReturnPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24, fontSize: 14 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20, fontSize: 14 }}>
                     <div><strong>Customer:</strong> {savedData?.customerName}</div>
                     <div><strong>Ref Invoice:</strong> {savedData?.invoiceNo}</div>
+                    {savedData?.driverName && <div><strong>Driver / Person:</strong> {savedData.driverName}</div>}
+                    {savedData?.vehicleNo  && <div><strong>Vehicle No:</strong> {savedData.vehicleNo}</div>}
+                    {savedData?.remarks    && <div style={{ gridColumn: "1 / -1" }}><strong>Reason / Remarks:</strong> {savedData.remarks}</div>}
                   </div>
 
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, marginBottom: 24 }}>
@@ -397,9 +426,12 @@ export default function SalesReturnPage() {
             <div style={{ fontSize: 12, color: "#333", marginTop: 4 }}>Date: {savedData.date} &nbsp;|&nbsp; Voucher No: {savedData.returnNo}</div>
           </div>
 
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 18, fontSize: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16, fontSize: 12 }}>
             <div><strong>Customer:</strong> {savedData.customerName}</div>
             <div><strong>Ref Invoice:</strong> {savedData.invoiceNo}</div>
+            {savedData.driverName && <div><strong>Driver / Person:</strong> {savedData.driverName}</div>}
+            {savedData.vehicleNo  && <div><strong>Vehicle No:</strong> {savedData.vehicleNo}</div>}
+            {savedData.remarks    && <div style={{ gridColumn: "1 / -1" }}><strong>Reason / Remarks:</strong> {savedData.remarks}</div>}
           </div>
 
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, marginBottom: 18 }}>
