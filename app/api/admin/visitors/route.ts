@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import { getCountryCenter } from "@/lib/geoMapData";
 
 function isAdmin(req: NextRequest) {
   const role = String(req.headers.get("x-user-role") || "").toUpperCase();
@@ -56,6 +57,8 @@ export async function GET(req: NextRequest) {
         country: v.country, countryName: v.countryName, city: v.city,
         flag: v.flag, device: v.device, page: v.page,
         duration: "Active",
+        lat: v.lat ?? null,
+        lon: v.lon ?? null,
       }));
       return NextResponse.json({ live, rows: [], stats: {} });
     }
@@ -125,9 +128,46 @@ export async function GET(req: NextRequest) {
       uniqueVisitors: uniqueSessions.size,
       countries:      byCountry.size,
       cities:         new Set(visits.map((v:any)=>v.city).filter(Boolean)).size,
+      precisePins:    visits.filter((v:any)=>typeof v.lat === "number" && typeof v.lon === "number").length,
       deviceBreakdown,
       topPages,
     };
+
+    const exactPins = visits
+      .filter((v:any) => typeof v.lat === "number" && Number.isFinite(v.lat) && typeof v.lon === "number" && Number.isFinite(v.lon))
+      .slice(0, 500)
+      .map((v:any) => ({
+        lat: v.lat,
+        lon: v.lon,
+        country: v.country,
+        countryName: v.countryName,
+        city: v.city,
+        page: v.page,
+        device: v.device,
+        flag: v.flag,
+        precision: "exact",
+      }));
+
+    const fallbackPins = rows
+      .filter((row) => !exactPins.some((pin) => pin.country === row.country))
+      .map((row) => {
+        const center = getCountryCenter(row.country);
+        if (!center) return null;
+        return {
+          lat: center.lat,
+          lon: center.lon,
+          country: row.country,
+          countryName: row.countryName,
+          city: row.topCity,
+          page: "",
+          device: "",
+          flag: row.flag,
+          precision: "country",
+          visitors: row.visitors,
+          uniqueVisitors: row.uniqueVisitors,
+        };
+      })
+      .filter(Boolean);
 
     // Live — last 30 min visits for map
     const liveVisits = visits.filter((v:any) => {
@@ -138,7 +178,7 @@ export async function GET(req: NextRequest) {
       flag:v.flag, device:v.device, page:v.page,
     }));
 
-    return NextResponse.json({ rows, stats, live: liveVisits });
+    return NextResponse.json({ rows, stats, live: liveVisits, mapPins: [...exactPins, ...fallbackPins] });
   } catch (e: any) {
     console.error("[visitors]", e.message);
     return NextResponse.json({ error: e.message }, { status: 500 });

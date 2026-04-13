@@ -1,162 +1,233 @@
 "use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type Row = { country: string; companies: number; activeUsers30d: number };
-
-const COUNTRY_CENTER: Record<string, { lat: number; lon: number }> = {
-  // Common markets + broad coverage
-  PK: { lat: 30.3753, lon: 69.3451 },
-  IN: { lat: 20.5937, lon: 78.9629 },
-  BD: { lat: 23.685, lon: 90.3563 },
-  AE: { lat: 23.4241, lon: 53.8478 },
-  SA: { lat: 23.8859, lon: 45.0792 },
-  QA: { lat: 25.3548, lon: 51.1839 },
-  KW: { lat: 29.3759, lon: 47.9774 },
-  OM: { lat: 21.4735, lon: 55.9754 },
-  US: { lat: 37.0902, lon: -95.7129 },
-  CA: { lat: 56.1304, lon: -106.3468 },
-  GB: { lat: 55.3781, lon: -3.4360 },
-  DE: { lat: 51.1657, lon: 10.4515 },
-  FR: { lat: 46.2276, lon: 2.2137 },
-  IT: { lat: 41.8719, lon: 12.5674 },
-  ES: { lat: 40.4637, lon: -3.7492 },
-  TR: { lat: 38.9637, lon: 35.2433 },
-  CN: { lat: 35.8617, lon: 104.1954 },
-  JP: { lat: 36.2048, lon: 138.2529 },
-  AU: { lat: -25.2744, lon: 133.7751 },
-  NZ: { lat: -40.9006, lon: 174.8860 },
-  ZA: { lat: -30.5595, lon: 22.9375 },
-  EG: { lat: 26.8206, lon: 30.8025 },
-  NG: { lat: 9.0820, lon: 8.6753 },
+type GeoPin = {
+  type: "company" | "branch" | "visitor";
+  label: string;
+  subtitle?: string | null;
+  country?: string | null;
+  lat: number;
+  lon: number;
+  precision: "exact" | "country";
+  address?: string | null;
+  city?: string | null;
+  page?: string | null;
+  device?: string | null;
+  plan?: string | null;
+  isActive?: boolean;
+  visitedAt?: string | null;
 };
 
-function project(lat: number, lon: number, width: number, height: number) {
-  // Equirectangular projection
-  const x = ((lon + 180) / 360) * width;
-  const y = ((90 - lat) / 180) * height;
-  return { x, y };
+type GeoResponse = {
+  companies: GeoPin[];
+  branches: GeoPin[];
+  visitors: GeoPin[];
+  stats: {
+    companies: number;
+    exactCompanies: number;
+    branches: number;
+    exactBranches: number;
+    visitors: number;
+    exactVisitors: number;
+  };
+};
+
+function StatCard({ label, value, sub }: { label: string; value: number; sub: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/35">{label}</div>
+      <div className="mt-2 text-3xl font-extrabold text-white">{value.toLocaleString()}</div>
+      <div className="mt-1 text-sm text-white/45">{sub}</div>
+    </div>
+  );
 }
 
-export default function GeoAnalyticsPage() {
-  const [rows, setRows] = useState<Row[] | null>(null);
-  const [loading, setLoading] = useState(true);
+function MapCanvas({ pins, color }: { pins: GeoPin[]; color: string }) {
   const mapDivRef = useRef<HTMLDivElement | null>(null);
-  const [mapReady, setMapReady] = useState(false);
+  const mapRef = useRef<any>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const r = await fetch("/api/admin/geo/countries", { cache: "no-store" });
-        if (r.ok) {
-          const j = await r.json();
-          setRows(j.rows || []);
-        } else setRows([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    if (!mapDivRef.current || mapRef.current) return;
 
-  // Load MapLibre GL from CDN and render markers
-  useEffect(() => {
-    if (!mapDivRef.current) return;
-    if (mapReady) return;
-    // inject CSS
-    if (!document.querySelector('link[data-maplibre]')) {
+    if (!document.querySelector('link[data-maplibre-admin="true"]')) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
       link.href = "https://unpkg.com/maplibre-gl@3.5.2/dist/maplibre-gl.css";
-      link.setAttribute("data-maplibre", "true");
+      link.setAttribute("data-maplibre-admin", "true");
       document.head.appendChild(link);
     }
-    function start() {
+
+    function boot() {
       const maplibregl = (window as any).maplibregl;
-      if (!maplibregl || !mapDivRef.current) return;
+      if (!mapDivRef.current || !maplibregl) return;
       const map = new maplibregl.Map({
         container: mapDivRef.current,
         style: "https://demotiles.maplibre.org/style.json",
-        center: [60, 25],
-        zoom: 1.2,
+        center: [18, 22],
+        zoom: 1.45,
       });
-      map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
-      map.on("load", () => {
-        setMapReady(true);
-        if (!rows) return;
-        const maxVal = Math.max(...rows.map(r => r.activeUsers30d || r.companies || 0), 1);
-        for (const r of rows) {
-          const cc = COUNTRY_CENTER[r.country];
-          if (!cc) continue;
-          const val = (r.activeUsers30d || r.companies || 0);
-          const size = Math.max(8, (val / maxVal) * 32);
-          const el = document.createElement("div");
-          el.style.width = `${size}px`;
-          el.style.height = `${size}px`;
-          el.style.borderRadius = "9999px";
-          el.style.background = "rgba(59,130,246,0.9)";
-          el.style.boxShadow = "0 0 0 4px rgba(59,130,246,0.25)";
-          el.title = `${r.country} • ${val} activity`;
-          new maplibregl.Marker({ element: el, anchor: "center" })
-            .setLngLat([cc.lon, cc.lat])
-            .addTo(map);
-        }
-      });
+      map.addControl(new maplibregl.NavigationControl(), "top-right");
+      mapRef.current = map;
     }
+
     if ((window as any).maplibregl) {
-      start();
+      boot();
     } else {
       const script = document.createElement("script");
       script.src = "https://unpkg.com/maplibre-gl@3.5.2/dist/maplibre-gl.js";
       script.async = true;
-      script.onload = start;
-      script.onerror = () => setMapReady(false);
+      script.onload = boot;
       document.body.appendChild(script);
     }
-  }, [rows, mapReady]);
 
-  const maxVal = useMemo(() => {
-    if (!rows || rows.length === 0) return 1;
-    return Math.max(...rows.map(r => r.activeUsers30d || r.companies || 0), 1);
-  }, [rows]);
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const maplibregl = (window as any).maplibregl;
+    if (!map || !maplibregl) return;
+
+    const markers: any[] = [];
+    for (const pin of pins) {
+      const el = document.createElement("div");
+      const isExact = pin.precision === "exact";
+      el.style.width = isExact ? "18px" : "12px";
+      el.style.height = isExact ? "18px" : "12px";
+      el.style.borderRadius = "9999px";
+      el.style.background = isExact ? color : "rgba(255,255,255,.58)";
+      el.style.border = isExact ? "2px solid rgba(255,255,255,.92)" : "1px solid rgba(255,255,255,.35)";
+      el.style.boxShadow = isExact ? `0 0 0 8px ${color}26` : "0 0 0 5px rgba(255,255,255,.08)";
+
+      const popupHtml = `
+        <div style="min-width:210px;font-family:system-ui,sans-serif">
+          <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:4px;">${pin.label}</div>
+          ${pin.subtitle ? `<div style="font-size:12px;color:#475569;margin-bottom:4px;">${pin.subtitle}</div>` : ""}
+          ${pin.address ? `<div style="font-size:12px;color:#334155;margin-bottom:2px;">${pin.address}</div>` : ""}
+          ${pin.city ? `<div style="font-size:12px;color:#475569;margin-bottom:2px;">City: ${pin.city}</div>` : ""}
+          <div style="font-size:12px;color:${isExact ? "#2563eb" : "#64748b"};font-weight:700;">
+            ${isExact ? "Exact pin" : "Country fallback"}
+          </div>
+        </div>
+      `;
+
+      const marker = new maplibregl.Marker({ element: el, anchor: "center" })
+        .setLngLat([pin.lon, pin.lat])
+        .setPopup(new maplibregl.Popup({ offset: 14 }).setHTML(popupHtml))
+        .addTo(map);
+      markers.push(marker);
+    }
+
+    if (pins.length) {
+      const bounds = new maplibregl.LngLatBounds();
+      pins.forEach((pin) => bounds.extend([pin.lon, pin.lat]));
+      map.fitBounds(bounds, { padding: 48, maxZoom: 4.2, duration: 600 });
+    }
+
+    return () => {
+      markers.forEach((marker) => marker.remove());
+    };
+  }, [pins, color]);
+
+  return <div ref={mapDivRef} className="w-full rounded-2xl" style={{ minHeight: 540 }} />;
+}
+
+export default function GeoAnalyticsPage() {
+  const [data, setData] = useState<GeoResponse | null>(null);
+  const [tab, setTab] = useState<"companies" | "branches" | "visitors">("companies");
+
+  useEffect(() => {
+    void fetch("/api/admin/geo/map", { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : null)
+      .then((json) => setData(json))
+      .catch(() => setData({ companies: [], branches: [], visitors: [], stats: { companies: 0, exactCompanies: 0, branches: 0, exactBranches: 0, visitors: 0, exactVisitors: 0 } }));
+  }, []);
+
+  const currentPins = useMemo(() => {
+    if (!data) return [];
+    if (tab === "companies") return data.companies;
+    if (tab === "branches") return data.branches;
+    return data.visitors;
+  }, [data, tab]);
+
+  const currentColor = tab === "companies" ? "#6366f1" : tab === "branches" ? "#22c55e" : "#38bdf8";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-white px-6 py-10">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl md:text-3xl font-extrabold">Geo Analytics</h1>
-        <p className="mt-2 text-slate-600">World map with country‑level activity (dots scaled by activity).</p>
+    <div className="min-h-screen bg-[#070b1a] px-6 py-10 text-white">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6">
+          <h1 className="text-3xl font-extrabold tracking-tight">Geo Analytics</h1>
+          <p className="mt-2 max-w-3xl text-sm text-white/50">
+            Precise world map for companies, branch pins, and visitor activity. Exact browser/company coordinates are used when available, with privacy-safe country fallback when they are not.
+          </p>
+        </div>
 
-        <div className="mt-6 grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 bg-white border border-indigo-100 rounded-2xl shadow p-0 overflow-hidden">
-            <div ref={mapDivRef} className="w-full" style={{ aspectRatio: "16/9" }} />
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+          <StatCard label="Companies" value={data?.stats.companies || 0} sub={`${data?.stats.exactCompanies || 0} exact pins`} />
+          <StatCard label="Branches" value={data?.stats.branches || 0} sub={`${data?.stats.exactBranches || 0} exact pins`} />
+          <StatCard label="Visitors" value={data?.stats.visitors || 0} sub={`${data?.stats.exactVisitors || 0} precise visitor pins`} />
+        </div>
+
+        <div className="mb-4 flex flex-wrap gap-2">
+          {[
+            { key: "companies", label: "Companies" },
+            { key: "branches", label: "Branches" },
+            { key: "visitors", label: "Visitors" },
+          ].map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => setTab(item.key as typeof tab)}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                tab === item.key
+                  ? "border-indigo-400 bg-indigo-500/20 text-white"
+                  : "border-white/10 bg-white/5 text-white/55 hover:border-white/20"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[1.45fr_.55fr]">
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-2">
+            <MapCanvas pins={currentPins} color={currentColor} />
           </div>
-          <div className="bg-white border border-indigo-100 rounded-2xl shadow p-4 overflow-auto">
-            <div className="text-sm font-semibold mb-2">Top Countries</div>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-slate-500">
-                  <th className="text-left py-2">Country</th>
-                  <th className="text-right py-2">Companies</th>
-                  <th className="text-right py-2">Active Users (30d)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {!rows ? (
-                  <tr><td colSpan={3} className="py-6 text-slate-500">Loading…</td></tr>
-                ) : rows.length === 0 ? (
-                  <tr><td colSpan={3} className="py-6 text-slate-500">No data</td></tr>
-                ) : (
-                  rows
-                    .slice()
-                    .sort((a, b) => (b.activeUsers30d || b.companies) - (a.activeUsers30d || a.companies))
-                    .map(r => (
-                      <tr key={r.country} className="border-t">
-                        <td className="py-2">{r.country}</td>
-                        <td className="py-2 text-right">{r.companies}</td>
-                        <td className="py-2 text-right">{r.activeUsers30d}</td>
-                      </tr>
-                    ))
-                )}
-              </tbody>
-            </table>
+
+          <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
+            <div className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-white/35">
+              {tab === "companies" ? "Top Companies" : tab === "branches" ? "Branch Pins" : "Recent Visitors"}
+            </div>
+            <div className="space-y-3">
+              {currentPins.slice(0, 12).map((pin, index) => (
+                <div key={`${pin.type}-${pin.label}-${index}`} className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold text-white">{pin.label}</div>
+                      {pin.subtitle && <div className="mt-1 text-xs text-white/45">{pin.subtitle}</div>}
+                    </div>
+                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${pin.precision === "exact" ? "bg-emerald-500/15 text-emerald-300" : "bg-white/10 text-white/45"}`}>
+                      {pin.precision}
+                    </span>
+                  </div>
+                  {(pin.address || pin.city) && (
+                    <div className="mt-2 text-xs text-white/45">{pin.address || pin.city}</div>
+                  )}
+                  <div className="mt-2 text-[11px] text-white/30">
+                    {pin.lat.toFixed(4)}, {pin.lon.toFixed(4)}
+                  </div>
+                </div>
+              ))}
+              {!currentPins.length && (
+                <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-6 text-center text-sm text-white/35">
+                  No geo pins available yet.
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

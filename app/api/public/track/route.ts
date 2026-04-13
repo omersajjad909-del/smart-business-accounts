@@ -97,6 +97,9 @@ export async function POST(req: NextRequest) {
       utmMedium,
       utmCampaign,
       duration,
+      lat,
+      lon,
+      geoPrecision,
       _update,
     } = body;
 
@@ -116,7 +119,11 @@ export async function POST(req: NextRequest) {
       if (latestVisit) {
         await db.siteVisit.update({
           where: { id: latestVisit.id },
-          data: { duration: typeof duration === "number" ? duration : latestVisit.duration ?? null },
+          data: {
+            duration: typeof duration === "number" ? duration : latestVisit.duration ?? null,
+            ...(typeof lat === "number" && Number.isFinite(lat) ? { lat } : {}),
+            ...(typeof lon === "number" && Number.isFinite(lon) ? { lon } : {}),
+          },
         });
       }
 
@@ -149,11 +156,13 @@ export async function POST(req: NextRequest) {
         os: getOs(ua),
         ip: rawIp,
         duration: typeof duration === "number" ? duration : null,
+        lat: typeof lat === "number" && Number.isFinite(lat) ? lat : null,
+        lon: typeof lon === "number" && Number.isFinite(lon) ? lon : null,
         visitedAt: new Date(),
       },
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, geoPrecision: geoPrecision || "approximate" });
   } catch (e: any) {
     console.error("[public-track]", e.message);
     return NextResponse.json({ ok: false });

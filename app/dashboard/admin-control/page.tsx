@@ -10,7 +10,17 @@ import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/c
 import { Card, PageHeader, ResponsiveContainer } from "@/components/ui/ResponsiveContainer";
 import { Button, FormActions, FormField, Input, ResponsiveForm, Select } from "@/components/ui/ResponsiveForm";
 
-type Branch = { id: string; code: string; name: string; city?: string | null; isActive: boolean };
+type Branch = {
+  id: string;
+  code: string;
+  name: string;
+  city?: string | null;
+  isActive: boolean;
+  address?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  geoSource?: "exact" | "manual" | "country" | "unset";
+};
 type UserRow = { id: string; name: string; email: string; role: string; active: boolean };
 type RoleRow = { role: string; permissions: string[] };
 type CompanyRow = { name: string; country?: string | null; baseCurrency?: string | null; plan?: string | null };
@@ -42,6 +52,9 @@ type CompanyIdentityProfile = {
   state: string;
   postalCode: string;
   website: string;
+  latitude: number | null;
+  longitude: number | null;
+  geoSource: "exact" | "manual" | "country" | "unset";
 };
 type InvoiceContactProfile = {
   contactName: string;
@@ -59,6 +72,12 @@ type BankDetailsProfile = {
   branchName: string;
   branchCode: string;
 };
+type BranchGeoProfile = {
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+  geoSource: "exact" | "manual" | "country" | "unset";
+};
 type AdminControlSettings = {
   branchAssignments: Record<string, string[]>;
   printPreferences: PrintPreferences;
@@ -66,6 +85,7 @@ type AdminControlSettings = {
   companyIdentity: CompanyIdentityProfile;
   invoiceContact: InvoiceContactProfile;
   bankDetails: BankDetailsProfile;
+  branchLocations: Record<string, BranchGeoProfile>;
 };
 type BackupRow = { id: string; fileName: string; status: string; createdAt: string };
 
@@ -97,6 +117,9 @@ const DEFAULT_COMPANY_IDENTITY: CompanyIdentityProfile = {
   state: "",
   postalCode: "",
   website: "",
+  latitude: null,
+  longitude: null,
+  geoSource: "unset",
 };
 const DEFAULT_INVOICE_CONTACT: InvoiceContactProfile = {
   contactName: "",
@@ -114,6 +137,12 @@ const DEFAULT_BANK_DETAILS: BankDetailsProfile = {
   branchName: "",
   branchCode: "",
 };
+const DEFAULT_BRANCH_GEO: BranchGeoProfile = {
+  address: "",
+  latitude: null,
+  longitude: null,
+  geoSource: "unset",
+};
 const CURRENCIES = [...SUPPORTED_CURRENCIES];
 
 export default function AdminControlPage() {
@@ -126,7 +155,7 @@ export default function AdminControlPage() {
   const [company, setCompany] = useState<CompanyRow | null>(null);
   const [companyForm, setCompanyForm] = useState({ companyName: "", country: "", baseCurrency: "" });
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [branchForm, setBranchForm] = useState({ id: "", code: "", name: "", city: "", isActive: true });
+  const [branchForm, setBranchForm] = useState({ id: "", code: "", name: "", city: "", address: "", latitude: "", longitude: "", isActive: true });
   const [branchSaving, setBranchSaving] = useState(false);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [roles, setRoles] = useState<RoleRow[]>([]);
@@ -139,6 +168,7 @@ export default function AdminControlPage() {
     companyIdentity: DEFAULT_COMPANY_IDENTITY,
     invoiceContact: DEFAULT_INVOICE_CONTACT,
     bankDetails: DEFAULT_BANK_DETAILS,
+    branchLocations: {},
   });
   const [opsLoading, setOpsLoading] = useState<null | "backup" | "download">(null);
 
@@ -167,7 +197,18 @@ export default function AdminControlPage() {
         country: companyData?.country || "",
         baseCurrency: companyData?.baseCurrency || "USD",
       });
-      setBranches(Array.isArray(branchData) ? branchData : []);
+      const branchLocationMap = settingsData?.branchLocations || {};
+      setBranches(
+        Array.isArray(branchData)
+          ? branchData.map((branch: Branch) => ({
+              ...branch,
+              address: branchLocationMap[branch.id]?.address || "",
+              latitude: typeof branchLocationMap[branch.id]?.latitude === "number" ? branchLocationMap[branch.id].latitude : null,
+              longitude: typeof branchLocationMap[branch.id]?.longitude === "number" ? branchLocationMap[branch.id].longitude : null,
+              geoSource: branchLocationMap[branch.id]?.geoSource || "unset",
+            }))
+          : []
+      );
       setUsers(Array.isArray(userData) ? userData : []);
       setRoles(Array.isArray(roleData) ? roleData : []);
       setSettings({
@@ -177,6 +218,7 @@ export default function AdminControlPage() {
         companyIdentity: { ...DEFAULT_COMPANY_IDENTITY, ...(settingsData?.companyIdentity || {}) },
         invoiceContact: { ...DEFAULT_INVOICE_CONTACT, ...(settingsData?.invoiceContact || {}) },
         bankDetails: { ...DEFAULT_BANK_DETAILS, ...(settingsData?.bankDetails || {}) },
+        branchLocations: settingsData?.branchLocations || {},
       });
 
       const firstRole = Array.isArray(roleData) && roleData.length > 0 ? roleData[0] : null;
@@ -212,6 +254,54 @@ export default function AdminControlPage() {
       country: countryName,
       baseCurrency: match ? nextCurrency : current.baseCurrency,
     }));
+  }
+
+  async function getBrowserLocation() {
+    if (typeof window === "undefined" || !("geolocation" in navigator)) {
+      throw new Error("Browser geolocation is not available.");
+    }
+    return await new Promise<{ latitude: number; longitude: number }>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => resolve({
+          latitude: Number(position.coords.latitude),
+          longitude: Number(position.coords.longitude),
+        }),
+        () => reject(new Error("Unable to read current location.")),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 120000 }
+      );
+    });
+  }
+
+  async function useCurrentCompanyLocation() {
+    try {
+      const coords = await getBrowserLocation();
+      setSettings((current) => ({
+        ...current,
+        companyIdentity: {
+          ...current.companyIdentity,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          geoSource: "exact",
+        },
+      }));
+      flash("Current HQ location captured. Save settings to keep it.");
+    } catch (error: unknown) {
+      flash(error instanceof Error ? error.message : "Unable to capture current location.", false);
+    }
+  }
+
+  async function useCurrentBranchLocation() {
+    try {
+      const coords = await getBrowserLocation();
+      setBranchForm((current) => ({
+        ...current,
+        latitude: coords.latitude.toFixed(6),
+        longitude: coords.longitude.toFixed(6),
+      }));
+      flash("Current branch location captured. Save branch to keep it.");
+    } catch (error: unknown) {
+      flash(error instanceof Error ? error.message : "Unable to capture branch location.", false);
+    }
   }
 
   async function handleLogoUpload(file: File | null) {
@@ -258,6 +348,7 @@ export default function AdminControlPage() {
             companyIdentity: settings.companyIdentity,
             invoiceContact: settings.invoiceContact,
             bankDetails: settings.bankDetails,
+            branchLocations: settings.branchLocations,
           }),
         }),
       ]);
@@ -328,7 +419,27 @@ export default function AdminControlPage() {
         body: JSON.stringify(branchForm.id ? branchForm : { code: branchForm.code, name: branchForm.name, city: branchForm.city, isActive: branchForm.isActive }),
       });
       if (!res.ok) throw new Error("Failed to save branch");
-      setBranchForm({ id: "", code: "", name: "", city: "", isActive: true });
+      const savedBranch = await res.json();
+      const lat = branchForm.latitude.trim() ? Number(branchForm.latitude) : null;
+      const lon = branchForm.longitude.trim() ? Number(branchForm.longitude) : null;
+      if (savedBranch?.id) {
+        await fetch("/api/company/admin-control", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            branchLocations: {
+              [savedBranch.id]: {
+                ...DEFAULT_BRANCH_GEO,
+                address: branchForm.address.trim(),
+                latitude: Number.isFinite(lat) ? lat : null,
+                longitude: Number.isFinite(lon) ? lon : null,
+                geoSource: Number.isFinite(lat) && Number.isFinite(lon) ? "manual" : "unset",
+              },
+            },
+          }),
+        });
+      }
+      setBranchForm({ id: "", code: "", name: "", city: "", address: "", latitude: "", longitude: "", isActive: true });
       flash(branchForm.id ? "Branch updated." : "Branch created.");
       await loadAll();
     } catch (error: unknown) {
@@ -532,6 +643,11 @@ export default function AdminControlPage() {
                   </div>
                   <FormField label="City"><Input value={settings.companyIdentity.city} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, city: e.target.value } }))} placeholder="City" /></FormField>
                   <FormField label="State / Region"><Input value={settings.companyIdentity.state} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))} placeholder="State / Region / Province" /></FormField>
+                  <FormField label="Latitude"><Input value={settings.companyIdentity.latitude ?? ""} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, latitude: e.target.value.trim() ? Number(e.target.value) : null, geoSource: "manual" } }))} placeholder="24.860735" /></FormField>
+                  <FormField label="Longitude"><Input value={settings.companyIdentity.longitude ?? ""} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, longitude: e.target.value.trim() ? Number(e.target.value) : null, geoSource: "manual" } }))} placeholder="67.001137" /></FormField>
+                  <div className="flex items-end">
+                    <Button type="button" variant="secondary" onClick={useCurrentCompanyLocation}>Use Current Location</Button>
+                  </div>
                 </div>
               </div>
 
@@ -612,9 +728,15 @@ export default function AdminControlPage() {
                   <FormField label="Branch Name" required><Input value={branchForm.name} onChange={(e) => setBranchForm((s) => ({ ...s, name: e.target.value }))} required /></FormField>
                   <FormField label="City"><Input value={branchForm.city} onChange={(e) => setBranchForm((s) => ({ ...s, city: e.target.value }))} /></FormField>
                   <FormField label="Status"><Select value={branchForm.isActive ? "active" : "inactive"} onChange={(e) => setBranchForm((s) => ({ ...s, isActive: e.target.value === "active" }))}><option value="active">Active</option><option value="inactive">Inactive</option></Select></FormField>
+                  <div className="md:col-span-2">
+                    <FormField label="Branch Address"><Input value={branchForm.address} onChange={(e) => setBranchForm((s) => ({ ...s, address: e.target.value }))} placeholder="Street, building, area" /></FormField>
+                  </div>
+                  <FormField label="Latitude"><Input value={branchForm.latitude} onChange={(e) => setBranchForm((s) => ({ ...s, latitude: e.target.value }))} placeholder="24.860735" /></FormField>
+                  <FormField label="Longitude"><Input value={branchForm.longitude} onChange={(e) => setBranchForm((s) => ({ ...s, longitude: e.target.value }))} placeholder="67.001137" /></FormField>
                 </div>
                 <FormActions>
-                  {branchForm.id && <Button type="button" variant="secondary" onClick={() => setBranchForm({ id: "", code: "", name: "", city: "", isActive: true })}>Cancel Edit</Button>}
+                  <Button type="button" variant="secondary" onClick={useCurrentBranchLocation}>Use Current Location</Button>
+                  {branchForm.id && <Button type="button" variant="secondary" onClick={() => setBranchForm({ id: "", code: "", name: "", city: "", address: "", latitude: "", longitude: "", isActive: true })}>Cancel Edit</Button>}
                   <Button type="submit" disabled={branchSaving}>{branchSaving ? "Saving..." : branchForm.id ? "Update Branch" : "Add Branch"}</Button>
                 </FormActions>
               </ResponsiveForm>
@@ -627,7 +749,7 @@ export default function AdminControlPage() {
                       <div className="text-xs text-[var(--text-muted)]">{branch.city || "No city"} · {branch.isActive ? "Active" : "Inactive"}</div>
                     </div>
                     <div className="flex gap-2">
-                      <Button type="button" variant="secondary" onClick={() => setBranchForm({ id: branch.id, code: branch.code, name: branch.name, city: branch.city || "", isActive: branch.isActive })}>Edit</Button>
+                      <Button type="button" variant="secondary" onClick={() => setBranchForm({ id: branch.id, code: branch.code, name: branch.name, city: branch.city || "", address: branch.address || "", latitude: typeof branch.latitude === "number" ? branch.latitude.toString() : "", longitude: typeof branch.longitude === "number" ? branch.longitude.toString() : "", isActive: branch.isActive })}>Edit</Button>
                       <Button type="button" variant="danger" onClick={() => deleteBranch(branch.id)}>Delete</Button>
                     </div>
                   </div>

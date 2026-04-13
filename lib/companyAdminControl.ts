@@ -32,6 +32,9 @@ export type CompanyIdentityProfile = {
   state: string;
   postalCode: string;
   website: string;
+  latitude: number | null;
+  longitude: number | null;
+  geoSource: "exact" | "manual" | "country" | "unset";
 };
 
 export type InvoiceContactProfile = {
@@ -52,6 +55,13 @@ export type BankDetailsProfile = {
   branchCode: string;
 };
 
+export type BranchGeoProfile = {
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+  geoSource: "exact" | "manual" | "country" | "unset";
+};
+
 export type AdminControlSettings = {
   branchAssignments: BranchAssignmentMap;
   printPreferences: PrintPreferences;
@@ -59,6 +69,7 @@ export type AdminControlSettings = {
   companyIdentity: CompanyIdentityProfile;
   invoiceContact: InvoiceContactProfile;
   bankDetails: BankDetailsProfile;
+  branchLocations: Record<string, BranchGeoProfile>;
 };
 
 export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
@@ -91,6 +102,9 @@ export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
     state: "",
     postalCode: "",
     website: "",
+    latitude: null,
+    longitude: null,
+    geoSource: "unset",
   },
   invoiceContact: {
     contactName: "",
@@ -108,6 +122,7 @@ export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
     branchName: "",
     branchCode: "",
   },
+  branchLocations: {},
 };
 
 function normalizeSettings(value: unknown): AdminControlSettings {
@@ -126,6 +141,9 @@ function normalizeSettings(value: unknown): AdminControlSettings {
     : {};
   const bankDetails = (parsed.bankDetails && typeof parsed.bankDetails === "object")
     ? parsed.bankDetails as Partial<BankDetailsProfile>
+    : {};
+  const branchLocations = (parsed.branchLocations && typeof parsed.branchLocations === "object")
+    ? parsed.branchLocations as Record<string, Partial<BranchGeoProfile>>
     : {};
 
   return {
@@ -157,6 +175,19 @@ function normalizeSettings(value: unknown): AdminControlSettings {
       ...DEFAULT_ADMIN_CONTROL_SETTINGS.bankDetails,
       ...bankDetails,
     },
+    branchLocations: Object.fromEntries(
+      Object.entries(branchLocations).map(([branchId, value]) => [
+        branchId,
+        {
+          address: String(value?.address || ""),
+          latitude: typeof value?.latitude === "number" && Number.isFinite(value.latitude) ? value.latitude : null,
+          longitude: typeof value?.longitude === "number" && Number.isFinite(value.longitude) ? value.longitude : null,
+          geoSource: value?.geoSource === "exact" || value?.geoSource === "manual" || value?.geoSource === "country"
+            ? value.geoSource
+            : "unset",
+        } satisfies BranchGeoProfile,
+      ])
+    ),
   };
 }
 
@@ -207,6 +238,10 @@ export async function saveCompanyAdminControlSettings(
     bankDetails: {
       ...current.bankDetails,
       ...(patch.bankDetails || {}),
+    },
+    branchLocations: {
+      ...current.branchLocations,
+      ...(patch.branchLocations || {}),
     },
   });
 
