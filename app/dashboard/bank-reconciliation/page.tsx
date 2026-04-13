@@ -152,28 +152,11 @@ export default function BankReconciliationPage() {
   const currency    = companyInfo?.baseCurrency || "PKR";
 
   const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
-  const inp:   React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
+  const inp:   React.CSSProperties = { width: "100%", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
   const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
 
   return (
     <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
-
-      {/* Guided Flow */}
-      <div style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)", borderRadius: 12, padding: "14px 18px", marginBottom: 24 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: accent, marginBottom: 8 }}>Guided Flow</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-          {[
-            { step: "1. Import", desc: "Upload bank statements to populate unreconciled entries." },
-            { step: "2. Match",  desc: "Select statements and align with system balance." },
-            { step: "3. Confirm", desc: "When difference is 0.00, click Reconcile to lock." },
-          ].map(s => (
-            <div key={s.step} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(59,130,246,0.15)", borderRadius: 8, padding: "10px 14px" }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: accent, marginBottom: 4 }}>{s.step}</div>
-              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
@@ -235,7 +218,7 @@ export default function BankReconciliationPage() {
           {bankAccounts.length > 0 && (
             <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
               {bankAccounts.map(a => (
-                <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: 6, padding: "7px 10px" }}>
+                <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 6, padding: "7px 10px" }}>
                   <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{a.bankName} — {a.accountNo}</span>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button type="button" onClick={() => handleEditBank(a)} style={{ background: "transparent", border: "none", color: "#818cf8", cursor: "pointer", fontSize: 12, fontFamily: ff }}>Edit</button>
@@ -301,7 +284,7 @@ export default function BankReconciliationPage() {
               return (
                 <tr key={s.id} style={{ borderBottom: idx < statements.length - 1 ? "1px solid var(--border)" : "none", background: checked ? "rgba(59,130,246,0.06)" : "transparent", cursor: "pointer" }}
                   onClick={() => setSelectedStatements(prev => prev.includes(s.id) ? prev.filter(x => x !== s.id) : [...prev, s.id])}
-                  onMouseEnter={e => { if (!checked) (e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.03)"; }}
+                  onMouseEnter={e => { if (!checked) (e.currentTarget as HTMLTableRowElement).style.background = "var(--panel-bg)"; }}
                   onMouseLeave={e => { if (!checked) (e.currentTarget as HTMLTableRowElement).style.background = "transparent"; }}>
                   <td style={{ padding: "13px 16px" }}>
                     <input type="checkbox" checked={checked} onChange={() => {}} style={{ cursor: "pointer", accentColor: accent }} />

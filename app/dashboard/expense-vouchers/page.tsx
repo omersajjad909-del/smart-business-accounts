@@ -140,7 +140,7 @@ export default function ExpenseVouchersPage() {
   });
 
   const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
-  const inp:   React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
+  const inp:   React.CSSProperties = { width: "100%", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
   const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
 
   return (
@@ -198,7 +198,7 @@ export default function ExpenseVouchersPage() {
             <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
-                  <tr style={{ background: "rgba(255,255,255,0.04)", borderBottom: "1px solid var(--border)" }}>
+                  <tr style={{ background: "var(--panel-bg)", borderBottom: "1px solid var(--border)" }}>
                     {["Description", "Category", "Amount", ""].map(h => (
                       <th key={h} style={{ padding: "10px 14px", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textAlign: h === "Amount" ? "right" : "left", textTransform: "uppercase", letterSpacing: 0.5 }}>{h}</th>
                     ))}
@@ -280,7 +280,7 @@ export default function ExpenseVouchersPage() {
               const sc = STATUS_COLOR[v.approvalStatus] || STATUS_COLOR.DRAFT;
               return (
                 <tr key={v.id} style={{ borderBottom: idx < vouchers.length - 1 ? "1px solid var(--border)" : "none" }}
-                  onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.03)"}
+                  onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "var(--panel-bg)"}
                   onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = "transparent"}>
                   <td style={{ padding: "13px 16px", fontWeight: 700, color: accent, fontSize: 13 }}>{v.voucherNo}</td>
                   <td style={{ padding: "13px 16px", fontSize: 13, color: "var(--text-muted)" }}>{fmtDate(v.date)}</td>

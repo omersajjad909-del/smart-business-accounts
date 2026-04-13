@@ -113,7 +113,7 @@ export default function PaymentFollowupPage() {
           <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 4px", letterSpacing: -0.5 }}>Payment Follow-up</h1>
           <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>Track and chase overdue customer invoices</p>
         </div>
-        <button onClick={loadInvoices} style={{ background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,.7)", fontSize: 12, cursor: "pointer", fontFamily: FONT }}>
+        <button onClick={loadInvoices} style={{ background: "var(--text-muted)", border: "1px solid var(--text-muted)", borderRadius: 10, padding: "8px 16px", color: "var(--text-muted)", fontSize: 12, cursor: "pointer", fontFamily: FONT }}>
           ↻ Refresh
         </button>
       </div>
@@ -171,7 +171,7 @@ export default function PaymentFollowupPage() {
             </thead>
             <tbody>
               {filtered.map((inv, i) => (
-                <tr key={inv.id} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.013)" : "transparent" }}>
+                <tr key={inv.id} style={{ background: i % 2 === 1 ? "var(--panel-bg)" : "transparent" }}>
                   <td style={{ ...td, fontWeight: 600, fontFamily: "monospace", fontSize: 12 }}>{inv.invoiceNo}</td>
                   <td style={td}>{inv.customer}</td>
                   <td style={{ ...td, fontWeight: 700 }}>Rs. {inv.amount.toLocaleString()}</td>

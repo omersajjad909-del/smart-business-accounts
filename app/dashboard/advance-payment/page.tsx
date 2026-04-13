@@ -117,7 +117,7 @@ export default function AdvancePaymentPage() {
   }
 
   const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
-  const inp:   React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
+  const inp:   React.CSSProperties = { width: "100%", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
   const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
 
   return (
@@ -225,7 +225,7 @@ export default function AdvancePaymentPage() {
                 const sc = STATUS_COLOR[adv.status] || STATUS_COLOR.OPEN;
                 return (
                   <tr key={adv.id} style={{ borderBottom: idx < advances.length - 1 ? "1px solid var(--border)" : "none" }}
-                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.03)"}
+                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "var(--panel-bg)"}
                     onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = "transparent"}>
                     <td style={{ padding: "13px 16px", fontWeight: 700, color: accent, fontSize: 13 }}>{adv.advanceNo}</td>
                     <td style={{ padding: "13px 16px", fontSize: 13, color: "var(--text-muted)" }}>{fmtDate(adv.date)}</td>

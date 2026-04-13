@@ -255,7 +255,7 @@ export default function PaymentReceiptsPage() {
   const clearedCount   = receipts.filter(r => r.status === "CLEARED").length;
 
   const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
-  const inp:   React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
+  const inp:   React.CSSProperties = { width: "100%", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
   const lbl:   React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 700, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
   const btnP:  React.CSSProperties = { background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: "pointer" };
   const btnG:  React.CSSProperties = { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 14, cursor: "pointer" };
@@ -480,7 +480,7 @@ export default function PaymentReceiptsPage() {
                   const sc = STATUS_COLOR[r.status] || STATUS_COLOR.PENDING;
                   return (
                     <tr key={r.id} style={{ borderBottom: idx < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
-                      onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "rgba(255,255,255,0.03)"}
+                      onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = "var(--panel-bg)"}
                       onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = "transparent"}>
                       <td style={{ padding: "12px 14px", fontWeight: 700, color: accent, fontSize: 13 }}>{r.receiptNo}</td>
                       <td style={{ padding: "12px 14px", fontSize: 12, color: green, fontWeight: 600 }}>{r.voucher?.voucherNo || "—"}</td>
