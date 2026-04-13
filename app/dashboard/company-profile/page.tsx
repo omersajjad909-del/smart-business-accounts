@@ -3,6 +3,8 @@ import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { getMaxUsersForPlan } from "@/lib/planLimits";
+import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
+import { currencyByCountry } from "@/lib/currency";
 import Link from "next/link";
 
 type CompanyData = {
@@ -17,7 +19,6 @@ type CompanyData = {
 };
 
 const CURRENCIES = ["USD","PKR","GBP","EUR","AED","SAR","INR","CAD","AUD","SGD","MYR"];
-const COUNTRIES  = ["Pakistan","United States","United Kingdom","United Arab Emirates","Saudi Arabia","India","Canada","Australia","Singapore","Malaysia","Bangladesh","Nigeria","Kenya"];
 
 export default function CompanyProfilePage() {
   const currentUser = getCurrentUser();
@@ -31,6 +32,7 @@ export default function CompanyProfilePage() {
   const [saveMsg, setSaveMsg] = useState<{text:string;ok:boolean}|null>(null);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name:"", country:"", baseCurrency:"" });
+  const countryOptions = sortCountries(ALL_COUNTRIES).map((country) => country.name);
 
   useEffect(() => {
     Promise.all([
@@ -79,6 +81,15 @@ export default function CompanyProfilePage() {
       setSaving(false);
       setTimeout(() => setSaveMsg(null), 3500);
     }
+  }
+
+  function updateCountry(countryName: string) {
+    const match = ALL_COUNTRIES.find((country) => country.name === countryName);
+    setForm((current) => ({
+      ...current,
+      country: countryName,
+      baseCurrency: match ? currencyByCountry(match.code) : current.baseCurrency,
+    }));
   }
 
   const card: React.CSSProperties = {
@@ -167,9 +178,9 @@ export default function CompanyProfilePage() {
               </div>
               <div>
                 <label style={labelStyle}>Country</label>
-                <select style={{...inputStyle,paddingRight:32}} value={form.country} onChange={e=>setForm(f=>({...f,country:e.target.value}))}>
+                <select style={{...inputStyle,paddingRight:32}} value={form.country} onChange={e=>updateCountry(e.target.value)}>
                   <option value="">Select country</option>
-                  {COUNTRIES.map(c=><option key={c} value={c}>{c}</option>)}
+                  {countryOptions.map(c=><option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>

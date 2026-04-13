@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
+import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
+import { currencyByCountry } from "@/lib/currency";
 import { Card, PageHeader, ResponsiveContainer } from "@/components/ui/ResponsiveContainer";
 import { Button, FormActions, FormField, Input, ResponsiveForm, Select } from "@/components/ui/ResponsiveForm";
 
@@ -43,7 +45,6 @@ const DEFAULT_PRINT: PrintPreferences = {
   thermalFontSize: "md",
 };
 
-const COUNTRIES = ["Pakistan", "United States", "United Kingdom", "United Arab Emirates", "Saudi Arabia", "Canada", "Australia", "Singapore"];
 const CURRENCIES = ["USD", "PKR", "GBP", "EUR", "AED", "SAR", "CAD", "AUD", "SGD"];
 
 export default function AdminControlPage() {
@@ -65,6 +66,7 @@ export default function AdminControlPage() {
   const [settings, setSettings] = useState<AdminControlSettings>({ branchAssignments: {}, printPreferences: DEFAULT_PRINT });
 
   const availablePermissions = useMemo(() => Object.values(PERMISSIONS), []);
+  const countryOptions = useMemo(() => sortCountries(ALL_COUNTRIES).map((country) => country.name), []);
 
   async function loadAll() {
     setLoading(true);
@@ -119,6 +121,16 @@ export default function AdminControlPage() {
   function flash(text: string, ok = true) {
     setMessage({ text, ok });
     window.setTimeout(() => setMessage(null), 3000);
+  }
+
+  function updateCompanyCountry(countryName: string) {
+    const match = ALL_COUNTRIES.find((country) => country.name === countryName);
+    const nextCurrency = match ? currencyByCountry(match.code) : companyForm.baseCurrency;
+    setCompanyForm((current) => ({
+      ...current,
+      country: countryName,
+      baseCurrency: match ? nextCurrency : current.baseCurrency,
+    }));
   }
 
   async function saveCompanyAndPrint() {
@@ -262,7 +274,7 @@ export default function AdminControlPage() {
 
               <div className="grid gap-4 md:grid-cols-3">
                 <FormField label="Company Name"><Input value={companyForm.companyName} onChange={(e) => setCompanyForm((s) => ({ ...s, companyName: e.target.value }))} /></FormField>
-                <FormField label="Country"><Select value={companyForm.country} onChange={(e) => setCompanyForm((s) => ({ ...s, country: e.target.value }))}><option value="">Select country</option>{COUNTRIES.map((country) => <option key={country} value={country}>{country}</option>)}</Select></FormField>
+                <FormField label="Country"><Select value={companyForm.country} onChange={(e) => updateCompanyCountry(e.target.value)}><option value="">Select country</option>{countryOptions.map((country) => <option key={country} value={country}>{country}</option>)}</Select></FormField>
                 <FormField label="Base Currency"><Select value={companyForm.baseCurrency} onChange={(e) => setCompanyForm((s) => ({ ...s, baseCurrency: e.target.value }))}>{CURRENCIES.map((currency) => <option key={currency} value={currency}>{currency}</option>)}</Select></FormField>
               </div>
 
@@ -309,6 +321,9 @@ export default function AdminControlPage() {
                   { href: "/dashboard/roles-permissions", label: "Detailed Roles Screen", desc: "Granular role and permission management." },
                   { href: "/dashboard/company-profile", label: "Company Profile", desc: "View subscription and company summary." },
                   { href: "/dashboard/business-settings", label: "Business Type", desc: "Switch industry-specific modules on or off." },
+                  { href: "/dashboard/security-access", label: "Security Access", desc: "Review login sessions, device access, and account safety." },
+                  { href: "/dashboard/billing", label: "Billing & Subscription", desc: "Manage plan, invoices, and payment settings." },
+                  { href: "/dashboard/reports/compliance", label: "Compliance Reports", desc: "Open tax, compliance, and statutory report views quickly." },
                 ].map((item) => (
                   <Link key={item.href} href={item.href} className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg-2)] px-4 py-3 no-underline transition hover:border-[var(--accent)]">
                     <div className="text-sm font-semibold text-[var(--text-primary)]">{item.label}</div>
