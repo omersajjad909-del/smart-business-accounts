@@ -132,12 +132,12 @@ export default function BulkPaymentsPage() {
     sub:    { fontSize: 13, color: "var(--text-muted)", marginTop: 3 },
     btn:    { padding: "10px 20px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "var(--text-primary)", fontSize: 13, fontWeight: 700, cursor: "pointer" },
     cards:  { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 24 },
-    card:   { borderRadius: 14, padding: 18, background: "var(--panel-bg)", border: "1px solid var(--panel-bg)" },
+    card:   { borderRadius: 14, padding: 18, background: "var(--panel-bg)", border: "1px solid var(--border)" },
     clabel: { fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: ".06em" },
     cval:   { fontSize: 22, fontWeight: 800, color: "var(--text-primary)", marginTop: 6 },
     table:  { width: "100%", borderCollapse: "collapse" as const },
-    th:     { padding: "10px 14px", textAlign: "left" as const, fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" as const, letterSpacing: ".06em", borderBottom: "1px solid var(--panel-bg)" },
-    td:     { padding: "12px 14px", fontSize: 13, color: "var(--text-primary)", borderBottom: "1px solid var(--panel-bg)" },
+    th:     { padding: "10px 14px", textAlign: "left" as const, fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" as const, letterSpacing: ".06em", borderBottom: "1px solid var(--border)" },
+    td:     { padding: "12px 14px", fontSize: 13, color: "var(--text-primary)", borderBottom: "1px solid var(--border)" },
     modal:  { position: "fixed" as const, inset: 0, background: "rgba(0,0,0,.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 },
     mbox:   { background: "var(--app-bg)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, width: 420, maxWidth: "90vw" },
     label:  { fontSize: 12, color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: 6 },
@@ -230,7 +230,7 @@ export default function BulkPaymentsPage() {
 
           {/* Table */}
           <div style={{ borderRadius: 14, border: "1px solid var(--panel-bg)", overflow: "hidden" }}>
-            <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--panel-bg)", display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
               <input type="checkbox" checked={selected.size === pendingPayments.length && pendingPayments.length > 0} onChange={toggleAll} style={{ width: 15, height: 15, cursor: "pointer" }} />
               <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>Payment Rows — {activeBatch.rows.length} total</span>
             </div>
