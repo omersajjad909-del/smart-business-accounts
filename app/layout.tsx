@@ -211,7 +211,7 @@ export default function RootLayout({
         <VisitorTracker />
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >

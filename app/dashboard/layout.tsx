@@ -608,7 +608,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="dashboard-root dark" style={{display:"flex",minHeight:"100vh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
+    <div className="dashboard-root" style={{display:"flex",minHeight:"100vh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
 
       {/* MOBILE OVERLAY */}
       {isMobileMenuOpen && (
@@ -1756,7 +1756,7 @@ export default function DashboardLayout({
               className="hidden sm:flex"
             >
               <span>💰</span>
-              <span>Affiliate</span>
+              <span>Refer &amp; Earn</span>
             </Link>
 
             <WhatsNew />
