@@ -35,7 +35,38 @@ type TaxProfile = {
   gstNumber: string;
   registrationNote: string;
 };
-type AdminControlSettings = { branchAssignments: Record<string, string[]>; printPreferences: PrintPreferences; taxProfile: TaxProfile };
+type CompanyIdentityProfile = {
+  legalName: string;
+  legalAddress: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  website: string;
+};
+type InvoiceContactProfile = {
+  contactName: string;
+  email: string;
+  phone: string;
+  supportEmail: string;
+  supportPhone: string;
+};
+type BankDetailsProfile = {
+  bankName: string;
+  accountTitle: string;
+  accountNumber: string;
+  iban: string;
+  swiftCode: string;
+  branchName: string;
+  branchCode: string;
+};
+type AdminControlSettings = {
+  branchAssignments: Record<string, string[]>;
+  printPreferences: PrintPreferences;
+  taxProfile: TaxProfile;
+  companyIdentity: CompanyIdentityProfile;
+  invoiceContact: InvoiceContactProfile;
+  bankDetails: BankDetailsProfile;
+};
 type BackupRow = { id: string; fileName: string; status: string; createdAt: string };
 
 const DEFAULT_PRINT: PrintPreferences = {
@@ -59,6 +90,30 @@ const DEFAULT_TAX_PROFILE: TaxProfile = {
   gstNumber: "",
   registrationNote: "",
 };
+const DEFAULT_COMPANY_IDENTITY: CompanyIdentityProfile = {
+  legalName: "",
+  legalAddress: "",
+  city: "",
+  state: "",
+  postalCode: "",
+  website: "",
+};
+const DEFAULT_INVOICE_CONTACT: InvoiceContactProfile = {
+  contactName: "",
+  email: "",
+  phone: "",
+  supportEmail: "",
+  supportPhone: "",
+};
+const DEFAULT_BANK_DETAILS: BankDetailsProfile = {
+  bankName: "",
+  accountTitle: "",
+  accountNumber: "",
+  iban: "",
+  swiftCode: "",
+  branchName: "",
+  branchCode: "",
+};
 const CURRENCIES = [...SUPPORTED_CURRENCIES];
 
 export default function AdminControlPage() {
@@ -77,7 +132,14 @@ export default function AdminControlPage() {
   const [roles, setRoles] = useState<RoleRow[]>([]);
   const [selectedRole, setSelectedRole] = useState("ADMIN");
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
-  const [settings, setSettings] = useState<AdminControlSettings>({ branchAssignments: {}, printPreferences: DEFAULT_PRINT, taxProfile: DEFAULT_TAX_PROFILE });
+  const [settings, setSettings] = useState<AdminControlSettings>({
+    branchAssignments: {},
+    printPreferences: DEFAULT_PRINT,
+    taxProfile: DEFAULT_TAX_PROFILE,
+    companyIdentity: DEFAULT_COMPANY_IDENTITY,
+    invoiceContact: DEFAULT_INVOICE_CONTACT,
+    bankDetails: DEFAULT_BANK_DETAILS,
+  });
   const [opsLoading, setOpsLoading] = useState<null | "backup" | "download">(null);
 
   const availablePermissions = useMemo(() => Object.values(PERMISSIONS), []);
@@ -112,6 +174,9 @@ export default function AdminControlPage() {
         branchAssignments: settingsData?.branchAssignments || {},
         printPreferences: { ...DEFAULT_PRINT, ...(settingsData?.printPreferences || {}) },
         taxProfile: { ...DEFAULT_TAX_PROFILE, ...(settingsData?.taxProfile || {}) },
+        companyIdentity: { ...DEFAULT_COMPANY_IDENTITY, ...(settingsData?.companyIdentity || {}) },
+        invoiceContact: { ...DEFAULT_INVOICE_CONTACT, ...(settingsData?.invoiceContact || {}) },
+        bankDetails: { ...DEFAULT_BANK_DETAILS, ...(settingsData?.bankDetails || {}) },
       });
 
       const firstRole = Array.isArray(roleData) && roleData.length > 0 ? roleData[0] : null;
@@ -149,6 +214,32 @@ export default function AdminControlPage() {
     }));
   }
 
+  async function handleLogoUpload(file: File | null) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      flash("Please choose an image file for the logo.", false);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === "string" ? reader.result : "";
+      if (!result) {
+        flash("Unable to read logo file.", false);
+        return;
+      }
+      setSettings((current) => ({
+        ...current,
+        printPreferences: {
+          ...current.printPreferences,
+          logoUrl: result,
+        },
+      }));
+      flash("Logo uploaded. Save settings to keep it.");
+    };
+    reader.onerror = () => flash("Unable to upload logo file.", false);
+    reader.readAsDataURL(file);
+  }
+
   async function saveCompanyAndPrint() {
     setSaving(true);
     try {
@@ -161,7 +252,13 @@ export default function AdminControlPage() {
         fetch("/api/company/admin-control", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ printPreferences: settings.printPreferences, taxProfile: settings.taxProfile }),
+          body: JSON.stringify({
+            printPreferences: settings.printPreferences,
+            taxProfile: settings.taxProfile,
+            companyIdentity: settings.companyIdentity,
+            invoiceContact: settings.invoiceContact,
+            bankDetails: settings.bankDetails,
+          }),
         }),
       ]);
       if (!profileRes.ok || !settingsRes.ok) throw new Error("Failed to save admin settings");
@@ -347,6 +444,39 @@ export default function AdminControlPage() {
                 <FormField label="Receipt Template"><Select value={settings.printPreferences.receiptTemplate} onChange={(e) => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, receiptTemplate: e.target.value as PrintPreferences["receiptTemplate"] } }))}><option value="standard">Standard</option><option value="mart">Mart / POS</option><option value="restaurant">Restaurant</option></Select></FormField>
               </div>
 
+              <div className="mt-4 grid gap-4 md:grid-cols-[1.1fr_.9fr]">
+                <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-bg-2)] p-4">
+                  <div className="mb-3 text-sm font-semibold text-[var(--text-primary)]">Logo Upload</div>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel-bg)]">
+                      {settings.printPreferences.logoUrl ? (
+                        <img src={settings.printPreferences.logoUrl} alt="Company logo" className="h-full w-full object-contain" />
+                      ) : (
+                        <span className="text-xs text-[var(--text-muted)]">No logo</span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => void handleLogoUpload(e.target.files?.[0] || null)}
+                        className="block w-full text-sm text-[var(--text-muted)] file:mr-3 file:rounded-lg file:border-0 file:bg-[color:rgba(99,102,241,.18)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[var(--text-primary)]"
+                      />
+                      <div className="mt-2 text-xs text-[var(--text-muted)]">Upload PNG, JPG, or SVG-style image. You can still paste a direct URL above if you prefer.</div>
+                    </div>
+                    {settings.printPreferences.logoUrl && (
+                      <Button type="button" variant="secondary" onClick={() => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, logoUrl: "" } }))}>
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-bg-2)] p-4">
+                  <div className="mb-2 text-sm font-semibold text-[var(--text-primary)]">Print Identity Notes</div>
+                  <div className="text-xs text-[var(--text-muted)]">These admin fields are now ready for invoice, quotation, receipt, and print template use across the platform.</div>
+                </div>
+              </div>
+
               <div className="mt-5 grid gap-4 md:grid-cols-3">
                 <FormField label="Paper Size"><Select value={settings.printPreferences.paperSize} onChange={(e) => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, paperSize: e.target.value as PrintPreferences["paperSize"] } }))}><option value="A4">A4</option><option value="THERMAL_80MM">Thermal 80mm</option><option value="THERMAL_58MM">Thermal 58mm</option></Select></FormField>
                 <FormField label="Default Output"><Select value={settings.printPreferences.defaultOutput} onChange={(e) => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, defaultOutput: e.target.value as PrintPreferences["defaultOutput"] } }))}><option value="pdf">PDF</option><option value="browser-print">Browser Print</option></Select></FormField>
@@ -385,6 +515,53 @@ export default function AdminControlPage() {
                   <div className="md:col-span-2 xl:col-span-2">
                     <FormField label="Registration Note"><Input value={settings.taxProfile.registrationNote} onChange={(e) => setSettings((s) => ({ ...s, taxProfile: { ...s.taxProfile, registrationNote: e.target.value } }))} placeholder="Optional note for invoices, footer, or local filing instructions" /></FormField>
                   </div>
+                </div>
+              </div>
+
+              <div className="mt-6 border-t border-[var(--border)] pt-5">
+                <div className="mb-4">
+                  <h3 className="text-base font-semibold text-[var(--text-primary)]">Company Legal Address</h3>
+                  <p className="text-sm text-[var(--text-muted)]">Keep the official legal identity of the company ready for invoices, compliance docs, and print layouts.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <FormField label="Legal Name"><Input value={settings.companyIdentity.legalName} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, legalName: e.target.value } }))} placeholder="Registered company name" /></FormField>
+                  <FormField label="Website"><Input value={settings.companyIdentity.website} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, website: e.target.value } }))} placeholder="https://yourcompany.com" /></FormField>
+                  <FormField label="Postal Code"><Input value={settings.companyIdentity.postalCode} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, postalCode: e.target.value } }))} placeholder="Postal / ZIP code" /></FormField>
+                  <div className="md:col-span-2 xl:col-span-3">
+                    <FormField label="Legal Address"><Input value={settings.companyIdentity.legalAddress} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, legalAddress: e.target.value } }))} placeholder="Street, building, floor, full legal address" /></FormField>
+                  </div>
+                  <FormField label="City"><Input value={settings.companyIdentity.city} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, city: e.target.value } }))} placeholder="City" /></FormField>
+                  <FormField label="State / Region"><Input value={settings.companyIdentity.state} onChange={(e) => setSettings((s) => ({ ...s, companyIdentity: { ...s.companyIdentity, state: e.target.value } }))} placeholder="State / Region / Province" /></FormField>
+                </div>
+              </div>
+
+              <div className="mt-6 border-t border-[var(--border)] pt-5">
+                <div className="mb-4">
+                  <h3 className="text-base font-semibold text-[var(--text-primary)]">Invoice Contact Details</h3>
+                  <p className="text-sm text-[var(--text-muted)]">These details can be shown on customer-facing documents and support sections.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <FormField label="Contact Name"><Input value={settings.invoiceContact.contactName} onChange={(e) => setSettings((s) => ({ ...s, invoiceContact: { ...s.invoiceContact, contactName: e.target.value } }))} placeholder="Billing contact or accounts person" /></FormField>
+                  <FormField label="Invoice Email"><Input value={settings.invoiceContact.email} onChange={(e) => setSettings((s) => ({ ...s, invoiceContact: { ...s.invoiceContact, email: e.target.value } }))} placeholder="billing@company.com" /></FormField>
+                  <FormField label="Invoice Phone"><Input value={settings.invoiceContact.phone} onChange={(e) => setSettings((s) => ({ ...s, invoiceContact: { ...s.invoiceContact, phone: e.target.value } }))} placeholder="+1 555 010 200" /></FormField>
+                  <FormField label="Support Email"><Input value={settings.invoiceContact.supportEmail} onChange={(e) => setSettings((s) => ({ ...s, invoiceContact: { ...s.invoiceContact, supportEmail: e.target.value } }))} placeholder="support@company.com" /></FormField>
+                  <FormField label="Support Phone"><Input value={settings.invoiceContact.supportPhone} onChange={(e) => setSettings((s) => ({ ...s, invoiceContact: { ...s.invoiceContact, supportPhone: e.target.value } }))} placeholder="+1 555 010 300" /></FormField>
+                </div>
+              </div>
+
+              <div className="mt-6 border-t border-[var(--border)] pt-5">
+                <div className="mb-4">
+                  <h3 className="text-base font-semibold text-[var(--text-primary)]">Bank Details For Print Templates</h3>
+                  <p className="text-sm text-[var(--text-muted)]">Store default remittance and transfer details once for invoices, quotations, and formal print outputs.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <FormField label="Bank Name"><Input value={settings.bankDetails.bankName} onChange={(e) => setSettings((s) => ({ ...s, bankDetails: { ...s.bankDetails, bankName: e.target.value } }))} placeholder="Bank name" /></FormField>
+                  <FormField label="Account Title"><Input value={settings.bankDetails.accountTitle} onChange={(e) => setSettings((s) => ({ ...s, bankDetails: { ...s.bankDetails, accountTitle: e.target.value } }))} placeholder="Account title" /></FormField>
+                  <FormField label="Account Number"><Input value={settings.bankDetails.accountNumber} onChange={(e) => setSettings((s) => ({ ...s, bankDetails: { ...s.bankDetails, accountNumber: e.target.value } }))} placeholder="Account number" /></FormField>
+                  <FormField label="IBAN"><Input value={settings.bankDetails.iban} onChange={(e) => setSettings((s) => ({ ...s, bankDetails: { ...s.bankDetails, iban: e.target.value } }))} placeholder="IBAN" /></FormField>
+                  <FormField label="SWIFT Code"><Input value={settings.bankDetails.swiftCode} onChange={(e) => setSettings((s) => ({ ...s, bankDetails: { ...s.bankDetails, swiftCode: e.target.value } }))} placeholder="SWIFT / BIC" /></FormField>
+                  <FormField label="Branch Name"><Input value={settings.bankDetails.branchName} onChange={(e) => setSettings((s) => ({ ...s, bankDetails: { ...s.bankDetails, branchName: e.target.value } }))} placeholder="Branch name" /></FormField>
+                  <FormField label="Branch Code"><Input value={settings.bankDetails.branchCode} onChange={(e) => setSettings((s) => ({ ...s, bankDetails: { ...s.bankDetails, branchCode: e.target.value } }))} placeholder="Branch code" /></FormField>
                 </div>
               </div>
             </Card>
