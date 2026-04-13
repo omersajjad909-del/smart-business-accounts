@@ -34,7 +34,7 @@ export default function BulkPaymentsPage() {
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
   const [showAdd, setShowAdd] = useState(false);
-  const [showNewBatch, setShowNewBatch] = useState(false);
+  const [showNewBatch, setShowNewBatch] = useState(true);
   const [newBatchName, setNewBatchName] = useState("");
   const [addForm, setAddForm] = useState({ partyName: "", amount: "", reference: "", method: "bank", note: "" });
 
