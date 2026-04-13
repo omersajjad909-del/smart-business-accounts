@@ -103,7 +103,9 @@
       "Bash(grep -n \"rgba\\(255,255,255\\\\|#0[0-9a-f]\\\\{5\\\\}\\\\|background.*#\" d:/projects/smart-business-accounts/app/dashboard/trading/order-desk/page.tsx)",
       "Bash(sed -i 's/color: \"#fff\", minHeight/color: \"var\\(--text-primary\\)\", minHeight/g' d:/projects/smart-business-accounts/app/dashboard/trading/page.tsx)",
       "Bash(sed -i 's/color: \"#fff\", minHeight/color: \"var\\(--text-primary\\)\", minHeight/g' d:/projects/smart-business-accounts/app/dashboard/trade/page.tsx)",
-      "Bash(sed -i 's/color: \"#fff\", textDecoration/color: \"var\\(--text-primary\\)\", textDecoration/g' d:/projects/smart-business-accounts/app/dashboard/trading/page.tsx)"
+      "Bash(sed -i 's/color: \"#fff\", textDecoration/color: \"var\\(--text-primary\\)\", textDecoration/g' d:/projects/smart-business-accounts/app/dashboard/trading/page.tsx)",
+      "Bash(grep -rn \"LEMON\\\\|WISE\\\\|lemonsqueezy\\\\|wise\" d:/projects/smart-business-accounts/.env*)",
+      "Bash(ls d:/projects/smart-business-accounts/.env*)"
     ]
   }
 }
