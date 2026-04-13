@@ -87,7 +87,7 @@ export default function TradingConversionCenterPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Conversion Center</h1>
@@ -119,13 +119,13 @@ export default function TradingConversionCenterPage() {
           <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Commercial Pipeline Checks</div>
           <div style={{ padding: 16, display: "grid", gap: 10 }}>
             {quotations.slice(0, 6).map((entry) => (
-              <div key={entry.id} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.02)", border: `1px solid ${tradingBorder}` }}>
+              <div key={entry.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                   <span style={{ fontWeight: 700 }}>{entry.quotationNo}</span>
                   <span style={{ color: normalizeStatus(entry.status) === "ACCEPTED" ? "#34d399" : "#38bdf8", fontSize: 11, textTransform: "uppercase" }}>{entry.status || "Draft"}</span>
                 </div>
                 <div style={{ fontSize: 12, color: tradingMuted, marginTop: 4 }}>{entry.customer?.name || entry.customerName || "Walk-in customer"}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.3)", marginTop: 4 }}>{formatDate(entry.date)} · {formatMoney(entry.total)}</div>
+                <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{formatDate(entry.date)} · {formatMoney(entry.total)}</div>
               </div>
             ))}
           </div>
@@ -152,7 +152,7 @@ export default function TradingConversionCenterPage() {
               ))}
               {pendingPos.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No pending PO handoffs.</td>
+                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "var(--text-muted)" }}>No pending PO handoffs.</td>
                 </tr>
               )}
             </tbody>

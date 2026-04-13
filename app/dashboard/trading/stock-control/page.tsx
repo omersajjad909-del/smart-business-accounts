@@ -57,7 +57,7 @@ export default function TradingStockControlPage() {
   );
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Stock Control</h1>
@@ -111,7 +111,7 @@ export default function TradingStockControlPage() {
               ))}
               {stock.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No stock report data available.</td>
+                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "var(--text-muted)" }}>No stock report data available.</td>
                 </tr>
               )}
             </tbody>
@@ -131,7 +131,7 @@ export default function TradingStockControlPage() {
                   <div style={{ fontSize: 12, color: tradingMuted, marginTop: 4 }}>{row.unit || "Unit"} · {formatMoney(row.stockValue)}</div>
                 </div>
               ))}
-              {lowStock.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No stock shortage warnings right now.</div>}
+              {lowStock.length === 0 && <div style={{ color: "var(--text-muted)" }}>No stock shortage warnings right now.</div>}
             </div>
           </div>
 
@@ -139,16 +139,16 @@ export default function TradingStockControlPage() {
             <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Recent Outward Movement</div>
             <div style={{ padding: 16, display: "grid", gap: 10 }}>
               {outward.slice(0, 5).map((row) => (
-                <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.02)", border: `1px solid ${tradingBorder}` }}>
+                <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <span style={{ fontWeight: 700 }}>OUT-{row.outwardNo}</span>
                     <span style={{ color: "#a78bfa", fontWeight: 700 }}>{formatDate(row.date)}</span>
                   </div>
                   <div style={{ fontSize: 12, color: tradingMuted, marginTop: 4 }}>{row.customer?.name || "-"}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.3)", marginTop: 4 }}>{row.vehicleNo || row.driverName || "No dispatch details"}</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{row.vehicleNo || row.driverName || "No dispatch details"}</div>
                 </div>
               ))}
-              {outward.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No outward movement yet.</div>}
+              {outward.length === 0 && <div style={{ color: "var(--text-muted)" }}>No outward movement yet.</div>}
               {deadStock.length > 0 && <div style={{ fontSize: 12, color: "#f87171" }}>{deadStock.length} item(s) are already at zero or negative stock.</div>}
             </div>
           </div>

@@ -80,7 +80,7 @@ export default function TradingAnalyticsPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ marginBottom: 26 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Trading Analytics</h1>
         <p style={{ fontSize: 13, color: tradingMuted, margin: 0 }}>
@@ -108,7 +108,7 @@ export default function TradingAnalyticsPage() {
               { label: "Active Customers", value: activeCustomers, color: "#a78bfa" },
               { label: "Tracked Stock Items", value: stock.length, color: "#f97316" },
             ].map((metric) => (
-              <div key={metric.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.02)", border: `1px solid ${tradingBorder}` }}>
+              <div key={metric.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
                 <span style={{ color: tradingMuted, fontSize: 13 }}>{metric.label}</span>
                 <span style={{ color: metric.color, fontSize: 18, fontWeight: 800 }}>{metric.value}</span>
               </div>
@@ -136,7 +136,7 @@ export default function TradingAnalyticsPage() {
               ))}
               {stock.length === 0 && (
                 <tr>
-                  <td colSpan={3} style={{ padding: 28, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No stock analytics yet.</td>
+                  <td colSpan={3} style={{ padding: 28, textAlign: "center", color: "var(--text-muted)" }}>No stock analytics yet.</td>
                 </tr>
               )}
             </tbody>

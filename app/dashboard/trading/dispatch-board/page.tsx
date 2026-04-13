@@ -51,7 +51,7 @@ export default function TradingDispatchBoardPage() {
   );
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Dispatch Board</h1>
@@ -106,7 +106,7 @@ export default function TradingDispatchBoardPage() {
               ))}
               {challans.length === 0 && (
                 <tr>
-                  <td colSpan={5} style={{ padding: 28, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No delivery challans yet.</td>
+                  <td colSpan={5} style={{ padding: 28, textAlign: "center", color: "var(--text-muted)" }}>No delivery challans yet.</td>
                 </tr>
               )}
             </tbody>
@@ -134,7 +134,7 @@ export default function TradingDispatchBoardPage() {
               ))}
               {outward.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No outward register entries yet.</td>
+                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "var(--text-muted)" }}>No outward register entries yet.</td>
                 </tr>
               )}
             </tbody>

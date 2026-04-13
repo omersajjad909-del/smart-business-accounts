@@ -62,7 +62,7 @@ export default function TradingOrderDeskPage() {
   const recentQuotations = quotations.slice(0, 6);
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 26 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Order Desk</h1>
@@ -117,7 +117,7 @@ export default function TradingOrderDeskPage() {
               ))}
               {recentSales.length === 0 && (
                 <tr>
-                  <td colSpan={5} style={{ padding: 28, textAlign: "center", color: "rgba(255,255,255,.28)" }}>No sales orders yet.</td>
+                  <td colSpan={5} style={{ padding: 28, textAlign: "center", color: "var(--text-muted)" }}>No sales orders yet.</td>
                 </tr>
               )}
             </tbody>
@@ -129,16 +129,16 @@ export default function TradingOrderDeskPage() {
             <div style={{ padding: "16px 18px", borderBottom: `1px solid ${tradingBorder}`, fontSize: 15, fontWeight: 800 }}>Quotation Pipeline</div>
             <div style={{ padding: 16, display: "grid", gap: 10 }}>
               {recentQuotations.map((row) => (
-                <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.02)", border: `1px solid ${tradingBorder}` }}>
+                <div key={row.id} style={{ padding: "12px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
                     <span style={{ fontWeight: 700 }}>{row.quotationNo}</span>
                     <span style={{ color: "#38bdf8", fontSize: 11, textTransform: "uppercase" }}>{row.status || "Draft"}</span>
                   </div>
                   <div style={{ fontSize: 12, color: tradingMuted }}>{row.customer?.name || row.customerName || "Walk-in customer"}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.3)", marginTop: 6 }}>{formatDate(row.date)}</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 6 }}>{formatDate(row.date)}</div>
                 </div>
               ))}
-              {recentQuotations.length === 0 && <div style={{ color: "rgba(255,255,255,.28)" }}>No quotation pipeline yet.</div>}
+              {recentQuotations.length === 0 && <div style={{ color: "var(--text-muted)" }}>No quotation pipeline yet.</div>}
             </div>
           </div>
 

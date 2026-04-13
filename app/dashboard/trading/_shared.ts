@@ -1,7 +1,7 @@
 export const tradingFont = "'Outfit','Inter',sans-serif";
-export const tradingBg = "rgba(255,255,255,0.03)";
-export const tradingBorder = "rgba(255,255,255,0.07)";
-export const tradingMuted = "rgba(255,255,255,.45)";
+export const tradingBg = "var(--panel-bg)";
+export const tradingBorder = "var(--border)";
+export const tradingMuted = "var(--text-muted)";
 
 export type DashboardSummary = {
   sales?: number;

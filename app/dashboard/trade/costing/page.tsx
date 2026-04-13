@@ -21,7 +21,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 10,
   border: `1px solid ${tradeBorder}`,
   background: "rgba(255,255,255,.04)",
-  color: "#fff",
+  color: "var(--text-primary)",
   fontSize: 13,
   fontFamily: tradeFont,
   boxSizing: "border-box",
@@ -183,13 +183,13 @@ export default function ImportCostingPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "#fff", fontFamily: tradeFont }}>
+    <div style={{ minHeight: "100vh", padding: "28px 32px", color: "var(--text-primary)", fontFamily: tradeFont }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: "0 0 6px", fontSize: 26, fontWeight: 800 }}>Import Costing</h1>
           <p style={{ margin: 0, fontSize: 13, color: tradeMuted }}>Landed cost booking per shipment with freight, customs, insurance, and clearing charges.</p>
         </div>
-        <button onClick={openNew} style={{ border: "none", borderRadius: 10, background: "#2563eb", color: "#fff", padding: "10px 16px", fontFamily: tradeFont, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+        <button onClick={openNew} style={{ border: "none", borderRadius: 10, background: "#2563eb", color: "var(--text-primary)", padding: "10px 16px", fontFamily: tradeFont, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
           New Costing
         </button>
       </div>
@@ -249,7 +249,7 @@ export default function ImportCostingPage() {
                       </td>
                       <td style={{ padding: "12px 14px", borderBottom: `1px solid ${tradeBorder}` }}>
                         <div style={{ display: "flex", gap: 8 }}>
-                          <button onClick={() => openEdit(row.id)} style={{ background: "transparent", border: `1px solid ${tradeBorder}`, color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer" }}>Edit</button>
+                          <button onClick={() => openEdit(row.id)} style={{ background: "transparent", border: `1px solid ${tradeBorder}`, color: "var(--text-primary)", borderRadius: 8, padding: "6px 10px", cursor: "pointer" }}>Edit</button>
                           <button onClick={() => handleDelete(row.id, row.shipmentRef)} style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer" }}>Delete</button>
                         </div>
                       </td>
@@ -288,7 +288,7 @@ export default function ImportCostingPage() {
               <div><label style={labelStyle}>Status</label><select value={form.status} onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value as CostingStatus }))} style={inputStyle}><option value="draft">Draft</option><option value="reviewed">Reviewed</option><option value="posted">Posted</option></select></div>
             </div>
 
-            <div style={{ marginTop: 18, padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${tradeBorder}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div style={{ marginTop: 18, padding: "14px 16px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradeBorder}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
                 <div style={{ fontSize: 11, color: tradeMuted, textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Total Landed Cost</div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: "#34d399" }}>{form.currency} {landedCost.toLocaleString()}</div>
@@ -302,8 +302,8 @@ export default function ImportCostingPage() {
             {error ? <div style={{ marginTop: 14, color: "#f87171", fontSize: 13 }}>{error}</div> : null}
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 22 }}>
-              <button onClick={() => setShowModal(false)} style={{ background: "rgba(255,255,255,.08)", border: "none", color: "#fff", borderRadius: 10, padding: "10px 14px", cursor: "pointer" }}>Cancel</button>
-              <button onClick={save} disabled={saving} style={{ background: "#2563eb", border: "none", color: "#fff", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 700 }}>
+              <button onClick={() => setShowModal(false)} style={{ background: "rgba(255,255,255,.08)", border: "none", color: "var(--text-primary)", borderRadius: 10, padding: "10px 14px", cursor: "pointer" }}>Cancel</button>
+              <button onClick={save} disabled={saving} style={{ background: "#2563eb", border: "none", color: "var(--text-primary)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", fontWeight: 700 }}>
                 {saving ? "Saving..." : editingId ? "Update Costing" : "Create Costing"}
               </button>
             </div>

@@ -103,7 +103,7 @@ export default function TradingOverviewPage() {
   ];
 
   return (
-    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "#fff", minHeight: "100vh" }}>
+    <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start", marginBottom: 26 }}>
         <div>
           <div style={{ fontSize: 12, letterSpacing: ".12em", color: "rgba(56,189,248,.8)", textTransform: "uppercase", fontWeight: 700, marginBottom: 8 }}>
@@ -161,7 +161,7 @@ export default function TradingOverviewPage() {
               <Link
                 key={link.href}
                 href={link.href}
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 14px", borderRadius: 12, background: "rgba(255,255,255,.04)", border: `1px solid ${tradingBorder}`, color: "#fff", textDecoration: "none", fontSize: 13, fontWeight: 700 }}
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}`, color: "var(--text-primary)", textDecoration: "none", fontSize: 13, fontWeight: 700 }}
               >
                 <span>{link.label}</span>
                 <span style={{ color: link.color }}>Open</span>

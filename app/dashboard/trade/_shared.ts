@@ -3,9 +3,9 @@
 import type { BusinessRecord } from "@/lib/useBusinessRecords";
 
 export const tradeFont = "'Outfit','Inter',sans-serif";
-export const tradeBg = "rgba(255,255,255,.03)";
-export const tradeBorder = "rgba(255,255,255,.07)";
-export const tradeMuted = "rgba(255,255,255,.45)";
+export const tradeBg = "var(--panel-bg)";
+export const tradeBorder = "var(--border)";
+export const tradeMuted = "var(--text-muted)";
 
 export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
   try {

@@ -11,7 +11,7 @@ const MODAL_BG = "#12161f";
 
 const inp: React.CSSProperties = {
   width: "100%", background: "rgba(255,255,255,0.04)", border: `1px solid ${BD}`,
-  borderRadius: 8, padding: "9px 12px", color: "#fff", fontFamily: FF, fontSize: 13,
+  borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: FF, fontSize: 13,
   boxSizing: "border-box",
 };
 const sel: React.CSSProperties = { ...inp, background: "#161b27" };
@@ -264,7 +264,7 @@ export default function LCPage() {
           </p>
         </div>
         <button onClick={openNew}
-          style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 9, padding: "10px 22px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: FF, letterSpacing: "0.01em" }}>
+          style={{ background: "#6366f1", color: "var(--text-primary)", border: "none", borderRadius: 9, padding: "10px 22px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: FF, letterSpacing: "0.01em" }}>
           + New LC / TT
         </button>
       </div>
@@ -623,7 +623,7 @@ export default function LCPage() {
             {/* Actions */}
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button onClick={save} disabled={saving}
-                style={{ flex: 1, padding: "11px 0", background: saving ? "#4b5563" : "#6366f1", border: "none", borderRadius: 9, color: "#fff", fontFamily: FF, fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
+                style={{ flex: 1, padding: "11px 0", background: saving ? "#4b5563" : "#6366f1", border: "none", borderRadius: 9, color: "var(--text-primary)", fontFamily: FF, fontSize: 14, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer" }}>
                 {saving ? "Saving…" : form.id ? "Save Changes" : `Create ${form.type}`}
               </button>
               <button onClick={() => setShowModal(false)}

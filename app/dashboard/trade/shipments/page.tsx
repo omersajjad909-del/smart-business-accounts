@@ -673,7 +673,7 @@ export default function ShipmentsPage() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={10} style={{ textAlign: "center", padding: 52, color: "rgba(255,255,255,.2)", fontSize: 14 }}>
+                  <td colSpan={10} style={{ textAlign: "center", padding: 52, color: "var(--text-muted)", fontSize: 14 }}>
                     No shipments found.
                   </td>
                 </tr>
