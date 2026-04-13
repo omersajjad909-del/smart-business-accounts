@@ -35,7 +35,7 @@ export default function ExpenseVouchersPage() {
 
   const [vouchers,    setVouchers]    = useState<ExpenseVoucher[]>([]);
   const [accounts,    setAccounts]    = useState<Acct[]>([]);
-  const [showForm,    setShowForm]    = useState(false);
+  const [showForm,    setShowForm]    = useState(true);
   const [saving,      setSaving]      = useState(false);
   const [editingId,   setEditingId]   = useState("");
   const [statusFilter, setStatusFilter] = useState("");
