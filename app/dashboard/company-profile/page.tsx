@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { getMaxUsersForPlan } from "@/lib/planLimits";
 import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
-import { currencyByCountry } from "@/lib/currency";
+import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency";
 import Link from "next/link";
 
 type CompanyData = {
@@ -18,7 +18,7 @@ type CompanyData = {
   stripeCustomerId: string | null;
 };
 
-const CURRENCIES = ["USD","PKR","GBP","EUR","AED","SAR","INR","CAD","AUD","SGD","MYR"];
+const CURRENCIES = [...SUPPORTED_CURRENCIES];
 
 export default function CompanyProfilePage() {
   const currentUser = getCurrentUser();
@@ -186,7 +186,7 @@ export default function CompanyProfilePage() {
               <div>
                 <label style={labelStyle}>Base Currency</label>
                 <select style={{...inputStyle,paddingRight:32}} value={form.baseCurrency} onChange={e=>setForm(f=>({...f,baseCurrency:e.target.value}))}>
-                  {CURRENCIES.map(c=><option key={c} value={c}>{c}</option>)}
+                  {CURRENCIES.map(c=><option key={c} value={c}>{c} - {CURRENCY_LABEL[c] || c}</option>)}
                 </select>
               </div>
             </div>

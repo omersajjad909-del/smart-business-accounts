@@ -1,3 +1,5 @@
+import { COUNTRIES } from "@/lib/countries";
+
 export const COUNTRY_TO_CURRENCY: Record<string, string> = {
   US: "USD",
   GB: "GBP",
@@ -11,6 +13,29 @@ export const COUNTRY_TO_CURRENCY: Record<string, string> = {
   IN: "INR",
   CN: "CNY",
   JP: "JPY",
+  CA: "CAD",
+  AU: "AUD",
+  SG: "SGD",
+  MY: "MYR",
+  NZ: "NZD",
+  CH: "CHF",
+  ZA: "ZAR",
+  NG: "NGN",
+  EG: "EGP",
+  BD: "BDT",
+  LK: "LKR",
+  NP: "NPR",
+  KE: "KES",
+  TR: "TRY",
+  RU: "RUB",
+  UA: "UAH",
+  BR: "BRL",
+  MX: "MXN",
+  AR: "ARS",
+  TH: "THB",
+  ID: "IDR",
+  PH: "PHP",
+  VN: "VND",
 };
 
 export const CURRENCY_SYMBOL: Record<string, string> = {
@@ -26,6 +51,29 @@ export const CURRENCY_SYMBOL: Record<string, string> = {
   INR: "INR ",
   CNY: "CNY ",
   JPY: "JPY ",
+  CAD: "CAD ",
+  AUD: "AUD ",
+  SGD: "SGD ",
+  MYR: "MYR ",
+  NZD: "NZD ",
+  CHF: "CHF ",
+  ZAR: "ZAR ",
+  NGN: "NGN ",
+  EGP: "EGP ",
+  BDT: "BDT ",
+  LKR: "LKR ",
+  NPR: "NPR ",
+  KES: "KES ",
+  TRY: "TRY ",
+  RUB: "RUB ",
+  UAH: "UAH ",
+  BRL: "BRL ",
+  MXN: "MXN ",
+  ARS: "ARS ",
+  THB: "THB ",
+  IDR: "IDR ",
+  PHP: "PHP ",
+  VND: "VND ",
 };
 
 export const SUPPORTED_CURRENCIES = [
@@ -41,6 +89,29 @@ export const SUPPORTED_CURRENCIES = [
   "INR",
   "CNY",
   "JPY",
+  "CAD",
+  "AUD",
+  "SGD",
+  "MYR",
+  "NZD",
+  "CHF",
+  "ZAR",
+  "NGN",
+  "EGP",
+  "BDT",
+  "LKR",
+  "NPR",
+  "KES",
+  "TRY",
+  "RUB",
+  "UAH",
+  "BRL",
+  "MXN",
+  "ARS",
+  "THB",
+  "IDR",
+  "PHP",
+  "VND",
 ] as const;
 
 export const CURRENCY_LABEL: Record<string, string> = {
@@ -56,6 +127,29 @@ export const CURRENCY_LABEL: Record<string, string> = {
   INR: "Indian Rupee",
   CNY: "Chinese Yuan",
   JPY: "Japanese Yen",
+  CAD: "Canadian Dollar",
+  AUD: "Australian Dollar",
+  SGD: "Singapore Dollar",
+  MYR: "Malaysian Ringgit",
+  NZD: "New Zealand Dollar",
+  CHF: "Swiss Franc",
+  ZAR: "South African Rand",
+  NGN: "Nigerian Naira",
+  EGP: "Egyptian Pound",
+  BDT: "Bangladeshi Taka",
+  LKR: "Sri Lankan Rupee",
+  NPR: "Nepalese Rupee",
+  KES: "Kenyan Shilling",
+  TRY: "Turkish Lira",
+  RUB: "Russian Ruble",
+  UAH: "Ukrainian Hryvnia",
+  BRL: "Brazilian Real",
+  MXN: "Mexican Peso",
+  ARS: "Argentine Peso",
+  THB: "Thai Baht",
+  IDR: "Indonesian Rupiah",
+  PHP: "Philippine Peso",
+  VND: "Vietnamese Dong",
 };
 
 // Approx FX rates to 1 USD (static snapshot; update via admin if needed)
@@ -72,6 +166,29 @@ export const FX_USD: Record<string, number> = {
   INR: 83,
   CNY: 7.1,
   JPY: 150,
+  CAD: 1.35,
+  AUD: 1.52,
+  SGD: 1.34,
+  MYR: 4.7,
+  NZD: 1.66,
+  CHF: 0.91,
+  ZAR: 18.4,
+  NGN: 1500,
+  EGP: 49,
+  BDT: 117,
+  LKR: 300,
+  NPR: 133,
+  KES: 130,
+  TRY: 32,
+  RUB: 92,
+  UAH: 40,
+  BRL: 5.1,
+  MXN: 17,
+  ARS: 880,
+  THB: 36,
+  IDR: 16000,
+  PHP: 56,
+  VND: 25500,
 };
 
 export function pickCurrencyByAcceptLanguage(al: string | null | undefined): string {
@@ -119,6 +236,9 @@ export function formatFromUSD(amountUsd: number, currency: string, rates?: Recor
 }
 
 export function currencyByCountry(countryCode: string | null | undefined): string {
-  const cc = String(countryCode || "").toUpperCase();
+  const raw = String(countryCode || "").trim();
+  if (!raw) return "USD";
+  const byName = COUNTRIES.find((country) => country.name.toLowerCase() === raw.toLowerCase());
+  const cc = (byName?.code || raw).toUpperCase();
   return COUNTRY_TO_CURRENCY[cc] || "USD";
 }

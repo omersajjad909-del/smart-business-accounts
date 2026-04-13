@@ -6,7 +6,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
 import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
-import { currencyByCountry } from "@/lib/currency";
+import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency";
 import { Card, PageHeader, ResponsiveContainer } from "@/components/ui/ResponsiveContainer";
 import { Button, FormActions, FormField, Input, ResponsiveForm, Select } from "@/components/ui/ResponsiveForm";
 
@@ -28,7 +28,15 @@ type PrintPreferences = {
   footerNote: string;
   thermalFontSize: "sm" | "md" | "lg";
 };
-type AdminControlSettings = { branchAssignments: Record<string, string[]>; printPreferences: PrintPreferences };
+type TaxProfile = {
+  taxIdLabel: string;
+  taxIdValue: string;
+  vatNumber: string;
+  gstNumber: string;
+  registrationNote: string;
+};
+type AdminControlSettings = { branchAssignments: Record<string, string[]>; printPreferences: PrintPreferences; taxProfile: TaxProfile };
+type BackupRow = { id: string; fileName: string; status: string; createdAt: string };
 
 const DEFAULT_PRINT: PrintPreferences = {
   paperSize: "A4",
@@ -44,8 +52,14 @@ const DEFAULT_PRINT: PrintPreferences = {
   footerNote: "Thank you for your business.",
   thermalFontSize: "md",
 };
-
-const CURRENCIES = ["USD", "PKR", "GBP", "EUR", "AED", "SAR", "CAD", "AUD", "SGD"];
+const DEFAULT_TAX_PROFILE: TaxProfile = {
+  taxIdLabel: "NTN / Tax ID",
+  taxIdValue: "",
+  vatNumber: "",
+  gstNumber: "",
+  registrationNote: "",
+};
+const CURRENCIES = [...SUPPORTED_CURRENCIES];
 
 export default function AdminControlPage() {
   const me = getCurrentUser();
@@ -63,7 +77,8 @@ export default function AdminControlPage() {
   const [roles, setRoles] = useState<RoleRow[]>([]);
   const [selectedRole, setSelectedRole] = useState("ADMIN");
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
-  const [settings, setSettings] = useState<AdminControlSettings>({ branchAssignments: {}, printPreferences: DEFAULT_PRINT });
+  const [settings, setSettings] = useState<AdminControlSettings>({ branchAssignments: {}, printPreferences: DEFAULT_PRINT, taxProfile: DEFAULT_TAX_PROFILE });
+  const [opsLoading, setOpsLoading] = useState<null | "backup" | "download">(null);
 
   const availablePermissions = useMemo(() => Object.values(PERMISSIONS), []);
   const countryOptions = useMemo(() => sortCountries(ALL_COUNTRIES).map((country) => country.name), []);
@@ -96,6 +111,7 @@ export default function AdminControlPage() {
       setSettings({
         branchAssignments: settingsData?.branchAssignments || {},
         printPreferences: { ...DEFAULT_PRINT, ...(settingsData?.printPreferences || {}) },
+        taxProfile: { ...DEFAULT_TAX_PROFILE, ...(settingsData?.taxProfile || {}) },
       });
 
       const firstRole = Array.isArray(roleData) && roleData.length > 0 ? roleData[0] : null;
@@ -145,7 +161,7 @@ export default function AdminControlPage() {
         fetch("/api/company/admin-control", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ printPreferences: settings.printPreferences }),
+          body: JSON.stringify({ printPreferences: settings.printPreferences, taxProfile: settings.taxProfile }),
         }),
       ]);
       if (!profileRes.ok || !settingsRes.ok) throw new Error("Failed to save admin settings");
@@ -155,6 +171,53 @@ export default function AdminControlPage() {
       flash(error instanceof Error ? error.message : "Unable to save settings", false);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function createInstantBackup() {
+    setOpsLoading("backup");
+    try {
+      const res = await fetch("/api/backup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-role": "ADMIN", ...(me?.id ? { "x-user-id": me.id } : {}) },
+        body: JSON.stringify({ backupType: "FULL" }),
+      });
+      if (!res.ok) throw new Error("Unable to create backup");
+      flash("Instant backup created successfully.");
+    } catch (error: unknown) {
+      flash(error instanceof Error ? error.message : "Unable to create backup", false);
+    } finally {
+      setOpsLoading(null);
+    }
+  }
+
+  async function downloadLatestBackup() {
+    setOpsLoading("download");
+    try {
+      const listRes = await fetch("/api/backup", {
+        headers: { "x-user-role": "ADMIN" },
+      });
+      if (!listRes.ok) throw new Error("Unable to load backups");
+      const backups = (await listRes.json()) as BackupRow[];
+      const latestCompleted = backups.find((row) => String(row.status).toUpperCase() === "COMPLETED");
+      if (!latestCompleted) throw new Error("No completed backup available yet");
+      const downloadRes = await fetch(`/api/backup/download?id=${latestCompleted.id}`, {
+        headers: { "x-user-role": "ADMIN" },
+      });
+      if (!downloadRes.ok) throw new Error("Unable to download latest backup");
+      const blob = await downloadRes.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = latestCompleted.fileName || "backup.json";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (error: unknown) {
+      flash(error instanceof Error ? error.message : "Unable to download backup", false);
+    } finally {
+      setOpsLoading(null);
     }
   }
 
@@ -275,7 +338,7 @@ export default function AdminControlPage() {
               <div className="grid gap-4 md:grid-cols-3">
                 <FormField label="Company Name"><Input value={companyForm.companyName} onChange={(e) => setCompanyForm((s) => ({ ...s, companyName: e.target.value }))} /></FormField>
                 <FormField label="Country"><Select value={companyForm.country} onChange={(e) => updateCompanyCountry(e.target.value)}><option value="">Select country</option>{countryOptions.map((country) => <option key={country} value={country}>{country}</option>)}</Select></FormField>
-                <FormField label="Base Currency"><Select value={companyForm.baseCurrency} onChange={(e) => setCompanyForm((s) => ({ ...s, baseCurrency: e.target.value }))}>{CURRENCIES.map((currency) => <option key={currency} value={currency}>{currency}</option>)}</Select></FormField>
+                <FormField label="Base Currency"><Select value={companyForm.baseCurrency} onChange={(e) => setCompanyForm((s) => ({ ...s, baseCurrency: e.target.value }))}>{CURRENCIES.map((currency) => <option key={currency} value={currency}>{currency} - {CURRENCY_LABEL[currency] || currency}</option>)}</Select></FormField>
               </div>
 
               <div className="mt-5 grid gap-4 md:grid-cols-3">
@@ -308,12 +371,37 @@ export default function AdminControlPage() {
                 <FormField label="Header Note"><Input value={settings.printPreferences.headerNote} onChange={(e) => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, headerNote: e.target.value } }))} placeholder="Short note shown at the top of invoices" /></FormField>
                 <FormField label="Footer Note"><Input value={settings.printPreferences.footerNote} onChange={(e) => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, footerNote: e.target.value } }))} placeholder="Thanks note / bank details" /></FormField>
               </div>
+
+              <div className="mt-6 border-t border-[var(--border)] pt-5">
+                <div className="mb-4">
+                  <h3 className="text-base font-semibold text-[var(--text-primary)]">Tax & Registration Profile</h3>
+                  <p className="text-sm text-[var(--text-muted)]">Store the main company tax details once, then reuse them across compliance, print formats, and statutory workflows.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <FormField label="Primary Tax Label"><Input value={settings.taxProfile.taxIdLabel} onChange={(e) => setSettings((s) => ({ ...s, taxProfile: { ...s.taxProfile, taxIdLabel: e.target.value } }))} placeholder="NTN / Tax ID / TRN" /></FormField>
+                  <FormField label="Primary Tax Number"><Input value={settings.taxProfile.taxIdValue} onChange={(e) => setSettings((s) => ({ ...s, taxProfile: { ...s.taxProfile, taxIdValue: e.target.value } }))} placeholder="Enter your main tax number" /></FormField>
+                  <FormField label="VAT Number"><Input value={settings.taxProfile.vatNumber} onChange={(e) => setSettings((s) => ({ ...s, taxProfile: { ...s.taxProfile, vatNumber: e.target.value } }))} placeholder="VAT / TRN" /></FormField>
+                  <FormField label="GST / Sales Tax No"><Input value={settings.taxProfile.gstNumber} onChange={(e) => setSettings((s) => ({ ...s, taxProfile: { ...s.taxProfile, gstNumber: e.target.value } }))} placeholder="GST / STRN" /></FormField>
+                  <div className="md:col-span-2 xl:col-span-2">
+                    <FormField label="Registration Note"><Input value={settings.taxProfile.registrationNote} onChange={(e) => setSettings((s) => ({ ...s, taxProfile: { ...s.taxProfile, registrationNote: e.target.value } }))} placeholder="Optional note for invoices, footer, or local filing instructions" /></FormField>
+                  </div>
+                </div>
+              </div>
             </Card>
 
             <Card>
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-[var(--text-primary)]">Quick Access</h2>
                 <p className="text-sm text-[var(--text-muted)]">Quick links to deep settings and existing modules.</p>
+              </div>
+              <div className="mb-4 rounded-lg border border-[var(--border)] bg-[var(--panel-bg-2)] p-4">
+                <div className="mb-3 text-sm font-semibold text-[var(--text-primary)]">Audit, Backup & Export</div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <Button type="button" onClick={createInstantBackup} disabled={opsLoading !== null}>{opsLoading === "backup" ? "Creating Backup..." : "Create Instant Backup"}</Button>
+                  <Button type="button" variant="secondary" onClick={downloadLatestBackup} disabled={opsLoading !== null}>{opsLoading === "download" ? "Preparing Download..." : "Download Latest Backup"}</Button>
+                  <Link href="/dashboard/audit-trail" className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] no-underline transition hover:border-[var(--accent)]">Open Audit Trail</Link>
+                  <Link href="/dashboard/backup-restore" className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] no-underline transition hover:border-[var(--accent)]">Open Backup & Restore</Link>
+                </div>
               </div>
               <div className="space-y-3">
                 {[
