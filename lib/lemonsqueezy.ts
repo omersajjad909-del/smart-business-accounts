@@ -86,7 +86,11 @@ export async function createLemonCheckout(input: LemonCheckoutInput) {
           ...(input.email ? { email: input.email } : {}),
           ...(input.name ? { name: input.name } : {}),
           ...(input.displayCountry ? { billing_address: { country: input.displayCountry } } : {}),
-          ...(input.couponCode ? { discount_code: input.couponCode } : {}),
+          // Use provided coupon OR auto-apply launch discount if set
+          ...((() => {
+            const code = input.couponCode || env("LEMONSQUEEZY_LAUNCH_DISCOUNT");
+            return code ? { discount_code: code } : {};
+          })()),
           custom: {
             company_id: input.companyId,
             user_id: input.userId || "",
