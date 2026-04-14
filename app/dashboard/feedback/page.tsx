@@ -13,23 +13,23 @@ const TYPES: {
 }[] = [
   {
     id: "complaint", label: "Complaint", icon: "⚠️", color: "#f87171",
-    desc: "Koi masla ya pareshani",
-    placeholder: "Kiya masla aaya? Kis page pe, kiya hua, kab se ho raha hai — tafseel mein batayein...",
+    desc: "Issue or problem",
+    placeholder: "What happened? Which page, what went wrong, since when — describe in detail...",
   },
   {
     id: "suggestion", label: "Suggestion", icon: "💡", color: "#fbbf24",
-    desc: "Naya idea ya improvement",
-    placeholder: "Aapka idea kiya hai? Kiya feature add ho ya kaise behtar ho sakta hai...",
+    desc: "New idea or improvement",
+    placeholder: "What is your idea? What feature should be added or improved...",
   },
   {
     id: "bug", label: "Bug Report", icon: "🐛", color: "#a78bfa",
-    desc: "Technical error ya kharabi",
-    placeholder: "Kaunsa page, kiya hua, kiya expect tha, browser/device bhi batayein...",
+    desc: "Technical error or glitch",
+    placeholder: "Which page, what happened, what was expected, also mention browser/device...",
   },
   {
     id: "general", label: "General", icon: "💬", color: "#60a5fa",
-    desc: "Koi aur baat",
-    placeholder: "Jo bhi kehna ho batayein...",
+    desc: "Anything else",
+    placeholder: "Share anything you'd like us to know...",
   },
 ];
 
@@ -100,8 +100,8 @@ export default function FeedbackPage() {
   }, [done]);
 
   async function submit() {
-    if (!subject.trim()) { setError("Subject likhein."); return; }
-    if (message.trim().length < 20) { setError("Message kam az kam 20 huroof ka hona chahiye."); return; }
+    if (!subject.trim()) { setError("Please enter a subject."); return; }
+    if (message.trim().length < 20) { setError("Message must be at least 20 characters."); return; }
     setSub(true); setError("");
     try {
       const res = await fetch("/api/public/feedback", {
@@ -148,7 +148,7 @@ export default function FeedbackPage() {
           Feedback & Complaints
         </h1>
         <p style={{ fontSize: "13px", color: "var(--text-muted)", marginTop: "4px" }}>
-          Koi masla, idea, ya bug — hamen batayein, hum suntay hain
+          Report an issue, share an idea, or flag a bug — we're listening
         </p>
       </div>
 
@@ -161,10 +161,10 @@ export default function FeedbackPage() {
         }}>
           <div style={{ fontSize: "48px", marginBottom: "12px" }}>✅</div>
           <div style={{ fontSize: "18px", fontWeight: 700, color: "#34d399", marginBottom: "6px" }}>
-            Mila! Shukriya
+            Received! Thank you
           </div>
           <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "16px" }}>
-            Aapka {activeType.label} hamare paas pahuncha. Hum jald review karenge.
+            Your {activeType.label} has been submitted. We'll review it shortly.
           </div>
           <div style={{
             display: "inline-block", padding: "4px 12px", borderRadius: "6px",
@@ -182,7 +182,7 @@ export default function FeedbackPage() {
               fontWeight: 600, cursor: "pointer",
             }}
           >
-            Aur likhen
+            Submit Another
           </button>
         </div>
       )}
@@ -191,7 +191,7 @@ export default function FeedbackPage() {
         <div style={card}>
           {/* Type selector */}
           <div style={{ marginBottom: "22px" }}>
-            <label style={labelStyle}>Type select karein</label>
+            <label style={labelStyle}>Select Type</label>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
               {TYPES.map(t => (
                 <button
@@ -226,7 +226,7 @@ export default function FeedbackPage() {
               style={inputStyle}
               value={subject}
               onChange={e => setSubject(e.target.value)}
-              placeholder={`${activeType.label} ka mukhtasar unwaan`}
+              placeholder={`Brief title for your ${activeType.label.toLowerCase()}`}
             />
           </div>
 
@@ -283,7 +283,7 @@ export default function FeedbackPage() {
               fontSize: "11px", marginTop: "5px", textAlign: "right",
               color: message.length < 20 ? "#f87171" : "var(--text-muted)",
             }}>
-              {message.length} huroof (kam az kam 20)
+              {message.length} characters (minimum 20)
             </div>
           </div>
 
@@ -297,7 +297,7 @@ export default function FeedbackPage() {
                 fontSize: "10px", fontWeight: 700, color: "var(--text-muted)",
                 textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "10px",
               }}>
-                Submission Info — ye details support team ko jayen gi
+                Submission Info — these details will be sent to our support team
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 {/* User */}
@@ -389,7 +389,7 @@ export default function FeedbackPage() {
               transition: "all .2s",
             }}
           >
-            {submitting ? "Bheja ja raha hai…" : `${activeType.icon} Submit Karen`}
+            {submitting ? "Submitting…" : `${activeType.icon} Submit`}
           </button>
         </div>
       )}
@@ -397,7 +397,7 @@ export default function FeedbackPage() {
       {/* Submission History */}
       <div style={{ ...card, marginTop: "20px" }}>
         <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "16px" }}>
-          Meri Purani Submissions
+          My Previous Submissions
         </div>
 
         {loadingHistory ? (

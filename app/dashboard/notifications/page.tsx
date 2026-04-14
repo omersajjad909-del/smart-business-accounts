@@ -317,8 +317,8 @@ export default function NotificationsPage() {
             testDest={testDest} setTestDest={setTestDest}
             testing={testing} testResult={testResult}
             onTest={testChannel}
-            destLabel="WhatsApp number (with country code, e.g. 923001234567)"
-            destPlaceholder="923001234567"
+            destLabel="WhatsApp number (with country code, e.g. 14155552671)"
+            destPlaceholder="14155552671"
           />
         </div>
       )}
@@ -493,10 +493,12 @@ export default function NotificationsPage() {
           <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)", marginBottom: "10px" }}>Popular SMS Providers</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "10px" }}>
             {[
-              { name: "Twilio",      desc: "Global, widely used",   url: "twilio.com" },
-              { name: "Telenor API", desc: "Pakistan local",        url: "telenor.com.pk" },
-              { name: "Jazz API",    desc: "Pakistan local",        url: "jazz.com.pk" },
-              { name: "Vonage",      desc: "EU & US focused",       url: "vonage.com" },
+              { name: "Twilio",        desc: "Global — most widely used" },
+              { name: "Vonage",        desc: "Global — EU & US focused" },
+              { name: "AWS SNS",       desc: "Global — Amazon cloud SMS" },
+              { name: "MessageBird",   desc: "Global — 180+ countries" },
+              { name: "Plivo",         desc: "Global — cost-effective" },
+              { name: "Sinch",         desc: "Global — enterprise grade" },
             ].map(p => (
               <div key={p.name} style={{
                 padding: "12px 14px", borderRadius: "10px",
@@ -515,8 +517,8 @@ export default function NotificationsPage() {
               testDest={testDest} setTestDest={setTestDest}
               testing={testing} testResult={testResult}
               onTest={testChannel}
-              destLabel="Phone number (with country code)"
-              destPlaceholder="923001234567"
+              destLabel="Phone number (with country code, e.g. 14155552671)"
+              destPlaceholder="14155552671"
             />
           </div>
         </div>
