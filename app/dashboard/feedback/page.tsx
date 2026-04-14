@@ -410,7 +410,7 @@ export default function FeedbackPage() {
             border: "1px dashed var(--border)", borderRadius: "10px",
             color: "var(--text-muted)", fontSize: "13px",
           }}>
-            Abhi tak koi submission nahi.
+            No any Submission.
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
