@@ -1737,7 +1737,6 @@ export default function DashboardLayout({
                 {/* Menu items */}
                 {[
                   { icon:"🏢", label:"Company Profile",    href:"/dashboard/company-profile" },
-                  { icon:"⚙️", label:"Business Settings",  href:"/dashboard/business-settings" },
                   { icon:"👥", label:"Team Members",        href:"/dashboard/team" },
                   { icon:"🔔", label:"Notifications",       href:"/dashboard/notifications" },
                   { icon:"🎁", label:"Refer & Earn",        href:"/dashboard/referrals" },
@@ -1971,11 +1970,8 @@ export default function DashboardLayout({
 
             {/* Actions */}
             <div style={{ display:"flex",gap:10,marginTop:4 }}>
-              <a href="/dashboard/company-profile" onClick={()=>setShowCompanyModal(false)} style={{ flex:1,padding:"11px",borderRadius:10,border:"1px solid rgba(255,255,255,.1)",background:"transparent",color:"rgba(255,255,255,.5)",fontSize:13,fontWeight:700,fontFamily:"inherit",cursor:"pointer",textDecoration:"none",textAlign:"center",display:"block" }}>
-                ✏️ Edit Profile
-              </a>
-              <a href="/dashboard/business-settings" onClick={()=>setShowCompanyModal(false)} style={{ flex:1,padding:"11px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:13,fontWeight:700,fontFamily:"inherit",cursor:"pointer",textDecoration:"none",textAlign:"center",display:"block",boxShadow:"0 4px 16px rgba(99,102,241,.3)" }}>
-                🏷️ Business Settings
+              <a href="/dashboard/company-profile" onClick={()=>setShowCompanyModal(false)} style={{ flex:1,padding:"11px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:13,fontWeight:700,fontFamily:"inherit",cursor:"pointer",textDecoration:"none",textAlign:"center",display:"block",boxShadow:"0 4px 16px rgba(99,102,241,.3)" }}>
+                🏢 Company Profile
               </a>
             </div>
           </div>
