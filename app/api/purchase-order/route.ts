@@ -101,8 +101,9 @@ export async function GET(req: NextRequest) {
     where: { companyId, ...(branchId ? { branchId } : {}) },
     include: {
       supplier: true,
+      branch: { select: { id: true, name: true } },
       items: {
-        include: { item: true },
+        include: { item: { select: { id: true, name: true } } },
       },
     },
     orderBy: { createdAt: "desc" },

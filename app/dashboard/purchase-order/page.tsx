@@ -16,7 +16,8 @@ const BG = "var(--app-bg)";
 type PO = {
   id: string; poNo: string; date: string; supplierId: string;
   supplier?: { name: string }; remarks?: string; approvalStatus?: string; status?: string;
-  items: Array<{ item: { name: string }; qty: number; rate: number }>;
+  branch?: { id: string; name: string } | null;
+  items: Array<{ item: { id: string; name: string }; qty: number; rate: number }>;
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -258,14 +259,14 @@ export default function PurchaseOrderPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
-                  {["PO Number", "Date", "Supplier", "Approval", "GRN Status", "Items", "Actions"].map(h => (
+                  {["PO Number", "Date", "Supplier", "Branch", "Approval", "GRN Status", "Items", "Actions"].map(h => (
                     <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7, whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {pos.length === 0 ? (
-                  <tr><td colSpan={7} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No purchase orders yet</td></tr>
+                  <tr><td colSpan={8} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No purchase orders yet</td></tr>
                 ) : pos.map((po) => {
                   const scApproval = STATUS_COLORS[po.approvalStatus || "PENDING"] || STATUS_COLORS.PENDING;
                   const scGrn = STATUS_COLORS[po.status || "PENDING"] || STATUS_COLORS.PENDING;
@@ -277,6 +278,11 @@ export default function PurchaseOrderPage() {
                       <td style={{ padding: "13px 16px", color: MUTED, fontSize: 12 }}>{fmtDate(po.date)}</td>
                       <td style={{ padding: "13px 16px", fontWeight: 600 }}>{po.supplier?.name || "—"}</td>
                       <td style={{ padding: "13px 16px" }}>
+                        {po.branch?.name
+                          ? <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "rgba(99,102,241,0.1)", color: ACCENT, border: `1px solid rgba(99,102,241,0.25)` }}>🏢 {po.branch.name}</span>
+                          : <span style={{ fontSize: 12, color: MUTED }}>—</span>}
+                      </td>
+                      <td style={{ padding: "13px 16px" }}>
                         <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: scApproval.bg, color: scApproval.text, border: `1px solid ${scApproval.border}` }}>
                           {po.approvalStatus || "PENDING"}
                         </span>
@@ -286,7 +292,17 @@ export default function PurchaseOrderPage() {
                           {po.status || "PENDING"}
                         </span>
                       </td>
-                      <td style={{ padding: "13px 16px", color: MUTED }}>{po.items?.length || 0} items</td>
+                      <td style={{ padding: "13px 16px", maxWidth: 200 }}>
+                        {po.items?.length > 0 ? (
+                          <div>
+                            <div style={{ fontSize: 12, fontWeight: 600, color: TEXT, lineHeight: 1.5 }}>
+                              {po.items.slice(0, 2).map(it => it.item?.name).filter(Boolean).join(", ")}
+                              {po.items.length > 2 && <span style={{ color: MUTED }}> +{po.items.length - 2} more</span>}
+                            </div>
+                            <div style={{ fontSize: 10, color: MUTED, marginTop: 1 }}>{po.items.length} item{po.items.length > 1 ? "s" : ""}</div>
+                          </div>
+                        ) : <span style={{ color: MUTED, fontSize: 12 }}>—</span>}
+                      </td>
                       <td style={{ padding: "13px 16px" }}>
                         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                           {(!po.approvalStatus || po.approvalStatus === "PENDING") && (

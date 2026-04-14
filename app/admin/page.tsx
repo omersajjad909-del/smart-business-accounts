@@ -2537,6 +2537,8 @@ function PagePermissions() {
   const [search, setSearch]             = useState("");
   const [saving, setSaving]             = useState(false);
   const [savedMsg, setSavedMsg]         = useState("");
+  const [syncing, setSyncing]           = useState(false);
+  const [syncMsg, setSyncMsg]           = useState("");
 
   // Load saved config
   useEffect(() => {
@@ -2604,6 +2606,25 @@ function PagePermissions() {
     setSaving(false);
   };
 
+  const syncPlan = async (plan?: string) => {
+    setSyncing(true); setSyncMsg("");
+    try {
+      const res = await fetch("/api/admin/sync-plan-permissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-role": "ADMIN" },
+        body: JSON.stringify(plan ? { plans: [plan] } : {}),
+      });
+      const d = await res.json();
+      if (d.success) {
+        setSyncMsg(`✅ ${d.message}`);
+      } else {
+        setSyncMsg(`❌ ${d.error || "Sync failed"}`);
+      }
+    } catch { setSyncMsg("❌ Network error"); }
+    setSyncing(false);
+    setTimeout(() => setSyncMsg(""), 4000);
+  };
+
   const cur = planPerms[selectedPlan]||[];
   const curDashboard = dashboardFeatureFlags[selectedPlan] || [];
   const meta = PLAN_UI[selectedPlan];
@@ -2632,11 +2653,22 @@ function PagePermissions() {
         <div>
           <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:4 }}>Select a plan → toggle modules → save</div>
         </div>
-        <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+        <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>
           {savedMsg && <span style={{ fontSize:12, fontWeight:700, color:savedMsg==="Error!"?"#f87171":"#34d399", padding:"6px 14px", borderRadius:8, background:savedMsg==="Error!"?"rgba(248,113,113,.12)":"rgba(52,211,153,.12)" }}>{savedMsg==="Error!"?"":"✓"} {savedMsg}</span>}
+          {syncMsg && <span style={{ fontSize:12, fontWeight:700, color:syncMsg.startsWith("✅")?"#34d399":"#f87171", padding:"6px 14px", borderRadius:8, background:syncMsg.startsWith("✅")?"rgba(52,211,153,.12)":"rgba(248,113,113,.12)" }}>{syncMsg}</span>}
           <button onClick={save} disabled={saving}
             style={{ padding:"10px 24px",borderRadius:10,background:saving?"rgba(99,102,241,.4)":"linear-gradient(135deg,#6366f1,#4f46e5)",border:"none",color:"white",fontSize:13,fontWeight:700,cursor:saving?"default":"pointer",fontFamily:"inherit",boxShadow:"0 4px 14px rgba(99,102,241,.35)" }}>
             {saving?"Saving…":"💾 Save Changes"}
+          </button>
+          <button onClick={() => syncPlan(selectedPlan)} disabled={syncing}
+            title={`Apply current ${selectedPlan} permissions to ALL existing users on this plan`}
+            style={{ padding:"10px 20px",borderRadius:10,background:syncing?"rgba(52,211,153,.2)":"rgba(52,211,153,.12)",border:"1px solid rgba(52,211,153,.3)",color:"#34d399",fontSize:13,fontWeight:700,cursor:syncing?"default":"pointer",fontFamily:"inherit" }}>
+            {syncing?"Syncing…":"🔄 Sync "+selectedPlan+" Users"}
+          </button>
+          <button onClick={() => syncPlan()} disabled={syncing}
+            title="Apply ALL plan permission changes to ALL existing users"
+            style={{ padding:"10px 20px",borderRadius:10,background:"rgba(251,191,36,.08)",border:"1px solid rgba(251,191,36,.25)",color:"#fbbf24",fontSize:12,fontWeight:700,cursor:syncing?"default":"pointer",fontFamily:"inherit" }}>
+            {syncing?"…":"⚡ Sync All Plans"}
           </button>
         </div>
       </div>
