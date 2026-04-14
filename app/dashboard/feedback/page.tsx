@@ -3,6 +3,8 @@ import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
+type CompanyInfo = { name: string; plan: string; country: string | null; businessType: string | null };
+
 type FeedbackType = "complaint" | "suggestion" | "bug" | "general";
 
 const TYPES: {
@@ -70,6 +72,7 @@ export default function FeedbackPage() {
   const [error,    setError]    = useState("");
   const [history,  setHistory]  = useState<HistoryItem[]>([]);
   const [loadingHistory, setLoadingH] = useState(true);
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
 
   const activeType = TYPES.find(t => t.id === fbType)!;
 
@@ -82,11 +85,17 @@ export default function FeedbackPage() {
   }
 
   useEffect(() => {
-    fetch("/api/public/feedback", { headers: getHeaders() })
+    const h = getHeaders();
+    fetch("/api/public/feedback", { headers: h })
       .then(r => r.ok ? r.json() : { items: [] })
       .then(d => setHistory(d.items || []))
       .catch(() => {})
       .finally(() => setLoadingH(false));
+
+    fetch("/api/me/company", { headers: h })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setCompanyInfo({ name: d.name, plan: d.plan, country: d.country, businessType: d.businessType }); })
+      .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
 
@@ -278,32 +287,82 @@ export default function FeedbackPage() {
             </div>
           </div>
 
-          {/* User info strip */}
+          {/* User + Company info strip */}
           {user && (
             <div style={{
-              display: "flex", alignItems: "center", gap: "10px",
-              padding: "10px 14px", borderRadius: "8px", marginBottom: "16px",
+              padding: "14px 16px", borderRadius: "10px", marginBottom: "16px",
               background: "var(--app-bg)", border: "1px solid var(--border)",
             }}>
               <div style={{
-                width: "30px", height: "30px", borderRadius: "50%",
-                background: "#6366f1", display: "flex", alignItems: "center",
-                justifyContent: "center", fontSize: "12px", fontWeight: 700, color: "#fff", flexShrink: 0,
+                fontSize: "10px", fontWeight: 700, color: "var(--text-muted)",
+                textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "10px",
               }}>
-                {(user.name || user.email || "U")[0].toUpperCase()}
+                Submission Info — ye details support team ko jayen gi
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)" }}>
-                  {user.name || "User"}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                {/* User */}
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{
+                    width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0,
+                    background: "#6366f1", display: "flex", alignItems: "center",
+                    justifyContent: "center", fontSize: "13px", fontWeight: 700, color: "#fff",
+                  }}>
+                    {(user.name || user.email || "U")[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)" }}>
+                      {user.name || "User"}
+                    </div>
+                    <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{user.email}</div>
+                  </div>
                 </div>
-                <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>{user.email}</div>
+                {/* Company */}
+                {companyInfo && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div style={{
+                      width: "32px", height: "32px", borderRadius: "8px", flexShrink: 0,
+                      background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                      display: "flex", alignItems: "center",
+                      justifyContent: "center", fontSize: "13px", fontWeight: 700, color: "#fff",
+                    }}>
+                      {companyInfo.name[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)" }}>
+                        {companyInfo.name}
+                      </div>
+                      <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                        {companyInfo.country || "—"} · {companyInfo.businessType || "Business"}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div style={{
-                fontSize: "10px", padding: "2px 8px", borderRadius: "10px",
-                background: "rgba(99,102,241,0.1)", color: "#818cf8",
-                border: "1px solid rgba(99,102,241,0.2)", fontWeight: 600,
-              }}>
-                {user.role}
+              {/* Badges row */}
+              <div style={{ display: "flex", gap: "6px", marginTop: "10px", flexWrap: "wrap" }}>
+                <span style={{
+                  fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "10px",
+                  background: "rgba(99,102,241,0.1)", color: "#818cf8",
+                  border: "1px solid rgba(99,102,241,0.2)",
+                }}>
+                  Role: {user.role}
+                </span>
+                {companyInfo && (
+                  <span style={{
+                    fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "10px",
+                    background: companyInfo.plan === "ENTERPRISE" ? "rgba(52,211,153,0.1)"
+                      : companyInfo.plan === "PROFESSIONAL" ? "rgba(167,139,250,0.1)"
+                      : "rgba(129,140,248,0.1)",
+                    color: companyInfo.plan === "ENTERPRISE" ? "#34d399"
+                      : companyInfo.plan === "PROFESSIONAL" ? "#a78bfa"
+                      : "#818cf8",
+                    border: `1px solid ${companyInfo.plan === "ENTERPRISE" ? "rgba(52,211,153,0.25)"
+                      : companyInfo.plan === "PROFESSIONAL" ? "rgba(167,139,250,0.25)"
+                      : "rgba(129,140,248,0.25)"}`,
+                  }}>
+                    Plan: {companyInfo.plan}
+                  </span>
+                )}
               </div>
             </div>
           )}
