@@ -2549,6 +2549,7 @@ function PagePermissions() {
   const [savedMsg, setSavedMsg] = useState("");
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState("");
+  const [bizSearch, setBizSearch] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/plan-config")
@@ -2605,20 +2606,30 @@ function PagePermissions() {
     });
   };
 
-  const enableAllForPlan = (plan: string, features: typeof DASHBOARD_FEATURE_DEFS) => {
-    setDashboardFeatureFlags(prev => {
+  const togglePerm = (plan: string, permKey: string) => {
+    setPlanPerms(prev => {
       const s = new Set(prev[plan]||[]);
-      features.forEach(f=>s.add(f.id));
+      s.has(permKey) ? s.delete(permKey) : s.add(permKey);
       return {...prev,[plan]:Array.from(s)};
     });
   };
 
-  const disableAllForPlan = (plan: string, features: typeof DASHBOARD_FEATURE_DEFS) => {
+  const enableAllForPlan = (plan: string, bizFeatures: typeof DASHBOARD_FEATURE_DEFS) => {
     setDashboardFeatureFlags(prev => {
       const s = new Set(prev[plan]||[]);
-      features.forEach(f=>s.delete(f.id));
+      bizFeatures.forEach(f=>s.add(f.id));
       return {...prev,[plan]:Array.from(s)};
     });
+    setPlanPerms(prev => ({...prev,[plan]:PLAN_FEATURES.map(f=>f.key)}));
+  };
+
+  const disableAllForPlan = (plan: string, bizFeatures: typeof DASHBOARD_FEATURE_DEFS) => {
+    setDashboardFeatureFlags(prev => {
+      const s = new Set(prev[plan]||[]);
+      bizFeatures.forEach(f=>s.delete(f.id));
+      return {...prev,[plan]:Array.from(s)};
+    });
+    setPlanPerms(prev => ({...prev,[plan]:[]}));
   };
 
   // Shared header action buttons
@@ -2641,9 +2652,31 @@ function PagePermissions() {
 
   /* ── STEP 2: Business detail — 3 plan columns ── */
   if (selectedBusiness) {
-    const features = bizGroups[selectedBusiness] || [];
-    const bizLabel = features[0]?.businessLabel || selectedBusiness;
+    const bizFeatures = bizGroups[selectedBusiness] || [];
+    const bizLabel = bizFeatures[0]?.businessLabel || selectedBusiness;
     const bizIcon  = BIZ_ICONS[selectedBusiness] || "🏢";
+    const totalPerPlan = bizFeatures.length + PLAN_FEATURES.length;
+
+    // Helper: render a single toggleable row (shared for both sections)
+    type PlanMeta = { icon:string; name:string; color:string; glow:string; border:string };
+    const ModuleRow = ({ label, sub, on, onToggle, meta }: { label:string; sub:string; on:boolean; onToggle:()=>void; meta: PlanMeta }) => (
+      <div onClick={onToggle}
+        style={{ display:"flex", alignItems:"center", gap:10, padding:"9px 14px", cursor:"pointer",
+          background:on?"rgba(255,255,255,.04)":"transparent", transition:"background .15s" }}
+        onMouseEnter={e=>(e.currentTarget.style.background=on?"rgba(255,255,255,.06)":"rgba(255,255,255,.03)")}
+        onMouseLeave={e=>(e.currentTarget.style.background=on?"rgba(255,255,255,.04)":"transparent")}>
+        <div style={{ width:16, height:16, borderRadius:4, flexShrink:0, border:`2px solid ${on?meta.color:"rgba(255,255,255,.2)"}`, background:on?meta.color:"transparent", display:"flex", alignItems:"center", justifyContent:"center", transition:"all .15s" }}>
+          {on && <svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5 9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        </div>
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontSize:12, fontWeight:600, color:on?"white":"rgba(255,255,255,.38)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{label}</div>
+          <div style={{ fontSize:10, color:"rgba(255,255,255,.2)", marginTop:1 }}>{sub}</div>
+        </div>
+        <div style={{ fontSize:10, fontWeight:700, padding:"2px 6px", borderRadius:5, background:on?meta.glow:"rgba(255,255,255,.05)", color:on?meta.color:"rgba(255,255,255,.25)", flexShrink:0 }}>
+          {on?"ON":"OFF"}
+        </div>
+      </div>
+    );
 
     return (
       <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
@@ -2652,12 +2685,12 @@ function PagePermissions() {
         {/* Header */}
         <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:22, flexWrap:"wrap" }}>
           <button onClick={()=>setSelectedBusiness(null)}
-            style={{ padding:"8px 16px", borderRadius:10, border:"1.5px solid rgba(255,255,255,.15)", background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:6 }}>
+            style={{ padding:"8px 16px", borderRadius:10, border:"1.5px solid rgba(255,255,255,.15)", background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
             ← All Businesses
           </button>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:18, fontWeight:800, color:"white" }}>{bizIcon} {bizLabel}</div>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>{features.length} modules — configure which plan gets access to each page</div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>{bizFeatures.length} business pages + {PLAN_FEATURES.length} general pages — configure per plan</div>
           </div>
           <ActionBar showSync={false} />
         </div>
@@ -2666,63 +2699,67 @@ function PagePermissions() {
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14, animation:"pf-in .25s ease" }}>
           {PLAN_KEYS.map(plan => {
             const meta = PLAN_UI[plan];
-            const flags = dashboardFeatureFlags[plan] || [];
-            const enabled = features.filter(f=>flags.includes(f.id)).length;
-            const allOn   = enabled === features.length;
+            const flags   = dashboardFeatureFlags[plan] || [];
+            const perms   = planPerms[plan] || [];
+            const bizEnabled  = bizFeatures.filter(f=>flags.includes(f.id)).length;
+            const permEnabled = PLAN_FEATURES.filter(f=>perms.includes(f.key)).length;
+            const totalEnabled = bizEnabled + permEnabled;
+            const pct = totalPerPlan ? Math.round((totalEnabled/totalPerPlan)*100) : 0;
 
             return (
               <div key={plan} style={{ borderRadius:16, border:`2px solid ${meta.border}`, overflow:"hidden", display:"flex", flexDirection:"column" }}>
 
                 {/* Plan header */}
                 <div style={{ padding:"14px 16px", background:meta.glow, borderBottom:`1px solid ${meta.border}` }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-                    <div style={{ width:40, height:40, borderRadius:10, background:"rgba(0,0,0,.25)", border:`1.5px solid ${meta.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{meta.icon}</div>
+                  <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8 }}>
+                    <div style={{ width:38, height:38, borderRadius:10, background:"rgba(0,0,0,.25)", border:`1.5px solid ${meta.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>{meta.icon}</div>
                     <div>
-                      <div style={{ fontSize:15, fontWeight:800, color:meta.color }}>{meta.name}</div>
-                      <div style={{ fontSize:11, color:"rgba(255,255,255,.45)", marginTop:1 }}>{enabled} / {features.length} enabled</div>
+                      <div style={{ fontSize:14, fontWeight:800, color:meta.color }}>{meta.name}</div>
+                      <div style={{ fontSize:10, color:"rgba(255,255,255,.4)", marginTop:1 }}>{totalEnabled} / {totalPerPlan} enabled ({pct}%)</div>
                     </div>
                   </div>
-                  {/* Progress bar */}
-                  <div style={{ height:4, background:"rgba(255,255,255,.1)", borderRadius:99, overflow:"hidden", marginBottom:10 }}>
-                    <div style={{ width:`${features.length ? Math.round((enabled/features.length)*100) : 0}%`, height:"100%", background:meta.color, borderRadius:99, transition:"width .3s" }}/>
+                  <div style={{ height:4, background:"rgba(255,255,255,.1)", borderRadius:99, overflow:"hidden", marginBottom:8 }}>
+                    <div style={{ width:`${pct}%`, height:"100%", background:meta.color, borderRadius:99, transition:"width .3s" }}/>
                   </div>
-                  {/* Quick actions */}
                   <div style={{ display:"flex", gap:6 }}>
-                    <button onClick={()=>enableAllForPlan(plan, features)}
+                    <button onClick={()=>enableAllForPlan(plan, bizFeatures)}
                       style={{ flex:1, fontSize:10, fontWeight:700, padding:"5px 0", borderRadius:7, border:`1px solid ${meta.border}`, background:"rgba(0,0,0,.2)", color:meta.color, cursor:"pointer", fontFamily:"inherit" }}>
                       ✓ Enable All
                     </button>
-                    <button onClick={()=>disableAllForPlan(plan, features)}
+                    <button onClick={()=>disableAllForPlan(plan, bizFeatures)}
                       style={{ flex:1, fontSize:10, fontWeight:700, padding:"5px 0", borderRadius:7, border:"1px solid rgba(255,255,255,.12)", background:"rgba(0,0,0,.2)", color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>
                       ✗ Disable All
                     </button>
                   </div>
                 </div>
 
-                {/* Module rows */}
-                <div style={{ flex:1, background:"rgba(255,255,255,.02)" }}>
-                  {features.map((feature, idx) => {
-                    const on = flags.includes(feature.id);
+                {/* Business-specific pages */}
+                {bizFeatures.length > 0 && (
+                  <div style={{ background:"rgba(255,255,255,.02)", borderBottom:"1px solid rgba(255,255,255,.07)" }}>
+                    <div style={{ padding:"7px 14px", background:"rgba(255,255,255,.04)", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                      <span style={{ fontSize:10, fontWeight:800, color:meta.color, textTransform:"uppercase", letterSpacing:".06em" }}>Business Pages</span>
+                      <span style={{ fontSize:10, color:"rgba(255,255,255,.35)" }}>{bizEnabled}/{bizFeatures.length}</span>
+                    </div>
+                    {bizFeatures.map(f => (
+                      <ModuleRow key={f.id} label={f.label} sub={f.section} on={flags.includes(f.id)} onToggle={()=>toggleFeature(plan,f.id)} meta={meta} />
+                    ))}
+                  </div>
+                )}
+
+                {/* General pages (PLAN_FEATURES grouped by category) */}
+                <div style={{ flex:1, background:"rgba(255,255,255,.01)" }}>
+                  {PF_CATEGORIES.map(cat => {
+                    const catFeats = PLAN_FEATURES.filter(f=>f.category===cat);
+                    const catEnabled = catFeats.filter(f=>perms.includes(f.key)).length;
                     return (
-                      <div key={feature.id}
-                        onClick={()=>toggleFeature(plan, feature.id)}
-                        style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px",
-                          borderBottom: idx < features.length-1 ? "1px solid rgba(255,255,255,.05)" : "none",
-                          cursor:"pointer", background:on?"rgba(255,255,255,.04)":"transparent",
-                          transition:"background .15s" }}
-                        onMouseEnter={e=>(e.currentTarget.style.background=on?"rgba(255,255,255,.06)":"rgba(255,255,255,.03)")}
-                        onMouseLeave={e=>(e.currentTarget.style.background=on?"rgba(255,255,255,.04)":"transparent")}>
-                        {/* Custom checkbox */}
-                        <div style={{ width:18, height:18, borderRadius:5, flexShrink:0, border:`2px solid ${on?meta.color:"rgba(255,255,255,.2)"}`, background:on?meta.color:"transparent", display:"flex", alignItems:"center", justifyContent:"center", transition:"all .15s" }}>
-                          {on && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5 9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      <div key={cat}>
+                        <div style={{ padding:"7px 14px", background:"rgba(255,255,255,.03)", borderBottom:"1px solid rgba(255,255,255,.05)", borderTop:"1px solid rgba(255,255,255,.05)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                          <span style={{ fontSize:10, fontWeight:800, color:"rgba(255,255,255,.5)", textTransform:"uppercase", letterSpacing:".06em" }}>{cat}</span>
+                          <span style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>{catEnabled}/{catFeats.length}</span>
                         </div>
-                        <div style={{ flex:1, minWidth:0 }}>
-                          <div style={{ fontSize:12, fontWeight:600, color:on?"white":"rgba(255,255,255,.4)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{feature.label}</div>
-                          <div style={{ fontSize:10, color:"rgba(255,255,255,.22)", marginTop:1 }}>{feature.section}</div>
-                        </div>
-                        <div style={{ fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:6, background:on?meta.glow:"rgba(255,255,255,.06)", color:on?meta.color:"rgba(255,255,255,.3)", flexShrink:0 }}>
-                          {on?"ON":"OFF"}
-                        </div>
+                        {catFeats.map(f => (
+                          <ModuleRow key={`${f.key}-${f.label}`} label={f.label} sub={f.route} on={perms.includes(f.key)} onToggle={()=>togglePerm(plan,f.key)} meta={meta} />
+                        ))}
                       </div>
                     );
                   })}
@@ -2736,7 +2773,9 @@ function PagePermissions() {
   }
 
   /* ── STEP 1: Business grid ── */
-  const bizEntries = Object.entries(bizGroups);
+  const bizEntries = Object.entries(bizGroups).filter(([key, feats]) =>
+    !bizSearch || feats[0]?.businessLabel?.toLowerCase().includes(bizSearch.toLowerCase()) || key.toLowerCase().includes(bizSearch.toLowerCase())
+  );
   const planTotals = PLAN_KEYS.map(plan => ({
     plan,
     meta: PLAN_UI[plan],
@@ -2771,6 +2810,14 @@ function PagePermissions() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Search bar */}
+      <div style={{ position:"relative", marginBottom:16 }}>
+        <span style={{ position:"absolute", left:13, top:"50%", transform:"translateY(-50%)", fontSize:14, color:"rgba(255,255,255,.3)" }}>🔍</span>
+        <input value={bizSearch} onChange={e=>setBizSearch(e.target.value)} placeholder="Search businesses…"
+          style={{ width:"100%", padding:"10px 14px 10px 40px", borderRadius:12, border:"1.5px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.05)", color:"white", fontSize:13, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}/>
+        {bizSearch && <button onClick={()=>setBizSearch("")} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", color:"rgba(255,255,255,.4)", cursor:"pointer", fontSize:16, lineHeight:1 }}>✕</button>}
       </div>
 
       {/* Business type grid */}
