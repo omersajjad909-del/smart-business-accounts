@@ -1,651 +1,393 @@
 "use client";
-import { confirmToast, alertToast } from "@/lib/toast-feedback";
+import { confirmToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
 
-// Helper: always check permission as string, case-insensitive, and handle both string/object arrays
-function userHasPerm(
-  user: {
-    role?: string;
-    permissions?: (string | { permission?: string })[];
-    rolePermissions?: (string | { permission?: string })[];
-  } | null,
-  perm: string
-) {
+const ff = "'Outfit','Inter',sans-serif";
+
+function userHasPerm(user: any, perm: string) {
   if (!user) return false;
   const p = perm.toUpperCase();
   if (user.role === "ADMIN") return true;
-  if (user.permissions?.some((x) => (typeof x === "string" ? x.toUpperCase() : (x.permission||"").toUpperCase()) === p)) return true;
-  if (user.rolePermissions?.some((x) => (typeof x === "string" ? x.toUpperCase() : (x.permission||"").toUpperCase()) === p)) return true;
+  if (user.permissions?.some((x: any) => (typeof x === "string" ? x : x.permission || "").toUpperCase() === p)) return true;
+  if (user.rolePermissions?.some((x: any) => (typeof x === "string" ? x : x.permission || "").toUpperCase() === p)) return true;
   return false;
 }
 
-interface Role {
-  role: string;
-  permissions: string[];
-}
+interface Branch { id: string; code: string; name: string; }
+interface Role { role: string; permissions: string[]; }
 
-interface Branch {
-  id: string;
-  code: string;
-  name: string;
-}
+const ROLE_COLORS: Record<string, { bg: string; color: string; border: string }> = {
+  ADMIN:      { bg: "rgba(248,113,113,.12)",  color: "#f87171",  border: "rgba(248,113,113,.3)"  },
+  ACCOUNTANT: { bg: "rgba(99,102,241,.12)",   color: "#818cf8",  border: "rgba(99,102,241,.3)"   },
+  VIEWER:     { bg: "rgba(148,163,184,.12)",  color: "#94a3b8",  border: "rgba(148,163,184,.3)"  },
+  MANAGER:    { bg: "rgba(52,211,153,.12)",   color: "#34d399",  border: "rgba(52,211,153,.3)"   },
+};
 
-type AdminControlSettings = {
-  branchAssignments?: Record<string, string[]>;
+const inp: React.CSSProperties = {
+  background: "var(--app-bg)", border: "1.5px solid var(--border)", borderRadius: 9,
+  padding: "9px 13px", color: "var(--text-primary)", fontFamily: ff, fontSize: 13,
+  outline: "none", width: "100%", boxSizing: "border-box",
 };
 
 export default function UsersMasterPage() {
-  const [me, setMe] = useState<any>(null);
-  const [_authorized, setAuthorized] = useState(false);
+  const [me, setMe]       = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab]     = useState<"users" | "permissions">("users");
 
-  // TAB STATE
-  const [activeTab, setActiveTab] = useState("users"); // "users" یا "permissions"
-
-  // USERS STATE
-  const [users, setUsers] = useState<any[]>([]);
-  const [editing, setEditing] = useState(false);
-  const [userForm, setUserForm] = useState({
-    id: null,
-    name: "",
-    email: "",
-    password: "",
-    role: "ACCOUNTANT",
-    active: true,
-  });
+  // Users
+  const [users, setUsers]   = useState<any[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [branchAssignments, setBranchAssignments] = useState<Record<string, string[]>>({});
-  const [selectedBranchIds, setSelectedBranchIds] = useState<string[]>([]);
+  const [showModal, setShowModal]   = useState(false);
+  const [editing, setEditing]       = useState(false);
+  const [saving, setSaving]         = useState(false);
+  const [form, setForm] = useState({ id: "", name: "", email: "", password: "", role: "ACCOUNTANT", active: true });
+  const [selBranches, setSelBranches] = useState<string[]>([]);
 
-  // PERMISSIONS STATE
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [selectedRole, setSelectedRole] = useState<string>("ADMIN");
-  const [rolePermissions, setRolePermissions] = useState<string[]>([]);
+  // Permissions
+  const [roles, setRoles]   = useState<Role[]>([]);
+  const [selRole, setSelRole] = useState("ADMIN");
+  const [rolePerms, setRolePerms] = useState<string[]>([]);
   const [savingPerms, setSavingPerms] = useState(false);
+  const [permSearch, setPermSearch] = useState("");
 
-  const availablePermissions = Object.values(PERMISSIONS);
+  const allPerms = Object.values(PERMISSIONS);
+  const h = (u?: any) => { const usr = u || me; return { "x-user-role": "ADMIN", "x-user-id": usr?.id || "", "x-company-id": usr?.companyId || "" }; };
 
-  // ============ INITIAL LOAD ============
   useEffect(() => {
     const user = getCurrentUser();
     setMe(user);
-
-    if (!user) {
-      setAuthorized(false);
-      setLoading(false);
-      return;
-    }
-
-    // صرف ADMIN access کر سکتا ہے
-    if (user.role === "ADMIN") {
-      setAuthorized(true);
-      loadUsers(user);
-      loadRoles(user);
-      loadBranches(user);
-      loadBranchAssignments(user);
-    } else {
-      setAuthorized(false);
-      setLoading(false);
-    }
+    if (user?.role === "ADMIN") {
+      Promise.all([loadUsers(user), loadBranches(user), loadBranchAssignments(user), loadRoles(user)]).finally(() => setLoading(false));
+    } else { setLoading(false); }
   }, []);
 
-  // ============ USERS TAB FUNCTIONS ============
-  const loadUsers = async (currentUser?: any) => {
-    const u = currentUser || me;
-    if (!u) return;
+  async function loadUsers(u?: any) {
+    const res = await fetch("/api/users", { headers: h(u) }).catch(() => null);
+    const d = await res?.json().catch(() => []);
+    setUsers(Array.isArray(d) ? d : []);
+  }
+  async function loadBranches(u?: any) {
+    const res = await fetch("/api/branches", { headers: h(u) }).catch(() => null);
+    const d = await res?.json().catch(() => []);
+    setBranches(Array.isArray(d) ? d : []);
+  }
+  async function loadBranchAssignments(u?: any) {
+    const res = await fetch("/api/company/admin-control", { headers: h(u) }).catch(() => null);
+    const d = await res?.json().catch(() => ({}));
+    setBranchAssignments(d?.branchAssignments || {});
+  }
+  async function loadRoles(u?: any) {
+    const res = await fetch("/api/admin/roles", { headers: h(u) }).catch(() => null);
+    const d = await res?.json().catch(() => []);
+    const list: Role[] = Array.isArray(d) ? d : (Array.isArray(d?.roles) ? d.roles : []);
+    setRoles(list);
+    const adminRole = list.find(r => r.role === "ADMIN");
+    if (adminRole) setRolePerms(adminRole.permissions || []);
+  }
 
-    try {
-      const res = await fetch("/api/users", {
-        headers: { 
-          "x-user-role": "ADMIN",
-          "x-user-id": u.id,
-          "x-company-id": u.companyId || ""
-        },
-      });
-      const data = await res.json();
-      setUsers(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Load users error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  function openAdd() {
+    setForm({ id: "", name: "", email: "", password: "", role: "ACCOUNTANT", active: true });
+    setSelBranches([]); setEditing(false); setShowModal(true);
+  }
+  function openEdit(user: any) {
+    setForm({ id: user.id, name: user.name, email: user.email, password: "", role: user.role, active: user.active ?? true });
+    setSelBranches(branchAssignments[user.id] || []); setEditing(true); setShowModal(true);
+  }
+  function closeModal() { setShowModal(false); }
 
-  const loadBranches = async (currentUser?: any) => {
-    const u = currentUser || me;
-    if (!u) return;
-    try {
-      const res = await fetch("/api/branches", {
-        headers: {
-          "x-user-role": "ADMIN",
-          "x-user-id": u.id,
-          "x-company-id": u.companyId || ""
-        },
-      });
-      const data = await res.json();
-      setBranches(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Load branches error:", err);
-    }
-  };
-
-  const loadBranchAssignments = async (currentUser?: any) => {
-    const u = currentUser || me;
-    if (!u) return;
-    try {
-      const res = await fetch("/api/company/admin-control", {
-        headers: {
-          "x-user-role": "ADMIN",
-          "x-user-id": u.id,
-          "x-company-id": u.companyId || ""
-        },
-      });
-      const data: AdminControlSettings = await res.json();
-      setBranchAssignments(data?.branchAssignments || {});
-    } catch (err) {
-      console.error("Load branch assignments error:", err);
-    }
-  };
-
-  const saveUser = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    
-    if (!userForm.name || !userForm.email)
-      return toast.error("Name and Email required!");
-
+  async function saveUser(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.name || !form.email) return toast.error("Name and email required");
+    setSaving(true);
     try {
       const res = await fetch("/api/users", {
         method: editing ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-role": "ADMIN",
-          "x-user-id": me?.id,
-          "x-company-id": me?.companyId || ""
-        },
-        body: JSON.stringify({
-          id: userForm.id,
-          name: userForm.name,
-          email: userForm.email,
-          password: userForm.password,
-          role: userForm.role,
-          active: userForm.active,
-        }),
+        headers: { "Content-Type": "application/json", ...h() },
+        body: JSON.stringify({ id: form.id || undefined, name: form.name, email: form.email, password: form.password, role: form.role, active: form.active }),
       });
-
-      if (res.ok) {
-        const savedUser = await res.json();
-        const targetUserId = savedUser?.id || userForm.id;
-        if (targetUserId) {
-          await fetch("/api/company/admin-control", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-user-role": "ADMIN",
-              "x-user-id": me?.id,
-              "x-company-id": me?.companyId || ""
-            },
-            body: JSON.stringify({
-              branchAssignments: {
-                ...branchAssignments,
-                [targetUserId]: selectedBranchIds,
-              },
-            }),
-          });
-        }
-        toast.success(editing ? "✅ User updated!" : "✅ User created!");
-        resetUserForm();
-        loadUsers(me);
-        loadBranchAssignments(me);
-      } else {
-        toast.error("Failed to save user");
-      }
-    } catch (err) {
-      console.error("Save error:", err);
-      toast.error("Error saving user");
-    }
-  };
-
-  const deleteUser = async (id: string) => {
-    if (!await confirmToast("Are you sure ?")) return;
-    try {
-      const res = await fetch("/api/users", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-role": "ADMIN",
-          "x-user-id": me?.id,
-          "x-company-id": me?.companyId || ""
-        },
-        body: JSON.stringify({ id }),
-      });
-
-      if (res.ok) {
-        const nextAssignments = { ...branchAssignments };
-        delete nextAssignments[id];
+      if (!res.ok) { toast.error("Failed to save"); return; }
+      const saved = await res.json();
+      const uid = saved?.id || form.id;
+      if (uid) {
         await fetch("/api/company/admin-control", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-user-role": "ADMIN",
-            "x-user-id": me?.id,
-            "x-company-id": me?.companyId || ""
-          },
-          body: JSON.stringify({ branchAssignments: nextAssignments }),
+          headers: { "Content-Type": "application/json", ...h() },
+          body: JSON.stringify({ branchAssignments: { ...branchAssignments, [uid]: selBranches } }),
         });
-        toast.success("✅ User deleted!");
-        loadUsers(me);
-        loadBranchAssignments(me);
       }
-    } catch (err) {
-      console.error("Delete error:", err);
+      toast.success(editing ? "User updated!" : "User created!");
+      closeModal(); loadUsers(); loadBranchAssignments();
+    } catch { toast.error("Error saving user"); }
+    finally { setSaving(false); }
+  }
+
+  async function deleteUser(id: string) {
+    if (!await confirmToast("Delete this user?")) return;
+    const res = await fetch("/api/users", { method: "DELETE", headers: { "Content-Type": "application/json", ...h() }, body: JSON.stringify({ id }) });
+    if (res.ok) {
+      const next = { ...branchAssignments }; delete next[id];
+      await fetch("/api/company/admin-control", { method: "POST", headers: { "Content-Type": "application/json", ...h() }, body: JSON.stringify({ branchAssignments: next }) });
+      toast.success("User deleted!"); loadUsers(); loadBranchAssignments();
     }
-  };
+  }
 
-  const editUser = (user: any) => {
-    setUserForm({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      password: "",
-      role: user.role,
-      active: user.active,
-    });
-    setSelectedBranchIds(branchAssignments[user.id] || []);
-    setEditing(true);
-  };
+  function pickRole(r: string) {
+    setSelRole(r);
+    setRolePerms(roles.find(x => x.role === r)?.permissions || []);
+  }
 
-  const resetUserForm = () => {
-    setUserForm({
-      id: null,
-      name: "",
-      email: "",
-      password: "",
-      role: "ACCOUNTANT",
-      active: true,
-    });
-    setSelectedBranchIds([]);
-    setEditing(false);
-  };
-
-  // ============ PERMISSIONS TAB FUNCTIONS ============
-  const loadRoles = async (user: any) => {
-    try {
-      const res = await fetch("/api/admin/roles", {
-        headers: {
-          "x-user-id": user.id,
-          "x-user-role": user.role,
-        },
-      });
-      const data = await res.json();
-      console.log("📊 Loaded roles:", data);
-      const list: Role[] = Array.isArray(data) ? data : (Array.isArray(data?.roles) ? data.roles : []);
-      setRoles(list);
-
-      // Set initial ADMIN permissions
-      const adminRole = Array.isArray(list) ? list.find((r: any) => r.role === "ADMIN") : undefined;
-      if (adminRole) {
-        setRolePermissions(adminRole.permissions || []);
-      }
-    } catch (error) {
-      console.error("Error loading roles:", error);
-    }
-  };
-
-  const selectRole = (roleName: string) => {
-    setSelectedRole(roleName);
-    const role = roles.find((r) => r.role === roleName);
-    if (role) {
-      setRolePermissions(role.permissions || []);
-    } else {
-      setRolePermissions([]);
-    }
-  };
-
-  const togglePermission = (perm: string) => {
-    setRolePermissions((prev) =>
-      prev.includes(perm) ? prev.filter((p) => p !== perm) : [...prev, perm]
-    );
-  };
-
-  const selectAllPermissions = () => {
-    setRolePermissions([...availablePermissions]);
-  };
-
-  const clearAllPermissions = () => {
-    setRolePermissions([]);
-  };
-
-  const savePermissions = async () => {
-    if (!me || me.role !== "ADMIN") {
-      toast.error("Only ADMIN can save permissions");
-      return;
-    }
-
+  async function savePermissions() {
     setSavingPerms(true);
-    try {
-      const res = await fetch("/api/admin/roles", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": me.id,
-          "x-user-role": me.role,
-        },
-        body: JSON.stringify({
-          role: selectedRole,
-          permissions: rolePermissions,
-        }),
-      });
+    const res = await fetch("/api/admin/roles", { method: "POST", headers: { "Content-Type": "application/json", ...h() }, body: JSON.stringify({ role: selRole, permissions: rolePerms }) });
+    if (res.ok) { toast.success(`${selRole} permissions saved!`); loadRoles(); }
+    else toast.error("Failed to save permissions");
+    setSavingPerms(false);
+  }
 
-      if (res.ok) {
-        toast.success(`✅ ${selectedRole} Permissions saved!`);
-        loadRoles(me);
-      } else {
-        toast.error("Failed to save permissions");
-      }
-    } catch (error) {
-      console.error("Error saving permissions:", error);
-      toast.error("Error saving permissions");
-    } finally {
-      setSavingPerms(false);
-    }
-  };
-
-  // ============ AUTHORIZATION CHECK ============
-  // Only show if user has MANAGE_USERS
-  if (!userHasPerm(me, 'MANAGE_USERS')) {
+  // ── ACCESS DENIED ─────────────────────────────────────────────────────────
+  if (!loading && !userHasPerm(me, "MANAGE_USERS")) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <h2 className="text-xl font-bold text-red-600 mb-2">
-            ❌ Access Denied
-          </h2>
-          <p className="text-red-700">You do not have permission to manage users or permissions.</p>
+      <div style={{ padding: "40px 28px", fontFamily: ff }}>
+        <div style={{ padding: 32, borderRadius: 16, background: "rgba(248,113,113,.07)", border: "1px solid rgba(248,113,113,.25)", textAlign: "center", color: "#f87171" }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
+          <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Access Denied</div>
+          <div style={{ fontSize: 13, color: "var(--text-muted)" }}>You do not have permission to manage users.</div>
         </div>
       </div>
     );
   }
 
-  if (loading) {
-    return (
-      <div className="p-6 text-center">
-        <div className="animate-pulse text-gray-500">Loading...</div>
-      </div>
-    );
-  }
+  if (loading) return <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontFamily: ff }}>Loading…</div>;
+
+  const filteredPerms = permSearch ? allPerms.filter(p => p.toLowerCase().includes(permSearch.toLowerCase())) : allPerms;
+
+  // Group permissions by category
+  const permGroups: Record<string, string[]> = {};
+  filteredPerms.forEach(p => {
+    const cat = p.startsWith("AI_") ? "AI Features" : p.startsWith("VIEW_") ? "View Access" : p.startsWith("CREATE_") ? "Create Access" : p.startsWith("BANK_") || p.startsWith("PAYMENT_") || p.startsWith("EXPENSE_") || p.startsWith("TAX_") ? "Banking & Tax" : p.startsWith("MANAGE_") ? "Management" : "Other";
+    if (!permGroups[cat]) permGroups[cat] = [];
+    permGroups[cat].push(p);
+  });
 
   return (
-    <div className="p-4 md:p-6 max-w-6xl mx-auto">
-      {/* TAB BUTTONS */}
-      <div className="flex flex-wrap gap-2 md:gap-4 mb-6 border-b border-gray-300">
-        <button
-          onClick={() => setActiveTab("users")}
-          className={`flex-1 sm:flex-none text-center px-4 py-2 font-semibold text-sm md:text-base ${
-            activeTab === "users"
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-gray-600 hover:text-gray-800"
-          }`}
-        >
-          👥 Users
-        </button>
-        <button
-          onClick={() => setActiveTab("permissions")}
-          className={`flex-1 sm:flex-none text-center px-4 py-2 font-semibold text-sm md:text-base ${
-            activeTab === "permissions"
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-gray-600 hover:text-gray-800"
-          }`}
-        >
-          🎭 Permissions
+    <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
+
+      {/* ── Header ── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Users Management</h1>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--text-muted)" }}>{users.length} user{users.length !== 1 ? "s" : ""} in your workspace</p>
+        </div>
+        <button onClick={openAdd} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(99,102,241,.35)" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New User
         </button>
       </div>
 
-      {/* ============ USERS TAB ============ */}
-      {activeTab === "users" && (
+      {/* ── Tabs ── */}
+      <div style={{ display: "flex", gap: 0, marginBottom: 24, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 11, padding: 4, width: "fit-content" }}>
+        {(["users", "permissions"] as const).map(t => (
+          <button key={t} onClick={() => setTab(t)} style={{ padding: "7px 20px", borderRadius: 8, background: tab === t ? "#6366f1" : "transparent", border: "none", color: tab === t ? "white" : "var(--text-muted)", fontFamily: ff, fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "capitalize" }}>
+            {t === "users" ? "👥 Users" : "🎭 Permissions"}
+          </button>
+        ))}
+      </div>
+
+      {/* ══════════════ USERS TAB ══════════════ */}
+      {tab === "users" && (
+        <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                {["Name", "Email", "Role", "Branches", "Status", "Actions"].map((h, i) => (
+                  <th key={h} style={{ padding: "11px 16px", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em", textAlign: "left" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {users.length === 0
+                ? <tr><td colSpan={6} style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}><div style={{ fontSize: 32, marginBottom: 8 }}>👥</div>No users yet — add your first team member</td></tr>
+                : users.map((u, i) => {
+                  const rc = ROLE_COLORS[u.role] || ROLE_COLORS.VIEWER;
+                  const assignedBranches = (branchAssignments[u.id] || []).map(bid => branches.find(b => b.id === bid)?.name).filter(Boolean);
+                  return (
+                    <tr key={u.id} style={{ borderBottom: i < users.length - 1 ? "1px solid var(--border)" : "none" }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "var(--app-bg)")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <td style={{ padding: "13px 16px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(99,102,241,.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#818cf8", flexShrink: 0 }}>
+                            {u.name?.charAt(0).toUpperCase()}
+                          </div>
+                          <span style={{ fontSize: 13, fontWeight: 600 }}>{u.name}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: "13px 16px", fontSize: 12, color: "var(--text-muted)" }}>{u.email}</td>
+                      <td style={{ padding: "13px 16px" }}>
+                        <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: rc.bg, color: rc.color, border: `1px solid ${rc.border}` }}>{u.role}</span>
+                      </td>
+                      <td style={{ padding: "13px 16px", fontSize: 12, color: "var(--text-muted)" }}>
+                        {assignedBranches.length > 0 ? assignedBranches.join(", ") : <span style={{ color: "var(--text-muted)" }}>All / Not set</span>}
+                      </td>
+                      <td style={{ padding: "13px 16px" }}>
+                        <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: u.active ? "rgba(52,211,153,.1)" : "rgba(248,113,113,.1)", color: u.active ? "#34d399" : "#f87171", border: `1px solid ${u.active ? "rgba(52,211,153,.25)" : "rgba(248,113,113,.25)"}` }}>
+                          {u.active ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "13px 16px" }}>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <button onClick={() => openEdit(u)} style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.1)", color: "#818cf8", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Edit</button>
+                          <button onClick={() => deleteUser(u.id)} style={{ padding: "5px 13px", borderRadius: 7, border: "1px solid rgba(248,113,113,.35)", background: "rgba(248,113,113,.07)", color: "#f87171", fontFamily: ff, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ══════════════ PERMISSIONS TAB ══════════════ */}
+      {tab === "permissions" && (
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-6">👥 Users Managment</h1>
-
-          {/* USER FORM */}
-          <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
-            <h2 className="text-xl md:text-2xl font-bold mb-4">
-              {editing ? "✏️ Edit User" : "➕ Add New User"}
-            </h2>
-
-            <form onSubmit={saveUser}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={userForm.name}
-                  onChange={(e) =>
-                    setUserForm({ ...userForm, name: e.target.value })
-                  }
-                  className="border rounded px-3 py-2"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={userForm.email}
-                  onChange={(e) =>
-                    setUserForm({ ...userForm, email: e.target.value })
-                  }
-                  className="border rounded px-3 py-2"
-                  autoComplete="username"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={userForm.password}
-                  onChange={(e) =>
-                    setUserForm({ ...userForm, password: e.target.value })
-                  }
-                  className="border rounded px-3 py-2"
-                  autoComplete="new-password"
-                />
-                <select
-                  value={userForm.role}
-                  onChange={(e) =>
-                    setUserForm({ ...userForm, role: e.target.value })
-                  }
-                  className="border rounded px-3 py-2"
-                >
-                  <option value="ADMIN">ADMIN</option>
-                  <option value="ACCOUNTANT">ACCOUNTANT</option>
-                  <option value="VIEWER">VIEWER</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-semibold mb-2">Allowed Branches</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                  {branches.map((branch) => (
-                    <label key={branch.id} className="flex items-center gap-2 border rounded px-3 py-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={selectedBranchIds.includes(branch.id)}
-                        onChange={(e) =>
-                          setSelectedBranchIds((prev) =>
-                            e.target.checked
-                              ? [...prev, branch.id]
-                              : prev.filter((id) => id !== branch.id)
-                          )
-                        }
-                      />
-                      <span>{branch.code} - {branch.name}</span>
-                    </label>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-500 mt-2">For Admin users, select all branches to grant full access.</p>
-              </div>
-
-              <div className="flex gap-2 mb-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={userForm.active}
-                    onChange={(e) =>
-                      setUserForm({ ...userForm, active: e.target.checked })
-                    }
-                  />
-                  Active
-                </label>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                  {editing ? "✏️ Edit User" : "✅ Add User"}
+          {/* Role pills */}
+          <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+            {["ADMIN", "ACCOUNTANT", "VIEWER"].map(r => {
+              const rc = ROLE_COLORS[r] || ROLE_COLORS.VIEWER;
+              const active = selRole === r;
+              return (
+                <button key={r} onClick={() => pickRole(r)} style={{ padding: "9px 22px", borderRadius: 10, border: `1.5px solid ${active ? rc.border : "var(--border)"}`, background: active ? rc.bg : "var(--panel-bg)", color: active ? rc.color : "var(--text-muted)", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  {r} {active && `(${rolePerms.length})`}
                 </button>
-                {editing && (
-                  <button
-                    type="button"
-                    onClick={resetUserForm}
-                    className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-                  >
-                    منسوخ کریں
-                  </button>
-                )}
-              </div>
-            </form>
+              );
+            })}
           </div>
 
-          {/* USERS TABLE */}
-          <div className="bg-white rounded-lg shadow-md overflow-x-auto">
-            <table className="w-full text-sm min-w-[800px]">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="p-3 text-left">Name</th>
-                  <th className="p-3 text-left">Email</th>
-                  <th className="p-3 text-left">Role</th>
-                  <th className="p-3 text-left">Branches</th>
-                  <th className="p-3 text-left">Status</th>
-                  <th className="p-3 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user: any) => (
-                  <tr
-                    key={user.id}
-                    className="border-t hover:bg-gray-50 text-xs"
-                  >
-                    <td className="p-3">{user.name}</td>
-                    <td className="p-3">{user.email}</td>
-                    <td className="p-3">
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      <span className="text-xs text-gray-600">
-                        {(branchAssignments[user.id] || [])
-                          .map((branchId) => branches.find((branch) => branch.id === branchId)?.name || branchId)
-                          .join(", ") || "All / Not set"}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      {user.active ? (
-                        <span className="text-green-600">✓ Active</span>
-                      ) : (
-                        <span className="text-red-600">✗ Inactive</span>
-                      )}
-                    </td>
-                    <td className="p-3 space-x-2 whitespace-nowrap">
-                      <button
-                        onClick={() => editUser(user)}
-                        className="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1 rounded text-xs transition-colors"
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button
-                        onClick={() => deleteUser(user.id)}
-                        className="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded text-xs transition-colors"
-                      >
-                        🗑️ Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "20px 22px" }}>
+            {/* Top bar */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>{selRole} — {rolePerms.length} permissions enabled</div>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input placeholder="Search permissions…" value={permSearch} onChange={e => setPermSearch(e.target.value)} style={{ ...inp, width: 200, padding: "7px 12px" }} />
+                <button onClick={() => setRolePerms([...allPerms])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.08)", color: "#34d399", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>All</button>
+                <button onClick={() => setRolePerms([])} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.07)", color: "#f87171", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>None</button>
+                <button onClick={savePermissions} disabled={savingPerms} style={{ padding: "7px 18px", borderRadius: 8, background: savingPerms ? "rgba(99,102,241,.4)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  {savingPerms ? "Saving…" : "💾 Save"}
+                </button>
+              </div>
+            </div>
+
+            {/* Permission groups */}
+            {Object.entries(permGroups).map(([cat, perms]) => (
+              <div key={cat} style={{ marginBottom: 18 }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>{cat}</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 6 }}>
+                  {perms.map(perm => {
+                    const on = rolePerms.includes(perm);
+                    return (
+                      <label key={perm} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: `1px solid ${on ? "rgba(99,102,241,.3)" : "var(--border)"}`, background: on ? "rgba(99,102,241,.07)" : "var(--app-bg)", cursor: "pointer" }}>
+                        <div onClick={() => setRolePerms(p => p.includes(perm) ? p.filter(x => x !== perm) : [...p, perm])}
+                          style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${on ? "#6366f1" : "var(--border)"}`, background: on ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, cursor: "pointer" }}>
+                          {on && <svg width="9" height="9" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                        </div>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: on ? "var(--text-primary)" : "var(--text-muted)" }}>{perm}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* ============ PERMISSIONS TAB ============ */}
-      {activeTab === "permissions" && (
-        <div>
-          <h1 className="text-3xl font-bold mb-6">🎭 Role Permissions</h1>
-
-          {/* ROLE SELECTOR */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-xl font-bold mb-4">Select Role:</h2>
-            <div className="flex gap-2 flex-wrap">
-              {["ADMIN", "ACCOUNTANT", "VIEWER"].map((role) => (
-                <button
-                  key={role}
-                  onClick={() => selectRole(role)}
-                  className={`px-4 py-2 rounded font-semibold ${
-                    selectedRole === role
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                  }`}
-                >
-                  {role}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* PERMISSIONS GRID */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">
-                {selectedRole} Permissions ({rolePermissions.length})
-              </h2>
-              <div className="space-x-2">
-                <button
-                  onClick={selectAllPermissions}
-                  className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
-                >
-                  ✓ Select All
-                </button>
-                <button
-                  onClick={clearAllPermissions}
-                  className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
-                >
-                   Clear All ✗
-                </button>
+      {/* ══════════════ ADD / EDIT MODAL ══════════════ */}
+      {showModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", backdropFilter: "blur(4px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={e => { if (e.target === e.currentTarget) closeModal(); }}>
+          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 32px 80px rgba(0,0,0,.4)" }}>
+            {/* Modal header */}
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 900 }}>{editing ? "✏️ Edit User" : "➕ Add New User"}</div>
+                <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{editing ? "Update user details and branch access" : "Create a new team member account"}</div>
               </div>
+              <button onClick={closeModal} style={{ width: 30, height: 30, borderRadius: "50%", border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-muted)", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-              {availablePermissions.map((perm) => (
-                <label
-                  key={perm}
-                  className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={rolePermissions.includes(perm)}
-                    onChange={() => togglePermission(perm)}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm">{perm}</span>
-                </label>
-              ))}
-            </div>
+            <form onSubmit={saveUser} style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* Name + Email */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Full Name</div>
+                  <input style={inp} placeholder="Muhammad Ali" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Email</div>
+                  <input style={inp} type="email" placeholder="ali@example.com" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} autoComplete="username" required />
+                </div>
+              </div>
 
-            <button
-              onClick={savePermissions}
-              disabled={savingPerms}
-              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
-            >
-              {savingPerms ? "Saving..." : "✅ Save Permissions"}
-            </button>
+              {/* Password + Role */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>{editing ? "New Password (optional)" : "Password"}</div>
+                  <input style={inp} type="password" placeholder={editing ? "Leave blank to keep" : "Enter password"} value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} autoComplete="new-password" />
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 6 }}>Role</div>
+                  <select style={inp} value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="ACCOUNTANT">ACCOUNTANT</option>
+                    <option value="VIEWER">VIEWER</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Allowed Branches */}
+              {branches.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 8 }}>Allowed Branches</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {branches.map(b => {
+                      const checked = selBranches.includes(b.id);
+                      return (
+                        <label key={b.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 13px", borderRadius: 9, border: `1px solid ${checked ? "rgba(99,102,241,.35)" : "var(--border)"}`, background: checked ? "rgba(99,102,241,.07)" : "var(--app-bg)", cursor: "pointer" }}>
+                          <div onClick={() => setSelBranches(p => p.includes(b.id) ? p.filter(x => x !== b.id) : [...p, b.id])}
+                            style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${checked ? "#6366f1" : "var(--border)"}`, background: checked ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            {checked && <svg width="9" height="9" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                          </div>
+                          <span style={{ fontSize: 13, fontWeight: 600 }}>{b.code} — {b.name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6 }}>For Admin users, select all branches to grant full access.</div>
+                </div>
+              )}
+
+              {/* Active toggle */}
+              <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                <div onClick={() => setForm(f => ({ ...f, active: !f.active }))}
+                  style={{ width: 38, height: 22, borderRadius: 11, background: form.active ? "#6366f1" : "var(--border)", position: "relative", transition: "background .2s", flexShrink: 0 }}>
+                  <div style={{ position: "absolute", top: 3, left: form.active ? 18 : 3, width: 16, height: 16, borderRadius: "50%", background: "white", transition: "left .2s", boxShadow: "0 1px 4px rgba(0,0,0,.2)" }} />
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>Active account</span>
+              </label>
+
+              {/* Action buttons */}
+              <div style={{ display: "flex", gap: 10, paddingTop: 4 }}>
+                <button type="submit" disabled={saving} style={{ flex: 1, padding: "11px 0", borderRadius: 10, background: saving ? "rgba(99,102,241,.5)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: saving ? "default" : "pointer" }}>
+                  {saving ? "Saving…" : editing ? "Update User" : "Create User"}
+                </button>
+                <button type="button" onClick={closeModal} style={{ padding: "11px 22px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-muted)", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
