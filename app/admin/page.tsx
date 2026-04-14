@@ -2498,9 +2498,18 @@ const PLAN_FEATURES = [
   { key:"VIEW_REPORTS",  label:"Sales Forecast",             route:"/dashboard/reports/forecast",             category:"Reports" },
   { key:"VIEW_REPORTS",  label:"Scenario Planning",          route:"/dashboard/reports/scenario",             category:"Reports" },
   // HR & CRM
-  { key:"VIEW_HR_PAYROLL",         label:"HR & Payroll",             route:"/dashboard/employees",        category:"HR & CRM" },
-  { key:"VIEW_CRM",                label:"CRM",                      route:"/dashboard/crm/contacts",     category:"HR & CRM" },
-  { key:"BACKUP_RESTORE",          label:"Backup & Restore",         route:"/dashboard/backup-restore",   category:"HR & CRM" },
+  { key:"VIEW_HR_PAYROLL",             label:"HR & Payroll",                route:"/dashboard/employees",        category:"HR & CRM" },
+  { key:"VIEW_CRM",                    label:"CRM",                         route:"/dashboard/crm/contacts",     category:"HR & CRM" },
+  { key:"BACKUP_RESTORE",              label:"Backup & Restore",            route:"/dashboard/backup-restore",   category:"HR & CRM" },
+  // AI Features
+  { key:"AI_ASSISTANT",                label:"AI Assistant (Ask Anything)", route:"/dashboard",                  category:"AI Features" },
+  { key:"AI_BUSINESS_OPERATOR",        label:"AI Business Operator",        route:"/dashboard",                  category:"AI Features" },
+  { key:"AI_SMART_SUGGESTIONS",        label:"Smart Invoice Suggestions",   route:"/dashboard",                  category:"AI Features" },
+  { key:"AI_FORECAST",                 label:"AI Sales Forecast",           route:"/dashboard/reports/forecast", category:"AI Features" },
+  { key:"AI_ANOMALY_DETECTION",        label:"Anomaly & Fraud Detection",   route:"/dashboard",                  category:"AI Features" },
+  { key:"AI_EXPENSE_CATEGORIZATION",   label:"AI Expense Categorization",   route:"/dashboard",                  category:"AI Features" },
+  { key:"AI_NATURAL_LANGUAGE",         label:"Natural Language Reports",    route:"/dashboard/reports",          category:"AI Features" },
+  { key:"AI_CASH_FLOW_PREDICTION",     label:"AI Cash Flow Prediction",     route:"/dashboard",                  category:"AI Features" },
 ];
 
 const PF_CATEGORIES = Array.from(new Set(PLAN_FEATURES.map(f => f.category)));

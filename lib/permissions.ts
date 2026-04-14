@@ -89,5 +89,14 @@ export const PERMISSIONS = {
   BACKUP_RESTORE: "BACKUP_RESTORE",
   EMAIL_SETTINGS: "EMAIL_SETTINGS",
 
+  // AI Features
+  AI_ASSISTANT: "AI_ASSISTANT",                   // Ask anything chatbot
+  AI_BUSINESS_OPERATOR: "AI_BUSINESS_OPERATOR",   // AI agent that runs business tasks
+  AI_SMART_SUGGESTIONS: "AI_SMART_SUGGESTIONS",   // Smart invoice / entry suggestions
+  AI_FORECAST: "AI_FORECAST",                     // AI-powered sales forecast
+  AI_ANOMALY_DETECTION: "AI_ANOMALY_DETECTION",   // Fraud & anomaly detection
+  AI_EXPENSE_CATEGORIZATION: "AI_EXPENSE_CATEGORIZATION", // Auto-categorize expenses
+  AI_NATURAL_LANGUAGE: "AI_NATURAL_LANGUAGE",     // Natural language report queries
+  AI_CASH_FLOW_PREDICTION: "AI_CASH_FLOW_PREDICTION", // Cash flow AI prediction
 
 } as const;

@@ -55,7 +55,7 @@ const PLANS = [
 
 // ── FEATURE COMPARISON DATA ──────────────────────────────────────────────────
 type Val = boolean | string | null;
-interface Feature { name: string; starter: Val; pro: Val; enterprise: Val; tooltip?: string; }
+interface Feature { name: string; permKey?: string; starter: Val; pro: Val; enterprise: Val; tooltip?: string; }
 interface Category { id: string; icon: string; title: string; features: Feature[]; }
 
 const COMPARISON: Category[] = [
@@ -190,13 +190,14 @@ const COMPARISON: Category[] = [
     icon: "🤖",
     title: "AI Features",
     features: [
-      { name: "AI assistant (ask anything)", starter: false, pro: true, enterprise: true },
-      { name: "Smart invoice suggestions", starter: false, pro: true, enterprise: true },
-      { name: "AI-powered sales forecast", starter: false, pro: false, enterprise: true },
-      { name: "Anomaly & fraud detection", starter: false, pro: false, enterprise: true },
-      { name: "AI expense categorization", starter: false, pro: true, enterprise: true },
-      { name: "Natural language reports", starter: false, pro: false, enterprise: true },
-      { name: "AI-based cash flow prediction", starter: false, pro: false, enterprise: true },
+      { name: "AI assistant (ask anything)",    permKey: "AI_ASSISTANT",             starter: false, pro: true,  enterprise: true },
+      { name: "AI Business Operator",           permKey: "AI_BUSINESS_OPERATOR",     starter: false, pro: false, enterprise: true, tooltip: "An AI agent that can run tasks, answer business questions, and suggest actions autonomously" },
+      { name: "Smart invoice suggestions",      permKey: "AI_SMART_SUGGESTIONS",     starter: false, pro: true,  enterprise: true },
+      { name: "AI-powered sales forecast",      permKey: "AI_FORECAST",              starter: false, pro: false, enterprise: true },
+      { name: "Anomaly & fraud detection",      permKey: "AI_ANOMALY_DETECTION",     starter: false, pro: false, enterprise: true },
+      { name: "AI expense categorization",      permKey: "AI_EXPENSE_CATEGORIZATION",starter: false, pro: true,  enterprise: true },
+      { name: "Natural language reports",       permKey: "AI_NATURAL_LANGUAGE",      starter: false, pro: false, enterprise: true },
+      { name: "AI-based cash flow prediction",  permKey: "AI_CASH_FLOW_PREDICTION",  starter: false, pro: false, enterprise: true },
     ],
   },
   {
@@ -282,6 +283,7 @@ export default function PricingPage() {
   const [selectedModules, setSelectedModules] = useState<string[]>(["accounting", "inventory"]);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [openCats, setOpenCats] = useState<Set<string>>(new Set(["platform", "accounting", "ai"]));
+  const [featureMap, setFeatureMap] = useState<Record<string, { starter: boolean; pro: boolean; enterprise: boolean }>>({});
 
   useEffect(() => {
     (async () => {
@@ -295,6 +297,11 @@ export default function PricingPage() {
       try {
         const fx = await fetch("/api/public/fx", { cache: "no-store" });
         if (fx.ok) { const d = await fx.json(); if (d?.rates) setRates(d.rates); }
+      } catch {}
+      // Load live plan feature overrides from admin config
+      try {
+        const pf = await fetch("/api/public/plan-features", { cache: "no-store" });
+        if (pf.ok) { const d = await pf.json(); if (d?.featureMap) setFeatureMap(d.featureMap); }
       } catch {}
     })();
   }, []);
@@ -456,7 +463,11 @@ export default function PricingPage() {
                     <div style={{ padding: "13px 24px 13px 44px", fontSize: 13, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 8 }}>
                       {feat.name}
                     </div>
-                    {([feat.starter, feat.pro, feat.enterprise] as Val[]).map((v, pi) => (
+                    {([
+                      feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].starter : feat.starter,
+                      feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].pro    : feat.pro,
+                      feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].enterprise : feat.enterprise,
+                    ] as Val[]).map((v, pi) => (
                       <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
                         <Val v={v} color={PLAN_COLORS[pi]} />
                       </div>
