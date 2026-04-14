@@ -10,7 +10,7 @@ const db = prisma as any;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { type, subject, message, email, name } = body;
+    const { type, subject, message, email, name, priority, module: affectedModule } = body;
 
     if (!type || !subject?.trim() || !message?.trim())
       return NextResponse.json({ error: "type, subject and message are required" }, { status: 400 });
@@ -41,7 +41,8 @@ export async function POST(req: NextRequest) {
         email: email?.toLowerCase().trim() || null,
         name: name?.trim() || null,
         status: "open",
-        priority: "normal",
+        priority: ["low","normal","high","urgent"].includes(priority) ? priority : "normal",
+        module: affectedModule?.trim() || null,
         userId,
         companyId,
       },
@@ -50,5 +51,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, id: fb.id });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    let userId: string | null = req.headers.get("x-user-id");
+    if (!userId) {
+      try {
+        const token = getTokenFromRequest(req as any);
+        if (token) {
+          const p = verifyJwt(token) as any;
+          userId = p?.userId || p?.id || null;
+        }
+      } catch {}
+    }
+    if (!userId) return NextResponse.json({ items: [] });
+
+    const items = await db.feedback.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: { id: true, type: true, subject: true, status: true, priority: true, createdAt: true },
+    });
+    return NextResponse.json({ items });
+  } catch (e: any) {
+    return NextResponse.json({ items: [] });
   }
 }
