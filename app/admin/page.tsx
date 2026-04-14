@@ -2462,6 +2462,41 @@ const PLAN_FEATURES = [
   { key:"VIEW_TRIAL_BALANCE_REPORT",label:"Trial Balance",           route:"/dashboard/reports/trial-balance", category:"Reports" },
   { key:"VIEW_PROFIT_LOSS_REPORT", label:"Profit & Loss",            route:"/dashboard/reports/profit-loss",  category:"Reports" },
   { key:"VIEW_INVENTORY_REPORTS",  label:"Inventory Reports",        route:"/dashboard/reports/inventory",category:"Reports" },
+  // Advanced Financial Reports
+  { key:"VIEW_REPORTS",  label:"Budget vs Actual",           route:"/dashboard/reports/budget-vs-actual",    category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"COGS Report",                route:"/dashboard/reports/cogs",                category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Gross Margin",               route:"/dashboard/reports/gross-margin",        category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Expense Breakdown",          route:"/dashboard/reports/expense-breakdown",   category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Breakeven Analysis",         route:"/dashboard/reports/breakeven",           category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Tax Forecast",               route:"/dashboard/reports/tax-forecast",        category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Audit & Exceptions",         route:"/dashboard/reports/audit-exception",     category:"Reports" },
+  // Inventory Intelligence
+  { key:"VIEW_INVENTORY_REPORTS",  label:"Stock Movement",   route:"/dashboard/reports/stock/movement",      category:"Reports" },
+  { key:"VIEW_INVENTORY_REPORTS",  label:"Dead Stock",       route:"/dashboard/reports/stock/dead",          category:"Reports" },
+  { key:"VIEW_INVENTORY_REPORTS",  label:"Stock Turnover",   route:"/dashboard/reports/stock/turnover",      category:"Reports" },
+  { key:"VIEW_INVENTORY_REPORTS",  label:"Expiry Tracking",  route:"/dashboard/reports/stock/expiry",        category:"Reports" },
+  { key:"VIEW_INVENTORY_REPORTS",  label:"Stock Valuation",  route:"/dashboard/reports/stock/valuation",     category:"Reports" },
+  { key:"VIEW_INVENTORY_REPORTS",  label:"Warehouse Stock",  route:"/dashboard/reports/stock/warehouse",     category:"Reports" },
+  // Sales & Customer Analytics
+  { key:"VIEW_REPORTS",  label:"Customer Profitability",     route:"/dashboard/reports/customer-profitability", category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Salesman Performance",       route:"/dashboard/reports/salesman-performance",   category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Discount Analysis",          route:"/dashboard/reports/discount-analysis",      category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Sales by Region",            route:"/dashboard/reports/sales-region",           category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Product Profitability",      route:"/dashboard/reports/product-profitability",  category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Returns Analysis",           route:"/dashboard/reports/returns-analysis",       category:"Reports" },
+  // Receivables & Payables
+  { key:"VIEW_AGEING_REPORT",  label:"Supplier Ageing (AP)", route:"/dashboard/reports/supplier-ageing",      category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Payment History",            route:"/dashboard/reports/payment-history",      category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Bad Debts",                  route:"/dashboard/reports/bad-debts",            category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Credit Analysis",            route:"/dashboard/reports/credit-analysis",      category:"Reports" },
+  // Operations Reports
+  { key:"VIEW_REPORTS",  label:"Order Fulfillment",          route:"/dashboard/reports/order-fulfillment",    category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Delivery Performance",       route:"/dashboard/reports/delivery-performance", category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"PO Tracking",                route:"/dashboard/reports/po-tracking",          category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Supplier Performance",       route:"/dashboard/reports/supplier-performance", category:"Reports" },
+  // Strategic Reports
+  { key:"VIEW_REPORTS",  label:"Sales Forecast",             route:"/dashboard/reports/forecast",             category:"Reports" },
+  { key:"VIEW_REPORTS",  label:"Scenario Planning",          route:"/dashboard/reports/scenario",             category:"Reports" },
   // HR & CRM
   { key:"VIEW_HR_PAYROLL",         label:"HR & Payroll",             route:"/dashboard/employees",        category:"HR & CRM" },
   { key:"VIEW_CRM",                label:"CRM",                      route:"/dashboard/crm/contacts",     category:"HR & CRM" },

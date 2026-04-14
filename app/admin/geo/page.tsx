@@ -96,12 +96,16 @@ function MapCanvas({ pins, color }: { pins: GeoPin[]; color: string }) {
     for (const pin of pins) {
       const el = document.createElement("div");
       const isExact = pin.precision === "exact";
+      const isLiveVisitor = pin.type === "visitor" && !!pin.visitedAt && Date.now() - new Date(pin.visitedAt).getTime() < 30 * 60 * 1000;
       el.style.width = isExact ? "18px" : "12px";
       el.style.height = isExact ? "18px" : "12px";
       el.style.borderRadius = "9999px";
       el.style.background = isExact ? color : "rgba(255,255,255,.58)";
       el.style.border = isExact ? "2px solid rgba(255,255,255,.92)" : "1px solid rgba(255,255,255,.35)";
       el.style.boxShadow = isExact ? `0 0 0 8px ${color}26` : "0 0 0 5px rgba(255,255,255,.08)";
+      if (isLiveVisitor) {
+        el.style.animation = "finovaGeoPulse 1.6s ease infinite";
+      }
 
       const popupHtml = `
         <div style="min-width:210px;font-family:system-ui,sans-serif">
@@ -133,12 +137,24 @@ function MapCanvas({ pins, color }: { pins: GeoPin[]; color: string }) {
     };
   }, [pins, color]);
 
-  return <div ref={mapDivRef} className="w-full rounded-2xl" style={{ minHeight: 540 }} />;
+  return (
+    <>
+      <style>{`
+        @keyframes finovaGeoPulse {
+          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56,189,248,.55); }
+          70% { transform: scale(1.14); box-shadow: 0 0 0 14px rgba(56,189,248,0); }
+          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56,189,248,0); }
+        }
+      `}</style>
+      <div ref={mapDivRef} className="w-full rounded-2xl" style={{ minHeight: 540 }} />
+    </>
+  );
 }
 
 export default function GeoAnalyticsPage() {
   const [data, setData] = useState<GeoResponse | null>(null);
   const [tab, setTab] = useState<"companies" | "branches" | "visitors">("companies");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     void fetch("/api/admin/geo/map", { cache: "no-store" })
@@ -153,6 +169,16 @@ export default function GeoAnalyticsPage() {
     if (tab === "branches") return data.branches;
     return data.visitors;
   }, [data, tab]);
+
+  const filteredPins = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return currentPins;
+    return currentPins.filter((pin) =>
+      [pin.label, pin.subtitle, pin.country, pin.address, pin.city, pin.page, pin.device]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(q))
+    );
+  }, [currentPins, query]);
 
   const currentColor = tab === "companies" ? "#6366f1" : tab === "branches" ? "#22c55e" : "#38bdf8";
 
@@ -193,9 +219,18 @@ export default function GeoAnalyticsPage() {
           ))}
         </div>
 
+        <div className="mb-6">
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={tab === "visitors" ? "Search by country, city, page, or device" : "Search by label, country, city, or address"}
+            className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-white/28"
+          />
+        </div>
+
         <div className="grid gap-6 xl:grid-cols-[1.45fr_.55fr]">
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-2">
-            <MapCanvas pins={currentPins} color={currentColor} />
+            <MapCanvas pins={filteredPins} color={currentColor} />
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
@@ -203,7 +238,7 @@ export default function GeoAnalyticsPage() {
               {tab === "companies" ? "Top Companies" : tab === "branches" ? "Branch Pins" : "Recent Visitors"}
             </div>
             <div className="space-y-3">
-              {currentPins.slice(0, 12).map((pin, index) => (
+              {filteredPins.slice(0, 12).map((pin, index) => (
                 <div key={`${pin.type}-${pin.label}-${index}`} className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -222,7 +257,7 @@ export default function GeoAnalyticsPage() {
                   </div>
                 </div>
               ))}
-              {!currentPins.length && (
+              {!filteredPins.length && (
                 <div className="rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-6 text-center text-sm text-white/35">
                   No geo pins available yet.
                 </div>

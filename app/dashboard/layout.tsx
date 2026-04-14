@@ -831,6 +831,101 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
+          {/* ── ADVANCED FINANCIAL REPORTS ── */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+            <NavGroup
+              title="Advanced Financial"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>}
+              open={openSection === "advancedFinancial"}
+              onToggle={() => toggle("advancedFinancial")}
+            >
+              <NavLink href="/dashboard/reports/budget-vs-actual" pathname={pathname}>Budget vs Actual</NavLink>
+              <NavLink href="/dashboard/reports/cogs" pathname={pathname}>COGS Report</NavLink>
+              <NavLink href="/dashboard/reports/gross-margin" pathname={pathname}>Gross Margin</NavLink>
+              <NavLink href="/dashboard/reports/expense-breakdown" pathname={pathname}>Expense Breakdown</NavLink>
+              <NavLink href="/dashboard/reports/breakeven" pathname={pathname}>Breakeven Analysis</NavLink>
+              <NavLink href="/dashboard/reports/tax-forecast" pathname={pathname}>Tax Forecast</NavLink>
+              <NavLink href="/dashboard/reports/audit-exception" pathname={pathname}>Audit & Exceptions</NavLink>
+            </NavGroup>
+          )}
+
+          {/* ── INVENTORY INTELLIGENCE ── */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+            <NavGroup
+              title="Inventory Intelligence"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>}
+              open={openSection === "inventoryIntelligence"}
+              onToggle={() => toggle("inventoryIntelligence")}
+            >
+              <NavLink href="/dashboard/reports/stock/movement" pathname={pathname}>Stock Movement</NavLink>
+              <NavLink href="/dashboard/reports/stock/dead" pathname={pathname}>Dead Stock</NavLink>
+              <NavLink href="/dashboard/reports/stock/turnover" pathname={pathname}>Stock Turnover</NavLink>
+              <NavLink href="/dashboard/reports/stock/expiry" pathname={pathname}>Expiry Tracking</NavLink>
+              <NavLink href="/dashboard/reports/stock/valuation" pathname={pathname}>Stock Valuation</NavLink>
+              <NavLink href="/dashboard/reports/stock/warehouse" pathname={pathname}>Warehouse Stock</NavLink>
+            </NavGroup>
+          )}
+
+          {/* ── SALES & CUSTOMER ANALYTICS ── */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+            <NavGroup
+              title="Sales Analytics"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>}
+              open={openSection === "salesAnalytics"}
+              onToggle={() => toggle("salesAnalytics")}
+            >
+              <NavLink href="/dashboard/reports/customer-profitability" pathname={pathname}>Customer Profitability</NavLink>
+              <NavLink href="/dashboard/reports/salesman-performance" pathname={pathname}>Salesman Performance</NavLink>
+              <NavLink href="/dashboard/reports/discount-analysis" pathname={pathname}>Discount Analysis</NavLink>
+              <NavLink href="/dashboard/reports/sales-region" pathname={pathname}>Sales by Region</NavLink>
+              <NavLink href="/dashboard/reports/product-profitability" pathname={pathname}>Product Profitability</NavLink>
+              <NavLink href="/dashboard/reports/returns-analysis" pathname={pathname}>Returns Analysis</NavLink>
+            </NavGroup>
+          )}
+
+          {/* ── RECEIVABLES & PAYABLES ── */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+            <NavGroup
+              title="Receivables & Payables"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>}
+              open={openSection === "receivablesPayables"}
+              onToggle={() => toggle("receivablesPayables")}
+            >
+              <NavLink href="/dashboard/reports/supplier-ageing" pathname={pathname}>Supplier Ageing (AP)</NavLink>
+              <NavLink href="/dashboard/reports/payment-history" pathname={pathname}>Payment History</NavLink>
+              <NavLink href="/dashboard/reports/bad-debts" pathname={pathname}>Bad Debts</NavLink>
+              <NavLink href="/dashboard/reports/credit-analysis" pathname={pathname}>Credit Analysis</NavLink>
+            </NavGroup>
+          )}
+
+          {/* ── OPERATIONS REPORTS ── */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+            <NavGroup
+              title="Operations Reports"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>}
+              open={openSection === "operationsReports"}
+              onToggle={() => toggle("operationsReports")}
+            >
+              <NavLink href="/dashboard/reports/order-fulfillment" pathname={pathname}>Order Fulfillment</NavLink>
+              <NavLink href="/dashboard/reports/delivery-performance" pathname={pathname}>Delivery Performance</NavLink>
+              <NavLink href="/dashboard/reports/po-tracking" pathname={pathname}>PO Tracking</NavLink>
+              <NavLink href="/dashboard/reports/supplier-performance" pathname={pathname}>Supplier Performance</NavLink>
+            </NavGroup>
+          )}
+
+          {/* ── STRATEGIC REPORTS ── */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
+            <NavGroup
+              title="Strategic Reports"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>}
+              open={openSection === "strategicReports"}
+              onToggle={() => toggle("strategicReports")}
+            >
+              <NavLink href="/dashboard/reports/forecast" pathname={pathname}>Sales Forecast</NavLink>
+              <NavLink href="/dashboard/reports/scenario" pathname={pathname}>Scenario Planning</NavLink>
+            </NavGroup>
+          )}
+
           {/* ── MANUFACTURING ── */}
           {businessType === "food_processing" && hasModule(businessType, "bom") && isBusinessEnabled(businessType) && (
             <NavGroup
