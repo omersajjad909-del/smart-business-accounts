@@ -64,16 +64,10 @@ function FinovaLoader() {
         {/* Logo icon */}
         <div style={{
           width: 64, height: 64, borderRadius: 18,
-          background: "linear-gradient(135deg,#6366f1,#4f46e5)",
-          display: "flex", alignItems: "center", justifyContent: "center",
           animation: "finova-glow 2s ease-in-out infinite",
           boxShadow: "0 0 24px rgba(99,102,241,.4)",
         }}>
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5"/>
-            <path d="M2 12l10 5 10-5"/>
-          </svg>
+          <img src="/logo-icon.svg" alt="FinovaOS" width={64} height={64} style={{borderRadius:18}}/>
         </div>
       </div>
 
@@ -653,16 +647,10 @@ export default function DashboardLayout({
               border: pathname === "/dashboard" ? "1px solid rgba(99,102,241,0.22)" : "1px solid transparent",
             }}
           >
-            <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#6366f1,#4f46e5)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 4px 12px rgba(99,102,241,0.35)"}}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-              </svg>
-            </div>
+            {/* Logo icon — always visible */}
+            <img src="/logo-icon.svg" alt="FinovaOS" width={34} height={34} style={{flexShrink:0,borderRadius:10,boxShadow:"0 4px 12px rgba(99,102,241,0.35)"}}/>
             {!sidebarCollapsed && (
-              <div>
-                <div style={{fontSize:14,fontWeight:700,color:"white",letterSpacing:"-.2px",lineHeight:1}}>FinovaOS</div>
-                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",letterSpacing:".04em",marginTop:2}}>Business Suite</div>
-              </div>
+              <img src="/logo-full.svg" alt="FinovaOS" height={34} style={{height:34,width:"auto",objectFit:"contain"}}/>
             )}
           </Link>
           {/* Branch selector */}
