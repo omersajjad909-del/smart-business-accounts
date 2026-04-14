@@ -1,77 +1,83 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 168 40" width="168" height="40">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#6366f1"/>
-      <stop offset="100%" stop-color="#3730a3"/>
+    <linearGradient id="layerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#9333ea"/>
     </linearGradient>
-    <linearGradient id="bar1" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="rgba(255,255,255,0.55)"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0.35)"/>
+    <linearGradient id="layerGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#9333ea" stop-opacity="0.65"/>
     </linearGradient>
-    <linearGradient id="bar2" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="rgba(255,255,255,0.78)"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0.55)"/>
+    <linearGradient id="layerGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#9333ea" stop-opacity="0.35"/>
     </linearGradient>
-    <linearGradient id="bar3" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="white"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0.8)"/>
+    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
     </linearGradient>
-    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0.9)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.92)"/>
     </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
 
-  <!-- ── Icon mark (40x40) ── -->
-  <rect width="40" height="40" rx="10" fill="url(#bg)"/>
-  <rect width="40" height="20" rx="10" fill="rgba(255,255,255,0.06)"/>
+  <!-- Icon area (80x80) -->
+  <!-- Layer 3 bottom -->
+  <path d="M8,62 L44,72 L80,62 L44,68 Z" fill="url(#layerGrad3)"/>
+  <!-- Layer 2 middle -->
+  <path d="M5,50 L44,62 L83,50 L44,57 Z" fill="url(#layerGrad2)"/>
+  <!-- Layer 1 top -->
+  <path d="M2,38 L44,52 L86,38 L44,45 Z" fill="url(#layerGrad)" filter="url(#glow)"/>
 
-  <!-- Ascending bars -->
-  <rect x="7"  y="27" width="6.5" height="6"  rx="1.5" fill="url(#bar1)"/>
-  <rect x="17" y="21" width="6.5" height="12" rx="1.5" fill="url(#bar2)"/>
-  <rect x="27" y="14" width="6.5" height="19" rx="1.5" fill="url(#bar3)"/>
+  <!-- Network graph lines -->
+  <line x1="20" y1="32" x2="34" y2="24" stroke="url(#arrowGrad)" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="34" y1="24" x2="50" y2="29" stroke="url(#arrowGrad)" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="50" y1="29" x2="62" y2="20" stroke="url(#arrowGrad)" stroke-width="1.8" stroke-linecap="round"/>
 
-  <!-- Trend line -->
-  <polyline points="10.25,27  20.25,21  30.25,14" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="27.5,12.5  30.25,14  28,16.5" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Nodes -->
+  <circle cx="20" cy="32" r="3.5" fill="#38bdf8" filter="url(#glow)"/>
+  <circle cx="34" cy="24" r="3.5" fill="#5b87f5" filter="url(#glow)"/>
+  <circle cx="50" cy="29" r="3.5" fill="#7c6cf0" filter="url(#glow)"/>
 
-  <!-- Dot highlights -->
-  <circle cx="10.25" cy="27" r="1.5" fill="rgba(255,255,255,0.6)"/>
-  <circle cx="20.25" cy="21" r="1.5" fill="rgba(255,255,255,0.75)"/>
-  <circle cx="30.25" cy="14" r="1.5" fill="white"/>
+  <!-- Arrow -->
+  <line x1="55" y1="23" x2="70" y2="9" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" filter="url(#softglow)"/>
+  <polygon points="70,9 60,12 67,20" fill="#38bdf8" filter="url(#softglow)"/>
 
-  <!-- ── Wordmark ── -->
-  <!-- "Finova" bold white -->
-  <text
-    x="50" y="26"
-    font-family="'Outfit', 'Inter', system-ui, sans-serif"
-    font-size="18"
+  <!-- Wordmark -->
+  <!-- "Finova" -->
+  <text x="100" y="46"
+    font-family="'Outfit','Inter',system-ui,sans-serif"
+    font-size="28"
     font-weight="800"
+    letter-spacing="-0.5"
+    fill="url(#textGrad)">Finova</text>
+
+  <!-- separator -->
+  <line x1="218" y1="20" x2="218" y2="56" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+
+  <!-- "OS" -->
+  <text x="226" y="46"
+    font-family="'Outfit','Inter',system-ui,sans-serif"
+    font-size="28"
+    font-weight="300"
     letter-spacing="-0.3"
-    fill="url(#textGrad)"
-  >Finova</text>
+    fill="rgba(165,180,252,0.8)">OS</text>
 
-  <!-- "OS" lighter with accent colour -->
-  <text
-    x="120" y="26"
-    font-family="'Outfit', 'Inter', system-ui, sans-serif"
-    font-size="18"
-    font-weight="400"
-    letter-spacing="-0.2"
-    fill="rgba(165,180,252,0.85)"
-  >OS</text>
-
-  <!-- Thin separator line -->
-  <line x1="115" y1="12" x2="115" y2="28" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-
-  <!-- Tagline (optional — remove if too small in navbar) -->
-  <text
-    x="50" y="35"
-    font-family="'Outfit', 'Inter', system-ui, sans-serif"
-    font-size="8.5"
+  <!-- tagline -->
+  <text x="100" y="62"
+    font-family="'Outfit','Inter',system-ui,sans-serif"
+    font-size="9"
     font-weight="500"
-    letter-spacing="0.06em"
-    fill="rgba(255,255,255,0.3)"
-    text-transform="uppercase"
-  >BUSINESS SUITE</text>
+    letter-spacing="0.18em"
+    fill="rgba(255,255,255,0.28)">BUSINESS SUITE</text>
 </svg>

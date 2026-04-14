@@ -65,9 +65,8 @@ function FinovaLoader() {
         <div style={{
           width: 64, height: 64, borderRadius: 18,
           animation: "finova-glow 2s ease-in-out infinite",
-          boxShadow: "0 0 24px rgba(99,102,241,.4)",
         }}>
-          <img src="/logo-icon.svg" alt="FinovaOS" width={64} height={64} style={{borderRadius:18}}/>
+          <img src="/finova-logo.png" alt="FinovaOS" width={64} height={64} style={{borderRadius:18,objectFit:"contain"}}/>
         </div>
       </div>
 
@@ -648,9 +647,12 @@ export default function DashboardLayout({
             }}
           >
             {/* Logo icon — always visible */}
-            <img src="/logo-icon.svg" alt="FinovaOS" width={34} height={34} style={{flexShrink:0,borderRadius:10,boxShadow:"0 4px 12px rgba(99,102,241,0.35)"}}/>
+            <img src="/finova-logo.png" alt="FinovaOS" width={34} height={34} style={{flexShrink:0,borderRadius:8,objectFit:"contain"}}/>
             {!sidebarCollapsed && (
-              <img src="/logo-full.svg" alt="FinovaOS" height={34} style={{height:34,width:"auto",objectFit:"contain"}}/>
+              <div style={{display:"flex",flexDirection:"column",gap:1}}>
+                <div style={{fontSize:14,fontWeight:800,color:"white",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
+                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",letterSpacing:".04em"}}>Business Suite</div>
+              </div>
             )}
           </Link>
           {/* Branch selector */}
