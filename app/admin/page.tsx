@@ -2530,17 +2530,26 @@ const PLAN_UI = {
 
 type PlanKey = keyof typeof PLAN_UI;
 
-function PagePermissions() {
-  const [selectedPlan, setSelectedPlan] = useState<PlanKey>("STARTER");
-  const [planPerms, setPlanPerms]       = useState<Record<string,string[]>>(PLAN_DEFAULTS);
-  const [dashboardFeatureFlags, setDashboardFeatureFlags] = useState<Record<string, string[]>>(() => createDefaultDashboardFeatureFlags());
-  const [search, setSearch]             = useState("");
-  const [saving, setSaving]             = useState(false);
-  const [savedMsg, setSavedMsg]         = useState("");
-  const [syncing, setSyncing]           = useState(false);
-  const [syncMsg, setSyncMsg]           = useState("");
+const BIZ_ICONS: Record<string, string> = {
+  salon:"💇", gym:"🏋️", restaurant:"🍽️", retail:"🛒", trading:"📦",
+  distribution:"🚚", manufacturing:"🏭", service:"🔧", healthcare:"🏥",
+  real_estate:"🏠", construction:"🏗️", school:"🎓", hotel:"🏨",
+  pharmacy:"💊", transport:"🚌", trade:"📊", ecommerce:"🛍️",
+  agriculture:"🌾", ngo:"🤝", law_firm:"⚖️", it:"💻",
+  automotive:"🚗", repair:"🔨", maintenance:"🛠️", media:"📺",
+  subscriptions:"📱", isp:"📡", solar:"☀️", events:"🎪",
+  rentals:"🏢", firm:"👔", franchise:"🏪",
+};
 
-  // Load saved config
+function PagePermissions() {
+  const [selectedBusiness, setSelectedBusiness] = useState<string | null>(null);
+  const [planPerms, setPlanPerms]               = useState<Record<string,string[]>>(PLAN_DEFAULTS);
+  const [dashboardFeatureFlags, setDashboardFeatureFlags] = useState<Record<string, string[]>>(() => createDefaultDashboardFeatureFlags());
+  const [saving, setSaving]   = useState(false);
+  const [savedMsg, setSavedMsg] = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState("");
+
   useEffect(() => {
     fetch("/api/admin/plan-config")
       .then(r=>r.json())
@@ -2550,47 +2559,6 @@ function PagePermissions() {
       })
       .catch(()=>{});
   }, []);
-
-  const toggle = (perm: string) => {
-    setPlanPerms(prev => {
-      const s = new Set(prev[selectedPlan]||[]);
-      s.has(perm) ? s.delete(perm) : s.add(perm);
-      return { ...prev, [selectedPlan]: Array.from(s) };
-    });
-  };
-
-  const toggleDashboardFeature = (featureId: string) => {
-    setDashboardFeatureFlags(prev => {
-      const s = new Set(prev[selectedPlan] || []);
-      s.has(featureId) ? s.delete(featureId) : s.add(featureId);
-      return { ...prev, [selectedPlan]: Array.from(s) };
-    });
-  };
-
-  const enableAll  = () => {
-    setPlanPerms(p=>({...p,[selectedPlan]:PLAN_FEATURES.map(f=>f.key)}));
-    setDashboardFeatureFlags(p=>({...p,[selectedPlan]:DASHBOARD_FEATURE_DEFS.map(f=>f.id)}));
-  };
-  const disableAll = () => {
-    setPlanPerms(p=>({...p,[selectedPlan]:["VIEW_DASHBOARD"]}));
-    setDashboardFeatureFlags(p=>({...p,[selectedPlan]:[]}));
-  };
-  const reset      = () => {
-    setPlanPerms(p=>({...p,[selectedPlan]:[...(PLAN_DEFAULTS[selectedPlan]||[])]}));
-    const defaults = createDefaultDashboardFeatureFlags();
-    setDashboardFeatureFlags(p=>({...p,[selectedPlan]:[...(defaults[selectedPlan]||[])]}));
-  };
-
-  const toggleCategory = (cat: string) => {
-    const catKeys = PLAN_FEATURES.filter(f=>f.category===cat).map(f=>f.key);
-    const cur = planPerms[selectedPlan]||[];
-    const allOn = catKeys.every(k=>cur.includes(k));
-    setPlanPerms(prev => {
-      const s = new Set(prev[selectedPlan]||[]);
-      catKeys.forEach(k => allOn ? s.delete(k) : s.add(k));
-      return {...prev,[selectedPlan]:Array.from(s)};
-    });
-  };
 
   const save = async () => {
     setSaving(true);
@@ -2609,234 +2577,232 @@ function PagePermissions() {
   const syncPlan = async (plan?: string) => {
     setSyncing(true); setSyncMsg("");
     try {
-      const res = await fetch("/api/admin/sync-plan-permissions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-user-role": "ADMIN" },
-        body: JSON.stringify(plan ? { plans: [plan] } : {}),
+      const res = await fetch("/api/admin/sync-plan-permissions",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","x-user-role":"ADMIN"},
+        body:JSON.stringify(plan ? { plans:[plan] } : {}),
       });
       const d = await res.json();
-      if (d.success) {
-        setSyncMsg(`✅ ${d.message}`);
-      } else {
-        setSyncMsg(`❌ ${d.error || "Sync failed"}`);
-      }
+      setSyncMsg(d.success ? `✅ ${d.message}` : `❌ ${d.error||"Sync failed"}`);
     } catch { setSyncMsg("❌ Network error"); }
     setSyncing(false);
-    setTimeout(() => setSyncMsg(""), 4000);
+    setTimeout(()=>setSyncMsg(""),4000);
   };
 
-  const cur = planPerms[selectedPlan]||[];
-  const curDashboard = dashboardFeatureFlags[selectedPlan] || [];
-  const meta = PLAN_UI[selectedPlan];
-  const filtered = PLAN_FEATURES.filter(f =>
-    !search || f.label.toLowerCase().includes(search.toLowerCase()) || f.route.toLowerCase().includes(search.toLowerCase())
-  );
-  const filteredBusinessFeatures = DASHBOARD_FEATURE_DEFS.filter(feature =>
-    !search ||
-    feature.label.toLowerCase().includes(search.toLowerCase()) ||
-    feature.route.toLowerCase().includes(search.toLowerCase()) ||
-    feature.businessLabel.toLowerCase().includes(search.toLowerCase()) ||
-    feature.section.toLowerCase().includes(search.toLowerCase())
-  );
-  const businessGroups = filteredBusinessFeatures.reduce<Record<string, typeof filteredBusinessFeatures>>((acc, feature) => {
-    (acc[feature.business] ||= []).push(feature);
+  const PLAN_KEYS = ["STARTER","PRO","ENTERPRISE"] as const;
+
+  // Group all business-specific features by business type
+  const bizGroups = DASHBOARD_FEATURE_DEFS.reduce<Record<string, typeof DASHBOARD_FEATURE_DEFS>>((acc, f) => {
+    (acc[f.business] ||= []).push(f);
     return acc;
   }, {});
-  const totalItems = PLAN_FEATURES.length + DASHBOARD_FEATURE_DEFS.length;
 
-  return (
-    <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
-      <style>{`@keyframes pf-slide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
+  const toggleFeature = (plan: string, featureId: string) => {
+    setDashboardFeatureFlags(prev => {
+      const s = new Set(prev[plan]||[]);
+      s.has(featureId) ? s.delete(featureId) : s.add(featureId);
+      return {...prev,[plan]:Array.from(s)};
+    });
+  };
 
-      {/* Header row */}
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20, flexWrap:"wrap", gap:12 }}>
-        <div>
-          <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:4 }}>Select a plan → toggle modules → save</div>
+  const enableAllForPlan = (plan: string, features: typeof DASHBOARD_FEATURE_DEFS) => {
+    setDashboardFeatureFlags(prev => {
+      const s = new Set(prev[plan]||[]);
+      features.forEach(f=>s.add(f.id));
+      return {...prev,[plan]:Array.from(s)};
+    });
+  };
+
+  const disableAllForPlan = (plan: string, features: typeof DASHBOARD_FEATURE_DEFS) => {
+    setDashboardFeatureFlags(prev => {
+      const s = new Set(prev[plan]||[]);
+      features.forEach(f=>s.delete(f.id));
+      return {...prev,[plan]:Array.from(s)};
+    });
+  };
+
+  // Shared header action buttons
+  const ActionBar = ({ showSync = true }: { showSync?: boolean }) => (
+    <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>
+      {savedMsg && <span style={{ fontSize:12, fontWeight:700, color:savedMsg==="Error!"?"#f87171":"#34d399", padding:"6px 14px", borderRadius:8, background:savedMsg==="Error!"?"rgba(248,113,113,.12)":"rgba(52,211,153,.12)" }}>{savedMsg==="Error!"?"":"✓ "}{savedMsg}</span>}
+      {syncMsg  && <span style={{ fontSize:12, fontWeight:700, color:syncMsg.startsWith("✅")?"#34d399":"#f87171", padding:"6px 14px", borderRadius:8, background:syncMsg.startsWith("✅")?"rgba(52,211,153,.12)":"rgba(248,113,113,.12)" }}>{syncMsg}</span>}
+      <button onClick={save} disabled={saving}
+        style={{ padding:"9px 22px",borderRadius:10,background:saving?"rgba(99,102,241,.4)":"linear-gradient(135deg,#6366f1,#4f46e5)",border:"none",color:"white",fontSize:13,fontWeight:700,cursor:saving?"default":"pointer",fontFamily:"inherit",boxShadow:"0 4px 14px rgba(99,102,241,.35)" }}>
+        {saving?"Saving…":"💾 Save Changes"}
+      </button>
+      {showSync && <>
+        <button onClick={()=>syncPlan()} disabled={syncing}
+          style={{ padding:"9px 18px",borderRadius:10,background:"rgba(251,191,36,.08)",border:"1px solid rgba(251,191,36,.25)",color:"#fbbf24",fontSize:12,fontWeight:700,cursor:syncing?"default":"pointer",fontFamily:"inherit" }}>
+          {syncing?"…":"⚡ Sync All Plans"}
+        </button>
+      </>}
+    </div>
+  );
+
+  /* ── STEP 2: Business detail — 3 plan columns ── */
+  if (selectedBusiness) {
+    const features = bizGroups[selectedBusiness] || [];
+    const bizLabel = features[0]?.businessLabel || selectedBusiness;
+    const bizIcon  = BIZ_ICONS[selectedBusiness] || "🏢";
+
+    return (
+      <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
+        <style>{`@keyframes pf-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
+
+        {/* Header */}
+        <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:22, flexWrap:"wrap" }}>
+          <button onClick={()=>setSelectedBusiness(null)}
+            style={{ padding:"8px 16px", borderRadius:10, border:"1.5px solid rgba(255,255,255,.15)", background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.7)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:6 }}>
+            ← All Businesses
+          </button>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:18, fontWeight:800, color:"white" }}>{bizIcon} {bizLabel}</div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>{features.length} modules — configure which plan gets access to each page</div>
+          </div>
+          <ActionBar showSync={false} />
         </div>
-        <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>
-          {savedMsg && <span style={{ fontSize:12, fontWeight:700, color:savedMsg==="Error!"?"#f87171":"#34d399", padding:"6px 14px", borderRadius:8, background:savedMsg==="Error!"?"rgba(248,113,113,.12)":"rgba(52,211,153,.12)" }}>{savedMsg==="Error!"?"":"✓"} {savedMsg}</span>}
-          {syncMsg && <span style={{ fontSize:12, fontWeight:700, color:syncMsg.startsWith("✅")?"#34d399":"#f87171", padding:"6px 14px", borderRadius:8, background:syncMsg.startsWith("✅")?"rgba(52,211,153,.12)":"rgba(248,113,113,.12)" }}>{syncMsg}</span>}
-          <button onClick={save} disabled={saving}
-            style={{ padding:"10px 24px",borderRadius:10,background:saving?"rgba(99,102,241,.4)":"linear-gradient(135deg,#6366f1,#4f46e5)",border:"none",color:"white",fontSize:13,fontWeight:700,cursor:saving?"default":"pointer",fontFamily:"inherit",boxShadow:"0 4px 14px rgba(99,102,241,.35)" }}>
-            {saving?"Saving…":"💾 Save Changes"}
-          </button>
-          <button onClick={() => syncPlan(selectedPlan)} disabled={syncing}
-            title={`Apply current ${selectedPlan} permissions to ALL existing users on this plan`}
-            style={{ padding:"10px 20px",borderRadius:10,background:syncing?"rgba(52,211,153,.2)":"rgba(52,211,153,.12)",border:"1px solid rgba(52,211,153,.3)",color:"#34d399",fontSize:13,fontWeight:700,cursor:syncing?"default":"pointer",fontFamily:"inherit" }}>
-            {syncing?"Syncing…":"🔄 Sync "+selectedPlan+" Users"}
-          </button>
-          <button onClick={() => syncPlan()} disabled={syncing}
-            title="Apply ALL plan permission changes to ALL existing users"
-            style={{ padding:"10px 20px",borderRadius:10,background:"rgba(251,191,36,.08)",border:"1px solid rgba(251,191,36,.25)",color:"#fbbf24",fontSize:12,fontWeight:700,cursor:syncing?"default":"pointer",fontFamily:"inherit" }}>
-            {syncing?"…":"⚡ Sync All Plans"}
-          </button>
-        </div>
-      </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"240px 1fr", gap:16, alignItems:"start" }}>
+        {/* 3 plan columns */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14, animation:"pf-in .25s ease" }}>
+          {PLAN_KEYS.map(plan => {
+            const meta = PLAN_UI[plan];
+            const flags = dashboardFeatureFlags[plan] || [];
+            const enabled = features.filter(f=>flags.includes(f.id)).length;
+            const allOn   = enabled === features.length;
 
-        {/* ── Left: Plan cards ── */}
-        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-          {(Object.keys(PLAN_UI) as PlanKey[]).map(plan => {
-            const m = PLAN_UI[plan];
-            const count = (planPerms[plan]||[]).length + (dashboardFeatureFlags[plan]||[]).length;
-            const pct = Math.round((count/totalItems)*100);
-            const isSel = selectedPlan === plan;
             return (
-              <div key={plan} onClick={()=>setSelectedPlan(plan)}
-                style={{ padding:"14px 16px", borderRadius:14, cursor:"pointer", transition:"all .2s",
-                  border:`2px solid ${isSel ? m.color : "rgba(255,255,255,.08)"}`,
-                  background: isSel ? `rgba(${m.color==="#818cf8"?"129,140,248":m.color==="#34d399"?"52,211,153":m.color==="#fbbf24"?"251,191,36":"56,189,248"},.1)` : "rgba(255,255,255,.03)",
-                  boxShadow: isSel ? `0 0 0 3px ${m.glow}` : "none" }}>
-                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-                  <div style={{ width:38, height:38, borderRadius:10, background:`${m.glow}`, border:`1.5px solid ${m.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>{m.icon}</div>
-                  <div>
-                    <div style={{ fontWeight:800, fontSize:14, color: isSel ? m.color : "white" }}>{m.name}</div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:1 }}>{count} / {totalItems} items</div>
+              <div key={plan} style={{ borderRadius:16, border:`2px solid ${meta.border}`, overflow:"hidden", display:"flex", flexDirection:"column" }}>
+
+                {/* Plan header */}
+                <div style={{ padding:"14px 16px", background:meta.glow, borderBottom:`1px solid ${meta.border}` }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+                    <div style={{ width:40, height:40, borderRadius:10, background:"rgba(0,0,0,.25)", border:`1.5px solid ${meta.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{meta.icon}</div>
+                    <div>
+                      <div style={{ fontSize:15, fontWeight:800, color:meta.color }}>{meta.name}</div>
+                      <div style={{ fontSize:11, color:"rgba(255,255,255,.45)", marginTop:1 }}>{enabled} / {features.length} enabled</div>
+                    </div>
                   </div>
-                  {isSel && <div style={{ marginLeft:"auto", width:20, height:20, borderRadius:"50%", background:m.color, display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>}
-                </div>
-                <div style={{ height:5, background:"rgba(255,255,255,.08)", borderRadius:99, overflow:"hidden" }}>
-                  <div style={{ width:`${pct}%`, height:"100%", background:m.color, borderRadius:99, transition:"width .4s ease" }}/>
-                </div>
-                {/* Quick actions */}
-                <div style={{ display:"flex", gap:6, marginTop:10 }}>
-                  {[["All",enableAll],["Min",disableAll],["Reset",reset]].map(([lbl,fn])=>(
-                    <button key={lbl as string} onClick={e=>{e.stopPropagation();if(isSel)(fn as ()=>void)();else{setSelectedPlan(plan);setTimeout(fn as ()=>void,50);}}}
-                      style={{ flex:1, fontSize:10, fontWeight:700, padding:"4px 0", border:`1px solid ${isSel?m.border:"rgba(255,255,255,.1)"}`, borderRadius:6, cursor:"pointer", background:"transparent", color:isSel?m.color:"rgba(255,255,255,.3)", fontFamily:"inherit" }}>
-                      {lbl as string}
+                  {/* Progress bar */}
+                  <div style={{ height:4, background:"rgba(255,255,255,.1)", borderRadius:99, overflow:"hidden", marginBottom:10 }}>
+                    <div style={{ width:`${features.length ? Math.round((enabled/features.length)*100) : 0}%`, height:"100%", background:meta.color, borderRadius:99, transition:"width .3s" }}/>
+                  </div>
+                  {/* Quick actions */}
+                  <div style={{ display:"flex", gap:6 }}>
+                    <button onClick={()=>enableAllForPlan(plan, features)}
+                      style={{ flex:1, fontSize:10, fontWeight:700, padding:"5px 0", borderRadius:7, border:`1px solid ${meta.border}`, background:"rgba(0,0,0,.2)", color:meta.color, cursor:"pointer", fontFamily:"inherit" }}>
+                      ✓ Enable All
                     </button>
-                  ))}
+                    <button onClick={()=>disableAllForPlan(plan, features)}
+                      style={{ flex:1, fontSize:10, fontWeight:700, padding:"5px 0", borderRadius:7, border:"1px solid rgba(255,255,255,.12)", background:"rgba(0,0,0,.2)", color:"rgba(255,255,255,.45)", cursor:"pointer", fontFamily:"inherit" }}>
+                      ✗ Disable All
+                    </button>
+                  </div>
+                </div>
+
+                {/* Module rows */}
+                <div style={{ flex:1, background:"rgba(255,255,255,.02)" }}>
+                  {features.map((feature, idx) => {
+                    const on = flags.includes(feature.id);
+                    return (
+                      <div key={feature.id}
+                        onClick={()=>toggleFeature(plan, feature.id)}
+                        style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px",
+                          borderBottom: idx < features.length-1 ? "1px solid rgba(255,255,255,.05)" : "none",
+                          cursor:"pointer", background:on?"rgba(255,255,255,.04)":"transparent",
+                          transition:"background .15s" }}
+                        onMouseEnter={e=>(e.currentTarget.style.background=on?"rgba(255,255,255,.06)":"rgba(255,255,255,.03)")}
+                        onMouseLeave={e=>(e.currentTarget.style.background=on?"rgba(255,255,255,.04)":"transparent")}>
+                        {/* Custom checkbox */}
+                        <div style={{ width:18, height:18, borderRadius:5, flexShrink:0, border:`2px solid ${on?meta.color:"rgba(255,255,255,.2)"}`, background:on?meta.color:"transparent", display:"flex", alignItems:"center", justifyContent:"center", transition:"all .15s" }}>
+                          {on && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5 9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                        </div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ fontSize:12, fontWeight:600, color:on?"white":"rgba(255,255,255,.4)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{feature.label}</div>
+                          <div style={{ fontSize:10, color:"rgba(255,255,255,.22)", marginTop:1 }}>{feature.section}</div>
+                        </div>
+                        <div style={{ fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:6, background:on?meta.glow:"rgba(255,255,255,.06)", color:on?meta.color:"rgba(255,255,255,.3)", flexShrink:0 }}>
+                          {on?"ON":"OFF"}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
           })}
         </div>
+      </div>
+    );
+  }
 
-        {/* ── Right: permissions ── */}
-        <div style={{ animation:"pf-slide .3s ease" }} key={selectedPlan}>
-          {/* Plan banner */}
-          <div style={{ padding:"14px 18px", borderRadius:14, background:meta.glow, border:`1.5px solid ${meta.border}`, marginBottom:14, display:"flex", alignItems:"center", gap:14 }}>
-            <span style={{ fontSize:26 }}>{meta.icon}</span>
-            <div>
-              <div style={{ fontSize:15, fontWeight:800, color:meta.color }}>{meta.name} Plan</div>
-              <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginTop:2 }}>{cur.length + curDashboard.length} of {totalItems} items enabled — applies to all users on this plan immediately after save</div>
+  /* ── STEP 1: Business grid ── */
+  const bizEntries = Object.entries(bizGroups);
+  const planTotals = PLAN_KEYS.map(plan => ({
+    plan,
+    meta: PLAN_UI[plan],
+    count: (dashboardFeatureFlags[plan]||[]).length,
+    total: DASHBOARD_FEATURE_DEFS.length,
+  }));
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
+      <style>{`@keyframes pf-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
+
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20, flexWrap:"wrap", gap:12 }}>
+        <div>
+          <div style={{ fontSize:15, fontWeight:800, color:"white", marginBottom:4 }}>Business Module Permissions</div>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>Select a business type → configure which plan gets access to each module</div>
+        </div>
+        <ActionBar />
+      </div>
+
+      {/* Plan summary strip */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:22 }}>
+        {planTotals.map(({plan,meta,count,total}) => (
+          <div key={plan} style={{ padding:"12px 16px", borderRadius:12, background:meta.glow, border:`1.5px solid ${meta.border}`, display:"flex", alignItems:"center", gap:12 }}>
+            <span style={{ fontSize:22 }}>{meta.icon}</span>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:13, fontWeight:800, color:meta.color }}>{meta.name}</div>
+              <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginTop:1 }}>{count} / {total} modules enabled</div>
+            </div>
+            <div style={{ height:36, width:36, borderRadius:"50%", background:"rgba(0,0,0,.2)", border:`1.5px solid ${meta.border}`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <span style={{ fontSize:12, fontWeight:800, color:meta.color }}>{total?Math.round((count/total)*100):0}%</span>
             </div>
           </div>
+        ))}
+      </div>
 
-          {/* Search */}
-          <div style={{ position:"relative", marginBottom:14 }}>
-            <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:13, color:"rgba(255,255,255,.3)" }}>🔍</span>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search modules…"
-              style={{ width:"100%", padding:"9px 12px 9px 36px", borderRadius:10, border:"1.5px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", color:"white", fontSize:13, outline:"none", fontFamily:"inherit", boxSizing:"border-box" }}/>
-          </div>
-
-          <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:14 }}>
-            <div style={{ fontSize:11, fontWeight:800, color:"rgba(255,255,255,.45)", letterSpacing:".08em", textTransform:"uppercase" }}>Business Modules</div>
-            {Object.entries(businessGroups).map(([businessKey, features]) => {
-              const enabled = features.filter(feature => curDashboard.includes(feature.id)).length;
-              const allOn = enabled === features.length;
-              const title = features[0]?.businessLabel || businessKey;
-              return (
-                <div key={businessKey} style={{ borderRadius:14, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.03)", overflow:"hidden" }}>
-                  <div style={{ padding:"10px 16px", background:"rgba(255,255,255,.04)", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
-                    <div>
-                      <div style={{ fontSize:13, fontWeight:800, color:"white" }}>{title}</div>
-                      <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>{enabled} / {features.length} pages active</div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setDashboardFeatureFlags(prev => {
-                          const s = new Set(prev[selectedPlan] || []);
-                          features.forEach(feature => allOn ? s.delete(feature.id) : s.add(feature.id));
-                          return { ...prev, [selectedPlan]: Array.from(s) };
-                        });
-                      }}
-                      style={{ fontSize:10, fontWeight:700, padding:"4px 10px", borderRadius:6, border:`1px solid ${meta.border}`, background:"transparent", color:meta.color, cursor:"pointer", fontFamily:"inherit" }}
-                    >
-                      {allOn ? "Disable All" : "Enable All"}
-                    </button>
-                  </div>
-                  <div>
-                    {features.map((feature, idx) => {
-                      const checked = curDashboard.includes(feature.id);
-                      return (
-                        <label key={feature.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 16px", borderBottom: idx < features.length - 1 ? "1px solid rgba(255,255,255,.06)" : "none", cursor:"pointer" }}>
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => toggleDashboardFeature(feature.id)}
-                            style={{ width:16, height:16, accentColor: meta.color, cursor:"pointer" }}
-                          />
-                          <div style={{ flex:1 }}>
-                            <div style={{ fontSize:13, fontWeight:600, color: checked ? "white" : "rgba(255,255,255,.45)" }}>{feature.label}</div>
-                            <div style={{ fontSize:11, color:"rgba(255,255,255,.28)", marginTop:2 }}>{feature.section} • {feature.route}</div>
-                          </div>
-                          <div style={{ padding:"2px 8px", borderRadius:8, fontSize:10, fontWeight:700, background: checked ? meta.glow : "rgba(255,255,255,.06)", color: checked ? meta.color : "rgba(255,255,255,.4)" }}>
-                            {checked ? "ON" : "OFF"}
-                          </div>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Categories */}
-          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-            {PF_CATEGORIES.map(cat => {
-              const catFeats = filtered.filter(f=>f.category===cat);
-              if (!catFeats.length) return null;
-              const catEnabled = catFeats.filter(f=>cur.includes(f.key)).length;
-              const allOn = catEnabled === catFeats.length;
-              return (
-                <div key={cat} style={{ borderRadius:14, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.03)", overflow:"hidden" }}>
-                  {/* Category header */}
-                  <div style={{ padding:"10px 16px", background:"rgba(255,255,255,.04)", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                      <div style={{ width:6, height:6, borderRadius:"50%", background:meta.color }}/>
-                      <span style={{ fontSize:11, fontWeight:800, color:"rgba(255,255,255,.7)", letterSpacing:".06em", textTransform:"uppercase" }}>{cat}</span>
-                      <span style={{ fontSize:10, padding:"1px 7px", borderRadius:99, background:`${meta.glow}`, color:meta.color, fontWeight:700 }}>{catEnabled}/{catFeats.length}</span>
-                    </div>
-                    <button onClick={()=>toggleCategory(cat)}
-                      style={{ fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:6, border:`1px solid ${meta.border}`, background:"transparent", color:meta.color, cursor:"pointer", fontFamily:"inherit" }}>
-                      {allOn?"Disable All":"Enable All"}
-                    </button>
-                  </div>
-                  {/* Feature rows */}
-                  {catFeats.map((f, idx) => {
-                    const on = cur.includes(f.key);
-                    return (
-                      <label key={f.key}
-                        style={{ display:"flex", alignItems:"center", gap:14, padding:"11px 16px", borderBottom:idx<catFeats.length-1?"1px solid rgba(255,255,255,.04)":"none", cursor:"pointer", transition:"background .15s" }}
-                        onMouseEnter={e=>(e.currentTarget.style.background="rgba(255,255,255,.04)")}
-                        onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
-                        {/* Toggle switch */}
-                        <div style={{ position:"relative", width:36, height:20, flexShrink:0 }} onClick={()=>toggle(f.key)}>
-                          <div style={{ width:36, height:20, borderRadius:10, background:on?meta.color:"rgba(255,255,255,.15)", transition:"background .2s", position:"relative" }}>
-                            <div style={{ position:"absolute", top:2, left:on?18:2, width:16, height:16, borderRadius:"50%", background:"white", boxShadow:"0 1px 3px rgba(0,0,0,.3)", transition:"left .2s" }}/>
-                          </div>
-                        </div>
-                        {/* Info */}
-                        <div style={{ flex:1 }}>
-                          <div style={{ fontSize:13, fontWeight:600, color:on?"white":"rgba(255,255,255,.35)" }}>{f.label}</div>
-                          <div style={{ fontSize:11, color:"rgba(255,255,255,.2)", marginTop:1, fontFamily:"monospace" }}>{f.route}</div>
-                        </div>
-                        {/* Badge */}
-                        <div style={{ padding:"2px 8px", borderRadius:8, fontSize:10, fontWeight:700, background:on?meta.glow:"rgba(255,255,255,.06)", color:on?meta.color:"rgba(255,255,255,.25)" }}>
-                          {on?"ON":"OFF"}
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
-              );
-            })}
-            {!filtered.length && <div style={{ padding:32, textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No modules match your search.</div>}
-          </div>
-        </div>
+      {/* Business type grid */}
+      <div style={{ fontSize:11, fontWeight:800, color:"rgba(255,255,255,.4)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:12 }}>
+        {bizEntries.length} Business Types — click to configure modules
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(170px, 1fr))", gap:10, animation:"pf-in .25s ease" }}>
+        {bizEntries.map(([bizKey, features]) => {
+          const bizLabel = features[0]?.businessLabel || bizKey;
+          const icon = BIZ_ICONS[bizKey] || "🏢";
+          // Count how many features are enabled across all plans
+          const enabledAcrossPlans = PLAN_KEYS.reduce((sum, plan) => {
+            const flags = dashboardFeatureFlags[plan]||[];
+            return sum + features.filter(f=>flags.includes(f.id)).length;
+          }, 0);
+          const maxPossible = features.length * PLAN_KEYS.length;
+          const pct = maxPossible ? Math.round((enabledAcrossPlans/maxPossible)*100) : 0;
+          return (
+            <div key={bizKey} onClick={()=>setSelectedBusiness(bizKey)}
+              style={{ padding:"16px 14px", borderRadius:14, cursor:"pointer", border:"1.5px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.03)", transition:"all .2s", display:"flex", flexDirection:"column", gap:8 }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLDivElement).style.border="1.5px solid rgba(99,102,241,.4)";(e.currentTarget as HTMLDivElement).style.background="rgba(99,102,241,.08)";}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLDivElement).style.border="1.5px solid rgba(255,255,255,.08)";(e.currentTarget as HTMLDivElement).style.background="rgba(255,255,255,.03)";}}>
+              <div style={{ fontSize:28 }}>{icon}</div>
+              <div style={{ fontSize:13, fontWeight:700, color:"white", lineHeight:1.3 }}>{bizLabel}</div>
+              <div style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>{features.length} modules</div>
+              <div style={{ height:3, background:"rgba(255,255,255,.08)", borderRadius:99, overflow:"hidden" }}>
+                <div style={{ width:`${pct}%`, height:"100%", background:"#6366f1", borderRadius:99 }}/>
+              </div>
+              <div style={{ fontSize:10, color:"rgba(255,255,255,.25)" }}>{pct}% configured</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
