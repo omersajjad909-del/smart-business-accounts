@@ -27,9 +27,6 @@
     </filter>
   </defs>
 
-  <!-- Dark background -->
-  <rect width="200" height="200" fill="#070b18"/>
-
   <!-- Layer 3 (bottom) — most faded -->
   <path d="M40,148 L100,172 L160,148 L100,162 Z" fill="url(#layerGrad3)" rx="4"/>
 

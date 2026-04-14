@@ -11,6 +11,8 @@ type Company = {
   subscriptionStatus?: string | null;
   stripeCustomerId?: string | null;
   currentPeriodEnd?: string | null;
+  cancelledAt?: string | null;
+  dataRetentionUntil?: string | null;
   usersCount: number;
   lastLogin?: string | null;
 };
@@ -30,6 +32,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   PAST_DUE: { bg: "rgba(249,115,22,.12)", text: "#f97316" },
   INACTIVE: { bg: "rgba(100,116,139,.12)",text: "#94a3b8" },
   CANCELED: { bg: "rgba(239,68,68,.12)",  text: "#f87171" },
+  PURGED:   { bg: "rgba(71,85,105,.12)",  text: "#475569" },
 };
 
 function PlanBadge({ plan }: { plan?: string | null }) {
@@ -272,6 +275,30 @@ export default function AdminSubscriptionsPage() {
   const [q, setQ]                 = useState("");
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [overriding, setOverriding]     = useState<Company | null>(null);
+  const [cleanupRunning, setCleanupRunning] = useState(false);
+  const [cleanupResult, setCleanupResult]   = useState<{ purged: number; errors: number } | null>(null);
+
+  async function runCleanup() {
+    if (!confirm("This will permanently delete data for all companies past their 90-day retention window. Continue?")) return;
+    setCleanupRunning(true);
+    setCleanupResult(null);
+    try {
+      const u = getCurrentUser();
+      const h: Record<string, string> = { "Content-Type": "application/json" };
+      if (u?.role) h["x-user-role"] = u.role;
+      if (u?.id)   h["x-user-id"]   = u.id;
+      const r = await fetch("/api/admin/cron/data-cleanup", { method: "POST", headers: h, credentials: "include" as any });
+      const j = await r.json();
+      if (r.ok) {
+        setCleanupResult({ purged: j.purged || 0, errors: j.errors || 0 });
+        toast.success(`Cleanup done — ${j.purged} account(s) purged`);
+        load();
+      } else {
+        toast.error(j?.error || "Cleanup failed");
+      }
+    } catch { toast.error("Cleanup request failed"); }
+    setCleanupRunning(false);
+  }
 
   useEffect(() => { load(); }, []);
 
@@ -313,7 +340,13 @@ export default function AdminSubscriptionsPage() {
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "white" }}>Subscription Management</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#475569" }}>Override billing, extend trials, grant access, reset offers</p>
         </div>
-        <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>↻ Refresh</button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={load} style={{ padding: "9px 18px", borderRadius: 10, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>↻ Refresh</button>
+          <button onClick={runCleanup} disabled={cleanupRunning}
+            style={{ padding: "9px 18px", borderRadius: 10, background: cleanupRunning ? "rgba(239,68,68,.08)" : "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.3)", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: cleanupRunning ? "wait" : "pointer", opacity: cleanupRunning ? .6 : 1 }}>
+            {cleanupRunning ? "Running…" : "🗑 Run Data Cleanup"}
+          </button>
+        </div>
       </div>
 
       {/* Alert panels */}
@@ -351,6 +384,18 @@ export default function AdminSubscriptionsPage() {
         </div>
       )}
 
+      {/* Cleanup result banner */}
+      {cleanupResult && (
+        <div style={{ marginBottom: 16, padding: "12px 18px", borderRadius: 12, background: cleanupResult.errors > 0 ? "rgba(249,115,22,.08)" : "rgba(34,197,94,.08)", border: `1px solid ${cleanupResult.errors > 0 ? "rgba(249,115,22,.3)" : "rgba(34,197,94,.3)"}`, display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 18 }}>{cleanupResult.errors > 0 ? "⚠️" : "✅"}</span>
+          <span style={{ fontSize: 13, color: cleanupResult.errors > 0 ? "#fb923c" : "#4ade80" }}>
+            Cleanup complete — <strong>{cleanupResult.purged}</strong> account(s) permanently purged
+            {cleanupResult.errors > 0 && `, ${cleanupResult.errors} error(s)`}
+          </span>
+          <button onClick={() => setCleanupResult(null)} style={{ marginLeft: "auto", background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 14 }}>✕</button>
+        </div>
+      )}
+
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px,1fr))", gap: 12, marginBottom: 22 }}>
         {[
@@ -358,6 +403,7 @@ export default function AdminSubscriptionsPage() {
           { label: "Active",    value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "ACTIVE").length,    color: "#22c55e" },
           { label: "Trialing",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "TRIALING").length,  color: "#06b6d4" },
           { label: "Past Due",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "PAST_DUE").length,  color: "#f97316" },
+          { label: "Canceled",  value: companies.filter(c => c.subscriptionStatus?.toUpperCase() === "CANCELED").length,  color: "#f87171" },
           { label: "Expiring",  value: expiringSoon.length,                                                                              color: "#fbbf24" },
         ].map(s => (
           <div key={s.label} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: `1px solid ${s.color}20` }}>
@@ -385,7 +431,7 @@ export default function AdminSubscriptionsPage() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,.04)" }}>
-              {["Company", "Plan", "Status", "Renewal", "Stripe ID", "Actions"].map(h => (
+              {["Company", "Plan", "Status", "Renewal / Retention", "Stripe ID", "Actions"].map(h => (
                 <th key={h} style={{ padding: "12px 16px", textAlign: h === "Actions" ? "right" : "left", fontSize: 10, fontWeight: 800, color: "#475569", letterSpacing: ".07em", borderBottom: "1px solid rgba(255,255,255,.07)" }}>{h.toUpperCase()}</th>
               ))}
             </tr>
@@ -399,17 +445,35 @@ export default function AdminSubscriptionsPage() {
               const periodEnd = c.currentPeriodEnd ? new Date(c.currentPeriodEnd) : null;
               const daysLeft  = periodEnd ? Math.ceil((periodEnd.getTime() - Date.now()) / 86400000) : null;
               const expiring  = daysLeft !== null && daysLeft >= 0 && daysLeft <= 7;
+              const isCanceled = (c.subscriptionStatus || "").toUpperCase() === "CANCELED";
+              const isPurged   = (c.subscriptionStatus || "").toUpperCase() === "PURGED";
+              const retentionDate = c.dataRetentionUntil ? new Date(c.dataRetentionUntil) : null;
+              const retentionDaysLeft = retentionDate ? Math.ceil((retentionDate.getTime() - Date.now()) / 86400000) : null;
+              const isOverdue = retentionDaysLeft !== null && retentionDaysLeft <= 0;
+              const gracePeriodActive = retentionDaysLeft !== null && retentionDaysLeft > 60; // first 30 days
 
               return (
-                <tr key={c.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)", background: expiring ? "rgba(249,115,22,.03)" : "transparent" }}>
+                <tr key={c.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)", background: expiring ? "rgba(249,115,22,.03)" : isOverdue ? "rgba(239,68,68,.04)" : "transparent" }}>
                   <td style={{ padding: "14px 16px" }}>
-                    <div style={{ fontWeight: 700, fontSize: 13, color: "white" }}>{c.name}</div>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: isPurged ? "#475569" : "white" }}>{c.name}</div>
                     <div style={{ fontSize: 11, color: "#334155" }}>{c.country || "—"} · {c.usersCount} users</div>
                   </td>
                   <td style={{ padding: "14px 16px" }}><PlanBadge plan={c.plan} /></td>
                   <td style={{ padding: "14px 16px" }}><StatusBadge status={c.subscriptionStatus} /></td>
                   <td style={{ padding: "14px 16px", fontSize: 12 }}>
-                    {periodEnd ? (
+                    {isCanceled && retentionDate ? (
+                      <div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "#f87171", letterSpacing: ".05em", marginBottom: 3 }}>DATA RETENTION</div>
+                        <div style={{ color: isOverdue ? "#f87171" : retentionDaysLeft! <= 14 ? "#f97316" : "#94a3b8" }}>
+                          {retentionDate.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                        </div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: isOverdue ? "#f87171" : retentionDaysLeft! <= 14 ? "#f97316" : "#475569", marginTop: 2 }}>
+                          {isOverdue ? "⚠️ Overdue — run cleanup" : `${retentionDaysLeft}d until purge${gracePeriodActive ? " · read-only grace" : ""}`}
+                        </div>
+                      </div>
+                    ) : isPurged ? (
+                      <span style={{ fontSize: 11, color: "#334155" }}>Data purged</span>
+                    ) : periodEnd ? (
                       <div>
                         <div style={{ color: expiring ? "#f97316" : "#94a3b8" }}>
                           {periodEnd.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}

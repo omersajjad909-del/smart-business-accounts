@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-const LAST_UPDATED = "1 March 2025";
+const LAST_UPDATED = "14 April 2026";
 const EMAIL = "finovaos.app@gmail.com";
 
 const SECTIONS = [
@@ -178,11 +178,31 @@ const SECTIONS = [
     color: "#f87171",
     dim: "rgba(248,113,113,.08)",
     border: "rgba(248,113,113,.25)",
-    title: "Account Termination",
+    title: "Account Termination & Data Retention",
     content: [
       {
         sub: "Cancellation",
-        body: "You may cancel your subscription at any time. After cancellation, your account may remain accessible for 30 days in read-only mode. After 30 days, data may be permanently deleted.",
+        body: "You may cancel your subscription at any time from your billing settings or by contacting support. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused time on monthly plans.",
+      },
+      {
+        sub: "Phase 1 — Read-Only Grace Period (Days 1–30)",
+        body: "For the first 30 days after cancellation, your account switches to read-only mode. You can log in, view all your records, and export your data in CSV, Excel, or PDF format. No new data can be created or edited during this period.",
+      },
+      {
+        sub: "Phase 2 — Account Locked (Days 31–90)",
+        body: "From day 31 to day 90 after cancellation, your account is locked and login is disabled. Your data remains stored on our servers during this window. You may reactivate your subscription at any time during this period to restore full access instantly.",
+      },
+      {
+        sub: "Phase 3 — Permanent Deletion (Day 90+)",
+        body: "90 days after cancellation, all of your business data is permanently and irreversibly deleted from our servers. This includes all invoices, ledger entries, inventory records, payroll data, contacts, and reports. We will send an email reminder 14 days and 3 days before this deadline.",
+      },
+      {
+        sub: "What We Retain After Deletion",
+        body: "After permanent deletion, we retain only: (1) an anonymized audit log entry confirming the deletion event, and (2) basic billing records required by law (company name, plan, payment amounts). No financial, accounting, or personal business data is retained.",
+      },
+      {
+        sub: "Reactivation Before Day 90",
+        body: "If you reactivate your subscription before the 90-day deadline, all your data is immediately restored and your account returns to full active status. We strongly recommend exporting a backup during the 30-day grace period as a safety measure.",
       },
     ],
   },

@@ -3,7 +3,7 @@ import Link from "next/link";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
-const LAST_UPDATED = "1 March 2025";
+const LAST_UPDATED = "14 April 2026";
 const COMPANY = "FinovaOS";
 const EMAIL = "finovaos.app@gmail.com";
 const ADDRESS = "Global Operations";
@@ -119,19 +119,35 @@ const SECTIONS = [
     color: "#f87171",
     dim: "rgba(248,113,113,.08)",
     border: "rgba(248,113,113,.25)",
-    title: "Data Retention",
+    title: "Data Retention Policy",
     content: [
       {
         sub: "Active Accounts",
-        body: "We retain your data for as long as your account is active and as necessary to provide services. Financial records may be retained longer to comply with applicable tax and accounting regulations.",
+        body: "We retain your data for as long as your account is active and as necessary to provide our services. Financial records may be retained for a longer period to comply with applicable tax and accounting regulations in your jurisdiction.",
       },
       {
-        sub: "Account Deletion",
-        body: "Upon account deletion request, we will purge your personal data within 30 days. Anonymized, aggregated data derived from your usage may be retained for analytical purposes.",
+        sub: "After Subscription Cancellation — 3-Phase Policy",
+        body: "When you cancel your subscription, a 90-day data retention window begins automatically. Phase 1 (Days 1–30): Your account is read-only. You can log in and export all your data. Phase 2 (Days 31–90): Your account is locked but data is preserved on our servers. You may reactivate at any time to restore access. Phase 3 (Day 90+): All business data is permanently and irreversibly deleted.",
+      },
+      {
+        sub: "Email Reminders Before Deletion",
+        body: "We will send reminder emails to your registered address 14 days and 3 days before the 90-day permanent deletion deadline. It is your responsibility to ensure your email address is current and to export any data you wish to keep.",
+      },
+      {
+        sub: "What Is Deleted at Day 90",
+        body: "Permanent deletion includes all invoices, purchase orders, ledger entries, inventory records, payroll data, employee records, contacts, bank reconciliation data, expense vouchers, reports, and any other business data you entered into the platform.",
+      },
+      {
+        sub: "What We Retain After Deletion",
+        body: "After permanent deletion we retain only: (1) an anonymized audit log confirming the purge event, and (2) minimum billing records required by applicable financial regulations (plan name, payment amounts, dates). No personal business data is retained after day 90.",
+      },
+      {
+        sub: "Explicit Deletion Request",
+        body: "You may request immediate deletion of your account and all associated data at any time by emailing finovaos.app@gmail.com. We will process the request within 7 business days and send written confirmation. Immediate deletion waives any remaining read-only grace period.",
       },
       {
         sub: "Backups",
-        body: "Backup copies of your data are retained for up to 30 days and are subject to the same security protections as live data.",
+        body: "System backup snapshots are retained for up to 30 days and are subject to the same security controls and deletion schedule as live data. Backup retention does not extend your data retention window after cancellation.",
       },
     ],
   },

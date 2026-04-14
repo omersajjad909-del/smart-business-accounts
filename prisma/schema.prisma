@@ -389,6 +389,8 @@ model Company {
   subscriptionStatus String? @default("ACTIVE")
   stripeCustomerId   String?
   currentPeriodEnd    DateTime?
+  cancelledAt        DateTime?  // Timestamp when subscription was cancelled
+  dataRetentionUntil DateTime?  // 90 days after cancellation — hard delete after this date
   createdAt DateTime @default(now())
 
   users        UserCompany[]

@@ -17,6 +17,8 @@ export async function GET(req: NextRequest) {
         subscriptionStatus: true,
         stripeCustomerId: true,
         currentPeriodEnd: true,
+        cancelledAt: true,
+        dataRetentionUntil: true,
         createdAt: true,
         isActive: true,
         businessType: true,

@@ -110,7 +110,8 @@
       "Bash(sed -i 's/rgba\\(255,255,255,\\\\.1[0-9]*\\)/var\\(--border\\)/g' d:/projects/smart-business-accounts/app/dashboard/bulk-payments/page.tsx)",
       "Bash(sed -i 's/rgba\\(255,255,255,\\\\.[2-5][0-9]*\\)/var\\(--text-muted\\)/g' d:/projects/smart-business-accounts/app/dashboard/bulk-payments/page.tsx)",
       "Bash(sed -i 's/rgba\\(255,255,255,\\\\.[6-9][0-9]*\\)/var\\(--text-primary\\)/g' d:/projects/smart-business-accounts/app/dashboard/bulk-payments/page.tsx)",
-      "Bash(sed -i 's/\"#0f1629\"/\"var\\(--app-bg\\)\"/g' d:/projects/smart-business-accounts/app/dashboard/bulk-payments/page.tsx)"
+      "Bash(sed -i 's/\"#0f1629\"/\"var\\(--app-bg\\)\"/g' d:/projects/smart-business-accounts/app/dashboard/bulk-payments/page.tsx)",
+      "Bash(ls -la /d/projects/smart-business-accounts/*.ts)"
     ]
   }
 }
