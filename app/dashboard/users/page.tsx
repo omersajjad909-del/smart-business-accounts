@@ -115,7 +115,12 @@ export default function TeamAndPermissionsPage() {
     setUsers(Array.isArray(d) ? d : []);
   }
   async function loadBranches() {
-    const res = await fetch("/api/branches").catch(() => null);
+    const u = getCurrentUser();
+    const hdrs: Record<string, string> = {};
+    if (u?.id)        hdrs["x-user-id"]    = u.id;
+    if (u?.companyId) hdrs["x-company-id"] = u.companyId;
+    if (u?.role)      hdrs["x-user-role"]  = u.role;
+    const res = await fetch("/api/branches", { headers: hdrs }).catch(() => null);
     const data = await res?.json().catch(() => []);
     setBranches(Array.isArray(data) ? data : []);
   }
