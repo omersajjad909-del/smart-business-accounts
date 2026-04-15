@@ -1632,8 +1632,8 @@ export default function DashboardLayout({
               onToggle={() => toggle("admin")}
             >
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
-              <NavLink href="/dashboard/users" pathname={pathname}>Users & Permissions</NavLink>
-              <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink>
+              {/* <NavLink href="/dashboard/users" pathname={pathname}>Users & Permissions</NavLink>
+              <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink> */}
               <NavLink href="/dashboard/users" pathname={pathname}>Team</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) && <NavLink href="/dashboard/users/logs" pathname={pathname}>System Logs</NavLink>}
             </NavGroup>
