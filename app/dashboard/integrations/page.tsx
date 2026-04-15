@@ -170,7 +170,7 @@ export default function IntegrationsPage() {
         {INTEGRATIONS.map(item => {
           const status = getStatus(item);
           return (
-            <Link key={item.label} href={item.href} style={{ textDecoration: "none" }}>
+            <Link prefetch={false} key={item.label} href={item.href} style={{ textDecoration: "none" }}>
               <div
                 style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "22px 22px 18px", cursor: "pointer", transition: "border-color .15s, transform .15s, box-shadow .15s", display: "flex", flexDirection: "column", gap: 12, height: "100%", boxSizing: "border-box" }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = item.color; el.style.transform = "translateY(-2px)"; el.style.boxShadow = `0 8px 24px ${item.color}20`; }}

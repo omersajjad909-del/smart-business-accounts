@@ -67,7 +67,7 @@ export default function HospitalOverviewPage() {
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {actionItems.map((action) => (
-            <Link key={action.href} href={action.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${hospitalBorder}`, background: hospitalBg, color: "#c7d2fe", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={action.href} href={action.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${hospitalBorder}`, background: hospitalBg, color: "#c7d2fe", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {action.label}
             </Link>
           ))}
@@ -92,7 +92,7 @@ export default function HospitalOverviewPage() {
         <div style={{ background: hospitalBg, border: `1px solid ${hospitalBorder}`, borderRadius: 16, overflow: "hidden" }}>
           <div style={{ padding: "16px 18px", borderBottom: `1px solid ${hospitalBorder}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ fontSize: 15, fontWeight: 800 }}>{isClinic ? "Today's OPD Queue" : "Today's Front Desk Queue"}</div>
-            <Link href="/dashboard/hospital/appointments" style={{ color: "#93c5fd", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+            <Link prefetch={false} href="/dashboard/hospital/appointments" style={{ color: "#93c5fd", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
               Open schedule
             </Link>
           </div>

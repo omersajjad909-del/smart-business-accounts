@@ -66,10 +66,10 @@ export default function TradingStockControlPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard/inventory" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(245,158,11,.14)", border: "1px solid rgba(245,158,11,.24)", color: "#f59e0b", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
+          <Link prefetch={false} href="/dashboard/inventory" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(245,158,11,.14)", border: "1px solid rgba(245,158,11,.24)", color: "#f59e0b", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
             Inventory Master
           </Link>
-          <Link href="/dashboard/outward" style={{ padding: "10px 16px", borderRadius: 10, background: "#f59e0b", color: "#1a1305", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
+          <Link prefetch={false} href="/dashboard/outward" style={{ padding: "10px 16px", borderRadius: 10, background: "#f59e0b", color: "#1a1305", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
             New Outward
           </Link>
         </div>

@@ -530,7 +530,7 @@ export default function CompanyProfilePage() {
           )}
 
           {isAdmin && (
-            <Link
+            <Link prefetch={false}
               href="/dashboard/billing"
               style={{
                 display: "inline-flex",
@@ -620,7 +620,7 @@ export default function CompanyProfilePage() {
               }}
             >
               ⚠️ Subscription inactive.{" "}
-              <Link href="/dashboard/billing" style={{ color: "#f87171", fontWeight: 700 }}>
+              <Link prefetch={false} href="/dashboard/billing" style={{ color: "#f87171", fontWeight: 700 }}>
                 Renew now →
               </Link>
             </div>
@@ -668,7 +668,7 @@ export default function CompanyProfilePage() {
             </span>
           </div>
           {isAdmin && (
-            <Link
+            <Link prefetch={false}
               href="/dashboard/branches"
               style={{ fontSize: "12px", color: "#6366f1", fontWeight: 600, textDecoration: "none" }}
             >
@@ -692,7 +692,7 @@ export default function CompanyProfilePage() {
             {isAdmin && (
               <>
                 {" "}
-                <Link href="/dashboard/branches" style={{ color: "#6366f1", fontWeight: 600, textDecoration: "none" }}>
+                <Link prefetch={false} href="/dashboard/branches" style={{ color: "#6366f1", fontWeight: 600, textDecoration: "none" }}>
                   Add your first branch →
                 </Link>
               </>
@@ -762,7 +762,7 @@ export default function CompanyProfilePage() {
             <span>👥</span> Team Members
           </div>
           {isAdmin && (
-            <Link
+            <Link prefetch={false}
               href="/dashboard/users"
               style={{ fontSize: "12px", color: "#6366f1", fontWeight: 600, textDecoration: "none" }}
             >
@@ -829,7 +829,7 @@ export default function CompanyProfilePage() {
                 {userCount >= maxUsers && (
                   <div style={{ marginTop: "10px", fontSize: "12px", color: "#f87171" }}>
                     User limit reached.{" "}
-                    <Link href="/dashboard/billing" style={{ color: "#f87171", fontWeight: 700 }}>
+                    <Link prefetch={false} href="/dashboard/billing" style={{ color: "#f87171", fontWeight: 700 }}>
                       Upgrade your plan →
                     </Link>
                   </div>
@@ -889,7 +889,7 @@ export default function CompanyProfilePage() {
               { href: "/dashboard/users/roles", label: "Roles & Access", icon: "🔐", color: "#7c3aed" },
               { href: "/dashboard/users/logs", label: "Activity Logs", icon: "📋", color: "#64748b" },
             ].map((link) => (
-              <Link
+              <Link prefetch={false}
                 key={link.href}
                 href={link.href}
                 style={{

@@ -75,7 +75,7 @@ export default function Phase1GuidePage() {
       {/* Features Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {features.map((feature, idx) => (
-          <Link
+          <Link prefetch={false}
             key={idx}
             href={feature.link}
             className={`border-2 p-6 rounded-lg transition-all hover:shadow-lg ${colorClasses[feature.color as keyof typeof colorClasses]}`}
@@ -155,7 +155,7 @@ export default function Phase1GuidePage() {
       {/* Footer */}
       <div className="mt-8 text-center bg-gray-50 p-6 rounded-lg">
         <p className="text-gray-600 mb-4">For questions or help, please contact support</p>
-        <Link href="/dashboard" className="inline-block bg-blue-500 text-white px-6 py-2 rounded font-semibold hover:bg-blue-600">
+        <Link prefetch={false} href="/dashboard" className="inline-block bg-blue-500 text-white px-6 py-2 rounded font-semibold hover:bg-blue-600">
           ← Back to Dashboard
         </Link>
       </div>

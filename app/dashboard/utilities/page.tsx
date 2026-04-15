@@ -62,7 +62,7 @@ export default function UtilitiesOverviewPage() {
             { label: utilityConfig.meterLabel, href: "/dashboard/utilities/meters" },
             { label: "Analytics", href: "/dashboard/utilities/analytics" },
           ].map((item) => (
-            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#bae6fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#bae6fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}

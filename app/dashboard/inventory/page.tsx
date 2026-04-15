@@ -111,13 +111,13 @@ export default function InventoryPage() {
           <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>Real-time stock levels across all items</p>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <Link href="/dashboard/warehouses" style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "var(--text-muted)", textDecoration: "none", fontFamily: FONT }}>
+          <Link prefetch={false} href="/dashboard/warehouses" style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "var(--text-muted)", textDecoration: "none", fontFamily: FONT }}>
             🏭 Warehouses
           </Link>
-          <Link href="/dashboard/grn" style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "var(--text-muted)", textDecoration: "none", fontFamily: FONT }}>
+          <Link prefetch={false} href="/dashboard/grn" style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "var(--text-muted)", textDecoration: "none", fontFamily: FONT }}>
             📥 GRN
           </Link>
-          <Link href="/dashboard/barcode" style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 9, padding: "8px 16px", fontSize: 13, fontWeight: 600, textDecoration: "none", fontFamily: FONT }}>
+          <Link prefetch={false} href="/dashboard/barcode" style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 9, padding: "8px 16px", fontSize: 13, fontWeight: 600, textDecoration: "none", fontFamily: FONT }}>
             📦 Barcodes
           </Link>
         </div>

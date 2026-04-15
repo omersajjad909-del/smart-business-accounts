@@ -34,7 +34,7 @@ export default function DistributionOverviewPage() {
             { href: "/dashboard/distribution/collections", label: "Collections" },
             { href: "/dashboard/distribution/analytics", label: "Analytics" },
           ].map((item) => (
-            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${distributionBorder}`, background: distributionBg, color: "#fdba74", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${distributionBorder}`, background: distributionBg, color: "#fdba74", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}

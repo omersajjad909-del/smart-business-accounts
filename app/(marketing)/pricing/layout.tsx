@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 export const metadata: Metadata = {
   title: "Pricing Plans — Starter $49/mo · Pro $99/mo · Enterprise",
   description:
-    "Transparent, affordable pricing for every business size. Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). All plans include accounting, invoicing, and inventory. 14-day free trial. No hidden fees.",
+    "Transparent, affordable pricing for every business size. Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). All plans include accounting, invoicing, and inventory. No hidden fees.",
   keywords: [
     "accounting software pricing",
     "invoicing software cost",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Pricing Plans — Start at $49/month | FinovaOS",
     description:
-      "Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). No hidden fees. 14-day free trial. Cancel anytime.",
+      "Starter ($49/mo), Professional ($99/mo), Enterprise ($249/mo). No hidden fees. Cancel anytime.",
     url: `${BASE}/pricing`,
     siteName: "FinovaOS",
     images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS Pricing Plans" }],
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "FinovaOS Pricing — Plans from $49/month",
-    description: "Starter · Professional · Enterprise. Transparent pricing, no hidden fees, 14-day free trial.",
+    description: "Starter · Professional · Enterprise. Transparent pricing, no hidden fees.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/pricing` },
@@ -49,10 +49,10 @@ export default function PricingLayout({ children }: { children: React.ReactNode 
       },
       {
         "@type": "Question",
-        name: "Is there a free trial?",
+        name: "Can I see a demo before purchasing?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Yes, FinovaOS offers a 14-day free trial on all plans. No credit card required to get started.",
+          text: "Yes, you can book a personalized demo where we walk you through FinovaOS for your specific business type. Get in touch via the contact form or live chat.",
         },
       },
       {

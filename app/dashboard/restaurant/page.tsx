@@ -38,7 +38,7 @@ export default function RestaurantOverviewPage() {
           { label: "Orders", href: "/dashboard/restaurant/orders" },
           { label: "Analytics", href: "/dashboard/restaurant/analytics" },
         ].map((item) => (
-          <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${restaurantBorder}`, background: restaurantBg, color: "#fca5a5", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+          <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${restaurantBorder}`, background: restaurantBg, color: "#fca5a5", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
             {item.label}
           </Link>
         ))}

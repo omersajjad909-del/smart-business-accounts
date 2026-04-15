@@ -132,7 +132,7 @@ export default function FirmOverviewPage() {
               { href: "/dashboard/firm/billing", label: "Fee Billing", hint: "Invoice lifecycle and collection control" },
               { href: "/dashboard/firm/analytics", label: "Firm Analytics", hint: "Revenue mix, utilization, and backlog" },
             ].map((item) => (
-              <Link key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: firmMuted }}>{item.hint}</div>
               </Link>

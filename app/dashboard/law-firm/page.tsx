@@ -78,7 +78,7 @@ export default function LawFirmOverviewPage() {
               { href: "/dashboard/law-firm/billing", label: "Legal Billing", hint: "Invoices, receipts, and dues follow-up" },
               { href: "/dashboard/law-firm/analytics", label: "See Law Analytics", hint: "Practice health and revenue reading" },
             ].map((item) => (
-              <Link key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: lawMuted }}>{item.hint}</div>
               </Link>

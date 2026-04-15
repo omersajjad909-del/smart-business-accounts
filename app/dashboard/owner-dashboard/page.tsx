@@ -44,7 +44,7 @@ function KPICard({ label, value, sub, color, spark, href }: { label: string; val
       {spark && <Sparkline vals={spark} color={color} />}
     </div>
   );
-  return href ? <Link href={href} style={{ textDecoration: "none" }}>{inner}</Link> : inner;
+  return href ? <Link prefetch={false} href={href} style={{ textDecoration: "none" }}>{inner}</Link> : inner;
 }
 
 export default function OwnerDashboardPage() {
@@ -154,7 +154,7 @@ export default function OwnerDashboardPage() {
                   <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{fmtFull(summary?.overdueAmount ?? 0)} overdue across {summary?.invoicesPending ?? 0} invoices</div>
                 </div>
               </div>
-              <Link href="/dashboard/payment-followup" style={{ background: "#f87171", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
+              <Link prefetch={false} href="/dashboard/payment-followup" style={{ background: "#f87171", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
                 Follow Up
               </Link>
             </div>
@@ -167,7 +167,7 @@ export default function OwnerDashboardPage() {
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Quick Actions</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 {QUICK_LINKS.map(q => (
-                  <Link key={q.href} href={q.href} style={{
+                  <Link prefetch={false} key={q.href} href={q.href} style={{
                     display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
                     background: `${q.color}10`, border: `1px solid ${q.color}25`,
                     borderRadius: 10, textDecoration: "none",

@@ -58,7 +58,7 @@ export default function AutomotiveOverviewPage() {
             { href: "/dashboard/automotive/deals", label: "Deals & Finance" },
             { href: "/dashboard/automotive/analytics", label: "Analytics" },
           ].map((item) => (
-            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${autoBorder}`, background: autoBg, color: "#93c5fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${autoBorder}`, background: autoBg, color: "#93c5fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}

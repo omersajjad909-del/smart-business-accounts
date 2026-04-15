@@ -692,8 +692,8 @@ export default function AdminControlPage() {
                 <div className="grid gap-2 sm:grid-cols-2">
                   <Button type="button" onClick={createInstantBackup} disabled={opsLoading !== null}>{opsLoading === "backup" ? "Creating Backup..." : "Create Instant Backup"}</Button>
                   <Button type="button" variant="secondary" onClick={downloadLatestBackup} disabled={opsLoading !== null}>{opsLoading === "download" ? "Preparing Download..." : "Download Latest Backup"}</Button>
-                  <Link href="/dashboard/audit-trail" className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] no-underline transition hover:border-[var(--accent)]">Open Audit Trail</Link>
-                  <Link href="/dashboard/backup-restore" className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] no-underline transition hover:border-[var(--accent)]">Open Backup & Restore</Link>
+                  <Link prefetch={false} href="/dashboard/audit-trail" className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] no-underline transition hover:border-[var(--accent)]">Open Audit Trail</Link>
+                  <Link prefetch={false} href="/dashboard/backup-restore" className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] no-underline transition hover:border-[var(--accent)]">Open Backup & Restore</Link>
                 </div>
               </div>
               <div className="space-y-3">
@@ -706,7 +706,7 @@ export default function AdminControlPage() {
                   { href: "/dashboard/billing", label: "Billing & Subscription", desc: "Manage plan, invoices, and payment settings." },
                   { href: "/dashboard/reports/compliance", label: "Compliance Reports", desc: "Open tax, compliance, and statutory report views quickly." },
                 ].map((item) => (
-                  <Link key={item.href} href={item.href} className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg-2)] px-4 py-3 no-underline transition hover:border-[var(--accent)]">
+                  <Link prefetch={false} key={item.href} href={item.href} className="block rounded-lg border border-[var(--border)] bg-[var(--panel-bg-2)] px-4 py-3 no-underline transition hover:border-[var(--accent)]">
                     <div className="text-sm font-semibold text-[var(--text-primary)]">{item.label}</div>
                     <div className="mt-1 text-xs text-[var(--text-muted)]">{item.desc}</div>
                   </Link>

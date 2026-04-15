@@ -248,7 +248,7 @@ const FAQS = [
   { q: "Is the charged currency the same as displayed?", a: "Displayed pricing is localized for convenience. Final billing currency is confirmed during checkout." },
   { q: "Can I build my own package?", a: "Yes. The Custom plan lets you pick only the modules you need and see an instant estimate." },
   { q: "Can I switch plans later?", a: "Yes. You can upgrade, downgrade, or move to a custom package at any time." },
-  { q: "Is there a free trial?", a: "Yes. All plans come with a 14-day free trial — no credit card required." },
+  { q: "Can I see a demo before buying?", a: "Yes. Book a personalized demo and we'll walk you through everything for your business type. Contact us via live chat or the contact form." },
 ];
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
@@ -351,7 +351,7 @@ export default function PricingPage() {
             <span style={{ background: "linear-gradient(135deg,#818cf8,#c4b5fd)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>your region</span>
           </h1>
           <p style={{ maxWidth: 640, margin: "0 auto", color: "rgba(255,255,255,.48)", fontSize: 17, lineHeight: 1.65 }}>
-            FinovaOS shows prices in your local currency — PKR, INR, AED, and more. All plans include a <strong style={{ color: "rgba(255,255,255,.7)" }}>14-day free trial</strong>.
+            FinovaOS shows prices in your local currency — PKR, INR, AED, and more. <strong style={{ color: "rgba(255,255,255,.7)" }}>No hidden fees. Cancel anytime.</strong>
           </p>
         </div>
 
@@ -444,7 +444,7 @@ export default function PricingPage() {
                     </div>
                   )}
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginBottom: 28 }}>
-                    Add to any plan · Cancel anytime · 14-day free trial included
+                    Add to any plan · Cancel anytime · No hidden fees
                   </div>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                     <Link href="/get-started?addon=automation" style={{

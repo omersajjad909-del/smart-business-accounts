@@ -99,7 +99,7 @@ export default function GymOverviewPage() {
               { href: "/dashboard/gym/analytics", label: "See Gym Analytics", hint: "Revenue, utilization, and risk reading" },
               { href: "/dashboard/payment-receipts", label: "Payment Follow-up", hint: "Member receipts and collections" },
             ].map((item) => (
-              <Link key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: gymMuted }}>{item.hint}</div>
               </Link>

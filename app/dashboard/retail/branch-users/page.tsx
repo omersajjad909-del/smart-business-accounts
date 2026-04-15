@@ -107,7 +107,7 @@ export default function BranchUsersPage() {
             Review branch-wise access for retail staff and jump into full user management when changes are needed.
           </p>
         </div>
-        <Link
+        <Link prefetch={false}
           href="/dashboard/users"
           style={{
             background: "linear-gradient(135deg,#6366f1,#4f46e5)",

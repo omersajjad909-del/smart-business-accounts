@@ -36,7 +36,7 @@ export default function HotelOverviewPage() {
             { label: "Room Service", href: "/dashboard/hotel/room-service" },
             { label: "Analytics", href: "/dashboard/hotel/analytics" },
           ].map((item) => (
-            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${hotelBorder}`, background: hotelBg, color: "#fdba74", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${hotelBorder}`, background: hotelBg, color: "#fdba74", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}

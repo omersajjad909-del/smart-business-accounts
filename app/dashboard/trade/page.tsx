@@ -71,7 +71,7 @@ export default function TradeOverviewPage() {
             { label: "Rebate", href: "/dashboard/trade/rebate" },
             { label: "Analytics", href: "/dashboard/trade/analytics" },
           ].map((item) => (
-            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${tradeBorder}`, background: tradeBg, color: "#7dd3fc", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${tradeBorder}`, background: tradeBg, color: "#7dd3fc", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}

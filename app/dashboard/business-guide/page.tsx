@@ -528,7 +528,7 @@ export default function BusinessGuidePage() {
               { label: "Business Settings", href: "/dashboard/business-settings", icon: "⚙️", color: "#fbbf24" },
               { label: "Team Management", href: "/dashboard/team", icon: "👥", color: "#f87171" },
             ].map((link) => (
-              <Link key={link.href} href={link.href} style={{
+              <Link prefetch={false} key={link.href} href={link.href} style={{
                 display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", borderRadius: 14, textDecoration: "none",
                 background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
                 transition: "all .2s",
@@ -580,7 +580,7 @@ export default function BusinessGuidePage() {
                         <span style={{ fontSize: 11, fontWeight: 800, color: businessMeta.color, background: `${businessMeta.color}15`, padding: "2px 8px", borderRadius: 20 }}>STEP {i + 1}</span>
                         <span style={{ fontSize: 15, fontWeight: 800 }}>{step.step}</span>
                       </div>
-                      <Link href={step.link} style={{
+                      <Link prefetch={false} href={step.link} style={{
                         fontSize: 11, fontWeight: 700, color: "#a5b4fc", textDecoration: "none",
                         background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", padding: "4px 12px", borderRadius: 20,
                         whiteSpace: "nowrap",
@@ -606,7 +606,7 @@ export default function BusinessGuidePage() {
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14 }}>
               {modules.map((mod) => (
-                <Link key={mod.label} href={mod.link} style={{ textDecoration: "none" }}>
+                <Link prefetch={false} key={mod.label} href={mod.link} style={{ textDecoration: "none" }}>
                   <div className="module-card" style={{
                     background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)",
                     borderRadius: 16, padding: "18px 20px", cursor: "pointer",
@@ -638,7 +638,7 @@ export default function BusinessGuidePage() {
                 { label: "Customer Statement", href: "/dashboard/reports/ledger" },
                 { label: "Tax Summary", href: "/dashboard/reports/tax-summary" },
               ].map((r) => (
-                <Link key={r.label} href={r.href} style={{
+                <Link prefetch={false} key={r.label} href={r.href} style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
                   padding: "10px 14px", borderRadius: 10, textDecoration: "none",
                   background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)",
@@ -671,7 +671,7 @@ export default function BusinessGuidePage() {
                 <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>FinovaOS AI Intelligence</div>
                 <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>9 AI-powered features analyzing your real business data 24/7</div>
               </div>
-              <Link href="/dashboard/ai" style={{ marginLeft: "auto", padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", textDecoration: "none", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap", boxShadow: "0 8px 24px rgba(99,102,241,.35)" }}>
+              <Link prefetch={false} href="/dashboard/ai" style={{ marginLeft: "auto", padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", textDecoration: "none", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap", boxShadow: "0 8px 24px rgba(99,102,241,.35)" }}>
                 Open AI Center →
               </Link>
             </div>
@@ -690,7 +690,7 @@ export default function BusinessGuidePage() {
           {/* AI Feature Cards */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
             {AI_FEATURES.map((f) => (
-              <Link key={f.title} href={f.link} style={{ textDecoration: "none" }}>
+              <Link prefetch={false} key={f.title} href={f.link} style={{ textDecoration: "none" }}>
                 <div className="module-card" style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(167,139,250,.12)", borderRadius: 18, padding: "22px 24px", height: "100%" }}>
                   <div style={{ fontSize: 28, marginBottom: 12 }}>{f.icon}</div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 8 }}>{f.title}</div>
@@ -764,7 +764,7 @@ export default function BusinessGuidePage() {
                       <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(239,68,68,.15)", color: "#fca5a5", border: "1px solid rgba(239,68,68,.2)", whiteSpace: "nowrap" }}>Required</span>
                     )}
 
-                    <Link href={item.link} onClick={(e) => e.stopPropagation()} style={{
+                    <Link prefetch={false} href={item.link} onClick={(e) => e.stopPropagation()} style={{
                       fontSize: 11, fontWeight: 700, color: "#a5b4fc", textDecoration: "none",
                       padding: "4px 12px", borderRadius: 20, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", whiteSpace: "nowrap",
                     }}>Go →</Link>
@@ -778,7 +778,7 @@ export default function BusinessGuidePage() {
                 <div style={{ fontSize: 28, marginBottom: 8 }}>🎉</div>
                 <div style={{ fontSize: 16, fontWeight: 800, color: "#6ee7b7" }}>Setup Complete!</div>
                 <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginTop: 4 }}>Your business is now fully configured. Head to the dashboard to get started.</div>
-                <Link href="/dashboard" style={{ display: "inline-block", marginTop: 14, padding: "10px 24px", borderRadius: 10, background: "#10b981", color: "white", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>Go to Dashboard →</Link>
+                <Link prefetch={false} href="/dashboard" style={{ display: "inline-block", marginTop: 14, padding: "10px 24px", borderRadius: 10, background: "#10b981", color: "white", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>Go to Dashboard →</Link>
               </div>
             )}
           </div>
@@ -790,7 +790,7 @@ export default function BusinessGuidePage() {
               { icon: "📧", title: "Contact Support", desc: "Our team is available 24/7 to assist you.", href: "mailto:finovaos.app@gmail.com", color: "#34d399" },
               { icon: "📹", title: "Video Tutorials", desc: "Watch step-by-step walkthroughs for each module.", href: "/help", color: "#38bdf8" },
             ].map((r) => (
-              <Link key={r.title} href={r.href} style={{ textDecoration: "none" }}>
+              <Link prefetch={false} key={r.title} href={r.href} style={{ textDecoration: "none" }}>
                 <div style={{ background: "rgba(255,255,255,.03)", border: `1px solid ${r.color}18`, borderRadius: 16, padding: "20px 22px", transition: "all .2s" }}
                   onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = `${r.color}35`; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = `${r.color}18`; }}

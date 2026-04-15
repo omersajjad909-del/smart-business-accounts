@@ -79,7 +79,7 @@ export default function NgoOverviewPage() {
               { href: "/dashboard/ngo/funds", label: "Fund Accounting", hint: "Receipts, expenses, and balances" },
               { href: "/dashboard/ngo/analytics", label: "See NGO Analytics", hint: "Mission-side financial and impact reading" },
             ].map((item) => (
-              <Link key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: ngoMuted }}>{item.hint}</div>
               </Link>

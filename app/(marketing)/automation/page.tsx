@@ -181,7 +181,7 @@ const FAQS = [
   { q: "AI content Urdu mein bhi likhta hai?", a: "Haan. Claude AI Urdu aur Roman Urdu dono mein content generate kar sakta hai. Aap language dropdown se select kar sakte hain." },
   { q: "Chatbot apni website pe lagana mushkil hai?", a: "Bilkul nahi. Sirf ek script tag copy karke apni website ke </body> se pehle paste karo. Koi coding nahi, koi developer nahi — 2 minute ka kaam hai." },
   { q: "Kya existing leads import kar sakta hun?", a: "Haan. Excel/CSV se import wizard ke zariye leads upload kar sakte ho. Yeh feature Professional aur Enterprise plans mein available hai." },
-  { q: "Trial available hai?", a: "Haan, 14-day free trial mein automation add-on bhi include hai. No credit card required." },
+  { q: "Demo available hai?", a: "Haan, aap ek personalized demo book kar sakte hain jahan hum aapke business ke liye automation setup dikhate hain. Book karne ke liye 'Get Started' pe click karein." },
 ];
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
@@ -232,7 +232,7 @@ export default function AutomationLandingPage() {
               color: "#fff", textDecoration: "none", fontSize: 15, fontWeight: 700,
               boxShadow: "0 0 30px rgba(124,58,237,.4)",
             }}>
-              Start Free Trial →
+              Get Started →
             </Link>
             <Link href="/pricing" style={{
               padding: "14px 28px", borderRadius: 12, border: "1px solid rgba(255,255,255,.15)",
@@ -409,7 +409,7 @@ export default function AutomationLandingPage() {
           textDecoration: "none", fontSize: 16, fontWeight: 700,
           boxShadow: "0 0 40px rgba(124,58,237,.4)",
         }}>
-          Start Free Trial — $79/month after trial
+          Add to My Plan — $79/month
         </Link>
         <div style={{ marginTop: 20, fontSize: 13, color: "rgba(255,255,255,.35)" }}>
           Requires an active FinovaOS plan · Works with Starter, Professional, and Enterprise

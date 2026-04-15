@@ -188,7 +188,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
         <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>AI Financial Intelligence</div>
         <div style={{ fontSize: 12, color: "var(--text-muted)" }}>AI summary unavailable. View full insights in AI center.</div>
       </div>
-      <Link href="/dashboard/ai" style={{ padding: "8px 16px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
+      <Link prefetch={false} href="/dashboard/ai" style={{ padding: "8px 16px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
         Open AI →
       </Link>
     </div>
@@ -260,7 +260,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
 
           {/* CTA */}
           <div style={{ padding: "14px 18px", display: "flex", alignItems: "center" }}>
-            <Link href="/dashboard/ai" style={{ padding: "8px 16px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(99,102,241,.3)" }}>
+            <Link prefetch={false} href="/dashboard/ai" style={{ padding: "8px 16px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(99,102,241,.3)" }}>
               AI Center →
             </Link>
           </div>
@@ -273,7 +273,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
               <>
                 <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", flexShrink: 0 }}>🔔 Alerts:</span>
                 {data.alerts.map((a, i) => (
-                  <Link key={i} href={a.link || "/dashboard/ai"} style={{
+                  <Link prefetch={false} key={i} href={a.link || "/dashboard/ai"} style={{
                     padding: "4px 10px", borderRadius: 20, textDecoration: "none", fontSize: 11, fontWeight: 600,
                     background: a.severity === "critical" ? "rgba(239,68,68,.12)" : a.severity === "warning" ? "rgba(245,158,11,.1)" : "rgba(99,102,241,.1)",
                     border: `1px solid ${a.severity === "critical" ? "rgba(239,68,68,.3)" : a.severity === "warning" ? "rgba(245,158,11,.3)" : "rgba(99,102,241,.25)"}`,
@@ -307,7 +307,7 @@ function AIWidget({ companyId, role, userId }: { companyId: string; role: string
                 style={{ padding: "8px 16px", borderRadius: 9, background: chat.trim() && !chatLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "var(--panel-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 12, fontWeight: 700, cursor: chat.trim() && !chatLoading ? "pointer" : "not-allowed", fontFamily: "inherit" }}>
                 {chatLoading ? "…" : "Ask"}
               </button>
-              <Link href="/dashboard/ai?tab=chat" style={{ padding: "8px 14px", borderRadius: 9, background: "var(--panel-bg)", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 11, fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center" }}>
+              <Link prefetch={false} href="/dashboard/ai?tab=chat" style={{ padding: "8px 14px", borderRadius: 9, background: "var(--panel-bg)", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 11, fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center" }}>
                 Full AI
               </Link>
             </div>
@@ -464,7 +464,7 @@ export default function DashboardContent() {
               <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Complete your payment to unlock all features.</div>
             </div>
           </div>
-          <Link href="/billing" style={{ padding: "8px 18px", borderRadius: 8, background: "#6366f1", color: "white", fontWeight: 700, fontSize: 12, textDecoration: "none" }}>Pay Now</Link>
+          <Link prefetch={false} href="/billing" style={{ padding: "8px 18px", borderRadius: 8, background: "#6366f1", color: "white", fontWeight: 700, fontSize: 12, textDecoration: "none" }}>Pay Now</Link>
         </div>
       )}
 
@@ -535,7 +535,7 @@ export default function DashboardContent() {
             <div style={{ fontSize: 22, fontWeight: 900, color: "#f87171", letterSpacing: "-.5px" }}>{cur} {stats.overdueReceivables.toLocaleString()}</div>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Outstanding from customers</div>
           </div>
-          <Link href="/dashboard/reports/ageing" style={{ padding: "8px 16px", borderRadius: 9, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.25)", color: "#f87171", fontSize: 11, fontWeight: 700, textDecoration: "none", flexShrink: 0 }}>View →</Link>
+          <Link prefetch={false} href="/dashboard/reports/ageing" style={{ padding: "8px 16px", borderRadius: 9, background: "rgba(248,113,113,.12)", border: "1px solid rgba(248,113,113,.25)", color: "#f87171", fontSize: 11, fontWeight: 700, textDecoration: "none", flexShrink: 0 }}>View →</Link>
         </div>
 
         {/* Low Stock */}
@@ -545,7 +545,7 @@ export default function DashboardContent() {
             <div style={{ fontSize: 22, fontWeight: 900, color: "#fbbf24", letterSpacing: "-.5px" }}>{stats.lowStockCount} <span style={{ fontSize: 14, fontWeight: 600 }}>items</span></div>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Below minimum stock level</div>
           </div>
-          <Link href="/dashboard/reports/stock/low" style={{ padding: "8px 16px", borderRadius: 9, background: "rgba(251,191,36,.12)", border: "1px solid rgba(251,191,36,.25)", color: "#fbbf24", fontSize: 11, fontWeight: 700, textDecoration: "none", flexShrink: 0 }}>Check →</Link>
+          <Link prefetch={false} href="/dashboard/reports/stock/low" style={{ padding: "8px 16px", borderRadius: 9, background: "rgba(251,191,36,.12)", border: "1px solid rgba(251,191,36,.25)", color: "#fbbf24", fontSize: 11, fontWeight: 700, textDecoration: "none", flexShrink: 0 }}>Check →</Link>
         </div>
       </div>
 
@@ -569,11 +569,11 @@ export default function DashboardContent() {
           )}
           <div style={{ marginLeft: "auto" }}>
             {subStatus === "TRIALING" ? (
-              <Link href="/dashboard/billing" style={{ padding: "7px 18px", borderRadius: 9, background: "linear-gradient(135deg,#f59e0b,#d97706)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" as const, boxShadow: "0 4px 12px rgba(245,158,11,.3)" }}>
+              <Link prefetch={false} href="/dashboard/billing" style={{ padding: "7px 18px", borderRadius: 9, background: "linear-gradient(135deg,#f59e0b,#d97706)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" as const, boxShadow: "0 4px 12px rgba(245,158,11,.3)" }}>
                 🚀 Activate Now →
               </Link>
             ) : subStatus === "ACTIVE" && companyInfo.plan !== "ENTERPRISE" ? (
-              <Link href="/dashboard/billing" style={{ padding: "7px 16px", borderRadius: 9, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>
+              <Link prefetch={false} href="/dashboard/billing" style={{ padding: "7px 16px", borderRadius: 9, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, textDecoration: "none" }}>
                 Upgrade Plan →
               </Link>
             ) : null}
@@ -677,7 +677,7 @@ export default function DashboardContent() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))", gap: 10 }}>
               {actions.map((a, i) => (
-                <Link key={i} href={a.href}
+                <Link prefetch={false} key={i} href={a.href}
                   style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "16px 10px", borderRadius: 12, textDecoration: "none", gap: 8, background: "var(--panel-bg)", border: "1px solid var(--border)", transition: "all .2s", textAlign: "center" }}
                   onMouseEnter={e => { e.currentTarget.style.background = `${a.color}10`; e.currentTarget.style.borderColor = `${a.color}30`; e.currentTarget.style.transform = "translateY(-2px)"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "var(--panel-bg)"; e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.transform = "translateY(0)"; }}
@@ -703,7 +703,7 @@ export default function DashboardContent() {
               { href: "/dashboard/opening-balances", label: "Opening Balances" },
               { href: "/onboarding/checklist",       label: "Setup Checklist" },
             ].map((btn, i) => (
-              <Link key={i} href={btn.href} style={{ padding: "8px 18px", borderRadius: 9, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.28)", color: "#a5b4fc", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>{btn.label}</Link>
+              <Link prefetch={false} key={i} href={btn.href} style={{ padding: "8px 18px", borderRadius: 9, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.28)", color: "#a5b4fc", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>{btn.label}</Link>
             ))}
           </div>
         </div>

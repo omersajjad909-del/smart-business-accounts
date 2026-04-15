@@ -35,7 +35,7 @@ export function BusinessVerticalShell({
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {links.map((item) => (
-            <Link
+            <Link prefetch={false}
               key={item.href}
               href={item.href}
               style={{

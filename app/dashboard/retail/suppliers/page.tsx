@@ -103,7 +103,7 @@ export default function RetailSuppliersPage() {
                   </span>
                 </td>
                 <td style={{ padding: "11px 14px" }}>
-                  <Link href={`/dashboard/reports/ledger?account=${sup.id}`} style={{ background: "rgba(99,102,241,.1)", color: "#818cf8", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 600, textDecoration: "none" }}>Ledger</Link>
+                  <Link prefetch={false} href={`/dashboard/reports/ledger?account=${sup.id}`} style={{ background: "rgba(99,102,241,.1)", color: "#818cf8", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 600, textDecoration: "none" }}>Ledger</Link>
                 </td>
               </tr>
             ))}

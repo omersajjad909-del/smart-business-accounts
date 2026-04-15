@@ -66,10 +66,10 @@ export default function TradingProcurementPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard/purchase-order" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(52,211,153,.14)", border: "1px solid rgba(52,211,153,.24)", color: "#34d399", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
+          <Link prefetch={false} href="/dashboard/purchase-order" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(52,211,153,.14)", border: "1px solid rgba(52,211,153,.24)", color: "#34d399", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
             New PO
           </Link>
-          <Link href="/dashboard/purchase-invoice" style={{ padding: "10px 16px", borderRadius: 10, background: "#34d399", color: "#04110c", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
+          <Link prefetch={false} href="/dashboard/purchase-invoice" style={{ padding: "10px 16px", borderRadius: 10, background: "#34d399", color: "#04110c", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
             New PI
           </Link>
         </div>

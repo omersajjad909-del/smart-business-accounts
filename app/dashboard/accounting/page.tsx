@@ -30,7 +30,7 @@ export default function AccountingPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
         {MODULES.map(m => (
-          <Link key={m.href} href={m.href} style={{ textDecoration: "none" }}>
+          <Link prefetch={false} key={m.href} href={m.href} style={{ textDecoration: "none" }}>
             <div style={{
               background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 14,
               padding: "18px 20px", cursor: "pointer", transition: "border-color .15s, transform .15s",

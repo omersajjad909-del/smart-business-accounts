@@ -52,7 +52,7 @@ export default function MaintenanceOverviewPage() {
             { href: "/dashboard/maintenance/parts", label: "Parts and Stock" },
             { href: "/dashboard/maintenance/analytics", label: "Analytics" },
           ].map((item) => (
-            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${maintenanceBorder}`, background: maintenanceBg, color: "#86efac", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${maintenanceBorder}`, background: maintenanceBg, color: "#86efac", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}

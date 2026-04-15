@@ -88,7 +88,7 @@ export default function ITOverviewPage() {
               { href: "/dashboard/it/support", label: "Support Tickets", hint: "Client incidents and SLA queue" },
               { href: "/dashboard/it/analytics", label: "IT Analytics", hint: "Portfolio health and ops mix" },
             ].map((item) => (
-              <Link key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
+              <Link prefetch={false} key={item.href} href={item.href} style={{ textDecoration: "none", color: "#fff", background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "14px 16px" }}>
                 <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 12, color: itMuted }}>{item.hint}</div>
               </Link>

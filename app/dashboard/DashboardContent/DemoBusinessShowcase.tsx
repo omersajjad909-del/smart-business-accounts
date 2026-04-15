@@ -89,7 +89,7 @@ export default function DemoBusinessShowcase({
             This preview is tailored for {businessMeta.label}. Explore the business flow here, then open the owner dashboard for a live operational view.
           </div>
         </div>
-        <Link
+        <Link prefetch={false}
           href="/dashboard/owner-dashboard"
           style={{
             padding: "10px 16px",
@@ -286,7 +286,7 @@ export default function DemoBusinessShowcase({
             </div>
             <div style={{ color: "white", fontSize: 24, fontWeight: 800, marginTop: 6 }}>Choose the growth path that matches this business</div>
           </div>
-          <Link
+          <Link prefetch={false}
             href="/pricing"
             style={{
               padding: "10px 16px",

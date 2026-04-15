@@ -71,10 +71,10 @@ export default function TradingOrderDeskPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard/quotation" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(56,189,248,.14)", border: "1px solid rgba(56,189,248,.26)", color: "#38bdf8", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
+          <Link prefetch={false} href="/dashboard/quotation" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(56,189,248,.14)", border: "1px solid rgba(56,189,248,.26)", color: "#38bdf8", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
             New Quotation
           </Link>
-          <Link href="/dashboard/sales-invoice" style={{ padding: "10px 16px", borderRadius: 10, background: "#38bdf8", color: "#08111d", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
+          <Link prefetch={false} href="/dashboard/sales-invoice" style={{ padding: "10px 16px", borderRadius: 10, background: "#38bdf8", color: "#08111d", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
             New Sale
           </Link>
         </div>

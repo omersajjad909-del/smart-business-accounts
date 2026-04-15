@@ -361,7 +361,7 @@ export default function ChoosePlanPage() {
           </h1>
 
           <p style={{ fontSize:15, color:"rgba(255,255,255,.4)", maxWidth:500, margin:"0 auto 28px", lineHeight:1.8 }}>
-            One price per company. No per-seat fees. All plans include a 14-day free trial.
+            One price per company. No per-seat fees. No hidden fees.
           </p>
 
           {/* Billing toggle */}
@@ -577,7 +577,7 @@ export default function ChoosePlanPage() {
             { icon:"🔄", label:"Cancel anytime" },
             { icon:"📦", label:"Price per company" },
             { icon:"⚡", label:"Setup in 10 minutes" },
-            { icon:"🎯", label:"14-day free trial" },
+            { icon:"🎯", label:"No hidden fees" },
           ].map(({ icon, label }) => (
             <div key={label} style={{ display:"flex", alignItems:"center", gap:7, fontSize:12.5, color:"rgba(255,255,255,.35)", fontWeight:500 }}>
               <span style={{ fontSize:15 }}>{icon}</span>

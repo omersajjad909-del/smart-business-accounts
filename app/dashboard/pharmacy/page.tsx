@@ -44,7 +44,7 @@ export default function PharmacyOverviewPage() {
             { label: "Counter Sales", href: "/dashboard/pharmacy/counter-sales" },
             { label: "Analytics", href: "/dashboard/pharmacy/analytics" },
           ].map((item) => (
-            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${pharmacyBorder}`, background: pharmacyBg, color: "#fda4af", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${pharmacyBorder}`, background: pharmacyBg, color: "#fda4af", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}

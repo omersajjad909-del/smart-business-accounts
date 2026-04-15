@@ -75,7 +75,7 @@ export default function ServicesDashboard() {
         <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.5)", marginBottom: 12, letterSpacing: ".06em" }}>QUICK ACTIONS</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           {quickLinks.map((link) => (
-            <Link key={link.href} href={link.href} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", color: "#c7d2fe", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+            <Link prefetch={false} key={link.href} href={link.href} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", color: "#c7d2fe", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
               {link.label}
             </Link>
           ))}

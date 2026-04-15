@@ -60,10 +60,10 @@ export default function TradingDispatchBoardPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard/delivery-challan" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(249,115,22,.14)", border: "1px solid rgba(249,115,22,.24)", color: "#f97316", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
+          <Link prefetch={false} href="/dashboard/delivery-challan" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(249,115,22,.14)", border: "1px solid rgba(249,115,22,.24)", color: "#f97316", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
             New Challan
           </Link>
-          <Link href="/dashboard/outward" style={{ padding: "10px 16px", borderRadius: 10, background: "#f97316", color: "#170a03", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
+          <Link prefetch={false} href="/dashboard/outward" style={{ padding: "10px 16px", borderRadius: 10, background: "#f97316", color: "#170a03", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
             New Outward
           </Link>
         </div>

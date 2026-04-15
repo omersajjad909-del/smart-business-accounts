@@ -67,10 +67,10 @@ export default function TradingOutstandingsPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard/parties" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(168,85,247,.14)", border: "1px solid rgba(168,85,247,.24)", color: "#a78bfa", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
+          <Link prefetch={false} href="/dashboard/parties" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(168,85,247,.14)", border: "1px solid rgba(168,85,247,.24)", color: "#a78bfa", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
             Manage Parties
           </Link>
-          <Link href="/dashboard/payment-receipts" style={{ padding: "10px 16px", borderRadius: 10, background: "#a78bfa", color: "#120720", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
+          <Link prefetch={false} href="/dashboard/payment-receipts" style={{ padding: "10px 16px", borderRadius: 10, background: "#a78bfa", color: "#120720", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
             Receive Payment
           </Link>
         </div>

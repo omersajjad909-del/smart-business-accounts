@@ -211,7 +211,7 @@ export default function WholesaleDashboard() {
             { label: "Warehouses", href: "/dashboard/warehouses" },
             { label: "Ageing", href: "/dashboard/reports/ageing" },
           ].map((item) => (
-            <Link
+            <Link prefetch={false}
               key={item.href}
               href={item.href}
               style={{

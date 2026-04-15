@@ -1747,7 +1747,7 @@ export default function FeaturesPage() {
             <div style={{ position:"absolute", width:380, height:380, borderRadius:"50%", background:"radial-gradient(circle,rgba(99,102,241,.12),transparent 70%)", top:-80, right:-60, pointerEvents:"none" }}/>
             <div style={{ position:"relative" }}>
               <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:24, background:"rgba(251,191,36,.12)", border:"1.5px solid rgba(251,191,36,.3)", fontSize:11, fontWeight:800, color:"#fbbf24", letterSpacing:".09em", textTransform:"uppercase" as const, marginBottom:22, animation:"floatBadge 3s ease-in-out infinite" }}>
-                🔥 14-Day Free Trial — No Credit Card
+                🔥 Get Started Today — No Hidden Fees
               </div>
               <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(28px,4.5vw,50px)", fontWeight:700, color:"white", letterSpacing:"-1.2px", lineHeight:1.12, marginBottom:14 }}>
                 Ready to transform

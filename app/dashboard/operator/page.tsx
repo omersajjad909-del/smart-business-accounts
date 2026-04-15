@@ -143,7 +143,7 @@ function DecisionCard({
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, minWidth: 140 }}>
           {decision.href ? (
-            <Link
+            <Link prefetch={false}
               href={decision.href}
               style={{
                 textDecoration: "none",
@@ -228,7 +228,7 @@ function ActionCard({
       <div style={{ marginTop: 10, fontSize: 14, color: shell.soft, lineHeight: 1.7 }}>{action.description}</div>
       <div style={{ marginTop: 14, display: "flex", gap: 10, flexWrap: "wrap" }}>
         {action.href ? (
-          <Link
+          <Link prefetch={false}
             href={action.href}
             style={{
               textDecoration: "none",

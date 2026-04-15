@@ -96,10 +96,10 @@ export default function TradingConversionCenterPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard/quotation" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(56,189,248,.14)", border: "1px solid rgba(56,189,248,.24)", color: "#38bdf8", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
+          <Link prefetch={false} href="/dashboard/quotation" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(56,189,248,.14)", border: "1px solid rgba(56,189,248,.24)", color: "#38bdf8", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
             Quotations
           </Link>
-          <Link href="/dashboard/delivery-challan" style={{ padding: "10px 16px", borderRadius: 10, background: "#f97316", color: "#160a03", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
+          <Link prefetch={false} href="/dashboard/delivery-challan" style={{ padding: "10px 16px", borderRadius: 10, background: "#f97316", color: "#160a03", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
             Dispatch Docs
           </Link>
         </div>

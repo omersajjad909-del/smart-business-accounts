@@ -629,7 +629,7 @@ export default function DashboardLayout({
         {/* ---- SIDEBAR HEADER ---- */}
         <div style={{padding: sidebarCollapsed ? "8px 8px" : "10px 16px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", alignItems: sidebarCollapsed ? "center" : "stretch"}}>
           {/* Logo + Brand */}
-          <Link
+          <Link prefetch={false}
             href="/dashboard"
             style={{
               display:"flex",
@@ -1847,7 +1847,7 @@ export default function DashboardLayout({
           {/* Right side */}
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
             {/* Affiliate link */}
-            <Link
+            <Link prefetch={false}
               href="/affiliate"
               style={{display:"flex",alignItems:"center",gap:6,padding:"5px 12px",borderRadius:8,background:"rgba(251,191,36,0.08)",border:"1px solid rgba(251,191,36,0.2)",color:"#fbbf24",textDecoration:"none",fontSize:11,fontWeight:700,letterSpacing:".04em"}}
               className="hidden sm:flex"
@@ -1900,7 +1900,7 @@ export default function DashboardLayout({
                     </span>
                   </div>
                 </div>
-                <Link href="/pricing" style={{
+                <Link prefetch={false} href="/pricing" style={{
                   padding:"7px 16px", borderRadius:8, fontSize:12, fontWeight:700,
                   background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff",
                   textDecoration:"none", whiteSpace:"nowrap",

@@ -52,15 +52,15 @@ export default function CRMOverview() {
           <p style={{ color: "rgba(255,255,255,.4)", fontSize: 13, margin: 0 }}>Contacts, Pipeline & Relationship Management</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard/crm/contacts" style={btnStyle("#6366f1")}>+ New Contact</Link>
-          <Link href="/dashboard/crm/opportunities" style={btnStyle("rgba(99,102,241,.2)", "#a5b4fc", "1px solid rgba(99,102,241,.3)")}>View Pipeline</Link>
+          <Link prefetch={false} href="/dashboard/crm/contacts" style={btnStyle("#6366f1")}>+ New Contact</Link>
+          <Link prefetch={false} href="/dashboard/crm/opportunities" style={btnStyle("rgba(99,102,241,.2)", "#a5b4fc", "1px solid rgba(99,102,241,.3)")}>View Pipeline</Link>
         </div>
       </div>
 
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: 14, marginBottom: 32 }}>
         {stats.map(s => (
-          <Link key={s.label} href={s.href} style={{ textDecoration: "none" }}>
+          <Link prefetch={false} key={s.label} href={s.href} style={{ textDecoration: "none" }}>
             <div style={{
               background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)",
               borderRadius: 14, padding: "18px 20px", cursor: "pointer",
@@ -80,7 +80,7 @@ export default function CRMOverview() {
         <div style={sectionStyle}>
           <div style={sectionHeader}>
             <span>Recent Contacts</span>
-            <Link href="/dashboard/crm/contacts" style={linkStyle}>View all →</Link>
+            <Link prefetch={false} href="/dashboard/crm/contacts" style={linkStyle}>View all →</Link>
           </div>
           {loading ? <Loader /> : contacts.length === 0 ? <Empty msg="No contacts yet" /> : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -101,7 +101,7 @@ export default function CRMOverview() {
         <div style={sectionStyle}>
           <div style={sectionHeader}>
             <span>Opportunities</span>
-            <Link href="/dashboard/crm/opportunities" style={linkStyle}>View all →</Link>
+            <Link prefetch={false} href="/dashboard/crm/opportunities" style={linkStyle}>View all →</Link>
           </div>
           {loading ? <Loader /> : opps.length === 0 ? <Empty msg="No opportunities yet" /> : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -127,7 +127,7 @@ export default function CRMOverview() {
         <div style={sectionStyle}>
           <div style={sectionHeader}>
             <span>Recent Interactions</span>
-            <Link href="/dashboard/crm/interactions" style={linkStyle}>View all →</Link>
+            <Link prefetch={false} href="/dashboard/crm/interactions" style={linkStyle}>View all →</Link>
           </div>
           {loading ? <Loader /> : interactions.length === 0 ? <Empty msg="No interactions yet" /> : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -155,7 +155,7 @@ export default function CRMOverview() {
           { href: "/dashboard/crm/interactions", label: "Interactions", icon: "🤝", desc: "Calls, meetings & emails" },
           { href: "/dashboard/quotation", label: "Quotations", icon: "📋", desc: "Create & send quotes" },
         ].map(n => (
-          <Link key={n.href} href={n.href} style={{
+          <Link prefetch={false} key={n.href} href={n.href} style={{
             display: "flex", alignItems: "center", gap: 12,
             padding: "14px 20px", borderRadius: 12,
             background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)",

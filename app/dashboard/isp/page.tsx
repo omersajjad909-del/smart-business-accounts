@@ -50,7 +50,7 @@ export default function IspOverviewPage() {
             { href: "/dashboard/isp/support", label: "Support Tickets" },
             { href: "/dashboard/isp/analytics", label: "Analytics" },
           ].map((item) => (
-            <Link key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${ispBorder}`, background: ispBg, color: "#93c5fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${ispBorder}`, background: ispBg, color: "#93c5fd", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
             </Link>
           ))}

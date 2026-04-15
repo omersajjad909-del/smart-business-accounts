@@ -49,7 +49,7 @@ export default function RealEstateOverviewPage() {
             { label: "Rent", href: "/dashboard/real-estate/rent" },
             { label: "Analytics", href: "/dashboard/real-estate/analytics" },
           ].map((action) => (
-            <Link key={action.href} href={action.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${realEstateBorder}`, background: realEstateBg, color: "#c7d2fe", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
+            <Link prefetch={false} key={action.href} href={action.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${realEstateBorder}`, background: realEstateBg, color: "#c7d2fe", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {action.label}
             </Link>
           ))}

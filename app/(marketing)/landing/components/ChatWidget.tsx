@@ -14,7 +14,7 @@ const WELCOME_SUGGESTIONS = [
   "What is FinovaOS?",
   "Explain pricing plans",
   "How do I create a sales invoice?",
-  "Is there a free trial?",
+  "Can I get a demo?",
   "Inventory management features",
   "HR & Payroll features",
 ];

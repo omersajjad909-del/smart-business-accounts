@@ -53,8 +53,8 @@ export default function RentalOverviewPage() {
           <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.45)" }}>Bookings and agreements for vehicle or equipment rentals.</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Link href="/dashboard/rental/bookings" style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#86efac", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>Bookings</Link>
-          <Link href="/dashboard/rental/agreements" style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#86efac", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>Agreements</Link>
+          <Link prefetch={false} href="/dashboard/rental/bookings" style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#86efac", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>Bookings</Link>
+          <Link prefetch={false} href="/dashboard/rental/agreements" style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", color: "#86efac", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>Agreements</Link>
         </div>
       </div>
 

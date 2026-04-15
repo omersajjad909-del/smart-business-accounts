@@ -114,7 +114,7 @@ export default function TradingOverviewPage() {
             Manage quotation to dispatch, supplier buying, warehouse stock, and party recoveries from one commercial workflow.
           </p>
         </div>
-        <Link
+        <Link prefetch={false}
           href="/dashboard/sales-invoice"
           style={{ padding: "10px 18px", borderRadius: 10, background: "#38bdf8", color: "#08111d", textDecoration: "none", fontSize: 13, fontWeight: 800, whiteSpace: "nowrap" }}
         >
@@ -158,7 +158,7 @@ export default function TradingOverviewPage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {quickLinks.map((link) => (
-              <Link
+              <Link prefetch={false}
                 key={link.href}
                 href={link.href}
                 style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 14px", borderRadius: 12, background: "var(--panel-bg)", border: `1px solid ${tradingBorder}`, color: "var(--text-primary)", textDecoration: "none", fontSize: 13, fontWeight: 700 }}
