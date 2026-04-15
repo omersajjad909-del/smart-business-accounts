@@ -105,7 +105,7 @@ export default function TeamAndPermissionsPage() {
     const user = getCurrentUser();
     setMe(user);
     if (user?.role === "ADMIN") {
-      Promise.all([loadUsers(user), loadBranches(user), loadBranchMap(user), loadRoles(user)]).finally(() => setLoading(false));
+      Promise.all([loadUsers(user), loadBranches(), loadBranchMap(), loadRoles(user)]).finally(() => setLoading(false));
     } else setLoading(false);
   }, []);
 
@@ -114,28 +114,13 @@ export default function TeamAndPermissionsPage() {
     const d = await res?.json().catch(() => []);
     setUsers(Array.isArray(d) ? d : []);
   }
-  async function loadBranches(u?: any) {
-    const usr = u || getCurrentUser();
-    // If we have companyId, send it directly. Otherwise let JWT cookie resolve it.
-    const hdrs: Record<string, string> = {};
-    if (usr?.companyId) {
-      hdrs["x-user-role"]  = "ADMIN";
-      hdrs["x-user-id"]    = usr.id || "";
-      hdrs["x-company-id"] = usr.companyId;
-    }
-    const res = await fetch("/api/branches", { headers: hdrs, credentials: "include" }).catch(() => null);
-    const d = await res?.json().catch(() => []);
-    setBranches(Array.isArray(d) ? d : []);
+  async function loadBranches() {
+    const res = await fetch("/api/branches").catch(() => null);
+    const data = await res?.json().catch(() => []);
+    setBranches(Array.isArray(data) ? data : []);
   }
-  async function loadBranchMap(u?: any) {
-    const usr = u || getCurrentUser();
-    const hdrs: Record<string, string> = {};
-    if (usr?.companyId) {
-      hdrs["x-user-role"]  = "ADMIN";
-      hdrs["x-user-id"]    = usr.id || "";
-      hdrs["x-company-id"] = usr.companyId;
-    }
-    const res = await fetch("/api/company/admin-control", { headers: hdrs, credentials: "include" }).catch(() => null);
+  async function loadBranchMap() {
+    const res = await fetch("/api/company/admin-control").catch(() => null);
     const d = await res?.json().catch(() => ({}));
     setBranchMap(d?.branchAssignments || {});
   }
