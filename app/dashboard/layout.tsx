@@ -655,17 +655,7 @@ export default function DashboardLayout({
               </div>
             )}
           </Link>
-          {/* Branch selector */}
-          {canShowBranchSelector && !sidebarCollapsed && (
-            <select
-              style={{marginTop:8,width:"100%",background:"#0d1430",border:"1px solid rgba(255,255,255,0.12)",borderRadius:7,padding:"6px 8px",fontSize:11,color:"rgba(255,255,255,0.8)",outline:"none",colorScheme:"dark"}}
-              value={activeBranchId}
-              onChange={(e) => setActiveBranchId(e.target.value)}
-            >
-              <option value="all" style={{background:"#0d1430",color:"#e8ecf5"}}>All Branches</option>
-              {branches.map(b => <option key={b.id} value={b.id} style={{background:"#0d1430",color:"#e8ecf5"}}>{b.code} - {b.name}</option>)}
-            </select>
-          )}
+          {/* Branch selector removed — use Settings → Branches page */}
         </div>
 
         {/* ---- NAV ---- */}

@@ -41,6 +41,9 @@ export async function POST(req: NextRequest) {
       code: body.code,
       name: body.name,
       city: body.city || null,
+      address: body.address || null,
+      phone: body.phone || null,
+      managerName: body.managerName || null,
       isActive: body.isActive !== false,
     },
   });
@@ -73,6 +76,9 @@ export async function PUT(req: NextRequest) {
       code: body.code,
       name: body.name,
       city: body.city || null,
+      address: body.address || null,
+      phone: body.phone || null,
+      managerName: body.managerName || null,
       isActive: body.isActive !== false,
     },
   });

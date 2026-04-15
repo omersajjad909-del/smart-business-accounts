@@ -938,6 +938,9 @@ model Branch {
   code      String
   name      String
   city      String?
+  address   String?
+  phone     String?
+  managerName String?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
