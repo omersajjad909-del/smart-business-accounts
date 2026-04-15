@@ -111,7 +111,14 @@
       "Bash(sed -i 's/rgba\\(255,255,255,\\\\.[2-5][0-9]*\\)/var\\(--text-muted\\)/g' d:/projects/smart-business-accounts/app/dashboard/bulk-payments/page.tsx)",
       "Bash(sed -i 's/rgba\\(255,255,255,\\\\.[6-9][0-9]*\\)/var\\(--text-primary\\)/g' d:/projects/smart-business-accounts/app/dashboard/bulk-payments/page.tsx)",
       "Bash(sed -i 's/\"#0f1629\"/\"var\\(--app-bg\\)\"/g' d:/projects/smart-business-accounts/app/dashboard/bulk-payments/page.tsx)",
-      "Bash(ls -la /d/projects/smart-business-accounts/*.ts)"
+      "Bash(ls -la /d/projects/smart-business-accounts/*.ts)",
+      "Bash(New-Item -Path \"d:\\\\projects\\\\smart-business-accounts\\\\lib\\\\whatsapp.ts\" -ItemType File -Force)",
+      "Bash(Out-Null)",
+      "Bash(mkdir -p lib app/api/whatsapp/webhook app/api/whatsapp/send app/api/automation/drip app/api/automation/webhooks/inbound app/api/automation/content app/api/automation/leads app/api/automation/sheets app/api/automation/social)",
+      "Bash(touch lib/whatsapp.ts app/api/whatsapp/webhook/route.ts app/api/whatsapp/send/route.ts app/api/automation/drip/route.ts app/api/automation/webhooks/route.ts app/api/automation/webhooks/inbound/route.ts app/api/automation/content/route.ts app/api/automation/leads/route.ts app/api/automation/sheets/route.ts app/api/automation/social/route.ts)"
+    ],
+    "additionalDirectories": [
+      "d:\\projects\\smart-business-accounts\\lib"
     ]
   }
 }

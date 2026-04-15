@@ -1,118 +1,74 @@
-// FILE: lib/whatsapp.ts
-// WhatsApp notification via WhatsApp Business API (Meta)
-// Or use a third-party like Twilio, MessageBird, or WATI
-// Set WHATSAPP_API_URL and WHATSAPP_TOKEN in .env
-import { getCompanyCommsConfig } from "@/lib/companyCommsConfig";
+import { getCompanyCommsConfig } from "./companyCommsConfig";
 
-type WAMessage = {
-  to: string;        // Phone number with country code e.g. "923001234567"
-  template?: string; // Template name (if using templates)
-  message?: string;  // Plain text (for sandbox/test)
-  params?: string[]; // Template parameters
-  companyId?: string;
-};
+export interface WhatsAppMessage {
+  to: string; // phone with country code e.g. 923001234567
+  type: "text" | "template";
+  text?: string;
+  templateName?: string;
+  templateParams?: string[];
+  languageCode?: string;
+}
 
-export async function sendWhatsApp({ to, template, message, params, companyId }: WAMessage): Promise<boolean> {
-  let token = process.env.WHATSAPP_TOKEN;
-  let phoneId = process.env.WHATSAPP_PHONE_ID;
-  let apiVersion = "v18.0";
+export interface WhatsAppResult {
+  success: boolean;
+  messageId?: string;
+  error?: string;
+}
 
-  if (companyId) {
-    const companyConfig = await getCompanyCommsConfig(companyId);
-    if (companyConfig.whatsapp.enabled && companyConfig.whatsapp.token && companyConfig.whatsapp.phoneId) {
-      token = companyConfig.whatsapp.token;
-      phoneId = companyConfig.whatsapp.phoneId;
-      apiVersion = companyConfig.whatsapp.apiVersion || "v18.0";
-    }
-  }
-
-  if (!token || !phoneId) {
-    console.warn("[WhatsApp] Missing WHATSAPP_TOKEN or WHATSAPP_PHONE_ID in .env");
-    return false;
-  }
-
+export async function sendWhatsApp(
+  companyId: string,
+  message: WhatsAppMessage
+): Promise<WhatsAppResult> {
   try {
-    const body = template ? {
-      messaging_product: "whatsapp",
-      to: to.replace(/\D/g, ""),
-      type: "template",
-      template: {
-        name: template,
-        language: { code: "en" },
-        components: params ? [{ type:"body", parameters: params.map(p=>({ type:"text", text:p })) }] : [],
-      },
-    } : {
-      messaging_product: "whatsapp",
-      to: to.replace(/\D/g, ""),
-      type: "text",
-      text: { body: message || "" },
-    };
+    const config = await getCompanyCommsConfig(companyId);
+    if (!config.whatsapp.enabled || !config.whatsapp.token || !config.whatsapp.phoneId) {
+      return { success: false, error: "WhatsApp not configured" };
+    }
 
-    const res = await fetch(`https://graph.facebook.com/${apiVersion}/${phoneId}/messages`, {
+    const { token, phoneId, apiVersion = "v18.0" } = config.whatsapp;
+    const url = `https://graph.facebook.com/${apiVersion}/${phoneId}/messages`;
+
+    let body: Record<string, unknown>;
+
+    if (message.type === "template") {
+      body = {
+        messaging_product: "whatsapp",
+        to: message.to,
+        type: "template",
+        template: {
+          name: message.templateName,
+          language: { code: message.languageCode || "en_US" },
+          components: message.templateParams?.length
+            ? [{ type: "body", parameters: message.templateParams.map(p => ({ type: "text", text: p })) }]
+            : [],
+        },
+      };
+    } else {
+      body = {
+        messaging_product: "whatsapp",
+        to: message.to,
+        type: "text",
+        text: { body: message.text || "" },
+      };
+    }
+
+    const res = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
 
-    if (!res.ok) {
-      const err = await res.json();
-      console.error("[WhatsApp] Send failed:", err);
-      return false;
-    }
-    return true;
-  } catch (e) {
-    console.error("[WhatsApp] Error:", e);
-    return false;
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data?.error?.message || "WhatsApp API error" };
+    return { success: true, messageId: data?.messages?.[0]?.id };
+  } catch (e: any) {
+    return { success: false, error: e?.message || "Unknown error" };
   }
 }
 
-// ── Pre-built notification helpers ──
-
-export const whatsappNotifications = {
-
-  // Invoice sent to customer
-  invoiceSent: (phone: string, customerName: string, invoiceNo: string, amount: string, viewUrl: string) =>
-    sendWhatsApp({
-      to: phone,
-      message: `Hi ${customerName},\n\nYou have a new invoice from us.\n\n📄 Invoice: ${invoiceNo}\n💰 Amount: ${amount}\n\n🔗 View & Pay: ${viewUrl}\n\n— FinovaOS`,
-    }),
-
-  // Payment reminder
-  paymentReminder: (phone: string, customerName: string, invoiceNo: string, amount: string, daysOverdue: number) =>
-    sendWhatsApp({
-      to: phone,
-      message: `Hi ${customerName},\n\n⚠️ Reminder: Invoice ${invoiceNo} for ${amount} is ${daysOverdue > 0 ? `${daysOverdue} days overdue` : "due today"}.\n\nPlease arrange payment at your earliest convenience.\n\n— FinovaOS`,
-    }),
-
-  // OTP verification
-  otp: (phone: string, name: string, code: string) =>
-    sendWhatsApp({
-      to: phone,
-      message: `Hi ${name},\n\nYour FinovaOS verification code is:\n\n*${code}*\n\nValid for 15 minutes. Do not share this code.\n\n— FinovaOS`,
-    }),
-
-  // Welcome message
-  welcome: (phone: string, name: string, companyName: string) =>
-    sendWhatsApp({
-      to: phone,
-      message: `Welcome to FinovaOS, ${name}! 🎉\n\nYour ${companyName} workspace is ready.\n\n🚀 Get started: ${(process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app")}/dashboard\n\nNeed help? Reply to this message.\n\n— The FinovaOS Team`,
-    }),
-
-  // Low stock alert (to business owner)
-  lowStock: (phone: string, itemName: string, currentStock: number, minStock: number) =>
-    sendWhatsApp({
-      to: phone,
-      message: `⚠️ *Low Stock Alert*\n\nItem: ${itemName}\nCurrent Stock: ${currentStock}\nMinimum Level: ${minStock}\n\nPlease reorder to avoid stockout.\n\n— FinovaOS`,
-    }),
-
-  // Payroll processed
-  payrollProcessed: (phone: string, employeeName: string, month: string, netSalary: string) =>
-    sendWhatsApp({
-      to: phone,
-      message: `Hi ${employeeName},\n\nYour salary for *${month}* has been processed.\n\n💰 Net Salary: *${netSalary}*\n\nYour payslip is ready in FinovaOS.\n\n— HR Team`,
-    }),
-};
-
+// Format Pakistani number: 03001234567 → 923001234567
+export function formatPhone(phone: string): string {
+  let n = phone.replace(/[\s\-\+\(\)]/g, "");
+  if (n.startsWith("0") && n.length === 11) n = "92" + n.slice(1);
+  return n;
+}

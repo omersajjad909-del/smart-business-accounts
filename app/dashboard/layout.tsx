@@ -1653,6 +1653,7 @@ export default function DashboardLayout({
               {/* {(!isCustomPlan || hasCustomActiveModule("whatsapp")) && <NavLink href="/dashboard/notifications" pathname={pathname}>Notifications & SMS</NavLink>} */}
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
               {(!isCustomPlan || hasCustomActiveModule("api_access")) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
+              {!isCustomPlan && <NavLink href="/dashboard/automation" pathname={pathname}>Business Automation</NavLink>}
             </NavGroup>
           )}
 
