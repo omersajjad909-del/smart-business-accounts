@@ -629,7 +629,7 @@ export default function DashboardLayout({
       >
 
         {/* ---- SIDEBAR HEADER ---- */}
-        <div style={{padding: sidebarCollapsed ? "12px 8px" : "16px 16px 12px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", alignItems: sidebarCollapsed ? "center" : "stretch"}}>
+        <div style={{padding: sidebarCollapsed ? "8px 8px" : "10px 16px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", alignItems: sidebarCollapsed ? "center" : "stretch"}}>
           {/* Logo + Brand */}
           <Link
             href="/dashboard"
@@ -640,7 +640,7 @@ export default function DashboardLayout({
               gap:10,
               marginBottom: sidebarCollapsed ? 0 : 12,
               textDecoration:"none",
-              padding: sidebarCollapsed ? "4px" : "6px 4px",
+              padding: sidebarCollapsed ? "2px" : "4px 4px",
               borderRadius:12,
               background: pathname === "/dashboard" ? "rgba(99,102,241,0.12)" : "transparent",
               border: pathname === "/dashboard" ? "1px solid rgba(99,102,241,0.22)" : "1px solid transparent",
