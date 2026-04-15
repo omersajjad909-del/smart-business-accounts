@@ -1801,7 +1801,22 @@ export default function DashboardLayout({
             <GlobalSearch />
           </Suspense>
 
-          {/* Branch switcher removed — managed via Settings → Branches */}
+          {/* Branch switcher */}
+          {branches.length > 0 && (
+            <div style={{display:"flex",alignItems:"center",gap:6,padding:"5px 10px",borderRadius:9,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)"}}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <select
+                value={activeBranchId}
+                onChange={e => setActiveBranchId(e.target.value)}
+                style={{background:"transparent",border:"none",color:"rgba(255,255,255,0.75)",fontSize:12,fontWeight:600,outline:"none",cursor:"pointer",fontFamily:"inherit",maxWidth:140}}
+              >
+                <option value="all" style={{background:"#0f172a"}}>All Branches</option>
+                {branches.map(b => (
+                  <option key={b.id} value={b.id} style={{background:"#0f172a"}}>{b.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Right side */}
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:12}}>
