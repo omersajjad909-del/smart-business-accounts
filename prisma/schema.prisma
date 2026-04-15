@@ -391,6 +391,9 @@ model Company {
   currentPeriodEnd    DateTime?
   cancelledAt        DateTime?  // Timestamp when subscription was cancelled
   dataRetentionUntil DateTime?  // 90 days after cancellation — hard delete after this date
+  fraudRisk          String?    @default("NONE") // NONE | LOW | MEDIUM | HIGH — updated by fraud monitor
+  flaggedAt          DateTime?  // When admin manually flagged this company
+  flagNote           String?    // Admin note explaining the flag
   createdAt DateTime @default(now())
 
   users        UserCompany[]

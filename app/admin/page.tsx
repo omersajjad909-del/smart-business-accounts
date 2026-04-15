@@ -64,7 +64,7 @@ const PERMISSIONS_LIST = [
 /* ═══════════════════════════════════════════════════════
    NAV CONFIG
 ═══════════════════════════════════════════════════════ */
-type Page = "dashboard"|"companies"|"users"|"revenue"|"geo"|"usage"|"plans"|"system"|"logs"|"permissions"|"settings"|"profile"|"tickets"|"broadcasts"|"flags"|"apikeys"|"visitors"|"updates"|"livesupport"|"subscriptions"|"coupons"|"emaillogs"|"referrals"|"teams"|"testimonials"|"leads"|"seo"|"social"|"business_modules"|"newsletter"|"feedback"|"crm";
+type Page = "dashboard"|"companies"|"users"|"revenue"|"geo"|"usage"|"plans"|"system"|"logs"|"permissions"|"settings"|"profile"|"tickets"|"broadcasts"|"flags"|"apikeys"|"visitors"|"updates"|"livesupport"|"subscriptions"|"coupons"|"emaillogs"|"referrals"|"teams"|"testimonials"|"leads"|"seo"|"social"|"business_modules"|"newsletter"|"feedback"|"crm"|"fraud";
 
 // SVG icon paths per nav item (14x14 viewBox, stroke-based)
 const NAV_ICONS: Record<string, React.ReactNode> = {
@@ -122,6 +122,7 @@ const NAV: { page:Page; label:string; icon:string; color:string; badge?:string }
   { page:"social",           label:"Social Media",     icon:"",  color:"#f472b6" },
   { page:"livesupport",      label:"Live Support",     icon:"",  color:"#38bdf8" },
   { page:"tickets",          label:"Support Tickets",  icon:"",  color:"#fbbf24" },
+  { page:"fraud",            label:"Fraud Monitor",    icon:"",  color:"#f87171", badge:"NEW" },
   { page:"system",           label:"System Health",    icon:"",  color:"#34d399", badge:"OK" },
   { page:"logs",             label:"Audit Logs",       icon:"",  color:"#94a3b8" },
   { page:"emaillogs",        label:"Email Logs",       icon:"",  color:"#94a3b8" },
@@ -139,6 +140,7 @@ const NAV_GROUPS: { label: string; pages: Page[] }[] = [
   { label: "Marketing",  pages: ["coupons","referrals","crm","leads","broadcasts","testimonials","newsletter","feedback"] },
   { label: "Content",    pages: ["updates","seo","social"] },
   { label: "Support",    pages: ["livesupport","tickets"] },
+  { label: "Security",   pages: ["fraud"] },
   { label: "System",     pages: ["system","logs","emaillogs","flags","apikeys"] },
   { label: "Access",     pages: ["permissions","teams","settings"] },
 ];
@@ -7206,6 +7208,7 @@ export default function AdminPanel() {
     business_modules:"Business Modules",
     newsletter:"Newsletter Subscribers", feedback:"Feedback & Complaints",
     crm:"CRM Workspace",
+    fraud:"Fraud & Risk Monitor",
   };
 
   const PAGE_ICONS: Partial<Record<Page,string>> = {
@@ -7351,7 +7354,7 @@ export default function AdminPanel() {
                   return (
                     <button key={item.page}
                       className="nav-btn"
-                      onClick={() => { setPage(item.page); setMobileOpen(false); }}
+                      onClick={() => { if (item.page === "fraud") { window.location.href = "/admin/fraud"; return; } setPage(item.page); setMobileOpen(false); }}
                       title={collapsed ? item.label : undefined}
                       style={{
                         display:"flex", alignItems:"center", gap:10,
