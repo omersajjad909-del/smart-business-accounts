@@ -93,7 +93,10 @@ export default function TeamAndPermissionsPage() {
 
   const h = (u?: any) => {
     const usr = u || me;
-    return { "x-user-role": "ADMIN", "x-user-id": usr?.id || "", "x-company-id": usr?.companyId || "" };
+    const headers: Record<string, string> = { "x-user-role": "ADMIN" };
+    if (usr?.id)        headers["x-user-id"]    = usr.id;
+    if (usr?.companyId) headers["x-company-id"] = usr.companyId;
+    return headers;
   };
 
   /* ── load ── */
