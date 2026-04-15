@@ -1,55 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
   <defs>
-    <linearGradient id="layerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#38bdf8"/>
-      <stop offset="50%" stop-color="#7c3aed"/>
+    <!-- Main bright gradient (top layer) -->
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#38bdf8"/>
+      <stop offset="55%"  stop-color="#6d28d9"/>
       <stop offset="100%" stop-color="#9333ea"/>
     </linearGradient>
-    <linearGradient id="layerGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.7"/>
-      <stop offset="100%" stop-color="#9333ea" stop-opacity="0.7"/>
+    <!-- Mid layer gradient -->
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#4f8ef7" stop-opacity="0.82"/>
+      <stop offset="100%" stop-color="#9333ea" stop-opacity="0.82"/>
     </linearGradient>
-    <linearGradient id="layerGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.4"/>
-      <stop offset="100%" stop-color="#9333ea" stop-opacity="0.4"/>
+    <!-- Bottom layer gradient -->
+    <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#6366f1" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#9333ea" stop-opacity="0.45"/>
     </linearGradient>
-    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#38bdf8"/>
+    <!-- Arrow / node gradient -->
+    <linearGradient id="ga" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#22d3ee"/>
       <stop offset="100%" stop-color="#6366f1"/>
     </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
+    <!-- Glow filter -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="softglow" x="-30%" y="-30%" width="160%" height="160%">
+    <filter id="softglow" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="layerglow" x="-15%" y="-40%" width="130%" height="180%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
-  <!-- Layer 3 (bottom) — most faded -->
-  <path d="M40,148 L100,172 L160,148 L100,162 Z" fill="url(#layerGrad3)" rx="4"/>
+  <!-- ── BOTTOM LAYER (most faded) ── -->
+  <path d="M30,162 Q100,182 170,162 Q100,172 30,162 Z" fill="url(#g3)"/>
+  <path d="M26,156 L100,174 L174,156 Q100,168 26,156 Z" fill="url(#g3)"/>
 
-  <!-- Layer 2 (middle) -->
-  <path d="M34,128 L100,154 L166,128 L100,142 Z" fill="url(#layerGrad2)"/>
+  <!-- ── MIDDLE LAYER ── -->
+  <path d="M22,138 L100,158 L178,138 Q100,150 22,138 Z" fill="url(#g2)"/>
+  <path d="M22,132 L100,150 L178,132 L100,144 Z" fill="url(#g2)"/>
 
-  <!-- Layer 1 (top) — brightest -->
-  <path d="M28,108 L100,136 L172,108 L100,122 Z" fill="url(#layerGrad)" filter="url(#glow)"/>
+  <!-- ── TOP LAYER (brightest) ── -->
+  <path d="M18,114 L100,136 L182,114 L100,126 Z" fill="url(#g1)" filter="url(#layerglow)"/>
 
-  <!-- Network graph nodes + lines on top of layers -->
-  <!-- Lines connecting nodes -->
-  <line x1="72" y1="95" x2="95" y2="82" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round"/>
-  <line x1="95" y1="82" x2="118" y2="90" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round"/>
-  <line x1="118" y1="90" x2="138" y2="72" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- ── NETWORK GRAPH LINES ── -->
+  <line x1="68"  y1="98"  x2="92"  y2="83"  stroke="url(#ga)" stroke-width="3"   stroke-linecap="round"/>
+  <line x1="92"  y1="83"  x2="118" y2="92"  stroke="url(#ga)" stroke-width="3"   stroke-linecap="round"/>
+  <line x1="118" y1="92"  x2="140" y2="74"  stroke="url(#ga)" stroke-width="3"   stroke-linecap="round"/>
 
-  <!-- Node dots -->
-  <circle cx="72"  cy="95" r="5" fill="#38bdf8" filter="url(#glow)"/>
-  <circle cx="95"  cy="82" r="5" fill="#5b87f5" filter="url(#glow)"/>
-  <circle cx="118" cy="90" r="5" fill="#7c6cf0" filter="url(#glow)"/>
+  <!-- ── NODE DOTS ── -->
+  <circle cx="68"  cy="98"  r="6.5" fill="#38bdf8" filter="url(#glow)"/>
+  <circle cx="92"  cy="83"  r="6.5" fill="#5b87f5" filter="url(#glow)"/>
+  <circle cx="118" cy="92"  r="6.5" fill="#7c6cf0" filter="url(#glow)"/>
 
-  <!-- Upward arrow (top right of graph) -->
-  <!-- Arrow shaft -->
-  <line x1="124" y1="84" x2="147" y2="52" stroke="url(#arrowGrad)" stroke-width="4" stroke-linecap="round" filter="url(#softglow)"/>
-  <!-- Arrow head -->
-  <polygon points="147,52 133,55 144,66" fill="#38bdf8" filter="url(#softglow)"/>
+  <!-- ── UPWARD ARROW ── -->
+  <line x1="128" y1="82" x2="154" y2="46"
+        stroke="#38bdf8" stroke-width="5" stroke-linecap="round" filter="url(#softglow)"/>
+  <polygon points="158,40 142,46 152,60" fill="#38bdf8" filter="url(#softglow)"/>
 </svg>
