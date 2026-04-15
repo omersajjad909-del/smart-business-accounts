@@ -123,12 +123,12 @@ export default function FinancialYearPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="responsive-page-shell responsive-page-shell--narrow space-y-6">
+      <div className="responsive-title-row">
         <h1 className="text-2xl font-bold">Financial Year Management</h1>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded"
         >
           + Add Financial Year
         </button>
@@ -138,7 +138,7 @@ export default function FinancialYearPage() {
         <div className="bg-white border p-6 rounded space-y-4">
           <h2 className="text-xl font-bold">New Financial Year</h2>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="responsive-grid-3">
             <div>
               <label className="block text-sm font-bold mb-1">Year *</label>
               <input
@@ -178,7 +178,7 @@ export default function FinancialYearPage() {
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="responsive-mobile-actions">
             <button
               onClick={saveYear}
               disabled={loading}
@@ -196,7 +196,7 @@ export default function FinancialYearPage() {
         </div>
       )}
 
-      <div className="bg-white border rounded overflow-hidden">
+      <div className="bg-white border rounded overflow-hidden responsive-table-wrap">
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
             <tr>

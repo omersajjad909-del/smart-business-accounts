@@ -43,7 +43,13 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   ACTIVE:   { bg: "rgba(99,102,241,.12)",  text: "#818cf8" },
 };
 
-type TabKey = "pricing" | "permissions" | "custom-plans" | "modules";
+type TabKey = "pricing" | "permissions" | "custom-plans" | "modules" | "addon";
+
+type AddonCompany = {
+  id: string; name: string; plan: string; createdAt: string;
+  addon: { enabled: boolean; plan: string; price: number; activatedAt: string; expiresAt: string | null; notes: string | null } | null;
+};
+type AddonStats = { total: number; active: number; mrr: number };
 
 /* ─── Section card ───────────────────────────────────── */
 function Card({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle?: string }) {
@@ -90,6 +96,17 @@ export default function AdminPlansPage() {
   const [updatingReq, setUpdatingReq] = useState<string | null>(null);
   const [expandedReq, setExpandedReq] = useState<string | null>(null);
 
+  /* ── Automation Add-on ── */
+  const [addonCompanies, setAddonCompanies] = useState<AddonCompany[]>([]);
+  const [addonStats, setAddonStats]         = useState<AddonStats>({ total: 0, active: 0, mrr: 0 });
+  const [loadingAddon, setLoadingAddon]     = useState(false);
+  const [savingAddon, setSavingAddon]       = useState<string | null>(null);
+  const [addonSearch, setAddonSearch]       = useState("");
+  const [addonEditId, setAddonEditId]       = useState<string | null>(null);
+  const [addonEditPrice, setAddonEditPrice] = useState(79);
+  const [addonEditPlan, setAddonEditPlan]   = useState<"monthly" | "yearly">("monthly");
+  const [addonEditNotes, setAddonEditNotes] = useState("");
+
   /* ── Module pricing ── */
   const [modulePrices, setModulePrices] = useState<Record<string, number>>(
     Object.fromEntries(MODULES.map(m => [m.id, 0]))
@@ -124,6 +141,67 @@ export default function AdminPlansPage() {
       } finally { setLoadingReqs(false); }
     })();
   }, [tab]);
+
+  /* ─── Load automation addon data ─── */
+  useEffect(() => {
+    if (tab !== "addon") return;
+    (async () => {
+      setLoadingAddon(true);
+      try {
+        const r = await fetch("/api/admin/automation-addon");
+        if (r.ok) {
+          const d = await r.json();
+          setAddonCompanies(d.companies || []);
+          setAddonStats(d.stats || { total: 0, active: 0, mrr: 0 });
+        }
+      } finally { setLoadingAddon(false); }
+    })();
+  }, [tab]);
+
+  /* ─── Toggle / save addon for company ─── */
+  async function saveAddon(companyId: string, enabled: boolean, price?: number, plan?: string, notes?: string) {
+    setSavingAddon(companyId);
+    try {
+      const r = await fetch("/api/admin/automation-addon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyId, enabled, price: price ?? 79, plan: plan ?? "monthly", notes: notes ?? null }),
+      });
+      if (r.ok) {
+        setAddonCompanies(prev => prev.map(c => c.id === companyId
+          ? { ...c, addon: { enabled, plan: plan ?? "monthly", price: price ?? 79, activatedAt: c.addon?.activatedAt || new Date().toISOString(), expiresAt: null, notes: notes ?? null } }
+          : c
+        ));
+        setAddonStats(prev => {
+          const wasActive = addonCompanies.find(c => c.id === companyId)?.addon?.enabled ?? false;
+          const newActive = enabled ? (wasActive ? prev.active : prev.active + 1) : (wasActive ? prev.active - 1 : prev.active);
+          const newMrr = addonCompanies
+            .map(c => c.id === companyId ? (enabled ? (price ?? 79) : 0) : (c.addon?.enabled ? (c.addon.price || 79) : 0))
+            .reduce((s, v) => s + v, 0);
+          return { ...prev, active: Math.max(0, newActive), mrr: newMrr };
+        });
+        setAddonEditId(null);
+        toast.success(enabled ? "Automation add-on enabled" : "Add-on disabled");
+      } else {
+        toast.error("Failed to update add-on");
+      }
+    } finally { setSavingAddon(null); }
+  }
+
+  async function removeAddon(companyId: string) {
+    setSavingAddon(companyId);
+    try {
+      const r = await fetch("/api/admin/automation-addon", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyId }),
+      });
+      if (r.ok) {
+        setAddonCompanies(prev => prev.map(c => c.id === companyId ? { ...c, addon: null } : c));
+        toast.success("Add-on removed");
+      }
+    } finally { setSavingAddon(null); }
+  }
 
   /* ─── Load module prices ─── */
   useEffect(() => {
@@ -216,10 +294,11 @@ export default function AdminPlansPage() {
   };
 
   const TABS: { key: TabKey; label: string; icon: string }[] = [
-    { key: "pricing",      label: "Pricing",         icon: "💰" },
-    { key: "permissions",  label: "Permissions",      icon: "🔐" },
-    { key: "custom-plans", label: "Custom Requests",  icon: "📋" },
-    { key: "modules",      label: "Module Pricing",   icon: "🧩" },
+    { key: "pricing",      label: "Pricing",           icon: "💰" },
+    { key: "permissions",  label: "Permissions",        icon: "🔐" },
+    { key: "custom-plans", label: "Custom Requests",    icon: "📋" },
+    { key: "modules",      label: "Module Pricing",     icon: "🧩" },
+    { key: "addon",        label: "Automation Add-on",  icon: "⚡" },
   ];
 
   const PLAN_COLORS: Record<string, string> = { starter: "#38bdf8", pro: "#818cf8", enterprise: "#c4b5fd" };
@@ -249,6 +328,12 @@ export default function AdminPlansPage() {
             style={{ padding: "10px 22px", borderRadius: 12, background: savingMod === "all" ? "#4338ca" : "linear-gradient(135deg,#4f46e5,#7c3aed)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             {savingMod === "all" ? "Saving…" : "Save All Module Prices"}
           </button>
+        )}
+        {tab === "addon" && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 11, color: "#475569" }}>Add-on price:</span>
+            <span style={{ fontSize: 18, fontWeight: 900, color: "#a78bfa" }}>$79<span style={{ fontSize: 12, fontWeight: 400, color: "#475569" }}>/mo</span></span>
+          </div>
         )}
       </div>
 
@@ -464,6 +549,175 @@ export default function AdminPlansPage() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </Card>
+        </>
+      )}
+
+      {/* ══ TAB: AUTOMATION ADD-ON ══ */}
+      {tab === "addon" && (
+        <>
+          {/* Stats row */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14, marginBottom: 24 }}>
+            {[
+              { label: "Companies Subscribed", value: addonStats.total, color: "#818cf8", icon: "🏢" },
+              { label: "Active Add-ons", value: addonStats.active, color: "#22c55e", icon: "⚡" },
+              { label: "Add-on MRR", value: `$${addonStats.mrr}/mo`, color: "#f59e0b", icon: "💰" },
+              { label: "Annual Revenue", value: `$${addonStats.mrr * 12}/yr`, color: "#38bdf8", icon: "📈" },
+            ].map(s => (
+              <div key={s.label} style={{ padding: "16px 18px", borderRadius: 14, background: `${s.color}10`, border: `1px solid ${s.color}30` }}>
+                <div style={{ fontSize: 24, marginBottom: 6 }}>{s.icon}</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{s.value}</div>
+                <div style={{ fontSize: 11, color: "#475569", fontWeight: 600 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* What's included info card */}
+          <div style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(167,139,250,.06)", border: "1px solid rgba(167,139,250,.2)", marginBottom: 24 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#a78bfa", marginBottom: 10 }}>⚡ Automation Add-on — $79/month per company</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 }}>
+              {["WhatsApp Auto-Reply (Claude AI)", "Email Drip Campaigns", "Zapier / Make Webhooks", "CRM Lead Capture", "Website AI Chatbot", "Social Media Auto-posting", "Google Sheets Sync", "AI Content Generator"].map(f => (
+                <div key={f} style={{ fontSize: 12, color: "#94a3b8", display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ color: "#22c55e", fontSize: 10 }}>✓</span> {f}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Card title="Company Add-on Management" subtitle="Enable or disable the Automation Add-on per company">
+            {/* Search */}
+            <div style={{ marginBottom: 18 }}>
+              <input
+                placeholder="Search companies…"
+                value={addonSearch}
+                onChange={e => setAddonSearch(e.target.value)}
+                style={{ ...inputStyle, maxWidth: 320 }}
+              />
+            </div>
+
+            {loadingAddon ? (
+              <div style={{ padding: "40px 0", textAlign: "center", color: "#475569" }}>Loading companies…</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {addonCompanies
+                  .filter(c => !addonSearch || c.name?.toLowerCase().includes(addonSearch.toLowerCase()))
+                  .map(c => {
+                    const isActive = c.addon?.enabled === true;
+                    const isEditing = addonEditId === c.id;
+                    const isSaving  = savingAddon === c.id;
+                    return (
+                      <div key={c.id} style={{ borderRadius: 14, border: `1px solid ${isActive ? "rgba(34,197,94,.2)" : "rgba(255,255,255,.06)"}`, background: isActive ? "rgba(34,197,94,.04)" : "rgba(255,255,255,.02)", overflow: "hidden" }}>
+                        {/* Main row */}
+                        <div style={{ padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+                          {/* Company info */}
+                          <div style={{ flex: 1, minWidth: 160 }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: "white" }}>{c.name || c.id}</div>
+                            <div style={{ display: "flex", gap: 8, marginTop: 3, alignItems: "center" }}>
+                              <span style={{ fontSize: 10, color: "#334155", fontFamily: "monospace" }}>{c.id.slice(0, 12)}…</span>
+                              <span style={{ padding: "1px 7px", borderRadius: 8, background: "rgba(99,102,241,.15)", color: "#818cf8", fontSize: 10, fontWeight: 700, textTransform: "uppercase" }}>{c.plan || "free"}</span>
+                            </div>
+                          </div>
+
+                          {/* Addon status */}
+                          {c.addon && (
+                            <div style={{ textAlign: "center" }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: isActive ? "#22c55e" : "#f87171" }}>
+                                {isActive ? "Active" : "Paused"}
+                              </div>
+                              <div style={{ fontSize: 10, color: "#475569" }}>
+                                ${c.addon.price}/mo · {c.addon.plan}
+                              </div>
+                              {c.addon.activatedAt && (
+                                <div style={{ fontSize: 9, color: "#334155" }}>
+                                  Since {new Date(c.addon.activatedAt).toLocaleDateString()}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {!c.addon && (
+                            <div style={{ fontSize: 12, color: "#334155" }}>No add-on</div>
+                          )}
+
+                          {/* Action buttons */}
+                          <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+                            {!isEditing ? (
+                              <>
+                                {!c.addon && (
+                                  <button
+                                    onClick={() => { setAddonEditId(c.id); setAddonEditPrice(79); setAddonEditPlan("monthly"); setAddonEditNotes(""); }}
+                                    style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(167,139,250,.15)", border: "1px solid rgba(167,139,250,.3)", color: "#a78bfa", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                                    + Enable
+                                  </button>
+                                )}
+                                {c.addon && (
+                                  <>
+                                    <button
+                                      onClick={() => saveAddon(c.id, !isActive, c.addon!.price, c.addon!.plan, c.addon!.notes ?? undefined)}
+                                      disabled={isSaving}
+                                      style={{ padding: "6px 14px", borderRadius: 8, background: isActive ? "rgba(239,68,68,.1)" : "rgba(34,197,94,.1)", border: `1px solid ${isActive ? "rgba(239,68,68,.25)" : "rgba(34,197,94,.25)"}`, color: isActive ? "#f87171" : "#22c55e", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                                      {isSaving ? "…" : isActive ? "Pause" : "Resume"}
+                                    </button>
+                                    <button
+                                      onClick={() => { setAddonEditId(c.id); setAddonEditPrice(c.addon!.price || 79); setAddonEditPlan((c.addon!.plan as any) || "monthly"); setAddonEditNotes(c.addon!.notes || ""); }}
+                                      style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, cursor: "pointer" }}>
+                                      Edit
+                                    </button>
+                                    <button
+                                      onClick={() => removeAddon(c.id)}
+                                      disabled={isSaving}
+                                      style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 12, cursor: "pointer" }}>
+                                      ✕
+                                    </button>
+                                  </>
+                                )}
+                              </>
+                            ) : (
+                              <button onClick={() => setAddonEditId(null)}
+                                style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#94a3b8", fontSize: 12, cursor: "pointer" }}>
+                                Cancel
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Edit form */}
+                        {isEditing && (
+                          <div style={{ padding: "16px 20px", borderTop: "1px solid rgba(255,255,255,.06)", background: "rgba(0,0,0,.2)", display: "grid", gridTemplateColumns: "1fr 1fr 2fr auto", gap: 12, alignItems: "end" }}>
+                            <div>
+                              <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>PRICE (USD/MO)</label>
+                              <div style={{ position: "relative" }}>
+                                <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 12 }}>$</span>
+                                <input type="number" min={1} value={addonEditPrice} onChange={e => setAddonEditPrice(Number(e.target.value))}
+                                  style={{ ...inputStyle, paddingLeft: 24, fontSize: 14, fontWeight: 700 }} />
+                              </div>
+                            </div>
+                            <div>
+                              <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>BILLING CYCLE</label>
+                              <select value={addonEditPlan} onChange={e => setAddonEditPlan(e.target.value as any)}
+                                style={{ ...inputStyle }}>
+                                <option value="monthly">Monthly</option>
+                                <option value="yearly">Yearly</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 5 }}>NOTES (OPTIONAL)</label>
+                              <input type="text" placeholder="e.g. Trial 30 days, special deal…" value={addonEditNotes} onChange={e => setAddonEditNotes(e.target.value)}
+                                style={{ ...inputStyle }} />
+                            </div>
+                            <button
+                              onClick={() => saveAddon(c.id, true, addonEditPrice, addonEditPlan, addonEditNotes)}
+                              disabled={isSaving}
+                              style={{ padding: "10px 18px", borderRadius: 10, background: isSaving ? "#4338ca" : "linear-gradient(135deg,#7c3aed,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+                              {isSaving ? "Saving…" : "Save & Enable"}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
               </div>
             )}
           </Card>

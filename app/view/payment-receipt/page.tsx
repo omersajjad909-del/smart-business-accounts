@@ -28,15 +28,15 @@ export default async function PublicPaymentReceiptPage({
         <PrintButton />
       </div>
 
-      <div className="bg-white p-10 shadow-lg max-w-4xl w-full mx-auto text-black print:shadow-none print:p-0">
-        <div className="flex justify-between border-b-4 border-black pb-4 mb-6">
+      <div className="bg-white p-4 sm:p-6 md:p-10 shadow-lg max-w-4xl w-full mx-auto text-black print:shadow-none print:p-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between border-b-4 border-black pb-4 mb-6">
           <div>
-            <h1 className="text-4xl font-black italic tracking-tighter">{receipt.company?.name || "FinovaOS"}</h1>
+            <h1 className="text-3xl sm:text-4xl font-black italic tracking-tighter">{receipt.company?.name || "FinovaOS"}</h1>
             <p className="text-[10px] font-bold uppercase tracking-[3px] text-gray-600">
               Payment Receipt
             </p>
           </div>
-          <div className="text-right">
+          <div className="text-left sm:text-right">
             <h2 className="text-2xl font-black uppercase underline">Receipt Voucher</h2>
             <p className="text-sm font-bold mt-1">REC #: {receipt.receiptNo}</p>
             <p className="text-sm">Date: {new Date(receipt.date).toLocaleDateString()}</p>
@@ -44,19 +44,20 @@ export default async function PublicPaymentReceiptPage({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
           <div>
             <p className="text-[10px] uppercase font-bold text-gray-400">Received From</p>
             <p className="text-xl font-black uppercase">{receipt.party?.name || "Walk-in Customer"}</p>
             {receipt.party?.code ? <p className="text-sm mt-1">Code: {receipt.party.code}</p> : null}
           </div>
-          <div className="text-right">
+          <div className="text-left sm:text-right">
             <p className="text-[10px] uppercase font-bold text-gray-400">Branch / Status</p>
             <p className="text-base font-bold uppercase">{receipt.branch?.name || "Main Branch"}</p>
             <p className="text-sm mt-1">Status: {receipt.status}</p>
           </div>
         </div>
 
+        <div className="responsive-table-wrap">
         <table className="w-full text-sm border-collapse border border-black">
           <tbody>
             <tr className="border border-black">
@@ -85,12 +86,13 @@ export default async function PublicPaymentReceiptPage({
             </tr>
           </tbody>
         </table>
+        </div>
 
-        <div className="mt-16 flex justify-between px-10">
-          <div className="text-center w-48 border-t-2 border-black pt-1 text-[10px] font-bold uppercase">
+        <div className="mt-16 flex flex-col gap-10 px-0 sm:px-10 sm:flex-row sm:justify-between">
+          <div className="text-center w-full sm:w-48 border-t-2 border-black pt-1 text-[10px] font-bold uppercase">
             Received By
           </div>
-          <div className="text-center w-48 border-t-2 border-black pt-1 text-[10px] font-bold uppercase">
+          <div className="text-center w-full sm:w-48 border-t-2 border-black pt-1 text-[10px] font-bold uppercase">
             Authorized Sign
           </div>
         </div>

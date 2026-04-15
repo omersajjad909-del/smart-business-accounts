@@ -214,8 +214,8 @@ export default function RecurringTransactionsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="responsive-page-shell space-y-6">
+      <div className="responsive-title-row">
         <h1 className="text-2xl font-bold">Recurring Transactions</h1>
         <button
           onClick={() => {
@@ -232,7 +232,7 @@ export default function RecurringTransactionsPage() {
               metadataText: "",
             });
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded"
         >
           + Add Recurring Transaction
         </button>
@@ -244,7 +244,7 @@ export default function RecurringTransactionsPage() {
             {editing ? "Edit" : "New"} Recurring Transaction
           </h2>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="responsive-grid-2">
             <div>
               <label className="block text-sm font-bold mb-1">Account *</label>
               <select
@@ -312,7 +312,7 @@ export default function RecurringTransactionsPage() {
               />
             </div>
 
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-sm font-bold mb-1">
                 Description *
               </label>
@@ -326,7 +326,7 @@ export default function RecurringTransactionsPage() {
               />
             </div>
 
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-sm font-bold mb-1">Narration</label>
               <input
                 type="text"
@@ -349,7 +349,7 @@ export default function RecurringTransactionsPage() {
                 }
               />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-sm font-bold mb-1">
                 Metadata (JSON, optional)
               </label>
@@ -364,7 +364,7 @@ export default function RecurringTransactionsPage() {
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="responsive-mobile-actions">
             <button
               onClick={saveTransaction}
               disabled={loading}
@@ -385,7 +385,7 @@ export default function RecurringTransactionsPage() {
         </div>
       )}
 
-      <div className="bg-white border rounded overflow-hidden">
+      <div className="bg-white border rounded overflow-hidden responsive-table-wrap">
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
             <tr>

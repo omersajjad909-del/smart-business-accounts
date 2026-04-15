@@ -412,6 +412,92 @@ export default function PricingPage() {
           })}
         </div>
 
+        {/* ── AUTOMATION ADD-ON ────────────────────────────────── */}
+        <div style={{ marginBottom: 80 }}>
+          <div style={{ textAlign: "center", marginBottom: 36 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.28)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#a78bfa", fontWeight: 700, marginBottom: 16 }}>
+              ⚡ Power Add-On
+            </div>
+            <h2 style={{ fontSize: "clamp(24px,3.5vw,36px)", fontWeight: 900, letterSpacing: "-.02em", marginBottom: 10 }}>
+              Add Marketing Automation to any plan
+            </h2>
+            <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
+              Turn FinovaOS into a complete business growth engine. Available on Starter, Professional, and Enterprise.
+            </p>
+          </div>
+
+          <div style={{ borderRadius: 24, background: "linear-gradient(135deg,rgba(124,58,237,.1),rgba(37,99,235,.08))", border: "1.5px solid rgba(124,58,237,.35)", overflow: "hidden", boxShadow: "0 0 60px rgba(124,58,237,.12)" }}>
+            <div style={{ height: 3, background: "linear-gradient(90deg,#7c3aed,#2563eb,#38bdf8)" }} />
+            <div style={{ padding: "36px 40px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
+
+                {/* Left: Price + CTA */}
+                <div>
+                  <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 700, marginBottom: 6 }}>AUTOMATION ADD-ON</div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 52, fontWeight: 900, color: "#fff", letterSpacing: "-.03em" }}>{formatPrice(79)}</span>
+                    <span style={{ fontSize: 14, color: "rgba(255,255,255,.4)" }}>/month</span>
+                  </div>
+                  {billing === "yearly" && (
+                    <div style={{ fontSize: 13, color: "#34d399", marginBottom: 8 }}>
+                      {formatPrice(69)}/month on yearly plan — save {formatPrice(10 * 12)}/year
+                    </div>
+                  )}
+                  <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginBottom: 28 }}>
+                    Add to any plan · Cancel anytime · 14-day free trial included
+                  </div>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                    <Link href="/get-started?addon=automation" style={{
+                      padding: "12px 28px", borderRadius: 12, background: "linear-gradient(135deg,#7c3aed,#2563eb)",
+                      color: "#fff", textDecoration: "none", fontSize: 14, fontWeight: 700,
+                      boxShadow: "0 0 24px rgba(124,58,237,.35)",
+                    }}>
+                      Add to my plan →
+                    </Link>
+                    <Link href="/automation" style={{
+                      padding: "12px 20px", borderRadius: 12, border: "1px solid rgba(255,255,255,.15)",
+                      color: "rgba(255,255,255,.7)", textDecoration: "none", fontSize: 14, fontWeight: 600,
+                    }}>
+                      See full details
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Right: Features grid */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  {[
+                    { icon: "💬", label: "WhatsApp Auto-Reply", sub: "AI replies 24/7" },
+                    { icon: "📧", label: "Email Drip Campaigns", sub: "Auto nurture leads" },
+                    { icon: "🤖", label: "Website Chatbot", sub: "1 script tag embed" },
+                    { icon: "🎯", label: "CRM Lead Capture", sub: "FB Ads + web + WA" },
+                    { icon: "🔗", label: "Zapier / Make", sub: "5,000+ app connects" },
+                    { icon: "📱", label: "Social Auto-Post", sub: "FB · IG · LinkedIn" },
+                    { icon: "📊", label: "Google Sheets Sync", sub: "1-click export" },
+                    { icon: "✍️", label: "AI Content Gen", sub: "English & Urdu" },
+                  ].map(f => (
+                    <div key={f.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>
+                      <span style={{ fontSize: 18, flexShrink: 0 }}>{f.icon}</span>
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{f.label}</div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)" }}>{f.sub}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Value comparison bar */}
+              <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>These tools cost separately:</span>
+                {["WATI $99", "Mailchimp $99", "Intercom $74", "HubSpot $50", "Zapier $49", "Buffer $18", "Jasper $49"].map(t => (
+                  <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5" }}>{t}</span>
+                ))}
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>= $438+/mo vs our {formatPrice(79)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* ── FEATURE COMPARISON TABLE ────────────────────────── */}
         <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 40 }}>

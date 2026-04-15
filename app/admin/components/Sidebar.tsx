@@ -28,9 +28,9 @@ const sections = [
 
 export default function Sidebar() {
   return (
-    <aside className="h-screen w-64 bg-gray-900 text-white flex flex-col fixed left-0 top-0 z-20 shadow-lg">
+    <aside className="hidden md:flex h-screen w-64 bg-gray-900 text-white flex-col fixed left-0 top-0 z-20 shadow-lg">
       <div className="px-6 py-8 text-2xl font-black tracking-tight border-b border-gray-800">Admin Panel</div>
-      <nav className="flex-1 py-6">
+      <nav className="flex-1 py-6 overflow-y-auto">
         <ul className="space-y-2">
           {sections.map((section) => (
             <li key={section.name}>

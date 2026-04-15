@@ -43,18 +43,18 @@ export default function DetailedBalanceSheet() {
   }, [date]);
 
   return (
-    <div className="p-4 max-w-4xl mx-auto bg-white border shadow-lg font-sans text-sm">
-      <div className="flex justify-between items-center border-b-4 border-black pb-2 mb-4">
+    <div className="responsive-page-shell responsive-page-shell--narrow bg-white border shadow-lg font-sans text-sm">
+      <div className="responsive-title-row border-b-4 border-black pb-2 mb-4">
         <div className="text-left">
           <h1 className="text-2xl font-black uppercase">{companyName || "Your Company"}</h1>
           <h2 className="text-md font-bold italic">Final Balance Sheet Statement</h2>
         </div>
-        <div className="flex gap-1 print:hidden">
+        <div className="responsive-mobile-actions print:hidden">
           <input
             type="date"
             value={date}
             onChange={e => setDate(e.target.value)}
-            className="border-2 border-black p-1 text-xs font-bold"
+            className="w-full border-2 border-black p-2 text-xs font-bold"
           />
           <button
             onClick={load}
@@ -113,7 +113,7 @@ export default function DetailedBalanceSheet() {
         <div className="space-y-6">
           
           {/* TWO COLUMN FORMAT - Assets (DR) and Liabilities (CR) */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="responsive-grid-2 gap-4">
             
             {/* LEFT SIDE - ASSETS (DEBIT) */}
             <div className="border border-black">

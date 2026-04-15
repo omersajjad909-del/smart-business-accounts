@@ -77,31 +77,31 @@ export default function TaxSummaryPage() {
   const totalAmount = data.reduce((sum, d) => sum + d.totalAmount, 0);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="responsive-page-shell space-y-6">
       <h1 className="text-2xl font-bold">Tax Summary Report</h1>
 
-      <div className="flex gap-4 items-end bg-white p-4 border rounded">
-        <div>
+      <div className="responsive-toolbar bg-white p-4 border rounded">
+        <div className="toolbar-field">
           <label className="block text-sm font-bold mb-1">From</label>
           <input
             type="date"
-            className="border p-2 rounded"
+            className="w-full border p-2 rounded"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
           />
         </div>
-        <div>
+        <div className="toolbar-field">
           <label className="block text-sm font-bold mb-1">To</label>
           <input
             type="date"
-            className="border p-2 rounded"
+            className="w-full border p-2 rounded"
             value={to}
             onChange={(e) => setTo(e.target.value)}
           />
         </div>
         <button
           onClick={loadReport}
-          className="bg-blue-600 text-white px-6 py-2 rounded"
+          className="toolbar-action-grow bg-blue-600 text-white px-6 py-2 rounded"
         >
           {loading ? "Loading..." : "Load Report"}
         </button>
@@ -109,7 +109,7 @@ export default function TaxSummaryPage() {
           <>
             <button
               onClick={() => exportToCSV(data, "tax-summary")}
-              className="bg-green-600 text-white px-6 py-2 rounded"
+              className="toolbar-action-grow bg-green-600 text-white px-6 py-2 rounded"
             >
               Export CSV
             </button>
@@ -121,7 +121,7 @@ export default function TaxSummaryPage() {
                   Object.keys(data[0] || {})
                 )
               }
-              className="bg-red-600 text-white px-6 py-2 rounded"
+              className="toolbar-action-grow bg-red-600 text-white px-6 py-2 rounded"
             >
               Export PDF
             </button>
@@ -131,7 +131,7 @@ export default function TaxSummaryPage() {
 
       {data.length > 0 && (
         <div className="bg-white border rounded p-4">
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="responsive-grid-3 mb-4">
             <div className="bg-blue-50 p-4 rounded">
               <p className="text-sm text-gray-600">Total Tax Amount</p>
               <p className="text-2xl font-bold">{totalTax.toLocaleString()}</p>
@@ -150,7 +150,7 @@ export default function TaxSummaryPage() {
         </div>
       )}
 
-      <div className="bg-white border rounded overflow-hidden">
+      <div className="bg-white border rounded overflow-hidden responsive-table-wrap">
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
             <tr>

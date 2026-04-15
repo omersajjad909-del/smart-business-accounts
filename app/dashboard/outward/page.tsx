@@ -281,10 +281,10 @@ export default function OutwardPage() {
 
   if (showPreview) {
     return (
-      <div className="invoice-print p-10 bg-white min-h-screen">
-        <div className="max-w-4xl mx-auto border-2 border-black p-8">
+      <div className="invoice-print p-4 sm:p-6 md:p-10 bg-white min-h-screen">
+        <div className="max-w-4xl mx-auto border-2 border-black p-4 sm:p-6 md:p-8">
            <div className="text-center border-b-4 border-black pb-4 mb-6">
-             <h1 className="text-4xl font-black">US TRADERS</h1>
+             <h1 className="text-3xl sm:text-4xl font-black">US TRADERS</h1>
              <p className="font-bold">OUTWARD GATE PASS #{savedData.outwardNo}</p>
            </div>
            <div className="grid grid-cols-1 md:grid-cols-2 mb-6 font-bold">
@@ -313,12 +313,12 @@ export default function OutwardPage() {
                ))}
              </tbody>
            </table>
-           <div className="mt-20 flex justify-between">
-             <div className="border-t-2 border-black w-40 text-center">Receiver Sign</div>
-             <div className="border-t-2 border-black w-40 text-center">Authorized Sign</div>
+           <div className="mt-20 flex flex-col gap-10 sm:flex-row sm:justify-between">
+             <div className="border-t-2 border-black w-full sm:w-40 text-center">Receiver Sign</div>
+             <div className="border-t-2 border-black w-full sm:w-40 text-center">Authorized Sign</div>
            </div>
         </div>
-        <div className="mt-8 flex gap-4 justify-center no-print">
+        <div className="mt-8 responsive-mobile-actions justify-center no-print">
           <button onClick={() => window.print()} className="bg-green-600 text-white px-8 py-2 font-bold">PRINT</button>
           <button onClick={() => { setShowPreview(false); resetForm(); }} className="bg-blue-600 text-white px-8 py-2 font-bold">NEW</button>
         </div>
@@ -327,12 +327,12 @@ export default function OutwardPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white border shadow-xl rounded-xl">
-      <div className="flex justify-between items-center mb-4">
+    <div className="responsive-page-shell responsive-page-shell--narrow bg-white border shadow-xl rounded-xl">
+      <div className="responsive-title-row mb-4">
         <h1 className="text-3xl font-black border-b-4 border-black pb-2 uppercase">
           Outward Gate Pass
         </h1>
-        <div className="flex gap-2">
+        <div className="responsive-mobile-actions">
           <button
             onClick={() => { setShowList(!showList); setShowForm(!showForm); setEditing(null); }}
             className="bg-gray-600 text-white px-4 py-2 rounded"
@@ -401,7 +401,7 @@ export default function OutwardPage() {
           <div className="mb-2 text-xs text-gray-500 italic">
             Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Customer | <strong>F8</strong> = Search Query
           </div>
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="responsive-grid-2 mb-6">
             <div className="flex flex-col">
               <label className="text-xs font-bold uppercase">Customer (F7: Clear, F8: Query)</label>
               <select
@@ -439,7 +439,8 @@ export default function OutwardPage() {
             <input className="border-2 p-3 rounded font-bold" placeholder="Vehicle No" value={vehicleNo} onChange={e => setVehicleNo(e.target.value)} />
           </div>
 
-          <table className="w-full border-2 border-black mb-4">
+          <div className="responsive-table-wrap mb-4">
+          <table className="w-full border-2 border-black">
             <thead className="bg-black text-white text-xs">
               <tr>
                 <th className="p-3 text-left">Item Name</th>
@@ -464,10 +465,11 @@ export default function OutwardPage() {
               ))}
             </tbody>
           </table>
+          </div>
 
           <textarea className="w-full border-2 p-3 rounded mb-6" placeholder="Remarks" value={remarks} onChange={e => setRemarks(e.target.value)} />
 
-          <div className="flex gap-2">
+          <div className="responsive-mobile-actions">
             <button
               onClick={saveOutward}
               disabled={saving || rows.length === 0}

@@ -76,7 +76,7 @@ export default function AdminPermissionsPage() {
   // ================= UI =================
 
   return (
-    <div className="grid grid-cols-3 gap-6 p-6">
+    <div className="responsive-page-shell responsive-grid-3">
 
       {/* USERS */}
       <div className="border rounded p-4">
@@ -95,7 +95,7 @@ export default function AdminPermissionsPage() {
       </div>
 
       {/* PERMISSIONS */}
-      <div className="col-span-2 border rounded p-4">
+      <div className="sm:col-span-2 border rounded p-4">
         {!selected ? (
           <div className="text-gray-500">Select a user</div>
         ) : (

@@ -120,6 +120,95 @@ a {
   width: 100%;
 }
 
+.responsive-page-shell {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.responsive-page-shell--narrow {
+  max-width: 1024px;
+}
+
+.responsive-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.responsive-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.responsive-toolbar > * {
+  min-width: 0;
+}
+
+.responsive-toolbar .toolbar-field {
+  flex: 1 1 180px;
+}
+
+.responsive-toolbar .toolbar-action {
+  flex: 0 0 auto;
+}
+
+.responsive-toolbar .toolbar-action-grow {
+  flex: 1 1 180px;
+}
+
+.responsive-grid-2,
+.responsive-grid-3,
+.responsive-grid-4,
+.responsive-stats-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.responsive-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.responsive-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.responsive-grid-4,
+.responsive-stats-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.responsive-card-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.responsive-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table-wrap table {
+  min-width: 680px;
+}
+
+.responsive-mobile-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.responsive-mobile-actions > * {
+  flex: 0 0 auto;
+}
+
 @media (max-width: 768px) {
   .app-root table {
     display: block;
@@ -130,6 +219,52 @@ a {
   .app-root th,
   .app-root td {
     white-space: nowrap;
+  }
+
+  .responsive-page-shell {
+    padding: 12px;
+  }
+
+  .responsive-title-row {
+    align-items: stretch;
+  }
+
+  .responsive-toolbar {
+    align-items: stretch;
+  }
+
+  .responsive-toolbar .toolbar-field,
+  .responsive-toolbar .toolbar-action,
+  .responsive-toolbar .toolbar-action-grow {
+    flex: 1 1 100%;
+  }
+
+  .responsive-grid-2,
+  .responsive-grid-3,
+  .responsive-grid-4,
+  .responsive-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .responsive-mobile-actions > * {
+    flex: 1 1 100%;
+  }
+
+  .responsive-table-wrap table {
+    min-width: 560px;
+  }
+}
+
+@media (max-width: 900px) {
+  .responsive-grid-4,
+  .responsive-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .responsive-table-wrap table {
+    min-width: 480px;
   }
 }
 

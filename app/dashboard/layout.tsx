@@ -623,7 +623,7 @@ export default function DashboardLayout({
         transition:"width .25s ease, transform .3s ease",
         overflow:"hidden",
       }}
-      className={!isMobileMenuOpen ? "max-md:hidden" : ""}
+      className={`${!isMobileMenuOpen ? "max-md:hidden" : ""} max-md:w-[82vw] max-md:max-w-[320px]`}
       >
 
         {/* ---- SIDEBAR HEADER ---- */}
@@ -1781,7 +1781,22 @@ export default function DashboardLayout({
       <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:SW,transition:"margin-left .25s ease"}} className="max-md:ml-0">
 
         {/* ---- TOPBAR ---- */}
-        <div style={{background:"var(--panel-bg)",borderBottom:"1px solid var(--border)",padding:"0 16px",height:56,display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:10}} className="print:hidden">
+        <div
+          style={{
+            background:"var(--panel-bg)",
+            borderBottom:"1px solid var(--border)",
+            padding:"8px 12px",
+            minHeight:56,
+            display:"flex",
+            alignItems:"center",
+            gap:12,
+            position:"sticky",
+            top:0,
+            zIndex:10,
+            flexWrap:"wrap",
+          }}
+          className="print:hidden sm:px-4"
+        >
 
           {/* HAMBURGER */}
           <button
@@ -1801,7 +1816,10 @@ export default function DashboardLayout({
 
           {/* Branch switcher */}
           {branches.length > 0 && (
-            <div style={{display:"flex",alignItems:"center",gap:6,padding:"5px 10px",borderRadius:9,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)"}}>
+            <div
+              style={{display:"flex",alignItems:"center",gap:6,padding:"5px 10px",borderRadius:9,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)"}}
+              className="hidden md:flex"
+            >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               <select
                 value={activeBranchId}
@@ -1817,7 +1835,7 @@ export default function DashboardLayout({
           )}
 
           {/* Right side */}
-          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:12}}>
+          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
             {/* Affiliate link */}
             <Link
               href="/affiliate"
@@ -1844,14 +1862,17 @@ export default function DashboardLayout({
             )}
 
             {/* User name */}
-            <div style={{fontSize:12,color:"rgba(255,255,255,0.5)",fontWeight:500}}>
+            <div
+              style={{fontSize:12,color:"rgba(255,255,255,0.5)",fontWeight:500}}
+              className="hidden md:block"
+            >
               {currentUser.name || currentUser.email}
             </div>
           </div>
         </div>
 
         {/* ---- PAGE CONTENT ---- */}
-        <div style={{flex:1,overflowY:"auto",padding:"20px 24px"}}>
+        <div style={{flex:1,overflowY:"auto",padding:"16px 12px"}} className="sm:px-4 sm:py-5 lg:px-6">
           <div style={{width:"100%",maxWidth:1280,margin:"0 auto"}}>
             {currentUser?.email === "finovaos.app@gmail.com" && (
               <div style={{
@@ -1860,7 +1881,7 @@ export default function DashboardLayout({
                 border:"1px solid rgba(251,191,36,.3)", borderRadius:12,
                 padding:"10px 18px", marginBottom:20, gap:12, flexWrap:"wrap",
               }}>
-                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
                   <span style={{fontSize:18}}>🎮</span>
                   <div>
                     <span style={{fontSize:13,fontWeight:700,color:"#fbbf24"}}>Demo Mode</span>
@@ -2175,7 +2196,6 @@ function NavLink({ href, children, pathname }: {
     </Link>
   );
 }
-
 
 
 

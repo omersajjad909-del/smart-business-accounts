@@ -373,6 +373,13 @@ export default function Navbar() {
     }
   }, [])
 
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : ""
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [mobileOpen])
+
   const openMega  = (which: "features" | "solutions") => {
     if (megaTimer.current) clearTimeout(megaTimer.current)
     setActiveMega(which)
@@ -397,7 +404,7 @@ export default function Navbar() {
         {/* Top shimmer */}
         <div style={{ position:"absolute", top:0, left:0, right:0, height:1, pointerEvents:"none", background:"linear-gradient(90deg,transparent,rgba(99,102,241,.65),rgba(167,139,250,.45),transparent)" }}/>
 
-        <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 24px" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 16px" }} className="sm:px-6">
           <div style={{ height:64, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
 
             {/* Logo */}

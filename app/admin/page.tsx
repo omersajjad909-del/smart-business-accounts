@@ -7272,7 +7272,7 @@ export default function AdminPanel() {
   const adminInitial = adminName.charAt(0).toUpperCase();
 
   return (
-    <div style={{ minHeight:"100vh", background:"#060a14", color:"white", fontFamily:"'Outfit','Inter',sans-serif", display:"flex" }}>
+    <div style={{ minHeight:"100vh", background:"#060a14", color:"white", fontFamily:"'Outfit','Inter',sans-serif", display:"flex", overflowX:"hidden", position:"relative" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -7295,6 +7295,13 @@ export default function AdminPanel() {
       {/* ══════════════════════════════════════════
           SIDEBAR
       ══════════════════════════════════════════ */}
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.6)", zIndex:45 }}
+        />
+      )}
+
       <aside style={{
         width: collapsed ? 64 : 256,
         minHeight:"100vh",
@@ -7304,7 +7311,9 @@ export default function AdminPanel() {
         transition:"width .25s cubic-bezier(.4,0,.2,1)",
         position:"sticky", top:0, height:"100vh",
         overflowY:"auto", overflowX:"hidden", flexShrink:0, zIndex:40,
-      }}>
+        transform: mobileOpen ? "translateX(0)" : undefined,
+      }}
+      className={mobileOpen ? "max-md:fixed max-md:left-0 max-md:top-0 max-md:bottom-0 max-md:z-50 max-md:w-[82vw] max-md:max-w-[320px]" : "max-md:hidden"}>
         {/* Top glow line */}
         <div style={{ position:"absolute",top:0,left:0,right:0,height:1,background:"linear-gradient(90deg,transparent 0%,#6366f1 40%,#a78bfa 60%,transparent 100%)",opacity:.6 }}/>
 
@@ -7477,8 +7486,21 @@ export default function AdminPanel() {
           height:64, flexShrink:0, position:"sticky", top:0, zIndex:30,
           background:"rgba(6,10,20,.9)", backdropFilter:"blur(20px)",
           borderBottom:"1px solid rgba(255,255,255,.05)",
-          display:"flex", alignItems:"center", padding:"0 24px", gap:12,
+          display:"flex", alignItems:"center", padding:"10px 14px", gap:12, flexWrap:"wrap",
         }}>
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="md:hidden"
+            style={{
+              width:38, height:38, borderRadius:10, border:"1px solid rgba(255,255,255,.09)",
+              background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.78)", cursor:"pointer",
+              display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0,
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
           {/* Left: breadcrumb + title */}
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ display:"flex", alignItems:"center", gap:5, marginBottom:2 }}>
@@ -7492,7 +7514,10 @@ export default function AdminPanel() {
           </div>
 
           {/* System status pill */}
-          <div style={{ display:"flex",alignItems:"center",gap:6,padding:"5px 12px",borderRadius:20,background:"rgba(52,211,153,.06)",border:"1px solid rgba(52,211,153,.15)" }}>
+          <div
+            style={{ display:"flex",alignItems:"center",gap:6,padding:"5px 12px",borderRadius:20,background:"rgba(52,211,153,.06)",border:"1px solid rgba(52,211,153,.15)" }}
+            className="hidden sm:flex"
+          >
             <div style={{ width:6,height:6,borderRadius:"50%",background:"#34d399",boxShadow:"0 0 6px #34d399",animation:"pulse 3s ease infinite" }}/>
             <span style={{ fontSize:10.5,fontWeight:700,color:"#34d399",letterSpacing:".02em" }}>All Systems Operational</span>
           </div>
@@ -7595,7 +7620,7 @@ export default function AdminPanel() {
         </header>
 
         {/* ── Page Content ── */}
-        <main style={{ flex:1, overflowY:"auto", padding:"28px 28px 56px", background:"#060a14" }}>
+        <main style={{ flex:1, overflowY:"auto", padding:"16px 12px 40px", background:"#060a14" }} className="sm:px-4 sm:py-6 lg:px-7">
           <div style={{ animation:"fadeUp .25s ease both", maxWidth:1420 }}>
             {renderPage()}
           </div>

@@ -22,6 +22,19 @@ function authHeaders(): Record<string, string> {
 // ─────────────────────────────────────────────────────────────────────────────
 export default function AutomationPage() {
   const [tab, setTab] = useState<Tab>("overview");
+  const [addonEnabled, setAddonEnabled] = useState<boolean | null>(null); // null = loading
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch("/api/automation/addon-status", { headers: authHeaders() });
+        const d = await r.json();
+        setAddonEnabled(d.enabled === true);
+      } catch {
+        setAddonEnabled(false);
+      }
+    })();
+  }, []);
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: "overview",  label: "Overview",        icon: "⚡" },
@@ -47,39 +60,99 @@ export default function AutomationPage() {
         </p>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 28 }}>
-        {tabs.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 13, fontFamily: FONT,
-            background: tab === t.id ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(255,255,255,0.06)",
-            color: tab === t.id ? "#fff" : "rgba(255,255,255,0.6)",
-            fontWeight: tab === t.id ? 600 : 400,
-            transition: "all 0.18s",
-          }}>
-            {t.icon} {t.label}
-          </button>
-        ))}
-      </div>
+      {/* Add-on gate — show upgrade prompt if not subscribed */}
+      {addonEnabled === false && (
+        <div style={{ marginBottom: 28, borderRadius: 20, background: "linear-gradient(135deg,rgba(124,58,237,.18),rgba(37,99,235,.12))", border: "1px solid rgba(124,58,237,.35)", overflow: "hidden" }}>
+          {/* Top accent bar */}
+          <div style={{ height: 3, background: "linear-gradient(90deg,#7c3aed,#2563eb,#a78bfa)" }} />
+          <div style={{ padding: "28px 30px 30px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 20, flexWrap: "wrap" }}>
+              {/* Icon */}
+              <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#7c3aed,#2563eb)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>⚡</div>
 
-      {/* Tab content */}
-      {tab === "overview"  && <OverviewTab onNavigate={setTab} />}
-      {tab === "whatsapp"  && <WhatsAppTab />}
-      {tab === "drip"      && <DripTab />}
-      {tab === "webhooks"  && <WebhooksTab />}
-      {tab === "leads"     && <LeadsTab />}
-      {tab === "sheets"    && <SheetsTab />}
-      {tab === "social"    && <SocialTab />}
-      {tab === "content"   && <ContentTab />}
-      {tab === "chatbot"   && <ChatbotTab />}
+              {/* Text */}
+              <div style={{ flex: 1, minWidth: 260 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
+                  <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "white" }}>Automation Add-on Not Active</h2>
+                  <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(251,191,36,.15)", color: "#fbbf24", fontSize: 11, fontWeight: 700, border: "1px solid rgba(251,191,36,.3)" }}>$79/month</span>
+                </div>
+                <p style={{ margin: "0 0 16px", fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
+                  Unlock AI-powered automation tools that replace 6+ separate tools costing $438+/month. WhatsApp AI replies, email drip campaigns, lead capture, social media scheduling, AI content generation, and more.
+                </p>
+
+                {/* Feature pills */}
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+                  {["💬 WhatsApp AI", "📧 Email Drip", "🤖 AI Chatbot", "👥 CRM Leads", "📱 Social Auto-post", "✍️ AI Content", "🔗 Webhooks", "📊 Sheets Sync"].map(f => (
+                    <span key={f} style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.7)", fontSize: 12, fontWeight: 500 }}>{f}</span>
+                  ))}
+                </div>
+
+                {/* Value comparison */}
+                <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(0,0,0,.25)", marginBottom: 20, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <div style={{ fontSize: 12, color: "#94a3b8" }}>Individual tools cost:</div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {[["WATI","$99"],["Mailchimp","$99"],["Intercom","$74"],["HubSpot","$50"],["Zapier","$49"],["Buffer","$18"]].map(([t, p]) => (
+                      <span key={t} style={{ fontSize: 11, color: "#475569" }}>{t} <span style={{ color: "#f87171", fontWeight: 700 }}>{p}</span></span>
+                    ))}
+                  </div>
+                  <div style={{ marginLeft: "auto", fontSize: 13, color: "#94a3b8" }}>
+                    = <span style={{ fontWeight: 900, color: "#f87171", textDecoration: "line-through" }}>$438+/mo</span>
+                    <span style={{ color: "#22c55e", fontWeight: 900, marginLeft: 8 }}>vs $79/mo</span>
+                  </div>
+                </div>
+
+                {/* CTAs */}
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <a href="/automation" style={{ padding: "11px 24px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 14, fontWeight: 700, textDecoration: "none", display: "inline-block" }}>
+                    See full details →
+                  </a>
+                  <a href="/get-started?addon=automation" style={{ padding: "11px 24px", borderRadius: 10, background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.15)", color: "white", fontSize: 14, fontWeight: 700, textDecoration: "none", display: "inline-block" }}>
+                    Add to my plan — $79/mo
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tabs + content — only show if addon active (or still loading) */}
+      {addonEnabled !== false && (
+        <>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 28 }}>
+            {tabs.map(t => (
+              <button key={t.id} onClick={() => setTab(t.id)} style={{
+                padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 13, fontFamily: FONT,
+                background: tab === t.id ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(255,255,255,0.06)",
+                color: tab === t.id ? "#fff" : "rgba(255,255,255,0.6)",
+                fontWeight: tab === t.id ? 600 : 400,
+                transition: "all 0.18s",
+              }}>
+                {t.icon} {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab content */}
+          {tab === "overview"  && <OverviewTab onNavigate={setTab} />}
+          {tab === "whatsapp"  && <WhatsAppTab />}
+          {tab === "drip"      && <DripTab />}
+          {tab === "webhooks"  && <WebhooksTab />}
+          {tab === "leads"     && <LeadsTab />}
+          {tab === "sheets"    && <SheetsTab />}
+          {tab === "social"    && <SocialTab />}
+          {tab === "content"   && <ContentTab />}
+          {tab === "chatbot"   && <ChatbotTab />}
+        </>
+      )}
     </div>
   );
 }
 
 // ─── Shared UI atoms ──────────────────────────────────────────────────────────
-function Card({ children, style = {} }: { children: React.ReactNode; style?: React.CSSProperties }) {
+function Card({ children, style = {}, onClick }: { children: React.ReactNode; style?: React.CSSProperties; onClick?: () => void }) {
   return (
-    <div style={{
+    <div onClick={onClick} style={{
       background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
       borderRadius: 14, padding: "20px 22px", ...style,
     }}>{children}</div>

@@ -30,20 +30,20 @@ export default function WebAdminDashboard() {
     })();
   }, []);
   return (
-    <div className="min-h-screen bg-white px-6 py-8">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 sm:py-8">
       <div className="max-w-6xl mx-auto space-y-6">
         <PageHeader title="Website Dashboard" />
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <StatCard label="Logins (24h)" value={m ? m.logins24h : "—"} />
           <StatCard label="Active Users (30d)" value={m ? m.users30d : "—"} />
           <StatCard label="Companies Created (7d)" value={m ? m.companies7d : "—"} />
         </div>
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <StatCard label="MRR (est.)" value={f ? `$${f.mrr.toFixed(0)}` : "—"} />
           <StatCard label="ARR (est.)" value={f ? `$${f.arr.toFixed(0)}` : "—"} />
           <StatCard label="Active Paid Companies" value={f ? f.active.pro + f.active.enterprise : "—"} />
         </div>
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Section title="Website Users">
             <Link href="/admin/web/users" className="text-indigo-600 underline text-sm">Open latest logins</Link>
           </Section>

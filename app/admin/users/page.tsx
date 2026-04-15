@@ -45,19 +45,19 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-2xl font-bold text-slate-100 mb-6">Users</h1>
         <div className="mb-6 rounded-xl border border-slate-700 bg-slate-800 p-4">
           <div className="text-sm font-semibold mb-3 text-slate-200">Invite user</div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <input value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} placeholder="email@example.com" className="px-3 py-2 border rounded bg-slate-900 border-slate-700 text-slate-200" />
-            <select value={inviteRole} onChange={e=>setInviteRole(e.target.value)} className="px-3 py-2 border rounded bg-slate-900 border-slate-700 text-slate-200">
+            <input value={inviteEmail} onChange={e=>setInviteEmail(e.target.value)} placeholder="email@example.com" className="flex-1 px-3 py-2 border rounded bg-slate-900 border-slate-700 text-slate-200" />
+            <select value={inviteRole} onChange={e=>setInviteRole(e.target.value)} className="w-full sm:w-40 px-3 py-2 border rounded bg-slate-900 border-slate-700 text-slate-200">
               <option value="ADMIN">ADMIN</option>
               <option value="MANAGER">MANAGER</option>
               <option value="USER">USER</option>
             </select>
-            <button onClick={sendInvite} className="px-4 py-2 rounded bg-indigo-600 text-white">Send</button>
+            <button onClick={sendInvite} className="w-full sm:w-auto px-4 py-2 rounded bg-indigo-600 text-white">Send</button>
             {msg ? <div className="text-sm text-slate-400">{msg}</div> : null}
           </div>
         </div>

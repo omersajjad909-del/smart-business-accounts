@@ -60,14 +60,14 @@ export default function ProfitabilityPage() {
   const overallMargin = totalSales > 0 ? (totalProfit / totalSales) * 100 : 0;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="responsive-page-shell space-y-6">
       <h1 className="text-2xl font-bold">Profitability Report</h1>
 
-      <div className="flex gap-4 items-end bg-white p-4 border rounded">
-        <div>
+      <div className="responsive-toolbar bg-white p-4 border rounded">
+        <div className="toolbar-field">
           <label className="block text-sm font-bold mb-1">Group By</label>
           <select
-            className="border p-2 rounded"
+            className="w-full border p-2 rounded"
             value={groupBy}
             onChange={(e) =>
               setGroupBy(e.target.value as "customer" | "product")
@@ -77,27 +77,27 @@ export default function ProfitabilityPage() {
             <option value="product">By Product</option>
           </select>
         </div>
-        <div>
+        <div className="toolbar-field">
           <label className="block text-sm font-bold mb-1">From</label>
           <input
             type="date"
-            className="border p-2 rounded"
+            className="w-full border p-2 rounded"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
           />
         </div>
-        <div>
+        <div className="toolbar-field">
           <label className="block text-sm font-bold mb-1">To</label>
           <input
             type="date"
-            className="border p-2 rounded"
+            className="w-full border p-2 rounded"
             value={to}
             onChange={(e) => setTo(e.target.value)}
           />
         </div>
         <button
           onClick={loadReport}
-          className="bg-blue-600 text-white px-6 py-2 rounded"
+          className="toolbar-action-grow bg-blue-600 text-white px-6 py-2 rounded"
         >
           {loading ? "Loading..." : "Load Report"}
         </button>
@@ -105,7 +105,7 @@ export default function ProfitabilityPage() {
           <>
             <button
               onClick={() => exportToCSV(data, "profitability")}
-              className="bg-green-600 text-white px-6 py-2 rounded"
+              className="toolbar-action-grow bg-green-600 text-white px-6 py-2 rounded"
             >
               Export CSV
             </button>
@@ -117,7 +117,7 @@ export default function ProfitabilityPage() {
                   Object.keys(data[0] || {})
                 )
               }
-              className="bg-red-600 text-white px-6 py-2 rounded"
+              className="toolbar-action-grow bg-red-600 text-white px-6 py-2 rounded"
             >
               Export PDF
             </button>
@@ -127,7 +127,7 @@ export default function ProfitabilityPage() {
 
       {data.length > 0 && (
         <div className="bg-white border rounded p-4">
-          <div className="grid grid-cols-4 gap-4">
+          <div className="responsive-stats-grid">
             <div className="bg-blue-50 p-4 rounded">
               <p className="text-sm text-gray-600">Total Sales</p>
               <p className="text-2xl font-bold">{totalSales.toLocaleString()}</p>
@@ -150,7 +150,7 @@ export default function ProfitabilityPage() {
         </div>
       )}
 
-      <div className="bg-white border rounded overflow-hidden">
+      <div className="bg-white border rounded overflow-hidden responsive-table-wrap">
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
             <tr>
