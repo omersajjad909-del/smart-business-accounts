@@ -540,16 +540,14 @@ export default function DashboardLayout({
   }, [currentUser?.companyId, currentUser?.id, currentUser?.role]);
 
   useEffect(() => {
-    if (!currentUser?.companyId) return;
+    if (!currentUser) return;
     (async () => {
       try {
-        const res = await fetch("/api/branches", {
-          headers: {
-            "x-user-id": currentUser.id || "",
-            "x-user-role": currentUser.role || "",
-            "x-company-id": currentUser.companyId || "",
-          },
-        });
+        const hdrs: Record<string, string> = {};
+        if (currentUser.id)        hdrs["x-user-id"]    = currentUser.id;
+        if (currentUser.role)      hdrs["x-user-role"]  = currentUser.role;
+        if (currentUser.companyId) hdrs["x-company-id"] = currentUser.companyId;
+        const res = await fetch("/api/branches", { headers: hdrs });
         const data = await res.json();
         const list: Branch[] = Array.isArray(data) ? data : [];
         const scoped = allowedBranchIds?.length ? list.filter((b) => allowedBranchIds.includes(b.id)) : list;
@@ -562,7 +560,7 @@ export default function DashboardLayout({
         setBranches([]);
       }
     })();
-  }, [activeBranchId, allowedBranchIds, currentUser?.companyId]);
+  }, [activeBranchId, allowedBranchIds, currentUser?.id]);
 
   // Fetch admin-controlled business module enablement status
   useEffect(() => {
