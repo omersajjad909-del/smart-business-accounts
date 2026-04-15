@@ -21,7 +21,7 @@ const BG = "#070b14";
 const PANEL = "rgba(255,255,255,0.04)";
 const BORDER = "rgba(255,255,255,0.08)";
 
-type Tab = "whatsapp" | "drip" | "content" | "leads" | "webhooks" | "chatbot";
+type Tab = "whatsapp" | "drip" | "content" | "social" | "leads" | "webhooks" | "chatbot";
 
 function adminHdrs(json = false): Record<string, string> {
   const u = getCurrentUser();
@@ -111,6 +111,7 @@ export default function AdminAutomationPage() {
     { id: "whatsapp", label: "WhatsApp Blasts",   icon: "💬", color: "#22c55e" },
     { id: "drip",     label: "Email Drip",        icon: "📧", color: "#38bdf8" },
     { id: "content",  label: "AI Content",        icon: "✍️", color: "#fbbf24" },
+    { id: "social",   label: "Social Media",      icon: "📱", color: "#f472b6" },
     { id: "leads",    label: "Lead Management",   icon: "🎯", color: "#fb923c" },
     { id: "webhooks", label: "Webhooks",          icon: "🔗", color: "#a78bfa" },
     { id: "chatbot",  label: "Website Chatbot",   icon: "🤖", color: "#38bdf8" },
@@ -153,6 +154,7 @@ export default function AdminAutomationPage() {
       {tab === "whatsapp" && <WhatsAppBlastTab />}
       {tab === "drip"     && <DripTab />}
       {tab === "content"  && <ContentTab />}
+      {tab === "social"   && <SocialTab />}
       {tab === "leads"    && <LeadsTab />}
       {tab === "webhooks" && <WebhooksTab />}
       {tab === "chatbot"  && <ChatbotTab />}
@@ -717,6 +719,207 @@ function ChatbotTab() {
           </div>
         </Card>
       </div>
+    </div>
+  );
+}
+
+// ─── SOCIAL MEDIA TAB ─────────────────────────────────────────────────────────
+function SocialTab() {
+  const { toast, show } = useToast();
+
+  // Credentials
+  const [creds, setCreds] = useState({ fbToken: "", fbPageId: "", igToken: "", igAccountId: "", liToken: "", liOrgId: "" });
+  const [savingCreds, setSavingCreds] = useState(false);
+
+  // New post
+  const [postText, setPostText]       = useState("");
+  const [platforms, setPlatforms]     = useState<string[]>(["facebook"]);
+  const [scheduleAt, setScheduleAt]   = useState("");
+  const [imageUrl, setImageUrl]       = useState("");
+  const [posting, setPosting]         = useState(false);
+
+  // History
+  const [posts, setPosts]             = useState<any[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(false);
+
+  useEffect(() => {
+    // Load credentials + post history
+    fetch("/api/automation/social", { headers: adminHdrs() })
+      .then(r => r.json())
+      .then(d => {
+        if (d?.config) {
+          const c = d.config;
+          setCreds({
+            fbToken: c.facebook?.accessToken || "",
+            fbPageId: c.facebook?.pageId || "",
+            igToken: c.instagram?.accessToken || "",
+            igAccountId: c.instagram?.accountId || "",
+            liToken: c.linkedin?.accessToken || "",
+            liOrgId: c.linkedin?.orgId || "",
+          });
+        }
+        setLoadingPosts(true);
+        return fetch("/api/automation/social?action=list", { headers: adminHdrs() });
+      })
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d)) setPosts(d); })
+      .catch(() => {})
+      .finally(() => setLoadingPosts(false));
+  }, []);
+
+  async function saveCreds() {
+    setSavingCreds(true);
+    try {
+      const r = await fetch("/api/automation/social", {
+        method: "PUT",
+        headers: adminHdrs(true),
+        body: JSON.stringify({
+          facebook:  { accessToken: creds.fbToken, pageId: creds.fbPageId },
+          instagram: { accessToken: creds.igToken, accountId: creds.igAccountId },
+          linkedin:  { accessToken: creds.liToken, orgId: creds.liOrgId },
+        }),
+      });
+      if (r.ok) show("Credentials saved!", true); else show("Save failed", false);
+    } finally { setSavingCreds(false); }
+  }
+
+  async function createPost() {
+    if (!postText.trim()) return show("Post text likho", false);
+    if (!platforms.length) return show("Koi platform select karo", false);
+    setPosting(true);
+    try {
+      const r = await fetch("/api/automation/social", {
+        method: "POST",
+        headers: adminHdrs(true),
+        body: JSON.stringify({
+          text: postText, platforms, scheduledAt: scheduleAt || null, imageUrl: imageUrl || null,
+        }),
+      });
+      const d = await r.json();
+      if (r.ok) {
+        show(scheduleAt ? "Post scheduled!" : "Post created!", true);
+        setPostText(""); setScheduleAt(""); setImageUrl("");
+        if (d?.id) setPosts(p => [d, ...p]);
+        // If no schedule → publish immediately
+        if (!scheduleAt && d?.id) {
+          await fetch(`/api/automation/social?action=publish&id=${d.id}`, { method: "POST", headers: adminHdrs() });
+          show("Published to platforms!", true);
+        }
+      } else show(d?.error || "Failed", false);
+    } finally { setPosting(false); }
+  }
+
+  function togglePlatform(p: string) {
+    setPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
+  }
+
+  const PLATFORMS = [
+    { id: "facebook",  label: "Facebook",  color: "#1877f2", icon: "📘" },
+    { id: "instagram", label: "Instagram", color: "#e1306c", icon: "📸" },
+    { id: "linkedin",  label: "LinkedIn",  color: "#0a66c2", icon: "💼" },
+  ];
+
+  const STATUS_COLOR: Record<string, string> = { draft: "#94a3b8", scheduled: "#fbbf24", published: "#22c55e", failed: "#f87171" };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {toast && <Toast msg={toast.msg} ok={toast.ok} />}
+
+      {/* ── Platform credentials ── */}
+      <Card>
+        <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>📱 Platform Credentials</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+          {/* Facebook */}
+          <div style={{ padding: "16px", borderRadius: 12, background: "rgba(24,119,242,.06)", border: "1px solid rgba(24,119,242,.2)" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#60a5fa", marginBottom: 12 }}>📘 Facebook Page</div>
+            <Inp label="Page Access Token" value={creds.fbToken} onChange={e => setCreds(c => ({ ...c, fbToken: e.target.value }))} placeholder="EAAxxxxx..." type="password" />
+            <Inp label="Page ID" value={creds.fbPageId} onChange={e => setCreds(c => ({ ...c, fbPageId: e.target.value }))} placeholder="123456789" />
+          </div>
+          {/* Instagram */}
+          <div style={{ padding: "16px", borderRadius: 12, background: "rgba(225,48,108,.06)", border: "1px solid rgba(225,48,108,.2)" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#f472b6", marginBottom: 12 }}>📸 Instagram Business</div>
+            <Inp label="Access Token" value={creds.igToken} onChange={e => setCreds(c => ({ ...c, igToken: e.target.value }))} placeholder="EAAxxxxx..." type="password" />
+            <Inp label="Instagram Account ID" value={creds.igAccountId} onChange={e => setCreds(c => ({ ...c, igAccountId: e.target.value }))} placeholder="17841400000000" />
+          </div>
+          {/* LinkedIn */}
+          <div style={{ padding: "16px", borderRadius: 12, background: "rgba(10,102,194,.06)", border: "1px solid rgba(10,102,194,.2)" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#60a5fa", marginBottom: 12 }}>💼 LinkedIn</div>
+            <Inp label="Access Token" value={creds.liToken} onChange={e => setCreds(c => ({ ...c, liToken: e.target.value }))} placeholder="AQVxx..." type="password" />
+            <Inp label="Organization URN / ID" value={creds.liOrgId} onChange={e => setCreds(c => ({ ...c, liOrgId: e.target.value }))} placeholder="urn:li:organization:12345" />
+          </div>
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <Btn onClick={saveCreds} loading={savingCreds}>Save Credentials</Btn>
+          <p style={{ margin: "8px 0 0", fontSize: 11, color: "rgba(255,255,255,.3)" }}>
+            Credentials encrypted aur securely store hote hain. Facebook/Instagram ke liye Meta Business Manager se Page Access Token lo.
+          </p>
+        </div>
+      </Card>
+
+      {/* ── Create post ── */}
+      <Card>
+        <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>✍️ New Post</h3>
+
+        {/* Platform toggles */}
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>POST TO</label>
+          <div style={{ display: "flex", gap: 8 }}>
+            {PLATFORMS.map(pl => (
+              <button key={pl.id} onClick={() => togglePlatform(pl.id)} style={{
+                padding: "7px 16px", borderRadius: 20, border: `2px solid ${platforms.includes(pl.id) ? pl.color : "rgba(255,255,255,.1)"}`,
+                background: platforms.includes(pl.id) ? `${pl.color}22` : "transparent",
+                color: platforms.includes(pl.id) ? "#fff" : "rgba(255,255,255,.4)",
+                fontSize: 13, fontFamily: F, cursor: "pointer", fontWeight: 600, transition: "all .15s",
+              }}>{pl.icon} {pl.label}</button>
+            ))}
+          </div>
+        </div>
+
+        <Txta label="Post Text" value={postText} onChange={e => setPostText(e.target.value)} rows={4} placeholder="FinovaOS mein naya feature aa gaya! Ab aap apna business aur bhi efficiently manage kar sakte hain..." />
+        <Inp label="Image URL (optional)" value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="https://cdn.yourdomain.com/image.jpg" />
+        <Inp label="Schedule (optional — blank = post now)" type="datetime-local" value={scheduleAt} onChange={e => setScheduleAt(e.target.value)} />
+
+        <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+          <Btn onClick={createPost} loading={posting}>
+            {scheduleAt ? "📅 Schedule Post" : "🚀 Post Now"}
+          </Btn>
+        </div>
+      </Card>
+
+      {/* ── Post history ── */}
+      <Card>
+        <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>📋 Post History</h3>
+        {loadingPosts ? (
+          <div style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>Loading...</div>
+        ) : posts.length === 0 ? (
+          <div style={{ padding: "32px 0", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>Koi post nahi abhi tak</div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {posts.map((p: any) => (
+              <div key={p.id} style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: `1px solid rgba(255,255,255,.07)`, display: "flex", gap: 14, alignItems: "flex-start" }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, color: "#e2e8f0", marginBottom: 6, lineHeight: 1.5 }}>{p.text?.slice(0, 120)}{p.text?.length > 120 ? "…" : ""}</div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                    {(p.platforms || []).map((pl: string) => (
+                      <span key={pl} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "rgba(255,255,255,.07)", color: "rgba(255,255,255,.5)", fontWeight: 600, textTransform: "capitalize" }}>{pl}</span>
+                    ))}
+                    <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: `${STATUS_COLOR[p.status] || "#94a3b8"}22`, color: STATUS_COLOR[p.status] || "#94a3b8", fontWeight: 700, textTransform: "uppercase" }}>{p.status}</span>
+                    {p.scheduledAt && <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>📅 {new Date(p.scheduledAt).toLocaleString()}</span>}
+                  </div>
+                </div>
+                {p.status === "scheduled" && (
+                  <Btn variant="ghost" style={{ fontSize: 11, padding: "5px 10px" }}
+                    onClick={async () => {
+                      await fetch(`/api/automation/social?action=publish&id=${p.id}`, { method: "POST", headers: adminHdrs() });
+                      show("Published!", true);
+                      setPosts(prev => prev.map(x => x.id === p.id ? { ...x, status: "published" } : x));
+                    }}>Publish Now</Btn>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }
