@@ -73,10 +73,11 @@ export default function TeamAndPermissionsPage() {
   const [selBr,    setSelBr]    = useState<string[]>([]);
 
   /* invite */
-  const [invEmail,  setInvEmail]  = useState("");
-  const [invName,   setInvName]   = useState("");
-  const [invRole,   setInvRole]   = useState("VIEWER");
-  const [invLoading, setInvLoading] = useState(false);
+  const [invEmail,   setInvEmail]   = useState("");
+  const [invName,    setInvName]    = useState("");
+  const [invRole,    setInvRole]    = useState("VIEWER");
+  const [invBranches, setInvBranches] = useState<string[]>([]);
+  const [invLoading, setInvLoading]  = useState(false);
 
   /* permissions */
   const [roles,      setRoles]      = useState<RoleData[]>([]);
@@ -114,7 +115,11 @@ export default function TeamAndPermissionsPage() {
     setUsers(Array.isArray(d) ? d : []);
   }
   async function loadBranches(u?: any) {
-    const res = await fetch("/api/branches", { headers: h(u) }).catch(() => null);
+    const usr = u || getCurrentUser();
+    const hdrs: Record<string, string> = { "Content-Type": "application/json", "x-user-role": "ADMIN" };
+    if (usr?.id)        hdrs["x-user-id"]    = usr.id;
+    if (usr?.companyId) hdrs["x-company-id"] = usr.companyId;
+    const res = await fetch("/api/branches", { headers: hdrs }).catch(() => null);
     const d = await res?.json().catch(() => []);
     setBranches(Array.isArray(d) ? d : []);
   }
@@ -187,12 +192,12 @@ export default function TeamAndPermissionsPage() {
       const res = await fetch("/api/team/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...h() },
-        body: JSON.stringify({ email: invEmail, role: invRole, name: invName || undefined }),
+        body: JSON.stringify({ email: invEmail, role: invRole, name: invName || undefined, branches: invBranches }),
       });
       const data = await res.json();
       if (res.ok) {
         toast.success("Invitation sent successfully!");
-        setInvEmail(""); setInvName(""); setInvRole("VIEWER");
+        setInvEmail(""); setInvName(""); setInvRole("VIEWER"); setInvBranches([]);
       } else {
         toast.error(data.error || "Failed to send invite");
       }
@@ -402,6 +407,31 @@ export default function TeamAndPermissionsPage() {
                     <div style={{ fontSize: 12, fontWeight: 700, color: roleMeta(invRole).color }}>{invRole.replace(/_/g, " ")}</div>
                     <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>{roleMeta(invRole).desc}</div>
                   </div>
+                </div>
+              )}
+
+              {/* Branch access for invite */}
+              {branches.length > 0 && (
+                <div style={{ marginBottom: 20 }}>
+                  <label style={lbl}>Branch Access <span style={{ color: "#334155", fontWeight: 400 }}>(optional)</span></label>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {branches.map(b => {
+                      const checked = invBranches.includes(b.id);
+                      return (
+                        <label key={b.id} onClick={() => setInvBranches(p => p.includes(b.id) ? p.filter(x => x !== b.id) : [...p, b.id])}
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 9, border: `1px solid ${checked ? "rgba(99,102,241,.35)" : "rgba(255,255,255,.07)"}`, background: checked ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.02)", cursor: "pointer", transition: "all .12s" }}>
+                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${checked ? "#6366f1" : "rgba(255,255,255,.15)"}`, background: checked ? "#6366f1" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            {checked && <svg width="9" height="9" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: checked ? "white" : "#475569" }}>{b.name}</div>
+                            <div style={{ fontSize: 10, color: "#334155" }}>{b.code}</div>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#334155", marginTop: 6 }}>Unchecked = access to all branches</div>
                 </div>
               )}
 
