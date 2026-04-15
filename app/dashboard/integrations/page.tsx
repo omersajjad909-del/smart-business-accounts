@@ -61,7 +61,7 @@ const INTEGRATIONS: IntegrationItem[] = [
     statusKey: "import",
   },
   {
-    href: "/dashboard/integrations/api-access",
+    href: "/dashboard/integrations/webhooks",
     icon: "🪝",
     label: "Webhooks",
     desc: "Send real-time event notifications to your own endpoints when invoices, payments, or orders are created",
