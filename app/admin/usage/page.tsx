@@ -40,10 +40,10 @@ export default function AdminUsagePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-white px-6 py-10">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-white px-4 py-6 sm:px-6 sm:py-10">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-extrabold">Usage Insights</h1>
-        <div className="mt-6 grid md:grid-cols-3 gap-6">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white border border-indigo-100 rounded-2xl shadow p-4">
             <div className="font-bold mb-3">Top 10 Most Active (7d)</div>
             <Table rows={active} cols={[
@@ -79,7 +79,7 @@ function Table({ rows, cols }:{ rows: any[] | null, cols: Array<{k:string,t:stri
   if (rows.length === 0) return <div className="text-sm text-slate-500">No data</div>;
   return (
     <div className="overflow-auto">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm min-w-[520px]">
         <thead>
           <tr className="text-slate-500">
             {cols.map(c => <th key={c.k} className={`py-2 ${c.r ? "text-right" : "text-left"}`}>{c.t}</th>)}

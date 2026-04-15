@@ -28,15 +28,15 @@ export default function AdminLogsPage() {
   useEffect(() => { load(); }, []);
 
   return (
-    <div className="min-h-screen bg-white px-6 py-8">
+    <div className="min-h-screen bg-white px-4 py-6 sm:px-6 sm:py-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <PageHeader title="Audit Log Viewer" />
-        <Section title="Filters" actions={<button onClick={load} className="px-3 py-2 rounded-md bg-indigo-600 text-white text-sm">Apply</button>}>
-          <div className="grid md:grid-cols-5 gap-3">
-            <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search text" className="px-3 py-2 border rounded-lg" />
-            <input value={action} onChange={e=>setAction(e.target.value)} placeholder="Action" className="px-3 py-2 border rounded-lg" />
-            <input type="date" value={from} onChange={e=>setFrom(e.target.value)} className="px-3 py-2 border rounded-lg" />
-            <input type="date" value={to} onChange={e=>setTo(e.target.value)} className="px-3 py-2 border rounded-lg" />
+        <Section title="Filters" actions={<button onClick={load} className="w-full sm:w-auto px-3 py-2 rounded-md bg-indigo-600 text-white text-sm">Apply</button>}>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search text" className="w-full px-3 py-2 border rounded-lg" />
+            <input value={action} onChange={e=>setAction(e.target.value)} placeholder="Action" className="w-full px-3 py-2 border rounded-lg" />
+            <input type="date" value={from} onChange={e=>setFrom(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
+            <input type="date" value={to} onChange={e=>setTo(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
           </div>
         </Section>
         <Section title="Entries">

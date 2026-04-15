@@ -151,18 +151,18 @@ export default function BudgetPage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="responsive-page-shell space-y-6">
       <h1 className="text-2xl font-bold">Budget Planning</h1>
 
       {/* FILTERS */}
-      <div className="bg-white border rounded-lg p-4 flex gap-4 items-end">
-        <div>
+      <div className="bg-white border rounded-lg p-4 responsive-toolbar">
+        <div className="toolbar-field">
           <label className="block text-sm font-medium mb-1">Year</label>
           <input
             type="number"
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            className="border rounded px-3 py-2"
+            className="w-full border rounded px-3 py-2"
             min="2020"
             max="2100"
           />
@@ -170,7 +170,7 @@ export default function BudgetPage() {
         {budgets.length > 0 && (
           <button
             onClick={exportBudgets}
-            className="bg-green-600 text-white px-6 py-2 rounded font-bold"
+            className="toolbar-action-grow bg-green-600 text-white px-6 py-2 rounded font-bold"
           >
             📥 Export CSV
           </button>
@@ -217,13 +217,15 @@ export default function BudgetPage() {
             />
           </div>
         </div>
-        <button
-          onClick={saveBudget}
-          disabled={loading || !selectedAccount || !amount}
-          className="bg-blue-600 text-white px-6 py-2 rounded font-bold disabled:bg-gray-400"
-        >
-          {loading ? "Saving..." : "Save Budget"}
-        </button>
+        <div className="responsive-mobile-actions">
+          <button
+            onClick={saveBudget}
+            disabled={loading || !selectedAccount || !amount}
+            className="bg-blue-600 text-white px-6 py-2 rounded font-bold disabled:bg-gray-400"
+          >
+            {loading ? "Saving..." : "Save Budget"}
+          </button>
+        </div>
       </div>
 
       {/* BUDGETS LIST */}

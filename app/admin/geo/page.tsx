@@ -146,7 +146,7 @@ function MapCanvas({ pins, color }: { pins: GeoPin[]; color: string }) {
           100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56,189,248,0); }
         }
       `}</style>
-      <div ref={mapDivRef} className="w-full rounded-2xl" style={{ minHeight: 540 }} />
+      <div ref={mapDivRef} className="w-full rounded-2xl" style={{ minHeight: 360 }} />
     </>
   );
 }
@@ -183,7 +183,7 @@ export default function GeoAnalyticsPage() {
   const currentColor = tab === "companies" ? "#6366f1" : tab === "branches" ? "#22c55e" : "#38bdf8";
 
   return (
-    <div className="min-h-screen bg-[#070b1a] px-6 py-10 text-white">
+    <div className="min-h-screen bg-[#070b1a] px-4 py-6 sm:px-6 sm:py-10 text-white">
       <div className="mx-auto max-w-7xl">
         <div className="mb-6">
           <h1 className="text-3xl font-extrabold tracking-tight">Geo Analytics</h1>
@@ -192,7 +192,7 @@ export default function GeoAnalyticsPage() {
           </p>
         </div>
 
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
+        <div className="mb-6 grid gap-4 grid-cols-1 md:grid-cols-3">
           <StatCard label="Companies" value={data?.stats.companies || 0} sub={`${data?.stats.exactCompanies || 0} exact pins`} />
           <StatCard label="Branches" value={data?.stats.branches || 0} sub={`${data?.stats.exactBranches || 0} exact pins`} />
           <StatCard label="Visitors" value={data?.stats.visitors || 0} sub={`${data?.stats.exactVisitors || 0} precise visitor pins`} />

@@ -29,10 +29,10 @@ export default function AdminRevenuePage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-white px-6 py-10">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-white px-4 py-6 sm:px-6 sm:py-10">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-extrabold">Revenue Analytics</h1>
-        <div className="mt-6 grid md:grid-cols-2 gap-6">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white border border-indigo-100 rounded-2xl shadow">
             <SimpleChart title="MRR Growth (last 6 months)" data={data?.mrrSeries || []} type="line" height={220} />
           </div>
