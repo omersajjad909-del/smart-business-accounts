@@ -1633,8 +1633,8 @@ export default function DashboardLayout({
             >
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
               <NavLink href="/dashboard/users" pathname={pathname}>Users & Permissions</NavLink>
-              <NavLink href="/dashboard/roles-permissions" pathname={pathname}>Roles & Permissions</NavLink>
-              <NavLink href="/dashboard/team" pathname={pathname}>Team</NavLink>
+              <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink>
+              <NavLink href="/dashboard/users" pathname={pathname}>Team</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) && <NavLink href="/dashboard/users/logs" pathname={pathname}>System Logs</NavLink>}
             </NavGroup>
           )}
@@ -1716,7 +1716,7 @@ export default function DashboardLayout({
                 {/* Menu items */}
                 {[
                   { icon:"🏢", label:"Company Profile",    href:"/dashboard/company-profile" },
-                  { icon:"👥", label:"Team Members",        href:"/dashboard/team" },
+                  { icon:"👥", label:"Team Members",        href:"/dashboard/users" },
                   { icon:"🔔", label:"Notifications",       href:"/dashboard/notifications" },
                   { icon:"🎁", label:"Refer & Earn",        href:"/dashboard/referrals" },
                   { icon:"⭐", label:"Share Your Review",   href:"/dashboard/feedback" },
