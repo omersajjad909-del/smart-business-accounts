@@ -9,7 +9,7 @@ import VisitorTracker from "@/components/VisitorTracker";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
-const BRAND_ICON_PATH = "/finova-logo.png";
+const BRAND_ICON_PATH = "/logo-icon.svg";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -78,10 +78,10 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   icons: {
     icon: [
-      { url: "/finova-logo.png", sizes: "any", type: "image/png" },
+      { url: "/logo-icon.svg", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/finova-logo.png", type: "image/png" }],
-    shortcut: "/finova-logo.png",
+    apple: [{ url: "/logo-icon.svg", type: "image/svg+xml" }],
+    shortcut: "/logo-icon.svg",
   },
   manifest: "/manifest.json",
   appleWebApp: {

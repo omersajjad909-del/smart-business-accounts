@@ -17,7 +17,6 @@
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
-  <rect width="32" height="32" fill="#070b18"/>
   <!-- Layers -->
   <path d="M2,25 L16,30 L30,25 L16,27.5 Z" fill="url(#lg3)"/>
   <path d="M1,19 L16,24.5 L31,19 L16,22 Z" fill="url(#lg2)"/>

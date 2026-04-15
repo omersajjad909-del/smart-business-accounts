@@ -66,7 +66,7 @@ function FinovaLoader() {
           width: 64, height: 64, borderRadius: 18,
           animation: "finova-glow 2s ease-in-out infinite",
         }}>
-          <img src="/finova-logo.png" alt="FinovaOS" width={64} height={64} style={{borderRadius:18,objectFit:"contain"}}/>
+          <img src="/logo-icon.svg" alt="FinovaOS" width={64} height={64} style={{objectFit:"contain"}}/>
         </div>
       </div>
 
@@ -647,7 +647,7 @@ export default function DashboardLayout({
             }}
           >
             {/* Logo icon — always visible */}
-            <img src="/finova-logo.png" alt="FinovaOS" width={34} height={34} style={{flexShrink:0,borderRadius:8,objectFit:"contain"}}/>
+            <img src="/logo-icon.svg" alt="FinovaOS" width={34} height={34} style={{flexShrink:0,objectFit:"contain"}}/>
             {!sidebarCollapsed && (
               <div style={{display:"flex",flexDirection:"column",gap:1}}>
                 <div style={{fontSize:14,fontWeight:800,color:"white",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
