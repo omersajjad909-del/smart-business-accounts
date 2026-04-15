@@ -181,6 +181,7 @@ export default function ClientAcceptInvite() {
                 onChange={e => setPassword(e.target.value)}
                 required
                 minLength={6}
+                autoComplete="new-password"
               />
             </div>
 

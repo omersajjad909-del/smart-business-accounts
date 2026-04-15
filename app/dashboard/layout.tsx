@@ -2133,6 +2133,7 @@ function NavLink({ href, children, pathname }: {
     return (
       <Link
         href={href}
+        prefetch={false}
         title={typeof displayChildren === "string" ? displayChildren : ""}
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
@@ -2152,6 +2153,7 @@ function NavLink({ href, children, pathname }: {
   return (
     <Link
       href={href}
+      prefetch={false}
       style={{
         display:"flex",alignItems:"center",gap:8,padding:"5px 8px",borderRadius:6,fontSize:isAiAssistant ? 13 : 12,
         color: active ? "#c7d2fe" : "rgba(255,255,255,0.5)",
@@ -2206,7 +2208,6 @@ function NavLink({ href, children, pathname }: {
     </Link>
   );
 }
-
 
 
 

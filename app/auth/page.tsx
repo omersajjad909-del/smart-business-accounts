@@ -453,6 +453,7 @@ function AuthPageInner() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         autoFocus
+                        autoComplete="email"
                         placeholder="you@company.com"
                         style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 14, color: "#fff", fontFamily: "inherit" }}
                       />
@@ -469,6 +470,7 @@ function AuthPageInner() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        autoComplete={mode === "signin" ? "current-password" : "new-password"}
                         placeholder="Enter your password"
                         style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 14, color: "#fff", fontFamily: "inherit" }}
                       />

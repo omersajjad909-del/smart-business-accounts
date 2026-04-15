@@ -111,7 +111,7 @@ function ResetPasswordForm() {
                 <div>
                   <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", display:"block", marginBottom:6 }}>New Password</label>
                   <div style={{ position:"relative" }}>
-                    <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Min 8 characters" required
+                    <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Min 8 characters" required autoComplete="new-password"
                       style={{ width:"100%", padding:"12px 40px 12px 14px", borderRadius:11, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:14, outline:"none", boxSizing:"border-box" as any }}
                       onFocus={e=>e.target.style.borderColor="rgba(99,102,241,.5)"}
                       onBlur={e=>e.target.style.borderColor="rgba(255,255,255,.1)"}
@@ -137,7 +137,7 @@ function ResetPasswordForm() {
                 {/* Confirm password */}
                 <div>
                   <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", display:"block", marginBottom:6 }}>Confirm Password</label>
-                  <input type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Repeat your password" required
+                  <input type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Repeat your password" required autoComplete="new-password"
                     style={{ width:"100%", padding:"12px 14px", borderRadius:11, background:"rgba(255,255,255,.05)", border:`1px solid ${confirm&&confirm!==password?"rgba(248,113,113,.4)":confirm&&confirm===password?"rgba(52,211,153,.4)":"rgba(255,255,255,.1)"}`, color:"white", fontSize:14, outline:"none", boxSizing:"border-box" as any }}
                   />
                   {confirm && confirm !== password && (
