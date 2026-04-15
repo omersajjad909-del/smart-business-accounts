@@ -123,18 +123,7 @@ export default function Footer() {
           <div>
             {/* Logo */}
             <Link href="/" style={{ display:"inline-flex", alignItems:"center", gap:10, textDecoration:"none", marginBottom:24 }}>
-              <div style={{
-                width:38, height:38, borderRadius:10, flexShrink:0,
-                background:"linear-gradient(135deg,#4f46e5,#818cf8)",
-                display:"flex", alignItems:"center", justifyContent:"center",
-                boxShadow:"0 4px 14px rgba(99,102,241,.4)",
-              }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                  <path d="M2 17l10 5 10-5" opacity=".7"/>
-                  <path d="M2 12l10 5 10-5" opacity=".88"/>
-                </svg>
-              </div>
+              <img src="/icon1.png" alt="FinovaOS" width={40} height={40} style={{ flexShrink:0, objectFit:"contain" }}/>
               <span style={{ fontFamily:"'Lora',serif", fontSize:20, fontWeight:700, color:"white", letterSpacing:"-.2px" }}>
                 FinovaOS
               </span>
