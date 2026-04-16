@@ -125,7 +125,7 @@ export default function MarketingAutopilotPage() {
 // ════════════════════════════════════════════════════════
 // TAB 1 — CONTENT CALENDAR
 // ════════════════════════════════════════════════════════
-type GeneratedPost = { platform: string; text: string; hashtags: string; bestTime: string; type: string };
+type GeneratedPost = { platform: string; text: string; hashtags: string; bestTime: string; type: string; imageUrl?: string; imageLoading?: boolean };
 
 function ContentCalendarTab() {
   const { t, show } = useToast();
@@ -160,6 +160,29 @@ function ContentCalendarTab() {
       if (r.ok && d.posts) { setPosts(d.posts); show(`${d.posts.length} posts ready!`); }
       else show(d?.error || "Generation failed", false);
     } finally { setLoading(false); }
+  }
+
+  async function generateImage(idx: number) {
+    const p = posts[idx];
+    setPosts(prev => prev.map((post, i) => i === idx ? { ...post, imageLoading: true } : post));
+    try {
+      const r = await fetch("/api/admin/marketing-autopilot/image", {
+        method: "POST",
+        headers: adminHdrs(true),
+        body: JSON.stringify({ postText: p.text, niche, platform: p.platform }),
+      });
+      const d = await r.json();
+      if (r.ok && d.url) {
+        setPosts(prev => prev.map((post, i) => i === idx ? { ...post, imageUrl: d.url, imageLoading: false } : post));
+        show("Image ready!", true);
+      } else {
+        setPosts(prev => prev.map((post, i) => i === idx ? { ...post, imageLoading: false } : post));
+        show(d?.error || "Image generation failed", false);
+      }
+    } catch {
+      setPosts(prev => prev.map((post, i) => i === idx ? { ...post, imageLoading: false } : post));
+      show("Error generating image", false);
+    }
   }
 
   async function publishPost(idx: number) {
@@ -223,18 +246,59 @@ function ContentCalendarTab() {
           <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>{posts.length} posts generated — review karke directly publish karo:</div>
           {posts.map((p, i) => (
             <Card key={i} style={{ borderLeft: `3px solid ${PLATFORM_COLOR[p.platform] || "#818cf8"}` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: `${PLATFORM_COLOR[p.platform] || "#818cf8"}22`, color: PLATFORM_COLOR[p.platform] || "#818cf8", fontWeight: 700, textTransform: "capitalize" as const }}>{p.platform}</span>
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{p.type}</span>
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>⏰ Best time: {p.bestTime}</span>
+              <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+
+                {/* Image preview / placeholder */}
+                <div style={{ flexShrink: 0, width: 120, height: 120, borderRadius: 10, overflow: "hidden", background: "rgba(255,255,255,.04)", border: `1px solid ${BDR}`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" as const }}>
+                  {p.imageLoading ? (
+                    <div style={{ textAlign: "center" as const, padding: 8 }}>
+                      <div style={{ fontSize: 22, marginBottom: 4 }}>⏳</div>
+                      <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)", lineHeight: 1.4 }}>Generating…</div>
+                    </div>
+                  ) : p.imageUrl ? (
+                    <>
+                      <img src={p.imageUrl} alt="post visual" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <a href={p.imageUrl} target="_blank" rel="noreferrer"
+                        style={{ position: "absolute" as const, bottom: 4, right: 4, padding: "3px 7px", borderRadius: 6, background: "rgba(0,0,0,.7)", color: "white", fontSize: 9, textDecoration: "none", fontWeight: 700 }}>
+                        ↗ Open
+                      </a>
+                    </>
+                  ) : (
+                    <button onClick={() => generateImage(i)} style={{ background: "none", border: "none", cursor: "pointer", textAlign: "center" as const, padding: 8 }}>
+                      <div style={{ fontSize: 22, marginBottom: 4 }}>🎨</div>
+                      <div style={{ fontSize: 9, color: "rgba(255,255,255,.4)", lineHeight: 1.4 }}>Generate<br/>Image</div>
+                    </button>
+                  )}
                 </div>
-                <Btn variant="ghost" style={{ fontSize: 12, padding: "5px 14px" }} loading={posting === i} onClick={() => publishPost(i)}>
-                  🚀 Publish Now
-                </Btn>
+
+                {/* Post content */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 8, flexWrap: "wrap" as const }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" as const }}>
+                      <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: `${PLATFORM_COLOR[p.platform] || "#818cf8"}22`, color: PLATFORM_COLOR[p.platform] || "#818cf8", fontWeight: 700, textTransform: "capitalize" as const }}>{p.platform}</span>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{p.type}</span>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>⏰ {p.bestTime}</span>
+                    </div>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {!p.imageUrl && !p.imageLoading && (
+                        <Btn variant="ghost" style={{ fontSize: 11, padding: "4px 10px" }} loading={p.imageLoading} onClick={() => generateImage(i)}>
+                          🎨 Make Image
+                        </Btn>
+                      )}
+                      {p.imageUrl && (
+                        <Btn variant="ghost" style={{ fontSize: 11, padding: "4px 10px" }} loading={p.imageLoading} onClick={() => generateImage(i)}>
+                          🔄 Regenerate
+                        </Btn>
+                      )}
+                      <Btn variant="ghost" style={{ fontSize: 12, padding: "4px 12px" }} loading={posting === i} onClick={() => publishPost(i)}>
+                        🚀 Publish
+                      </Btn>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 13, color: "#e2e8f0", lineHeight: 1.7, margin: "0 0 6px", whiteSpace: "pre-wrap" as const }}>{p.text}</p>
+                  <div style={{ fontSize: 11, color: "#818cf8" }}>{p.hashtags}</div>
+                </div>
               </div>
-              <p style={{ fontSize: 13, color: "#e2e8f0", lineHeight: 1.7, margin: "0 0 8px", whiteSpace: "pre-wrap" as const }}>{p.text}</p>
-              <div style={{ fontSize: 11, color: "#818cf8" }}>{p.hashtags}</div>
             </Card>
           ))}
         </div>

@@ -224,12 +224,28 @@ export default function DashboardLayout({
 
   // MOBILE MENU STATE
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 767px)").matches;
+  });
   const pathname = usePathname();
 
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(max-width: 767px)");
+    const onChange = (event: MediaQueryListEvent) => {
+      setIsMobileViewport(event.matches);
+      if (!event.matches) setIsMobileMenuOpen(false);
+    };
+    setIsMobileViewport(media.matches);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
   // Enable global Enter key navigation
   useGlobalEnterNavigation();
@@ -602,7 +618,7 @@ export default function DashboardLayout({
     <div className="dashboard-root" style={{display:"flex",minHeight:"100vh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
 
       {/* MOBILE OVERLAY */}
-      {isMobileMenuOpen && (
+      {isMobileViewport && isMobileMenuOpen && (
         <div
           style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:20}}
           onClick={() => setIsMobileMenuOpen(false)}
@@ -613,17 +629,18 @@ export default function DashboardLayout({
       <aside style={{
         position:"fixed",
         top:0, left:0, bottom:0,
-        width: SW,
+        width: isMobileViewport ? "min(82vw, 320px)" : SW,
         background:"var(--panel-bg)",
         borderRight:"1px solid var(--border)",
         display:"flex",
         flexDirection:"column",
         zIndex:30,
-        transform: isMobileMenuOpen ? "translateX(0)" : undefined,
+        transform: isMobileViewport
+          ? (isMobileMenuOpen ? "translateX(0)" : "translateX(-100%)")
+          : "translateX(0)",
         transition:"width .25s ease, transform .3s ease",
         overflow:"hidden",
       }}
-      className={`${!isMobileMenuOpen ? "max-md:hidden" : ""} max-md:w-[82vw] max-md:max-w-[320px]`}
       >
 
         {/* ---- SIDEBAR HEADER ---- */}
@@ -1788,7 +1805,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* ═══════════════ MAIN AREA ═══════════════ */}
-      <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:SW,transition:"margin-left .25s ease"}} className="max-md:ml-0">
+      <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:isMobileViewport ? 0 : SW,transition:"margin-left .25s ease"}}>
 
         {/* ---- TOPBAR ---- */}
         <div
@@ -1810,8 +1827,7 @@ export default function DashboardLayout({
 
           {/* HAMBURGER */}
           <button
-            style={{display:"none",padding:"6px",background:"none",border:"none",cursor:"pointer",color:"rgba(255,255,255,0.5)",borderRadius:8}}
-            className="max-md:flex"
+            style={{display:isMobileViewport ? "flex" : "none",padding:"6px",background:"none",border:"none",cursor:"pointer",color:"rgba(255,255,255,0.5)",borderRadius:8}}
             onClick={() => setIsMobileMenuOpen(true)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="22" height="22">
@@ -2208,6 +2224,5 @@ function NavLink({ href, children, pathname }: {
     </Link>
   );
 }
-
 
 
