@@ -7,6 +7,7 @@ import {
   getStoredCurrencyPreference,
   setStoredCurrencyPreference,
 } from "@/lib/currencyPreference";
+import { getCustomPlanMonthlyUsd } from "@/lib/customPlanPricing";
 
 /* ══════════════════════════════════════════════════════════
    TYPES & DATA — exact match with PricingSection.tsx
@@ -82,7 +83,7 @@ const MODULES = [
   { id:"inventory",           name:"Inventory",              icon:"📦", price:12 },
   { id:"reports",             name:"Advanced Reports",       icon:"📈", price:8  },
   { id:"multi_branch",        name:"Multi-Branch",           icon:"🏢", price:15 },
-  { id:"whatsapp",            name:"WhatsApp / Slack",       icon:"💬", price:8  },
+  { id:"whatsapp",            name:"WhatsApp & SMS",         icon:"💬", price:8  },
   { id:"api_access",          name:"API Access",             icon:"🔗", price:20 },
   { id:"tax_filing",          name:"Tax Filing",             icon:"🧾", price:10 },
 ];
@@ -138,11 +139,12 @@ export default function ChoosePlanPage() {
     const c = (searchParams.get("cycle") || "").toLowerCase();
     const p = (searchParams.get("plan") || "").toLowerCase();
     const mods = searchParams.get("modules");
-    if (p === "custom") {
+      if (p === "custom") {
       if (mods) {
         // Modules already chosen on pricing page — skip builder, go straight to signup
-        const price = mods.split(",").reduce((sum, id) => sum + (MODULES.find(m => m.id === id)?.price || 0), 0);
         const cycle = c === "yearly" ? "yearly" : "monthly";
+        const monthly = getCustomPlanMonthlyUsd(mods.split(","));
+        const price = cycle === "yearly" ? Math.round(monthly * 0.8) : monthly;
         router.replace(`/onboarding/signup/custom?modules=${mods}&price=${price}&cycle=${cycle}&currency=${currency}&country=${country}`);
       }
     }
@@ -204,10 +206,7 @@ export default function ChoosePlanPage() {
     return () => obs.disconnect();
   }, []);
 
-  const customPrice = useMemo(() =>
-    selectedModules.reduce((sum, id) => sum + (MODULES.find(m => m.id === id)?.price || 0), 0),
-    [selectedModules]
-  );
+  const customPrice = useMemo(() => getCustomPlanMonthlyUsd(selectedModules), [selectedModules]);
 
   const formatPrice = (amountUsd: number) => formatFromUSD(amountUsd, currency, rates);
   const buildSignupHref = (slug: string) =>
@@ -589,4 +588,3 @@ export default function ChoosePlanPage() {
     </div>
   );
 }
-

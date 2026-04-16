@@ -12,6 +12,10 @@ import {
   normalizePhone,
   sendVerificationCode,
 } from "@/lib/verification";
+import {
+  getCustomPlanPerMonthForCycleUsd,
+  parseCustomModules,
+} from "@/lib/customPlanPricing";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,7 +30,6 @@ export async function POST(req: NextRequest) {
       planCode,
       billingCycle,
       customModules,
-      customPrice,
       referralCode,
     } = await req.json();
 
@@ -92,6 +95,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const normalizedPlanCode = String(planCode || "STARTER").toUpperCase();
+    const normalizedBillingCycle =
+      String(billingCycle || "").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
+    const customModuleIds =
+      normalizedPlanCode === "CUSTOM" ? parseCustomModules(customModules) : [];
+    const computedCustomPrice =
+      normalizedPlanCode === "CUSTOM"
+        ? getCustomPlanPerMonthForCycleUsd(customModuleIds, normalizedBillingCycle)
+        : null;
+
     const company = await prisma.company.create({
       data: {
         name: companyName,
@@ -100,10 +113,10 @@ export async function POST(req: NextRequest) {
         baseCurrency: currencyByCountry(countryCode ? String(countryCode).toUpperCase() : "US"),
         businessType: businessType ? String(businessType) as BusinessType : "trading",
         businessSetupDone: Boolean(businessType),
-        plan: String(planCode || "STARTER").toUpperCase(),
+        plan: normalizedPlanCode,
         subscriptionStatus: "TRIALING",
-        activeModules: customModules ? String(customModules) : null,
-        customPrice: customPrice ? parseFloat(String(customPrice)) : null,
+        activeModules: customModuleIds.length > 0 ? customModuleIds.join(",") : null,
+        customPrice: computedCustomPrice,
       },
     });
 
@@ -146,7 +159,7 @@ export async function POST(req: NextRequest) {
           details: JSON.stringify({
             email: user.email,
             phone: phoneNormalized || null,
-            plan: planCode,
+            plan: normalizedPlanCode,
           }),
         },
       })
@@ -212,14 +225,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const planPath = String(planCode || "starter").toLowerCase();
+    const planPath = String(normalizedPlanCode || "starter").toLowerCase();
     const nextParams = new URLSearchParams();
-    nextParams.set(
-      "cycle",
-      String(billingCycle || "").toLowerCase() === "yearly" ? "yearly" : "monthly",
-    );
-    if (customModules) nextParams.set("modules", String(customModules));
-    if (customPrice) nextParams.set("price", String(customPrice));
+    nextParams.set("cycle", normalizedBillingCycle.toLowerCase());
+    if (customModuleIds.length > 0) nextParams.set("modules", customModuleIds.join(","));
+    if (computedCustomPrice !== null) nextParams.set("price", String(computedCustomPrice));
     const next = `/onboarding/payment/${planPath}?${nextParams.toString()}`;
 
     const verifyToken = signJwt({

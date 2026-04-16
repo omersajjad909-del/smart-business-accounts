@@ -5,6 +5,7 @@ import { apiError, apiOk } from "@/lib/apiError";
 import { getRuntimeAppUrl } from "@/lib/domains";
 import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
+import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
 
 const DEFAULT_PRICING = {
   starter: { monthly: 49, yearly: 39 },
@@ -43,11 +44,12 @@ export async function POST(req: NextRequest) {
     const displayCurrency = body?.displayCurrency ? String(body.displayCurrency).toUpperCase() : null;
     const displayCountry = body?.displayCountry ? String(body.displayCountry).toUpperCase() : null;
     const customPrice = Number(body?.customPrice || 0);
+    const customModulesFromBody = parseCustomModules(body?.customModules);
     const normalizedPlan = normalizePlanKey(planCode);
 
     const company = await prisma.company.findUnique({
       where: { id: companyId },
-      select: { id: true, name: true, baseCurrency: true, country: true },
+      select: { id: true, name: true, baseCurrency: true, country: true, activeModules: true },
     });
     if (!company) return apiError("Company not found", 404);
 
@@ -84,9 +86,13 @@ export async function POST(req: NextRequest) {
     const computedPerMonth = planBasePerMonth + seatAddonPerMonth;
     const computedCycleAmount = billingCycle === "YEARLY" ? computedPerMonth * 12 : computedPerMonth;
     const baseCycleAmount = billingCycle === "YEARLY" ? planBasePerMonth * 12 : planBasePerMonth;
+    const seatAddonCycleAmount = billingCycle === "YEARLY" ? seatAddonPerMonth * 12 : seatAddonPerMonth;
+    const companyCustomModules = parseCustomModules(company.activeModules || "");
+    const effectiveCustomModules = companyCustomModules.length > 0 ? companyCustomModules : customModulesFromBody;
+    const computedCustomCycleAmount = getCustomPlanCycleAmountUsd(effectiveCustomModules, billingCycle);
     const finalCustomPrice =
-      planCode === "CUSTOM" && customPrice > 0
-        ? customPrice + (billingCycle === "YEARLY" ? seatAddonPerMonth * 12 : seatAddonPerMonth)
+      planCode === "CUSTOM"
+        ? ((computedCustomCycleAmount > 0 ? computedCustomCycleAmount : (customPrice > 0 ? customPrice : 0)) + seatAddonCycleAmount)
         : computedCycleAmount;
 
     if (hasLemonSqueezyConfig()) {
@@ -121,9 +127,10 @@ export async function POST(req: NextRequest) {
             displayCurrency: displayCurrency || company.baseCurrency,
             displayCountry: displayCountry || company.country,
             baseCycleAmount,
-            seatAddonCycleAmount: billingCycle === "YEARLY" ? seatAddonPerMonth * 12 : seatAddonPerMonth,
+            seatAddonCycleAmount,
             seatAddonPerMonth,
             extraSeats,
+            customModules: effectiveCustomModules,
             checkoutCycleAmount: finalCustomPrice,
             createdAt: new Date().toISOString(),
           }),
@@ -161,9 +168,10 @@ export async function POST(req: NextRequest) {
           displayCurrency,
           displayCountry,
           baseCycleAmount,
-          seatAddonCycleAmount: billingCycle === "YEARLY" ? seatAddonPerMonth * 12 : seatAddonPerMonth,
+          seatAddonCycleAmount,
           seatAddonPerMonth,
           extraSeats,
+          customModules: effectiveCustomModules,
           checkoutCycleAmount: finalCustomPrice,
           provider: "DIRECT_FALLBACK",
         }),

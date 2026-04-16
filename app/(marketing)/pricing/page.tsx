@@ -13,6 +13,10 @@ import {
   getStoredCurrencyPreference,
   setStoredCurrencyPreference,
 } from "@/lib/currencyPreference";
+import {
+  CUSTOM_PLAN_BASE_MONTHLY_USD,
+  getCustomPlanMonthlyUsd,
+} from "@/lib/customPlanPricing";
 
 type BillingCycle = "monthly" | "yearly";
 type PlanPricing = {
@@ -377,7 +381,7 @@ export default function PricingPage() {
     return () => window.removeEventListener(FINOVA_CURRENCY_EVENT, handler as EventListener);
   }, []);
 
-  const customMonthly = useMemo(() => selectedModules.reduce((s, id) => s + (MODULES.find(m => m.id === id)?.price || 0), 0), [selectedModules]);
+  const customMonthly = useMemo(() => getCustomPlanMonthlyUsd(selectedModules), [selectedModules]);
   const customDisplayUsd = billing === "yearly" ? Math.round(customMonthly * 0.8) : customMonthly;
   const formatPrice = (usd: number) => formatFromUSD(usd, currency, rates);
   const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
@@ -430,9 +434,6 @@ export default function PricingPage() {
         </div>
         <div style={{ textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 12, marginBottom: 56 }}>
           Showing prices in {currency} · Final billing currency confirmed at checkout
-          <div style={{ marginTop: 6, color: "rgba(110,231,183,.9)", fontWeight: 700 }}>
-            Need more users? Extra seats from {formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo
-          </div>
         </div>
 
         {/* ── PLAN CARDS ──────────────────────────────────────── */}
@@ -467,9 +468,6 @@ export default function PricingPage() {
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: -12, marginBottom: 16, textAlign: "center" }}>
                     You&apos;ll be charged {formatPrice(regularPrice)}/mo after the first 3 months.
                   </div>
-                  <div style={{ fontSize: 10.5, color: "rgba(110,231,183,.9)", marginTop: -10, marginBottom: 14, textAlign: "center", fontWeight: 700 }}>
-                    Extra seat add-on: {formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo
-                  </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {plan.features.map((f, idx) => (
                       <div key={f} style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -487,9 +485,6 @@ export default function PricingPage() {
                         </span>
                       </div>
                     ))}
-                  </div>
-                  <div style={{ marginTop: 14, padding: "10px 12px", borderRadius: 10, background: "rgba(16,185,129,.12)", border: "1px solid rgba(16,185,129,.28)", fontSize: 11.5, color: "#6ee7b7", fontWeight: 700, textAlign: "center" }}>
-                    Add more users anytime: +{formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo
                   </div>
                 </div>
               </div>
@@ -604,9 +599,6 @@ export default function PricingPage() {
                   <div style={{ fontSize: 10, color: "rgba(251,146,60,.9)", marginTop: 4, fontWeight: 700 }}>
                     Intro: {formatPrice(Math.round((billing === "yearly" ? publicPricing[plan.slug as keyof PlanPricing].yearly : publicPricing[plan.slug as keyof PlanPricing].monthly) * 0.25))}/mo for 3 months
                   </div>
-                  <div style={{ fontSize: 10, color: "rgba(110,231,183,.92)", marginTop: 3, fontWeight: 700 }}>
-                    + Seats: {formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo
-                  </div>
                   {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
                 </div>
               ))}
@@ -716,7 +708,7 @@ export default function PricingPage() {
             })}
           </div>
           <div style={{ marginTop: 20, fontSize: 13, color: "rgba(255,255,255,.36)", textAlign: "center" }}>
-            Base infrastructure starts from {formatPrice(15)}/mo · plus selected module prices.
+            Base infrastructure starts from {formatPrice(CUSTOM_PLAN_BASE_MONTHLY_USD)}/mo · shown estimate includes base + selected modules.
           </div>
         </div>
 

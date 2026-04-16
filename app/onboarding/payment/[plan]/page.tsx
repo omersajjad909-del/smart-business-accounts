@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { getCurrentUser, setCurrentUser } from "@/lib/auth";
 import { FX_USD, formatFromUSD } from "@/lib/currency";
 import { getStoredCurrencyPreference, setStoredCurrencyPreference } from "@/lib/currencyPreference";
+import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
 
 /* ── Plan meta ──────────────────────────────────────────── */
 const PLAN_META: Record<string, { name: string; price: number; yearlyPrice: number; color: string; glow: string; dim: string; border: string; gradientFrom: string; gradientTo: string; icon: string }> = {
@@ -188,6 +189,8 @@ export default function PaymentPage() {
   const meta     = PLAN_META[plan] || PLAN_META.starter;
   const urlCycle = (searchParams.get("cycle") || "").toLowerCase() === "yearly" ? "yearly" : "monthly";
   const queryPrice = Number(searchParams.get("price") || "");
+  const customModulesParam = searchParams.get("modules") || "";
+  const customModuleIds = parseCustomModules(customModulesParam);
 
   const [billingCycle, setBillingCycle] = useState<"monthly"|"yearly">(urlCycle);
   const [currency, setCurrency] = useState<string>(searchParams.get("currency") || "USD");
@@ -196,7 +199,11 @@ export default function PaymentPage() {
 
   const planPrice =
     plan === "custom"
-      ? (Number.isFinite(queryPrice) && queryPrice > 0 ? queryPrice : 0)
+      ? (
+        customModuleIds.length > 0
+          ? getCustomPlanCycleAmountUsd(customModuleIds, billingCycle === "yearly" ? "YEARLY" : "MONTHLY")
+          : (Number.isFinite(queryPrice) && queryPrice > 0 ? queryPrice : 0)
+      )
       : billingCycle === "yearly"
         ? meta.yearlyPrice
         : meta.price;
@@ -336,6 +343,7 @@ export default function PaymentPage() {
           displayCurrency: currency,
           displayCountry: country,
           billingCycle,
+          customModules: customModulesParam || null,
         }),
       });
       const data = await res.json();
@@ -419,6 +427,7 @@ export default function PaymentPage() {
           displayCurrency: currency,
           displayCountry: country,
           billingCycle,
+          customModules: customModulesParam || null,
         }),
       });
       const data = await res.json();
