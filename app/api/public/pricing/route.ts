@@ -10,6 +10,12 @@ const DEFAULT_PRICING = {
   enterprise: { monthly: 249, yearly: 2388 },  // $199/mo × 12
 };
 
+const DEFAULT_PLAN_LIMITS = {
+  starter: 5,
+  pro: 20,
+  enterprise: null,
+};
+
 export async function GET() {
   try {
     const latest = await prisma.activityLog.findFirst({
@@ -33,14 +39,24 @@ export async function GET() {
       };
       return NextResponse.json({
         pricing,
-        features:      payload?.features      ?? null,
-        featureMatrix: payload?.featureMatrix  ?? null,
+        planLimits: payload?.planLimits ?? DEFAULT_PLAN_LIMITS,
+        features: payload?.features ?? null,
+        featureMatrix: payload?.featureMatrix ?? null,
         updatedAt: latest.createdAt,
       });
     }
 
-    return NextResponse.json({ pricing: DEFAULT_PRICING, features: null, featureMatrix: null, updatedAt: latest.createdAt });
-  } catch (e: any) {
-    return NextResponse.json({ pricing: DEFAULT_PRICING, error: e.message }, { status: 200 });
+    return NextResponse.json({
+      pricing: DEFAULT_PRICING,
+      planLimits: DEFAULT_PLAN_LIMITS,
+      features: null,
+      featureMatrix: null,
+      updatedAt: latest.createdAt,
+    });
+  } catch (e: unknown) {
+    return NextResponse.json(
+      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, error: e instanceof Error ? e.message : "unknown" },
+      { status: 200 },
+    );
   }
 }

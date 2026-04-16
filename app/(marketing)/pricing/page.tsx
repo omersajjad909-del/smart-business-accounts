@@ -15,6 +15,11 @@ import {
 } from "@/lib/currencyPreference";
 
 type BillingCycle = "monthly" | "yearly";
+type PlanPricing = {
+  starter: { monthly: number; yearly: number };
+  professional: { monthly: number; yearly: number };
+  enterprise: { monthly: number; yearly: number };
+};
 
 const PLANS = [
   {
@@ -52,6 +57,18 @@ const PLANS = [
     features: ["Unlimited users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority onboarding and support"],
   },
 ];
+
+const DEFAULT_PUBLIC_PRICING: PlanPricing = {
+  starter: { monthly: 49, yearly: 39 },
+  professional: { monthly: 99, yearly: 79 },
+  enterprise: { monthly: 249, yearly: 199 },
+};
+
+const DEFAULT_PLAN_LIMITS: Record<string, number | null> = {
+  starter: 5,
+  professional: 20,
+  enterprise: null,
+};
 
 // ── FEATURE COMPARISON DATA ──────────────────────────────────────────────────
 type Val = boolean | string | null;
@@ -284,6 +301,8 @@ export default function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [openCats, setOpenCats] = useState<Set<string>>(new Set(["platform", "accounting", "ai"]));
   const [featureMap, setFeatureMap] = useState<Record<string, { starter: boolean; pro: boolean; enterprise: boolean }>>({});
+  const [publicPricing, setPublicPricing] = useState<PlanPricing>(DEFAULT_PUBLIC_PRICING);
+  const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
 
   useEffect(() => {
     (async () => {
@@ -297,6 +316,35 @@ export default function PricingPage() {
       try {
         const fx = await fetch("/api/public/fx", { cache: "no-store" });
         if (fx.ok) { const d = await fx.json(); if (d?.rates) setRates(d.rates); }
+      } catch {}
+      try {
+        const pr = await fetch("/api/public/pricing", { cache: "no-store" });
+        if (pr.ok) {
+          const d = await pr.json();
+          if (d?.pricing) {
+            setPublicPricing({
+              starter: {
+                monthly: Number(d.pricing?.starter?.monthly ?? DEFAULT_PUBLIC_PRICING.starter.monthly),
+                yearly: Math.round(Number(d.pricing?.starter?.yearly ?? (DEFAULT_PUBLIC_PRICING.starter.yearly * 12)) / 12),
+              },
+              professional: {
+                monthly: Number(d.pricing?.pro?.monthly ?? DEFAULT_PUBLIC_PRICING.professional.monthly),
+                yearly: Math.round(Number(d.pricing?.pro?.yearly ?? (DEFAULT_PUBLIC_PRICING.professional.yearly * 12)) / 12),
+              },
+              enterprise: {
+                monthly: Number(d.pricing?.enterprise?.monthly ?? DEFAULT_PUBLIC_PRICING.enterprise.monthly),
+                yearly: Math.round(Number(d.pricing?.enterprise?.yearly ?? (DEFAULT_PUBLIC_PRICING.enterprise.yearly * 12)) / 12),
+              },
+            });
+          }
+          if (d?.planLimits) {
+            setPlanLimits({
+              starter: d.planLimits?.starter ?? DEFAULT_PLAN_LIMITS.starter,
+              professional: d.planLimits?.pro ?? DEFAULT_PLAN_LIMITS.professional,
+              enterprise: d.planLimits?.enterprise ?? DEFAULT_PLAN_LIMITS.enterprise,
+            });
+          }
+        }
       } catch {}
       // Load live plan feature overrides from admin config
       try {
@@ -325,6 +373,7 @@ export default function PricingPage() {
   const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
   const toggleCat = (id: string) => setOpenCats(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const usersLabel = (v: number | null | undefined) => (v === null || v === undefined ? "Unlimited" : `Up to ${v}`);
 
   const ff = "'Outfit','DM Sans',sans-serif";
 
@@ -375,7 +424,8 @@ export default function PricingPage() {
         {/* ── PLAN CARDS ──────────────────────────────────────── */}
         <div className="pg" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20, marginBottom: 80 }}>
           {PLANS.map((plan) => {
-            const regularPrice = billing === "yearly" ? plan.yearly : plan.monthly;
+            const pricingKey = plan.slug as keyof PlanPricing;
+            const regularPrice = billing === "yearly" ? publicPricing[pricingKey].yearly : publicPricing[pricingKey].monthly;
             const introPrice = Math.round(regularPrice * 0.25);
             return (
               <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(255,255,255,.03))" : "rgba(255,255,255,.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
@@ -404,12 +454,20 @@ export default function PricingPage() {
                     You&apos;ll be charged {formatPrice(regularPrice)}/mo after the first 3 months.
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {plan.features.map((f) => (
+                    {plan.features.map((f, idx) => (
                       <div key={f} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{ width: 16, height: 16, borderRadius: "50%", background: `${plan.color}18`, border: `1px solid ${plan.color}38`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <svg width="8" height="8" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke={plan.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </div>
-                        <span style={{ fontSize: 13, color: "rgba(255,255,255,.72)" }}>{f}</span>
+                        <span style={{ fontSize: 13, color: "rgba(255,255,255,.72)" }}>
+                          {idx === 0
+                            ? (plan.slug === "starter"
+                              ? usersLabel(planLimits.starter) + " users"
+                              : plan.slug === "professional"
+                                ? usersLabel(planLimits.professional) + " users"
+                                : usersLabel(planLimits.enterprise) + " users")
+                            : f}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -521,10 +579,10 @@ export default function PricingPage() {
                 <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
                   <div style={{ fontSize: 14, fontWeight: 900, color: PLAN_COLORS[pi], marginBottom: 4 }}>{plan.name}</div>
                   <div style={{ fontSize: 14, color: "rgba(255,255,255,.9)", fontWeight: 800 }}>
-                    {formatPrice(billing === "yearly" ? plan.yearly : plan.monthly)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
+                    {formatPrice(billing === "yearly" ? publicPricing[plan.slug as keyof PlanPricing].yearly : publicPricing[plan.slug as keyof PlanPricing].monthly)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
                   </div>
                   <div style={{ fontSize: 10, color: "rgba(251,146,60,.9)", marginTop: 4, fontWeight: 700 }}>
-                    Intro: {formatPrice(Math.round((billing === "yearly" ? plan.yearly : plan.monthly) * 0.25))}/mo for 3 months
+                    Intro: {formatPrice(Math.round((billing === "yearly" ? publicPricing[plan.slug as keyof PlanPricing].yearly : publicPricing[plan.slug as keyof PlanPricing].monthly) * 0.25))}/mo for 3 months
                   </div>
                   {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
                 </div>
@@ -572,9 +630,15 @@ export default function PricingPage() {
                       {feat.name}
                     </div>
                     {([
-                      feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].starter : feat.starter,
-                      feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].pro    : feat.pro,
-                      feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].enterprise : feat.enterprise,
+                      feat.name === "Users"
+                        ? usersLabel(planLimits.starter)
+                        : (feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].starter : feat.starter),
+                      feat.name === "Users"
+                        ? usersLabel(planLimits.professional)
+                        : (feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].pro : feat.pro),
+                      feat.name === "Users"
+                        ? usersLabel(planLimits.enterprise)
+                        : (feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].enterprise : feat.enterprise),
                     ] as Val[]).map((v, pi) => (
                       <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
                         <Val v={v} color={PLAN_COLORS[pi]} />
