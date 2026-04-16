@@ -240,5 +240,11 @@ export function currencyByCountry(countryCode: string | null | undefined): strin
   if (!raw) return "USD";
   const byName = COUNTRIES.find((country) => country.name.toLowerCase() === raw.toLowerCase());
   const cc = (byName?.code || raw).toUpperCase();
+  // Common eurozone/EEA country codes that should default to EUR.
+  const euroCountryCodes = new Set([
+    "AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IE", "IT",
+    "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK",
+  ]);
+  if (euroCountryCodes.has(cc)) return "EUR";
   return COUNTRY_TO_CURRENCY[cc] || "USD";
 }
