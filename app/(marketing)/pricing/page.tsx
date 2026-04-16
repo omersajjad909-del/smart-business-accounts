@@ -488,6 +488,9 @@ export default function PricingPage() {
                       </div>
                     ))}
                   </div>
+                  <div style={{ marginTop: 14, padding: "10px 12px", borderRadius: 10, background: "rgba(16,185,129,.12)", border: "1px solid rgba(16,185,129,.28)", fontSize: 11.5, color: "#6ee7b7", fontWeight: 700, textAlign: "center" }}>
+                    Add more users anytime: +{formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo
+                  </div>
                 </div>
               </div>
             );
@@ -651,13 +654,13 @@ export default function PricingPage() {
                     </div>
                     {([
                       feat.name === "Users"
-                        ? usersLabel(planLimits.starter)
+                        ? `${usersLabel(planLimits.starter)} (+${formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo)`
                         : (feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].starter : feat.starter),
                       feat.name === "Users"
-                        ? usersLabel(planLimits.professional)
+                        ? `${usersLabel(planLimits.professional)} (+${formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo)`
                         : (feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].pro : feat.pro),
                       feat.name === "Users"
-                        ? usersLabel(planLimits.enterprise)
+                        ? `${usersLabel(planLimits.enterprise)} (+${formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo)`
                         : (feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].enterprise : feat.enterprise),
                     ] as Val[]).map((v, pi) => (
                       <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
