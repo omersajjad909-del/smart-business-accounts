@@ -544,18 +544,16 @@ export default function PricingPage() {
                     <span style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,.85)", letterSpacing: ".01em" }}>{cat.title}</span>
                     <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,.3)", transition: "transform .2s", display: "inline-block", transform: openCats.has(cat.id) ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
                   </div>
-                  {PLANS.map((plan, pi) => (
-                <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: PLAN_COLORS[pi], marginBottom: 4 }}>{plan.name}</div>
-                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.9)", fontWeight: 800 }}>
-                    {formatPrice(billing === "yearly" ? plan.yearly : plan.monthly)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
-                  </div>
-                  <div style={{ fontSize: 10, color: "rgba(251,146,60,.9)", marginTop: 4, fontWeight: 700 }}>
-                    Intro: {formatPrice(Math.round((billing === "yearly" ? plan.yearly : plan.monthly) * 0.25))}/mo for 3 months
-                  </div>
-                  {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
-                </div>
-              ))}
+                  {PLANS.map((plan) => (
+                    <div
+                      key={plan.slug}
+                      style={{
+                        padding: "14px 16px",
+                        borderLeft: "1px solid rgba(255,255,255,.04)",
+                        background: plan.featured ? "rgba(99,102,241,.04)" : "transparent",
+                      }}
+                    />
+                  ))}
                 </button>
 
                 {/* Feature rows */}
@@ -586,15 +584,10 @@ export default function PricingPage() {
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.015)" }}>
               <div style={{ padding: "24px 24px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.3)" }}>Ready to start?</div>
               {PLANS.map((plan, pi) => (
-                <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: PLAN_COLORS[pi], marginBottom: 4 }}>{plan.name}</div>
-                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.9)", fontWeight: 800 }}>
-                    {formatPrice(billing === "yearly" ? plan.yearly : plan.monthly)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
-                  </div>
-                  <div style={{ fontSize: 10, color: "rgba(251,146,60,.9)", marginTop: 4, fontWeight: 700 }}>
-                    Intro: {formatPrice(Math.round((billing === "yearly" ? plan.yearly : plan.monthly) * 0.25))}/mo for 3 months
-                  </div>
-                  {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
+                <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
+                  <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient }}>
+                    Get {plan.name}
+                  </Link>
                 </div>
               ))}
             </div>
