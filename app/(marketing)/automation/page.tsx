@@ -176,12 +176,12 @@ const COMPARE_TOOLS = [
 ];
 
 const FAQS = [
-  { q: "Kya me sirf Automation add-on le sakta hun bina main plan ke?", a: "Automation add-on kisi bhi active FinovaOS plan ke saath available hai — Starter, Professional, ya Enterprise. Aapko pehle ek base plan lena hoga." },
-  { q: "WhatsApp Auto-Reply ke liye kya zaroori hai?", a: "Aapko ek WhatsApp Business API account chahiye (Meta se). Aap Meta Business Suite mein free mein apply kar sakte hain. Setup mein aam tor par 1-3 din lagte hain. Hum step-by-step guide dete hain." },
-  { q: "AI content Urdu mein bhi likhta hai?", a: "Haan. Claude AI Urdu aur Roman Urdu dono mein content generate kar sakta hai. Aap language dropdown se select kar sakte hain." },
-  { q: "Chatbot apni website pe lagana mushkil hai?", a: "Bilkul nahi. Sirf ek script tag copy karke apni website ke </body> se pehle paste karo. Koi coding nahi, koi developer nahi — 2 minute ka kaam hai." },
-  { q: "Kya existing leads import kar sakta hun?", a: "Haan. Excel/CSV se import wizard ke zariye leads upload kar sakte ho. Yeh feature Professional aur Enterprise plans mein available hai." },
-  { q: "Demo available hai?", a: "Haan, aap ek personalized demo book kar sakte hain jahan hum aapke business ke liye automation setup dikhate hain. Book karne ke liye 'Get Started' pe click karein." },
+  { q: "Can I buy only the Automation add-on without a main plan?", a: "The Automation add-on is available with any active FinovaOS plan: Starter, Professional, or Enterprise. You need an active base plan first." },
+  { q: "What is required for WhatsApp Auto-Reply?", a: "You need a WhatsApp Business API account (via Meta). You can apply through Meta Business Suite, and setup usually takes 1-3 days. We provide a step-by-step guide." },
+  { q: "Can AI content be generated in Urdu as well?", a: "Yes. Claude AI can generate content in both Urdu and Roman Urdu. You can choose your preferred language from the language dropdown." },
+  { q: "Is it difficult to add the chatbot to my website?", a: "Not at all. Copy one script tag and paste it before </body> on your website. No complex coding required, and setup takes about 2 minutes." },
+  { q: "Can I import existing leads?", a: "Yes. You can upload leads via Excel/CSV using the import wizard. This feature is available on Professional and Enterprise plans." },
+  { q: "Is a demo available?", a: "Yes, you can book a personalized demo where we show the automation setup for your business. Click 'Get Started' to book." },
 ];
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
@@ -256,11 +256,11 @@ export default function AutomationLandingPage() {
       <div style={{ padding: "80px 24px", maxWidth: 900, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 50 }}>
           <h2 style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 800, margin: "0 0 12px" }}>
-            Ye sab tools alag alag khareedne se zyada mehnga padta hai
+            Buying all these tools separately costs much more
           </h2>
           <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>
-            Aap in sab tools ke <strong style={{ color: "#f87171" }}>$400–$2,200/month</strong> dete hain —<br />
-            ya sirf FinovaOS Automation ke <strong style={{ color: "#34d399" }}>$79/month</strong>.
+            You would pay <strong style={{ color: "#f87171" }}>$400-$2,200/month</strong> for all these tools combined -<br />
+            or just <strong style={{ color: "#34d399" }}>$79/month</strong> with FinovaOS Automation.
           </p>
         </div>
 
@@ -287,9 +287,9 @@ export default function AutomationLandingPage() {
       <div style={{ padding: "20px 24px 80px", maxWidth: 1000, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 60 }}>
           <h2 style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 800, margin: "0 0 12px" }}>
-            Har feature ki poori detail
+            Detailed breakdown of every feature
           </h2>
-          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>Taki aap confident raho ke yeh add-on aapke paise ka poora fayda deta hai</p>
+          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>So you can confidently evaluate how much value this add-on delivers.</p>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -306,7 +306,7 @@ export default function AutomationLandingPage() {
             <h2 style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 800, margin: "0 0 10px" }}>
               ROI Calculator
             </h2>
-            <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>Dekho $79/month pe aapka kitna return aata hai</p>
+            <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>See how much return you can generate from $79/month.</p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 32 }}>
@@ -345,9 +345,9 @@ export default function AutomationLandingPage() {
       <div style={{ padding: "80px 24px", maxWidth: 800, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 800, margin: "0 0 10px" }}>
-            $79/month mein kya kya milta hai
+            What is included in $79/month
           </h2>
-          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>Koi hidden fees nahi. Koi per-message charges nahi. Flat rate.</p>
+          <p style={{ color: "rgba(255,255,255,.5)", fontSize: 15 }}>No hidden fees. No per-message charges. One flat rate.</p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -375,7 +375,7 @@ export default function AutomationLandingPage() {
 
       {/* ── FAQs ── */}
       <div style={{ padding: "20px 24px 80px", maxWidth: 700, margin: "0 auto" }}>
-        <h2 style={{ textAlign: "center", fontSize: "clamp(1.4rem, 2.5vw, 2rem)", fontWeight: 800, marginBottom: 36 }}>Aksar Pooche Jane Wale Sawal</h2>
+        <h2 style={{ textAlign: "center", fontSize: "clamp(1.4rem, 2.5vw, 2rem)", fontWeight: 800, marginBottom: 36 }}>Frequently Asked Questions</h2>
         {FAQS.map((faq, i) => (
           <div key={i} style={{ marginBottom: 12, borderRadius: 12, border: "1px solid rgba(255,255,255,.08)", overflow: "hidden" }}>
             <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{
@@ -398,7 +398,7 @@ export default function AutomationLandingPage() {
       {/* ── CTA ── */}
       <div style={{ padding: "80px 24px", textAlign: "center", background: "radial-gradient(ellipse 60% 50% at 50% 100%, rgba(124,58,237,.2) 0%, transparent 70%)" }}>
         <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.8rem)", fontWeight: 900, margin: "0 0 16px" }}>
-          Aaj shuru karo — 14 din free
+          Start today - 14 days free
         </h2>
         <p style={{ color: "rgba(255,255,255,.5)", fontSize: 16, marginBottom: 36 }}>
           No credit card. Cancel anytime. Full access to all 8 automation features.
