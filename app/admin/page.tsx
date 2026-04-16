@@ -1956,16 +1956,19 @@ function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, tog
                 <label style={{ fontSize:10.5, color:"rgba(255,255,255,.35)", fontWeight:700, textTransform:"uppercase", letterSpacing:".05em", display:"block", marginBottom:5 }}>Max Users</label>
                 <div style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(99,102,241,.08)", borderRadius:8, border:"1px solid rgba(99,102,241,.2)", padding:"7px 12px" }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(129,140,248,.6)" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                  {plan === "enterprise" ? (
-                    <span style={{ color:"rgba(255,255,255,.4)", fontSize:13, fontWeight:600, flex:1 }}>Unlimited</span>
-                  ) : (
-                    <input type="number" min="1" max="9999"
-                      value={planLimits[plan] ?? ""}
-                      onChange={e=>setPlanLimits((l:any)=>({...l,[plan]:e.target.value===""?null:Number(e.target.value)}))}
-                      style={{ background:"none",border:"none",color:"#a5b4fc",fontSize:15,fontWeight:700,width:"100%",outline:"none",fontFamily:"inherit" }}
-                    />
-                  )}
+                  <input
+                    type="number"
+                    min="1"
+                    max="9999"
+                    value={planLimits[plan] ?? ""}
+                    onChange={e=>setPlanLimits((l:any)=>({...l,[plan]:e.target.value===""?null:Number(e.target.value)}))}
+                    placeholder="Unlimited"
+                    style={{ background:"none",border:"none",color:"#a5b4fc",fontSize:15,fontWeight:700,width:"100%",outline:"none",fontFamily:"inherit" }}
+                  />
                   <span style={{ color:"rgba(255,255,255,.25)", fontSize:11 }}>users</span>
+                </div>
+                <div style={{ marginTop:4, fontSize:10, color:"rgba(255,255,255,.3)" }}>
+                  Leave empty for unlimited
                 </div>
               </div>
             </div>
