@@ -544,15 +544,20 @@ export default function PricingPage() {
                     <span style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,.85)", letterSpacing: ".01em" }}>{cat.title}</span>
                     <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,.3)", transition: "transform .2s", display: "inline-block", transform: openCats.has(cat.id) ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
                   </div>
-                  {PLANS.map((plan) => (
+                  {PLANS.map((plan, pi) => (
                     <div
                       key={plan.slug}
                       style={{
                         padding: "14px 16px",
                         borderLeft: "1px solid rgba(255,255,255,.04)",
                         background: plan.featured ? "rgba(99,102,241,.04)" : "transparent",
+                        textAlign: "center",
                       }}
-                    />
+                    >
+                      <div style={{ fontSize: 12, fontWeight: 800, color: PLAN_COLORS[pi], letterSpacing: ".01em" }}>
+                        {plan.name}
+                      </div>
+                    </div>
                   ))}
                 </button>
 
