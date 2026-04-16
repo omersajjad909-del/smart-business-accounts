@@ -8,6 +8,13 @@ export default function BillingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [msg, setMsg] = useState("");
   const [introOfferClaimed, setIntroOfferClaimed] = useState(false);
+  const [extraSeats, setExtraSeats] = useState(0);
+  const [seatPricing, setSeatPricing] = useState({ monthly: 7, yearly: 6 });
+  const [planPricing, setPlanPricing] = useState<Record<string, { monthly: number; yearly: number }>>({
+    starter: { monthly: 49, yearly: 39 },
+    pro: { monthly: 99, yearly: 79 },
+    enterprise: { monthly: 249, yearly: 199 },
+  });
 
   useEffect(() => {
     (async () => {
@@ -22,10 +29,34 @@ export default function BillingPage() {
         const j = await r.json();
         setPlans(Array.isArray(j?.plans) ? j.plans : []);
 
+        const pr = await fetch("/api/public/pricing", { cache: "no-store" });
+        if (pr.ok) {
+          const pj = await pr.json();
+          setPlanPricing({
+            starter: {
+              monthly: Number(pj?.pricing?.starter?.monthly ?? 49),
+              yearly: Math.round(Number(pj?.pricing?.starter?.yearly ?? 468) / 12),
+            },
+            pro: {
+              monthly: Number(pj?.pricing?.pro?.monthly ?? 99),
+              yearly: Math.round(Number(pj?.pricing?.pro?.yearly ?? 948) / 12),
+            },
+            enterprise: {
+              monthly: Number(pj?.pricing?.enterprise?.monthly ?? 249),
+              yearly: Math.round(Number(pj?.pricing?.enterprise?.yearly ?? 2388) / 12),
+            },
+          });
+          setSeatPricing({
+            monthly: Number(pj?.seatPricing?.monthly ?? 7),
+            yearly: Math.round(Number(pj?.seatPricing?.yearly ?? 72) / 12),
+          });
+        }
+
         const me = await fetch("/api/me/company", { cache: "no-store", headers });
         if (me.ok) {
           const cj = await me.json();
           setIntroOfferClaimed(!!cj?.introOfferClaimed);
+          setExtraSeats(Math.max(0, Number(cj?.extraSeats || 0)));
         }
       } catch {}
     })();
@@ -47,11 +78,14 @@ export default function BillingPage() {
 
     const successUrl = window.location.origin + "/dashboard?upgrade=success";
     const cancelUrl = window.location.origin + "/billing?cancel=1";
+    const key = planCode === "enterprise" ? "enterprise" : planCode === "pro" || planCode === "professional" ? "pro" : "starter";
+    const basePerMonth = planPricing[key]?.monthly ?? 49;
+    const checkoutAmount = basePerMonth + (extraSeats * seatPricing.monthly);
     const r = await fetch("/api/billing/checkout", {
       method: "POST",
       headers,
       credentials: "include",
-      body: JSON.stringify({ planCode, priceId, successUrl, cancelUrl }),
+      body: JSON.stringify({ planCode, priceId, successUrl, cancelUrl, customPrice: checkoutAmount }),
     });
 
     const j = await r.json().catch(() => ({}));

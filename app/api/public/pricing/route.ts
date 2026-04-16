@@ -28,7 +28,14 @@ export async function GET() {
     });
 
     if (!latest?.details) {
-      return NextResponse.json({ pricing: DEFAULT_PRICING, updatedAt: null });
+      return NextResponse.json({
+        pricing: DEFAULT_PRICING,
+        planLimits: DEFAULT_PLAN_LIMITS,
+        seatPricing: DEFAULT_SEAT_PRICING,
+        features: null,
+        featureMatrix: null,
+        updatedAt: null,
+      });
     }
 
     const payload = JSON.parse(latest.details);

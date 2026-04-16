@@ -1807,6 +1807,7 @@ function PagePlans() {
   ];
   const [plansTab, setPlansTab] = useState<"config"|"custom"|"modules">("config");
   const [pricing, setPricing]   = useState({ starter:{monthly:49,yearly:39}, pro:{monthly:99,yearly:79}, enterprise:{monthly:249,yearly:199} });
+  const [seatPricing, setSeatPricing] = useState({ monthly:7, yearly:6 });
   const [planLimits, setPlanLimits] = useState<Record<string,number|null>>({ starter:5, pro:20, enterprise:null });
   const [saved,   setSaved]     = useState<""|"saving"|"ok"|"err">("");
   const [features, setFeatures] = useState<string[]>(DEFAULT_FEATURES);
@@ -1835,6 +1836,7 @@ function PagePlans() {
       .then(r => r.json())
       .then(d => {
         if (d.pricing) setPricing(p => ({ ...p, ...d.pricing }));
+        if (d.seatPricing) setSeatPricing(s => ({ ...s, ...d.seatPricing }));
         if (d.features) setFeatures(d.features);
         if (d.featureMatrix) setPf(d.featureMatrix);
         if (d.planLimits) setPlanLimits(l => ({ ...l, ...d.planLimits }));
@@ -1852,7 +1854,7 @@ function PagePlans() {
       const r = await fetch("/api/admin/plan-config", {
         method: "POST",
         headers,
-        body: JSON.stringify({ pricing, features, featureMatrix: pf, planLimits }),
+        body: JSON.stringify({ pricing, seatPricing, features, featureMatrix: pf, planLimits }),
       });
       setSaved(r.ok ? "ok" : "err");
       setTimeout(() => setSaved(""), 2500);
@@ -1911,6 +1913,8 @@ function PagePlans() {
           defaultFeatures={DEFAULT_FEATURES}
           addFeature={addFeature}
           removeFeature={removeFeature}
+          seatPricing={seatPricing}
+          setSeatPricing={setSeatPricing}
           planLimits={planLimits}
           setPlanLimits={setPlanLimits}
         />
@@ -1921,7 +1925,7 @@ function PagePlans() {
   );
 }
 
-function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, toggle, defaultFeatures, addFeature, removeFeature, planLimits, setPlanLimits }: any) {
+function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, toggle, defaultFeatures, addFeature, removeFeature, seatPricing, setSeatPricing, planLimits, setPlanLimits }: any) {
   const plans = ["starter","pro","enterprise"] as const;
   const saveLabel = saved==="saving"?"Saving…":saved==="ok"?"✓ Saved!":saved==="err"?"✕ Error":"Save Changes";
   const [newFeat, setNewFeat] = useState("");
@@ -1933,6 +1937,31 @@ function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, tog
           {saveLabel}
         </button>
       }>
+        <div style={{ marginBottom:14, padding:"12px", borderRadius:10, background:"rgba(16,185,129,.08)", border:"1px solid rgba(16,185,129,.22)" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.45)", letterSpacing:".05em", textTransform:"uppercase", marginBottom:8 }}>
+            Extra Seat Add-On Pricing
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(2,minmax(0,1fr))", gap:10 }}>
+            {(["monthly","yearly"] as const).map(period => (
+              <div key={period}>
+                <label style={{ fontSize:10.5, color:"rgba(255,255,255,.35)", fontWeight:700, textTransform:"uppercase", letterSpacing:".05em", display:"block", marginBottom:5 }}>
+                  {period} per-seat
+                </label>
+                <div style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(255,255,255,.05)", borderRadius:8, border:"1px solid rgba(255,255,255,.08)", padding:"7px 12px" }}>
+                  <span style={{ color:"rgba(255,255,255,.4)", fontSize:13 }}>$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={seatPricing?.[period] ?? 0}
+                    onChange={e=>setSeatPricing((s:any)=>({ ...s, [period]: Number(e.target.value || 0) }))}
+                    style={{ background:"none",border:"none",color:"#6ee7b7",fontSize:16,fontWeight:700,width:"100%",outline:"none",fontFamily:"inherit" }}
+                  />
+                  <span style={{ color:"rgba(255,255,255,.25)", fontSize:11 }}>/user/mo</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
           {plans.map(plan => (
             <div key={plan} style={{ padding:"16px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)" }}>

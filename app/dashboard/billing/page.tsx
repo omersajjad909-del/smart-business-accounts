@@ -20,6 +20,11 @@ type Subscription = {
   plan: string; status: string; currentPeriodEnd: string | null;
   amount: number; currency: string; introOfferClaimed: boolean; billingCycle?: string;
 };
+type PlanPricingMap = {
+  starter: { monthly: number; yearly: number };
+  professional: { monthly: number; yearly: number };
+  enterprise: { monthly: number; yearly: number };
+};
 
 /* ─── Plan definitions ───────────────────────────────── */
 const PLANS = [
@@ -261,6 +266,13 @@ function BillingPage() {
   const [checkingOut,       setCheckingOut]        = useState<string | null>(null);
   const [showUpgradeBanner, setShowUpgradeBanner]  = useState(upgraded);
   const [activeTab,         setActiveTab]          = useState<"overview"|"methods"|"invoices"|"plans">(isRequired ? "plans" : "overview");
+  const [extraSeats,        setExtraSeats]         = useState(0);
+  const [seatPricing,       setSeatPricing]        = useState({ monthly: 7, yearly: 6 });
+  const [planPricing,       setPlanPricing]        = useState<PlanPricingMap>({
+    starter: { monthly: 49, yearly: 39 },
+    professional: { monthly: 99, yearly: 79 },
+    enterprise: { monthly: 249, yearly: 199 },
+  });
 
   useEffect(() => {
     (async () => {
@@ -271,10 +283,11 @@ function BillingPage() {
         if (u?.id)        h["x-user-id"]    = u.id;
         if (u?.companyId) h["x-company-id"] = u.companyId;
 
-        const [meRes, pmRes, invRes] = await Promise.all([
+        const [meRes, pmRes, invRes, pricingRes] = await Promise.all([
           fetch("/api/me/company",              { cache:"no-store", headers:h, credentials:"include" }),
           fetch("/api/billing/payment-methods", { cache:"no-store", headers:h, credentials:"include" }),
           fetch("/api/billing/invoices",        { cache:"no-store", headers:h, credentials:"include" }),
+          fetch("/api/public/pricing",          { cache:"no-store" }),
         ]);
 
         if (meRes.ok) {
@@ -282,9 +295,31 @@ function BillingPage() {
           const planUpper = (d.plan || "STARTER").toUpperCase();
           const amountMap: Record<string,number> = { STARTER:49, PRO:99, PROFESSIONAL:99, ENTERPRISE:249 };
           setSubscription({ plan:planUpper, status:d.subscriptionStatus||"active", currentPeriodEnd:d.currentPeriodEnd||null, amount:amountMap[planUpper]??49, currency:"USD", introOfferClaimed:!!d.introOfferClaimed, billingCycle:d.billingCycle||"monthly" });
+          setExtraSeats(Math.max(0, Number(d.extraSeats || 0)));
         }
         if (pmRes.ok)  { const d = await pmRes.json();  setPaymentMethods(d.paymentMethods || []); }
         if (invRes.ok) { const d = await invRes.json(); setInvoices(d.invoices || []); }
+        if (pricingRes.ok) {
+          const d = await pricingRes.json();
+          setPlanPricing({
+            starter: {
+              monthly: Number(d?.pricing?.starter?.monthly ?? 49),
+              yearly: Math.round(Number(d?.pricing?.starter?.yearly ?? 468) / 12),
+            },
+            professional: {
+              monthly: Number(d?.pricing?.pro?.monthly ?? 99),
+              yearly: Math.round(Number(d?.pricing?.pro?.yearly ?? 948) / 12),
+            },
+            enterprise: {
+              monthly: Number(d?.pricing?.enterprise?.monthly ?? 249),
+              yearly: Math.round(Number(d?.pricing?.enterprise?.yearly ?? 2388) / 12),
+            },
+          });
+          setSeatPricing({
+            monthly: Number(d?.seatPricing?.monthly ?? 7),
+            yearly: Math.round(Number(d?.seatPricing?.yearly ?? 72) / 12),
+          });
+        }
       } catch { /* silent */ }
       setLoading(false);
     })();
@@ -297,7 +332,21 @@ function BillingPage() {
     if (u?.role)      h["x-user-role"]  = u.role;
     if (u?.id)        h["x-user-id"]    = u.id;
     if (u?.companyId) h["x-company-id"] = u.companyId;
-    const r = await fetch("/api/billing/checkout", { method:"POST", headers:h, credentials:"include", body:JSON.stringify({ planCode, successUrl:`${window.location.origin}/dashboard/billing?upgrade=success`, billingCycle:cycle }) });
+    const pricingKey = planCode === "ENTERPRISE" ? "enterprise" : (planCode === "PROFESSIONAL" || planCode === "PRO") ? "professional" : "starter";
+    const basePerMonth = planPricing[pricingKey][cycle === "yearly" ? "yearly" : "monthly"];
+    const seatsPerMonth = (extraSeats > 0 ? extraSeats * seatPricing[cycle === "yearly" ? "yearly" : "monthly"] : 0);
+    const checkoutAmount = cycle === "yearly" ? (basePerMonth + seatsPerMonth) * 12 : (basePerMonth + seatsPerMonth);
+    const r = await fetch("/api/billing/checkout", {
+      method:"POST",
+      headers:h,
+      credentials:"include",
+      body:JSON.stringify({
+        planCode,
+        successUrl:`${window.location.origin}/dashboard/billing?upgrade=success`,
+        billingCycle:cycle,
+        customPrice: checkoutAmount,
+      }),
+    });
     const j = await r.json().catch(()=>({}));
     if (r.ok && j?.url) window.location.assign(j.url);
     else toast.error(j?.error || "Failed to change plan.");
@@ -580,7 +629,10 @@ function BillingPage() {
           <div className="bill-plans" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:18 }}>
             {PLANS.map(plan => {
               const isCurrent = currentPlanCode === plan.code;
-              const price     = billing === "annual" ? Math.round(plan.monthlyPrice * 0.8) : plan.monthlyPrice;
+              const pricingKey = plan.code === "ENTERPRISE" ? "enterprise" : plan.code === "PROFESSIONAL" ? "professional" : "starter";
+              const basePrice  = planPricing[pricingKey][billing === "annual" ? "yearly" : "monthly"];
+              const seatAddon  = extraSeats > 0 ? (extraSeats * seatPricing[billing === "annual" ? "yearly" : "monthly"]) : 0;
+              const price      = basePrice + seatAddon;
               const planIdx   = PLANS.findIndex(p=>p.code===plan.code);
               const curIdx    = PLANS.findIndex(p=>p.code===currentPlanCode);
               const isHigher  = planIdx > curIdx;
@@ -596,7 +648,12 @@ function BillingPage() {
                     <span style={{ fontSize:30, fontWeight:900, color:plan.color }}>${price}</span>
                     <span style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>/ mo{billing==="annual"?" · billed annually":""}</span>
                   </div>
-                  {billing==="annual" && <div style={{ fontSize:11, color:"rgba(52,211,153,.7)", marginBottom:14, fontWeight:600 }}>Save ${Math.round(plan.monthlyPrice*12 - plan.monthlyPrice*0.8*12)}/year</div>}
+                  {seatAddon > 0 && (
+                    <div style={{ fontSize:11, color:"rgba(110,231,183,.95)", marginBottom:8, fontWeight:700 }}>
+                      Includes {extraSeats} extra seats (+${seatAddon}/mo)
+                    </div>
+                  )}
+                  {billing==="annual" && <div style={{ fontSize:11, color:"rgba(52,211,153,.7)", marginBottom:14, fontWeight:600 }}>Save ${Math.max(0, Math.round((planPricing[pricingKey].monthly - planPricing[pricingKey].yearly) * 12))}/year</div>}
                   <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom:22, marginTop:billing==="annual"?0:14 }}>
                     {plan.features.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.7)" }}><span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{f}</div>)}
                     {plan.notIncluded.map(f => <div key={f} style={{ display:"flex", alignItems:"center", gap:8, fontSize:12, color:"rgba(255,255,255,.22)" }}><span style={{ flexShrink:0, opacity:.4 }}>✕</span>{f}</div>)}

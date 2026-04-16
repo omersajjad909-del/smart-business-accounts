@@ -69,6 +69,10 @@ const DEFAULT_PLAN_LIMITS: Record<string, number | null> = {
   professional: 20,
   enterprise: null,
 };
+const DEFAULT_SEAT_PRICING = {
+  monthly: 7,
+  yearly: 6,
+};
 
 // ── FEATURE COMPARISON DATA ──────────────────────────────────────────────────
 type Val = boolean | string | null;
@@ -303,6 +307,7 @@ export default function PricingPage() {
   const [featureMap, setFeatureMap] = useState<Record<string, { starter: boolean; pro: boolean; enterprise: boolean }>>({});
   const [publicPricing, setPublicPricing] = useState<PlanPricing>(DEFAULT_PUBLIC_PRICING);
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
+  const [seatPricing, setSeatPricing] = useState<{ monthly: number; yearly: number }>(DEFAULT_SEAT_PRICING);
 
   useEffect(() => {
     (async () => {
@@ -342,6 +347,12 @@ export default function PricingPage() {
               starter: d.planLimits?.starter ?? DEFAULT_PLAN_LIMITS.starter,
               professional: d.planLimits?.pro ?? DEFAULT_PLAN_LIMITS.professional,
               enterprise: d.planLimits?.enterprise ?? DEFAULT_PLAN_LIMITS.enterprise,
+            });
+          }
+          if (d?.seatPricing) {
+            setSeatPricing({
+              monthly: Number(d.seatPricing?.monthly ?? DEFAULT_SEAT_PRICING.monthly),
+              yearly: Math.round(Number(d.seatPricing?.yearly ?? (DEFAULT_SEAT_PRICING.yearly * 12)) / 12),
             });
           }
         }
@@ -419,6 +430,9 @@ export default function PricingPage() {
         </div>
         <div style={{ textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 12, marginBottom: 56 }}>
           Showing prices in {currency} · Final billing currency confirmed at checkout
+          <div style={{ marginTop: 6, color: "rgba(110,231,183,.9)", fontWeight: 700 }}>
+            Need more users? Extra seats from {formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo
+          </div>
         </div>
 
         {/* ── PLAN CARDS ──────────────────────────────────────── */}
@@ -452,6 +466,9 @@ export default function PricingPage() {
                   </Link>
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: -12, marginBottom: 16, textAlign: "center" }}>
                     You&apos;ll be charged {formatPrice(regularPrice)}/mo after the first 3 months.
+                  </div>
+                  <div style={{ fontSize: 10.5, color: "rgba(110,231,183,.9)", marginTop: -10, marginBottom: 14, textAlign: "center", fontWeight: 700 }}>
+                    Extra seat add-on: {formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {plan.features.map((f, idx) => (
@@ -512,7 +529,7 @@ export default function PricingPage() {
                     Add to any plan · Cancel anytime · No hidden fees
                   </div>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    <Link href="/get-started?addon=automation" style={{
+                    <Link href="/onboarding/choose-plan?addon=automation" style={{
                       padding: "12px 28px", borderRadius: 12, background: "linear-gradient(135deg,#7c3aed,#2563eb)",
                       color: "#fff", textDecoration: "none", fontSize: 14, fontWeight: 700,
                       boxShadow: "0 0 24px rgba(124,58,237,.35)",
@@ -583,6 +600,9 @@ export default function PricingPage() {
                   </div>
                   <div style={{ fontSize: 10, color: "rgba(251,146,60,.9)", marginTop: 4, fontWeight: 700 }}>
                     Intro: {formatPrice(Math.round((billing === "yearly" ? publicPricing[plan.slug as keyof PlanPricing].yearly : publicPricing[plan.slug as keyof PlanPricing].monthly) * 0.25))}/mo for 3 months
+                  </div>
+                  <div style={{ fontSize: 10, color: "rgba(110,231,183,.92)", marginTop: 3, fontWeight: 700 }}>
+                    + Seats: {formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo
                   </div>
                   {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
                 </div>
