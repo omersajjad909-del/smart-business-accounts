@@ -9,10 +9,11 @@ import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
     - GRANT_FREE_ACCESS — set plan + status → ACTIVE + currentPeriodEnd
     - RESET_INTRO_OFFER — delete BILLING_OFFER_CLAIM log (lets them use 75% off again)
     - SET_STATUS        — manually override subscriptionStatus only
+    - SET_EXTRA_SEATS   — set company-level additional seats on top of plan limit
     - ADD_NOTE          — add an internal audit note
 */
 
-const ALLOWED_ACTIONS = ["EXTEND_TRIAL", "GRANT_FREE_ACCESS", "RESET_INTRO_OFFER", "SET_STATUS", "ADD_NOTE"];
+const ALLOWED_ACTIONS = ["EXTEND_TRIAL", "GRANT_FREE_ACCESS", "RESET_INTRO_OFFER", "SET_STATUS", "SET_EXTRA_SEATS", "ADD_NOTE"];
 
 export async function POST(req: NextRequest) {
   try {
@@ -92,6 +93,30 @@ export async function POST(req: NextRequest) {
         where: { id: companyId },
         data: { subscriptionStatus: status.toUpperCase() },
       });
+    }
+
+    /* —— SET_EXTRA_SEATS —— */
+    if (action === "SET_EXTRA_SEATS") {
+      const extraSeatsRaw = Number(payload?.extraSeats ?? 0);
+      if (!Number.isFinite(extraSeatsRaw) || extraSeatsRaw < 0 || extraSeatsRaw > 10000) {
+        return NextResponse.json({ error: "extraSeats must be between 0 and 10000" }, { status: 400 });
+      }
+      const extraSeats = Math.floor(extraSeatsRaw);
+      await prisma.activityLog.create({
+        data: {
+          companyId,
+          userId: adminId,
+          action: "ADMIN_SEAT_OVERRIDE",
+          details: JSON.stringify({
+            extraSeats,
+            note: note || null,
+            adminId,
+            adminEmail: admin.email,
+            timestamp: new Date().toISOString(),
+          }),
+        },
+      });
+      result = { extraSeats };
     }
 
     /* ── Always log the override ── */

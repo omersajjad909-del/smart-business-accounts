@@ -4,6 +4,24 @@ import { resolveCompanyId } from "@/lib/tenant";
 import { apiError, apiOk } from "@/lib/apiError";
 import { getRuntimeAppUrl } from "@/lib/domains";
 import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
+import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
+
+const DEFAULT_PRICING = {
+  starter: { monthly: 49, yearly: 39 },
+  pro: { monthly: 99, yearly: 79 },
+  enterprise: { monthly: 249, yearly: 199 },
+};
+const DEFAULT_SEAT_PRICING = {
+  monthly: 7,
+  yearly: 6,
+};
+
+function normalizePlanKey(planCode: string): "starter" | "pro" | "enterprise" {
+  const normalized = String(planCode || "").toUpperCase();
+  if (normalized === "PRO" || normalized === "PROFESSIONAL") return "pro";
+  if (normalized === "ENTERPRISE") return "enterprise";
+  return "starter";
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,6 +43,7 @@ export async function POST(req: NextRequest) {
     const displayCurrency = body?.displayCurrency ? String(body.displayCurrency).toUpperCase() : null;
     const displayCountry = body?.displayCountry ? String(body.displayCountry).toUpperCase() : null;
     const customPrice = Number(body?.customPrice || 0);
+    const normalizedPlan = normalizePlanKey(planCode);
 
     const company = await prisma.company.findUnique({
       where: { id: companyId },
@@ -38,6 +57,37 @@ export async function POST(req: NextRequest) {
           select: { id: true, name: true, email: true },
         })
       : null;
+
+    let pricing = DEFAULT_PRICING;
+    let seatPricing = DEFAULT_SEAT_PRICING;
+    try {
+      const latest = await prisma.activityLog.findFirst({
+        where: { action: "PLAN_CONFIG" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      });
+      if (latest?.details) {
+        const cfg = JSON.parse(latest.details);
+        if (cfg?.pricing) pricing = { ...pricing, ...cfg.pricing };
+        if (cfg?.seatPricing) seatPricing = { ...seatPricing, ...cfg.seatPricing };
+      }
+    } catch {}
+
+    const extraSeats = await getCompanyExtraSeats(companyId);
+    const planBasePerMonth =
+      Number(pricing[normalizedPlan]?.[billingCycle === "YEARLY" ? "yearly" : "monthly"]) ||
+      Number(DEFAULT_PRICING[normalizedPlan][billingCycle === "YEARLY" ? "yearly" : "monthly"]);
+    const seatPricePerMonth =
+      Number(seatPricing[billingCycle === "YEARLY" ? "yearly" : "monthly"]) ||
+      Number(DEFAULT_SEAT_PRICING[billingCycle === "YEARLY" ? "yearly" : "monthly"]);
+    const seatAddonPerMonth = extraSeats > 0 ? extraSeats * seatPricePerMonth : 0;
+    const computedPerMonth = planBasePerMonth + seatAddonPerMonth;
+    const computedCycleAmount = billingCycle === "YEARLY" ? computedPerMonth * 12 : computedPerMonth;
+    const baseCycleAmount = billingCycle === "YEARLY" ? planBasePerMonth * 12 : planBasePerMonth;
+    const finalCustomPrice =
+      planCode === "CUSTOM" && customPrice > 0
+        ? customPrice + (billingCycle === "YEARLY" ? seatAddonPerMonth * 12 : seatAddonPerMonth)
+        : computedCycleAmount;
 
     if (hasLemonSqueezyConfig()) {
       const base = getRuntimeAppUrl(req.nextUrl.origin);
@@ -53,7 +103,7 @@ export async function POST(req: NextRequest) {
         couponCode,
         displayCurrency: displayCurrency || company.baseCurrency,
         displayCountry: displayCountry || company.country,
-        customPriceUsd: customPrice > 0 ? customPrice : null,
+        customPriceUsd: finalCustomPrice > 0 ? finalCustomPrice : null,
       });
 
       await prisma.activityLog.create({
@@ -70,6 +120,11 @@ export async function POST(req: NextRequest) {
             couponCode,
             displayCurrency: displayCurrency || company.baseCurrency,
             displayCountry: displayCountry || company.country,
+            baseCycleAmount,
+            seatAddonCycleAmount: billingCycle === "YEARLY" ? seatAddonPerMonth * 12 : seatAddonPerMonth,
+            seatAddonPerMonth,
+            extraSeats,
+            checkoutCycleAmount: finalCustomPrice,
             createdAt: new Date().toISOString(),
           }),
         },
@@ -105,6 +160,11 @@ export async function POST(req: NextRequest) {
           activatedAt: new Date().toISOString(),
           displayCurrency,
           displayCountry,
+          baseCycleAmount,
+          seatAddonCycleAmount: billingCycle === "YEARLY" ? seatAddonPerMonth * 12 : seatAddonPerMonth,
+          seatAddonPerMonth,
+          extraSeats,
+          checkoutCycleAmount: finalCustomPrice,
           provider: "DIRECT_FALLBACK",
         }),
       },

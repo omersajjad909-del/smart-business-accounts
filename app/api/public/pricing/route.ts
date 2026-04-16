@@ -15,6 +15,10 @@ const DEFAULT_PLAN_LIMITS = {
   pro: 20,
   enterprise: null,
 };
+const DEFAULT_SEAT_PRICING = {
+  monthly: 7,
+  yearly: 72, // yearly annual total (6/mo equivalent)
+};
 
 export async function GET() {
   try {
@@ -40,6 +44,12 @@ export async function GET() {
       return NextResponse.json({
         pricing,
         planLimits: payload?.planLimits ?? DEFAULT_PLAN_LIMITS,
+        seatPricing: payload?.seatPricing
+          ? {
+              monthly: Number(payload.seatPricing?.monthly ?? DEFAULT_SEAT_PRICING.monthly),
+              yearly: Number(payload.seatPricing?.yearly ?? 6) * 12,
+            }
+          : DEFAULT_SEAT_PRICING,
         features: payload?.features ?? null,
         featureMatrix: payload?.featureMatrix ?? null,
         updatedAt: latest.createdAt,
@@ -49,13 +59,14 @@ export async function GET() {
     return NextResponse.json({
       pricing: DEFAULT_PRICING,
       planLimits: DEFAULT_PLAN_LIMITS,
+      seatPricing: DEFAULT_SEAT_PRICING,
       features: null,
       featureMatrix: null,
       updatedAt: latest.createdAt,
     });
   } catch (e: unknown) {
     return NextResponse.json(
-      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, error: e instanceof Error ? e.message : "unknown" },
+      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, seatPricing: DEFAULT_SEAT_PRICING, error: e instanceof Error ? e.message : "unknown" },
       { status: 200 },
     );
   }

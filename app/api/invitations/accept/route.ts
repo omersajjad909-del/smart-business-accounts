@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { getMaxUsersForPlan } from "@/lib/planLimits";
+import { getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,23 +32,7 @@ export async function POST(req: NextRequest) {
       where: { id: companyId },
       select: { plan: true },
     });
-    let maxUsers = getMaxUsersForPlan(company?.plan);
-    // Respect admin-configured dynamic plan limits when available
-    try {
-      const cfgRow = await prisma.activityLog.findFirst({
-        where: { action: "PLAN_CONFIG" },
-        orderBy: { createdAt: "desc" },
-        select: { details: true },
-      });
-      if (cfgRow?.details) {
-        const cfg = JSON.parse(cfgRow.details);
-        const normalized = String(company?.plan || "STARTER").trim().toUpperCase();
-        const planKey = normalized === "PROFESSIONAL" ? "pro" : normalized.toLowerCase();
-        if (cfg.planLimits && planKey in cfg.planLimits) {
-          maxUsers = cfg.planLimits[planKey]; // null = unlimited
-        }
-      }
-    } catch {}
+    const maxUsers = await getEffectiveUserLimitForCompany(companyId, company?.plan);
     if (maxUsers !== null) {
       const count = await prisma.userCompany.count({ where: { companyId } });
       if (count >= maxUsers) {

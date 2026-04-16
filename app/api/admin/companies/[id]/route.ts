@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
+import { getCompanyExtraSeats, getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
 
 export async function GET(
   req: NextRequest,
@@ -75,6 +76,9 @@ export async function GET(
       select: { action: true, createdAt: true, userId: true },
     }).catch(() => []);
 
+    const extraSeats = await getCompanyExtraSeats(id);
+    const effectiveUserLimit = await getEffectiveUserLimitForCompany(id, company.plan);
+
     return NextResponse.json({
       company,
       users,
@@ -82,6 +86,8 @@ export async function GET(
       lastLogin: lastLogin?.createdAt || null,
       recentActivity,
       totalUsers: users.length,
+      extraSeats,
+      effectiveUserLimit,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -98,7 +104,7 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await req.json();
-    const { plan, enabledModules, isActive, subscriptionStatus } = body;
+    const { plan, enabledModules, isActive, subscriptionStatus, extraSeats } = body;
 
     const before = await prisma.company.findUnique({
       where: { id },
@@ -115,6 +121,26 @@ export async function PATCH(
 
     const updated = await prisma.company.update({ where: { id }, data });
 
+    if (extraSeats !== undefined && extraSeats !== null) {
+      const seatValue = Number(extraSeats);
+      if (Number.isFinite(seatValue) && seatValue >= 0) {
+        await prisma.activityLog.create({
+          data: {
+            companyId: id,
+            userId: admin.id,
+            action: "ADMIN_SEAT_OVERRIDE",
+            details: JSON.stringify({
+              extraSeats: Math.floor(seatValue),
+              source: "admin_company_patch",
+              adminId: admin.id,
+              adminEmail: admin.email,
+              timestamp: new Date().toISOString(),
+            }),
+          },
+        }).catch(() => {});
+      }
+    }
+
     // Audit log
     await logAdminAction({
       adminId: admin.id,
@@ -127,7 +153,18 @@ export async function PATCH(
       details: { before, after: data },
     });
 
-    return NextResponse.json({ ok: true, company: { id: updated.id, plan: updated.plan, activeModules: updated.activeModules } });
+    const latestExtraSeats = await getCompanyExtraSeats(id);
+    const effectiveUserLimit = await getEffectiveUserLimitForCompany(id, updated.plan);
+    return NextResponse.json({
+      ok: true,
+      company: {
+        id: updated.id,
+        plan: updated.plan,
+        activeModules: updated.activeModules,
+        extraSeats: latestExtraSeats,
+        effectiveUserLimit,
+      },
+    });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

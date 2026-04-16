@@ -11,10 +11,15 @@ const DEFAULT_PRICING = {
   pro:        { monthly: 99,  yearly: 79  },
   enterprise: { monthly: 249, yearly: 199 },
 };
+const DEFAULT_SEAT_PRICING = {
+  monthly: 7,
+  yearly: 6,
+};
 
 // Canonical default plan config returned when no admin override exists
 const DEFAULT_CONFIG = {
   pricing: DEFAULT_PRICING,
+  seatPricing: DEFAULT_SEAT_PRICING,
   plans: [
     {
       code: "starter", name: "Starter",
@@ -97,6 +102,7 @@ export async function GET(req: NextRequest) {
         ...DEFAULT_CONFIG,
         ...saved,
         pricing: { ...DEFAULT_PRICING, ...(saved.pricing || {}) },
+        seatPricing: { ...DEFAULT_SEAT_PRICING, ...(saved.seatPricing || {}) },
         dashboardFeatureFlags: {
           ...createDefaultDashboardFeatureFlags(),
           ...(saved.dashboardFeatureFlags || {}),

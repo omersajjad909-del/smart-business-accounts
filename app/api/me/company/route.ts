@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { currencyByCountry } from "@/lib/currency";
+import { getCompanyExtraSeats, getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,6 +38,8 @@ export async function GET(req: NextRequest) {
       where: { companyId, action: "BILLING_OFFER_CLAIM" },
       select: { id: true },
     });
+    const extraSeats = await getCompanyExtraSeats(companyId);
+    const effectiveUserLimit = await getEffectiveUserLimitForCompany(companyId, company.plan);
 
     const baseCurrency = (company as any).baseCurrency || currencyByCountry((company as any).country);
 
@@ -46,6 +49,8 @@ export async function GET(req: NextRequest) {
       totalUsers: company?._count?.users ?? 0,
       totalAccounts: company?._count?.accounts ?? 0,
       introOfferClaimed: !!offerClaimed,
+      extraSeats,
+      effectiveUserLimit,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

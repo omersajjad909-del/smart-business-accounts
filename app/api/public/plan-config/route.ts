@@ -8,6 +8,10 @@ const DEFAULT_PRICING = {
   pro:        { monthly: 99,  yearly: 79  },
   enterprise: { monthly: 249, yearly: 199 },
 };
+const DEFAULT_SEAT_PRICING = {
+  monthly: 7,
+  yearly: 6,
+};
 
 const DEFAULT_FEATURES = [
   "Sales Invoices","Purchase Invoices","Ledger & Trial Balance","Chart of Accounts",
@@ -45,6 +49,7 @@ export async function GET(req: NextRequest) {
 
       // Ensure planLimits always present
       if (!saved.planLimits) saved.planLimits = { starter: 5, pro: 20, enterprise: null };
+      if (!saved.seatPricing) saved.seatPricing = DEFAULT_SEAT_PRICING;
 
       // Ensure features + featureMatrix always present (may be missing in old saves)
       if (!saved.features || saved.features.length === 0) saved.features = DEFAULT_FEATURES;
@@ -76,6 +81,7 @@ export async function GET(req: NextRequest) {
     // No saved config — return full defaults
     return NextResponse.json({
       pricing: DEFAULT_PRICING,
+      seatPricing: DEFAULT_SEAT_PRICING,
       features: DEFAULT_FEATURES,
       featureMatrix: DEFAULT_FEATURE_MATRIX,
       planLimits: { starter: 5, pro: 20, enterprise: null },

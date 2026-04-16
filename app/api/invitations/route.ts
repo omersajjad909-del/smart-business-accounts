@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
 import { getRuntimeAppUrl } from "@/lib/domains";
+import { getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,6 +17,18 @@ export async function POST(req: NextRequest) {
 
     const { email, inviteRole } = await req.json();
     if (!email || !inviteRole) return NextResponse.json({ error: "email and inviteRole required" }, { status: 400 });
+
+    const company = await prisma.company.findUnique({
+      where: { id: companyId },
+      select: { plan: true },
+    });
+    const maxUsers = await getEffectiveUserLimitForCompany(companyId, company?.plan);
+    if (maxUsers !== null) {
+      const count = await prisma.userCompany.count({ where: { companyId } });
+      if (count >= maxUsers) {
+        return NextResponse.json({ error: `User limit reached for your plan (${maxUsers}).` }, { status: 400 });
+      }
+    }
 
     const tokenStr = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
     const details = { token: tokenStr, email, role: String(inviteRole).toUpperCase(), companyId };

@@ -22,6 +22,8 @@ type CompanyData = {
   createdAt?: string;
   totalUsers?: number;
   totalAccounts?: number;
+  extraSeats?: number;
+  effectiveUserLimit?: number | null;
 };
 
 type Branch = {
@@ -82,7 +84,9 @@ export default function CompanyProfilePage() {
             baseCurrency: companyData.baseCurrency || "USD",
           });
           // max users
-          if (planConfig?.planLimits && companyData?.plan) {
+          if (companyData?.effectiveUserLimit !== undefined) {
+            setMaxUsers(companyData.effectiveUserLimit);
+          } else if (planConfig?.planLimits && companyData?.plan) {
             const key = String(companyData.plan).toLowerCase();
             const lim = planConfig.planLimits[key];
             setMaxUsers(lim === undefined ? null : lim);
@@ -478,6 +482,11 @@ export default function CompanyProfilePage() {
               <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "3px" }}>
                 {maxUsers === null ? "Unlimited users" : `Up to ${maxUsers} users`}
               </div>
+              {!!company.extraSeats && company.extraSeats > 0 && (
+                <div style={{ fontSize: "11px", color: "#34d399", marginTop: "2px" }}>
+                  Includes +{company.extraSeats} extra seats add-on
+                </div>
+              )}
               {periodEnd && (
                 <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
                   Renews {periodEnd}

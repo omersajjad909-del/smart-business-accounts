@@ -69,6 +69,14 @@ export default function UsersPage() {
       ]).then(([companyData, planConfig]) => {
         const planCode = String(companyData?.plan || "STARTER").toUpperCase();
         setPlan(planCode);
+        if (companyData?.effectiveUserLimit !== undefined && companyData?.effectiveUserLimit !== null) {
+          setDynamicMaxUsers(Number(companyData.effectiveUserLimit));
+          return;
+        }
+        if (companyData?.effectiveUserLimit === null) {
+          setDynamicMaxUsers(null);
+          return;
+        }
         // Dynamic limit from admin config — overrides hardcoded
         if (planConfig?.planLimits) {
           const key = planCode.toLowerCase();
