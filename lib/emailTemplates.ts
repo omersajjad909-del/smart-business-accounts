@@ -236,19 +236,147 @@ export const emailTemplates = {
       </div>
     `, `Your payslip for ${month} is ready`),
 
-  /* ── 11. Welcome — Subscription ── */
-  welcomeSubscription: (name: string, plan: string, features: string[], dashboardUrl: string) => {
-    const planColors: Record<string, { bg: string; accent: string; badge: string }> = {
-      starter:    { bg: "linear-gradient(135deg,#4f46e5,#6366f1)", accent: "#818cf8", badge: "🚀 Starter Plan" },
-      pro:        { bg: "linear-gradient(135deg,#7c3aed,#a78bfa)", accent: "#a78bfa", badge: "⭐ Professional Plan" },
-      enterprise: { bg: "linear-gradient(135deg,#1e1b4b,#4f46e5)", accent: "#c4b5fd", badge: "💎 Enterprise Plan" },
-      custom:     { bg: "linear-gradient(135deg,#065f46,#059669)", accent: "#34d399", badge: "✦ Custom Plan" },
+  /* ── 11. Welcome — Subscription (Country-Aware) ── */
+  welcomeSubscription: (name: string, plan: string, features: string[], dashboardUrl: string, country?: string) => {
+
+    /* ── Plan styling ── */
+    const planColors: Record<string, { bg: string; accent: string; badge: string; badgeBg: string }> = {
+      starter:    { bg: "linear-gradient(135deg,#4338ca,#6366f1)", accent: "#818cf8", badge: "🚀 Starter Plan",      badgeBg: "rgba(99,102,241,.18)" },
+      pro:        { bg: "linear-gradient(135deg,#6d28d9,#a78bfa)", accent: "#c4b5fd", badge: "⭐ Professional Plan", badgeBg: "rgba(167,139,250,.18)" },
+      enterprise: { bg: "linear-gradient(135deg,#1e1b4b,#4f46e5)", accent: "#e0e7ff", badge: "💎 Enterprise Plan",   badgeBg: "rgba(199,210,254,.12)" },
+      custom:     { bg: "linear-gradient(135deg,#064e3b,#059669)", accent: "#6ee7b7", badge: "✦ Custom Plan",        badgeBg: "rgba(52,211,153,.12)" },
     };
-    const key = plan.toLowerCase().replace("professional","pro");
-    const c = planColors[key] || planColors.starter;
+    const planKey = plan.toLowerCase().replace("professional","pro");
+    const c = planColors[planKey] || planColors.starter;
+    const planLabel = planKey === "pro" ? "Professional" : planKey.charAt(0).toUpperCase() + planKey.slice(1);
+
+    /* ── Country config ── */
+    const cc = (country || "").toUpperCase();
+    type CountryProfile = {
+      flag: string; greeting: string; currency: string; taxLabel: string;
+      taxTips: string[]; supportNote: string; localTips: string[];
+    };
+    const GULF = ["AE","SA","QA","KW","BH","OM"];
+    const countryProfile = (): CountryProfile => {
+      if (cc === "PK") return {
+        flag: "🇵🇰",
+        greeting: "خوش آمدید! Welcome",
+        currency: "PKR",
+        taxLabel: "FBR / Tax Compliance",
+        taxTips: [
+          "Set your base currency to <strong>PKR</strong> in Settings → Company",
+          "Enable <strong>SRB / FBR tax</strong> in tax settings for compliant invoices",
+          "Add your <strong>NTN number</strong> to your company profile",
+        ],
+        supportNote: "Support available via WhatsApp & email · Pakistan Standard Time (UTC+5)",
+        localTips: [
+          "Use <strong>Sales Invoice</strong> to bill customers in PKR",
+          "Add your bank accounts (HBL, MCB, UBL, etc.) for reconciliation",
+          "Set up <strong>multi-branch</strong> if you have multiple outlets",
+          "Use <strong>Expense Tracking</strong> to monitor daily business costs",
+        ],
+      };
+      if (GULF.includes(cc)) return {
+        flag: cc === "AE" ? "🇦🇪" : cc === "SA" ? "🇸🇦" : cc === "QA" ? "🇶🇦" : "🌍",
+        greeting: "أهلاً وسهلاً! Welcome",
+        currency: cc === "AE" ? "AED" : cc === "SA" ? "SAR" : cc === "QA" ? "QAR" : "USD",
+        taxLabel: "VAT Compliance (5%)",
+        taxTips: [
+          `Set your currency to <strong>${cc === "AE" ? "AED" : cc === "SA" ? "SAR" : "local currency"}</strong> in Settings → Company`,
+          "Enable <strong>VAT (5%)</strong> in tax settings — required for GCC businesses",
+          "Add your <strong>TRN (Tax Registration Number)</strong> to company profile",
+        ],
+        supportNote: "Support available via email & live chat · Gulf Standard Time (UTC+4)",
+        localTips: [
+          "Configure <strong>VAT 5%</strong> on all taxable items",
+          "Use <strong>multi-currency</strong> for USD / EUR international transactions",
+          "Add all bank accounts including local UAE/KSA banks",
+          "Enable <strong>Arabic language</strong> on invoices in Settings",
+        ],
+      };
+      if (cc === "IN") return {
+        flag: "🇮🇳",
+        greeting: "स्वागत है! Welcome",
+        currency: "INR",
+        taxLabel: "GST Compliance",
+        taxTips: [
+          "Set your base currency to <strong>INR</strong> in Settings → Company",
+          "Configure <strong>GST (CGST / SGST / IGST)</strong> in tax settings",
+          "Add your <strong>GSTIN</strong> to company profile for compliant invoices",
+        ],
+        supportNote: "Support available via email · India Standard Time (UTC+5:30)",
+        localTips: [
+          "Set up <strong>HSN/SAC codes</strong> on your products and services",
+          "Use <strong>Sales Invoice</strong> with GST calculations built in",
+          "Connect your bank account for automated reconciliation",
+          "Generate <strong>GSTR reports</strong> from the Reports section",
+        ],
+      };
+      if (cc === "GB") return {
+        flag: "🇬🇧",
+        greeting: "Welcome",
+        currency: "GBP",
+        taxLabel: "UK VAT & Making Tax Digital",
+        taxTips: [
+          "Set your base currency to <strong>GBP</strong> in Settings → Company",
+          "Enable <strong>VAT (20%)</strong> in tax settings for MTD compliance",
+          "Add your <strong>VAT Registration Number</strong> to company profile",
+        ],
+        supportNote: "Support available via email · GMT / BST timezone",
+        localTips: [
+          "Set up <strong>UK VAT rates</strong> (Standard 20%, Reduced 5%, Zero-rated)",
+          "Use <strong>Making Tax Digital</strong> compatible reports",
+          "Connect your UK bank account for automated reconciliation",
+          "Add team members and set roles under <strong>Users & Roles</strong>",
+        ],
+      };
+      if (cc === "US" || cc === "CA") return {
+        flag: cc === "CA" ? "🇨🇦" : "🇺🇸",
+        greeting: "Welcome",
+        currency: cc === "CA" ? "CAD" : "USD",
+        taxLabel: cc === "CA" ? "CRA / HST / GST" : "US Sales Tax & IRS",
+        taxTips: [
+          `Set your base currency to <strong>${cc === "CA" ? "CAD" : "USD"}</strong> in Settings → Company`,
+          cc === "CA"
+            ? "Configure <strong>HST / GST / PST</strong> rates per province in tax settings"
+            : "Set up <strong>state sales tax rates</strong> in tax settings",
+          "Add your <strong>EIN / Business Number</strong> to company profile",
+        ],
+        supportNote: "Support available via email & live chat · US/CA timezones",
+        localTips: [
+          "Use the <strong>Chart of Accounts</strong> aligned with GAAP standards",
+          "Connect your bank account for automated reconciliation",
+          `Generate <strong>${cc === "CA" ? "CRA-ready" : "IRS-ready"}</strong> financial reports`,
+          "Add your team with role-based permissions under <strong>Users & Roles</strong>",
+        ],
+      };
+      /* Default / Global */
+      return {
+        flag: "🌍",
+        greeting: "Welcome",
+        currency: "USD",
+        taxLabel: "Tax & Compliance",
+        taxTips: [
+          "Set your base <strong>currency</strong> in Settings → Company",
+          "Configure applicable <strong>tax rates</strong> in tax settings",
+          "Add your <strong>tax registration number</strong> to company profile",
+        ],
+        supportNote: "Support available via email & live chat",
+        localTips: [
+          "Set up your <strong>company profile</strong> in Settings",
+          "Add your team under <strong>Users & Roles</strong>",
+          "Create your first <strong>Sales Invoice</strong>",
+          "Connect your <strong>bank account</strong> for reconciliation",
+        ],
+      };
+    };
+
+    const cp = countryProfile();
+
+    /* ── Feature checklist ── */
     const featureRows = features.map(f => `
       <tr>
-        <td style="padding:9px 0;border-bottom:1px solid #f1f5f9;">
+        <td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
           <span style="display:inline-flex;align-items:center;gap:10px;">
             <span style="width:22px;height:22px;border-radius:50%;background:#ede9fe;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
               <svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="#4f46e5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -259,44 +387,72 @@ export const emailTemplates = {
       </tr>
     `).join("");
 
+    /* ── Tips list helper ── */
+    const tipsList = (tips: string[]) => tips.map(t => `
+      <li style="padding:6px 0;font-size:13px;color:#475569;line-height:1.7;">${t}</li>
+    `).join("");
+
     return baseTemplate(`
-      <!-- Hero -->
-      <div style="background:${c.bg};padding:36px 40px;text-align:center;margin:-40px -40px 32px;">
-        <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">${c.badge}</div>
-        <h1 style="font-size:28px;font-weight:900;color:#ffffff;margin:0 0 10px;line-height:1.2;">Welcome to FinovaOS! 🎉</h1>
-        <p style="font-size:15px;color:rgba(255,255,255,.75);margin:0;">Your subscription is active and ready to use.</p>
-      </div>
-
-      <p>Hi <strong>${name}</strong>,</p>
-      <p>We're thrilled to have you on board! Your <span style="color:${c.accent};font-weight:700;">${plan.charAt(0).toUpperCase()+plan.slice(1).toLowerCase().replace("pro","Professional")}</span> plan is now active. Here's everything included:</p>
-
-      <!-- Features -->
-      <div style="background:#f8fafc;border-radius:14px;padding:20px 24px;margin:24px 0;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">What's included in your plan</div>
-        <table style="width:100%;border-collapse:collapse;">${featureRows}</table>
-      </div>
-
-      <!-- CTA -->
-      <div style="text-align:center;margin:32px 0;">
-        <a href="${dashboardUrl}" style="display:inline-block;padding:15px 36px;border-radius:12px;background:${c.bg};color:#ffffff!important;font-weight:800;font-size:15px;text-decoration:none;letter-spacing:-.01em;">
-          Go to Your Dashboard →
+      <!-- Hero banner -->
+      <div style="background:${c.bg};padding:40px 40px 36px;text-align:center;margin:-40px -40px 36px;position:relative;">
+        <div style="display:inline-block;padding:5px 16px;border-radius:20px;background:${c.badgeBg};border:1px solid rgba(255,255,255,.2);font-size:12px;font-weight:800;color:rgba(255,255,255,.9);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;">${c.badge}</div>
+        <h1 style="font-size:30px;font-weight:900;color:#ffffff;margin:0 0 10px;line-height:1.2;letter-spacing:-.5px;">
+          ${cp.flag} ${cp.greeting}!
+        </h1>
+        <p style="font-size:15px;color:rgba(255,255,255,.75);margin:0 0 20px;">Your <strong style="color:#fff;">${planLabel} Plan</strong> is active and ready to use.</p>
+        <a href="${dashboardUrl}" style="display:inline-block;padding:13px 32px;border-radius:10px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.4);color:#ffffff!important;font-weight:800;font-size:14px;text-decoration:none;letter-spacing:.01em;">
+          Open My Dashboard →
         </a>
       </div>
 
-      <!-- Tips -->
-      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:18px 22px;margin:24px 0;">
-        <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:8px;">💡 Quick Tips to Get Started</div>
-        <ul style="margin:0;padding-left:18px;font-size:13px;color:#78350f;line-height:1.9;">
-          <li>Set up your company profile in <strong>Settings</strong></li>
-          <li>Add your team members under <strong>Users & Roles</strong></li>
-          <li>Create your first sales invoice in <strong>Sales Invoice</strong></li>
-          <li>Connect your bank account for reconciliation</li>
+      <!-- Greeting -->
+      <p style="font-size:16px;color:#1e293b;">Hi <strong>${name}</strong>,</p>
+      <p>Thank you for choosing <strong>FinovaOS</strong> — the accounting and business management platform built for growing companies worldwide. Your <span style="color:#4f46e5;font-weight:700;">${planLabel} Plan</span> is now active.</p>
+
+      <!-- Plan features -->
+      <div style="background:#f8fafc;border-radius:14px;padding:22px 26px;margin:28px 0;border:1px solid #e2e8f0;">
+        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">✦ What's Included in Your Plan</div>
+        <table style="width:100%;border-collapse:collapse;">${featureRows}</table>
+      </div>
+
+      <!-- Country-specific tax setup -->
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:20px 24px;margin:24px 0;">
+        <div style="font-size:13px;font-weight:800;color:#166534;margin-bottom:12px;">🏛️ ${cp.taxLabel} — Setup for ${cp.flag}</div>
+        <ul style="margin:0;padding-left:18px;">
+          ${tipsList(cp.taxTips)}
         </ul>
       </div>
 
+      <!-- Getting started tips -->
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:20px 24px;margin:24px 0;">
+        <div style="font-size:13px;font-weight:800;color:#92400e;margin-bottom:12px;">🚀 5 Steps to Get Started</div>
+        <ol style="margin:0;padding-left:20px;">
+          <li style="padding:5px 0;font-size:13px;color:#78350f;line-height:1.7;">Go to <strong>Settings → Company</strong> — add your logo, address, and set currency to <strong>${cp.currency}</strong></li>
+          ${tipsList(cp.localTips)}
+        </ol>
+      </div>
+
+      <!-- Support info -->
+      <div style="background:#f8fafc;border-radius:12px;padding:18px 22px;margin:24px 0;border:1px solid #e2e8f0;display:flex;align-items:center;gap:14px;">
+        <div style="font-size:28px;">💬</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:4px;">Need help getting started?</div>
+          <div style="font-size:12px;color:#64748b;">${cp.supportNote}</div>
+          <div style="margin-top:8px;">
+            <a href="${BASE_URL}/support" style="font-size:12px;color:#4f46e5;font-weight:700;text-decoration:none;">Visit Help Centre →</a>
+            &nbsp;&nbsp;
+            <a href="mailto:support@finovaos.app" style="font-size:12px;color:#4f46e5;font-weight:700;text-decoration:none;">Email Support →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer note -->
       <div class="divider"></div>
-      <p style="font-size:13px;color:#94a3b8;">Questions? Reply to this email or visit our <a href="${BASE_URL}/support" style="color:#6366f1;">Help Centre</a>. We're always here.</p>
-      <p style="font-size:13px;color:#94a3b8;">— The FinovaOS Team ✨</p>
-    `, `Welcome to FinovaOS — Your ${plan} plan is active!`);
+      <p style="font-size:13px;color:#94a3b8;text-align:center;">
+        You subscribed to FinovaOS ${planLabel} Plan.<br>
+        Manage your subscription anytime from <a href="${dashboardUrl}/subscriptions" style="color:#6366f1;">Dashboard → Subscription</a>.
+      </p>
+      <p style="font-size:14px;color:#475569;text-align:center;margin-top:8px;">— The FinovaOS Team ✨</p>
+    `, `Welcome to FinovaOS ${planLabel} — Your account is active!`);
   },
 };
