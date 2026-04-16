@@ -19,6 +19,39 @@ function getSessionContext(req: NextRequest) {
   return { userId, companyId };
 }
 
+function normalizeModuleId(value: string): string {
+  return String(value || "").trim().toLowerCase().replace(/-/g, "_");
+}
+
+async function assertApiAccessEnabled(companyId: string): Promise<{ ok: true } | { ok: false; message: string }> {
+  const company = await prisma.company.findUnique({
+    where: { id: companyId },
+    select: { plan: true, activeModules: true },
+  });
+
+  if (!company) {
+    return { ok: false, message: "Company not found" };
+  }
+
+  const planCode = String(company.plan || "STARTER").toUpperCase();
+  if (planCode !== "CUSTOM") {
+    return { ok: true };
+  }
+
+  const active = new Set(
+    String(company.activeModules || "")
+      .split(",")
+      .map((item) => normalizeModuleId(item))
+      .filter(Boolean)
+  );
+
+  if (!active.has("api_access")) {
+    return { ok: false, message: "API Access module is not active in your custom plan" };
+  }
+
+  return { ok: true };
+}
+
 export async function GET(req: NextRequest) {
   const session = getSessionContext(req);
   if (!session) {
@@ -26,6 +59,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const gate = await assertApiAccessEnabled(session.companyId);
+    if (!gate.ok) {
+      return NextResponse.json({ error: gate.message }, { status: 403 });
+    }
     const keys = await listCompanyApiKeys(session.companyId);
     return NextResponse.json({ keys });
   } catch (error: any) {
@@ -40,6 +77,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const gate = await assertApiAccessEnabled(session.companyId);
+    if (!gate.ok) {
+      return NextResponse.json({ error: gate.message }, { status: 403 });
+    }
     const body = await req.json();
     const action = String(body?.action || "").toUpperCase();
 

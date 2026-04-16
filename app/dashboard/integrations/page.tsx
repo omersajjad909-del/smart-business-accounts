@@ -76,12 +76,39 @@ export default function IntegrationsPage() {
   const [bankCount,   setBankCount]   = useState<number | null>(null);
   const [ssoEnabled,  setSsoEnabled]  = useState<boolean | null>(null);
   const [notifSetup,  setNotifSetup]  = useState<boolean | null>(null);
+  const [apiAccessAvailable, setApiAccessAvailable] = useState<boolean | null>(null);
 
   useEffect(() => {
+    fetch("/api/me/company")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        const planCode = String(d?.plan || "STARTER").toUpperCase();
+        if (planCode !== "CUSTOM") {
+          setApiAccessAvailable(true);
+          return;
+        }
+        const modules = String(d?.activeModules || "")
+          .split(",")
+          .map((m: string) => String(m || "").trim().toLowerCase().replace(/-/g, "_"))
+          .filter(Boolean);
+        setApiAccessAvailable(modules.includes("api_access"));
+      })
+      .catch(() => setApiAccessAvailable(true));
+
     // API keys
     fetch("/api/integrations/api-keys")
-      .then(r => r.ok ? r.json() : null)
-      .then(d => setApiKeyCount(Array.isArray(d?.keys) ? d.keys.filter((k: any) => k.status === "active").length : 0))
+      .then(async r => {
+        if (r.status === 403) {
+          setApiAccessAvailable(false);
+          setApiKeyCount(0);
+          return null;
+        }
+        return r.ok ? r.json() : null;
+      })
+      .then(d => {
+        if (!d) return;
+        setApiKeyCount(Array.isArray(d?.keys) ? d.keys.filter((k: any) => k.status === "active").length : 0);
+      })
       .catch(() => setApiKeyCount(0));
 
     // Bank accounts
@@ -106,6 +133,7 @@ export default function IntegrationsPage() {
   const getStatus = (item: IntegrationItem): { label: string; color: string; bg: string } => {
     switch (item.statusKey) {
       case "api":
+        if (apiAccessAvailable === false) return { label: "Locked in custom plan", color: "#f59e0b", bg: "rgba(245,158,11,.12)" };
         if (apiKeyCount === null) return { label: "Loading…", color: "#6b7280", bg: "rgba(107,114,128,.1)" };
         return apiKeyCount > 0
           ? { label: `${apiKeyCount} Active Key${apiKeyCount > 1 ? "s" : ""}`, color: "#34d399", bg: "rgba(52,211,153,.1)" }
