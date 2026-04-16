@@ -374,8 +374,9 @@ export default function PricingPage() {
 
         {/* ── PLAN CARDS ──────────────────────────────────────── */}
         <div className="pg" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20, marginBottom: 80 }}>
-          {PLANS.map(plan => {
-            const usdPrice = billing === "yearly" ? plan.yearly : plan.monthly;
+          {PLANS.map((plan) => {
+            const regularPrice = billing === "yearly" ? plan.yearly : plan.monthly;
+            const introPrice = Math.round(regularPrice * 0.25);
             return (
               <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(255,255,255,.03))" : "rgba(255,255,255,.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
                 <div style={{ height: 3, background: plan.gradient }} />
@@ -385,19 +386,25 @@ export default function PricingPage() {
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", lineHeight: 1.5, minHeight: 40 }}>{plan.tagline}</div>
                   <div style={{ margin: "24px 0" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                      <span style={{ fontSize: 14, color: "rgba(255,255,255,.35)", textDecoration: "line-through" }}>{formatPrice(plan.monthly)}/mo</span>
-                      <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.18)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "#fb923c" }}>75% OFF × 3 months</span>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.55)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 800 }}>Now</span>
+                      <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.18)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "#fb923c" }}>75% OFF x 3 months</span>
                     </div>
-                    <div style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{formatPrice(Math.round(usdPrice * 0.25))}</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.36)", marginTop: 6 }}>
-                      {billing === "yearly" ? `per month for 3 months · then ${formatPrice(usdPrice)}/mo on yearly plan` : `per month for 3 months · then ${formatPrice(plan.monthly)}/mo`}
+                    <div style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{formatPrice(introPrice)}</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.92)", marginTop: 6, fontWeight: 700 }}>
+                      Then {formatPrice(regularPrice)}/mo
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.36)", marginTop: 6 }}>
+                      {billing === "yearly" ? "Intro price for first 3 months, then yearly-plan monthly equivalent applies." : "Intro price for first 3 months, then regular monthly billing starts."}
                     </div>
                   </div>
                   <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14 }}>
                     Continue with {plan.name}
                   </Link>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: -12, marginBottom: 16, textAlign: "center" }}>
+                    You&apos;ll be charged {formatPrice(regularPrice)}/mo after the first 3 months.
+                  </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {plan.features.map(f => (
+                    {plan.features.map((f) => (
                       <div key={f} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{ width: 16, height: 16, borderRadius: "50%", background: `${plan.color}18`, border: `1px solid ${plan.color}38`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <svg width="8" height="8" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke={plan.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -513,10 +520,13 @@ export default function PricingPage() {
               {PLANS.map((plan, pi) => (
                 <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
                   <div style={{ fontSize: 14, fontWeight: 900, color: PLAN_COLORS[pi], marginBottom: 4 }}>{plan.name}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
-                    {formatPrice(Math.round((billing === "yearly" ? plan.yearly : plan.monthly) * 0.25))}<span style={{ fontSize: 10 }}>/mo</span>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.9)", fontWeight: 800 }}>
+                    {formatPrice(billing === "yearly" ? plan.yearly : plan.monthly)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
                   </div>
-                  {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>★ POPULAR</div>}
+                  <div style={{ fontSize: 10, color: "rgba(251,146,60,.9)", marginTop: 4, fontWeight: 700 }}>
+                    Intro: {formatPrice(Math.round((billing === "yearly" ? plan.yearly : plan.monthly) * 0.25))}/mo for 3 months
+                  </div>
+                  {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
                 </div>
               ))}
             </div>
@@ -535,8 +545,17 @@ export default function PricingPage() {
                     <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,.3)", transition: "transform .2s", display: "inline-block", transform: openCats.has(cat.id) ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
                   </div>
                   {PLANS.map((plan, pi) => (
-                    <div key={plan.slug} style={{ padding: "14px 16px", borderLeft: "1px solid rgba(255,255,255,.04)", background: plan.featured ? "rgba(99,102,241,.04)" : "transparent" }} />
-                  ))}
+                <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: PLAN_COLORS[pi], marginBottom: 4 }}>{plan.name}</div>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.9)", fontWeight: 800 }}>
+                    {formatPrice(billing === "yearly" ? plan.yearly : plan.monthly)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: "rgba(251,146,60,.9)", marginTop: 4, fontWeight: 700 }}>
+                    Intro: {formatPrice(Math.round((billing === "yearly" ? plan.yearly : plan.monthly) * 0.25))}/mo for 3 months
+                  </div>
+                  {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
+                </div>
+              ))}
                 </button>
 
                 {/* Feature rows */}
@@ -567,10 +586,15 @@ export default function PricingPage() {
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.015)" }}>
               <div style={{ padding: "24px 24px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.3)" }}>Ready to start?</div>
               {PLANS.map((plan, pi) => (
-                <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
-                  <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient }}>
-                    Get {plan.name}
-                  </Link>
+                <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: PLAN_COLORS[pi], marginBottom: 4 }}>{plan.name}</div>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.9)", fontWeight: 800 }}>
+                    {formatPrice(billing === "yearly" ? plan.yearly : plan.monthly)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: "rgba(251,146,60,.9)", marginTop: 4, fontWeight: 700 }}>
+                    Intro: {formatPrice(Math.round((billing === "yearly" ? plan.yearly : plan.monthly) * 0.25))}/mo for 3 months
+                  </div>
+                  {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
                 </div>
               ))}
             </div>
@@ -637,3 +661,5 @@ export default function PricingPage() {
     </div>
   );
 }
+
+
