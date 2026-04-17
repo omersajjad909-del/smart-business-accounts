@@ -43,7 +43,6 @@ const NAV_PAGES = [
   { title: "Outstandings",        url: "/dashboard/trading/outstandings",    icon: "📊", tags: ["outstanding","receivable","payable"] },
   { title: "Dispatch Board",      url: "/dashboard/trading/dispatch-board",  icon: "🚚", tags: ["dispatch","board","delivery"] },
   { title: "Settings",            url: "/dashboard/settings",                icon: "⚙️", tags: ["settings","config","setup"] },
-  { title: "Refer & Earn",        url: "/affiliate",                         icon: "💰", tags: ["affiliate","refer","earn","commission"] },
 ];
 
 function searchPages(q: string) {
@@ -57,10 +56,9 @@ function searchPages(q: string) {
 
 export default function GlobalSearch() {
   const [query,       setQuery]       = useState("");
-  const [results,     setResults]     = useState<any>(null);
+  const [results,     setResults]     = useState<SearchResults | null>(null);
   const [loading,     setLoading]     = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [error,       setError]       = useState<string | null>(null);
   const searchRef  = useRef<HTMLDivElement>(null);
   const router     = useRouter();
   const searchParams = useSearchParams();
@@ -95,7 +93,7 @@ export default function GlobalSearch() {
   }, [query]);
 
   async function performSearch() {
-    setLoading(true); setError(null);
+    setLoading(true);
     try {
       const user = getCurrentUser();
       const res  = await fetch(`/api/search?q=${encodeURIComponent(query)}`, {
@@ -107,7 +105,7 @@ export default function GlobalSearch() {
       });
       const text = await res.text();
       const data = text ? JSON.parse(text) : {};
-      if (!res.ok) { setError(null); setResults({}); }
+      if (!res.ok) { setResults({}); }
       else { setResults(data); }
     } catch {
       setResults({});
@@ -143,7 +141,6 @@ export default function GlobalSearch() {
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          onFocus={() => query.length >= 2 && setShowResults(true)}
           onKeyDown={e => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -231,7 +228,7 @@ export default function GlobalSearch() {
                 display: "flex", alignItems: "center", gap: 6 }}>
                 <span>{section.icon}</span> {section.label}
               </div>
-              {section.items.map((item: any) => (
+              {section.items.map((item: SearchResultItem) => (
                 <div key={item.id} onClick={() => handleResultClick(item.url)}
                   style={{ padding: "9px 14px", cursor: "pointer", transition: "background .1s" }}
                   onMouseEnter={e => (e.currentTarget.style.background = "rgba(129,140,248,.1)")}
