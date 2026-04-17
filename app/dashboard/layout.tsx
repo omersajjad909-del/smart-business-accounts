@@ -1743,7 +1743,6 @@ export default function DashboardLayout({
                   { icon:"🏢", label:"Company Profile",    href:"/dashboard/company-profile" },
                   { icon:"👥", label:"Team Members",        href:"/dashboard/users" },
                   { icon:"🔔", label:"Notifications",       href:"/dashboard/notifications" },
-                  { icon:"🎁", label:"Refer & Earn",        href:"/dashboard/referrals" },
                   { icon:"⭐", label:"Share Your Review",   href:"/dashboard/feedback" },
                 ].map(item => (
                   <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
@@ -1862,16 +1861,6 @@ export default function DashboardLayout({
 
           {/* Right side */}
           <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
-            {/* Affiliate link */}
-            <Link prefetch={false}
-              href="/affiliate"
-              style={{display:"flex",alignItems:"center",gap:6,padding:"5px 12px",borderRadius:8,background:"rgba(251,191,36,0.08)",border:"1px solid rgba(251,191,36,0.2)",color:"#fbbf24",textDecoration:"none",fontSize:11,fontWeight:700,letterSpacing:".04em"}}
-              className="hidden sm:flex"
-            >
-              <span>💰</span>
-              <span>Refer &amp; Earn</span>
-            </Link>
-
             <WhatsNew />
             <ModeToggle />
 
