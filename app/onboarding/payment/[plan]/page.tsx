@@ -235,6 +235,41 @@ export default function PaymentPage() {
   const [couponError,    setCouponError]    = useState("");
   const [couponLoading,  setCouponLoading]  = useState(false);
 
+  // Saved payment method + subscription status (for addon confirm UI)
+  const [savedPayMethod, setSavedPayMethod] = useState<{ type: PayMethod; label: string; processor: string; processorColor: string } | null>(null);
+  const [activePlanName, setActivePlanName] = useState<string | null>(null);
+
+  // Load saved payment method and, for addon plan, check subscription status
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("finovaPayMethod");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.type) {
+          setSavedPayMethod(parsed);
+          setMethod(parsed.type as PayMethod);
+        }
+      }
+    } catch {}
+
+    if (plan === "addon-automation") {
+      const user = getCurrentUser();
+      if (user?.companyId) {
+        fetch("/api/me/company", {
+          headers: { "x-company-id": user.companyId, "x-user-id": user.id || "", "x-user-role": user.role || "" },
+        })
+          .then(r => r.json())
+          .then(d => {
+            if (d?.subscriptionStatus === "ACTIVE" && d?.plan) {
+              const planLabels: Record<string, string> = { STARTER: "Starter", PRO: "Professional", ENTERPRISE: "Enterprise", CUSTOM: "Custom" };
+              setActivePlanName(planLabels[String(d.plan).toUpperCase()] || d.plan);
+            }
+          })
+          .catch(() => {});
+      }
+    }
+  }, [plan]);
+
   useEffect(() => {
     const user = getCurrentUser();
     if (user?.email) {
@@ -328,6 +363,14 @@ export default function PaymentPage() {
     const user = getCurrentUser();
     if (!user) { setOtpError("Please sign in again before activating your plan."); return; }
     setActivating(true);
+    // Save selected payment method for future auto-fill
+    try {
+      const allMethods = METHOD_GROUPS.flatMap(g => g.methods);
+      const mDef = allMethods.find(m => m.id === method);
+      if (mDef) {
+        localStorage.setItem("finovaPayMethod", JSON.stringify({ type: mDef.id, label: mDef.label, processor: mDef.processor, processorColor: mDef.processorColor }));
+      }
+    } catch {}
     try {
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
@@ -533,6 +576,47 @@ export default function PaymentPage() {
         {/* ═══ STEP 1: Payment ═══ */}
         {step === 1 && (
           <div className="fu" style={{ display:"flex", flexDirection:"column", gap:20 }}>
+
+            {/* Quick Confirm card — shown when adding addon with an existing active subscription */}
+            {plan === "addon-automation" && activePlanName && savedPayMethod && (
+              <div style={{ borderRadius:16, background:"linear-gradient(135deg,rgba(124,58,237,.18),rgba(37,99,235,.12))", border:"1px solid rgba(124,58,237,.4)", overflow:"hidden", marginBottom:4 }}>
+                <div style={{ height:3, background:"linear-gradient(90deg,#7c3aed,#2563eb,#a78bfa)" }} />
+                <div style={{ padding:"22px 24px" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14 }}>
+                    <span style={{ fontSize:20 }}>✅</span>
+                    <div>
+                      <div style={{ fontWeight:700, fontSize:15, color:"white" }}>Active {activePlanName} subscription detected</div>
+                      <div style={{ fontSize:12, color:"rgba(255,255,255,.5)", marginTop:2 }}>You can add the Automation Add-on with one click — no re-entry needed</div>
+                    </div>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:12, background:"rgba(0,0,0,.25)", border:"1px solid rgba(255,255,255,.08)", marginBottom:16 }}>
+                    <div style={{ width:36, height:36, borderRadius:10, background:`${savedPayMethod.processorColor}22`, border:`1px solid ${savedPayMethod.processorColor}44`, display:"flex", alignItems:"center", justifyContent:"center", color:savedPayMethod.processorColor, flexShrink:0 }}>
+                      {METHOD_GROUPS.flatMap(g => g.methods).find(m => m.id === savedPayMethod.type)?.icon}
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontWeight:600, fontSize:14, color:"white" }}>{savedPayMethod.label}</div>
+                      <div style={{ fontSize:11, color:"rgba(255,255,255,.45)", marginTop:1 }}>via {savedPayMethod.processor} · saved from your {activePlanName} plan</div>
+                    </div>
+                    <span style={{ padding:"3px 10px", borderRadius:20, background:"rgba(34,197,94,.12)", border:"1px solid rgba(34,197,94,.25)", color:"#22c55e", fontSize:11, fontWeight:700 }}>Saved</span>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
+                    <div style={{ fontSize:13, color:"rgba(255,255,255,.6)" }}>
+                      Adding <strong style={{ color:"white" }}>Automation Add-on</strong> — <strong style={{ color:"#a78bfa" }}>$79/month</strong>
+                    </div>
+                    <button
+                      onClick={activatePlanDirect}
+                      disabled={activating}
+                      style={{ padding:"11px 28px", borderRadius:11, background:"linear-gradient(135deg,#7c3aed,#2563eb)", color:"white", fontSize:14, fontWeight:700, border:"none", cursor:activating ? "not-allowed" : "pointer", opacity:activating ? .7 : 1, fontFamily:"inherit" }}
+                    >
+                      {activating ? "Confirming…" : "Confirm & Add — $79/mo →"}
+                    </button>
+                  </div>
+                  <div style={{ marginTop:12, fontSize:11, color:"rgba(255,255,255,.3)", borderTop:"1px solid rgba(255,255,255,.06)", paddingTop:10 }}>
+                    Or scroll down to choose a different payment method
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Title */}
             <div style={{ marginBottom:4 }}>
