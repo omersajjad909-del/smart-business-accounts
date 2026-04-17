@@ -25,6 +25,23 @@ const DEFAULT_SEAT_PRICING = {
   yearly: 72, // yearly annual total (6/mo equivalent)
 };
 
+const DEFAULT_CUSTOM_PLAN = {
+  basePrice: 0,
+  yearlyDiscount: 20,
+  modules: [
+    { id: "accounting",          name: "Accounting & Invoicing",  price: 15, desc: "Ledger, invoices, vouchers, P&L, balance sheet",        icon: "📒", enabled: true,  category: "core" },
+    { id: "inventory",           name: "Inventory Management",    price: 12, desc: "Stock tracking, GRN, barcode, low-stock alerts",         icon: "📦", enabled: true,  category: "core" },
+    { id: "crm",                 name: "CRM",                     price: 15, desc: "Contacts, sales pipeline, interaction logs",             icon: "👥", enabled: true,  category: "core" },
+    { id: "hr_payroll",          name: "HR & Payroll",            price: 20, desc: "Employees, attendance, payroll, advance salary",         icon: "👨‍💼", enabled: true,  category: "core" },
+    { id: "bank_reconciliation", name: "Bank Reconciliation",     price: 10, desc: "Statement import, discrepancy flagging, closing",        icon: "🏦", enabled: true,  category: "finance" },
+    { id: "tax_filing",          name: "Tax & Compliance",        price: 10, desc: "Tax summary, GST/VAT reports, compliance docs",          icon: "🧾", enabled: true,  category: "finance" },
+    { id: "reports",             name: "Advanced Reports",        price: 8,  desc: "Cash flow, profitability, annual statements",            icon: "📈", enabled: true,  category: "operations" },
+    { id: "multi_branch",        name: "Multi-Branch",            price: 15, desc: "Branches, consolidated reports, branch access",          icon: "🏢", enabled: true,  category: "operations" },
+    { id: "whatsapp",            name: "WhatsApp & SMS",          price: 8,  desc: "Payment reminders, invoices via WhatsApp and SMS",       icon: "💬", enabled: true,  category: "integrations" },
+    { id: "api_access",          name: "API Access",              price: 20, desc: "REST API, webhooks, third-party integrations",           icon: "⚡", enabled: true,  category: "integrations" },
+  ],
+};
+
 export async function GET() {
   try {
     const latest = await prisma.activityLog.findFirst({
@@ -38,6 +55,7 @@ export async function GET() {
         planLimits: DEFAULT_PLAN_LIMITS,
         branchLimits: DEFAULT_BRANCH_LIMITS,
         seatPricing: DEFAULT_SEAT_PRICING,
+        customPlan: DEFAULT_CUSTOM_PLAN,
         features: null,
         featureMatrix: null,
         updatedAt: null,
@@ -64,6 +82,7 @@ export async function GET() {
               yearly: Number(payload.seatPricing?.yearly ?? 6) * 12,
             }
           : DEFAULT_SEAT_PRICING,
+        customPlan: payload?.customPlan ?? DEFAULT_CUSTOM_PLAN,
         features: payload?.features ?? null,
         featureMatrix: payload?.featureMatrix ?? null,
         updatedAt: latest.createdAt,
@@ -75,13 +94,14 @@ export async function GET() {
       planLimits: DEFAULT_PLAN_LIMITS,
       branchLimits: DEFAULT_BRANCH_LIMITS,
       seatPricing: DEFAULT_SEAT_PRICING,
+      customPlan: DEFAULT_CUSTOM_PLAN,
       features: null,
       featureMatrix: null,
       updatedAt: latest.createdAt,
     });
   } catch (e: unknown) {
     return NextResponse.json(
-      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, branchLimits: DEFAULT_BRANCH_LIMITS, seatPricing: DEFAULT_SEAT_PRICING, error: e instanceof Error ? e.message : "unknown" },
+      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, branchLimits: DEFAULT_BRANCH_LIMITS, seatPricing: DEFAULT_SEAT_PRICING, customPlan: DEFAULT_CUSTOM_PLAN, error: e instanceof Error ? e.message : "unknown" },
       { status: 200 },
     );
   }
