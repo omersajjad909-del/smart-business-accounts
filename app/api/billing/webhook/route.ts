@@ -63,30 +63,35 @@ async function applySuccessfulPlanUpdate(params: {
   });
 }
 
-async function sendWelcomeSubscriptionEmail(companyId: string, planCode: string) {
+async function sendWelcomeSubscriptionEmail(companyId: string, planCode: string, country?: string | null) {
   try {
     const PLAN_FEATURES: Record<string, string[]> = {
-      starter: ["Up to 5 users", "Basic accounting", "Sales & purchase invoices", "Chart of accounts", "Bank reconciliation", "Basic reports", "Email support"],
-      pro: ["Up to 20 users", "Advanced accounting", "Multi-branch support", "Inventory management", "Financial reports", "Expense management", "Payment reconciliation", "Priority support", "Audit logging"],
-      professional: ["Up to 20 users", "Advanced accounting", "Multi-branch support", "Inventory management", "Financial reports", "Expense management", "Payment reconciliation", "Priority support", "Audit logging"],
-      enterprise: ["Unlimited users", "Full accounting suite", "Advanced inventory", "Custom reports", "Guided onboarding", "Custom integrations", "Implementation planning", "Advanced audit trails", "Expanded admin controls"],
-      custom: ["Your selected modules", "Flexible billing", "Dedicated account manager", "Priority support", "Custom onboarding"],
+      starter:      ["Up to 5 users", "Sales & purchase invoices", "Chart of accounts", "Ledger & trial balance", "Basic reports", "Email support"],
+      pro:          ["Up to 20 users", "Everything in Starter", "Inventory management", "Bank reconciliation", "Multi-branch support", "HR & payroll", "CRM & advanced reports", "Priority support"],
+      professional: ["Up to 20 users", "Everything in Starter", "Inventory management", "Bank reconciliation", "Multi-branch support", "HR & payroll", "CRM & advanced reports", "Priority support"],
+      enterprise:   ["Unlimited users", "Everything in Professional", "API access", "Custom integrations", "Multi-currency", "Guided onboarding", "Advanced audit trails", "Dedicated support"],
+      custom:       ["Your selected modules", "Flexible billing", "Dedicated account manager", "Priority support", "Custom onboarding"],
     };
-    const planKey = String(planCode || "starter").toLowerCase();
-    const features = PLAN_FEATURES[planKey] || PLAN_FEATURES.starter;
+    const planKey      = String(planCode || "starter").toLowerCase();
+    const features     = PLAN_FEATURES[planKey] || PLAN_FEATURES.starter;
     const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app"}/dashboard`;
+
     const uc = await prisma.userCompany.findFirst({
-      where: { companyId, user: { role: { in: ["ADMIN", "OWNER"] } } },
-      include: { user: { select: { name: true, email: true } } },
+      where:   { companyId, user: { role: { in: ["ADMIN", "OWNER"] } } },
+      include: { user: { select: { name: true, email: true } }, company: { select: { country: true } } },
     });
-    if (uc?.user?.email) {
-      await sendEmail({
-        to: uc.user.email,
-        subject: `Welcome to FinovaOS! Your ${planKey.charAt(0).toUpperCase() + planKey.slice(1)} plan is active`,
-        html: emailTemplates.welcomeSubscription(uc.user.name || "there", planKey, features, dashboardUrl),
-        companyId,
-      });
-    }
+    if (!uc?.user?.email) return;
+
+    // Priority: payment provider country → company profile country → global
+    const resolvedCountry = country || uc.company?.country || "GLOBAL";
+    const planLabel = ["pro","professional"].includes(planKey) ? "Professional" : planKey.charAt(0).toUpperCase() + planKey.slice(1);
+
+    await sendEmail({
+      to:      uc.user.email,
+      subject: `Welcome to FinovaOS! Your ${planLabel} plan is active 🎉`,
+      html:    emailTemplates.welcomeSubscription(uc.user.name || "there", planKey, features, dashboardUrl, resolvedCountry),
+      companyId,
+    });
   } catch {}
 }
 
@@ -144,7 +149,7 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
     }).catch(() => {});
 
     if (eventName === "subscription_created" && (status === "ACTIVE" || status === "TRIALING")) {
-      await sendWelcomeSubscriptionEmail(companyId, planCode);
+      await sendWelcomeSubscriptionEmail(companyId, planCode, displayCountry);
     }
   }
 
@@ -219,7 +224,8 @@ async function handleStripeWebhook(req: NextRequest, raw: string) {
       });
 
       if (type === "customer.subscription.created" && (dbStatus === "ACTIVE" || dbStatus === "TRIALING")) {
-        await sendWelcomeSubscriptionEmail(companyId, String(planCode || "starter"));
+        const countryMeta = data.metadata?.country || null;
+        await sendWelcomeSubscriptionEmail(companyId, String(planCode || "starter"), countryMeta);
       }
     }
   }
