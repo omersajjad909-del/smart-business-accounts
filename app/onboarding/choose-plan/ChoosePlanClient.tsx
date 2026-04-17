@@ -8,6 +8,7 @@ import {
   setStoredCurrencyPreference,
 } from "@/lib/currencyPreference";
 import { getCustomPlanMonthlyUsd } from "@/lib/customPlanPricing";
+import { getCurrentUser } from "@/lib/auth";
 
 /* ══════════════════════════════════════════════════════════
    TYPES & DATA — exact match with PricingSection.tsx
@@ -136,6 +137,15 @@ export default function ChoosePlanPage() {
 
   // ── Addon mode: ?addon=automation ────────────────────────────────────────
   const addonMode = searchParams.get("addon") === "automation";
+  const [loggedInUser, setLoggedInUser] = useState<{ name?: string; email?: string; id?: string } | null>(null);
+
+  useEffect(() => {
+    if (!addonMode) return;
+    try {
+      const u = getCurrentUser();
+      if (u?.id) setLoggedInUser(u);
+    } catch {}
+  }, [addonMode]);
 
   // Read cycle + plan from URL — auto-open custom module selector
   useEffect(() => {
@@ -294,9 +304,36 @@ export default function ChoosePlanPage() {
               ))}
             </div>
 
-            <a href={`/onboarding/signup/addon-automation?cycle=${billing}&currency=${currency}&country=${country}`} style={{ display:"block", textAlign:"center", padding:"14px 28px", borderRadius:12, background:"linear-gradient(135deg,#7c3aed,#2563eb)", color:"#fff", textDecoration:"none", fontSize:15, fontWeight:800, boxShadow:"0 0 30px rgba(124,58,237,.4)" }}>
-              Add to My Plan →
-            </a>
+            {/* CTA — different for logged-in vs guest */}
+            {loggedInUser ? (
+              <div>
+                <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:10, background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.2)", marginBottom:14 }}>
+                  <span style={{ fontSize:18 }}>✅</span>
+                  <div>
+                    <div style={{ fontSize:13, fontWeight:700, color:"#34d399" }}>Logged in as {loggedInUser.email}</div>
+                    <div style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>Your existing plan and company info will be used</div>
+                  </div>
+                </div>
+                <a href={`/onboarding/payment/addon-automation?cycle=${billing}&currency=${currency}&country=${country}`} style={{ display:"block", textAlign:"center", padding:"14px 28px", borderRadius:12, background:"linear-gradient(135deg,#7c3aed,#2563eb)", color:"#fff", textDecoration:"none", fontSize:15, fontWeight:800, boxShadow:"0 0 30px rgba(124,58,237,.4)" }}>
+                  Add to My Plan — {price}/mo →
+                </a>
+              </div>
+            ) : (
+              <div>
+                <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:10, background:"rgba(251,191,36,.07)", border:"1px solid rgba(251,191,36,.2)", marginBottom:14 }}>
+                  <span style={{ fontSize:18 }}>ℹ️</span>
+                  <div style={{ fontSize:13, color:"rgba(255,255,255,.55)" }}>Already have a plan? <strong style={{ color:"#fbbf24" }}>Log in first</strong> — no need to re-enter your details.</div>
+                </div>
+                <div style={{ display:"flex", gap:10 }}>
+                  <a href={`/login?next=/onboarding/choose-plan?addon=automation`} style={{ flex:1, display:"block", textAlign:"center", padding:"13px 20px", borderRadius:12, background:"linear-gradient(135deg,#7c3aed,#2563eb)", color:"#fff", textDecoration:"none", fontSize:14, fontWeight:800, boxShadow:"0 0 30px rgba(124,58,237,.4)" }}>
+                    Log In & Add →
+                  </a>
+                  <a href={`/onboarding/signup/addon-automation?cycle=${billing}&currency=${currency}&country=${country}`} style={{ flex:1, display:"block", textAlign:"center", padding:"13px 20px", borderRadius:12, border:"1px solid rgba(255,255,255,.15)", color:"rgba(255,255,255,.7)", textDecoration:"none", fontSize:14, fontWeight:600 }}>
+                    New Account
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
           <p style={{ fontSize:12, color:"rgba(255,255,255,.3)", textAlign:"center" }}>Add to any existing plan · Cancel anytime · Instant activation</p>
