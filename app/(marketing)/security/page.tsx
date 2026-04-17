@@ -130,7 +130,7 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
   const isEven = index % 2 === 0;
 
   return (
-    <section ref={ref} id={p.id} style={{
+    <section ref={ref} id={p.id} className="pillar-section" style={{
       padding:"88px 24px",
       background: index % 2 === 0 ? "transparent" : "rgba(255,255,255,.015)",
       borderTop:"1px solid rgba(255,255,255,.05)",
@@ -145,7 +145,7 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
       }}/>
 
       <div style={{ maxWidth:1100, margin:"0 auto", position:"relative" }}>
-        <div style={{
+        <div className="pillar-grid" style={{
           display:"grid", gridTemplateColumns:"1fr 1fr", gap:72, alignItems:"center",
           direction: isEven ? "ltr" : "rtl",
         }}>
@@ -338,7 +338,14 @@ export default function SecurityPage() {
           @keyframes pulseRing{0%{transform:translate(-50%,-50%) scale(1);opacity:.6}100%{transform:translate(-50%,-50%) scale(1.6);opacity:0}}
           @keyframes shieldBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
           @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-          @media(max-width:900px){.pillar-grid{grid-template-columns:1fr!important;direction:ltr!important;} .stats-grid{grid-template-columns:repeat(2,1fr)!important;}}
+          @media(max-width:900px){
+            .pillar-grid{grid-template-columns:1fr!important;direction:ltr!important;gap:36px!important;}
+            .stats-grid{grid-template-columns:repeat(2,1fr)!important;}
+          }
+          @media(max-width:600px){
+            .pillar-section{padding:52px 16px!important;}
+            .cert-chip{padding:8px 12px!important;}
+          }
           @media(max-width:500px){.stats-grid{grid-template-columns:1fr!important;}}
           .cert-chip{
             display:inline-flex;align-items:center;gap:9px;
