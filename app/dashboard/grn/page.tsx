@@ -33,6 +33,7 @@ function Label({ children }: { children: React.ReactNode }) {
 export default function GRNPage() {
   const today = new Date().toISOString().slice(0, 10);
   const user  = getCurrentUser();
+  const [isMobile, setIsMobile] = useState(false);
 
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [allItems,  setAllItems]  = useState<any[]>([]);
@@ -51,6 +52,15 @@ export default function GRNPage() {
   const [rows, setRows] = useState<GRNItem[]>([
     { itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" },
   ]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(max-width: 900px)");
+    const onChange = () => setIsMobile(media.matches);
+    onChange();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
   function bh(): Record<string, string> {
     return { "Content-Type": "application/json", "x-company-id": user?.companyId || "", "x-user-role": user?.role || "", "x-user-id": user?.id || "" };
@@ -236,7 +246,7 @@ export default function GRNPage() {
                   <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>Record items received from supplier</div>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button onClick={handleSubmit} disabled={saving}
                   style={{ padding: "9px 22px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1, boxShadow: "0 4px 14px rgba(99,102,241,0.35)" }}>
                   {saving ? "Saving…" : "Save & Preview"}
@@ -247,7 +257,7 @@ export default function GRNPage() {
 
             <div style={{ padding: "22px" }}>
               {/* Row 1: GRN No, Date, Against PO, Supplier */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
                 <div>
                   <Label>GRN Number *</Label>
                   <input value={grnNo} disabled placeholder="Auto..."
@@ -287,7 +297,8 @@ export default function GRNPage() {
 
               {/* Items Table */}
               <div style={{ border: `1px solid ${BORDER}`, borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 920 }}>
                   <thead>
                     <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
                       {[["#","left",36],["Item","left","auto"],["Ordered Qty","center",110],["Received Qty","center",110],["Rate","right",110],["Amount","right",120],["Note","left",140],["","center",36]].map(([h,a,w]) => (
@@ -335,6 +346,7 @@ export default function GRNPage() {
                     })}
                   </tbody>
                 </table>
+                </div>
                 <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <button onClick={() => setRows([...rows, { itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" }])}
                     style={{ background: "none", border: "none", cursor: "pointer", color: ACCENT, fontFamily: FONT, fontSize: 13, fontWeight: 700, padding: 0 }}>+ Add Row</button>

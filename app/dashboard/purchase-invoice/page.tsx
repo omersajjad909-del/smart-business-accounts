@@ -172,6 +172,16 @@ const [searchTerm, setSearchTerm] = useState("");
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [currencyId, setCurrencyId] = useState("");
   const [exchangeRate, setExchangeRate] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(max-width: 900px)");
+    const onChange = () => setIsMobile(media.matches);
+    onChange();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     fetch("/api/currencies")
@@ -564,13 +574,13 @@ const [searchTerm, setSearchTerm] = useState("");
 
 
   return (
-    <div style={{ padding: 24, maxWidth: 1380, margin: "0 auto", fontFamily: FONT, color: TEXT }}>
+    <div style={{ padding: isMobile ? 12 : 24, maxWidth: 1380, margin: "0 auto", fontFamily: FONT, color: TEXT }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Purchase Invoice</h1>
           <p style={{ margin: "3px 0 0", fontSize: 13, color: MUTED }}>{invoices.length} total purchase invoices</p>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button
             onClick={() => { setShowList(!showList); setShowForm(showList); setEditing(null); }}
             style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(99,102,241,0.12)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}
@@ -680,7 +690,7 @@ const [searchTerm, setSearchTerm] = useState("");
               <div style={{ marginBottom: 16, fontSize: 12, color: MUTED, fontStyle: "italic" }}>
                 Keyboard Shortcuts: <strong>F7</strong> = Clear Date & Supplier | <strong>F8</strong> = Search Query
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 14, marginBottom: 18 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(4, minmax(0, 1fr))", gap: 14, marginBottom: 18 }}>
                 <div>
                   <div style={labelStyle()}>Supplier (F7 / F8)</div>
                   <select ref={supplierRef} value={supplierId} onChange={e => handleSupplierChange(e.target.value)} style={inp()}>
@@ -758,7 +768,7 @@ const [searchTerm, setSearchTerm] = useState("");
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 330px", gap: 18, alignItems: "start" }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "minmax(0, 1fr) 330px", gap: 18, alignItems: "start" }}>
                 <div style={{ background: "rgba(255,255,255,0.02)", border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden" }}>
                   <div style={{ padding: "14px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
                     <div>
@@ -798,7 +808,7 @@ const [searchTerm, setSearchTerm] = useState("");
                   </div>
                 </div>
 
-                <div style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18, position: "sticky", top: 24 }}>
+                <div style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18, position: isMobile ? "static" : "sticky", top: 24 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>Totals & Charges</div>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 12 }}>
                     <span style={{ color: MUTED }}>Gross Total</span>

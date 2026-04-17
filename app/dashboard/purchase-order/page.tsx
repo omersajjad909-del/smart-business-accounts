@@ -46,6 +46,7 @@ function Label({ children }: { children: React.ReactNode }) {
 export default function PurchaseOrderPage() {
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
+  const [isMobile, setIsMobile] = useState(false);
 
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [items, setItems] = useState<any[]>([]);
@@ -70,6 +71,15 @@ export default function PurchaseOrderPage() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [recipientEmail, setRecipientEmail] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(max-width: 900px)");
+    const onChange = () => setIsMobile(media.matches);
+    onChange();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -337,7 +347,7 @@ export default function PurchaseOrderPage() {
                   <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>F7 = Clear Supplier & Date &nbsp;|&nbsp; F8 = Search Supplier</div>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button onClick={savePO} disabled={saving} style={{ padding: "9px 22px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1, boxShadow: "0 4px 14px rgba(99,102,241,0.35)" }}>
                   {saving ? "Saving…" : editing ? "Update PO" : "Save & Preview"}
                 </button>
@@ -347,7 +357,7 @@ export default function PurchaseOrderPage() {
 
             <div style={{ padding: "22px 22px" }}>
               {/* Row 1 */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
                 <div>
                   <Label>PO Number</Label>
                   <input value={poNo} disabled style={{ ...inp(), fontFamily: "monospace", fontWeight: 700, color: ACCENT, background: "rgba(99,102,241,0.06)", cursor: "not-allowed" }} />
@@ -378,7 +388,8 @@ export default function PurchaseOrderPage() {
 
               {/* Items Table */}
               <div style={{ border: `1px solid ${BORDER}`, borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 760 }}>
                   <thead>
                     <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
                       {["#", "Item", "Qty", "Rate", "Amount", ""].map((h, i) => (
@@ -418,6 +429,7 @@ export default function PurchaseOrderPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
                 <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between" }}>
                   <button onClick={addRow} style={{ background: "none", border: "none", cursor: "pointer", color: ACCENT, fontFamily: FONT, fontSize: 13, fontWeight: 700, padding: 0 }}>+ Add Row</button>
                   <div style={{ fontSize: 12, color: MUTED }}>{rows.filter(r => r.itemId && r.qty).length} of {rows.length} rows filled</div>
@@ -425,7 +437,7 @@ export default function PurchaseOrderPage() {
               </div>
 
               {/* Freight + Remarks + Total */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 16, alignItems: "end" }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr auto", gap: 16, alignItems: "end" }}>
                 <div>
                   <Label>Remarks / Notes</Label>
                   <textarea value={remarks} onChange={e => setRemarks(e.target.value)} placeholder="Any special instructions or terms..." style={{ ...inp({ height: 80, resize: "none" as const, display: "block" }) }} />
@@ -439,7 +451,7 @@ export default function PurchaseOrderPage() {
                     </div>
                   )}
                 </div>
-                <div style={{ background: "rgba(99,102,241,0.08)", border: `1px solid rgba(99,102,241,0.2)`, borderRadius: 12, padding: "16px 24px", textAlign: "right", minWidth: 190 }}>
+                <div style={{ background: "rgba(99,102,241,0.08)", border: `1px solid rgba(99,102,241,0.2)`, borderRadius: 12, padding: "16px 24px", textAlign: "right", minWidth: isMobile ? 0 : 190 }}>
                   <div style={{ fontSize: 11, color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>Grand Total</div>
                   <div style={{ fontSize: 26, fontWeight: 800, color: ACCENT, letterSpacing: -1 }}>
                     {cur} {grandTotal.toLocaleString()}
