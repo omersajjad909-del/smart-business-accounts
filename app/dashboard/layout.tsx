@@ -1824,15 +1824,13 @@ export default function DashboardLayout({
           className="print:hidden sm:px-4"
         >
 
-          {/* HAMBURGER */}
-          <button
-            style={{display:isMobileViewport ? "flex" : "none",padding:"6px",background:"none",border:"none",cursor:"pointer",color:"rgba(255,255,255,0.5)",borderRadius:8}}
-            onClick={() => setIsMobileMenuOpen(true)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width="22" height="22">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-          </button>
+          {/* MOBILE: Logo + company name */}
+          {isMobileViewport && (
+            <div style={{display:"flex",alignItems:"center",gap:7,flexShrink:0}}>
+              <img src="/icon1.png" alt="FinovaOS" width={28} height={28} style={{objectFit:"contain",flexShrink:0}}/>
+              <span style={{fontSize:13,fontWeight:800,color:"white",letterSpacing:"-.2px",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
+            </div>
+          )}
 
           {/* Global Search */}
           <Suspense fallback={<div style={{width:"100%",maxWidth:340,height:36,background:"rgba(255,255,255,0.04)",borderRadius:8,animation:"pulse 1.5s infinite"}} />}>
@@ -1887,7 +1885,7 @@ export default function DashboardLayout({
         </div>
 
         {/* ---- PAGE CONTENT ---- */}
-        <div style={{flex:1,overflowY:"auto",padding:"16px 12px"}} className="dashboard-content-scroll sm:px-4 sm:py-5 lg:px-6">
+        <div style={{flex:1,overflowY:"auto",padding:"16px 12px",paddingBottom: isMobileViewport ? "80px" : "16px"}} className="dashboard-content-scroll sm:px-4 sm:py-5 lg:px-6">
           <div style={{width:"100%",maxWidth:1280,margin:"0 auto"}} className="dashboard-content-inner">
             {currentUser?.email === "finovaos.app@gmail.com" && (
               <div style={{
@@ -1919,6 +1917,50 @@ export default function DashboardLayout({
         </div>
 
       </main>
+
+      {/* ── MOBILE BOTTOM NAV ── */}
+      {isMobileViewport && (
+        <nav style={{
+          position:"fixed", bottom:0, left:0, right:0, zIndex:25,
+          background:"rgba(8,12,30,0.96)", backdropFilter:"blur(20px)",
+          borderTop:"1px solid rgba(255,255,255,0.08)",
+          display:"flex", alignItems:"stretch",
+          paddingBottom:"env(safe-area-inset-bottom)",
+          height:"calc(58px + env(safe-area-inset-bottom))",
+        }}>
+          {[
+            { href:"/dashboard", label:"Home", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
+            { href:"/dashboard/sales-invoice", label:"Invoice", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> },
+            { href:"/dashboard/reports/ledger", label:"Reports", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
+            { href:"/dashboard/ai", label:"AI", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> },
+          ].map(item => {
+            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            return (
+              <Link prefetch={false} key={item.href} href={item.href} style={{
+                flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+                gap:3, textDecoration:"none", paddingTop:6,
+                color: isActive ? "#818cf8" : "rgba(255,255,255,0.4)",
+                background: isActive ? "rgba(99,102,241,0.08)" : "transparent",
+                transition:"color .15s, background .15s",
+                borderTop: isActive ? "2px solid #6366f1" : "2px solid transparent",
+              }}>
+                {item.icon}
+                <span style={{fontSize:10,fontWeight:600,letterSpacing:".01em"}}>{item.label}</span>
+              </Link>
+            );
+          })}
+          {/* Menu tab — opens sidebar */}
+          <button onClick={() => setIsMobileMenuOpen(true)} style={{
+            flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+            gap:3, background:"transparent", border:"none", cursor:"pointer", paddingTop:6,
+            color: isMobileMenuOpen ? "#818cf8" : "rgba(255,255,255,0.4)",
+            borderTop: isMobileMenuOpen ? "2px solid #6366f1" : "2px solid transparent",
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <span style={{fontSize:10,fontWeight:600,letterSpacing:".01em"}}>Menu</span>
+          </button>
+        </nav>
+      )}
 
       {/* ── Company Details Modal ── */}
       {showCompanyModal && (
