@@ -433,7 +433,7 @@ export default function QuotationPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Quotation / Estimate</h1>
+        <h1 className="text-2xl font-bold">Quotation</h1>
         <div className="flex gap-2">
           <button
             onClick={() => { setShowList(!showList); setShowForm(!showForm); setEditing(null); }}
@@ -720,7 +720,7 @@ export default function QuotationPage() {
               <div style={{ padding: "26px 36px 18px", borderBottom: "1.5px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
                 <div>
                   <div style={{ fontSize: 28, fontWeight: 900, color: "#0f172a", letterSpacing: -0.8, lineHeight: 1 }}>{companyName}</div>
-                  <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1.2, marginTop: 6 }}>Quotation / Estimate</div>
+                  <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1.2, marginTop: 6 }}>Quotation</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{

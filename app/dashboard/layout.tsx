@@ -715,7 +715,7 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/grn" pathname={pathname}>GRN (Goods Receipt)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>Purchase Invoice</NavLink>}
               {/* ── Sales Flow ── */}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_QUOTATION) && <NavLink href="/dashboard/quotation" pathname={pathname}>Quotation / Estimate</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_QUOTATION) && <NavLink href="/dashboard/quotation" pathname={pathname}>Quotation</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-order" pathname={pathname}>Sales Order</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_DELIVERY_CHALLAN) && <NavLink href="/dashboard/delivery-challan" pathname={pathname}>Delivery Challan</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoice</NavLink>}
