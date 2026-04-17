@@ -43,6 +43,7 @@ function SalesInvoiceContent() {
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
   const canCreate = hasPermission(user, PERMISSIONS.CREATE_SALES_INVOICE);
+  const [isMobile, setIsMobile] = useState(false);
 
   // ── Data ──
   const [customers, setCustomers]   = useState<Account[]>([]);
@@ -97,6 +98,15 @@ function SalesInvoiceContent() {
     fetch("/api/company/admin-control").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.printPreferences) setPrintPrefs(p => ({ ...p, ...d.printPreferences }));
     }).finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(max-width: 900px)");
+    const onChange = () => setIsMobile(media.matches);
+    onChange();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
   }, []);
 
   useEffect(() => {
@@ -315,15 +325,15 @@ function SalesInvoiceContent() {
       `}</style>
 
       {/* ══════════════════════════ SCREEN UI ══════════════════════════ */}
-      <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
+      <div style={{ padding: isMobile ? "12px 10px" : "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1200 }}>
 
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: 24, gap: 10, flexWrap: "wrap" }}>
           <div>
             <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700 }}>Sales Invoice</h1>
             <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-muted)" }}>Create and manage sales invoices</p>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button style={btnGhost} onClick={() => { setShowList(!showList); if (!showList) { setShowForm(false); loadInvoices(); } else setShowForm(true); }}>
               {showList ? "Hide List" : "Show List"}
             </button>
@@ -336,7 +346,8 @@ function SalesInvoiceContent() {
         {/* ── Invoices List ── */}
         {showList && (
           <div style={{ ...panelStyle, padding: 0, overflow: "hidden", marginBottom: 24 }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid var(--border)" }}>
                   {["Invoice No", "Date", "Customer", "Total", "Actions"].map(h => (
@@ -356,7 +367,7 @@ function SalesInvoiceContent() {
                     <td style={{ padding: "12px 16px", fontSize: 14 }}>{inv.customer?.name || "—"}</td>
                     <td style={{ padding: "12px 16px", fontSize: 14, fontWeight: 600, textAlign: "right" }}>{fmt(inv.total)}</td>
                     <td style={{ padding: "12px 16px" }}>
-                      <div style={{ display: "flex", gap: 8 }}>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                         <button style={{ ...btnGhost, padding: "5px 12px", fontSize: 12 }} onClick={() => startEdit(inv)}>Edit</button>
                         <button style={{ ...btnGhost, padding: "5px 12px", fontSize: 12, color: "#f87171", borderColor: "#f8717144" }} onClick={() => deleteInvoice(inv.id)}>Delete</button>
                       </div>
@@ -365,6 +376,7 @@ function SalesInvoiceContent() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 
@@ -382,7 +394,7 @@ function SalesInvoiceContent() {
                 )}
               </div>
               {!preview ? (
-                <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                   <button style={btnPrimary} onClick={saveInvoice} disabled={saving}>{saving ? "Saving…" : editing ? "Update Invoice" : "Save & Preview"}</button>
                   <button style={btnGhost} onClick={() => { setShowForm(false); setEditing(null); resetForm(); }}>Cancel</button>
                 </div>
@@ -476,7 +488,7 @@ function SalesInvoiceContent() {
                     <button style={{ ...btnGhost, padding: "5px 14px", fontSize: 12, color: accent, borderColor: accent + "55" }} onClick={addRow}>+ Add Row</button>
                   </div>
                   <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
                       <thead>
                         <tr style={{ borderBottom: "1px solid var(--border)" }}>
                           {["Item", "Qty", "Rate", "Amount", ""].map(h => (
@@ -513,7 +525,7 @@ function SalesInvoiceContent() {
 
                   {/* Totals */}
                   <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-                    <div style={{ width: 300, display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ width: isMobile ? "100%" : 300, display: "flex", flexDirection: "column", gap: 10 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
                         <span style={{ color: "var(--text-muted)" }}>Subtotal</span>
                         <span style={{ fontWeight: 600 }}>{fmt(subtotal)}</span>

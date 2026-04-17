@@ -356,6 +356,20 @@ a {
   .dashboard-root .dashboard-content-inner :is(div, section, article)[style*="overflow: hidden"] :is(table)[style*="min-width"] {
     min-width: 680px !important;
   }
+
+  .dashboard-root .dashboard-content-inner table {
+    display: block;
+    width: max-content !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-root .dashboard-content-inner th,
+  .dashboard-root .dashboard-content-inner td {
+    white-space: nowrap;
+  }
 }
 
 /* Overrides for specific tailwind classes to map to our vars */
