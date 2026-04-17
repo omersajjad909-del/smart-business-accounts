@@ -23,8 +23,16 @@ function authHeaders(): Record<string, string> {
 export default function AutomationPage() {
   const [tab, setTab] = useState<Tab>("overview");
   const [addonEnabled, setAddonEnabled] = useState<boolean | null>(null); // null = loading
+  const [showActivatedBanner, setShowActivatedBanner] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("addon") === "activated") {
+      setShowActivatedBanner(true);
+      // Clean URL without reload
+      window.history.replaceState({}, "", window.location.pathname);
+      setTimeout(() => setShowActivatedBanner(false), 6000);
+    }
     (async () => {
       try {
         const r = await fetch("/api/automation/addon-status", { headers: authHeaders() });
@@ -59,6 +67,17 @@ export default function AutomationPage() {
           AI-powered automations for WhatsApp, email, social media, leads, and more
         </p>
       </div>
+
+      {/* Activation success banner */}
+      {showActivatedBanner && (
+        <div style={{ marginBottom: 20, padding: "14px 20px", borderRadius: 12, background: "linear-gradient(135deg,rgba(34,197,94,.15),rgba(16,185,129,.1))", border: "1px solid rgba(34,197,94,.35)", display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 22 }}>🎉</span>
+          <div>
+            <div style={{ fontWeight: 700, color: "#22c55e", fontSize: 15 }}>Automation Add-on Activated!</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>All automation tools are now unlocked for your account.</div>
+          </div>
+        </div>
+      )}
 
       {/* Add-on gate — show upgrade prompt if not subscribed */}
       {addonEnabled === false && (

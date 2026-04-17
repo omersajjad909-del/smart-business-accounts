@@ -37,6 +37,35 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const planCode = String(body?.planCode || "STARTER").toUpperCase();
+
+    // ── Automation addon: activate directly, no payment gateway needed ────────
+    if (planCode === "ADDON-AUTOMATION") {
+      const base = getRuntimeAppUrl(req.nextUrl.origin);
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "AutomationAddon" (
+          "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+          "companyId" TEXT NOT NULL UNIQUE,
+          "enabled" BOOLEAN NOT NULL DEFAULT true,
+          "plan" TEXT NOT NULL DEFAULT 'MONTHLY',
+          "pricePerMonth" DOUBLE PRECISION NOT NULL DEFAULT 79,
+          "expiresAt" TIMESTAMP(3),
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `).catch(() => {});
+      await prisma.$executeRaw`
+        INSERT INTO "AutomationAddon" ("companyId", "enabled", "plan", "pricePerMonth")
+        VALUES (${companyId}, true, ${body?.billingCycle?.toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY"}, 79)
+        ON CONFLICT ("companyId") DO UPDATE SET "enabled" = true, "updatedAt" = NOW()
+      `.catch(() => {});
+      await prisma.activityLog.create({
+        data: { companyId, userId: userId || null, action: "ADDON_AUTOMATION_ACTIVATED", details: JSON.stringify({ planCode, activatedAt: new Date().toISOString() }) },
+      }).catch(() => {});
+      const successRedirect = String(body?.successUrl || `${base}/dashboard/automation?addon=activated`);
+      return apiOk({ url: successRedirect, activated: true });
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const billingCycle = String(body?.billingCycle || "MONTHLY").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
     const successUrl = String(body?.successUrl || "");
     const cancelUrl = body?.cancelUrl ? String(body.cancelUrl) : null;

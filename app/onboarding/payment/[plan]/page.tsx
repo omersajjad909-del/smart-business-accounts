@@ -339,7 +339,9 @@ export default function PaymentPage() {
         },
         body: JSON.stringify({
           planCode: plan.toUpperCase(),
-          successUrl: `${window.location.origin}/dashboard/billing?upgrade=success`,
+          successUrl: plan === "addon-automation"
+            ? `${window.location.origin}/dashboard/automation?addon=activated`
+            : `${window.location.origin}/dashboard/billing?upgrade=success`,
           couponCode: couponApplied?.code || null,
           displayCurrency: currency,
           displayCountry: country,
@@ -423,7 +425,9 @@ export default function PaymentPage() {
         },
         body: JSON.stringify({
           planCode: plan.toUpperCase(),
-          successUrl: window.location.origin + "/dashboard/billing?upgrade=success",
+          successUrl: plan === "addon-automation"
+            ? window.location.origin + "/dashboard/automation?addon=activated"
+            : window.location.origin + "/dashboard/billing?upgrade=success",
           couponCode: couponApplied?.code || null,
           displayCurrency: currency,
           displayCountry: country,
