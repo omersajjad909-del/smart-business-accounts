@@ -200,11 +200,7 @@ export default function RootLayout({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       </head>
-      <body
-        className="app-root"
-        style={{ background: "#060919" }}
-        suppressHydrationWarning
-      >
+      <body className="app-root" suppressHydrationWarning>
         <VisitorTracker />
         <ThemeProvider
           attribute="class"
