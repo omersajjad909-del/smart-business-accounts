@@ -1450,10 +1450,12 @@ export interface AnomalyAlert {
   link?: string;
 }
 
-export async function detectAnomalies(companyId: string): Promise<AnomalyAlert[]> {
+export async function detectAnomalies(companyIdOrCtx: string | FinancialContext): Promise<AnomalyAlert[]> {
   let ctx: FinancialContext;
   try {
-    ctx = await buildFinancialContext(companyId);
+    ctx = typeof companyIdOrCtx === "string"
+      ? await buildFinancialContext(companyIdOrCtx)
+      : companyIdOrCtx;
   } catch {
     return [];
   }

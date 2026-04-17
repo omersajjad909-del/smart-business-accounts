@@ -182,7 +182,8 @@ function formatMoney(value: number, currency: string) {
   return `${currency} ${Number(value || 0).toLocaleString("en-PK", { maximumFractionDigits: 0 })}`;
 }
 
-function labelForBusinessType(businessType: string) {
+function labelForBusinessType(businessType?: string) {
+  if (!businessType) return "Business";
   return BUSINESS_LABELS[businessType] || businessType.replace(/_/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
@@ -468,11 +469,11 @@ function buildAutoRunSuggestions(ctx: FinancialContext, operational: Operational
 }
 
 export async function buildBusinessOperator(companyId: string): Promise<OperatorPayload> {
-  const [ctx, anomalies, operational] = await Promise.all([
+  const [ctx, operational] = await Promise.all([
     buildFinancialContext(companyId),
-    detectAnomalies(companyId),
     getOperationalContext(companyId),
   ]);
+  const anomalies = await detectAnomalies(ctx);
 
   return {
     generatedAt: new Date().toISOString(),
