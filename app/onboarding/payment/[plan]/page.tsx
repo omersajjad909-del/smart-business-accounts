@@ -13,7 +13,8 @@ const PLAN_META: Record<string, { name: string; price: number; yearlyPrice: numb
   pro:          { name: "Professional", price: 99,  yearlyPrice: 950,  icon: "🚀", color: "#34d399", glow: "rgba(52,211,153,.35)",  dim: "rgba(52,211,153,.1)",   border: "rgba(52,211,153,.3)",   gradientFrom: "#10b981", gradientTo: "#059669" },
   professional: { name: "Professional", price: 99,  yearlyPrice: 950,  icon: "🚀", color: "#34d399", glow: "rgba(52,211,153,.35)",  dim: "rgba(52,211,153,.1)",   border: "rgba(52,211,153,.3)",   gradientFrom: "#10b981", gradientTo: "#059669" },
   enterprise:   { name: "Enterprise",   price: 249, yearlyPrice: 2390, icon: "💎", color: "#fbbf24", glow: "rgba(251,191,36,.35)",  dim: "rgba(251,191,36,.1)",   border: "rgba(251,191,36,.3)",   gradientFrom: "#f59e0b", gradientTo: "#d97706" },
-  custom:       { name: "Custom",       price: 0,   yearlyPrice: 0,    icon: "⚡", color: "#38bdf8", glow: "rgba(56,189,248,.35)",  dim: "rgba(56,189,248,.1)",   border: "rgba(56,189,248,.3)",   gradientFrom: "#0ea5e9", gradientTo: "#0284c7" },
+  custom:             { name: "Custom",            price: 0,  yearlyPrice: 0,   icon: "⚡", color: "#38bdf8", glow: "rgba(56,189,248,.35)",  dim: "rgba(56,189,248,.1)",   border: "rgba(56,189,248,.3)",   gradientFrom: "#0ea5e9", gradientTo: "#0284c7" },
+  "addon-automation": { name: "Automation Add-on", price: 79, yearlyPrice: 828, icon: "🤖", color: "#a78bfa", glow: "rgba(167,139,250,.35)", dim: "rgba(167,139,250,.1)",  border: "rgba(167,139,250,.3)",  gradientFrom: "#7c3aed", gradientTo: "#6d28d9" },
 };
 
 /* ── Payment method types ───────────────────────────────── */

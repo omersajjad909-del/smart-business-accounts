@@ -106,7 +106,7 @@ export default function AutomationPage() {
                   <a href="/automation" style={{ padding: "11px 24px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 14, fontWeight: 700, textDecoration: "none", display: "inline-block" }}>
                     See full details →
                   </a>
-                  <a href="/get-started?addon=automation" style={{ padding: "11px 24px", borderRadius: 10, background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.15)", color: "white", fontSize: 14, fontWeight: 700, textDecoration: "none", display: "inline-block" }}>
+                  <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "11px 24px", borderRadius: 10, background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.15)", color: "white", fontSize: 14, fontWeight: 700, textDecoration: "none", display: "inline-block" }}>
                     Add to my plan — $79/mo
                   </a>
                 </div>
