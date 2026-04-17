@@ -255,6 +255,8 @@ function BillingPage() {
   const searchParams = useSearchParams();
   const upgraded = searchParams?.get("upgrade") === "success";
   const isRequired = searchParams?.get("required") === "1";
+  const seatsAdded = searchParams?.get("seats") === "added";
+  const seatsQtyParam = Number(searchParams?.get("qty") || "0");
 
   const [subscription,      setSubscription]      = useState<Subscription | null>(null);
   const [paymentMethods,    setPaymentMethods]    = useState<PaymentMethod[]>([]);
@@ -268,11 +270,22 @@ function BillingPage() {
   const [activeTab,         setActiveTab]          = useState<"overview"|"methods"|"invoices"|"plans">(isRequired ? "plans" : "overview");
   const [extraSeats,        setExtraSeats]         = useState(0);
   const [seatPricing,       setSeatPricing]        = useState({ monthly: 7, yearly: 6 });
+  const [totalUsers,        setTotalUsers]         = useState(0);
+  const [effectiveUserLimit, setEffectiveUserLimit] = useState<number | null>(null);
+  const [showSeatModal,     setShowSeatModal]      = useState(false);
+  const [seatQty,           setSeatQty]            = useState(1);
+  const [buyingSeats,       setBuyingSeats]        = useState(false);
   const [planPricing,       setPlanPricing]        = useState<PlanPricingMap>({
     starter: { monthly: 49, yearly: 39 },
     professional: { monthly: 99, yearly: 79 },
     enterprise: { monthly: 249, yearly: 199 },
   });
+
+  useEffect(() => {
+    if (seatsAdded && seatsQtyParam > 0) {
+      toast.success(`${seatsQtyParam} seat${seatsQtyParam > 1 ? "s" : ""} added successfully! Your team capacity has been expanded.`);
+    }
+  }, [seatsAdded, seatsQtyParam]);
 
   useEffect(() => {
     (async () => {
@@ -296,6 +309,8 @@ function BillingPage() {
           const amountMap: Record<string,number> = { STARTER:49, PRO:99, PROFESSIONAL:99, ENTERPRISE:249 };
           setSubscription({ plan:planUpper, status:d.subscriptionStatus||"active", currentPeriodEnd:d.currentPeriodEnd||null, amount:amountMap[planUpper]??49, currency:"USD", introOfferClaimed:!!d.introOfferClaimed, billingCycle:d.billingCycle||"monthly" });
           setExtraSeats(Math.max(0, Number(d.extraSeats || 0)));
+          setTotalUsers(Number(d.totalUsers || 0));
+          setEffectiveUserLimit(d.effectiveUserLimit ?? null);
         }
         if (pmRes.ok)  { const d = await pmRes.json();  setPaymentMethods(d.paymentMethods || []); }
         if (invRes.ok) { const d = await invRes.json(); setInvoices(d.invoices || []); }
@@ -388,6 +403,36 @@ function BillingPage() {
     else toast.error("Failed to update default.");
   }
 
+  async function handleBuySeats() {
+    if (buyingSeats) return;
+    setBuyingSeats(true);
+    try {
+      const u = getCurrentUser();
+      const h: Record<string,string> = { "Content-Type":"application/json" };
+      if (u?.role)      h["x-user-role"]  = u.role;
+      if (u?.id)        h["x-user-id"]    = u.id;
+      if (u?.companyId) h["x-company-id"] = u.companyId;
+      const res = await fetch("/api/billing/seats", {
+        method: "POST", headers: h,
+        body: JSON.stringify({ addSeats: seatQty, billingCycle: subscription?.billingCycle?.toUpperCase() || "MONTHLY" }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.url) {
+        if (data?.activated) {
+          setExtraSeats(prev => prev + seatQty);
+          setEffectiveUserLimit(prev => prev !== null ? prev + seatQty : prev);
+          setShowSeatModal(false);
+          toast.success(`${seatQty} seat${seatQty > 1 ? "s" : ""} added successfully!`);
+        } else {
+          window.location.href = data.url;
+        }
+      } else {
+        toast.error(data?.error || "Failed to purchase seats.");
+      }
+    } catch { toast.error("Network error. Please try again."); }
+    setBuyingSeats(false);
+  }
+
   const currentPlanCode = subscription?.plan?.toUpperCase() ?? "STARTER";
   const currentPlan     = PLANS.find(p => p.code === currentPlanCode) ?? PLANS[0];
   const isCanceled      = subscription?.status?.toLowerCase() === "canceled";
@@ -408,6 +453,9 @@ function BillingPage() {
     borderRadius:20, border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.03)",
     overflow:"hidden", boxShadow:"0 2px 12px rgba(0,0,0,.12)",
   };
+
+  const seatCyclePrice = seatPricing[subscription?.billingCycle === "yearly" ? "yearly" : "monthly"];
+  const seatTotalCost  = seatQty * seatCyclePrice;
 
   return (
     <div style={{ padding:"28px 28px 80px", maxWidth:1050, margin:"0 auto", fontFamily:"'Outfit','DM Sans',sans-serif", color:"white" }}>
@@ -547,6 +595,54 @@ function BillingPage() {
               </div>
             </div>
           </div>
+
+          {/* Users & Seats */}
+          {currentPlanCode !== "ENTERPRISE" && (
+            <div style={{ ...card }}>
+              <div style={{ height:3, background:"linear-gradient(90deg,#6366f1,#7c3aed)" }}/>
+              <div style={{ padding:"20px 24px" }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
+                  {/* Left: usage info */}
+                  <div style={{ flex:1, minWidth:200 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+                      <div style={{ width:38, height:38, borderRadius:11, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.28)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>👥</div>
+                      <div>
+                        <div style={{ fontSize:15, fontWeight:800 }}>Users &amp; Seats</div>
+                        <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginTop:1 }}>Team capacity for {currentPlan.name} plan</div>
+                      </div>
+                    </div>
+                    {/* Usage bar */}
+                    {effectiveUserLimit !== null ? (
+                      <>
+                        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
+                          <span style={{ fontSize:13, color:"rgba(255,255,255,.6)" }}>{totalUsers} of {effectiveUserLimit} seats used</span>
+                          {extraSeats > 0 && <span style={{ fontSize:11, color:"#a78bfa", fontWeight:600 }}>+{extraSeats} extra</span>}
+                        </div>
+                        <div style={{ height:7, borderRadius:4, background:"rgba(255,255,255,.07)", overflow:"hidden" }}>
+                          <div style={{ height:"100%", borderRadius:4, width:`${Math.min(100, (totalUsers / effectiveUserLimit) * 100)}%`, background: totalUsers >= effectiveUserLimit ? "linear-gradient(90deg,#f87171,#ef4444)" : "linear-gradient(90deg,#6366f1,#7c3aed)", transition:"width .5s" }}/>
+                        </div>
+                        {totalUsers >= effectiveUserLimit && (
+                          <div style={{ marginTop:8, fontSize:12, color:"#fbbf24", fontWeight:600 }}>⚠️ Seat limit reached — add more seats to invite users</div>
+                        )}
+                      </>
+                    ) : (
+                      <div style={{ fontSize:13, color:"rgba(255,255,255,.5)" }}>{totalUsers} users · <span style={{ color:"#34d399", fontWeight:700 }}>Unlimited seats</span></div>
+                    )}
+                  </div>
+                  {/* Right: pricing + button */}
+                  <div style={{ display:"flex", flexDirection:"column", gap:8, alignItems:"flex-end" }}>
+                    <div style={{ textAlign:"right" }}>
+                      <div style={{ fontSize:20, fontWeight:900, color:"white" }}>+${seatCyclePrice}<span style={{ fontSize:12, fontWeight:500, color:"rgba(255,255,255,.4)" }}>/seat/mo</span></div>
+                      {extraSeats > 0 && <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginTop:2 }}>Current: +${extraSeats * seatCyclePrice}/mo for {extraSeats} extra seat{extraSeats > 1 ? "s" : ""}</div>}
+                    </div>
+                    <button onClick={() => { setSeatQty(1); setShowSeatModal(true); }} style={{ padding:"10px 20px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}>
+                      + Add Seats
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Recent invoices */}
           <div style={{ ...card }}>
@@ -767,6 +863,89 @@ function BillingPage() {
       {/* ── Modals ── */}
       {showAddCard && <AddCardModal onClose={() => setShowAddCard(false)} onSuccess={c => setPaymentMethods(prev => [...prev, c])} />}
       {showCancel  && <CancelModal planName={currentPlan.name} onClose={() => setShowCancel(false)} onConfirm={handleCancel} />}
+
+      {/* ── Seat Purchase Modal ── */}
+      {showSeatModal && (
+        <div style={{ position:"fixed", inset:0, zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+          <div onClick={() => setShowSeatModal(false)} style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.75)", backdropFilter:"blur(6px)" }}/>
+          <div style={{ position:"relative", width:"100%", maxWidth:480, background:"#0f1630", borderRadius:24, border:"1px solid rgba(99,102,241,.25)", boxShadow:"0 32px 80px rgba(0,0,0,.5)", overflow:"hidden" }}>
+            <div style={{ height:3, background:"linear-gradient(90deg,#6366f1,#7c3aed,#a78bfa)" }}/>
+            <div style={{ padding:"26px 28px 28px" }}>
+              {/* Header */}
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
+                <div>
+                  <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                    <div style={{ width:40, height:40, borderRadius:12, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>👥</div>
+                    <div>
+                      <div style={{ fontSize:17, fontWeight:800, color:"white" }}>Add More Users</div>
+                      <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginTop:1 }}>Expand your team capacity</div>
+                    </div>
+                  </div>
+                </div>
+                <button onClick={() => setShowSeatModal(false)} style={{ width:32, height:32, borderRadius:8, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", cursor:"pointer", fontSize:16, color:"rgba(255,255,255,.5)", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+              </div>
+
+              {/* Current usage */}
+              <div style={{ padding:"12px 16px", borderRadius:12, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", marginBottom:20 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                  <span style={{ fontSize:12, color:"rgba(255,255,255,.5)" }}>Current users</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:"white" }}>{totalUsers} / {effectiveUserLimit ?? "∞"}</span>
+                </div>
+                {effectiveUserLimit !== null && (
+                  <div style={{ height:6, borderRadius:3, background:"rgba(255,255,255,.08)", overflow:"hidden" }}>
+                    <div style={{ height:"100%", borderRadius:3, width:`${Math.min(100, (totalUsers / effectiveUserLimit) * 100)}%`, background: totalUsers >= effectiveUserLimit ? "linear-gradient(90deg,#f87171,#ef4444)" : "linear-gradient(90deg,#6366f1,#7c3aed)", transition:"width .3s" }}/>
+                  </div>
+                )}
+                {extraSeats > 0 && <div style={{ fontSize:11, color:"rgba(167,139,250,.7)", marginTop:8 }}>Includes {extraSeats} extra purchased seat{extraSeats > 1 ? "s" : ""}</div>}
+              </div>
+
+              {/* Quantity selector */}
+              <div style={{ marginBottom:20 }}>
+                <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".07em", textTransform:"uppercase", marginBottom:12 }}>How many seats to add?</div>
+                <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                  <button onClick={() => setSeatQty(q => Math.max(1, q - 1))} style={{ width:40, height:40, borderRadius:10, border:"1.5px solid rgba(255,255,255,.12)", background:"rgba(255,255,255,.06)", cursor:"pointer", fontSize:20, color:"white", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>−</button>
+                  <div style={{ flex:1, textAlign:"center", fontSize:32, fontWeight:900, color:"white", lineHeight:1 }}>{seatQty}</div>
+                  <button onClick={() => setSeatQty(q => Math.min(50, q + 1))} style={{ width:40, height:40, borderRadius:10, border:"1.5px solid rgba(255,255,255,.12)", background:"rgba(255,255,255,.06)", cursor:"pointer", fontSize:20, color:"white", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>+</button>
+                </div>
+                {/* Quick picks */}
+                <div style={{ display:"flex", gap:6, marginTop:12, justifyContent:"center" }}>
+                  {[1, 2, 5, 10].map(n => (
+                    <button key={n} onClick={() => setSeatQty(n)} style={{ padding:"5px 14px", borderRadius:8, border:`1.5px solid ${seatQty===n?"rgba(99,102,241,.6)":"rgba(255,255,255,.1)"}`, background:seatQty===n?"rgba(99,102,241,.15)":"rgba(255,255,255,.04)", cursor:"pointer", fontSize:12, fontWeight:700, color:seatQty===n?"#a5b4fc":"rgba(255,255,255,.5)", fontFamily:"inherit", transition:"all .15s" }}>+{n}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price breakdown */}
+              <div style={{ padding:"14px 18px", borderRadius:14, background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(124,58,237,.08))", border:"1px solid rgba(99,102,241,.2)", marginBottom:20 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+                  <span style={{ fontSize:12, color:"rgba(255,255,255,.5)" }}>{seatQty} seat{seatQty > 1 ? "s" : ""} × ${seatCyclePrice}/seat/mo</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:"white" }}>${seatTotalCost}/mo</span>
+                </div>
+                {subscription?.billingCycle === "yearly" && (
+                  <div style={{ display:"flex", justifyContent:"space-between" }}>
+                    <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>Billed yearly</span>
+                    <span style={{ fontSize:12, fontWeight:700, color:"#34d399" }}>${seatTotalCost * 12}/year</span>
+                  </div>
+                )}
+                <div style={{ borderTop:"1px solid rgba(255,255,255,.07)", marginTop:10, paddingTop:10, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <span style={{ fontSize:11, color:"rgba(255,255,255,.4)" }}>New user limit</span>
+                  <span style={{ fontSize:14, fontWeight:800, color:"#a5b4fc" }}>{effectiveUserLimit !== null ? effectiveUserLimit + seatQty : "∞"} users</span>
+                </div>
+              </div>
+
+              {/* Confirm button */}
+              <button
+                onClick={handleBuySeats}
+                disabled={buyingSeats}
+                style={{ width:"100%", padding:"14px", borderRadius:14, background:buyingSeats?"rgba(255,255,255,.07)":"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:buyingSeats?"rgba(255,255,255,.3)":"white", fontSize:15, fontWeight:800, cursor:buyingSeats?"not-allowed":"pointer", fontFamily:"inherit", transition:"all .2s" }}
+              >
+                {buyingSeats ? "Processing…" : `Confirm — Add ${seatQty} seat${seatQty > 1 ? "s" : ""} for $${seatTotalCost}/mo`}
+              </button>
+              <div style={{ marginTop:10, fontSize:11, color:"rgba(255,255,255,.3)", textAlign:"center" }}>Seats are added immediately · Cancel anytime</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
