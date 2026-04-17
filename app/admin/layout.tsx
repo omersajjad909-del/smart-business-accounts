@@ -17,14 +17,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(false);
   const [checking,   setChecking]   = useState(true);
 
-  // Force dark body background for admin
   useEffect(() => {
-    document.documentElement.style.background = "#070b14";
-    document.body.style.background = "#070b14";
-    return () => {
-      document.documentElement.style.background = "";
-      document.body.style.background = "";
-    };
+    // Keep background in sync with theme values instead of forcing dark mode
+    document.documentElement.style.background = "";
+    document.body.style.background = "";
   }, []);
 
   useEffect(() => {

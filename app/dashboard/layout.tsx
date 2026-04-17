@@ -181,16 +181,6 @@ export default function DashboardLayout({
   // Admin-controlled business module enablement
   const [enabledTypes, setEnabledTypes] = useState<Set<string> | null>(null);
 
-  // Force dark body background for dashboard
-  useEffect(() => {
-    document.documentElement.style.background = "#080c1e";
-    document.body.style.background = "#080c1e";
-    return () => {
-      document.documentElement.style.background = "";
-      document.body.style.background = "";
-    };
-  }, []);
-
   useEffect(() => {
     async function fetchCompany() {
       try {
@@ -665,8 +655,8 @@ export default function DashboardLayout({
             <img src="/icon1.png" alt="FinovaOS" width={42} height={42} style={{flexShrink:0,objectFit:"contain"}}/>
             {!sidebarCollapsed && (
               <div style={{display:"flex",flexDirection:"column",gap:1}}>
-                <div style={{fontSize:14,fontWeight:800,color:"white",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
-                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",letterSpacing:".04em"}}>Business Suite</div>
+                <div style={{fontSize:14,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
+                <div style={{fontSize:10,color:"var(--text-muted)",letterSpacing:".04em"}}>Business Suite</div>
               </div>
             )}
           </Link>

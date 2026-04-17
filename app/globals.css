@@ -391,12 +391,12 @@ a {
   color: var(--text-primary) !important;
 }
 
-/* ─── Dashboard always-dark override ─────────────────────────────────────────
-   The dashboard is built with hardcoded rgba(255,255,255,x) inline styles.
-   Forcing dark CSS variables here means it looks correct in both light & dark
-   system themes — no need to rewrite every inline style.
+/* ─── Dashboard theme-aware override ───────────────────────────────────────
+   The dashboard is built with some hardcoded dark-mode styles. Use the
+   dark theme only when the active theme is dark, and let light mode inherit
+   the default CSS variables.
 ──────────────────────────────────────────────────────────────────────────── */
-.dashboard-root {
+html.dark .dashboard-root {
   color-scheme: dark;
 
   --app-bg:     #080c1e;
@@ -420,7 +420,6 @@ a {
 
   --shadow: 0 18px 40px rgba(0,0,0,0.45);
 
-  /* Force all inputs/selects inside dashboard to use dark surface */
   background-color: var(--app-bg);
   color: var(--text-primary);
 }
@@ -428,71 +427,74 @@ a {
 .dashboard-root input,
 .dashboard-root select,
 .dashboard-root textarea {
-  background-color: rgba(255,255,255,0.05) !important;
-  color: #e8ecf5 !important;
-  border-color: rgba(255,255,255,0.1) !important;
+  background-color: var(--surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
 }
 
 /* Fix white-on-white native dropdown options in all dashboard selects */
 .dashboard-root select {
-  color-scheme: dark;
-  background-color: #0d1430 !important;
+  background-color: var(--surface) !important;
+  color: var(--text-primary) !important;
 }
-.dashboard-root select option,
-.dashboard-root select optgroup {
+html.dark .dashboard-root select {
+  color-scheme: dark;
+}
+html.dark .dashboard-root select option,
+html.dark .dashboard-root select optgroup {
   background-color: #0d1430 !important;
   color: #e8ecf5 !important;
 }
 
-/* Tailwind bg-white / bg-gray-* inside dashboard → dark surfaces */
-.dashboard-root .bg-white    { background-color: #101828 !important; }
-.dashboard-root .bg-gray-50  { background-color: #0f1835 !important; }
-.dashboard-root .bg-gray-100 { background-color: #0d1430 !important; }
-.dashboard-root .bg-gray-200 { background-color: #0b1124 !important; }
+/* Tailwind bg-white / bg-gray-* inside dashboard → dark surfaces only in dark mode */
+html.dark .dashboard-root .bg-white    { background-color: #101828 !important; }
+html.dark .dashboard-root .bg-gray-50  { background-color: #0f1835 !important; }
+html.dark .dashboard-root .bg-gray-100 { background-color: #0d1430 !important; }
+html.dark .dashboard-root .bg-gray-200 { background-color: #0b1124 !important; }
 
-/* Tailwind text-* inside dashboard → always light */
-.dashboard-root .text-gray-900,
-.dashboard-root .text-gray-800,
-.dashboard-root .text-gray-700,
-.dashboard-root .text-gray-600,
-.dashboard-root .text-gray-500 { color: rgba(255,255,255,0.75) !important; }
-.dashboard-root .text-gray-400,
-.dashboard-root .text-gray-300 { color: rgba(255,255,255,0.4)  !important; }
-.dashboard-root .text-black    { color: #e8ecf5 !important; }
+/* Tailwind text-* inside dashboard → light colors only in dark mode */
+html.dark .dashboard-root .text-gray-900,
+html.dark .dashboard-root .text-gray-800,
+html.dark .dashboard-root .text-gray-700,
+html.dark .dashboard-root .text-gray-600,
+html.dark .dashboard-root .text-gray-500 { color: rgba(255,255,255,0.75) !important; }
+html.dark .dashboard-root .text-gray-400,
+html.dark .dashboard-root .text-gray-300 { color: rgba(255,255,255,0.4)  !important; }
+html.dark .dashboard-root .text-black    { color: #e8ecf5 !important; }
 
 /* Tailwind border-* inside dashboard */
-.dashboard-root .border,
-.dashboard-root .border-gray-200,
-.dashboard-root .border-gray-300 { border-color: rgba(255,255,255,0.08) !important; }
+html.dark .dashboard-root .border,
+html.dark .dashboard-root .border-gray-200,
+html.dark .dashboard-root .border-gray-300 { border-color: rgba(255,255,255,0.08) !important; }
 
 /* Tailwind hover:bg-gray-* inside dashboard */
-.dashboard-root .hover\:bg-gray-50:hover,
-.dashboard-root .hover\:bg-gray-100:hover { background-color: rgba(255,255,255,0.05) !important; }
+html.dark .dashboard-root .hover\:bg-gray-50:hover,
+html.dark .dashboard-root .hover\:bg-gray-100:hover { background-color: rgba(255,255,255,0.05) !important; }
 
 /* Hover text */
-.dashboard-root .hover\:text-gray-900:hover,
-.dashboard-root .hover\:text-gray-800:hover { color: white !important; }
+html.dark .dashboard-root .hover\:text-gray-900:hover,
+html.dark .dashboard-root .hover\:text-gray-800:hover { color: white !important; }
 
 /* Tailwind divide lines */
-.dashboard-root .divide-gray-200 > * + * { border-color: rgba(255,255,255,0.07) !important; }
+html.dark .dashboard-root .divide-gray-200 > * + * { border-color: rgba(255,255,255,0.07) !important; }
 
 /* Tables */
-.dashboard-root th  { background-color: rgba(255,255,255,0.04) !important; color: rgba(255,255,255,0.5) !important; }
-.dashboard-root td  { border-color: rgba(255,255,255,0.05) !important; }
-.dashboard-root tr:hover td { background-color: rgba(255,255,255,0.03) !important; }
+html.dark .dashboard-root th  { background-color: rgba(255,255,255,0.04) !important; color: rgba(255,255,255,0.5) !important; }
+html.dark .dashboard-root td  { border-color: rgba(255,255,255,0.05) !important; }
+html.dark .dashboard-root tr:hover td { background-color: rgba(255,255,255,0.03) !important; }
 
 /* Cards / panels */
-.dashboard-root .rounded-lg,
-.dashboard-root .rounded-xl,
-.dashboard-root .rounded-2xl {
+html.dark .dashboard-root .rounded-lg,
+html.dark .dashboard-root .rounded-xl,
+html.dark .dashboard-root .rounded-2xl {
   border-color: rgba(255,255,255,0.07);
 }
 
 /* Scrollbar */
-.dashboard-root ::-webkit-scrollbar       { width: 5px; height: 5px; }
-.dashboard-root ::-webkit-scrollbar-track { background: transparent; }
-.dashboard-root ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
-.dashboard-root ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+html.dark .dashboard-root ::-webkit-scrollbar       { width: 5px; height: 5px; }
+html.dark .dashboard-root ::-webkit-scrollbar-track { background: transparent; }
+html.dark .dashboard-root ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
+html.dark .dashboard-root ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 
 /* ═══════════════════════════════════════════════════════════════
    MARKETING PAGES — GLOBAL RESPONSIVE CSS

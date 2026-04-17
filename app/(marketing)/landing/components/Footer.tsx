@@ -163,9 +163,9 @@ export default function Footer() {
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 56, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)" }}>
             <Zap size={12} color="#818cf8"/>
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", letterSpacing: ".08em", textTransform: "uppercase" }}>Trade & Finance OS</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", letterSpacing: ".08em", textTransform: "uppercase" }}>Business OS</span>
           </div>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,.25)" }}>— Built for wholesale, distribution &amp; import/export</span>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,.25)" }}>— All-in-one platform for modern businesses</span>
         </div>
 
         {/* Main 4-column grid */}
@@ -188,7 +188,7 @@ export default function Footer() {
             </Link>
 
             <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.36)", lineHeight: 1.85, marginBottom: 28, maxWidth: 310 }}>
-              Invoicing, inventory, branch visibility, shipment tracking, and trade finance — unified in one platform for serious business operations.
+              Invoicing, inventory, accounting, payroll, and more — unified in one platform built for businesses of every size.
             </p>
 
             {/* Social row */}
@@ -267,8 +267,8 @@ export default function Footer() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
               {[
                 { Icon: Mail,  text: "finovaos.app@gmail.com", color: "#818cf8", href: "mailto:finovaos.app@gmail.com" },
-                { Icon: Phone, text: "+92 304 7653693",        color: "#34d399", href: "tel:+923047653693" },
-                { Icon: Globe, text: "Global Operations",      color: "#fbbf24", href: "#" },
+                { Icon: Phone, text: "+92 304-7653693",        color: "#34d399", href: "tel:+923047653693" },
+                { Icon: Globe, text: "Pakistan 🇵🇰",           color: "#fbbf24", href: "#" },
               ].map(({ Icon, text, color, href }) => (
                 <a key={text} href={href} className="ft-contact-item" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
                   <div className="ft-contact-icon" style={{
@@ -296,10 +296,10 @@ export default function Footer() {
                 <span style={{ fontSize: 10.5, fontWeight: 800, color: "#a5b4fc", letterSpacing: ".08em", textTransform: "uppercase" }}>Limited Offer</span>
               </div>
               <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.75)", fontWeight: 600, margin: "0 0 5px", lineHeight: 1.3 }}>
-                Trade-ready workflows
+                Start free, grow fast
               </p>
               <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.32)", margin: "0 0 14px", lineHeight: 1.55 }}>
-                For wholesale ops, distribution teams &amp; import/export businesses
+                Full platform access. No credit card required. Cancel anytime.
               </p>
               <Link href="/pricing" className="ft-cta-btn">
                 Get Started <ArrowRight size={13}/>
@@ -318,13 +318,17 @@ export default function Footer() {
           flexWrap: "wrap", gap: 14, paddingBottom: "max(28px, env(safe-area-inset-bottom))",
         }}>
           {/* Left */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.2)", margin: 0 }}>
-              © {new Date().getFullYear()} <span style={{ color: "rgba(255,255,255,.35)", fontWeight: 600 }}>FinovaOS</span>. All rights reserved.
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.22)", margin: 0 }}>
+              © {new Date().getFullYear()} <span style={{ color: "rgba(255,255,255,.4)", fontWeight: 700 }}>FinovaOS</span>. All rights reserved.
             </p>
-            <p style={{ fontSize: 10.5, color: "rgba(255,255,255,.14)", margin: 0, fontStyle: "italic" }}>
-              FinovaOS is represented by <span style={{ color: "rgba(255,255,255,.3)", fontWeight: 600, fontStyle: "normal" }}>Finova Forge</span>
-            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ width: 16, height: 1, background: "rgba(255,255,255,.1)", borderRadius: 1 }}/>
+              <p style={{ fontSize: 10.5, color: "rgba(255,255,255,.15)", margin: 0 }}>
+                Represented by{" "}
+                <span style={{ color: "rgba(255,255,255,.32)", fontWeight: 600 }}>Finova Forge</span>
+              </p>
+            </div>
           </div>
 
           {/* Center: links */}
