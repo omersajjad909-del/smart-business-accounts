@@ -267,10 +267,10 @@ export default function Footer() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
               {[
                 { Icon: Mail,  text: "finovaos.app@gmail.com", color: "#818cf8", href: "mailto:finovaos.app@gmail.com" },
-                { Icon: Phone, text: "+92 304-7653693",        color: "#34d399", href: "tel:+923047653693" },
+                { Icon: Phone, text: "+92 304-7653693",        color: "#34d399", href: "https://wa.me/923047653693" },
                 { Icon: Globe, text: "Pakistan 🇵🇰",           color: "#fbbf24", href: "#" },
               ].map(({ Icon, text, color, href }) => (
-                <a key={text} href={href} className="ft-contact-item" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+                <a key={text} href={href} className="ft-contact-item" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
                   <div className="ft-contact-icon" style={{
                     width: 32, height: 32, borderRadius: 9, flexShrink: 0,
                     background: `${color}14`, border: `1px solid ${color}28`,
@@ -293,13 +293,13 @@ export default function Footer() {
               <div aria-hidden style={{ position: "absolute", top: -30, right: -30, width: 100, height: 100, borderRadius: "50%", background: "radial-gradient(circle,rgba(99,102,241,.14),transparent 70%)", pointerEvents: "none" }}/>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                 <span style={{ fontSize: 14 }}>🚀</span>
-                <span style={{ fontSize: 10.5, fontWeight: 800, color: "#a5b4fc", letterSpacing: ".08em", textTransform: "uppercase" }}>Limited Offer</span>
+                <span style={{ fontSize: 10.5, fontWeight: 800, color: "#a5b4fc", letterSpacing: ".08em", textTransform: "uppercase" }}>Get Started</span>
               </div>
               <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.75)", fontWeight: 600, margin: "0 0 5px", lineHeight: 1.3 }}>
-                Start free, grow fast
+                Join 14k+ businesses worldwide
               </p>
               <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.32)", margin: "0 0 14px", lineHeight: 1.55 }}>
-                Full platform access. No credit card required. Cancel anytime.
+                Full platform access. Expert support. 24/7 availability.
               </p>
               <Link href="/pricing" className="ft-cta-btn">
                 Get Started <ArrowRight size={13}/>

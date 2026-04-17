@@ -36,7 +36,7 @@ export default function QuickBooksHero() {
                 href="/signup" 
                 className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-lg font-bold shadow-lg shadow-emerald-200 transition-all text-center"
               >
-                Try it free for 30 days
+                Get Started Now
               </Link>
               <Link 
                 href="/pricing" 
