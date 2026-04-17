@@ -11,9 +11,9 @@ const DEFAULT_PRICING = {
 };
 
 const DEFAULT_PLAN_LIMITS = {
-  starter: 5,
-  pro: 20,
-  enterprise: null,
+  starter: 3,
+  pro: 10,
+  enterprise: 25,
 };
 const DEFAULT_SEAT_PRICING = {
   monthly: 7,

@@ -35,7 +35,7 @@ const PLANS = [
     border: "rgba(129,140,248,.32)",
     gradient: "linear-gradient(135deg,#6366f1,#4f46e5)",
     tagline: "For small businesses getting started",
-    features: ["Up to 5 users","Sales & purchase invoices","Ledger and trial balance","Basic reports","Chart of accounts","Email support"],
+    features: ["Up to 3 users","Sales & purchase invoices","Ledger and trial balance","Basic reports","Chart of accounts","Email support"],
   },
   {
     slug: "professional",
@@ -58,7 +58,7 @@ const PLANS = [
     border: "rgba(52,211,153,.35)",
     gradient: "linear-gradient(135deg,#059669,#34d399)",
     tagline: "Full power for large organizations",
-    features: ["Unlimited users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority onboarding and support"],
+    features: ["Up to 25 users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority onboarding and support"],
   },
 ];
 
@@ -69,9 +69,9 @@ const DEFAULT_PUBLIC_PRICING: PlanPricing = {
 };
 
 const DEFAULT_PLAN_LIMITS: Record<string, number | null> = {
-  starter: 5,
-  professional: 20,
-  enterprise: null,
+  starter: 3,
+  professional: 10,
+  enterprise: 25,
 };
 const DEFAULT_SEAT_PRICING = {
   monthly: 7,
@@ -90,8 +90,7 @@ const COMPARISON: Category[] = [
     title: "Core Platform",
     features: [
       { name: "Users", starter: "Up to 5", pro: "Up to 20", enterprise: "Unlimited" },
-      { name: "Companies / Workspaces", starter: "1", pro: "3", enterprise: "Unlimited" },
-      { name: "Multi-branch support", starter: false, pro: true, enterprise: true },
+      { name: "Branches", starter: "1 branch", pro: "Up to 3", enterprise: "Up to 10" },
       { name: "Custom domain (white-label)", starter: false, pro: false, enterprise: true },
       { name: "API access", starter: false, pro: false, enterprise: true },
       { name: "Webhooks & integrations", starter: false, pro: false, enterprise: true },
@@ -612,26 +611,11 @@ export default function PricingPage() {
                   onClick={() => toggleCat(cat.id)}
                   style={{ width: "100%", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", background: "rgba(255,255,255,.025)", border: "none", borderTop: "1px solid rgba(255,255,255,.06)", cursor: "pointer", fontFamily: ff, color: "white", padding: 0 }}
                 >
-                  <div style={{ padding: "14px 24px", display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ padding: "14px 24px", display: "flex", alignItems: "center", gap: 10, gridColumn: "1 / -1" }}>
                     <span style={{ fontSize: 16 }}>{cat.icon}</span>
                     <span style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,.85)", letterSpacing: ".01em" }}>{cat.title}</span>
                     <span style={{ marginLeft: "auto", fontSize: 11, color: "rgba(255,255,255,.3)", transition: "transform .2s", display: "inline-block", transform: openCats.has(cat.id) ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
                   </div>
-                  {PLANS.map((plan, pi) => (
-                    <div
-                      key={plan.slug}
-                      style={{
-                        padding: "14px 16px",
-                        borderLeft: "1px solid rgba(255,255,255,.04)",
-                        background: plan.featured ? "rgba(99,102,241,.04)" : "transparent",
-                        textAlign: "center",
-                      }}
-                    >
-                      <div style={{ fontSize: 12, fontWeight: 800, color: PLAN_COLORS[pi], letterSpacing: ".01em" }}>
-                        {plan.name}
-                      </div>
-                    </div>
-                  ))}
                 </button>
 
                 {/* Feature rows */}
@@ -644,21 +628,23 @@ export default function PricingPage() {
                     <div style={{ padding: "13px 24px 13px 44px", fontSize: 13, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 8 }}>
                       {feat.name}
                     </div>
-                    {([
-                      feat.name === "Users"
-                        ? `${usersLabel(planLimits.starter)} (+${formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo)`
-                        : (feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].starter : feat.starter),
-                      feat.name === "Users"
-                        ? `${usersLabel(planLimits.professional)} (+${formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo)`
-                        : (feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].pro : feat.pro),
-                      feat.name === "Users"
-                        ? `${usersLabel(planLimits.enterprise)} (+${formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo)`
-                        : (feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].enterprise : feat.enterprise),
-                    ] as Val[]).map((v, pi) => (
-                      <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
-                        <Val v={v} color={PLAN_COLORS[pi]} />
-                      </div>
-                    ))}
+                    {feat.name === "Users"
+                      ? ([planLimits.starter, planLimits.professional, planLimits.enterprise] as (number | null)[]).map((lim, pi) => (
+                          <div key={pi} style={{ padding: "12px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: PLAN_COLORS[pi] }}>{usersLabel(lim)}</span>
+                            <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 500 }}>+{formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/extra user</span>
+                          </div>
+                        ))
+                      : ([
+                          feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].starter : feat.starter,
+                          feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].pro : feat.pro,
+                          feat.permKey && featureMap[feat.permKey] !== undefined ? featureMap[feat.permKey].enterprise : feat.enterprise,
+                        ] as Val[]).map((v, pi) => (
+                          <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
+                            <Val v={v} color={PLAN_COLORS[pi]} />
+                          </div>
+                        ))
+                    }
                   </div>
                 ))}
               </div>

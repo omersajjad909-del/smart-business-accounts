@@ -16,10 +16,17 @@ const DEFAULT_SEAT_PRICING = {
   yearly: 6,
 };
 
+const DEFAULT_PLAN_LIMITS = {
+  starter: 3,
+  pro: 10,
+  enterprise: 25,
+};
+
 // Canonical default plan config returned when no admin override exists
 const DEFAULT_CONFIG = {
   pricing: DEFAULT_PRICING,
   seatPricing: DEFAULT_SEAT_PRICING,
+  planLimits: DEFAULT_PLAN_LIMITS,
   plans: [
     {
       code: "starter", name: "Starter",

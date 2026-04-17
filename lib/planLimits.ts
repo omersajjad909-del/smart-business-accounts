@@ -6,8 +6,8 @@ export function normalizePlanCode(plan: string | null | undefined): string {
 
 export function getMaxUsersForPlan(plan: string | null | undefined): number | null {
   const p = normalizePlanCode(plan);
-  if (p === "ENTERPRISE") return null;   // unlimited
+  if (p === "ENTERPRISE") return 25;
   if (p === "CUSTOM")     return null;   // unlimited
-  if (p === "PRO")        return 20;     // up to 20 users
-  return 5;                              // STARTER: up to 5 users
+  if (p === "PRO")        return 10;
+  return 3;                              // STARTER: up to 3 users
 }

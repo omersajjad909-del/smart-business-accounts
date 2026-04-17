@@ -31,19 +31,19 @@ const PLANS = [
   {
     code: "STARTER", name: "Starter", monthlyPrice: 49, icon: "🌱", color: "#818cf8",
     gradFrom: "#6366f1", gradTo: "#4f46e5",
-    features: ["Up to 5 users","Core Accounting","Sales & Purchase Invoices","Bank Reconciliation","Basic Reports","Email Support"],
+    features: ["Up to 3 users","Core Accounting","Sales & Purchase Invoices","Bank Reconciliation","Basic Reports","Email Support"],
     notIncluded: ["HR & Payroll","Advanced Reports","Multi-Branch","API Access"],
   },
   {
     code: "PROFESSIONAL", name: "Professional", monthlyPrice: 99, icon: "🚀", color: "#34d399", popular: true,
     gradFrom: "#10b981", gradTo: "#059669",
-    features: ["Up to 20 users","Everything in Starter","CRM & Sales Pipeline","Inventory Management","Multi-Branch Support","Advanced Reports","Backup & Restore","Priority Support"],
+    features: ["Up to 10 users","Everything in Starter","CRM & Sales Pipeline","Inventory Management","Multi-Branch Support","Advanced Reports","Backup & Restore","Priority Support"],
     notIncluded: ["HR & Payroll","API Access","Dedicated Account Manager"],
   },
   {
     code: "ENTERPRISE", name: "Enterprise", monthlyPrice: 249, icon: "💎", color: "#fbbf24",
     gradFrom: "#f59e0b", gradTo: "#d97706",
-    features: ["Unlimited users","Everything in Pro","HR & Payroll","API Access & Webhooks","Custom Integrations","Dedicated Account Manager","SLA Support","Custom Modules"],
+    features: ["Up to 25 users","Everything in Pro","HR & Payroll","API Access & Webhooks","Custom Integrations","Dedicated Account Manager","SLA Support","Custom Modules"],
     notIncluded: [],
   },
 ];
@@ -597,7 +597,7 @@ function BillingPage() {
           </div>
 
           {/* Users & Seats */}
-          {currentPlanCode !== "ENTERPRISE" && (
+          {effectiveUserLimit !== null && (
             <div style={{ ...card }}>
               <div style={{ height:3, background:"linear-gradient(90deg,#6366f1,#7c3aed)" }}/>
               <div style={{ padding:"20px 24px" }}>

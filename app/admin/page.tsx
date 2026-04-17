@@ -1808,7 +1808,7 @@ function PagePlans() {
   const [plansTab, setPlansTab] = useState<"config"|"custom"|"modules">("config");
   const [pricing, setPricing]   = useState({ starter:{monthly:49,yearly:39}, pro:{monthly:99,yearly:79}, enterprise:{monthly:249,yearly:199} });
   const [seatPricing, setSeatPricing] = useState({ monthly:7, yearly:6 });
-  const [planLimits, setPlanLimits] = useState<Record<string,number|null>>({ starter:5, pro:20, enterprise:null });
+  const [planLimits, setPlanLimits] = useState<Record<string,number|null>>({ starter:3, pro:10, enterprise:25 });
   const [saved,   setSaved]     = useState<""|"saving"|"ok"|"err">("");
   const [features, setFeatures] = useState<string[]>(DEFAULT_FEATURES);
   const [pf, setPf] = useState<Record<PlanKey, string[]>>({
