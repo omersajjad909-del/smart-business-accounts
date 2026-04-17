@@ -279,6 +279,43 @@ a {
   }
 }
 
+/* Dashboard form safety-net for legacy inline styles */
+@media (max-width: 900px) {
+  .dashboard-root form,
+  .dashboard-root form * {
+    min-width: 0;
+  }
+
+  .dashboard-root form input,
+  .dashboard-root form select,
+  .dashboard-root form textarea,
+  .dashboard-root form button {
+    max-width: 100%;
+  }
+
+  .dashboard-root form[style*="display: flex"],
+  .dashboard-root form [style*="display: flex"] {
+    flex-wrap: wrap !important;
+  }
+
+  .dashboard-root form [style*="display: flex"] > * {
+    min-width: 0 !important;
+  }
+
+  .dashboard-root form[style*="grid-template-columns"],
+  .dashboard-root form [style*="grid-template-columns"],
+  .dashboard-root div[style*="grid-template-columns"]:has(input, select, textarea),
+  .dashboard-root section[style*="grid-template-columns"]:has(input, select, textarea) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-root form button {
+    width: 100%;
+  }
+}
+
 /* Overrides for specific tailwind classes to map to our vars */
 .app-root .bg-white {
   background-color: var(--card-bg) !important;
