@@ -458,9 +458,9 @@ export default function PricingPage() {
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,.92)", marginTop: 6, fontWeight: 700 }}>
                       Then {formatPrice(regularPrice)}/mo
                     </div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.36)", marginTop: 6 }}>
+                    {/* <div style={{ fontSize: 11, color: "rgba(255,255,255,.36)", marginTop: 6 }}>
                       {billing === "yearly" ? "Intro price for first 3 months, then yearly-plan monthly equivalent applies." : "Intro price for first 3 months, then regular monthly billing starts."}
-                    </div>
+                    </div> */}
                   </div>
                   <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14 }}>
                     Continue with {plan.name}
