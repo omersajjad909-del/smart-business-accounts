@@ -15,7 +15,6 @@ import {
 } from "@/lib/currencyPreference";
 import {
   CUSTOM_PLAN_BASE_MONTHLY_USD,
-  getCustomPlanMonthlyUsd,
 } from "@/lib/customPlanPricing";
 
 type BillingCycle = "monthly" | "yearly";
@@ -254,18 +253,6 @@ const COMPARISON: Category[] = [
   },
 ];
 
-const MODULES = [
-  { id: "accounting",         name: "Accounting & Invoicing",  price: 15, desc: "Ledger, invoices, vouchers, P&L, balance sheet" },
-  { id: "inventory",          name: "Inventory Management",    price: 12, desc: "Stock tracking, GRN, barcode, low-stock alerts" },
-  { id: "crm",                name: "CRM",                     price: 15, desc: "Contacts, sales pipeline, interaction logs" },
-  { id: "hr_payroll",         name: "HR & Payroll",            price: 20, desc: "Employees, attendance, payroll, advance salary" },
-  { id: "bank_reconciliation",name: "Bank Reconciliation",     price: 10, desc: "Statement import, discrepancy flagging, closing" },
-  { id: "reports",            name: "Advanced Reports",        price: 8,  desc: "Cash flow, profitability, annual statements" },
-  { id: "multi_branch",       name: "Multi-Branch",            price: 15, desc: "Branches, consolidated reports, branch access" },
-  { id: "whatsapp",           name: "WhatsApp & SMS",          price: 8,  desc: "Payment reminders, invoices via WhatsApp and SMS" },
-  { id: "api_access",         name: "API Access",              price: 20, desc: "REST API, webhooks, third-party integrations" },
-  { id: "tax_filing",         name: "Tax & Compliance",        price: 10, desc: "Tax summary, GST/VAT reports, compliance docs" },
-];
 
 const FAQS = [
   { q: "Will prices automatically match my country?", a: "Yes. We detect your region and show localized display pricing. You can still change the currency manually at any time." },
@@ -381,6 +368,15 @@ export default function PricingPage() {
               yearly: Math.round(Number(d.seatPricing?.yearly ?? (DEFAULT_SEAT_PRICING.yearly * 12)) / 12),
             });
           }
+          if (d?.customPlan) {
+            setCustomPlanData(prev => ({
+              basePrice: d.customPlan.basePrice ?? prev.basePrice,
+              yearlyDiscount: d.customPlan.yearlyDiscount ?? prev.yearlyDiscount,
+              modules: Array.isArray(d.customPlan.modules) && d.customPlan.modules.length
+                ? d.customPlan.modules
+                : prev.modules,
+            }));
+          }
         }
       } catch {}
       // Load live plan feature overrides from admin config
@@ -403,8 +399,15 @@ export default function PricingPage() {
     return () => window.removeEventListener(FINOVA_CURRENCY_EVENT, handler as EventListener);
   }, []);
 
-  const customMonthly = useMemo(() => getCustomPlanMonthlyUsd(selectedModules), [selectedModules]);
-  const customDisplayUsd = billing === "yearly" ? Math.round(customMonthly * 0.8) : customMonthly;
+  const customMonthly = useMemo(() => {
+    const base = Number(customPlanData.basePrice) || 0;
+    const moduleTotal = customPlanData.modules
+      .filter((m: any) => selectedModules.includes(m.id))
+      .reduce((s: number, m: any) => s + Number(m.price), 0);
+    return base + moduleTotal || CUSTOM_PLAN_BASE_MONTHLY_USD;
+  }, [selectedModules, customPlanData]);
+  const yearlyDiscount = customPlanData.yearlyDiscount ?? 20;
+  const customDisplayUsd = billing === "yearly" ? Math.round(customMonthly * (1 - yearlyDiscount / 100)) : customMonthly;
   const formatPrice = (usd: number) => formatFromUSD(usd, currency, rates);
   const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
   const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&cycle=${billing}&currency=${currency}&country=${country}`;
@@ -639,7 +642,7 @@ export default function PricingPage() {
                 </button>
 
                 {/* Feature rows */}
-                {openCats.has(cat.id) && cat.features.map((feat, fi) => (
+                {openCats.has(cat.id) && cat.features.map((feat) => (
                   <div
                     key={feat.name}
                     className="feat-row"
@@ -678,7 +681,7 @@ export default function PricingPage() {
             {/* Bottom CTA row */}
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.015)" }}>
               <div style={{ padding: "24px 24px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.3)" }}>Ready to start?</div>
-              {PLANS.map((plan, pi) => (
+              {PLANS.map((plan) => (
                 <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
                   <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "11px 12px", borderRadius: 10, textDecoration: "none", color: "white", fontWeight: 800, fontSize: 13, background: plan.gradient }}>
                     Get {plan.name}
@@ -721,7 +724,7 @@ export default function PricingPage() {
             </div>
           </div>
           <div className="cg" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
-            {MODULES.map(module => {
+            {customPlanData.modules.map((module: any) => {
               const selected = selectedModules.includes(module.id);
               return (
                 <button key={module.id} onClick={() => toggleModule(module.id)} style={{ textAlign: "left", padding: "18px 18px", borderRadius: 16, border: `1.5px solid ${selected ? "rgba(249,115,22,.45)" : "rgba(255,255,255,.08)"}`, background: selected ? "rgba(249,115,22,.08)" : "rgba(255,255,255,.03)", color: "white", cursor: "pointer", fontFamily: ff }}>
@@ -735,7 +738,7 @@ export default function PricingPage() {
             })}
           </div>
           <div style={{ marginTop: 20, fontSize: 13, color: "rgba(255,255,255,.36)", textAlign: "center" }}>
-            Base infrastructure starts from {formatPrice(CUSTOM_PLAN_BASE_MONTHLY_USD)}/mo · shown estimate includes base + selected modules.
+            Base infrastructure starts from {formatPrice(Number(customPlanData.basePrice) || CUSTOM_PLAN_BASE_MONTHLY_USD)}/mo · shown estimate includes base + selected modules.
           </div>
         </div>
 

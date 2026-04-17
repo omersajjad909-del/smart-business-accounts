@@ -120,7 +120,9 @@
       "Bash(node send-test-email.mjs)",
       "Bash(node send-test-all-countries.mjs)",
       "Bash(npm install *)",
-      "WebFetch(domain:www.finovaos.app)"
+      "WebFetch(domain:www.finovaos.app)",
+      "Read(//c/Users/Standard Laptop/.claude/projects/d--projects-smart-business-accounts/**)",
+      "Bash(python -c \"import sys, json; lines = sys.stdin.read\\(\\).strip\\(\\).split\\('\\\\n'\\); [print\\(json.loads\\(l\\).get\\('message', {}\\).get\\('content', ''\\)\\) for l in lines[-20:] if l]\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib"
