@@ -1898,8 +1898,8 @@ export default function DashboardLayout({
         </div>
 
         {/* ---- PAGE CONTENT ---- */}
-        <div style={{flex:1,overflowY:"auto",padding:"16px 12px"}} className="sm:px-4 sm:py-5 lg:px-6">
-          <div style={{width:"100%",maxWidth:1280,margin:"0 auto"}}>
+        <div style={{flex:1,overflowY:"auto",padding:"16px 12px"}} className="dashboard-content-scroll sm:px-4 sm:py-5 lg:px-6">
+          <div style={{width:"100%",maxWidth:1280,margin:"0 auto"}} className="dashboard-content-inner">
             {currentUser?.email === "finovaos.app@gmail.com" && (
               <div style={{
                 display:"flex", alignItems:"center", justifyContent:"space-between",
@@ -2224,5 +2224,4 @@ function NavLink({ href, children, pathname }: {
     </Link>
   );
 }
-
 

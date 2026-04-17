@@ -316,6 +316,48 @@ a {
   }
 }
 
+/* Dashboard-wide mobile fallback for pages with heavy inline styles */
+@media (max-width: 900px) {
+  .dashboard-root .dashboard-content-scroll {
+    padding: 10px 8px !important;
+  }
+
+  .dashboard-root .dashboard-content-inner {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .dashboard-root .dashboard-content-inner > * {
+    max-width: 100% !important;
+    width: 100%;
+  }
+
+  .dashboard-root .dashboard-content-inner :is(div, section, article, form)[style*="max-width"] {
+    max-width: 100% !important;
+  }
+
+  .dashboard-root .dashboard-content-inner :is(div, section, article, form)[style*="grid-template-columns"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .dashboard-root .dashboard-content-inner :is(div, section, article, form)[style*="display: flex"] {
+    flex-wrap: wrap !important;
+  }
+
+  .dashboard-root .dashboard-content-inner :is(div, section, article, form) > * {
+    min-width: 0 !important;
+  }
+
+  .dashboard-root .dashboard-content-inner :is(input, select, textarea, button) {
+    max-width: 100% !important;
+  }
+
+  .dashboard-root .dashboard-content-inner :is(div, section, article)[style*="overflow: hidden"] :is(table)[style*="min-width"] {
+    min-width: 680px !important;
+  }
+}
+
 /* Overrides for specific tailwind classes to map to our vars */
 .app-root .bg-white {
   background-color: var(--card-bg) !important;

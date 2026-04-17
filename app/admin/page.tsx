@@ -2278,91 +2278,153 @@ function PageCustomOrders() {
 /* ══════════════════════════════════════════════
    MODULE PRICES — Admin can edit per-module pricing
 ══════════════════════════════════════════════ */
-function PageModulePrices() {
-  // Import MODULES from lib — here we inline for admin override
-  const DEFAULT_MODULES = [
-    { key:"accounting",         name:"Accounting & Invoicing", icon:"📊", price:15, category:"core" },
-    { key:"crm",                name:"CRM",                    icon:"👥", price:15, category:"core" },
-    { key:"hr_payroll",         name:"HR & Payroll",           icon:"👨‍💼", price:20, category:"core" },
-    { key:"bank_reconciliation",name:"Bank Reconciliation",    icon:"🏦", price:10, category:"finance" },
-    { key:"tax_filing",         name:"Tax Filing",             icon:"🧾", price:10, category:"finance" },
-    { key:"inventory",          name:"Inventory",              icon:"📦", price:12, category:"operations" },
-    { key:"reports",            name:"Advanced Reports",       icon:"📈", price:8,  category:"operations" },
-    { key:"multi_branch",       name:"Multi-Branch",           icon:"🏢", price:15, category:"operations" },
-    { key:"whatsapp",           name:"WhatsApp / Slack",       icon:"💬", price:8,  category:"integrations" },
-    { key:"api_access",         name:"API Access",             icon:"", price:20, category:"integrations" },
-  ];
+function PageModulePrices({ customPlan, setCustomPlan, onSave, saved }: any) {
+  const [newMod, setNewMod] = useState({ id:"", name:"", price:0, desc:"", icon:"📌", category:"core" });
+  const [showAdd, setShowAdd] = useState(false);
+  const categories = ["core","finance","operations","integrations"];
+  const catLabels: Record<string,string> = { core:"Core", finance:"Finance", operations:"Operations", integrations:"Integrations" };
+  const catColors: Record<string,string> = { core:"#818cf8", finance:"#34d399", operations:"#38bdf8", integrations:"#a78bfa" };
 
-  const [modules, setModules] = useState(DEFAULT_MODULES);
-  const [saving, setSaving]   = useState(false);
-  const [saved,  setSaved]    = useState(false);
-
-  useEffect(()=>{
-    fetch("/api/admin/module-prices")
-      .then(r=>r.json())
-      .then(d=>{ if(d.modules?.length) setModules(d.modules); })
-      .catch(()=>{});
-  },[]);
-
-  async function save() {
-    setSaving(true);
-    try {
-      await fetch("/api/admin/module-prices", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ modules }),
-      });
-      setSaved(true);
-      setTimeout(()=>setSaved(false), 3000);
-    } catch {}
-    setSaving(false);
+  function updateModule(id: string, field: string, value: any) {
+    setCustomPlan((cp: any) => ({ ...cp, modules: cp.modules.map((m: any) => m.id === id ? { ...m, [field]: value } : m) }));
+  }
+  function removeModule(id: string) {
+    setCustomPlan((cp: any) => ({ ...cp, modules: cp.modules.filter((m: any) => m.id !== id) }));
+  }
+  function addModule() {
+    if (!newMod.id || !newMod.name) return;
+    setCustomPlan((cp: any) => ({ ...cp, modules: [...cp.modules, { ...newMod, enabled: true }] }));
+    setNewMod({ id:"", name:"", price:0, desc:"", icon:"📌", category:"core" });
+    setShowAdd(false);
   }
 
-  const total = modules.reduce((s,m)=>s+m.price, 0);
-  const categories = ["core","finance","operations","integrations"];
-  const catLabels: Record<string,string> = { core:"Core Modules", finance:"Finance", operations:"Operations", integrations:"Integrations" };
+  const enabledTotal = customPlan.modules.filter((m:any) => m.enabled).reduce((s:number, m:any) => s + Number(m.price), 0);
+  const saveLabel = saved==="saving"?"Saving…":saved==="ok"?"✓ Saved!":saved==="err"?"✕ Error":"Save Changes";
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <div style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>Set price per module for Custom plan. Changes reflect live on pricing page.</div>
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
+        <div>
+          <div style={{ fontSize:15, fontWeight:800, color:"white" }}>Custom Plan Modules</div>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:2 }}>Manage which modules appear on the pricing page and their prices. Changes go live immediately after saving.</div>
+        </div>
         <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-          {saved && <span style={{ color:"#34d399", fontSize:12, fontWeight:600 }}>✓ Saved</span>}
-          <button onClick={save} disabled={saving}
-            style={{ padding:"9px 22px", borderRadius:10, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-            {saving?"Saving...":"Save Prices"}
+          <button onClick={() => setShowAdd((s: boolean) => !s)} style={{ padding:"8px 16px", borderRadius:9, background:"rgba(255,255,255,.07)", border:"1px solid rgba(255,255,255,.12)", color:"white", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+            {showAdd ? "✕ Cancel" : "+ Add Module"}
+          </button>
+          <button onClick={onSave} disabled={saved==="saving"} style={{ padding:"9px 22px", borderRadius:10, background:saved==="ok"?"rgba(52,211,153,.2)":saved==="err"?"rgba(248,113,113,.2)":"linear-gradient(135deg,#6366f1,#4f46e5)", border:saved==="ok"?"1px solid rgba(52,211,153,.4)":saved==="err"?"1px solid rgba(248,113,113,.4)":"none", color:saved==="ok"?"#34d399":saved==="err"?"#f87171":"white", fontSize:13, fontWeight:700, cursor:"pointer", transition:"all .2s", opacity:saved==="saving"?.7:1 }}>
+            {saveLabel}
           </button>
         </div>
       </div>
 
-      {categories.map(cat=>{
-        const catMods = modules.filter(m=>m.category===cat);
+      {/* Base price + yearly discount */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        <div style={{ padding:"16px 18px", borderRadius:14, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)" }}>
+          <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", marginBottom:8 }}>Base Price (platform fee)</div>
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <span style={{ color:"rgba(255,255,255,.4)", fontSize:16, fontWeight:700 }}>$</span>
+            <input type="number" min="0" value={customPlan.basePrice}
+              onChange={e => setCustomPlan((cp:any) => ({ ...cp, basePrice: Number(e.target.value) }))}
+              style={{ flex:1, padding:"8px 12px", borderRadius:9, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", color:"#a5b4fc", fontSize:18, fontWeight:800, outline:"none" }} />
+            <span style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>/mo</span>
+          </div>
+        </div>
+        <div style={{ padding:"16px 18px", borderRadius:14, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)" }}>
+          <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", marginBottom:8 }}>Yearly Discount</div>
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <input type="number" min="0" max="80" value={customPlan.yearlyDiscount}
+              onChange={e => setCustomPlan((cp:any) => ({ ...cp, yearlyDiscount: Number(e.target.value) }))}
+              style={{ flex:1, padding:"8px 12px", borderRadius:9, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", color:"#34d399", fontSize:18, fontWeight:800, outline:"none" }} />
+            <span style={{ fontSize:16, color:"rgba(255,255,255,.4)", fontWeight:700 }}>%</span>
+            <span style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>off yearly</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Add module form */}
+      {showAdd && (
+        <div style={{ padding:"18px 20px", borderRadius:14, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.25)" }}>
+          <div style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.5)", marginBottom:14 }}>New Module</div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:12 }}>
+            <input placeholder="ID (e.g. my_module)" value={newMod.id} onChange={e => setNewMod(n => ({...n, id: e.target.value.toLowerCase().replace(/\s/g,"_")}))}
+              style={{ padding:"9px 12px", borderRadius:9, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, outline:"none" }} />
+            <input placeholder="Module Name" value={newMod.name} onChange={e => setNewMod(n => ({...n, name: e.target.value}))}
+              style={{ padding:"9px 12px", borderRadius:9, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, outline:"none" }} />
+            <div style={{ display:"flex", gap:6 }}>
+              <input placeholder="Icon" value={newMod.icon} onChange={e => setNewMod(n => ({...n, icon: e.target.value}))} style={{ width:60, padding:"9px 10px", borderRadius:9, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:14, outline:"none", textAlign:"center" }} />
+              <input type="number" placeholder="Price $" value={newMod.price || ""} onChange={e => setNewMod(n => ({...n, price: Number(e.target.value)}))}
+                style={{ flex:1, padding:"9px 12px", borderRadius:9, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, outline:"none" }} />
+            </div>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:10 }}>
+            <input placeholder="Description" value={newMod.desc} onChange={e => setNewMod(n => ({...n, desc: e.target.value}))}
+              style={{ padding:"9px 12px", borderRadius:9, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:12, outline:"none" }} />
+            <button onClick={addModule} style={{ padding:"9px 20px", borderRadius:9, background:"linear-gradient(135deg,#6366f1,#4f46e5)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer" }}>Add</button>
+          </div>
+        </div>
+      )}
+
+      {/* Modules by category */}
+      {categories.map(cat => {
+        const mods = customPlan.modules.filter((m:any) => m.category === cat);
+        if (!mods.length) return null;
         return (
-          <div key={cat} style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", overflow:"hidden" }}>
-            <div style={{ padding:"12px 18px", borderBottom:"1px solid rgba(255,255,255,.06)", fontSize:11, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em" }}>{catLabels[cat]}</div>
-            {catMods.map((m,i)=>(
-              <div key={m.key} style={{ display:"flex", alignItems:"center", gap:14, padding:"13px 18px", borderBottom:i<catMods.length-1?"1px solid rgba(255,255,255,.04)":"none" }}>
-                <span style={{ fontSize:18 }}>{m.icon}</span>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontSize:13, fontWeight:600, color:"white" }}>{m.name}</div>
-                  <div style={{ fontSize:10, color:"rgba(255,255,255,.25)", fontFamily:"monospace" }}>{m.key}</div>
+          <div key={cat} style={{ background:"rgba(255,255,255,.02)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", overflow:"hidden" }}>
+            <div style={{ padding:"10px 18px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", gap:8 }}>
+              <div style={{ width:8, height:8, borderRadius:"50%", background:catColors[cat] }}/>
+              <span style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.45)", textTransform:"uppercase", letterSpacing:".06em" }}>{catLabels[cat]}</span>
+              <span style={{ marginLeft:"auto", fontSize:11, color:"rgba(255,255,255,.25)" }}>{mods.filter((m:any)=>m.enabled).length}/{mods.length} enabled</span>
+            </div>
+            {mods.map((m:any, i:number) => (
+              <div key={m.id} style={{ display:"grid", gridTemplateColumns:"auto 1fr auto auto auto", gap:12, alignItems:"center", padding:"13px 18px", borderBottom:i<mods.length-1?"1px solid rgba(255,255,255,.04)":"none", opacity:m.enabled?1:.45, transition:"opacity .2s" }}>
+                {/* Toggle */}
+                <button onClick={() => updateModule(m.id, "enabled", !m.enabled)}
+                  style={{ width:36, height:20, borderRadius:10, background:m.enabled?"#6366f1":"rgba(255,255,255,.1)", border:"none", cursor:"pointer", position:"relative", transition:"background .2s", flexShrink:0 }}>
+                  <div style={{ position:"absolute", top:2, left:m.enabled?18:2, width:16, height:16, borderRadius:"50%", background:"white", transition:"left .2s" }}/>
+                </button>
+                {/* Info */}
+                <div style={{ minWidth:0 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:16 }}>{m.icon}</span>
+                    <input value={m.name} onChange={e => updateModule(m.id, "name", e.target.value)}
+                      style={{ background:"none", border:"none", color:"white", fontSize:13, fontWeight:700, outline:"none", width:"100%" }} />
+                  </div>
+                  <input value={m.desc} onChange={e => updateModule(m.id, "desc", e.target.value)}
+                    style={{ background:"none", border:"none", color:"rgba(255,255,255,.35)", fontSize:11, outline:"none", width:"100%", marginTop:2 }} />
                 </div>
-                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                  <span style={{ fontSize:13, color:"rgba(255,255,255,.4)" }}>$</span>
-                  <input type="number" min="0" max="999" value={m.price}
-                    onChange={e=>setModules(ms=>ms.map(mod=>mod.key===m.key?{...mod,price:Number(e.target.value)}:mod))}
-                    style={{ width:72, padding:"7px 10px", borderRadius:8, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", color:"white", fontSize:14, fontWeight:700, outline:"none", textAlign:"center" }}/>
-                  <span style={{ fontSize:11, color:"rgba(255,255,255,.3)" }}>/mo</span>
+                {/* Price */}
+                <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                  <span style={{ color:"rgba(255,255,255,.3)", fontSize:12 }}>$</span>
+                  <input type="number" min="0" value={m.price} onChange={e => updateModule(m.id, "price", Number(e.target.value))}
+                    style={{ width:64, padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"white", fontSize:14, fontWeight:700, outline:"none", textAlign:"center" }} />
+                  <span style={{ fontSize:11, color:"rgba(255,255,255,.25)" }}>/mo</span>
                 </div>
+                {/* Category */}
+                <select value={m.category} onChange={e => updateModule(m.id, "category", e.target.value)}
+                  style={{ padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", fontSize:11, outline:"none" }}>
+                  {categories.map(c => <option key={c} value={c}>{catLabels[c]}</option>)}
+                </select>
+                {/* Remove */}
+                <button onClick={() => removeModule(m.id)} title="Remove module"
+                  style={{ width:28, height:28, borderRadius:8, background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.18)", color:"#f87171", fontSize:14, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
               </div>
             ))}
           </div>
         );
       })}
 
-      <div style={{ padding:"14px 18px", borderRadius:12, background:"rgba(251,191,36,.08)", border:"1px solid rgba(251,191,36,.2)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>If all modules selected (max price)</span>
-        <span style={{ fontSize:18, fontWeight:800, color:"#fbbf24" }}>${total}/mo</span>
+      {/* Summary */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        <div style={{ padding:"14px 18px", borderRadius:12, background:"rgba(251,191,36,.07)", border:"1px solid rgba(251,191,36,.18)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>Max (all enabled modules)</span>
+          <span style={{ fontSize:18, fontWeight:800, color:"#fbbf24" }}>${Number(customPlan.basePrice) + enabledTotal}/mo</span>
+        </div>
+        <div style={{ padding:"14px 18px", borderRadius:12, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.18)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <span style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>Yearly price (after {customPlan.yearlyDiscount}% off)</span>
+          <span style={{ fontSize:18, fontWeight:800, color:"#34d399" }}>${Math.round((Number(customPlan.basePrice) + enabledTotal) * (1 - customPlan.yearlyDiscount/100))}/mo</span>
+        </div>
       </div>
     </div>
   );

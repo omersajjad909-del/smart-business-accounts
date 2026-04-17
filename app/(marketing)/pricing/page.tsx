@@ -312,6 +312,21 @@ export default function PricingPage() {
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
   const [branchLimits, setBranchLimits] = useState<Record<string, number | null>>({ starter: 1, pro: 3, enterprise: 10 });
   const [seatPricing, setSeatPricing] = useState<{ monthly: number; yearly: number }>(DEFAULT_SEAT_PRICING);
+  const [customPlanData, setCustomPlanData] = useState<{ basePrice: number; yearlyDiscount: number; modules: any[] }>({
+    basePrice: 0, yearlyDiscount: 20,
+    modules: [
+      { id:"accounting", name:"Accounting & Invoicing", price:15, desc:"Ledger, invoices, vouchers, P&L, balance sheet", icon:"📒", enabled:true, category:"core" },
+      { id:"inventory", name:"Inventory Management", price:12, desc:"Stock tracking, GRN, barcode, low-stock alerts", icon:"📦", enabled:true, category:"core" },
+      { id:"crm", name:"CRM", price:15, desc:"Contacts, sales pipeline, interaction logs", icon:"👥", enabled:true, category:"core" },
+      { id:"hr_payroll", name:"HR & Payroll", price:20, desc:"Employees, attendance, payroll, advance salary", icon:"👨‍💼", enabled:true, category:"core" },
+      { id:"bank_reconciliation", name:"Bank Reconciliation", price:10, desc:"Statement import, discrepancy flagging, closing", icon:"🏦", enabled:true, category:"finance" },
+      { id:"tax_filing", name:"Tax & Compliance", price:10, desc:"Tax summary, GST/VAT reports, compliance docs", icon:"🧾", enabled:true, category:"finance" },
+      { id:"reports", name:"Advanced Reports", price:8, desc:"Cash flow, profitability, annual statements", icon:"📈", enabled:true, category:"operations" },
+      { id:"multi_branch", name:"Multi-Branch", price:15, desc:"Branches, consolidated reports, branch access", icon:"🏢", enabled:true, category:"operations" },
+      { id:"whatsapp", name:"WhatsApp & SMS", price:8, desc:"Payment reminders, invoices via WhatsApp and SMS", icon:"💬", enabled:true, category:"integrations" },
+      { id:"api_access", name:"API Access", price:20, desc:"REST API, webhooks, third-party integrations", icon:"⚡", enabled:true, category:"integrations" },
+    ],
+  });
 
   useEffect(() => {
     (async () => {
