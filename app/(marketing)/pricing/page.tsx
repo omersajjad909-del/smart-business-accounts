@@ -465,9 +465,9 @@ export default function PricingPage() {
                   <Link href={buildHref(plan.slug)} style={{ display: "block", textAlign: "center", padding: "12px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: plan.gradient, marginBottom: 22, fontSize: 14 }}>
                     Continue with {plan.name}
                   </Link>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: -12, marginBottom: 16, textAlign: "center" }}>
+                  {/* <div style={{ fontSize: 11, color: "rgba(255,255,255,.42)", marginTop: -12, marginBottom: 16, textAlign: "center" }}>
                     You&apos;ll be charged {formatPrice(regularPrice)}/mo after the first 3 months.
-                  </div>
+                  </div> */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {plan.features.map((f, idx) => (
                       <div key={f} style={{ display: "flex", alignItems: "center", gap: 10 }}>
