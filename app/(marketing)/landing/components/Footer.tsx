@@ -296,10 +296,10 @@ export default function Footer() {
                 <span style={{ fontSize: 10.5, fontWeight: 800, color: "#a5b4fc", letterSpacing: ".08em", textTransform: "uppercase" }}>Get Started</span>
               </div>
               <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.75)", fontWeight: 600, margin: "0 0 5px", lineHeight: 1.3 }}>
-                Join 14k+ businesses worldwide
+                Take Control of Your Business Today
               </p>
               <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.32)", margin: "0 0 14px", lineHeight: 1.55 }}>
-                Full platform access. Expert support. 24/7 availability.
+                Stop wasting time on spreadsheets. Automate invoicing, payments, and reporting. Get real-time insights with AI-powered analytics. Scale with confidence.
               </p>
               <Link href="/pricing" className="ft-cta-btn">
                 Get Started <ArrowRight size={13}/>
@@ -310,7 +310,7 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div style={{ height: 1, background: "linear-gradient(90deg,transparent,rgba(255,255,255,.07) 20%,rgba(255,255,255,.07) 80%,transparent)", marginBottom: 22 }}/>
+        <div style={{ height: 1, background: "linear-gradient(90deg,transparent,rgba(255,255,255,.07) 0%,rgba(255,255,255,.07) 100%,transparent)", marginBottom: 22, width: "100%" }}/>
 
         {/* Bottom bar */}
         <div className="ft-bottom-inner" style={{
