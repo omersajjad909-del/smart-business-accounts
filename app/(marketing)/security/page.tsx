@@ -386,43 +386,46 @@ export default function SecurityPage() {
           <div ref={heroRef} style={{ maxWidth:860, margin:"0 auto", textAlign:"center", position:"relative" }}>
             {/* Shield hero icon */}
             <div style={{
-              display:"inline-flex", alignItems:"center", justifyContent:"center",
-              width:80, height:80, borderRadius:24, marginBottom:28,
-              background:"linear-gradient(135deg,rgba(129,140,248,.2),rgba(99,102,241,.1))",
-              border:"1.5px solid rgba(129,140,248,.35)",
-              backdropFilter:"blur(16px)",
-              boxShadow:"0 8px 32px rgba(99,102,241,.3)",
-              animation:"shieldBob 4s ease-in-out infinite",
-              position:"relative",
+              display:"flex", flexDirection:"column", alignItems:"center", gap:20, marginBottom:28,
               opacity:heroVisible?1:0, transition:"opacity .5s ease",
             }}>
-              {/* Pulse rings */}
-              <div style={{ position:"absolute", width:80, height:80, borderRadius:24,
-                border:"1px solid rgba(99,102,241,.3)",
-                top:"50%", left:"50%",
-                animation:"pulseRing 2.5s ease-out infinite" }}/>
-              <div style={{ position:"absolute", width:80, height:80, borderRadius:24,
-                border:"1px solid rgba(99,102,241,.2)",
-                top:"50%", left:"50%",
-                animation:"pulseRing 2.5s ease-out .8s infinite" }}/>
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" strokeWidth="1.8">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <path d="M9 12l2 2 4-4"/>
-              </svg>
-            </div>
+              <div style={{
+                display:"flex", alignItems:"center", justifyContent:"center",
+                width:80, height:80, borderRadius:24,
+                background:"linear-gradient(135deg,rgba(129,140,248,.2),rgba(99,102,241,.1))",
+                border:"1.5px solid rgba(129,140,248,.35)",
+                backdropFilter:"blur(16px)",
+                boxShadow:"0 8px 32px rgba(99,102,241,.3)",
+                animation:"shieldBob 4s ease-in-out infinite",
+                position:"relative", flexShrink:0,
+              }}>
+                <div style={{ position:"absolute", width:80, height:80, borderRadius:24,
+                  border:"1px solid rgba(99,102,241,.3)",
+                  top:"50%", left:"50%",
+                  animation:"pulseRing 2.5s ease-out infinite" }}/>
+                <div style={{ position:"absolute", width:80, height:80, borderRadius:24,
+                  border:"1px solid rgba(99,102,241,.2)",
+                  top:"50%", left:"50%",
+                  animation:"pulseRing 2.5s ease-out .8s infinite" }}/>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" strokeWidth="1.8">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="M9 12l2 2 4-4"/>
+                </svg>
+              </div>
 
-            {/* Badge */}
-            <div style={{
-              display:"inline-flex", alignItems:"center", gap:8,
-              padding:"6px 16px", borderRadius:24,
-              background:"rgba(52,211,153,.1)", border:"1.5px solid rgba(52,211,153,.28)",
-              fontSize:11, fontWeight:700, color:"#6ee7b7",
-              letterSpacing:".09em", textTransform:"uppercase", marginBottom:24,
-              opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
-              transition:"all .5s ease .1s",
-            }}>
-              <span style={{ width:6, height:6, borderRadius:"50%", background:"#34d399", animation:"blink 2s ease infinite" }}/>
-              Bank-Grade Security
+              {/* Badge — sits directly below icon */}
+              <div style={{
+                display:"inline-flex", alignItems:"center", gap:8,
+                padding:"6px 16px", borderRadius:24,
+                background:"rgba(52,211,153,.1)", border:"1.5px solid rgba(52,211,153,.28)",
+                fontSize:11, fontWeight:700, color:"#6ee7b7",
+                letterSpacing:".09em", textTransform:"uppercase",
+                transform:heroVisible?"translateY(0)":"translateY(16px)",
+                transition:"transform .5s ease .1s",
+              }}>
+                <span style={{ width:6, height:6, borderRadius:"50%", background:"#34d399", animation:"blink 2s ease infinite", flexShrink:0 }}/>
+                Bank-Grade Security
+              </div>
             </div>
 
             <h1 style={{

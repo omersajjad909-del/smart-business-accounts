@@ -24,6 +24,12 @@ export default function GeoPrecisionPrompt() {
       return;
     }
 
+    // If user dismissed before, don't show again
+    try {
+      const dismissed = localStorage.getItem("geo_prompt_dismissed");
+      if (dismissed) { setVisible(false); return; }
+    } catch { /* ignore */ }
+
     let mounted = true;
     void (async () => {
       try {
@@ -63,6 +69,7 @@ export default function GeoPrecisionPrompt() {
             }),
             keepalive: true,
           });
+          try { localStorage.setItem("geo_prompt_dismissed","1"); } catch{}
           setVisible(false);
         } finally {
           setLoading(false);
@@ -124,7 +131,7 @@ export default function GeoPrecisionPrompt() {
         </button>
         <button
           type="button"
-          onClick={() => setVisible(false)}
+          onClick={() => { try { localStorage.setItem("geo_prompt_dismissed","1"); } catch{} setVisible(false); }}
           style={{
             borderRadius: 12,
             padding: "10px 14px",
