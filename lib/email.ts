@@ -1,8 +1,17 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { prisma } from '@/lib/prisma';
 import { getCompanyCommsConfig } from "@/lib/companyCommsConfig";
 
-// Email configuration from environment variables
+// ─── Resend client (platform emails — welcome, OTP, billing) ─────────────────
+let _resend: Resend | null = null;
+function getResend(): Resend | null {
+  if (!process.env.RESEND_API_KEY) return null;
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
+
+// ─── SMTP config (company-specific emails — invoices, POs) ───────────────────
 const getEmailConfig = async (companyId?: string) => {
   if (companyId) {
     const companyConfig = await getCompanyCommsConfig(companyId);
@@ -24,17 +33,16 @@ const getEmailConfig = async (companyId?: string) => {
   return {
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    secure: process.env.SMTP_SECURE === 'true',
     auth: {
       user: process.env.SMTP_USER || '',
       pass: process.env.SMTP_PASS || '',
     },
-    from: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@ustraders.com',
+    from: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@finovaos.app',
     fromName: "FinovaOS",
   };
 };
 
-// Create reusable transporter
 let transporter: nodemailer.Transporter | null = null;
 let lastConfig: any = null;
 
@@ -44,16 +52,8 @@ const getTransporter = async (companyId?: string) => {
     console.warn('⚠️ Email not configured. Set SMTP_USER and SMTP_PASS in .env');
     return { transport: null, config };
   }
-  
-  // Re-create if config changed
   const configStr = JSON.stringify(config);
   if (!transporter || lastConfig !== configStr) {
-    console.log('📧 Creating new email transporter with config:', {
-      host: config.host,
-      port: config.port,
-      secure: config.secure,
-      user: config.auth.user
-    });
     transporter = nodemailer.createTransport(config);
     lastConfig = configStr;
   }
@@ -323,65 +323,73 @@ export const emailTemplates = {
 };
 
 // Send email function
+// - No companyId  → uses Resend (platform emails: welcome, OTP, billing) for best inbox delivery
+// - With companyId → uses company SMTP (their own email for invoices, POs)
 export async function sendEmail(options: {
   to: string | string[];
   subject: string;
   html: string;
+  text?: string;
   attachments?: Array<{ filename: string; content: string | Buffer }>;
   companyId?: string;
 }): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  const toStr = Array.isArray(options.to) ? options.to.join(', ') : options.to;
+  const toArr = Array.isArray(options.to) ? options.to : [options.to];
+
+  // ── Resend path (platform emails, no companyId) ──────────────────────────
+  const resend = getResend();
+  if (!options.companyId && resend) {
+    try {
+      const fromDomain = process.env.RESEND_FROM_DOMAIN || 'finovaos.app';
+      const { data, error } = await resend.emails.send({
+        from: `FinovaOS <noreply@${fromDomain}>`,
+        to: toArr,
+        subject: options.subject,
+        html: options.html,
+        ...(options.text ? { text: options.text } : {}),
+        headers: {
+          'List-Unsubscribe': `<https://finovaos.app/unsubscribe>`,
+          'X-Entity-Ref-ID': Date.now().toString(),
+        },
+      });
+      if (error) throw new Error(error.message);
+      prisma.emailLog.create({ data: { to: toStr, subject: options.subject, status: 'sent' } }).catch(() => {});
+      return { success: true, messageId: data?.id };
+    } catch (error: any) {
+      console.error('❌ Resend error:', error);
+      prisma.emailLog.create({ data: { to: toStr, subject: options.subject, status: 'failed', error: error.message } }).catch(() => {});
+      return { success: false, error: error.message };
+    }
+  }
+
+  // ── SMTP path (company emails with companyId, or Resend not configured) ──
   const { transport, config } = await getTransporter(options.companyId);
-  
   if (!transport) {
-    return {
-      success: false,
-      error: 'Email not configured for this company.',
-    };
+    return { success: false, error: 'Email not configured.' };
   }
 
   try {
-    const fromEmail = config.from || config.auth.user || 'noreply@ustraders.com';
+    const fromEmail = config.from || config.auth.user || 'noreply@finovaos.app';
     const fromName = config.fromName || "FinovaOS";
-    
-    const mailPayload = {
+
+    const info = await transport.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
-      to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
+      to: toStr,
       subject: options.subject,
       html: options.html,
+      ...(options.text ? { text: options.text } : {}),
       attachments: options.attachments,
-    };
+      headers: {
+        'List-Unsubscribe': `<https://finovaos.app/unsubscribe>`,
+      },
+    });
 
-    console.log('Sending email to:', mailPayload.to);
-    console.log('Email subject:', mailPayload.subject);
-
-    const info = await transport.sendMail(mailPayload);
-
-    // Log to DB (non-blocking)
-    prisma.emailLog.create({ data: {
-      to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
-      subject: options.subject,
-      status: 'sent',
-    } }).catch(() => {});
-
-    return {
-      success: true,
-      messageId: info.messageId,
-    };
+    prisma.emailLog.create({ data: { to: toStr, subject: options.subject, status: 'sent' } }).catch(() => {});
+    return { success: true, messageId: info.messageId };
   } catch (error: any) {
     console.error('❌ Email send error:', error);
-
-    // Log failure to DB (non-blocking)
-    prisma.emailLog.create({ data: {
-      to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
-      subject: options.subject,
-      status: 'failed',
-      error: error.message || 'Unknown error',
-    } }).catch(() => {});
-
-    return {
-      success: false,
-      error: error.message || 'Failed to send email',
-    };
+    prisma.emailLog.create({ data: { to: toStr, subject: options.subject, status: 'failed', error: error.message } }).catch(() => {});
+    return { success: false, error: error.message || 'Failed to send email' };
   }
 }
 
