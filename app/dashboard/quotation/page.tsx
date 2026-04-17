@@ -130,7 +130,13 @@ export default function QuotationPage() {
       .then(r => r.json())
       .then(d => setItems(Array.isArray(d) ? d : []));
 
-    fetch("/api/tax-configuration")
+    fetch("/api/tax-configuration", {
+      headers: {
+        "x-user-role": user.role || "",
+        "x-user-id": user.id || "",
+        "x-company-id": user.companyId || "",
+      },
+    })
       .then(r => r.json())
       .then(d => setTaxes(Array.isArray(d) ? d : []))
       .catch(err => console.log("Tax config error:", err));
