@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") || "unknown";
+  const rl = rateLimit(`signup:${ip}`, 5, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json({ success: false, error: { code: "RATE_LIMITED", message: "Too many signup attempts. Please wait a minute." } }, { status: 429 });
+  }
+
   const { name, email, password, companyId, role } = await req.json();
   if (!name || !email || !password || !companyId) {
     return NextResponse.json({ success: false, error: { code: 'INVALID_INPUT', message: 'All fields are required.' } }, { status: 400 });

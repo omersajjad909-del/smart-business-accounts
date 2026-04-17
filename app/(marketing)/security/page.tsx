@@ -4,11 +4,13 @@ import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
 /* ─── Data ─── */
+
+// What is live today (honest framing)
 const CERTIFICATIONS = [
-  { icon:"🛡️", label:"256-bit SSL/TLS", sub:"All data in transit" },
-  { icon:"🔐", label:"AES-256 Encryption", sub:"All data at rest" },
-  { icon:"🏦", label:"Bank-grade Security", sub:"PCI-DSS aligned" },
-  { icon:"🌐", label:"Global Data Residency", sub:"Tier-4 data centers" },
+  { icon:"🔐", label:"TLS 1.3 Encryption", sub:"All data in transit" },
+  { icon:"🔒", label:"AES-256 Field Encryption", sub:"Sensitive data at rest" },
+  { icon:"👤", label:"Role-Based Access (RBAC)", sub:"Granular permissions" },
+  { icon:"📋", label:"Immutable Audit Logs", sub:"Append-only security trail" },
 ];
 
 const PILLARS = [
@@ -19,12 +21,12 @@ const PILLARS = [
     glow:"rgba(129,140,248,.22)",
     dim:"rgba(129,140,248,.08)",
     border:"rgba(129,140,248,.3)",
-    title:"Encryption at Every Layer",
-    subtitle:"Your data is unreadable to anyone but you.",
+    title:"Encryption — Active Now",
+    subtitle:"Sensitive data is encrypted before it touches the database.",
     points:[
-      { icon:"🔑", title:"TLS 1.3 in Transit", desc:"Every byte between your browser and our servers is encrypted using the latest TLS 1.3 protocol. No exceptions." },
-      { icon:"💾", title:"AES-256 at Rest", desc:"Your database records, attachments, and backups are encrypted with AES-256 before being written to disk." },
-      { icon:"🗝️", title:"Key Management", desc:"Encryption keys are rotated automatically and stored separately from the data they protect, in a dedicated key vault." },
+      { icon:"🔑", title:"TLS 1.3 in Transit", desc:"All communication between your browser and our servers is encrypted with TLS 1.3. This is enforced on every request, no exceptions." },
+      { icon:"💾", title:"AES-256-GCM Field Encryption", desc:"PII fields — phone numbers, tax IDs, contact details — are encrypted with AES-256-GCM at the application layer before being written to the database." },
+      { icon:"🗝️", title:"Key Management (In Progress)", desc:"Encryption keys are currently managed via environment secrets. A dedicated key vault with automatic rotation is on our roadmap for Q3 2025." },
     ],
   },
   {
@@ -34,12 +36,12 @@ const PILLARS = [
     glow:"rgba(52,211,153,.22)",
     dim:"rgba(52,211,153,.08)",
     border:"rgba(52,211,153,.3)",
-    title:"Access Control & Identity",
+    title:"Access Control — Active Now",
     subtitle:"The right people see the right data. Nothing more.",
     points:[
-      { icon:"🎛️", title:"Role-Based Access (RBAC)", desc:"Define granular permissions per user — by module, branch, and action type. A cashier can never see payroll." },
-      { icon:"🏢", title:"Company & Branch Isolation", desc:"Multi-company users have strict data boundaries. Switching companies never leaks data between entities." },
-      { icon:"📱", title:"Two-Factor Authentication", desc:"Enforce 2FA for any or all users. Supports TOTP authenticator apps and SMS fallback." },
+      { icon:"🎛️", title:"Role-Based Access (RBAC)", desc:"Granular permissions per user — by module, branch, and action type. A cashier cannot access payroll. Fully configurable by your admin." },
+      { icon:"🏢", title:"Company & Branch Isolation", desc:"Multi-company users have strict data boundaries enforced at the database query level. Switching companies never leaks data between entities." },
+      { icon:"📱", title:"Two-Factor Authentication (TOTP)", desc:"2FA is available now via any TOTP authenticator app (Google Authenticator, Authy). Users can enable it from their account settings." },
     ],
   },
   {
@@ -50,11 +52,11 @@ const PILLARS = [
     dim:"rgba(251,191,36,.08)",
     border:"rgba(251,191,36,.3)",
     title:"Infrastructure & Uptime",
-    subtitle:"Always on. Always backed up. Always recoverable.",
+    subtitle:"Built on managed cloud infrastructure with automated backups.",
     points:[
-      { icon:"⚡", title:"99.9% Uptime SLA", desc:"Our infrastructure runs on redundant cloud nodes across multiple availability zones. No single point of failure." },
-      { icon:"💿", title:"Daily Automated Backups", desc:"Full database snapshots are taken every 24 hours and retained for 30 days. Point-in-time recovery available on Enterprise." },
-      { icon:"🌐", title:"Global Cloud Infrastructure", desc:"Primary data stored on world-class servers with multi-region replication for disaster recovery." },
+      { icon:"⚡", title:"Managed Cloud Hosting", desc:"FinovaOS runs on Supabase (PostgreSQL) and Vercel — both enterprise-grade platforms with built-in redundancy, SSL, and infrastructure monitoring." },
+      { icon:"💿", title:"Automated Daily Backups", desc:"Supabase performs automated daily database backups. Point-in-time recovery is available. Your data is never stored on a single machine." },
+      { icon:"🌐", title:"Uptime Commitment", desc:"We target 99.9% uptime. Our infrastructure providers (Vercel + Supabase) maintain SLAs above this threshold. Live status is always accessible." },
     ],
   },
   {
@@ -64,12 +66,12 @@ const PILLARS = [
     glow:"rgba(248,113,113,.22)",
     dim:"rgba(248,113,113,.08)",
     border:"rgba(248,113,113,.3)",
-    title:"Audit Trails & Compliance",
-    subtitle:"Every action logged. Every change attributable.",
+    title:"Audit Trails — Active Now",
+    subtitle:"Every security action is logged and protected from modification.",
     points:[
-      { icon:"📝", title:"Immutable Audit Logs", desc:"Every create, edit, and delete is logged with user identity, IP address, device, and precise timestamp. Logs cannot be modified." },
-      { icon:"🔍", title:"Change History", desc:"View before/after snapshots for any record. Your auditors and compliance team will love the paper trail." },
-      { icon:"📊", title:"Tax Compliance", desc:"Reports and data exports are structured to align with global VAT/GST and local tax authority requirements." },
+      { icon:"📝", title:"Immutable Security Logs", desc:"Login attempts, password changes, 2FA events, permission changes, and data exports are logged with timestamp, IP address, and user identity — and cannot be modified or deleted." },
+      { icon:"🔍", title:"Full Activity History", desc:"Every create, update, and delete operation in your company is tracked and viewable by authorized admins. Your auditors will have a complete paper trail." },
+      { icon:"📊", title:"Structured Export", desc:"Audit logs can be exported as CSV for your compliance team or external auditors at any time." },
     ],
   },
   {
@@ -80,11 +82,11 @@ const PILLARS = [
     dim:"rgba(167,139,250,.08)",
     border:"rgba(167,139,250,.3)",
     title:"Network & Application Security",
-    subtitle:"Hardened against modern threats, continuously monitored.",
+    subtitle:"Hardened against common web threats.",
     points:[
-      { icon:"🛡️", title:"DDoS Protection", desc:"Multi-layer DDoS mitigation protects platform availability even under large-scale attack traffic." },
-      { icon:"🚧", title:"Web Application Firewall", desc:"All requests pass through a WAF that blocks SQL injection, XSS, and OWASP Top 10 vulnerabilities automatically." },
-      { icon:"🔬", title:"Penetration Testing", desc:"Third-party security audits and penetration tests are conducted periodically to surface and remediate vulnerabilities." },
+      { icon:"🛡️", title:"Security Headers", desc:"All responses include HSTS, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, and Referrer-Policy headers to defend against common browser-based attacks." },
+      { icon:"🚧", title:"Rate Limiting on Auth", desc:"All authentication endpoints (login, signup, magic link, 2FA) are rate-limited per IP to prevent brute-force and credential stuffing attacks." },
+      { icon:"🔬", title:"Penetration Testing (Planned)", desc:"We plan to engage a third-party security firm for penetration testing before our Enterprise tier launch. Results will be shared under NDA upon request." },
     ],
   },
   {
@@ -95,20 +97,20 @@ const PILLARS = [
     dim:"rgba(6,182,212,.08)",
     border:"rgba(6,182,212,.3)",
     title:"Privacy & Data Ownership",
-    subtitle:"Your data is yours. Always.",
+    subtitle:"Your data is yours. We are just the custodian.",
     points:[
-      { icon:"🚫", title:"Zero Data Selling",       desc:"We never sell, share, or license your financial data to third parties. Your business data is never used for advertising." },
-      { icon:"📤", title:"Full Data Export",         desc:"Export your complete data at any time in standard formats (CSV, Excel, PDF). No lock-in, no hostage data." },
-      { icon:"🗑️", title:"Right to Deletion",       desc:"Request full account deletion at any time. We purge all your data within 30 days, with written confirmation." },
+      { icon:"🚫", title:"Zero Data Selling", desc:"We never sell, share, or license your financial data to third parties. Your business data is never used for advertising or analytics sold externally." },
+      { icon:"📤", title:"Full Data Export", desc:"Export your complete data at any time in CSV, Excel, or PDF format. No lock-in. You can leave whenever you want — and take everything with you." },
+      { icon:"🗑️", title:"Right to Deletion", desc:"Request full account deletion at any time. We will purge all your data within 30 days and provide written confirmation. No hidden retention." },
     ],
   },
 ];
 
 const STATS = [
-  { val:"256-bit", label:"AES Encryption", color:"#818cf8" },
-  { val:"99.9%",   label:"Uptime SLA",     color:"#34d399" },
-  { val:"30 days", label:"Backup Retention",color:"#fbbf24" },
-  { val:"24/7",    label:"Monitoring",      color:"#f87171" },
+  { val:"AES-256", label:"Field Encryption", color:"#818cf8" },
+  { val:"TLS 1.3", label:"In Transit",       color:"#34d399" },
+  { val:"30 days", label:"Backup Retention", color:"#fbbf24" },
+  { val:"24/7",    label:"Monitoring",        color:"#f87171" },
 ];
 
 /* ─── Hook ─── */
@@ -424,7 +426,7 @@ export default function SecurityPage() {
                 transition:"transform .5s ease .1s",
               }}>
                 <span style={{ width:6, height:6, borderRadius:"50%", background:"#34d399", animation:"blink 2s ease infinite", flexShrink:0 }}/>
-                Bank-Grade Security
+                Our Security Commitment
               </div>
             </div>
 
@@ -436,22 +438,35 @@ export default function SecurityPage() {
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(20px)",
               transition:"all .6s ease .15s",
             }}>
-              Your data is safe.
+              Security built in,
               <span style={{ display:"block", fontStyle:"italic",
                 background:"linear-gradient(135deg,#a5b4fc,#818cf8,#c4b5fd)",
                 WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
-                We guarantee it.
+                not bolted on.
               </span>
             </h1>
 
             <p style={{
               fontSize:17, color:"rgba(255,255,255,.42)", lineHeight:1.8,
-              maxWidth:580, margin:"0 auto 40px",
+              maxWidth:620, margin:"0 auto 16px",
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(16px)",
               transition:"all .6s ease .22s",
             }}>
-              FinovaOS is built on a security-first foundation. Your financial data is encrypted, isolated, audited, and stored on world-class servers — never sold, never shared.
+              FinovaOS protects your financial data with encryption, role-based access, immutable audit logs, and 2FA — all active today. Formal certifications like PCI-DSS and SOC 2 are on our roadmap as we grow.
             </p>
+
+            {/* Honest transparency note */}
+            <div style={{
+              display:"inline-flex", alignItems:"center", gap:8, marginBottom:32,
+              padding:"8px 16px", borderRadius:12,
+              background:"rgba(251,191,36,.07)", border:"1px solid rgba(251,191,36,.18)",
+              opacity:heroVisible?1:0, transition:"opacity .5s ease .26s",
+            }}>
+              <span style={{ fontSize:14 }}>📌</span>
+              <span style={{ fontSize:12.5, color:"rgba(251,191,36,.8)", fontWeight:500 }}>
+                We show what&apos;s live today and what&apos;s planned — no false claims.
+              </span>
+            </div>
 
             {/* Cert chips */}
             <div style={{

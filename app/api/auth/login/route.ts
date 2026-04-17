@@ -258,6 +258,26 @@ export async function POST(req: NextRequest) {
       return res;
     }
 
+    // ── 2FA enforcement ──
+    // If user has 2FA enabled, issue a short-lived pre-auth token instead of full session
+    if (user.twoFactorEnabled && user.twoFactorSecret) {
+      const preAuthToken = signJwt({
+        userId: safeUser.id,
+        role: safeUser.role,
+        companyId: defaultCompanyId,
+        twoFactorPending: true,
+      });
+      const res2fa = NextResponse.json({ needs2FA: true });
+      res2fa.cookies.set("sb_2fa_pending", preAuthToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 5 * 60, // 5 minutes to complete 2FA
+      });
+      return res2fa;
+    }
+
     // Determine first-login before creating session
     let isFirstLogin = false;
     try {
