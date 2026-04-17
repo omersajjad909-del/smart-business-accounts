@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getAutomationCompanyId } from "@/lib/automationHelpers";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 
@@ -27,32 +28,12 @@ async function ensureInboundTable() {
   `).catch(() => {});
 }
 
-async function getCompanyId(req: NextRequest): Promise<string | null> {
-  try {
-    const h = req.headers.get("x-company-id");
-    if (h) return h;
-    const uid = req.headers.get("x-user-id");
-    if (uid) {
-      const u = await prisma.user.findUnique({ where: { id: uid }, select: { defaultCompanyId: true } });
-      if (u?.defaultCompanyId) return u.defaultCompanyId;
-    }
-    const cookie = req.headers.get("cookie") || "";
-    const m = cookie.match(/sb_auth=([^;]+)/);
-    if (m) {
-      const parts = decodeURIComponent(m[1]).split(".");
-      if (parts.length === 3) {
-        const p = JSON.parse(Buffer.from(parts[1], "base64url").toString());
-        if (p?.companyId) return p.companyId;
-      }
-    }
-    return null;
-  } catch { return null; }
-}
+
 
 // ─── GET — list inbound tokens for this company ──────────────────────────────
 export async function GET(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     await ensureInboundTable();
     const rows = await prisma.$queryRaw<any[]>`
@@ -80,7 +61,7 @@ export async function POST(req: NextRequest) {
 
   // Authenticated management path
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     await ensureInboundTable();
     const body = await req.json();
@@ -101,7 +82,7 @@ export async function POST(req: NextRequest) {
 // ─── DELETE ──────────────────────────────────────────────────────────────────
 export async function DELETE(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");

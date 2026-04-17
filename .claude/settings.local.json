@@ -119,7 +119,8 @@
       "Bash(node -e ' *)",
       "Bash(node send-test-email.mjs)",
       "Bash(node send-test-all-countries.mjs)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "WebFetch(domain:www.finovaos.app)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib"

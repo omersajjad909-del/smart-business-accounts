@@ -13,28 +13,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-async function getCompanyId(req: NextRequest): Promise<string | null> {
-  try {
-    const h = req.headers.get("x-company-id");
-    if (h) return h;
-    const uid = req.headers.get("x-user-id");
-    if (uid) {
-      const u = await prisma.user.findUnique({ where: { id: uid }, select: { defaultCompanyId: true } });
-      if (u?.defaultCompanyId) return u.defaultCompanyId;
-    }
-    const cookie = req.headers.get("cookie") || "";
-    const m = cookie.match(/sb_auth=([^;]+)/);
-    if (m) {
-      const parts = decodeURIComponent(m[1]).split(".");
-      if (parts.length === 3) {
-        const p = JSON.parse(Buffer.from(parts[1], "base64url").toString());
-        if (p?.companyId) return p.companyId;
-      }
-    }
-    return null;
-  } catch { return null; }
-}
+import { getAutomationCompanyId, getSocialConfig, saveSocialConfig } from "@/lib/automationHelpers";
 
 async function ensureSocialTables() {
   await prisma.$executeRawUnsafe(`
@@ -53,21 +32,10 @@ async function ensureSocialTables() {
   `).catch(() => {});
 }
 
-async function getSocialConfig(companyId: string): Promise<any> {
-  try {
-    const log = await prisma.activityLog.findFirst({
-      where: { action: "SOCIAL_CONFIG", companyId },
-      orderBy: { createdAt: "desc" },
-      select: { details: true },
-    });
-    return log?.details ? JSON.parse(log.details) : {};
-  } catch { return {}; }
-}
-
 // ─── GET ─────────────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     await ensureSocialTables();
 
@@ -100,23 +68,17 @@ export async function GET(req: NextRequest) {
 // ─── PUT — save platform credentials ─────────────────────────────────────────
 export async function PUT(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    // body.facebook: { accessToken, pageId }
-    // body.instagram: { accessToken, accountId }
-    // body.linkedin: { accessToken, orgId }
-
     const current = await getSocialConfig(companyId);
     const next = { ...current };
     if (body.facebook) next.facebook = { ...current.facebook, ...body.facebook };
     if (body.instagram) next.instagram = { ...current.instagram, ...body.instagram };
     if (body.linkedin) next.linkedin = { ...current.linkedin, ...body.linkedin };
 
-    await prisma.activityLog.create({
-      data: { action: "SOCIAL_CONFIG", companyId, details: JSON.stringify(next) },
-    });
+    await saveSocialConfig(companyId, next);
 
     return NextResponse.json({ success: true });
   } catch (e: any) {
@@ -127,7 +89,7 @@ export async function PUT(req: NextRequest) {
 // ─── POST ────────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     await ensureSocialTables();
 
@@ -179,7 +141,7 @@ export async function POST(req: NextRequest) {
 // ─── DELETE ──────────────────────────────────────────────────────────────────
 export async function DELETE(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -281,11 +243,12 @@ async function postToFacebook(content: string, imageUrl: string | null, cfg: any
 
 async function postToInstagram(content: string, imageUrl: string | null, cfg: any) {
   if (!cfg?.accessToken || !cfg?.accountId) throw new Error("Instagram not configured");
-  if (!imageUrl) throw new Error("Instagram requires an image");
+  // Instagram Graph API requires an image — text-only posts are not supported
+  if (!imageUrl) throw new Error("Instagram requires an image. Add an image URL to post on Instagram.");
 
   // Step 1: create media container
   const containerRes = await fetch(
-    `https://graph.facebook.com/v18.0/${cfg.accountId}/media`,
+    `https://graph.facebook.com/v21.0/${cfg.accountId}/media`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -297,7 +260,7 @@ async function postToInstagram(content: string, imageUrl: string | null, cfg: an
 
   // Step 2: publish container
   const publishRes = await fetch(
-    `https://graph.facebook.com/v18.0/${cfg.accountId}/media_publish`,
+    `https://graph.facebook.com/v21.0/${cfg.accountId}/media_publish`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -311,61 +274,79 @@ async function postToInstagram(content: string, imageUrl: string | null, cfg: an
 
 async function postToLinkedIn(content: string, imageUrl: string | null, cfg: any) {
   if (!cfg?.accessToken || !cfg?.orgId) throw new Error("LinkedIn not configured");
+  const author = `urn:li:organization:${cfg.orgId}`;
 
-  const shareContent: any = {
-    shareCommentary: { text: content },
-    shareMediaCategory: imageUrl ? "IMAGE" : "NONE",
-  };
-
-  if (imageUrl) {
-    // Register upload
-    const regRes = await fetch("https://api.linkedin.com/v2/assets?action=registerUpload", {
+  // Text-only post
+  if (!imageUrl) {
+    const res = await fetch("https://api.linkedin.com/rest/posts", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${cfg.accessToken}`,
         "Content-Type": "application/json",
-        "X-Restli-Protocol-Version": "2.0.0",
+        "LinkedIn-Version": "202406",
       },
       body: JSON.stringify({
-        registerUploadRequest: {
-          recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
-          owner: `urn:li:organization:${cfg.orgId}`,
-          serviceRelationships: [{ relationshipType: "OWNER", identifier: "urn:li:userGeneratedContent" }],
-        },
+        author,
+        commentary: content,
+        visibility: "PUBLIC",
+        distribution: { feedDistribution: "MAIN_FEED", targetEntities: [], thirdPartyDistributionChannels: [] },
+        lifecycleState: "PUBLISHED",
+        isReshareDisabledByAuthor: false,
       }),
     });
-    const regData = await regRes.json();
-    const uploadUrl = regData?.value?.uploadMechanism?.["com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"]?.uploadUrl;
-    const asset = regData?.value?.asset;
-
-    if (uploadUrl && asset) {
-      const imgRes = await fetch(imageUrl);
-      const imgBuffer = await imgRes.arrayBuffer();
-      await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${cfg.accessToken}`, "Content-Type": "image/jpeg" },
-        body: imgBuffer,
-      });
-      shareContent.media = [{ status: "READY", description: { text: content }, media: asset, title: { text: "Post" } }];
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d?.message || "LinkedIn post failed");
     }
+    const postId = res.headers.get("x-restli-id") || "";
+    return { postId };
   }
 
-  const postRes = await fetch("https://api.linkedin.com/v2/ugcPosts", {
+  // Image post — Step 1: initialize upload
+  const initRes = await fetch("https://api.linkedin.com/rest/images?action=initializeUpload", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${cfg.accessToken}`,
       "Content-Type": "application/json",
-      "X-Restli-Protocol-Version": "2.0.0",
+      "LinkedIn-Version": "202406",
     },
-    body: JSON.stringify({
-      author: `urn:li:organization:${cfg.orgId}`,
-      lifecycleState: "PUBLISHED",
-      specificContent: { "com.linkedin.ugc.ShareContent": shareContent },
-      visibility: { "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC" },
-    }),
+    body: JSON.stringify({ initializeUploadRequest: { owner: author } }),
+  });
+  const initData = await initRes.json();
+  const uploadUrl = initData?.value?.uploadUrl;
+  const imageUrn = initData?.value?.image;
+  if (!uploadUrl || !imageUrn) throw new Error("LinkedIn image upload init failed");
+
+  // Step 2: upload image bytes
+  const imgRes = await fetch(imageUrl);
+  const imgBuffer = await imgRes.arrayBuffer();
+  await fetch(uploadUrl, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${cfg.accessToken}`, "Content-Type": "image/jpeg" },
+    body: imgBuffer,
   });
 
-  const postData = await postRes.json();
-  if (!postRes.ok) throw new Error(postData?.message || "LinkedIn post failed");
-  return { postId: postData.id };
+  // Step 3: create post with image
+  const postRes = await fetch("https://api.linkedin.com/rest/posts", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${cfg.accessToken}`,
+      "Content-Type": "application/json",
+      "LinkedIn-Version": "202406",
+    },
+    body: JSON.stringify({
+      author,
+      commentary: content,
+      visibility: "PUBLIC",
+      distribution: { feedDistribution: "MAIN_FEED", targetEntities: [], thirdPartyDistributionChannels: [] },
+      content: { media: { id: imageUrn } },
+      lifecycleState: "PUBLISHED",
+      isReshareDisabledByAuthor: false,
+    }),
+  });
+  if (!postRes.ok) {
+    const d = await postRes.json().catch(() => ({}));
+    throw new Error(d?.message || "LinkedIn post failed");
+  }
+  return { postId: postRes.headers.get("x-restli-id") || "" };
 }

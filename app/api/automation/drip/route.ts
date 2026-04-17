@@ -11,33 +11,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getAutomationCompanyId } from "@/lib/automationHelpers";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import Anthropic from "@anthropic-ai/sdk";
 
 // ─── auth helper ────────────────────────────────────────────────────────────
-async function getCompanyId(req: NextRequest): Promise<string | null> {
-  try {
-    const h = req.headers.get("x-company-id");
-    if (h) return h;
-    const uid = req.headers.get("x-user-id");
-    if (uid) {
-      const u = await prisma.user.findUnique({ where: { id: uid }, select: { defaultCompanyId: true } });
-      if (u?.defaultCompanyId) return u.defaultCompanyId;
-    }
-    const cookie = req.headers.get("cookie") || "";
-    const m = cookie.match(/sb_auth=([^;]+)/);
-    if (m) {
-      const parts = decodeURIComponent(m[1]).split(".");
-      if (parts.length === 3) {
-        const p = JSON.parse(Buffer.from(parts[1], "base64url").toString());
-        const cid = p?.companyId || p?.defaultCompanyId;
-        if (cid) return cid;
-      }
-    }
-    return null;
-  } catch { return null; }
-}
+
 
 // ─── storage helpers (activity log as lightweight KV) ────────────────────────
 async function getCampaigns(companyId: string): Promise<any[]> {
@@ -78,7 +58,7 @@ async function ensureDripTable() {
 // ─── GET ─────────────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const campaigns = await getCampaigns(companyId);
     return NextResponse.json(campaigns);
@@ -90,7 +70,7 @@ export async function GET(req: NextRequest) {
 // ─── POST ────────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
@@ -122,7 +102,7 @@ export async function POST(req: NextRequest) {
 // ─── PUT ─────────────────────────────────────────────────────────────────────
 export async function PUT(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const body = await req.json();
     const { id, ...rest } = body;
@@ -142,7 +122,7 @@ export async function PUT(req: NextRequest) {
 // ─── DELETE ──────────────────────────────────────────────────────────────────
 export async function DELETE(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");

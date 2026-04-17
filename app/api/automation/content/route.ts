@@ -7,30 +7,11 @@
  * GET  /api/automation/content  — history
  */
 import { NextRequest, NextResponse } from "next/server";
+import { getAutomationCompanyId } from "@/lib/automationHelpers";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 
-async function getCompanyId(req: NextRequest): Promise<string | null> {
-  try {
-    const h = req.headers.get("x-company-id");
-    if (h) return h;
-    const uid = req.headers.get("x-user-id");
-    if (uid) {
-      const u = await prisma.user.findUnique({ where: { id: uid }, select: { defaultCompanyId: true } });
-      if (u?.defaultCompanyId) return u.defaultCompanyId;
-    }
-    const cookie = req.headers.get("cookie") || "";
-    const m = cookie.match(/sb_auth=([^;]+)/);
-    if (m) {
-      const parts = decodeURIComponent(m[1]).split(".");
-      if (parts.length === 3) {
-        const p = JSON.parse(Buffer.from(parts[1], "base64url").toString());
-        if (p?.companyId) return p.companyId;
-      }
-    }
-    return null;
-  } catch { return null; }
-}
+
 
 const TYPE_PROMPTS: Record<string, string> = {
   social_post: "Write an engaging social media post (Facebook/Instagram/LinkedIn) for a Pakistani business.",
@@ -43,7 +24,7 @@ const TYPE_PROMPTS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
@@ -80,7 +61,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const logs = await prisma.activityLog.findMany({
       where: { action: "AI_CONTENT_GENERATED", companyId },

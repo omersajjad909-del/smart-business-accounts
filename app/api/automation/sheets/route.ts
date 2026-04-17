@@ -13,29 +13,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getAutomationCompanyId } from "@/lib/automationHelpers";
 import { prisma } from "@/lib/prisma";
 
-async function getCompanyId(req: NextRequest): Promise<string | null> {
-  try {
-    const h = req.headers.get("x-company-id");
-    if (h) return h;
-    const uid = req.headers.get("x-user-id");
-    if (uid) {
-      const u = await prisma.user.findUnique({ where: { id: uid }, select: { defaultCompanyId: true } });
-      if (u?.defaultCompanyId) return u.defaultCompanyId;
-    }
-    const cookie = req.headers.get("cookie") || "";
-    const m = cookie.match(/sb_auth=([^;]+)/);
-    if (m) {
-      const parts = decodeURIComponent(m[1]).split(".");
-      if (parts.length === 3) {
-        const p = JSON.parse(Buffer.from(parts[1], "base64url").toString());
-        if (p?.companyId) return p.companyId;
-      }
-    }
-    return null;
-  } catch { return null; }
-}
+
 
 async function getSheetsConfig(companyId: string): Promise<{ spreadsheetId: string; serviceAccountJson: string; sheetName: string } | null> {
   try {
@@ -127,7 +108,7 @@ async function readFromSheet(spreadsheetId: string, sheetName: string, accessTok
 // ─── GET ─────────────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
@@ -161,7 +142,7 @@ export async function GET(req: NextRequest) {
 // ─── PUT — save config ────────────────────────────────────────────────────────
 export async function PUT(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
@@ -186,7 +167,7 @@ export async function PUT(req: NextRequest) {
 // ─── POST — append row or sync ───────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
-    const companyId = await getCompanyId(req);
+    const companyId = await getAutomationCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const cfg = await getSheetsConfig(companyId);
@@ -219,18 +200,18 @@ export async function POST(req: NextRequest) {
 
     if (action === "sync_contacts") {
       // Sync customers from DB
-      const customers = await prisma.customer.findMany({
+      const customers = await prisma.contact.findMany({
         where: { companyId },
         select: { name: true, email: true, phone: true, createdAt: true },
         take: 1000,
         orderBy: { createdAt: "desc" },
-      }).catch(() => []);
+      }).catch(() => [] as { name: string; email: string | null; phone: string | null; createdAt: Date }[]);
 
       const sheetName = searchParams.get("sheet") || "Contacts";
       const header = ["Name", "Email", "Phone", "Created At"];
       const values = [
         header,
-        ...customers.map(c => [c.name || "", c.email || "", c.phone || "", new Date(c.createdAt).toLocaleString()]),
+        ...customers.map((c: any) => [c.name || "", c.email || "", c.phone || "", new Date(c.createdAt).toLocaleString()]),
       ];
 
       await appendToSheet(cfg.spreadsheetId, sheetName, values, accessToken);

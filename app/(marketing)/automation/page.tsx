@@ -398,10 +398,10 @@ export default function AutomationLandingPage() {
       {/* ── CTA ── */}
       <div style={{ padding: "80px 24px", textAlign: "center", background: "radial-gradient(ellipse 60% 50% at 50% 100%, rgba(124,58,237,.2) 0%, transparent 70%)" }}>
         <h2 style={{ fontSize: "clamp(1.8rem, 3vw, 2.8rem)", fontWeight: 900, margin: "0 0 16px" }}>
-          Start today - 14 days free
+          Ready to grow your business on autopilot?
         </h2>
         <p style={{ color: "rgba(255,255,255,.5)", fontSize: 16, marginBottom: 36 }}>
-          No credit card. Cancel anytime. Full access to all 8 automation features.
+          No hidden fees. Cancel anytime. Full access to all 8 automation features.
         </p>
         <Link href="/get-started" style={{
           display: "inline-block", padding: "16px 40px", borderRadius: 14,

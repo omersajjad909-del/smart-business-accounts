@@ -134,6 +134,9 @@ export default function ChoosePlanPage() {
   const [country, setCountry] = useState<string>(searchParams.get("country") || "US");
   const [rates, setRates] = useState<Record<string, number> | null>(null);
 
+  // ── Addon mode: ?addon=automation ────────────────────────────────────────
+  const addonMode = searchParams.get("addon") === "automation";
+
   // Read cycle + plan from URL — auto-open custom module selector
   useEffect(() => {
     const c = (searchParams.get("cycle") || "").toLowerCase();
@@ -141,7 +144,6 @@ export default function ChoosePlanPage() {
     const mods = searchParams.get("modules");
       if (p === "custom") {
       if (mods) {
-        // Modules already chosen on pricing page — skip builder, go straight to signup
         const cycle = c === "yearly" ? "yearly" : "monthly";
         const monthly = getCustomPlanMonthlyUsd(mods.split(","));
         const price = cycle === "yearly" ? Math.round(monthly * 0.8) : monthly;
@@ -238,6 +240,68 @@ export default function ChoosePlanPage() {
   function toggleModule(id: string) {
     setSelectedModules(prev =>
       prev.includes(id) ? (prev.length > 1 ? prev.filter(m => m !== id) : prev) : [...prev, id]
+    );
+  }
+
+  // ── Addon purchase page ───────────────────────────────────────────────────
+  if (addonMode) {
+    const monthlyUsd = 79;
+    const yearlyUsd  = 69;
+    const price = billing === "yearly" ? formatPrice(yearlyUsd) : formatPrice(monthlyUsd);
+    const savings = formatPrice((monthlyUsd - yearlyUsd) * 12);
+    return (
+      <div style={{ background:"linear-gradient(160deg,#06071a 0%,#0c0f2e 50%,#080c1e 100%)", minHeight:"100vh", padding:"48px 24px 80px", fontFamily:"'Outfit','DM Sans',sans-serif", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center" }}>
+        <div style={{ maxWidth:560, width:"100%" }}>
+          {/* Back */}
+          <a href="/pricing" style={{ fontSize:13, color:"rgba(255,255,255,.4)", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6, marginBottom:32 }}>← Back to Pricing</a>
+
+          {/* Badge */}
+          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(124,58,237,.12)", border:"1px solid rgba(124,58,237,.3)", borderRadius:100, padding:"5px 14px", fontSize:12, color:"#a78bfa", fontWeight:700, marginBottom:20 }}>⚡ Power Add-On</div>
+
+          <h1 style={{ fontSize:"clamp(26px,5vw,38px)", fontWeight:900, margin:"0 0 10px", letterSpacing:"-.02em" }}>AI Business Automation</h1>
+          <p style={{ color:"rgba(255,255,255,.45)", fontSize:15, marginBottom:36 }}>Add to your existing plan. 8 automation tools in one add-on.</p>
+
+          {/* Billing toggle */}
+          <div style={{ display:"flex", gap:8, marginBottom:32 }}>
+            {(["monthly","yearly"] as const).map(c => (
+              <button key={c} onClick={() => setBilling(c)} style={{ padding:"8px 20px", borderRadius:10, border:"1px solid rgba(255,255,255,.12)", background: billing===c ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(255,255,255,.05)", color:"#fff", fontWeight:700, fontSize:13, cursor:"pointer" }}>
+                {c === "monthly" ? "Monthly" : `Yearly — save ${savings}/yr`}
+              </button>
+            ))}
+          </div>
+
+          {/* Price card */}
+          <div style={{ background:"linear-gradient(135deg,rgba(124,58,237,.1),rgba(37,99,235,.07))", border:"1.5px solid rgba(124,58,237,.35)", borderRadius:20, padding:"32px 36px", marginBottom:24, boxShadow:"0 0 60px rgba(124,58,237,.12)" }}>
+            <div style={{ height:3, background:"linear-gradient(90deg,#7c3aed,#2563eb,#38bdf8)", borderRadius:2, marginBottom:28 }} />
+            <div style={{ fontSize:13, color:"#a78bfa", fontWeight:700, marginBottom:8 }}>AUTOMATION ADD-ON</div>
+            <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:6 }}>
+              <span style={{ fontSize:52, fontWeight:900, letterSpacing:"-.03em" }}>{price}</span>
+              <span style={{ fontSize:14, color:"rgba(255,255,255,.4)" }}>/month</span>
+            </div>
+            {billing === "yearly" && <div style={{ fontSize:13, color:"#34d399", marginBottom:20 }}>Billed yearly · No hidden fees</div>}
+
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:28 }}>
+              {[
+                { icon:"💬", label:"WhatsApp Auto-Reply" }, { icon:"📧", label:"Email Drip Campaigns" },
+                { icon:"🤖", label:"Website Chatbot" },     { icon:"👥", label:"CRM Lead Capture" },
+                { icon:"🔗", label:"Zapier / Make" },       { icon:"📱", label:"Social Auto-Post" },
+                { icon:"📊", label:"Google Sheets Sync" },  { icon:"✍️", label:"AI Content Gen" },
+              ].map(f => (
+                <div key={f.label} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.04)" }}>
+                  <span style={{ fontSize:15 }}>{f.icon}</span>
+                  <span style={{ fontSize:12, fontWeight:600, color:"#e2e8f0" }}>{f.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <a href={`/onboarding/signup/addon-automation?cycle=${billing}&currency=${currency}&country=${country}`} style={{ display:"block", textAlign:"center", padding:"14px 28px", borderRadius:12, background:"linear-gradient(135deg,#7c3aed,#2563eb)", color:"#fff", textDecoration:"none", fontSize:15, fontWeight:800, boxShadow:"0 0 30px rgba(124,58,237,.4)" }}>
+              Add to My Plan →
+            </a>
+          </div>
+
+          <p style={{ fontSize:12, color:"rgba(255,255,255,.3)", textAlign:"center" }}>Add to any existing plan · Cancel anytime · Instant activation</p>
+        </div>
+      </div>
     );
   }
 
