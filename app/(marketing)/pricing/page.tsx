@@ -603,9 +603,6 @@ export default function PricingPage() {
                   <div style={{ fontSize: 14, color: "rgba(255,255,255,.9)", fontWeight: 800 }}>
                     {formatPrice(billing === "yearly" ? publicPricing[plan.slug as keyof PlanPricing].yearly : publicPricing[plan.slug as keyof PlanPricing].monthly)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
                   </div>
-                  <div style={{ fontSize: 10, color: "rgba(251,146,60,.9)", marginTop: 4, fontWeight: 700 }}>
-                    Intro: {formatPrice(Math.round((billing === "yearly" ? publicPricing[plan.slug as keyof PlanPricing].yearly : publicPricing[plan.slug as keyof PlanPricing].monthly) * 0.25))}/mo for 3 months
-                  </div>
                   {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
                 </div>
               ))}
@@ -638,9 +635,8 @@ export default function PricingPage() {
                     </div>
                     {feat.name === "Users"
                       ? ([planLimits.starter, planLimits.professional, planLimits.enterprise] as (number | null)[]).map((lim, pi) => (
-                          <div key={pi} style={{ padding: "12px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: PLAN_COLORS[pi] }}>{usersLabel(lim)}</span>
-                            <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 500 }}>+{formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/extra user</span>
+                          <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: PLAN_COLORS[pi] }}>{usersLabel(lim)} users</span>
                           </div>
                         ))
                       : feat.name === "Branches"
@@ -686,11 +682,27 @@ export default function PricingPage() {
               <h2 style={{ fontSize: "clamp(28px,4vw,40px)", fontWeight: 900, letterSpacing: "-.03em", marginBottom: 10 }}>Build your own package</h2>
               <p style={{ color: "rgba(255,255,255,.45)", maxWidth: 520, lineHeight: 1.6 }}>Pick only the modules you need. Perfect for niche use cases — pay for exactly what you use.</p>
             </div>
-            <div style={{ minWidth: 220, padding: "22px 24px", borderRadius: 18, background: "rgba(249,115,22,.08)", border: "1px solid rgba(249,115,22,.24)", textAlign: "center" }}>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Your Estimate</div>
-              <div style={{ fontSize: 44, fontWeight: 900, color: "#f97316", lineHeight: 1 }}>{formatPrice(customDisplayUsd)}</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 6 }}>{selectedModules.length} module{selectedModules.length === 1 ? "" : "s"} selected</div>
-              <Link href={buildCustomHref()} style={{ display: "block", marginTop: 18, padding: "11px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: "linear-gradient(135deg,#f97316,#ea580c)" }}>Continue</Link>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 220 }}>
+              <div style={{ padding: "22px 24px", borderRadius: 18, background: "rgba(249,115,22,.08)", border: "1px solid rgba(249,115,22,.24)", textAlign: "center" }}>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Your Estimate</div>
+                <div style={{ fontSize: 44, fontWeight: 900, color: "#f97316", lineHeight: 1 }}>{formatPrice(customDisplayUsd)}</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 6 }}>{selectedModules.length} module{selectedModules.length === 1 ? "" : "s"} selected</div>
+                <Link href={buildCustomHref()} style={{ display: "block", marginTop: 18, padding: "11px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: "linear-gradient(135deg,#f97316,#ea580c)" }}>Continue</Link>
+              </div>
+              {/* Add-ons info */}
+              <div style={{ padding: "16px 18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)" }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>Add-ons (optional)</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>👥 Extra users</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc" }}>+{formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>🏢 Extra branches</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#38bdf8" }}>+{formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/branch/mo</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className="cg" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
