@@ -1809,6 +1809,7 @@ function PagePlans() {
   const [pricing, setPricing]   = useState({ starter:{monthly:49,yearly:39}, pro:{monthly:99,yearly:79}, enterprise:{monthly:249,yearly:199} });
   const [seatPricing, setSeatPricing] = useState({ monthly:7, yearly:6 });
   const [planLimits, setPlanLimits] = useState<Record<string,number|null>>({ starter:3, pro:10, enterprise:25 });
+  const [branchLimits, setBranchLimits] = useState<Record<string,number|null>>({ starter:1, pro:3, enterprise:10 });
   const [saved,   setSaved]     = useState<""|"saving"|"ok"|"err">("");
   const [features, setFeatures] = useState<string[]>(DEFAULT_FEATURES);
   const [pf, setPf] = useState<Record<PlanKey, string[]>>({
@@ -1840,6 +1841,7 @@ function PagePlans() {
         if (d.features) setFeatures(d.features);
         if (d.featureMatrix) setPf(d.featureMatrix);
         if (d.planLimits) setPlanLimits(l => ({ ...l, ...d.planLimits }));
+        if (d.branchLimits) setBranchLimits(l => ({ ...l, ...d.branchLimits }));
       })
       .catch(() => {});
   }, []);
@@ -1854,7 +1856,7 @@ function PagePlans() {
       const r = await fetch("/api/admin/plan-config", {
         method: "POST",
         headers,
-        body: JSON.stringify({ pricing, seatPricing, features, featureMatrix: pf, planLimits }),
+        body: JSON.stringify({ pricing, seatPricing, features, featureMatrix: pf, planLimits, branchLimits }),
       });
       setSaved(r.ok ? "ok" : "err");
       setTimeout(() => setSaved(""), 2500);
@@ -1917,6 +1919,8 @@ function PagePlans() {
           setSeatPricing={setSeatPricing}
           planLimits={planLimits}
           setPlanLimits={setPlanLimits}
+          branchLimits={branchLimits}
+          setBranchLimits={setBranchLimits}
         />
       )}
       {plansTab === "custom" && <PageCustomOrders/>}
@@ -1995,6 +1999,26 @@ function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, tog
                     style={{ background:"none",border:"none",color:"#a5b4fc",fontSize:15,fontWeight:700,width:"100%",outline:"none",fontFamily:"inherit" }}
                   />
                   <span style={{ color:"rgba(255,255,255,.25)", fontSize:11 }}>users</span>
+                </div>
+                <div style={{ marginTop:4, fontSize:10, color:"rgba(255,255,255,.3)" }}>
+                  Leave empty for unlimited
+                </div>
+              </div>
+              {/* Max Branches */}
+              <div style={{ marginTop:10 }}>
+                <label style={{ fontSize:10.5, color:"rgba(255,255,255,.35)", fontWeight:700, textTransform:"uppercase", letterSpacing:".05em", display:"block", marginBottom:5 }}>Max Branches</label>
+                <div style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(56,189,248,.08)", borderRadius:8, border:"1px solid rgba(56,189,248,.2)", padding:"7px 12px" }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(56,189,248,.6)" strokeWidth="2"><path d="M3 21h18M9 21V7l3-4 3 4v14M9 12h6"/></svg>
+                  <input
+                    type="number"
+                    min="1"
+                    max="9999"
+                    value={branchLimits[plan] ?? ""}
+                    onChange={e=>setBranchLimits((l:any)=>({...l,[plan]:e.target.value===""?null:Number(e.target.value)}))}
+                    placeholder="Unlimited"
+                    style={{ background:"none",border:"none",color:"#38bdf8",fontSize:15,fontWeight:700,width:"100%",outline:"none",fontFamily:"inherit" }}
+                  />
+                  <span style={{ color:"rgba(255,255,255,.25)", fontSize:11 }}>branches</span>
                 </div>
                 <div style={{ marginTop:4, fontSize:10, color:"rgba(255,255,255,.3)" }}>
                   Leave empty for unlimited

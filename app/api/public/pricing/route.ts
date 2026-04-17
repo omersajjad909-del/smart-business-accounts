@@ -15,6 +15,11 @@ const DEFAULT_PLAN_LIMITS = {
   pro: 10,
   enterprise: 25,
 };
+const DEFAULT_BRANCH_LIMITS = {
+  starter: 1,
+  pro: 3,
+  enterprise: 10,
+};
 const DEFAULT_SEAT_PRICING = {
   monthly: 7,
   yearly: 72, // yearly annual total (6/mo equivalent)
@@ -31,6 +36,7 @@ export async function GET() {
       return NextResponse.json({
         pricing: DEFAULT_PRICING,
         planLimits: DEFAULT_PLAN_LIMITS,
+        branchLimits: DEFAULT_BRANCH_LIMITS,
         seatPricing: DEFAULT_SEAT_PRICING,
         features: null,
         featureMatrix: null,
@@ -51,6 +57,7 @@ export async function GET() {
       return NextResponse.json({
         pricing,
         planLimits: payload?.planLimits ?? DEFAULT_PLAN_LIMITS,
+        branchLimits: payload?.branchLimits ?? DEFAULT_BRANCH_LIMITS,
         seatPricing: payload?.seatPricing
           ? {
               monthly: Number(payload.seatPricing?.monthly ?? DEFAULT_SEAT_PRICING.monthly),
@@ -66,6 +73,7 @@ export async function GET() {
     return NextResponse.json({
       pricing: DEFAULT_PRICING,
       planLimits: DEFAULT_PLAN_LIMITS,
+      branchLimits: DEFAULT_BRANCH_LIMITS,
       seatPricing: DEFAULT_SEAT_PRICING,
       features: null,
       featureMatrix: null,
@@ -73,7 +81,7 @@ export async function GET() {
     });
   } catch (e: unknown) {
     return NextResponse.json(
-      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, seatPricing: DEFAULT_SEAT_PRICING, error: e instanceof Error ? e.message : "unknown" },
+      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, branchLimits: DEFAULT_BRANCH_LIMITS, seatPricing: DEFAULT_SEAT_PRICING, error: e instanceof Error ? e.message : "unknown" },
       { status: 200 },
     );
   }

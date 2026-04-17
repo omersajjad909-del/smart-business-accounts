@@ -90,7 +90,7 @@ const COMPARISON: Category[] = [
     title: "Core Platform",
     features: [
       { name: "Users", starter: "Up to 5", pro: "Up to 20", enterprise: "Unlimited" },
-      { name: "Branches", starter: "1 branch", pro: "Up to 3", enterprise: "Up to 10" },
+      { name: "Branches", starter: "1", pro: "3", enterprise: "10" },
       { name: "Custom domain (white-label)", starter: false, pro: false, enterprise: true },
       { name: "API access", starter: false, pro: false, enterprise: true },
       { name: "Webhooks & integrations", starter: false, pro: false, enterprise: true },
@@ -310,6 +310,7 @@ export default function PricingPage() {
   const [featureMap, setFeatureMap] = useState<Record<string, { starter: boolean; pro: boolean; enterprise: boolean }>>({});
   const [publicPricing, setPublicPricing] = useState<PlanPricing>(DEFAULT_PUBLIC_PRICING);
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
+  const [branchLimits, setBranchLimits] = useState<Record<string, number | null>>({ starter: 1, pro: 3, enterprise: 10 });
   const [seatPricing, setSeatPricing] = useState<{ monthly: number; yearly: number }>(DEFAULT_SEAT_PRICING);
 
   useEffect(() => {
@@ -350,6 +351,13 @@ export default function PricingPage() {
               starter: d.planLimits?.starter ?? DEFAULT_PLAN_LIMITS.starter,
               professional: d.planLimits?.pro ?? DEFAULT_PLAN_LIMITS.professional,
               enterprise: d.planLimits?.enterprise ?? DEFAULT_PLAN_LIMITS.enterprise,
+            });
+          }
+          if (d?.branchLimits) {
+            setBranchLimits({
+              starter:    d.branchLimits?.starter    ?? 1,
+              professional: d.branchLimits?.pro      ?? 3,
+              enterprise: d.branchLimits?.enterprise ?? 10,
             });
           }
           if (d?.seatPricing) {
@@ -633,6 +641,12 @@ export default function PricingPage() {
                           <div key={pi} style={{ padding: "12px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
                             <span style={{ fontSize: 13, fontWeight: 800, color: PLAN_COLORS[pi] }}>{usersLabel(lim)}</span>
                             <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 500 }}>+{formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/extra user</span>
+                          </div>
+                        ))
+                      : feat.name === "Branches"
+                      ? ([branchLimits.starter, branchLimits.professional, branchLimits.enterprise] as (number | null)[]).map((lim, pi) => (
+                          <div key={pi} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", background: PLANS[pi].featured ? "rgba(99,102,241,.03)" : "transparent" }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: PLAN_COLORS[pi] }}>{lim === null ? "Unlimited" : lim === 1 ? "1 branch" : `Up to ${lim}`}</span>
                           </div>
                         ))
                       : ([

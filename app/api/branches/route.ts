@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { logActivity } from "@/lib/audit";
+import { getBaseBranchLimitForPlan, getCompanyBranchCount } from "@/lib/branchLimit";
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 if (process.env.NODE_ENV === "development") {
@@ -76,6 +77,22 @@ export async function POST(req: NextRequest) {
     if (!body.code || !body.name) {
       return NextResponse.json({ error: "Code and name required" }, { status: 400 });
     }
+
+    // Enforce branch limit
+    const company = await prisma.company.findUnique({ where: { id: companyId }, select: { plan: true } });
+    const branchLimit = await getBaseBranchLimitForPlan(company?.plan);
+    if (branchLimit !== null) {
+      const currentCount = await getCompanyBranchCount(companyId);
+      if (currentCount >= branchLimit) {
+        return NextResponse.json({
+          error: `Branch limit reached. Your ${(company?.plan || "current").toUpperCase()} plan allows up to ${branchLimit} branch${branchLimit > 1 ? "es" : ""}. Upgrade your plan to add more.`,
+          limitReached: true,
+          limit: branchLimit,
+          current: currentCount,
+        }, { status: 403 });
+      }
+    }
+
     const branch = await prisma.branch.create({
       data: {
         companyId,

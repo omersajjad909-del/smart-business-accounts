@@ -21,12 +21,18 @@ const DEFAULT_PLAN_LIMITS = {
   pro: 10,
   enterprise: 25,
 };
+const DEFAULT_BRANCH_LIMITS = {
+  starter: 1,
+  pro: 3,
+  enterprise: 10,
+};
 
 // Canonical default plan config returned when no admin override exists
 const DEFAULT_CONFIG = {
   pricing: DEFAULT_PRICING,
   seatPricing: DEFAULT_SEAT_PRICING,
   planLimits: DEFAULT_PLAN_LIMITS,
+  branchLimits: DEFAULT_BRANCH_LIMITS,
   plans: [
     {
       code: "starter", name: "Starter",
