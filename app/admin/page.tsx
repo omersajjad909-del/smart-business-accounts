@@ -11,6 +11,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { clearCurrentUser, getCurrentUser, updateStoredUser } from "@/lib/auth";
 import { DASHBOARD_FEATURE_DEFS, createDefaultDashboardFeatureFlags } from "@/lib/dashboardFeatureRegistry";
+import CrmPage from "@/app/admin/crm/page";
 type Notif = {
   id: string;
   type: string;
@@ -6326,21 +6327,7 @@ function PageTestimonials() {
    PAGE: LEAD MANAGEMENT
 ═══════════════════════════════════════════════════════ */
 function PageCRM() {
-  return (
-    <div style={{ padding: 24, fontFamily: "inherit" }}>
-      <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: "white", margin: "0 0 4px" }}>CRM Workspace</h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: 0 }}>Visitors, leads, and pipeline — full CRM view.</p>
-      </div>
-      <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
-        <iframe
-          src="/admin/crm"
-          style={{ width: "100%", height: "calc(100vh - 140px)", border: "none", background: "#060a14" }}
-          title="CRM"
-        />
-      </div>
-    </div>
-  );
+  return <CrmPage />;
 }
 
 function PageLeads() {
