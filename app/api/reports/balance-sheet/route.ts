@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    const sub = await requireEntitlement(req, "proReports");
+    const sub = await requireEntitlement(req, "advancedReports");
     if (sub) return sub;
 
     const accounts = await prisma.account.findMany({
