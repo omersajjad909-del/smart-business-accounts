@@ -7,9 +7,9 @@ import { useEffect, useState } from "react";
 const PRODUCT_LINKS = [
   { label: "Core Features",      href: "/features" },
   { label: "Pricing Plans",      href: "/pricing" },
+  { label: "All 61 Industries",  href: "/industries" },
   { label: "Industry Solutions", href: "/solutions" },
   { label: "Data Security",      href: "/security" },
-  { label: "Changelog",          href: "/changelog" },
   { label: "Release Notes",      href: "/updates" },
 ];
 

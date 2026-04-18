@@ -35,15 +35,11 @@ type Branch = {
   createdAt: string;
 };
 
-const BUSINESS_TYPE_LABELS: Record<string, string> = {
-  trading: "Trading",
-  manufacturing: "Manufacturing",
-  distribution: "Distribution",
-  retail: "Retail",
-  service: "Service",
-  restaurant: "Restaurant",
-  real_estate: "Real Estate",
-  construction: "Construction",
+// Business type labels loaded dynamically from API — see useEffect below
+const BUSINESS_TYPE_LABELS_FALLBACK: Record<string, string> = {
+  trading: "Trading", manufacturing: "Manufacturing", distribution: "Distribution",
+  retail: "Retail", service: "Service", restaurant: "Restaurant",
+  real_estate: "Real Estate", construction: "Construction",
 };
 
 const PLAN_META: Record<string, { color: string; bg: string; border: string; icon: string; label: string }> = {
@@ -67,7 +63,21 @@ export default function CompanyProfilePage() {
   const [saveMsg, setSaveMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: "", country: "", baseCurrency: "" });
+  const [bizTypeLabels, setBizTypeLabels] = useState<Record<string, string>>(BUSINESS_TYPE_LABELS_FALLBACK);
   const countryOptions = sortCountries(ALL_COUNTRIES).map((c) => c.name);
+
+  useEffect(() => {
+    // Load business type labels from API
+    fetch("/api/public/business-types")
+      .then(r => r.json())
+      .then(d => {
+        if (d.types) {
+          const map: Record<string, string> = {};
+          d.types.forEach((t: any) => { map[t.id] = t.label; });
+          setBizTypeLabels(map);
+        }
+      }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -321,7 +331,7 @@ export default function CompanyProfilePage() {
               </span>
               {company.businessType && (
                 <span style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
-                  🏭 {BUSINESS_TYPE_LABELS[company.businessType] || company.businessType}
+                  🏭 {bizTypeLabels[company.businessType] || company.businessType}
                 </span>
               )}
               {company.createdAt && (
