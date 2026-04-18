@@ -210,7 +210,15 @@ export default function DashboardLayout({
     fetchCompany();
   }, []);
 
+  useEffect(() => {
+    fetch("/api/admin/dev-test/status")
+      .then(r => r.json())
+      .then(d => setTestMode(d))
+      .catch(() => {});
+  }, []);
+
   const [subInfo, setSubInfo] = useState<{ plan: string; status: string } | null>(null);
+  const [testMode, setTestMode] = useState<{ isTestMode: boolean; testBusinessType: string | null; testPlan: string | null } | null>(null);
 
   // MOBILE MENU STATE
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -1902,6 +1910,46 @@ export default function DashboardLayout({
                 </Link>
               </div>
             )}
+            {/* ── TEST MODE BANNER ── */}
+            {testMode?.isTestMode && (
+              <div style={{
+                display:"flex", alignItems:"center", justifyContent:"space-between",
+                background:"linear-gradient(135deg,rgba(99,102,241,.12),rgba(79,70,229,.08))",
+                border:"1px solid rgba(99,102,241,.35)", borderRadius:12,
+                padding:"10px 18px", marginBottom:20, gap:12, flexWrap:"wrap",
+              }}>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+                  <span style={{fontSize:18}}>🧪</span>
+                  <div>
+                    <span style={{fontSize:13,fontWeight:700,color:"#a5b4fc"}}>Dev Test Mode</span>
+                    <span style={{fontSize:12,color:"rgba(255,255,255,.45)",marginLeft:10}}>
+                      {testMode.testBusinessType} · {testMode.testPlan} — This is an isolated test workspace
+                    </span>
+                  </div>
+                </div>
+                <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                  <button
+                    onClick={async () => {
+                      await fetch("/api/admin/dev-test/clear", { method:"POST" });
+                      window.location.reload();
+                    }}
+                    style={{ padding:"6px 14px", borderRadius:7, border:"1px solid rgba(248,113,113,.4)", background:"rgba(248,113,113,.1)", color:"#f87171", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}
+                  >
+                    🗑 Clear Data
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await fetch("/api/admin/dev-test/exit", { method:"POST" });
+                      window.location.href = "/admin/dev-test";
+                    }}
+                    style={{ padding:"6px 14px", borderRadius:7, border:"1px solid rgba(99,102,241,.4)", background:"rgba(99,102,241,.12)", color:"#a5b4fc", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}
+                  >
+                    ✕ Exit Test Mode
+                  </button>
+                </div>
+              </div>
+            )}
+
             {children}
           </div>
         </div>

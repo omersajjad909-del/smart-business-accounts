@@ -22,6 +22,7 @@ const sections = [
   { name: 'Email Logs', icon: '✉️', href: '/admin/email-logs' },
   { name: 'Testimonials', icon: '⭐', href: '/admin/testimonials' },
   { name: 'Web Content', icon: '🌐', href: '/admin/web' },
+  { name: 'Dev Test Mode', icon: '🧪', href: '/admin/dev-test' },
   { name: 'System Health', icon: '🩺', href: '/admin/system' },
   { name: 'Audit Logs', icon: '📝', href: '/admin/logs' },
   { name: 'Settings', icon: '⚙️', href: '/admin/settings' },
