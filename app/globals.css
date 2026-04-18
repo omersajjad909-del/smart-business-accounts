@@ -45,6 +45,9 @@
   --accent: #0d9488;        /* Teal 600 - slightly darker for contrast on white */
   --accent-strong: #0f766e; /* Teal 700 */
   --accent-soft: rgba(13, 148, 136, 0.1);
+  --nav-bg: rgba(255,255,255,.92);
+  --nav-border: rgba(148,163,184,.18);
+  --nav-text: var(--text-primary);
   
   --success: #22c55e;       /* Green 500 */
   --warning: #f59e0b;       /* Amber 500 */
@@ -54,6 +57,28 @@
 }
 
 .dark {
+  /* DARK MODE (Original Colors) */
+  color-scheme: dark;
+  --app-bg: #0b1324;
+  --surface: #0f1b35;
+  --panel-bg: #0f1a30;
+  --panel-bg-2: #122142;
+  --card-bg: #141f3b;
+  --card-bg-2: #18274b;
+  --border: #22365f;
+  --text-primary: #eef3ff;
+  --text-muted: #a6b4d4;
+  --accent: #21c7b7;
+  --accent-strong: #16a59a;
+  --accent-soft: rgba(33, 199, 183, 0.15);
+  --success: #4ade80;
+  --warning: #f4c25b;
+  --danger: #f87171;
+  --shadow: 0 18px 40px rgba(7, 12, 24, 0.35);
+  --nav-bg: rgba(8, 12, 30, 0.88);
+  --nav-border: rgba(255,255,255,0.08);
+  --nav-text: #eef3ff;
+}
   /* DARK MODE (Original Colors) */
   color-scheme: dark;
   --app-bg: #0b1324;

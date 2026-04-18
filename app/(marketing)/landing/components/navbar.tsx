@@ -394,11 +394,11 @@ export default function Navbar() {
 
       <nav style={{
         position:"relative", zIndex:50, width:"100%",
-        background: scrolled ? "rgba(8,12,30,.94)" : "rgba(8,12,30,.78)",
+        background: "var(--nav-bg)",
         backdropFilter:"blur(22px)",
-        borderBottom:`1px solid ${scrolled ? "rgba(99,102,241,.22)" : "rgba(255,255,255,.07)"}`,
+        borderBottom:`1px solid var(--nav-border)`,
         transition:"all .3s ease",
-        boxShadow: scrolled ? "0 4px 32px rgba(0,0,0,.45)" : "none",
+        boxShadow: scrolled ? "0 4px 32px rgba(0,0,0,.12)" : "none",
         fontFamily:"'Outfit',sans-serif",
       }}>
         {/* Top shimmer */}
@@ -412,11 +412,7 @@ export default function Navbar() {
               <div style={{ width: 56, height: 56, minWidth: 56, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.28)", boxShadow: "0 10px 30px rgba(99,102,241,.08)" }}>
                 <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{ objectFit: "contain" }}/>
               </div>
-              <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", letterSpacing:"-.2px" }}>FinovaOS</span>
-            </Link>
-
-            {/* Desktop links */}
-            <div className="fn-desk" style={{ display:"flex", alignItems:"center", gap:28 }}>
+              <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--nav-text)", letterSpacing:"-.2px" }}>FinovaOS</span>
 
               {/* Features trigger */}
               <div ref={featuresRef} style={{ position:"relative" }}

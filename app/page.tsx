@@ -40,7 +40,7 @@ export default async function RootPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#060919]">
+    <div className="flex min-h-screen flex-col bg-[var(--app-bg)] text-[var(--text-primary)]">
       <Offer />
       <div className="sticky top-0 z-50">
         <Navbar />

@@ -213,17 +213,17 @@ export default function RootLayout({
             toastOptions={{
               duration: 3500,
               style: {
-                background: "#1a1f3a",
-                color: "#e8ecf5",
-                border: "1px solid rgba(99,102,241,0.3)",
+                background: "var(--surface)",
+                color: "var(--text-primary)",
+                border: "1px solid var(--border)",
                 borderRadius: "10px",
                 fontFamily: "'Outfit','Inter',sans-serif",
                 fontSize: "13px",
                 fontWeight: 600,
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                boxShadow: "0 16px 40px rgba(15,23,42,0.12)",
               },
-              success: { iconTheme: { primary: "#34d399", secondary: "#1a1f3a" } },
-              error:   { iconTheme: { primary: "#f87171", secondary: "#1a1f3a" } },
+              success: { iconTheme: { primary: "#34d399", secondary: "var(--surface)" } },
+              error:   { iconTheme: { primary: "#f87171", secondary: "var(--surface)" } },
             }}
           />
           <div className="flex min-h-screen flex-col">

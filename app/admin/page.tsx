@@ -64,7 +64,7 @@ const PERMISSIONS_LIST = [
 /* ═══════════════════════════════════════════════════════
    NAV CONFIG
 ═══════════════════════════════════════════════════════ */
-type Page = "dashboard"|"companies"|"users"|"revenue"|"geo"|"usage"|"plans"|"system"|"logs"|"permissions"|"settings"|"profile"|"tickets"|"broadcasts"|"flags"|"apikeys"|"visitors"|"updates"|"livesupport"|"subscriptions"|"coupons"|"emaillogs"|"referrals"|"teams"|"testimonials"|"leads"|"seo"|"social"|"business_modules"|"newsletter"|"feedback"|"crm"|"fraud";
+type Page = "dashboard"|"companies"|"users"|"revenue"|"geo"|"usage"|"plans"|"system"|"logs"|"permissions"|"settings"|"profile"|"tickets"|"broadcasts"|"flags"|"apikeys"|"visitors"|"updates"|"livesupport"|"subscriptions"|"coupons"|"emaillogs"|"referrals"|"teams"|"testimonials"|"leads"|"seo"|"social"|"business_modules"|"newsletter"|"feedback"|"crm"|"fraud"|"dev_test";
 
 // SVG icon paths per nav item (14x14 viewBox, stroke-based)
 const NAV_ICONS: Record<string, React.ReactNode> = {
@@ -96,6 +96,7 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   apikeys:          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>,
   permissions:      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
   teams:            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  dev_test:         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>,
   settings:         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
 };
 
@@ -123,6 +124,7 @@ const NAV: { page:Page; label:string; icon:string; color:string; badge?:string }
   { page:"livesupport",      label:"Live Support",     icon:"",  color:"#38bdf8" },
   { page:"tickets",          label:"Support Tickets",  icon:"",  color:"#fbbf24" },
   { page:"fraud",            label:"Fraud Monitor",    icon:"",  color:"#f87171", badge:"NEW" },
+  { page:"dev_test",         label:"Dev Test Mode",    icon:"",  color:"#a78bfa", badge:"DEV" },
   { page:"system",           label:"System Health",    icon:"",  color:"#34d399", badge:"OK" },
   { page:"logs",             label:"Audit Logs",       icon:"",  color:"#94a3b8" },
   { page:"emaillogs",        label:"Email Logs",       icon:"",  color:"#94a3b8" },
@@ -141,6 +143,7 @@ const NAV_GROUPS: { label: string; pages: Page[] }[] = [
   { label: "Content",    pages: ["updates","seo","social"] },
   { label: "Support",    pages: ["livesupport","tickets"] },
   { label: "Security",   pages: ["fraud"] },
+  { label: "Developer",  pages: ["dev_test"] },
   { label: "System",     pages: ["system","logs","emaillogs","flags","apikeys"] },
   { label: "Access",     pages: ["permissions","teams","settings"] },
 ];
@@ -7343,6 +7346,7 @@ export default function AdminPanel() {
     newsletter:"Newsletter Subscribers", feedback:"Feedback & Complaints",
     crm:"CRM Workspace",
     fraud:"Fraud & Risk Monitor",
+    dev_test:"Dev Test Mode",
   };
 
   const PAGE_ICONS: Partial<Record<Page,string>> = {
@@ -7406,7 +7410,7 @@ export default function AdminPanel() {
   const adminInitial = adminName.charAt(0).toUpperCase();
 
   return (
-    <div style={{ minHeight:"100vh", background:"#060a14", color:"white", fontFamily:"'Outfit','Inter',sans-serif", display:"flex", overflowX:"hidden", position:"relative" }}>
+    <div style={{ height:"100vh", background:"#060a14", color:"white", fontFamily:"'Outfit','Inter',sans-serif", display:"flex", overflow:"hidden", position:"relative" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -7443,7 +7447,7 @@ export default function AdminPanel() {
         borderRight:"1px solid rgba(255,255,255,.06)",
         display:"flex", flexDirection:"column",
         transition:"width .25s cubic-bezier(.4,0,.2,1)",
-        position:"sticky", top:0, height:"100vh",
+        height:"100vh",
         overflowY:"auto", overflowX:"hidden", flexShrink:0, zIndex:40,
         transform: mobileOpen ? "translateX(0)" : undefined,
       }}
@@ -7497,7 +7501,7 @@ export default function AdminPanel() {
                   return (
                     <button key={item.page}
                       className="nav-btn"
-                      onClick={() => { if (item.page === "fraud") { window.location.href = "/admin/fraud"; return; } setPage(item.page); setMobileOpen(false); }}
+                      onClick={() => { if (item.page === "fraud") { window.location.href = "/admin/fraud"; return; } if (item.page === "dev_test") { window.location.href = "/admin/dev-test"; return; } setPage(item.page); setMobileOpen(false); }}
                       title={collapsed ? item.label : undefined}
                       style={{
                         display:"flex", alignItems:"center", gap:10,
@@ -7640,7 +7644,7 @@ export default function AdminPanel() {
             <div style={{ display:"flex", alignItems:"center", gap:5, marginBottom:2 }}>
               <span style={{ fontSize:10,color:"rgba(255,255,255,.18)",fontWeight:600,letterSpacing:".08em",textTransform:"uppercase" }}>FinovaOS</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-              <span style={{ fontSize:10,color:"rgba(255,255,255,.35)",fontWeight:600,letterSpacing:".06em",textTransform:"uppercase" }}>{PAGE_TITLES[page]}</span>
+              <span style={{ fontSize:10,color:"rgba(255,255,255,.18)",fontWeight:600,letterSpacing:".08em",textTransform:"uppercase" }}>Admin Console</span>
             </div>
             <h1 style={{ fontSize:17,fontWeight:800,color:"white",letterSpacing:"-0.02em",lineHeight:1 }}>
               {PAGE_TITLES[page]}
