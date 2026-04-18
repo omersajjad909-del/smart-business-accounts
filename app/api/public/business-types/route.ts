@@ -17,9 +17,8 @@ export async function GET() {
 
   const types = Object.entries(BUSINESS_PHASE_CONFIG).map(([id, cfg]) => {
     const overrideStatus = overrides[id];
-    const isLive = overrideStatus
-      ? overrideStatus === "live"
-      : cfg.status === "live";
+    const effectiveStatus = overrideStatus || "live";
+    const isLive = effectiveStatus === "live";
 
     return {
       id,
