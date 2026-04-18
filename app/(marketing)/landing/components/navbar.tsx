@@ -413,6 +413,7 @@ export default function Navbar() {
                 <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{ objectFit: "contain" }}/>
               </div>
               <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--nav-text)", letterSpacing:"-.2px" }}>FinovaOS</span>
+            </Link>
 
               {/* Features trigger */}
               <div ref={featuresRef} style={{ position:"relative" }}
