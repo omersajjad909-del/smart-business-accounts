@@ -25,6 +25,7 @@ export default function LedgerReportPage() {
   const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [showModal,   setShowModal]   = useState(true);
   const [search,      setSearch]      = useState("");
+  const [dropOpen,    setDropOpen]    = useState(false);
 
   useEffect(() => {
     const user = getCurrentUser();
@@ -104,58 +105,54 @@ export default function LedgerReportPage() {
               </p>
             </div>
 
-            {/* Account search */}
-            <div style={{ marginBottom: 18 }}>
-              <label style={labelStyle}>Search Account</label>
-              <input
-                type="text"
-                placeholder="Type account name..."
-                style={inputStyle}
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                autoFocus
-              />
-            </div>
-
-            {/* Account list */}
-            <div style={{ marginBottom: 20 }}>
-              <label style={labelStyle}>Select Account</label>
-              <div style={{
-                background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)",
-                borderRadius: 8, maxHeight: 180, overflowY: "auto",
-              }}>
-                {filteredAccounts.length === 0 ? (
-                  <div style={{ padding: "20px", textAlign: "center", color: "rgba(255,255,255,.2)", fontSize: 12 }}>
-                    No accounts found
-                  </div>
-                ) : filteredAccounts.map(a => (
-                  <div
-                    key={a.id}
-                    onClick={() => setAccountId(a.id)}
-                    style={{
-                      padding: "10px 14px", cursor: "pointer", fontSize: 13,
-                      background: accountId === a.id ? "rgba(99,102,241,.2)" : "transparent",
-                      color: accountId === a.id ? "#a5b4fc" : "rgba(255,255,255,.65)",
-                      fontWeight: accountId === a.id ? 700 : 400,
-                      borderBottom: "1px solid rgba(255,255,255,.04)",
-                      display: "flex", alignItems: "center", gap: 8, transition: "background .1s",
-                    }}
-                    onMouseEnter={e => { if (accountId !== a.id) e.currentTarget.style.background = "rgba(255,255,255,.04)"; }}
-                    onMouseLeave={e => { if (accountId !== a.id) e.currentTarget.style.background = "transparent"; }}
-                  >
-                    {accountId === a.id && (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="3">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                    )}
-                    {a.name}
-                  </div>
-                ))}
+            {/* Autocomplete account selector */}
+            <div style={{ marginBottom: 24, position: "relative" }}>
+              <label style={labelStyle}>Account</label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  placeholder="Type to search account..."
+                  style={{ ...inputStyle, paddingRight: accountId ? 36 : 14 }}
+                  value={accountId ? acctName : search}
+                  onChange={e => { setSearch(e.target.value); setAccountId(""); setDropOpen(true); }}
+                  onFocus={() => setDropOpen(true)}
+                  onBlur={() => setTimeout(() => setDropOpen(false), 150)}
+                  autoFocus
+                />
+                {accountId && (
+                  <button onClick={() => { setAccountId(""); setSearch(""); setDropOpen(false); }} style={{
+                    position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", color: "rgba(255,255,255,.4)",
+                    cursor: "pointer", fontSize: 16, lineHeight: 1, padding: 2,
+                  }}>×</button>
+                )}
               </div>
-              {accountId && (
-                <div style={{ marginTop: 6, fontSize: 11, color: "#818cf8", paddingLeft: 4 }}>
-                  ✓ Selected: {acctName}
+              {/* Dropdown */}
+              {dropOpen && !accountId && (
+                <div style={{
+                  position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
+                  background: "#0f1a35", border: "1px solid rgba(99,102,241,.3)",
+                  borderRadius: 8, marginTop: 4, maxHeight: 220, overflowY: "auto",
+                  boxShadow: "0 16px 40px rgba(0,0,0,.5)",
+                }}>
+                  {filteredAccounts.length === 0 ? (
+                    <div style={{ padding: "14px", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 12 }}>
+                      No accounts found
+                    </div>
+                  ) : filteredAccounts.map(a => (
+                    <div key={a.id} onMouseDown={() => { setAccountId(a.id); setSearch(""); setDropOpen(false); }} style={{
+                      padding: "10px 14px", cursor: "pointer", fontSize: 13,
+                      color: "rgba(255,255,255,.75)", borderBottom: "1px solid rgba(255,255,255,.04)",
+                      transition: "background .1s",
+                    }}
+                      onMouseEnter={e => e.currentTarget.style.background = "rgba(99,102,241,.15)"}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                    >{a.name}</div>
+                  ))}
                 </div>
+              )}
+              {accountId && (
+                <div style={{ marginTop: 5, fontSize: 11, color: "#818cf8" }}>✓ {acctName}</div>
               )}
             </div>
 
