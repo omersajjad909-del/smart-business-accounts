@@ -4970,7 +4970,7 @@ function PageBusinessModules() {
   async function load() {
     setLoading(true);
     try {
-      const r = await fetch("/api/admin/business-modules", { headers: adminHeaders() });
+      const r = await fetch("/api/admin/business-modules", { headers: adminHeaders(), cache: "no-store" });
       const d = await r.json();
       setModules(d.modules || []);
     } finally { setLoading(false); }
@@ -4994,6 +4994,11 @@ function PageBusinessModules() {
         setModules(prev=>prev.map(m=>m.id===id ? {...m, enabled:!currentEnabled, status:!currentEnabled?"live":"coming_soon", adminOverride:true, waitlistCount:0} : m));
         const notifMsg = d.notified > 0 ? ` — 📧 ${d.notified} waitlist notified` : "";
         showMsg(`${!currentEnabled?"✅ Enabled":"⏸ Disabled"}: ${id}${notifMsg}`);
+        // Re-fetch from DB to confirm save persisted
+        await load();
+      } else {
+        const err = await r.json().catch(() => ({}));
+        showMsg(`❌ Save failed: ${err.error || r.status}`, false);
       }
     } finally { setSaving(null); }
   }

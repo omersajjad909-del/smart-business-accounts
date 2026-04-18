@@ -34,6 +34,6 @@ export async function GET() {
   const liveIds = types.filter(t => t.isLive).map(t => t.id);
 
   return NextResponse.json({ types, liveIds }, {
-    headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
+    headers: { "Cache-Control": "no-store" },
   });
 }
