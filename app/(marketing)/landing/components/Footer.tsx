@@ -174,8 +174,9 @@ export default function Footer() {
           {/* Brand column */}
           <div className="ft-brand">
             <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 11, textDecoration: "none", marginBottom: 20 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 12, overflow: "hidden", flexShrink: 0, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <img src="/icon1.png" alt="FinovaOS" width={30} height={30} style={{ objectFit: "contain" }}/>
+              <div style={{ width: 42, height: 42, borderRadius: 12, overflow: "hidden", flexShrink: 0, border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {/* background: "rgba(99,102,241,.12)", */}
+                <img src="/icon1.png" alt="FinovaOS" width={100} height={100} style={{ objectFit: "contain" }}/>
               </div>
               <div>
                 <div style={{ fontFamily: "'Lora', serif", fontSize: 19, fontWeight: 700, color: "white", letterSpacing: "-.3px", lineHeight: 1.1 }}>
