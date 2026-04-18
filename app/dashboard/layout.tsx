@@ -628,8 +628,8 @@ export default function DashboardLayout({
         position:"fixed",
         top:0, left:0, bottom:0,
         width: isMobileViewport ? "min(82vw, 320px)" : SW,
-        background:"var(--panel-bg)",
-        borderRight:"1px solid var(--border)",
+        background:"var(--sidebar-bg)",
+        borderRight:"1px solid var(--sidebar-border)",
         display:"flex",
         flexDirection:"column",
         zIndex:30,
@@ -642,7 +642,7 @@ export default function DashboardLayout({
       >
 
         {/* ---- SIDEBAR HEADER ---- */}
-        <div style={{padding: sidebarCollapsed ? "8px 8px" : "10px 16px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", flexDirection:"column", alignItems: sidebarCollapsed ? "center" : "stretch"}}>
+        <div style={{padding: sidebarCollapsed ? "8px 8px" : "10px 16px 10px", borderBottom:"1px solid var(--sidebar-border)", display:"flex", flexDirection:"column", alignItems: sidebarCollapsed ? "center" : "stretch"}}>
           {/* Logo + Brand */}
           <Link prefetch={false}
             href="/dashboard"
@@ -2097,12 +2097,12 @@ function NavGroup({ title, icon, open, onToggle, children }: {
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
           width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
-          color: open ? "#818cf8" : "rgba(255,255,255,0.4)",
-          background: open ? "rgba(99,102,241,0.15)" : "transparent",
+          color: open ? "#818cf8" : "var(--sidebar-link-muted)",
+          background: open ? "var(--sidebar-active-bg)" : "transparent",
           transition:"all .15s",
         }}
-        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background=open?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=open?"#818cf8":"rgba(255,255,255,0.4)";}}
+        onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";e.currentTarget.style.color="var(--sidebar-link-hover)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=open?"var(--sidebar-active-bg)":"transparent";e.currentTarget.style.color=open?"#818cf8":"var(--sidebar-link-muted)";}}
       >
         <span style={{display:"flex",fontSize:16}}>{icon}</span>
       </div>
@@ -2223,12 +2223,12 @@ function NavLink({ href, children, pathname }: {
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
           width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
-          color: active ? "#818cf8" : "rgba(255,255,255,0.4)",
-          background: active ? "rgba(99,102,241,0.15)" : "transparent",
+          color: active ? "#818cf8" : "var(--sidebar-link-muted)",
+          background: active ? "var(--sidebar-active-bg)" : "transparent",
           textDecoration:"none", transition:"all .15s",
         }}
-        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=active?"#818cf8":"rgba(255,255,255,0.4)";}}
+        onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";e.currentTarget.style.color="var(--sidebar-link-hover)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=active?"var(--sidebar-active-bg)":"transparent";e.currentTarget.style.color=active?"#818cf8":"var(--sidebar-link-muted)";}}
       >
         <span style={{display:"flex",fontSize:16}}>{collapsedIcon}</span>
       </Link>
