@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { fmtDate } from "@/lib/dateUtils";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
@@ -18,6 +19,7 @@ const fmt = (n: number, cur = "") =>
 const today = new Date().toISOString().slice(0, 10);
 
 export default function TrialBalancePage() {
+  const router = useRouter();
   const [showModal,    setShowModal]    = useState(true);
   const [fromDate,     setFromDate]     = useState(`${new Date().getFullYear()}-01-01`);
   const [toDate,       setToDate]       = useState(today);

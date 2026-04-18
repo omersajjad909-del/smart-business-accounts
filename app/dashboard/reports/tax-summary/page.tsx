@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
 
@@ -13,6 +14,7 @@ const fmtN = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits:
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
 export default function TaxSummaryPage() {
+  const router = useRouter();
   const [showModal,   setShowModal]   = useState(true);
   const [from,        setFrom]        = useState(`${new Date().getFullYear()}-01-01`);
   const [to,          setTo]          = useState(todayStr());

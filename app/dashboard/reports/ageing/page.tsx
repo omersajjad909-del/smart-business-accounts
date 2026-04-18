@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
 interface Party { id: string; name: string; partyType: string; }
@@ -16,6 +17,7 @@ function getHeaders(): Record<string, string> {
 }
 
 export default function AgeingReportPage() {
+  const router = useRouter();
   const [showModal,      setShowModal]      = useState(true);
   const [type,           setType]           = useState<"customer"|"supplier">("customer");
   const [asOnDate,       setAsOnDate]       = useState(todayStr());

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
 interface CashFlowItem { date: string; voucherNo: string; description: string; amount: number; type: "INFLOW"|"OUTFLOW"; }
@@ -63,6 +64,7 @@ function Section({ title, accent, section, expanded, onToggle }: { title:string;
 }
 
 export default function CashFlowPage() {
+  const router = useRouter();
   const [showModal,  setShowModal]  = useState(true);
   const [from,       setFrom]       = useState(firstOfYear());
   const [to,         setTo]         = useState(todayStr());

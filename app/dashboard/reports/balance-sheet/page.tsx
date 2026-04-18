@@ -2,12 +2,14 @@
 
 import toast from "react-hot-toast";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 const fmtN = (n: number) => Math.abs(n).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
 
 export default function BalanceSheetPage() {
+  const router = useRouter();
   const [showModal,     setShowModal]     = useState(true);
   const [date,          setDate]          = useState(todayStr());
   const [data,          setData]          = useState<any>(null);

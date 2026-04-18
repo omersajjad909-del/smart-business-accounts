@@ -2,6 +2,7 @@
 
 import toast from "react-hot-toast";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
 interface PLItem { name: string; amount: number; }
@@ -24,6 +25,7 @@ function getHeaders(): Record<string, string> {
 }
 
 export default function ProfitLossPage() {
+  const router = useRouter();
   const [showModal,     setShowModal]     = useState(true);
   const [from,          setFrom]          = useState(firstOfYear());
   const [to,            setTo]            = useState(todayStr());
