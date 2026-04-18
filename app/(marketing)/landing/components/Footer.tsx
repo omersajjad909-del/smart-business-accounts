@@ -174,8 +174,7 @@ export default function Footer() {
           {/* Brand column */}
           <div className="ft-brand">
             <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 11, textDecoration: "none", marginBottom: 20 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 12, overflow: "hidden", flexShrink: 0, border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {/* background: "rgba(99,102,241,.12)", */}
+              <div style={{ width: 100, height: 100, borderRadius: 18, overflow: "hidden", flexShrink: 0, border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(99,102,241,.12)" }}>
                 <img src="/icon1.png" alt="FinovaOS" width={100} height={100} style={{ objectFit: "contain" }}/>
               </div>
               <div>
@@ -320,17 +319,33 @@ export default function Footer() {
         }}>
           {/* Left */}
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-            <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.22)", margin: 0 }}>
-              © {new Date().getFullYear()} <span style={{ color: "rgba(255,255,255,.4)", fontWeight: 700 }}>FinovaOS</span>. All rights reserved.
-            </p>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 16, height: 1, background: "rgba(255,255,255,.1)", borderRadius: 1 }}/>
-              <p style={{ fontSize: 10.5, color: "rgba(255,255,255,.15)", margin: 0 }}>
-                Represented by{" "}
-                <span style={{ color: "rgba(255,255,255,.32)", fontWeight: 600 }}>Finova Forge</span>
-              </p>
-            </div>
-          </div>
+  <p style={{ fontSize: 11.5, color: "rgba(255,255,255,.22)", margin: 0 }}>
+    © {new Date().getFullYear()}{" "}
+    <span style={{ color: "rgba(255,255,255,.4)", fontWeight: 700 }}>
+      Finova Forge
+    </span>. All rights reserved.
+  </p>
+
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <div
+      style={{
+        width: 16,
+        height: 1,
+        background: "rgba(255,255,255,.1)",
+        borderRadius: 1,
+      }}
+    />
+    <p style={{ fontSize: 10.5, color: "rgba(255,255,255,.15)", margin: 0 }}>
+      <span style={{ color: "rgba(255,255,255,.32)", fontWeight: 600 }}>
+        FinovaOS™
+      </span>{" "}
+      is a product of{" "}
+      <span style={{ color: "rgba(255,255,255,.32)", fontWeight: 600 }}>
+        Finova Forge
+      </span>
+    </p>
+  </div>
+</div>
 
           {/* Center: links */}
           <div className="ft-bottom-links" style={{ display: "flex", gap: 18, flexWrap: "wrap", justifyContent: "center" }}>
