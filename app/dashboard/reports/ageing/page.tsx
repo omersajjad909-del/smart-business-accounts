@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -17,7 +17,9 @@ function getHeaders(): Record<string, string> {
 }
 
 export default function AgeingReportPage() {
-  const router = useRouter();
+  const router     = useRouter();
+  const dateRef    = useRef<HTMLInputElement>(null);
+  const partyRef   = useRef<HTMLInputElement>(null);
   const [showModal,      setShowModal]      = useState(true);
   const [type,           setType]           = useState<"customer"|"supplier">("customer");
   const [asOnDate,       setAsOnDate]       = useState(todayStr());
@@ -52,13 +54,14 @@ export default function AgeingReportPage() {
 
   const filtered = query.trim() ? parties.filter(p => p.name.toLowerCase().includes(query.toLowerCase())) : parties.slice(0, 12);
 
-  async function loadData() {
-    if (!partyId) return;
+  async function loadData(overrideId?: string) {
+    const id = overrideId || partyId;
+    if (!id) return;
     setLoading(true); setData([]); setError(null);
     setShowModal(false);
     const url = type === "customer"
-      ? `/api/reports/ageing/customer?date=${asOnDate}&customerId=${partyId}`
-      : `/api/reports/ageing/supplier?date=${asOnDate}&supplierId=${partyId}`;
+      ? `/api/reports/ageing/customer?date=${asOnDate}&customerId=${id}`
+      : `/api/reports/ageing/supplier?date=${asOnDate}&supplierId=${id}`;
     try {
       const res = await fetch(url, { headers: getHeaders(), credentials:"include" });
       const json = await res.json();
@@ -107,7 +110,7 @@ export default function AgeingReportPage() {
             {/* As on date */}
             <div style={{ marginBottom:16 }}>
               <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>As On Date</label>
-              <input type="date" style={inputStyle} value={asOnDate} onChange={e => setAsOnDate(e.target.value)}/>
+              <input ref={dateRef} type="date" style={inputStyle} value={asOnDate} onChange={e => setAsOnDate(e.target.value)} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); partyRef.current?.focus(); setDropOpen(true); } }}/>
             </div>
 
             {/* Party autocomplete */}
@@ -116,6 +119,7 @@ export default function AgeingReportPage() {
                 {type === "customer" ? "Customer" : "Supplier"}
               </label>
               <input
+                ref={partyRef}
                 type="text"
                 style={{ ...inputStyle, paddingRight:36 }}
                 placeholder={partiesLoading ? "Loading…" : `Search ${type}…`}
@@ -123,6 +127,17 @@ export default function AgeingReportPage() {
                 onChange={e => { setQuery(e.target.value); setDropOpen(true); setPartyId(""); setPartyName(""); }}
                 onFocus={() => setDropOpen(true)}
                 onBlur={() => setTimeout(() => setDropOpen(false), 150)}
+                onKeyDown={e => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (partyId) { loadData(); return; }
+                    if (filtered.length > 0) {
+                      const first = filtered[0];
+                      setPartyId(first.id); setPartyName(first.name); setQuery(first.name); setDropOpen(false);
+                      loadData(first.id);
+                    }
+                  }
+                }}
               />
               {partyId && <span style={{ position:"absolute", right:12, top:"calc(50% + 7px)", transform:"translateY(-50%)", color:"#34d399", fontSize:14 }}>✓</span>}
               {dropOpen && filtered.length > 0 && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -64,7 +64,9 @@ function Section({ title, accent, section, expanded, onToggle }: { title:string;
 }
 
 export default function CashFlowPage() {
-  const router = useRouter();
+  const router  = useRouter();
+  const fromRef = useRef<HTMLInputElement>(null);
+  const toRef   = useRef<HTMLInputElement>(null);
   const [showModal,  setShowModal]  = useState(true);
   const [from,       setFrom]       = useState(firstOfYear());
   const [to,         setTo]         = useState(todayStr());
@@ -118,11 +120,11 @@ export default function CashFlowPage() {
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
               <div>
                 <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>From</label>
-                <input type="date" style={inputStyle} value={from} onChange={e => setFrom(e.target.value)}/>
+                <input ref={fromRef} type="date" style={inputStyle} value={from} onChange={e => setFrom(e.target.value)} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); toRef.current?.focus(); } }}/>
               </div>
               <div>
                 <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>To</label>
-                <input type="date" style={inputStyle} value={to} onChange={e => setTo(e.target.value)}/>
+                <input ref={toRef} type="date" style={inputStyle} value={to} onChange={e => setTo(e.target.value)} onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); handleGenerate(); } }}/>
               </div>
             </div>
             <button onClick={handleGenerate} style={{ width:"100%", padding:"13px 0", borderRadius:12, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"white", fontSize:15, fontWeight:700, fontFamily:"inherit", boxShadow:"0 6px 24px rgba(99,102,241,.35)" }}>

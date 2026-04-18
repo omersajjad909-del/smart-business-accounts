@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fmtDate } from "@/lib/dateUtils";
 import { getCurrentUser } from "@/lib/auth";
@@ -19,7 +19,9 @@ const fmt = (n: number, cur = "") =>
 const today = new Date().toISOString().slice(0, 10);
 
 export default function TrialBalancePage() {
-  const router = useRouter();
+  const router  = useRouter();
+  const fromRef = useRef<HTMLInputElement>(null);
+  const toRef   = useRef<HTMLInputElement>(null);
   const [showModal,    setShowModal]    = useState(true);
   const [fromDate,     setFromDate]     = useState(`${new Date().getFullYear()}-01-01`);
   const [toDate,       setToDate]       = useState(today);
@@ -94,11 +96,11 @@ export default function TrialBalancePage() {
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
               <div>
                 <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>From</label>
-                <input type="date" style={inputStyle} value={fromDate} onChange={e => setFromDate(e.target.value)}/>
+                <input ref={fromRef} type="date" style={inputStyle} value={fromDate} onChange={e => setFromDate(e.target.value)} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); toRef.current?.focus(); } }}/>
               </div>
               <div>
                 <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>To</label>
-                <input type="date" style={inputStyle} value={toDate} onChange={e => setToDate(e.target.value)}/>
+                <input ref={toRef} type="date" style={inputStyle} value={toDate} onChange={e => setToDate(e.target.value)} onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); handleGenerate(); } }}/>
               </div>
             </div>
             <button onClick={handleGenerate} style={{ width:"100%", padding:"13px 0", borderRadius:12, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"white", fontSize:15, fontWeight:700, fontFamily:"inherit", boxShadow:"0 6px 24px rgba(99,102,241,.4)" }}>

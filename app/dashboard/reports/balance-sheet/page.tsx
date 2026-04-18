@@ -1,7 +1,7 @@
 "use client";
 
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -9,7 +9,8 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 const fmtN = (n: number) => Math.abs(n).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
 
 export default function BalanceSheetPage() {
-  const router = useRouter();
+  const router  = useRouter();
+  const dateRef = useRef<HTMLInputElement>(null);
   const [showModal,     setShowModal]     = useState(true);
   const [date,          setDate]          = useState(todayStr());
   const [data,          setData]          = useState<any>(null);
@@ -78,7 +79,7 @@ export default function BalanceSheetPage() {
             </div>
             <div style={{ marginBottom:22 }}>
               <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>As of Date</label>
-              <input type="date" style={inputStyle} value={date} onChange={e => setDate(e.target.value)}/>
+              <input ref={dateRef} type="date" style={inputStyle} value={date} onChange={e => setDate(e.target.value)} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); handleGenerate(); } }}/>
             </div>
             <button onClick={handleGenerate} style={{ width:"100%", padding:"13px 0", borderRadius:12, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#3b82f6,#2563eb)", color:"white", fontSize:15, fontWeight:700, fontFamily:"inherit", boxShadow:"0 6px 24px rgba(59,130,246,.35)" }}>
               Generate Report →
