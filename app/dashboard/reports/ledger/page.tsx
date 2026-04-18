@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fmtDate } from "@/lib/dateUtils";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
@@ -26,6 +26,10 @@ export default function LedgerReportPage() {
   const [showModal,   setShowModal]   = useState(true);
   const [search,      setSearch]      = useState("");
   const [dropOpen,    setDropOpen]    = useState(false);
+
+  const fromRef    = useRef<HTMLInputElement>(null);
+  const toRef      = useRef<HTMLInputElement>(null);
+  const accountRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const user = getCurrentUser();
@@ -60,9 +64,9 @@ export default function LedgerReportPage() {
   const cur         = companyInfo?.baseCurrency || "";
   const acctName    = accounts.find(a => a.id === accountId)?.name || "";
 
-  const filteredAccounts = accounts.filter(a =>
-    a.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredAccounts = accounts
+    .filter(a => a.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const inputStyle: React.CSSProperties = {
     background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)",
@@ -101,15 +105,49 @@ export default function LedgerReportPage() {
                 </h2>
               </div>
               <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,.3)", paddingLeft: 14 }}>
-                Select account and date range to generate ledger
+                Select date range and account to generate ledger
               </p>
             </div>
 
+            {/* Date range — shown first */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
+              <div>
+                <label style={labelStyle}>From Date</label>
+                <input
+                  ref={fromRef}
+                  type="date"
+                  style={inputStyle}
+                  value={fromDate}
+                  onChange={e => setFromDate(e.target.value)}
+                  autoFocus
+                  onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); toRef.current?.focus(); } }}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>To Date</label>
+                <input
+                  ref={toRef}
+                  type="date"
+                  style={inputStyle}
+                  value={toDate}
+                  onChange={e => setToDate(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      accountRef.current?.focus();
+                      setDropOpen(true);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
             {/* Autocomplete account selector */}
-            <div style={{ marginBottom: 24, position: "relative" }}>
+            <div style={{ marginBottom: 28, position: "relative" }}>
               <label style={labelStyle}>Account</label>
               <div style={{ position: "relative" }}>
                 <input
+                  ref={accountRef}
                   type="text"
                   placeholder="Type to search account..."
                   style={{ ...inputStyle, paddingRight: accountId ? 36 : 14 }}
@@ -117,7 +155,7 @@ export default function LedgerReportPage() {
                   onChange={e => { setSearch(e.target.value); setAccountId(""); setDropOpen(true); }}
                   onFocus={() => setDropOpen(true)}
                   onBlur={() => setTimeout(() => setDropOpen(false), 150)}
-                  autoFocus
+                  onKeyDown={e => { if (e.key === "Enter" && accountId) loadLedger(); }}
                 />
                 {accountId && (
                   <button onClick={() => { setAccountId(""); setSearch(""); setDropOpen(false); }} style={{
@@ -154,18 +192,6 @@ export default function LedgerReportPage() {
               {accountId && (
                 <div style={{ marginTop: 5, fontSize: 11, color: "#818cf8" }}>✓ {acctName}</div>
               )}
-            </div>
-
-            {/* Date range */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 28 }}>
-              <div>
-                <label style={labelStyle}>From Date</label>
-                <input type="date" style={inputStyle} value={fromDate} onChange={e => setFromDate(e.target.value)}/>
-              </div>
-              <div>
-                <label style={labelStyle}>To Date</label>
-                <input type="date" style={inputStyle} value={toDate} onChange={e => setToDate(e.target.value)}/>
-              </div>
             </div>
 
             {/* Buttons */}
@@ -226,63 +252,40 @@ export default function LedgerReportPage() {
             background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)",
             borderRadius: 16, overflow: "hidden",
           }}>
-            {/* Header */}
+            {/* Compact header */}
             <div style={{
-              padding: "32px 36px 28px",
-              background: "linear-gradient(135deg,rgba(99,102,241,.12) 0%,rgba(79,70,229,.06) 100%)",
-              borderBottom: "1px solid rgba(255,255,255,.08)",
+              padding: "14px 20px",
+              background: "rgba(99,102,241,.08)",
+              borderBottom: "1px solid rgba(255,255,255,.07)",
+              display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8,
             }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-.5px", color: "white", lineHeight: 1 }}>
-                    {companyInfo?.name || "—"}
-                  </div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.3)", letterSpacing: ".14em", textTransform: "uppercase", marginTop: 5 }}>
-                    {companyInfo?.country || "Global"} Operations
-                  </div>
+              {/* Left: company + account */}
+              <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "white", letterSpacing: "-.2px" }}>
+                  {companyInfo?.name || "—"}
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#818cf8", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>
-                    Account Ledger
-                  </div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 3 }}>
-                    Reporting Period
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)" }}>
-                    {fromDate} <span style={{ color: "rgba(255,255,255,.25)" }}>—</span> {toDate}
-                  </div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", marginTop: 8 }}>
-                    Generated: {fmtDate(new Date())}
-                  </div>
-                </div>
-              </div>
-
-              <div style={{
-                marginTop: 28, paddingTop: 20,
-                borderTop: "1px solid rgba(255,255,255,.07)",
-                display: "flex", justifyContent: "space-between", alignItems: "flex-end",
-              }}>
-                <div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
-                    Statement for
-                  </div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: "white", letterSpacing: "-.3px" }}>
-                    {acctName}
-                  </div>
-                </div>
+                <div style={{ width: 1, height: 16, background: "rgba(255,255,255,.1)" }}/>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8" }}>{acctName}</div>
                 {openingBal !== null && rows.length > 0 && (
-                  <div style={{
-                    background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)",
-                    borderRadius: 10, padding: "10px 20px", textAlign: "right",
-                  }}>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 3 }}>
-                      Opening Balance
+                  <>
+                    <div style={{ width: 1, height: 16, background: "rgba(255,255,255,.1)" }}/>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>
+                      Opening: <span style={{ fontWeight: 700, color: openingBal >= 0 ? "#34d399" : "#f87171" }}>
+                        {fmt(openingBal, cur)} {openingBal >= 0 ? "Dr" : "Cr"}
+                      </span>
                     </div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: openingBal >= 0 ? "#34d399" : "#f87171" }}>
-                      {fmt(openingBal, cur)} {openingBal >= 0 ? "Dr" : "Cr"}
-                    </div>
-                  </div>
+                  </>
                 )}
+              </div>
+              {/* Right: period + date */}
+              <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 11 }}>
+                <div style={{ color: "rgba(255,255,255,.45)" }}>
+                  <span style={{ color: "rgba(255,255,255,.25)", marginRight: 4 }}>Period:</span>
+                  <span style={{ fontWeight: 700, color: "rgba(255,255,255,.7)" }}>{fromDate}</span>
+                  <span style={{ color: "rgba(255,255,255,.2)", margin: "0 4px" }}>—</span>
+                  <span style={{ fontWeight: 700, color: "rgba(255,255,255,.7)" }}>{toDate}</span>
+                </div>
+                <div style={{ color: "rgba(255,255,255,.2)" }}>Generated: {fmtDate(new Date())}</div>
               </div>
             </div>
 
