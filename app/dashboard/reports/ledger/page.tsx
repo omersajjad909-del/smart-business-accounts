@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { fmtDate } from "@/lib/dateUtils";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
@@ -14,7 +15,10 @@ type LedgerRow = {
 const fmt = (n: number, cur = "") =>
   `${cur ? cur + " " : ""}${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+const closeX: React.CSSProperties = { position:"absolute", top:14, right:16, background:"none", border:"none", color:"rgba(255,255,255,.35)", fontSize:20, cursor:"pointer", lineHeight:1, padding:4, borderRadius:6, fontFamily:"inherit" };
+
 export default function LedgerReportPage() {
+  const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const [accounts,    setAccounts]    = useState<Account[]>([]);
   const [accountId,   setAccountId]   = useState("");
@@ -94,8 +98,9 @@ export default function LedgerReportPage() {
             background: "linear-gradient(145deg,#0f1a35,#0b1225)",
             border: "1px solid rgba(99,102,241,.25)",
             borderRadius: 18, padding: "36px 40px", width: "100%", maxWidth: 480,
-            boxShadow: "0 32px 80px rgba(0,0,0,.6)",
+            boxShadow: "0 32px 80px rgba(0,0,0,.6)", position: "relative",
           }}>
+            <button style={closeX} onClick={() => rows.length > 0 ? setShowModal(false) : router.back()}>✕</button>
             {/* Modal header */}
             <div style={{ marginBottom: 28 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
@@ -218,7 +223,7 @@ export default function LedgerReportPage() {
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
 
           {/* Top bar */}
-          <div style={{ marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 4, height: 28, borderRadius: 2, background: "linear-gradient(180deg,#818cf8,#6366f1)" }}/>
               <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-.4px", margin: 0 }}>Ledger Report</h1>
