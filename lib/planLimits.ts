@@ -1,6 +1,8 @@
 export function normalizePlanCode(plan: string | null | undefined): string {
   const p = String(plan || "").trim().toUpperCase();
   if (p === "PROFESSIONAL") return "PRO";
+  // Addon codes are applied on top of a base plan; treat as Enterprise
+  if (p.startsWith("ADDON-")) return "ENTERPRISE";
   return p || "STARTER";
 }
 

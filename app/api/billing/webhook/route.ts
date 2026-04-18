@@ -27,6 +27,31 @@ async function applySuccessfulPlanUpdate(params: {
   const normalizedPlan = String(params.planCode || "STARTER").toUpperCase();
   const normalizedCycle = String(params.billingCycle || "MONTHLY").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
 
+  // Addon purchases should never overwrite the base plan on the company record.
+  // Instead, activate the relevant addon separately.
+  if (normalizedPlan.startsWith("ADDON-")) {
+    if (normalizedPlan === "ADDON-AUTOMATION") {
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "AutomationAddon" (
+          "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+          "companyId" TEXT NOT NULL UNIQUE,
+          "enabled" BOOLEAN NOT NULL DEFAULT true,
+          "plan" TEXT NOT NULL DEFAULT 'MONTHLY',
+          "pricePerMonth" DOUBLE PRECISION NOT NULL DEFAULT 79,
+          "expiresAt" TIMESTAMP(3),
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `).catch(() => {});
+      await prisma.$executeRaw`
+        INSERT INTO "AutomationAddon" ("companyId", "enabled", "plan", "pricePerMonth")
+        VALUES (${params.companyId}, true, ${normalizedCycle}, 79)
+        ON CONFLICT ("companyId") DO UPDATE SET "enabled" = true, "updatedAt" = NOW()
+      `.catch(() => {});
+    }
+    return;
+  }
+
   await prisma.company.update({
     where: { id: params.companyId },
     data: {

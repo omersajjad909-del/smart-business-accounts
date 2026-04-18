@@ -797,7 +797,8 @@ function PageCompaniesUsers() {
       navigator.clipboard.writeText(text).then(()=>{ setCopied(key); setTimeout(()=>setCopied(null),1500); });
     }
 
-    const [newPlan, setNewPlan] = useState(String(c.plan||"STARTER").toUpperCase());
+    const rawPlanInit = String(c.plan||"STARTER").toUpperCase();
+    const [newPlan, setNewPlan] = useState(["STARTER","PRO","ENTERPRISE","CUSTOM"].includes(rawPlanInit) ? rawPlanInit : "ENTERPRISE");
     const [newStatus, setNewStatus] = useState(String(c.subscriptionStatus||"ACTIVE").toUpperCase());
     const [planNote, setPlanNote] = useState("");
     const [planSaving, setPlanSaving] = useState(false);

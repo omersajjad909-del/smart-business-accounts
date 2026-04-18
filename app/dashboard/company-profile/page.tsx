@@ -43,10 +43,12 @@ const BUSINESS_TYPE_LABELS_FALLBACK: Record<string, string> = {
 };
 
 const PLAN_META: Record<string, { color: string; bg: string; border: string; icon: string; label: string }> = {
-  STARTER:      { color: "#818cf8", bg: "rgba(129,140,248,0.08)", border: "rgba(129,140,248,0.25)", icon: "🌱", label: "Starter" },
-  PROFESSIONAL: { color: "#a78bfa", bg: "rgba(167,139,250,0.08)", border: "rgba(167,139,250,0.25)", icon: "⚡", label: "Professional" },
-  ENTERPRISE:   { color: "#34d399", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.25)", icon: "🏢", label: "Enterprise" },
-  CUSTOM:       { color: "#fbbf24", bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.25)", icon: "⭐", label: "Custom" },
+  STARTER:           { color: "#818cf8", bg: "rgba(129,140,248,0.08)", border: "rgba(129,140,248,0.25)", icon: "🌱", label: "Starter" },
+  PROFESSIONAL:      { color: "#a78bfa", bg: "rgba(167,139,250,0.08)", border: "rgba(167,139,250,0.25)", icon: "⚡", label: "Professional" },
+  PRO:               { color: "#a78bfa", bg: "rgba(167,139,250,0.08)", border: "rgba(167,139,250,0.25)", icon: "⚡", label: "Professional" },
+  ENTERPRISE:        { color: "#34d399", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.25)", icon: "🏢", label: "Enterprise" },
+  CUSTOM:            { color: "#fbbf24", bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.25)", icon: "⭐", label: "Custom" },
+  "ADDON-AUTOMATION":{ color: "#34d399", bg: "rgba(52,211,153,0.08)", border: "rgba(52,211,153,0.25)", icon: "🏢", label: "Enterprise" },
 };
 
 const CURRENCIES = [...SUPPORTED_CURRENCIES];

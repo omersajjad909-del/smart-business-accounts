@@ -305,7 +305,9 @@ function BillingPage() {
 
         if (meRes.ok) {
           const d = await meRes.json();
-          const planUpper = (d.plan || "STARTER").toUpperCase();
+          const rawPlan = (d.plan || "STARTER").toUpperCase();
+          // Addon codes are not base plans — treat as Enterprise (highest tier that would have addons)
+          const planUpper = rawPlan.startsWith("ADDON-") ? "ENTERPRISE" : rawPlan;
           const amountMap: Record<string,number> = { STARTER:49, PRO:99, PROFESSIONAL:99, ENTERPRISE:249 };
           setSubscription({ plan:planUpper, status:d.subscriptionStatus||"active", currentPeriodEnd:d.currentPeriodEnd||null, amount:amountMap[planUpper]??49, currency:"USD", introOfferClaimed:!!d.introOfferClaimed, billingCycle:d.billingCycle||"monthly" });
           setExtraSeats(Math.max(0, Number(d.extraSeats || 0)));
