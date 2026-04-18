@@ -2119,13 +2119,12 @@ function NavGroup({ title, icon, open, onToggle, children }: {
           borderRadius:8,cursor:"pointer",userSelect:"none",transition:"all .15s",
           background: open ? "rgba(99,102,241,0.1)" : "transparent",
           borderLeft: open ? "2px solid rgba(99,102,241,0.6)" : "2px solid transparent",
-          color: open ? "#818cf8" : "rgba(15,23,42,0.35)",
         }}
-        onMouseEnter={e => { if (!open) { e.currentTarget.style.background="rgba(15,23,42,0.04)"; e.currentTarget.style.borderLeft="2px solid rgba(99,102,241,0.25)"; e.currentTarget.style.color="rgba(15,23,42,0.7)"; }}}
-        onMouseLeave={e => { if (!open) { e.currentTarget.style.background="transparent"; e.currentTarget.style.borderLeft="2px solid transparent"; e.currentTarget.style.color="rgba(15,23,42,0.35)"; }}}
+        onMouseEnter={e => { if (!open) { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderLeft="2px solid rgba(255,255,255,0.1)"; }}}
+        onMouseLeave={e => { if (!open) { e.currentTarget.style.background="transparent"; e.currentTarget.style.borderLeft="2px solid transparent"; }}}
       >
-        <span style={{display:"flex",transition:"color .15s",color:"inherit"}}>{icon}</span>
-        <span style={{flex:1,fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:".07em",transition:"color .15s",color:"inherit"}}>{displayTitle}</span>
+        <span style={{color: open ? "#818cf8" : "rgba(255,255,255,0.35)",display:"flex",transition:"color .15s"}}>{icon}</span>
+        <span style={{flex:1,fontSize:11,fontWeight:700,color: open ? "#a5b4fc" : "rgba(255,255,255,0.45)",textTransform:"uppercase",letterSpacing:".07em",transition:"color .15s"}}>{displayTitle}</span>
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={open ? "rgba(165,180,252,0.6)" : "rgba(255,255,255,0.25)"} strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s, stroke .15s",flexShrink:0}}>
           <polyline points="6 9 12 15 18 9"/>
         </svg>
