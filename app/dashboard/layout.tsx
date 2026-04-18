@@ -2097,12 +2097,12 @@ function NavGroup({ title, icon, open, onToggle, children }: {
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
           width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
-          color: open ? "#818cf8" : "rgba(255,255,255,0.4)",
+          color: open ? "#818cf8" : "var(--sidebar-link-muted)",
           background: open ? "rgba(99,102,241,0.15)" : "transparent",
           transition:"all .15s",
         }}
-        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background=open?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=open?"#818cf8":"rgba(255,255,255,0.4)";}}
+        onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";e.currentTarget.style.color="var(--sidebar-text)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=open?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=open?"#818cf8":"var(--sidebar-link-muted)";}}
       >
         <span style={{display:"flex",fontSize:16}}>{icon}</span>
       </div>
@@ -2120,12 +2120,12 @@ function NavGroup({ title, icon, open, onToggle, children }: {
           background: open ? "rgba(99,102,241,0.1)" : "transparent",
           borderLeft: open ? "2px solid rgba(99,102,241,0.6)" : "2px solid transparent",
         }}
-        onMouseEnter={e => { if (!open) { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderLeft="2px solid rgba(255,255,255,0.1)"; }}}
+        onMouseEnter={e => { if (!open) { e.currentTarget.style.background="var(--sidebar-hover-bg)"; e.currentTarget.style.borderLeft="2px solid rgba(99,102,241,0.25)"; }}}
         onMouseLeave={e => { if (!open) { e.currentTarget.style.background="transparent"; e.currentTarget.style.borderLeft="2px solid transparent"; }}}
       >
-        <span style={{color: open ? "#818cf8" : "rgba(255,255,255,0.35)",display:"flex",transition:"color .15s"}}>{icon}</span>
-        <span style={{flex:1,fontSize:11,fontWeight:700,color: open ? "#a5b4fc" : "rgba(255,255,255,0.45)",textTransform:"uppercase",letterSpacing:".07em",transition:"color .15s"}}>{displayTitle}</span>
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={open ? "rgba(165,180,252,0.6)" : "rgba(255,255,255,0.25)"} strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s, stroke .15s",flexShrink:0}}>
+        <span style={{color: open ? "#818cf8" : "var(--sidebar-link-muted)",display:"flex",transition:"color .15s"}}>{icon}</span>
+        <span style={{flex:1,fontSize:11,fontWeight:700,color: open ? "#818cf8" : "var(--sidebar-link)",textTransform:"uppercase",letterSpacing:".07em",transition:"color .15s"}}>{displayTitle}</span>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={open ? "rgba(129,140,248,0.6)" : "var(--sidebar-link-muted)"} strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s, stroke .15s",flexShrink:0}}>
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </div>
@@ -2156,10 +2156,10 @@ function NavSubGroup({ title, open, onToggle, children }: {
       <div
         onClick={onToggle}
         style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"5px 8px",borderRadius:6,cursor:"pointer",userSelect:"none",transition:"background .15s"}}
-        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";}}
+        onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";}}
         onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}
       >
-        <span style={{fontSize:10,fontWeight:700,color:"rgba(99,102,241,0.7)",letterSpacing:".06em",textTransform:"uppercase"}}>{displayTitle}</span>
+        <span style={{fontSize:10,fontWeight:700,color:"#818cf8",letterSpacing:".06em",textTransform:"uppercase"}}>{displayTitle}</span>
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(99,102,241,0.4)" strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .15s"}}>
           <polyline points="6 9 12 15 18 9"/>
         </svg>
@@ -2223,12 +2223,12 @@ function NavLink({ href, children, pathname }: {
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
           width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
-          color: active ? "#818cf8" : "rgba(255,255,255,0.4)",
+          color: active ? "#818cf8" : "var(--sidebar-link)",
           background: active ? "rgba(99,102,241,0.15)" : "transparent",
           textDecoration:"none", transition:"all .15s",
         }}
-        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=active?"#818cf8":"rgba(255,255,255,0.4)";}}
+        onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";e.currentTarget.style.color="var(--sidebar-text)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=active?"#818cf8":"var(--sidebar-link)";}}
       >
         <span style={{display:"flex",fontSize:16}}>{collapsedIcon}</span>
       </Link>
@@ -2241,21 +2241,21 @@ function NavLink({ href, children, pathname }: {
       prefetch={false}
       style={{
         display:"flex",alignItems:"center",gap:8,padding:"5px 8px",borderRadius:6,fontSize:isAiAssistant ? 13 : 12,
-        color: active ? "#c7d2fe" : "rgba(255,255,255,0.5)",
-        background: active ? "rgba(99,102,241,0.15)" : "transparent",
+        color: active ? "var(--sidebar-link-active)" : "var(--sidebar-link)",
+        background: active ? "var(--sidebar-active-bg)" : "transparent",
         fontWeight: active || isAiAssistant ? 600 : 400,
         textDecoration:"none",transition:"all .15s",
         marginBottom:1,
       }}
       onMouseEnter={e => {
         if (!active) {
-          e.currentTarget.style.color = "rgba(255,255,255,0.75)";
-          e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+          e.currentTarget.style.color = "var(--sidebar-link-hover)";
+          e.currentTarget.style.background = "var(--sidebar-hover-bg)";
         }
       }}
       onMouseLeave={e => {
         if (!active) {
-          e.currentTarget.style.color = "rgba(255,255,255,0.45)";
+          e.currentTarget.style.color = "var(--sidebar-link)";
           e.currentTarget.style.background = "transparent";
         }
       }}
