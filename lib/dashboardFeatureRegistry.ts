@@ -1,6 +1,6 @@
 export type DashboardFeaturePlanCode = "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
 
-export type DashboardBusinessGroup = "retail" | "distribution" | "trading" | "manufacturing" | "service" | "restaurant" | "healthcare" | "real_estate" | "construction" | "school" | "hotel" | "pharmacy" | "transport" | "trade" | "ecommerce" | "salon" | "gym" | "agriculture" | "ngo" | "law_firm" | "it" | "automotive" | "repair" | "maintenance" | "media" | "subscriptions" | "isp" | "solar" | "events" | "rentals" | "firm" | "franchise";
+export type DashboardBusinessGroup = "retail" | "distribution" | "trading" | "wholesale" | "manufacturing" | "service" | "restaurant" | "healthcare" | "real_estate" | "construction" | "school" | "hotel" | "pharmacy" | "transport" | "trade" | "ecommerce" | "salon" | "gym" | "agriculture" | "ngo" | "law_firm" | "it" | "automotive" | "repair" | "maintenance" | "media" | "subscriptions" | "isp" | "solar" | "events" | "rentals" | "firm" | "franchise";
 
 export type DashboardFeatureDefinition = {
   id: string;
@@ -2133,6 +2133,16 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     route: "/dashboard/trading/analytics",
     business: "trading",
     businessLabel: "Trading",
+    section: "Control Center",
+  },
+
+  // ── WHOLESALE ────────────────────────────────────────────────
+  {
+    id: "WHOLESALE_OVERVIEW",
+    label: "Wholesale Overview",
+    route: "/dashboard/wholesale",
+    business: "wholesale",
+    businessLabel: "Wholesale",
     section: "Control Center",
   },
 ];
