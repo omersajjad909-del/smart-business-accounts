@@ -415,6 +415,9 @@ export default function Navbar() {
               <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--nav-text)", letterSpacing:"-.2px" }}>FinovaOS</span>
             </Link>
 
+            {/* Center nav links */}
+            <div className="fn-desk" style={{ display:"flex", alignItems:"center", gap:4 }}>
+
               {/* Features trigger */}
               <div ref={featuresRef} style={{ position:"relative" }}
                 onMouseEnter={() => openMega("features")}
