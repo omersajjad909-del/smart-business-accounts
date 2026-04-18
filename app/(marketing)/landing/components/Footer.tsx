@@ -173,12 +173,12 @@ export default function Footer() {
 
           {/* Brand column */}
           <div className="ft-brand">
-            <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 11, textDecoration: "none", marginBottom: 20 }}>
-              <div style={{ width: 100, height: 100, borderRadius: 18, overflow: "hidden", flexShrink: 0, border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(99,102,241,.12)" }}>
-                <img src="/icon1.png" alt="FinovaOS" width={100} height={100} style={{ objectFit: "contain" }}/>
+            <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none", marginBottom: 20 }}>
+              <div style={{ width: 96, height: 96, borderRadius: 20, overflow: "hidden", flexShrink: 0, border: "1px solid rgba(99,102,241,.24)", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(99,102,241,.18)", boxShadow: "0 12px 30px rgba(99,102,241,.12)" }}>
+                <img src="/logo-icon.svg" alt="FinovaOS" width={56} height={56} style={{ objectFit: "contain" }}/>
               </div>
               <div>
-                <div style={{ fontFamily: "'Lora', serif", fontSize: 19, fontWeight: 700, color: "white", letterSpacing: "-.3px", lineHeight: 1.1 }}>
+                <div style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 700, color: "white", letterSpacing: "-.2px", lineHeight: 1.1 }}>
                   FinovaOS
                 </div>
                 <div style={{ fontSize: 10, color: "rgba(255,255,255,.28)", fontWeight: 500, letterSpacing: ".04em", marginTop: 1 }}>
