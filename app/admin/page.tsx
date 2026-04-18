@@ -1949,7 +1949,7 @@ function PagePlans() {
   );
 }
 
-function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, toggle, defaultFeatures, addFeature, removeFeature, seatPricing, setSeatPricing, planLimits, setPlanLimits }: any) {
+function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, toggle, defaultFeatures, addFeature, removeFeature, seatPricing, setSeatPricing, planLimits, setPlanLimits, branchLimits, setBranchLimits }: any) {
   const plans = ["starter","pro","enterprise"] as const;
   const saveLabel = saved==="saving"?"Saving…":saved==="ok"?"✓ Saved!":saved==="err"?"✕ Error":"Save Changes";
   const [newFeat, setNewFeat] = useState("");
