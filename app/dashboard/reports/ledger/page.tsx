@@ -45,13 +45,14 @@ export default function LedgerReportPage() {
       .then(r => r.ok ? r.json() : null).then(d => d && setCompanyInfo(d)).catch(() => {});
   }, []);
 
-  async function loadLedger() {
-    if (!accountId) return;
+  async function loadLedger(overrideId?: string) {
+    const id = overrideId || accountId;
+    if (!id) return;
     setLoading(true);
     setShowModal(false);
     try {
       const user = getCurrentUser();
-      const res = await fetch(`/api/reports/ledger?accountId=${accountId}&from=${fromDate}&to=${toDate}`, {
+      const res = await fetch(`/api/reports/ledger?accountId=${id}&from=${fromDate}&to=${toDate}`, {
         credentials: "include",
         headers: { "x-user-id": user?.id ?? "", "x-user-role": user?.role ?? "", "x-company-id": user?.companyId ?? "" },
       });
@@ -160,7 +161,17 @@ export default function LedgerReportPage() {
                   onChange={e => { setSearch(e.target.value); setAccountId(""); setDropOpen(true); }}
                   onFocus={() => setDropOpen(true)}
                   onBlur={() => setTimeout(() => setDropOpen(false), 150)}
-                  onKeyDown={e => { if (e.key === "Enter" && accountId) loadLedger(); }}
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      if (accountId) { loadLedger(); return; }
+                      if (filteredAccounts.length > 0) {
+                        const first = filteredAccounts[0];
+                        setAccountId(first.id); setSearch(""); setDropOpen(false);
+                        loadLedger(first.id);
+                      }
+                    }
+                  }}
                 />
                 {accountId && (
                   <button onClick={() => { setAccountId(""); setSearch(""); setDropOpen(false); }} style={{
