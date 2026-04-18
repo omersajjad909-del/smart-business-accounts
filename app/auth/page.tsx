@@ -321,13 +321,7 @@ function AuthPageInner() {
           }}>
             {/* Logo */}
             <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 14 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg, #4f46e5, #818cf8)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 24px rgba(99,102,241,0.4)" }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                  <path d="M2 17l10 5 10-5" opacity=".7"/>
-                  <path d="M2 12l10 5 10-5" opacity=".88"/>
-                </svg>
-              </div>
+              <img src="/icon1.png" alt="FinovaOS" width={48} height={48} style={{ objectFit: "contain", flexShrink: 0 }}/>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px" }}>FinovaOS</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>Cloud accounting platform</div>
@@ -394,13 +388,7 @@ function AuthPageInner() {
 
               {/* Mobile logo */}
               <Link href="/" style={{ textDecoration: "none", display: "none", alignItems: "center", gap: 12, marginBottom: 24 }} className="auth-mobile-logo">
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#4f46e5,#818cf8)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5" opacity=".7"/>
-                    <path d="M2 12l10 5 10-5" opacity=".88"/>
-                  </svg>
-                </div>
+                <img src="/icon1.png" alt="FinovaOS" width={40} height={40} style={{ objectFit: "contain", flexShrink: 0 }}/>
                 <span style={{ fontSize: 20, fontWeight: 700 }}>FinovaOS</span>
               </Link>
 

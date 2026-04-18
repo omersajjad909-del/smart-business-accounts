@@ -32,11 +32,7 @@ export default function ForgotPasswordPage() {
         <div style={{ textAlign:"center", marginBottom:32 }}>
           <Link href="/" style={{ textDecoration:"none" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:10 }}>
-              <div style={{ width:40, height:40, borderRadius:12, background:"linear-gradient(135deg,#6366f1,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-                </svg>
-              </div>
+              <img src="/icon1.png" alt="FinovaOS" width={40} height={40} style={{ objectFit:"contain", flexShrink:0 }}/>
               <span style={{ fontSize:20, fontWeight:800, color:"white", fontFamily:"Lora,serif" }}>FinovaOS</span>
             </div>
           </Link>

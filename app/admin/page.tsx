@@ -7575,18 +7575,7 @@ export default function AdminPanel() {
           flexShrink:0, overflow:"hidden",
           justifyContent: collapsed ? "center" : "flex-start",
         }}>
-          <div style={{
-            width:34, height:34, borderRadius:10, flexShrink:0,
-            background:"linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%)",
-            display:"flex", alignItems:"center", justifyContent:"center",
-            boxShadow:"0 0 0 1px rgba(99,102,241,.4), 0 4px 16px rgba(79,70,229,.4)",
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5" opacity=".75"/>
-              <path d="M2 12l10 5 10-5" opacity=".9"/>
-            </svg>
-          </div>
+          <img src="/icon1.png" alt="FinovaOS" width={34} height={34} style={{ objectFit:"contain", flexShrink:0, borderRadius:10 }}/>
           {!collapsed && (
             <div>
               <div style={{ fontSize:15,fontWeight:800,color:"white",letterSpacing:"-0.02em",lineHeight:1 }}>FinovaOS</div>
