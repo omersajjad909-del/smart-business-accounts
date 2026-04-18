@@ -48,6 +48,12 @@
   --nav-bg: rgba(255,255,255,.92);
   --nav-border: rgba(148,163,184,.18);
   --nav-text: var(--text-primary);
+  --nav-link: rgba(15,23,42,.76);
+  --nav-link-hover: rgba(15,23,42,.95);
+  --nav-link-muted: rgba(15,23,42,.62);
+  --nav-card-bg: rgba(15,23,42,.04);
+  --nav-card-bg-hover: rgba(15,23,42,.08);
+  --nav-card-border: rgba(148,163,184,.18);
   
   --success: #22c55e;       /* Green 500 */
   --warning: #f59e0b;       /* Amber 500 */
@@ -78,6 +84,12 @@
   --nav-bg: rgba(8, 12, 30, 0.88);
   --nav-border: rgba(255,255,255,0.08);
   --nav-text: #eef3ff;
+  --nav-link: rgba(255,255,255,.65);
+  --nav-link-hover: #fff;
+  --nav-link-muted: rgba(255,255,255,.45);
+  --nav-card-bg: rgba(255,255,255,.03);
+  --nav-card-bg-hover: rgba(255,255,255,.06);
+  --nav-card-border: rgba(255,255,255,.08);
 }
   /* DARK MODE (Original Colors) */
   color-scheme: dark;
