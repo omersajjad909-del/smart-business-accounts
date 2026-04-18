@@ -1,218 +1,100 @@
 import { NextResponse, NextRequest } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
-import { getBaseAmounts, sumWithCurrency } from "@/lib/currencyHelper";
-type VoucherWithEntries = Prisma.VoucherGetPayload<{
-  include: {
-    entries: true;
-  };
-}>;
-
-type VoucherEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
-type SalesInvoice = Prisma.SalesInvoiceGetPayload<Prisma.SalesInvoiceDefaultArgs>;
-type PurchaseInvoice = Prisma.PurchaseInvoiceGetPayload<Prisma.PurchaseInvoiceDefaultArgs>;
-type SaleReturn = Prisma.SaleReturnGetPayload<Prisma.SaleReturnDefaultArgs>;
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
 if (process.env.NODE_ENV === "development") {
   (globalThis as { prisma?: PrismaClient }).prisma = prisma;
 }
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
-    const userRole = req.headers.get("x-user-role");
+    const userId    = req.headers.get("x-user-id");
+    const userRole  = req.headers.get("x-user-role");
 
     const companyId = await resolveCompanyId(req);
-    if (!companyId) {
-      return NextResponse.json({ error: "Company required" }, { status: 400 });
-    }
+    if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+
     const branchId = await resolveBranchId(req, companyId);
 
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_LEDGER_REPORT, companyId);
-    if (!allowed) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const { searchParams } = new URL(req.url);
     const accountId = searchParams.get("accountId");
-    const from = searchParams.get("from");
-    const to = searchParams.get("to");
+    const from      = searchParams.get("from");
+    const to        = searchParams.get("to");
 
     if (!accountId) return NextResponse.json([]);
 
     const account = await prisma.account.findFirst({
       where: { id: accountId, companyId },
-      select: { id: true },
+      select: { id: true, openDebit: true, openCredit: true },
     });
     if (!account) return NextResponse.json([]);
 
-    // 📅 Dates Calculation
     const fromDate = from ? new Date(from + "T00:00:00") : new Date("2024-01-01");
-    const toDate = to ? new Date(new Date(to).setHours(23, 59, 59, 999)) : new Date();
+    const toDate   = to   ? new Date(to   + "T23:59:59.999") : new Date();
 
-    // ---------------------------------------------------------
-    // 1. 🟢 OPENING BALANCE CALCULATION
-    // 'from' date سے پہلے کی تمام ٹرانزیکشنز کا ٹوٹل
-    // ---------------------------------------------------------
-
-    // Previous Vouchers
-    const prevVouchers = await prisma.voucher.findMany({
-      where: { date: { lt: fromDate }, entries: { some: { accountId } }, companyId, ...(branchId ? { branchId } : {}) },
-      include: { entries: true }
-    });
-    let openingBal = prevVouchers.reduce(
-      (sum: number, v: VoucherWithEntries) => {
-        const amt = v.entries
-          .filter((e: VoucherEntry) => e.accountId === accountId)
-          .reduce((s: number, e: VoucherEntry) => s + Number(e.amount), 0);
-
-        return sum + amt;
-      },
-      0
-    );
-
-
-    // Previous Sales (currency-aware)
-    const prevSalesInvs = await prisma.salesInvoice.findMany({
-      where: { date: { lt: fromDate }, customerId: accountId, companyId, ...(branchId ? { branchId } : {}), deletedAt: null },
-      select: { id: true, total: true },
-    });
-    const prevSalesBase = await getBaseAmounts(prevSalesInvs.map((i) => i.id));
-    openingBal += sumWithCurrency(prevSalesInvs, prevSalesBase);
-
-    // Previous Purchases (currency-aware)
-    const prevPurchaseInvs = await prisma.purchaseInvoice.findMany({
-      where: { date: { lt: fromDate }, supplierId: accountId, companyId, ...(branchId ? { branchId } : {}), deletedAt: null },
-      select: { id: true, total: true },
-    });
-    const prevPurchaseBase = await getBaseAmounts(prevPurchaseInvs.map((i) => i.id));
-    openingBal -= sumWithCurrency(prevPurchaseInvs, prevPurchaseBase);
-
-    // Previous Returns
-    const prevReturns = await prisma.saleReturn.aggregate({
-      where: { date: { lt: fromDate }, customerId: accountId, companyId },
-      _sum: { total: true }
-    });
-    openingBal -= Number(prevReturns._sum.total || 0);
-
-
-    // ---------------------------------------------------------
-    // 2. 🔵 FETCH CURRENT PERIOD DATA
-    // ---------------------------------------------------------
-
-    // Fetch Vouchers (Filter out PI and SI to avoid doubles)
-    const vouchers = await prisma.voucher.findMany({
+    // ── 1. Opening balance: master opening + all voucher entries before period ──
+    const prevEntries = await prisma.voucherEntry.findMany({
       where: {
-        date: { gte: fromDate, lte: toDate },
-        entries: { some: { accountId } },
-        companyId,
-        ...(branchId ? { branchId } : {}),
-        // 🔥 ڈبل انٹری روکنے کے لیے فلٹر
-        NOT: {
-          OR: [
-            { voucherNo: { startsWith: "PI-" } },
-            { voucherNo: { startsWith: "SI-" } },
-            { voucherNo: { startsWith: "SR-" } },
-          ]
-        }
+        accountId,
+        voucher: {
+          companyId,
+          date: { lt: fromDate },
+          ...(branchId ? { branchId } : {}),
+        },
       },
-      include: { entries: true },
+      select: { amount: true },
     });
 
-    const sales = await prisma.salesInvoice.findMany({
-      where: { date: { gte: fromDate, lte: toDate }, customerId: accountId, companyId, ...(branchId ? { branchId } : {}) },
+    const openingFromMaster   = Number(account.openDebit || 0) - Number(account.openCredit || 0);
+    const openingFromVouchers = prevEntries.reduce((s, e) => s + Number(e.amount), 0);
+    const openingBal          = openingFromMaster + openingFromVouchers;
+
+    // ── 2. Period entries — join voucher for date/voucherNo/narration ──
+    const periodEntries = await prisma.voucherEntry.findMany({
+      where: {
+        accountId,
+        voucher: {
+          companyId,
+          date: { gte: fromDate, lte: toDate },
+          ...(branchId ? { branchId } : {}),
+        },
+      },
+      include: {
+        voucher: { select: { date: true, voucherNo: true, narration: true } },
+      },
+      orderBy: { voucher: { date: "asc" } },
     });
 
-    const purchases = await prisma.purchaseInvoice.findMany({
-      where: { date: { gte: fromDate, lte: toDate }, supplierId: accountId, companyId, ...(branchId ? { branchId } : {}) },
-    });
-
-    const returns = await prisma.saleReturn.findMany({
-      where: { date: { gte: fromDate, lte: toDate }, customerId: accountId, companyId },
-    });
-
-    // ---------------------------------------------------------
-    // 3. 🟠 COMBINE AND SORT
-    // ---------------------------------------------------------
-    const combinedData: any[] = [];
-    vouchers.forEach((v: VoucherWithEntries) => {
-      const amount = v.entries
-        .filter((e: VoucherEntry) => e.accountId === accountId)
-        .reduce(
-          (sum: number, e: VoucherEntry) => sum + Number(e.amount),
-          0
-        );
-
-      combinedData.push({
-        date: new Date(v.date),
-        voucherNo: v.voucherNo,
-        narration: v.narration || "Voucher Entry",
-        debit: amount > 0 ? amount : 0,
-        credit: amount < 0 ? Math.abs(amount) : 0,
-      });
-    });
-
-
-    sales.forEach((s : SalesInvoice) => {
-      combinedData.push({
-        date: new Date(s.date),
-        voucherNo: s.invoiceNo,
-        narration: "Sales Invoice",
-        debit: Number(s.total || 0),
-        credit: 0,
-      });
-    });
-
-    purchases.forEach((p : PurchaseInvoice) => {
-      combinedData.push({
-        date: new Date(p.date),
-        voucherNo: p.invoiceNo,
-        narration: "Purchase Invoice",
-        debit: 0,
-        credit: Number(p.total || 0),
-      });
-    });
-
-    returns.forEach((r: SaleReturn) => {
-      combinedData.push({
-        date: new Date(r.date),
-        voucherNo: r.returnNo,
-        narration: "Sale Return",
-        debit: 0,
-        credit: Number(r.total || 0),
-      });
-    });
-
-    // Sort by Date
-    combinedData.sort((a, b) => a.date.getTime() - b.date.getTime());
-
-    // ---------------------------------------------------------
-    // 4. 🏁 FINAL CALCULATIONS (Running Balance)
-    // ---------------------------------------------------------
+    // ── 3. Build running balance rows ──
     let runningBalance = openingBal;
 
-    // اوپننگ بیلنس کو پہلی لائن کے طور پر شامل کریں
     const finalRows = [
       {
-        date: fromDate.toISOString().slice(0, 10),
+        date:      fromDate.toISOString().slice(0, 10),
         voucherNo: "---",
         narration: "OPENING BALANCE B/F",
-        debit: openingBal > 0 ? openingBal : 0,
-        credit: openingBal < 0 ? Math.abs(openingBal) : 0,
-        balance: openingBal
+        debit:     openingBal > 0 ? openingBal  : 0,
+        credit:    openingBal < 0 ? Math.abs(openingBal) : 0,
+        balance:   openingBal,
       },
-      ...combinedData.map(row => {
-        runningBalance += row.debit - row.credit;
+      ...periodEntries.map(e => {
+        const amount = Number(e.amount);
+        runningBalance += amount;
         return {
-          ...row,
-          date: row.date.toISOString().slice(0, 10),
-          balance: runningBalance
+          date:      new Date(e.voucher.date).toISOString().slice(0, 10),
+          voucherNo: e.voucher.voucherNo,
+          narration: e.voucher.narration || "Voucher Entry",
+          debit:     amount > 0 ? amount        : 0,
+          credit:    amount < 0 ? Math.abs(amount) : 0,
+          balance:   runningBalance,
         };
-      })
+      }),
     ];
 
     return NextResponse.json(finalRows);
@@ -222,4 +104,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Ledger generation failed" }, { status: 500 });
   }
 }
-
