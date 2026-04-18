@@ -64,7 +64,7 @@ const PERMISSIONS_LIST = [
 /* ═══════════════════════════════════════════════════════
    NAV CONFIG
 ═══════════════════════════════════════════════════════ */
-type Page = "dashboard"|"companies"|"users"|"revenue"|"geo"|"usage"|"plans"|"system"|"logs"|"permissions"|"settings"|"profile"|"tickets"|"broadcasts"|"flags"|"apikeys"|"visitors"|"updates"|"livesupport"|"subscriptions"|"coupons"|"emaillogs"|"referrals"|"teams"|"testimonials"|"leads"|"seo"|"social"|"business_modules"|"newsletter"|"feedback"|"crm"|"fraud"|"dev_test";
+type Page = "dashboard"|"companies"|"users"|"revenue"|"geo"|"usage"|"plans"|"system"|"logs"|"permissions"|"settings"|"profile"|"tickets"|"broadcasts"|"flags"|"apikeys"|"visitors"|"updates"|"livesupport"|"subscriptions"|"coupons"|"emaillogs"|"referrals"|"teams"|"testimonials"|"leads"|"seo"|"social"|"business_modules"|"newsletter"|"feedback"|"crm"|"fraud"|"dev_test"|"signup_analytics";
 
 // SVG icon paths per nav item (14x14 viewBox, stroke-based)
 const NAV_ICONS: Record<string, React.ReactNode> = {
@@ -107,7 +107,8 @@ const NAV: { page:Page; label:string; icon:string; color:string; badge?:string }
   { page:"revenue",          label:"Revenue",          icon:"",  color:"#34d399" },
   { page:"geo",              label:"Geo Analytics",    icon:"",  color:"#a78bfa" },
   { page:"usage",            label:"Usage Insights",   icon:"",  color:"#f472b6" },
-  { page:"visitors",         label:"Visitor Analytics", icon:"", color:"#38bdf8" },
+  { page:"visitors",         label:"Visitor Analytics",  icon:"", color:"#38bdf8" },
+  { page:"signup_analytics", label:"Signup Analytics",   icon:"", color:"#34d399" },
   { page:"plans",            label:"Plans & Billing",  icon:"",  color:"#818cf8" },
   { page:"business_modules", label:"Business Modules", icon:"",  color:"#a78bfa" },
   { page:"coupons",          label:"Coupon Codes",     icon:"",  color:"#34d399" },
@@ -137,7 +138,7 @@ const NAV: { page:Page; label:string; icon:string; color:string; badge?:string }
 
 const NAV_GROUPS: { label: string; pages: Page[] }[] = [
   { label: "Overview",   pages: ["dashboard"] },
-  { label: "Analytics",  pages: ["revenue","geo","usage","visitors"] },
+  { label: "Analytics",  pages: ["revenue","geo","usage","visitors","signup_analytics"] },
   { label: "Business",   pages: ["companies","subscriptions","plans","business_modules"] },
   { label: "Marketing",  pages: ["coupons","referrals","crm","leads","broadcasts","testimonials","newsletter","feedback"] },
   { label: "Content",    pages: ["updates","seo","social"] },
@@ -7221,6 +7222,122 @@ function PageFeedback() {
 }
 
 /* ═══════════════════════════════════════════════════════
+   SIGNUP ANALYTICS
+═══════════════════════════════════════════════════════ */
+function PageSignupAnalytics() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const uu = getAdminUser();
+    const h: Record<string,string> = {};
+    if (uu?.id)   h["x-user-id"]   = uu.id;
+    if (uu?.role) h["x-user-role"] = uu.role;
+    fetch("/api/admin/signup-analytics", { headers: h, cache: "no-store" })
+      .then(r => r.json())
+      .then(d => setData(d))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const Card = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", borderRadius:14, padding:24 }}>
+      <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.4)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:16 }}>{title}</div>
+      {children}
+    </div>
+  );
+
+  const Bar = ({ label, count, total, color }: { label: string; count: number; total: number; color: string }) => (
+    <div style={{ marginBottom:10 }}>
+      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+        <span style={{ fontSize:12.5, color:"rgba(255,255,255,.7)" }}>{label}</span>
+        <span style={{ fontSize:12.5, fontWeight:700, color:"rgba(255,255,255,.85)" }}>{count}</span>
+      </div>
+      <div style={{ height:6, borderRadius:4, background:"rgba(255,255,255,.06)", overflow:"hidden" }}>
+        <div style={{ height:"100%", width:`${Math.round((count/Math.max(total,1))*100)}%`, background:color, borderRadius:4, transition:"width .6s ease" }}/>
+      </div>
+    </div>
+  );
+
+  if (loading) return <div style={{ padding:40, color:"rgba(255,255,255,.4)", textAlign:"center" }}>Loading...</div>;
+  if (!data) return <div style={{ padding:40, color:"#f87171", textAlign:"center" }}>Failed to load</div>;
+
+  const refTotal = data.referralSources.reduce((s: number, r: any) => s + r.count, 0);
+  const tsTotal  = data.teamSizes.reduce((s: number, r: any) => s + r.count, 0);
+  const btTotal  = data.businessTypes.reduce((s: number, r: any) => s + r.count, 0);
+  const plTotal  = data.plans.reduce((s: number, r: any) => s + r.count, 0);
+  const barColors = ["#818cf8","#34d399","#fbbf24","#f87171","#38bdf8","#a78bfa","#fb923c","#e879f9"];
+
+  return (
+    <div style={{ padding:"0 4px" }}>
+      {/* KPI row */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))", gap:16, marginBottom:24 }}>
+        {[
+          { label:"Total Signups", value:data.total, color:"#818cf8" },
+          { label:"Referral Sources", value:data.referralSources.length, color:"#34d399" },
+          { label:"Business Types", value:data.businessTypes.length, color:"#fbbf24" },
+          { label:"Plans", value:data.plans.length, color:"#f87171" },
+        ].map(k => (
+          <div key={k.label} style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", borderRadius:12, padding:"16px 20px" }}>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", fontWeight:600, letterSpacing:".06em", textTransform:"uppercase", marginBottom:6 }}>{k.label}</div>
+            <div style={{ fontSize:28, fontWeight:800, color:k.color, fontFamily:"'Lora',serif" }}>{k.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:20 }}>
+        <Card title="How Did You Hear About Us">
+          {data.referralSources.map((r: any, i: number) => (
+            <Bar key={r.label} label={r.label} count={r.count} total={refTotal} color={barColors[i % barColors.length]}/>
+          ))}
+          {!data.referralSources.length && <div style={{ color:"rgba(255,255,255,.25)", fontSize:13 }}>No data yet</div>}
+        </Card>
+
+        <Card title="Team Size">
+          {data.teamSizes.map((r: any, i: number) => (
+            <Bar key={r.label} label={r.label} count={r.count} total={tsTotal} color={barColors[(i+2) % barColors.length]}/>
+          ))}
+          {!data.teamSizes.length && <div style={{ color:"rgba(255,255,255,.25)", fontSize:13 }}>No data yet</div>}
+        </Card>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:20 }}>
+        <Card title="Plans at Signup">
+          {data.plans.map((r: any, i: number) => (
+            <Bar key={r.label} label={r.label} count={r.count} total={plTotal} color={barColors[(i+1) % barColors.length]}/>
+          ))}
+          {!data.plans.length && <div style={{ color:"rgba(255,255,255,.25)", fontSize:13 }}>No data yet</div>}
+        </Card>
+
+        <Card title="Top Business Types">
+          {data.businessTypes.map((r: any, i: number) => (
+            <Bar key={r.label} label={r.label} count={r.count} total={btTotal} color={barColors[(i+3) % barColors.length]}/>
+          ))}
+          {!data.businessTypes.length && <div style={{ color:"rgba(255,255,255,.25)", fontSize:13 }}>No data yet</div>}
+        </Card>
+      </div>
+
+      {/* Signups by day */}
+      {data.signupsByDay.length > 0 && (
+        <Card title="Daily Signups (Last 30 Days)">
+          <div style={{ display:"flex", alignItems:"flex-end", gap:4, height:80 }}>
+            {data.signupsByDay.map((d: any) => {
+              const max = Math.max(...data.signupsByDay.map((x: any) => x.count));
+              return (
+                <div key={d.date} title={`${d.date}: ${d.count}`} style={{ flex:1, minWidth:4, borderRadius:"3px 3px 0 0", background:"#818cf8", height:`${Math.max(8,Math.round((d.count/Math.max(max,1))*100))}%`, opacity:.8, cursor:"default" }}/>
+              );
+            })}
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", marginTop:6, fontSize:10, color:"rgba(255,255,255,.25)" }}>
+            <span>{data.signupsByDay[0]?.date}</span>
+            <span>{data.signupsByDay[data.signupsByDay.length-1]?.date}</span>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
    MAIN ADMIN PANEL
 ═══════════════════════════════════════════════════════ */
 export default function AdminPanel() {
@@ -7352,6 +7469,7 @@ export default function AdminPanel() {
     crm:"CRM Workspace",
     fraud:"Fraud & Risk Monitor",
     dev_test:"Dev Test Mode",
+    signup_analytics:"Signup Analytics",
   };
 
   const PAGE_ICONS: Partial<Record<Page,string>> = {
@@ -7389,7 +7507,8 @@ export default function AdminPanel() {
       case "settings":      return <PageSettings/>;
       case "profile":       return <PageProfile setPage={setPage}/>;
       case "updates":       return <PageUpdates/>;
-      case "visitors":      return <PageVisitors/>;
+      case "visitors":         return <PageVisitors/>;
+      case "signup_analytics": return <PageSignupAnalytics/>;
       case "tickets":       return <PageTickets/>;
       case "broadcasts":    return <PageBroadcasts/>;
       case "flags":         return <PageFlags/>;

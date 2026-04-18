@@ -5,259 +5,272 @@ import { fmtDate } from "@/lib/dateUtils";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
 
-type Account = { id: string; name: string; };
+type Account  = { id: string; name: string };
 type LedgerRow = {
-    date: string;
-    voucherNo: string;
-    narration: string;
-    debit?: number;
-    credit?: number;
-    balance: number;
+  date: string; voucherNo: string; narration: string;
+  debit?: number; credit?: number; balance: number;
 };
 
+const fmt = (n: number, cur = "") =>
+  `${cur ? cur + " " : ""}${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export default function LedgerReportPage() {
-    const today = new Date().toISOString().slice(0, 10);
-    const [accounts, setAccounts] = useState<Account[]>([]);
-    const [accountId, setAccountId] = useState("");
-    const [fromDate, setFromDate] = useState("2026-01-01");
-    const [toDate, setToDate] = useState(today);
-    const [rows, setRows] = useState<LedgerRow[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [companyInfo, setCompanyInfo] = useState<any>(null);
+  const today = new Date().toISOString().slice(0, 10);
+  const [accounts,    setAccounts]    = useState<Account[]>([]);
+  const [accountId,   setAccountId]   = useState("");
+  const [fromDate,    setFromDate]    = useState("2026-01-01");
+  const [toDate,      setToDate]      = useState(today);
+  const [rows,        setRows]        = useState<LedgerRow[]>([]);
+  const [loading,     setLoading]     = useState(false);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
 
-    useEffect(() => {
-        const user = getCurrentUser();
-        if (!user) return;
-        fetch("/api/accounts", { credentials: "include", headers: { "x-user-id": user.id, "x-user-role": user.role, "x-company-id": user.companyId || "" } })
-            .then(r => r.json())
-            .then(d => setAccounts(d));
-        loadCompany();
-    }, []);
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user) return;
+    const h = { "x-user-id": user.id, "x-user-role": user.role, "x-company-id": user.companyId || "" };
+    fetch("/api/accounts", { credentials: "include", headers: h })
+      .then(r => r.json()).then(d => setAccounts(Array.isArray(d) ? d : []));
+    fetch("/api/me/company", { headers: { "x-user-role": user?.role || "", "x-company-id": user?.companyId || "" } })
+      .then(r => r.ok ? r.json() : null).then(d => d && setCompanyInfo(d)).catch(() => {});
+  }, []);
 
-    async function loadCompany() {
-        try {
-            const user = getCurrentUser();
-            const res = await fetch("/api/me/company", {
-                headers: { 
-                    "x-user-role": user?.role || "",
-                    "x-company-id": user?.companyId || ""
-                },
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setCompanyInfo(data);
-            }
-        } catch (e) {}
-    }
+  async function loadLedger() {
+    if (!accountId) return;
+    setLoading(true);
+    try {
+      const user = getCurrentUser();
+      const res = await fetch(`/api/reports/ledger?accountId=${accountId}&from=${fromDate}&to=${toDate}`, {
+        credentials: "include",
+        headers: { "x-user-id": user?.id ?? "", "x-user-role": user?.role ?? "", "x-company-id": user?.companyId ?? "" },
+      });
+      const data = await res.json();
+      setRows(Array.isArray(data) ? data : []);
+    } finally { setLoading(false); }
+  }
 
-    async function loadLedger() {
-        if (!accountId) return;
-        setLoading(true);
-        try {
-            const user = getCurrentUser();
+  const dataRows    = rows.slice(1);
+  const totalDebit  = dataRows.reduce((s, r) => s + (r.debit  || 0), 0);
+  const totalCredit = dataRows.reduce((s, r) => s + (r.credit || 0), 0);
+  const finalBal    = rows.length ? rows[rows.length - 1].balance : 0;
+  const openingBal  = rows.length ? rows[0].balance : null;
+  const cur         = companyInfo?.baseCurrency || "";
+  const acctName    = accounts.find(a => a.id === accountId)?.name || "";
 
-            const res = await fetch(
-                `/api/reports/ledger?accountId=${accountId}&from=${fromDate}&to=${toDate}`,
-                {
-                    credentials: "include",
-                    headers: {
-                        "x-user-id":    user?.id        ?? "",
-                        "x-user-role":  user?.role      ?? "",
-                        "x-company-id": user?.companyId ?? "",
-                    },
-                }
-            );
+  /* ── styles ── */
+  const inputStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)",
+    borderRadius: 8, color: "rgba(255,255,255,.85)", padding: "9px 12px",
+    fontSize: 13, fontFamily: "inherit", outline: "none", width: "100%",
+  };
+  const labelStyle: React.CSSProperties = {
+    fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)",
+    letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 6, display: "block",
+  };
 
-            const data = await res.json();
-            setRows(Array.isArray(data) ? data : []);
-        } finally {
-            setLoading(false);
-        }
-    }
+  return (
+    <div style={{ fontFamily: "'Outfit','Inter',sans-serif", color: "rgba(255,255,255,.85)", maxWidth: 1100, margin: "0 auto" }}>
 
-    const _totalDebit = rows.reduce((s, r) => s + (r.debit || 0), 0);
-    const _totalCredit = rows.reduce((s, r) => s + (r.credit || 0), 0);
-    const _finalBalance = rows.length ? rows[rows.length - 1].balance : 0;
+      {/* ── Page title ── */}
+      <div style={{ marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ width: 4, height: 28, borderRadius: 2, background: "linear-gradient(180deg,#818cf8,#6366f1)" }}/>
+        <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-.4px", margin: 0 }}>Ledger Report</h1>
+      </div>
 
-    return (
-        <div className="p-4 max-w-6xl mx-auto font-sans">
-            <h1 className="text-2xl font-bold mb-6 print:hidden">Ledger Report</h1>
-
-            {/* Filters */}
-            <div className="flex gap-3 mb-6 items-end print:hidden bg-white p-4 border rounded shadow-sm">
-                <div className="flex-1">
-                    <label className="block text-xs font-bold mb-1 uppercase">Account</label>
-                    <select className="w-full border p-2 rounded" value={accountId} onChange={e => setAccountId(e.target.value)}>
-                        <option value="">Select Account</option>
-                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-xs font-bold mb-1 uppercase">From</label>
-                    <input type="date" className="border p-2 rounded" value={fromDate} onChange={e => setFromDate(e.target.value)} />
-                </div>
-                <div>
-                    <label className="block text-xs font-bold mb-1 uppercase">To</label>
-                    <input type="date" className="border p-2 rounded" value={toDate} onChange={e => setToDate(e.target.value)} />
-                </div>
-                <button onClick={loadLedger} className="bg-blue-600 text-white px-6 py-2 rounded font-bold">Search</button>
-                {rows.length > 0 && (
-                    <button
-                        onClick={() => exportToCSV(rows.map(r => ({
-                            date: r.date,
-                            voucherNo: r.voucherNo,
-                            narration: r.narration,
-                            debit: r.debit || 0,
-                            credit: r.credit || 0,
-                            balance: r.balance
-                        })), "ledger-report")}
-                        className="bg-green-600 text-white px-6 py-2 rounded font-bold"
-                    >
-                        📥 Export CSV
-                    </button>
-                )}
-            </div>
-
-            {/* Ledger View */}
-            <div className="invoice-print bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                {/* 📋 PROFESSIONAL HEADER */}
-                <div className="p-8 border-b-2 border-black bg-gray-50">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            {/* کمپنی کا نام بڑے اور بولڈ فونٹ میں */}
-                            <h1 className="text-4xl font-black tracking-tighter text-black uppercase">
-                                {companyInfo?.name || "FINOVA SME"}
-                            </h1>
-                            <p className="text-xs font-bold text-gray-500 mt-1 tracking-widest uppercase italic">
-                                {companyInfo?.country || "GLOBAL"} OPERATIONS
-                            </p>
-                        </div>
-                        <div className="text-right border-l-4 border-black pl-4">
-                            <h2 className="text-xl font-black uppercase text-blue-900">
-                                Account Ledger
-                            </h2>
-                            <div className="mt-2 text-[10px] font-bold uppercase text-gray-500">
-                                Reporting Period
-                                <span className="block text-sm text-black font-black italic">
-                                    {fromDate} <span className="text-gray-400 font-normal">TO</span> {toDate}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-10 flex justify-between items-end border-t-2 border-dashed border-black pt-6">
-                        <div>
-                            <span className="text-[10px] font-black uppercase text-gray-400 block mb-1">
-                                Statement For:
-                            </span>
-                            <h3 className="text-3xl font-black uppercase underline decoration-4 underline-offset-8 decoration-yellow-400">
-                                {accounts.find(a => a.id === accountId)?.name || "N/A"}
-                            </h3>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase">System Date</p>
-                            <p className="text-sm font-black italic">{fmtDate(new Date())}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 💰 OPENING BALANCE SUMMARY - یہ ٹیبل کے اوپر الگ نظر آئے گا */}
-                {!loading && rows.length > 0 && (
-                    <div className="flex justify-between items-end mb-1 print:mt-4">
-                        <div className="text-[10px] font-bold text-gray-500 uppercase italic">
-                            * All amounts are in {companyInfo?.baseCurrency || "$"}
-                        </div>
-                        <div className="bg-white border-2 border-black p-2 px-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center gap-4">
-                            <span className="text-[11px] font-black uppercase tracking-tighter text-gray-400">
-                                Opening Balance B/F
-                            </span>
-                            <span className={`text-xl font-black ${rows[0].balance >= 0 ? "text-green-700" : "text-red-700"}`}>
-                                {rows[0].balance >= 0 ? "" : "-"}{Math.abs(rows[0].balance).toLocaleString()} {rows[0].balance >= 0 ? "Dr" : "Cr"}
-                            </span>
-                        </div>
-                    </div>
-                )}
-
-                {/* 📊 MAIN LEDGER TABLE */}
-                <div className="border-2 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
-                    <table className="w-full text-sm border-collapse">
-                        <thead className="bg-black text-white uppercase text-[11px] font-bold">
-                            <tr>
-                                <th className="p-3 border-r border-gray-700 text-left w-28">Date</th>
-                                <th className="p-3 border-r border-gray-700 text-left w-32">Voucher #</th>
-                                <th className="p-3 border-r border-gray-700 text-left">Narration / Particulars</th>
-                                <th className="p-3 border-r border-gray-700 text-right w-32">Debit (In)</th>
-                                <th className="p-3 border-r border-gray-700 text-right w-32">Credit (Out)</th>
-                                <th className="p-3 text-right w-40 bg-gray-900">Running Balance</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y-2 divide-black">
-                            {loading ? (
-                                <tr>
-                                    <td colSpan={6} className="p-20 text-center font-black uppercase animate-pulse text-gray-400">
-                                        Fetching Ledger Records...
-                                    </td>
-                                </tr>
-                            ) : rows.length <= 1 ? (
-                                <tr>
-                                    <td colSpan={6} className="p-20 text-center text-gray-400 uppercase italic">
-                                        No transactions found for this period.
-                                    </td>
-                                </tr>
-                            ) : (
-                                /* rows.slice(1) اس لیے تاکہ اوپننگ بیلنس ٹیبل کے اندر دوبارہ نہ آئے */
-                                rows.slice(1).map((r, i) => (
-                                    <tr key={i} className="hover:bg-yellow-50 transition-colors group">
-                                        <td className="p-3 border-r border-black font-medium text-gray-600">
-                                            {r.date}
-                                        </td>
-                                        <td className="p-3 border-r border-black font-black text-blue-900 group-hover:underline">
-                                            {r.voucherNo}
-                                        </td>
-                                        <td className="p-3 border-r border-black uppercase text-[11px] leading-tight font-bold text-gray-700">
-                                            {r.narration}
-                                        </td>
-                                        <td className="p-3 border-r border-black text-right font-bold text-black">
-                                            {r.debit ? r.debit.toLocaleString() : "-"}
-                                        </td>
-                                        <td className="p-3 border-r border-black text-right font-bold text-black">
-                                            {r.credit ? r.credit.toLocaleString() : "-"}
-                                        </td>
-                                        <td className={`p-3 text-right font-black text-base ${r.balance >= 0 ? "bg-green-50 text-green-900" : "bg-red-50 text-red-900"}`}>
-                                            {r.balance >= 0 ? "" : "-"}{Math.abs(r.balance).toLocaleString()}{r.balance >= 0 ? "Dr" : "Cr"}
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-
-                        {/* 🏆 PERIOD TOTALS FOOTER */}
-                        {!loading && rows.length > 1 && (
-                            <tfoot className="bg-black text-white font-black uppercase border-t-4 border-black">
-                                <tr>
-                                    <td colSpan={3} className="p-4 text-right tracking-widest text-gray-400">Period Totals</td>
-                                    <td className="p-4 text-right border-x border-gray-800">
-                                        {rows.slice(1).reduce((s, r) => s + (r.debit || 0), 0).toLocaleString()}
-                                    </td>
-                                    <td className="p-4 text-right border-r border-gray-800">
-                                        {rows.slice(1).reduce((s, r) => s + (r.credit || 0), 0).toLocaleString()}
-                                    </td>
-                                    <td className="p-4 text-right bg-blue-700 text-white text-lg italic">
-                                        {rows[rows.length - 1].balance >= 0 ? "" : "-"}{Math.abs(rows[rows.length - 1].balance).toLocaleString()} {rows[rows.length - 1].balance >= 0 ? "Dr" : "Cr"}
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        )}
-                    </table>
-                </div>
-            </div>
-
-            <div className="mt-6 flex gap-4 print:hidden">
-                <button onClick={() => window.print()} className="border-2 border-black px-8 py-2 font-bold hover:bg-black hover:text-white transition-all">
-                    PRINT LEDGER
-                </button>
-            </div>
+      {/* ── Filter bar ── */}
+      <div style={{
+        background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
+        borderRadius: 14, padding: "20px 24px", marginBottom: 28,
+        display: "grid", gridTemplateColumns: "1fr 160px 160px auto auto", gap: 16, alignItems: "end",
+      }} className="print:hidden">
+        <div>
+          <label style={labelStyle}>Account</label>
+          <select style={inputStyle} value={accountId} onChange={e => setAccountId(e.target.value)}>
+            <option value="">Select Account</option>
+            {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
         </div>
-    );
+        <div>
+          <label style={labelStyle}>From</label>
+          <input type="date" style={inputStyle} value={fromDate} onChange={e => setFromDate(e.target.value)}/>
+        </div>
+        <div>
+          <label style={labelStyle}>To</label>
+          <input type="date" style={inputStyle} value={toDate} onChange={e => setToDate(e.target.value)}/>
+        </div>
+        <button onClick={loadLedger} style={{
+          padding: "9px 24px", borderRadius: 8, border: "none", cursor: "pointer",
+          background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white",
+          fontSize: 13, fontWeight: 700, fontFamily: "inherit", letterSpacing: ".01em",
+        }}>Search</button>
+        {rows.length > 0 && (
+          <button onClick={() => exportToCSV(dataRows.map(r => ({
+            Date: r.date, "Voucher #": r.voucherNo, Narration: r.narration,
+            Debit: r.debit || 0, Credit: r.credit || 0, Balance: r.balance,
+          })), "ledger-report")} style={{
+            padding: "9px 20px", borderRadius: 8, border: "1px solid rgba(52,211,153,.3)",
+            cursor: "pointer", background: "rgba(52,211,153,.08)", color: "#34d399",
+            fontSize: 13, fontWeight: 700, fontFamily: "inherit", whiteSpace: "nowrap",
+          }}>↓ Export CSV</button>
+        )}
+      </div>
+
+      {/* ── Report document ── */}
+      <div style={{
+        background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)",
+        borderRadius: 16, overflow: "hidden",
+      }}>
+
+        {/* Header */}
+        <div style={{
+          padding: "32px 36px 28px",
+          background: "linear-gradient(135deg,rgba(99,102,241,.12) 0%,rgba(79,70,229,.06) 100%)",
+          borderBottom: "1px solid rgba(255,255,255,.08)",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            {/* Left: company */}
+            <div>
+              <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-.5px", color: "white", lineHeight: 1 }}>
+                {companyInfo?.name || "—"}
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.3)", letterSpacing: ".14em", textTransform: "uppercase", marginTop: 5 }}>
+                {companyInfo?.country || "Global"} Operations
+              </div>
+            </div>
+            {/* Right: report meta */}
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "#818cf8", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>
+                Account Ledger
+              </div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 3 }}>
+                Reporting Period
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)" }}>
+                {fromDate} <span style={{ color: "rgba(255,255,255,.25)" }}>—</span> {toDate}
+              </div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", marginTop: 8 }}>
+                Generated: {fmtDate(new Date())}
+              </div>
+            </div>
+          </div>
+
+          {/* Account name row */}
+          <div style={{
+            marginTop: 28, paddingTop: 20,
+            borderTop: "1px solid rgba(255,255,255,.07)",
+            display: "flex", justifyContent: "space-between", alignItems: "flex-end",
+          }}>
+            <div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
+                Statement for
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "white", letterSpacing: "-.3px" }}>
+                {acctName || <span style={{ color: "rgba(255,255,255,.2)" }}>—</span>}
+              </div>
+            </div>
+            {openingBal !== null && rows.length > 0 && (
+              <div style={{
+                background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)",
+                borderRadius: 10, padding: "10px 20px", textAlign: "right",
+              }}>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 3 }}>
+                  Opening Balance
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: openingBal >= 0 ? "#34d399" : "#f87171" }}>
+                  {fmt(openingBal, cur)} {openingBal >= 0 ? "Dr" : "Cr"}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Table */}
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: "rgba(255,255,255,.05)", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+                {["Date","Voucher #","Narration / Particulars","Debit","Credit","Running Balance"].map((h, i) => (
+                  <th key={h} style={{
+                    padding: "11px 16px", fontSize: 10, fontWeight: 700,
+                    color: "rgba(255,255,255,.35)", letterSpacing: ".08em", textTransform: "uppercase",
+                    textAlign: i >= 3 ? "right" : "left", whiteSpace: "nowrap",
+                    borderRight: i < 5 ? "1px solid rgba(255,255,255,.05)" : "none",
+                  }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={6} style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>
+                  Loading transactions…
+                </td></tr>
+              ) : !accountId ? (
+                <tr><td colSpan={6} style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,.2)", fontSize: 13 }}>
+                  Select an account and click Search
+                </td></tr>
+              ) : dataRows.length === 0 ? (
+                <tr><td colSpan={6} style={{ padding: "60px 0", textAlign: "center", color: "rgba(255,255,255,.2)", fontSize: 13 }}>
+                  No transactions found for this period
+                </td></tr>
+              ) : dataRows.map((r, i) => (
+                <tr key={i} style={{
+                  borderBottom: "1px solid rgba(255,255,255,.04)",
+                  background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,.015)",
+                  transition: "background .15s",
+                }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,.06)")}
+                  onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? "transparent" : "rgba(255,255,255,.015)")}
+                >
+                  <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.45)", fontSize: 12, borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>
+                    {r.date}
+                  </td>
+                  <td style={{ padding: "11px 16px", color: "#818cf8", fontWeight: 600, fontSize: 12, borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>
+                    {r.voucherNo}
+                  </td>
+                  <td style={{ padding: "11px 16px", color: "rgba(255,255,255,.65)", borderRight: "1px solid rgba(255,255,255,.04)", maxWidth: 360 }}>
+                    {r.narration}
+                  </td>
+                  <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.debit ? "#34d399" : "rgba(255,255,255,.18)", borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>
+                    {r.debit ? fmt(r.debit) : "—"}
+                  </td>
+                  <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 700, color: r.credit ? "#f87171" : "rgba(255,255,255,.18)", borderRight: "1px solid rgba(255,255,255,.04)", whiteSpace: "nowrap" }}>
+                    {r.credit ? fmt(r.credit) : "—"}
+                  </td>
+                  <td style={{ padding: "11px 16px", textAlign: "right", fontWeight: 800, whiteSpace: "nowrap", color: r.balance >= 0 ? "#34d399" : "#f87171" }}>
+                    {fmt(r.balance, cur)} <span style={{ fontSize: 10, opacity: .7 }}>{r.balance >= 0 ? "Dr" : "Cr"}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+
+            {/* Totals row */}
+            {dataRows.length > 0 && (
+              <tfoot>
+                <tr style={{ borderTop: "1px solid rgba(255,255,255,.12)", background: "rgba(99,102,241,.06)" }}>
+                  <td colSpan={3} style={{ padding: "12px 16px", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase" }}>
+                    Period Totals
+                  </td>
+                  <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, color: "#34d399", fontSize: 14, whiteSpace: "nowrap" }}>
+                    {fmt(totalDebit, cur)}
+                  </td>
+                  <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, color: "#f87171", fontSize: 14, whiteSpace: "nowrap" }}>
+                    {fmt(totalCredit, cur)}
+                  </td>
+                  <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 900, fontSize: 15, color: finalBal >= 0 ? "#34d399" : "#f87171", whiteSpace: "nowrap" }}>
+                    {fmt(finalBal, cur)} <span style={{ fontSize: 10, opacity: .7 }}>{finalBal >= 0 ? "Dr" : "Cr"}</span>
+                  </td>
+                </tr>
+              </tfoot>
+            )}
+          </table>
+        </div>
+
+        {/* Footer note */}
+        {cur && (
+          <div style={{ padding: "12px 24px", borderTop: "1px solid rgba(255,255,255,.05)", fontSize: 11, color: "rgba(255,255,255,.2)" }}>
+            All amounts in {cur}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
