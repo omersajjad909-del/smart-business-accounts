@@ -1622,8 +1622,8 @@ export default function DashboardLayout({
             <NavGroup
               title="Trading Control"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>}
-              open={openSection === "wholesale"}
-              onToggle={() => toggle("wholesale")}
+              open={openSection === "trading"}
+              onToggle={() => toggle("trading")}
             >
               {hasDashboardFeature("TRADING_OVERVIEW") && <NavLink href="/dashboard/trading" pathname={pathname}>Trading Overview</NavLink>}
               {hasDashboardFeature("TRADING_ORDER_DESK") && <NavLink href="/dashboard/trading/order-desk" pathname={pathname}>Order Desk</NavLink>}
@@ -1633,6 +1633,24 @@ export default function DashboardLayout({
               {hasDashboardFeature("TRADING_DISPATCH_BOARD") && <NavLink href="/dashboard/trading/dispatch-board" pathname={pathname}>Dispatch Board</NavLink>}
               {hasDashboardFeature("TRADING_CONVERSION_CENTER") && <NavLink href="/dashboard/trading/conversion-center" pathname={pathname}>Conversion Center</NavLink>}
               {hasDashboardFeature("TRADING_ANALYTICS") && <NavLink href="/dashboard/trading/analytics" pathname={pathname}>Trading Analytics</NavLink>}
+            </NavGroup>
+          )}
+
+          {/* ── WHOLESALE ── */}
+          {!isCustomPlan && businessType === "wholesale" && (
+            <NavGroup
+              title="Wholesale"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>}
+              open={openSection === "wholesale"}
+              onToggle={() => toggle("wholesale")}
+            >
+              {hasDashboardFeature("WHOLESALE_OVERVIEW") && <NavLink href="/dashboard/wholesale" pathname={pathname}>Wholesale Overview</NavLink>}
+              {hasDashboardFeature("TRADING_ORDER_DESK") && <NavLink href="/dashboard/trading/order-desk" pathname={pathname}>Order Desk</NavLink>}
+              {hasDashboardFeature("TRADING_PROCUREMENT") && <NavLink href="/dashboard/trading/procurement" pathname={pathname}>Procurement</NavLink>}
+              {hasDashboardFeature("TRADING_STOCK_CONTROL") && <NavLink href="/dashboard/trading/stock-control" pathname={pathname}>Stock Control</NavLink>}
+              {hasDashboardFeature("TRADING_OUTSTANDINGS") && <NavLink href="/dashboard/trading/outstandings" pathname={pathname}>Outstandings</NavLink>}
+              {hasDashboardFeature("TRADING_DISPATCH_BOARD") && <NavLink href="/dashboard/trading/dispatch-board" pathname={pathname}>Dispatch Board</NavLink>}
+              {hasDashboardFeature("TRADING_ANALYTICS") && <NavLink href="/dashboard/trading/analytics" pathname={pathname}>Analytics</NavLink>}
             </NavGroup>
           )}
 
