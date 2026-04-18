@@ -416,7 +416,7 @@ export default function Navbar() {
             </Link>
 
             {/* Center nav links */}
-            <div className="fn-desk" style={{ display:"flex", alignItems:"center", gap:4 }}>
+            <div className="fn-desk" style={{ display:"flex", alignItems:"center", gap:36 }}>
 
               {/* Features trigger */}
               <div ref={featuresRef} style={{ position:"relative" }}

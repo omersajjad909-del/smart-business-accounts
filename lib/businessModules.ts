@@ -25,6 +25,8 @@ export type BusinessType =
   | "mobile_repair" | "computer_repair" | "electronics_repair" | "equipment_maintenance"
   // Energy & Utilities
   | "solar_company" | "electric_company" | "gas_distribution" | "water_supply"
+  // Wholesale
+  | "wholesale"
   // Import / Export
   | "import_company" | "export_company" | "clearing_forwarding"
   // Event Management
@@ -242,6 +244,36 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
       { label: "Delivery Challan", href: "/dashboard/delivery-challan", icon: "🚚", color: "#38bdf8" },
       { label: "Purchase Stock", href: "/dashboard/purchase-invoice", icon: "📦", color: "#34d399" },
       { label: "Route Management", href: "/dashboard/distribution/routes", icon: "🗺️", color: "#fbbf24" },
+    ],
+  },
+
+  // ── WHOLESALE ─────────────────────────────────────────────
+  {
+    id: "wholesale", label: "Wholesale", icon: "📦", emoji: "📦",
+    description: "Bulk buying and selling — dealers, distributors, warehouse-level operations",
+    tagline: "Buy Bulk → Warehouse → Sell → Collect",
+    color: "#f59e0b", gradient: "linear-gradient(135deg,#d97706,#f59e0b)", category: "Commerce",
+    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","sale_return","outward","inventory_items","stock_rates","barcode","reports_inventory","crm","hr_payroll"],
+    defaultAccounts: [
+      ...COMMON_ACCOUNTS,
+      { code: "1100", name: "Accounts Receivable", type: "Asset" },
+      { code: "1200", name: "Warehouse Inventory", type: "Asset" },
+      { code: "5100", name: "Cost of Goods Sold", type: "Expense" },
+      { code: "5101", name: "Warehouse Expense", type: "Expense" },
+      { code: "5102", name: "Transport & Delivery", type: "Expense" },
+      { code: "5103", name: "Sales Commission", type: "Expense" },
+    ],
+    kpis: [
+      { key: "monthly_sales", label: "Monthly Sales", icon: "📦", color: "#f59e0b" },
+      { key: "stock_value", label: "Stock Value", icon: "🏭", color: "#34d399" },
+      { key: "receivables", label: "Receivables", icon: "🧾", color: "#f87171" },
+      { key: "overdue", label: "Overdue Parties", icon: "⚠️", color: "#818cf8" },
+    ],
+    quickActions: [
+      { label: "Sales Invoice", href: "/dashboard/sales-invoice", icon: "🧾", color: "#f59e0b" },
+      { label: "Purchase Order", href: "/dashboard/purchase-order", icon: "🛒", color: "#34d399" },
+      { label: "Wholesale Dashboard", href: "/dashboard/wholesale", icon: "📦", color: "#818cf8" },
+      { label: "Inventory", href: "/dashboard/inventory", icon: "🏭", color: "#38bdf8" },
     ],
   },
 
@@ -1447,7 +1479,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     ],
   },
 
-  /* PHASE-2+ (hidden for Phase 1 launch)
+  // ── CLEARING & FORWARDING ─────────────────────────────────
   {
     id: "clearing_forwarding", label: "Clearing & Forwarding Agent", icon: "🛃", emoji: "🛃",
     description: "Customs clearance — import/export clearing, freight forwarding, documentation",
@@ -1477,7 +1509,6 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
       { label: "Ageing Report", href: "/dashboard/reports/ageing", icon: "📊", color: "#fbbf24" },
     ],
   },
-  */
 
   // ════════════════════════════════════════════════════════════
   //  EVENT MANAGEMENT
@@ -1636,9 +1667,10 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
   // ── Phase 1 — LIVE (Commerce / Trade) ───────────────────────
   trading:              { phase:1, status:"live",        category:"Commerce",          label:"Wholesale & Trading",     emoji:"🛒", description:"Buy & sell goods — general merchandise, hardware, electronics" },
   distribution:         { phase:1, status:"live",        category:"Commerce",          label:"Distribution",            emoji:"🚚", description:"Route-based distribution, van sales, multi-depot operations" },
+  wholesale:            { phase:1, status:"live",        category:"Commerce",          label:"Wholesale",               emoji:"📦", description:"Bulk pricing, dealer management, warehouse operations" },
   import_company:       { phase:1, status:"live",        category:"Commerce",          label:"Import Company",          emoji:"🚢", description:"International trade, landed cost, customs clearance" },
-  export_company:       { phase:1, status:"live",        category:"Commerce",          label:"Export Company",          emoji:"📦", description:"Export management, commercial invoices, packing lists" },
-  clearing_forwarding:  { phase:1, status:"live",        category:"Commerce",          label:"Clearing & Forwarding",   emoji:"🏗️", description:"Freight forwarding, customs documentation" },
+  export_company:       { phase:1, status:"live",        category:"Commerce",          label:"Export Company",          emoji:"📤", description:"Export management, commercial invoices, packing lists" },
+  clearing_forwarding:  { phase:1, status:"live",        category:"Commerce",          label:"Clearing & Forwarding",   emoji:"🛃", description:"Freight forwarding, customs documentation" },
 
   // ── Phase 2 — COMING SOON (Production + Retail + Food) ──────
   manufacturing:        { phase:2, status:"coming_soon", category:"Production",        label:"Manufacturing",           emoji:"🏭", description:"BOM, production orders, work orders, finished goods" },

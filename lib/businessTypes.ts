@@ -17,10 +17,12 @@ export interface BusinessType {
 
 export const ALL_BUSINESS_TYPES: BusinessType[] = [
   // ── PHASE 1 — Live at launch ──────────────────────────────────
-  { id: "trading",          label: "Trading",                  icon: "🔄", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Buy-sell operations, purchase orders, and trade finance" },
-  { id: "distribution",     label: "Distribution",             icon: "🚛", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Multi-route delivery, van sales, and branch settlement" },
-  { id: "import_export",    label: "Import / Export",          icon: "🌐", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Shipment tracking, LC management, and customs duty" },
-  { id: "wholesale",        label: "Wholesale",                icon: "📦", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Bulk pricing, party ledgers, and dealer management" },
+  { id: "trading",              label: "Trading",                  icon: "🔄", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Buy-sell operations, purchase orders, and trade finance" },
+  { id: "distribution",         label: "Distribution",             icon: "🚛", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Multi-route delivery, van sales, and branch settlement" },
+  { id: "wholesale",            label: "Wholesale",                icon: "📦", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Bulk pricing, party ledgers, and dealer management" },
+  { id: "import_company",       label: "Import Company",           icon: "🚢", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Shipment tracking, LC management, and customs duty" },
+  { id: "export_company",       label: "Export Company",           icon: "📤", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Export invoices, packing lists, and shipment tracking" },
+  { id: "clearing_forwarding",  label: "Clearing & Forwarding",    icon: "🛃", phase: 1, liveByDefault: true,  category: "Commerce",      description: "Customs clearance, freight forwarding, documentation" },
   { id: "services",         label: "Services",                 icon: "🛠️", phase: 1, liveByDefault: true,  category: "Services",      description: "Project billing, retainers, and expense tracking" },
   { id: "enterprise",       label: "Enterprise / Holding",     icon: "🏢", phase: 1, liveByDefault: true,  category: "Corporate",     description: "Multi-company group with consolidated reporting" },
   { id: "general",          label: "General Business",         icon: "💼", phase: 1, liveByDefault: true,  category: "General",       description: "All-purpose accounting for any small or medium business" },
