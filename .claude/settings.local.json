@@ -123,7 +123,11 @@
       "WebFetch(domain:www.finovaos.app)",
       "Read(//c/Users/Standard Laptop/.claude/projects/d--projects-smart-business-accounts/**)",
       "Bash(python -c \"import sys, json; lines = sys.stdin.read\\(\\).strip\\(\\).split\\('\\\\n'\\); [print\\(json.loads\\(l\\).get\\('message', {}\\).get\\('content', ''\\)\\) for l in lines[-20:] if l]\")",
-      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('hex'\\)\\)\")"
+      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('hex'\\)\\)\")",
+      "Bash(grep -v \"//.*logo\")",
+      "Bash(xargs '-I{}' bash -c 'file=$\\(echo \"{}\" | cut -d: -f1\\); line=$\\(echo \"{}\" | cut -d: -f2\\); grep -n \"setError\" \"$file\" | head -3; echo \"---\"')",
+      "Bash(grep -v \"//.*return\\\\|returnUrl\\\\|return res\\\\|return null\\\\|return;\\\\|.return\\\\|return {\")",
+      "Bash(grep -v \"node_modules\\\\|//.*logo\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib"

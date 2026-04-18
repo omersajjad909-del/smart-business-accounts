@@ -66,7 +66,7 @@ function FinovaLoader() {
           width: 90, height: 90,
           animation: "finova-glow 2s ease-in-out infinite",
         }}>
-          <img src="/logo-icon.svg" alt="FinovaOS" width={90} height={90} style={{objectFit:"contain"}}/>
+          <img src="/icon1.png" alt="FinovaOS" width={90} height={90} style={{objectFit:"contain"}}/>
         </div>
       </div>
 
@@ -660,7 +660,7 @@ export default function DashboardLayout({
             }}
           >
             {/* Logo icon — always visible */}
-            <img src="/logo-icon.svg" alt="FinovaOS" width={42} height={42} style={{flexShrink:0,objectFit:"contain"}}/>
+            <img src="/icon1.png" alt="FinovaOS" width={42} height={42} style={{flexShrink:0,objectFit:"contain"}}/>
             {!sidebarCollapsed && (
               <div style={{display:"flex",flexDirection:"column",gap:1}}>
                 <div style={{fontSize:14,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
@@ -1825,7 +1825,7 @@ export default function DashboardLayout({
           {/* MOBILE: Logo + company name */}
           {isMobileViewport && (
             <div style={{display:"flex",alignItems:"center",gap:7,flexShrink:0}}>
-              <img src="/logo-icon.svg" alt="FinovaOS" width={28} height={28} style={{objectFit:"contain",flexShrink:0}}/>
+              <img src="/icon1.png" alt="FinovaOS" width={28} height={28} style={{objectFit:"contain",flexShrink:0}}/>
               <span style={{fontSize:13,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.2px",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
             </div>
           )}
