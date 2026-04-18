@@ -66,7 +66,7 @@ function FinovaLoader() {
           width: 90, height: 90,
           animation: "finova-glow 2s ease-in-out infinite",
         }}>
-          <img src="/icon1.png" alt="FinovaOS" width={100} height={100} style={{objectFit:"contain"}}/>
+          <img src="/logo-icon.svg" alt="FinovaOS" width={90} height={90} style={{objectFit:"contain"}}/>
         </div>
       </div>
 
@@ -660,7 +660,7 @@ export default function DashboardLayout({
             }}
           >
             {/* Logo icon — always visible */}
-            <img src="/icon1.png" alt="FinovaOS" width={42} height={42} style={{flexShrink:0,objectFit:"contain"}}/>
+            <img src="/logo-icon.svg" alt="FinovaOS" width={42} height={42} style={{flexShrink:0,objectFit:"contain"}}/>
             {!sidebarCollapsed && (
               <div style={{display:"flex",flexDirection:"column",gap:1}}>
                 <div style={{fontSize:14,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
@@ -1622,8 +1622,8 @@ export default function DashboardLayout({
             <NavGroup
               title="Trading Control"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>}
-              open={openSection === "trading"}
-              onToggle={() => toggle("trading")}
+              open={openSection === "wholesale"}
+              onToggle={() => toggle("wholesale")}
             >
               {hasDashboardFeature("TRADING_OVERVIEW") && <NavLink href="/dashboard/trading" pathname={pathname}>Trading Overview</NavLink>}
               {hasDashboardFeature("TRADING_ORDER_DESK") && <NavLink href="/dashboard/trading/order-desk" pathname={pathname}>Order Desk</NavLink>}
@@ -1633,24 +1633,6 @@ export default function DashboardLayout({
               {hasDashboardFeature("TRADING_DISPATCH_BOARD") && <NavLink href="/dashboard/trading/dispatch-board" pathname={pathname}>Dispatch Board</NavLink>}
               {hasDashboardFeature("TRADING_CONVERSION_CENTER") && <NavLink href="/dashboard/trading/conversion-center" pathname={pathname}>Conversion Center</NavLink>}
               {hasDashboardFeature("TRADING_ANALYTICS") && <NavLink href="/dashboard/trading/analytics" pathname={pathname}>Trading Analytics</NavLink>}
-            </NavGroup>
-          )}
-
-          {/* ── WHOLESALE ── */}
-          {!isCustomPlan && businessType === "wholesale" && (
-            <NavGroup
-              title="Wholesale"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>}
-              open={openSection === "wholesale"}
-              onToggle={() => toggle("wholesale")}
-            >
-              {hasDashboardFeature("WHOLESALE_OVERVIEW") && <NavLink href="/dashboard/wholesale" pathname={pathname}>Wholesale Overview</NavLink>}
-              {hasDashboardFeature("TRADING_ORDER_DESK") && <NavLink href="/dashboard/trading/order-desk" pathname={pathname}>Order Desk</NavLink>}
-              {hasDashboardFeature("TRADING_PROCUREMENT") && <NavLink href="/dashboard/trading/procurement" pathname={pathname}>Procurement</NavLink>}
-              {hasDashboardFeature("TRADING_STOCK_CONTROL") && <NavLink href="/dashboard/trading/stock-control" pathname={pathname}>Stock Control</NavLink>}
-              {hasDashboardFeature("TRADING_OUTSTANDINGS") && <NavLink href="/dashboard/trading/outstandings" pathname={pathname}>Outstandings</NavLink>}
-              {hasDashboardFeature("TRADING_DISPATCH_BOARD") && <NavLink href="/dashboard/trading/dispatch-board" pathname={pathname}>Dispatch Board</NavLink>}
-              {hasDashboardFeature("TRADING_ANALYTICS") && <NavLink href="/dashboard/trading/analytics" pathname={pathname}>Analytics</NavLink>}
             </NavGroup>
           )}
 
@@ -1843,7 +1825,7 @@ export default function DashboardLayout({
           {/* MOBILE: Logo + company name */}
           {isMobileViewport && (
             <div style={{display:"flex",alignItems:"center",gap:7,flexShrink:0}}>
-              <img src="/icon1.png" alt="FinovaOS" width={28} height={28} style={{objectFit:"contain",flexShrink:0}}/>
+              <img src="/logo-icon.svg" alt="FinovaOS" width={28} height={28} style={{objectFit:"contain",flexShrink:0}}/>
               <span style={{fontSize:13,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.2px",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
             </div>
           )}
@@ -2115,12 +2097,12 @@ function NavGroup({ title, icon, open, onToggle, children }: {
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
           width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
-          color: open ? "#818cf8" : "var(--sidebar-link-muted)",
-          background: open ? "var(--sidebar-active-bg)" : "transparent",
+          color: open ? "#818cf8" : "rgba(255,255,255,0.4)",
+          background: open ? "rgba(99,102,241,0.15)" : "transparent",
           transition:"all .15s",
         }}
-        onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";e.currentTarget.style.color="var(--sidebar-link-hover)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background=open?"var(--sidebar-active-bg)":"transparent";e.currentTarget.style.color=open?"#818cf8":"var(--sidebar-link-muted)";}}
+        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=open?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=open?"#818cf8":"rgba(255,255,255,0.4)";}}
       >
         <span style={{display:"flex",fontSize:16}}>{icon}</span>
       </div>
@@ -2137,12 +2119,13 @@ function NavGroup({ title, icon, open, onToggle, children }: {
           borderRadius:8,cursor:"pointer",userSelect:"none",transition:"all .15s",
           background: open ? "rgba(99,102,241,0.1)" : "transparent",
           borderLeft: open ? "2px solid rgba(99,102,241,0.6)" : "2px solid transparent",
+          color: open ? "#818cf8" : "rgba(15,23,42,0.35)",
         }}
-        onMouseEnter={e => { if (!open) { e.currentTarget.style.background="rgba(255,255,255,0.04)"; e.currentTarget.style.borderLeft="2px solid rgba(255,255,255,0.1)"; }}}
-        onMouseLeave={e => { if (!open) { e.currentTarget.style.background="transparent"; e.currentTarget.style.borderLeft="2px solid transparent"; }}}
+        onMouseEnter={e => { if (!open) { e.currentTarget.style.background="rgba(15,23,42,0.04)"; e.currentTarget.style.borderLeft="2px solid rgba(99,102,241,0.25)"; e.currentTarget.style.color="rgba(15,23,42,0.7)"; }}}
+        onMouseLeave={e => { if (!open) { e.currentTarget.style.background="transparent"; e.currentTarget.style.borderLeft="2px solid transparent"; e.currentTarget.style.color="rgba(15,23,42,0.35)"; }}}
       >
-        <span style={{color: open ? "#818cf8" : "rgba(255,255,255,0.35)",display:"flex",transition:"color .15s"}}>{icon}</span>
-        <span style={{flex:1,fontSize:11,fontWeight:700,color: open ? "#a5b4fc" : "rgba(255,255,255,0.45)",textTransform:"uppercase",letterSpacing:".07em",transition:"color .15s"}}>{displayTitle}</span>
+        <span style={{display:"flex",transition:"color .15s",color:"inherit"}}>{icon}</span>
+        <span style={{flex:1,fontSize:11,fontWeight:700,textTransform:"uppercase",letterSpacing:".07em",transition:"color .15s",color:"inherit"}}>{displayTitle}</span>
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={open ? "rgba(165,180,252,0.6)" : "rgba(255,255,255,0.25)"} strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s, stroke .15s",flexShrink:0}}>
           <polyline points="6 9 12 15 18 9"/>
         </svg>
@@ -2241,12 +2224,12 @@ function NavLink({ href, children, pathname }: {
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
           width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
-          color: active ? "#818cf8" : "var(--sidebar-link-muted)",
-          background: active ? "var(--sidebar-active-bg)" : "transparent",
+          color: active ? "#818cf8" : "rgba(255,255,255,0.4)",
+          background: active ? "rgba(99,102,241,0.15)" : "transparent",
           textDecoration:"none", transition:"all .15s",
         }}
-        onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";e.currentTarget.style.color="var(--sidebar-link-hover)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background=active?"var(--sidebar-active-bg)":"transparent";e.currentTarget.style.color=active?"#818cf8":"var(--sidebar-link-muted)";}}
+        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="rgba(255,255,255,0.8)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=active?"#818cf8":"rgba(255,255,255,0.4)";}}
       >
         <span style={{display:"flex",fontSize:16}}>{collapsedIcon}</span>
       </Link>

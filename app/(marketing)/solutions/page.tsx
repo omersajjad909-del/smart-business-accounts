@@ -1084,18 +1084,24 @@ export default function SolutionsPage() {
 
             {/* Industry tab strip — grouped by category */}
             <div style={{
-              display:"flex", flexDirection:"column", alignItems:"center", gap:6,
+              display:"grid",
+              gridTemplateColumns:"80px 1px 1fr",
+              rowGap:10, columnGap:16,
+              alignItems:"center",
               opacity:heroVisible?1:0, transition:"opacity .6s ease .3s",
+              maxWidth:780, margin:"0 auto",
             }}>
               {TAB_GROUPS.map(group => (
-                <div key={group.label} style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", justifyContent:"center" }}>
-                  <span style={{
-                    fontSize:9, fontWeight:800, color:"rgba(255,255,255,.2)",
-                    letterSpacing:".1em", textTransform:"uppercase",
-                    minWidth:68, textAlign:"right", flexShrink:0,
+                <>
+                  <span key={group.label+"-label"} style={{
+                    fontSize:9, fontWeight:800, color:"rgba(255,255,255,.22)",
+                    letterSpacing:".12em", textTransform:"uppercase",
+                    textAlign:"right", whiteSpace:"nowrap",
                   }}>{group.label}</span>
-                  <div style={{ width:1, height:20, background:"rgba(255,255,255,.1)", flexShrink:0 }} />
-                  <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+
+                  <div key={group.label+"-div"} style={{ width:1, height:"100%", background:"rgba(255,255,255,.1)", alignSelf:"stretch" }} />
+
+                  <div key={group.label+"-pills"} style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
                     {group.ids.map(id => {
                       const ind = INDUSTRIES.find(i => i.id === id);
                       if (!ind) return null;
@@ -1111,7 +1117,7 @@ export default function SolutionsPage() {
                       );
                     })}
                   </div>
-                </div>
+                </>
               ))}
             </div>
           </div>
