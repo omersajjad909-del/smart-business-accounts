@@ -7,7 +7,9 @@ const TEST_ACTION = "ADMIN_DEV_TEST_COMPANY";
 export async function POST(req: NextRequest) {
   const token = getTokenFromRequest(req);
   const payload = token ? verifyJwt(token) : null;
-  if (!payload?.userId || payload.role !== "ADMIN") {
+  // Admin JWT uses `id`, regular user JWT uses `userId`
+  const userId = payload?.userId || payload?.id;
+  if (!userId || payload?.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -16,8 +18,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "businessType and plan required" }, { status: 400 });
   }
 
-  const userId = payload.userId;
-  const originCompanyId = payload.isTestMode ? payload.originCompanyId : payload.companyId;
+  // Get real companyId — admin JWT may not include it
+  let originCompanyId = payload.isTestMode ? payload.originCompanyId : payload.companyId;
+  if (!originCompanyId) {
+    const u = await prisma.user.findUnique({ where: { id: userId }, select: { defaultCompanyId: true } });
+    originCompanyId = u?.defaultCompanyId || null;
+  }
 
   // Find existing test company for this admin
   let testCompanyId: string | null = null;

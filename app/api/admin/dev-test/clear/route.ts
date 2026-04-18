@@ -6,7 +6,8 @@ export async function POST(req: NextRequest) {
   const token = getTokenFromRequest(req);
   const payload = token ? verifyJwt(token) : null;
 
-  if (!payload?.userId || payload.role !== "ADMIN" || !payload.isTestMode) {
+  const userId = payload?.userId || payload?.id;
+  if (!userId || payload?.role !== "ADMIN" || !payload.isTestMode) {
     return NextResponse.json({ error: "Only callable in test mode" }, { status: 403 });
   }
 
