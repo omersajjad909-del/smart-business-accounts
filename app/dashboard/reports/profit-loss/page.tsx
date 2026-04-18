@@ -1,290 +1,206 @@
 "use client";
 
 import toast from "react-hot-toast";
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
-interface PLItem {
-  name: string;
-  amount: number;
-}
-
+interface PLItem { name: string; amount: number; }
 interface PLReport {
-  income: PLItem[];
-  expense: PLItem[];
-  totalIncome: number;
-  totalExpense: number;
-  grossProfit: number;
-  netProfit: number;
+  income: PLItem[]; expense: PLItem[];
+  totalIncome: number; totalExpense: number;
+  grossProfit: number; netProfit: number;
 }
 
-function fmt(n: number | undefined | null) {
-  if (n === undefined || n === null) return "—";
-  return Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
+const fmt = (n: number | undefined | null) =>
+  (n === undefined || n === null) ? "—" : Math.abs(n).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+const todayStr = () => new Date().toISOString().slice(0, 10);
+const firstOfYear = () => `${new Date().getFullYear()}-01-01`;
 
 function getHeaders(): Record<string, string> {
   const user = getCurrentUser();
   if (!user) return {};
-  return {
-    "x-user-id": user.id,
-    "x-user-role": user.role ?? "",
-    "x-company-id": user.companyId ?? "",
-  };
-}
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function firstOfYear() {
-  return `${new Date().getFullYear()}-01-01`;
+  return { "x-user-id": user.id, "x-user-role": user.role ?? "", "x-company-id": user.companyId ?? "" };
 }
 
 export default function ProfitLossPage() {
-  const [from, setFrom] = useState(firstOfYear());
-  const [to, setTo] = useState(todayStr());
-  const [report, setReport] = useState<PLReport | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sendingEmail, setSendingEmail] = useState(false);
+  const [showModal,     setShowModal]     = useState(true);
+  const [from,          setFrom]          = useState(firstOfYear());
+  const [to,            setTo]            = useState(todayStr());
+  const [report,        setReport]        = useState<PLReport | null>(null);
+  const [loading,       setLoading]       = useState(false);
+  const [error,         setError]         = useState<string | null>(null);
+  const [sendingEmail,  setSendingEmail]  = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  async function loadReport() {
+    setLoading(true); setError(null);
     try {
-      const res = await fetch(
-        `/api/reports/profit-loss?from=${from}&to=${to}`,
-        { headers: getHeaders(), credentials: "include" }
-      );
+      const res = await fetch(`/api/reports/profit-loss?from=${from}&to=${to}`, { headers: getHeaders(), credentials: "include" });
       const d = await res.json();
-      if (!res.ok) {
-        setError(d.error || "Failed to load report");
-        return;
-      }
+      if (!res.ok) { setError(d.error || "Failed to load report"); return; }
       setReport(d);
-    } catch {
-      setError("Network error — could not load report");
-    } finally {
-      setLoading(false);
-    }
-  }, [from, to]);
+    } catch { setError("Network error — could not load report"); }
+    finally { setLoading(false); }
+  }
 
-  useEffect(() => {
-    load();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  function handleGenerate() { setShowModal(false); loadReport(); }
 
-  const sendEmail = async () => {
-    const email = window.prompt("Enter email address to send the report:");
+  async function sendEmail() {
+    const email = window.prompt("Enter email address:");
     if (!email || !email.includes("@")) return;
     setSendingEmail(true);
     try {
       const user = getCurrentUser();
       const res = await fetch("/api/email/send", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-role": user?.role ?? "",
-          "x-user-id": user?.id ?? "",
-          "x-company-id": user?.companyId ?? "",
-        },
-        body: JSON.stringify({
-          type: "custom",
-          to: email,
-          subject: `Profit & Loss Report: ${from} to ${to}`,
-          message: `Please find the Profit & Loss report for the period ${from} to ${to}.`,
-        }),
+        method: "POST", credentials: "include",
+        headers: { "Content-Type":"application/json", "x-user-role": user?.role ?? "", "x-user-id": user?.id ?? "", "x-company-id": user?.companyId ?? "" },
+        body: JSON.stringify({ type:"custom", to:email, subject:`Profit & Loss Report: ${from} to ${to}`, message:`P&L report for the period ${from} to ${to}.` }),
       });
       const data = await res.json();
-      if (res.ok) {
-        toast.success("Email sent successfully");
-      } else {
-        toast.error(data.error || "Failed to send email");
-      }
-    } catch {
-      toast.error("Error sending email");
-    } finally {
-      setSendingEmail(false);
-    }
-  };
+      res.ok ? toast.success("Email sent successfully") : toast.error(data.error || "Failed to send email");
+    } catch { toast.error("Error sending email"); }
+    finally { setSendingEmail(false); }
+  }
 
   const profit = report?.netProfit ?? 0;
   const isProfitable = profit >= 0;
-
-  const panelBg = "var(--panel-bg, #0f1729)";
-  const border = "var(--border, #1e2a45)";
-  const textPrimary = "var(--text-primary, #f1f5f9)";
-  const textMuted = "var(--text-muted, #94a3b8)";
+  const inputStyle: React.CSSProperties = { width:"100%", padding:"11px 14px", borderRadius:10, fontSize:14, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", color:"white", outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
+  const card: React.CSSProperties = { background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:14, overflow:"hidden" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--app-bg, #060918)", padding: "28px 24px", fontFamily: "'Outfit','Inter',sans-serif", color: textPrimary }}>
+    <div style={{ fontFamily:"'Outfit','Inter',sans-serif", color:"rgba(255,255,255,.85)" }}>
 
-      {/* ── Header ── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 4px", letterSpacing: -0.5 }}>Profit &amp; Loss Statement</h1>
-          <p style={{ margin: 0, fontSize: 13, color: textMuted }}>Trading &amp; P&amp;L — Income vs Expenses</p>
-        </div>
-
-        <div className="print:hidden" style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-end" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <label style={{ fontSize: 10, color: textMuted, textTransform: "uppercase", letterSpacing: 0.6 }}>From</label>
-            <input
-              type="date"
-              value={from}
-              onChange={e => setFrom(e.target.value)}
-              style={{ background: panelBg, border: `1px solid ${border}`, borderRadius: 8, padding: "7px 10px", color: textPrimary, fontSize: 13, outline: "none" }}
-            />
+      {/* ── MODAL ── */}
+      {showModal && (
+        <div style={{ position:"fixed", inset:0, zIndex:9000, background:"rgba(0,0,0,.78)", backdropFilter:"blur(14px)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
+          <div style={{ width:"100%", maxWidth:460, background:"rgba(10,13,32,.97)", border:"1px solid rgba(255,255,255,.12)", borderRadius:22, padding:"40px 40px 36px", boxShadow:"0 40px 100px rgba(0,0,0,.8)" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:28 }}>
+              <div style={{ width:46, height:46, borderRadius:14, background:"linear-gradient(135deg,#10b981,#059669)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>📊</div>
+              <div>
+                <div style={{ fontSize:20, fontWeight:800, color:"white", letterSpacing:"-.3px" }}>Profit & Loss</div>
+                <div style={{ fontSize:12, color:"rgba(255,255,255,.35)", marginTop:2 }}>Select reporting period</div>
+              </div>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
+              <div>
+                <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>From</label>
+                <input type="date" style={inputStyle} value={from} onChange={e => setFrom(e.target.value)}/>
+              </div>
+              <div>
+                <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>To</label>
+                <input type="date" style={inputStyle} value={to} onChange={e => setTo(e.target.value)}/>
+              </div>
+            </div>
+            <button onClick={handleGenerate} style={{ width:"100%", padding:"13px 0", borderRadius:12, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#10b981,#059669)", color:"white", fontSize:15, fontWeight:700, fontFamily:"inherit", boxShadow:"0 6px 24px rgba(16,185,129,.35)" }}>
+              Generate Report →
+            </button>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <label style={{ fontSize: 10, color: textMuted, textTransform: "uppercase", letterSpacing: 0.6 }}>To</label>
-            <input
-              type="date"
-              value={to}
-              onChange={e => setTo(e.target.value)}
-              style={{ background: panelBg, border: `1px solid ${border}`, borderRadius: 8, padding: "7px 10px", color: textPrimary, fontSize: 13, outline: "none" }}
-            />
-          </div>
-          <button
-            onClick={load}
-            disabled={loading}
-            style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1 }}
-          >
-            {loading ? "Loading…" : "Run Report"}
-          </button>
-          <button
-            onClick={() => window.print()}
-            style={{ background: "transparent", color: textMuted, border: `1px solid ${border}`, borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
-          >
-            Print
-          </button>
-          <button
-            onClick={sendEmail}
-            disabled={sendingEmail || !report}
-            style={{ background: "transparent", color: "#4ade80", border: "1px solid rgba(74,222,128,0.3)", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: (sendingEmail || !report) ? 0.5 : 1 }}
-          >
-            {sendingEmail ? "Sending…" : "Email"}
-          </button>
-        </div>
-      </div>
-
-      {/* ── Error ── */}
-      {error && (
-        <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "12px 16px", marginBottom: 20, color: "#f87171", fontSize: 13 }}>
-          {error}
         </div>
       )}
 
-      {/* ── Loading ── */}
-      {loading && !report && (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 200, color: textMuted, fontSize: 14 }}>
-          Loading report…
-        </div>
-      )}
-
-      {/* ── Report ── */}
-      {report && (
+      {/* ── REPORT ── */}
+      {!showModal && (
         <>
-          <div style={{ textAlign: "center", marginBottom: 20, fontSize: 13, color: textMuted }}>
-            Period:{" "}
-            <strong style={{ color: textPrimary }}>{from}</strong>
-            {" "}to{" "}
-            <strong style={{ color: textPrimary }}>{to}</strong>
-          </div>
-
-          {/* Two-column table */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
-
-            {/* Expenses */}
-            <div style={{ background: panelBg, border: `1px solid ${border}`, borderRadius: 12, overflow: "hidden" }}>
-              <div style={{ background: "rgba(239,68,68,0.1)", padding: "10px 16px", borderBottom: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#f87171", display: "inline-block" }} />
-                <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "#f87171" }}>Expenses / Outflows</span>
-              </div>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <tbody>
-                  {report.expense.length === 0 ? (
-                    <tr>
-                      <td colSpan={2} style={{ padding: "24px 16px", textAlign: "center", color: textMuted, fontSize: 13 }}>No expenses in this period</td>
-                    </tr>
-                  ) : report.expense.map((item, i) => (
-                    <tr key={i} style={{ borderBottom: `1px solid ${border}` }}>
-                      <td style={{ padding: "10px 16px", fontSize: 13, color: textPrimary }}>{item.name}</td>
-                      <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, fontSize: 13, color: "#fca5a5" }}>{fmt(item.amount)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr style={{ background: "rgba(239,68,68,0.07)", borderTop: `2px solid rgba(239,68,68,0.2)` }}>
-                    <td style={{ padding: "12px 16px", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.5, color: "#f87171" }}>Total Expenses</td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, fontSize: 15, color: "#f87171" }}>{fmt(report.totalExpense)}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            {/* Income */}
-            <div style={{ background: panelBg, border: `1px solid ${border}`, borderRadius: 12, overflow: "hidden" }}>
-              <div style={{ background: "rgba(34,197,94,0.08)", padding: "10px 16px", borderBottom: `1px solid ${border}`, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#4ade80", display: "inline-block" }} />
-                <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "#4ade80" }}>Income / Inflows</span>
-              </div>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <tbody>
-                  {report.income.length === 0 ? (
-                    <tr>
-                      <td colSpan={2} style={{ padding: "24px 16px", textAlign: "center", color: textMuted, fontSize: 13 }}>No income in this period</td>
-                    </tr>
-                  ) : report.income.map((item, i) => (
-                    <tr key={i} style={{ borderBottom: `1px solid ${border}` }}>
-                      <td style={{ padding: "10px 16px", fontSize: 13, color: textPrimary }}>{item.name}</td>
-                      <td style={{ padding: "10px 16px", textAlign: "right", fontWeight: 600, fontSize: 13, color: "#86efac" }}>{fmt(item.amount)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr style={{ background: "rgba(34,197,94,0.07)", borderTop: `2px solid rgba(34,197,94,0.2)` }}>
-                    <td style={{ padding: "12px 16px", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: 0.5, color: "#4ade80" }}>Total Income</td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 800, fontSize: 15, color: "#4ade80" }}>{fmt(report.totalIncome)}</td>
-                  </tr>
-                </tfoot>
-              </table>
+          {/* Top bar */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:10 }}>
+            <button onClick={() => setShowModal(true)} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:10, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.6)", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
+              ⟵ Change Dates
+            </button>
+            <div style={{ display:"flex", gap:8 }}>
+              <button onClick={() => window.print()} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.5)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🖨 Print</button>
+              <button onClick={sendEmail} disabled={sendingEmail || !report} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(52,211,153,.3)", background:"rgba(52,211,153,.06)", color:"#34d399", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", opacity:(sendingEmail||!report)?0.5:1 }}>
+                {sendingEmail ? "Sending…" : "✉ Email"}
+              </button>
             </div>
           </div>
 
-          {/* KPI summary row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-            <div style={{ background: panelBg, border: `1px solid ${border}`, borderRadius: 12, padding: "18px 20px" }}>
-              <div style={{ fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 8 }}>Total Revenue</div>
-              <div style={{ fontSize: 26, fontWeight: 800, color: "#4ade80" }}>{fmt(report.totalIncome)}</div>
-            </div>
-            <div style={{ background: panelBg, border: `1px solid ${border}`, borderRadius: 12, padding: "18px 20px" }}>
-              <div style={{ fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 8 }}>Total Expenses</div>
-              <div style={{ fontSize: 26, fontWeight: 800, color: "#f87171" }}>{fmt(report.totalExpense)}</div>
-            </div>
-            <div style={{
-              background: isProfitable ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)",
-              border: `1px solid ${isProfitable ? "rgba(34,197,94,0.25)" : "rgba(239,68,68,0.25)"}`,
-              borderRadius: 12, padding: "18px 20px"
-            }}>
-              <div style={{ fontSize: 11, color: textMuted, textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 8 }}>
-                Net {isProfitable ? "Profit" : "Loss"}
+          {error && (
+            <div style={{ background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.2)", borderRadius:10, padding:"12px 16px", marginBottom:20, color:"#f87171", fontSize:13 }}>{error}</div>
+          )}
+
+          {loading && (
+            <div style={{ textAlign:"center", padding:"80px 0", color:"rgba(255,255,255,.25)", fontSize:14 }}>Loading report…</div>
+          )}
+
+          {report && !loading && (
+            <>
+              {/* Period label */}
+              <div style={{ textAlign:"center", marginBottom:20, fontSize:13, color:"rgba(255,255,255,.4)" }}>
+                Period: <strong style={{ color:"white" }}>{from}</strong> to <strong style={{ color:"white" }}>{to}</strong>
               </div>
-              <div style={{ fontSize: 26, fontWeight: 800, color: isProfitable ? "#4ade80" : "#f87171" }}>
-                {isProfitable ? "" : "−"}{fmt(profit)}
+
+              {/* KPI row */}
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:20 }}>
+                {[
+                  { label:"Total Revenue",  val:report.totalIncome,  color:"#34d399", bg:"rgba(52,211,153,.08)",  border:"rgba(52,211,153,.2)"  },
+                  { label:"Total Expenses", val:report.totalExpense, color:"#f87171", bg:"rgba(248,113,113,.08)", border:"rgba(248,113,113,.2)" },
+                  { label:isProfitable?"Net Profit":"Net Loss", val:profit, color:isProfitable?"#34d399":"#f87171", bg:isProfitable?"rgba(52,211,153,.08)":"rgba(248,113,113,.08)", border:isProfitable?"rgba(52,211,153,.2)":"rgba(248,113,113,.2)" },
+                ].map(k => (
+                  <div key={k.label} style={{ background:k.bg, border:`1px solid ${k.border}`, borderRadius:14, padding:"18px 20px" }}>
+                    <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>{k.label}</div>
+                    <div style={{ fontSize:26, fontWeight:900, color:k.color }}>{!isProfitable && k.label.includes("Net") ? "−" : ""}{fmt(k.val)}</div>
+                  </div>
+                ))}
               </div>
-            </div>
-          </div>
+
+              {/* Two-column income/expense */}
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                {/* Expenses */}
+                <div style={card}>
+                  <div style={{ background:"rgba(239,68,68,.1)", padding:"12px 16px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ width:8, height:8, borderRadius:"50%", background:"#f87171", display:"inline-block" }}/>
+                    <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:"#f87171" }}>Expenses / Outflows</span>
+                  </div>
+                  <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                    <tbody>
+                      {report.expense.length === 0 ? (
+                        <tr><td colSpan={2} style={{ padding:"24px 16px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No expenses in this period</td></tr>
+                      ) : report.expense.map((item, i) => (
+                        <tr key={i} style={{ borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding:"10px 16px", fontSize:13, color:"rgba(255,255,255,.7)" }}>{item.name}</td>
+                          <td style={{ padding:"10px 16px", textAlign:"right", fontWeight:600, fontSize:13, color:"#fca5a5" }}>{fmt(item.amount)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr style={{ background:"rgba(239,68,68,.07)", borderTop:"2px solid rgba(239,68,68,.2)" }}>
+                        <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"#f87171" }}>Total Expenses</td>
+                        <td style={{ padding:"12px 16px", textAlign:"right", fontWeight:800, fontSize:15, color:"#f87171" }}>{fmt(report.totalExpense)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                {/* Income */}
+                <div style={card}>
+                  <div style={{ background:"rgba(34,197,94,.08)", padding:"12px 16px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ width:8, height:8, borderRadius:"50%", background:"#4ade80", display:"inline-block" }}/>
+                    <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:"#4ade80" }}>Income / Inflows</span>
+                  </div>
+                  <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                    <tbody>
+                      {report.income.length === 0 ? (
+                        <tr><td colSpan={2} style={{ padding:"24px 16px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No income in this period</td></tr>
+                      ) : report.income.map((item, i) => (
+                        <tr key={i} style={{ borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding:"10px 16px", fontSize:13, color:"rgba(255,255,255,.7)" }}>{item.name}</td>
+                          <td style={{ padding:"10px 16px", textAlign:"right", fontWeight:600, fontSize:13, color:"#86efac" }}>{fmt(item.amount)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr style={{ background:"rgba(34,197,94,.07)", borderTop:"2px solid rgba(34,197,94,.2)" }}>
+                        <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"#4ade80" }}>Total Income</td>
+                        <td style={{ padding:"12px 16px", textAlign:"right", fontWeight:800, fontSize:15, color:"#4ade80" }}>{fmt(report.totalIncome)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
-
-      <style>{`
-        @media print {
-          body { background: white !important; color: black !important; }
-          .print\\:hidden { display: none !important; }
-        }
-      `}</style>
     </div>
   );
 }

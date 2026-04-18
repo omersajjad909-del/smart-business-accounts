@@ -798,6 +798,7 @@ export default function DashboardLayout({
               onToggle={() => toggle("reports")}
             >
               {hasPermission(currentUser, PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT) && <NavLink href="/dashboard/reports/trial-balance" pathname={pathname}>Trial Balance</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_AGEING_REPORT) && <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/reports/profit-loss" pathname={pathname}>Profit & Loss</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_BALANCE_SHEET_REPORT) && <NavLink href="/dashboard/reports/balance-sheet" pathname={pathname}>Balance Sheet</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_LEDGER_REPORT) && <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Ledger</NavLink>}
@@ -816,7 +817,6 @@ export default function DashboardLayout({
               open={openSection === "activityReports"}
               onToggle={() => toggle("activityReports")}
             >
-              {hasPermission(currentUser, PERMISSIONS.VIEW_AGEING_REPORT) && <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/payment-followup" pathname={pathname}>Payment Follow-up</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_STOCK_SUMMARY) && <NavLink href="/dashboard/reports/stock" pathname={pathname}>Stock Report</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_SALES_REPORT) && <NavLink href="/dashboard/reports/sales" pathname={pathname}>Sales Report</NavLink>}
