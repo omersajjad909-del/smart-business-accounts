@@ -31,6 +31,8 @@ export async function POST(req: NextRequest) {
       billingCycle,
       customModules,
       referralCode,
+      teamSize,
+      referralSource,
     } = await req.json();
 
     if (!companyName || !name || !email || !password) {
@@ -160,6 +162,8 @@ export async function POST(req: NextRequest) {
             email: user.email,
             phone: phoneNormalized || null,
             plan: normalizedPlanCode,
+            teamSize: teamSize || null,
+            referralSource: referralSource || null,
           }),
         },
       })

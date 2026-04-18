@@ -7,7 +7,7 @@ import {
   setStoredCurrencyPreference,
 } from "@/lib/currencyPreference";
 import { COUNTRIES, sortCountries } from "@/lib/countries";
-import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
+import { BUSINESS_TYPES } from "@/lib/businessModules";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 
 /* â”€â”€â”€ Country dial codes â”€â”€â”€ */
@@ -373,9 +373,23 @@ export default function SignupByPlanPage() {
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [businessType, setBusinessType] = useState<BusinessType | "">(
-    (searchParams.get("businessType") as BusinessType | null) || ""
+  const [businessType, setBusinessType] = useState<string>(
+    searchParams.get("businessType") || ""
   );
+  const [teamSize, setTeamSize] = useState("");
+  const [referralSource, setReferralSource] = useState("");
+  const [liveTypes, setLiveTypes] = useState<{ id: string; label: string; category: string; description: string }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/public/business-types")
+      .then(r => r.json())
+      .then(d => {
+        const live = (d.types || []).filter((t: { isLive: boolean }) => t.isLive);
+        if (live.length > 0) setLiveTypes(live);
+        else setLiveTypes(BUSINESS_TYPES.map(b => ({ id: b.id, label: b.label, category: b.category, description: b.description })));
+      })
+      .catch(() => setLiveTypes(BUSINESS_TYPES.map(b => ({ id: b.id, label: b.label, category: b.category, description: b.description }))));
+  }, []);
 
   useEffect(() => {
     if (currency) {
@@ -449,6 +463,8 @@ export default function SignupByPlanPage() {
           customModules: isCustomPlan ? customModules : undefined,
           customPrice: isCustomPlan ? parseFloat(customPrice) : undefined,
           referralCode: referralCode.trim().toUpperCase() || undefined,
+          teamSize: teamSize || undefined,
+          referralSource: referralSource || undefined,
         }),
       });
       const data = await res.json();
@@ -870,7 +886,7 @@ export default function SignupByPlanPage() {
                     onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,.09)")}
                   >
                     <option value="">Select your business type</option>
-                    {BUSINESS_TYPES.map((bt) => (
+                    {liveTypes.map((bt) => (
                       <option key={bt.id} value={bt.id}>
                         {bt.label} - {bt.category}
                       </option>
@@ -883,7 +899,7 @@ export default function SignupByPlanPage() {
                       color:"rgba(255,255,255,.42)",
                       lineHeight:1.5,
                     }}>
-                      {BUSINESS_TYPES.find((bt) => bt.id === businessType)?.description}
+                      {liveTypes.find((bt) => bt.id === businessType)?.description}
                     </div>
                   )}
                 </div>
@@ -937,6 +953,54 @@ export default function SignupByPlanPage() {
                   )}
                 </div>
                 )}
+
+                {/* Team Size */}
+                <div className="name-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                  <div>
+                    <label style={{ display:"block", fontSize:10, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", color:"rgba(255,255,255,.3)", marginBottom:6 }}>
+                      Team Size <span style={{ fontWeight:400, textTransform:"none", color:"rgba(255,255,255,.2)" }}>(optional)</span>
+                    </label>
+                    <select
+                      value={teamSize}
+                      onChange={e => setTeamSize(e.target.value)}
+                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(255,255,255,.09)", background:"rgba(255,255,255,.04)", padding:"13px 12px", fontSize:13, color: teamSize ? "white" : "rgba(255,255,255,.35)", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
+                      onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.6)")}
+                      onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,.09)")}
+                    >
+                      <option value="">Select team size</option>
+                      <option value="1">1 — Just me</option>
+                      <option value="2-5">2 – 5 people</option>
+                      <option value="6-15">6 – 15 people</option>
+                      <option value="16-50">16 – 50 people</option>
+                      <option value="51-200">51 – 200 people</option>
+                      <option value="200+">200+ people</option>
+                    </select>
+                  </div>
+
+                  {/* Referral Source */}
+                  <div>
+                    <label style={{ display:"block", fontSize:10, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", color:"rgba(255,255,255,.3)", marginBottom:6 }}>
+                      How did you hear about us? <span style={{ fontWeight:400, textTransform:"none", color:"rgba(255,255,255,.2)" }}>(optional)</span>
+                    </label>
+                    <select
+                      value={referralSource}
+                      onChange={e => setReferralSource(e.target.value)}
+                      style={{ width:"100%", borderRadius:12, border:"1.5px solid rgba(255,255,255,.09)", background:"rgba(255,255,255,.04)", padding:"13px 12px", fontSize:13, color: referralSource ? "white" : "rgba(255,255,255,.35)", outline:"none", fontFamily:"inherit", cursor:"pointer", transition:"border-color .2s" }}
+                      onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.6)")}
+                      onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,.09)")}
+                    >
+                      <option value="">Select an option</option>
+                      <option value="google">Google / Search</option>
+                      <option value="social_media">Social Media</option>
+                      <option value="friend">Friend / Colleague</option>
+                      <option value="youtube">YouTube</option>
+                      <option value="newsletter">Newsletter / Email</option>
+                      <option value="blog">Blog / Article</option>
+                      <option value="existing_customer">Existing Customer</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
 
                 {/* Password */}
                 <div>
