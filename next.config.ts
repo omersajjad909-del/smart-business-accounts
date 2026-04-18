@@ -7,7 +7,7 @@ const CSP = [
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
   "connect-src 'self' https://ipapi.co https://www.googletagmanager.com",
-  "frame-src 'none'",
+  "frame-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -16,7 +16,7 @@ const CSP = [
 
 const SECURITY_HEADERS = [
   // Prevent clickjacking
-  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
   // Prevent MIME sniffing
   { key: "X-Content-Type-Options", value: "nosniff" },
   // XSS protection (legacy browsers)
