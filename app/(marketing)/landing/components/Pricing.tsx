@@ -509,7 +509,7 @@ export default function PricingSection() {
                 </div>
                 <div style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>/module/mo</div>
               </div>
-              <Link href="/onboarding/choose-plan?plan=custom" style={{
+              <Link href="/pricing#custom" style={{
                 display:"flex", alignItems:"center", gap:8,
                 padding:"13px 28px", borderRadius:12,
                 background:"linear-gradient(135deg,#f97316,#ea580c)",

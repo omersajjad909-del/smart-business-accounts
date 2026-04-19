@@ -13,9 +13,6 @@ import {
   getStoredCurrencyPreference,
   setStoredCurrencyPreference,
 } from "@/lib/currencyPreference";
-import {
-  CUSTOM_PLAN_BASE_MONTHLY_USD,
-} from "@/lib/customPlanPricing";
 
 type BillingCycle = "monthly" | "yearly";
 type PlanPricing = {
@@ -62,6 +59,13 @@ const PLANS = [
     gradient: "linear-gradient(135deg,#059669,#34d399)",
     tagline: "Full power for large organizations",
   },
+];
+
+const MODULE_CATEGORIES = [
+  { id: "core",         label: "Core",         icon: "⚡", color: "#818cf8" },
+  { id: "finance",      label: "Finance",      icon: "💰", color: "#34d399" },
+  { id: "operations",   label: "Operations",   icon: "⚙️", color: "#38bdf8" },
+  { id: "integrations", label: "Integrations", icon: "🔗", color: "#f97316" },
 ];
 
 const DEFAULT_PUBLIC_PRICING: PlanPricing = {
@@ -295,6 +299,8 @@ export default function PricingPage() {
   const [country, setCountry] = useState<string>("US");
   const [rates, setRates] = useState<Record<string, number> | null>(null);
   const [selectedModules, setSelectedModules] = useState<string[]>(["accounting", "inventory"]);
+  const [extraUsers, setExtraUsers] = useState(0);
+  const [extraBranches, setExtraBranches] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [openCats, setOpenCats] = useState<Set<string>>(new Set(["platform", "accounting", "ai"]));
   const [featureMap, setFeatureMap] = useState<Record<string, { starter: boolean; pro: boolean; enterprise: boolean }>>({});
@@ -406,18 +412,22 @@ export default function PricingPage() {
     return () => window.removeEventListener(FINOVA_CURRENCY_EVENT, handler as EventListener);
   }, []);
 
-  const customMonthly = useMemo(() => {
-    const base = Number(customPlanData.basePrice) || 0;
-    const moduleTotal = customPlanData.modules
-      .filter((m: any) => selectedModules.includes(m.id))
-      .reduce((s: number, m: any) => s + Number(m.price), 0);
-    return base + moduleTotal || CUSTOM_PLAN_BASE_MONTHLY_USD;
-  }, [selectedModules, customPlanData]);
   const yearlyDiscount = customPlanData.yearlyDiscount ?? 20;
+  const seatRate = billing === "yearly" ? seatPricing.yearly : seatPricing.monthly;
+  const customModuleTotal = useMemo(() =>
+    customPlanData.modules
+      .filter((m: any) => selectedModules.includes(m.id))
+      .reduce((s: number, m: any) => s + Number(m.price), 0),
+    [selectedModules, customPlanData]
+  );
+  const customMonthly = useMemo(() =>
+    customModuleTotal + extraUsers * seatRate + extraBranches * seatRate,
+    [customModuleTotal, extraUsers, extraBranches, seatRate]
+  );
   const customDisplayUsd = billing === "yearly" ? Math.round(customMonthly * (1 - yearlyDiscount / 100)) : customMonthly;
   const formatPrice = (usd: number) => formatFromUSD(usd, currency, rates);
   const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
-  const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&cycle=${billing}&currency=${currency}&country=${country}`;
+  const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
   const toggleCat = (id: string) => setOpenCats(p => { const n = new Set(p); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const usersLabel = (v: number | null | undefined) => (v === null || v === undefined ? "Unlimited" : `Up to ${v}`);
@@ -700,52 +710,162 @@ export default function PricingPage() {
         </div>
 
         {/* ── CUSTOM PLAN ──────────────────────────────────────── */}
-        <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 24, padding: "34px 28px", marginBottom: 72 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 24, flexWrap: "wrap", marginBottom: 28 }}>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 800, color: "#f97316", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 10 }}>Custom Plan</div>
-              <h2 style={{ fontSize: "clamp(28px,4vw,40px)", fontWeight: 900, letterSpacing: "-.03em", marginBottom: 10 }}>Build your own package</h2>
-              <p style={{ color: "rgba(255,255,255,.45)", maxWidth: 520, lineHeight: 1.6 }}>Pick only the modules you need. Perfect for niche use cases — pay for exactly what you use.</p>
+        <div id="custom" style={{ marginBottom: 80 }}>
+          {/* Header */}
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(249,115,22,.1)", border: "1px solid rgba(249,115,22,.25)", borderRadius: 100, padding: "5px 14px", fontSize: 12, color: "#f97316", fontWeight: 700, marginBottom: 16 }}>
+              🧩 Custom Plan
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 220 }}>
-              <div style={{ padding: "22px 24px", borderRadius: 18, background: "rgba(249,115,22,.08)", border: "1px solid rgba(249,115,22,.24)", textAlign: "center" }}>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Your Estimate</div>
-                <div style={{ fontSize: 44, fontWeight: 900, color: "#f97316", lineHeight: 1 }}>{formatPrice(customDisplayUsd)}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 6 }}>{selectedModules.length} module{selectedModules.length === 1 ? "" : "s"} selected</div>
-                <Link href={buildCustomHref()} style={{ display: "block", marginTop: 18, padding: "11px 18px", borderRadius: 12, textDecoration: "none", color: "white", fontWeight: 800, background: "linear-gradient(135deg,#f97316,#ea580c)" }}>Continue</Link>
-              </div>
-              {/* Add-ons info */}
-              <div style={{ padding: "16px 18px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)" }}>
-                <div style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>Add-ons (optional)</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>👥 Extra users</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc" }}>+{formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/user/mo</span>
+            <h2 style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: 900, letterSpacing: "-.03em", marginBottom: 10 }}>Pay only for modules you need</h2>
+            <p style={{ color: "rgba(255,255,255,.42)", fontSize: 15, maxWidth: 540, margin: "0 auto" }}>
+              Pick the exact features your business needs. No bloat, no unused modules — just what you actually use.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
+            {/* Left — Module picker + add-ons */}
+            <div style={{ flex: "1 1 560px", minWidth: 0 }}>
+              {MODULE_CATEGORIES.map(cat => {
+                const catMods = customPlanData.modules.filter((m: any) => m.category === cat.id);
+                if (!catMods.length) return null;
+                return (
+                  <div key={cat.id} style={{ marginBottom: 22 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 7 }}>
+                      <span style={{ color: cat.color }}>{cat.icon}</span>{cat.label}
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
+                      {catMods.map((module: any) => {
+                        const sel = selectedModules.includes(module.id);
+                        return (
+                          <button key={module.id} onClick={() => toggleModule(module.id)} style={{
+                            textAlign: "left", padding: "16px 18px", borderRadius: 14,
+                            border: `1.5px solid ${sel ? "rgba(249,115,22,.5)" : "rgba(255,255,255,.07)"}`,
+                            background: sel ? "rgba(249,115,22,.07)" : "rgba(255,255,255,.025)",
+                            color: "white", cursor: "pointer", fontFamily: ff, transition: "all .2s",
+                          }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 7 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                                <span style={{ fontSize: 20, lineHeight: 1 }}>{module.icon}</span>
+                                <span style={{ fontSize: 13, fontWeight: 800, color: sel ? "#fb923c" : "white" }}>{module.name}</span>
+                              </div>
+                              <div style={{ flexShrink: 0, width: 20, height: 20, borderRadius: "50%", background: sel ? "#f97316" : "transparent", border: sel ? "none" : "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                {sel && <svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                              </div>
+                            </div>
+                            <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", lineHeight: 1.5, marginBottom: 9 }}>{module.desc}</div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: sel ? "#f97316" : "rgba(255,255,255,.45)" }}>
+                              +{formatPrice(module.price)}<span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,.3)" }}>/mo</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>🏢 Extra branches</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#38bdf8" }}>+{formatPrice(billing === "yearly" ? seatPricing.yearly : seatPricing.monthly)}/branch/mo</span>
-                  </div>
+                );
+              })}
+
+              {/* Add-ons */}
+              <div style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", marginTop: 4 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 14 }}>Add-ons — Optional</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  {[
+                    { key: "users",    label: "Extra Users",    icon: "👥", color: "#a5b4fc", val: extraUsers,    set: setExtraUsers },
+                    { key: "branches", label: "Extra Branches", icon: "🏢", color: "#38bdf8", val: extraBranches, set: setExtraBranches },
+                  ].map(addon => (
+                    <div key={addon.key}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.65)", marginBottom: 4 }}>{addon.icon} {addon.label}</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 10 }}>+{formatPrice(seatRate)}/each/mo</div>
+                      <div style={{ display: "flex", alignItems: "center", background: "rgba(255,255,255,.05)", borderRadius: 10, border: "1px solid rgba(255,255,255,.09)", overflow: "hidden" }}>
+                        <button onClick={() => addon.set((v: number) => Math.max(0, v - 1))} style={{ padding: "9px 16px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>−</button>
+                        <input type="number" min="0" value={addon.val} onChange={e => addon.set(Math.max(0, parseInt(e.target.value) || 0))} style={{ flex: 1, background: "none", border: "none", color: addon.color, fontSize: 16, fontWeight: 800, textAlign: "center", outline: "none", fontFamily: ff, width: 0 }} />
+                        <button onClick={() => addon.set((v: number) => v + 1)} style={{ padding: "9px 16px", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 18, cursor: "pointer", fontFamily: ff, lineHeight: 1 }}>+</button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
-          <div className="cg" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
-            {customPlanData.modules.map((module: any) => {
-              const selected = selectedModules.includes(module.id);
-              return (
-                <button key={module.id} onClick={() => toggleModule(module.id)} style={{ textAlign: "left", padding: "18px 18px", borderRadius: 16, border: `1.5px solid ${selected ? "rgba(249,115,22,.45)" : "rgba(255,255,255,.08)"}`, background: selected ? "rgba(249,115,22,.08)" : "rgba(255,255,255,.03)", color: "white", cursor: "pointer", fontFamily: ff }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800 }}>{module.name}</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: selected ? "#f97316" : "rgba(255,255,255,.58)" }}>+{formatPrice(module.price)}</div>
+
+            {/* Right — Price summary */}
+            <div style={{ width: 276, flexShrink: 0, position: "sticky", top: 24 }}>
+              <div style={{ borderRadius: 20, background: "rgba(249,115,22,.07)", border: "1.5px solid rgba(249,115,22,.28)", padding: "24px 22px" }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#f97316", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 16 }}>Your Estimate</div>
+
+                {/* Modules breakdown */}
+                {selectedModules.length === 0 ? (
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.28)", marginBottom: 14, fontStyle: "italic" }}>No modules selected yet</div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+                    {customPlanData.modules.filter((m: any) => selectedModules.includes(m.id)).map((m: any) => (
+                      <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.55)" }}>{m.icon} {m.name}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.78)" }}>{formatPrice(m.price)}</span>
+                      </div>
+                    ))}
                   </div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)", lineHeight: 1.5 }}>{module.desc}</div>
-                </button>
-              );
-            })}
-          </div>
-          <div style={{ marginTop: 20, fontSize: 13, color: "rgba(255,255,255,.36)", textAlign: "center" }}>
-            Base infrastructure starts from {formatPrice(Number(customPlanData.basePrice) || CUSTOM_PLAN_BASE_MONTHLY_USD)}/mo · shown estimate includes base + selected modules.
+                )}
+
+                {/* Add-ons breakdown */}
+                {(extraUsers > 0 || extraBranches > 0) && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.07)" }}>
+                    {extraUsers > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>👥 {extraUsers} user{extraUsers > 1 ? "s" : ""} × {formatPrice(seatRate)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc" }}>{formatPrice(extraUsers * seatRate)}</span>
+                      </div>
+                    )}
+                    {extraBranches > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>🏢 {extraBranches} branch{extraBranches > 1 ? "es" : ""} × {formatPrice(seatRate)}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "#38bdf8" }}>{formatPrice(extraBranches * seatRate)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Total */}
+                <div style={{ borderTop: "1px solid rgba(249,115,22,.25)", paddingTop: 14, marginBottom: 16 }}>
+                  {billing === "yearly" && customMonthly > 0 && (
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
+                      <span>Subtotal</span><span>{formatPrice(customMonthly)}/mo</span>
+                    </div>
+                  )}
+                  {billing === "yearly" && (
+                    <div style={{ fontSize: 11, color: "#34d399", marginBottom: 6, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
+                      <span>Yearly −{yearlyDiscount}%</span>
+                      <span>−{formatPrice(Math.round(customMonthly * yearlyDiscount / 100))}</span>
+                    </div>
+                  )}
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>
+                    {billing === "yearly" ? "Per month, billed annually" : "Per month"}
+                  </div>
+                  <div style={{ fontSize: 46, fontWeight: 900, color: customMonthly > 0 ? "#f97316" : "rgba(255,255,255,.2)", lineHeight: 1, letterSpacing: "-1.5px" }}>
+                    {customMonthly > 0 ? formatPrice(customDisplayUsd) : "—"}
+                  </div>
+                  {billing === "yearly" && customMonthly > 0 && (
+                    <div style={{ fontSize: 11, color: "#34d399", marginTop: 6, fontWeight: 700 }}>
+                      Save {formatPrice(Math.round(customMonthly * yearlyDiscount / 100 * 12))} per year
+                    </div>
+                  )}
+                </div>
+
+                <Link
+                  href={selectedModules.length ? buildCustomHref() : "#custom"}
+                  style={{
+                    display: "block", textAlign: "center", padding: "13px 18px", borderRadius: 12,
+                    background: selectedModules.length ? "linear-gradient(135deg,#f97316,#ea580c)" : "rgba(255,255,255,.06)",
+                    color: "white", fontWeight: 800, fontSize: 14, textDecoration: "none",
+                    opacity: selectedModules.length ? 1 : 0.5,
+                    border: selectedModules.length ? "none" : "1px solid rgba(255,255,255,.1)",
+                  }}
+                >
+                  {selectedModules.length ? "Continue →" : "Select modules above"}
+                </Link>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.22)", textAlign: "center", marginTop: 10 }}>
+                  You'll confirm everything before payment
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

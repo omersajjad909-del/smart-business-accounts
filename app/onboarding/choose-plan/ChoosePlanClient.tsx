@@ -124,9 +124,7 @@ export default function ChoosePlanPage() {
     (searchParams.get("cycle") || "").toLowerCase() === "yearly" ? "yearly" : "monthly"
   );
   const [visible,         setVisible]         = useState(false);
-  const [showCustom,      setShowCustom]      = useState(
-    (searchParams.get("plan") || "").toLowerCase() === "custom" && !searchParams.get("modules")
-  );
+  const [showCustom,      setShowCustom]      = useState(false);
   const [selectedModules, setSelectedModules] = useState<string[]>(["accounting"]);
   const [livePricing,     setLivePricing]     = useState<Record<string, {monthly:number; yearly:number}>>({});
   const [liveFeatures,    setLiveFeatures]    = useState<string[]>([]);
@@ -138,6 +136,15 @@ export default function ChoosePlanPage() {
   // ── Addon mode: ?addon=automation ────────────────────────────────────────
   const addonMode = searchParams.get("addon") === "automation";
   const [loggedInUser, setLoggedInUser] = useState<{ name?: string; email?: string; id?: string } | null>(null);
+
+  // Redirect bare custom plan requests to the pricing page
+  useEffect(() => {
+    const plan = (searchParams.get("plan") || "").toLowerCase();
+    const modules = searchParams.get("modules");
+    if (plan === "custom" && !modules) {
+      router.replace("/pricing#custom");
+    }
+  }, []);
 
   useEffect(() => {
     if (!addonMode) return;
