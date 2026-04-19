@@ -4,6 +4,7 @@ import Hero from "./components/Hero";
 import SolutionSection from "./components/SolutionSection";
 import FeaturesSection from "./components/FeaturesSection";
 import ModulesSection from "./components/ModulesSection";
+import IndustrySelector from "./components/IndustrySelector";
 import PricingSection from "./components/Pricing";
 import TestimonialsSection from "./components/Testimonials";
 import FAQSection from "./components/FAQSection";
@@ -45,6 +46,7 @@ export default async function LandingPage() {
       <SolutionSection />
       <FeaturesSection />
       <ModulesSection />
+      <IndustrySelector />
       <TestimonialsSection />
       <PricingSection />
       <FAQSection />

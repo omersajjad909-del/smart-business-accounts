@@ -87,6 +87,24 @@ export default function BusinessModulesPage() {
     }
   }
 
+  async function launchPhase(phase: number) {
+    const phaseLabel = PHASE_LABELS[phase as keyof typeof PHASE_LABELS]?.label ?? `Phase ${phase}`;
+    const count = modules.filter(m => m.phase === phase && !m.enabled).length;
+    if (count === 0) { setMsg(`✅ All ${phaseLabel} industries already live`); return; }
+    if (!await confirmToast(`Launch ${phaseLabel}? This will enable ${count} industries and notify their waitlists.`)) return;
+    setSaving(`phase_${phase}`);
+    try {
+      const r = await fetch("/api/admin/business-modules", {
+        method: "POST", credentials: "include",
+        headers: headers(),
+        body: JSON.stringify({ action: "RELEASE_PHASE", phase }),
+      });
+      const d = await r.json();
+      await load();
+      setMsg(`🚀 ${phaseLabel} launched! ${d.newlyEnabled} enabled, ${d.notified} waitlist emails sent.`);
+    } finally { setSaving(null); }
+  }
+
   async function resetAll() {
     if (!await confirmToast("Reset all business module overrides to default phase settings?")) return;
     await fetch("/api/admin/business-modules", {
@@ -184,13 +202,30 @@ export default function BusinessModulesPage() {
             return (
               <div key={phase}>
                 {/* Phase header */}
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
                   <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: ph.bg, color: ph.color, border: `1px solid ${ph.color}30` }}>
                     {ph.label}
                   </span>
                   <span style={{ fontSize: 12, color: "rgba(255,255,255,.25)" }}>
                     {rows.filter(r=>r.enabled).length}/{rows.length} enabled
                   </span>
+                  {rows.some(r => !r.enabled) && (
+                    <button
+                      onClick={() => launchPhase(phase)}
+                      disabled={saving === `phase_${phase}`}
+                      style={{
+                        marginLeft: "auto", padding: "5px 14px", borderRadius: 8, fontSize: 11, fontWeight: 700,
+                        cursor: "pointer", border: `1px solid ${ph.color}50`,
+                        background: `${ph.color}18`, color: ph.color,
+                        opacity: saving === `phase_${phase}` ? 0.5 : 1,
+                        transition: "all .2s",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = `${ph.color}30`; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = `${ph.color}18`; }}
+                    >
+                      {saving === `phase_${phase}` ? "Launching…" : `🚀 Launch Phase ${phase}`}
+                    </button>
+                  )}
                 </div>
 
                 {/* Table */}
