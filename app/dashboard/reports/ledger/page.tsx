@@ -7,7 +7,7 @@ import { fmtDate } from "@/lib/dateUtils";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
 
-type Account  = { id: string; name: string };
+type Account  = { id: string; name: string; code?: string };
 type LedgerRow = {
   date: string; voucherNo: string; narration: string;
   debit?: number; credit?: number; balance: number;
@@ -68,7 +68,9 @@ export default function LedgerReportPage() {
   const finalBal    = rows.length ? rows[rows.length - 1].balance : 0;
   const openingBal  = rows.length ? rows[0].balance : null;
   const cur         = companyInfo?.baseCurrency || "";
-  const acctName    = accounts.find(a => a.id === accountId)?.name || "";
+  const acctObj     = accounts.find(a => a.id === accountId);
+  const acctName    = acctObj?.name || "";
+  const acctCode    = acctObj?.code || "";
 
   const filteredAccounts = accounts
     .filter(a => a.name.toLowerCase().includes(search.toLowerCase()))
@@ -156,7 +158,7 @@ export default function LedgerReportPage() {
                   type="text"
                   placeholder="Type to search account..."
                   style={{ ...inputStyle, paddingRight: accountId ? 36 : 14 }}
-                  value={accountId ? acctName : search}
+                  value={accountId ? `${acctCode ? acctCode + " – " : ""}${acctName}` : search}
                   onChange={e => { setSearch(e.target.value); setAccountId(""); setDropOpen(true); }}
                   onFocus={() => setDropOpen(true)}
                   onBlur={() => setTimeout(() => setDropOpen(false), 150)}
@@ -200,12 +202,15 @@ export default function LedgerReportPage() {
                     }}
                       onMouseEnter={e => e.currentTarget.style.background = "rgba(99,102,241,.15)"}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                    >{a.name}</div>
+                    >
+                      {a.code && <span style={{ fontFamily:"monospace", fontSize:11, color:"#818cf8", marginRight:8 }}>{a.code}</span>}
+                      {a.name}
+                    </div>
                   ))}
                 </div>
               )}
               {accountId && (
-                <div style={{ marginTop: 5, fontSize: 11, color: "#818cf8" }}>✓ {acctName}</div>
+                <div style={{ marginTop: 5, fontSize: 11, color: "#818cf8" }}>✓ {acctCode && <span style={{ fontFamily:"monospace", marginRight:5 }}>{acctCode}</span>}{acctName}</div>
               )}
             </div>
 

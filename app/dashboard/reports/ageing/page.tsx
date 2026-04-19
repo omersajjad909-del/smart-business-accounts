@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 
-interface Party { id: string; name: string; partyType: string; }
+interface Party { id: string; name: string; partyType: string; code?: string; }
 interface AgeingRow { numType:string; date:string; narration:string; billAmount:number; billBalance:number; days:number; totalBalance:number; }
 
 const fmt = (n: number) => Math.abs(n).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
@@ -134,7 +134,7 @@ export default function AgeingReportPage() {
                     if (partyId) { loadData(); return; }
                     if (filtered.length > 0) {
                       const first = filtered[0];
-                      setPartyId(first.id); setPartyName(first.name); setQuery(first.name); setDropOpen(false);
+                      setPartyId(first.id); setPartyName(first.name); setQuery(`${first.code ? first.code + " – " : ""}${first.name}`); setDropOpen(false);
                       loadData(first.id);
                     }
                   }
@@ -144,10 +144,11 @@ export default function AgeingReportPage() {
               {dropOpen && filtered.length > 0 && (
                 <div style={{ position:"absolute", top:"100%", left:0, right:0, zIndex:100, background:"rgba(13,16,35,.98)", border:"1px solid rgba(255,255,255,.12)", borderRadius:10, maxHeight:200, overflowY:"auto", marginTop:4, boxShadow:"0 12px 40px rgba(0,0,0,.5)" }}>
                   {filtered.map(p => (
-                    <div key={p.id} onMouseDown={() => { setPartyId(p.id); setPartyName(p.name); setQuery(p.name); setDropOpen(false); }}
+                    <div key={p.id} onMouseDown={() => { setPartyId(p.id); setPartyName(p.name); setQuery(`${p.code ? p.code + " – " : ""}${p.name}`); setDropOpen(false); }}
                       style={{ padding:"10px 14px", cursor:"pointer", fontSize:13, color:"rgba(255,255,255,.8)", borderBottom:"1px solid rgba(255,255,255,.05)" }}
                       onMouseEnter={e => (e.currentTarget.style.background="rgba(99,102,241,.15)")}
                       onMouseLeave={e => (e.currentTarget.style.background="transparent")}>
+                      {p.code && <span style={{ fontFamily:"monospace", fontSize:11, color:"#818cf8", marginRight:8 }}>{p.code}</span>}
                       {p.name}
                     </div>
                   ))}
