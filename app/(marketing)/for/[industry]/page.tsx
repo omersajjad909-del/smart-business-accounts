@@ -85,6 +85,172 @@ const CATEGORY_FEATURES: Record<string, { icon: string; title: string; desc: str
 const PHASE_COLORS: Record<number, string> = { 1:"#34d399", 2:"#818cf8", 3:"#fbbf24", 4:"#f87171" };
 const PHASE_LABELS: Record<number, string> = { 1:"Live Now", 2:"Phase 2 — Coming Soon", 3:"Phase 3 — Planned", 4:"Phase 4 — Roadmap" };
 
+// Category-based plan feature rows
+const PLAN_ROWS: Record<string, { feature: string; starter: string | boolean; pro: string | boolean; enterprise: string | boolean }[]> = {
+  Healthcare: [
+    { feature: "Patient billing",          starter: true,         pro: true,             enterprise: true },
+    { feature: "Pharmacy inventory",       starter: "Basic",      pro: true,             enterprise: true },
+    { feature: "Doctor & OPD management",  starter: false,        pro: true,             enterprise: true },
+    { feature: "Insurance claims",         starter: false,        pro: true,             enterprise: true },
+    { feature: "Multi-branch / chain",     starter: false,        pro: "Up to 3",        enterprise: "Unlimited" },
+    { feature: "Revenue analytics",        starter: "Basic",      pro: "Advanced",       enterprise: "Full suite" },
+    { feature: "Staff payroll",            starter: false,        pro: true,             enterprise: true },
+    { feature: "Lab & diagnostic records", starter: false,        pro: false,            enterprise: true },
+  ],
+  Education: [
+    { feature: "Fee collection",           starter: true,         pro: true,             enterprise: true },
+    { feature: "Student ledger",           starter: true,         pro: true,             enterprise: true },
+    { feature: "Staff payroll",            starter: "Basic",      pro: true,             enterprise: true },
+    { feature: "Academic year management", starter: true,         pro: true,             enterprise: true },
+    { feature: "Multi-campus",             starter: false,        pro: "Up to 3",        enterprise: "Unlimited" },
+    { feature: "Financial reports",        starter: "Basic",      pro: "Advanced",       enterprise: "Full suite" },
+    { feature: "Parent communication",     starter: false,        pro: true,             enterprise: true },
+    { feature: "Custom fee structures",    starter: false,        pro: false,            enterprise: true },
+  ],
+  Commerce: [
+    { feature: "Sales & purchase invoicing", starter: true,       pro: true,             enterprise: true },
+    { feature: "Inventory management",       starter: "Basic",    pro: true,             enterprise: true },
+    { feature: "Party ledger & ageing",      starter: true,       pro: true,             enterprise: true },
+    { feature: "Multi-branch operations",    starter: false,      pro: "Up to 3",        enterprise: "Unlimited" },
+    { feature: "Bank reconciliation",        starter: false,      pro: true,             enterprise: true },
+    { feature: "Trade reports",              starter: "Basic",    pro: "Advanced",       enterprise: "Full suite" },
+    { feature: "CRM",                        starter: false,      pro: true,             enterprise: true },
+    { feature: "API access",                 starter: false,      pro: false,            enterprise: true },
+  ],
+  Services: [
+    { feature: "Project & retainer billing", starter: true,       pro: true,             enterprise: true },
+    { feature: "Expense tracking",           starter: true,       pro: true,             enterprise: true },
+    { feature: "CRM & client management",    starter: "Basic",    pro: true,             enterprise: true },
+    { feature: "HR & payroll",               starter: false,      pro: true,             enterprise: true },
+    { feature: "Recurring invoices",         starter: false,      pro: true,             enterprise: true },
+    { feature: "Multi-branch",               starter: false,      pro: "Up to 3",        enterprise: "Unlimited" },
+    { feature: "Profitability reports",      starter: "Basic",    pro: "Advanced",       enterprise: "Full suite" },
+    { feature: "API access",                 starter: false,      pro: false,            enterprise: true },
+  ],
+  Hospitality: [
+    { feature: "Table & order billing",      starter: true,       pro: true,             enterprise: true },
+    { feature: "F&B inventory",              starter: "Basic",    pro: true,             enterprise: true },
+    { feature: "Staff management & payroll", starter: false,      pro: true,             enterprise: true },
+    { feature: "Recipe / food costing",      starter: false,      pro: true,             enterprise: true },
+    { feature: "Multi-outlet",               starter: false,      pro: "Up to 3",        enterprise: "Unlimited" },
+    { feature: "Daily sales reports",        starter: "Basic",    pro: "Advanced",       enterprise: "Full suite" },
+    { feature: "Supplier payments",          starter: true,       pro: true,             enterprise: true },
+    { feature: "White-label branding",       starter: false,      pro: false,            enterprise: true },
+  ],
+  default: [
+    { feature: "Invoicing & billing",        starter: true,       pro: true,             enterprise: true },
+    { feature: "Inventory management",       starter: "Basic",    pro: true,             enterprise: true },
+    { feature: "Ledger & trial balance",     starter: true,       pro: true,             enterprise: true },
+    { feature: "HR & payroll",               starter: false,      pro: true,             enterprise: true },
+    { feature: "Multi-branch",               starter: false,      pro: "Up to 3",        enterprise: "Unlimited" },
+    { feature: "Advanced reports",           starter: "Basic",    pro: "Advanced",       enterprise: "Full suite" },
+    { feature: "CRM",                        starter: false,      pro: true,             enterprise: true },
+    { feature: "API access",                 starter: false,      pro: false,            enterprise: true },
+  ],
+};
+
+function PlanComparison({ label, category }: { label: string; category: string }) {
+  const [prices, setPrices] = useState({ starter: 49, pro: 99, enterprise: 249 });
+  const [currency, setCurrency] = useState("USD");
+
+  useEffect(() => {
+    fetch("/api/public/pricing")
+      .then(r => r.json())
+      .then(d => {
+        if (d?.pricing) setPrices({
+          starter:    d.pricing.starter?.monthly    ?? 49,
+          pro:        d.pricing.pro?.monthly        ?? 99,
+          enterprise: d.pricing.enterprise?.monthly ?? 249,
+        });
+      }).catch(() => {});
+    fetch("/api/public/geo", { cache: "no-store" })
+      .then(r => r.json()).then(d => { if (d?.currency) setCurrency(d.currency); }).catch(() => {});
+  }, []);
+
+  const rows = PLAN_ROWS[category] ?? PLAN_ROWS.default;
+
+  const PLANS = [
+    { key: "starter",    name: "Starter",      price: prices.starter,    color: "#818cf8", gradient: "linear-gradient(135deg,#6366f1,#4f46e5)" },
+    { key: "pro",        name: "Professional", price: prices.pro,        color: "#a5b4fc", gradient: "linear-gradient(135deg,#818cf8,#6366f1)", featured: true },
+    { key: "enterprise", name: "Enterprise",   price: prices.enterprise, color: "#34d399", gradient: "linear-gradient(135deg,#059669,#34d399)" },
+  ];
+
+  function fmtPrice(usd: number) {
+    try {
+      const { formatFromUSD } = require("@/lib/currency");
+      return formatFromUSD(usd, currency);
+    } catch { return `$${usd}`; }
+  }
+
+  function Cell({ val }: { val: string | boolean }) {
+    if (val === true)  return <span style={{ color: "#34d399", fontSize: 18 }}>✓</span>;
+    if (val === false) return <span style={{ color: "rgba(255,255,255,.15)", fontSize: 16 }}>—</span>;
+    return <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.75)" }}>{val as string}</span>;
+  }
+
+  return (
+    <div style={{ maxWidth: 960, margin: "0 auto 80px", padding: "0 24px" }}>
+      <h2 style={{ textAlign: "center", fontSize: "clamp(22px,3vw,34px)", fontWeight: 900, letterSpacing: "-1px", marginBottom: 10 }}>
+        Which plan suits your {label}?
+      </h2>
+      <p style={{ textAlign: "center", color: "rgba(255,255,255,.4)", fontSize: 15, marginBottom: 40 }}>
+        All plans include core accounting. Higher plans unlock more {label.toLowerCase()} features.
+      </p>
+
+      <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.02)" }}>
+        {/* Plan headers */}
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.02)" }}>
+          <div style={{ padding: "20px 24px", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".06em" }}>
+            Feature
+          </div>
+          {PLANS.map(p => (
+            <div key={p.key} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: p.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
+              {p.featured && <div style={{ fontSize: 9, fontWeight: 800, color: "#fbbf24", letterSpacing: ".08em", marginBottom: 4 }}>POPULAR</div>}
+              <div style={{ fontSize: 13, fontWeight: 900, color: p.color, marginBottom: 4 }}>{p.name}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "white" }}>{fmtPrice(p.price)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.4)", fontWeight: 500 }}>/mo</span></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Feature rows */}
+        {rows.map((row, i) => (
+          <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "1px solid rgba(255,255,255,.04)", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,.01)" }}>
+            <div style={{ padding: "13px 24px", fontSize: 13, color: "rgba(255,255,255,.65)" }}>{row.feature}</div>
+            {(["starter","pro","enterprise"] as const).map(k => (
+              <div key={k} style={{ padding: "13px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.04)", background: k === "pro" ? "rgba(99,102,241,.03)" : "transparent" }}>
+                <Cell val={row[k]} />
+              </div>
+            ))}
+          </div>
+        ))}
+
+        {/* CTA row */}
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", background: "rgba(255,255,255,.02)", borderTop: "1px solid rgba(255,255,255,.08)" }}>
+          <div style={{ padding: "20px 24px", fontSize: 12, color: "rgba(255,255,255,.3)" }}>75% off for first 3 months</div>
+          {PLANS.map(p => (
+            <div key={p.key} style={{ padding: "16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: p.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
+              <Link href={`/onboarding/signup/${p.key === "pro" ? "professional" : p.key}`} style={{
+                display: "block", padding: "10px 0", borderRadius: 10,
+                background: p.featured ? p.gradient : "rgba(255,255,255,.07)",
+                border: p.featured ? "none" : `1px solid ${p.color}30`,
+                color: "white", fontWeight: 700, fontSize: 12, textDecoration: "none",
+              }}>
+                Get {p.name}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ textAlign: "center", marginTop: 16 }}>
+        <Link href="/pricing" style={{ fontSize: 13, color: "#818cf8", textDecoration: "none", fontWeight: 600 }}>
+          View full pricing details →
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export default function IndustryPage() {
   const { industry } = useParams<{ industry: string }>();
   const router = useRouter();
@@ -263,6 +429,11 @@ export default function IndustryPage() {
           ))}
         </div>
       </div>
+
+      {/* ── Plan Comparison ── */}
+      {type.isLive && (
+        <PlanComparison label={type.label} category={type.category} />
+      )}
 
       {/* ── CTA ── */}
       <div style={{ maxWidth:800, margin:"0 auto 80px", padding:"0 24px", textAlign:"center" }}>
