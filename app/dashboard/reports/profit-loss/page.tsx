@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 
 interface PLItem { name: string; amount: number; }
@@ -89,11 +90,11 @@ export default function ProfitLossPage() {
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:22 }}>
               <div>
                 <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>From</label>
-                <input ref={fromRef} type="date" style={inputStyle} value={from} onChange={e => setFrom(e.target.value)} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); toRef.current?.focus(); } }}/>
+                <DateInput ref={fromRef} value={from} onChange={setFrom} style={inputStyle} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); toRef.current?.focus(); } }}/>
               </div>
               <div>
                 <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>To</label>
-                <input ref={toRef} type="date" style={inputStyle} value={to} onChange={e => setTo(e.target.value)} onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); handleGenerate(); } }}/>
+                <DateInput ref={toRef} value={to} onChange={setTo} style={inputStyle} onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); handleGenerate(); } }}/>
               </div>
             </div>
             <button onClick={handleGenerate} style={{ width:"100%", padding:"13px 0", borderRadius:12, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#10b981,#059669)", color:"white", fontSize:15, fontWeight:700, fontFamily:"inherit", boxShadow:"0 6px 24px rgba(16,185,129,.35)" }}>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 
 interface Party { id: string; name: string; partyType: string; }
@@ -110,7 +111,7 @@ export default function AgeingReportPage() {
             {/* As on date */}
             <div style={{ marginBottom:16 }}>
               <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>As On Date</label>
-              <input ref={dateRef} type="date" style={inputStyle} value={asOnDate} onChange={e => setAsOnDate(e.target.value)} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); partyRef.current?.focus(); setDropOpen(true); } }}/>
+              <DateInput ref={dateRef} value={asOnDate} onChange={setAsOnDate} style={inputStyle} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); partyRef.current?.focus(); setDropOpen(true); } }}/>
             </div>
 
             {/* Party autocomplete */}

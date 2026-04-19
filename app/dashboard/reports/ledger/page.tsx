@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { fmtDate } from "@/lib/dateUtils";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
@@ -119,24 +120,22 @@ export default function LedgerReportPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
               <div>
                 <label style={labelStyle}>From Date</label>
-                <input
+                <DateInput
                   ref={fromRef}
-                  type="date"
-                  style={inputStyle}
                   value={fromDate}
-                  onChange={e => setFromDate(e.target.value)}
+                  onChange={setFromDate}
+                  style={inputStyle}
                   autoFocus
                   onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); toRef.current?.focus(); } }}
                 />
               </div>
               <div>
                 <label style={labelStyle}>To Date</label>
-                <input
+                <DateInput
                   ref={toRef}
-                  type="date"
-                  style={inputStyle}
                   value={toDate}
-                  onChange={e => setToDate(e.target.value)}
+                  onChange={setToDate}
+                  style={inputStyle}
                   onKeyDown={e => {
                     if (e.key === "Enter") {
                       e.preventDefault();

@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { getCurrentUser } from "@/lib/auth";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
@@ -79,7 +80,7 @@ export default function BalanceSheetPage() {
             </div>
             <div style={{ marginBottom:22 }}>
               <label style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", display:"block", marginBottom:7 }}>As of Date</label>
-              <input ref={dateRef} type="date" style={inputStyle} value={date} onChange={e => setDate(e.target.value)} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); handleGenerate(); } }}/>
+              <DateInput ref={dateRef} value={date} onChange={setDate} style={inputStyle} autoFocus onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); handleGenerate(); } }}/>
             </div>
             <button onClick={handleGenerate} style={{ width:"100%", padding:"13px 0", borderRadius:12, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#3b82f6,#2563eb)", color:"white", fontSize:15, fontWeight:700, fontFamily:"inherit", boxShadow:"0 6px 24px rgba(59,130,246,.35)" }}>
               Generate Report →
