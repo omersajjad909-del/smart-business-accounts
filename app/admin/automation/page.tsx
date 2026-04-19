@@ -21,7 +21,7 @@ const BG = "#070b14";
 const PANEL = "rgba(255,255,255,0.04)";
 const BORDER = "rgba(255,255,255,0.08)";
 
-type Tab = "whatsapp" | "drip" | "content" | "social" | "leads" | "webhooks" | "chatbot";
+type Tab = "whatsapp" | "drip" | "content" | "social" | "leads" | "webhooks" | "chatbot" | "analytics";
 
 function adminHdrs(json = false): Record<string, string> {
   const u = getCurrentUser();
@@ -108,13 +108,14 @@ export default function AdminAutomationPage() {
   if (!ready) return <div style={{ minHeight: "100vh", background: BG }} />;
 
   const tabs: { id: Tab; label: string; icon: string; color: string }[] = [
-    { id: "whatsapp", label: "WhatsApp Blasts",   icon: "💬", color: "#22c55e" },
-    { id: "drip",     label: "Email Drip",        icon: "📧", color: "#38bdf8" },
-    { id: "content",  label: "AI Content",        icon: "✍️", color: "#fbbf24" },
-    { id: "social",   label: "Social Media",      icon: "📱", color: "#f472b6" },
-    { id: "leads",    label: "Lead Management",   icon: "🎯", color: "#fb923c" },
-    { id: "webhooks", label: "Webhooks",          icon: "🔗", color: "#a78bfa" },
-    { id: "chatbot",  label: "Website Chatbot",   icon: "🤖", color: "#38bdf8" },
+    { id: "whatsapp",  label: "WhatsApp Blasts",   icon: "💬", color: "#22c55e" },
+    { id: "drip",      label: "Email Drip",        icon: "📧", color: "#38bdf8" },
+    { id: "content",   label: "AI Content",        icon: "✍️", color: "#fbbf24" },
+    { id: "social",    label: "Social Media",      icon: "📱", color: "#f472b6" },
+    { id: "leads",     label: "Lead Management",   icon: "🎯", color: "#fb923c" },
+    { id: "webhooks",  label: "Webhooks",          icon: "🔗", color: "#a78bfa" },
+    { id: "chatbot",   label: "Website Chatbot",   icon: "🤖", color: "#38bdf8" },
+    { id: "analytics", label: "Analytics",         icon: "📊", color: "#34d399" },
   ];
 
   return (
@@ -128,7 +129,7 @@ export default function AdminAutomationPage() {
           </h1>
         </div>
         <p style={{ margin: 0, color: "rgba(255,255,255,.4)", fontSize: 14 }}>
-          FinovaOS ki marketing — WhatsApp blasts, email campaigns, AI content, lead management
+          FinovaOS marketing — WhatsApp blasts, email campaigns, AI content, lead management
         </p>
       </div>
 
@@ -156,8 +157,9 @@ export default function AdminAutomationPage() {
       {tab === "content"  && <ContentTab />}
       {tab === "social"   && <SocialTab />}
       {tab === "leads"    && <LeadsTab />}
-      {tab === "webhooks" && <WebhooksTab />}
-      {tab === "chatbot"  && <ChatbotTab />}
+      {tab === "webhooks"  && <WebhooksTab />}
+      {tab === "chatbot"   && <ChatbotTab />}
+      {tab === "analytics" && <AnalyticsTab />}
     </div>
   );
 }
@@ -202,6 +204,20 @@ function WhatsAppBlastTab() {
   const [autoReply, setAutoReply] = useState({ enabled: false, systemPrompt: "" });
   const [cfgLoading, setCfgLoading] = useState(false);
 
+  function handleCSV(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const text = ev.target?.result as string;
+      const nums = text.split(/[\r\n,;]+/).map(s => s.trim().replace(/[^0-9+]/g, "")).filter(s => s.length >= 10);
+      setPhones(prev => [...new Set([...prev.split(/[\n,]/).map(p => p.trim()).filter(Boolean), ...nums])].join("\n"));
+      show(`${nums.length} numbers imported from CSV`, true);
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  }
+
   useEffect(() => {
     fetch("/api/whatsapp/send", { headers: adminHdrs() })
       .then(r => r.json()).then(d => { if (!d.error) setAutoReply(d); }).catch(() => {});
@@ -209,7 +225,7 @@ function WhatsAppBlastTab() {
 
   async function sendBlast() {
     const list = phones.split(/[\n,]/).map(p => p.trim()).filter(Boolean);
-    if (!list.length || !msg.trim()) return show("Phone numbers aur message dono zaroori hain", false);
+    if (!list.length || !msg.trim()) return show("Phone numbers and message are both required", false);
     setLoading(true);
     setResults([]);
 
@@ -245,11 +261,21 @@ function WhatsAppBlastTab() {
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>Bulk WhatsApp Blast</h3>
         <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>
-          Multiple numbers ko ek saath message bhejo. Pakistani format support: 03001234567
+          Send a message to multiple numbers at once. Pakistani format supported: 03001234567
         </p>
-        <Txta label="Phone Numbers (har line ya comma se alag karo)" value={phones} onChange={e => setPhones(e.target.value)} rows={5}
-          placeholder={"03001234567\n03211234567\n923001234567"} />
-        <Txta label="Message" value={msg} onChange={e => setMsg(e.target.value)} rows={4} placeholder="Assalamualaikum! FinovaOS..." />
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+            <label style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Phone Numbers (one per line or comma-separated)</label>
+            <label style={{ fontSize: 11, color: "#38bdf8", cursor: "pointer", padding: "3px 10px", borderRadius: 6, border: "1px solid rgba(56,189,248,.3)", background: "rgba(56,189,248,.06)" }}>
+              📂 Import CSV
+              <input type="file" accept=".csv,.txt" onChange={handleCSV} style={{ display: "none" }} />
+            </label>
+          </div>
+          <textarea value={phones} onChange={e => setPhones(e.target.value)} rows={5}
+            placeholder={"03001234567\n03211234567\n923001234567"}
+            style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+        </div>
+        <Txta label="Message" value={msg} onChange={e => setMsg(e.target.value)} rows={4} placeholder="Hello! FinovaOS..." />
         <Btn onClick={sendBlast} loading={loading}>Send Blast ({phones.split(/[\n,]/).filter(p => p.trim()).length} numbers)</Btn>
 
         {results.length > 0 && (
@@ -268,7 +294,7 @@ function WhatsAppBlastTab() {
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>Auto-Reply (AI)</h3>
         <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>
-          Jab koi WhatsApp pe message kare to AI automatically reply kare.
+          When someone messages on WhatsApp, AI automatically replies on your behalf.
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
           <span style={{ fontSize: 13, color: "rgba(255,255,255,.7)" }}>Auto-Reply</span>
@@ -280,9 +306,9 @@ function WhatsAppBlastTab() {
           </div>
         </div>
         <Txta label="AI System Prompt" value={autoReply.systemPrompt} onChange={e => setAutoReply(c => ({ ...c, systemPrompt: e.target.value }))} rows={5}
-          placeholder="Tum FinovaOS ka support assistant ho. Customers ke sawaalon ka jawab Urdu ya English mein do..." />
+          placeholder="You are FinovaOS support assistant. Answer customer questions in Urdu or English..." />
         <div style={{ marginBottom: 16, padding: "10px 12px", borderRadius: 8, background: "rgba(255,255,255,.03)", fontSize: 11, color: "rgba(255,255,255,.35)" }}>
-          Webhook URL (Meta mein add karo):<br />
+          Webhook URL (add in Meta Business Manager):<br />
           <span style={{ color: "#a78bfa" }}>{typeof window !== "undefined" ? window.location.origin : ""}/api/whatsapp/webhook</span>
         </div>
         <Btn onClick={saveAutoReply} loading={cfgLoading}>Save Config</Btn>
@@ -306,16 +332,16 @@ function DripTab() {
   useEffect(load, []);
 
   async function create() {
-    if (!form.name) return show("Campaign name zaroori hai", false);
+    if (!form.name) return show("Campaign name is required", false);
     setLoading(true);
     const r = await fetch("/api/automation/drip", { method: "POST", headers: adminHdrs(true), body: JSON.stringify(form) });
     setLoading(false);
-    if (r.ok) { show("Campaign bana diya", true); setForm({ name: "", steps: [{ delayDays: 0, subject: "", bodyHtml: "", useAI: false, aiPrompt: "" }] }); load(); }
+    if (r.ok) { show("Campaign created!", true); setForm({ name: "", steps: [{ delayDays: 0, subject: "", bodyHtml: "", useAI: false, aiPrompt: "" }] }); load(); }
     else show("Failed", false);
   }
 
   async function enrollContact() {
-    if (!enroll.campaignId || !enroll.email) return show("Campaign aur email dono chahiye", false);
+    if (!enroll.campaignId || !enroll.email) return show("Campaign and email are both required", false);
     setLoading(true);
     const r = await fetch("/api/automation/drip?action=enroll", { method: "POST", headers: adminHdrs(true), body: JSON.stringify(enroll) });
     setLoading(false);
@@ -329,7 +355,7 @@ function DripTab() {
       {toast && <Toast {...toast} />}
 
       <Card>
-        <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Campaign Banao</h3>
+        <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Create Campaign</h3>
         <Inp label="Campaign Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="FinovaOS Welcome Series" />
         {form.steps.map((step, i) => (
           <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 10, padding: 12, marginBottom: 10, border: `1px solid ${BORDER}` }}>
@@ -343,10 +369,10 @@ function DripTab() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
               <input type="checkbox" checked={step.useAI} onChange={e => setForm(f => ({ ...f, steps: f.steps.map((s, j) => j === i ? { ...s, useAI: e.target.checked } : s) }))} />
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>AI se body generate karo</span>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Generate body with AI</span>
             </div>
             {step.useAI
-              ? <Inp label="AI Prompt" value={step.aiPrompt} onChange={e => setForm(f => ({ ...f, steps: f.steps.map((s, j) => j === i ? { ...s, aiPrompt: e.target.value } : s) }))} placeholder="New user ke liye welcome email..." />
+              ? <Inp label="AI Prompt" value={step.aiPrompt} onChange={e => setForm(f => ({ ...f, steps: f.steps.map((s, j) => j === i ? { ...s, aiPrompt: e.target.value } : s) }))} placeholder="Welcome email for a new FinovaOS user..." />
               : <Txta label="Email Body" value={step.bodyHtml} onChange={e => setForm(f => ({ ...f, steps: f.steps.map((s, j) => j === i ? { ...s, bodyHtml: e.target.value } : s) }))} rows={3} />
             }
           </div>
@@ -359,7 +385,7 @@ function DripTab() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <Card>
-          <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Lead Enroll Karo</h3>
+          <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Enroll a Lead</h3>
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Campaign</label>
             <select value={enroll.campaignId} onChange={e => setEnroll(v => ({ ...v, campaignId: e.target.value }))}
@@ -375,7 +401,7 @@ function DripTab() {
 
         <Card>
           <h3 style={{ margin: "0 0 14px", fontSize: 16, fontWeight: 700 }}>Campaigns ({campaigns.length})</h3>
-          {campaigns.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>Koi campaign nahi abhi tak</p>}
+          {campaigns.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>No campaigns yet</p>}
           {campaigns.map(c => (
             <div key={c.id} style={{ padding: "10px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", marginBottom: 8, display: "flex", justifyContent: "space-between" }}>
               <div>
@@ -396,14 +422,14 @@ function DripTab() {
 // ─── 3. AI CONTENT ────────────────────────────────────────────────────────────
 function ContentTab() {
   const { toast, show } = useToast();
-  const [form, setForm] = useState({ type: "social_post", topic: "", tone: "professional", language: "en", keywords: "", wordCount: 150, context: "FinovaOS — Pakistan ka No.1 AI-powered business management software" });
+  const [form, setForm] = useState({ type: "social_post", topic: "", tone: "professional", language: "en", keywords: "", wordCount: 150, context: "FinovaOS — Pakistan's No.1 AI-powered business management software" });
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
   const types = ["social_post", "email", "ad_copy", "product_desc", "whatsapp", "blog_intro"];
 
   async function generate() {
-    if (!form.topic) return show("Topic zaroori hai", false);
+    if (!form.topic) return show("Topic is required", false);
     setLoading(true); setResult("");
     const r = await fetch("/api/automation/content", {
       method: "POST", headers: adminHdrs(true),
@@ -435,7 +461,7 @@ function ContentTab() {
           </div>
         </div>
 
-        <Txta label="Topic kya likhna hai?" value={form.topic} onChange={e => setForm(f => ({ ...f, topic: e.target.value }))} rows={3}
+        <Txta label="What to write about?" value={form.topic} onChange={e => setForm(f => ({ ...f, topic: e.target.value }))} rows={3}
           placeholder="FinovaOS ka new feature launch — AI-powered inventory management..." />
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -470,7 +496,7 @@ function ContentTab() {
           )}
         </div>
         {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,.3)" }}>✍️ Generating...</div>}
-        {!loading && !result && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,.2)", fontSize: 13 }}>Form bhar ke Generate karo</div>}
+        {!loading && !result && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,.2)", fontSize: 13 }}>Fill the form and click Generate</div>}
         {result && (
           <div style={{ whiteSpace: "pre-wrap", fontSize: 14, lineHeight: 1.7, color: "rgba(255,255,255,.85)", padding: 16, borderRadius: 10, background: "rgba(255,255,255,.04)", border: `1px solid ${BORDER}` }}>
             {result}
@@ -495,11 +521,11 @@ function LeadsTab() {
   useEffect(load, []);
 
   async function add() {
-    if (!form.name && !form.email) return show("Name ya email zaroori hai", false);
+    if (!form.name && !form.email) return show("Name or email is required", false);
     setLoading(true);
     const r = await fetch("/api/automation/leads", { method: "POST", headers: adminHdrs(true), body: JSON.stringify(form) });
     setLoading(false);
-    if (r.ok) { show("Lead add ho gaya", true); setForm({ name: "", email: "", phone: "", source: "manual", notes: "" }); load(); }
+    if (r.ok) { show("Lead added!", true); setForm({ name: "", email: "", phone: "", source: "manual", notes: "" }); load(); }
     else show("Failed", false);
   }
 
@@ -520,7 +546,7 @@ function LeadsTab() {
       {toast && <Toast {...toast} />}
 
       <Card>
-        <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Lead Add Karo</h3>
+        <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>Add Lead</h3>
         <Inp label="Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ahmed Ali" />
         <Inp label="Email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="ahmed@company.com" />
         <Inp label="Phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="03001234567" />
@@ -567,7 +593,7 @@ function LeadsTab() {
                   </td>
                 </tr>
               ))}
-              {leads.length === 0 && <tr><td colSpan={7} style={{ textAlign: "center", padding: 30, color: "rgba(255,255,255,.2)" }}>Koi lead nahi abhi tak</td></tr>}
+              {leads.length === 0 && <tr><td colSpan={7} style={{ textAlign: "center", padding: 30, color: "rgba(255,255,255,.2)" }}>No leads yet</td></tr>}
             </tbody>
           </table>
         </div>
@@ -591,14 +617,14 @@ function WebhooksTab() {
   useEffect(load, []);
 
   async function create() {
-    if (!form.name || !form.url) return show("Name aur URL zaroori hain", false);
+    if (!form.name || !form.url) return show("Name and URL are required", false);
     setLoading(true);
     const r = await fetch("/api/automation/webhooks", {
       method: "POST", headers: adminHdrs(true),
       body: JSON.stringify({ ...form, events: form.events ? form.events.split(",").map(e => e.trim()) : [] }),
     });
     setLoading(false);
-    if (r.ok) { show("Webhook bana diya", true); setForm({ name: "", url: "", events: "" }); load(); }
+    if (r.ok) { show("Webhook created!", true); setForm({ name: "", url: "", events: "" }); load(); }
     else show("Failed", false);
   }
 
@@ -617,7 +643,7 @@ function WebhooksTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>Outbound Webhooks</h3>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>FinovaOS events Zapier/Make ko bhejte hain</p>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>Send FinovaOS events to Zapier / Make</p>
         <Inp label="Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Zapier Lead Notifier" />
         <Inp label="URL" value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} placeholder="https://hooks.zapier.com/..." />
         <Inp label="Events (* for all)" value={form.events} onChange={e => setForm(f => ({ ...f, events: e.target.value }))} placeholder="lead.created, *" />
@@ -637,7 +663,7 @@ function WebhooksTab() {
 
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>Inbound Tokens</h3>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>Zapier/Make se data receive karo</p>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 16 }}>Receive data from Zapier / Make</p>
         <Btn onClick={createToken} loading={loading}>+ New Token</Btn>
         <div style={{ marginTop: 16 }}>
           {tokens.map(t => (
@@ -649,7 +675,7 @@ function WebhooksTab() {
               <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 3 }}>Hits: {t.hitCount}</div>
             </div>
           ))}
-          {tokens.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>Koi token nahi</p>}
+          {tokens.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>No tokens yet</p>}
         </div>
       </Card>
     </div>
@@ -659,7 +685,7 @@ function WebhooksTab() {
 // ─── 6. WEBSITE CHATBOT ───────────────────────────────────────────────────────
 function ChatbotTab() {
   const { toast, show } = useToast();
-  const [cfg, setCfg] = useState({ botName: "FinovaOS Support", greeting: "Assalamualaikum! FinovaOS ke baare mein koi sawal? Main help karunga.", systemPrompt: "", primaryColor: "#7c3aed", active: true, widgetToken: "" });
+  const [cfg, setCfg] = useState({ botName: "FinovaOS Support", greeting: "Hi! Any questions about FinovaOS? I'm here to help.", systemPrompt: "", primaryColor: "#7c3aed", active: true, widgetToken: "" });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -686,7 +712,7 @@ function ChatbotTab() {
         <Inp label="Bot Name" value={cfg.botName} onChange={e => setCfg(c => ({ ...c, botName: e.target.value }))} />
         <Inp label="Greeting" value={cfg.greeting} onChange={e => setCfg(c => ({ ...c, greeting: e.target.value }))} />
         <Txta label="System Prompt" value={cfg.systemPrompt} onChange={e => setCfg(c => ({ ...c, systemPrompt: e.target.value }))} rows={5}
-          placeholder="Tum FinovaOS ka AI assistant ho. FinovaOS Pakistan ka leading business software hai. Pricing ke baare mein batao, features explain karo..." />
+          placeholder="You are FinovaOS AI assistant. FinovaOS is Pakistan's leading business software. Explain features, pricing, and onboarding to prospects..." />
         <Inp label="Color" type="color" value={cfg.primaryColor} onChange={e => setCfg(c => ({ ...c, primaryColor: e.target.value }))} style={{ height: 40 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
           <span style={{ fontSize: 13, color: "rgba(255,255,255,.7)" }}>Active</span>
@@ -699,9 +725,9 @@ function ChatbotTab() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <Card>
-          <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700 }}>Website pe Embed Karo</h3>
+          <h3 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700 }}>Embed on Your Website</h3>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 0, marginBottom: 12 }}>
-            Ye script tag <code style={{ color: "#a78bfa" }}>&lt;/body&gt;</code> se pehle paste karo apni website pe.
+            Paste this script tag before <code style={{ color: "#a78bfa" }}>&lt;/body&gt;</code> on your website.
           </p>
           <div style={{ position: "relative" }}>
             <pre style={{ background: "rgba(0,0,0,.5)", borderRadius: 10, padding: 14, fontSize: 11, color: "#a78bfa", overflowX: "auto", border: `1px solid ${BORDER}`, margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
@@ -784,8 +810,8 @@ function SocialTab() {
   }
 
   async function createPost() {
-    if (!postText.trim()) return show("Post text likho", false);
-    if (!platforms.length) return show("Koi platform select karo", false);
+    if (!postText.trim()) return show("Post text is required", false);
+    if (!platforms.length) return show("Select at least one platform", false);
     setPosting(true);
     try {
       const r = await fetch("/api/automation/social", {
@@ -851,7 +877,7 @@ function SocialTab() {
         <div style={{ marginTop: 16 }}>
           <Btn onClick={saveCreds} loading={savingCreds}>Save Credentials</Btn>
           <p style={{ margin: "8px 0 0", fontSize: 11, color: "rgba(255,255,255,.3)" }}>
-            Credentials encrypted aur securely store hote hain. Facebook/Instagram ke liye Meta Business Manager se Page Access Token lo.
+            Credentials are encrypted and stored securely. Get the Page Access Token from Meta Business Manager for Facebook/Instagram.
           </p>
         </div>
       </Card>
@@ -875,7 +901,7 @@ function SocialTab() {
           </div>
         </div>
 
-        <Txta label="Post Text" value={postText} onChange={e => setPostText(e.target.value)} rows={4} placeholder="FinovaOS mein naya feature aa gaya! Ab aap apna business aur bhi efficiently manage kar sakte hain..." />
+        <Txta label="Post Text" value={postText} onChange={e => setPostText(e.target.value)} rows={4} placeholder="Exciting new feature in FinovaOS! Now manage your business even more efficiently..." />
         <Inp label="Image URL (optional)" value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="https://cdn.yourdomain.com/image.jpg" />
         <Inp label="Schedule (optional — blank = post now)" type="datetime-local" value={scheduleAt} onChange={e => setScheduleAt(e.target.value)} />
 
@@ -892,7 +918,7 @@ function SocialTab() {
         {loadingPosts ? (
           <div style={{ color: "rgba(255,255,255,.3)", fontSize: 13 }}>Loading...</div>
         ) : posts.length === 0 ? (
-          <div style={{ padding: "32px 0", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>Koi post nahi abhi tak</div>
+          <div style={{ padding: "32px 0", textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 13 }}>No posts yet</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {posts.map((p: any) => (
@@ -920,6 +946,120 @@ function SocialTab() {
           </div>
         )}
       </Card>
+    </div>
+  );
+}
+
+// ─── 8. ANALYTICS ─────────────────────────────────────────────────────────────
+function AnalyticsTab() {
+  const { toast, show } = useToast();
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState("30");
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/admin/automation-stats?days=${range}`, { headers: adminHdrs() })
+      .then(r => r.json())
+      .then(d => { if (d && !d.error) setStats(d); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [range]);
+
+  const kpis = stats ? [
+    { label: "Total Leads",        value: stats.leads            ?? 0, color: "#fb923c", icon: "🎯" },
+    { label: "WhatsApp Sent",      value: stats.whatsappSent     ?? 0, color: "#22c55e", icon: "💬" },
+    { label: "Emails Sent",        value: stats.emailsSent       ?? 0, color: "#38bdf8", icon: "📧" },
+    { label: "Drip Campaigns",     value: stats.dripCampaigns    ?? 0, color: "#a78bfa", icon: "📋" },
+    { label: "Content Generated",  value: stats.contentGenerated ?? 0, color: "#fbbf24", icon: "✍️" },
+    { label: "Social Posts",       value: stats.socialPosts      ?? 0, color: "#f472b6", icon: "📱" },
+    { label: "Webhook Hits",       value: stats.webhookHits      ?? 0, color: "#a78bfa", icon: "🔗" },
+    { label: "Chat Messages",      value: stats.chatMessages     ?? 0, color: "#38bdf8", icon: "🤖" },
+  ] : [];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {toast && <Toast {...toast} />}
+
+      <Card style={{ padding: "14px 20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)", fontWeight: 600 }}>Period:</span>
+          {[{ v: "7", l: "Last 7 days" }, { v: "30", l: "Last 30 days" }, { v: "90", l: "Last 90 days" }].map(opt => (
+            <button key={opt.v} onClick={() => setRange(opt.v)} style={{
+              padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontFamily: F,
+              background: range === opt.v ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(255,255,255,.07)",
+              color: range === opt.v ? "#fff" : "rgba(255,255,255,.5)", fontWeight: range === opt.v ? 700 : 400,
+            }}>{opt.l}</button>
+          ))}
+        </div>
+      </Card>
+
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,.3)" }}>Loading analytics…</div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr))", gap: 14 }}>
+          {kpis.map(k => (
+            <Card key={k.label} style={{ padding: "18px 20px", background: `${k.color}0d`, border: `1px solid ${k.color}30` }}>
+              <div style={{ fontSize: 22, marginBottom: 10 }}>{k.icon}</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: k.color, lineHeight: 1 }}>{k.value.toLocaleString()}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginTop: 6, fontWeight: 600 }}>{k.label}</div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {stats?.campaigns?.length > 0 && (
+        <Card>
+          <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>📧 Email Drip Performance</h3>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ borderBottom: `1px solid ${BORDER}` }}>
+                {["Campaign", "Enrolled", "Emails Sent", "Status"].map(h => (
+                  <th key={h} style={{ padding: "8px 12px", textAlign: "left", color: "rgba(255,255,255,.4)", fontWeight: 500, fontSize: 11 }}>{h.toUpperCase()}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {stats.campaigns.map((c: any) => (
+                <tr key={c.id} style={{ borderBottom: `1px solid rgba(255,255,255,.04)` }}>
+                  <td style={{ padding: "10px 12px", fontWeight: 600 }}>{c.name}</td>
+                  <td style={{ padding: "10px 12px", color: "rgba(255,255,255,.6)" }}>{c.enrolledCount ?? 0}</td>
+                  <td style={{ padding: "10px 12px", color: "#38bdf8" }}>{c.sentCount ?? 0}</td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 5, background: c.active ? "rgba(34,197,94,.12)" : "rgba(255,255,255,.06)", color: c.active ? "#22c55e" : "#888" }}>
+                      {c.active ? "Active" : "Paused"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
+
+      {stats?.leadsByStage && (
+        <Card>
+          <h3 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700 }}>🎯 Lead Funnel</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {Object.entries(stats.leadsByStage as Record<string, number>).map(([stage, count]) => {
+              const total = Object.values(stats.leadsByStage as Record<string, number>).reduce((a: number, b: number) => a + b, 0);
+              const pct = total ? Math.round((count / total) * 100) : 0;
+              const colors: Record<string, string> = { new: "#818cf8", contacted: "#38bdf8", qualified: "#22c55e", lost: "#f87171", won: "#fbbf24" };
+              return (
+                <div key={stage}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+                    <span style={{ color: "rgba(255,255,255,.7)", textTransform: "capitalize" }}>{stage}</span>
+                    <span style={{ color: "rgba(255,255,255,.4)" }}>{count} ({pct}%)</span>
+                  </div>
+                  <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,.06)", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${pct}%`, background: colors[stage] || "#818cf8", borderRadius: 3 }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
