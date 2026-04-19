@@ -49,8 +49,8 @@ function Sel({ label, options, value, onChange }: { label: string; options: { v:
   return (
     <div style={{ marginBottom: 14 }}>
       <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 5, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase" as const }}>{label}</label>
-      <select value={value} onChange={e => onChange(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BDR}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none" }}>
-        {options.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+      <select value={value} onChange={e => onChange(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BDR}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, outline: "none", colorScheme: "dark" }}>
+        {options.map(o => <option key={o.v} value={o.v} style={{ background: "#0d1117", color: "#e2e8f0" }}>{o.l}</option>)}
       </select>
     </div>
   );

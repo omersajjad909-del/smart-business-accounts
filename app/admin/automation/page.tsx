@@ -389,9 +389,9 @@ function DripTab() {
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Campaign</label>
             <select value={enroll.campaignId} onChange={e => setEnroll(v => ({ ...v, campaignId: e.target.value }))}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, fontFamily: F }}>
-              <option value="">Select...</option>
-              {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
+              <option value="" style={{ background:"#0d1117", color:"#e2e8f0" }}>Select...</option>
+              {campaigns.map(c => <option key={c.id} value={c.id} style={{ background:"#0d1117", color:"#e2e8f0" }}>{c.name}</option>)}
             </select>
           </div>
           <Inp label="Email" value={enroll.email} onChange={e => setEnroll(v => ({ ...v, email: e.target.value }))} placeholder="lead@email.com" />
@@ -468,16 +468,16 @@ function ContentTab() {
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Tone</label>
             <select value={form.tone} onChange={e => setForm(f => ({ ...f, tone: e.target.value }))}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, fontFamily: F }}>
-              {["professional", "casual", "persuasive", "informative", "friendly"].map(t => <option key={t} value={t}>{t}</option>)}
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
+              {["professional", "casual", "persuasive", "informative", "friendly"].map(t => <option key={t} value={t} style={{ background:"#0d1117", color:"#e2e8f0" }}>{t}</option>)}
             </select>
           </div>
           <div style={{ marginBottom: 14 }}>
             <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Language</label>
             <select value={form.language} onChange={e => setForm(f => ({ ...f, language: e.target.value }))}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, fontFamily: F }}>
-              <option value="en">English</option>
-              <option value="ur">Urdu / Roman Urdu</option>
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
+              <option value="en" style={{ background:"#0d1117", color:"#e2e8f0" }}>English</option>
+              <option value="ur" style={{ background:"#0d1117", color:"#e2e8f0" }}>Urdu / Roman Urdu</option>
             </select>
           </div>
         </div>
@@ -553,8 +553,8 @@ function LeadsTab() {
         <div style={{ marginBottom: 14 }}>
           <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 5 }}>Source</label>
           <select value={form.source} onChange={e => setForm(f => ({ ...f, source: e.target.value }))}
-            style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "rgba(255,255,255,.06)", color: "#e2e8f0", fontSize: 13, fontFamily: F }}>
-            {["manual", "website", "facebook", "whatsapp", "referral", "google_ads"].map(s => <option key={s} value={s}>{s.replace(/_/g, " ")}</option>)}
+            style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#0d1117", color: "#e2e8f0", fontSize: 13, fontFamily: F, colorScheme: "dark" }}>
+            {["manual", "website", "facebook", "whatsapp", "referral", "google_ads"].map(s => <option key={s} value={s} style={{ background:"#0d1117", color:"#e2e8f0" }}>{s.replace(/_/g, " ")}</option>)}
           </select>
         </div>
         <Txta label="Notes" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} />
@@ -583,8 +583,8 @@ function LeadsTab() {
                   <td style={{ padding: "8px 10px" }}><span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 5, background: "rgba(255,255,255,.07)" }}>{l.source}</span></td>
                   <td style={{ padding: "8px 10px" }}>
                     <select value={l.status} onChange={e => updateStatus(l.id, e.target.value)}
-                      style={{ background: "transparent", border: "none", color: STATUS_COLOR[l.status] || "#888", fontSize: 12, fontFamily: F, cursor: "pointer" }}>
-                      {Object.keys(STATUS_COLOR).map(s => <option key={s} value={s}>{s}</option>)}
+                      style={{ background: "#0d1117", border: "none", color: STATUS_COLOR[l.status] || "#888", fontSize: 12, fontFamily: F, cursor: "pointer", colorScheme: "dark" }}>
+                      {Object.keys(STATUS_COLOR).map(s => <option key={s} value={s} style={{ background:"#0d1117", color: STATUS_COLOR[s] || "#888" }}>{s}</option>)}
                     </select>
                   </td>
                   <td style={{ padding: "8px 10px", color: "rgba(255,255,255,.3)", fontSize: 11 }}>{new Date(l.createdAt).toLocaleDateString()}</td>
