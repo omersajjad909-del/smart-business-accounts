@@ -128,6 +128,8 @@ const PLANS = [
   },
 ];
 
+const DEFAULT_PLAN_LIMITS = { starter: 3, pro: 10, enterprise: 25 };
+
 function Check({ color }: { color: string }) {
   return (
     <div style={{ width:18, height:18, borderRadius:6, background:`${color}18`, border:`1px solid ${color}30`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -269,20 +271,23 @@ function PlanCard({ plan, billing, prices, vis, i, currency, planLimits }: {
 
       {/* Feature list */}
       <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
-        {plan.features.map((f, fi) => (
-          <div key={fi} style={{ display:"flex", alignItems:"center", gap:10 }}>
-            {f.yes ? <Check color={plan.color}/> : <Cross/>}
-            <span style={{ fontSize:13, color: f.yes ? "rgba(255,255,255,.7)" : "rgba(255,255,255,.28)", fontWeight: f.yes ? 500 : 400 }}>
-              {f.text}
-            </span>
-          </div>
-        ))}
+        {plan.features.map((f, fi) => {
+          const lim = plan.key === "starter" ? planLimits.starter : plan.key === "pro" ? planLimits.pro : planLimits.enterprise;
+          const userText = lim === null || lim === undefined ? "Unlimited users" : `Up to ${lim} users`;
+          const text = fi === 0 && plan.key !== "custom" ? userText : f.text;
+          return (
+            <div key={fi} style={{ display:"flex", alignItems:"center", gap:10 }}>
+              {f.yes ? <Check color={plan.color}/> : <Cross/>}
+              <span style={{ fontSize:13, color: f.yes ? "rgba(255,255,255,.7)" : "rgba(255,255,255,.28)", fontWeight: f.yes ? 500 : 400 }}>
+                {text}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
-
-const DEFAULT_PLAN_LIMITS = { starter: 3, pro: 10, enterprise: 25 };
 
 export default function PricingSection() {
   const [ref, vis]      = useInView();
@@ -442,7 +447,7 @@ export default function PricingSection() {
         {/* Plans — 3 column grid (Starter, Pro, Enterprise) */}
         <div className="pricing-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:32, alignItems:"start" }}>
           {PLANS.filter(p => p.key !== "custom").map((plan, i) => (
-            <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} vis={vis} i={i} currency={currency} />
+            <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} vis={vis} i={i} currency={currency} planLimits={planLimits} />
           ))}
         </div>
 
