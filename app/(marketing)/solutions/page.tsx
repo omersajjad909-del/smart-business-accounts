@@ -851,22 +851,36 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
                   <span style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>Phase {ind.phase} — Coming Soon</span>
                 </div>
               ) : (
-                <Link href={`/onboarding/signup/starter?businessType=${ind.id}`} style={{
-                  display:"inline-flex", alignItems:"center", gap:8,
-                  padding:"13px 28px", borderRadius:13,
-                  background:`linear-gradient(135deg,${ind.color},${ind.color}cc)`,
-                  color:"#0f172a", fontWeight:800, fontSize:14,
-                  textDecoration:"none", fontFamily:"inherit",
-                  boxShadow:`0 6px 24px ${ind.glow}`, transition:"all .25s",
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow=`0 10px 32px ${ind.glow}`; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow=`0 6px 24px ${ind.glow}`; }}
-                >
-                  Get Started — {ind.label}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-                  </svg>
-                </Link>
+                <div style={{ display:"flex", gap:12, flexWrap:"wrap", alignItems:"center" }}>
+                  <Link href={`/onboarding/signup/starter?businessType=${ind.id}`} style={{
+                    display:"inline-flex", alignItems:"center", gap:8,
+                    padding:"13px 28px", borderRadius:13,
+                    background:`linear-gradient(135deg,${ind.color},${ind.color}cc)`,
+                    color:"#0f172a", fontWeight:800, fontSize:14,
+                    textDecoration:"none", fontFamily:"inherit",
+                    boxShadow:`0 6px 24px ${ind.glow}`, transition:"all .25s",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow=`0 10px 32px ${ind.glow}`; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow=`0 6px 24px ${ind.glow}`; }}
+                  >
+                    Get Started — {ind.label}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </Link>
+                  <Link href={`/for/${ind.id}`} style={{
+                    display:"inline-flex", alignItems:"center", gap:6,
+                    padding:"13px 22px", borderRadius:13,
+                    background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)",
+                    color:"rgba(255,255,255,.7)", fontWeight:700, fontSize:14,
+                    textDecoration:"none", fontFamily:"inherit", transition:"all .25s",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,.1)"; e.currentTarget.style.color="white"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,.06)"; e.currentTarget.style.color="rgba(255,255,255,.7)"; }}
+                  >
+                    View Details →
+                  </Link>
+                </div>
               )}
             </div>
           </div>

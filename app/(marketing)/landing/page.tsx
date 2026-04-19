@@ -24,6 +24,10 @@ async function getRequestHost() {
 export default async function LandingPage() {
   const host = await getRequestHost();
 
+  if (host === "finovaforge.com" || host === "www.finovaforge.com") {
+    redirect("/forge");
+  }
+
   if (host === "usefinova.app" || host.endsWith(".usefinova.app")) {
     redirect("/auth");
   }
