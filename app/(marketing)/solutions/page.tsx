@@ -848,6 +848,18 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
                   >
                     🔔 Notify me when live
                   </Link>
+                  <Link href={`/for/${ind.id}`} style={{
+                    display:"inline-flex", alignItems:"center", gap:6,
+                    padding:"13px 22px", borderRadius:13,
+                    background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)",
+                    color:"rgba(255,255,255,.7)", fontWeight:700, fontSize:14,
+                    textDecoration:"none", fontFamily:"inherit", transition:"all .25s",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,.1)"; e.currentTarget.style.color="white"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,.06)"; e.currentTarget.style.color="rgba(255,255,255,.7)"; }}
+                  >
+                    Learn More →
+                  </Link>
                   <span style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>Phase {ind.phase} — Coming Soon</span>
                 </div>
               ) : (
