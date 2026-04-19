@@ -148,13 +148,14 @@ function Cross() {
   );
 }
 
-function PlanCard({ plan, billing, prices, vis, i, currency }: {
+function PlanCard({ plan, billing, prices, vis, i, currency, planLimits }: {
   plan: typeof PLANS[0];
   billing: "monthly" | "yearly";
   prices: Prices;
   vis: boolean;
   i: number;
   currency: string;
+  planLimits: typeof DEFAULT_PLAN_LIMITS;
 }) {
   const [hov, setHov] = useState(false);
   const isCustom = plan.key === "custom";
@@ -281,17 +282,27 @@ function PlanCard({ plan, billing, prices, vis, i, currency }: {
   );
 }
 
+const DEFAULT_PLAN_LIMITS = { starter: 3, pro: 10, enterprise: 25 };
+
 export default function PricingSection() {
   const [ref, vis]      = useInView();
   const [billing, setBilling] = useState<"monthly"|"yearly">("monthly");
   const [prices, setPrices]   = useState<Prices>(DEFAULT_PRICES);
+  const [planLimits, setPlanLimits] = useState(DEFAULT_PLAN_LIMITS);
   const [currency, setCurrency] = useState<string>("USD");
   const [country,  setCountry]  = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/public/pricing")
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.pricing) setPrices({ ...DEFAULT_PRICES, ...d.pricing }); })
+      .then(d => {
+        if (d?.pricing) setPrices({ ...DEFAULT_PRICES, ...d.pricing });
+        if (d?.planLimits) setPlanLimits({
+          starter:    d.planLimits.starter    ?? DEFAULT_PLAN_LIMITS.starter,
+          pro:        d.planLimits.pro        ?? DEFAULT_PLAN_LIMITS.pro,
+          enterprise: d.planLimits.enterprise ?? DEFAULT_PLAN_LIMITS.enterprise,
+        });
+      })
       .catch(() => {});
   }, []);
 
