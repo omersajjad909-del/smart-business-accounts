@@ -431,9 +431,7 @@ export default function IndustryPage() {
       </div>
 
       {/* ── Plan Comparison ── */}
-      {type.isLive && (
-        <PlanComparison label={type.label} category={type.category} />
-      )}
+      <PlanComparison label={type.label} category={type.category} />
 
       {/* ── CTA ── */}
       <div style={{ maxWidth:800, margin:"0 auto 80px", padding:"0 24px", textAlign:"center" }}>
