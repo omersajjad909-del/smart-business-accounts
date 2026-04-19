@@ -1820,6 +1820,11 @@ function PagePlans() {
   const [seatPricing, setSeatPricing] = useState({ monthly:7, yearly:6 });
   const [planLimits, setPlanLimits] = useState<Record<string,number|null>>({ starter:3, pro:10, enterprise:25 });
   const [branchLimits, setBranchLimits] = useState<Record<string,number|null>>({ starter:1, pro:3, enterprise:10 });
+  const [planHighlights, setPlanHighlights] = useState<Record<string, string[]>>({
+    starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support"],
+    pro:        ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports"],
+    enterprise: ["Unlimited users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7"],
+  });
   const [customPlan, setCustomPlan] = useState<{ basePrice: number; yearlyDiscount: number; modules: any[] }>({
     basePrice: 0, yearlyDiscount: 20,
     modules: [
@@ -1868,6 +1873,7 @@ function PagePlans() {
         if (d.planLimits) setPlanLimits(l => ({ ...l, ...d.planLimits }));
         if (d.branchLimits) setBranchLimits(l => ({ ...l, ...d.branchLimits }));
         if (d.customPlan) setCustomPlan(cp => ({ ...cp, ...d.customPlan, modules: d.customPlan.modules ?? cp.modules }));
+        if (d.planHighlights) setPlanHighlights(h => ({ ...h, ...d.planHighlights }));
       })
       .catch(() => {});
   }, []);
@@ -1882,7 +1888,7 @@ function PagePlans() {
       const r = await fetch("/api/admin/plan-config", {
         method: "POST",
         headers,
-        body: JSON.stringify({ pricing, seatPricing, features, featureMatrix: pf, planLimits, branchLimits, customPlan }),
+        body: JSON.stringify({ pricing, seatPricing, features, featureMatrix: pf, planLimits, branchLimits, customPlan, planHighlights }),
       });
       setSaved(r.ok ? "ok" : "err");
       setTimeout(() => setSaved(""), 2500);
@@ -1947,6 +1953,8 @@ function PagePlans() {
           setPlanLimits={setPlanLimits}
           branchLimits={branchLimits}
           setBranchLimits={setBranchLimits}
+          planHighlights={planHighlights}
+          setPlanHighlights={setPlanHighlights}
         />
       )}
       {plansTab === "custom" && <PageCustomOrders/>}
@@ -1955,7 +1963,7 @@ function PagePlans() {
   );
 }
 
-function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, toggle, defaultFeatures, addFeature, removeFeature, seatPricing, setSeatPricing, planLimits, setPlanLimits, branchLimits, setBranchLimits }: any) {
+function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, toggle, defaultFeatures, addFeature, removeFeature, seatPricing, setSeatPricing, planLimits, setPlanLimits, branchLimits, setBranchLimits, planHighlights, setPlanHighlights }: any) {
   const plans = ["starter","pro","enterprise"] as const;
   const saveLabel = saved==="saving"?"Saving…":saved==="ok"?"✓ Saved!":saved==="err"?"✕ Error":"Save Changes";
   const [newFeat, setNewFeat] = useState("");
@@ -2127,6 +2135,55 @@ function PagePlansConfig({ pricing, setPricing, saved, onSave, features, pf, tog
               </tr>
             </tbody>
           </table>
+        </div>
+      </SectionCard>
+
+      {/* Plan Card Highlights */}
+      <SectionCard title="Plan Card Highlights" action={
+        <button onClick={onSave} disabled={saved==="saving"}
+          style={{ padding:"7px 18px",borderRadius:9,background:saved==="ok"?"rgba(52,211,153,.2)":saved==="err"?"rgba(248,113,113,.2)":"linear-gradient(135deg,#6366f1,#4f46e5)",border:saved==="ok"?"1px solid rgba(52,211,153,.4)":saved==="err"?"1px solid rgba(248,113,113,.4)":"none",color:saved==="ok"?"#34d399":saved==="err"?"#f87171":"white",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"all .2s",opacity:saved==="saving"?.7:1 }}>
+          {saveLabel}
+        </button>
+      }>
+        <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", marginBottom:14, lineHeight:1.6 }}>
+          These bullets appear on the plan cards on the pricing page and landing page. The first bullet is always replaced with the dynamic user count from Max Users above.
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
+          {(["starter","pro","enterprise"] as const).map(plan => {
+            const bullets: string[] = planHighlights?.[plan] || [];
+            return (
+              <div key={plan} style={{ padding:"16px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)" }}>
+                <div style={{ fontSize:12, fontWeight:800, color:"white", textTransform:"capitalize", marginBottom:12 }}>{plan === "pro" ? "Professional" : plan}</div>
+                <div style={{ display:"flex", flexDirection:"column", gap:6, marginBottom:10 }}>
+                  {bullets.map((bullet, idx) => (
+                    <div key={idx} style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      {idx === 0 && <span style={{ fontSize:9, padding:"1px 5px", borderRadius:4, background:"rgba(99,102,241,.2)", color:"#a5b4fc", fontWeight:700, whiteSpace:"nowrap" }}>auto</span>}
+                      <input
+                        value={bullet}
+                        onChange={e => setPlanHighlights((h: any) => ({
+                          ...h,
+                          [plan]: bullets.map((b, i) => i === idx ? e.target.value : b),
+                        }))}
+                        style={{ flex:1, padding:"5px 9px", borderRadius:7, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.09)", color:"white", fontSize:12, fontFamily:"inherit", outline:"none" }}
+                      />
+                      <button
+                        onClick={() => setPlanHighlights((h: any) => ({ ...h, [plan]: bullets.filter((_: any, i: number) => i !== idx) }))}
+                        style={{ background:"none", border:"none", cursor:"pointer", color:"rgba(248,113,113,.5)", fontSize:14, padding:"0 3px" }}
+                        onMouseEnter={e=>(e.currentTarget.style.color="#f87171")}
+                        onMouseLeave={e=>(e.currentTarget.style.color="rgba(248,113,113,.5)")}
+                      >✕</button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setPlanHighlights((h: any) => ({ ...h, [plan]: [...bullets, ""] }))}
+                  style={{ width:"100%", padding:"6px 10px", borderRadius:8, background:"rgba(99,102,241,.08)", border:"1px dashed rgba(99,102,241,.35)", color:"#a5b4fc", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}
+                >
+                  + Add bullet
+                </button>
+              </div>
+            );
+          })}
         </div>
       </SectionCard>
     </div>

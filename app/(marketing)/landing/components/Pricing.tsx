@@ -130,6 +130,12 @@ const PLANS = [
 
 const DEFAULT_PLAN_LIMITS = { starter: 3, pro: 10, enterprise: 25 };
 
+const DEFAULT_PLAN_HIGHLIGHTS = {
+  starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support"],
+  pro:        ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports"],
+  enterprise: ["Unlimited users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7"],
+};
+
 function Check({ color }: { color: string }) {
   return (
     <div style={{ width:18, height:18, borderRadius:6, background:`${color}18`, border:`1px solid ${color}30`, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -150,7 +156,7 @@ function Cross() {
   );
 }
 
-function PlanCard({ plan, billing, prices, vis, i, currency, planLimits }: {
+function PlanCard({ plan, billing, prices, vis, i, currency, planLimits, planHighlights }: {
   plan: typeof PLANS[0];
   billing: "monthly" | "yearly";
   prices: Prices;
@@ -158,6 +164,7 @@ function PlanCard({ plan, billing, prices, vis, i, currency, planLimits }: {
   i: number;
   currency: string;
   planLimits: typeof DEFAULT_PLAN_LIMITS;
+  planHighlights: typeof DEFAULT_PLAN_HIGHLIGHTS;
 }) {
   const [hov, setHov] = useState(false);
   const isCustom = plan.key === "custom";
@@ -271,19 +278,28 @@ function PlanCard({ plan, billing, prices, vis, i, currency, planLimits }: {
 
       {/* Feature list */}
       <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
-        {plan.features.map((f, fi) => {
-          const lim = plan.key === "starter" ? planLimits.starter : plan.key === "pro" ? planLimits.pro : planLimits.enterprise;
-          const userText = lim === null || lim === undefined ? "Unlimited users" : `Up to ${lim} users`;
-          const text = fi === 0 && plan.key !== "custom" ? userText : f.text;
-          return (
-            <div key={fi} style={{ display:"flex", alignItems:"center", gap:10 }}>
-              {f.yes ? <Check color={plan.color}/> : <Cross/>}
-              <span style={{ fontSize:13, color: f.yes ? "rgba(255,255,255,.7)" : "rgba(255,255,255,.28)", fontWeight: f.yes ? 500 : 400 }}>
-                {text}
-              </span>
-            </div>
-          );
-        })}
+        {isCustom ? plan.features.map((f, fi) => (
+          <div key={fi} style={{ display:"flex", alignItems:"center", gap:10 }}>
+            {f.yes ? <Check color={plan.color}/> : <Cross/>}
+            <span style={{ fontSize:13, color: f.yes ? "rgba(255,255,255,.7)" : "rgba(255,255,255,.28)", fontWeight: f.yes ? 500 : 400 }}>
+              {f.text}
+            </span>
+          </div>
+        )) : (
+          (planHighlights[plan.key as keyof typeof DEFAULT_PLAN_HIGHLIGHTS] ?? DEFAULT_PLAN_HIGHLIGHTS[plan.key as keyof typeof DEFAULT_PLAN_HIGHLIGHTS] ?? []).map((text: string, fi: number) => {
+            const lim = plan.key === "starter" ? planLimits.starter : plan.key === "pro" ? planLimits.pro : planLimits.enterprise;
+            const userText = lim === null || lim === undefined ? "Unlimited users" : `Up to ${lim} users`;
+            const displayText = fi === 0 ? userText : text;
+            return (
+              <div key={fi} style={{ display:"flex", alignItems:"center", gap:10 }}>
+                <Check color={plan.color}/>
+                <span style={{ fontSize:13, color:"rgba(255,255,255,.7)", fontWeight:500 }}>
+                  {displayText}
+                </span>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
@@ -294,6 +310,7 @@ export default function PricingSection() {
   const [billing, setBilling] = useState<"monthly"|"yearly">("monthly");
   const [prices, setPrices]   = useState<Prices>(DEFAULT_PRICES);
   const [planLimits, setPlanLimits] = useState(DEFAULT_PLAN_LIMITS);
+  const [planHighlights, setPlanHighlights] = useState(DEFAULT_PLAN_HIGHLIGHTS);
   const [currency, setCurrency] = useState<string>("USD");
   const [country,  setCountry]  = useState<string | null>(null);
 
@@ -307,6 +324,7 @@ export default function PricingSection() {
           pro:        d.planLimits.pro        ?? DEFAULT_PLAN_LIMITS.pro,
           enterprise: d.planLimits.enterprise ?? DEFAULT_PLAN_LIMITS.enterprise,
         });
+        if (d?.planHighlights) setPlanHighlights(h => ({ ...h, ...d.planHighlights }));
       })
       .catch(() => {});
   }, []);
@@ -447,7 +465,7 @@ export default function PricingSection() {
         {/* Plans — 3 column grid (Starter, Pro, Enterprise) */}
         <div className="pricing-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:32, alignItems:"start" }}>
           {PLANS.filter(p => p.key !== "custom").map((plan, i) => (
-            <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} vis={vis} i={i} currency={currency} planLimits={planLimits} />
+            <PlanCard key={plan.key} plan={plan} billing={billing} prices={prices} vis={vis} i={i} currency={currency} planLimits={planLimits} planHighlights={planHighlights} />
           ))}
         </div>
 

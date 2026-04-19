@@ -25,6 +25,33 @@ const DEFAULT_SEAT_PRICING = {
   yearly: 72, // yearly annual total (6/mo equivalent)
 };
 
+const DEFAULT_PLAN_HIGHLIGHTS = {
+  starter: [
+    "Up to 3 users",
+    "Sales & purchase invoices",
+    "Ledger & trial balance",
+    "Basic reports",
+    "Chart of accounts",
+    "Email support",
+  ],
+  pro: [
+    "Up to 10 users",
+    "Everything in Starter",
+    "Inventory management",
+    "Bank reconciliation",
+    "HR & Payroll",
+    "CRM + Advanced reports",
+  ],
+  enterprise: [
+    "Unlimited users",
+    "Everything in Professional",
+    "API access",
+    "Custom integrations",
+    "Multi-currency",
+    "Priority support 24/7",
+  ],
+};
+
 const DEFAULT_CUSTOM_PLAN = {
   basePrice: 0,
   yearlyDiscount: 20,
@@ -56,6 +83,7 @@ export async function GET() {
         branchLimits: DEFAULT_BRANCH_LIMITS,
         seatPricing: DEFAULT_SEAT_PRICING,
         customPlan: DEFAULT_CUSTOM_PLAN,
+        planHighlights: DEFAULT_PLAN_HIGHLIGHTS,
         features: null,
         featureMatrix: null,
         updatedAt: null,
@@ -83,6 +111,9 @@ export async function GET() {
             }
           : DEFAULT_SEAT_PRICING,
         customPlan: payload?.customPlan ?? DEFAULT_CUSTOM_PLAN,
+        planHighlights: payload?.planHighlights
+          ? { ...DEFAULT_PLAN_HIGHLIGHTS, ...payload.planHighlights }
+          : DEFAULT_PLAN_HIGHLIGHTS,
         features: payload?.features ?? null,
         featureMatrix: payload?.featureMatrix ?? null,
         updatedAt: latest.createdAt,
@@ -95,13 +126,14 @@ export async function GET() {
       branchLimits: DEFAULT_BRANCH_LIMITS,
       seatPricing: DEFAULT_SEAT_PRICING,
       customPlan: DEFAULT_CUSTOM_PLAN,
+      planHighlights: DEFAULT_PLAN_HIGHLIGHTS,
       features: null,
       featureMatrix: null,
       updatedAt: latest.createdAt,
     });
   } catch (e: unknown) {
     return NextResponse.json(
-      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, branchLimits: DEFAULT_BRANCH_LIMITS, seatPricing: DEFAULT_SEAT_PRICING, customPlan: DEFAULT_CUSTOM_PLAN, error: e instanceof Error ? e.message : "unknown" },
+      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, branchLimits: DEFAULT_BRANCH_LIMITS, seatPricing: DEFAULT_SEAT_PRICING, customPlan: DEFAULT_CUSTOM_PLAN, planHighlights: DEFAULT_PLAN_HIGHLIGHTS, error: e instanceof Error ? e.message : "unknown" },
       { status: 200 },
     );
   }

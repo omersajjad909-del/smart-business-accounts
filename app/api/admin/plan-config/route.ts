@@ -27,6 +27,33 @@ const DEFAULT_BRANCH_LIMITS = {
   enterprise: 10,
 };
 
+const DEFAULT_PLAN_HIGHLIGHTS = {
+  starter: [
+    "Up to 3 users",
+    "Sales & purchase invoices",
+    "Ledger & trial balance",
+    "Basic reports",
+    "Chart of accounts",
+    "Email support",
+  ],
+  pro: [
+    "Up to 10 users",
+    "Everything in Starter",
+    "Inventory management",
+    "Bank reconciliation",
+    "HR & Payroll",
+    "CRM + Advanced reports",
+  ],
+  enterprise: [
+    "Unlimited users",
+    "Everything in Professional",
+    "API access",
+    "Custom integrations",
+    "Multi-currency",
+    "Priority support 24/7",
+  ],
+};
+
 const DEFAULT_CUSTOM_PLAN = {
   basePrice: 0,
   yearlyDiscount: 20,
@@ -51,6 +78,7 @@ const DEFAULT_CONFIG = {
   planLimits: DEFAULT_PLAN_LIMITS,
   branchLimits: DEFAULT_BRANCH_LIMITS,
   customPlan: DEFAULT_CUSTOM_PLAN,
+  planHighlights: DEFAULT_PLAN_HIGHLIGHTS,
   plans: [
     {
       code: "starter", name: "Starter",
@@ -135,6 +163,7 @@ export async function GET(req: NextRequest) {
         pricing: { ...DEFAULT_PRICING, ...(saved.pricing || {}) },
         seatPricing: { ...DEFAULT_SEAT_PRICING, ...(saved.seatPricing || {}) },
         customPlan: { ...DEFAULT_CUSTOM_PLAN, ...(saved.customPlan || {}), modules: saved.customPlan?.modules ?? DEFAULT_CUSTOM_PLAN.modules },
+        planHighlights: { ...DEFAULT_PLAN_HIGHLIGHTS, ...(saved.planHighlights || {}) },
         dashboardFeatureFlags: {
           ...createDefaultDashboardFeatureFlags(),
           ...(saved.dashboardFeatureFlags || {}),

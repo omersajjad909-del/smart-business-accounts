@@ -24,6 +24,12 @@ type PlanPricing = {
   enterprise: { monthly: number; yearly: number };
 };
 
+const DEFAULT_HIGHLIGHTS = {
+  starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support"],
+  professional: ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports"],
+  enterprise: ["Unlimited users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7"],
+};
+
 const PLANS = [
   {
     slug: "starter",
@@ -34,7 +40,6 @@ const PLANS = [
     border: "rgba(129,140,248,.32)",
     gradient: "linear-gradient(135deg,#6366f1,#4f46e5)",
     tagline: "For small businesses getting started",
-    features: ["Up to 3 users","Sales & purchase invoices","Ledger and trial balance","Basic reports","Chart of accounts","Email support"],
   },
   {
     slug: "professional",
@@ -45,7 +50,6 @@ const PLANS = [
     border: "rgba(165,180,252,.45)",
     gradient: "linear-gradient(135deg,#818cf8,#6366f1)",
     tagline: "Most popular for growing businesses",
-    features: ["Everything in Starter","Inventory management","Bank reconciliation","Multi-branch support","HR and payroll","CRM and advanced reports"],
     featured: true,
   },
   {
@@ -57,7 +61,6 @@ const PLANS = [
     border: "rgba(52,211,153,.35)",
     gradient: "linear-gradient(135deg,#059669,#34d399)",
     tagline: "Full power for large organizations",
-    features: ["Up to 25 users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority onboarding and support"],
   },
 ];
 
@@ -299,6 +302,7 @@ export default function PricingPage() {
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
   const [branchLimits, setBranchLimits] = useState<Record<string, number | null>>({ starter: 1, pro: 3, enterprise: 10 });
   const [seatPricing, setSeatPricing] = useState<{ monthly: number; yearly: number }>(DEFAULT_SEAT_PRICING);
+  const [planHighlights, setPlanHighlights] = useState<Record<string, string[]>>(DEFAULT_HIGHLIGHTS);
   const [customPlanData, setCustomPlanData] = useState<{ basePrice: number; yearlyDiscount: number; modules: any[] }>({
     basePrice: 0, yearlyDiscount: 20,
     modules: [
@@ -376,6 +380,9 @@ export default function PricingPage() {
                 ? d.customPlan.modules
                 : prev.modules,
             }));
+          }
+          if (d?.planHighlights) {
+            setPlanHighlights(h => ({ ...h, ...d.planHighlights }));
           }
         }
       } catch {}
@@ -494,8 +501,8 @@ export default function PricingPage() {
                     You&apos;ll be charged {formatPrice(regularPrice)}/mo after the first 3 months.
                   </div> */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {plan.features.map((f, idx) => (
-                      <div key={f} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    {(planHighlights[plan.slug] ?? DEFAULT_HIGHLIGHTS[plan.slug as keyof typeof DEFAULT_HIGHLIGHTS] ?? []).map((f: string, idx: number) => (
+                      <div key={idx} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{ width: 16, height: 16, borderRadius: "50%", background: `${plan.color}18`, border: `1px solid ${plan.color}38`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <svg width="8" height="8" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke={plan.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                         </div>
