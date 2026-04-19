@@ -6966,7 +6966,7 @@ function PageNewsletter() {
       <div style={{background:"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.07)",borderRadius:16,overflow:"hidden"}}>
         <table style={{width:"100%",borderCollapse:"collapse"}}>
           <thead><tr style={{borderBottom:"1px solid rgba(255,255,255,.07)"}}>
-            {["Email","Naam","Source","Status","Date"].map(h=>(
+            {["Email","Name","Source","Status","Date"].map(h=>(
               <th key={h} style={{padding:"12px 16px",textAlign:"left",fontSize:11,fontWeight:700,color:"rgba(255,255,255,.35)",letterSpacing:".07em"}}>{h.toUpperCase()}</th>
             ))}
           </tr></thead>
@@ -6997,14 +6997,14 @@ function PageNewsletter() {
             {sent ? (
               <div style={{textAlign:"center",padding:"24px 0"}}>
                 <div style={{fontSize:48,marginBottom:12}}>✅</div>
-                <h3 style={{margin:"0 0 8px",color:"#34d399"}}>Bhej Di Gayi!</h3>
-                <p style={{color:"rgba(255,255,255,.5)",fontSize:14}}>{sent.sent}/{sent.total} subscribers ko deliver hua</p>
+                <h3 style={{margin:"0 0 8px",color:"#34d399"}}>Newsletter Sent!</h3>
+                <p style={{color:"rgba(255,255,255,.5)",fontSize:14}}>Delivered to {sent.sent}/{sent.total} subscribers</p>
                 <button onClick={()=>setShowBcast(false)} style={{marginTop:16,padding:"9px 24px",borderRadius:10,border:"none",background:"#6366f1",color:"white",fontFamily:"inherit",fontWeight:700,cursor:"pointer"}}>Close</button>
               </div>
             ):(
               <>
                 <div style={{background:"rgba(99,102,241,.08)",border:"1px solid rgba(99,102,241,.2)",borderRadius:10,padding:"10px 14px",marginBottom:16,fontSize:13,color:"#a5b4fc"}}>
-                  📊 {active} active subscribers ko jayegi
+                  📊 Will be sent to {active} active subscribers
                 </div>
                 <div style={{marginBottom:12}}>
                   <label style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.35)",display:"block",marginBottom:6}}>SUBJECT *</label>
@@ -7012,9 +7012,9 @@ function PageNewsletter() {
                 </div>
                 <div style={{marginBottom:16}}>
                   <label style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.35)",display:"block",marginBottom:6}}>MESSAGE / HTML *</label>
-                  <textarea value={body} onChange={e=>setBody(e.target.value)} rows={7} style={{width:"100%",background:"rgba(255,255,255,.04)",border:"1.5px solid rgba(255,255,255,.1)",borderRadius:10,padding:"11px 14px",color:"white",fontFamily:"inherit",fontSize:13,outline:"none",resize:"vertical",boxSizing:"border-box"}} placeholder="Email content (plain text ya HTML)..." />
+                  <textarea value={body} onChange={e=>setBody(e.target.value)} rows={7} style={{width:"100%",background:"rgba(255,255,255,.04)",border:"1.5px solid rgba(255,255,255,.1)",borderRadius:10,padding:"11px 14px",color:"white",fontFamily:"inherit",fontSize:13,outline:"none",resize:"vertical",boxSizing:"border-box"}} placeholder="Email content (plain text or HTML)..." />
                 </div>
-                {preview!==null && <div style={{background:"rgba(251,191,36,.08)",border:"1px solid rgba(251,191,36,.25)",borderRadius:10,padding:"9px 14px",marginBottom:12,fontSize:13,color:"#fbbf24"}}>✅ {preview} subscribers ko jayegi — confirm karein?</div>}
+                {preview!==null && <div style={{background:"rgba(251,191,36,.08)",border:"1px solid rgba(251,191,36,.25)",borderRadius:10,padding:"9px 14px",marginBottom:12,fontSize:13,color:"#fbbf24"}}>✅ Will be sent to {preview} subscribers — confirm to proceed?</div>}
                 <div style={{display:"flex",gap:10}}>
                   {preview===null ? (
                     <button onClick={()=>doBroadcast(true)} disabled={!subj||!body||sending} style={{flex:1,padding:"10px",borderRadius:10,border:"1px solid rgba(251,191,36,.3)",background:"rgba(251,191,36,.1)",color:"#fbbf24",fontFamily:"inherit",fontWeight:700,cursor:"pointer"}}>
@@ -7022,7 +7022,7 @@ function PageNewsletter() {
                     </button>
                   ):(
                     <button onClick={()=>doBroadcast(false)} disabled={sending} style={{flex:1,padding:"10px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontFamily:"inherit",fontWeight:700,cursor:"pointer"}}>
-                      {sending?"Bhej raha hai...":"✅ Send Karo"}
+                      {sending?"Sending...":"✅ Send Newsletter"}
                     </button>
                   )}
                   <button onClick={()=>setPreview(null)} style={{padding:"10px 18px",borderRadius:10,border:"1px solid rgba(255,255,255,.1)",background:"transparent",color:"rgba(255,255,255,.5)",fontFamily:"inherit",cursor:"pointer"}}>Cancel</button>

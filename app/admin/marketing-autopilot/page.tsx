@@ -77,10 +77,10 @@ export default function MarketingAutopilotPage() {
   if (!ready) return <div style={{ minHeight: "100vh", background: BG }} />;
 
   const TABS: { id: Tab; icon: string; label: string; desc: string; color: string }[] = [
-    { id: "calendar",  icon: "📅", label: "Content Calendar",   desc: "AI se daily posts generate karo",           color: "#818cf8" },
-    { id: "ads",       icon: "🎯", label: "Ad Copy Generator",  desc: "$50 budget mein Facebook/Instagram ads",    color: "#f472b6" },
-    { id: "outreach",  icon: "📨", label: "Outreach Builder",   desc: "WhatsApp + Email cold scripts",             color: "#34d399" },
-    { id: "pipeline",  icon: "💼", label: "Lead Pipeline",      desc: "Prospect se paid customer track karo",      color: "#fbbf24" },
+    { id: "calendar",  icon: "📅", label: "Content Calendar",   desc: "AI-generated posts for your niche",          color: "#818cf8" },
+    { id: "ads",       icon: "🎯", label: "Ad Copy Generator",  desc: "Facebook & Instagram ad copy + targeting",  color: "#f472b6" },
+    { id: "outreach",  icon: "📨", label: "Outreach Builder",   desc: "WhatsApp & Email cold outreach scripts",    color: "#34d399" },
+    { id: "pipeline",  icon: "💼", label: "Lead Pipeline",      desc: "Track prospects from lead to paid customer", color: "#fbbf24" },
   ];
 
   return (
@@ -219,7 +219,7 @@ function ContentCalendarTab() {
 
         {/* What AI will generate */}
         <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(129,140,248,.06)", border: "1px solid rgba(129,140,248,.15)", marginBottom: 18 }}>
-          <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, marginBottom: 8 }}>AI kya likhega — {NICHES.find(n => n.v === niche)?.l} ke liye:</div>
+          <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, marginBottom: 8 }}>AI will generate content for: {NICHES.find(n => n.v === niche)?.l}</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 6 }}>
             {[
               "Pain point posts (manual work, errors, time waste)",
@@ -243,7 +243,7 @@ function ContentCalendarTab() {
       {/* Generated posts */}
       {posts.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>{posts.length} posts generated — review karke directly publish karo:</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>{posts.length} posts generated — review and publish directly:</div>
           {posts.map((p, i) => (
             <Card key={i} style={{ borderLeft: `3px solid ${PLATFORM_COLOR[p.platform] || "#818cf8"}` }}>
               <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
@@ -342,7 +342,7 @@ function AdCopyTab() {
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>🎯 Facebook & Instagram Ad Copy</h3>
         <p style={{ margin: "0 0 18px", fontSize: 13, color: "rgba(255,255,255,.4)" }}>
-          AI aapke budget aur niche ke hisaab se complete ad sets banata hai — headline, copy, CTA, targeting, aur budget split ke saath.
+          AI generates complete ad sets for your budget and niche — headline, copy, CTA, targeting, and budget split included.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 18 }}>
           <Sel label="Target Niche" options={[
@@ -392,7 +392,7 @@ function AdCopyTab() {
       {/* Generated ads */}
       {ads.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>{ads.length} ad sets — copy karke Facebook Ads Manager mein paste karo:</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>{ads.length} ad sets ready — copy and paste into Facebook Ads Manager:</div>
           {ads.map((ad, i) => (
             <Card key={i}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
@@ -466,7 +466,7 @@ function OutreachTab() {
       <Card>
         <h3 style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700 }}>📨 Cold Outreach Scripts</h3>
         <p style={{ margin: "0 0 18px", fontSize: 13, color: "rgba(255,255,255,.4)" }}>
-          AI niche ke hisaab se WhatsApp aur Email cold scripts banata hai — follow-up ke saath. Directly send karo ya WhatsApp blast mein use karo.
+          AI generates niche-specific WhatsApp and Email cold scripts — with follow-up messages included. Use directly or upload to WhatsApp Blast.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 18 }}>
           <Sel label="Target Business Type" options={[
@@ -494,7 +494,7 @@ function OutreachTab() {
         </div>
 
         <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.15)", marginBottom: 18, fontSize: 12, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
-          <strong style={{ color: "#34d399" }}>Pro tip:</strong> WhatsApp outreach ke liye pehle business directories (JustDial, Rozee, LinkedIn) se numbers collect karo. Phir admin panel ke WhatsApp Blasts tab mein CSV upload karke blast karo.
+          <strong style={{ color: "#34d399" }}>Pro tip:</strong> For WhatsApp outreach, collect numbers from business directories (JustDial, Rozee, LinkedIn) first. Then upload a CSV in the WhatsApp Blasts tab to send in bulk.
         </div>
 
         <Btn onClick={generate} loading={loading}>🤖 Generate Outreach Scripts</Btn>
