@@ -192,7 +192,7 @@ export default function IndustryPage() {
               color:"white", fontWeight:800, fontSize:15, textDecoration:"none",
               boxShadow:"0 8px 32px rgba(99,102,241,.4)",
             }}>
-              Start Free Trial →
+              Get Started →
             </Link>
             <Link href="/pricing" style={{
               padding:"14px 32px", borderRadius:14, background:"rgba(255,255,255,.06)",
@@ -281,7 +281,7 @@ export default function IndustryPage() {
                   padding:"14px 32px", borderRadius:12, background:"linear-gradient(135deg,#6366f1,#4f46e5)",
                   color:"white", fontWeight:800, fontSize:15, textDecoration:"none",
                 }}>
-                  Start Free Trial →
+                  Get Started →
                 </Link>
                 <Link href="/pricing" style={{
                   padding:"14px 28px", borderRadius:12, background:"rgba(255,255,255,.07)",
