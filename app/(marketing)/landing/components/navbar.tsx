@@ -149,6 +149,7 @@ const SOLUTIONS_CARDS = [
 const NAV_LINKS = [
   { label: "Pricing", href: "/pricing" },
   { label: "Blog",    href: "/blog" },
+  { label: "Contact", href: "/contact" },
 ]
 
 /* ─── Shared styles ─── */

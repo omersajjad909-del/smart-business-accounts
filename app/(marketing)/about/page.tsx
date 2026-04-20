@@ -2,86 +2,9 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-/* ══════════════════════════════════════════════════════════
-   DATA
-══════════════════════════════════════════════════════════ */
-const STATS = [
-  { value: "50+",    label: "Modules Available",     icon: "⬡" },
-  { value: "Multi",  label: "Currency Support",       icon: "🌍" },
-  { value: "AI",     label: "Powered Insights",       icon: "◆" },
-  { value: "99.9%",  label: "Uptime SLA",             icon: "⬢" },
-];
+const ff = "'Outfit','Inter',sans-serif";
 
-const VALUES = [
-  {
-    icon: "◈",
-    title: "Clarity Over Complexity",
-    desc: "Accounting software doesn't have to be intimidating. We obsess over making every feature intuitive — for founders, not just accountants.",
-    color: "#818cf8",
-    glow: "rgba(129,140,248,.15)",
-  },
-  {
-    icon: "🌍",
-    title: "Built for the World",
-    desc: "From San Francisco to London to Dubai — every business deserves world-class financial tools, regardless of where they operate.",
-    color: "#34d399",
-    glow: "rgba(52,211,153,.12)",
-  },
-  {
-    icon: "🔒",
-    title: "Trust is Non-Negotiable",
-    desc: "Your financial data is sacred. Strong encryption, strict access controls, and zero data selling — ever.",
-    color: "#38bdf8",
-    glow: "rgba(56,189,248,.12)",
-  },
-  {
-    icon: "⚡",
-    title: "Speed Matters",
-    desc: "A month-end close should take hours, not days. We build for speed at every layer — from UI to infrastructure.",
-    color: "#fbbf24",
-    glow: "rgba(251,191,36,.12)",
-  },
-  {
-    icon: "◎",
-    title: "Customer Obsession",
-    desc: "Every decision starts with the question: does this make our customers' lives easier? Support isn't a department — it's a mindset.",
-    color: "#c4b5fd",
-    glow: "rgba(196,181,253,.12)",
-  },
-  {
-    icon: "✦",
-    title: "Continuous Improvement",
-    desc: "We ship updates every week. Our changelog is public. We listen, we iterate, and we never stop getting better.",
-    color: "#f9a8d4",
-    glow: "rgba(249,168,212,.12)",
-  },
-];
-
-const TEAM: { name: string; role: string; bio: string; avatar: string; gradient: string; linkedin: string }[] = [];
-
-const TIMELINE = [
-  { year:"2024", title:"The Idea", desc:"Frustrated by outdated and expensive accounting software that didn't fit trading businesses, we started building FinovaOS — purpose-built for how real businesses actually work.", color:"#818cf8" },
-  { year:"2025", title:"First Version Launched", desc:"Launched with core accounting, inventory, and multi-branch support. Early users helped shape the direction. Built for Pakistan, UAE, and beyond.", color:"#34d399" },
-  { year:"Now",  title:"Growing Platform", desc:"50+ modules, AI insights, multi-currency, payroll, CRM, and more. Continuously shipping based on real business feedback.", color:"#6366f1" },
-];
-
-const PRESS: { name: string; logo: string; quote: string }[] = [];
-
-const PERKS = [
-  { icon:"🌍", label:"Remote-first" },
-  { icon:"💰", label:"Competitive equity" },
-  { icon:"🏥", label:"Full health cover" },
-  { icon:"📚", label:"$2,000 learning budget" },
-  { icon:"✈️",  label:"Annual team retreats" },
-  { icon:"🕐", label:"Flexible hours" },
-  { icon:"🍼", label:"Generous parental leave" },
-  { icon:"💻", label:"Top-spec equipment" },
-];
-
-/* ══════════════════════════════════════════════════════════
-   HELPERS
-══════════════════════════════════════════════════════════ */
-function useInView(threshold = 0.15) {
+function useInView(threshold = 0.12) {
   const ref = useRef<HTMLDivElement>(null);
   const [vis, setVis] = useState(false);
   useEffect(() => {
@@ -92,13 +15,13 @@ function useInView(threshold = 0.15) {
   return { ref, vis };
 }
 
-function Section({ children, style, id }: { children: React.ReactNode; style?: React.CSSProperties; id?: string }) {
+function FadeIn({ children, delay = 0, style }: { children: React.ReactNode; delay?: number; style?: React.CSSProperties }) {
   const { ref, vis } = useInView();
   return (
-    <div ref={ref} id={id} style={{
+    <div ref={ref} style={{
       opacity: vis ? 1 : 0,
-      transform: vis ? "translateY(0)" : "translateY(32px)",
-      transition: "opacity .65s ease, transform .65s ease",
+      transform: vis ? "translateY(0)" : "translateY(28px)",
+      transition: `opacity .7s ease ${delay}ms, transform .7s ease ${delay}ms`,
       ...style,
     }}>
       {children}
@@ -106,387 +29,294 @@ function Section({ children, style, id }: { children: React.ReactNode; style?: R
   );
 }
 
-function SectionLabel({ text }: { text: string }) {
-  return (
-    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:14 }}>
-      <div style={{ height:1, width:32, background:"rgba(99,102,241,.4)" }}/>
-      <span style={{ fontSize:11, fontWeight:800, color:"#818cf8", letterSpacing:".12em", textTransform:"uppercase" }}>{text}</span>
-      <div style={{ height:1, width:32, background:"rgba(99,102,241,.4)" }}/>
-    </div>
-  );
-}
+const MODULES = [
+  { icon: "📊", label: "Accounting" },
+  { icon: "📦", label: "Inventory" },
+  { icon: "🧾", label: "Invoicing" },
+  { icon: "👥", label: "CRM" },
+  { icon: "💰", label: "Payroll" },
+  { icon: "🏦", label: "Banking" },
+  { icon: "🤖", label: "AI Insights" },
+  { icon: "🏢", label: "Multi-Branch" },
+  { icon: "🌍", label: "Multi-Currency" },
+  { icon: "📈", label: "Reports" },
+  { icon: "🛒", label: "Purchase Orders" },
+  { icon: "⚙️", label: "50+ More" },
+];
 
-/* ══════════════════════════════════════════════════════════
-   MAIN COMPONENT
-══════════════════════════════════════════════════════════ */
+const VALUES = [
+  { icon: "🎯", title: "Built for Real Businesses", desc: "Not demo companies. We built this for trading, wholesale, and distribution businesses — the ones that actually need multi-branch, multi-currency, and landed cost.", color: "#818cf8" },
+  { icon: "🔒", title: "Your Data is Yours", desc: "We don't sell your data. Ever. Your financial records stay private, encrypted, and fully under your control.", color: "#34d399" },
+  { icon: "⚡", title: "Speed at Every Level", desc: "Fast UI, fast reports, fast support. Month-end close in hours, not days.", color: "#fbbf24" },
+  { icon: "📞", title: "Real Support", desc: "When something breaks, a real person responds — not a chatbot. We're here because your business can't wait.", color: "#38bdf8" },
+  { icon: "🚀", title: "Continuously Shipping", desc: "We push updates every week based on real feedback. Our roadmap is driven by what you actually need.", color: "#c4b5fd" },
+  { icon: "💡", title: "Affordable by Design", desc: "Enterprise-level features at a price that makes sense for growing businesses. No hidden fees, no surprise charges.", color: "#f9a8d4" },
+];
+
+const TIMELINE = [
+  { year: "2024", title: "The Problem", desc: "Existing accounting software was either too expensive, too complex, or not built for trading and wholesale businesses. We decided to build something better.", color: "#818cf8", dot: "◉" },
+  { year: "2025", title: "FinovaOS Launched", desc: "First version shipped with core accounting, inventory, multi-branch, and AI insights. Built specifically for Pakistan, UAE, and regional trading businesses.", color: "#34d399", dot: "◉" },
+  { year: "Now", title: "Growing Every Week", desc: "50+ modules, payroll, CRM, landed cost, multi-currency, and more. Every feature built from real customer feedback.", color: "#6366f1", dot: "◉" },
+];
+
 export default function AboutPage() {
-  const heroRef = useRef<HTMLDivElement>(null);
   const [heroVis, setHeroVis] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setHeroVis(true), 100);
-    return () => clearTimeout(t);
-  }, []);
+  useEffect(() => { const t = setTimeout(() => setHeroVis(true), 80); return () => clearTimeout(t); }, []);
 
   return (
-    <main style={{
-      minHeight: "100vh",
-      background: "linear-gradient(160deg,#080c1e 0%,#0c0f2e 50%,#080c1e 100%)",
-      color: "white",
-      fontFamily: "'DM Sans','Outfit',system-ui,sans-serif",
-      overflowX: "hidden",
-    }}>
+    <main style={{ minHeight: "100vh", background: "linear-gradient(160deg,#04061a 0%,#07091f 60%,#0a0620 100%)", color: "white", fontFamily: ff, overflowX: "hidden" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+        *,*::before,*::after{box-sizing:border-box;margin:0;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse2{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}70%{box-shadow:0 0 0 7px rgba(16,185,129,0)}}
+        @keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        @keyframes orbA{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+        @keyframes orbB{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,15px)}}
+        @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+        .about-cta-primary{display:inline-flex;align-items:center;gap:9px;padding:14px 30px;border-radius:13px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-family:inherit;font-size:14px;font-weight:700;border:none;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(99,102,241,.4);transition:all .2s;}
+        .about-cta-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,102,241,.5);}
+        .about-cta-ghost{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:13px;border:1.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);background:rgba(255,255,255,.04);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;}
+        .about-cta-ghost:hover{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;transform:translateY(-1px);}
+        .val-card{transition:transform .2s,box-shadow .2s,border-color .2s;}
+        .val-card:hover{transform:translateY(-5px)!important;}
+        @media(max-width:860px){.about-grid-3{grid-template-columns:repeat(2,1fr)!important;}.about-grid-2{grid-template-columns:1fr!important;}}
+        @media(max-width:560px){.about-grid-3{grid-template-columns:1fr!important;}.about-grid-mod{grid-template-columns:repeat(3,1fr)!important;}}
+      `}</style>
 
       {/* ── HERO ── */}
-      <section style={{
-        position: "relative", overflow: "hidden",
-        padding: "140px 24px 100px",
-        textAlign: "center",
-      }}>
-        {/* Background orbs */}
-        <div style={{ position:"absolute", top:-120, left:"50%", transform:"translateX(-50%)", width:700, height:700, borderRadius:"50%", background:"radial-gradient(circle,rgba(99,102,241,.18) 0%,transparent 70%)", pointerEvents:"none" }}/>
-        <div style={{ position:"absolute", top:60, left:"10%", width:300, height:300, borderRadius:"50%", background:"radial-gradient(circle,rgba(124,58,237,.12) 0%,transparent 70%)", pointerEvents:"none" }}/>
-        <div style={{ position:"absolute", top:40, right:"8%", width:250, height:250, borderRadius:"50%", background:"radial-gradient(circle,rgba(56,189,248,.1) 0%,transparent 70%)", pointerEvents:"none" }}/>
+      <section style={{ position: "relative", overflow: "hidden", padding: "140px 24px 90px", textAlign: "center" }}>
+        {/* Background */}
+        <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
+          <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(99,102,241,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.04) 1px,transparent 1px)", backgroundSize:"56px 56px" }}/>
+          <div style={{ position:"absolute", width:700, height:700, borderRadius:"50%", top:-200, left:"50%", transform:"translateX(-50%)", animation:"orbA 18s ease-in-out infinite", background:"radial-gradient(circle,rgba(99,102,241,.15),transparent 65%)" }}/>
+          <div style={{ position:"absolute", width:400, height:400, borderRadius:"50%", bottom:-80, right:"5%", animation:"orbB 22s ease-in-out infinite", background:"radial-gradient(circle,rgba(109,40,217,.1),transparent 65%)" }}/>
+        </div>
 
-        <div ref={heroRef} style={{ maxWidth:760, margin:"0 auto", position:"relative", zIndex:1 }}>
-          {/* Tag */}
+        <div style={{ maxWidth: 780, margin: "0 auto", position: "relative", zIndex: 1 }}>
+
+          {/* Badge */}
           <div style={{
-            display:"inline-flex", alignItems:"center", gap:8,
-            padding:"6px 16px", borderRadius:24,
-            background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)",
+            display:"inline-flex", alignItems:"center", gap:8, padding:"6px 14px 6px 10px",
+            borderRadius:100, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.22)",
             marginBottom:28,
             opacity: heroVis?1:0, transform: heroVis?"translateY(0)":"translateY(16px)",
-            transition:"opacity .6s ease, transform .6s ease",
+            transition:"opacity .55s ease, transform .55s ease",
           }}>
-            <div style={{ width:6, height:6, borderRadius:"50%", background:"#34d399" }}/>
-            <span style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.7)", letterSpacing:".06em" }}>OUR STORY</span>
+            <span style={{ width:7, height:7, borderRadius:"50%", background:"#10b981", animation:"pulse2 2s infinite", display:"inline-block" }}/>
+            <span style={{ fontSize:11, fontWeight:700, color:"#a5b4fc", letterSpacing:".08em" }}>ABOUT FINOVAOS</span>
           </div>
 
-          {/* Heading */}
+          {/* Headline */}
           <h1 style={{
-            fontSize:"clamp(38px,6vw,68px)", fontWeight:900,
-            letterSpacing:"-.03em", lineHeight:1.1,
-            fontFamily:"Lora,Georgia,serif",
-            margin:"0 0 24px",
+            fontSize:"clamp(40px,6vw,70px)", fontWeight:900, lineHeight:1.05,
+            letterSpacing:"-2.5px", color:"#fff", marginBottom:24,
             opacity: heroVis?1:0, transform: heroVis?"translateY(0)":"translateY(20px)",
-            transition:"opacity .65s ease .1s, transform .65s ease .1s",
+            transition:"opacity .6s ease .1s, transform .6s ease .1s",
           }}>
-            We're building the financial
-            <span style={{ display:"block", background:"linear-gradient(90deg,#818cf8,#c4b5fd,#38bdf8)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
-              OS for global business
+            Built for businesses that{" "}
+            <span style={{
+              background:"linear-gradient(135deg,#818cf8,#a78bfa,#60a5fa)",
+              backgroundSize:"200% auto", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
+              animation:"gradShift 4s ease infinite",
+            }}>
+              actually work hard
             </span>
           </h1>
 
+          {/* Subheading */}
           <p style={{
-            fontSize:"clamp(16px,2vw,19px)", color:"rgba(255,255,255,.55)", lineHeight:1.75,
-            margin:"0 auto 40px", maxWidth:580,
+            fontSize:"clamp(15px,2vw,18px)", color:"rgba(255,255,255,.48)", lineHeight:1.8,
+            maxWidth:560, margin:"0 auto 40px",
             opacity: heroVis?1:0, transform: heroVis?"translateY(0)":"translateY(20px)",
-            transition:"opacity .65s ease .2s, transform .65s ease .2s",
+            transition:"opacity .6s ease .2s, transform .6s ease .2s",
           }}>
-            FinovaOS was born from a simple belief — every business in the world deserves accounting software that is powerful, beautiful, and actually affordable.
+            FinovaOS was built from frustration — expensive, outdated software that never fit
+            trading and wholesale businesses. We built what they actually needed.
           </p>
 
+          {/* CTAs */}
           <div style={{
-            display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap",
+            display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap",
             opacity: heroVis?1:0, transform: heroVis?"translateY(0)":"translateY(20px)",
-            transition:"opacity .65s ease .3s, transform .65s ease .3s",
+            transition:"opacity .6s ease .3s, transform .6s ease .3s",
           }}>
-            <Link href="/signup" style={{
-              padding:"13px 30px", borderRadius:12, fontWeight:800, fontSize:14,
-              background:"linear-gradient(135deg,#4f46e5,#7c3aed)",
-              color:"white", textDecoration:"none",
-              boxShadow:"0 4px 24px rgba(79,70,229,.4)",
-            }}>
-              Get Started
+            <Link href="/onboarding/signup/starter" className="about-cta-primary">
+              Start Free Trial
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </Link>
-            <Link href="/careers" style={{
-              padding:"13px 30px", borderRadius:12, fontWeight:700, fontSize:14,
-              background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)",
-              color:"rgba(255,255,255,.8)", textDecoration:"none",
-            }}>
-              We're Hiring →
+            <Link href="/contact" className="about-cta-ghost">
+              Talk to Us →
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── STATS ── */}
-      <Section>
-        <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 80px" }}>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:16 }}>
-            {STATS.map((s,i)=>(
-              <div key={s.label} style={{
-                background:"rgba(255,255,255,.03)", borderRadius:18,
-                border:"1px solid rgba(255,255,255,.07)",
-                padding:"28px 24px", textAlign:"center",
-                transition:"transform .2s, box-shadow .2s",
-              }}
-                onMouseEnter={e=>(e.currentTarget.style.transform="translateY(-4px)")}
-                onMouseLeave={e=>(e.currentTarget.style.transform="translateY(0)")}
-              >
-                <div style={{ fontSize:24, marginBottom:10 }}>{s.icon}</div>
-                <div style={{ fontSize:36, fontWeight:900, color:"white", letterSpacing:"-.02em", fontFamily:"Lora,serif" }}>{s.value}</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginTop:6, fontWeight:500 }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Section>
-
-      {/* ── MISSION ── */}
-      <Section>
-        <div style={{ maxWidth:900, margin:"0 auto", padding:"0 24px 100px", textAlign:"center" }}>
-          <SectionLabel text="Our Mission"/>
-          <h2 style={{ fontSize:"clamp(28px,4vw,44px)", fontWeight:800, letterSpacing:"-.02em", lineHeight:1.25, margin:"0 0 24px", fontFamily:"Lora,serif" }}>
-            Finance tools shouldn't be a privilege
-          </h2>
-          <p style={{ fontSize:17, color:"rgba(255,255,255,.5)", lineHeight:1.8, maxWidth:680, margin:"0 auto 40px" }}>
-            For too long, world-class accounting software has been expensive, complex, and built only for Western markets. FinovaOS changes that. We're building infrastructure that makes every business — from a boutique in Singapore to a logistics firm in Lagos — financially unstoppable.
-          </p>
-          {/* Mission pillars */}
-          <div className="about-3col" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginTop:20 }}>
-            {[
-              { icon:"💡", title:"Simplify", desc:"Turn complex accounting into intuitive workflows anyone can use." },
-              { icon:"🌐", title:"Globalise", desc:"Multi-currency, multi-language, multi-compliance — one platform." },
-              { icon:"🚀", title:"Accelerate", desc:"Close your books faster. Make better decisions. Grow quicker." },
-            ].map(p=>(
-              <div key={p.title} style={{ padding:"24px 20px", borderRadius:16, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)" }}>
-                <div style={{ fontSize:28, marginBottom:10 }}>{p.icon}</div>
-                <div style={{ fontSize:15, fontWeight:700, color:"white", marginBottom:6 }}>{p.title}</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.6 }}>{p.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Section>
-
-      {/* ── STORY / TIMELINE ── */}
-      <Section>
-        <div style={{ maxWidth:900, margin:"0 auto", padding:"0 24px 100px" }}>
-          <div style={{ textAlign:"center", marginBottom:52 }}>
-            <SectionLabel text="Our Journey"/>
-            <h2 style={{ fontSize:"clamp(26px,4vw,40px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:0 }}>
-              From a shared workspace<br/>to 40+ countries
+      {/* ── WHAT IS FINOVAOS ── */}
+      <FadeIn style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 90px" }}>
+        <div style={{
+          borderRadius:24, padding:"52px 48px",
+          background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.07)",
+          display:"grid", gridTemplateColumns:"1fr 1fr", gap:48, alignItems:"center",
+        }} className="about-grid-2">
+          <div>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 14px", borderRadius:100, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.2)", marginBottom:20 }}>
+              <span style={{ fontSize:11, fontWeight:700, color:"#818cf8", letterSpacing:".08em" }}>WHAT WE ARE</span>
+            </div>
+            <h2 style={{ fontSize:"clamp(26px,3.5vw,40px)", fontWeight:800, letterSpacing:"-1.5px", lineHeight:1.2, marginBottom:18 }}>
+              One platform. Every tool your business needs.
             </h2>
+            <p style={{ fontSize:15, color:"rgba(255,255,255,.45)", lineHeight:1.8, marginBottom:24 }}>
+              FinovaOS is a complete business management platform — accounting, inventory, payroll, CRM, and AI insights — all connected in one system. No switching between apps. No broken integrations.
+            </p>
+            <p style={{ fontSize:15, color:"rgba(255,255,255,.45)", lineHeight:1.8 }}>
+              Purpose-built for trading, wholesale, distribution, and manufacturing businesses in Pakistan, UAE, and beyond.
+            </p>
           </div>
-          <div style={{ position:"relative" }}>
-            {/* Center line */}
-            <div style={{ position:"absolute", left:"50%", top:0, bottom:0, width:2, background:"rgba(99,102,241,.2)", transform:"translateX(-50%)" }}/>
-            {TIMELINE.map((t, i)=>{
-              const isLeft = i%2===0;
-              return (
-                <div key={t.year} style={{
-                  display:"flex", justifyContent: isLeft?"flex-start":"flex-end",
-                  marginBottom:32, position:"relative",
-                }}>
-                  {/* Dot */}
-                  <div style={{
-                    position:"absolute", left:"50%", top:18, transform:"translateX(-50%)",
-                    width:14, height:14, borderRadius:"50%",
-                    background:t.color, border:"3px solid #080c1e",
-                    boxShadow:`0 0 12px ${t.color}66`, zIndex:1,
-                  }}/>
-                  {/* Card */}
-                  <div style={{
-                    width:"44%",
-                    marginLeft: isLeft?0:"6%",
-                    marginRight: isLeft?"6%":0,
-                    background:"rgba(255,255,255,.03)", borderRadius:14,
-                    border:`1px solid rgba(255,255,255,.07)`,
-                    padding:"18px 20px",
-                    borderLeft: isLeft?`3px solid ${t.color}`:"1px solid rgba(255,255,255,.07)",
-                    borderRight: !isLeft?`3px solid ${t.color}`:"1px solid rgba(255,255,255,.07)",
-                  }}>
-                    <div style={{ fontSize:11, fontWeight:800, color:t.color, letterSpacing:".08em", marginBottom:6 }}>{t.year}</div>
-                    <div style={{ fontSize:15, fontWeight:700, color:"white", marginBottom:6 }}>{t.title}</div>
-                    <div style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.6 }}>{t.desc}</div>
-                  </div>
-                </div>
-              );
-            })}
+          {/* Module grid */}
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10 }} className="about-grid-mod">
+            {MODULES.map(m => (
+              <div key={m.label} style={{
+                background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)",
+                borderRadius:12, padding:"14px 8px", textAlign:"center",
+                transition:"background .2s, border-color .2s",
+              }}
+                onMouseEnter={e=>{ e.currentTarget.style.background="rgba(99,102,241,.1)"; e.currentTarget.style.borderColor="rgba(99,102,241,.3)"; }}
+                onMouseLeave={e=>{ e.currentTarget.style.background="rgba(255,255,255,.04)"; e.currentTarget.style.borderColor="rgba(255,255,255,.07)"; }}
+              >
+                <div style={{ fontSize:20, marginBottom:6 }}>{m.icon}</div>
+                <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", letterSpacing:".04em" }}>{m.label}</div>
+              </div>
+            ))}
           </div>
         </div>
-      </Section>
+      </FadeIn>
+
+      {/* ── TIMELINE ── */}
+      <FadeIn style={{ maxWidth:800, margin:"0 auto", padding:"0 24px 90px" }}>
+        <div style={{ textAlign:"center", marginBottom:48 }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:10, marginBottom:16 }}>
+            <div style={{ height:1, width:28, background:"rgba(99,102,241,.4)" }}/>
+            <span style={{ fontSize:11, fontWeight:800, color:"#818cf8", letterSpacing:".1em", textTransform:"uppercase" }}>Our Journey</span>
+            <div style={{ height:1, width:28, background:"rgba(99,102,241,.4)" }}/>
+          </div>
+          <h2 style={{ fontSize:"clamp(26px,3.5vw,38px)", fontWeight:800, letterSpacing:"-1.5px", lineHeight:1.2 }}>
+            How we got here
+          </h2>
+        </div>
+
+        <div style={{ position:"relative" }}>
+          {/* Line */}
+          <div style={{ position:"absolute", left:28, top:14, bottom:14, width:2, background:"linear-gradient(180deg,#6366f1,#34d399,#6366f1)", borderRadius:2 }}/>
+
+          {TIMELINE.map((t, i) => (
+            <div key={t.year} style={{ display:"flex", gap:28, marginBottom: i < TIMELINE.length-1 ? 36 : 0 }}>
+              {/* Dot */}
+              <div style={{ flexShrink:0, width:58, display:"flex", flexDirection:"column", alignItems:"center", paddingTop:4 }}>
+                <div style={{ width:16, height:16, borderRadius:"50%", background:t.color, border:"3px solid #04061a", boxShadow:`0 0 14px ${t.color}80`, zIndex:1 }}/>
+              </div>
+              {/* Card */}
+              <div style={{
+                flex:1, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)",
+                borderLeft:`3px solid ${t.color}`, borderRadius:"0 14px 14px 0",
+                padding:"20px 24px", marginBottom:0,
+              }}>
+                <div style={{ fontSize:11, fontWeight:800, color:t.color, letterSpacing:".08em", marginBottom:6 }}>{t.year}</div>
+                <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:8 }}>{t.title}</div>
+                <div style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.7 }}>{t.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </FadeIn>
 
       {/* ── VALUES ── */}
-      <Section>
-        <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 100px" }}>
-          <div style={{ textAlign:"center", marginBottom:52 }}>
-            <SectionLabel text="What We Believe"/>
-            <h2 style={{ fontSize:"clamp(26px,4vw,40px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:0 }}>
-              Values that guide everything
-            </h2>
+      <FadeIn style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 90px" }}>
+        <div style={{ textAlign:"center", marginBottom:48 }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:10, marginBottom:16 }}>
+            <div style={{ height:1, width:28, background:"rgba(99,102,241,.4)" }}/>
+            <span style={{ fontSize:11, fontWeight:800, color:"#818cf8", letterSpacing:".1em", textTransform:"uppercase" }}>What We Believe</span>
+            <div style={{ height:1, width:28, background:"rgba(99,102,241,.4)" }}/>
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))", gap:16 }}>
-            {VALUES.map(v=>(
-              <div key={v.title} style={{
-                padding:"26px 24px", borderRadius:18,
-                background:`linear-gradient(135deg,${v.glow},rgba(255,255,255,.02))`,
-                border:"1px solid rgba(255,255,255,.07)",
-                transition:"transform .2s, box-shadow .2s",
-              }}
-                onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow=`0 12px 40px ${v.glow}`; }}
-                onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}
-              >
-                <div style={{ fontSize:28, marginBottom:14, color:v.color }}>{v.icon}</div>
-                <div style={{ fontSize:15, fontWeight:700, color:"white", marginBottom:8 }}>{v.title}</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.7 }}>{v.desc}</div>
-              </div>
-            ))}
-          </div>
+          <h2 style={{ fontSize:"clamp(26px,3.5vw,38px)", fontWeight:800, letterSpacing:"-1.5px", lineHeight:1.2 }}>
+            Our principles
+          </h2>
         </div>
-      </Section>
-
-      {/* ── TEAM (hidden until real members added) ── */}
-      {TEAM.length > 0 && (
-        <Section>
-          <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 100px" }}>
-            <div style={{ textAlign:"center", marginBottom:52 }}>
-              <SectionLabel text="The Team"/>
-              <h2 style={{ fontSize:"clamp(26px,4vw,40px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 14px" }}>
-                The people behind FinovaOS
-              </h2>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16 }} className="about-grid-3">
+          {VALUES.map(v => (
+            <div key={v.title} className="val-card" style={{
+              padding:"28px 24px", borderRadius:18,
+              background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)",
+            }}
+              onMouseEnter={e=>{ (e.currentTarget as HTMLDivElement).style.borderColor=v.color+"40"; (e.currentTarget as HTMLDivElement).style.boxShadow=`0 12px 40px ${v.color}15`; }}
+              onMouseLeave={e=>{ (e.currentTarget as HTMLDivElement).style.borderColor="rgba(255,255,255,.07)"; (e.currentTarget as HTMLDivElement).style.boxShadow="none"; }}
+            >
+              <div style={{ width:44, height:44, borderRadius:12, background:`${v.color}18`, border:`1px solid ${v.color}30`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, marginBottom:16 }}>
+                {v.icon}
+              </div>
+              <div style={{ fontSize:15, fontWeight:700, color:"#fff", marginBottom:8 }}>{v.title}</div>
+              <div style={{ fontSize:13, color:"rgba(255,255,255,.42)", lineHeight:1.7 }}>{v.desc}</div>
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))", gap:20 }}>
-              {TEAM.map(m=>(
-                <div key={m.name} style={{ background:"rgba(255,255,255,.03)", borderRadius:18, border:"1px solid rgba(255,255,255,.07)", padding:"24px", transition:"transform .2s, border-color .2s" }}
-                  onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.borderColor="rgba(99,102,241,.3)"; }}
-                  onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.borderColor="rgba(255,255,255,.07)"; }}
-                >
-                  <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:14 }}>
-                    <div style={{ width:52, height:52, borderRadius:14, background:m.gradient, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, fontWeight:800, color:"white", flexShrink:0 }}>{m.avatar}</div>
-                    <div>
-                      <div style={{ fontSize:15, fontWeight:700, color:"white" }}>{m.name}</div>
-                      <div style={{ fontSize:12, color:"#818cf8", marginTop:2, fontWeight:600 }}>{m.role}</div>
-                    </div>
-                  </div>
-                  <p style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.7, margin:0 }}>{m.bio}</p>
+          ))}
+        </div>
+      </FadeIn>
+
+      {/* ── WHY DIFFERENT ── */}
+      <FadeIn style={{ maxWidth:900, margin:"0 auto", padding:"0 24px 90px" }}>
+        <div style={{
+          borderRadius:22, padding:"52px 48px", textAlign:"center",
+          background:"linear-gradient(135deg,rgba(99,102,241,.08),rgba(109,40,217,.06))",
+          border:"1px solid rgba(99,102,241,.2)", position:"relative", overflow:"hidden",
+        }}>
+          <div style={{ position:"absolute", top:-60, right:-60, width:250, height:250, borderRadius:"50%", background:"rgba(99,102,241,.08)", filter:"blur(50px)", pointerEvents:"none" }}/>
+          <div style={{ position:"relative", zIndex:1 }}>
+            <div style={{ fontSize:36, marginBottom:16 }}>🤔</div>
+            <h2 style={{ fontSize:"clamp(24px,3.5vw,36px)", fontWeight:800, letterSpacing:"-1.5px", marginBottom:16 }}>
+              Why not just use QuickBooks or Xero?
+            </h2>
+            <p style={{ fontSize:15, color:"rgba(255,255,255,.5)", lineHeight:1.8, maxWidth:640, margin:"0 auto 32px" }}>
+              Those tools are great — for Western businesses. They weren't designed for landed cost calculations, local supplier terms, multi-warehouse management, or the way trading businesses in Pakistan and UAE actually operate. FinovaOS was.
+            </p>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, maxWidth:640, margin:"0 auto" }} className="about-grid-3">
+              {[
+                { label:"Landed Cost", sub:"Built-in calculation" },
+                { label:"Local Compliance", sub:"PKR, AED, SAR ready" },
+                { label:"Trading Focus", sub:"PO → PI → Payment flow" },
+              ].map(f => (
+                <div key={f.label} style={{ padding:"16px", borderRadius:12, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)" }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#fff", marginBottom:4 }}>{f.label}</div>
+                  <div style={{ fontSize:12, color:"rgba(255,255,255,.35)" }}>{f.sub}</div>
                 </div>
               ))}
             </div>
           </div>
-        </Section>
-      )}
-
-      {/* ── PRESS (hidden until real press coverage) ── */}
-      {PRESS.length > 0 && (
-        <Section>
-          <div style={{ maxWidth:1000, margin:"0 auto", padding:"0 24px 100px", textAlign:"center" }}>
-            <SectionLabel text="In The Press"/>
-            <h2 style={{ fontSize:"clamp(22px,3vw,34px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 40px" }}>
-              What the world is saying
-            </h2>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:16 }}>
-              {PRESS.map(p=>(
-                <div key={p.name} style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", padding:"24px 20px" }}>
-                  <div style={{ width:40, height:40, borderRadius:10, background:"rgba(255,255,255,.08)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, color:"white", margin:"0 auto 14px" }}>{p.logo}</div>
-                  <div style={{ fontSize:15, fontWeight:800, color:"white", marginBottom:10 }}>{p.name}</div>
-                  <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.6, margin:0, fontStyle:"italic" }}>"{p.quote}"</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Section>
-      )}
-
-      {/* ── CAREERS ── */}
-      <Section>
-        <div style={{ maxWidth:960, margin:"0 auto", padding:"0 24px 100px" }}>
-          <div style={{
-            borderRadius:24, overflow:"hidden", position:"relative",
-            background:"linear-gradient(135deg,#1e1b4b,#312e81,#1e1b4b)",
-            border:"1px solid rgba(99,102,241,.3)",
-            padding:"56px 48px",
-          }}>
-            {/* BG decoration */}
-            <div style={{ position:"absolute", top:-80, right:-80, width:300, height:300, borderRadius:"50%", background:"rgba(99,102,241,.15)", filter:"blur(60px)", pointerEvents:"none" }}/>
-            <div style={{ position:"absolute", bottom:-60, left:-60, width:250, height:250, borderRadius:"50%", background:"rgba(124,58,237,.12)", filter:"blur(50px)", pointerEvents:"none" }}/>
-
-            <div style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", justifyContent:"space-between", gap:32, flexWrap:"wrap" }}>
-              <div style={{ flex:1, minWidth:280 }}>
-                <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 14px", borderRadius:20, background:"rgba(99,102,241,.2)", border:"1px solid rgba(99,102,241,.3)", marginBottom:16 }}>
-                  <div style={{ width:6, height:6, borderRadius:"50%", background:"#34d399" }}/>
-                  <span style={{ fontSize:11, fontWeight:800, color:"#818cf8", letterSpacing:".08em" }}>WE'RE HIRING</span>
-                </div>
-                <h2 style={{ fontSize:"clamp(24px,3.5vw,36px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 14px", lineHeight:1.2 }}>
-                  Join us in building<br/>the future of finance
-                </h2>
-                <p style={{ fontSize:15, color:"rgba(255,255,255,.5)", lineHeight:1.7, margin:"0 0 24px", maxWidth:440 }}>
-                  We're a remote-first team of 120+ across 18 countries. If you care about craft, customers, and impact — we want to hear from you.
-                </p>
-                {/* Perks */}
-                <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:28 }}>
-                  {PERKS.map(p=>(
-                    <div key={p.label} style={{ padding:"5px 12px", borderRadius:20, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", fontSize:12, color:"rgba(255,255,255,.6)", fontWeight:600 }}>
-                      {p.icon} {p.label}
-                    </div>
-                  ))}
-                </div>
-                <Link href="/careers" style={{
-                  display:"inline-flex", alignItems:"center", gap:8,
-                  padding:"13px 28px", borderRadius:12,
-                  background:"linear-gradient(135deg,#4f46e5,#7c3aed)",
-                  color:"white", textDecoration:"none", fontWeight:800, fontSize:14,
-                  boxShadow:"0 4px 24px rgba(79,70,229,.4)",
-                }}>
-                  View Open Roles →
-                </Link>
-              </div>
-
-              {/* Open roles count */}
-              <div style={{ textAlign:"center", flexShrink:0 }}>
-                <div style={{ fontSize:72, fontWeight:900, color:"white", letterSpacing:"-.03em", lineHeight:1, fontFamily:"Lora,serif" }}>24</div>
-                <div style={{ fontSize:14, color:"rgba(255,255,255,.4)", marginTop:4, fontWeight:600 }}>Open Positions</div>
-                <div style={{ fontSize:12, color:"rgba(255,255,255,.25)", marginTop:4 }}>Across 8 departments</div>
-              </div>
-            </div>
-          </div>
         </div>
-      </Section>
+      </FadeIn>
 
       {/* ── FINAL CTA ── */}
-      <Section>
-        <div style={{ maxWidth:680, margin:"0 auto", padding:"0 24px 120px", textAlign:"center" }}>
-          <SectionLabel text="Get Started"/>
-          <h2 style={{ fontSize:"clamp(28px,4vw,44px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 16px" }}>
-            Ready to transform your finances?
-          </h2>
-          <p style={{ fontSize:16, color:"rgba(255,255,255,.45)", lineHeight:1.7, margin:"0 auto 36px", maxWidth:480 }}>
-            Join 12,000+ businesses who've made the switch. Free 14-day trial. No credit card required.
-          </p>
-          <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap", marginBottom:48 }}>
-            <Link href="/signup" style={{
-              padding:"14px 34px", borderRadius:12, fontWeight:800, fontSize:15,
-              background:"linear-gradient(135deg,#4f46e5,#7c3aed)",
-              color:"white", textDecoration:"none",
-              boxShadow:"0 4px 24px rgba(79,70,229,.4)",
-            }}>
-              Get Started
-            </Link>
-            <Link href="/demo" style={{
-              padding:"14px 34px", borderRadius:12, fontWeight:700, fontSize:15,
-              background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)",
-              color:"rgba(255,255,255,.8)", textDecoration:"none",
-            }}>
-              Try Live Demo
-            </Link>
-          </div>
-
-          <div style={{ display:"flex", gap:28, justifyContent:"center", flexWrap:"wrap" }}>
-            <Link href="/blog" style={{ fontSize:13, fontWeight:700, color:"#818cf8", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6 }}>
-              📚 Read our blog →
-            </Link>
-            <Link href="/contact" style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.45)", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:6 }}>
-              Talk to Sales →
-            </Link>
-          </div>
+      <FadeIn style={{ maxWidth:680, margin:"0 auto", padding:"0 24px 120px", textAlign:"center" }}>
+        <div style={{ fontSize:40, marginBottom:20 }}>🚀</div>
+        <h2 style={{ fontSize:"clamp(28px,4vw,44px)", fontWeight:800, letterSpacing:"-1.5px", marginBottom:16, lineHeight:1.15 }}>
+          Ready to run your business smarter?
+        </h2>
+        <p style={{ fontSize:16, color:"rgba(255,255,255,.4)", lineHeight:1.75, maxWidth:460, margin:"0 auto 36px" }}>
+          Start free — no credit card needed. See why trading businesses choose FinovaOS.
+        </p>
+        <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap", marginBottom:32 }}>
+          <Link href="/onboarding/signup/starter" className="about-cta-primary">
+            Get Started Free
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </Link>
+          <Link href="/demo" className="about-cta-ghost">
+            Watch Demo →
+          </Link>
         </div>
-      </Section>
-
-      <style>{`
-        @media(max-width:860px){.about-3col{grid-template-columns:repeat(2,1fr)!important;}}
-        @media(max-width:480px){.about-3col{grid-template-columns:1fr!important;}}
-      `}</style>
+        <div style={{ display:"flex", gap:24, justifyContent:"center", flexWrap:"wrap" }}>
+          {["✓ 14-day free trial","✓ No credit card","✓ Cancel anytime"].map(t => (
+            <span key={t} style={{ fontSize:13, color:"rgba(255,255,255,.3)", fontWeight:600 }}>{t}</span>
+          ))}
+        </div>
+      </FadeIn>
     </main>
   );
 }
