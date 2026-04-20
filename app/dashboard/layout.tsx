@@ -739,6 +739,7 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/price-lists" pathname={pathname}>Price Lists</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_STOCK_RATE) && <NavLink href="/dashboard/stock-rate" pathname={pathname}>Stock Rates</NavLink>}
               <NavLink href="/dashboard/barcode" pathname={pathname}>Barcode</NavLink>
+              {hasPermission(currentUser, PERMISSIONS.VIEW_STOCK_SUMMARY) && <NavLink href="/dashboard/reports/stock" pathname={pathname}>Stock Report</NavLink>}
             </NavGroup>
           )}
 
@@ -771,6 +772,7 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_CPV) && <NavLink href="/dashboard/jv" pathname={pathname}>Journal Voucher (JV)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/opening-balances" pathname={pathname}>Opening Balances</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_ACCOUNTING) && <NavLink href="/dashboard/advance-payment" pathname={pathname}>Advance Payment</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/audit-trail" pathname={pathname}>Audit Trail</NavLink>}
             </NavGroup>
           )}
 
@@ -806,23 +808,10 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/reports/tax-summary" pathname={pathname}>Tax Summary</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/customer-statement" pathname={pathname}>Customer Statement</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/supplier-statement" pathname={pathname}>Supplier Statement</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_SALES_REPORT) && <NavLink href="/dashboard/reports/sales" pathname={pathname}>Sales Report</NavLink>}
             </NavGroup>
           )}
 
-          {/* ── ACTIVITY REPORTS ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
-            <NavGroup
-              title="Activity Reports"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>}
-              open={openSection === "activityReports"}
-              onToggle={() => toggle("activityReports")}
-            >
-              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/payment-followup" pathname={pathname}>Payment Follow-up</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_STOCK_SUMMARY) && <NavLink href="/dashboard/reports/stock" pathname={pathname}>Stock Report</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_SALES_REPORT) && <NavLink href="/dashboard/reports/sales" pathname={pathname}>Sales Report</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/audit-trail" pathname={pathname}>Audit Trail</NavLink>}
-            </NavGroup>
-          )}
 
           {/* ── ADVANCED FINANCIAL REPORTS ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
@@ -888,6 +877,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/reports/payment-history" pathname={pathname}>Payment History</NavLink>
               <NavLink href="/dashboard/reports/bad-debts" pathname={pathname}>Bad Debts</NavLink>
               <NavLink href="/dashboard/reports/credit-analysis" pathname={pathname}>Credit Analysis</NavLink>
+              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/payment-followup" pathname={pathname}>Payment Follow-up</NavLink>}
             </NavGroup>
           )}
 
@@ -1711,92 +1701,6 @@ export default function DashboardLayout({
             </button>
           </div>
 
-          {/* ── User Menu Popup ── */}
-          {showUserMenu && (
-            <>
-              {/* Backdrop */}
-              <div style={{position:"fixed",inset:0,zIndex:40}} onClick={()=>setShowUserMenu(false)}/>
-              {/* Popup panel — slides up from footer */}
-              <div style={{
-                position:"absolute",bottom:"100%",left:12,right:12,marginBottom:8,
-                background:"#0e1120",border:"1px solid rgba(255,255,255,0.12)",
-                borderRadius:14,padding:"6px",zIndex:50,
-                boxShadow:"0 -20px 60px rgba(0,0,0,0.6)",
-              }}>
-                {/* Company info at top */}
-                <div style={{padding:"12px 12px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)",marginBottom:4}}>
-                  <div style={{display:"flex",alignItems:"center",gap:10}}>
-                    <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>🏢</div>
-                    <div style={{minWidth:0}}>
-                      <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</div>
-                      <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",marginTop:1,textTransform:"capitalize"}}>
-                        {companyDetail?.businessType ? companyDetail.businessType.replace(/_/g," ") : "Business"} · {companyDetail?.plan || "STARTER"}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Menu items */}
-                {[
-                  { icon:"🏢", label:"Company Profile",    href:"/dashboard/company-profile" },
-                  { icon:"👥", label:"Team Members",        href:"/dashboard/users" },
-                  { icon:"🔔", label:"Notifications",       href:"/dashboard/notifications" },
-                  { icon:"⭐", label:"Share Your Review",   href:"/dashboard/feedback" },
-                ].map(item => (
-                  <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
-                    style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(255,255,255,0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
-                    onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="white";}}
-                    onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(255,255,255,0.65)";}}>
-                    <span style={{fontSize:14,width:18,textAlign:"center"}}>{item.icon}</span>
-                    {item.label}
-                  </a>
-                ))}
-
-                <div style={{borderTop:"1px solid rgba(255,255,255,0.07)",marginTop:4,paddingTop:4}}>
-                  <button onClick={logout}
-                    style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,background:"transparent",border:"none",color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",textAlign:"left"}}
-                    onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.1)";}}
-                    onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{flexShrink:0}}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* ── Clickable User Row ── */}
-          <div
-            onClick={()=>setShowUserMenu(v=>!v)}
-            style={{
-              display:"flex",alignItems:"center",gap:10,
-              padding: sidebarCollapsed ? "12px 0" : "12px 14px",
-              justifyContent: sidebarCollapsed ? "center" : "flex-start",
-              cursor:"pointer",
-              transition:"background .15s",
-              background: showUserMenu ? "rgba(255,255,255,0.05)" : "transparent",
-            }}
-            onMouseEnter={e=>{if(!showUserMenu)e.currentTarget.style.background="rgba(255,255,255,0.04)";}}
-            onMouseLeave={e=>{if(!showUserMenu)e.currentTarget.style.background="transparent";}}
-          >
-            {/* Avatar */}
-            <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"white",flexShrink:0}}>
-              {(currentUser.name || currentUser.email || "U")[0].toUpperCase()}
-            </div>
-            {/* Name + company */}
-            {!sidebarCollapsed && (
-              <div style={{minWidth:0,flex:1}}>
-                <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.85)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{currentUser.name || "User"}</div>
-                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{companyName}</div>
-              </div>
-            )}
-            {/* Chevron up/down */}
-            {!sidebarCollapsed && (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2.5" style={{flexShrink:0,transform:showUserMenu?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s"}}>
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
-            )}
-          </div>
         </div>
 
       </aside>
@@ -1872,12 +1776,80 @@ export default function DashboardLayout({
               </div>
             )}
 
-            {/* User name */}
-            <div
-              style={{fontSize:12,color:"rgba(255,255,255,0.5)",fontWeight:500}}
-              className="hidden md:block"
-            >
-              {currentUser.name || currentUser.email}
+            {/* ── User button (top-right) ── */}
+            <div style={{position:"relative"}}>
+              <div
+                onClick={()=>setShowUserMenu(v=>!v)}
+                style={{
+                  display:"flex", alignItems:"center", gap:8,
+                  padding:"5px 10px 5px 6px", borderRadius:10,
+                  background: showUserMenu ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)",
+                  border:"1px solid rgba(255,255,255,0.08)",
+                  cursor:"pointer", transition:"all .15s",
+                }}
+                onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";}}
+                onMouseLeave={e=>{if(!showUserMenu)e.currentTarget.style.background="rgba(255,255,255,0.04)";}}
+              >
+                <div style={{width:26,height:26,borderRadius:7,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:"white",flexShrink:0}}>
+                  {(currentUser.name || currentUser.email || "U")[0].toUpperCase()}
+                </div>
+                <div className="hidden md:block" style={{minWidth:0}}>
+                  <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.85)",whiteSpace:"nowrap"}}>{currentUser.name || currentUser.email}</div>
+                  <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",maxWidth:120}}>{companyName}</div>
+                </div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" style={{flexShrink:0,transform:showUserMenu?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s"}} className="hidden md:block">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+
+              {/* Dropdown */}
+              {showUserMenu && (
+                <>
+                  <div style={{position:"fixed",inset:0,zIndex:40}} onClick={()=>setShowUserMenu(false)}/>
+                  <div style={{
+                    position:"absolute",top:"calc(100% + 8px)",right:0,minWidth:220,
+                    background:"#0e1120",border:"1px solid rgba(255,255,255,0.12)",
+                    borderRadius:14,padding:"6px",zIndex:50,
+                    boxShadow:"0 20px 60px rgba(0,0,0,0.6)",
+                  }}>
+                    {/* Company info */}
+                    <div style={{padding:"12px 12px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)",marginBottom:4}}>
+                      <div style={{display:"flex",alignItems:"center",gap:10}}>
+                        <div style={{width:34,height:34,borderRadius:9,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0}}>🏢</div>
+                        <div style={{minWidth:0}}>
+                          <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</div>
+                          <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",marginTop:1,textTransform:"capitalize"}}>
+                            {companyDetail?.businessType ? companyDetail.businessType.replace(/_/g," ") : "Business"} · {companyDetail?.plan || "STARTER"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {[
+                      { icon:"🏢", label:"Company Profile",  href:"/dashboard/company-profile" },
+                      { icon:"👥", label:"Team Members",      href:"/dashboard/users" },
+                      { icon:"🔔", label:"Notifications",     href:"/dashboard/notifications" },
+                      { icon:"⭐", label:"Share Your Review", href:"/dashboard/feedback" },
+                    ].map(item => (
+                      <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
+                        style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(255,255,255,0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
+                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="white";}}
+                        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(255,255,255,0.65)";}}>
+                        <span style={{fontSize:14,width:18,textAlign:"center"}}>{item.icon}</span>
+                        {item.label}
+                      </a>
+                    ))}
+                    <div style={{borderTop:"1px solid rgba(255,255,255,0.07)",marginTop:4,paddingTop:4}}>
+                      <button onClick={logout}
+                        style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,background:"transparent",border:"none",color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",textAlign:"left"}}
+                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.1)";}}
+                        onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{flexShrink:0}}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
