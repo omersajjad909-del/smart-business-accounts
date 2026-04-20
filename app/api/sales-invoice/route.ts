@@ -456,6 +456,15 @@ export async function DELETE(req: NextRequest) {
     }
 
     await prisma.$transaction(async (tx: TxClient) => {
+      const voucher = await tx.voucher.findFirst({
+        where: { voucherNo: existing.invoiceNo, type: "SI", companyId },
+        select: { id: true },
+      });
+      if (voucher) {
+        await tx.voucherEntry.deleteMany({ where: { voucherId: voucher.id } });
+        await tx.voucher.delete({ where: { id: voucher.id } });
+      }
+
       await tx.salesInvoiceItem.deleteMany({ where: { invoiceId: id } });
       await tx.salesInvoice.delete({ where: { id } });
     });

@@ -82,9 +82,27 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.CREATE_PURCHASE_INVOICE, companyId);
     if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    await prisma.purchaseInvoice.update({
-      where: { id, companyId, ...(branchId ? { branchId } : {}) },
-      data: { deletedAt: new Date() },
+    await prisma.$transaction(async (tx) => {
+      const invoice = await tx.purchaseInvoice.findFirst({
+        where: { id, companyId },
+        select: { invoiceNo: true },
+      });
+
+      if (invoice) {
+        const voucher = await tx.voucher.findFirst({
+          where: { voucherNo: invoice.invoiceNo, type: "PI", companyId },
+          select: { id: true },
+        });
+        if (voucher) {
+          await tx.voucherEntry.deleteMany({ where: { voucherId: voucher.id } });
+          await tx.voucher.delete({ where: { id: voucher.id } });
+        }
+      }
+
+      await tx.purchaseInvoice.update({
+        where: { id, companyId },
+        data: { deletedAt: new Date() },
+      });
     });
 
     return NextResponse.json({ ok: true });

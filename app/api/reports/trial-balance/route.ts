@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
       const opVouchers = await prisma.voucherEntry.aggregate({
         where: {
           accountId: acc.id,
-          voucher: { date: { lt: fromDate }, companyId, ...(branchId ? { branchId } : {}) },
+          voucher: { date: { lt: fromDate }, companyId, deletedAt: null, ...(branchId ? { branchId } : {}) },
         },
         _sum: { amount: true },
       });
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
       const periodVouchers = await prisma.voucherEntry.findMany({
         where: {
           accountId: acc.id,
-          voucher: { date: { gte: fromDate, lte: toDate }, companyId, ...(branchId ? { branchId } : {}) },
+          voucher: { date: { gte: fromDate, lte: toDate }, companyId, deletedAt: null, ...(branchId ? { branchId } : {}) },
         },
       });
       const transDebit = periodVouchers
