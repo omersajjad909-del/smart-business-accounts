@@ -27,6 +27,10 @@ async function getRequestHost() {
 export default async function RootPage() {
   const host = await getRequestHost();
 
+  if (host === "finovaforge.com" || host === "www.finovaforge.com") {
+    redirect("/forge");
+  }
+
   if (host === "usefinova.app" || host.endsWith(".usefinova.app")) {
     redirect("/auth");
   }
