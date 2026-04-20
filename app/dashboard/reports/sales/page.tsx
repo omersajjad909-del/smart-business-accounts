@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { exportToCSV } from "@/lib/export";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
@@ -128,16 +129,16 @@ export default function SalesReportPage() {
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:18 }}>
               <div>
                 <label style={labelStyle}>From Date</label>
-                <input ref={fromRef} type="date" value={from} onChange={e => setFrom(e.target.value)}
-                  style={{ ...inputStyle, colorScheme:"dark" }} autoFocus
+                <DateInput ref={fromRef} value={from} onChange={setFrom}
+                  style={inputStyle} autoFocus
                   onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); toRef.current?.focus(); } }}
                 />
               </div>
               <div>
                 <label style={labelStyle}>To Date</label>
-                <input ref={toRef} type="date" value={to} onChange={e => setTo(e.target.value)}
-                  style={{ ...inputStyle, colorScheme:"dark" }}
-                  onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); } }}
+                <DateInput ref={toRef} value={to} onChange={setTo}
+                  style={inputStyle}
+                  onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); generateReport(); } }}
                 />
               </div>
             </div>

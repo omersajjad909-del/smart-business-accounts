@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 
 const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
@@ -124,12 +125,11 @@ export default function StockReportPage() {
             {/* As On */}
             <div style={{ marginBottom: 18 }}>
               <label style={labelStyle}>As On</label>
-              <input
+              <DateInput
                 ref={dateRef}
-                type="date"
                 value={asOn}
-                onChange={e => setAsOn(e.target.value)}
-                style={{ ...inputStyle, colorScheme: "dark" }}
+                onChange={setAsOn}
+                style={inputStyle}
                 autoFocus
                 onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); phrRef.current?.focus(); } }}
               />
