@@ -11,7 +11,6 @@ import TestimonialsSection from "./(marketing)/landing/components/Testimonials";
 import FAQSection from "./(marketing)/landing/components/FAQSection";
 import CTASection from "./(marketing)/landing/components/CTASection";
 import NewsletterSection from "./(marketing)/landing/components/NewsletterSection";
-import CookieBanner from "./(marketing)/landing/components/CookieBanner";
 import Footer from "./(marketing)/landing/components/Footer";
 import ChatWidget from "./(marketing)/landing/components/ChatWidget";
 
@@ -59,7 +58,6 @@ export default async function RootPage() {
         <FAQSection />
         <NewsletterSection />
         <CTASection />
-        <CookieBanner />
       </main>
       <Footer />
       <ChatWidget />

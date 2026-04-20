@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
-import CookieBanner from "./(marketing)/landing/components/CookieBanner";
 import { ThemeProvider } from "@/components/theme-provider";
 import VisitorTracker from "@/components/VisitorTracker";
 
@@ -229,7 +228,6 @@ export default function RootLayout({
           <div className="flex min-h-screen flex-col">
             <main className="flex-grow">{children}</main>
           </div>
-          <CookieBanner />
         </ThemeProvider>
       </body>
     </html>
