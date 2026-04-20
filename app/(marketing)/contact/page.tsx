@@ -22,20 +22,20 @@ const CONTACT_METHODS = [
     icon: "📧",
     title: "Email Us",
     desc: "We'll respond within 24 hours",
-    detail: "finovaos.app@gmail.com",
+    detail: "hello@finovaos.app",
     action: "Send Email",
-    href: "mailto:finovaos.app@gmail.com",
+    href: "mailto:hello@finovaos.app",
     color: "#34d399",
     glow: "rgba(52,211,153,.12)",
     border: "rgba(52,211,153,.25)",
   },
   {
-    icon: "📞",
-    title: "Call Us",
-    desc: "Speak directly with our team",
-    detail: "+1 (888) 456-7890",
-    action: "Call Now",
-    href: "tel:+18884567890",
+    icon: "📅",
+    title: "Book a Demo",
+    desc: "See FinovaOS in action — 30 min",
+    detail: "Free personalised walkthrough",
+    action: "Schedule Demo",
+    href: "/demo",
     color: "#38bdf8",
     glow: "rgba(56,189,248,.12)",
     border: "rgba(56,189,248,.25)",
@@ -53,51 +53,23 @@ const CONTACT_METHODS = [
   },
 ];
 
-const OFFICES = [
-  {
-    city: "San Francisco",
-    country: "United States 🇺🇸",
-    address: "535 Mission Street, 14th Floor, San Francisco, CA 94105",
-    phone: "+1 (800) 555-0100",
-    email: "finovaos.app@gmail.com",
-    type: "Headquarters",
-    color: "#818cf8",
-  },
-  {
-    city: "Dubai",
-    country: "UAE 🇦🇪",
-    address: "Level 9, Gate District 7, DIFC, Dubai, UAE",
-    phone: "+971 4 456 7890",
-    email: "finovaos.app@gmail.com",
-    type: "Regional Office",
-    color: "#34d399",
-  },
-  {
-    city: "London",
-    country: "United Kingdom 🇬🇧",
-    address: "2nd Floor, 1 Aldgate, London EC3N 1RE, UK",
-    phone: "+44 20 7946 0890",
-    email: "finovaos.app@gmail.com",
-    type: "Regional Office",
-    color: "#38bdf8",
-  },
-];
+const OFFICES: { city: string; country: string; address: string; phone: string; email: string; type: string; color: string }[] = [];
 
 const FAQS = [
   { q:"How quickly do you respond to support tickets?", a:"Pro and Enterprise customers receive responses within 4 hours. Starter plan customers within 24 hours. We never leave anyone hanging." },
   { q:"Do you offer onboarding help?", a:"Yes — all plans include access to our help centre and video tutorials. Enterprise plans include dedicated onboarding sessions with a FinovaOS specialist." },
   { q:"Can I migrate data from my current software?", a:"Absolutely. We support CSV/Excel imports and have native migration tools for QuickBooks, Xero, Sage, and Tally. Our team can help guide the process." },
   { q:"Is there a phone number for urgent issues?", a:"Enterprise customers have a dedicated support line available 24/7. Pro customers can access our priority callback service during business hours." },
-  { q:"Do you have partners or resellers in my country?", a:"We have certified partners in 20+ countries. Contact our partnerships team at finovaos.app@gmail.com to find a local expert." },
+  { q:"Do you have partners or resellers in my country?", a:"We are actively building our partner network. Contact our partnerships team at partnerships@finovaos.app to discuss opportunities." },
 ];
 
 const DEPARTMENTS = [
-  { icon:"💼", label:"Sales",        email:"finovaos.app@gmail.com",        desc:"Plans, pricing, enterprise deals" },
-  { icon:"🛠",  label:"Support",      email:"finovaos.app@gmail.com",       desc:"Technical help & account issues" },
-  { icon:"🤝", label:"Partnerships", email:"finovaos.app@gmail.com",      desc:"Reseller & integration enquiries" },
-  { icon:"📰", label:"Press & Media",email:"finovaos.app@gmail.com",         desc:"Interviews, coverage, assets" },
-  { icon:"⚖️",  label:"Legal",        email:"finovaos.app@gmail.com",         desc:"Compliance & data requests" },
-  { icon:"💡", label:"Feedback",      email:"finovaos.app@gmail.com",      desc:"Product suggestions & ideas" },
+  { icon:"💼", label:"Sales",        email:"hello@finovaos.app",            desc:"Plans, pricing, enterprise deals" },
+  { icon:"🛠",  label:"Support",      email:"support@finovaos.app",         desc:"Technical help & account issues" },
+  { icon:"🤝", label:"Partnerships", email:"partnerships@finovaos.app",    desc:"Reseller & integration enquiries" },
+  { icon:"📰", label:"Press & Media",email:"press@finovaos.app",           desc:"Interviews, coverage, assets" },
+  { icon:"⚖️",  label:"Legal",        email:"legal@finovaos.app",           desc:"Compliance & data requests" },
+  { icon:"💡", label:"Feedback",      email:"feedback@finovaos.app",        desc:"Product suggestions & ideas" },
 ];
 
 /* ══════════════════════════════════════════════════════════
@@ -541,7 +513,7 @@ export default function ContactPage() {
                 <Link href="/help" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", textDecoration:"none", boxShadow:"0 4px 20px rgba(79,70,229,.4)" }}>
                   Help Centre
                 </Link>
-                <a href="mailto:finovaos.app@gmail.com" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.8)", textDecoration:"none" }}>
+                <a href="mailto:hello@finovaos.app" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.8)", textDecoration:"none" }}>
                   Email Us Directly
                 </a>
               </div>

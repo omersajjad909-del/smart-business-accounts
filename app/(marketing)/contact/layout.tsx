@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 export const metadata: Metadata = {
   title: "Contact Us — Support, Sales & Partnerships",
   description:
-    "Get in touch with the FinovaOS team. Live chat, email support (finovaos.app@gmail.com), or submit a support ticket. Our team responds within 2 hours during business hours.",
+    "Get in touch with the FinovaOS team. Live chat, email support (hello@finovaos.app), or submit a support ticket. Our team responds within 2 hours during business hours.",
   keywords: [
     "contact FinovaOS",
     "FinovaOS support",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Contact FinovaOS — We're Here to Help",
     description:
-      "Live chat, email (finovaos.app@gmail.com), or submit a ticket. 2-hour response time, 24/7 chat support available.",
+      "Live chat, email (hello@finovaos.app), or submit a ticket. 2-hour response time, 24/7 chat support available.",
     url: `${BASE}/contact`,
     siteName: "FinovaOS",
     images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "Contact FinovaOS" }],
