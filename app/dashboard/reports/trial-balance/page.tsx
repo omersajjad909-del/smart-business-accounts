@@ -29,6 +29,8 @@ export default function TrialBalancePage() {
   const [rows,         setRows]         = useState<TBRow[]>([]);
   const [loading,      setLoading]      = useState(false);
   const [companyInfo,  setCompanyInfo]  = useState<any>(null);
+  const [cleaning,     setCleaning]     = useState(false);
+  const [cleanMsg,     setCleanMsg]     = useState("");
 
   async function loadReport() {
     setLoading(true);
@@ -51,6 +53,20 @@ export default function TrialBalancePage() {
   function handleGenerate() {
     setShowModal(false);
     loadReport();
+  }
+
+  async function cleanOrphans() {
+    setCleaning(true);
+    setCleanMsg("");
+    try {
+      const user = getCurrentUser();
+      const h = { "x-user-id": user?.id ?? "", "x-user-role": user?.role ?? "", "x-company-id": user?.companyId ?? "" };
+      const r = await fetch("/api/admin/cleanup-vouchers", { method: "POST", headers: h });
+      const d = await r.json();
+      setCleanMsg(d.message || "Done");
+      if ((d.deleted || 0) > 0) loadReport();
+    } catch { setCleanMsg("Cleanup failed"); }
+    finally { setCleaning(false); }
   }
 
   const categories = Array.from(new Set(rows.map(r => r.category)));
@@ -129,6 +145,17 @@ export default function TrialBalancePage() {
               <button onClick={() => window.print()} style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.5)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
                 🖨 Print
               </button>
+              <button
+                onClick={cleanOrphans}
+                disabled={cleaning}
+                title="Delete voucher entries of deleted invoices"
+                style={{ padding:"8px 16px", borderRadius:9, border:"1px solid rgba(248,113,113,.25)", background:"rgba(248,113,113,.06)", color:"#f87171", fontSize:12, fontWeight:700, cursor: cleaning ? "not-allowed" : "pointer", fontFamily:"inherit", opacity: cleaning ? 0.6 : 1 }}
+              >
+                {cleaning ? "Cleaning…" : "🧹 Fix Orphans"}
+              </button>
+              {cleanMsg && (
+                <span style={{ fontSize:12, color:"#34d399", fontWeight:600, alignSelf:"center" }}>{cleanMsg}</span>
+              )}
             </div>
           </div>
 
