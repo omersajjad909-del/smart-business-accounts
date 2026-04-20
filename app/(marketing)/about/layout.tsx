@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 export const metadata: Metadata = {
   title: "About FinovaOS — Our Mission, Team & Story",
   description:
-    "Learn about FinovaOS's mission to simplify business finance for 12,000+ businesses across 40+ countries. Trusted by traders, distributors, and enterprises worldwide. $2.4B+ transactions processed.",
+    "Learn about FinovaOS's mission to simplify business finance for trading, wholesale, and distribution businesses. Purpose-built for how real businesses actually work.",
   keywords: [
     "about FinovaOS",
     "FinovaOS team",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "About FinovaOS — Our Mission & Team",
     description:
-      "12,000+ businesses. 40+ countries. $2.4B+ transactions processed. FinovaOS is on a mission to make financial management simple for every business.",
+      "FinovaOS is on a mission to make financial management simple for trading, wholesale, and distribution businesses worldwide.",
     url: `${BASE}/about`,
     siteName: "FinovaOS",
     images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "About FinovaOS" }],
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "About FinovaOS",
-    description: "12,000+ businesses. 40+ countries. Our mission is to make financial management simple.",
+    description: "Purpose-built for trading businesses. Our mission is to make financial management simple.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/about` },

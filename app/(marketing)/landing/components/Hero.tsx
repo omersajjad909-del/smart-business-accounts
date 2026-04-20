@@ -237,17 +237,10 @@ export default function Hero() {
 
               {/* Social proof row */}
               <div className="h5 hero-proof" style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
-                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                  {/* Stars */}
-                  <div style={{ display:"flex", gap:2 }}>
-                    {[...Array(5)].map((_,i) => (
-                      <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill="#fbbf24">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                      </svg>
-                    ))}
-                  </div>
-                  <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.4)" }}>
-                    <span style={{ color:"rgba(255,255,255,.75)" }}>4.9/5</span> • 2,400+ reviews
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:18 }}>🚀</span>
+                  <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.5)" }}>
+                    <span style={{ color:"rgba(255,255,255,.8)" }}>Early Access</span> — Limited spots available
                   </span>
                 </div>
                 <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>

@@ -6,10 +6,10 @@ import { useEffect, useRef, useState } from "react";
    DATA
 ══════════════════════════════════════════════════════════ */
 const STATS = [
-  { value: "12,000+", label: "Businesses Served",  icon: "⬡" },
-  { value: "40+",     label: "Countries",           icon: "🌍" },
-  { value: "$2.4B+",  label: "Transactions Processed", icon: "◆" },
-  { value: "99.9%",   label: "Uptime SLA",          icon: "⬢" },
+  { value: "50+",    label: "Modules Available",     icon: "⬡" },
+  { value: "Multi",  label: "Currency Support",       icon: "🌍" },
+  { value: "AI",     label: "Powered Insights",       icon: "◆" },
+  { value: "99.9%",  label: "Uptime SLA",             icon: "⬢" },
 ];
 
 const VALUES = [
@@ -57,72 +57,15 @@ const VALUES = [
   },
 ];
 
-const TEAM = [
-  {
-    name: "Zara Ahmed",
-    role: "Co-founder & CEO",
-    bio: "Former Goldman Sachs. Built and sold two fintech startups before FinovaOS. Passionate about democratising financial tools for emerging markets.",
-    avatar: "ZA",
-    gradient: "linear-gradient(135deg,#4f46e5,#7c3aed)",
-    linkedin: "#",
-  },
-  {
-    name: "Omar Khalid",
-    role: "Co-founder & CTO",
-    bio: "Ex-Stripe engineering. 12 years building payments infrastructure at scale. Architect of FinovaOS's real-time reconciliation engine.",
-    avatar: "OK",
-    gradient: "linear-gradient(135deg,#0891b2,#06b6d4)",
-    linkedin: "#",
-  },
-  {
-    name: "Sara Malik",
-    role: "Chief Product Officer",
-    bio: "Previously led product at Xero APAC. Turned complex accounting workflows into delightfully simple experiences used by thousands daily.",
-    avatar: "SM",
-    gradient: "linear-gradient(135deg,#059669,#34d399)",
-    linkedin: "#",
-  },
-  {
-    name: "Ali Hassan",
-    role: "VP Engineering",
-    bio: "Led backend teams at AWS and Revolut. Obsessed with reliability, latency, and systems that never go down.",
-    avatar: "AH",
-    gradient: "linear-gradient(135deg,#b45309,#f59e0b)",
-    linkedin: "#",
-  },
-  {
-    name: "Nadia Qureshi",
-    role: "Head of Finance & Compliance",
-    bio: "Chartered accountant with 15 years in Big Four. Ensures FinovaOS meets every regulatory standard across our 40+ operating markets.",
-    avatar: "NQ",
-    gradient: "linear-gradient(135deg,#be185d,#ec4899)",
-    linkedin: "#",
-  },
-  {
-    name: "Tariq Mirza",
-    role: "VP Sales & Partnerships",
-    bio: "Built revenue from zero to $10M ARR at two SaaS companies. Leads our global GTM and channel partner ecosystem.",
-    avatar: "TM",
-    gradient: "linear-gradient(135deg,#7c3aed,#a78bfa)",
-    linkedin: "#",
-  },
-];
+const TEAM: { name: string; role: string; bio: string; avatar: string; gradient: string; linkedin: string }[] = [];
 
 const TIMELINE = [
-  { year:"2020", title:"The Idea", desc:"Frustrated by outdated accounting software, Zara and Omar sketched the first version of FinovaOS on a whiteboard in a San Francisco co-working space.", color:"#818cf8" },
-  { year:"2021", title:"First 100 Customers", desc:"Launched in private beta. 100 businesses signed up in the first month. We knew we were onto something.", color:"#34d399" },
-  { year:"2022", title:"Series A — $8M", desc:"Raised $8M led by Sequoia Southeast Asia. Expanded to UAE, Saudi Arabia, and the UK.", color:"#38bdf8" },
-  { year:"2023", title:"10,000 Businesses", desc:"Hit 10,000 active businesses across 30 countries. Launched HR & Payroll module. Team grew to 85 people.", color:"#fbbf24" },
-  { year:"2024", title:"Global Expansion", desc:"Opened offices in Dubai and London. Launched Enterprise plan. Processed over $1 billion in transactions.", color:"#c4b5fd" },
-  { year:"2025", title:"The Platform Era", desc:"Expanded integrations, added more configurable workflows, and strengthened multi-currency support for growing businesses. 12,000 businesses and counting.", color:"#f9a8d4" },
+  { year:"2024", title:"The Idea", desc:"Frustrated by outdated and expensive accounting software that didn't fit trading businesses, we started building FinovaOS — purpose-built for how real businesses actually work.", color:"#818cf8" },
+  { year:"2025", title:"First Version Launched", desc:"Launched with core accounting, inventory, and multi-branch support. Early users helped shape the direction. Built for Pakistan, UAE, and beyond.", color:"#34d399" },
+  { year:"Now",  title:"Growing Platform", desc:"50+ modules, AI insights, multi-currency, payroll, CRM, and more. Continuously shipping based on real business feedback.", color:"#6366f1" },
 ];
 
-const PRESS = [
-  { name:"TechCrunch",   logo:"TC", quote:"FinovaOS is redefining what SME accounting software can be in emerging markets." },
-  { name:"Forbes",       logo:"F",  quote:"One of the 50 most promising fintech startups of 2024." },
-  { name:"The Guardian", logo:"G",  quote:"The accounting tool quietly powering thousands of global businesses." },
-  { name:"Bloomberg",    logo:"B",  quote:"A challenger to Xero and QuickBooks with a distinctly global DNA." },
-];
+const PRESS: { name: string; logo: string; quote: string }[] = [];
 
 const PERKS = [
   { icon:"🌍", label:"Remote-first" },
@@ -394,71 +337,57 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      {/* ── TEAM ── */}
-      <Section>
-        <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 100px" }}>
-          <div style={{ textAlign:"center", marginBottom:52 }}>
-            <SectionLabel text="The Team"/>
-            <h2 style={{ fontSize:"clamp(26px,4vw,40px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 14px" }}>
-              Built by people who've been there
-            </h2>
-            <p style={{ fontSize:15, color:"rgba(255,255,255,.4)", maxWidth:520, margin:"0 auto" }}>
-              Our team brings together experience from Stripe, Goldman Sachs, Xero, AWS, and Revolut — all united by a passion for building great software.
-            </p>
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))", gap:20 }}>
-            {TEAM.map(m=>(
-              <div key={m.name} style={{
-                background:"rgba(255,255,255,.03)", borderRadius:18,
-                border:"1px solid rgba(255,255,255,.07)",
-                padding:"24px",
-                transition:"transform .2s, border-color .2s",
-              }}
-                onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.borderColor="rgba(99,102,241,.3)"; }}
-                onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.borderColor="rgba(255,255,255,.07)"; }}
-              >
-                <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:14 }}>
-                  <div style={{ width:52, height:52, borderRadius:14, background:m.gradient, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, fontWeight:800, color:"white", flexShrink:0 }}>
-                    {m.avatar}
-                  </div>
-                  <div>
-                    <div style={{ fontSize:15, fontWeight:700, color:"white" }}>{m.name}</div>
-                    <div style={{ fontSize:12, color:"#818cf8", marginTop:2, fontWeight:600 }}>{m.role}</div>
-                  </div>
-                </div>
-                <p style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.7, margin:0 }}>{m.bio}</p>
-                <a href={m.linkedin} style={{ display:"inline-flex", alignItems:"center", gap:6, marginTop:14, fontSize:12, color:"rgba(255,255,255,.3)", textDecoration:"none", fontWeight:600 }}
-                  onMouseEnter={e=>(e.currentTarget.style.color="#818cf8")}
-                  onMouseLeave={e=>(e.currentTarget.style.color="rgba(255,255,255,.3)")}
+      {/* ── TEAM (hidden until real members added) ── */}
+      {TEAM.length > 0 && (
+        <Section>
+          <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 100px" }}>
+            <div style={{ textAlign:"center", marginBottom:52 }}>
+              <SectionLabel text="The Team"/>
+              <h2 style={{ fontSize:"clamp(26px,4vw,40px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 14px" }}>
+                The people behind FinovaOS
+              </h2>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))", gap:20 }}>
+              {TEAM.map(m=>(
+                <div key={m.name} style={{ background:"rgba(255,255,255,.03)", borderRadius:18, border:"1px solid rgba(255,255,255,.07)", padding:"24px", transition:"transform .2s, border-color .2s" }}
+                  onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.borderColor="rgba(99,102,241,.3)"; }}
+                  onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.borderColor="rgba(255,255,255,.07)"; }}
                 >
-                  in LinkedIn →
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Section>
-
-      {/* ── PRESS ── */}
-      <Section>
-        <div style={{ maxWidth:1000, margin:"0 auto", padding:"0 24px 100px", textAlign:"center" }}>
-          <SectionLabel text="In The Press"/>
-          <h2 style={{ fontSize:"clamp(22px,3vw,34px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 40px" }}>
-            What the world is saying
-          </h2>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:16 }}>
-            {PRESS.map(p=>(
-              <div key={p.name} style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", padding:"24px 20px" }}>
-                <div style={{ width:40, height:40, borderRadius:10, background:"rgba(255,255,255,.08)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, color:"white", margin:"0 auto 14px" }}>
-                  {p.logo}
+                  <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:14 }}>
+                    <div style={{ width:52, height:52, borderRadius:14, background:m.gradient, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, fontWeight:800, color:"white", flexShrink:0 }}>{m.avatar}</div>
+                    <div>
+                      <div style={{ fontSize:15, fontWeight:700, color:"white" }}>{m.name}</div>
+                      <div style={{ fontSize:12, color:"#818cf8", marginTop:2, fontWeight:600 }}>{m.role}</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.7, margin:0 }}>{m.bio}</p>
                 </div>
-                <div style={{ fontSize:15, fontWeight:800, color:"white", marginBottom:10 }}>{p.name}</div>
-                <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.6, margin:0, fontStyle:"italic" }}>"{p.quote}"</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </Section>
+        </Section>
+      )}
+
+      {/* ── PRESS (hidden until real press coverage) ── */}
+      {PRESS.length > 0 && (
+        <Section>
+          <div style={{ maxWidth:1000, margin:"0 auto", padding:"0 24px 100px", textAlign:"center" }}>
+            <SectionLabel text="In The Press"/>
+            <h2 style={{ fontSize:"clamp(22px,3vw,34px)", fontWeight:800, letterSpacing:"-.02em", fontFamily:"Lora,serif", margin:"0 0 40px" }}>
+              What the world is saying
+            </h2>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:16 }}>
+              {PRESS.map(p=>(
+                <div key={p.name} style={{ background:"rgba(255,255,255,.03)", borderRadius:16, border:"1px solid rgba(255,255,255,.07)", padding:"24px 20px" }}>
+                  <div style={{ width:40, height:40, borderRadius:10, background:"rgba(255,255,255,.08)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, color:"white", margin:"0 auto 14px" }}>{p.logo}</div>
+                  <div style={{ fontSize:15, fontWeight:800, color:"white", marginBottom:10 }}>{p.name}</div>
+                  <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.6, margin:0, fontStyle:"italic" }}>"{p.quote}"</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Section>
+      )}
 
       {/* ── CAREERS ── */}
       <Section>

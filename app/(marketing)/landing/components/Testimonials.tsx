@@ -22,11 +22,7 @@ type Testimonial = {
   rating: number; planUsed: string | null; featured: boolean;
 };
 
-const FALLBACK: Testimonial[] = [
-  { id:"1", name:"Thomas Miller",  company:"Miller Trading Co.",        role:"CEO",              message:"Finally, accounting that matches our business reality. Bank reconciliation used to take 3 days — now it's done before lunch.", rating:5, planUsed:"PROFESSIONAL",       featured:true },
-  { id:"2", name:"Alicia Stevens", company:"Global Distribution Group", role:"CFO",              message:"The dashboard gives us instant clarity across all 5 branches. We scaled from 2 to 5 locations with zero chaos.", rating:5, planUsed:"ENTERPRISE", featured:true },
-  { id:"3", name:"Ryan Kennedy",   company:"Apex Supply Chain",         role:"Managing Director",message:"We were running on spreadsheets and prayers. Switching to FinovaOS was the single best operational decision we made this year.", rating:5, planUsed:"PROFESSIONAL",  featured:true },
-];
+const FALLBACK: Testimonial[] = [];
 
 const COLORS = ["#818cf8","#34d399","#fbbf24","#f87171","#a78bfa","#06b6d4"];
 
@@ -152,29 +148,25 @@ export default function TestimonialsSection() {
               worldwide
             </span>
           </h2>
-          <div className="testi-proof" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:16,flexWrap:"wrap"}}>
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <div style={{display:"flex",gap:2}}>
-                {[...Array(5)].map((_,i)=>(
-                  <svg key={i} width="15" height="15" viewBox="0 0 24 24" fill="#fbbf24">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                  </svg>
-                ))}
-              </div>
-              <span style={{fontSize:18,fontWeight:800,color:"white"}}>4.9</span>
-              <span style={{fontSize:13,color:"rgba(255,255,255,.4)"}}>average rating</span>
+          {total > 0 && (
+            <div className="testi-proof" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:16,flexWrap:"wrap"}}>
+              <span style={{fontSize:13,color:"rgba(255,255,255,.4)"}}>{total} verified review{total !== 1 ? "s" : ""}</span>
             </div>
-            <div className="testi-divider" style={{width:1,height:18,background:"rgba(255,255,255,.1)"}}/>
-            <span style={{fontSize:13,color:"rgba(255,255,255,.4)"}}>{total || "2,400"}+ verified reviews</span>
-            <div className="testi-divider" style={{width:1,height:18,background:"rgba(255,255,255,.1)"}}/>
-            <span style={{fontSize:13,color:"rgba(255,255,255,.4)"}}>40+ countries</span>
-          </div>
+          )}
         </div>
 
         {/* 6 cards */}
-        <div className="testi-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:40 }}>
-          {display.map((t,i) => <TestimonialCard key={t.id} t={t} i={i} vis={vis} />)}
-        </div>
+        {display.length > 0 ? (
+          <div className="testi-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:40 }}>
+            {display.map((t,i) => <TestimonialCard key={t.id} t={t} i={i} vis={vis} />)}
+          </div>
+        ) : (
+          <div style={{ textAlign:"center", padding:"40px 0 60px", opacity: vis ? 1 : 0, transition:"opacity .6s ease" }}>
+            <div style={{ fontSize:32, marginBottom:12 }}>✍️</div>
+            <div style={{ fontSize:15, color:"rgba(255,255,255,.4)", fontWeight:600 }}>Be the first to share your experience</div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,.25)", marginTop:6 }}>Early access customers — your feedback shapes FinovaOS</div>
+          </div>
+        )}
 
         {/* View all button — only if more than 3 exist */}
         {hasMore && (
