@@ -1968,24 +1968,76 @@ export default function DashboardLayout({
           height:"calc(58px + env(safe-area-inset-bottom))",
         }}>
           {[
-            { href:"/dashboard", label:"Home", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
-            { href:"/dashboard/sales-invoice", label:"Invoice", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> },
-            { href:"/dashboard/reports/ledger", label:"Reports", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
-            { href:"/dashboard/ai", label:"AI", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> },
+            { type:"link", href:"/dashboard", label:"Home", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
+            {
+              type:"action",
+              key:"invoice",
+              label:"Invoice",
+              icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
+              onClick: () => {
+                setIsMobileMenuOpen(true);
+                setOpenSection("sales");
+              },
+            },
+            {
+              type:"action",
+              key:"reports",
+              label:"Reports",
+              icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
+              onClick: () => {
+                router.push("/dashboard/reports");
+              },
+            },
+            { type:"link", href:"/dashboard/ai", label:"AI", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> },
           ].map(item => {
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isInvoiceRoute =
+              pathname.startsWith("/dashboard/sales-") ||
+              pathname.startsWith("/dashboard/purchase-") ||
+              pathname.startsWith("/dashboard/quotation") ||
+              pathname.startsWith("/dashboard/delivery-challan") ||
+              pathname.startsWith("/dashboard/grn") ||
+              pathname.startsWith("/dashboard/payment-receipts");
+            const isReportsRoute = pathname.startsWith("/dashboard/reports") || pathname === "/dashboard/customer-statement" || pathname === "/dashboard/supplier-statement";
+            const isActive =
+              item.type === "link"
+                ? pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
+                : item.key === "invoice"
+                ? isInvoiceRoute || (isMobileMenuOpen && openSection === "sales")
+                : isReportsRoute;
+
+            const commonStyle = {
+              flex:1, display:"flex", flexDirection:"column" as const, alignItems:"center", justifyContent:"center",
+              gap:3, paddingTop:6,
+              color: isActive ? "#818cf8" : "rgba(255,255,255,0.4)",
+              background: isActive ? "rgba(99,102,241,0.08)" : "transparent",
+              transition:"color .15s, background .15s",
+              borderTop: isActive ? "2px solid #6366f1" : "2px solid transparent",
+            };
+
+            if (item.type === "link") {
+              return (
+                <Link prefetch={false} key={item.href} href={item.href} style={{ ...commonStyle, textDecoration:"none" }}>
+                  {item.icon}
+                  <span style={{fontSize:10,fontWeight:600,letterSpacing:".01em"}}>{item.label}</span>
+                </Link>
+              );
+            }
+
             return (
-              <Link prefetch={false} key={item.href} href={item.href} style={{
-                flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-                gap:3, textDecoration:"none", paddingTop:6,
-                color: isActive ? "#818cf8" : "rgba(255,255,255,0.4)",
-                background: isActive ? "rgba(99,102,241,0.08)" : "transparent",
-                transition:"color .15s, background .15s",
-                borderTop: isActive ? "2px solid #6366f1" : "2px solid transparent",
-              }}>
+              <button
+                key={item.key}
+                onClick={item.onClick}
+                style={{
+                  ...commonStyle,
+                  borderLeft:"none",
+                  borderRight:"none",
+                  borderBottom:"none",
+                  cursor:"pointer",
+                }}
+              >
                 {item.icon}
                 <span style={{fontSize:10,fontWeight:600,letterSpacing:".01em"}}>{item.label}</span>
-              </Link>
+              </button>
             );
           })}
           {/* Menu tab — opens sidebar */}
@@ -2294,4 +2346,3 @@ function NavLink({ href, children, pathname }: {
     </Link>
   );
 }
-
