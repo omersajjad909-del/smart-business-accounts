@@ -125,8 +125,8 @@ const SOLUTIONS_CARDS = [
     glow: "rgba(167,139,250,.18)",
     border: "rgba(167,139,250,.28)",
     stats: [
-      { val: "40+", label: "Countries" },
-      { val: "14k+", label: "Businesses" },
+      { val: "50+",  label: "Modules" },
+      { val: "PKR·AED·SAR", label: "Multi-Currency" },
     ],
   },
   {
@@ -149,6 +149,7 @@ const SOLUTIONS_CARDS = [
 const NAV_LINKS = [
   { label: "Pricing", href: "/pricing" },
   { label: "Blog",    href: "/blog" },
+  { label: "Contact", href: "/contact" },
 ]
 
 /* ─── Shared styles ─── */
@@ -161,7 +162,7 @@ const SHARED_CSS = `
 
   .fn-link {
     position:relative; font-size:13.5px; font-weight:600;
-    color:var(--nav-link); text-decoration:none;
+    color:rgba(255,255,255,.65); text-decoration:none;
     padding:6px 0; font-family:'Outfit',sans-serif; letter-spacing:.01em;
     transition:color .2s;
   }
@@ -171,12 +172,12 @@ const SHARED_CSS = `
     background:linear-gradient(90deg,#818cf8,#6366f1);
     transition:width .25s ease;
   }
-  .fn-link:hover        { color:var(--nav-link-hover); }
+  .fn-link:hover        { color:#fff; }
   .fn-link:hover::after { width:100%; }
 
   .fn-feat {
     position:relative; font-size:13.5px; font-weight:600;
-    color:var(--nav-link); background:none; border:none; cursor:pointer;
+    color:rgba(255,255,255,.65); background:none; border:none; cursor:pointer;
     padding:6px 0; font-family:'Outfit',sans-serif; letter-spacing:.01em;
     display:flex; align-items:center; gap:5px; transition:color .2s;
   }
@@ -186,31 +187,31 @@ const SHARED_CSS = `
     background:linear-gradient(90deg,#818cf8,#6366f1);
     transition:width .25s ease;
   }
-  .fn-feat:hover,.fn-feat.open        { color:var(--nav-link-hover); }
+  .fn-feat:hover,.fn-feat.open        { color:#fff; }
   .fn-feat:hover::after,.fn-feat.open::after { width:100%; }
 
   .fn-ml {
-    font-size:13px; font-weight:500; color:var(--nav-link-muted);
+    font-size:13px; font-weight:500; color:rgba(255,255,255,.45);
     text-decoration:none; padding:4px 0;
     display:flex; align-items:center; gap:7px;
     font-family:'Outfit',sans-serif; transition:all .2s;
   }
-  .fn-ml:hover { color:var(--nav-link-hover); padding-left:4px; }
+  .fn-ml:hover { color:#fff; padding-left:4px; }
 
   .fn-hc {
-    border-radius:14px; padding:14px; border:1.5px solid var(--nav-card-border);
-    background:var(--nav-card-bg);
+    border-radius:14px; padding:14px; border:1.5px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.03);
     transition:all .25s; cursor:pointer; text-decoration:none; display:block;
   }
-  .fn-hc:hover { background:var(--nav-card-bg-hover); transform:translateY(-2px); }
+  .fn-hc:hover { background:rgba(255,255,255,.06); transform:translateY(-2px); }
 
   .fn-mob {
     display:block; font-size:15px; font-weight:600;
-    color:var(--nav-link-muted); text-decoration:none;
-    padding:12px 0; border-bottom:1px solid var(--nav-card-border);
+    color:rgba(255,255,255,.65); text-decoration:none;
+    padding:12px 0; border-bottom:1px solid rgba(255,255,255,.07);
     transition:color .2s; font-family:'Outfit',sans-serif;
   }
-  .fn-mob:hover { color:var(--nav-link-hover); }
+  .fn-mob:hover { color:#fff; }
 
   .fn-cta {
     display:inline-flex; align-items:center; gap:7px;
@@ -394,11 +395,11 @@ export default function Navbar() {
 
       <nav style={{
         position:"relative", zIndex:50, width:"100%",
-        background: "var(--nav-bg)",
+        background: "rgba(8,12,30,.9)",
         backdropFilter:"blur(22px)",
-        borderBottom:`1px solid var(--nav-border)`,
+        borderBottom:"1px solid rgba(255,255,255,.08)",
         transition:"all .3s ease",
-        boxShadow: scrolled ? "0 4px 32px rgba(0,0,0,.12)" : "none",
+        boxShadow: scrolled ? "0 4px 32px rgba(0,0,0,.25)" : "none",
         fontFamily:"'Outfit',sans-serif",
       }}>
         {/* Top shimmer */}
@@ -412,7 +413,7 @@ export default function Navbar() {
               <div style={{ width: 56, height: 56, minWidth: 56, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.28)", boxShadow: "0 10px 30px rgba(99,102,241,.08)" }}>
                 <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{ objectFit: "contain" }}/>
               </div>
-              <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"var(--nav-text)", letterSpacing:"-.2px" }}>FinovaOS</span>
+              <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"#eef3ff", letterSpacing:"-.2px" }}>FinovaOS</span>
             </Link>
 
             {/* Center nav links */}
