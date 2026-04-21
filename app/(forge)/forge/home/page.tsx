@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ForgeNav, ForgeFooter, useInView } from "../components/shared";
+import { ForgeNav, ForgeFooter, useInView } from "../../components/shared";
 
 const ff = "'Outfit','DM Sans',sans-serif";
 

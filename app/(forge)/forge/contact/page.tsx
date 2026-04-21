@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ForgeNav, ForgeFooter, useInView } from "../components/shared";
+import { ForgeNav, ForgeFooter, useInView } from "../../components/shared";
 
 const ff = "'Outfit','DM Sans',sans-serif";
 
