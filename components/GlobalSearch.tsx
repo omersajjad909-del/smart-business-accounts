@@ -87,7 +87,7 @@ export default function GlobalSearch() {
         router.replace(`${pathname}?${p.toString()}`);
       }
       if (query.length >= 2) { setShowResults(true); performSearch(); }
-      else { setResults(null); setShowResults(false); setError(null); }
+      else { setResults(null); setShowResults(false); }
     }, 300);
     return () => clearTimeout(id);
   }, [query]);
