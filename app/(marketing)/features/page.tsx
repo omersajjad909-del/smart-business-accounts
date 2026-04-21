@@ -1538,7 +1538,7 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
       transition:"all .65s cubic-bezier(.22,1,.36,1)",
     }}>
       {/* Copy */}
-      <div style={{ direction:"ltr" }}>
+      <div className="feat-row-copy" style={{ direction:"ltr" }}>
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"4px 12px", borderRadius:20, background:dim, border:`1px solid ${border}`, fontSize:10, fontWeight:700, color, letterSpacing:".1em", textTransform:"uppercase" as const, marginBottom:16 }}>
           <span style={{ width:5, height:5, borderRadius:"50%", background:color }}/>
           Feature {String(globalIndex+1).padStart(2,"0")}
@@ -1564,7 +1564,7 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
       </div>
 
       {/* Mock screen */}
-      <div style={{ direction:"ltr" }}>
+      <div className="feat-row-mock" style={{ direction:"ltr" }}>
         <div style={{ borderRadius:18, padding:3, background:`linear-gradient(135deg,${color}30,rgba(255,255,255,.04))`, boxShadow:`0 20px 56px rgba(0,0,0,.4), 0 0 0 1px ${border}` }}>
           <div style={{ borderRadius:16, overflow:"hidden", background:"#080c1e" }}>
             <MockScreen type={(feature as any).mockType || "ledger"} color={color}/>
@@ -1646,6 +1646,8 @@ export default function FeaturesPage() {
           .feat-tab:hover{color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2);}
           @media(max-width:900px){
             .feat-row{grid-template-columns:1fr!important;direction:ltr!important;gap:36px!important;}
+            .feat-row-copy{order:1!important;}
+            .feat-row-mock{order:2!important;}
             .feat-tabs{flex-wrap:wrap!important;gap:8px!important;}
             .feat-section{padding:60px 20px!important;}
             .feat-header-mb{margin-bottom:40px!important;}
