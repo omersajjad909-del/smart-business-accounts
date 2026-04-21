@@ -141,7 +141,7 @@ export default function AboutPage() {
             opacity: heroVis?1:0, transform: heroVis?"translateY(0)":"translateY(20px)",
             transition:"opacity .6s ease .3s, transform .6s ease .3s",
           }}>
-            <Link href="/onboarding/signup/starter" className="about-cta-primary">
+            <Link href="/onboarding/pricing" className="about-cta-primary">
               Get Started
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </Link>
