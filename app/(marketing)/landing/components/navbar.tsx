@@ -409,15 +409,13 @@ export default function Navbar() {
           <div style={{ height:64, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
 
             {/* Logo */}
-            <Link href="/" style={{ display:"flex", alignItems:"center", gap:10, textDecoration:"none" }}>
-              <div style={{ width: 56, height: 56, minWidth: 56, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(99,102,241,.16)", border: "1px solid rgba(99,102,241,.28)", boxShadow: "0 10px 30px rgba(99,102,241,.08)" }}>
-                <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{ objectFit: "contain" }}/>
-              </div>
+            <Link href="/" style={{ display:"flex", alignItems:"center", gap:9, textDecoration:"none" }}>
+              <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{ objectFit:"contain", flexShrink:0 }}/>
               <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"#eef3ff", letterSpacing:"-.2px" }}>FinovaOS</span>
             </Link>
 
             {/* Center nav links */}
-            <div className="fn-desk" style={{ display:"flex", alignItems:"center", gap:4 }}>
+            <div className="fn-desk" style={{ display:"flex", alignItems:"center", gap:28 }}>
 
               {/* Features trigger */}
               <div ref={featuresRef} style={{ position:"relative" }}
