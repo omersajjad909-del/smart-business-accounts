@@ -164,7 +164,7 @@ export default function AboutPage() {
             opacity: heroVis?1:0, transform: heroVis?"translateY(0)":"translateY(20px)",
             transition:"opacity .6s ease .3s, transform .6s ease .3s",
           }}>
-            <Link href="/onboarding/pricing" className="about-cta-primary">
+            <Link href="/pricing" className="about-cta-primary">
               Get Started
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </Link>
@@ -175,21 +175,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── STATS BAR ── */}
-      <FadeIn style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 80px" }}>
-        <div className="about-stats" style={{
-          display:"flex", borderRadius:20,
-          background:"rgba(255,255,255,.025)", border:"1px solid rgba(255,255,255,.07)",
-          overflow:"hidden",
-        }}>
-          {STATS.map(s => (
-            <div key={s.label} className="stat-item" style={{ flex:1, padding:"28px 32px", textAlign:"center" }}>
-              <div style={{ fontSize:"clamp(20px,2.5vw,28px)", fontWeight:900, color:s.color, letterSpacing:"-1px", marginBottom:6 }}>{s.value}</div>
-              <div style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)", letterSpacing:".06em", textTransform:"uppercase" }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </FadeIn>
 
       {/* ── WHAT IS FINOVAOS ── */}
       <FadeIn style={{ maxWidth:1100, margin:"0 auto", padding:"0 24px 90px" }}>
