@@ -231,18 +231,52 @@ async function handleDemoLogin(req: NextRequest, businessType?: string | null) {
   }
 }
 
+const ALLOWED_DEMO_TYPES = new Set([
+  "trading",
+  "distribution",
+  "wholesale",
+  "import_company",
+  "export_company",
+]);
+
+function normalizeBusinessType(input?: string | null) {
+  if (!input) return null;
+  const normalized = String(input).trim().toLowerCase();
+  if (!normalized) return null;
+  return ALLOWED_DEMO_TYPES.has(normalized) ? normalized : null;
+}
+
 export async function GET(req: NextRequest) {
-  return handleDemoLogin(req);
+  const requested = normalizeBusinessType(req.nextUrl.searchParams.get("businessType"));
+  return handleDemoLogin(req, requested);
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json().catch(() => ({}));
-    const businessType = typeof body?.businessType === "string" ? body.businessType : null;
-    return handleDemoLogin(req, businessType);
+    let businessType: string | null = null;
+    const contentType = req.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+      const body = await req.json().catch(() => ({}));
+      businessType = typeof body?.businessType === "string" ? body.businessType : null;
+    } else if (
+      contentType.includes("application/x-www-form-urlencoded") ||
+      contentType.includes("multipart/form-data")
+    ) {
+      const form = await req.formData().catch(() => null);
+      businessType = typeof form?.get("businessType") === "string" ? String(form?.get("businessType")) : null;
+    } else {
+      const body = await req.json().catch(() => ({}));
+      businessType = typeof body?.businessType === "string" ? body.businessType : null;
+    }
+
+    const requested = normalizeBusinessType(
+      businessType || req.nextUrl.searchParams.get("businessType")
+    );
+    return handleDemoLogin(req, requested);
   } catch {
-    return handleDemoLogin(req);
+    const requested = normalizeBusinessType(req.nextUrl.searchParams.get("businessType"));
+    return handleDemoLogin(req, requested);
   }
 }
-
 

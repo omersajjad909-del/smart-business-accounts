@@ -561,23 +561,40 @@ export default function DemoPage() {
     setLoading(true);
     setStoredDemoBusinessPreference(biz.liveBusinessType);
     try {
-      const res = await fetch("/api/demo/login", {
+      const requestPath = `/api/demo/login?businessType=${encodeURIComponent(biz.liveBusinessType)}`;
+      const res = await fetch(requestPath, {
         method: "POST",
+        credentials: "include",
+        cache: "no-store",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ businessType: biz.liveBusinessType }),
       });
-      if (res.ok) {
-        const data = await res.json();
+
+      let finalRes = res;
+      if (!finalRes.ok) {
+        finalRes = await fetch(requestPath, {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+      }
+
+      if (finalRes.ok) {
+        const data = await finalRes.json().catch(() => ({}));
+        const activeBusinessType = data.company?.businessType || biz.liveBusinessType;
         if (data.user) {
           setCurrentUser({
             ...data.user,
-            businessType: data.company?.businessType || biz.liveBusinessType,
+            businessType: activeBusinessType,
           });
         }
-        setStoredDemoBusinessPreference(data.company?.businessType || biz.liveBusinessType);
-        window.location.href = "/dashboard";
+        setStoredDemoBusinessPreference(activeBusinessType);
+        window.location.assign("/dashboard");
         return;
       }
+
+      const failText = await finalRes.text().catch(() => "");
+      console.error("Demo login failed", finalRes.status, failText);
     } catch {}
     setLoading(false);
   }

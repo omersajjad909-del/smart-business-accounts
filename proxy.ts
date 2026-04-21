@@ -67,6 +67,8 @@ export function proxy(req: NextRequest) {
     "/api/test-db",
     "/api/test-login",
     "/api/analytics",
+    "/api/demo/login",
+    "/api/demo/seed",
     "/api/invitations/accept",
     "/api/invitations/preview",
     "/api/public/",
