@@ -46,7 +46,7 @@ const CONTACT_METHODS = [
     desc: "Quick questions? Message us",
     detail: "Usually replies within 1 hour",
     action: "Message Now",
-    href: "https://wa.me/923001234567",
+    href: "https://wa.me/923047653693",
     color: "#22c55e",
     glow: "rgba(34,197,94,.12)",
     border: "rgba(34,197,94,.25)",
