@@ -797,6 +797,7 @@ export default function DashboardLayout({
               open={openSection === "reports"}
               onToggle={() => toggle("reports")}
             >
+              <NavLink href="/dashboard/reports" pathname={pathname} style={{fontWeight:700, color:"#818cf8"}}>📊 View All Reports</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT) && <NavLink href="/dashboard/reports/trial-balance" pathname={pathname}>Trial Balance</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_PROFIT_LOSS_REPORT) && <NavLink href="/dashboard/reports/profit-loss" pathname={pathname}>Profit & Loss</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_BALANCE_SHEET_REPORT) && <NavLink href="/dashboard/reports/balance-sheet" pathname={pathname}>Balance Sheet</NavLink>}
