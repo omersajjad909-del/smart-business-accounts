@@ -142,7 +142,7 @@ export default function AboutPage() {
             transition:"opacity .6s ease .3s, transform .6s ease .3s",
           }}>
             <Link href="/onboarding/signup/starter" className="about-cta-primary">
-              Start Free Trial
+              Get Started
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </Link>
             <Link href="/contact" className="about-cta-ghost">
@@ -300,11 +300,11 @@ export default function AboutPage() {
           Ready to run your business smarter?
         </h2>
         <p style={{ fontSize:16, color:"rgba(255,255,255,.4)", lineHeight:1.75, maxWidth:460, margin:"0 auto 36px" }}>
-          Start free — no credit card needed. See why trading businesses choose FinovaOS.
+          75% off your first 3 months — 14-day money-back guarantee. No risk.
         </p>
         <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap", marginBottom:32 }}>
           <Link href="/onboarding/signup/starter" className="about-cta-primary">
-            Get Started Free
+            Get Started
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </Link>
           <Link href="/demo" className="about-cta-ghost">
@@ -312,7 +312,7 @@ export default function AboutPage() {
           </Link>
         </div>
         <div style={{ display:"flex", gap:24, justifyContent:"center", flexWrap:"wrap" }}>
-          {["✓ 14-day free trial","✓ No credit card","✓ Cancel anytime"].map(t => (
+          {["✓ 14-day money-back guarantee","✓ 75% off first 3 months","✓ Cancel anytime"].map(t => (
             <span key={t} style={{ fontSize:13, color:"rgba(255,255,255,.3)", fontWeight:600 }}>{t}</span>
           ))}
         </div>
