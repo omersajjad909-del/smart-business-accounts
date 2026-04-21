@@ -1941,3 +1941,14 @@ model PaymentFollowUpLog {
   @@unique([companyId, invoiceId])
   @@index([companyId, status])
 }
+
+
+// ================= STATUS SUBSCRIBERS =================
+
+model StatusSubscriber {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  confirmed   Boolean  @default(false)
+  token       String   @unique @default(uuid())
+  createdAt   DateTime @default(now())
+}

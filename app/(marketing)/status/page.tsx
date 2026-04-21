@@ -5,6 +5,99 @@ import { useEffect, useRef, useState } from "react";
 /* ─── Types ─── */
 type Status = "operational" | "degraded" | "outage" | "maintenance";
 
+/* ─── Subscribe banner ─── */
+function SubscribeBanner() {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle"|"loading"|"sent"|"already"|"error">("idle");
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setState("loading");
+    try {
+      const res = await fetch("/api/status/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setState("error"); return; }
+      if (data.message === "already_subscribed") setState("already");
+      else setState("sent");
+    } catch {
+      setState("error");
+    }
+  }
+
+  return (
+    <div style={{
+      marginTop:48, borderRadius:20, padding:"28px 32px",
+      background:"linear-gradient(135deg,rgba(45,43,107,.8),rgba(30,27,85,.8))",
+      border:"1px solid rgba(165,180,252,.2)",
+      backdropFilter:"blur(20px)",
+      boxShadow:"0 16px 48px rgba(99,102,241,.2)",
+    }}>
+      <div style={{ fontSize:13.5, fontWeight:700, color:"white", marginBottom:4 }}>
+        📬 Subscribe to status updates
+      </div>
+      <div style={{ fontSize:12.5, color:"rgba(255,255,255,.4)", marginBottom:20 }}>
+        Get notified by email when incidents occur or are resolved.
+      </div>
+
+      {state === "sent" || state === "already" ? (
+        <div style={{
+          display:"inline-flex", alignItems:"center", gap:8,
+          padding:"10px 18px", borderRadius:11,
+          background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.3)",
+          fontSize:13, color:"#34d399", fontWeight:600,
+        }}>
+          {state === "already"
+            ? "✓ You're already subscribed."
+            : "✓ Check your inbox — confirmation email sent."}
+        </div>
+      ) : (
+        <form onSubmit={submit} style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+          <input
+            type="email"
+            required
+            placeholder="you@example.com"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            style={{
+              flex:1, minWidth:220,
+              padding:"10px 16px", borderRadius:11,
+              background:"rgba(255,255,255,.07)",
+              border:"1px solid rgba(255,255,255,.15)",
+              color:"white", fontSize:13,
+              outline:"none", fontFamily:"inherit",
+            }}
+          />
+          <button
+            type="submit"
+            disabled={state === "loading"}
+            style={{
+              display:"inline-flex", alignItems:"center", gap:8,
+              padding:"10px 20px", borderRadius:11,
+              background: state === "loading" ? "rgba(99,102,241,.5)" : "linear-gradient(135deg,#6366f1,#4f46e5)",
+              color:"white", fontWeight:700, fontSize:13,
+              border:"none", cursor: state === "loading" ? "not-allowed" : "pointer",
+              whiteSpace:"nowrap", fontFamily:"inherit",
+              boxShadow:"0 4px 16px rgba(99,102,241,.35)",
+              transition:"all .25s",
+            }}
+          >
+            {state === "loading" ? "Sending…" : "Subscribe →"}
+          </button>
+          {state === "error" && (
+            <div style={{ width:"100%", fontSize:12, color:"#f87171", marginTop:4 }}>
+              Something went wrong. Try again.
+            </div>
+          )}
+        </form>
+      )}
+    </div>
+  );
+}
+
 /* ─── Static data ─── */
 const SERVICES = [
   {
@@ -216,6 +309,10 @@ export default function StatusPage() {
   const [histRef, histVisible] = useVisible(0.08);
   const [uptimeRef, uptimeVisible] = useVisible(0.1);
   const [expandedInc, setExpandedInc] = useState<number | null>(null);
+  const searchParams = typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search)
+    : null;
+  const confirmed = searchParams?.get("confirmed");
 
   const allOperational = SERVICES.every(s => s.status === "operational");
 
@@ -250,6 +347,21 @@ export default function StatusPage() {
         </div>
 
         <div style={{ position:"relative", zIndex:1, maxWidth:900, margin:"0 auto", padding:"72px 24px 80px" }}>
+
+          {/* ── CONFIRMATION TOAST ── */}
+          {confirmed && (
+            <div style={{
+              marginBottom:24, padding:"12px 20px", borderRadius:12,
+              background: confirmed === "true" ? "rgba(52,211,153,.1)" : "rgba(248,113,113,.1)",
+              border: `1px solid ${confirmed === "true" ? "rgba(52,211,153,.3)" : "rgba(248,113,113,.3)"}`,
+              color: confirmed === "true" ? "#34d399" : "#f87171",
+              fontSize:13, fontWeight:600, textAlign:"center",
+            }}>
+              {confirmed === "true"
+                ? "✓ Subscription confirmed! You'll receive status alerts by email."
+                : "✗ Invalid or expired confirmation link."}
+            </div>
+          )}
 
           {/* ── HERO ── */}
           <div ref={heroRef} style={{ textAlign:"center", marginBottom:56 }}>
@@ -505,38 +617,7 @@ export default function StatusPage() {
           </div>
 
           {/* ── SUBSCRIBE BANNER ── */}
-          <div style={{
-            marginTop:48, borderRadius:20, padding:"28px 32px",
-            background:"linear-gradient(135deg,rgba(45,43,107,.8),rgba(30,27,85,.8))",
-            border:"1px solid rgba(165,180,252,.2)",
-            display:"flex", alignItems:"center", justifyContent:"space-between",
-            gap:20, flexWrap:"wrap",
-            backdropFilter:"blur(20px)",
-            boxShadow:"0 16px 48px rgba(99,102,241,.2)",
-          }}>
-            <div>
-              <div style={{ fontSize:13.5, fontWeight:700, color:"white", marginBottom:4 }}>
-                📬 Subscribe to status updates
-              </div>
-              <div style={{ fontSize:12.5, color:"rgba(255,255,255,.4)" }}>
-                Get notified by email when incidents occur or are resolved.
-              </div>
-            </div>
-            <a href="mailto:finovaos.app@gmail.com?subject=Subscribe to Status Updates" style={{
-              display:"inline-flex", alignItems:"center", gap:8,
-              padding:"10px 20px", borderRadius:11,
-              background:"linear-gradient(135deg,#6366f1,#4f46e5)",
-              color:"white", fontWeight:700, fontSize:13,
-              textDecoration:"none", whiteSpace:"nowrap",
-              boxShadow:"0 4px 16px rgba(99,102,241,.35)",
-              transition:"all .25s",
-            }}
-              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(99,102,241,.5)";}}
-              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="0 4px 16px rgba(99,102,241,.35)";}}
-            >
-              Subscribe →
-            </a>
-          </div>
+          <SubscribeBanner />
 
           {/* Footer links */}
           <div style={{ marginTop:48, display:"flex", justifyContent:"center", gap:24, flexWrap:"wrap" }}>
