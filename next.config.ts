@@ -45,6 +45,15 @@ const nextConfig: NextConfig = {
   experimental: {
     cpus: 1,
   },
+  async redirects() {
+    return [
+      {
+        source: "/forge",
+        destination: "/forge/home",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [
       {
