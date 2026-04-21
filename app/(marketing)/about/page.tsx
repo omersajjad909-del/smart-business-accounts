@@ -156,7 +156,7 @@ export default function AboutPage() {
             transition:"opacity .6s ease .2s, transform .6s ease .2s",
           }}>
             FinovaOS was built from frustration — expensive, outdated software that never fit
-            trading and wholesale businesses. We built what they actually needed.
+            tradings and wholesale businesses. We built what they actually needed.
           </p>
 
           <div style={{
