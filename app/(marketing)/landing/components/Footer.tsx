@@ -39,9 +39,9 @@ const BOTTOM_LINKS = [
 ];
 
 const STATS = [
-  { val: "14k+",  label: "Businesses", color: "#818cf8" },
-  { val: "4.9/5", label: "Rating",     color: "#fbbf24" },
-  { val: "99.9%", label: "Uptime",     color: "#34d399" },
+  { val: "50+",   label: "Modules",  color: "#818cf8" },
+  { val: "PKR·AED·SAR", label: "Multi-Currency", color: "#fbbf24" },
+  { val: "99.9%", label: "Uptime",   color: "#34d399" },
 ];
 
 export default function Footer() {
@@ -266,7 +266,7 @@ export default function Footer() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
               {[
-                { Icon: Mail,  text: "finovaos.app@gmail.com", color: "#818cf8", href: "mailto:finovaos.app@gmail.com" },
+                { Icon: Mail,  text: "hello@finovaos.app", color: "#818cf8", href: "mailto:hello@finovaos.app" },
                 { Icon: Phone, text: "+92 304-7653693",        color: "#34d399", href: "https://wa.me/923047653693" },
                 { Icon: Globe, text: "Pakistan 🇵🇰",           color: "#fbbf24", href: "#" },
               ].map(({ Icon, text, color, href }) => (
