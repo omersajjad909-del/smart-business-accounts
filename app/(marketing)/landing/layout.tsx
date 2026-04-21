@@ -1,126 +1,34 @@
 import type { Metadata } from "next";
 
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
+
 export const metadata: Metadata = {
-  title: "FinovaOS — Cloud Financial Management for SMEs",
-  description: "Secure, cloud-based accounting for traders, distributors, manufacturers, and service businesses. Real-time dashboards, smart reporting, and multi-company management.",
+  title: "FinovaOS — Cloud Accounting & Business Management for SMEs",
+  description:
+    "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. Purpose-built for trading, wholesale, and distribution businesses.",
+  keywords: [
+    "accounting software", "cloud accounting", "invoicing software", "inventory management",
+    "HR payroll", "bank reconciliation", "CRM software", "SME accounting",
+    "financial management", "business software", "online accounting", "FinovaOS",
+  ],
   openGraph: {
-    title: "FinovaOS",
-    description: "Cloud financial management for SMEs — professional, trustworthy, and simple.",
-    url: "https://example.com/landing",
+    title: "FinovaOS — Cloud Accounting & Business Management",
+    description: "Cloud financial management for SMEs — invoicing, inventory, payroll, CRM, and more in one platform.",
+    url: `${BASE}/`,
     siteName: "FinovaOS",
-    images: [
-      { url: "/og/landing", width: 1200, height: 630, alt: "FinovaOS" },
-    ],
+    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS" }],
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FinovaOS",
-    description: "Cloud financial management for SMEs.",
-    images: ["/og/landing"],
+    title: "FinovaOS — Cloud Accounting for SMEs",
+    description: "Cloud financial management for SMEs — invoicing, inventory, payroll, CRM, and more.",
+    images: [`${BASE}/icon.png`],
   },
+  alternates: { canonical: `${BASE}/` },
 };
 
 export default function LandingLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-    
-      {children}
-    </>
-  )
+  return <>{children}</>;
 }
-
-// "use client";
-// // ═══════════════════════════════════════════════════════
-// //  FILE: app/admin/layout.tsx
-// //  Sirf auth check karta hai — sidebar/UI AdminPanel.tsx mein hai
-// // ═══════════════════════════════════════════════════════
-
-// import { ReactNode, useEffect, useState } from "react";
-// import { usePathname, useRouter } from "next/navigation";
-// import { Toaster } from "react-hot-toast";
-
-// function getCurrentUser() {
-//   if (typeof window === "undefined") return null;
-//   try {
-//     const raw = localStorage.getItem("user");
-//     return raw ? JSON.parse(raw) : null;
-//   } catch {
-//     return null;
-//   }
-// }
-
-// export default function AdminLayout({ children }: { children: ReactNode }) {
-//   const pathname  = usePathname();
-//   const router    = useRouter();
-//   const isLoginPage = pathname === "/admin/login";
-
-//   const [authorized, setAuthorized] = useState(false);
-//   const [checking,   setChecking]   = useState(true);
-
-//   useEffect(() => {
-//     // Login page — no auth needed
-//     if (isLoginPage) {
-//       setChecking(false);
-//       return;
-//     }
-
-//     const user = getCurrentUser();
-
-//     if (!user || user.role !== "ADMIN") {
-//       router.replace("/admin/login");
-//       return;
-//     }
-
-//     setAuthorized(true);
-//     setChecking(false);
-//   }, [pathname]);
-
-//   // Login page — render as-is
-//   if (isLoginPage) {
-//     return (
-//       <>
-//         <Toaster position="top-center" />
-//         {children}
-//       </>
-//     );
-//   }
-
-//   // Auth check chal raha hai
-//   if (checking) {
-//     return (
-//       <div style={{
-//         minHeight: "100vh",
-//         background: "#080c1e",
-//         display: "flex",
-//         alignItems: "center",
-//         justifyContent: "center",
-//         color: "rgba(255,255,255,.4)",
-//         fontFamily: "'Outfit',sans-serif",
-//         fontSize: 14,
-//         gap: 12,
-//       }}>
-//         <div style={{
-//           width: 20, height: 20, borderRadius: "50%",
-//           border: "2px solid rgba(99,102,241,.3)",
-//           borderTopColor: "#6366f1",
-//           animation: "spin 0.8s linear infinite",
-//         }}/>
-//         Verifying Admin Access...
-//         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-//       </div>
-//     );
-//   }
-
-//   // Unauthorized — null return (redirect ho raha hai)
-//   if (!authorized) return null;
-
-//   // Authorized — sirf children render karo (AdminPanel.tsx apna layout khud handle karta hai)
-//   return (
-//     <>
-//       <Toaster position="top-center" />
-//       {children}
-//     </>
-//   );
-// }

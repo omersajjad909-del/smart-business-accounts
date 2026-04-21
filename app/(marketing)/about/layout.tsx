@@ -3,21 +3,21 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "About FinovaOS — Our Mission, Team & Story",
+  title: "About FinovaOS — Our Mission, Story & Values",
   description:
     "Learn about FinovaOS's mission to simplify business finance for trading, wholesale, and distribution businesses. Purpose-built for how real businesses actually work.",
   keywords: [
     "about FinovaOS",
-    "FinovaOS team",
+    "FinovaOS story",
     "cloud accounting company",
     "accounting software company",
-    "SME fintech",
+    "SME fintech Pakistan",
     "financial management platform",
     "FinovaOS mission",
-    "global accounting software company",
+    "trading business accounting software",
   ],
   openGraph: {
-    title: "About FinovaOS — Our Mission & Team",
+    title: "About FinovaOS — Our Mission & Story",
     description:
       "FinovaOS is on a mission to make financial management simple for trading, wholesale, and distribution businesses worldwide.",
     url: `${BASE}/about`,

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: "%s | FinovaOS",
   },
   description:
-    "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. Trusted by 12,000+ businesses in 40+ countries.",
+    "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. Purpose-built for trading, wholesale, and distribution businesses.",
   keywords: [
     "accounting software", "cloud accounting", "invoicing software", "inventory management",
     "HR payroll", "bank reconciliation", "CRM software", "SME accounting", "financial management",

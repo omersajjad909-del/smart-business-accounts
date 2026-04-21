@@ -45,9 +45,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/developers/api`,     lastModified: now, changeFrequency: "monthly" as const, priority: 0.6  },
   ];
 
-  // Blog articles
+  // Blog articles — only add real published slugs here
   const blogSlugs = [
-    "bank-reconciliation-guide", "1", "2", "3", "4", "5", "6", "7",
+    "bank-reconciliation-guide",
   ];
   const blogPages = blogSlugs.map(slug => ({
     url: `${BASE}/blog/${slug}`,
