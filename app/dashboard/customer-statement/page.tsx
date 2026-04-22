@@ -90,20 +90,37 @@ export default function CustomerStatementPage() {
             background: "linear-gradient(145deg,#0f1a35,#0b1225)",
             border: "1px solid rgba(99,102,241,.25)",
             borderRadius: 18, padding: "36px 40px", width: "100%", maxWidth: 480,
-            boxShadow: "0 32px 80px rgba(0,0,0,.6)",
+            boxShadow: "0 32px 80px rgba(0,0,0,.6)", position: "relative",
           }}>
+            <button style={{
+              position: "absolute", top: 14, right: 16, background: "none", border: "none",
+              color: "rgba(255,255,255,.35)", fontSize: 20, cursor: "pointer", lineHeight: 1,
+              padding: 4, borderRadius: 6, fontFamily: "inherit",
+            }} onClick={() => setShowModal(false)}>✕</button>
             <div style={{ marginBottom: 28 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
                 <div style={{ width: 4, height: 24, borderRadius: 2, background: "linear-gradient(180deg,#818cf8,#6366f1)" }}/>
                 <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800 }}>Customer Statement</h2>
               </div>
               <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,.3)", paddingLeft: 14 }}>
-                Select customer and date range to generate statement
+                Select date range and customer to generate statement
               </p>
             </div>
 
+            {/* Dates — shown first */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
+              <div>
+                <label style={labelStyle}>From Date</label>
+                <input type="date" style={inputStyle} value={dateFrom} onChange={e => setDateFrom(e.target.value)} autoFocus/>
+              </div>
+              <div>
+                <label style={labelStyle}>To Date</label>
+                <input type="date" style={inputStyle} value={dateTo} onChange={e => setDateTo(e.target.value)}/>
+              </div>
+            </div>
+
             {/* Autocomplete */}
-            <div style={{ marginBottom: 20, position: "relative" }}>
+            <div style={{ marginBottom: 28, position: "relative" }}>
               <label style={labelStyle}>Customer</label>
               <input
                 type="text"
@@ -113,7 +130,6 @@ export default function CustomerStatementPage() {
                 onChange={e => { setSearch(e.target.value); setSelected(null); setDropOpen(true); }}
                 onFocus={() => setDropOpen(true)}
                 onBlur={() => setTimeout(() => setDropOpen(false), 150)}
-                autoFocus
               />
               {selected && (
                 <button onClick={() => { setSelected(null); setSearch(""); }} style={{
@@ -145,18 +161,6 @@ export default function CustomerStatementPage() {
                 </div>
               )}
               {selected && <div style={{ marginTop: 5, fontSize: 11, color: "#818cf8" }}>✓ {selected.name}</div>}
-            </div>
-
-            {/* Dates */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 28 }}>
-              <div>
-                <label style={labelStyle}>From Date</label>
-                <input type="date" style={inputStyle} value={dateFrom} onChange={e => setDateFrom(e.target.value)}/>
-              </div>
-              <div>
-                <label style={labelStyle}>To Date</label>
-                <input type="date" style={inputStyle} value={dateTo} onChange={e => setDateTo(e.target.value)}/>
-              </div>
             </div>
 
             <button onClick={generate} disabled={!selected} style={{
