@@ -32,6 +32,7 @@ const MODULE_LABELS: Record<string, string> = {
   payment_receipts: "Payment Receipts",
   expense_vouchers: "Expense Vouchers",
   tax_configuration: "Tax Configuration",
+  bulk_payments: "Bulk Payments",
   loans: "Loans",
   recurring: "Recurring Transactions",
   reports_financial: "Financial Reports",

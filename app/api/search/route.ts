@@ -129,7 +129,14 @@ export async function GET(req: NextRequest) {
           companyId,
           deletedAt: null,
           ...branchWhere,
-          OR: [{ name: contains }, { email: contains }, { phone: contains }, { companyName: contains }, { type: contains }],
+          OR: [
+            { name: contains },
+            { email: contains },
+            { phone: contains },
+            { companyName: contains },
+            { position: contains },
+            { type: contains },
+          ],
         },
         take: MAX_RESULTS,
         select: {
@@ -138,6 +145,7 @@ export async function GET(req: NextRequest) {
           email: true,
           phone: true,
           companyName: true,
+          position: true,
           type: true,
         },
       }),
@@ -156,6 +164,7 @@ export async function GET(req: NextRequest) {
           title: true,
           stage: true,
           value: true,
+          expectedCloseDate: true,
           contact: { select: { name: true } },
         },
       }),
@@ -334,14 +343,18 @@ export async function GET(req: NextRequest) {
         type: "contact",
         id: row.id,
         title: row.name,
-        subtitle: `${row.type} - ${row.companyName}${row.phone ? ` - ${row.phone}` : ""}${row.email ? ` - ${row.email}` : ""}`,
+        subtitle: `${row.type} - ${row.companyName}${row.position ? ` - ${row.position}` : ""}${
+          row.phone ? ` - ${row.phone}` : ""
+        }${row.email ? ` - ${row.email}` : ""}`,
         url: `/dashboard/crm/contacts`,
       })),
       opportunities: opportunities.map((row) => ({
         type: "opportunity",
         id: row.id,
         title: row.title,
-        subtitle: `${row.contact?.name || "N/A"} - ${row.stage} - ${formatAmount(row.value)}`,
+        subtitle: `${row.contact?.name || "N/A"} - ${row.stage} - ${formatAmount(row.value)} - ${formatDate(
+          row.expectedCloseDate
+        )}`,
         url: `/dashboard/crm/opportunities`,
       })),
       interactions: interactions.map((row) => ({
