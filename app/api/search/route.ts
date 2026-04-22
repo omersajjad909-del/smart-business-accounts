@@ -80,10 +80,10 @@ export async function GET(req: NextRequest) {
     const [
       customers,
       suppliers,
+      accounts,
       contacts,
       opportunities,
       interactions,
-      accounts,
       items,
       salesInvoices,
       purchaseInvoices,
