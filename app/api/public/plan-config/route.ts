@@ -37,6 +37,17 @@ const DEFAULT_FEATURE_MATRIX = {
   enterprise: [...DEFAULT_FEATURES],
 };
 
+function mergePlanPermissions(savedPlanPermissions?: Record<string, string[]>) {
+  const saved = savedPlanPermissions || {};
+
+  return {
+    STARTER: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.STARTER || []), ...(saved.STARTER || saved.starter || [])])),
+    PRO: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.PRO || []), ...(saved.PRO || saved.pro || [])])),
+    ENTERPRISE: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.ENTERPRISE || []), ...(saved.ENTERPRISE || saved.enterprise || [])])),
+    CUSTOM: Array.from(new Set([...(saved.CUSTOM || saved.custom || [])])),
+  };
+}
+
 export async function GET(req: NextRequest) {
   try {
     const latest = await prisma.activityLog.findFirst({
@@ -75,6 +86,8 @@ export async function GET(req: NextRequest) {
         };
       }
 
+      saved.planPermissions = mergePlanPermissions(saved.planPermissions);
+
       return NextResponse.json(saved);
     }
 
@@ -86,10 +99,7 @@ export async function GET(req: NextRequest) {
       featureMatrix: DEFAULT_FEATURE_MATRIX,
       planLimits: { starter: 5, pro: 20, enterprise: null },
       planPermissions: {
-        STARTER:    PLAN_DEFAULT_PERMISSIONS.STARTER,
-        PRO:        PLAN_DEFAULT_PERMISSIONS.PRO,
-        ENTERPRISE: PLAN_DEFAULT_PERMISSIONS.ENTERPRISE,
-        CUSTOM:     [],
+        ...mergePlanPermissions(),
       },
       dashboardFeatureFlags: createDefaultDashboardFeatureFlags(),
     });

@@ -71,6 +71,17 @@ const DEFAULT_CUSTOM_PLAN = {
   ],
 };
 
+function mergePlanPermissions(savedPlanPermissions?: Record<string, string[]>) {
+  const saved = savedPlanPermissions || {};
+
+  return {
+    STARTER: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.STARTER || []), ...(saved.STARTER || saved.starter || [])])),
+    PRO: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.PRO || []), ...(saved.PRO || saved.pro || [])])),
+    ENTERPRISE: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.ENTERPRISE || []), ...(saved.ENTERPRISE || saved.enterprise || [])])),
+    CUSTOM: Array.from(new Set([...(saved.CUSTOM || saved.custom || [])])),
+  };
+}
+
 // Canonical default plan config returned when no admin override exists
 const DEFAULT_CONFIG = {
   pricing: DEFAULT_PRICING,
@@ -134,10 +145,7 @@ const DEFAULT_CONFIG = {
     },
   ],
   planPermissions: {
-    STARTER:    PLAN_DEFAULT_PERMISSIONS.STARTER,
-    PRO:        PLAN_DEFAULT_PERMISSIONS.PRO,
-    ENTERPRISE: PLAN_DEFAULT_PERMISSIONS.ENTERPRISE,
-    CUSTOM:     [],
+    ...mergePlanPermissions(),
   },
   dashboardFeatureFlags: createDefaultDashboardFeatureFlags(),
 };
@@ -164,6 +172,7 @@ export async function GET(req: NextRequest) {
         seatPricing: { ...DEFAULT_SEAT_PRICING, ...(saved.seatPricing || {}) },
         customPlan: { ...DEFAULT_CUSTOM_PLAN, ...(saved.customPlan || {}), modules: saved.customPlan?.modules ?? DEFAULT_CUSTOM_PLAN.modules },
         planHighlights: { ...DEFAULT_PLAN_HIGHLIGHTS, ...(saved.planHighlights || {}) },
+        planPermissions: mergePlanPermissions(saved.planPermissions),
         dashboardFeatureFlags: {
           ...createDefaultDashboardFeatureFlags(),
           ...(saved.dashboardFeatureFlags || {}),

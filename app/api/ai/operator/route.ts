@@ -1,9 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildBusinessOperator } from "@/lib/businessOperator";
 import { prisma } from "@/lib/prisma";
+import { apiHasPermission } from "@/lib/apiPermission";
+import { PERMISSIONS } from "@/lib/permissions";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+
+async function requireOperatorAccess(req: NextRequest, companyId: string) {
+  const allowed = await apiHasPermission(
+    req.headers.get("x-user-id"),
+    req.headers.get("x-user-role"),
+    PERMISSIONS.AI_BUSINESS_OPERATOR,
+    companyId
+  );
+
+  if (!allowed) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  return null;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,6 +28,8 @@ export async function GET(req: NextRequest) {
     if (!companyId) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
+    const denied = await requireOperatorAccess(req, companyId);
+    if (denied) return denied;
 
     const payload = await buildBusinessOperator(companyId);
     return NextResponse.json(payload);
@@ -34,6 +53,8 @@ export async function POST(req: NextRequest) {
     if (!companyId || !actionId) {
       return NextResponse.json({ error: "Company and action are required" }, { status: 400 });
     }
+    const denied = await requireOperatorAccess(req, companyId);
+    if (denied) return denied;
 
     await Promise.allSettled([
       prisma.auditLog.create({

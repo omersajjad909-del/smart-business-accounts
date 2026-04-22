@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { apiHasPermission } from "@/lib/apiPermission";
+import { PERMISSIONS } from "@/lib/permissions";
 
 function getCompanyId(req: NextRequest) {
   return req.headers.get("x-company-id");
+}
+
+async function requireBulkPaymentsAccess(req: NextRequest, companyId: string) {
+  const allowed = await apiHasPermission(
+    req.headers.get("x-user-id"),
+    req.headers.get("x-user-role"),
+    PERMISSIONS.BULK_PAYMENTS,
+    companyId
+  );
+
+  if (!allowed) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  return null;
 }
 
 // POST /api/bulk-payments/[id] — add a row to a batch
@@ -10,6 +27,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   const companyId = getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = await requireBulkPaymentsAccess(req, companyId);
+  if (denied) return denied;
 
   const batch = await (prisma as any).bulkPaymentBatch.findFirst({
     where: { id, companyId },
@@ -41,6 +60,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
   const companyId = getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = await requireBulkPaymentsAccess(req, companyId);
+  if (denied) return denied;
 
   const batch = await (prisma as any).bulkPaymentBatch.findFirst({
     where: { id, companyId },
@@ -77,6 +98,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { id } = await params;
   const companyId = getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = await requireBulkPaymentsAccess(req, companyId);
+  if (denied) return denied;
 
   await (prisma as any).bulkPaymentBatch.deleteMany({
     where: { id, companyId },

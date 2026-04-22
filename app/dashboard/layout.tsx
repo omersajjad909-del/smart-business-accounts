@@ -681,7 +681,9 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/business-guide" pathname={pathname}>Business Guide</NavLink>
               <NavLink href="/dashboard/owner-dashboard" pathname={pathname}>Owner Dashboard</NavLink>
               <NavLink href="/dashboard/ai-center" pathname={pathname}>AI Intelligence</NavLink>
-              <NavLink href="/dashboard/operator" pathname={pathname}>Business Operator</NavLink>
+              {hasPermission(currentUser, PERMISSIONS.AI_BUSINESS_OPERATOR) && (
+                <NavLink href="/dashboard/operator" pathname={pathname}>Business Operator</NavLink>
+              )}
             </div>
           )}
 
@@ -754,7 +756,7 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.BANK_RECONCILIATION) && <NavLink href="/dashboard/bank-reconciliation" pathname={pathname}>Bank Reconciliation</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.EXPENSE_VOUCHERS) && <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>Expense Vouchers</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.TAX_CONFIGURATION) && <NavLink href="/dashboard/tax-configuration" pathname={pathname}>Tax Configuration</NavLink>}
-              {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && <NavLink href="/dashboard/bulk-payments" pathname={pathname}>Bulk Payments</NavLink>}
+              {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BULK_PAYMENTS) && <NavLink href="/dashboard/bulk-payments" pathname={pathname}>Bulk Payments</NavLink>}
             </NavGroup>
           )}
 

@@ -1,14 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { apiHasPermission } from "@/lib/apiPermission";
+import { PERMISSIONS } from "@/lib/permissions";
 
 function getCompanyId(req: NextRequest) {
   return req.headers.get("x-company-id");
+}
+
+async function requireBulkPaymentsAccess(req: NextRequest, companyId: string) {
+  const allowed = await apiHasPermission(
+    req.headers.get("x-user-id"),
+    req.headers.get("x-user-role"),
+    PERMISSIONS.BULK_PAYMENTS,
+    companyId
+  );
+
+  if (!allowed) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  return null;
 }
 
 // GET /api/bulk-payments — list all batches for company
 export async function GET(req: NextRequest) {
   const companyId = getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = await requireBulkPaymentsAccess(req, companyId);
+  if (denied) return denied;
 
   const batches = await (prisma as any).bulkPaymentBatch.findMany({
     where: { companyId },
@@ -23,6 +42,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const companyId = getCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const denied = await requireBulkPaymentsAccess(req, companyId);
+  if (denied) return denied;
 
   const body = await req.json();
   const { name } = body;

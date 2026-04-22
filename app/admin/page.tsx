@@ -2638,6 +2638,7 @@ const PLAN_FEATURES = [
   { key:"PAYMENT_RECEIPTS",        label:"Payment Receipts",         route:"/dashboard/payment-receipts", category:"Banking & Payment" },
   { key:"EXPENSE_VOUCHERS",        label:"Expense Vouchers",         route:"/dashboard/expense-vouchers", category:"Banking & Payment" },
   { key:"TAX_CONFIGURATION",       label:"Tax Configuration",        route:"/dashboard/tax-configuration",category:"Banking & Payment" },
+  { key:"BULK_PAYMENTS",           label:"Bulk Payments",            route:"/dashboard/bulk-payments",    category:"Banking & Payment" },
   // Accounts
   { key:"VIEW_ACCOUNTS",           label:"Accounts Overview",        route:"/dashboard/accounts",         category:"Accounts" },
   { key:"CREATE_CPV",              label:"CPV — Cash Payment",       route:"/dashboard/cpv",              category:"Accounts" },
@@ -2713,12 +2714,21 @@ const PLAN_FEATURES = [
   { key:"AI_EXPENSE_CATEGORIZATION",   label:"AI Expense Categorization",   route:"/dashboard",                  category:"AI Features" },
   { key:"AI_NATURAL_LANGUAGE",         label:"Natural Language Reports",    route:"/dashboard/reports",          category:"AI Features" },
   { key:"AI_CASH_FLOW_PREDICTION",     label:"AI Cash Flow Prediction",     route:"/dashboard",                  category:"AI Features" },
+  // Trading Control
+  { key:"TRADING_OVERVIEW",            label:"Trading Overview",            route:"/dashboard/trading",                    category:"Trading Control" },
+  { key:"TRADING_ORDER_DESK",          label:"Order Desk",                  route:"/dashboard/trading/order-desk",         category:"Trading Control" },
+  { key:"TRADING_PROCUREMENT",         label:"Procurement",                 route:"/dashboard/trading/procurement",        category:"Trading Control" },
+  { key:"TRADING_STOCK_CONTROL",       label:"Stock Control",               route:"/dashboard/trading/stock-control",      category:"Trading Control" },
+  { key:"TRADING_OUTSTANDINGS",        label:"Outstandings",                route:"/dashboard/trading/outstandings",       category:"Trading Control" },
+  { key:"TRADING_DISPATCH_BOARD",      label:"Dispatch Board",              route:"/dashboard/trading/dispatch-board",     category:"Trading Control" },
+  { key:"TRADING_CONVERSION_CENTER",   label:"Conversion Center",           route:"/dashboard/trading/conversion-center",  category:"Trading Control" },
+  { key:"TRADING_ANALYTICS",           label:"Trading Analytics",           route:"/dashboard/trading/analytics",          category:"Trading Control" },
 ];
 
 const PF_CATEGORIES = Array.from(new Set(PLAN_FEATURES.map(f => f.category)));
 
 const PLAN_DEFAULTS: Record<string, string[]> = {
-  STARTER:    PLAN_FEATURES.filter(f => ["VIEW_DASHBOARD","VIEW_SETTINGS","MANAGE_USERS","BANK_RECONCILIATION","PAYMENT_RECEIPTS","EXPENSE_VOUCHERS","TAX_CONFIGURATION","VIEW_ACCOUNTS","CREATE_CPV","CREATE_CRV","VIEW_ACCOUNTING","VIEW_CATALOG","CREATE_ACCOUNTS","CREATE_ITEMS","CREATE_STOCK_RATE","VIEW_INVENTORY","CREATE_SALES_INVOICE","CREATE_QUOTATION","CREATE_DELIVERY_CHALLAN","CREATE_PURCHASE_INVOICE","CREATE_PURCHASE_ORDER","CREATE_SALE_RETURN","CREATE_OUTWARD","VIEW_REPORTS","VIEW_FINANCIAL_REPORTS","VIEW_AGEING_REPORT","VIEW_LEDGER_REPORT","VIEW_TRIAL_BALANCE_REPORT"].includes(f.key)).map(f=>f.key),
+  STARTER:    PLAN_FEATURES.filter(f => ["VIEW_DASHBOARD","VIEW_SETTINGS","MANAGE_USERS","BANK_RECONCILIATION","PAYMENT_RECEIPTS","EXPENSE_VOUCHERS","TAX_CONFIGURATION","BULK_PAYMENTS","VIEW_ACCOUNTS","CREATE_CPV","CREATE_CRV","VIEW_ACCOUNTING","VIEW_CATALOG","CREATE_ACCOUNTS","CREATE_ITEMS","CREATE_STOCK_RATE","VIEW_INVENTORY","CREATE_SALES_INVOICE","CREATE_QUOTATION","CREATE_DELIVERY_CHALLAN","CREATE_PURCHASE_INVOICE","CREATE_PURCHASE_ORDER","CREATE_SALE_RETURN","CREATE_OUTWARD","VIEW_REPORTS","VIEW_FINANCIAL_REPORTS","VIEW_AGEING_REPORT","VIEW_LEDGER_REPORT","VIEW_TRIAL_BALANCE_REPORT","AI_BUSINESS_OPERATOR","TRADING_OVERVIEW","TRADING_ORDER_DESK","TRADING_PROCUREMENT","TRADING_STOCK_CONTROL","TRADING_OUTSTANDINGS","TRADING_DISPATCH_BOARD","TRADING_CONVERSION_CENTER","TRADING_ANALYTICS"].includes(f.key)).map(f=>f.key),
   PRO:        PLAN_FEATURES.filter(f => f.key !== "VIEW_HR_PAYROLL").map(f=>f.key),
   ENTERPRISE: PLAN_FEATURES.map(f=>f.key),
   CUSTOM:     [],
