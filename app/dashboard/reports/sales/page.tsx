@@ -10,6 +10,7 @@ const ff = "'Outfit','Inter',sans-serif";
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
 
 type Account = { id: string; name: string };
+type Item = { id: string; code: string; name: string; unit: string };
 type Row = { date: string; invoiceNo: string; customer: string; item: string; unit: string; qty: number; rate: number; amount: number; status: string };
 
 const inputStyle: React.CSSProperties = {
@@ -37,14 +38,17 @@ export default function SalesReportPage() {
   const [to,          setTo]          = useState(today);
   const [customerId,  setCustomerId]  = useState("");
   const [unitParam,   setUnitParam]   = useState("");
+  const [itemId,      setItemId]      = useState("");
   const [itemSearch,  setItemSearch]  = useState("");
   const [statusParam, setStatusParam] = useState("");
 
   // Data
   const [customers, setCustomers] = useState<Account[]>([]);
+  const [items,     setItems]     = useState<Item[]>([]);
   const [units,     setUnits]     = useState<string[]>([]);
   const [rows,      setRows]      = useState<Row[]>([]);
   const [loading,   setLoading]   = useState(false);
+  const [itemDropOpen, setItemDropOpen] = useState(false);
 
   // Refs for keyboard nav
   const fromRef   = useRef<HTMLInputElement>(null);
@@ -58,6 +62,11 @@ export default function SalesReportPage() {
     fetch("/api/accounts", { credentials: "include", headers: h() })
       .then(r => r.json())
       .then(d => setCustomers((Array.isArray(d) ? d : []).filter((a: any) => a.partyType === "CUSTOMER")))
+      .catch(() => {});
+    // Fetch items from items-new
+    fetch("/api/items-new", { credentials: "include", headers: h() })
+      .then(r => r.json())
+      .then(d => setItems(Array.isArray(d) ? d : []))
       .catch(() => {});
     // Pre-fetch units from stock
     fetch("/api/reports/stock", { credentials: "include", headers: h() })
@@ -73,11 +82,12 @@ export default function SalesReportPage() {
   async function generateReport() {
     setLoading(true);
     setShowModal(false);
+    const selectedItem = items.find(i => i.id === itemId);
     const qs = new URLSearchParams({
       from, to,
       ...(customerId && { customerId }),
       ...(unitParam   && { unit: unitParam }),
-      ...(itemSearch  && { item: itemSearch }),
+      ...(itemId && selectedItem && { item: selectedItem.code }),
       ...(statusParam && { status: statusParam }),
     });
     try {
@@ -161,12 +171,45 @@ export default function SalesReportPage() {
                   {units.map(u => <option key={u} value={u}>{u}</option>)}
                 </select>
               </div>
-              <div>
+              <div style={{ position: "relative" }}>
                 <label style={labelStyle}>Item</label>
-                <input ref={itemRef} type="text" placeholder="Search item…" value={itemSearch}
-                  onChange={e => setItemSearch(e.target.value)} style={inputStyle}
+                <input ref={itemRef} type="text" placeholder="Search item…"
+                  value={itemId ? (items.find(i => i.id === itemId)?.code + " – " + items.find(i => i.id === itemId)?.name || "") : itemSearch}
+                  onChange={e => { setItemSearch(e.target.value); setItemId(""); setItemDropOpen(true); }}
+                  onFocus={() => setItemDropOpen(true)}
+                  onBlur={() => setTimeout(() => setItemDropOpen(false), 150)}
+                  style={{...inputStyle, paddingRight: itemId ? 36 : 14}}
                   onKeyDown={e => { if (e.key==="Enter") { e.preventDefault(); generateReport(); } }}
                 />
+                {itemId && (
+                  <button onClick={() => { setItemId(""); setItemSearch(""); setItemDropOpen(false); }} style={{
+                    position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", color: "rgba(255,255,255,.4)", cursor: "pointer", fontSize: 16,
+                  }}>×</button>
+                )}
+                {itemDropOpen && !itemId && (
+                  <div style={{
+                    position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
+                    background: "#0f1a35", border: "1px solid rgba(52,211,153,.3)",
+                    borderRadius: 8, marginTop: 4, maxHeight: 180, overflowY: "auto",
+                    boxShadow: "0 16px 40px rgba(0,0,0,.5)",
+                  }}>
+                    {items.filter(i => i.code.toLowerCase().includes(itemSearch.toLowerCase()) || i.name.toLowerCase().includes(itemSearch.toLowerCase())).length === 0 ? (
+                      <div style={{ padding: 14, textAlign: "center", color: "rgba(255,255,255,.25)", fontSize: 12 }}>No items found</div>
+                    ) : items.filter(i => i.code.toLowerCase().includes(itemSearch.toLowerCase()) || i.name.toLowerCase().includes(itemSearch.toLowerCase())).map(item => (
+                      <div key={item.id} onMouseDown={() => { setItemId(item.id); setItemSearch(""); setItemDropOpen(false); }} style={{
+                        padding: "10px 14px", cursor: "pointer", fontSize: 13,
+                        color: "rgba(255,255,255,.75)", borderBottom: "1px solid rgba(255,255,255,.04)",
+                      }}
+                        onMouseEnter={e => e.currentTarget.style.background = "rgba(52,211,153,.15)"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <div style={{ fontWeight: 600 }}>{item.code}</div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>{item.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -213,7 +256,7 @@ export default function SalesReportPage() {
                   {from} → {to}
                   {customerId && customers.find(c=>c.id===customerId) ? ` · ${customers.find(c=>c.id===customerId)!.name}` : ""}
                   {unitParam ? ` · Unit: ${unitParam}` : ""}
-                  {itemSearch ? ` · Item: ${itemSearch}` : ""}
+                  {itemId && items.find(i=>i.id===itemId) ? ` · Item: ${items.find(i=>i.id===itemId)!.code}` : ""}
                   {statusParam ? ` · ${statusParam}` : ""}
                 </div>
               </div>
