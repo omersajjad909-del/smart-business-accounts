@@ -37,6 +37,8 @@
   --card-bg: #ffffff;       /* White */
   --card-bg-2: #f8fafc;     /* Slate 50 */
   --border: #e2e8f0;        /* Slate 200 */
+  --input-bg: #ffffff;
+  --background: #f8fafc;
   
   --text-primary: #0f172a;  /* Slate 900 */
   --text-muted: #64748b;    /* Slate 500 */
@@ -81,6 +83,8 @@
   --card-bg: #141f3b;
   --card-bg-2: #18274b;
   --border: #22365f;
+  --input-bg: #0f1b35;
+  --background: #0b1324;
   --text-primary: #eef3ff;
   --text-muted: #a6b4d4;
   --accent: #21c7b7;
@@ -466,6 +470,78 @@ html.dark .dashboard-root {
   background-color: var(--surface) !important;
   color: var(--text-primary) !important;
   border-color: var(--border) !important;
+}
+
+html:not(.dark) .dashboard-root {
+  color-scheme: light;
+  background-color: var(--app-bg);
+  color: var(--text-primary);
+}
+
+html:not(.dark) .dashboard-root [style*="background: rgba(255, 255, 255, 0.03"],
+html:not(.dark) .dashboard-root [style*="background: rgba(255, 255, 255, 0.04"],
+html:not(.dark) .dashboard-root [style*="background: rgba(255, 255, 255, 0.05"],
+html:not(.dark) .dashboard-root [style*="background: rgba(255, 255, 255, 0.06"],
+html:not(.dark) .dashboard-root [style*="background: rgba(255, 255, 255, 0.08"],
+html:not(.dark) .dashboard-root [style*="background:rgba(255,255,255,.03"],
+html:not(.dark) .dashboard-root [style*="background:rgba(255,255,255,.04"],
+html:not(.dark) .dashboard-root [style*="background:rgba(255,255,255,.05"],
+html:not(.dark) .dashboard-root [style*="background:rgba(255,255,255,.06"],
+html:not(.dark) .dashboard-root [style*="background:rgba(255,255,255,.08"] {
+  background: var(--card-bg) !important;
+  box-shadow: var(--shadow);
+}
+
+html:not(.dark) .dashboard-root [style*="border: 1px solid rgba(255, 255, 255"],
+html:not(.dark) .dashboard-root [style*="border-color: rgba(255, 255, 255"],
+html:not(.dark) .dashboard-root [style*="border:1px solid rgba(255,255,255"],
+html:not(.dark) .dashboard-root [style*="border-color:rgba(255,255,255"] {
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .dashboard-root :is(div, span, p, h1, h2, h3, h4, h5, h6, td, th, label, small, strong)[style*="color: white"],
+html:not(.dark) .dashboard-root :is(div, span, p, h1, h2, h3, h4, h5, h6, td, th, label, small, strong)[style*="color:#fff"] {
+  color: var(--text-primary) !important;
+}
+
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.25"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.3"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.35"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.4"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.42"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.45"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.5"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.6"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.65"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.72"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.75"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color: rgba(255, 255, 255, 0.8"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.25"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.3"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.35"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.4"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.42"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.45"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.5"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.6"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.65"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.72"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.75"],
+html:not(.dark) .dashboard-root :is(div, span, p, td, th, label, small)[style*="color:rgba(255,255,255,.8"] {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .dashboard-root table {
+  background: var(--card-bg);
+}
+
+html:not(.dark) .dashboard-root th {
+  background-color: var(--panel-bg) !important;
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .dashboard-root tr:hover td {
+  background-color: rgba(15, 23, 42, 0.03) !important;
 }
 
 /* Fix white-on-white native dropdown options in all dashboard selects */
