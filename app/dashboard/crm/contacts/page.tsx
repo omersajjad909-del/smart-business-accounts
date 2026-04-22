@@ -10,7 +10,7 @@ interface Contact {
   name: string;
   email?: string;
   phone: string;
-  company: string;
+  companyName: string;
   position?: string;
   type: string;
   isActive: boolean;
@@ -102,7 +102,7 @@ export default function CrmContactsPage() {
       name: contact.name,
       email: contact.email || "",
       phone: contact.phone,
-      company: contact.company,
+      company: contact.companyName,
       position: contact.position || "",
       type: contact.type,
     });
@@ -274,7 +274,7 @@ export default function CrmContactsPage() {
                     <td className="px-6 py-3 font-semibold">{contact.name}</td>
                     <td className="px-6 py-3">{contact.phone}</td>
                     <td className="px-6 py-3">{contact.email || "-"}</td>
-                    <td className="px-6 py-3">{contact.company}</td>
+                    <td className="px-6 py-3">{contact.companyName}</td>
                     <td className="px-6 py-3">{contact.position || "-"}</td>
                     <td className="px-6 py-3">
                       <span className={`px-3 py-1 rounded text-sm font-semibold ${getTypeColor(contact.type)}`}>
