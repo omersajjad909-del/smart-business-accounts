@@ -1809,17 +1809,20 @@ export default function DashboardLayout({
         {/* ---- TOPBAR ---- */}
         <div
           style={{
-            background:"var(--panel-bg)",
+            background:isMobileViewport
+              ? "linear-gradient(180deg, rgba(15,26,48,.96), rgba(15,26,48,.88))"
+              : "var(--panel-bg)",
             borderBottom:"1px solid var(--border)",
-            padding:"8px 12px",
-            minHeight:56,
+            padding:isMobileViewport ? "8px 10px" : "8px 12px",
+            minHeight:isMobileViewport ? 0 : 56,
             display:"flex",
             alignItems:"center",
-            gap:12,
+            gap:isMobileViewport ? 8 : 12,
             position:"sticky",
             top:0,
             zIndex:10,
             flexWrap:"wrap",
+            boxShadow:isMobileViewport ? "0 10px 24px rgba(2,6,23,.14)" : "none",
           }}
           className="print:hidden sm:px-4"
         >
