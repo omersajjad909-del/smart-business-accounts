@@ -3,6 +3,7 @@
 import toast from "react-hot-toast";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import {
   XAxis, YAxis, CartesianGrid, Tooltip,
@@ -338,6 +339,7 @@ function HealthRing({ score }: { score: number }) {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 export default function AICommandCenter() {
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<Tab>("overview");
   const [ctx, setCtx] = useState<FinCtx | null>(null);
   const [alerts, setAlerts] = useState<AnomalyAlert[]>([]);
@@ -375,6 +377,26 @@ export default function AICommandCenter() {
   const [streaming, setStreaming] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const nextTab = searchParams.get("tab");
+    const allowedTabs = new Set<Tab>([
+      "overview",
+      "chat",
+      "insights",
+      "alerts",
+      "forecast",
+      "recommendations",
+      "reminders",
+      "tax",
+      "report",
+      "market",
+      "advisor",
+    ]);
+    if (nextTab && allowedTabs.has(nextTab as Tab) && nextTab !== tab) {
+      setTab(nextTab as Tab);
+    }
+  }, [searchParams, tab]);
 
   const getHeaders = useCallback((): Record<string, string> => {
     const user = getCurrentUser();
