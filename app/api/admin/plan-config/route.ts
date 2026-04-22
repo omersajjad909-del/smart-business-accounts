@@ -71,14 +71,32 @@ const DEFAULT_CUSTOM_PLAN = {
   ],
 };
 
-function mergePlanPermissions(savedPlanPermissions?: Record<string, string[]>) {
+function normalizePlanPermissions(savedPlanPermissions?: Record<string, string[]>) {
   const saved = savedPlanPermissions || {};
+  const hasAnySaved =
+    Array.isArray(saved.STARTER) ||
+    Array.isArray(saved.starter) ||
+    Array.isArray(saved.PRO) ||
+    Array.isArray(saved.pro) ||
+    Array.isArray(saved.ENTERPRISE) ||
+    Array.isArray(saved.enterprise) ||
+    Array.isArray(saved.CUSTOM) ||
+    Array.isArray(saved.custom);
+
+  if (!hasAnySaved) {
+    return {
+      STARTER: PLAN_DEFAULT_PERMISSIONS.STARTER,
+      PRO: PLAN_DEFAULT_PERMISSIONS.PRO,
+      ENTERPRISE: PLAN_DEFAULT_PERMISSIONS.ENTERPRISE,
+      CUSTOM: [],
+    };
+  }
 
   return {
-    STARTER: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.STARTER || []), ...(saved.STARTER || saved.starter || [])])),
-    PRO: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.PRO || []), ...(saved.PRO || saved.pro || [])])),
-    ENTERPRISE: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.ENTERPRISE || []), ...(saved.ENTERPRISE || saved.enterprise || [])])),
-    CUSTOM: Array.from(new Set([...(saved.CUSTOM || saved.custom || [])])),
+    STARTER: Array.isArray(saved.STARTER) ? saved.STARTER : Array.isArray(saved.starter) ? saved.starter : [],
+    PRO: Array.isArray(saved.PRO) ? saved.PRO : Array.isArray(saved.pro) ? saved.pro : [],
+    ENTERPRISE: Array.isArray(saved.ENTERPRISE) ? saved.ENTERPRISE : Array.isArray(saved.enterprise) ? saved.enterprise : [],
+    CUSTOM: Array.isArray(saved.CUSTOM) ? saved.CUSTOM : Array.isArray(saved.custom) ? saved.custom : [],
   };
 }
 
@@ -145,7 +163,7 @@ const DEFAULT_CONFIG = {
     },
   ],
   planPermissions: {
-    ...mergePlanPermissions(),
+    ...normalizePlanPermissions(),
   },
   dashboardFeatureFlags: createDefaultDashboardFeatureFlags(),
 };
@@ -172,7 +190,7 @@ export async function GET(req: NextRequest) {
         seatPricing: { ...DEFAULT_SEAT_PRICING, ...(saved.seatPricing || {}) },
         customPlan: { ...DEFAULT_CUSTOM_PLAN, ...(saved.customPlan || {}), modules: saved.customPlan?.modules ?? DEFAULT_CUSTOM_PLAN.modules },
         planHighlights: { ...DEFAULT_PLAN_HIGHLIGHTS, ...(saved.planHighlights || {}) },
-        planPermissions: mergePlanPermissions(saved.planPermissions),
+        planPermissions: normalizePlanPermissions(saved.planPermissions),
         dashboardFeatureFlags: {
           ...createDefaultDashboardFeatureFlags(),
           ...(saved.dashboardFeatureFlags || {}),

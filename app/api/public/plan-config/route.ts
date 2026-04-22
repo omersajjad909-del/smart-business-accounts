@@ -37,14 +37,32 @@ const DEFAULT_FEATURE_MATRIX = {
   enterprise: [...DEFAULT_FEATURES],
 };
 
-function mergePlanPermissions(savedPlanPermissions?: Record<string, string[]>) {
+function normalizePlanPermissions(savedPlanPermissions?: Record<string, string[]>) {
   const saved = savedPlanPermissions || {};
+  const hasAnySaved =
+    Array.isArray(saved.STARTER) ||
+    Array.isArray(saved.starter) ||
+    Array.isArray(saved.PRO) ||
+    Array.isArray(saved.pro) ||
+    Array.isArray(saved.ENTERPRISE) ||
+    Array.isArray(saved.enterprise) ||
+    Array.isArray(saved.CUSTOM) ||
+    Array.isArray(saved.custom);
+
+  if (!hasAnySaved) {
+    return {
+      STARTER: PLAN_DEFAULT_PERMISSIONS.STARTER,
+      PRO: PLAN_DEFAULT_PERMISSIONS.PRO,
+      ENTERPRISE: PLAN_DEFAULT_PERMISSIONS.ENTERPRISE,
+      CUSTOM: [],
+    };
+  }
 
   return {
-    STARTER: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.STARTER || []), ...(saved.STARTER || saved.starter || [])])),
-    PRO: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.PRO || []), ...(saved.PRO || saved.pro || [])])),
-    ENTERPRISE: Array.from(new Set([...(PLAN_DEFAULT_PERMISSIONS.ENTERPRISE || []), ...(saved.ENTERPRISE || saved.enterprise || [])])),
-    CUSTOM: Array.from(new Set([...(saved.CUSTOM || saved.custom || [])])),
+    STARTER: Array.isArray(saved.STARTER) ? saved.STARTER : Array.isArray(saved.starter) ? saved.starter : [],
+    PRO: Array.isArray(saved.PRO) ? saved.PRO : Array.isArray(saved.pro) ? saved.pro : [],
+    ENTERPRISE: Array.isArray(saved.ENTERPRISE) ? saved.ENTERPRISE : Array.isArray(saved.enterprise) ? saved.enterprise : [],
+    CUSTOM: Array.isArray(saved.CUSTOM) ? saved.CUSTOM : Array.isArray(saved.custom) ? saved.custom : [],
   };
 }
 
@@ -86,7 +104,7 @@ export async function GET(req: NextRequest) {
         };
       }
 
-      saved.planPermissions = mergePlanPermissions(saved.planPermissions);
+      saved.planPermissions = normalizePlanPermissions(saved.planPermissions);
 
       return NextResponse.json(saved);
     }
@@ -99,7 +117,7 @@ export async function GET(req: NextRequest) {
       featureMatrix: DEFAULT_FEATURE_MATRIX,
       planLimits: { starter: 5, pro: 20, enterprise: null },
       planPermissions: {
-        ...mergePlanPermissions(),
+        ...normalizePlanPermissions(),
       },
       dashboardFeatureFlags: createDefaultDashboardFeatureFlags(),
     });
