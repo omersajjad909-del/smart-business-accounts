@@ -194,7 +194,7 @@ export default function AICenterPage() {
                 <Link key={item.path} href={item.path} style={cardStyle}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text-primary)" }}>{item.name}</div>
                   <div style={{ fontSize: 12, lineHeight: 1.5, color: "var(--text-muted)" }}>{item.desc}</div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", marginTop: 2 }}>Open tool -></div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", marginTop: 2 }}>Open tool {'->'}</div>
                 </Link>
               ))}
             </div>

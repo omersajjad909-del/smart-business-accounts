@@ -680,7 +680,7 @@ export default function DashboardLayout({
             <div style={{marginBottom:6}}>
               <NavLink href="/dashboard/business-guide" pathname={pathname}>Business Guide</NavLink>
               <NavLink href="/dashboard/owner-dashboard" pathname={pathname}>Owner Dashboard</NavLink>
-              <NavLink href="/dashboard/ai" pathname={pathname}>AI Intelligence</NavLink>
+              <NavLink href="/dashboard/ai-center" pathname={pathname}>AI Intelligence</NavLink>
               <NavLink href="/dashboard/operator" pathname={pathname}>Business Operator</NavLink>
             </div>
           )}
@@ -1829,16 +1829,23 @@ export default function DashboardLayout({
 
           {/* MOBILE: Logo + company name */}
           {isMobileViewport && (
-            <div style={{display:"flex",alignItems:"center",gap:7,flexShrink:0}}>
-              <img src="/logo-icon.svg" alt="FinovaOS" width={28} height={28} style={{objectFit:"contain",flexShrink:0}}/>
-              <span style={{fontSize:13,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.2px",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
+            <div style={{display:"flex",alignItems:"center",gap:7,flexShrink:0,padding:"2px 0"}}>
+              <div style={{width:28,height:28,borderRadius:9,background:"linear-gradient(135deg,rgba(99,102,241,.24),rgba(59,130,246,.18))",display:"flex",alignItems:"center",justifyContent:"center",border:"1px solid rgba(129,140,248,.18)"}}>
+                <img src="/logo-icon.svg" alt="FinovaOS" width={18} height={18} style={{objectFit:"contain",flexShrink:0}}/>
+              </div>
+              <div style={{display:"flex",flexDirection:"column",minWidth:0}}>
+                <span style={{fontSize:12,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.2px",maxWidth:124,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
+                <span style={{fontSize:10,color:"var(--text-muted)",lineHeight:1.1}}>Workspace</span>
+              </div>
             </div>
           )}
 
           {/* Global Search */}
-          <Suspense fallback={<div style={{width:"100%",maxWidth:340,height:36,background:"rgba(255,255,255,0.04)",borderRadius:8,animation:"pulse 1.5s infinite"}} />}>
-            <GlobalSearch />
-          </Suspense>
+          <div style={{flex:isMobileViewport ? "1 1 100%" : "1 1 auto",minWidth:isMobileViewport ? "100%" : 240,order:isMobileViewport ? 3 : 0}}>
+            <Suspense fallback={<div style={{width:"100%",maxWidth:340,height:36,background:"rgba(255,255,255,0.04)",borderRadius:8,animation:"pulse 1.5s infinite"}} />}>
+              <GlobalSearch />
+            </Suspense>
+          </div>
 
           {/* Branch switcher */}
           {branches.length > 0 && (
@@ -1861,7 +1868,7 @@ export default function DashboardLayout({
           )}
 
           {/* Right side */}
-          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:isMobileViewport ? 8 : 10,flexWrap:"wrap"}}>
             <WhatsNew />
             <ModeToggle />
 
@@ -1888,14 +1895,14 @@ export default function DashboardLayout({
         </div>
 
         {/* ---- PAGE CONTENT ---- */}
-        <div style={{flex:1,overflowY:"auto",padding:"16px 12px",paddingBottom: isMobileViewport ? "80px" : "16px"}} className="dashboard-content-scroll sm:px-4 sm:py-5 lg:px-6">
+        <div style={{flex:1,overflowY:"auto",padding:isMobileViewport ? "10px 10px" : "16px 12px",paddingBottom: isMobileViewport ? "80px" : "16px"}} className="dashboard-content-scroll sm:px-4 sm:py-5 lg:px-6">
           <div style={{width:"100%",maxWidth:1280,margin:"0 auto"}} className="dashboard-content-inner">
             {currentUser?.email === "finovaos.app@gmail.com" && (
               <div style={{
                 display:"flex", alignItems:"center", justifyContent:"space-between",
                 background:"linear-gradient(135deg,rgba(251,191,36,.12),rgba(245,158,11,.08))",
                 border:"1px solid rgba(251,191,36,.3)", borderRadius:12,
-                padding:"10px 18px", marginBottom:20, gap:12, flexWrap:"wrap",
+                padding:isMobileViewport ? "8px 12px" : "10px 18px", marginBottom:isMobileViewport ? 12 : 20, gap:12, flexWrap:"wrap",
               }}>
                 <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
                   <span style={{fontSize:18}}>🎮</span>
@@ -1907,7 +1914,7 @@ export default function DashboardLayout({
                   </div>
                 </div>
                 <Link prefetch={false} href="/pricing" style={{
-                  padding:"7px 16px", borderRadius:8, fontSize:12, fontWeight:700,
+                  padding:isMobileViewport ? "6px 12px" : "7px 16px", borderRadius:8, fontSize:isMobileViewport ? 11 : 12, fontWeight:700,
                   background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff",
                   textDecoration:"none", whiteSpace:"nowrap",
                 }}>
@@ -1921,7 +1928,7 @@ export default function DashboardLayout({
                 display:"flex", alignItems:"center", justifyContent:"space-between",
                 background:"linear-gradient(135deg,rgba(99,102,241,.12),rgba(79,70,229,.08))",
                 border:"1px solid rgba(99,102,241,.35)", borderRadius:12,
-                padding:"10px 18px", marginBottom:20, gap:12, flexWrap:"wrap",
+                padding:isMobileViewport ? "8px 12px" : "10px 18px", marginBottom:isMobileViewport ? 12 : 20, gap:12, flexWrap:"wrap",
               }}>
                 <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
                   <span style={{fontSize:18}}>🧪</span>
@@ -1991,7 +1998,7 @@ export default function DashboardLayout({
                 router.push("/dashboard/reports");
               },
             },
-            { type:"link", href:"/dashboard/ai", label:"AI", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> },
+            { type:"link", href:"/dashboard/ai-center", label:"AI", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> },
           ].map(item => {
             const isInvoiceRoute =
               pathname.startsWith("/dashboard/invoices") ||
@@ -2002,9 +2009,12 @@ export default function DashboardLayout({
               pathname.startsWith("/dashboard/grn") ||
               pathname.startsWith("/dashboard/payment-receipts");
             const isReportsRoute = pathname.startsWith("/dashboard/reports") || pathname === "/dashboard/customer-statement" || pathname === "/dashboard/supplier-statement";
+            const isAIRoute = pathname.startsWith("/dashboard/ai-center") || pathname.startsWith("/dashboard/ai");
             const isActive =
               item.type === "link"
-                ? pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
+                ? item.href === "/dashboard/ai-center"
+                  ? isAIRoute
+                  : pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
                 : item.key === "invoice"
                 ? isInvoiceRoute
                 : isReportsRoute;
