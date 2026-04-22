@@ -13,6 +13,9 @@ type SearchResultItem = {
 };
 
 type SearchResults = {
+  contacts?: SearchResultItem[];
+  opportunities?: SearchResultItem[];
+  interactions?: SearchResultItem[];
   accounts?: SearchResultItem[];
   customers?: SearchResultItem[];
   suppliers?: SearchResultItem[];
@@ -57,7 +60,10 @@ const NAV_PAGES: NavPage[] = [
   { title: "Employees", url: "/dashboard/employees", icon: "👥", tags: ["employees", "staff", "hr", "team"] },
   { title: "Attendance", url: "/dashboard/attendance", icon: "📅", tags: ["attendance", "present", "leave"] },
   { title: "Payroll", url: "/dashboard/payroll", icon: "💵", tags: ["payroll", "salary", "wages"] },
-  { title: "CRM", url: "/dashboard/crm", icon: "🤝", tags: ["crm", "customers", "contacts", "leads"] },
+      { title: "CRM", url: "/dashboard/crm", icon: "🤝", tags: ["crm", "customers", "contacts", "leads"] },
+  { title: "CRM Contacts", url: "/dashboard/crm/contacts", icon: "📇", tags: ["crm", "contacts", "customer", "supplier", "lead", "partner"] },
+  { title: "CRM Opportunities", url: "/dashboard/crm/opportunities", icon: "🎯", tags: ["crm", "opportunity", "pipeline", "deal"] },
+  { title: "CRM Interactions", url: "/dashboard/crm/interactions", icon: "💬", tags: ["crm", "interaction", "calls", "meetings", "followup"] },
   { title: "Reports Hub", url: "/dashboard/reports", icon: "📊", tags: ["reports", "analytics"] },
   { title: "Ledger Report", url: "/dashboard/reports/ledger", icon: "📘", tags: ["report", "ledger"] },
   { title: "Sales Report", url: "/dashboard/reports/sales", icon: "📈", tags: ["report", "sales"] },
@@ -158,6 +164,9 @@ export default function GlobalSearch() {
     ? [
         { label: "Customers", items: results.customers || [], icon: "👤" },
         { label: "Suppliers", items: results.suppliers || [], icon: "🏭" },
+        { label: "CRM Contacts", items: results.contacts || [], icon: "📇" },
+        { label: "Opportunities", items: results.opportunities || [], icon: "🎯" },
+        { label: "Interactions", items: results.interactions || [], icon: "💬" },
         { label: "Accounts", items: results.accounts || [], icon: "📒" },
         { label: "Items", items: results.items || [], icon: "📦" },
         { label: "Sales Invoices", items: results.salesInvoices || [], icon: "🧾" },

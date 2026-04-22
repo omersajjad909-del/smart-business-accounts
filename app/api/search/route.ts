@@ -54,6 +54,9 @@ export async function GET(req: NextRequest) {
     const query = searchParams.get("q")?.trim();
     if (!query || query.length < 2) {
       return NextResponse.json({
+        contacts: [],
+        opportunities: [],
+        interactions: [],
         customers: [],
         suppliers: [],
         accounts: [],
@@ -77,6 +80,9 @@ export async function GET(req: NextRequest) {
     const [
       customers,
       suppliers,
+      contacts,
+      opportunities,
+      interactions,
       accounts,
       items,
       salesInvoices,
@@ -117,6 +123,59 @@ export async function GET(req: NextRequest) {
         },
         take: MAX_RESULTS,
         select: { id: true, name: true, code: true, type: true, partyType: true },
+      }),
+      prisma.contact.findMany({
+        where: {
+          companyId,
+          deletedAt: null,
+          ...branchWhere,
+          OR: [{ name: contains }, { email: contains }, { phone: contains }, { companyName: contains }, { type: contains }],
+        },
+        take: MAX_RESULTS,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          companyName: true,
+          type: true,
+        },
+      }),
+      prisma.opportunity.findMany({
+        where: {
+          contact: {
+            companyId,
+            deletedAt: null,
+            ...(branchId ? { branchId } : {}),
+          },
+          OR: [{ title: contains }, { description: contains }, { stage: contains }, { contact: { name: contains } }],
+        },
+        take: MAX_RESULTS,
+        select: {
+          id: true,
+          title: true,
+          stage: true,
+          value: true,
+          contact: { select: { name: true } },
+        },
+      }),
+      prisma.interaction.findMany({
+        where: {
+          contact: {
+            companyId,
+            deletedAt: null,
+            ...(branchId ? { branchId } : {}),
+          },
+          OR: [{ subject: contains }, { description: contains }, { type: contains }, { contact: { name: contains } }],
+        },
+        take: MAX_RESULTS,
+        select: {
+          id: true,
+          subject: true,
+          type: true,
+          date: true,
+          contact: { select: { name: true } },
+        },
       }),
       prisma.itemNew.findMany({
         where: {
@@ -271,6 +330,27 @@ export async function GET(req: NextRequest) {
     ]);
 
     return NextResponse.json({
+      contacts: contacts.map((row) => ({
+        type: "contact",
+        id: row.id,
+        title: row.name,
+        subtitle: `${row.type} - ${row.companyName}${row.phone ? ` - ${row.phone}` : ""}${row.email ? ` - ${row.email}` : ""}`,
+        url: `/dashboard/crm/contacts`,
+      })),
+      opportunities: opportunities.map((row) => ({
+        type: "opportunity",
+        id: row.id,
+        title: row.title,
+        subtitle: `${row.contact?.name || "N/A"} - ${row.stage} - ${formatAmount(row.value)}`,
+        url: `/dashboard/crm/opportunities`,
+      })),
+      interactions: interactions.map((row) => ({
+        type: "interaction",
+        id: row.id,
+        title: row.subject,
+        subtitle: `${row.contact?.name || "N/A"} - ${row.type} - ${formatDate(row.date)}`,
+        url: `/dashboard/crm/interactions`,
+      })),
       customers: customers.map((row: AccountSearch) => ({
         type: "customer",
         id: row.id,
