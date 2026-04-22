@@ -144,6 +144,11 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const normalizedEmail = body.email ? String(body.email).trim().toLowerCase() : null;
 
+    if (body.company !== undefined) {
+      body.companyName = body.company;
+      delete body.company;
+    }
+
     if (body.email !== undefined) {
       body.email = normalizedEmail;
     }
