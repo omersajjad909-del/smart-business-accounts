@@ -831,18 +831,118 @@ td{
 }
 
 @media (max-width: 640px){
+  .admin-dashboard{
+    gap:12px;
+  }
   .dash-header h1{
-    font-size:28px;
+    font-size:24px;
+  }
+  .dash-header p{
+    font-size:12px;
+  }
+  .dash-range{
+    width:100%;
+    justify-content:space-between;
+    padding:10px 12px;
+    border-radius:12px;
+    font-size:12px;
   }
   .stats-grid{
     grid-template-columns:1fr;
+    gap:10px;
+  }
+  .dash-card{
+    border-radius:18px;
+  }
+  .stat-card{
+    padding:14px 14px 12px;
+  }
+  .stat-row{
+    align-items:center;
+    gap:10px;
+  }
+  .stat-icon{
+    width:34px;
+    height:34px;
+    border-radius:11px;
+    font-size:12px;
+  }
+  .stat-title{
+    font-size:12px;
   }
   .stat-value{
-    font-size:30px;
+    margin-top:4px;
+    font-size:24px;
+  }
+  .stat-footer{
+    margin-top:10px;
+    font-size:11px;
   }
   .card-head{
     flex-direction:column;
     align-items:flex-start;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .card-head h2{
+    font-size:16px;
+  }
+  .chip{
+    padding:7px 10px;
+    border-radius:10px;
+    font-size:11px;
+  }
+  .chart-card,.system-card,
+  .content-grid > .dash-card{
+    padding:14px;
+  }
+  .legend-row{
+    gap:10px;
+  }
+  .legend-item{
+    font-size:10px;
+  }
+  .overview-chart{
+    min-height:180px;
+  }
+  .gauge-wrap{
+    margin:10px 0 14px;
+  }
+  .gauge{
+    width:132px;
+    height:132px;
+  }
+  .gauge::after{
+    width:96px;
+    height:96px;
+  }
+  .gauge-inner strong{
+    font-size:24px;
+  }
+  .health-list li,
+  .system-meta{
+    font-size:12px;
+  }
+  .donut-layout{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:12px;
+  }
+  .donut-svg{
+    width:150px;
+    height:150px;
+  }
+  .donut-item,
+  .progress-meta,
+  td{
+    font-size:12px;
+  }
+  .activity-item{
+    grid-template-columns:auto 1fr;
+  }
+  .activity-time{
+    grid-column:2;
+    margin-top:2px;
   }
   th:nth-child(2),td:nth-child(2),
   th:nth-child(3),td:nth-child(3){
