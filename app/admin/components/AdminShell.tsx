@@ -60,9 +60,12 @@ export default function AdminShell({ children }: { children: ReactNode }) {
       <div className="admin-shell">
         <aside className={`admin-sidebar${mobileOpen ? " open" : ""}`}>
           <div className="admin-sidebar__brand">
-            <div>
-              <div className="admin-brand__title">FinovaOS</div>
-              <div className="admin-brand__subtitle">Admin Panel</div>
+            <div className="admin-brand">
+              <div className="admin-brand__mark">✦</div>
+              <div>
+                <div className="admin-brand__title">FinovaOS</div>
+                <div className="admin-brand__subtitle">Admin Panel</div>
+              </div>
             </div>
             <button type="button" className="admin-sidebar__close" onClick={() => setMobileOpen(false)}>
               X
@@ -208,7 +211,7 @@ const shellStyles = `
 .admin-shell{
   min-height:100vh;
   display:grid;
-  grid-template-columns:290px minmax(0,1fr);
+  grid-template-columns:270px minmax(0,1fr);
 }
 .admin-sidebar{
   position:sticky;
@@ -229,8 +232,24 @@ const shellStyles = `
   gap:12px;
   padding:8px 10px 14px;
 }
+.admin-brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.admin-brand__mark{
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  background:linear-gradient(135deg, var(--admin-accent), var(--admin-accent-2));
+  box-shadow:0 12px 24px rgba(124,58,237,.22);
+  font-size:15px;
+}
 .admin-brand__title{
-  font-size:24px;
+  font-size:22px;
   font-weight:800;
   letter-spacing:-.04em;
 }
@@ -250,7 +269,7 @@ const shellStyles = `
 }
 .admin-sidebar__nav{
   overflow:auto;
-  padding:8px 4px 12px;
+  padding:8px 6px 12px;
   display:grid;
   gap:18px;
 }
@@ -274,8 +293,8 @@ const shellStyles = `
   display:flex;
   align-items:center;
   gap:10px;
-  padding:12px 12px;
-  border-radius:18px;
+  padding:10px 12px;
+  border-radius:16px;
   text-decoration:none;
   color:var(--admin-text);
   border:1px solid transparent;
@@ -290,9 +309,9 @@ const shellStyles = `
   border-color:rgba(124,58,237,.25);
 }
 .admin-nav-link__icon{
-  width:34px;
-  height:34px;
-  border-radius:12px;
+  width:30px;
+  height:30px;
+  border-radius:10px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -364,7 +383,7 @@ const shellStyles = `
   justify-content:space-between;
   align-items:center;
   gap:14px;
-  padding:18px 22px;
+  padding:14px 22px;
   backdrop-filter:blur(18px);
   background:color-mix(in srgb, var(--admin-panel) 88%, transparent);
   border-bottom:1px solid var(--admin-border);
@@ -393,7 +412,7 @@ const shellStyles = `
   color:var(--admin-text-soft);
 }
 .admin-topbar__title{
-  font-size:24px;
+  font-size:18px;
   font-weight:800;
   letter-spacing:-.04em;
 }

@@ -630,10 +630,10 @@ function PageDashboardPremium({ setPage }: { setPage:(p:Page)=>void }) {
     .slice(0, 5);
 
   const statCards = [
-    { label: "Total Companies", value: fmt(kpis?.totalCompanies), trend: kpis?.trends?.totalCompanies, accent: "#7c3aed" },
-    { label: "Total Users", value: fmt(totalUsers), trend: kpis?.trends?.logins24h, accent: "#4f7cff" },
-    { label: "Active Subscriptions", value: fmt(kpis?.activeSubs), trend: kpis?.trends?.activeSubs, accent: "#37c978" },
-    { label: "Monthly Revenue", value: fmt(kpis?.revenueThisMonth, "$"), trend: 18, accent: "#f59e0b" },
+    { label: "Total Companies", value: fmt(kpis?.totalCompanies), trend: kpis?.trends?.totalCompanies, accent: "#7c3aed", icon: "◫", line: "#8b5cf6" },
+    { label: "Total Users", value: fmt(totalUsers), trend: kpis?.trends?.logins24h, accent: "#4f7cff", icon: "◪", line: "#5b8cff" },
+    { label: "Active Subscriptions", value: fmt(kpis?.activeSubs), trend: kpis?.trends?.activeSubs, accent: "#37c978", icon: "◩", line: "#45d17e" },
+    { label: "Monthly Revenue", value: fmt(kpis?.revenueThisMonth, "$"), trend: 18, accent: "#f59e0b", icon: "◧", line: "#f59e0b" },
   ];
 
   function DonutChart() {
@@ -677,18 +677,22 @@ function PageDashboardPremium({ setPage }: { setPage:(p:Page)=>void }) {
     .admin-dashboard-v3{display:grid;gap:18px}
     .admin-dashboard-v3 *{box-sizing:border-box}
     .admin-dash-hero{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+    .admin-dash-hero__actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
     .admin-dash-hero__eyebrow{font-size:12px;font-weight:700;color:var(--admin-text-muted);margin-bottom:6px}
     .admin-dash-hero__title{font-size:34px;line-height:1;font-weight:800;letter-spacing:-.04em;color:var(--admin-text)}
     .admin-dash-hero__sub{margin-top:8px;font-size:13px;color:var(--admin-text-soft);max-width:560px}
     .admin-dash-date{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:16px;background:var(--admin-panel-soft);border:1px solid var(--admin-border);color:var(--admin-text-soft);min-width:220px;justify-content:space-between}
+    .admin-dash-export{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--admin-accent),var(--admin-accent-2));color:#fff;font:inherit;font-size:12px;font-weight:700;box-shadow:0 16px 30px rgba(124,58,237,.22);cursor:pointer}
     .admin-dash-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
     .admin-dash-card{background:var(--admin-panel-soft);border:1px solid var(--admin-border);border-radius:22px;padding:18px;box-shadow:0 18px 40px rgba(15,23,42,.08)}
     .admin-dash-stat{position:relative;overflow:hidden}
     .admin-dash-stat::after{content:"";position:absolute;inset:auto -24px -26px auto;width:96px;height:96px;border-radius:50%;background:var(--card-accent);opacity:.10;filter:blur(16px)}
-    .admin-dash-stat__top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .admin-dash-stat__top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .admin-dash-stat__icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:16px;font-weight:800;background:color-mix(in srgb,var(--card-accent) 14%, transparent);color:var(--card-accent);border:1px solid color-mix(in srgb,var(--card-accent) 24%, transparent)}
+    .admin-dash-stat__spark{opacity:.95}
     .admin-dash-stat__value{margin-top:20px;font-size:36px;font-weight:800;letter-spacing:-.05em;color:var(--admin-text)}
     .admin-dash-stat__label{margin-top:8px;font-size:13px;font-weight:600;color:var(--admin-text-soft)}
-    .admin-dash-stat__trend{font-size:11px;font-weight:700;color:#56d17c}
+    .admin-dash-stat__trend{margin-top:10px;font-size:11px;font-weight:700;color:#56d17c}
     .admin-dash-main-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(320px,.95fr);gap:16px}
     .admin-dash-panel__head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:18px}
     .admin-dash-panel__title{font-size:22px;font-weight:700;letter-spacing:-.03em;color:var(--admin-text)}
@@ -741,7 +745,7 @@ function PageDashboardPremium({ setPage }: { setPage:(p:Page)=>void }) {
     .admin-dash-actions button{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border:none;border-radius:16px;background:var(--admin-hover);color:var(--admin-text);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
     .admin-dash-actions button:hover{background:rgba(124,58,237,.12)}
     @media (max-width: 1180px){.admin-dash-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-dash-main-grid,.admin-dash-row{grid-template-columns:1fr}.admin-dash-split{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media (max-width: 780px){.admin-dash-hero__title{font-size:28px}.admin-dash-stat-grid,.admin-dash-summary,.admin-dash-split{grid-template-columns:1fr}.admin-dash-table__head{display:none}.admin-dash-table__row{grid-template-columns:1fr;gap:8px;padding:14px}.admin-dash-date{width:100%}}
+    @media (max-width: 780px){.admin-dash-hero__title{font-size:28px}.admin-dash-stat-grid,.admin-dash-summary,.admin-dash-split{grid-template-columns:1fr}.admin-dash-table__head{display:none}.admin-dash-table__row{grid-template-columns:1fr;gap:8px;padding:14px}.admin-dash-date,.admin-dash-export{width:100%;justify-content:center}}
   `;
 
   return (
@@ -753,22 +757,36 @@ function PageDashboardPremium({ setPage }: { setPage:(p:Page)=>void }) {
           <div className="admin-dash-hero__title">Dashboard</div>
           <div className="admin-dash-hero__sub">This premium dashboard uses your existing admin data and reshapes it into the new desktop, tablet and mobile-first card system.</div>
         </div>
-        <div className="admin-dash-date">
-          <span>May 20 - May 26, 2024</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <rect x="3" y="4" width="18" height="18" rx="3"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
+        <div className="admin-dash-hero__actions">
+          <div className="admin-dash-date">
+            <span>May 20 - May 26, 2024</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <rect x="3" y="4" width="18" height="18" rx="3"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <button className="admin-dash-export">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export Report
+          </button>
         </div>
       </div>
       <div className="admin-dash-stat-grid">
         {statCards.map((card) => (
           <div key={card.label} className="admin-dash-card admin-dash-stat" style={{ ["--card-accent" as any]: card.accent }}>
-            <div className="admin-dash-stat__top"><div className="admin-dash-pill">{card.label}</div><div className="admin-dash-stat__trend">{card.trend !== undefined && card.trend !== null ? `${card.trend >= 0 ? "+" : "-"}${Math.abs(card.trend)}%` : "Live"}</div></div>
+            <div className="admin-dash-stat__top">
+              <div className="admin-dash-stat__icon">{card.icon}</div>
+              <svg className="admin-dash-stat__spark" width="62" height="28" viewBox="0 0 62 28" fill="none">
+                <path d="M2 22C10 22 12 8 20 8C28 8 30 18 38 18C46 18 48 6 60 6" stroke={card.line} strokeWidth="2.5" strokeLinecap="round"/>
+              </svg>
+            </div>
             <div className="admin-dash-stat__value">{loading ? "--" : card.value}</div>
-            <div className="admin-dash-stat__label">Live platform metric</div>
+            <div className="admin-dash-stat__label">{card.label}</div>
+            <div className="admin-dash-stat__trend">{card.trend !== undefined && card.trend !== null ? `+ ${Math.abs(card.trend)}% vs last month` : "Live platform metric"}</div>
           </div>
         ))}
       </div>
