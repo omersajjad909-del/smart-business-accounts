@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
@@ -51,11 +51,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
 
-  useEffect(() => {
-    setMobileOpen(false);
-    setQuickOpen(false);
-  }, [pathname]);
-
   const groupedItems = useMemo(
     () =>
       ADMIN_NAV_GROUP_ORDER.map((group) => ({
@@ -96,7 +91,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
         <aside className={`fin-admin-sidebar${mobileOpen ? " is-open" : ""}`}>
           <div className="fin-admin-brandRow">
             <div className="fin-admin-brand">
-              <div className="fin-admin-brandBadge">✣</div>
+              <div className="fin-admin-brandBadge">F</div>
               <div>
                 <div className="fin-admin-brandTitle">FinovaOS</div>
                 <div className="fin-admin-brandSub">Admin</div>
@@ -115,7 +110,15 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                   {items.map((item) => {
                     const active = isActivePath(pathname, item.href);
                     return (
-                      <Link key={item.id} href={item.href} className={`fin-admin-navLink${active ? " is-active" : ""}`}>
+                      <Link
+                        key={item.id}
+                        href={item.href}
+                        className={`fin-admin-navLink${active ? " is-active" : ""}`}
+                        onClick={() => {
+                          setMobileOpen(false);
+                          setQuickOpen(false);
+                        }}
+                      >
                         <span className="fin-admin-navIcon">{item.icon ? ICONS[item.icon] : item.short}</span>
                         <span className="fin-admin-navText">{item.label}</span>
                         {item.badge ? <span className="fin-admin-navBadge">{item.badge}</span> : null}
@@ -133,7 +136,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               <div className="fin-admin-userName">{user?.name || "Usman Ali"}</div>
               <div className="fin-admin-userRole">Super Admin</div>
             </div>
-            <div className="fin-admin-userArrow">›</div>
+            <div className="fin-admin-userArrow">{">"}</div>
           </div>
         </aside>
 
@@ -149,7 +152,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                   <Svg><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></Svg>
                 </span>
                 <span className="fin-admin-searchText">Search anything...</span>
-                <span className="fin-admin-searchHint">⌘ K</span>
+                <span className="fin-admin-searchHint">Ctrl K</span>
               </div>
             </div>
 
@@ -179,7 +182,15 @@ export default function AdminShell({ children }: { children: ReactNode }) {
         {mobilePrimary.map((item) => {
           const active = isActivePath(pathname, item.href);
           return (
-            <Link key={item.id} href={item.href} className={`fin-admin-mobileLink${active ? " is-active" : ""}`}>
+            <Link
+              key={item.id}
+              href={item.href}
+              className={`fin-admin-mobileLink${active ? " is-active" : ""}`}
+              onClick={() => {
+                setMobileOpen(false);
+                setQuickOpen(false);
+              }}
+            >
               <span className="fin-admin-mobileIcon">{item.icon ? ICONS[item.icon] : item.short}</span>
               <span>{item.label}</span>
             </Link>
@@ -202,7 +213,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           ))}
         </div>
         <button type="button" className="fin-admin-fab" aria-label="Quick actions" onClick={() => setQuickOpen((value) => !value)}>
-          {quickOpen ? "×" : "+"}
+          {quickOpen ? "x" : "+"}
         </button>
       </div>
     </div>

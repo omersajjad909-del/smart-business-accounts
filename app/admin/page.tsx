@@ -39,7 +39,7 @@ const activeModules = [
 const recentActivity = [
   { title: "New company registered", detail: "Al Noor Traders", time: "2 min ago", tone: "purple" },
   { title: "New user added", detail: "Zain Khan added by Usman Ali", time: "15 min ago", tone: "blue" },
-  { title: "Subscription updated", detail: "Zain Enterprises · Plan upgraded", time: "1 hour ago", tone: "green" },
+  { title: "Subscription updated", detail: "Zain Enterprises - Plan upgraded", time: "1 hour ago", tone: "green" },
   { title: "Payment received", detail: "Payment of $199 received from & Sons", time: "2 hours ago", tone: "orange" },
 ];
 
@@ -115,7 +115,7 @@ export default function AdminDashboardPage() {
             {["Server Status", "Database", "Queue Workers", "Storage", "Backup Status"].map((item) => (
               <li key={item}>
                 <span>{item}</span>
-                <span className="ok-mark">✓</span>
+                <span className="ok-mark">OK</span>
               </li>
             ))}
           </ul>
@@ -318,15 +318,19 @@ function OverviewChart() {
 
 function DonutChart() {
   const total = subscriptionOverview.reduce((sum, item) => sum + item.value, 0);
-  let offset = 0;
+  const arcs = subscriptionOverview.map((item, index) => {
+    const previous = subscriptionOverview.slice(0, index).reduce((sum, current) => sum + current.value, 0);
+    return {
+      ...item,
+      length: (item.value / total) * 364.42,
+      offset: (previous / total) * 364.42,
+    };
+  });
 
   return (
     <svg width="190" height="190" viewBox="0 0 190 190" className="donut-svg" aria-hidden="true">
       <circle cx="95" cy="95" r="58" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="22" />
-      {subscriptionOverview.map((item) => {
-        const length = (item.value / total) * 364.42;
-        const currentOffset = offset;
-        offset += length;
+      {arcs.map((item) => {
         return (
           <circle
             key={item.label}
@@ -336,8 +340,8 @@ function DonutChart() {
             fill="none"
             stroke={item.color}
             strokeWidth="22"
-            strokeDasharray={`${length} ${364.42 - length}`}
-            strokeDashoffset={-currentOffset}
+            strokeDasharray={`${item.length} ${364.42 - item.length}`}
+            strokeDashoffset={-item.offset}
             transform="rotate(-90 95 95)"
             strokeLinecap="round"
           />
