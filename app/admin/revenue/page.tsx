@@ -165,20 +165,28 @@ const styles = `
   min-height:100%;
 }
 .revenue-shell{
-  background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,249,252,.98));
-  border-radius:0;
-  padding:52px 30px 220px;
+  max-width:1520px;
+  margin:0 auto;
+  padding:18px 4px 80px;
 }
 .revenue-header{
-  margin-bottom:30px;
+  margin-bottom:22px;
 }
 .revenue-header h1{
   margin:0;
-  color:#f8f7ef;
-  font-size:38px;
+  color:#f8fafc;
+  font-size:34px;
   line-height:1;
   font-weight:800;
   letter-spacing:-.05em;
+}
+.revenue-header::after{
+  content:"Live revenue trends and active plan split.";
+  display:block;
+  margin-top:8px;
+  color:rgba(226,232,240,.62);
+  font-size:13px;
+  font-weight:500;
 }
 .revenue-grid{
   display:grid;
@@ -187,10 +195,11 @@ const styles = `
 }
 .revenue-card{
   min-height:365px;
-  padding:22px 20px 18px;
-  border-radius:22px;
-  background:#1b2748;
-  box-shadow:0 10px 18px rgba(11,18,38,.18);
+  padding:26px 24px 22px;
+  border-radius:26px;
+  background:linear-gradient(180deg, rgba(27,39,72,.98), rgba(26,36,67,.98));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 22px 50px rgba(3,8,21,.32);
 }
 .revenue-card h2{
   margin:0 0 18px;
@@ -200,6 +209,7 @@ const styles = `
   letter-spacing:-.03em;
 }
 .chart-frame{
+  margin-top:6px;
   border-radius:10px;
   overflow:hidden;
 }
@@ -252,15 +262,14 @@ const styles = `
 }
 @media (max-width: 640px){
   .revenue-shell{
-    padding:18px 14px 140px;
-    border-radius:18px;
+    padding:4px 0 120px;
   }
   .revenue-header{
     margin-bottom:16px;
   }
   .revenue-header h1{
     font-size:28px;
-    color:#1d2848;
+    color:#f8fafc;
   }
   .revenue-grid{
     gap:14px;
@@ -272,6 +281,9 @@ const styles = `
   }
   .revenue-card h2{
     font-size:17px;
+  }
+  .revenue-header::after{
+    font-size:12px;
   }
   .bars-wrap{
     gap:14px;

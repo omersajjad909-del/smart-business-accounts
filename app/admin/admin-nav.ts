@@ -32,6 +32,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "feedback", label: "Feedback", href: "/admin/feedback", group: "Business", short: "FB", icon: "message" },
   { id: "testimonials", label: "Testimonials", href: "/admin/testimonials", group: "Business", short: "TS", icon: "star" },
   { id: "permissions", label: "Roles & Permissions", href: "/admin/permissions", group: "System", short: "PM", icon: "lock" },
+  { id: "settings", label: "Settings", href: "/admin/settings", group: "System", short: "ST", icon: "spark" },
   { id: "system", label: "System Health", href: "/admin/system", group: "System", short: "SY", icon: "shield" },
   { id: "logs", label: "Activity Logs", href: "/admin/logs", group: "System", short: "LG", icon: "activity" },
   { id: "email-logs", label: "Email Logs", href: "/admin/email-logs", group: "System", short: "EM", icon: "mail" },

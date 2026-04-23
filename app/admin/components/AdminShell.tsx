@@ -276,6 +276,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                     </div>
                     <div className="fin-admin-dropdownList">
                       <Link href="/admin" className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Dashboard</Link>
+                      <Link href="/admin/settings" className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Settings</Link>
                       <Link href="/admin/permissions" className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>Roles & Permissions</Link>
                       <Link href="/admin/system" className="fin-admin-linkRow" onClick={() => setProfileOpen(false)}>System Health</Link>
                       <button type="button" className="fin-admin-linkRow fin-admin-linkRow--danger" onClick={() => { clearCurrentUser(); window.location.href = "/admin/login"; }}>Sign Out</button>
