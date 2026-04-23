@@ -7,26 +7,70 @@ export async function GET(req: NextRequest) {
     if (role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const sessions = await prisma.session.findMany({
-      where: { createdAt: { gte: since } },
-      select: { companyId: true },
-    });
-    const companyCounts: Record<string, number> = {};
-    for (const s of sessions) {
-      if (!s.companyId) continue;
-      companyCounts[s.companyId] = (companyCounts[s.companyId] || 0) + 1;
+
+    const [companies, sessions, activities, loginLogs] = await Promise.all([
+      prisma.company.findMany({
+        select: { id: true, name: true, country: true, subscriptionStatus: true },
+      }),
+      prisma.session.groupBy({
+        by: ["companyId"],
+        _count: { id: true },
+        where: { createdAt: { gte: since } },
+      } as never),
+      prisma.activityLog.groupBy({
+        by: ["companyId"],
+        _count: { id: true },
+        where: { createdAt: { gte: since }, companyId: { not: null } },
+      } as never),
+      (prisma as unknown as { loginLog?: { groupBy?: (args: unknown) => Promise<Array<{ companyId: string; _count: { id: number } }>> } }).loginLog?.groupBy
+        ? (prisma as unknown as { loginLog: { groupBy: (args: unknown) => Promise<Array<{ companyId: string; _count: { id: number } }>> } }).loginLog.groupBy({
+            by: ["companyId"],
+            _count: { id: true },
+            where: { loginAt: { gte: since } },
+          })
+        : Promise.resolve([]),
+    ]);
+
+    const sessionCount = new Map<string, number>();
+    const activityCount = new Map<string, number>();
+    const loginCount = new Map<string, number>();
+
+    for (const item of sessions as Array<{ companyId: string; _count: { id: number } }>) {
+      sessionCount.set(item.companyId, item._count.id || 0);
     }
-    const ids = Object.keys(companyCounts);
-    const companies = ids.length
-      ? await prisma.company.findMany({ where: { id: { in: ids } }, select: { id: true, name: true, country: true } })
-      : [];
-    const info = companies
-      .map(c => ({ id: c.id, name: c.name, country: c.country || null, activity: companyCounts[c.id] || 0 }))
+    for (const item of activities as Array<{ companyId: string | null; _count: { id: number } }>) {
+      if (!item.companyId) continue;
+      activityCount.set(item.companyId, item._count.id || 0);
+    }
+    for (const item of loginLogs as Array<{ companyId: string; _count: { id: number } }>) {
+      loginCount.set(item.companyId, item._count.id || 0);
+    }
+
+    const rows = companies
+      .filter((company) => !["CANCELLED", "INACTIVE"].includes(String(company.subscriptionStatus || "").toUpperCase()))
+      .map((company) => {
+        const sessions7d = sessionCount.get(company.id) || 0;
+        const actions7d = activityCount.get(company.id) || 0;
+        const logins7d = loginCount.get(company.id) || 0;
+        return {
+          id: company.id,
+          name: company.name,
+          country: company.country || null,
+          activity: sessions7d + actions7d + logins7d,
+          sessions7d,
+          actions7d,
+          logins7d,
+        };
+      })
+      .filter((company) => company.activity > 0)
       .sort((a, b) => b.activity - a.activity)
       .slice(0, 10);
 
-    return NextResponse.json({ rows: info });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ rows });
+  } catch (e: unknown) {
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : "Failed to load top active companies" },
+      { status: 500 }
+    );
   }
 }
