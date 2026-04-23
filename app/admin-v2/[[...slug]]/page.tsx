@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -18,7 +19,6 @@ const UsersPage = dynamic(() => import("@/app/admin/users/page"));
 const SubscriptionsPage = dynamic(() => import("@/app/admin/subscriptions/page"));
 const BroadcastsPage = dynamic(() => import("@/app/admin/broadcasts/page"));
 const FeatureFlagsPage = dynamic(() => import("@/app/admin/feature-flags/page"));
-const ApiKeysPage = dynamic(() => import("@/app/admin/feature-flags/page"));
 const EmailLogsPage = dynamic(() => import("@/app/admin/email-logs/page"));
 const TestimonialsPage = dynamic(() => import("@/app/admin/testimonials/page"));
 const LeadsPage = dynamic(() => import("@/app/admin/leads/page"));
@@ -38,7 +38,7 @@ type AdminSection = {
   id: string;
   label: string;
   href: string;
-  icon: string;
+  short: string;
   description: string;
   badge?: string;
   standalone?: boolean;
@@ -46,34 +46,34 @@ type AdminSection = {
 };
 
 const SECTIONS: AdminSection[] = [
-  { id: "dashboard", label: "Overview", href: "/admin-v2", icon: "◈", description: "Premium command center", group: "Overview", standalone: true },
-  { id: "companies", label: "Companies", href: "/admin-v2/companies", icon: "⌂", description: "Tenants, plans, business types", group: "Core", standalone: true },
-  { id: "users", label: "Users", href: "/admin-v2/users", icon: "◎", description: "Access and user operations", group: "Core", standalone: true },
-  { id: "subscriptions", label: "Subscriptions", href: "/admin-v2/subscriptions", icon: "◍", description: "Billing overrides and renewals", group: "Core", standalone: true },
-  { id: "plans", label: "Plans", href: "/admin-v2/plans", icon: "✦", description: "Pricing, plan permissions, modules", group: "Core", standalone: true },
-  { id: "permissions", label: "Permissions", href: "/admin-v2/permissions", icon: "◇", description: "Business plan permissions", group: "Core", standalone: true },
-  { id: "business-modules", label: "Business Modules", href: "/admin-v2/business-modules", icon: "⬡", description: "Industry module controls", group: "Core", standalone: true },
-  { id: "revenue", label: "Revenue", href: "/admin-v2/revenue", icon: "↗", description: "MRR and plan mix", group: "Analytics", standalone: true },
-  { id: "geo", label: "Geo", href: "/admin-v2/geo", icon: "◌", description: "Regional intelligence", group: "Analytics", standalone: true },
-  { id: "usage", label: "Usage", href: "/admin-v2/usage", icon: "⋯", description: "Behavior and risk signals", group: "Analytics", standalone: true },
-  { id: "audit-trail", label: "Audit Trail", href: "/admin-v2/audit-trail", icon: "▤", description: "Deep activity trace", group: "Analytics", standalone: true },
-  { id: "web", label: "Web Metrics", href: "/admin-v2/web", icon: "☰", description: "Site traffic and web KPIs", group: "Analytics", standalone: true },
-  { id: "crm", label: "CRM", href: "/admin-v2/crm", icon: "◐", description: "Leads and visitor funnel", group: "Growth", standalone: true },
-  { id: "leads", label: "Leads", href: "/admin-v2/leads", icon: "✓", description: "Lead operations", group: "Growth", standalone: true },
-  { id: "broadcasts", label: "Broadcasts", href: "/admin-v2/broadcasts", icon: "◔", description: "Outbound campaigns", group: "Growth", standalone: true },
-  { id: "newsletter", label: "Newsletter", href: "/admin-v2/newsletter", icon: "✉", description: "Subscriber engagement", group: "Growth", standalone: true },
-  { id: "social", label: "Social", href: "/admin-v2/social", icon: "⌘", description: "Social publishing", group: "Growth", standalone: true },
-  { id: "feedback", label: "Feedback", href: "/admin-v2/feedback", icon: "✎", description: "User sentiment and issues", group: "Growth", standalone: true },
-  { id: "testimonials", label: "Testimonials", href: "/admin-v2/testimonials", icon: "★", description: "Public proof management", group: "Growth", standalone: true },
-  { id: "automation", label: "Automation", href: "/admin-v2/automation", icon: "⚡", description: "Marketing automations", group: "Growth", standalone: true, badge: "NEW" },
-  { id: "marketing-autopilot", label: "Autopilot", href: "/admin-v2/marketing-autopilot", icon: "☼", description: "AI growth workspace", group: "Growth", standalone: true, badge: "AI" },
-  { id: "system", label: "System", href: "/admin-v2/system", icon: "▣", description: "Environment health", group: "Security", standalone: true },
-  { id: "logs", label: "Logs", href: "/admin-v2/logs", icon: "▦", description: "Operational logs", group: "Security", standalone: true },
-  { id: "email-logs", label: "Email Logs", href: "/admin-v2/email-logs", icon: "✉", description: "Outbound email activity", group: "Security", standalone: true },
-  { id: "feature-flags", label: "Feature Flags", href: "/admin-v2/feature-flags", icon: "⚑", description: "Controlled releases", group: "Security", standalone: true },
-  { id: "fraud", label: "Fraud Monitor", href: "/admin-v2/fraud", icon: "⛨", description: "Risk and abuse review", group: "Security", standalone: true },
-  { id: "dev-test", label: "Dev Test Mode", href: "/admin-v2/dev-test", icon: "⌁", description: "Developer preview tooling", group: "Security", standalone: true, badge: "DEV" },
-  { id: "settings", label: "Legacy Settings", href: "/admin", icon: "⚙", description: "Fallback to current admin for legacy-only sections", group: "Legacy", standalone: false },
+  { id: "dashboard", label: "Overview", href: "/admin-v2", short: "OV", description: "Premium command center", group: "Overview", standalone: true },
+  { id: "companies", label: "Companies", href: "/admin-v2/companies", short: "CO", description: "Tenants, plans, and business types", group: "Core", standalone: true },
+  { id: "users", label: "Users", href: "/admin-v2/users", short: "US", description: "Access and user operations", group: "Core", standalone: true },
+  { id: "subscriptions", label: "Subscriptions", href: "/admin-v2/subscriptions", short: "SB", description: "Billing overrides and renewals", group: "Core", standalone: true },
+  { id: "plans", label: "Plans", href: "/admin-v2/plans", short: "PL", description: "Pricing, permissions, and modules", group: "Core", standalone: true },
+  { id: "permissions", label: "Permissions", href: "/admin-v2/permissions", short: "PM", description: "Business plan permissions", group: "Core", standalone: true },
+  { id: "business-modules", label: "Business Modules", href: "/admin-v2/business-modules", short: "BM", description: "Industry module controls", group: "Core", standalone: true },
+  { id: "revenue", label: "Revenue", href: "/admin-v2/revenue", short: "RV", description: "MRR and plan mix", group: "Analytics", standalone: true },
+  { id: "geo", label: "Geo", href: "/admin-v2/geo", short: "GE", description: "Regional intelligence", group: "Analytics", standalone: true },
+  { id: "usage", label: "Usage", href: "/admin-v2/usage", short: "UG", description: "Behavior and risk signals", group: "Analytics", standalone: true },
+  { id: "audit-trail", label: "Audit Trail", href: "/admin-v2/audit-trail", short: "AT", description: "Deep activity trace", group: "Analytics", standalone: true },
+  { id: "web", label: "Web Metrics", href: "/admin-v2/web", short: "WB", description: "Site traffic and web KPIs", group: "Analytics", standalone: true },
+  { id: "crm", label: "CRM", href: "/admin-v2/crm", short: "CR", description: "Leads and visitor funnel", group: "Growth", standalone: true },
+  { id: "leads", label: "Leads", href: "/admin-v2/leads", short: "LD", description: "Lead operations", group: "Growth", standalone: true },
+  { id: "broadcasts", label: "Broadcasts", href: "/admin-v2/broadcasts", short: "BR", description: "Outbound campaigns", group: "Growth", standalone: true },
+  { id: "newsletter", label: "Newsletter", href: "/admin-v2/newsletter", short: "NL", description: "Subscriber engagement", group: "Growth", standalone: true },
+  { id: "social", label: "Social", href: "/admin-v2/social", short: "SO", description: "Social publishing", group: "Growth", standalone: true },
+  { id: "feedback", label: "Feedback", href: "/admin-v2/feedback", short: "FB", description: "User sentiment and issues", group: "Growth", standalone: true },
+  { id: "testimonials", label: "Testimonials", href: "/admin-v2/testimonials", short: "TS", description: "Public proof management", group: "Growth", standalone: true },
+  { id: "automation", label: "Automation", href: "/admin-v2/automation", short: "AU", description: "Marketing automations", group: "Growth", standalone: true, badge: "NEW" },
+  { id: "marketing-autopilot", label: "Autopilot", href: "/admin-v2/marketing-autopilot", short: "AI", description: "AI growth workspace", group: "Growth", standalone: true, badge: "AI" },
+  { id: "system", label: "System", href: "/admin-v2/system", short: "SY", description: "Environment health", group: "Security", standalone: true },
+  { id: "logs", label: "Logs", href: "/admin-v2/logs", short: "LG", description: "Operational logs", group: "Security", standalone: true },
+  { id: "email-logs", label: "Email Logs", href: "/admin-v2/email-logs", short: "EM", description: "Outbound email activity", group: "Security", standalone: true },
+  { id: "feature-flags", label: "Feature Flags", href: "/admin-v2/feature-flags", short: "FF", description: "Controlled releases", group: "Security", standalone: true },
+  { id: "fraud", label: "Fraud Monitor", href: "/admin-v2/fraud", short: "FR", description: "Risk and abuse review", group: "Security", standalone: true },
+  { id: "dev-test", label: "Dev Test Mode", href: "/admin-v2/dev-test", short: "DV", description: "Developer preview tooling", group: "Security", standalone: true, badge: "DEV" },
+  { id: "legacy", label: "Legacy Admin", href: "/admin", short: "LG", description: "Fallback to the current admin panel", group: "Legacy", standalone: false },
 ];
 
 const GROUP_ORDER = ["Overview", "Core", "Analytics", "Growth", "Security", "Legacy"];
@@ -133,8 +133,6 @@ function renderSection(sectionId: string) {
       return <EmailLogsPage />;
     case "feature-flags":
       return <FeatureFlagsPage />;
-    case "apikeys":
-      return <ApiKeysPage />;
     case "fraud":
       return <FraudPage />;
     case "dev-test":
@@ -144,22 +142,25 @@ function renderSection(sectionId: string) {
   }
 }
 
+function pill(color: string, bg: string): CSSProperties {
+  return {
+    padding: "6px 10px",
+    borderRadius: 999,
+    fontSize: 11,
+    fontWeight: 700,
+    color,
+    background: bg,
+    border: "1px solid rgba(255,255,255,.06)",
+  };
+}
+
 function OverviewPanel() {
   const user = getCurrentUser();
   const quickLinks = SECTIONS.filter((section) => section.standalone && section.id !== "dashboard").slice(0, 8);
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
-      <section
-        style={{
-          borderRadius: 30,
-          padding: 28,
-          background:
-            "linear-gradient(135deg, rgba(14,25,58,.96), rgba(8,12,24,.98))",
-          border: "1px solid rgba(125,211,252,.16)",
-          boxShadow: "0 24px 80px rgba(0,0,0,.34)",
-        }}
-      >
+      <section style={heroCard}>
         <div style={{ display: "grid", gap: 14 }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
             <span style={pill("#67e8f9", "rgba(103,232,249,.14)")}>Premium Admin Preview</span>
@@ -169,32 +170,26 @@ function OverviewPanel() {
             FinovaOS Admin V2
           </div>
           <div style={{ maxWidth: 760, fontSize: 15, lineHeight: 1.7, color: "rgba(226,232,240,.72)" }}>
-            Yeh redesigned workspace current admin functionality ko replace kiye baghair preview mode me chal raha hai.
-            Aap compare kar sakte ho, aur agar pasand na aaye to purana admin bilkul safe rahega.
+            Yeh premium redesign preview current admin ko replace kiye baghair chal raha hai.
+            Aap compare kar sakte ho, aur agar pasand na aaye to existing admin turant fallback ke taur par available hai.
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 4 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
             <Link href="/admin" style={primaryGhost}>
               Open Current Admin
             </Link>
             <Link href="/admin-v2/companies" style={primaryButton}>
-              Open Premium Workspace
+              Enter Premium Workspace
             </Link>
           </div>
         </div>
       </section>
 
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
-          gap: 14,
-        }}
-      >
+      <section style={metricGrid}>
         {[
           { label: "Admin User", value: user?.name || "Admin", note: "Current authenticated admin" },
           { label: "Preview Route", value: "/admin-v2", note: "Rollback-safe redesign route" },
           { label: "Fallback", value: "/admin", note: "Existing panel remains untouched" },
-          { label: "Responsive Goal", value: "Mobile + Tablet + Desktop", note: "Redesign shell built for all sizes" },
+          { label: "Responsive Goal", value: "Mobile + Tablet + Desktop", note: "New shell built for all sizes" },
         ].map((card) => (
           <div key={card.label} style={metricCard}>
             <div style={{ fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", color: "rgba(148,163,184,.72)" }}>
@@ -206,20 +201,13 @@ function OverviewPanel() {
         ))}
       </section>
 
-      <section
-        style={{
-          borderRadius: 28,
-          padding: 22,
-          background: "rgba(7,12,24,.86)",
-          border: "1px solid rgba(255,255,255,.07)",
-        }}
-      >
+      <section style={panelCard}>
         <div style={{ fontSize: 18, fontWeight: 700, color: "white", marginBottom: 14 }}>Quick Access</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+        <div style={quickGrid}>
           {quickLinks.map((section) => (
             <Link key={section.id} href={section.href} style={quickCard}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                <span style={{ fontSize: 20, color: "#7dd3fc" }}>{section.icon}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
+                <span style={avatarBubble}>{section.short}</span>
                 {section.badge ? <span style={miniBadge}>{section.badge}</span> : null}
               </div>
               <div style={{ marginTop: 18, fontSize: 16, fontWeight: 700, color: "white" }}>{section.label}</div>
@@ -236,16 +224,7 @@ function OverviewPanel() {
 
 function LegacyFallbackCard({ section }: { section: AdminSection | undefined }) {
   return (
-    <div
-      style={{
-        borderRadius: 28,
-        padding: 28,
-        background: "rgba(7,12,24,.9)",
-        border: "1px solid rgba(251,191,36,.16)",
-        display: "grid",
-        gap: 14,
-      }}
-    >
+    <div style={legacyCard}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
         <span style={pill("#fbbf24", "rgba(251,191,36,.12)")}>Legacy Section</span>
         <span style={pill("#cbd5e1", "rgba(148,163,184,.12)")}>No feature removed</span>
@@ -254,7 +233,7 @@ function LegacyFallbackCard({ section }: { section: AdminSection | undefined }) 
         {section?.label || "Legacy Admin Section"}
       </div>
       <div style={{ fontSize: 14, lineHeight: 1.7, color: "rgba(226,232,240,.72)", maxWidth: 760 }}>
-        Yeh section abhi current legacy admin shell me available hai. Premium redesign preview me bhi feature ko remove nahi kiya gaya,
+        Yeh section abhi current legacy admin shell me available hai. Premium redesign preview me bhi feature remove nahi kiya gaya,
         balki safe fallback diya gaya hai taa ke aap kisi bhi waqt purana flow use kar sako.
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
@@ -286,15 +265,7 @@ export default function AdminV2Page() {
   );
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top, rgba(30,41,84,.42), rgba(5,8,18,1) 42%), #050812",
-        color: "white",
-        fontFamily: "'Outfit','Inter',sans-serif",
-      }}
-    >
+    <div style={appShell}>
       <style>{responsiveStyles}</style>
 
       <div className="adminv2-shell">
@@ -308,12 +279,8 @@ export default function AdminV2Page() {
                     Admin V2 Preview
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileNavOpen(false)}
-                  className="adminv2-mobileClose"
-                >
-                  ×
+                <button type="button" onClick={() => setMobileNavOpen(false)} className="adminv2-mobileClose">
+                  X
                 </button>
               </div>
               <div style={{ fontSize: 12.5, lineHeight: 1.6, color: "rgba(203,213,225,.72)" }}>
@@ -325,17 +292,7 @@ export default function AdminV2Page() {
           <div className="adminv2-nav">
             {groupedSections.map((entry) => (
               <div key={entry.group} style={{ display: "grid", gap: 8 }}>
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: "rgba(148,163,184,.72)",
-                    textTransform: "uppercase",
-                    letterSpacing: ".14em",
-                    fontWeight: 700,
-                  }}
-                >
-                  {entry.group}
-                </div>
+                <div style={groupLabel}>{entry.group}</div>
                 <div style={{ display: "grid", gap: 6 }}>
                   {entry.items.map((section) => {
                     const active = section.id === activeSection.id;
@@ -347,23 +304,11 @@ export default function AdminV2Page() {
                           setMobileNavOpen(false);
                           router.push(section.href);
                         }}
-                        style={{
-                          borderRadius: 18,
-                          padding: "14px 14px",
-                          border: active ? "1px solid rgba(125,211,252,.28)" : "1px solid rgba(255,255,255,.05)",
-                          background: active
-                            ? "linear-gradient(135deg, rgba(18,34,71,.96), rgba(8,15,34,.96))"
-                            : "rgba(255,255,255,.02)",
-                          color: "white",
-                          cursor: "pointer",
-                          textAlign: "left",
-                          display: "grid",
-                          gap: 4,
-                        }}
+                        style={navButton(active)}
                       >
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                            <span style={{ color: active ? "#7dd3fc" : "rgba(148,163,184,.78)", fontSize: 16 }}>{section.icon}</span>
+                            <span style={navIcon(active)}>{section.short}</span>
                             <span style={{ fontSize: 13.5, fontWeight: 700, color: active ? "#e0f2fe" : "white" }}>{section.label}</span>
                           </div>
                           {section.badge ? <span style={miniBadge}>{section.badge}</span> : null}
@@ -389,15 +334,11 @@ export default function AdminV2Page() {
         <main className="adminv2-main">
           <header className="adminv2-header">
             <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-              <button
-                type="button"
-                className="adminv2-burger"
-                onClick={() => setMobileNavOpen(true)}
-              >
-                ☰
+              <button type="button" className="adminv2-burger" onClick={() => setMobileNavOpen(true)}>
+                Menu
               </button>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 11, color: "rgba(148,163,184,.74)", letterSpacing: ".14em)", textTransform: "uppercase" }}>
+                <div style={{ fontSize: 11, color: "rgba(148,163,184,.74)", letterSpacing: ".14em", textTransform: "uppercase" }}>
                   Premium Admin Workspace
                 </div>
                 <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-.03em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -429,7 +370,39 @@ export default function AdminV2Page() {
   );
 }
 
-const primaryButton: React.CSSProperties = {
+const appShell: CSSProperties = {
+  minHeight: "100vh",
+  background:
+    "radial-gradient(circle at top, rgba(30,41,84,.42), rgba(5,8,18,1) 42%), #050812",
+  color: "white",
+  fontFamily: "'Outfit','Inter',sans-serif",
+};
+
+const heroCard: CSSProperties = {
+  borderRadius: 30,
+  padding: 28,
+  background: "linear-gradient(135deg, rgba(14,25,58,.96), rgba(8,12,24,.98))",
+  border: "1px solid rgba(125,211,252,.16)",
+  boxShadow: "0 24px 80px rgba(0,0,0,.34)",
+};
+
+const panelCard: CSSProperties = {
+  borderRadius: 28,
+  padding: 22,
+  background: "rgba(7,12,24,.86)",
+  border: "1px solid rgba(255,255,255,.07)",
+};
+
+const legacyCard: CSSProperties = {
+  borderRadius: 28,
+  padding: 28,
+  background: "rgba(7,12,24,.9)",
+  border: "1px solid rgba(251,191,36,.16)",
+  display: "grid",
+  gap: 14,
+};
+
+const primaryButton: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
@@ -443,7 +416,7 @@ const primaryButton: React.CSSProperties = {
   boxShadow: "0 14px 32px rgba(125,211,252,.24)",
 };
 
-const primaryGhost: React.CSSProperties = {
+const primaryGhost: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
@@ -457,14 +430,26 @@ const primaryGhost: React.CSSProperties = {
   background: "rgba(255,255,255,.04)",
 };
 
-const metricCard: React.CSSProperties = {
+const metricGrid: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+  gap: 14,
+};
+
+const metricCard: CSSProperties = {
   borderRadius: 22,
   padding: 20,
   background: "rgba(255,255,255,.035)",
   border: "1px solid rgba(255,255,255,.06)",
 };
 
-const quickCard: React.CSSProperties = {
+const quickGrid: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+  gap: 12,
+};
+
+const quickCard: CSSProperties = {
   display: "block",
   borderRadius: 22,
   padding: 18,
@@ -473,7 +458,21 @@ const quickCard: React.CSSProperties = {
   textDecoration: "none",
 };
 
-const miniBadge: React.CSSProperties = {
+const avatarBubble: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 38,
+  height: 38,
+  borderRadius: 12,
+  background: "rgba(125,211,252,.12)",
+  color: "#7dd3fc",
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: ".08em",
+};
+
+const miniBadge: CSSProperties = {
   padding: "3px 7px",
   borderRadius: 999,
   background: "rgba(103,232,249,.12)",
@@ -485,25 +484,54 @@ const miniBadge: React.CSSProperties = {
   textTransform: "uppercase",
 };
 
-const contentShell: React.CSSProperties = {
+const groupLabel: CSSProperties = {
+  fontSize: 10,
+  color: "rgba(148,163,184,.72)",
+  textTransform: "uppercase",
+  letterSpacing: ".14em",
+  fontWeight: 700,
+};
+
+function navButton(active: boolean): CSSProperties {
+  return {
+    borderRadius: 18,
+    padding: "14px 14px",
+    border: active ? "1px solid rgba(125,211,252,.28)" : "1px solid rgba(255,255,255,.05)",
+    background: active
+      ? "linear-gradient(135deg, rgba(18,34,71,.96), rgba(8,15,34,.96))"
+      : "rgba(255,255,255,.02)",
+    color: "white",
+    cursor: "pointer",
+    textAlign: "left",
+    display: "grid",
+    gap: 4,
+  };
+}
+
+function navIcon(active: boolean): CSSProperties {
+  return {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    background: active ? "rgba(125,211,252,.12)" : "rgba(255,255,255,.05)",
+    color: active ? "#7dd3fc" : "rgba(148,163,184,.82)",
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: ".08em",
+    flexShrink: 0,
+  };
+}
+
+const contentShell: CSSProperties = {
   borderRadius: 28,
   overflow: "hidden",
   border: "1px solid rgba(255,255,255,.06)",
   background: "rgba(255,255,255,.015)",
   boxShadow: "0 24px 80px rgba(0,0,0,.24)",
 };
-
-function pill(color: string, bg: string): React.CSSProperties {
-  return {
-    padding: "6px 10px",
-    borderRadius: 999,
-    fontSize: 11,
-    fontWeight: 700,
-    color,
-    background: bg,
-    border: `1px solid ${bg.replace(".12", ".22").replace(".14", ".24")}`,
-  };
-}
 
 const responsiveStyles = `
 .adminv2-shell{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:100vh}
