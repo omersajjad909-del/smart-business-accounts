@@ -7664,6 +7664,7 @@ function PageSignupAnalytics() {
 export default function AdminPanel() {
   const [page,        setPage]        = useState<Page>("dashboard");
   const [avatarOpen,  setAvatarOpen]  = useState(false);
+  const [theme,       setTheme]       = useState<"dark"|"light">("dark");
   const avatarRef = useRef<HTMLDivElement>(null);
 
   // ── Team member access control ───────────────────────────────────────────
@@ -7679,6 +7680,22 @@ export default function AdminPanel() {
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("admin-theme-v1");
+      if (saved === "light" || saved === "dark") setTheme(saved);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.dataset.adminTheme = theme;
+    try {
+      window.localStorage.setItem("admin-theme-v1", theme);
+    } catch {}
+  }, [theme]);
+
   const [collapsed,   setCollapsed]   = useState(false);
   const [mobileOpen,  setMobileOpen]  = useState(false);
 
@@ -7855,9 +7872,43 @@ export default function AdminPanel() {
   const adminInitial = adminName.charAt(0).toUpperCase();
 
   return (
-    <div style={{ height:"100vh", background:"#060a14", color:"white", fontFamily:"'Outfit','Inter',sans-serif", display:"flex", overflow:"hidden", position:"relative" }}>
+    <div data-admin-theme={theme} style={{ height:"100vh", background:"var(--admin-bg)", color:"var(--admin-text)", fontFamily:"'Outfit','Inter',sans-serif", display:"flex", overflow:"hidden", position:"relative" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+        [data-admin-theme="dark"]{
+          --admin-bg:#0a1020;
+          --admin-bg-soft:#0f172a;
+          --admin-shell:#0b1220;
+          --admin-shell-2:#101827;
+          --admin-panel:#111a2e;
+          --admin-panel-soft:#0d1226;
+          --admin-border:rgba(255,255,255,.08);
+          --admin-text:#ffffff;
+          --admin-text-soft:rgba(255,255,255,.58);
+          --admin-text-muted:rgba(255,255,255,.34);
+          --admin-nav-idle:rgba(255,255,255,.46);
+          --admin-hover:rgba(255,255,255,.05);
+          --admin-accent:#7c3aed;
+          --admin-accent-2:#8b5cf6;
+          --admin-green:#34d399;
+        }
+        [data-admin-theme="light"]{
+          --admin-bg:#f4f7fb;
+          --admin-bg-soft:#eef2f8;
+          --admin-shell:#ffffff;
+          --admin-shell-2:#fbfcfe;
+          --admin-panel:#ffffff;
+          --admin-panel-soft:#ffffff;
+          --admin-border:rgba(15,23,42,.08);
+          --admin-text:#0f172a;
+          --admin-text-soft:rgba(51,65,85,.74);
+          --admin-text-muted:rgba(71,85,105,.56);
+          --admin-nav-idle:rgba(30,41,59,.72);
+          --admin-hover:rgba(124,58,237,.06);
+          --admin-accent:#7c3aed;
+          --admin-accent-2:#8b5cf6;
+          --admin-green:#16a34a;
+        }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
         @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -7870,9 +7921,50 @@ export default function AdminPanel() {
         ::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:4px;}
         ::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,.45);}
         input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
-        select option{background:#0c1122;color:white;}
+        select option{background:var(--admin-panel-soft);color:var(--admin-text);}
         .nav-btn{transition:all .15s ease!important;}
-        .nav-btn:hover .nav-label{color:rgba(255,255,255,.9)!important;}
+        .nav-btn:hover .nav-label{color:var(--admin-text)!important;}
+        .admin-mobile-bottom{display:none}
+        @media (max-width: 768px){
+          .admin-mobile-bottom{
+            display:grid;
+            position:fixed;
+            left:12px; right:12px; bottom:12px;
+            grid-template-columns:repeat(4,1fr);
+            gap:8px;
+            padding:12px 12px calc(12px + env(safe-area-inset-bottom));
+            background:color-mix(in srgb, var(--admin-shell) 92%, transparent);
+            border:1px solid var(--admin-border);
+            border-radius:24px;
+            backdrop-filter:blur(18px);
+            z-index:55;
+            box-shadow:0 18px 40px rgba(15,23,42,.18);
+          }
+          .admin-mobile-bottom__link{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:5px;
+            color:var(--admin-text-soft);
+            font-size:10px;
+            font-weight:700;
+          }
+          .admin-mobile-bottom__link.active{color:var(--admin-accent)}
+          .admin-mobile-fab{
+            position:fixed;
+            right:22px;
+            bottom:96px;
+            width:58px;
+            height:58px;
+            border-radius:999px;
+            border:none;
+            background:linear-gradient(135deg,var(--admin-accent),var(--admin-accent-2));
+            color:white;
+            font-size:30px;
+            box-shadow:0 14px 28px rgba(124,58,237,.35);
+            z-index:56;
+          }
+        }
       `}</style>
 
       {/* ══════════════════════════════════════════
@@ -7888,8 +7980,8 @@ export default function AdminPanel() {
       <aside style={{
         width: collapsed ? 64 : 256,
         minHeight:"100vh",
-        background:"#0a0f1e",
-        borderRight:"1px solid rgba(255,255,255,.06)",
+        background:"linear-gradient(180deg,var(--admin-shell),var(--admin-shell-2))",
+        borderRight:"1px solid var(--admin-border)",
         display:"flex", flexDirection:"column",
         transition:"width .25s cubic-bezier(.4,0,.2,1)",
         height:"100vh",
@@ -7904,15 +7996,15 @@ export default function AdminPanel() {
         <div style={{
           height:64, display:"flex", alignItems:"center",
           padding: collapsed ? "0" : "0 18px", gap:12,
-          borderBottom:"1px solid rgba(255,255,255,.05)",
+          borderBottom:"1px solid var(--admin-border)",
           flexShrink:0, overflow:"hidden",
           justifyContent: collapsed ? "center" : "flex-start",
         }}>
           <img src="/icon1.png" alt="FinovaOS" width={34} height={34} style={{ objectFit:"contain", flexShrink:0, borderRadius:10 }}/>
           {!collapsed && (
             <div>
-              <div style={{ fontSize:15,fontWeight:800,color:"white",letterSpacing:"-0.02em",lineHeight:1 }}>FinovaOS</div>
-              <div style={{ fontSize:9,color:"rgba(255,255,255,.22)",fontWeight:700,letterSpacing:".14em",textTransform:"uppercase",marginTop:3 }}>Admin Console</div>
+              <div style={{ fontSize:15,fontWeight:800,color:"var(--admin-text)",letterSpacing:"-0.02em",lineHeight:1 }}>FinovaOS</div>
+              <div style={{ fontSize:9,color:"var(--admin-text-muted)",fontWeight:700,letterSpacing:".14em",textTransform:"uppercase",marginTop:3 }}>Admin Console</div>
             </div>
           )}
         </div>
@@ -7925,7 +8017,7 @@ export default function AdminPanel() {
             return (
               <div key={group.label} style={{ marginBottom:4 }}>
                 {!collapsed && (
-                  <div style={{ padding:"10px 10px 4px", fontSize:9, fontWeight:800, color:"rgba(255,255,255,.18)", letterSpacing:".12em", textTransform:"uppercase", userSelect:"none" }}>
+                  <div style={{ padding:"10px 10px 4px", fontSize:9, fontWeight:800, color:"var(--admin-text-muted)", letterSpacing:".12em", textTransform:"uppercase", userSelect:"none" }}>
                     {group.label}
                   </div>
                 )}
@@ -7962,10 +8054,10 @@ export default function AdminPanel() {
                         width:28, height:28, borderRadius:8, flexShrink:0,
                         display:"flex", alignItems:"center", justifyContent:"center",
                         background: active ? `${item.color}22` : "rgba(255,255,255,.04)",
-                        border: active ? `1px solid ${item.color}30` : "1px solid rgba(255,255,255,.05)",
+                        border: active ? `1px solid ${item.color}30` : "1px solid var(--admin-border)",
                         transition:"all .15s",
                       }}>
-                        <span style={{ color: active ? item.color : "rgba(255,255,255,.4)", display:"flex", alignItems:"center" }}>
+                        <span style={{ color: active ? item.color : "var(--admin-nav-idle)", display:"flex", alignItems:"center" }}>
                           {NAV_ICONS[item.page] ?? (
                             <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor">
                               <rect x="1" y="1" width="8" height="8" rx="1.5"/>
@@ -7977,7 +8069,7 @@ export default function AdminPanel() {
                       {!collapsed && (
                         <span className="nav-label" style={{
                           fontSize:12.5, fontWeight: active ? 700 : 500,
-                          color: active ? item.color : "rgba(255,255,255,.45)",
+                          color: active ? item.color : "var(--admin-nav-idle)",
                           flex:1, textAlign:"left", whiteSpace:"nowrap",
                           overflow:"hidden", textOverflow:"ellipsis",
                           letterSpacing: active ? "0" : "0",
@@ -8005,24 +8097,24 @@ export default function AdminPanel() {
         </nav>
 
         {/* ── Bottom: User + Collapse ── */}
-        <div style={{ borderTop:"1px solid rgba(255,255,255,.05)", padding:"10px 8px", flexShrink:0 }}>
+        <div style={{ borderTop:"1px solid var(--admin-border)", padding:"10px 8px", flexShrink:0 }}>
           {/* User profile strip */}
           {!collapsed && (
             <div style={{
               display:"flex", alignItems:"center", gap:10, padding:"10px 12px",
-              borderRadius:10, background:"rgba(255,255,255,.03)",
-              border:"1px solid rgba(255,255,255,.06)", marginBottom:8, cursor:"pointer",
+              borderRadius:10, background:"var(--admin-hover)",
+              border:"1px solid var(--admin-border)", marginBottom:8, cursor:"pointer",
               transition:"background .15s",
             }}
               onClick={() => setPage("profile")}
               onMouseEnter={e=>(e.currentTarget.style.background="rgba(99,102,241,.08)")}
-              onMouseLeave={e=>(e.currentTarget.style.background="rgba(255,255,255,.03)")}>
+              onMouseLeave={e=>(e.currentTarget.style.background="var(--admin-hover)")}>
               <div style={{ width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,color:"white",flexShrink:0 }}>
                 {adminInitial}
               </div>
               <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontSize:12,fontWeight:700,color:"rgba(255,255,255,.85)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{adminName}</div>
-                <div style={{ fontSize:10,color:"rgba(255,255,255,.25)",marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>Super Admin</div>
+                <div style={{ fontSize:12,fontWeight:700,color:"var(--admin-text)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{adminName}</div>
+                <div style={{ fontSize:10,color:"var(--admin-text-muted)",marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>Super Admin</div>
               </div>
               <div style={{ width:6,height:6,borderRadius:"50%",background:"#34d399",flexShrink:0,boxShadow:"0 0 5px #34d399",animation:"pulse 3s ease infinite" }}/>
             </div>
@@ -8031,14 +8123,14 @@ export default function AdminPanel() {
           <button onClick={() => setCollapsed(v=>!v)}
             style={{
               width:"100%", padding:"8px", borderRadius:9,
-              border:"1px solid rgba(255,255,255,.06)",
-              background:"rgba(255,255,255,.03)",
-              color:"rgba(255,255,255,.3)", cursor:"pointer",
+              border:"1px solid var(--admin-border)",
+              background:"var(--admin-hover)",
+              color:"var(--admin-text-muted)", cursor:"pointer",
               display:"flex", alignItems:"center", justifyContent:"center", gap:7,
               transition:"all .15s", fontSize:11, fontWeight:600, fontFamily:"inherit",
             }}
-            onMouseEnter={e=>{e.currentTarget.style.color="rgba(255,255,255,.7)";e.currentTarget.style.background="rgba(255,255,255,.06)";}}
-            onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,.3)";e.currentTarget.style.background="rgba(255,255,255,.03)";}}>
+            onMouseEnter={e=>{e.currentTarget.style.color="var(--admin-text)";e.currentTarget.style.background="rgba(124,58,237,.08)";}}
+            onMouseLeave={e=>{e.currentTarget.style.color="var(--admin-text-muted)";e.currentTarget.style.background="var(--admin-hover)";}}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
               style={{ transform:collapsed?"rotate(180deg)":"none", transition:"transform .25s" }}>
               <polyline points="15 18 9 12 15 6"/>
@@ -8056,8 +8148,8 @@ export default function AdminPanel() {
         {/* ── Top Header ── */}
         <header style={{
           height:64, flexShrink:0, position:"sticky", top:0, zIndex:30,
-          background:"rgba(6,10,20,.9)", backdropFilter:"blur(20px)",
-          borderBottom:"1px solid rgba(255,255,255,.05)",
+          background:"color-mix(in srgb, var(--admin-shell) 88%, transparent)", backdropFilter:"blur(20px)",
+          borderBottom:"1px solid var(--admin-border)",
           display:"flex", alignItems:"center", padding:"10px 14px", gap:12, flexWrap:"wrap",
         }}>
           <button
@@ -8065,7 +8157,7 @@ export default function AdminPanel() {
             className="md:hidden"
             style={{
               width:38, height:38, borderRadius:10, border:"1px solid rgba(255,255,255,.09)",
-              background:"rgba(255,255,255,.04)", color:"rgba(255,255,255,.78)", cursor:"pointer",
+              background:"var(--admin-hover)", color:"var(--admin-text)", cursor:"pointer",
               display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0,
             }}
           >
@@ -8076,13 +8168,22 @@ export default function AdminPanel() {
           {/* Left: breadcrumb + title */}
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ display:"flex", alignItems:"center", gap:5, marginBottom:2 }}>
-              <span style={{ fontSize:10,color:"rgba(255,255,255,.18)",fontWeight:600,letterSpacing:".08em",textTransform:"uppercase" }}>FinovaOS</span>
+              <span style={{ fontSize:10,color:"var(--admin-text-muted)",fontWeight:600,letterSpacing:".08em",textTransform:"uppercase" }}>FinovaOS</span>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
-              <span style={{ fontSize:10,color:"rgba(255,255,255,.18)",fontWeight:600,letterSpacing:".08em",textTransform:"uppercase" }}>Admin Console</span>
+              <span style={{ fontSize:10,color:"var(--admin-text-muted)",fontWeight:600,letterSpacing:".08em",textTransform:"uppercase" }}>Admin Console</span>
             </div>
-            <h1 style={{ fontSize:17,fontWeight:800,color:"white",letterSpacing:"-0.02em",lineHeight:1 }}>
+            <h1 style={{ fontSize:17,fontWeight:800,color:"var(--admin-text)",letterSpacing:"-0.02em",lineHeight:1 }}>
               {PAGE_TITLES[page]}
             </h1>
+          </div>
+
+          <div style={{ flexShrink:0 }} className="max-md:hidden">
+            <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px", borderRadius:14, background:"var(--admin-hover)", border:"1px solid var(--admin-border)", minWidth:240 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color:"var(--admin-text-muted)" }}>
+                <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <span style={{ fontSize:12, color:"var(--admin-text-muted)" }}>Search anything...</span>
+            </div>
           </div>
 
           {/* System status pill */}
@@ -8094,19 +8195,34 @@ export default function AdminPanel() {
             <span style={{ fontSize:10.5,fontWeight:700,color:"#34d399",letterSpacing:".02em" }}>All Systems Operational</span>
           </div>
 
+          <button
+            onClick={() => setTheme((current) => current === "dark" ? "light" : "dark")}
+            style={{
+              width:38, height:38, borderRadius:12, border:"1px solid var(--admin-border)", background:"var(--admin-hover)",
+              color:"var(--admin-text)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center"
+            }}
+            title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          >
+            {theme === "dark" ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 0 1 11.21 3c0-.34.02-.67.06-1A1 1 0 0 0 10 1 11 11 0 1 0 23 14a1 1 0 0 0-2-.21z"/></svg>
+            )}
+          </button>
+
           {/* Notifications */}
           <div ref={notifRef} style={{ position:"relative" }}>
             <button onClick={() => setNotifOpen(v=>!v)}
               style={{
                 position:"relative", width:38, height:38, borderRadius:10, cursor:"pointer",
-                background: notifOpen ? "rgba(99,102,241,.2)" : "rgba(255,255,255,.04)",
-                border:`1px solid ${notifOpen ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.07)"}`,
+                background: notifOpen ? "rgba(99,102,241,.2)" : "var(--admin-hover)",
+                border:`1px solid ${notifOpen ? "rgba(99,102,241,.4)" : "var(--admin-border)"}`,
                 display:"flex", alignItems:"center", justifyContent:"center",
                 transition:"all .15s", flexShrink:0,
               }}
-              onMouseEnter={e=>{ if(!notifOpen){e.currentTarget.style.background="rgba(255,255,255,.07)";e.currentTarget.style.borderColor="rgba(255,255,255,.12)"; }}}
-              onMouseLeave={e=>{ if(!notifOpen){e.currentTarget.style.background="rgba(255,255,255,.04)";e.currentTarget.style.borderColor="rgba(255,255,255,.07)"; }}}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={notifOpen?"#a5b4fc":"rgba(255,255,255,.5)"} strokeWidth="2" strokeLinecap="round">
+              onMouseEnter={e=>{ if(!notifOpen){e.currentTarget.style.background="rgba(124,58,237,.08)";e.currentTarget.style.borderColor="var(--admin-border)"; }}}
+              onMouseLeave={e=>{ if(!notifOpen){e.currentTarget.style.background="var(--admin-hover)";e.currentTarget.style.borderColor="var(--admin-border)"; }}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={notifOpen?"#a5b4fc":"var(--admin-text-soft)"} strokeWidth="2" strokeLinecap="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
               </svg>
@@ -8127,20 +8243,20 @@ export default function AdminPanel() {
               style={{
                 display:"flex", alignItems:"center", gap:9, padding:"6px 12px 6px 8px",
                 borderRadius:10, cursor:"pointer",
-                background: avatarOpen ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.04)",
-                border:`1px solid ${avatarOpen ? "rgba(99,102,241,.35)" : "rgba(255,255,255,.07)"}`,
+                background: avatarOpen ? "rgba(99,102,241,.15)" : "var(--admin-hover)",
+                border:`1px solid ${avatarOpen ? "rgba(99,102,241,.35)" : "var(--admin-border)"}`,
                 transition:"all .15s",
               }}
-              onMouseEnter={e=>{ if(!avatarOpen){e.currentTarget.style.background="rgba(255,255,255,.07)"; }}}
-              onMouseLeave={e=>{ if(!avatarOpen){e.currentTarget.style.background="rgba(255,255,255,.04)"; }}}>
+              onMouseEnter={e=>{ if(!avatarOpen){e.currentTarget.style.background="rgba(124,58,237,.08)"; }}}
+              onMouseLeave={e=>{ if(!avatarOpen){e.currentTarget.style.background="var(--admin-hover)"; }}}>
               <div style={{ width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,color:"white" }}>
                 {adminInitial}
               </div>
               <div style={{ textAlign:"left" }}>
-                <div style={{ fontSize:12,fontWeight:700,color:"rgba(255,255,255,.85)",lineHeight:1 }}>{adminName}</div>
-                <div style={{ fontSize:9.5,color:"rgba(255,255,255,.3)",marginTop:2,letterSpacing:".02em" }}>Super Admin</div>
+                <div style={{ fontSize:12,fontWeight:700,color:"var(--admin-text)",lineHeight:1 }}>{adminName}</div>
+                <div style={{ fontSize:9.5,color:"var(--admin-text-muted)",marginTop:2,letterSpacing:".02em" }}>Super Admin</div>
               </div>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2.5" strokeLinecap="round" style={{ transition:"transform .2s", transform: avatarOpen ? "rotate(180deg)" : "none" }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--admin-text-muted)" strokeWidth="2.5" strokeLinecap="round" style={{ transition:"transform .2s", transform: avatarOpen ? "rotate(180deg)" : "none" }}>
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
             </button>
@@ -8150,15 +8266,15 @@ export default function AdminPanel() {
                 <div onClick={() => setAvatarOpen(false)} style={{ position:"fixed",inset:0,zIndex:45 }}/>
                 <div style={{
                   position:"absolute",top:"calc(100% + 8px)",right:0,width:228,zIndex:50,
-                  background:"#0c1122",border:"1px solid rgba(255,255,255,.08)",
+                  background:"var(--admin-panel-soft)",border:"1px solid var(--admin-border)",
                   borderRadius:14,boxShadow:"0 16px 48px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04)",
                   animation:"fadeUp .15s ease both", overflow:"hidden",
                 }}>
-                  <div style={{ padding:"14px 16px",borderBottom:"1px solid rgba(255,255,255,.06)",display:"flex",gap:10,alignItems:"center" }}>
+                  <div style={{ padding:"14px 16px",borderBottom:"1px solid var(--admin-border)",display:"flex",gap:10,alignItems:"center" }}>
                     <div style={{ width:38,height:38,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:800,color:"white",flexShrink:0 }}>{adminInitial}</div>
                     <div style={{ minWidth:0 }}>
-                      <div style={{ fontSize:13,fontWeight:700,color:"white",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{adminName}</div>
-                      <div style={{ fontSize:11,color:"rgba(255,255,255,.3)",marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{adminEmail}</div>
+                      <div style={{ fontSize:13,fontWeight:700,color:"var(--admin-text)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{adminName}</div>
+                      <div style={{ fontSize:11,color:"var(--admin-text-muted)",marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{adminEmail}</div>
                     </div>
                   </div>
                   <div style={{ padding:"6px" }}>
@@ -8192,11 +8308,35 @@ export default function AdminPanel() {
         </header>
 
         {/* ── Page Content ── */}
-        <main style={{ flex:1, overflowY:"auto", padding:"16px 12px 40px", background:"#060a14" }} className="sm:px-4 sm:py-6 lg:px-7">
+        <main style={{ flex:1, overflowY:"auto", padding:"16px 12px 132px", background:"var(--admin-bg)" }} className="sm:px-4 sm:py-6 lg:px-7">
           <div style={{ animation:"fadeUp .25s ease both", maxWidth:1420 }}>
             {renderPage()}
           </div>
         </main>
+      </div>
+      <button className="admin-mobile-fab" onClick={() => setPage("companies")} aria-label="Quick create">+</button>
+      <div className="admin-mobile-bottom">
+        {[
+          { id:"dashboard", label:"Dashboard" },
+          { id:"companies", label:"Companies" },
+          { id:"users", label:"Users" },
+          { id:"more", label:"More" },
+        ].map((item) => (
+          <button
+            key={item.id}
+            className={`admin-mobile-bottom__link${page === item.id ? " active" : ""}`}
+            style={{ background:"transparent", border:"none", font:"inherit", cursor:"pointer" }}
+            onClick={() => {
+              if (item.id === "more") {
+                setMobileOpen(true);
+                return;
+              }
+              setPage(item.id as Page);
+            }}
+          >
+            <span>{item.label}</span>
+          </button>
+        ))}
       </div>
     </div>
   );
