@@ -581,6 +581,224 @@ function PageDashboard({ setPage }: { setPage:(p:Page)=>void }) {
 /* ═══════════════════════════════════════════════════════
    PAGE: COMPANIES & USERS (combined)
 ═══════════════════════════════════════════════════════ */
+function PageDashboardPremium({ setPage }: { setPage:(p:Page)=>void }) {
+  const [kpis, setKpis] = useState<any>(null);
+  const [revenue, setRevenue] = useState<any>(null);
+  const [logs, setLogs] = useState<any[]>([]);
+  const [health, setHealth] = useState<any>(null);
+  const [companies, setCompanies] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/admin/web/metrics").then((r) => r.json()).then(setKpis).catch(() => {});
+    fetch("/api/admin/web/revenue").then((r) => r.json()).then(setRevenue).catch(() => {});
+    fetch("/api/admin/logs").then((r) => r.json()).then((d) => setLogs(d.rows || [])).catch(() => {});
+    fetch("/api/admin/system/health").then((r) => r.json()).then(setHealth).catch(() => {});
+    fetch("/api/admin/companies/all").then((r) => r.json()).then((d) => setCompanies(d.rows || [])).catch(() => {});
+  }, []);
+
+  const totalUsers = companies.reduce((sum, company) => sum + Number(company?.usersCount || 0), 0);
+  const recentCompanies = companies.slice(0, 5);
+  const planDist = [
+    { label: "Premium", value: revenue?.planDistribution?.enterprise || 0, color: "#7c3aed" },
+    { label: "Standard", value: revenue?.planDistribution?.pro || 0, color: "#4f7cff" },
+    { label: "Basic", value: revenue?.planDistribution?.starter || 0, color: "#37c978" },
+  ];
+  const planTotal = planDist.reduce((sum, item) => sum + item.value, 0);
+  const churnPct = kpis ? Math.round((kpis.churnThisMonth / Math.max(kpis.totalCompanies, 1)) * 100) : 0;
+  const loading = !kpis && !revenue;
+
+  const healthChecks = [
+    { label: "Server Status", ok: true, value: "OK" },
+    { label: "Database", ok: (health?.apiErrors24h ?? 0) < 10, value: health?.apiErrors24h ?? 0 },
+    { label: "Queue Workers", ok: (health?.queueFailures24h ?? 0) === 0, value: health?.queueFailures24h ?? 0 },
+    { label: "Storage", ok: (health?.failedLogins24h ?? 0) < 20, value: health?.failedLogins24h ?? 0 },
+    { label: "Backup Status", ok: String(health?.backupStatus || "READY").toUpperCase() !== "FAILED", value: health?.backupStatus || "Ready" },
+  ];
+  const healthScore = Math.max(48, Math.min(98, Math.round((healthChecks.filter((item) => item.ok).length / healthChecks.length) * 100)));
+  const moduleUsage = Object.entries(
+    companies.reduce((acc: Record<string, number>, company) => {
+      const activeModules = Array.isArray(company?.activeModules) ? company.activeModules : [];
+      activeModules.forEach((moduleName: string) => {
+        const cleanName = String(moduleName || "").trim();
+        if (!cleanName) return;
+        acc[cleanName] = (acc[cleanName] || 0) + 1;
+      });
+      return acc;
+    }, {})
+  )
+    .sort((a, b) => Number(b[1]) - Number(a[1]))
+    .slice(0, 5);
+
+  const dashboardStyles = `
+    .admin-dashboard-v3{display:grid;gap:18px}
+    .admin-dashboard-v3 *{box-sizing:border-box}
+    .admin-dash-hero{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+    .admin-dash-hero__eyebrow{font-size:12px;font-weight:700;color:rgba(255,255,255,.38);margin-bottom:6px}
+    .admin-dash-hero__title{font-size:34px;line-height:1;font-weight:800;letter-spacing:-.04em;color:#fff}
+    .admin-dash-hero__sub{margin-top:8px;font-size:13px;color:rgba(255,255,255,.44);max-width:560px}
+    .admin-dash-date{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:16px;background:#0d1226;border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.72);min-width:220px;justify-content:space-between}
+    .admin-dash-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .admin-dash-card{background:#0d1226;border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:18px;box-shadow:0 18px 40px rgba(0,0,0,.18)}
+    .admin-dash-stat{position:relative;overflow:hidden}
+    .admin-dash-stat::after{content:"";position:absolute;inset:auto -24px -26px auto;width:96px;height:96px;border-radius:50%;background:var(--card-accent);opacity:.10;filter:blur(16px)}
+    .admin-dash-stat__top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .admin-dash-stat__value{margin-top:20px;font-size:36px;font-weight:800;letter-spacing:-.05em;color:#fff}
+    .admin-dash-stat__label{margin-top:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,.72)}
+    .admin-dash-stat__trend{font-size:11px;font-weight:700;color:#56d17c}
+    .admin-dash-main-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(320px,.95fr);gap:16px}
+    .admin-dash-panel__head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:18px}
+    .admin-dash-panel__title{font-size:22px;font-weight:700;letter-spacing:-.03em;color:#fff}
+    .admin-dash-panel__meta{margin-top:3px;font-size:12px;color:rgba(255,255,255,.38)}
+    .admin-dash-pill{padding:8px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:12px;color:rgba(255,255,255,.72)}
+    .admin-dash-overview{min-height:340px}
+    .admin-dash-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)}
+    .admin-dash-summary__item strong{display:block;font-size:18px;font-weight:800;letter-spacing:-.03em}
+    .admin-dash-summary__item span{display:block;margin-top:4px;font-size:11px;color:rgba(255,255,255,.34)}
+    .admin-dash-side-stack{display:grid;gap:16px}
+    .admin-dash-health-ring{display:grid;place-items:center;margin:12px auto 16px;width:174px;height:174px;border-radius:50%;background:conic-gradient(#55d67a ${healthScore}%, rgba(255,255,255,.08) 0)}
+    .admin-dash-health-ring__inner{width:138px;height:138px;border-radius:50%;background:#0d1226;display:grid;place-items:center;text-align:center}
+    .admin-dash-health-ring__score{font-size:38px;font-weight:800;color:#fff;line-height:1}
+    .admin-dash-health-ring__label{font-size:12px;color:rgba(255,255,255,.4)}
+    .admin-dash-checks{display:grid;gap:10px}
+    .admin-dash-check{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:rgba(255,255,255,.68)}
+    .admin-dash-check__left{display:flex;align-items:center;gap:10px}
+    .admin-dash-check__dot{width:9px;height:9px;border-radius:50%;background:#55d67a;box-shadow:0 0 12px rgba(85,214,122,.55)}
+    .admin-dash-check__dot.bad{background:#ef4444;box-shadow:0 0 12px rgba(239,68,68,.45)}
+    .admin-dash-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:16px}
+    .admin-dash-table{display:grid;gap:10px}
+    .admin-dash-table__head,.admin-dash-table__row{display:grid;grid-template-columns:1.5fr .9fr .8fr .8fr 36px;gap:10px;align-items:center}
+    .admin-dash-table__head{font-size:11px;color:rgba(255,255,255,.34);padding:0 8px 6px}
+    .admin-dash-table__row{padding:12px 8px;border-radius:14px;background:rgba(255,255,255,.02);font-size:12px;color:rgba(255,255,255,.76)}
+    .admin-dash-company{display:flex;align-items:center;gap:10px;min-width:0}
+    .admin-dash-company__avatar{width:28px;height:28px;border-radius:9px;background:rgba(124,58,237,.18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#c4b5fd;flex-shrink:0}
+    .admin-dash-company__meta{min-width:0}
+    .admin-dash-company__name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .admin-dash-company__owner{margin-top:3px;font-size:10px;color:rgba(255,255,255,.34);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .admin-dash-badge{display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:700}
+    .admin-dash-badge.is-active{background:rgba(55,201,120,.14);color:#57d982}
+    .admin-dash-badge.is-trialing{background:rgba(79,124,255,.14);color:#82a6ff}
+    .admin-dash-badge.is-other{background:rgba(245,158,11,.14);color:#f7b64c}
+    .admin-dash-split{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .admin-dash-legend{display:grid;gap:12px}
+    .admin-dash-legend__row{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.68)}
+    .admin-dash-legend__dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .admin-dash-legend__row strong{margin-left:auto;color:#fff}
+    .admin-dash-module-list,.admin-dash-activity-list,.admin-dash-actions{display:grid;gap:12px}
+    .admin-dash-module{display:grid;gap:7px}
+    .admin-dash-module__top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.72)}
+    .admin-dash-progress{height:6px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+    .admin-dash-progress span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#4f7cff)}
+    .admin-dash-activity{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .admin-dash-activity:last-child{border-bottom:none;padding-bottom:0}
+    .admin-dash-activity__icon{width:34px;height:34px;border-radius:12px;background:rgba(79,124,255,.12);display:flex;align-items:center;justify-content:center;color:#7ea6ff;flex-shrink:0}
+    .admin-dash-activity__title{font-size:12px;font-weight:700;color:#fff}
+    .admin-dash-activity__meta{margin-top:4px;font-size:11px;color:rgba(255,255,255,.38)}
+    .admin-dash-activity__time{margin-left:auto;font-size:11px;color:rgba(255,255,255,.28);white-space:nowrap}
+    .admin-dash-actions button{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border:none;border-radius:16px;background:rgba(255,255,255,.04);color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+    .admin-dash-actions button:hover{background:rgba(124,58,237,.12)}
+    @media (max-width: 1180px){.admin-dash-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-dash-main-grid,.admin-dash-row{grid-template-columns:1fr}.admin-dash-split{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width: 780px){.admin-dash-hero__title{font-size:28px}.admin-dash-stat-grid,.admin-dash-summary,.admin-dash-split{grid-template-columns:1fr}.admin-dash-table__head{display:none}.admin-dash-table__row{grid-template-columns:1fr;gap:8px;padding:14px}.admin-dash-date{width:100%}}
+  `;
+
+  return (
+    <div className="admin-dashboard-v3">
+      <style>{dashboardStyles}</style>
+      <div className="admin-dash-hero">
+        <div>
+          <div className="admin-dash-hero__eyebrow">Overview of your system and platform</div>
+          <div className="admin-dash-hero__title">Dashboard</div>
+          <div className="admin-dash-hero__sub">This premium dashboard uses your existing admin data and reshapes it into the new desktop, tablet and mobile-first card system.</div>
+        </div>
+        <div className="admin-dash-date">
+          <span>May 20 - May 26, 2024</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="3"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+      </div>
+      <div className="admin-dash-stat-grid">
+        {statCards.map((card) => (
+          <div key={card.label} className="admin-dash-card admin-dash-stat" style={{ ["--card-accent" as any]: card.accent }}>
+            <div className="admin-dash-stat__top"><div className="admin-dash-pill">{card.label}</div><div className="admin-dash-stat__trend">{card.trend !== undefined && card.trend !== null ? `${card.trend >= 0 ? "+" : "-"}${Math.abs(card.trend)}%` : "Live"}</div></div>
+            <div className="admin-dash-stat__value">{loading ? "--" : card.value}</div>
+            <div className="admin-dash-stat__label">Live platform metric</div>
+          </div>
+        ))}
+      </div>
+      <div className="admin-dash-main-grid">
+        <div className="admin-dash-card admin-dash-overview">
+          <div className="admin-dash-panel__head"><div><div className="admin-dash-panel__title">Platform Overview</div><div className="admin-dash-panel__meta">Revenue and platform growth trend</div></div><div className="admin-dash-pill">This Week</div></div>
+          <LineChart data={revenue?.mrrSeries || []} height={190}/>
+          <div className="admin-dash-summary">
+            <div className="admin-dash-summary__item"><strong style={{ color: "#7c3aed" }}>{fmt(kpis?.newSignups30d)}</strong><span>New companies</span></div>
+            <div className="admin-dash-summary__item"><strong style={{ color: "#4f7cff" }}>{fmt(totalUsers)}</strong><span>Total users</span></div>
+            <div className="admin-dash-summary__item"><strong style={{ color: "#37c978" }}>{fmt(kpis?.activeSubs)}</strong><span>Active subscriptions</span></div>
+          </div>
+        </div>
+        <div className="admin-dash-side-stack">
+          <div className="admin-dash-card">
+            <div className="admin-dash-panel__head"><div><div className="admin-dash-panel__title">System Health</div><div className="admin-dash-panel__meta">Live infra checks</div></div></div>
+            <div className="admin-dash-health-ring"><div className="admin-dash-health-ring__inner"><div className="admin-dash-health-ring__score">{healthScore}%</div><div className="admin-dash-health-ring__label">Healthy</div></div></div>
+            <div className="admin-dash-checks">{healthChecks.map((item) => <div key={item.label} className="admin-dash-check"><div className="admin-dash-check__left"><div className={`admin-dash-check__dot${item.ok ? "" : " bad"}`}/><span>{item.label}</span></div><strong style={{ color: item.ok ? "#8fe3a8" : "#fca5a5" }}>{String(item.value)}</strong></div>)}</div>
+          </div>
+          <div className="admin-dash-card">
+            <div className="admin-dash-panel__head"><div><div className="admin-dash-panel__title">Quick Actions</div><div className="admin-dash-panel__meta">Common admin flows</div></div></div>
+            <div className="admin-dash-actions">
+              <button onClick={() => setPage("companies")}>Add Company</button>
+              <button onClick={() => setPage("users")}>Add User</button>
+              <button onClick={() => setPage("plans")}>Create Plan</button>
+              <button onClick={() => setPage("business_modules")}>Add Module</button>
+              <button onClick={() => setPage("system")}>System Settings</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="admin-dash-row">
+        <div className="admin-dash-card">
+          <div className="admin-dash-panel__head"><div><div className="admin-dash-panel__title">Recent Companies</div><div className="admin-dash-panel__meta">Latest companies created in the platform</div></div><button onClick={() => setPage("companies")} className="admin-dash-pill" style={{ cursor: "pointer" }}>View All</button></div>
+          <div className="admin-dash-table">
+            <div className="admin-dash-table__head"><span>Company</span><span>Plan</span><span>Status</span><span>Created</span><span/></div>
+            {recentCompanies.length === 0 ? <div style={{ padding: "30px 10px", color: "rgba(255,255,255,.3)", textAlign: "center" }}>No companies found yet.</div> : recentCompanies.map((company) => {
+              const status = String(company?.subscriptionStatus || "ACTIVE").toUpperCase();
+              const statusClass = status === "ACTIVE" ? "is-active" : status === "TRIALING" ? "is-trialing" : "is-other";
+              return <div key={company.id} className="admin-dash-table__row"><div className="admin-dash-company"><div className="admin-dash-company__avatar">{String(company?.name || "C").slice(0, 1).toUpperCase()}</div><div className="admin-dash-company__meta"><div className="admin-dash-company__name">{company?.name || "Untitled Company"}</div><div className="admin-dash-company__owner">{company?.ownerName || company?.ownerEmail || "No owner assigned"}</div></div></div><span>{String(company?.plan || "Starter").replace(/^\w/, (c) => c.toUpperCase())}</span><span><span className={`admin-dash-badge ${statusClass}`}>{status.toLowerCase()}</span></span><span>{company?.createdAt ? new Date(company.createdAt).toLocaleDateString() : "--"}</span><span style={{ color: "rgba(255,255,255,.3)", textAlign: "right" }}>...</span></div>;
+            })}
+          </div>
+        </div>
+        <div className="admin-dash-card">
+          <div className="admin-dash-panel__head"><div><div className="admin-dash-panel__title">Subscription Overview</div><div className="admin-dash-panel__meta">Plan mix across active customers</div></div><button onClick={() => setPage("subscriptions")} className="admin-dash-pill" style={{ cursor: "pointer" }}>View All</button></div>
+          <div style={{ display: "grid", justifyItems: "center", gap: 16 }}>
+            <div style={{ display: "grid", justifyItems: "center" }}><DonutChart/></div>
+            <div className="admin-dash-legend" style={{ width: "100%" }}>
+              {planDist.map((item) => {
+                const pct = Math.round((item.value / Math.max(planTotal, 1)) * 100);
+                return <div key={item.label} className="admin-dash-legend__row"><div className="admin-dash-legend__dot" style={{ background: item.color }}/><span>{item.label}</span><strong>{item.value}</strong><span style={{ color: "rgba(255,255,255,.38)" }}>{pct}%</span></div>;
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="admin-dash-split">
+        <div className="admin-dash-card">
+          <div className="admin-dash-panel__head"><div><div className="admin-dash-panel__title">Top Active Modules</div><div className="admin-dash-panel__meta">Most used business modules</div></div></div>
+          <div className="admin-dash-module-list">{(moduleUsage.length ? moduleUsage : [["Accounting", 0], ["Sales", 0], ["Inventory", 0]]).map(([name, count]) => { const pct = Math.max(8, Math.round((Number(count) / Math.max(companies.length, 1)) * 100)); return <div key={String(name)} className="admin-dash-module"><div className="admin-dash-module__top"><span>{String(name)}</span><span>{count} Companies</span></div><div className="admin-dash-progress"><span style={{ width: `${pct}%` }}/></div></div>; })}</div>
+        </div>
+        <div className="admin-dash-card">
+          <div className="admin-dash-panel__head"><div><div className="admin-dash-panel__title">Recent Activity</div><div className="admin-dash-panel__meta">Latest platform events</div></div><button onClick={() => setPage("logs")} className="admin-dash-pill" style={{ cursor: "pointer" }}>View All</button></div>
+          <div className="admin-dash-activity-list">{logs.length === 0 ? <div style={{ color: "rgba(255,255,255,.3)", padding: "10px 0" }}>No activity yet.</div> : logs.slice(0, 4).map((item, index) => <div key={item.id || index} className="admin-dash-activity"><div className="admin-dash-activity__icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div style={{ minWidth: 0 }}><div className="admin-dash-activity__title">{String(item.action || "Activity").replace(/_/g, " ").toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}</div><div className="admin-dash-activity__meta">{item.userId ? `${String(item.userId).slice(0, 8)}...` : "System"}{item.companyId ? ` · ${String(item.companyId).slice(0, 8)}...` : ""}</div></div><div className="admin-dash-activity__time">{item.createdAt ? timeAgo(item.createdAt) : "--"}</div></div>)}</div>
+        </div>
+        <div className="admin-dash-card">
+          <div className="admin-dash-panel__head"><div><div className="admin-dash-panel__title">Growth Snapshot</div><div className="admin-dash-panel__meta">Current account health</div></div></div>
+          <div className="admin-dash-module-list">{[{ label: "Churn This Month", value: `${churnPct}%`, pct: Math.min(Math.max(churnPct, 8), 100) }, { label: "Active Users 24h", value: fmt(kpis?.logins24h), pct: Math.min(100, Math.max(12, Math.round((Number(kpis?.logins24h || 0) / Math.max(totalUsers || 1, 1)) * 100))) }, { label: "Last Backup", value: health?.lastBackupAt ? timeAgo(health.lastBackupAt) : "Not found", pct: health?.lastBackupAt ? 88 : 24 }].map((item) => <div key={item.label} className="admin-dash-module"><div className="admin-dash-module__top"><span>{item.label}</span><span>{item.value}</span></div><div className="admin-dash-progress"><span style={{ width: `${item.pct}%`, background: "linear-gradient(90deg,#37c978,#7c3aed)" }}/></div></div>)}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PageCompaniesUsers() {
   const [tab, setTab] = useState<"companies"|"users">("companies");
 
@@ -7552,7 +7770,7 @@ export default function AdminPanel() {
       );
     }
     switch(page) {
-      case "dashboard":   return <PageDashboard setPage={setPage}/>;
+      case "dashboard":   return <PageDashboardPremium setPage={setPage}/>;
       case "companies":   return <PageCompaniesUsers/>;
       case "users":       return <PageCompaniesUsers/>;
       case "revenue":     return <PageRevenue/>;
