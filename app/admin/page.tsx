@@ -629,6 +629,50 @@ function PageDashboardPremium({ setPage }: { setPage:(p:Page)=>void }) {
     .sort((a, b) => Number(b[1]) - Number(a[1]))
     .slice(0, 5);
 
+  const statCards = [
+    { label: "Total Companies", value: fmt(kpis?.totalCompanies), trend: kpis?.trends?.totalCompanies, accent: "#7c3aed" },
+    { label: "Total Users", value: fmt(totalUsers), trend: kpis?.trends?.logins24h, accent: "#4f7cff" },
+    { label: "Active Subscriptions", value: fmt(kpis?.activeSubs), trend: kpis?.trends?.activeSubs, accent: "#37c978" },
+    { label: "Monthly Revenue", value: fmt(kpis?.revenueThisMonth, "$"), trend: 18, accent: "#f59e0b" },
+  ];
+
+  function DonutChart() {
+    const total = planTotal || 1;
+    const size = 174;
+    const stroke = 14;
+    const radius = (size - stroke) / 2;
+    const circumference = 2 * Math.PI * radius;
+    let offset = 0;
+
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(255,255,255,.08)" strokeWidth={stroke}/>
+        {planDist.map((item) => {
+          const length = (item.value / total) * circumference;
+          const segment = (
+            <circle
+              key={item.label}
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={item.color}
+              strokeWidth={stroke}
+              strokeLinecap="round"
+              strokeDasharray={`${length} ${circumference - length}`}
+              strokeDashoffset={-offset}
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+          );
+          offset += length;
+          return segment;
+        })}
+        <text x="50%" y="47%" textAnchor="middle" fill="white" fontSize="34" fontWeight="800">{planTotal}</text>
+        <text x="50%" y="60%" textAnchor="middle" fill="rgba(255,255,255,.42)" fontSize="13">Total</text>
+      </svg>
+    );
+  }
+
   const dashboardStyles = `
     .admin-dashboard-v3{display:grid;gap:18px}
     .admin-dashboard-v3 *{box-sizing:border-box}
