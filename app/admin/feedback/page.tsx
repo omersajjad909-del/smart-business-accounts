@@ -80,7 +80,9 @@ export default function AdminFeedbackPage() {
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Feedback & Complaints</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>Users اور visitors کے complaints، suggestions اور bug reports</p>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+          User and visitor complaints, suggestions, and bug reports.
+        </p>
       </div>
 
       {/* KPI cards */}
@@ -139,7 +141,11 @@ export default function AdminFeedbackPage() {
             {loading ? (
               <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 14 }}>Loading...</td></tr>
             ) : items.length === 0 ? (
-              <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 14 }}>کوئی feedback نہیں ملی</td></tr>
+              <tr>
+                <td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 14 }}>
+                  No feedback found.
+                </td>
+              </tr>
             ) : items.map((fb: any) => (
               <tr key={fb.id} className="fb-row" onClick={() => { setSelected(fb); setNote(fb.adminNote || ""); }}
                 style={{ borderBottom: "1px solid rgba(255,255,255,.04)", transition: "background .15s" }}>
@@ -173,12 +179,12 @@ export default function AdminFeedbackPage() {
       {total > 25 && (
         <div style={{ display: "flex", justifyContent: "center", gap: 10, marginTop: 20 }}>
           <button className="fb-btn" disabled={page === 1} onClick={() => setPage(p => p - 1)}
-            style={{ background: "rgba(255,255,255,.07)", color: "white", opacity: page === 1 ? .3 : 1 }}>← Prev</button>
+            style={{ background: "rgba(255,255,255,.07)", color: "white", opacity: page === 1 ? .3 : 1 }}>Previous</button>
           <span style={{ padding: "8px 16px", fontSize: 13, color: "rgba(255,255,255,.5)" }}>
             Page {page} of {Math.ceil(total / 25)}
           </span>
           <button className="fb-btn" disabled={page >= Math.ceil(total / 25)} onClick={() => setPage(p => p + 1)}
-            style={{ background: "rgba(255,255,255,.07)", color: "white", opacity: page >= Math.ceil(total / 25) ? .3 : 1 }}>Next →</button>
+            style={{ background: "rgba(255,255,255,.07)", color: "white", opacity: page >= Math.ceil(total / 25) ? .3 : 1 }}>Next</button>
         </div>
       )}
 
@@ -213,8 +219,8 @@ export default function AdminFeedbackPage() {
 
             {/* Admin note */}
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 8 }}>ADMIN NOTE (internal)</label>
-              <textarea className="fb-textarea" rows={3} value={note} onChange={e => setNote(e.target.value)} placeholder="Internal note — user ko nahi dikhi gi..." />
+              <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 8 }}>ADMIN NOTE (INTERNAL)</label>
+              <textarea className="fb-textarea" rows={3} value={note} onChange={e => setNote(e.target.value)} placeholder="Internal note visible to admins only..." />
             </div>
 
             {/* Actions */}
