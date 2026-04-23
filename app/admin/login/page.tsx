@@ -75,7 +75,7 @@ export default function AdminLoginPage() {
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#080c1e", fontFamily: "inherit" }}>
       <div style={{ width: "100%", maxWidth: 400, padding: 40, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 24, textAlign: "center" }}>
         <div style={{ marginBottom: 32 }}>
-          <img src="/icon.png" alt="Logo" style={{ width: 48, height: 48, margin: "0 auto 16px", borderRadius: 12 }} />
+          <img src="/icon.png" alt="Logo" style={{ width: 84, height: 84, margin: "0 auto 16px", borderRadius: 12 }} />
           <h1 style={{ fontSize: 24, fontWeight: 800, color: "white", marginBottom: 8 }}>Admin Login</h1>
           <p style={{ color: "rgba(255,255,255,.4)", fontSize: 14 }}>SaaS Control Center Access</p>
         </div>
