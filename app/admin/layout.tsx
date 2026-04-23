@@ -8,6 +8,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
+import AdminShell from "@/app/admin/components/AdminShell";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname  = usePathname();
@@ -75,8 +76,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   // Unauthorized — null return (redirect ho raha hai)
   if (!authorized) return null;
 
-  // Authorized — sirf children render karo (AdminPanel.tsx apna layout khud handle karta hai)
+  if (pathname === "/admin") {
+    return <>{children}</>;
+  }
+
   return (
-    <>{children}</>
+    <>
+      <Toaster position="top-right" />
+      <AdminShell>{children}</AdminShell>
+    </>
   );
 }
