@@ -286,6 +286,7 @@ function CompanyRow({ c, onFlag }: { c: Company; onFlag: (c: Company) => void })
 export default function FraudMonitorPage() {
   const [data, setData]           = useState<{ summary: Summary; companies: Company[] } | null>(null);
   const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState("");
   const [q, setQ]                 = useState("");
   const [filterRisk, setFilterRisk] = useState("ALL");
   const [flagging, setFlagging]   = useState<Company | null>(null);
@@ -294,12 +295,22 @@ export default function FraudMonitorPage() {
 
   async function load() {
     setLoading(true);
+    setError("");
     try {
       const u = getCurrentUser();
       const h: Record<string, string> = {};
       if (u?.role) h["x-user-role"] = u.role;
       const r = await fetch("/api/admin/fraud", { headers: h, credentials: "include" as any });
-      if (r.ok) { const j = await r.json(); setData(j); }
+      const j = await r.json().catch(() => null);
+      if (r.ok) {
+        setData(j);
+      } else {
+        setData({ summary: { total: 0, high: 0, medium: 0, low: 0, flagged: 0 }, companies: [] });
+        setError(j?.error || "Unable to load fraud monitor data.");
+      }
+    } catch {
+      setData({ summary: { total: 0, high: 0, medium: 0, low: 0, flagged: 0 }, companies: [] });
+      setError("Unable to load fraud monitor data.");
     } finally { setLoading(false); }
   }
 
@@ -377,6 +388,12 @@ export default function FraudMonitorPage() {
           {["HIGH", "MEDIUM", "LOW", "NONE", "FLAGGED"].map(r => <option key={r} value={r}>{r}</option>)}
         </select>
       </div>
+
+      {error ? (
+        <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 12, background: "rgba(239,68,68,.12)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12, fontWeight: 700 }}>
+          {error}
+        </div>
+      ) : null}
 
       {/* Table */}
       <div style={{ borderRadius: 18, border: "1px solid rgba(255,255,255,.07)", overflow: "hidden" }}>

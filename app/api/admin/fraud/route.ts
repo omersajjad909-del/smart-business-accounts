@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
     const [invoices, vouchers] = await Promise.all([
       prisma.salesInvoice.findMany({
         where: { createdAt: { gte: d30 } },
-        select: { companyId: true, createdAt: true, totalAmount: true },
+        select: { companyId: true, createdAt: true, total: true },
       }),
       prisma.voucher.findMany({
         where: { createdAt: { gte: d30 } },
@@ -141,7 +141,7 @@ export async function GET(req: NextRequest) {
       // Signal 3: NEW_HEAVY — account < 30d with >50 invoices or >$50k
       const ageMs = now.getTime() - c.createdAt.getTime();
       const ageDays = ageMs / 86400000;
-      const totalInvoiceAmount = compInvoices.reduce((s, i) => s + (i.totalAmount || 0), 0);
+      const totalInvoiceAmount = compInvoices.reduce((s, i) => s + (i.total || 0), 0);
       if (ageDays < 30 && (compInvoices.length > 50 || totalInvoiceAmount > 50000)) {
         signals.push({
           code: "NEW_HEAVY",

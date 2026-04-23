@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
+import { BUSINESS_TYPES } from "@/lib/businessModules";
 import { getCurrentUser } from "@/lib/auth";
 
 const FONT = "'Outfit','Inter',sans-serif";
@@ -185,8 +185,7 @@ function getDefaultPlanModules(allModules: string[]): Record<Plan, string[]> {
   return { STARTER: starter, PRO: pro, ENTERPRISE: enterprise };
 }
 
-// Only show live business types
-const LIVE_BUSINESSES = BUSINESS_TYPES.filter((b: any) => !b.phase || b.phase === "phase1" || b.status === "live" || (b as any).coming_soon === false);
+const ALL_BUSINESSES = BUSINESS_TYPES;
 
 type ConfigMap = Record<string, Record<Plan, string[]>>;
 
@@ -197,7 +196,6 @@ export default function AdminPermissionsPage() {
   const [config,  setConfig]  = useState<ConfigMap>({});
   const [saving,  setSaving]  = useState(false);
   const [saved,   setSaved]   = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const getHeaders = () => {
     const h: Record<string, string> = { "Content-Type": "application/json" };
@@ -210,9 +208,7 @@ export default function AdminPermissionsPage() {
     fetch("/api/admin/business-plan-modules", { headers: getHeaders() })
       .then(r => r.ok ? r.json() : { config: {} })
       .then(d => setConfig(d.config || {}))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+      .catch(() => {});
   }, []);
 
   // Get plan modules for selected business (saved config or defaults)
@@ -263,7 +259,7 @@ export default function AdminPermissionsPage() {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return LIVE_BUSINESSES.filter(b =>
+    return ALL_BUSINESSES.filter(b =>
       !q || b.label.toLowerCase().includes(q) || b.id.toLowerCase().includes(q)
     );
   }, [search]);
@@ -306,7 +302,7 @@ export default function AdminPermissionsPage() {
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
           <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>
-              {LIVE_BUSINESSES.length} Business Types
+              {ALL_BUSINESSES.length} Business Types
             </div>
             <input
               value={search}
