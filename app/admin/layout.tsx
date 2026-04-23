@@ -76,10 +76,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   // Unauthorized — null return (redirect ho raha hai)
   if (!authorized) return null;
 
-  if (pathname === "/admin") {
-    return <>{children}</>;
-  }
-
   return (
     <>
       <Toaster position="top-right" />
