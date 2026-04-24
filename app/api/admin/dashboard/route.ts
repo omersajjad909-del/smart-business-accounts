@@ -46,17 +46,31 @@ function summarizeDetails(details: string | null | undefined) {
   return firstString ? String(firstString) : "Updated in admin panel";
 }
 
+function growthPct(current: number, previous: number): number {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return Math.round(((current - previous) / previous) * 100 * 10) / 10;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
     const now = new Date();
-    const start = new Date(now);
-    start.setDate(now.getDate() - 6);
-    start.setHours(0, 0, 0, 0);
 
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    // 7-day window for overview chart
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - 6);
+    weekStart.setHours(0, 0, 0, 0);
+
+    // This month: 1st of current month → now
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // Last month: 1st → last day of previous month
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+    // 24h window for health checks
     const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     const [
@@ -68,6 +82,7 @@ export async function GET(req: NextRequest) {
       latestBackup,
       apiErrors24h,
       failedLogins24h,
+      totalActivityLogs,
     ] = await Promise.all([
       prisma.company.findMany({
         orderBy: { createdAt: "desc" },
@@ -111,61 +126,98 @@ export async function GET(req: NextRequest) {
       prisma.activityLog.count({
         where: { action: "LOGIN_FAILED", createdAt: { gte: dayAgo } },
       }).catch(() => 0),
+      prisma.activityLog.count().catch(() => 0),
     ]);
 
+    // ── KPI totals ─────────────────────────────────────────────────────────
     const totalCompanies = companies.length;
     const totalUsers = users.length;
-    const activeSubscriptions = companies.filter((company) =>
-      ["ACTIVE", "TRIALING"].includes(String(company.subscriptionStatus || "").toUpperCase())
+    const activeSubscriptions = companies.filter((c) =>
+      ["ACTIVE", "TRIALING"].includes(String(c.subscriptionStatus || "").toUpperCase())
     ).length;
 
+    // ── Revenue: this month vs last month ─────────────────────────────────
     let monthlyRevenue = 0;
+    let lastMonthRevenue = 0;
     for (const log of paymentLogs) {
-      if (log.createdAt < monthStart) continue;
       const details = parseDetails(log.details);
       if (String(details?.status || "") !== "succeeded") continue;
-      monthlyRevenue += Number(details?.amount_paid || 0) / 100;
+      const amount = Number(details?.amount_paid || 0) / 100;
+      if (log.createdAt >= thisMonthStart) {
+        monthlyRevenue += amount;
+      } else if (log.createdAt >= lastMonthStart && log.createdAt <= lastMonthEnd) {
+        lastMonthRevenue += amount;
+      }
     }
 
+    // ── Growth: companies (this month vs last month) ───────────────────────
+    const thisMonthCompanies = companies.filter((c) => c.createdAt >= thisMonthStart).length;
+    const lastMonthCompanies = companies.filter(
+      (c) => c.createdAt >= lastMonthStart && c.createdAt <= lastMonthEnd
+    ).length;
+
+    // ── Growth: users (this month vs last month) ──────────────────────────
+    const thisMonthUsers = users.filter((u) => u.createdAt >= thisMonthStart).length;
+    const lastMonthUsers = users.filter(
+      (u) => u.createdAt >= lastMonthStart && u.createdAt <= lastMonthEnd
+    ).length;
+
+    // ── Growth: active subscriptions (snapshot comparison via history is
+    //    unavailable — use new activations this month vs last month as proxy)
+    const thisMonthActivations = companies.filter(
+      (c) =>
+        c.createdAt >= thisMonthStart &&
+        ["ACTIVE", "TRIALING"].includes(String(c.subscriptionStatus || "").toUpperCase())
+    ).length;
+    const lastMonthActivations = companies.filter(
+      (c) =>
+        c.createdAt >= lastMonthStart &&
+        c.createdAt <= lastMonthEnd &&
+        ["ACTIVE", "TRIALING"].includes(String(c.subscriptionStatus || "").toUpperCase())
+    ).length;
+
+    const growth = {
+      companies: growthPct(thisMonthCompanies, lastMonthCompanies),
+      users: growthPct(thisMonthUsers, lastMonthUsers),
+      subscriptions: growthPct(thisMonthActivations, lastMonthActivations),
+      revenue: growthPct(monthlyRevenue, lastMonthRevenue),
+    };
+
+    // ── 7-day overview chart ──────────────────────────────────────────────
     const dayBuckets = Array.from({ length: 7 }, (_, index) => {
-      const date = new Date(start);
-      date.setDate(start.getDate() + index);
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + index);
       return { key: dayKey(date), label: labelForDay(date) };
     });
 
     const companyCounts = new Map<string, number>();
     const userCounts = new Map<string, number>();
     const activeCounts = new Map<string, number>();
-    dayBuckets.forEach((bucket) => {
-      companyCounts.set(bucket.key, 0);
-      userCounts.set(bucket.key, 0);
-      activeCounts.set(bucket.key, 0);
+    dayBuckets.forEach((b) => {
+      companyCounts.set(b.key, 0);
+      userCounts.set(b.key, 0);
+      activeCounts.set(b.key, 0);
     });
 
-    companies.forEach((company) => {
-      const key = dayKey(company.createdAt);
-      if (companyCounts.has(key)) {
-        companyCounts.set(key, (companyCounts.get(key) || 0) + 1);
-      }
+    companies.forEach((c) => {
+      const key = dayKey(c.createdAt);
+      if (companyCounts.has(key)) companyCounts.set(key, (companyCounts.get(key) || 0) + 1);
     });
-
-    users.forEach((user) => {
-      const key = dayKey(user.createdAt);
-      if (userCounts.has(key)) {
-        userCounts.set(key, (userCounts.get(key) || 0) + 1);
-      }
+    users.forEach((u) => {
+      const key = dayKey(u.createdAt);
+      if (userCounts.has(key)) userCounts.set(key, (userCounts.get(key) || 0) + 1);
     });
-
-    dayBuckets.forEach((bucket) => {
-      const endOfDay = new Date(`${bucket.key}T23:59:59.999Z`);
+    dayBuckets.forEach((b) => {
+      const endOfDay = new Date(`${b.key}T23:59:59.999Z`);
       const count = companies.filter(
-        (company) =>
-          company.createdAt <= endOfDay &&
-          ["ACTIVE", "TRIALING"].includes(String(company.subscriptionStatus || "").toUpperCase())
+        (c) =>
+          c.createdAt <= endOfDay &&
+          ["ACTIVE", "TRIALING"].includes(String(c.subscriptionStatus || "").toUpperCase())
       ).length;
-      activeCounts.set(bucket.key, count);
+      activeCounts.set(b.key, count);
     });
 
+    // ── Recent companies ──────────────────────────────────────────────────
     const ownerByCompany = new Map<string, string>();
     userLinks.forEach((link) => {
       const existing = ownerByCompany.get(link.companyId);
@@ -174,19 +226,20 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    const recentCompanies = companies.slice(0, 5).map((company) => ({
-      company: company.name,
-      owner: ownerByCompany.get(company.id) || "Unknown",
-      plan: formatPlan(company.plan),
-      status: String(company.subscriptionStatus || "ACTIVE").toUpperCase(),
-      createdAt: company.createdAt.toISOString(),
+    const recentCompanies = companies.slice(0, 5).map((c) => ({
+      company: c.name,
+      owner: ownerByCompany.get(c.id) || "Unknown",
+      plan: formatPlan(c.plan),
+      status: String(c.subscriptionStatus || "ACTIVE").toUpperCase(),
+      createdAt: c.createdAt.toISOString(),
     }));
 
+    // ── Subscription plan breakdown (active only) ─────────────────────────
     const planGroups = new Map<string, number>();
     companies
-      .filter((company) => ["ACTIVE", "TRIALING"].includes(String(company.subscriptionStatus || "").toUpperCase()))
-      .forEach((company) => {
-        const plan = formatPlan(company.plan);
+      .filter((c) => ["ACTIVE", "TRIALING"].includes(String(c.subscriptionStatus || "").toUpperCase()))
+      .forEach((c) => {
+        const plan = formatPlan(c.plan);
         planGroups.set(plan, (planGroups.get(plan) || 0) + 1);
       });
 
@@ -198,14 +251,15 @@ export async function GET(req: NextRequest) {
       }))
       .sort((a, b) => b.value - a.value);
 
+    // ── Top active modules ────────────────────────────────────────────────
     const moduleGroups = new Map<string, number>();
-    companies.forEach((company) => {
-      const modules = String(company.activeModules || "")
+    companies.forEach((c) => {
+      const modules = String(c.activeModules || "")
         .split(",")
-        .map((value) => value.trim())
+        .map((v) => v.trim())
         .filter(Boolean);
-      modules.forEach((moduleName) => {
-        const label = moduleName
+      modules.forEach((m) => {
+        const label = m
           .split(/[-_]/g)
           .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
           .join(" ");
@@ -219,6 +273,8 @@ export async function GET(req: NextRequest) {
       .slice(0, 5);
 
     const maxModuleCount = topModules[0]?.companies || 1;
+
+    // ── Recent activity ───────────────────────────────────────────────────
     const recentActivity = activityRows.map((row, index) => ({
       title: prettifyAction(row.action),
       detail: summarizeDetails(row.details),
@@ -226,6 +282,7 @@ export async function GET(req: NextRequest) {
       tone: ["purple", "blue", "green", "orange", "purple"][index % 5],
     }));
 
+    // ── System health ─────────────────────────────────────────────────────
     const systemChecks = [
       { label: "API Errors (24h)", ok: apiErrors24h === 0 },
       { label: "Login Failures (24h)", ok: failedLogins24h < 10 },
@@ -235,18 +292,24 @@ export async function GET(req: NextRequest) {
     const healthyChecks = systemChecks.filter((item) => item.ok).length;
     const healthPercent = Math.round((healthyChecks / systemChecks.length) * 100);
 
+    // ── Platform summary (replaces fake storage widget) ────────────────────
+    const platformSummary = {
+      totalActivityLogs,
+      apiErrors24h,
+      failedLogins24h,
+      thisMonthCompanies,
+      thisMonthUsers,
+      countriesCount: new Set(companies.map((c) => c.country).filter(Boolean)).size,
+    };
+
     return NextResponse.json({
-      cards: {
-        totalCompanies,
-        totalUsers,
-        activeSubscriptions,
-        monthlyRevenue,
-      },
-      overview: dayBuckets.map((bucket) => ({
-        label: bucket.label,
-        newCompanies: companyCounts.get(bucket.key) || 0,
-        newUsers: userCounts.get(bucket.key) || 0,
-        activeSubscriptions: activeCounts.get(bucket.key) || 0,
+      cards: { totalCompanies, totalUsers, activeSubscriptions, monthlyRevenue },
+      growth,
+      overview: dayBuckets.map((b) => ({
+        label: b.label,
+        newCompanies: companyCounts.get(b.key) || 0,
+        newUsers: userCounts.get(b.key) || 0,
+        activeSubscriptions: activeCounts.get(b.key) || 0,
       })),
       systemHealth: {
         percent: healthPercent,
@@ -261,6 +324,7 @@ export async function GET(req: NextRequest) {
         width: Math.max(12, Math.round((item.companies / maxModuleCount) * 100)),
       })),
       recentActivity,
+      platformSummary,
     });
   } catch (error: unknown) {
     return NextResponse.json(

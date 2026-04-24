@@ -10,6 +10,12 @@ type DashboardPayload = {
     activeSubscriptions: number;
     monthlyRevenue: number;
   };
+  growth: {
+    companies: number;
+    users: number;
+    subscriptions: number;
+    revenue: number;
+  };
   overview: {
     label: string;
     newCompanies: number;
@@ -45,9 +51,15 @@ type DashboardPayload = {
     time: string;
     tone: string;
   }[];
+  platformSummary: {
+    totalActivityLogs: number;
+    apiErrors24h: number;
+    failedLogins24h: number;
+    thisMonthCompanies: number;
+    thisMonthUsers: number;
+    countriesCount: number;
+  };
 };
-
-const GROWTH = { companies: 12.5, users: 8.3, subscriptions: 15.2, revenue: 18.7 };
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState<DashboardPayload | null>(null);
@@ -83,10 +95,10 @@ export default function AdminDashboardPage() {
   }, []);
 
   const cards = [
-    { title: "Total Companies",      value: formatNumber(data?.cards.totalCompanies),      tone: "purple", growth: GROWTH.companies,     icon: "building",  series: data?.overview.map((r) => r.newCompanies) || [] },
-    { title: "Total Users",          value: formatNumber(data?.cards.totalUsers),           tone: "blue",   growth: GROWTH.users,         icon: "users",     series: data?.overview.map((r) => r.newUsers) || [] },
-    { title: "Active Subscriptions", value: formatNumber(data?.cards.activeSubscriptions),  tone: "green",  growth: GROWTH.subscriptions, icon: "layers",    series: data?.overview.map((r) => r.activeSubscriptions) || [] },
-    { title: "Monthly Revenue",      value: formatCurrency(data?.cards.monthlyRevenue),     tone: "orange", growth: GROWTH.revenue,       icon: "chart",     series: data?.overview.map((r) => r.activeSubscriptions) || [] },
+    { title: "Total Companies",      value: formatNumber(data?.cards.totalCompanies),      tone: "purple", growth: data?.growth.companies,     icon: "building", series: data?.overview.map((r) => r.newCompanies) || [] },
+    { title: "Total Users",          value: formatNumber(data?.cards.totalUsers),           tone: "blue",   growth: data?.growth.users,         icon: "users",    series: data?.overview.map((r) => r.newUsers) || [] },
+    { title: "Active Subscriptions", value: formatNumber(data?.cards.activeSubscriptions),  tone: "green",  growth: data?.growth.subscriptions, icon: "layers",   series: data?.overview.map((r) => r.activeSubscriptions) || [] },
+    { title: "Monthly Revenue",      value: formatCurrency(data?.cards.monthlyRevenue),     tone: "orange", growth: data?.growth.revenue,       icon: "chart",    series: data?.overview.map((r) => r.activeSubscriptions) || [] },
   ];
 
   const dateRange = getDateRange();
@@ -172,7 +184,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <ul className="health-list">
-            {(data?.systemHealth.checks || PLACEHOLDER_CHECKS).map((item) => (
+            {(data?.systemHealth.checks || []).map((item) => (
               <li key={item.label}>
                 <span>{item.label}</span>
                 <span className={item.ok ? "ok-mark" : "warn-mark"}>{item.ok ? "✓" : "⚠"}</span>
@@ -248,7 +260,7 @@ export default function AdminDashboardPage() {
         </article>
       </section>
 
-      {/* ── Top Modules + Recent Activity + Storage ────────────────────── */}
+      {/* ── Top Modules + Recent Activity + Platform Summary ─────────────── */}
       <section className="bottom-grid">
         <article className="dash-card">
           <div className="card-head">
@@ -291,29 +303,42 @@ export default function AdminDashboardPage() {
           </div>
         </article>
 
-        <article className="dash-card storage-card">
+        <article className="dash-card platform-card">
           <div className="card-head">
-            <h2>Storage Usage</h2>
-            <a href="/admin/backup-restore" className="view-all">View All</a>
+            <h2>Platform Summary</h2>
+            <a href="/admin/logs" className="view-all">View Logs</a>
           </div>
-          <div className="storage-layout">
-            <StorageDonut used={65} />
-            <div className="storage-meta">
-              <div className="storage-row">
-                <span className="storage-label">Total Storage</span>
-                <span className="storage-val">100 GB</span>
-              </div>
-              <div className="storage-row">
-                <span className="storage-label">Used Storage</span>
-                <span className="storage-val storage-val--used">65 GB</span>
-              </div>
-              <div className="storage-row">
-                <span className="storage-label">Free Storage</span>
-                <span className="storage-val storage-val--free">35 GB</span>
-              </div>
+          <div className="platform-grid">
+            <div className="platform-stat">
+              <span className="platform-val">{loading ? "—" : formatNumber(data?.platformSummary?.totalActivityLogs)}</span>
+              <span className="platform-label">Activity Logs</span>
+            </div>
+            <div className="platform-stat">
+              <span className="platform-val" style={{ color: loading ? undefined : (data?.platformSummary?.apiErrors24h ?? 0) > 0 ? "#fca5a5" : "#4ad37a" }}>
+                {loading ? "—" : (data?.platformSummary?.apiErrors24h ?? 0)}
+              </span>
+              <span className="platform-label">API Errors (24h)</span>
+            </div>
+            <div className="platform-stat">
+              <span className="platform-val" style={{ color: loading ? undefined : (data?.platformSummary?.failedLogins24h ?? 0) >= 10 ? "#fb923c" : "#4ad37a" }}>
+                {loading ? "—" : (data?.platformSummary?.failedLogins24h ?? 0)}
+              </span>
+              <span className="platform-label">Login Failures (24h)</span>
+            </div>
+            <div className="platform-stat">
+              <span className="platform-val">{loading ? "—" : (data?.platformSummary?.thisMonthCompanies ?? 0)}</span>
+              <span className="platform-label">New Companies</span>
+            </div>
+            <div className="platform-stat">
+              <span className="platform-val">{loading ? "—" : (data?.platformSummary?.thisMonthUsers ?? 0)}</span>
+              <span className="platform-label">New Users</span>
+            </div>
+            <div className="platform-stat">
+              <span className="platform-val">{loading ? "—" : (data?.platformSummary?.countriesCount ?? 0)}</span>
+              <span className="platform-label">Countries</span>
             </div>
           </div>
-          <a href="/admin/backup-restore" className="storage-btn">Manage Storage</a>
+          <a href="/admin/system" className="platform-btn">View System Health</a>
         </article>
       </section>
     </div>
@@ -358,13 +383,6 @@ function getDateRange() {
   return `${fmt(start)} – ${fmt(end)}`;
 }
 
-const PLACEHOLDER_CHECKS = [
-  { label: "Server Status", ok: true },
-  { label: "Database", ok: true },
-  { label: "Queue Workers", ok: true },
-  { label: "Storage", ok: true },
-  { label: "Backup Status", ok: true },
-];
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 function CalendarIcon() {
@@ -461,22 +479,6 @@ function DonutChart({ items }: { items: DashboardPayload["subscriptionOverview"]
   );
 }
 
-function StorageDonut({ used }: { used: number }) {
-  const circ = 251.2;
-  const usedLen = (used / 100) * circ;
-  return (
-    <svg width="130" height="130" viewBox="0 0 130 130" aria-hidden="true">
-      <circle cx="65" cy="65" r="40" fill="none" stroke="rgba(148,163,184,.12)" strokeWidth="18" />
-      <circle cx="65" cy="65" r="40" fill="none" stroke="#8b5cf6" strokeWidth="18"
-        strokeDasharray={`${usedLen} ${circ - usedLen}`}
-        strokeDashoffset={circ * 0.25}
-        strokeLinecap="round"
-      />
-      <text x="65" y="61" textAnchor="middle" fill="var(--text, #f8fafc)" fontSize="20" fontWeight="800">{used}%</text>
-      <text x="65" y="78" textAnchor="middle" fill="rgba(148,163,184,.7)" fontSize="11">Used</text>
-    </svg>
-  );
-}
 
 // ── Styles ─────────────────────────────────────────────────────────────────
 const dashboardStyles = `
@@ -671,29 +673,29 @@ tbody tr:last-child td{border-bottom:none;}
 .activity-time{color:var(--text-muted);font-size:11px;white-space:nowrap;}
 .empty-note{color:var(--text-muted);font-size:13px;}
 
-/* Storage */
-.storage-card{display:flex;flex-direction:column;}
-.storage-layout{
-  display:flex;flex-direction:column;align-items:center;
-  gap:14px;margin:10px 0;
+/* Platform Summary */
+.platform-card{display:flex;flex-direction:column;}
+.platform-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:10px;margin:10px 0;flex:1;
 }
-.storage-meta{width:100%;display:grid;gap:8px;}
-.storage-row{
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:12px;color:var(--text-muted);
+.platform-stat{
+  display:flex;flex-direction:column;gap:3px;
+  padding:10px 12px;border-radius:12px;
+  background:var(--bg-soft,rgba(255,255,255,.04));
+  border:1px solid var(--border);
 }
-.storage-val{font-weight:700;color:var(--text);}
-.storage-val--used{color:#a78bfa;}
-.storage-val--free{color:#4ad37a;}
-.storage-btn{
-  display:block;margin-top:auto;padding-top:16px;
+.platform-val{font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1;}
+.platform-label{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.platform-btn{
+  display:block;margin-top:auto;
   text-align:center;padding:10px 14px;border-radius:14px;
-  background:var(--panel-2,rgba(255,255,255,.04));
-  border:1px solid var(--border);color:var(--text-soft);
-  text-decoration:none;font-size:13px;font-weight:700;
+  background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(90,61,248,.18));
+  border:1px solid rgba(143,110,255,.3);
+  color:#c4b5fd;text-decoration:none;font-size:13px;font-weight:700;
   transition:background .14s ease;
 }
-.storage-btn:hover{background:var(--bg-soft);}
+.platform-btn:hover{background:linear-gradient(135deg,rgba(124,58,237,.38),rgba(90,61,248,.28));}
 
 /* ── Responsive: Tablet 768–1024px ─────────────────────────────── */
 @media (max-width: 1024px){
@@ -702,7 +704,7 @@ tbody tr:last-child td{border-bottom:none;}
   .system-card{flex-direction:row;flex-wrap:wrap;gap:18px;align-items:flex-start;}
   .system-card h2{width:100%;}
   .gauge-wrap{margin:0;}
-  .storage-layout{flex-direction:row;align-items:center;}
+  .platform-grid{grid-template-columns:repeat(3,1fr);}
 }
 
 /* ── Responsive: Mobile 320–767px ──────────────────────────────── */
@@ -729,6 +731,6 @@ tbody tr:last-child td{border-bottom:none;}
   th:nth-child(2),td:nth-child(2),
   th:nth-child(3),td:nth-child(3){display:none;}
   .bottom-grid{grid-template-columns:1fr;}
-  .storage-layout{flex-direction:row;align-items:center;}
+  .platform-grid{grid-template-columns:1fr 1fr;}
 }
 `;
