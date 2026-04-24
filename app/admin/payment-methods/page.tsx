@@ -20,7 +20,7 @@ export default function AdminPaymentMethodsPage() {
       emptyTitle="No payment methods configured"
       emptyHint="If billing is provider-managed, checkout methods will be controlled by that provider."
       columns={[
-        { key: "provider", label: "Provider", render: (item) => <span style={{ fontWeight: 700, color: "white" }}>{item.provider || "-"}</span> },
+        { key: "provider", label: "Provider", render: (item) => <span style={{ fontWeight: 700, color: "var(--text)" }}>{item.provider || "-"}</span> },
         {
           key: "managed",
           label: "Managed By",

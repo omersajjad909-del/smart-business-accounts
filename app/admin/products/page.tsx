@@ -22,7 +22,7 @@ export default function AdminProductsPage() {
       emptyHint="Add products from your inventory workflow and they will appear here."
       columns={[
         { key: "code", label: "Code", render: (item) => item.code || "-" },
-        { key: "name", label: "Product", render: (item) => <span style={{ fontWeight: 700, color: "white" }}>{item.name || "-"}</span> },
+        { key: "name", label: "Product", render: (item) => <span style={{ fontWeight: 700, color: "var(--text)" }}>{item.name || "-"}</span> },
         { key: "category", label: "Category", render: (item) => item.category || "-" },
         { key: "unit", label: "Unit", render: (item) => item.unit || "-" },
         { key: "rate", label: "Rate", render: (item) => (item.rate ?? 0).toLocaleString() },

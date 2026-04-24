@@ -71,47 +71,34 @@ export default function AdminMasterDataPage<T>({
     }
 
     load();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [endpoint]);
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", paddingBottom: 40 }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "var(--text)", paddingBottom: 40 }}>
+      <style>{masterStyles}</style>
+
       <div style={{ marginBottom: 26 }}>
-        <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800 }}>{title}</h1>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.46)" }}>{subtitle}</p>
+        <h1 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 800, color: "var(--text)" }}>{title}</h1>
+        <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>{subtitle}</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14, marginBottom: 20 }}>
-        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "20px 22px" }}>
-          <div style={{ fontSize: 12, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.38)", fontWeight: 700 }}>
-            {metricLabel}
-          </div>
-          <div style={{ marginTop: 8, fontSize: 34, fontWeight: 800, color: "#a78bfa" }}>
+        <div className="master-metric-card">
+          <div className="master-metric-label">{metricLabel}</div>
+          <div className="master-metric-value">
             {loading ? "..." : items.length}
           </div>
         </div>
       </div>
 
-      <div style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, overflow: "hidden" }}>
+      <div className="master-table-wrap">
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 680 }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+              <tr className="master-thead-row">
                 {columns.map((column) => (
-                  <th
-                    key={column.key}
-                    style={{
-                      padding: "14px 16px",
-                      textAlign: "left",
-                      fontSize: 11,
-                      fontWeight: 800,
-                      letterSpacing: ".08em",
-                      textTransform: "uppercase",
-                      color: "rgba(255,255,255,.34)",
-                    }}
-                  >
+                  <th key={column.key} className="master-th">
                     {column.label}
                   </th>
                 ))}
@@ -120,28 +107,28 @@ export default function AdminMasterDataPage<T>({
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={columns.length} style={{ padding: 42, textAlign: "center", color: "rgba(255,255,255,.38)" }}>
-                    Loading...
+                  <td colSpan={columns.length} className="master-state-cell">
+                    <span className="master-loading-dots">Loading</span>
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={columns.length} style={{ padding: 42, textAlign: "center", color: "#fda4af" }}>
+                  <td colSpan={columns.length} className="master-state-cell master-error-cell">
                     {error}
                   </td>
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} style={{ padding: 42, textAlign: "center" }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,.7)" }}>{emptyTitle}</div>
-                    <div style={{ marginTop: 6, fontSize: 12, color: "rgba(255,255,255,.4)" }}>{emptyHint}</div>
+                  <td colSpan={columns.length} className="master-state-cell">
+                    <div className="master-empty-title">{emptyTitle}</div>
+                    <div className="master-empty-hint">{emptyHint}</div>
                   </td>
                 </tr>
               ) : (
                 items.map((item, index) => (
-                  <tr key={index} style={{ borderBottom: index === items.length - 1 ? "none" : "1px solid rgba(255,255,255,.05)" }}>
+                  <tr key={index} className={`master-row${index === items.length - 1 ? " master-row--last" : ""}`}>
                     {columns.map((column) => (
-                      <td key={column.key} style={{ padding: "15px 16px", fontSize: 13, color: "rgba(255,255,255,.82)" }}>
+                      <td key={column.key} className="master-td">
                         {column.render(item)}
                       </td>
                     ))}
@@ -155,3 +142,88 @@ export default function AdminMasterDataPage<T>({
     </div>
   );
 }
+
+const masterStyles = `
+.master-metric-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px 22px;
+}
+.master-metric-label {
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+.master-metric-value {
+  margin-top: 8px;
+  font-size: 34px;
+  font-weight: 800;
+  color: #a78bfa;
+}
+.master-table-wrap {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.master-thead-row {
+  border-bottom: 1px solid var(--border);
+}
+.master-th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.master-row {
+  border-bottom: 1px solid var(--border);
+  transition: background .12s ease;
+}
+.master-row:hover {
+  background: var(--bg-soft);
+}
+.master-row--last {
+  border-bottom: none;
+}
+.master-td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+.master-state-cell {
+  padding: 44px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.master-error-cell {
+  color: #fda4af;
+}
+.master-empty-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin-bottom: 6px;
+}
+.master-empty-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.master-loading-dots::after {
+  content: '...';
+  animation: masterDots 1.2s steps(3, end) infinite;
+}
+@keyframes masterDots {
+  0%   { content: '.'; }
+  33%  { content: '..'; }
+  66%  { content: '...'; }
+}
+`;

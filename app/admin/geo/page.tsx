@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type GeoPin = {
   type: "company" | "branch" | "visitor";
@@ -44,110 +44,108 @@ function StatCard({ label, value, sub }: { label: string; value: number; sub: st
 }
 
 function MapCanvas({ pins, color }: { pins: GeoPin[]; color: string }) {
-  const mapDivRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [nowTs] = useState(() => Date.now());
+  const width = 960;
+  const height = 560;
 
-  useEffect(() => {
-    if (!mapDivRef.current || mapRef.current) return;
+  const projectedPins = useMemo(
+    () =>
+      pins.map((pin) => {
+        const x = ((pin.lon + 180) / 360) * width;
+        const y = ((90 - pin.lat) / 180) * height;
+        const isLiveVisitor =
+          pin.type === "visitor" &&
+          !!pin.visitedAt &&
+          nowTs > 0 &&
+          nowTs - new Date(pin.visitedAt).getTime() < 30 * 60 * 1000;
 
-    if (!document.querySelector('link[data-maplibre-admin="true"]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "https://unpkg.com/maplibre-gl@3.5.2/dist/maplibre-gl.css";
-      link.setAttribute("data-maplibre-admin", "true");
-      document.head.appendChild(link);
-    }
+        return {
+          ...pin,
+          x,
+          y,
+          isLiveVisitor,
+        };
+      }),
+    [nowTs, pins],
+  );
 
-    function boot() {
-      const maplibregl = (window as any).maplibregl;
-      if (!mapDivRef.current || !maplibregl) return;
-      const map = new maplibregl.Map({
-        container: mapDivRef.current,
-        style: "https://demotiles.maplibre.org/style.json",
-        center: [18, 22],
-        zoom: 1.45,
-      });
-      map.addControl(new maplibregl.NavigationControl(), "top-right");
-      mapRef.current = map;
-    }
-
-    if ((window as any).maplibregl) {
-      boot();
-    } else {
-      const script = document.createElement("script");
-      script.src = "https://unpkg.com/maplibre-gl@3.5.2/dist/maplibre-gl.js";
-      script.async = true;
-      script.onload = boot;
-      document.body.appendChild(script);
-    }
-
-    return () => {
-      mapRef.current?.remove();
-      mapRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    const maplibregl = (window as any).maplibregl;
-    if (!map || !maplibregl) return;
-
-    const markers: any[] = [];
-    for (const pin of pins) {
-      const el = document.createElement("div");
-      const isExact = pin.precision === "exact";
-      const isLiveVisitor = pin.type === "visitor" && !!pin.visitedAt && Date.now() - new Date(pin.visitedAt).getTime() < 30 * 60 * 1000;
-      el.style.width = isExact ? "18px" : "12px";
-      el.style.height = isExact ? "18px" : "12px";
-      el.style.borderRadius = "9999px";
-      el.style.background = isExact ? color : "rgba(255,255,255,.58)";
-      el.style.border = isExact ? "2px solid rgba(255,255,255,.92)" : "1px solid rgba(255,255,255,.35)";
-      el.style.boxShadow = isExact ? `0 0 0 8px ${color}26` : "0 0 0 5px rgba(255,255,255,.08)";
-      if (isLiveVisitor) {
-        el.style.animation = "finovaGeoPulse 1.6s ease infinite";
-      }
-
-      const popupHtml = `
-        <div style="min-width:210px;font-family:system-ui,sans-serif">
-          <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:4px;">${pin.label}</div>
-          ${pin.subtitle ? `<div style="font-size:12px;color:#475569;margin-bottom:4px;">${pin.subtitle}</div>` : ""}
-          ${pin.address ? `<div style="font-size:12px;color:#334155;margin-bottom:2px;">${pin.address}</div>` : ""}
-          ${pin.city ? `<div style="font-size:12px;color:#475569;margin-bottom:2px;">City: ${pin.city}</div>` : ""}
-          <div style="font-size:12px;color:${isExact ? "#2563eb" : "#64748b"};font-weight:700;">
-            ${isExact ? "Exact pin" : "Country fallback"}
-          </div>
-        </div>
-      `;
-
-      const marker = new maplibregl.Marker({ element: el, anchor: "center" })
-        .setLngLat([pin.lon, pin.lat])
-        .setPopup(new maplibregl.Popup({ offset: 14 }).setHTML(popupHtml))
-        .addTo(map);
-      markers.push(marker);
-    }
-
-    if (pins.length) {
-      const bounds = new maplibregl.LngLatBounds();
-      pins.forEach((pin) => bounds.extend([pin.lon, pin.lat]));
-      map.fitBounds(bounds, { padding: 48, maxZoom: 4.2, duration: 600 });
-    }
-
-    return () => {
-      markers.forEach((marker) => marker.remove());
-    };
-  }, [pins, color]);
+  const activePin = activeIndex !== null ? projectedPins[activeIndex] : projectedPins[0] || null;
 
   return (
-    <>
+    <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-[#0d1428]">
       <style>{`
         @keyframes finovaGeoPulse {
-          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56,189,248,.55); }
-          70% { transform: scale(1.14); box-shadow: 0 0 0 14px rgba(56,189,248,0); }
-          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56,189,248,0); }
+          0% { transform: scale(1); opacity: .95; }
+          50% { transform: scale(1.18); opacity: .55; }
+          100% { transform: scale(1); opacity: .95; }
         }
       `}</style>
-      <div ref={mapDivRef} className="w-full rounded-2xl" style={{ minHeight: 360 }} />
-    </>
+
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,.18),transparent_28%),radial-gradient(circle_at_80%_18%,rgba(56,189,248,.14),transparent_22%),linear-gradient(180deg,rgba(9,14,28,.96),rgba(12,18,34,.98))]" />
+
+      <svg viewBox={`0 0 ${width} ${height}`} className="relative z-10 block w-full h-[520px]">
+        <defs>
+          <linearGradient id="geoGlow" x1="0" x2="1">
+            <stop offset="0%" stopColor="rgba(99,102,241,.16)" />
+            <stop offset="100%" stopColor="rgba(56,189,248,.08)" />
+          </linearGradient>
+        </defs>
+
+        {Array.from({ length: 7 }).map((_, index) => {
+          const y = 60 + index * 70;
+          return <line key={`h-${index}`} x1="0" y1={y} x2={width} y2={y} stroke="rgba(255,255,255,.06)" strokeWidth="1" />;
+        })}
+        {Array.from({ length: 11 }).map((_, index) => {
+          const x = 40 + index * 88;
+          return <line key={`v-${index}`} x1={x} y1="0" x2={x} y2={height} stroke="rgba(255,255,255,.05)" strokeWidth="1" />;
+        })}
+
+        <path d="M92 164c42-26 92-30 124-16 29 12 46 34 71 44 38 15 82-13 120-10 41 4 61 33 101 48 40 15 95 8 130 28 29 18 43 50 41 81-3 39-34 75-82 94-48 19-120 17-173 7-72-14-120-52-171-63-51-11-96 4-139-14-51-21-90-80-76-124 12-35 32-53 54-75z" fill="rgba(148,163,184,.16)" stroke="rgba(255,255,255,.07)" />
+        <path d="M542 146c38-34 88-44 130-34 44 10 68 42 98 58 36 20 80 20 116 41 38 22 66 63 62 103-4 45-47 85-103 96-68 13-143-15-194-29-54-15-88-12-123-36-35-23-60-73-48-118 9-35 28-55 62-81z" fill="rgba(148,163,184,.14)" stroke="rgba(255,255,255,.07)" />
+        <path d="M738 370c27-11 60-10 83 1 24 11 35 31 31 50-5 23-31 43-63 49-33 6-72-3-92-21-19-17-17-45 5-62 8-7 21-13 36-17z" fill="rgba(148,163,184,.13)" stroke="rgba(255,255,255,.06)" />
+
+        {projectedPins.map((pin, index) => {
+          const exact = pin.precision === "exact";
+          const active = index === activeIndex || (activeIndex === null && index === 0);
+          const dotColor = exact ? color : "rgba(255,255,255,.66)";
+          const radius = exact ? 6.5 : 4.5;
+
+          return (
+            <g key={`${pin.type}-${pin.label}-${index}`} onMouseEnter={() => setActiveIndex(index)} onMouseLeave={() => setActiveIndex(null)} style={{ cursor: "pointer" }}>
+              <circle cx={pin.x} cy={pin.y} r={exact ? 14 : 10} fill={exact ? `${color}22` : "rgba(255,255,255,.08)"} className={pin.isLiveVisitor ? "animate-[finovaGeoPulse_1.6s_ease-in-out_infinite]" : ""} />
+              <circle cx={pin.x} cy={pin.y} r={radius} fill={dotColor} stroke="rgba(15,23,42,.95)" strokeWidth="2" />
+              {active ? <circle cx={pin.x} cy={pin.y} r={exact ? 20 : 15} fill="none" stroke={dotColor} strokeOpacity=".45" /> : null}
+            </g>
+          );
+        })}
+      </svg>
+
+      <div className="absolute left-4 top-4 z-20 rounded-2xl border border-white/10 bg-[#0d1428]/88 px-4 py-3 backdrop-blur">
+        <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/38">Live Geo Map</div>
+        <div className="mt-2 flex gap-4 text-[11px] text-white/56">
+          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} /> Exact Pin</span>
+          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-white/60" /> Country Fallback</span>
+        </div>
+      </div>
+
+      {activePin ? (
+        <div className="absolute bottom-4 left-4 right-4 z-20 rounded-2xl border border-white/10 bg-[#10192f]/92 px-4 py-4 backdrop-blur">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="text-sm font-extrabold text-white">{activePin.label}</div>
+              {activePin.subtitle ? <div className="mt-1 text-xs text-white/50">{activePin.subtitle}</div> : null}
+              <div className="mt-2 text-xs text-white/36">
+                {activePin.city || activePin.country || "Unknown location"} · {activePin.lat.toFixed(4)}, {activePin.lon.toFixed(4)}
+              </div>
+            </div>
+            <div className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${activePin.precision === "exact" ? "bg-cyan-400/15 text-cyan-300" : "bg-white/10 text-white/45"}`}>
+              {activePin.precision === "exact" ? "Exact Pin" : "Country Fallback"}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
 

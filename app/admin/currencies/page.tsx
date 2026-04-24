@@ -20,7 +20,7 @@ export default function AdminCurrenciesPage() {
       emptyTitle="No currencies found"
       emptyHint="Add currencies in company settings to support multi-currency transactions."
       columns={[
-        { key: "code", label: "Code", render: (item) => <span style={{ fontWeight: 700, color: "white" }}>{item.code || "-"}</span> },
+        { key: "code", label: "Code", render: (item) => <span style={{ fontWeight: 700, color: "var(--text)" }}>{item.code || "-"}</span> },
         { key: "name", label: "Currency", render: (item) => item.name || "-" },
         { key: "symbol", label: "Symbol", render: (item) => item.symbol || "-" },
         { key: "rate", label: "Exchange Rate", render: (item) => String(item.exchangeRate ?? 1) },

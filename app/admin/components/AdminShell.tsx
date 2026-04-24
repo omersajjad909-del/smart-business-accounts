@@ -49,6 +49,7 @@ const ICONS: Record<string, ReactNode> = {
   alert: <Svg><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></Svg>,
   code: <Svg><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></Svg>,
   spark: <Svg><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></Svg>,
+  archive: <Svg><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" rx="1" /><line x1="10" y1="12" x2="14" y2="12" /></Svg>,
 };
 
 function Svg({ children }: { children: ReactNode }) {
@@ -56,11 +57,11 @@ function Svg({ children }: { children: ReactNode }) {
 }
 
 const QUICK_ACTIONS = [
-  { label: "Add Company", href: "/admin/companies" },
-  { label: "Add User", href: "/admin/users" },
-  { label: "Create Plan", href: "/admin/plans" },
-  { label: "Add Module", href: "/admin/business-modules" },
-  { label: "System Health", href: "/admin/system" },
+  { label: "Add Company",    href: "/admin/companies" },
+  { label: "Add User",       href: "/admin/users" },
+  { label: "Create Plan",    href: "/admin/plans" },
+  { label: "Add Module",     href: "/admin/business-modules" },
+  { label: "System Settings", href: "/admin/settings" },
 ];
 
 export default function AdminShell({ children }: { children: ReactNode }) {
@@ -421,6 +422,59 @@ const shellStyles = `
 .fin-admin-linkRow{display:block;padding:12px;border-radius:14px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--text);text-decoration:none;font-size:13px;font-weight:600}
 .fin-admin-linkRow--danger{width:100%;text-align:left;color:#fda4af;background:rgba(244,63,94,.08);cursor:pointer}
 .fin-admin-mobileNav,.fin-admin-fabWrap{display:none}
-@media (max-width: 1120px){.fin-admin-shell{grid-template-columns:1fr}.fin-admin-sidebar{position:fixed;inset:0 auto 0 0;width:min(88vw, 320px);transform:translateX(-100%);transition:transform .2s ease}.fin-admin-sidebar.is-open{transform:translateX(0)}.fin-admin-closeBtn,.fin-admin-menuBtn{display:inline-flex}}
-@media (max-width: 768px){.fin-admin-topbar{padding:12px 14px}.fin-admin-mobileBrand{display:block;line-height:1}.fin-admin-mobileBrandTitle{font-size:22px;font-weight:800;letter-spacing:-.04em}.fin-admin-mobileBrandSub{margin-top:2px;font-size:11px;color:var(--text-muted)}.fin-admin-search{display:none}.fin-admin-searchHint,.fin-admin-profileMeta{display:none}.fin-admin-page{padding:14px 14px 120px}.fin-admin-dropdown{width:min(88vw,320px)}.fin-admin-mobileNav{position:fixed;left:0;right:0;bottom:0;z-index:34;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:color-mix(in srgb, var(--panel) 92%, transparent);border-top:1px solid var(--border);backdrop-filter:blur(18px)}.fin-admin-mobileLink{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:7px 4px;color:var(--text-muted);text-decoration:none;border:none;border-radius:14px;background:transparent;font:inherit;font-size:10px;font-weight:600}.fin-admin-mobileLink.is-active{color:#a78bfa}.fin-admin-mobileIcon{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center}.fin-admin-fabWrap{position:fixed;right:18px;bottom:86px;z-index:35;display:flex;flex-direction:column;align-items:flex-end;gap:12px}.fin-admin-fabMenu{display:none;width:172px;padding:10px;border-radius:18px;background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--border-strong);box-shadow:var(--card-shadow)}.fin-admin-fabWrap.is-open .fin-admin-fabMenu{display:grid;gap:8px}.fin-admin-fabAction{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);color:var(--text);text-decoration:none;font-size:13px;font-weight:600}.fin-admin-fab{width:58px;height:58px;border:none;border-radius:999px;display:grid;place-items:center;background:linear-gradient(135deg, #6d28d9, #8b5cf6);color:#fff;font-size:32px;box-shadow:0 18px 35px rgba(109,40,217,.35)}}
+@media (max-width: 1024px){
+  .fin-admin-shell{grid-template-columns:1fr}
+  .fin-admin-sidebar{position:fixed;inset:0 auto 0 0;width:min(88vw,300px);transform:translateX(-100%);transition:transform .22s ease}
+  .fin-admin-sidebar.is-open{transform:translateX(0)}
+  .fin-admin-closeBtn,.fin-admin-menuBtn{display:inline-flex}
+}
+@media (max-width: 767px){
+  .fin-admin-topbar{padding:11px 14px}
+  .fin-admin-mobileBrand{display:block;line-height:1}
+  .fin-admin-mobileBrandTitle{font-size:21px;font-weight:800;letter-spacing:-.04em}
+  .fin-admin-mobileBrandSub{margin-top:2px;font-size:11px;color:var(--text-muted)}
+  .fin-admin-search{display:none}
+  .fin-admin-searchHint,.fin-admin-profileMeta{display:none}
+  .fin-admin-page{padding:12px 12px 116px}
+  .fin-admin-dropdown{width:min(92vw,320px)}
+  .fin-admin-mobileNav{
+    position:fixed;left:0;right:0;bottom:0;z-index:34;
+    display:grid;grid-template-columns:repeat(4,1fr);
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+    background:color-mix(in srgb,var(--panel) 94%,transparent);
+    border-top:1px solid var(--border);backdrop-filter:blur(20px);
+    box-shadow:0 -4px 24px rgba(3,6,18,.18);
+  }
+  .fin-admin-mobileLink{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;padding:7px 4px;color:var(--text-muted);text-decoration:none;
+    border:none;border-radius:14px;background:transparent;
+    font:inherit;font-size:10px;font-weight:600;cursor:pointer;
+  }
+  .fin-admin-mobileLink.is-active{color:#a78bfa}
+  .fin-admin-mobileIcon{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center}
+  .fin-admin-fabWrap{
+    position:fixed;right:16px;bottom:80px;z-index:35;
+    display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+  }
+  .fin-admin-fabMenu{
+    display:none;width:178px;padding:10px;
+    border-radius:18px;background:linear-gradient(180deg,var(--panel),var(--panel-2));
+    border:1px solid var(--border-strong);box-shadow:var(--card-shadow);
+  }
+  .fin-admin-fabWrap.is-open .fin-admin-fabMenu{display:grid;gap:6px}
+  .fin-admin-fabAction{
+    padding:10px 12px;border-radius:12px;
+    background:rgba(255,255,255,.03);color:var(--text);
+    text-decoration:none;font-size:13px;font-weight:600;
+    display:flex;align-items:center;gap:8px;
+  }
+  .fin-admin-fab{
+    width:56px;height:56px;border:none;border-radius:999px;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#6d28d9,#8b5cf6);
+    color:#fff;font-size:30px;
+    box-shadow:0 16px 32px rgba(109,40,217,.38);cursor:pointer;
+  }
+}
 `;
