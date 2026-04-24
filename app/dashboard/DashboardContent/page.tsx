@@ -70,43 +70,64 @@ function AIInsightPanel({companyId,role,userId}:{companyId:string;role:string;us
   const scoreLabel=sc>=75?"Good":sc>=55?"Fair":"Poor";
 
   return (
-    <div style={{borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",display:"flex",flexDirection:"column",height:"100%",overflow:"hidden"}}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 20px 0"}}>
-        <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>AI Insights</div>
-        <Link prefetch={false} href="/dashboard/ai" style={{fontSize:11,color:"#818cf8",textDecoration:"none",fontWeight:600}}>View all</Link>
-      </div>
-      <div style={{margin:"14px 16px 0",borderRadius:14,background:"linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.06))",border:"1px solid rgba(99,102,241,.22)",padding:"18px",flex:1,display:"flex",flexDirection:"column",gap:12}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div style={{display:"flex",alignItems:"center",gap:7}}>
-            <span style={{fontSize:15}}>✨</span>
-            <span style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>Smart Insight</span>
-          </div>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+    <div style={{borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",display:"flex",flexDirection:"column",height:"100%",overflow:"hidden",position:"relative"}}>
+      {/* Header */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 18px 0"}}>
+        <div style={{display:"flex",alignItems:"center",gap:7}}>
+          <div style={{fontSize:14,fontWeight:800,color:"var(--text-primary)"}}>AI Insights</div>
+          <span style={{padding:"1px 7px",borderRadius:20,background:"rgba(99,102,241,.2)",border:"1px solid rgba(99,102,241,.3)",fontSize:9,fontWeight:700,color:"#818cf8"}}>NEW</span>
         </div>
-        <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
-          <div style={{flex:1}}>
-            {loading ? (
-              <div style={{fontSize:12,color:"var(--text-muted)"}}>Loading insights…</div>
-            ) : <>
-              <p style={{margin:"0 0 10px",fontSize:12,color:"rgba(255,255,255,.75)",lineHeight:1.75}}>
-                {topAlert||"Your business financials look healthy. Keep tracking expenses to maintain profitability."}
-              </p>
-              {sc>0&&<div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
-                <span style={{fontSize:10,color:"var(--text-muted)"}}>Health Score:</span>
-                <span style={{padding:"1px 9px",borderRadius:20,background:`${scoreColor}18`,border:`1px solid ${scoreColor}30`,fontSize:10,fontWeight:700,color:scoreColor}}>{scoreLabel} {sc}/100</span>
-              </div>}
-              <Link prefetch={false} href="/dashboard/ai" style={{display:"inline-flex",alignItems:"center",gap:5,padding:"7px 14px",borderRadius:9,background:"rgba(99,102,241,.2)",border:"1px solid rgba(99,102,241,.3)",color:"#a5b4fc",fontSize:11,fontWeight:700,textDecoration:"none"}}>
-                View Full Insight →
-              </Link>
-            </>}
-          </div>
-          <div style={{width:76,height:76,borderRadius:"50%",background:"radial-gradient(circle at 35% 35%,rgba(167,139,250,.45),rgba(79,70,229,.7))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:34,flexShrink:0,boxShadow:"0 0 28px rgba(139,92,246,.45)"}}>
+        <Link prefetch={false} href="/dashboard/ai" style={{fontSize:11,color:"#818cf8",textDecoration:"none",fontWeight:600}}>View all →</Link>
+      </div>
+
+      {/* Brain illustration */}
+      <div style={{display:"flex",justifyContent:"center",alignItems:"center",padding:"18px 0 8px",position:"relative"}}>
+        {/* Stars/sparkles */}
+        <div style={{position:"absolute",top:8,left:"20%",fontSize:12,opacity:.7,animation:"ai-twinkle 2s ease-in-out infinite"}}>✦</div>
+        <div style={{position:"absolute",top:14,right:"18%",fontSize:9,opacity:.5,animation:"ai-twinkle 2.4s ease-in-out .6s infinite"}}>✦</div>
+        <div style={{position:"absolute",bottom:14,left:"16%",fontSize:8,opacity:.4,animation:"ai-twinkle 1.8s ease-in-out 1s infinite"}}>✦</div>
+        <div style={{position:"absolute",bottom:10,right:"22%",fontSize:11,opacity:.6,animation:"ai-twinkle 2.2s ease-in-out .3s infinite"}}>✦</div>
+        {/* Glowing rings */}
+        <div style={{position:"relative",width:110,height:110,display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div style={{position:"absolute",inset:0,borderRadius:"50%",background:"radial-gradient(circle,rgba(99,102,241,.18) 0%,transparent 70%)",animation:"ai-pulse 3s ease-in-out infinite"}}/>
+          <div style={{position:"absolute",inset:10,borderRadius:"50%",background:"radial-gradient(circle,rgba(139,92,246,.22) 0%,transparent 70%)",animation:"ai-pulse 3s ease-in-out .8s infinite"}}/>
+          {/* Brain circle */}
+          <div style={{width:86,height:86,borderRadius:"50%",background:"radial-gradient(circle at 38% 35%,rgba(167,139,250,.55),rgba(79,70,229,.85))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:42,boxShadow:"0 0 36px rgba(99,102,241,.5),0 0 64px rgba(139,92,246,.25)",border:"1.5px solid rgba(129,140,248,.3)"}}>
             🧠
           </div>
         </div>
       </div>
-      <div style={{display:"flex",justifyContent:"center",gap:5,padding:"12px 0 14px"}}>
-        {[0,1,2].map(i=><div key={i} style={{width:i===0?18:6,height:5,borderRadius:3,background:i===0?"#6366f1":"rgba(99,102,241,.2)",transition:"width .2s"}}/>)}
+
+      {/* Insight card */}
+      <div style={{margin:"0 14px 14px",borderRadius:14,background:"linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.06))",border:"1px solid rgba(99,102,241,.22)",padding:"14px 16px",flex:1,display:"flex",flexDirection:"column",gap:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <span style={{fontSize:13}}>✨</span>
+          <span style={{fontSize:12,fontWeight:700,color:"var(--text-primary)"}}>Smart Insight</span>
+        </div>
+        <div style={{flex:1}}>
+          {loading ? (
+            <div style={{display:"flex",gap:5,alignItems:"center"}}>
+              <div style={{width:8,height:8,borderRadius:"50%",background:"#6366f1",animation:"ai-dot 1.2s ease 0s infinite"}}/>
+              <div style={{width:8,height:8,borderRadius:"50%",background:"#6366f1",animation:"ai-dot 1.2s ease .2s infinite"}}/>
+              <div style={{width:8,height:8,borderRadius:"50%",background:"#6366f1",animation:"ai-dot 1.2s ease .4s infinite"}}/>
+            </div>
+          ) : <>
+            <p style={{margin:"0 0 10px",fontSize:11.5,color:"rgba(255,255,255,.75)",lineHeight:1.7}}>
+              {topAlert||"Your business financials look healthy. Keep tracking expenses to maintain profitability."}
+            </p>
+            {sc>0&&<div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
+              <span style={{fontSize:10,color:"var(--text-muted)"}}>Health Score:</span>
+              <span style={{padding:"2px 9px",borderRadius:20,background:`${scoreColor}18`,border:`1px solid ${scoreColor}30`,fontSize:10,fontWeight:700,color:scoreColor}}>{scoreLabel} · {sc}/100</span>
+            </div>}
+            <Link prefetch={false} href="/dashboard/ai" style={{display:"inline-flex",alignItems:"center",gap:5,padding:"7px 14px",borderRadius:9,background:"linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.18))",border:"1px solid rgba(99,102,241,.3)",color:"#c4b5fd",fontSize:11,fontWeight:700,textDecoration:"none"}}>
+              View Full Insight →
+            </Link>
+            </>}
+          </div>
+      </div>
+      {/* Page indicator dots */}
+      <div style={{display:"flex",justifyContent:"center",gap:5,padding:"10px 0 12px"}}>
+        {[0,1,2].map(i=><div key={i} style={{width:i===0?18:6,height:4,borderRadius:3,background:i===0?"#6366f1":"rgba(99,102,241,.2)",transition:"width .2s"}}/>)}
       </div>
     </div>
   );
@@ -185,8 +206,8 @@ export default function DashboardContent() {
           const eb=await eR.value.json();
           const rows=eb.rows||[];
           const EC=["#ef4444","#f59e0b","#6366f1","#10b981","#38bdf8"];
-          const tot=rows.reduce((a:number,r:any)=>a+Number(r.current||0),0);
-          if(tot>0)setDonut(rows.slice(0,5).map((r:any,i:number)=>({name:r.label||"Other",value:Number(r.current||0),color:EC[i]})));
+          const tot=rows.reduce((a:number,r:any)=>a+Number(r.amount||0),0);
+          if(tot>0)setDonut(rows.slice(0,5).map((r:any,i:number)=>({name:r.category||r.label||"Other",value:Number(r.amount||0),color:EC[i]})));
         }
       } catch(e){console.error("Dashboard:",e);}
       finally{setLoad(false);}
@@ -247,6 +268,9 @@ export default function DashboardContent() {
       <style>{`
         @keyframes db-spin{to{transform:rotate(360deg)}}
         @keyframes db-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes ai-pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+        @keyframes ai-twinkle{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+        @keyframes ai-dot{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 
         .db-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
         @media(max-width:1100px){.db-kpi{grid-template-columns:repeat(2,1fr);}}

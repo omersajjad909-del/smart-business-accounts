@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
       where: { id: payload.userId },
       select: {
         id: true, name: true, email: true, role: true,
-        defaultCompanyId: true,
+        defaultCompanyId: true, avatar: true,
         permissions: { select: { permission: true, companyId: true } },
       },
     });
@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
       email: user.email,
       role: (user.role || "VIEWER").toUpperCase(),
       companyId,
+      avatar: user.avatar || null,
       permissions: userPermissions,
       rolePermissions: [],
       companies: companies.map((c: any) => ({

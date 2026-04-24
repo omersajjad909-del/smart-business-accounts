@@ -113,6 +113,7 @@ type CurrentUser = {
   email: string;
   role: string;
   businessType?: string | null;
+  avatar?: string | null;
   permissions: PermissionEntry[];
   rolePermissions: PermissionEntry[];
   companyId?: string | null;
@@ -175,6 +176,8 @@ export default function DashboardLayout({
       "trading"
   );
   const [companyPlan, setCompanyPlan] = useState("STARTER");
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [allowedBranchIds, setAllowedBranchIds] = useState<string[] | null>(null);
   const [activeBranchId, setActiveBranchId] = useState<string>("all");
@@ -288,6 +291,8 @@ export default function DashboardLayout({
         setReady(true);
         return;
       }
+
+      if (u.avatar) setUserAvatar(u.avatar);
 
       if (u.role === "ADMIN") {
         setCurrentUser(u);
@@ -1727,13 +1732,44 @@ export default function DashboardLayout({
                 borderRadius:14,padding:"6px",zIndex:50,
                 boxShadow:"0 -20px 60px rgba(0,0,0,0.6)",
               }}>
-                {/* Company info at top */}
+                {/* User + avatar at top */}
                 <div style={{padding:"12px 12px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)",marginBottom:4}}>
                   <div style={{display:"flex",alignItems:"center",gap:10}}>
-                    <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>🏢</div>
+                    {/* Clickable avatar for upload */}
+                    <label htmlFor="sidebar-avatar-input" style={{cursor:"pointer",flexShrink:0,position:"relative"}}>
+                      <div style={{width:42,height:42,borderRadius:12,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"white",overflow:"hidden",border:"2px solid rgba(99,102,241,0.35)"}}>
+                        {userAvatar
+                          ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                          : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
+                        }
+                      </div>
+                      {/* Camera overlay */}
+                      <div style={{position:"absolute",bottom:-3,right:-3,width:16,height:16,borderRadius:"50%",background:"#4f46e5",border:"1.5px solid #0e1120",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                      </div>
+                    </label>
+                    <input id="sidebar-avatar-input" type="file" accept="image/*" style={{display:"none"}} onChange={async(e)=>{
+                      const f=e.target.files?.[0]; if(!f)return;
+                      setAvatarUploading(true);
+                      try{
+                        const fd=new FormData(); fd.append("avatar",f);
+                        const r=await fetch("/api/me/avatar",{method:"POST",body:fd});
+                        if(r.ok){const d=await r.json();setUserAvatar(d.avatar);}
+                      }catch{}finally{setAvatarUploading(false);e.target.value="";}
+                    }}/>
                     <div style={{minWidth:0}}>
-                      <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</div>
-                      <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",marginTop:1,textTransform:"capitalize"}}>
+                      <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
+                      <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:1,textTransform:"capitalize"}}>
+                        {(currentUser.role||"User").toLowerCase()} · {avatarUploading?"Uploading…":"Tap photo to change"}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Company row below */}
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginTop:10,padding:"8px 10px",borderRadius:9,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)"}}>
+                    <div style={{width:26,height:26,borderRadius:8,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0}}>🏢</div>
+                    <div style={{minWidth:0}}>
+                      <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.8)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</div>
+                      <div style={{fontSize:9,color:"rgba(255,255,255,0.3)",textTransform:"capitalize"}}>
                         {companyDetail?.businessType ? companyDetail.businessType.replace(/_/g," ") : "Business"} · {companyDetail?.plan || "STARTER"}
                       </div>
                     </div>
@@ -1784,14 +1820,17 @@ export default function DashboardLayout({
             onMouseLeave={e=>{if(!showUserMenu)e.currentTarget.style.background="transparent";}}
           >
             {/* Avatar */}
-            <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"white",flexShrink:0}}>
-              {(currentUser.name || currentUser.email || "U")[0].toUpperCase()}
+            <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"white",flexShrink:0,overflow:"hidden",position:"relative"}}>
+              {userAvatar
+                ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:10}}/>
+                : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
+              }
             </div>
-            {/* Name + company */}
+            {/* Name + role */}
             {!sidebarCollapsed && (
               <div style={{minWidth:0,flex:1}}>
                 <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.85)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{currentUser.name || "User"}</div>
-                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{companyName}</div>
+                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",textTransform:"capitalize"}}>{(currentUser.role||"User").toLowerCase()}</div>
               </div>
             )}
             {/* Chevron up/down */}
@@ -1870,28 +1909,52 @@ export default function DashboardLayout({
           )}
 
           {/* Right side */}
-          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:isMobileViewport ? 8 : 10,flexWrap:"wrap"}}>
+          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:isMobileViewport ? 6 : 10,flexWrap:"nowrap"}}>
             <WhatsNew />
             <ModeToggle />
 
+            {/* + New button — desktop only */}
+            {!isMobileViewport && (
+              <Link prefetch={false} href="/dashboard/sales-invoice/new"
+                style={{display:"flex",alignItems:"center",gap:5,padding:"6px 14px",borderRadius:9,background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:12,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap",transition:"opacity .15s",boxShadow:"0 2px 10px rgba(99,102,241,.35)"}}
+                onMouseEnter={e=>e.currentTarget.style.opacity=".85"}
+                onMouseLeave={e=>e.currentTarget.style.opacity="1"}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New
+              </Link>
+            )}
+
             {/* Subscription badge — only for ADMIN */}
-            {subInfo && currentUser?.role === "ADMIN" && (
+            {subInfo && currentUser?.role === "ADMIN" && !isMobileViewport && (
               <div style={{
-                fontSize:11,padding:"4px 10px",borderRadius:6,fontWeight:600,
+                fontSize:10,padding:"3px 8px",borderRadius:6,fontWeight:700,
                 border: subInfo.status === "ACTIVE" ? "1px solid rgba(52,211,153,0.3)" : "1px solid rgba(248,113,113,0.3)",
                 color: subInfo.status === "ACTIVE" ? "#34d399" : "#f87171",
                 background: subInfo.status === "ACTIVE" ? "rgba(52,211,153,0.08)" : "rgba(248,113,113,0.08)",
               }}>
-                {subInfo.plan} · {subInfo.status}
+                {subInfo.plan}
               </div>
             )}
 
-            {/* User name */}
+            {/* User avatar + name */}
             <div
-              style={{fontSize:12,color:"rgba(255,255,255,0.5)",fontWeight:500}}
-              className="hidden md:block"
+              className="hidden md:flex"
+              style={{display:"flex",alignItems:"center",gap:7,padding:"4px 8px 4px 4px",borderRadius:10,cursor:"pointer",transition:"background .15s",background:"transparent"}}
+              onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.05)"}
+              onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+              onClick={()=>setShowUserMenu(v=>!v)}
             >
-              {currentUser.name || currentUser.email}
+              <div style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"white",overflow:"hidden",flexShrink:0}}>
+                {userAvatar
+                  ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                  : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
+                }
+              </div>
+              <div style={{display:"flex",flexDirection:"column"}}>
+                <span style={{fontSize:12,fontWeight:700,color:"var(--text-primary)",whiteSpace:"nowrap",lineHeight:1.2}}>{currentUser.name || "User"}</span>
+                <span style={{fontSize:9,color:"var(--text-muted)",textTransform:"capitalize",lineHeight:1.2}}>{(currentUser.role||"User").toLowerCase()}</span>
+              </div>
             </div>
           </div>
         </div>
