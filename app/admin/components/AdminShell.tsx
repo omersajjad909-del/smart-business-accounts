@@ -317,7 +317,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           <header className="fin-admin-topbar">
             <div className="fin-admin-topbarLeft">
               <button type="button" className="fin-admin-menuBtn" onClick={() => setMobileOpen(true)}>
-                <img src="icon1.png" alt=""  className="fin-admin-menuIcon"/>
+                <img src="icon1.png" alt=""  className="w-6 h-6"/>
               </button>
 
               <div className="fin-admin-mobileBrand">
