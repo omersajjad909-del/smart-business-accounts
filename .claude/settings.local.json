@@ -128,7 +128,8 @@
       "Bash(xargs '-I{}' bash -c 'file=$\\(echo \"{}\" | cut -d: -f1\\); line=$\\(echo \"{}\" | cut -d: -f2\\); grep -n \"setError\" \"$file\" | head -3; echo \"---\"')",
       "Bash(grep -v \"//.*return\\\\|returnUrl\\\\|return res\\\\|return null\\\\|return;\\\\|.return\\\\|return {\")",
       "Bash(grep -v \"node_modules\\\\|//.*logo\")",
-      "Bash(grep -E \"for$|For$\")"
+      "Bash(grep -E \"for$|For$\")",
+      "Bash(grep -v \"\\\\\\\\[\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
