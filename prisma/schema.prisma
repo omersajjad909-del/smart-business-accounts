@@ -1943,6 +1943,66 @@ model PaymentFollowUpLog {
 }
 
 
+// ================= ADMIN PLATFORM MODULES =================
+
+model AdminProductCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  color       String   @default("#8b5cf6")
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdminTaxPreset {
+  id          String   @id @default(uuid())
+  country     String
+  countryCode String
+  region      String?
+  taxType     String   // GST | VAT | SALES_TAX | WHT | INCOME_TAX | EXCISE | CUSTOM
+  name        String
+  code        String   @unique
+  rate        Float
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([countryCode, isActive])
+}
+
+model PlatformCurrency {
+  id           String   @id @default(uuid())
+  code         String   @unique
+  name         String
+  symbol       String
+  flag         String?
+  isEnabled    Boolean  @default(true)
+  isDefault    Boolean  @default(false)
+  rateSource   String   @default("MANUAL")
+  exchangeRate Float    @default(1.0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isEnabled])
+}
+
+model AdminPaymentGateway {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  category    String   @default("OTHER")
+  isEnabled   Boolean  @default(false)
+  configJson  String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 // ================= STATUS SUBSCRIBERS =================
 
 model StatusSubscriber {
