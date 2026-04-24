@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
     const testCompany = await prisma.company.create({
       data: {
-        name: `[DEV TEST] ${user?.name || "Admin"}'s Workspace`,
+        name: `${user?.name || "Admin"}'s`,
         isActive: true,
         country: "PK",
         baseCurrency: "PKR",
