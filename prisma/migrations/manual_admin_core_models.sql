@@ -93,3 +93,64 @@ CREATE TABLE IF NOT EXISTS "public"."AdminProductCategory" (
 CREATE UNIQUE INDEX IF NOT EXISTS "AdminProductCategory_name_key"
   ON "public"."AdminProductCategory" ("name");
 
+-- 6) AdminTaxPreset
+CREATE TABLE IF NOT EXISTS "public"."AdminTaxPreset" (
+  "id"          TEXT PRIMARY KEY,
+  "country"     TEXT NOT NULL,
+  "countryCode" TEXT NOT NULL,
+  "region"      TEXT,
+  "taxType"     TEXT NOT NULL,
+  "name"        TEXT NOT NULL,
+  "code"        TEXT NOT NULL,
+  "rate"        DOUBLE PRECISION NOT NULL,
+  "isDefault"   BOOLEAN NOT NULL DEFAULT FALSE,
+  "isActive"    BOOLEAN NOT NULL DEFAULT TRUE,
+  "description" TEXT,
+  "createdAt"   TIMESTAMP NOT NULL DEFAULT NOW(),
+  "updatedAt"   TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "AdminTaxPreset_code_key"
+  ON "public"."AdminTaxPreset" ("code");
+
+CREATE INDEX IF NOT EXISTS "AdminTaxPreset_countryCode_isActive_idx"
+  ON "public"."AdminTaxPreset" ("countryCode", "isActive");
+
+-- 7) PlatformCurrency
+CREATE TABLE IF NOT EXISTS "public"."PlatformCurrency" (
+  "id"           TEXT PRIMARY KEY,
+  "code"         TEXT NOT NULL,
+  "name"         TEXT NOT NULL,
+  "symbol"       TEXT NOT NULL,
+  "flag"         TEXT,
+  "isEnabled"    BOOLEAN NOT NULL DEFAULT TRUE,
+  "isDefault"    BOOLEAN NOT NULL DEFAULT FALSE,
+  "rateSource"   TEXT NOT NULL DEFAULT 'MANUAL',
+  "exchangeRate" DOUBLE PRECISION NOT NULL DEFAULT 1.0,
+  "createdAt"    TIMESTAMP NOT NULL DEFAULT NOW(),
+  "updatedAt"    TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "PlatformCurrency_code_key"
+  ON "public"."PlatformCurrency" ("code");
+
+CREATE INDEX IF NOT EXISTS "PlatformCurrency_isEnabled_idx"
+  ON "public"."PlatformCurrency" ("isEnabled");
+
+-- 8) AdminPaymentGateway
+CREATE TABLE IF NOT EXISTS "public"."AdminPaymentGateway" (
+  "id"          TEXT PRIMARY KEY,
+  "key"         TEXT NOT NULL,
+  "name"        TEXT NOT NULL,
+  "description" TEXT,
+  "category"    TEXT NOT NULL DEFAULT 'OTHER',
+  "isEnabled"   BOOLEAN NOT NULL DEFAULT FALSE,
+  "configJson"  TEXT,
+  "sortOrder"   INTEGER NOT NULL DEFAULT 0,
+  "createdAt"   TIMESTAMP NOT NULL DEFAULT NOW(),
+  "updatedAt"   TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "AdminPaymentGateway_key_key"
+  ON "public"."AdminPaymentGateway" ("key");
+

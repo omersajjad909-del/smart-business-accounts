@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
 
+export const runtime = "nodejs";
+
 const DEFAULTS = [
   { country: "Pakistan",     countryCode: "PK", taxType: "GST",        name: "Pakistan GST",          code: "PK-GST-17",   rate: 17,  isDefault: true,  description: "General Sales Tax on goods & services" },
   { country: "Pakistan",     countryCode: "PK", taxType: "WHT",        name: "Pakistan WHT",          code: "PK-WHT-10",   rate: 10,  isDefault: false, description: "Withholding Tax on supplier payments" },
@@ -18,21 +20,80 @@ const DEFAULTS = [
   { country: "Australia",    countryCode: "AU", taxType: "GST",        name: "Australia GST",         code: "AU-GST-10",   rate: 10,  isDefault: false, description: "Goods and Services Tax" },
 ];
 
+function isMissingTableError(error: unknown) {
+  return !!(
+    error &&
+    typeof error === "object" &&
+    (
+      ("code" in error && error.code === "P2021") ||
+      ("message" in error && typeof error.message === "string" && error.message.includes("AdminTaxPreset"))
+    )
+  );
+}
+
+async function ensureAdminTaxPresetTable() {
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "public"."AdminTaxPreset" (
+      "id" TEXT NOT NULL,
+      "country" TEXT NOT NULL,
+      "countryCode" TEXT NOT NULL,
+      "region" TEXT,
+      "taxType" TEXT NOT NULL,
+      "name" TEXT NOT NULL,
+      "code" TEXT NOT NULL,
+      "rate" DOUBLE PRECISION NOT NULL,
+      "isDefault" BOOLEAN NOT NULL DEFAULT FALSE,
+      "isActive" BOOLEAN NOT NULL DEFAULT TRUE,
+      "description" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "AdminTaxPreset_pkey" PRIMARY KEY ("id")
+    );
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    CREATE UNIQUE INDEX IF NOT EXISTS "AdminTaxPreset_code_key"
+    ON "public"."AdminTaxPreset"("code");
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    CREATE INDEX IF NOT EXISTS "AdminTaxPreset_countryCode_isActive_idx"
+    ON "public"."AdminTaxPreset"("countryCode", "isActive");
+  `);
+}
+
+async function findPresets() {
+  try {
+    return await prisma.adminTaxPreset.findMany({
+      orderBy: [{ countryCode: "asc" }, { rate: "desc" }],
+    });
+  } catch (error) {
+    if (!isMissingTableError(error)) throw error;
+    await ensureAdminTaxPresetTable();
+    return prisma.adminTaxPreset.findMany({
+      orderBy: [{ countryCode: "asc" }, { rate: "desc" }],
+    });
+  }
+}
+
+async function seedDefaultsIfEmpty() {
+  const presets = await findPresets();
+  if (presets.length > 0) return presets;
+
+  await prisma.adminTaxPreset.createMany({
+    data: DEFAULTS,
+    skipDuplicates: true,
+  });
+
+  return findPresets();
+}
+
 export async function GET(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
-    let presets = await prisma.adminTaxPreset.findMany({
-      orderBy: [{ countryCode: "asc" }, { rate: "desc" }],
-    });
-
-    if (presets.length === 0) {
-      await prisma.adminTaxPreset.createMany({ data: DEFAULTS });
-      presets = await prisma.adminTaxPreset.findMany({
-        orderBy: [{ countryCode: "asc" }, { rate: "desc" }],
-      });
-    }
+    const presets = await seedDefaultsIfEmpty();
 
     const total     = presets.length;
     const active    = presets.filter((p) => p.isActive).length;
@@ -49,6 +110,7 @@ export async function POST(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
+    await ensureAdminTaxPresetTable();
     const body = await req.json();
     const preset = await prisma.adminTaxPreset.create({
       data: {
@@ -74,6 +136,7 @@ export async function PUT(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
+    await ensureAdminTaxPresetTable();
     const id = req.nextUrl.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     const body = await req.json();
@@ -98,6 +161,7 @@ export async function DELETE(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
+    await ensureAdminTaxPresetTable();
     const id = req.nextUrl.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     await prisma.adminTaxPreset.delete({ where: { id } });
