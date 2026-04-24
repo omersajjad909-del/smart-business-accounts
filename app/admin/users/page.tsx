@@ -447,6 +447,7 @@ const styles = `
   display:grid;gap:16px;
   font-family:'Outfit','DM Sans',sans-serif;
   position:relative;
+  width:100%;max-width:100%;overflow-x:hidden;
 }
 .users-header{margin-bottom:4px;}
 .users-header h1{margin:0;font-size:30px;font-weight:800;letter-spacing:-.05em;color:var(--text);}
@@ -659,7 +660,10 @@ const styles = `
   .users-form-grid{grid-template-columns:1fr;}
 }
 @media(max-width:767px){
-  .users-stats{grid-template-columns:1fr 1fr;}
+  .users-stats{grid-template-columns:1fr 1fr;gap:10px;}
+  .users-stat{padding:12px 14px;gap:10px;}
+  .users-stat-icon{width:36px;height:36px;border-radius:11px;}
+  .users-stat-val{font-size:24px;}
   .users-invite-row{flex-direction:column;}
   .users-invite-email{min-width:unset;}
   .users-filters{flex-direction:column;align-items:stretch;}
