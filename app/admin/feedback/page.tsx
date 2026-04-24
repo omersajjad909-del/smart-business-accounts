@@ -129,7 +129,8 @@ export default function AdminFeedbackPage() {
 
       {/* Table */}
       <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
           <thead>
             <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
               {["Type","Subject","From","Priority","Status","Date"].map(h => (
@@ -173,6 +174,7 @@ export default function AdminFeedbackPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Pagination */}

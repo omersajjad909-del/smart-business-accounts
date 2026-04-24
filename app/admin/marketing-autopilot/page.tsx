@@ -84,7 +84,11 @@ export default function MarketingAutopilotPage() {
   ];
 
   return (
-    <div style={{ fontFamily: F, color: "#e2e8f0", minHeight: "100vh", background: BG, padding: "32px 32px 60px 280px" }}>
+    <div style={{ fontFamily: F, color: "var(--text, #e2e8f0)", paddingBottom: 40, width: "100%", maxWidth: "100%", overflowX: "hidden" }}>
+      <style>{`
+        .map-tabs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+        @media(max-width:767px){.map-tabs-grid{grid-template-columns:repeat(2,1fr)!important}}
+      `}</style>
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
@@ -99,7 +103,7 @@ export default function MarketingAutopilotPage() {
       </div>
 
       {/* Tab cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div className="map-tabs-grid">
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             padding: "16px", borderRadius: 14, border: `2px solid ${tab === t.id ? t.color + "60" : BDR}`,

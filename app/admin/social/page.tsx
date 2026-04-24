@@ -218,6 +218,7 @@ export default function SocialMediaPage() {
 
   return (
     <div style={s.page}>
+      <style>{`@media(max-width:767px){.soc-compose-grid{grid-template-columns:1fr!important}}`}</style>
       {/* Header */}
       <div style={s.header}>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -323,7 +324,8 @@ export default function SocialMediaPage() {
 
         {/* ══ COMPOSE TAB ══ */}
         {tab === "compose" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "clamp(1fr, 1fr, 1fr) min(360px, 100%)", gap: 24 }}
+               className="soc-compose-grid">
             {/* Left: editor */}
             <div>
               <div style={{ fontSize: 16, fontWeight: 700, color: "white", marginBottom: 16 }}>Create Post</div>

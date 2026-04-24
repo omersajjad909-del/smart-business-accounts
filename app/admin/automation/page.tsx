@@ -119,7 +119,12 @@ export default function AdminAutomationPage() {
   ];
 
   return (
-    <div style={{ fontFamily: F, color: "#e2e8f0", minHeight: "100vh", background: BG, padding: "32px 32px 32px 280px" }}>
+    <div style={{ fontFamily: F, color: "var(--text, #e2e8f0)", paddingBottom: 40, width: "100%", maxWidth: "100%", overflowX: "hidden" }}>
+      <style>{`
+        .aut-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+        .aut-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:28px 0 24px}
+        @media(max-width:767px){.aut-stats-grid{grid-template-columns:repeat(2,1fr)!important}}
+      `}</style>
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
@@ -182,7 +187,7 @@ function AdminAutomationStats() {
   ];
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
+    <div className="aut-stats-grid">
       {items.map(s => (
         <Card key={s.label} style={{ padding: "16px 18px" }}>
           <div style={{ fontSize: 20, marginBottom: 8 }}>{s.icon}</div>

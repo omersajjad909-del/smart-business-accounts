@@ -155,7 +155,8 @@ export default function BusinessModulesPage() {
       </div>
 
       {/* KPI cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
+      <style>{`.bm-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}@media(max-width:767px){.bm-kpi{grid-template-columns:repeat(2,1fr)!important}}`}</style>
+      <div className="bm-kpi">
         {[
           { label: "Total Types",   val: modules.length,                          color: "#818cf8" },
           { label: "Live",          val: totalLive,                               color: "#34d399" },
