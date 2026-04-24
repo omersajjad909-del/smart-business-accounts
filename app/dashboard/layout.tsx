@@ -1974,97 +1974,91 @@ export default function DashboardLayout({
       {isMobileViewport && (
         <nav style={{
           position:"fixed", bottom:0, left:0, right:0, zIndex:25,
-          background:"rgba(8,12,30,0.96)", backdropFilter:"blur(20px)",
+          background:"rgba(8,12,30,0.97)", backdropFilter:"blur(24px)",
           borderTop:"1px solid rgba(255,255,255,0.08)",
           display:"flex", alignItems:"stretch",
           paddingBottom:"env(safe-area-inset-bottom)",
-          height:"calc(58px + env(safe-area-inset-bottom))",
+          height:"calc(62px + env(safe-area-inset-bottom))",
         }}>
-          {[
-            { type:"link", href:"/dashboard", label:"Home", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
-            {
-              type:"action",
-              key:"invoice",
-              label:"Invoice",
-              icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
-              onClick: () => {
-                router.push("/dashboard/invoices");
-              },
-            },
-            {
-              type:"action",
-              key:"reports",
-              label:"Reports",
-              icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
-              onClick: () => {
-                router.push("/dashboard/reports");
-              },
-            },
-            { type:"link", href:"/dashboard/ai-center", label:"AI", icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> },
-          ].map(item => {
-            const isInvoiceRoute =
-              pathname.startsWith("/dashboard/invoices") ||
-              pathname.startsWith("/dashboard/sales-") ||
-              pathname.startsWith("/dashboard/purchase-") ||
-              pathname.startsWith("/dashboard/quotation") ||
-              pathname.startsWith("/dashboard/delivery-challan") ||
-              pathname.startsWith("/dashboard/grn") ||
-              pathname.startsWith("/dashboard/payment-receipts");
-            const isReportsRoute = pathname.startsWith("/dashboard/reports") || pathname === "/dashboard/customer-statement" || pathname === "/dashboard/supplier-statement";
-            const isAIRoute = pathname.startsWith("/dashboard/ai-center") || pathname.startsWith("/dashboard/ai");
-            const isActive =
-              item.type === "link"
-                ? item.href === "/dashboard/ai-center"
-                  ? isAIRoute
-                  : pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
-                : item.key === "invoice"
-                ? isInvoiceRoute
-                : isReportsRoute;
+          {/* Home */}
+          <Link prefetch={false} href="/dashboard" style={{
+            flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+            gap:3, paddingTop:6, textDecoration:"none",
+            color: pathname==="/dashboard" ? "#818cf8" : "rgba(255,255,255,0.4)",
+            background: pathname==="/dashboard" ? "rgba(99,102,241,0.08)" : "transparent",
+            borderTop: pathname==="/dashboard" ? "2px solid #6366f1" : "2px solid transparent",
+            transition:"color .15s",
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span style={{fontSize:10,fontWeight:600}}>Home</span>
+          </Link>
 
-            const commonStyle = {
-              flex:1, display:"flex", flexDirection:"column" as const, alignItems:"center", justifyContent:"center",
-              gap:3, paddingTop:6,
-              color: isActive ? "#818cf8" : "rgba(255,255,255,0.4)",
-              background: isActive ? "rgba(99,102,241,0.08)" : "transparent",
-              transition:"color .15s, background .15s",
-              borderTop: isActive ? "2px solid #6366f1" : "2px solid transparent",
-            };
-
-            if (item.type === "link") {
-              return (
-                <Link prefetch={false} key={item.href} href={item.href} style={{ ...commonStyle, textDecoration:"none" }}>
-                  {item.icon}
-                  <span style={{fontSize:10,fontWeight:600,letterSpacing:".01em"}}>{item.label}</span>
-                </Link>
-              );
-            }
-
+          {/* Sales */}
+          {(() => {
+            const isSalesActive = pathname.startsWith("/dashboard/sales-") || pathname.startsWith("/dashboard/invoices") || pathname.startsWith("/dashboard/quotation") || pathname.startsWith("/dashboard/sales-order");
             return (
-              <button
-                key={item.key}
-                onClick={item.onClick}
-                style={{
-                  ...commonStyle,
-                  borderLeft:"none",
-                  borderRight:"none",
-                  borderBottom:"none",
-                  cursor:"pointer",
-                }}
-              >
-                {item.icon}
-                <span style={{fontSize:10,fontWeight:600,letterSpacing:".01em"}}>{item.label}</span>
-              </button>
+              <Link prefetch={false} href="/dashboard/invoices" style={{
+                flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+                gap:3, paddingTop:6, textDecoration:"none",
+                color: isSalesActive ? "#818cf8" : "rgba(255,255,255,0.4)",
+                background: isSalesActive ? "rgba(99,102,241,0.08)" : "transparent",
+                borderTop: isSalesActive ? "2px solid #6366f1" : "2px solid transparent",
+                transition:"color .15s",
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span style={{fontSize:10,fontWeight:600}}>Sales</span>
+              </Link>
             );
-          })}
-          {/* Menu tab — opens sidebar */}
+          })()}
+
+          {/* FAB — Centre + Button */}
+          <div style={{flex:1, display:"flex", alignItems:"center", justifyContent:"center", paddingTop:0}}>
+            <button
+              onClick={() => router.push("/dashboard/sales-invoice/new")}
+              style={{
+                width:52, height:52, borderRadius:"50%",
+                background:"linear-gradient(135deg,#6366f1,#4f46e5)",
+                border:"none", cursor:"pointer",
+                display:"flex", alignItems:"center", justifyContent:"center",
+                boxShadow:"0 4px 20px rgba(99,102,241,.5)",
+                transform:"translateY(-10px)",
+                transition:"transform .15s, box-shadow .15s",
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-12px)";e.currentTarget.style.boxShadow="0 6px 24px rgba(99,102,241,.6)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(-10px)";e.currentTarget.style.boxShadow="0 4px 20px rgba(99,102,241,.5)";}}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+
+          {/* Inventory */}
+          {(() => {
+            const isInvActive = pathname.startsWith("/dashboard/inventory") || pathname.startsWith("/dashboard/items");
+            return (
+              <Link prefetch={false} href="/dashboard/inventory" style={{
+                flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+                gap:3, paddingTop:6, textDecoration:"none",
+                color: isInvActive ? "#818cf8" : "rgba(255,255,255,0.4)",
+                background: isInvActive ? "rgba(99,102,241,0.08)" : "transparent",
+                borderTop: isInvActive ? "2px solid #6366f1" : "2px solid transparent",
+                transition:"color .15s",
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                <span style={{fontSize:10,fontWeight:600}}>Inventory</span>
+              </Link>
+            );
+          })()}
+
+          {/* More — opens sidebar */}
           <button onClick={() => setIsMobileMenuOpen(true)} style={{
             flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-            gap:3, background:"transparent", border:"none", cursor:"pointer", paddingTop:6,
+            gap:3, paddingTop:6, background:"transparent", border:"none", cursor:"pointer",
             color: isMobileMenuOpen ? "#818cf8" : "rgba(255,255,255,0.4)",
             borderTop: isMobileMenuOpen ? "2px solid #6366f1" : "2px solid transparent",
+            transition:"color .15s",
           }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            <span style={{fontSize:10,fontWeight:600,letterSpacing:".01em"}}>Menu</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span style={{fontSize:10,fontWeight:600}}>More</span>
           </button>
         </nav>
       )}
