@@ -140,6 +140,11 @@ const METHOD_GROUPS: MethodGroup[] = [
   },
 ];
 
+const FALLBACK_ENABLED_METHODS: PayMethod[] = [
+  "card", "paypal", "applepay", "googlepay", "bank", "ach", "sepa",
+  "jazzcash", "easypaisa", "crypto", "klarna",
+];
+
 /* ── Helpers ────────────────────────────────────────────── */
 function fmt4(v: string) { return v.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim(); }
 function fmtExp(v: string) { const d = v.replace(/\D/g,"").slice(0,4); return d.length>2?d.slice(0,2)+"/"+d.slice(2):d; }
@@ -228,6 +233,7 @@ export default function PaymentPage() {
   const [processing,  setProcessing]  = useState(false);
   const [activating,  setActivating]  = useState(false);
   const [otpError,    setOtpError]    = useState("");
+  const [enabledMethods, setEnabledMethods] = useState<PayMethod[]>(FALLBACK_ENABLED_METHODS);
 
   /* Coupon */
   const [couponInput,    setCouponInput]    = useState("");
@@ -327,6 +333,34 @@ export default function PaymentPage() {
     if (currency) setStoredCurrencyPreference(currency, country);
   }, [currency, country]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await fetch("/api/public/payment-gateways", { cache: "no-store" });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (Array.isArray(data?.enabledMethodIds) && data.enabledMethodIds.length > 0) {
+          setEnabledMethods(data.enabledMethodIds as PayMethod[]);
+        }
+      } catch {}
+    })();
+  }, []);
+
+  const enabledMethodSet = new Set(enabledMethods);
+  const availableGroups = METHOD_GROUPS
+    .map((group) => ({
+      ...group,
+      methods: group.methods.filter((methodOption) => enabledMethodSet.has(methodOption.id)),
+    }))
+    .filter((group) => group.methods.length > 0);
+  const allAvailableMethods = availableGroups.flatMap((group) => group.methods);
+
+  useEffect(() => {
+    if (!allAvailableMethods.some((methodOption) => methodOption.id === method) && allAvailableMethods[0]) {
+      setMethod(allAvailableMethods[0].id);
+    }
+  }, [allAvailableMethods, method]);
+
   // 75% off for first 3 months — today's charge is 25% of full price
   const discountedPrice  = plan === "custom" ? planPrice : Math.round(planPrice * 0.25);
   const finalPrice       = couponApplied
@@ -365,7 +399,7 @@ export default function PaymentPage() {
     setActivating(true);
     // Save selected payment method for future auto-fill
     try {
-      const allMethods = METHOD_GROUPS.flatMap(g => g.methods);
+      const allMethods = allAvailableMethods;
       const mDef = allMethods.find(m => m.id === method);
       if (mDef) {
         localStorage.setItem("finovaPayMethod", JSON.stringify({ type: mDef.id, label: mDef.label, processor: mDef.processor, processorColor: mDef.processorColor }));
@@ -511,8 +545,6 @@ export default function PaymentPage() {
   };
 
   /* ── Yearly savings ── */
-  const yearlySavings = plan !== "custom" ? Math.round(meta.price * 12 - meta.yearlyPrice) : 0;
-
   return (
     <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#06091c 0%,#0b0f28 45%,#07091e 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
       <style>{`
@@ -591,7 +623,7 @@ export default function PaymentPage() {
                   </div>
                   <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:12, background:"rgba(0,0,0,.25)", border:"1px solid rgba(255,255,255,.08)", marginBottom:16 }}>
                     <div style={{ width:36, height:36, borderRadius:10, background:`${savedPayMethod.processorColor}22`, border:`1px solid ${savedPayMethod.processorColor}44`, display:"flex", alignItems:"center", justifyContent:"center", color:savedPayMethod.processorColor, flexShrink:0 }}>
-                      {METHOD_GROUPS.flatMap(g => g.methods).find(m => m.id === savedPayMethod.type)?.icon}
+                      {allAvailableMethods.find(m => m.id === savedPayMethod.type)?.icon}
                     </div>
                     <div style={{ flex:1 }}>
                       <div style={{ fontWeight:600, fontSize:14, color:"white" }}>{savedPayMethod.label}</div>
@@ -639,7 +671,11 @@ export default function PaymentPage() {
                 <div style={{ borderRadius:18, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", padding:"20px" }}>
                   <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:16 }}>Select Payment Method</div>
 
-                  {METHOD_GROUPS.map(group => (
+                  {availableGroups.length === 0 ? (
+                    <div style={{ padding:"16px", borderRadius:12, background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.18)", fontSize:12, color:"#fca5a5" }}>
+                      No payment methods are enabled right now. Please contact support or try again later.
+                    </div>
+                  ) : availableGroups.map(group => (
                     <div key={group.label} style={{ marginBottom:18 }}>
                       {/* Group header */}
                       <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
@@ -848,14 +884,14 @@ export default function PaymentPage() {
                 )}
 
                 {/* Submit */}
-                <button onClick={handlePaymentSubmit} disabled={processing||activating}
+                <button onClick={handlePaymentSubmit} disabled={processing||activating||allAvailableMethods.length===0}
                   style={{
                     width:"100%", padding:"16px", borderRadius:14, border:"none",
-                    background:(processing||activating) ? "rgba(255,255,255,.06)" : `linear-gradient(135deg,${meta.gradientFrom},${meta.gradientTo})`,
-                    color:(processing||activating) ? "rgba(255,255,255,.3)" : "white",
-                    fontSize:15, fontWeight:800, cursor:(processing||activating)?"not-allowed":"pointer",
+                    background:(processing||activating||allAvailableMethods.length===0) ? "rgba(255,255,255,.06)" : `linear-gradient(135deg,${meta.gradientFrom},${meta.gradientTo})`,
+                    color:(processing||activating||allAvailableMethods.length===0) ? "rgba(255,255,255,.3)" : "white",
+                    fontSize:15, fontWeight:800, cursor:(processing||activating||allAvailableMethods.length===0)?"not-allowed":"pointer",
                     display:"flex", alignItems:"center", justifyContent:"center", gap:10,
-                    fontFamily:"inherit", boxShadow:(processing||activating)?"none":`0 8px 28px ${meta.glow}`,
+                    fontFamily:"inherit", boxShadow:(processing||activating||allAvailableMethods.length===0)?"none":`0 8px 28px ${meta.glow}`,
                     transition:"all .3s",
                   }}>
                   {(processing||activating) ? (
