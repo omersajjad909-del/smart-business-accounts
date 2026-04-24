@@ -1,16 +1,19 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useSyncExternalStore } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import AdminShell from "@/app/admin/components/AdminShell";
 
+const subscribeToHydration = () => () => {};
+
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isLoginPage = pathname === "/admin/login";
-  const user = isLoginPage ? null : getCurrentUser();
+  const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
+  const user = !hydrated || isLoginPage ? null : getCurrentUser();
   const isAuthorized = isLoginPage ? true : !!user && user.role === "ADMIN";
 
   useEffect(() => {
@@ -19,16 +22,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!isLoginPage && !isAuthorized) {
-      router.replace("/admin/login");
-    }
-  }, [isAuthorized, isLoginPage, router]);
+    if (!hydrated || isLoginPage || isAuthorized) return;
+    router.replace("/admin/login");
+  }, [hydrated, isAuthorized, isLoginPage, router]);
 
   if (isLoginPage) {
     return <>{children}</>;
   }
 
-  if (!isAuthorized) {
+  if (!hydrated || !isAuthorized) {
     return (
       <div
         style={{
