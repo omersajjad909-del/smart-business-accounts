@@ -78,3 +78,18 @@ DO $$ BEGIN
     FOREIGN KEY ("companyId") REFERENCES "public"."Company"("id") ON DELETE SET NULL;
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
+-- 5) AdminProductCategory
+CREATE TABLE IF NOT EXISTS "public"."AdminProductCategory" (
+  "id"          TEXT PRIMARY KEY,
+  "name"        TEXT NOT NULL,
+  "description" TEXT,
+  "color"       TEXT NOT NULL DEFAULT '#8b5cf6',
+  "isActive"    BOOLEAN NOT NULL DEFAULT TRUE,
+  "sortOrder"   INTEGER NOT NULL DEFAULT 0,
+  "createdAt"   TIMESTAMP NOT NULL DEFAULT NOW(),
+  "updatedAt"   TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "AdminProductCategory_name_key"
+  ON "public"."AdminProductCategory" ("name");
+

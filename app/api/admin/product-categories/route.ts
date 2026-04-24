@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
 
+export const runtime = "nodejs";
+
 const DEFAULTS = [
   { name: "Trading",          description: "Buy and sell goods without manufacturing",   color: "#8b5cf6", sortOrder: 1 },
   { name: "Manufacturing",    description: "Production of goods from raw materials",     color: "#4f7cff", sortOrder: 2 },
@@ -15,21 +17,70 @@ const DEFAULTS = [
   { name: "Construction",     description: "Building materials and hardware",            color: "#64748b", sortOrder: 10 },
 ];
 
+function isMissingTableError(error: unknown) {
+  return !!(
+    error &&
+    typeof error === "object" &&
+    (
+      ("code" in error && error.code === "P2021") ||
+      ("message" in error && typeof error.message === "string" && error.message.includes("AdminProductCategory"))
+    )
+  );
+}
+
+async function ensureAdminProductCategoryTable() {
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "public"."AdminProductCategory" (
+      "id" TEXT NOT NULL,
+      "name" TEXT NOT NULL,
+      "description" TEXT,
+      "color" TEXT NOT NULL DEFAULT '#8b5cf6',
+      "isActive" BOOLEAN NOT NULL DEFAULT TRUE,
+      "sortOrder" INTEGER NOT NULL DEFAULT 0,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "AdminProductCategory_pkey" PRIMARY KEY ("id")
+    );
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    CREATE UNIQUE INDEX IF NOT EXISTS "AdminProductCategory_name_key"
+    ON "public"."AdminProductCategory"("name");
+  `);
+}
+
+async function findCategories() {
+  try {
+    return await prisma.adminProductCategory.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    });
+  } catch (error) {
+    if (!isMissingTableError(error)) throw error;
+    await ensureAdminProductCategoryTable();
+    return prisma.adminProductCategory.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    });
+  }
+}
+
+async function seedDefaultsIfEmpty() {
+  const categories = await findCategories();
+  if (categories.length > 0) return categories;
+
+  await prisma.adminProductCategory.createMany({
+    data: DEFAULTS,
+    skipDuplicates: true,
+  });
+
+  return findCategories();
+}
+
 export async function GET(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
 
-    let categories = await prisma.adminProductCategory.findMany({
-      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    });
-
-    if (categories.length === 0) {
-      await prisma.adminProductCategory.createMany({ data: DEFAULTS });
-      categories = await prisma.adminProductCategory.findMany({
-        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      });
-    }
+    const categories = await seedDefaultsIfEmpty();
 
     const total    = categories.length;
     const active   = categories.filter((c) => c.isActive).length;
@@ -44,6 +95,7 @@ export async function POST(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
+    await ensureAdminProductCategoryTable();
     const body = await req.json();
     const category = await prisma.adminProductCategory.create({
       data: {
@@ -64,6 +116,7 @@ export async function PUT(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
+    await ensureAdminProductCategoryTable();
     const id   = req.nextUrl.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     const body = await req.json();
@@ -84,6 +137,7 @@ export async function DELETE(req: NextRequest) {
   try {
     const admin = requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
+    await ensureAdminProductCategoryTable();
     const id = req.nextUrl.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     await prisma.adminProductCategory.delete({ where: { id } });
