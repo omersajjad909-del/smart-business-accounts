@@ -486,6 +486,8 @@ const dashboardStyles = `
   display:grid;
   gap:16px;
   font-family:'Outfit','DM Sans',sans-serif;
+  overflow-x:hidden;
+  max-width:100%;
 }
 .dash-card{
   border-radius:22px;
