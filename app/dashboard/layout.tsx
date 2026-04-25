@@ -189,6 +189,36 @@ export default function DashboardLayout({
   const [enabledTypes, setEnabledTypes] = useState<Set<string> | null>(null);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
 
+  // Notification bell
+  type NotifItem = { id: string; title: string; message: string; type: string; link?: string | null; isRead: boolean; createdAt: string };
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [notifs, setNotifs] = useState<NotifItem[]>([]);
+  const [notifsLoading, setNotifsLoading] = useState(false);
+  const [notifsFetched, setNotifsFetched] = useState(false);
+  const unreadCount = notifs.filter(n => !n.isRead).length;
+
+  async function fetchNotifs() {
+    if (notifsLoading) return;
+    setNotifsLoading(true);
+    try {
+      const r = await fetch("/api/admin/notifications");
+      if (r.ok) { const d = await r.json(); setNotifs(d.notifications || []); setNotifsFetched(true); }
+    } catch {} finally { setNotifsLoading(false); }
+  }
+
+  async function markRead(id: string) {
+    setNotifs(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    await fetch("/api/admin/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "MARK_READ", id }) });
+  }
+
+  async function markAllRead() {
+    setNotifs(prev => prev.map(n => ({ ...n, isRead: true })));
+    await fetch("/api/admin/notifications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "MARK_READ", id: "ALL" }) });
+  }
+
+  // Help panel
+  const [showHelpPanel, setShowHelpPanel] = useState(false);
+
   async function refreshCompanySummary() {
     try {
       const res = await fetch("/api/me/company", { cache: "no-store" });
@@ -315,6 +345,20 @@ export default function DashboardLayout({
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
+
+  // Close notification/help panels on outside click
+  useEffect(() => {
+    if (!showNotifPanel && !showHelpPanel) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("[data-panel-anchor]")) {
+        setShowNotifPanel(false);
+        setShowHelpPanel(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showNotifPanel, showHelpPanel]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1980,23 +2024,143 @@ export default function DashboardLayout({
             )}
 
             {/* Notification Bell */}
-            <button style={{position:"relative",width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"background .15s",color:"var(--text-muted)"}}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
-              </svg>
-              <span style={{position:"absolute",top:7,right:7,width:7,height:7,borderRadius:"50%",background:"#6366f1",border:"1.5px solid var(--panel-bg)"}}/>
-            </button>
+            <div style={{position:"relative"}} data-panel-anchor="notif">
+              <button
+                onClick={()=>{
+                  const next = !showNotifPanel;
+                  setShowNotifPanel(next);
+                  setShowHelpPanel(false);
+                  setShowUserMenu(false);
+                  if (next && !notifsFetched) fetchNotifs();
+                }}
+                style={{position:"relative",width:36,height:36,borderRadius:10,background:showNotifPanel?"rgba(99,102,241,0.15)":"rgba(255,255,255,0.05)",border:showNotifPanel?"1px solid rgba(99,102,241,0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showNotifPanel?"#818cf8":"var(--text-muted)"}}
+                onMouseEnter={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+                onMouseLeave={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+                </svg>
+                {unreadCount > 0 && (
+                  <span style={{position:"absolute",top:6,right:6,minWidth:8,height:8,borderRadius:"50%",background:"#f87171",border:"1.5px solid var(--panel-bg)",fontSize:8,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700,padding:unreadCount>9?"0 2px":0}}>
+                    {unreadCount > 9 ? "9+" : ""}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification dropdown */}
+              {showNotifPanel && (
+                <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,width:340,background:"var(--panel-bg)",border:"1px solid var(--border)",borderRadius:14,boxShadow:"0 20px 60px rgba(0,0,0,0.4)",zIndex:9999,overflow:"hidden"}}>
+                  {/* Header */}
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderBottom:"1px solid var(--border)"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8}}>
+                      <span style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>Notifications</span>
+                      {unreadCount > 0 && <span style={{padding:"2px 7px",borderRadius:10,background:"rgba(248,113,113,0.12)",border:"1px solid rgba(248,113,113,0.25)",fontSize:10,fontWeight:700,color:"#f87171"}}>{unreadCount} new</span>}
+                    </div>
+                    {unreadCount > 0 && (
+                      <button onClick={markAllRead} style={{fontSize:11,color:"#818cf8",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:0}}>Mark all read</button>
+                    )}
+                  </div>
+
+                  {/* List */}
+                  <div style={{maxHeight:320,overflowY:"auto"}}>
+                    {notifsLoading ? (
+                      <div style={{padding:"32px 16px",textAlign:"center",color:"var(--text-muted)",fontSize:13}}>
+                        <div style={{width:22,height:22,border:"2px solid var(--border)",borderTopColor:"#6366f1",borderRadius:"50%",animation:"finova-spin .7s linear infinite",margin:"0 auto 8px"}}/>
+                        Loading…
+                      </div>
+                    ) : notifs.length === 0 ? (
+                      <div style={{padding:"36px 16px",textAlign:"center"}}>
+                        <div style={{fontSize:28,marginBottom:8}}>🔔</div>
+                        <div style={{fontSize:13,color:"var(--text-muted)",fontWeight:500}}>No notifications yet</div>
+                        <div style={{fontSize:11,color:"var(--text-muted)",marginTop:4}}>System alerts will appear here</div>
+                      </div>
+                    ) : notifs.map(n => {
+                      const typeColor: Record<string,string> = { INFO:"#818cf8", SUCCESS:"#34d399", WARNING:"#fbbf24", ERROR:"#f87171" };
+                      const col = typeColor[n.type] || "#818cf8";
+                      return (
+                        <div
+                          key={n.id}
+                          onClick={()=>{ markRead(n.id); if(n.link) { router.push(n.link); setShowNotifPanel(false); } }}
+                          style={{display:"flex",gap:12,padding:"12px 16px",borderBottom:"1px solid var(--border)",cursor:n.link?"pointer":"default",background:n.isRead?"transparent":"rgba(99,102,241,0.04)",transition:"background .12s"}}
+                          onMouseEnter={e=>{ if(!n.isRead||n.link) e.currentTarget.style.background="rgba(255,255,255,0.03)"; }}
+                          onMouseLeave={e=>{ e.currentTarget.style.background=n.isRead?"transparent":"rgba(99,102,241,0.04)"; }}
+                        >
+                          <div style={{width:8,height:8,borderRadius:"50%",background:col,flexShrink:0,marginTop:5,opacity:n.isRead?0.3:1}}/>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{fontSize:12,fontWeight:700,color:"var(--text-primary)",marginBottom:2,opacity:n.isRead?0.6:1}}>{n.title}</div>
+                            <div style={{fontSize:11,color:"var(--text-muted)",lineHeight:1.5,opacity:n.isRead?0.5:1}}>{n.message}</div>
+                            <div style={{fontSize:10,color:"var(--text-muted)",marginTop:4,opacity:0.5}}>
+                              {new Date(n.createdAt).toLocaleDateString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}
+                            </div>
+                          </div>
+                          {!n.isRead && <div style={{width:6,height:6,borderRadius:"50%",background:"#6366f1",flexShrink:0,marginTop:6}}/>}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Footer */}
+                  <div style={{padding:"10px 16px",borderTop:"1px solid var(--border)"}}>
+                    <Link prefetch={false} href="/dashboard/notifications" onClick={()=>setShowNotifPanel(false)}
+                      style={{fontSize:12,color:"#818cf8",fontWeight:600,textDecoration:"none",display:"block",textAlign:"center"}}>
+                      View all notifications →
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Help button */}
-            <button style={{width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"background .15s",color:"var(--text-muted)"}}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-              </svg>
-            </button>
+            <div style={{position:"relative"}} data-panel-anchor="help">
+              <button
+                onClick={()=>{ setShowHelpPanel(v=>!v); setShowNotifPanel(false); setShowUserMenu(false); }}
+                style={{width:36,height:36,borderRadius:10,background:showHelpPanel?"rgba(99,102,241,0.15)":"rgba(255,255,255,0.05)",border:showHelpPanel?"1px solid rgba(99,102,241,0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showHelpPanel?"#818cf8":"var(--text-muted)"}}
+                onMouseEnter={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+                onMouseLeave={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              </button>
+
+              {/* Help dropdown */}
+              {showHelpPanel && (
+                <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,width:300,background:"var(--panel-bg)",border:"1px solid var(--border)",borderRadius:14,boxShadow:"0 20px 60px rgba(0,0,0,0.4)",zIndex:9999,overflow:"hidden"}}>
+                  <div style={{padding:"14px 16px",borderBottom:"1px solid var(--border)"}}>
+                    <div style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>Keyboard Shortcuts</div>
+                    <div style={{fontSize:11,color:"var(--text-muted)",marginTop:2}}>Speed up your workflow</div>
+                  </div>
+                  <div style={{padding:"10px 0"}}>
+                    {[
+                      { keys:["Ctrl","K"], label:"Global Search" },
+                      { keys:["Ctrl","N"], label:"New Sales Invoice" },
+                      { keys:["Ctrl","Shift","P"], label:"Purchase Invoice" },
+                      { keys:["Ctrl","B"], label:"Toggle Sidebar" },
+                      { keys:["Ctrl","D"], label:"Go to Dashboard" },
+                      { keys:["Ctrl","I"], label:"Inventory" },
+                      { keys:["Escape"], label:"Close popups" },
+                    ].map(s=>(
+                      <div key={s.label} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"7px 16px"}}>
+                        <span style={{fontSize:12,color:"var(--text-muted)"}}>{s.label}</span>
+                        <div style={{display:"flex",gap:4}}>
+                          {s.keys.map(k=>(
+                            <kbd key={k} style={{padding:"2px 6px",borderRadius:5,background:"rgba(255,255,255,0.06)",border:"1px solid var(--border)",fontSize:10,fontWeight:700,color:"var(--text-primary)",fontFamily:"inherit"}}>{k}</kbd>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{padding:"10px 16px",borderTop:"1px solid var(--border)",display:"flex",flexDirection:"column",gap:6}}>
+                    <Link prefetch={false} href="/dashboard/business-guide" onClick={()=>setShowHelpPanel(false)}
+                      style={{fontSize:12,color:"#818cf8",fontWeight:600,textDecoration:"none",display:"flex",alignItems:"center",gap:6}}>
+                      📖 Business Guide
+                    </Link>
+                    <a href="mailto:finovaos.app@gmail.com"
+                      style={{fontSize:12,color:"var(--text-muted)",fontWeight:500,textDecoration:"none",display:"flex",alignItems:"center",gap:6}}>
+                      ✉️ Contact Support
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Subscription badge — only for ADMIN */}
             {subInfo && currentUser?.role === "ADMIN" && !isMobileViewport && (
