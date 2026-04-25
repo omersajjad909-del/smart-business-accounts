@@ -145,6 +145,7 @@ export default function DashboardContent() {
   const [companyInfo,setCompanyInfo] = useState<{plan:string;subscriptionStatus:string;baseCurrency:string;name?:string}|null>(null);
   const [userAvatar,setUserAvatar]   = useState<string|null>(null);
   const [unreadNotifs,setUnreadNotifs] = useState(0);
+  const [todayStats,setTodayStats]   = useState<{todaySales:number;todayOrders:number;pendingCount:number;lowStockCount:number}|null>(null);
   const [businessType,setBT]  = useState<BusinessType>(initDemo||(storedUser?.businessType as BusinessType)||"trading");
   const [stats,setStats]      = useState<DashStats>({
     revenue:0,expenses:0,profit:0,cashBalance:0,revenueGrowth:0,
@@ -165,12 +166,13 @@ export default function DashboardContent() {
         if(user.id)        h["x-user-id"]   =user.id;
         if(user.companyId) h["x-company-id"]=user.companyId;
 
-        const [sR,cR,mR,bR,eR]=await Promise.allSettled([
+        const [sR,cR,mR,bR,eR,tR]=await Promise.allSettled([
           fetch("/api/reports/dashboard-summary",              {headers:h,cache:"no-store"}),
           fetch("/api/reports/dashboard-charts?period=week",   {headers:h,cache:"no-store"}),
           fetch("/api/me/company",                             {cache:"no-store"}),
           fetch("/api/company/business-type",                  {headers:h,cache:"no-store"}),
           fetch("/api/reports/expense-breakdown?period=month", {headers:h,cache:"no-store"}),
+          fetch("/api/reports/today-stats",                    {headers:h,cache:"no-store"}),
         ]);
 
         if(sR.status==="fulfilled"&&sR.value.ok){
@@ -215,6 +217,10 @@ export default function DashboardContent() {
           const EC=["#ef4444","#f59e0b","#6366f1","#10b981","#38bdf8"];
           const tot=rows.reduce((a:number,r:any)=>a+Number(r.amount||0),0);
           if(tot>0)setDonut(rows.slice(0,5).map((r:any,i:number)=>({name:r.category||r.label||"Other",value:Number(r.amount||0),color:EC[i]})));
+        }
+        if(tR.status==="fulfilled"&&tR.value.ok){
+          const t=await tR.value.json();
+          setTodayStats({todaySales:Number(t.todaySales||0),todayOrders:Number(t.todayOrders||0),pendingCount:Number(t.pendingCount||0),lowStockCount:Number(t.lowStockCount||0)});
         }
         // load avatar from stored user or me API
         const meUser = getCurrentUser() as any;
@@ -511,14 +517,14 @@ export default function DashboardContent() {
         </div>
         <div className="db-grid-exempt" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
           {[
-            {l:"Sales",           v:`${cur} ${fmt(stats.revenue)}`,          c:"#10b981", bg:"rgba(16,185,129,.12)",  icon:"🛍️"},
-            {l:"Orders",          v:String(stats.invoicesPending),            c:"#818cf8", bg:"rgba(129,140,248,.12)", icon:"📦"},
-            {l:"Pending",         v:String(stats.invoicesPending),            c:"#f59e0b", bg:"rgba(245,158,11,.12)",  icon:"🧾"},
-            {l:"Low Stock",       v:`${fmt(stats.overdueAmount)}`,            c:"#f87171", bg:"rgba(248,113,113,.12)", icon:"⚠️"},
+            {l:"Sales",      v:todayStats?`${cur} ${fmt(todayStats.todaySales)}`:"—",  c:"#10b981", bg:"rgba(16,185,129,.12)",  icon:"🛍️"},
+            {l:"Orders",     v:todayStats?String(todayStats.todayOrders):"—",           c:"#818cf8", bg:"rgba(129,140,248,.12)", icon:"📦"},
+            {l:"Pending",    v:todayStats?String(todayStats.pendingCount):"—",          c:"#f59e0b", bg:"rgba(245,158,11,.12)",  icon:"🧾"},
+            {l:"Low Stock",  v:todayStats?String(todayStats.lowStockCount):"—",         c:"#f87171", bg:"rgba(248,113,113,.12)", icon:"⚠️"},
           ].map((it,i)=>(
             <div key={i} style={{borderRadius:14,padding:"12px 8px 10px",background:"var(--panel-bg)",border:"1px solid var(--border)",display:"flex",flexDirection:"column",alignItems:"center",gap:6,textAlign:"center",overflow:"hidden"}}>
               <div style={{width:38,height:38,borderRadius:12,background:it.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>{it.icon}</div>
-              <div style={{fontSize:13,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1,wordBreak:"break-all"}}>{it.v}</div>
+              <div style={{fontSize:12,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1,wordBreak:"break-all"}}>{it.v}</div>
               <div style={{fontSize:9,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".04em",lineHeight:1.2}}>{it.l}</div>
               <div style={{width:"100%",height:2,borderRadius:1,background:`${it.c}20`}}><div style={{height:"100%",width:"70%",borderRadius:1,background:it.c}}/></div>
             </div>
