@@ -463,7 +463,7 @@ export default function DashboardContent() {
           </div>
         </div>
         {/* Bottom stats row */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,paddingTop:16,borderTop:"1px solid rgba(255,255,255,.12)",position:"relative"}}>
+        <div className="db-grid-exempt" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,paddingTop:16,borderTop:"1px solid rgba(255,255,255,.12)",position:"relative"}}>
           {[
             {l:"Revenue",  v:stats.revenue,  c:"#86efac"},
             {l:"Expenses", v:stats.expenses, c:"#fca5a5"},
@@ -482,7 +482,7 @@ export default function DashboardContent() {
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
           <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>Quick Actions</div>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10}}>
+        <div className="db-grid-exempt" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10}}>
           {[
             {label:"+ Invoice", href:"/dashboard/sales-invoice",      bg:"linear-gradient(135deg,#6366f1,#4f46e5)",
               icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>},
