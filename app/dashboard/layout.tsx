@@ -189,6 +189,10 @@ export default function DashboardLayout({
   const [enabledTypes, setEnabledTypes] = useState<Set<string> | null>(null);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
 
+  // Dynamic keyboard shortcuts (loaded from API per company)
+  type ShortcutItem = { id: string; keys: string[]; label: string; action: string; route?: string; enabled: boolean };
+  const [shortcuts, setShortcuts] = useState<ShortcutItem[]>([]);
+
   // Notification bell
   type NotifItem = { id: string; title: string; message: string; type: string; link?: string | null; isRead: boolean; createdAt: string };
   const [showNotifPanel, setShowNotifPanel] = useState(false);
@@ -288,6 +292,8 @@ export default function DashboardLayout({
       } catch (err) {}
     }
     fetchCompany();
+    // Load company shortcuts
+    fetch("/api/company/shortcuts").then(r => r.json()).then(d => { if (d.shortcuts) setShortcuts(d.shortcuts); }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -375,70 +381,58 @@ export default function DashboardLayout({
   // Enable global Enter key navigation
   useGlobalEnterNavigation();
 
-  // Global keyboard shortcuts
+  // Global keyboard shortcuts — driven by per-company config from API
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      const ctrl = e.ctrlKey || e.metaKey;
       const tag = (e.target as HTMLElement).tagName;
       const inInput = tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement).isContentEditable;
 
-      // Ctrl+K — focus search
-      if (ctrl && e.key === "k") {
+      // Escape always closes panels
+      if (e.key === "Escape") {
+        setShowNotifPanel(false);
+        setShowHelpPanel(false);
+        setShowUserMenu(false);
+        return;
+      }
+
+      // Build a normalised key string from the event
+      const parts: string[] = [];
+      if (e.ctrlKey || e.metaKey) parts.push("Ctrl");
+      if (e.shiftKey) parts.push("Shift");
+      if (e.altKey) parts.push("Alt");
+      if (!["Control","Shift","Alt","Meta"].includes(e.key)) {
+        parts.push(e.key.length === 1 ? e.key.toUpperCase() : e.key);
+      }
+      const pressed = parts.join("+").toLowerCase();
+      if (parts.length < 2) return; // require at least one modifier
+
+      const match = shortcuts.find(s => s.enabled && s.keys.join("+").toLowerCase() === pressed);
+      if (!match) return;
+
+      // focus_search and toggle_sidebar work even inside inputs
+      if (match.action === "focus_search") {
         e.preventDefault();
         const searchInput = document.querySelector<HTMLInputElement>("[data-global-search-input]");
         searchInput?.focus();
         searchInput?.select();
         return;
       }
-
-      // Ctrl+B — toggle sidebar
-      if (ctrl && e.key === "b") {
+      if (match.action === "toggle_sidebar") {
         e.preventDefault();
         setSidebarCollapsed(v => !v);
         return;
       }
 
-      // Skip remaining shortcuts when user is typing
+      // navigate actions: skip if typing
       if (inInput) return;
-
-      // Ctrl+N — new sales invoice
-      if (ctrl && e.key === "n") {
+      if (match.action === "navigate" && match.route) {
         e.preventDefault();
-        router.push("/dashboard/sales-invoice");
-        return;
-      }
-
-      // Ctrl+Shift+P — purchase invoice
-      if (ctrl && e.shiftKey && e.key === "P") {
-        e.preventDefault();
-        router.push("/dashboard/purchase-invoice");
-        return;
-      }
-
-      // Ctrl+D — dashboard
-      if (ctrl && e.key === "d") {
-        e.preventDefault();
-        router.push("/dashboard");
-        return;
-      }
-
-      // Ctrl+I — inventory
-      if (ctrl && e.key === "i") {
-        e.preventDefault();
-        router.push("/dashboard/inventory");
-        return;
-      }
-
-      // Escape — close all panels
-      if (e.key === "Escape") {
-        setShowNotifPanel(false);
-        setShowHelpPanel(false);
-        setShowUserMenu(false);
+        router.push(match.route);
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [router]);
+  }, [router, shortcuts]);
 
   const normalizedPlanCode =
     String(companyPlan || "STARTER").toUpperCase() === "PROFESSIONAL"
@@ -1852,6 +1846,7 @@ export default function DashboardLayout({
               onToggle={() => toggle("admin")}
             >
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
+              <NavLink href="/dashboard/shortcuts" pathname={pathname}>Keyboard Shortcuts</NavLink>
               {/* <NavLink href="/dashboard/users" pathname={pathname}>Users & Permissions</NavLink>
               <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink> */}
               <NavLink href="/dashboard/users" pathname={pathname}>Team</NavLink>
@@ -2188,30 +2183,39 @@ export default function DashboardLayout({
 
               {/* Help dropdown */}
               {showHelpPanel && (
-                <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,width:300,background:"var(--panel-bg)",border:"1px solid var(--border)",borderRadius:14,boxShadow:"0 20px 60px rgba(0,0,0,0.4)",zIndex:9999,overflow:"hidden"}}>
-                  <div style={{padding:"14px 16px",borderBottom:"1px solid var(--border)"}}>
-                    <div style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>Keyboard Shortcuts</div>
-                    <div style={{fontSize:11,color:"var(--text-muted)",marginTop:2}}>Speed up your workflow</div>
+                <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,width:310,background:"var(--panel-bg)",border:"1px solid var(--border)",borderRadius:14,boxShadow:"0 20px 60px rgba(0,0,0,0.4)",zIndex:9999,overflow:"hidden"}}>
+                  <div style={{padding:"14px 16px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                    <div>
+                      <div style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>Keyboard Shortcuts</div>
+                      <div style={{fontSize:11,color:"var(--text-muted)",marginTop:2}}>Speed up your workflow</div>
+                    </div>
+                    {isAdmin && (
+                      <Link prefetch={false} href="/dashboard/shortcuts" onClick={()=>setShowHelpPanel(false)}
+                        style={{fontSize:11,color:"#818cf8",fontWeight:600,textDecoration:"none",padding:"4px 10px",borderRadius:7,background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)"}}>
+                        Manage
+                      </Link>
+                    )}
                   </div>
-                  <div style={{padding:"10px 0"}}>
-                    {[
-                      { keys:["Ctrl","K"], label:"Global Search" },
-                      { keys:["Ctrl","N"], label:"New Sales Invoice" },
-                      { keys:["Ctrl","Shift","P"], label:"Purchase Invoice" },
-                      { keys:["Ctrl","B"], label:"Toggle Sidebar" },
-                      { keys:["Ctrl","D"], label:"Go to Dashboard" },
-                      { keys:["Ctrl","I"], label:"Inventory" },
-                      { keys:["Escape"], label:"Close popups" },
-                    ].map(s=>(
-                      <div key={s.label} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"7px 16px"}}>
+                  <div style={{padding:"8px 0",maxHeight:260,overflowY:"auto"}}>
+                    {shortcuts.filter(s=>s.enabled && s.keys.length>0).length === 0 ? (
+                      <div style={{padding:"20px 16px",textAlign:"center",color:"var(--text-muted)",fontSize:12}}>No active shortcuts</div>
+                    ) : shortcuts.filter(s=>s.enabled && s.keys.length>0).map(s=>(
+                      <div key={s.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"7px 16px"}}>
                         <span style={{fontSize:12,color:"var(--text-muted)"}}>{s.label}</span>
-                        <div style={{display:"flex",gap:4}}>
-                          {s.keys.map(k=>(
-                            <kbd key={k} style={{padding:"2px 6px",borderRadius:5,background:"rgba(255,255,255,0.06)",border:"1px solid var(--border)",fontSize:10,fontWeight:700,color:"var(--text-primary)",fontFamily:"inherit"}}>{k}</kbd>
+                        <div style={{display:"flex",gap:3,alignItems:"center"}}>
+                          {s.keys.map((k,i)=>(
+                            <span key={k}>
+                              <kbd style={{padding:"2px 6px",borderRadius:5,background:"rgba(99,102,241,0.12)",border:"1px solid rgba(99,102,241,0.25)",fontSize:10,fontWeight:700,color:"#818cf8",fontFamily:"inherit"}}>{k}</kbd>
+                              {i<s.keys.length-1 && <span style={{fontSize:9,color:"var(--text-muted)",margin:"0 1px"}}>+</span>}
+                            </span>
                           ))}
                         </div>
                       </div>
                     ))}
+                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"7px 16px",opacity:.5}}>
+                      <span style={{fontSize:12,color:"var(--text-muted)"}}>Close popups</span>
+                      <kbd style={{padding:"2px 6px",borderRadius:5,background:"rgba(255,255,255,0.06)",border:"1px solid var(--border)",fontSize:10,fontWeight:700,color:"var(--text-primary)",fontFamily:"inherit"}}>Escape</kbd>
+                    </div>
                   </div>
                   <div style={{padding:"10px 16px",borderTop:"1px solid var(--border)",display:"flex",flexDirection:"column",gap:6}}>
                     <Link prefetch={false} href="/dashboard/business-guide" onClick={()=>setShowHelpPanel(false)}
