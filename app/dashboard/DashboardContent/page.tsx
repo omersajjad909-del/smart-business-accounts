@@ -503,25 +503,24 @@ export default function DashboardContent() {
         </div>
       </div>
 
-      {/* ── Today's Stats (2×2) ── */}
+      {/* ── Today's Overview (4 in a row) ── */}
       <div className="db-mo" style={{marginBottom:20}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
-          <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>Overview</div>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+          <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>Today's Overview</div>
           <Link prefetch={false} href="/dashboard/reports" style={{fontSize:12,color:"#818cf8",textDecoration:"none",fontWeight:600}}>View All</Link>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+        <div className="db-grid-exempt" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
           {[
-            {l:"Total Revenue",  v:`${cur} ${fmt(stats.revenue)}`,     d:stats.revenueHistory.slice(-7),  c:"#10b981", icon:"📈"},
-            {l:"Pending Invoices",v:String(stats.invoicesPending),      d:stats.revenueHistory.slice(-7).map(()=>1),c:"#f59e0b", icon:"⏳"},
-            {l:"Net Profit",     v:`${cur} ${fmt(Math.abs(stats.profit))}`,d:stats.revenueHistory.slice(-7),c:profC, icon:stats.profit>=0?"🚀":"📉"},
-            {l:"Overdue",        v:`${cur} ${fmt(stats.overdueAmount)}`,d:stats.expensesHistory.slice(-7),c:"#f87171", icon:"⚠️"},
+            {l:"Sales",           v:`${cur} ${fmt(stats.revenue)}`,          c:"#10b981", bg:"rgba(16,185,129,.12)",  icon:"🛍️"},
+            {l:"Orders",          v:String(stats.invoicesPending),            c:"#818cf8", bg:"rgba(129,140,248,.12)", icon:"📦"},
+            {l:"Pending",         v:String(stats.invoicesPending),            c:"#f59e0b", bg:"rgba(245,158,11,.12)",  icon:"🧾"},
+            {l:"Low Stock",       v:`${fmt(stats.overdueAmount)}`,            c:"#f87171", bg:"rgba(248,113,113,.12)", icon:"⚠️"},
           ].map((it,i)=>(
-            <div key={i} style={{borderRadius:16,padding:"14px 14px 12px",background:"var(--panel-bg)",border:"1px solid var(--border)",position:"relative",overflow:"hidden"}}>
-              <div style={{position:"absolute",top:10,right:12,fontSize:20,opacity:.18}}>{it.icon}</div>
-              <div style={{fontSize:10,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>{it.l}</div>
-              <div style={{fontSize:18,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.5px",marginBottom:6}}>{it.v}</div>
-              <Sparkline data={it.d} color={it.c}/>
-              <div style={{height:2,borderRadius:1,background:`${it.c}20`,marginTop:8}}><div style={{height:"100%",width:"65%",borderRadius:1,background:it.c}}/></div>
+            <div key={i} style={{borderRadius:14,padding:"12px 8px 10px",background:"var(--panel-bg)",border:"1px solid var(--border)",display:"flex",flexDirection:"column",alignItems:"center",gap:6,textAlign:"center",overflow:"hidden"}}>
+              <div style={{width:38,height:38,borderRadius:12,background:it.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>{it.icon}</div>
+              <div style={{fontSize:13,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1,wordBreak:"break-all"}}>{it.v}</div>
+              <div style={{fontSize:9,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".04em",lineHeight:1.2}}>{it.l}</div>
+              <div style={{width:"100%",height:2,borderRadius:1,background:`${it.c}20`}}><div style={{height:"100%",width:"70%",borderRadius:1,background:it.c}}/></div>
             </div>
           ))}
         </div>
