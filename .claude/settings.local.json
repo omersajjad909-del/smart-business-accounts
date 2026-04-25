@@ -129,7 +129,10 @@
       "Bash(grep -v \"//.*return\\\\|returnUrl\\\\|return res\\\\|return null\\\\|return;\\\\|.return\\\\|return {\")",
       "Bash(grep -v \"node_modules\\\\|//.*logo\")",
       "Bash(grep -E \"for$|For$\")",
-      "Bash(grep -v \"\\\\\\\\[\")"
+      "Bash(grep -v \"\\\\\\\\[\")",
+      "Bash(findstr /r /s /i \"FinovaOS is a product\" app\\\\*.tsx app\\\\*.ts)",
+      "Bash(findstr /r /s /i \"product of Finova\\\\|FinovaOS is\" \"app\\\\dashboard\\\\DashboardContent\\\\page.tsx\")",
+      "Bash(findstr /r /s /i \"product of Finova\\\\|FinovaOS is\" \"app\\\\dashboard\\\\layout.tsx\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
