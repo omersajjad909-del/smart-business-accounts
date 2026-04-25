@@ -19,6 +19,7 @@ type CompanyData = {
   currentPeriodEnd: string | null;
   activeModules: string | null;
   stripeCustomerId: string | null;
+  logoUrl?: string | null;
   createdAt?: string;
   totalUsers?: number;
   totalAccounts?: number;
@@ -64,6 +65,7 @@ export default function CompanyProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [editing, setEditing] = useState(false);
+  const [logoUploading, setLogoUploading] = useState(false);
   const [form, setForm] = useState({ name: "", country: "", baseCurrency: "" });
   const [bizTypeLabels, setBizTypeLabels] = useState<Record<string, string>>(BUSINESS_TYPE_LABELS_FALLBACK);
   const countryOptions = sortCountries(ALL_COUNTRIES).map((c) => c.name);
@@ -282,24 +284,73 @@ export default function CompanyProfilePage() {
 
         {/* Top row: avatar + info */}
         <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: editing ? "24px" : 0 }}>
-          <div
-            style={{
-              width: 70,
-              height: 70,
-              borderRadius: "18px",
-              background: "linear-gradient(135deg,#6366f1,#4f46e5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "28px",
-              fontWeight: 800,
-              color: "#fff",
-              flexShrink: 0,
-              boxShadow: "0 8px 24px rgba(99,102,241,0.3)",
-            }}
-          >
-            {(company.name || "C")[0].toUpperCase()}
-          </div>
+          {/* Company logo — clickable upload for admin */}
+          <label htmlFor="company-logo-input" style={{ cursor: isAdmin ? "pointer" : "default", flexShrink: 0, position: "relative" }}>
+            <div
+              style={{
+                width: 70,
+                height: 70,
+                borderRadius: "18px",
+                background: company.logoUrl ? "transparent" : "linear-gradient(135deg,#6366f1,#4f46e5)",
+                border: company.logoUrl ? "2px solid var(--border)" : "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "28px",
+                fontWeight: 800,
+                color: "#fff",
+                overflow: "hidden",
+                boxShadow: "0 8px 24px rgba(99,102,241,0.3)",
+              }}
+            >
+              {logoUploading ? (
+                <div style={{ width: 22, height: 22, border: "3px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin .7s linear infinite" }} />
+              ) : company.logoUrl ? (
+                <img src={company.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                (company.name || "C")[0].toUpperCase()
+              )}
+            </div>
+            {isAdmin && (
+              <div style={{
+                position: "absolute", bottom: -4, right: -4,
+                width: 22, height: 22, borderRadius: "50%",
+                background: "#6366f1", border: "2px solid var(--panel-bg)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 11,
+              }}>
+                📷
+              </div>
+            )}
+          </label>
+          {isAdmin && (
+            <input
+              id="company-logo-input"
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={async (e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                setLogoUploading(true);
+                const fd = new FormData();
+                fd.append("logo", f);
+                const r = await fetch("/api/company/logo", { method: "POST", body: fd });
+                if (r.ok) {
+                  const d = await r.json();
+                  setCompany((prev) => prev ? { ...prev, logoUrl: d.logoUrl } : prev);
+                  setSaveMsg({ text: "Logo updated successfully", ok: true });
+                  setTimeout(() => setSaveMsg(null), 3000);
+                } else {
+                  const d = await r.json().catch(() => ({}));
+                  setSaveMsg({ text: d.error || "Failed to upload logo", ok: false });
+                  setTimeout(() => setSaveMsg(null), 3000);
+                }
+                setLogoUploading(false);
+                e.target.value = "";
+              }}
+            />
+          )}
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: "20px", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-.3px" }}>
               {company.name}

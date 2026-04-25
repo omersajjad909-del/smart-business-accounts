@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
         stripeCustomerId: true,
         businessType: true,
         businessSetupDone: true,
+        logoUrl: true,
         createdAt: true,
         _count: { select: { users: true, accounts: true } },
       },

@@ -394,6 +394,7 @@ model Company {
   fraudRisk          String?    @default("NONE") // NONE | LOW | MEDIUM | HIGH — updated by fraud monitor
   flaggedAt          DateTime?  // When admin manually flagged this company
   flagNote           String?    // Admin note explaining the flag
+  logoUrl   String?  // Company logo stored as base64 data URL
   createdAt DateTime @default(now())
 
   users        UserCompany[]
@@ -585,6 +586,8 @@ model User {
   companies        UserCompany[]
   loginLogs        LoginLog[]       @relation("UserLoginLogs")
   sessions         Session[]
+
+  avatar    String?  // Profile photo stored as base64 data URL
 
   // 2FA / TOTP
   twoFactorEnabled Boolean @default(false)
