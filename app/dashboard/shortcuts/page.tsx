@@ -20,6 +20,17 @@ const ACTION_OPTIONS = [
 const MODIFIER_KEYS = ["Ctrl", "Shift", "Alt"];
 const DISPLAY_KEY = (k: string) => k;
 
+const BROWSER_RESERVED = new Set([
+  "ctrl+n","ctrl+t","ctrl+w","ctrl+p","ctrl+s","ctrl+d","ctrl+r","ctrl+f",
+  "ctrl+l","ctrl+k","ctrl+h","ctrl+j","ctrl+u","ctrl+shift+n","ctrl+shift+t",
+  "ctrl+shift+w","ctrl+shift+p","ctrl+shift+j","ctrl+tab","ctrl+shift+tab",
+  "alt+f4","alt+left","alt+right","f5","f11","f12",
+]);
+
+function isBrowserReserved(keys: string[]): boolean {
+  return BROWSER_RESERVED.has(keys.join("+").toLowerCase());
+}
+
 const card: React.CSSProperties = {
   background: "var(--panel-bg)", border: "1px solid var(--border)",
   borderRadius: 14, padding: "22px 24px", marginBottom: 16,
@@ -104,13 +115,14 @@ function KeyRecorder({ value, onChange }: { value: string[]; onChange: (keys: st
 }
 
 function ShortcutRow({
-  sc, onUpdate, onDelete, onToggle, conflict,
+  sc, onUpdate, onDelete, onToggle, conflict, browserReserved,
 }: {
   sc: ShortcutItem;
   onUpdate: (id: string, patch: Partial<ShortcutItem>) => void;
   onDelete: (id: string) => void;
   onToggle: (id: string) => void;
   conflict: boolean;
+  browserReserved: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -149,6 +161,11 @@ function ShortcutRow({
         {conflict && (
           <span style={{ fontSize: 10, color: "#f87171", fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)" }}>
             ⚠ Conflict
+          </span>
+        )}
+        {browserReserved && !conflict && (
+          <span title="This key combo is reserved by the browser and may not work" style={{ fontSize: 10, color: "#fb923c", fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "rgba(251,146,60,0.1)", border: "1px solid rgba(251,146,60,0.25)" }}>
+            🌐 Browser Key
           </span>
         )}
 
@@ -348,6 +365,7 @@ export default function ShortcutsPage() {
           <span>🔍 <strong>Focus Search</strong> — opens search bar</span>
           <span>◀ <strong>Toggle Sidebar</strong> — collapse/expand sidebar</span>
           <span>🔗 <strong>Navigate</strong> — go to any page</span>
+          <span>🌐 <strong style={{ color: "#fb923c" }}>Browser Key</strong> — reserved by browser (Ctrl+N, Ctrl+P etc.) — use Alt+key instead</span>
         </div>
       </div>
 
@@ -376,6 +394,7 @@ export default function ShortcutsPage() {
               onDelete={isAdmin ? remove : () => {}}
               onToggle={isAdmin ? toggle : () => {}}
               conflict={conflicts.has(sc.id)}
+              browserReserved={isBrowserReserved(sc.keys)}
             />
           ))
         )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 
 type SearchResultItem = {
@@ -90,14 +90,6 @@ export default function GlobalSearch() {
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const q = searchParams.get("q");
-    if (q && q !== query) setQuery(q);
-    if (!q && query) setQuery("");
-  }, [query, searchParams]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -111,14 +103,6 @@ export default function GlobalSearch() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      const currentQ = searchParams.get("q") || "";
-      if (query !== currentQ) {
-        const params = new URLSearchParams(searchParams.toString());
-        if (query) params.set("q", query);
-        else params.delete("q");
-        router.replace(`${pathname}?${params.toString()}`);
-      }
-
       if (query.length >= 2) {
         setShowResults(true);
         void performSearch();
@@ -129,7 +113,7 @@ export default function GlobalSearch() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [pathname, query, router, searchParams]);
+  }, [query]);
 
   async function performSearch() {
     setLoading(true);

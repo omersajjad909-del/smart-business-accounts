@@ -14,12 +14,12 @@ export type ShortcutItem = {
 const ACTION_LOG = "COMPANY_SHORTCUTS_V1";
 
 export const DEFAULT_SHORTCUTS: ShortcutItem[] = [
-  { id: "search",    keys: ["Ctrl","K"],         label: "Global Search",      action: "focus_search",    enabled: true },
-  { id: "sidebar",   keys: ["Ctrl","B"],         label: "Toggle Sidebar",     action: "toggle_sidebar",  enabled: true },
-  { id: "invoice",   keys: ["Ctrl","N"],         label: "New Sales Invoice",  action: "navigate", route: "/dashboard/sales-invoice",  enabled: true },
-  { id: "purchase",  keys: ["Ctrl","Shift","P"],  label: "Purchase Invoice",   action: "navigate", route: "/dashboard/purchase-invoice", enabled: true },
-  { id: "dashboard", keys: ["Ctrl","D"],         label: "Dashboard",          action: "navigate", route: "/dashboard",                 enabled: true },
-  { id: "inventory", keys: ["Ctrl","I"],         label: "Inventory",          action: "navigate", route: "/dashboard/inventory",       enabled: true },
+  { id: "search",    keys: ["Alt","S"],           label: "Global Search",      action: "focus_search",    enabled: true },
+  { id: "sidebar",   keys: ["Alt","B"],           label: "Toggle Sidebar",     action: "toggle_sidebar",  enabled: true },
+  { id: "invoice",   keys: ["Alt","I"],           label: "New Sales Invoice",  action: "navigate", route: "/dashboard/sales-invoice",  enabled: true },
+  { id: "purchase",  keys: ["Alt","P"],           label: "Purchase Invoice",   action: "navigate", route: "/dashboard/purchase-invoice", enabled: true },
+  { id: "dashboard", keys: ["Alt","H"],           label: "Dashboard",          action: "navigate", route: "/dashboard",                 enabled: true },
+  { id: "inventory", keys: ["Alt","V"],           label: "Inventory",          action: "navigate", route: "/dashboard/inventory",       enabled: true },
 ];
 
 async function getShortcuts(companyId: string): Promise<ShortcutItem[]> {
