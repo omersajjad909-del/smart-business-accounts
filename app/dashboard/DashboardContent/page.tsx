@@ -143,6 +143,8 @@ export default function DashboardContent() {
     ?(getStoredDemoBusinessPreference() as BusinessType|null):null;
 
   const [companyInfo,setCompanyInfo] = useState<{plan:string;subscriptionStatus:string;baseCurrency:string;name?:string}|null>(null);
+  const [userAvatar,setUserAvatar]   = useState<string|null>(null);
+  const [unreadNotifs,setUnreadNotifs] = useState(0);
   const [businessType,setBT]  = useState<BusinessType>(initDemo||(storedUser?.businessType as BusinessType)||"trading");
   const [stats,setStats]      = useState<DashStats>({
     revenue:0,expenses:0,profit:0,cashBalance:0,revenueGrowth:0,
@@ -214,6 +216,16 @@ export default function DashboardContent() {
           const tot=rows.reduce((a:number,r:any)=>a+Number(r.amount||0),0);
           if(tot>0)setDonut(rows.slice(0,5).map((r:any,i:number)=>({name:r.category||r.label||"Other",value:Number(r.amount||0),color:EC[i]})));
         }
+        // load avatar from stored user or me API
+        const meUser = getCurrentUser() as any;
+        if(meUser?.avatar) setUserAvatar(meUser.avatar);
+        else {
+          fetch("/api/me").then(r=>r.ok?r.json():null).then(d=>{ if(d?.avatar) setUserAvatar(d.avatar); }).catch(()=>{});
+        }
+        // load unread notification count
+        fetch("/api/admin/notifications").then(r=>r.ok?r.json():null).then(d=>{
+          if(d?.notifications) setUnreadNotifs((d.notifications as any[]).filter((n:any)=>!n.isRead).length);
+        }).catch(()=>{});
       } catch(e){console.error("Dashboard:",e);}
       finally{setLoad(false);}
     })();
@@ -299,7 +311,9 @@ export default function DashboardContent() {
 
         .db-mo{display:none!important;}
         @media(max-width:767px){
-          .db-mo{display:block!important;}
+          .db-mo        {display:block!important;}
+          .db-mo-flex   {display:flex!important;}
+          .db-mo-grid   {display:grid!important;}
           .db-mo-legacy-head{display:none!important;}
           .db-kpi{display:none!important;}
           .db-mid{display:none!important;}
@@ -397,31 +411,37 @@ export default function DashboardContent() {
         {loading&&<div style={{width:28,height:28,border:"2.5px solid rgba(99,102,241,.2)",borderTopColor:"#6366f1",borderRadius:"50%",animation:"db-spin .7s linear infinite",flexShrink:0}}/>}
       </div>
 
-      {/* ── Hero Balance Card ── */}
-      <div className="db-mo" style={{marginBottom:18,display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
+      {/* ── Mobile Header: Avatar + Name + Notification ── */}
+      <div className="db-mo db-mo-flex" style={{marginBottom:18,alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
         <div style={{display:"flex",alignItems:"flex-start",gap:12,minWidth:0}}>
-          <div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,color:"#fff",flexShrink:0,boxShadow:"0 8px 24px rgba(99,102,241,.28)"}}>
-            {userInitials}
+          {/* Avatar — shows real photo if uploaded */}
+          <div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:800,color:"#fff",flexShrink:0,boxShadow:"0 8px 24px rgba(99,102,241,.28)",overflow:"hidden"}}>
+            {userAvatar
+              ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+              : userInitials}
           </div>
           <div style={{minWidth:0,paddingTop:2}}>
             <div style={{fontSize:12,color:"var(--text-muted)",marginBottom:2}}>{greeting},</div>
-            <div style={{fontSize:20,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.45px",lineHeight:1.05,marginBottom:6}}>{uName}</div>
-            <div style={{display:"flex",alignItems:"center",gap:6,minWidth:0}}>
+            <div style={{fontSize:20,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.45px",lineHeight:1.05,marginBottom:6}}>{uName} 👋</div>
+            {/* Company — clickable link */}
+            <Link prefetch={false} href="/dashboard/company-profile" style={{display:"flex",alignItems:"center",gap:5,textDecoration:"none",minWidth:0}}>
               <span style={{fontSize:12,color:"var(--text-muted)",flexShrink:0}}>Company:</span>
-              <span style={{fontSize:12,fontWeight:600,color:"#a5b4fc",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{companyLabel}</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" style={{color:"var(--text-muted)",flexShrink:0}}><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
+              <span style={{fontSize:12,fontWeight:700,color:"#a5b4fc",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{companyLabel}</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" strokeWidth="2.5" style={{flexShrink:0}}><polyline points="6 9 12 15 18 9"/></svg>
+            </Link>
           </div>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-          <button style={{position:"relative",width:38,height:38,borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--text-primary)",boxShadow:"0 8px 18px rgba(2,6,23,.18)"}}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
-            </svg>
-            <span style={{position:"absolute",top:5,right:5,minWidth:14,height:14,padding:"0 3px",borderRadius:999,background:"#6366f1",display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,fontWeight:800,color:"#fff",lineHeight:1}}>3</span>
-          </button>
-          {loading&&<div style={{width:22,height:22,border:"2px solid rgba(99,102,241,.2)",borderTopColor:"#6366f1",borderRadius:"50%",animation:"db-spin .7s linear infinite",flexShrink:0}}/>}
-        </div>
+        {/* Notification bell — real count, navigates to notifications */}
+        <Link prefetch={false} href="/dashboard/notifications" style={{position:"relative",width:40,height:40,borderRadius:13,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--text-primary)",flexShrink:0,textDecoration:"none"}}>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+          </svg>
+          {unreadNotifs > 0 && (
+            <span style={{position:"absolute",top:7,right:7,minWidth:8,height:8,padding:"0 2px",borderRadius:999,background:"#f87171",border:"1.5px solid var(--panel-bg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:7,fontWeight:800,color:"#fff",lineHeight:1}}>
+              {unreadNotifs > 9 ? "9+" : ""}
+            </span>
+          )}
+        </Link>
       </div>
 
       <div className="db-mo" style={{borderRadius:22,padding:"24px 20px 20px",background:"linear-gradient(135deg,#1e1b4b 0%,#312e81 35%,#4338ca 70%,#6366f1 100%)",marginBottom:16,position:"relative",overflow:"hidden",boxShadow:"0 8px 32px rgba(99,102,241,.35)"}}>
@@ -462,22 +482,22 @@ export default function DashboardContent() {
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
           <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>Quick Actions</div>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10}}>
           {[
-            {label:"Invoice", href:"/dashboard/sales-invoice", bg:"linear-gradient(135deg,#6366f1,#4f46e5)",
+            {label:"+ Invoice", href:"/dashboard/sales-invoice",      bg:"linear-gradient(135deg,#6366f1,#4f46e5)",
               icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>},
-            {label:"Sale",    href:"/dashboard/sales-order/new",   bg:"linear-gradient(135deg,#0ea5e9,#0284c7)",
+            {label:"+ Sale",    href:"/dashboard/sales-invoice",      bg:"linear-gradient(135deg,#0ea5e9,#0284c7)",
               icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.97 1.61h9.72a2 2 0 001.97-1.61L23 6H6"/></svg>},
-            {label:"Expense", href:"/dashboard/expense-vouchers/new", bg:"linear-gradient(135deg,#f59e0b,#d97706)",
+            {label:"+ Expense", href:"/dashboard/expense-vouchers",   bg:"linear-gradient(135deg,#f59e0b,#d97706)",
               icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>},
-            {label:"Product", href:"/dashboard/items-new",           bg:"linear-gradient(135deg,#10b981,#059669)",
+            {label:"+ Product", href:"/dashboard/items-new",          bg:"linear-gradient(135deg,#10b981,#059669)",
               icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>},
           ].map((q,i)=>(
-            <Link prefetch={false} key={i} href={q.href} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,textDecoration:"none"}}>
-              <div style={{width:60,height:60,borderRadius:18,background:q.bg,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 16px rgba(0,0,0,.2)"}}>
+            <Link prefetch={false} key={i} href={q.href} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:7,textDecoration:"none"}}>
+              <div style={{width:58,height:58,borderRadius:18,background:q.bg,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 16px rgba(0,0,0,.25)",flexShrink:0}}>
                 {q.icon}
               </div>
-              <span style={{fontSize:11,fontWeight:600,color:"var(--text-muted)",textAlign:"center"}}>{q.label}</span>
+              <span style={{fontSize:10,fontWeight:700,color:"var(--text-muted)",textAlign:"center",lineHeight:1.2,whiteSpace:"nowrap"}}>{q.label}</span>
             </Link>
           ))}
         </div>
