@@ -283,7 +283,16 @@ export default function AccountSettingsPage() {
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
                 <label style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.12)", color: "#c7d2fe", fontSize: 13, fontWeight: 800, cursor: loading || uploadingPhoto ? "not-allowed" : "pointer", opacity: loading || uploadingPhoto ? 0.65 : 1 }}>
                   {uploadingPhoto ? "Uploading..." : "Upload Photo"}
-                  <input type="file" accept="image/*" style={{ display: "none" }} disabled={loading || uploadingPhoto} onChange={(event) => setPendingAvatarFile(event.target.files?.[0] || null)} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    disabled={loading || uploadingPhoto}
+                    onChange={(event) => {
+                      setPendingAvatarFile(event.target.files?.[0] || null);
+                      event.target.value = "";
+                    }}
+                  />
                 </label>
                 <button type="button" disabled={!avatar || uploadingPhoto} onClick={removeAvatar} style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,.12)", background: "transparent", color: "rgba(255,255,255,.8)", fontSize: 13, fontWeight: 700, cursor: !avatar || uploadingPhoto ? "not-allowed" : "pointer", opacity: !avatar || uploadingPhoto ? 0.55 : 1 }}>
                   Remove

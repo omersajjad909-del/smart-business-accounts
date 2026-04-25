@@ -1,13 +1,13 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, updateStoredUser } from "@/lib/auth";
 import { getMaxUsersForPlan } from "@/lib/planLimits";
 import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
 import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency";
 import Link from "next/link";
 import ImageAdjusterModal from "@/components/ImageAdjusterModal";
-import { dispatchCompanyProfileUpdated } from "@/lib/dashboardProfileEvents";
+import { dispatchCompanyProfileUpdated, dispatchUserProfileUpdated } from "@/lib/dashboardProfileEvents";
 
 type CompanyData = {
   id: string;
@@ -78,13 +78,31 @@ export default function CompanyProfilePage() {
     setSaveMsg(null);
     try {
       const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], "company-logo.png", { type: blob.type || "image/png" });
       const fd = new FormData();
-      fd.append("logo", new File([blob], "company-logo.png", { type: blob.type || "image/png" }));
+      fd.append("logo", file);
       const r = await fetch("/api/company/logo", { method: "POST", body: fd });
       if (r.ok) {
         const d = await r.json();
         setCompany((prev) => prev ? { ...prev, logoUrl: d.logoUrl } : prev);
         dispatchCompanyProfileUpdated({ logoUrl: d.logoUrl });
+        if (isAdmin) {
+          const avatarForm = new FormData();
+          avatarForm.append("avatar", file);
+          const avatarRes = await fetch("/api/me/avatar", { method: "POST", body: avatarForm });
+          if (avatarRes.ok) {
+            const avatarData = await avatarRes.json();
+            updateStoredUser((stored: any) => ({
+              ...stored,
+              avatar: avatarData.avatar || null,
+              user: {
+                ...(stored?.user || {}),
+                avatar: avatarData.avatar || null,
+              },
+            }));
+            dispatchUserProfileUpdated({ avatar: avatarData.avatar || null });
+          }
+        }
         setSaveMsg({ text: "Logo updated successfully", ok: true });
         setTimeout(() => setSaveMsg(null), 3000);
       } else {
@@ -421,7 +439,7 @@ export default function CompanyProfilePage() {
               )}
             </div>
             <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "12px", lineHeight: 1.6 }}>
-              Company logo yahan se manage hota hai. Personal photo, jo navbar aur sidebar me dikhni chahiye, ab{" "}
+              Yahan upload ki hui photo company card par dikh jayegi, aur admin ke navbar/sidebar preview ko bhi sync kar degi. Personal photo ko baad me{" "}
               <Link href="/dashboard/account-settings" style={{ color: "#a5b4fc", fontWeight: 700, textDecoration: "none" }}>
                 Account Settings
               </Link>{" "}
