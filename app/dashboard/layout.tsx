@@ -655,7 +655,7 @@ export default function DashboardLayout({
               <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{flexShrink:0,objectFit:"contain"}}/>
               <div style={{display:"flex",flexDirection:"column",gap:1}}>
                 <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
-                <div style={{fontSize:9,color:"var(--text-muted)",letterSpacing:".05em",textTransform:"uppercase"}}>Business Suitess</div>
+                <div style={{fontSize:9,color:"var(--text-muted)",letterSpacing:".05em",textTransform:"uppercase"}}>Business Suite</div>
               </div>
             </Link>
           )}
