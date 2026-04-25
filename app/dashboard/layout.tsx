@@ -78,7 +78,7 @@ function FinovaLoader() {
           FinovaOS
         </div>
         <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", letterSpacing: ".12em", textTransform: "uppercase", marginTop: 4 }}>
-          Global Accounting & Business Suite
+          Global Accounting & Business Suitess
         </div>
       </div>
 
