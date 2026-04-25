@@ -387,11 +387,15 @@ export default function DashboardLayout({
       const tag = (e.target as HTMLElement).tagName;
       const inInput = tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement).isContentEditable;
 
-      // Escape always closes panels
+      // Escape: close open panels, or navigate back if all closed
       if (e.key === "Escape") {
-        setShowNotifPanel(false);
-        setShowHelpPanel(false);
-        setShowUserMenu(false);
+        if (showNotifPanel || showHelpPanel || showUserMenu) {
+          setShowNotifPanel(false);
+          setShowHelpPanel(false);
+          setShowUserMenu(false);
+        } else {
+          router.back();
+        }
         return;
       }
 
@@ -432,7 +436,7 @@ export default function DashboardLayout({
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [router, shortcuts]);
+  }, [router, shortcuts, showNotifPanel, showHelpPanel, showUserMenu]);
 
   const normalizedPlanCode =
     String(companyPlan || "STARTER").toUpperCase() === "PROFESSIONAL"
@@ -2213,7 +2217,7 @@ export default function DashboardLayout({
                       </div>
                     ))}
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"7px 16px",opacity:.5}}>
-                      <span style={{fontSize:12,color:"var(--text-muted)"}}>Close popups</span>
+                      <span style={{fontSize:12,color:"var(--text-muted)"}}>Close popup / Go back</span>
                       <kbd style={{padding:"2px 6px",borderRadius:5,background:"rgba(255,255,255,0.06)",border:"1px solid var(--border)",fontSize:10,fontWeight:700,color:"var(--text-primary)",fontFamily:"inherit"}}>Escape</kbd>
                     </div>
                   </div>
