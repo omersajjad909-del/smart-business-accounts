@@ -255,9 +255,9 @@ export default function DashboardContent() {
   ].filter(Boolean) as {label:string;detail:string;due:string;color:string}[];
 
   const QA=[
-    {label:"+ Invoice",href:"/dashboard/sales-invoice/new",  bg:"linear-gradient(135deg,#6366f1,#4f46e5)",icon:"📄"},
-    {label:"+ Sale",   href:"/dashboard/sales-order/new",    bg:"linear-gradient(135deg,#38bdf8,#0ea5e9)",icon:"🛒"},
-    {label:"+ Expense",href:"/dashboard/expense-vouchers/new",bg:"linear-gradient(135deg,#f59e0b,#d97706)",icon:"💰"},
+    {label:"+ Invoice",href:"/dashboard/sales-invoice",  bg:"linear-gradient(135deg,#6366f1,#4f46e5)",icon:"📄"},
+    {label:"+ Sale",   href:"/dashboard/sales-order",    bg:"linear-gradient(135deg,#38bdf8,#0ea5e9)",icon:"🛒"},
+    {label:"+ Expense",href:"/dashboard/expense-vouchers",bg:"linear-gradient(135deg,#f59e0b,#d97706)",icon:"💰"},
     {label:"+ Product",href:"/dashboard/items-new",          bg:"linear-gradient(135deg,#10b981,#059669)",icon:"📦"},
   ];
 
@@ -288,9 +288,11 @@ export default function DashboardContent() {
         .db-mo{display:none!important;}
         @media(max-width:767px){
           .db-mo{display:block!important;}
+          .db-kpi{display:none!important;}
           .db-mid{display:none!important;}
+          .db-bot{display:none!important;}
           .db-deskqa{display:none!important;}
-          .db-kpi-bal{display:none!important;}
+          .db-desk-header{display:none!important;}
         }
 
         .db-card{transition:transform .15s,box-shadow .15s;}
@@ -311,8 +313,8 @@ export default function DashboardContent() {
         </div>
       )}
 
-      {/* ── Header ── */}
-      <div style={{marginBottom:24,display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+      {/* ── Header (desktop only) ── */}
+      <div className="db-desk-header" style={{marginBottom:24,display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
         <div>
           <h1 style={{fontSize:22,fontWeight:900,color:"var(--text-primary)",margin:"0 0 5px",letterSpacing:"-.4px"}}>{greeting}, {uName} 👋</h1>
           <p style={{margin:0,fontSize:13,color:"var(--text-muted)"}}>Here&apos;s what&apos;s happening with your business today.</p>
@@ -369,114 +371,161 @@ export default function DashboardContent() {
         </div>
       </div>
 
-      {/* ── MOBILE ONLY: Hero Balance ── */}
-      <div className="db-mo" style={{borderRadius:20,padding:"22px 20px",background:"linear-gradient(135deg,#312e81 0%,#4338ca 45%,#6366f1 100%)",marginBottom:18,position:"relative",overflow:"hidden",animation:"db-up .4s ease"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}}>
-          <div>
-            <div style={{fontSize:10,color:"rgba(255,255,255,.55)",fontWeight:600,textTransform:"uppercase",letterSpacing:".08em",marginBottom:4}}>Total Balance 👁</div>
-            <div style={{fontSize:30,fontWeight:900,color:"white",letterSpacing:"-1px",marginBottom:5}}>{cur} {fmt(stats.cashBalance)}</div>
-            <div style={{fontSize:11,fontWeight:700,color:"#86efac"}}>{stats.revenueGrowth>=0?"↑":"↓"} {Math.abs(stats.revenueGrowth).toFixed(1)}% <span style={{color:"rgba(255,255,255,.45)",fontWeight:400}}>vs last month</span></div>
-          </div>
-          <div style={{width:46,height:46,borderRadius:13,background:"rgba(255,255,255,.14)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>📈</div>
+      {/* ════════════════════════════════════════
+           MOBILE ONLY — Full redesign
+          ════════════════════════════════════════ */}
+
+      {/* ── Greeting + date ── */}
+      <div className="db-mo" style={{marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div>
+          <div style={{fontSize:20,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.4px"}}>{greeting}, {uName} 👋</div>
+          <div style={{fontSize:12,color:"var(--text-muted)",marginTop:3}}>{dRange}</div>
         </div>
-        <div style={{display:"flex",gap:20,paddingTop:14,borderTop:"1px solid rgba(255,255,255,.14)"}}>
-          {[["Revenue","#86efac",stats.revenue],["Expenses","#fca5a5",stats.expenses],["Profit Margin",stats.revenue>0?"#c4b5fd":"#fca5a5",stats.revenue>0?`${Math.round((stats.profit/stats.revenue)*100)}%`:0]].map(([l,c,v],i)=>(
+        {loading&&<div style={{width:28,height:28,border:"2.5px solid rgba(99,102,241,.2)",borderTopColor:"#6366f1",borderRadius:"50%",animation:"db-spin .7s linear infinite",flexShrink:0}}/>}
+      </div>
+
+      {/* ── Hero Balance Card ── */}
+      <div className="db-mo" style={{borderRadius:22,padding:"24px 20px 20px",background:"linear-gradient(135deg,#1e1b4b 0%,#312e81 35%,#4338ca 70%,#6366f1 100%)",marginBottom:16,position:"relative",overflow:"hidden",boxShadow:"0 8px 32px rgba(99,102,241,.35)"}}>
+        {/* Background circles */}
+        <div style={{position:"absolute",top:-30,right:-30,width:160,height:160,borderRadius:"50%",background:"rgba(255,255,255,.04)",pointerEvents:"none"}}/>
+        <div style={{position:"absolute",bottom:-20,left:-20,width:120,height:120,borderRadius:"50%",background:"rgba(255,255,255,.03)",pointerEvents:"none"}}/>
+        {/* Top row */}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20,position:"relative"}}>
+          <div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.55)",fontWeight:600,textTransform:"uppercase",letterSpacing:".1em",marginBottom:6}}>Total Balance</div>
+            <div style={{fontSize:34,fontWeight:900,color:"white",letterSpacing:"-1.5px",lineHeight:1}}>{cur} {fmt(stats.cashBalance)}</div>
+            <div style={{fontSize:12,fontWeight:700,color:stats.revenueGrowth>=0?"#86efac":"#fca5a5",marginTop:6,display:"flex",alignItems:"center",gap:4}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points={stats.revenueGrowth>=0?"23 6 13.5 15.5 8.5 10.5 1 18":"1 6 10.5 15.5 15.5 10.5 23 18"}/></svg>
+              {Math.abs(stats.revenueGrowth).toFixed(1)}% vs last month
+            </div>
+          </div>
+          <div style={{width:48,height:48,borderRadius:15,background:"rgba(255,255,255,.15)",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.2)"}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+        </div>
+        {/* Bottom stats row */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,paddingTop:16,borderTop:"1px solid rgba(255,255,255,.12)",position:"relative"}}>
+          {[
+            {l:"Revenue",  v:stats.revenue,  c:"#86efac"},
+            {l:"Expenses", v:stats.expenses, c:"#fca5a5"},
+            {l:"Profit",   v:stats.profit,   c:profC=="#10b981"?"#86efac":"#fca5a5"},
+          ].map((s,i)=>(
             <div key={i}>
-              <div style={{fontSize:9,color:"rgba(255,255,255,.45)",fontWeight:600,marginBottom:2}}>{l as string}</div>
-              <div style={{fontSize:13,fontWeight:800,color:c as string}}>{typeof v==="string"?v:`${cur} ${fmt(v as number)}`}</div>
+              <div style={{fontSize:9,color:"rgba(255,255,255,.45)",fontWeight:600,textTransform:"uppercase",letterSpacing:".07em",marginBottom:4}}>{s.l}</div>
+              <div style={{fontSize:13,fontWeight:800,color:s.c,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{cur} {fmt(s.v)}</div>
             </div>
           ))}
         </div>
-        <svg style={{position:"absolute",bottom:-1,left:0,right:0,opacity:.12}} viewBox="0 0 400 50" fill="white" preserveAspectRatio="none" height={50}>
-          <path d="M0,25 C100,50 300,0 400,25 L400,50 L0,50 Z"/>
-        </svg>
       </div>
 
-      {/* ── MOBILE ONLY: Quick Actions ── */}
-      <div className="db-mo" style={{marginBottom:18}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
-          <div style={{fontSize:14,fontWeight:700,color:"var(--text-primary)"}}>Quick Actions</div>
-          <span style={{fontSize:12,color:"#818cf8",fontWeight:600}}>Edit</span>
+      {/* ── Quick Actions ── */}
+      <div className="db-mo" style={{marginBottom:20}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+          <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>Quick Actions</div>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10}}>
-          {QA.map((q,i)=>(
-            <Link prefetch={false} key={i} href={q.href} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:7,textDecoration:"none"}}>
-              <div style={{width:58,height:58,borderRadius:17,background:q.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,boxShadow:`0 4px 14px rgba(0,0,0,.2)`}}>{q.icon}</div>
-              <span style={{fontSize:10,fontWeight:600,color:"var(--text-muted)",textAlign:"center"}}>{q.label}</span>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
+          {[
+            {label:"Invoice", href:"/dashboard/sales-invoice", bg:"linear-gradient(135deg,#6366f1,#4f46e5)",
+              icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>},
+            {label:"Sale",    href:"/dashboard/sales-order/new",   bg:"linear-gradient(135deg,#0ea5e9,#0284c7)",
+              icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.97 1.61h9.72a2 2 0 001.97-1.61L23 6H6"/></svg>},
+            {label:"Expense", href:"/dashboard/expense-vouchers/new", bg:"linear-gradient(135deg,#f59e0b,#d97706)",
+              icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>},
+            {label:"Product", href:"/dashboard/items-new",           bg:"linear-gradient(135deg,#10b981,#059669)",
+              icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>},
+          ].map((q,i)=>(
+            <Link prefetch={false} key={i} href={q.href} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,textDecoration:"none"}}>
+              <div style={{width:60,height:60,borderRadius:18,background:q.bg,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 16px rgba(0,0,0,.2)"}}>
+                {q.icon}
+              </div>
+              <span style={{fontSize:11,fontWeight:600,color:"var(--text-muted)",textAlign:"center"}}>{q.label}</span>
             </Link>
           ))}
         </div>
       </div>
 
-      {/* ── MOBILE ONLY: AI Insight card ── */}
-      <div className="db-mo" style={{marginBottom:18}}>
-        <div style={{borderRadius:16,background:"linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.06))",border:"1px solid rgba(99,102,241,.22)",padding:"16px 18px",display:"flex",alignItems:"center",gap:14}}>
-          <div style={{width:44,height:44,borderRadius:13,background:"linear-gradient(135deg,#6366f1,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🤖</div>
-          <div style={{flex:1}}>
-            <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:5}}>
-              <div style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>AI Insight</div>
-              <span style={{padding:"1px 7px",borderRadius:20,background:"rgba(99,102,241,.2)",border:"1px solid rgba(99,102,241,.3)",fontSize:9,fontWeight:700,color:"#818cf8"}}>New</span>
-            </div>
-            <p style={{margin:"0 0 8px",fontSize:11,color:"var(--text-muted)",lineHeight:1.6}}>Track business performance with AI-powered insights.</p>
-            <Link prefetch={false} href="/dashboard/ai" style={{padding:"5px 12px",borderRadius:8,background:"rgba(99,102,241,.18)",color:"#a5b4fc",fontSize:11,fontWeight:700,textDecoration:"none",display:"inline-block"}}>View Details</Link>
-          </div>
-          <div style={{fontSize:38,flexShrink:0,opacity:.55}}>🧠</div>
-        </div>
-      </div>
-
-      {/* ── MOBILE ONLY: Today's Overview ── */}
-      <div className="db-mo" style={{marginBottom:18}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:11}}>
-          <div style={{fontSize:14,fontWeight:700,color:"var(--text-primary)"}}>Today&apos;s Overview</div>
+      {/* ── Today's Stats (2×2) ── */}
+      <div className="db-mo" style={{marginBottom:20}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+          <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>Overview</div>
           <Link prefetch={false} href="/dashboard/reports" style={{fontSize:12,color:"#818cf8",textDecoration:"none",fontWeight:600}}>View All</Link>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
           {[
-            {l:"Sales",          v:`${cur} ${fmt(stats.revenue)}`,     d:stats.revenueHistory.slice(-7),  c:"#10b981"},
-            {l:"Pending Inv.",   v:String(stats.invoicesPending),       d:stats.revenueHistory.slice(-7).map(()=>1),c:"#f59e0b"},
-            {l:"Profit",         v:`${cur} ${fmt(Math.abs(stats.profit))}`,d:stats.revenueHistory.slice(-7),c:profC},
-            {l:"Overdue",        v:`${cur} ${fmt(stats.overdueAmount)}`,d:stats.expensesHistory.slice(-7),c:"#f87171"},
+            {l:"Total Revenue",  v:`${cur} ${fmt(stats.revenue)}`,     d:stats.revenueHistory.slice(-7),  c:"#10b981", icon:"📈"},
+            {l:"Pending Invoices",v:String(stats.invoicesPending),      d:stats.revenueHistory.slice(-7).map(()=>1),c:"#f59e0b", icon:"⏳"},
+            {l:"Net Profit",     v:`${cur} ${fmt(Math.abs(stats.profit))}`,d:stats.revenueHistory.slice(-7),c:profC, icon:stats.profit>=0?"🚀":"📉"},
+            {l:"Overdue",        v:`${cur} ${fmt(stats.overdueAmount)}`,d:stats.expensesHistory.slice(-7),c:"#f87171", icon:"⚠️"},
           ].map((it,i)=>(
-            <div key={i} style={{borderRadius:14,padding:"13px 14px",background:"var(--panel-bg)",border:"1px solid var(--border)"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
-                <div style={{fontSize:10,fontWeight:700,color:"var(--text-muted)"}}>{it.l}</div>
-                <Sparkline data={it.d} color={it.c}/>
-              </div>
-              <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>{it.v}</div>
-              <div style={{height:2,borderRadius:1,background:`${it.c}20`,marginTop:7}}><div style={{height:"100%",width:"70%",borderRadius:1,background:it.c}}/></div>
+            <div key={i} style={{borderRadius:16,padding:"14px 14px 12px",background:"var(--panel-bg)",border:"1px solid var(--border)",position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",top:10,right:12,fontSize:20,opacity:.18}}>{it.icon}</div>
+              <div style={{fontSize:10,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>{it.l}</div>
+              <div style={{fontSize:18,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.5px",marginBottom:6}}>{it.v}</div>
+              <Sparkline data={it.d} color={it.c}/>
+              <div style={{height:2,borderRadius:1,background:`${it.c}20`,marginTop:8}}><div style={{height:"100%",width:"65%",borderRadius:1,background:it.c}}/></div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── MOBILE ONLY: Recent Activity ── */}
+      {/* ── AI Insight ── */}
       <div className="db-mo" style={{marginBottom:20}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:11}}>
-          <div style={{fontSize:14,fontWeight:700,color:"var(--text-primary)"}}>Recent Activity</div>
+        <div style={{borderRadius:18,background:"linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.07))",border:"1px solid rgba(99,102,241,.25)",padding:"18px 16px",display:"flex",gap:16,alignItems:"center",position:"relative",overflow:"hidden"}}>
+          <div style={{position:"absolute",right:-10,top:-10,width:80,height:80,borderRadius:"50%",background:"radial-gradient(circle,rgba(99,102,241,.15) 0%,transparent 70%)"}}/>
+          {/* Brain */}
+          <div style={{width:54,height:54,borderRadius:16,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0,boxShadow:"0 4px 18px rgba(99,102,241,.45)"}}>🧠</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:6}}>
+              <div style={{fontSize:14,fontWeight:800,color:"var(--text-primary)"}}>AI Insight</div>
+              <span style={{padding:"2px 8px",borderRadius:20,background:"rgba(99,102,241,.25)",border:"1px solid rgba(99,102,241,.35)",fontSize:9,fontWeight:700,color:"#a5b4fc"}}>NEW</span>
+            </div>
+            <p style={{margin:"0 0 10px",fontSize:11.5,color:"var(--text-muted)",lineHeight:1.65}}>Track business performance with AI-powered insights and smart alerts.</p>
+            <Link prefetch={false} href="/dashboard/ai" style={{display:"inline-flex",alignItems:"center",gap:5,padding:"6px 14px",borderRadius:9,background:"rgba(99,102,241,.2)",border:"1px solid rgba(99,102,241,.3)",color:"#c4b5fd",fontSize:11,fontWeight:700,textDecoration:"none"}}>
+              View Details
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Recent Transactions ── */}
+      <div className="db-mo" style={{marginBottom:24}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+          <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>Recent Transactions</div>
           <Link prefetch={false} href="/dashboard/invoices" style={{fontSize:12,color:"#818cf8",textDecoration:"none",fontWeight:600}}>View All</Link>
         </div>
-        <div style={{borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",overflow:"hidden"}}>
+        <div style={{borderRadius:18,background:"var(--panel-bg)",border:"1px solid var(--border)",overflow:"hidden"}}>
           {stats.recentActivity.length===0?(
-            <div style={{padding:"30px",textAlign:"center",color:"var(--text-muted)",fontSize:12}}>No recent activity</div>
+            <div style={{padding:"36px",textAlign:"center"}}>
+              <div style={{fontSize:32,marginBottom:8}}>📋</div>
+              <div style={{fontSize:12,color:"var(--text-muted)"}}>No recent activity</div>
+            </div>
           ):stats.recentActivity.slice(0,5).map((tx,i)=>{
             const isInv=tx.type==="invoice";
-            const tc=isInv?"#10b981":tx.type==="purchase"?"#818cf8":"#f59e0b";
-            const ref=tx.description.split(" ").pop()||"—";
+            const isPur=tx.type==="purchase";
+            const tc=isInv?"#10b981":isPur?"#818cf8":"#f59e0b";
+            const amt=tx.amount;
+            const bg=isInv?"rgba(16,185,129,.1)":isPur?"rgba(129,140,248,.1)":"rgba(245,158,11,.1)";
             return (
-              <div key={i} className="db-row" style={{display:"flex",alignItems:"center",gap:11,padding:"12px 16px",borderBottom:i<Math.min(stats.recentActivity.length,5)-1?"1px solid rgba(255,255,255,.05)":"none",transition:"background .12s"}}>
-                <div style={{width:38,height:38,borderRadius:11,background:`${tc}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0}}>{isInv?"🧾":tx.type==="purchase"?"📦":"💸"}</div>
+              <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 16px",borderBottom:i<Math.min(stats.recentActivity.length,5)-1?"1px solid var(--border)":"none"}}>
+                {/* Icon */}
+                <div style={{width:42,height:42,borderRadius:13,background:bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  {isInv
+                    ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={tc} strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    : isPur
+                    ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={tc} strokeWidth="2" strokeLinecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                    : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={tc} strokeWidth="2" strokeLinecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  }
+                </div>
+                {/* Details */}
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:12,fontWeight:600,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{tx.description}</div>
-                  <div style={{fontSize:10,color:"var(--text-muted)",marginTop:1}}>{tx.date}</div>
+                  <div style={{fontSize:13,fontWeight:600,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{tx.description}</div>
+                  <div style={{fontSize:11,color:"var(--text-muted)",marginTop:2}}>{tx.date} · <span style={{color:isInv?"#10b981":"#f87171",fontWeight:600}}>{isInv?"Received":"Paid"}</span></div>
                 </div>
+                {/* Amount */}
                 <div style={{textAlign:"right",flexShrink:0}}>
-                  <div style={{fontSize:13,fontWeight:700,color:isInv?"#10b981":"#f87171"}}>{isInv?"+":"-"}{cur} {fmt(tx.amount)}</div>
-                  <div style={{display:"flex",alignItems:"center",gap:3,justifyContent:"flex-end",marginTop:1}}>
-                    <div style={{fontSize:10,color:"#10b981",fontWeight:600}}>Paid</div>
-                    <div style={{width:5,height:5,borderRadius:"50%",background:"#10b981"}}/>
-                  </div>
+                  <div style={{fontSize:14,fontWeight:800,color:isInv?"#10b981":"#f87171"}}>{isInv?"+":`-`}{cur} {fmt(amt)}</div>
                 </div>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
               </div>
             );
           })}

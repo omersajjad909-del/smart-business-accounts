@@ -1917,7 +1917,7 @@ export default function DashboardLayout({
 
             {/* + New button — desktop only */}
             {!isMobileViewport && (
-              <Link prefetch={false} href="/dashboard/sales-invoice/new"
+              <Link prefetch={false} href="/dashboard/sales-invoice"
                 style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:10,background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:13,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap",boxShadow:"0 2px 10px rgba(99,102,241,.4)"}}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -2097,7 +2097,7 @@ export default function DashboardLayout({
           {/* FAB — Centre + Button */}
           <div style={{flex:1, display:"flex", alignItems:"center", justifyContent:"center", paddingTop:0}}>
             <button
-              onClick={() => router.push("/dashboard/sales-invoice/new")}
+              onClick={() => router.push("/dashboard/sales-invoice")}
               style={{
                 width:52, height:52, borderRadius:"50%",
                 background:"linear-gradient(135deg,#6366f1,#4f46e5)",
