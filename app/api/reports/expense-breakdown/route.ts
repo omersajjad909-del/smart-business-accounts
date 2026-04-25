@@ -77,13 +77,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ rows });
     }
 
-    // Default: group by ExpenseVoucherItem.category
+    // Default: group by ExpenseItem.category
     const [currentItems, previousItems] = await Promise.all([
-      prisma.expenseVoucherItem.findMany({
+      prisma.expenseItem.findMany({
         where: { expenseVoucher: { companyId, date: { gte: start, lt: end }, deletedAt: null } },
         select: { category: true, amount: true },
       }),
-      prisma.expenseVoucherItem.findMany({
+      prisma.expenseItem.findMany({
         where: { expenseVoucher: { companyId, date: { gte: prevStart, lt: prevEnd }, deletedAt: null } },
         select: { category: true, amount: true },
       }),

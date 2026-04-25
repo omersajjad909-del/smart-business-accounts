@@ -1,6 +1,6 @@
 /**
  * GET /api/reports/budget-vs-actual
- * Compares Budget table amounts vs actual ExpenseVoucherItem spend
+ * Compares Budget table amounts vs actual ExpenseItem spend
  * Query params: period (month|quarter|year), costCenterId (optional)
  */
 import { NextRequest, NextResponse } from "next/server";
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 2. Fetch actual expenses for the period
-    const actualItems = await prisma.expenseVoucherItem.findMany({
+    const actualItems = await prisma.expenseItem.findMany({
       where: {
         expenseVoucher: {
           companyId,
