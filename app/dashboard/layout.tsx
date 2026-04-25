@@ -375,6 +375,71 @@ export default function DashboardLayout({
   // Enable global Enter key navigation
   useGlobalEnterNavigation();
 
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const ctrl = e.ctrlKey || e.metaKey;
+      const tag = (e.target as HTMLElement).tagName;
+      const inInput = tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement).isContentEditable;
+
+      // Ctrl+K — focus search
+      if (ctrl && e.key === "k") {
+        e.preventDefault();
+        const searchInput = document.querySelector<HTMLInputElement>("[data-global-search-input]");
+        searchInput?.focus();
+        searchInput?.select();
+        return;
+      }
+
+      // Ctrl+B — toggle sidebar
+      if (ctrl && e.key === "b") {
+        e.preventDefault();
+        setSidebarCollapsed(v => !v);
+        return;
+      }
+
+      // Skip remaining shortcuts when user is typing
+      if (inInput) return;
+
+      // Ctrl+N — new sales invoice
+      if (ctrl && e.key === "n") {
+        e.preventDefault();
+        router.push("/dashboard/sales-invoice");
+        return;
+      }
+
+      // Ctrl+Shift+P — purchase invoice
+      if (ctrl && e.shiftKey && e.key === "P") {
+        e.preventDefault();
+        router.push("/dashboard/purchase-invoice");
+        return;
+      }
+
+      // Ctrl+D — dashboard
+      if (ctrl && e.key === "d") {
+        e.preventDefault();
+        router.push("/dashboard");
+        return;
+      }
+
+      // Ctrl+I — inventory
+      if (ctrl && e.key === "i") {
+        e.preventDefault();
+        router.push("/dashboard/inventory");
+        return;
+      }
+
+      // Escape — close all panels
+      if (e.key === "Escape") {
+        setShowNotifPanel(false);
+        setShowHelpPanel(false);
+        setShowUserMenu(false);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [router]);
+
   const normalizedPlanCode =
     String(companyPlan || "STARTER").toUpperCase() === "PROFESSIONAL"
       ? "PRO"

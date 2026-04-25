@@ -206,6 +206,7 @@ export default function GlobalSearch() {
         </svg>
         <input
           type="text"
+          data-global-search-input="true"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={(event) => {
