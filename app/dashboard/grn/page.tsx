@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -265,7 +266,7 @@ export default function GRNPage() {
                 </div>
                 <div>
                   <Label>Receipt Date *</Label>
-                  <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{ ...inp(), colorScheme: "dark" }} />
+                  <DateInput value={date} onChange={setDate} style={inp()} />
                 </div>
                 <div>
                   <Label>Against PO (optional)</Label>

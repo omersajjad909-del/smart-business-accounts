@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -435,7 +436,7 @@ function SalesInvoiceContent() {
                     </div>
                     <div>
                       <label style={labelStyle}>Date</label>
-                      <input type="date" style={inputStyle} value={date} onChange={e => setDate(e.target.value)} />
+                      <DateInput value={date} onChange={setDate} style={inputStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>Currency</label>

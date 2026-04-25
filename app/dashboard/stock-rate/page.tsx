@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
 
 import { useEffect, useState } from "react";
@@ -146,12 +147,7 @@ export default function StockRatePage() {
             onChange={e => setRate(e.target.value)}
           />
 
-          <input
-            type="date"
-            className="border p-2 w-full"
-            value={date}
-            onChange={e => setDate(e.target.value)}
-          />
+          <DateInput value={date} onChange={setDate} style={{ border: "1px solid #d1d5db", padding: "0.5rem", width: "100%" }} />
         </div>
 
         <div className="flex gap-2">

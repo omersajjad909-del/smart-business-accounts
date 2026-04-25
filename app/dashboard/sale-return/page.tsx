@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useCallback, useEffect, useState } from "react";
@@ -261,7 +262,7 @@ export default function SalesReturnPage() {
                     </div>
                     <div>
                       <label style={lbl}>Return Date</label>
-                      <input type="date" style={inp} value={date} onChange={e => setDate(e.target.value)} />
+                      <DateInput value={date} onChange={setDate} style={inp} />
                     </div>
                   </div>
 

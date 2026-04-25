@@ -1892,7 +1892,7 @@ export default function DashboardLayout({
         </SidebarCtx.Provider>
 
         {/* ── Upgrade Plan card ── */}
-        {!sidebarCollapsed && !isCustomPlan && normalizedPlanCode === "STARTER" && (
+        {!sidebarCollapsed && !isCustomPlan && ["STARTER", "PRO"].includes(normalizedPlanCode) && (
           <div style={{margin:"0 10px 10px",borderRadius:14,background:"linear-gradient(135deg,rgba(99,102,241,.18),rgba(139,92,246,.1))",border:"1px solid rgba(99,102,241,.28)",padding:"14px 14px 12px",position:"relative",overflow:"hidden"}}>
             {/* X close */}
             <div style={{position:"absolute",top:8,right:8,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,.35)"}}

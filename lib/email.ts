@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 import { prisma } from '@/lib/prisma';
 import { getCompanyCommsConfig } from "@/lib/companyCommsConfig";
+import { fmtDate } from "@/lib/dateUtils";
 
 // ─── Resend client (platform emails — welcome, OTP, billing) ─────────────────
 let _resend: Resend | null = null;
@@ -144,7 +145,7 @@ export const emailTemplates = {
         </div>
         <div class="content">
           <p><strong>Invoice No:</strong> ${invoice.invoiceNo}</p>
-          <p><strong>Date:</strong> ${new Date(invoice.date).toLocaleDateString()}</p>
+          <p><strong>Date:</strong> ${fmtDate(invoice.date)}</p>
           <p><strong>Customer:</strong> ${customer?.name || 'N/A'}</p>
           
           <table>
@@ -212,7 +213,7 @@ export const emailTemplates = {
 
       <div style="padding:20px">
         <p><strong>PO No:</strong> ${po.poNo}</p>
-        <p><strong>Date:</strong> ${new Date(po.date).toLocaleDateString()}</p>
+        <p><strong>Date:</strong> ${fmtDate(po.date)}</p>
         <p><strong>Supplier:</strong> ${supplier?.name || "N/A"}</p>
 
         <table>
@@ -270,7 +271,7 @@ export const emailTemplates = {
         </div>
         <div class="content">
           <p><strong>Invoice No:</strong> ${invoice.invoiceNo}</p>
-          <p><strong>Date:</strong> ${new Date(invoice.date).toLocaleDateString()}</p>
+          <p><strong>Date:</strong> ${fmtDate(invoice.date)}</p>
           <p><strong>Supplier:</strong> ${supplier?.name || 'N/A'}</p>
           
           <table>

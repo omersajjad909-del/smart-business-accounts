@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { fmtDate } from "@/lib/dateUtils";
 import BarcodeWrapper from "@/components/BarcodeWrapper";
 import QRCodeWrapper from "@/components/QRCodeWrapper";
 import { notFound } from "next/navigation";
@@ -62,7 +63,7 @@ export default async function PublicSalesInvoicePage({
           <div className="text-right">
             <h2 className="text-2xl font-black uppercase underline">Sales Invoice</h2>
             <p className="text-sm font-bold mt-1">INV #: {invoice.invoiceNo}</p>
-            <p className="text-sm">Date: {new Date(invoice.date).toLocaleDateString()}</p>
+            <p className="text-sm">Date: {fmtDate(invoice.date)}</p>
             
             <div className="flex flex-col items-end gap-2 mt-2">
                 <div className="text-center">

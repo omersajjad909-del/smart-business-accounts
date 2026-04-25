@@ -1,5 +1,6 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -169,7 +170,7 @@ export default function ExpenseVouchersPage() {
             </div>
             <div>
               <label style={lbl}>Date *</label>
-              <input type="date" style={inp} value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} required />
+              <DateInput value={form.date} onChange={value => setForm(f => ({ ...f, date: value }))} style={inp} />
             </div>
             <div>
               <label style={lbl}>Expense Account *</label>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
 /* ─── types ─── */
@@ -243,7 +244,7 @@ function NewPOModal({
           </div>
           <div>
             <label style={labelStyle}>Date</label>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
+            <DateInput value={date} onChange={setDate} style={inputStyle} />
           </div>
         </div>
 

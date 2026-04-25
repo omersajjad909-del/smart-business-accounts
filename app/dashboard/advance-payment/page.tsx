@@ -1,6 +1,7 @@
 "use client";
 import { confirmToast } from "@/lib/toast-feedback";
 import { fmtDate } from "@/lib/dateUtils";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
@@ -145,7 +146,7 @@ export default function AdvancePaymentPage() {
             </div>
             <div>
               <label style={lbl}>Date *</label>
-              <input type="date" style={inp} value={date} onChange={e => setDate(e.target.value)} required />
+              <DateInput value={date} onChange={setDate} style={inp} />
             </div>
             <div>
               <label style={lbl}>Amount *</label>

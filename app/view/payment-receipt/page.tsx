@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { fmtDate } from "@/lib/dateUtils";
 import { notFound } from "next/navigation";
 import PrintButton from "@/components/PrintButton";
 
@@ -39,7 +40,7 @@ export default async function PublicPaymentReceiptPage({
           <div className="text-left sm:text-right">
             <h2 className="text-2xl font-black uppercase underline">Receipt Voucher</h2>
             <p className="text-sm font-bold mt-1">REC #: {receipt.receiptNo}</p>
-            <p className="text-sm">Date: {new Date(receipt.date).toLocaleDateString()}</p>
+            <p className="text-sm">Date: {fmtDate(receipt.date)}</p>
             <p className="text-sm">Mode: {receipt.paymentMode}</p>
           </div>
         </div>
@@ -66,7 +67,7 @@ export default async function PublicPaymentReceiptPage({
             </tr>
             <tr className="border border-black">
               <td className="p-3 border border-black font-bold uppercase bg-gray-50">Payment Date</td>
-              <td className="p-3 border border-black">{new Date(receipt.date).toLocaleDateString()}</td>
+              <td className="p-3 border border-black">{fmtDate(receipt.date)}</td>
             </tr>
             <tr className="border border-black">
               <td className="p-3 border border-black font-bold uppercase bg-gray-50">Amount Received</td>
