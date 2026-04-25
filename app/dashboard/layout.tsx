@@ -1810,40 +1810,6 @@ export default function DashboardLayout({
           )}
 
           {/* ── Clickable User Row ── */}
-          <div
-            onClick={()=>setShowUserMenu(v=>!v)}
-            style={{
-              display:"flex",alignItems:"center",gap:10,
-              padding: sidebarCollapsed ? "12px 0" : "12px 14px",
-              justifyContent: sidebarCollapsed ? "center" : "flex-start",
-              cursor:"pointer",
-              transition:"background .15s",
-              background: showUserMenu ? "rgba(255,255,255,0.05)" : "transparent",
-            }}
-            onMouseEnter={e=>{if(!showUserMenu)e.currentTarget.style.background="rgba(255,255,255,0.04)";}}
-            onMouseLeave={e=>{if(!showUserMenu)e.currentTarget.style.background="transparent";}}
-          >
-            {/* Avatar */}
-            <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"white",flexShrink:0,overflow:"hidden",position:"relative"}}>
-              {userAvatar
-                ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:10}}/>
-                : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
-              }
-            </div>
-            {/* Name + role */}
-            {!sidebarCollapsed && (
-              <div style={{minWidth:0,flex:1}}>
-                <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.85)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{currentUser.name || "User"}</div>
-                <div style={{fontSize:10,color:"rgba(255,255,255,0.35)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",textTransform:"capitalize"}}>{(currentUser.role||"User").toLowerCase()}</div>
-              </div>
-            )}
-            {/* Chevron up/down */}
-            {!sidebarCollapsed && (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2.5" style={{flexShrink:0,transform:showUserMenu?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s"}}>
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
-            )}
-          </div>
         </div>
 
       </aside>

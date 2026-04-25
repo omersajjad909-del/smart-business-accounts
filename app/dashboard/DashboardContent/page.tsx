@@ -706,6 +706,26 @@ export default function DashboardContent() {
           </div>
         </div>
       )}
+
+      <div className="db-desk-header" style={{borderTop:"1px solid var(--border)",marginTop:8,padding:"14px 4px 4px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap"}}>
+        <div style={{fontSize:11,color:"var(--text-muted)"}}>© 2026 Finova Forge. All rights reserved.</div>
+        <div style={{fontSize:11,color:"var(--text-muted)"}}>FinovaOS is a product of Finova Forge.</div>
+        <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+          {[
+            { href: "/legal/privacy", label: "Privacy Policy" },
+            { href: "/security", label: "Security" },
+            { href: "/legal/terms", label: "Terms of Service" },
+            { href: "/support", label: "Support" },
+          ].map((item, index) => (
+            <div key={item.href} style={{display:"flex",alignItems:"center",gap:12}}>
+              {index > 0 && <span style={{fontSize:11,color:"rgba(255,255,255,.2)"}}>•</span>}
+              <Link prefetch={false} href={item.href} style={{fontSize:11,color:"var(--text-muted)",textDecoration:"none"}}>
+                {item.label}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
