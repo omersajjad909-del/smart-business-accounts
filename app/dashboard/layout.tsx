@@ -647,38 +647,47 @@ export default function DashboardLayout({
       >
 
         {/* ---- SIDEBAR HEADER ---- */}
-        <div style={{padding: sidebarCollapsed ? "8px 8px" : "10px 16px 10px", borderBottom:"1px solid var(--sidebar-border)", display:"flex", flexDirection:"column", alignItems: sidebarCollapsed ? "center" : "stretch"}}>
-          {/* Logo + Brand */}
-          <Link prefetch={false}
-            href="/dashboard"
-            style={{
-              display:"flex",
-              alignItems:"center",
-              justifyContent: sidebarCollapsed ? "center" : "flex-start",
-              gap:10,
-              marginBottom: sidebarCollapsed ? 0 : 12,
-              textDecoration:"none",
-              padding: sidebarCollapsed ? "2px" : "4px 4px",
-              borderRadius:12,
-              background: pathname === "/dashboard" ? "rgba(99,102,241,0.12)" : "transparent",
-              border: pathname === "/dashboard" ? "1px solid rgba(99,102,241,0.22)" : "1px solid transparent",
-            }}
-          >
-            {/* Logo icon — always visible */}
-            <img src="/logo-icon.svg" alt="FinovaOS" width={42} height={42} style={{flexShrink:0,objectFit:"contain"}}/>
-            {!sidebarCollapsed && (
+        <div style={{padding: sidebarCollapsed ? "12px 8px" : "12px 14px", borderBottom:"1px solid var(--sidebar-border)", display:"flex", alignItems:"center", justifyContent: sidebarCollapsed ? "center" : "space-between", gap:10}}>
+          {!sidebarCollapsed && (
+            <Link prefetch={false} href="/dashboard" style={{display:"flex",alignItems:"center",gap:9,textDecoration:"none"}}>
+              <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{flexShrink:0,objectFit:"contain"}}/>
               <div style={{display:"flex",flexDirection:"column",gap:1}}>
-                <div style={{fontSize:14,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
-                <div style={{fontSize:10,color:"var(--text-muted)",letterSpacing:".04em"}}>Business Suite</div>
+                <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
+                <div style={{fontSize:9,color:"var(--text-muted)",letterSpacing:".05em",textTransform:"uppercase"}}>Business Suite</div>
               </div>
-            )}
-          </Link>
-          {/* Branch selector removed — use Settings → Branches page */}
+            </Link>
+          )}
+          {sidebarCollapsed && (
+            <Link prefetch={false} href="/dashboard" style={{textDecoration:"none",display:"flex"}}>
+              <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{objectFit:"contain"}}/>
+            </Link>
+          )}
+          {/* Hamburger/collapse toggle */}
+          <button
+            onClick={() => setSidebarCollapsed(v => !v)}
+            style={{width:32,height:32,borderRadius:8,background:"transparent",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--sidebar-link-muted)",flexShrink:0,transition:"background .15s"}}
+            onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.07)";}}
+            onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
         </div>
 
         {/* ---- NAV ---- */}
         <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setSidebarCollapsed(false) }}>
-        <nav style={{flex:1,overflowY:"auto",padding:"10px 10px",paddingBottom:80}}>
+        <nav style={{flex:1,overflowY:"auto",padding:"8px 8px",paddingBottom:80}}>
+
+          {/* ── Main Dashboard link ── */}
+          {hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
+            <NavDirectLink
+              href="/dashboard"
+              pathname={pathname}
+              icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>}
+              exact
+            >Dashboard</NavDirectLink>
+          )}
 
           {/* Dashboard utilities */}
           {canShowDashboardUtilities && hasPermission(currentUser, PERMISSIONS.VIEW_DASHBOARD) && (
@@ -1693,32 +1702,26 @@ export default function DashboardLayout({
         </nav>
         </SidebarCtx.Provider>
 
+        {/* ── Upgrade Plan card ── */}
+        {!sidebarCollapsed && !isCustomPlan && companyPlan !== "PRO" && companyPlan !== "PROFESSIONAL" && (
+          <div style={{margin:"0 10px 10px",borderRadius:14,background:"linear-gradient(135deg,rgba(99,102,241,.18),rgba(139,92,246,.1))",border:"1px solid rgba(99,102,241,.28)",padding:"14px 14px 12px",position:"relative",overflow:"hidden"}}>
+            {/* X close */}
+            <div style={{position:"absolute",top:8,right:8,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,.35)"}}
+              onClick={e=>{e.currentTarget.parentElement!.style.display="none";}}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,#6366f1,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,marginBottom:9}}>⭐</div>
+            <div style={{fontSize:12,fontWeight:800,color:"rgba(255,255,255,.9)",marginBottom:4}}>Upgrade Plan</div>
+            <div style={{fontSize:10,color:"rgba(255,255,255,.45)",lineHeight:1.5,marginBottom:10}}>Unlock more features and grow your business.</div>
+            <a href="/pricing" style={{display:"flex",alignItems:"center",gap:5,padding:"7px 13px",borderRadius:9,background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:11,fontWeight:700,textDecoration:"none",boxShadow:"0 3px 12px rgba(99,102,241,.4)"}}>
+              Upgrade Now
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        )}
+
         {/* ---- SIDEBAR FOOTER ---- */}
         <div style={{borderTop:"1px solid var(--border)",background:"var(--panel-bg-2)",position:"relative"}}>
-
-          {/* Collapse Toggle Button */}
-          <div style={{borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
-            <button
-              onClick={() => setSidebarCollapsed(v => !v)}
-              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              style={{
-                display:"flex", alignItems:"center", gap:8,
-                width:"100%", padding:"10px 14px",
-                background:"transparent", border:"none", cursor:"pointer",
-                color:"rgba(255,255,255,0.4)", fontFamily:"inherit", fontSize:12,
-                transition:"background .15s, color .15s",
-                justifyContent: sidebarCollapsed ? "center" : "flex-start",
-              }}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.05)";e.currentTarget.style.color="rgba(255,255,255,0.7)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(255,255,255,0.4)";}}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                style={{flexShrink:0, transform: sidebarCollapsed ? "rotate(180deg)" : "rotate(0deg)", transition:"transform .25s"}}>
-                <path d="M11 19l-7-7 7-7"/><path d="M21 19l-7-7 7-7"/>
-              </svg>
-              {!sidebarCollapsed && <span>Collapse</span>}
-            </button>
-          </div>
 
           {/* ── User Menu Popup ── */}
           {showUserMenu && (
@@ -1868,15 +1871,15 @@ export default function DashboardLayout({
           className="print:hidden sm:px-4"
         >
 
-          {/* MOBILE: Logo + company name */}
+          {/* MOBILE: Hamburger + Logo + company name */}
           {isMobileViewport && (
-            <div style={{display:"flex",alignItems:"center",gap:7,flexShrink:0,padding:"2px 0"}}>
-              <div style={{width:28,height:28,borderRadius:9,background:"linear-gradient(135deg,rgba(99,102,241,.24),rgba(59,130,246,.18))",display:"flex",alignItems:"center",justifyContent:"center",border:"1px solid rgba(129,140,248,.18)"}}>
-                <img src="/logo-icon.svg" alt="FinovaOS" width={18} height={18} style={{objectFit:"contain",flexShrink:0}}/>
-              </div>
-              <div style={{display:"flex",flexDirection:"column",minWidth:0}}>
-                <span style={{fontSize:12,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.2px",maxWidth:124,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
-                <span style={{fontSize:10,color:"var(--text-muted)",lineHeight:1.1}}>Workspace</span>
+            <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+              <button onClick={()=>setIsMobileMenuOpen(true)} style={{width:34,height:34,borderRadius:9,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"var(--text-muted)",flexShrink:0}}>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+              </button>
+              <div style={{display:"flex",alignItems:"center",gap:7,padding:"2px 0"}}>
+                <img src="/logo-icon.svg" alt="FinovaOS" width={24} height={24} style={{objectFit:"contain",flexShrink:0}}/>
+                <span style={{fontSize:13,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.2px",whiteSpace:"nowrap"}}>{companyName}</span>
               </div>
             </div>
           )}
@@ -1909,21 +1912,38 @@ export default function DashboardLayout({
           )}
 
           {/* Right side */}
-          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:isMobileViewport ? 6 : 10,flexWrap:"nowrap"}}>
-            <WhatsNew />
+          <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:isMobileViewport ? 6 : 8,flexWrap:"nowrap"}}>
             <ModeToggle />
 
             {/* + New button — desktop only */}
             {!isMobileViewport && (
               <Link prefetch={false} href="/dashboard/sales-invoice/new"
-                style={{display:"flex",alignItems:"center",gap:5,padding:"6px 14px",borderRadius:9,background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:12,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap",transition:"opacity .15s",boxShadow:"0 2px 10px rgba(99,102,241,.35)"}}
-                onMouseEnter={e=>e.currentTarget.style.opacity=".85"}
-                onMouseLeave={e=>e.currentTarget.style.opacity="1"}
+                style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:10,background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:13,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap",boxShadow:"0 2px 10px rgba(99,102,241,.4)"}}
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 New
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               </Link>
             )}
+
+            {/* Notification Bell */}
+            <button style={{position:"relative",width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"background .15s",color:"var(--text-muted)"}}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+              </svg>
+              <span style={{position:"absolute",top:7,right:7,width:7,height:7,borderRadius:"50%",background:"#6366f1",border:"1.5px solid var(--panel-bg)"}}/>
+            </button>
+
+            {/* Help button */}
+            <button style={{width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"background .15s",color:"var(--text-muted)"}}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </button>
 
             {/* Subscription badge — only for ADMIN */}
             {subInfo && currentUser?.role === "ADMIN" && !isMobileViewport && (
@@ -2204,6 +2224,40 @@ function cleanNavLabel(value: string) {
   return value.replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, "").trim();
 }
 
+/* Flat top-level link with icon (matches reference sidebar items like Dashboard) */
+function NavDirectLink({ href, icon, children, pathname, exact }: {
+  href: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  pathname: string;
+  exact?: boolean;
+}) {
+  const { collapsed, expand } = useContext(SidebarCtx);
+  const active = exact ? pathname === href : (pathname === href || pathname.startsWith(href + "/"));
+  const label = typeof children === "string" ? cleanNavLabel(children) : children;
+
+  if (collapsed) {
+    return (
+      <Link prefetch={false} href={href} title={typeof label === "string" ? label : ""}
+        style={{display:"flex",alignItems:"center",justifyContent:"center",width:44,height:36,borderRadius:9,margin:"1px auto",cursor:"pointer",color:active?"#818cf8":"var(--sidebar-link-muted)",background:active?"rgba(99,102,241,0.15)":"transparent",textDecoration:"none",transition:"all .15s"}}
+        onMouseEnter={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.18)":"rgba(255,255,255,0.06)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.15)":"transparent";}}
+      ><span style={{display:"flex"}}>{icon}</span></Link>
+    );
+  }
+
+  return (
+    <Link prefetch={false} href={href}
+      style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",borderRadius:10,fontSize:13,fontWeight:active?700:500,color:active?"#c7d2fe":"var(--sidebar-link)",background:active?"rgba(99,102,241,0.15)":"transparent",textDecoration:"none",transition:"all .15s",marginBottom:2}}
+      onMouseEnter={e=>{if(!active){e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="var(--sidebar-link-hover)";}}}
+      onMouseLeave={e=>{if(!active){e.currentTarget.style.background="transparent";e.currentTarget.style.color="var(--sidebar-link)";}}}
+    >
+      <span style={{display:"flex",color:active?"#818cf8":"var(--sidebar-link-muted)",flexShrink:0,transition:"color .15s"}}>{icon}</span>
+      {label}
+    </Link>
+  );
+}
+
 function NavGroup({ title, icon, open, onToggle, children }: {
   title: string;
   icon: React.ReactNode;
@@ -2236,33 +2290,27 @@ function NavGroup({ title, icon, open, onToggle, children }: {
   }
 
   return (
-    <div style={{marginBottom:1}}>
+    <div style={{marginBottom:2}}>
       {/* Section header button */}
       <div
         onClick={onToggle}
         style={{
-          display:"flex",alignItems:"center",gap:8,padding:"7px 10px",
-          borderRadius:8,cursor:"pointer",userSelect:"none",transition:"all .15s",
-          background: open ? "rgba(99,102,241,0.1)" : "transparent",
-          borderLeft: open ? "2px solid rgba(99,102,241,0.6)" : "2px solid transparent",
+          display:"flex",alignItems:"center",gap:9,padding:"8px 10px",
+          borderRadius:10,cursor:"pointer",userSelect:"none",transition:"all .15s",
+          background: open ? "rgba(99,102,241,0.12)" : "transparent",
         }}
-        onMouseEnter={e => { if (!open) { e.currentTarget.style.background="var(--sidebar-hover-bg)"; e.currentTarget.style.borderLeft="2px solid rgba(99,102,241,0.25)"; }}}
-        onMouseLeave={e => { if (!open) { e.currentTarget.style.background="transparent"; e.currentTarget.style.borderLeft="2px solid transparent"; }}}
+        onMouseEnter={e => { if (!open) e.currentTarget.style.background="rgba(255,255,255,0.05)";}}
+        onMouseLeave={e => { if (!open) e.currentTarget.style.background="transparent";}}
       >
-        <span style={{color: open ? "#818cf8" : "var(--sidebar-link-muted)",display:"flex",transition:"color .15s"}}>{icon}</span>
-        <span style={{flex:1,fontSize:11,fontWeight:700,color: open ? "#818cf8" : "var(--sidebar-link)",textTransform:"uppercase",letterSpacing:".07em",transition:"color .15s"}}>{displayTitle}</span>
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={open ? "rgba(129,140,248,0.6)" : "var(--sidebar-link-muted)"} strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s, stroke .15s",flexShrink:0}}>
+        <span style={{color: open ? "#818cf8" : "var(--sidebar-link-muted)",display:"flex",flexShrink:0,transition:"color .15s"}}>{icon}</span>
+        <span style={{flex:1,fontSize:12.5,fontWeight:600,color: open ? "#c7d2fe" : "var(--sidebar-link)",transition:"color .15s"}}>{displayTitle}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={open ? "rgba(129,140,248,0.7)" : "var(--sidebar-link-muted)"} strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s",flexShrink:0}}>
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </div>
-      {/* Children — indented with left guide line */}
+      {/* Children — indented */}
       {open && (
-        <div style={{
-          marginTop:2,marginBottom:4,
-          marginLeft:14,
-          paddingLeft:10,
-          borderLeft:"1px solid rgba(99,102,241,0.2)",
-        }}>
+        <div style={{marginTop:2,marginBottom:4,marginLeft:12,paddingLeft:10,borderLeft:"1px solid rgba(99,102,241,0.18)"}}>
           {children}
         </div>
       )}
@@ -2366,17 +2414,17 @@ function NavLink({ href, children, pathname }: {
       href={href}
       prefetch={false}
       style={{
-        display:"flex",alignItems:"center",gap:8,padding:"5px 8px",borderRadius:6,fontSize:isAiAssistant ? 13 : 12,
-        color: active ? "var(--sidebar-link-active)" : "var(--sidebar-link)",
-        background: active ? "var(--sidebar-active-bg)" : "transparent",
-        fontWeight: active || isAiAssistant ? 600 : 400,
+        display:"flex",alignItems:"center",gap:8,padding:"7px 10px",borderRadius:9,fontSize:12.5,
+        color: active ? "#c7d2fe" : "var(--sidebar-link)",
+        background: active ? "rgba(99,102,241,0.15)" : "transparent",
+        fontWeight: active ? 600 : 400,
         textDecoration:"none",transition:"all .15s",
         marginBottom:1,
       }}
       onMouseEnter={e => {
         if (!active) {
           e.currentTarget.style.color = "var(--sidebar-link-hover)";
-          e.currentTarget.style.background = "var(--sidebar-hover-bg)";
+          e.currentTarget.style.background = "rgba(255,255,255,0.06)";
         }
       }}
       onMouseLeave={e => {
