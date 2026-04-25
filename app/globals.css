@@ -377,7 +377,7 @@ a {
     max-width: 100% !important;
   }
 
-  .dashboard-root .dashboard-content-inner :is(div, section, article, form)[style*="grid-template-columns"] {
+  .dashboard-root .dashboard-content-inner :is(div, section, article, form)[style*="grid-template-columns"]:not(.db-grid-exempt) {
     grid-template-columns: minmax(0, 1fr) !important;
   }
 

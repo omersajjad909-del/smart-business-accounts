@@ -168,7 +168,7 @@ export default function DashboardContent() {
         const [sR,cR,mR,bR,eR]=await Promise.allSettled([
           fetch("/api/reports/dashboard-summary",              {headers:h,cache:"no-store"}),
           fetch("/api/reports/dashboard-charts?period=week",   {headers:h,cache:"no-store"}),
-          fetch("/api/me/company",                             {headers:h,cache:"no-store"}),
+          fetch("/api/me/company",                             {cache:"no-store"}),
           fetch("/api/company/business-type",                  {headers:h,cache:"no-store"}),
           fetch("/api/reports/expense-breakdown?period=month", {headers:h,cache:"no-store"}),
         ]);
