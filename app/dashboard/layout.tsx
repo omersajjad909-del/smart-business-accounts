@@ -65,8 +65,10 @@ function FinovaLoader() {
         <div style={{
           width: 90, height: 90,
           animation: "finova-glow 2s ease-in-out infinite",
+          borderRadius: "22px",
+          overflow: "hidden",
         }}>
-          <img src="/logo-icon.svg" alt="FinovaOS" width={90} height={90} style={{objectFit:"contain"}}/>
+          <img src="/icon1.png" alt="FinovaOS" width={90} height={90} style={{objectFit:"contain",width:"100%",height:"100%"}}/>
         </div>
       </div>
 
@@ -1781,7 +1783,6 @@ export default function DashboardLayout({
 
                 {/* Menu items */}
                 {[
-                  { icon:"🏢", label:"Company Profile",    href:"/dashboard/company-profile" },
                   { icon:"👥", label:"Team Members",        href:"/dashboard/users" },
                   { icon:"🔔", label:"Notifications",       href:"/dashboard/notifications" },
                   { icon:"⭐", label:"Share Your Review",   href:"/dashboard/feedback" },
