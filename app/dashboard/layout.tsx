@@ -1703,7 +1703,7 @@ export default function DashboardLayout({
         </SidebarCtx.Provider>
 
         {/* ── Upgrade Plan card ── */}
-        {!sidebarCollapsed && !isCustomPlan && companyPlan !== "PRO" && companyPlan !== "PROFESSIONAL" && (
+        {!sidebarCollapsed && !isCustomPlan && normalizedPlanCode === "STARTER" && (
           <div style={{margin:"0 10px 10px",borderRadius:14,background:"linear-gradient(135deg,rgba(99,102,241,.18),rgba(139,92,246,.1))",border:"1px solid rgba(99,102,241,.28)",padding:"14px 14px 12px",position:"relative",overflow:"hidden"}}>
             {/* X close */}
             <div style={{position:"absolute",top:8,right:8,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,.35)"}}
@@ -1955,6 +1955,18 @@ export default function DashboardLayout({
               }}>
                 {subInfo.plan}
               </div>
+            )}
+
+            {/* Company Profile — desktop only */}
+            {!isMobileViewport && (
+              <Link prefetch={false} href="/dashboard/company-profile"
+                style={{display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:10,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"var(--text-muted)",fontSize:12,fontWeight:600,textDecoration:"none",whiteSpace:"nowrap",transition:"all .15s"}}
+                onMouseEnter={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="var(--text-primary)";}}
+                onMouseLeave={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";e.currentTarget.style.color="var(--text-muted)";}}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                {companyName}
+              </Link>
             )}
 
             {/* User avatar + name */}
