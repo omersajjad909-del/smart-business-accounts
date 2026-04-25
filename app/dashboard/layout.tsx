@@ -1958,18 +1958,6 @@ export default function DashboardLayout({
               </div>
             )}
 
-            {/* Company Profile — desktop only */}
-            {!isMobileViewport && (
-              <Link prefetch={false} href="/dashboard/company-profile"
-                style={{display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:10,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"var(--text-muted)",fontSize:12,fontWeight:600,textDecoration:"none",whiteSpace:"nowrap",transition:"all .15s"}}
-                onMouseEnter={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="var(--text-primary)";}}
-                onMouseLeave={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";e.currentTarget.style.color="var(--text-muted)";}}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                {companyName}
-              </Link>
-            )}
-
             {/* User avatar + name */}
             <div
               className="hidden md:flex"
