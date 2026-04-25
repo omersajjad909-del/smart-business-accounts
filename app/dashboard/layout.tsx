@@ -232,6 +232,7 @@ export default function DashboardLayout({
     return window.matchMedia("(max-width: 767px)").matches;
   });
   const pathname = usePathname();
+  const isMobileDashboardHome = isMobileViewport && pathname === "/dashboard";
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -1818,6 +1819,7 @@ export default function DashboardLayout({
       <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:isMobileViewport ? 0 : SW,transition:"margin-left .25s ease"}}>
 
         {/* ---- TOPBAR ---- */}
+        {!isMobileDashboardHome && (
         <div
           style={{
             background:isMobileViewport
@@ -1956,6 +1958,7 @@ export default function DashboardLayout({
             </div>
           </div>
         </div>
+        )}
 
         {/* ---- PAGE CONTENT ---- */}
         <div style={{flex:1,overflowY:"auto",padding:isMobileViewport ? "10px 10px" : "16px 12px",paddingBottom: isMobileViewport ? "80px" : "16px"}} className="dashboard-content-scroll sm:px-4 sm:py-5 lg:px-6">

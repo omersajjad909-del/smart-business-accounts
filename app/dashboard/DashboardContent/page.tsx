@@ -142,7 +142,7 @@ export default function DashboardContent() {
   const initDemo  = typeof window!=="undefined"&&storedUser?.email==="finovaos.app@gmail.com"
     ?(getStoredDemoBusinessPreference() as BusinessType|null):null;
 
-  const [companyInfo,setCompanyInfo] = useState<{plan:string;subscriptionStatus:string;baseCurrency:string}|null>(null);
+  const [companyInfo,setCompanyInfo] = useState<{plan:string;subscriptionStatus:string;baseCurrency:string;name?:string}|null>(null);
   const [businessType,setBT]  = useState<BusinessType>(initDemo||(storedUser?.businessType as BusinessType)||"trading");
   const [stats,setStats]      = useState<DashStats>({
     revenue:0,expenses:0,profit:0,cashBalance:0,revenueGrowth:0,
@@ -200,7 +200,12 @@ export default function DashboardContent() {
         if(mR.status==="fulfilled"&&mR.value.ok){
           const s=await mR.value.json();
           if(initDemo)setBT(initDemo); else if(s.businessType)setBT(s.businessType as BusinessType);
-          setCompanyInfo({plan:String(s.plan||"STARTER"),subscriptionStatus:String(s.subscriptionStatus||"ACTIVE"),baseCurrency:CURRENCY_SYMBOL[String(s.baseCurrency||"")]||CURRENCY_SYMBOL["USD"]});
+          setCompanyInfo({
+            plan:String(s.plan||"STARTER"),
+            subscriptionStatus:String(s.subscriptionStatus||"ACTIVE"),
+            baseCurrency:CURRENCY_SYMBOL[String(s.baseCurrency||"")]||CURRENCY_SYMBOL["USD"],
+            name:String(s.name || s.companyName || ""),
+          });
         }
         if(eR.status==="fulfilled"&&eR.value.ok){
           const eb=await eR.value.json();
@@ -227,12 +232,19 @@ export default function DashboardContent() {
   if(cu?.email==="finovaos.app@gmail.com") return <DemoBusinessShowcase businessType={businessType} companyInfo={companyInfo}/>;
 
   const cur=companyInfo?.baseCurrency||"Rs";
+  const companyLabel=companyInfo?.name || "Your Business";
   const sub=companyInfo?.subscriptionStatus;
   const hasData=stats.revenue>0||stats.expenses>0;
   const fmt=(n:number)=>n>=1e6?`${(n/1e6).toFixed(1)}M`:n>=1e3?`${(n/1e3).toFixed(0)}K`:n.toLocaleString();
   const h=new Date().getHours();
   const greeting=h<12?"Good morning":h<17?"Good afternoon":"Good evening";
   const uName=(cu as any)?.name||"there";
+  const userInitials=String(uName)
+    .split(" ")
+    .filter(Boolean)
+    .slice(0,2)
+    .map(part => part[0]?.toUpperCase() || "")
+    .join("") || "U";
   const profC=stats.profit>=0?"#10b981":"#ef4444";
   const grC  =stats.revenueGrowth>=0?"#10b981":"#ef4444";
   const MO=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -288,6 +300,7 @@ export default function DashboardContent() {
         .db-mo{display:none!important;}
         @media(max-width:767px){
           .db-mo{display:block!important;}
+          .db-mo-legacy-head{display:none!important;}
           .db-kpi{display:none!important;}
           .db-mid{display:none!important;}
           .db-bot{display:none!important;}
@@ -376,7 +389,7 @@ export default function DashboardContent() {
           ════════════════════════════════════════ */}
 
       {/* ── Greeting + date ── */}
-      <div className="db-mo" style={{marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <div className="db-mo db-mo-legacy-head" style={{marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div>
           <div style={{fontSize:20,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.4px"}}>{greeting}, {uName} 👋</div>
           <div style={{fontSize:12,color:"var(--text-muted)",marginTop:3}}>{dRange}</div>
@@ -385,6 +398,32 @@ export default function DashboardContent() {
       </div>
 
       {/* ── Hero Balance Card ── */}
+      <div className="db-mo" style={{marginBottom:18,display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:12,minWidth:0}}>
+          <div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,color:"#fff",flexShrink:0,boxShadow:"0 8px 24px rgba(99,102,241,.28)"}}>
+            {userInitials}
+          </div>
+          <div style={{minWidth:0,paddingTop:2}}>
+            <div style={{fontSize:12,color:"var(--text-muted)",marginBottom:2}}>{greeting},</div>
+            <div style={{fontSize:20,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.45px",lineHeight:1.05,marginBottom:6}}>{uName}</div>
+            <div style={{display:"flex",alignItems:"center",gap:6,minWidth:0}}>
+              <span style={{fontSize:12,color:"var(--text-muted)",flexShrink:0}}>Company:</span>
+              <span style={{fontSize:12,fontWeight:600,color:"#a5b4fc",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{companyLabel}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" style={{color:"var(--text-muted)",flexShrink:0}}><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+          <button style={{position:"relative",width:38,height:38,borderRadius:12,background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--text-primary)",boxShadow:"0 8px 18px rgba(2,6,23,.18)"}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+            </svg>
+            <span style={{position:"absolute",top:5,right:5,minWidth:14,height:14,padding:"0 3px",borderRadius:999,background:"#6366f1",display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,fontWeight:800,color:"#fff",lineHeight:1}}>3</span>
+          </button>
+          {loading&&<div style={{width:22,height:22,border:"2px solid rgba(99,102,241,.2)",borderTopColor:"#6366f1",borderRadius:"50%",animation:"db-spin .7s linear infinite",flexShrink:0}}/>}
+        </div>
+      </div>
+
       <div className="db-mo" style={{borderRadius:22,padding:"24px 20px 20px",background:"linear-gradient(135deg,#1e1b4b 0%,#312e81 35%,#4338ca 70%,#6366f1 100%)",marginBottom:16,position:"relative",overflow:"hidden",boxShadow:"0 8px 32px rgba(99,102,241,.35)"}}>
         {/* Background circles */}
         <div style={{position:"absolute",top:-30,right:-30,width:160,height:160,borderRadius:"50%",background:"rgba(255,255,255,.04)",pointerEvents:"none"}}/>
