@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 type ImageAdjusterModalProps = {
   open: boolean;
@@ -35,7 +35,6 @@ export default function ImageAdjusterModal({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [imageEl, setImageEl] = useState<HTMLImageElement | null>(null);
   const [dragState, setDragState] = useState<DragState | null>(null);
-  const frameRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!file || !open) {
@@ -77,8 +76,6 @@ export default function ImageAdjusterModal({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onCancel]);
 
-  if (!open || !file) return null;
-
   const frameSize = 280;
   const scaledWidth = imageEl ? imageEl.width * zoom : frameSize;
   const scaledHeight = imageEl ? imageEl.height * zoom : frameSize;
@@ -93,6 +90,10 @@ export default function ImageAdjusterModal({
       y: Math.min(maxY, Math.max(minY, nextY)),
     };
   }
+
+  useEffect(() => {
+    setPosition((prev) => clampPosition(prev.x, prev.y));
+  }, [zoom, imageEl]);
 
   function beginDrag(clientX: number, clientY: number) {
     setDragState({
@@ -111,7 +112,7 @@ export default function ImageAdjusterModal({
   }
 
   function exportImage() {
-    if (!imageEl) return;
+    if (!imageEl || !file) return;
 
     const canvas = document.createElement("canvas");
     canvas.width = outputSize;
@@ -149,6 +150,8 @@ export default function ImageAdjusterModal({
 
     onConfirm(canvas.toDataURL(file.type || "image/png", 0.92));
   }
+
+  if (!open || !file) return null;
 
   return (
     <div
@@ -195,13 +198,12 @@ export default function ImageAdjusterModal({
               fontSize: 18,
             }}
           >
-            ×
+            x
           </button>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20, marginTop: 20 }}>
           <div
-            ref={frameRef}
             onMouseDown={(event) => beginDrag(event.clientX, event.clientY)}
             onMouseMove={(event) => handlePointerMove(event.clientX, event.clientY)}
             onMouseUp={() => setDragState(null)}
@@ -211,6 +213,7 @@ export default function ImageAdjusterModal({
               if (touch) beginDrag(touch.clientX, touch.clientY);
             }}
             onTouchMove={(event) => {
+              event.preventDefault();
               const touch = event.touches[0];
               if (touch) handlePointerMove(touch.clientX, touch.clientY);
             }}
@@ -270,11 +273,7 @@ export default function ImageAdjusterModal({
               max="3"
               step="0.01"
               value={zoom}
-              onChange={(event) => {
-                const nextZoom = Number(event.target.value);
-                setZoom(nextZoom);
-                setPosition((prev) => clampPosition(prev.x, prev.y));
-              }}
+              onChange={(event) => setZoom(Number(event.target.value))}
               style={{ width: "100%" }}
             />
           </div>

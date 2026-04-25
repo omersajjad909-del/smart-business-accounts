@@ -6,6 +6,8 @@ import { getMaxUsersForPlan } from "@/lib/planLimits";
 import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
 import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency";
 import Link from "next/link";
+import ImageAdjusterModal from "@/components/ImageAdjusterModal";
+import { dispatchCompanyProfileUpdated } from "@/lib/dashboardProfileEvents";
 
 type CompanyData = {
   id: string;
@@ -66,9 +68,38 @@ export default function CompanyProfilePage() {
   const [saveMsg, setSaveMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [editing, setEditing] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
+  const [pendingLogoFile, setPendingLogoFile] = useState<File | null>(null);
   const [form, setForm] = useState({ name: "", country: "", baseCurrency: "" });
   const [bizTypeLabels, setBizTypeLabels] = useState<Record<string, string>>(BUSINESS_TYPE_LABELS_FALLBACK);
   const countryOptions = sortCountries(ALL_COUNTRIES).map((c) => c.name);
+
+  async function uploadAdjustedLogo(dataUrl: string) {
+    setLogoUploading(true);
+    setSaveMsg(null);
+    try {
+      const blob = await (await fetch(dataUrl)).blob();
+      const fd = new FormData();
+      fd.append("logo", new File([blob], "company-logo.png", { type: blob.type || "image/png" }));
+      const r = await fetch("/api/company/logo", { method: "POST", body: fd });
+      if (r.ok) {
+        const d = await r.json();
+        setCompany((prev) => prev ? { ...prev, logoUrl: d.logoUrl } : prev);
+        dispatchCompanyProfileUpdated({ logoUrl: d.logoUrl });
+        setSaveMsg({ text: "Logo updated successfully", ok: true });
+        setTimeout(() => setSaveMsg(null), 3000);
+      } else {
+        const d = await r.json().catch(() => ({}));
+        setSaveMsg({ text: d.error || "Failed to upload logo", ok: false });
+        setTimeout(() => setSaveMsg(null), 3000);
+      }
+    } catch {
+      setSaveMsg({ text: "Failed to upload logo", ok: false });
+      setTimeout(() => setSaveMsg(null), 3000);
+    } finally {
+      setLogoUploading(false);
+      setPendingLogoFile(null);
+    }
+  }
 
   useEffect(() => {
     // Load business type labels from API
@@ -126,6 +157,7 @@ export default function CompanyProfilePage() {
       });
       if (res.ok) {
         setCompany((prev) => (prev ? { ...prev, ...form } : prev));
+        dispatchCompanyProfileUpdated({ name: form.name, country: form.country, baseCurrency: form.baseCurrency });
         setSaveMsg({ text: "Profile updated successfully", ok: true });
         setEditing(false);
       } else {
@@ -228,6 +260,15 @@ export default function CompanyProfilePage() {
 
   return (
     <div style={{ maxWidth: 860, padding: "32px" }}>
+      <ImageAdjusterModal
+        open={!!pendingLogoFile}
+        file={pendingLogoFile}
+        title="Adjust Company Photo"
+        description="Photo ya logo ko drag aur zoom karke card me sahi framing set karein."
+        shape="rounded"
+        onCancel={() => setPendingLogoFile(null)}
+        onConfirm={uploadAdjustedLogo}
+      />
       {/* ── PAGE HEADER ── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
@@ -329,24 +370,10 @@ export default function CompanyProfilePage() {
               type="file"
               accept="image/*"
               style={{ display: "none" }}
-              onChange={async (e) => {
+              onChange={(e) => {
                 const f = e.target.files?.[0];
                 if (!f) return;
-                setLogoUploading(true);
-                const fd = new FormData();
-                fd.append("logo", f);
-                const r = await fetch("/api/company/logo", { method: "POST", body: fd });
-                if (r.ok) {
-                  const d = await r.json();
-                  setCompany((prev) => prev ? { ...prev, logoUrl: d.logoUrl } : prev);
-                  setSaveMsg({ text: "Logo updated successfully", ok: true });
-                  setTimeout(() => setSaveMsg(null), 3000);
-                } else {
-                  const d = await r.json().catch(() => ({}));
-                  setSaveMsg({ text: d.error || "Failed to upload logo", ok: false });
-                  setTimeout(() => setSaveMsg(null), 3000);
-                }
-                setLogoUploading(false);
+                setPendingLogoFile(f);
                 e.target.value = "";
               }}
             />
@@ -392,6 +419,13 @@ export default function CompanyProfilePage() {
                   📅 Member since {fmtDate(company.createdAt)}
                 </span>
               )}
+            </div>
+            <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "12px", lineHeight: 1.6 }}>
+              Company logo yahan se manage hota hai. Personal photo, jo navbar aur sidebar me dikhni chahiye, ab{" "}
+              <Link href="/dashboard/account-settings" style={{ color: "#a5b4fc", fontWeight: 700, textDecoration: "none" }}>
+                Account Settings
+              </Link>{" "}
+              se change hogi.
             </div>
           </div>
 

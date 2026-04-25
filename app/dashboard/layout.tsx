@@ -1891,15 +1891,6 @@ export default function DashboardLayout({
       </aside>
 
       {/* ═══════════════ MAIN AREA ═══════════════ */}
-      <ImageAdjusterModal
-        open={!!pendingAvatarFile}
-        file={pendingAvatarFile}
-        title="Adjust Profile Photo"
-        description="Apni photo ko drag aur zoom karke sidebar aur navbar ke liye set karen."
-        shape="circle"
-        onCancel={() => setPendingAvatarFile(null)}
-        onConfirm={uploadAvatarFromAdjustedImage}
-      />
       <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:isMobileViewport ? 0 : SW,transition:"margin-left .25s ease"}}>
 
         {/* ---- TOPBAR ---- */}
