@@ -12,9 +12,11 @@ import GlobalSearch from "@/components/GlobalSearch";
 import { useGlobalEnterNavigation } from "@/hooks/useGlobalEnterNavigation";
 import { ModeToggle } from "@/components/mode-toggle";
 import WhatsNew from "@/components/WhatsNew";
+import ImageAdjusterModal from "@/components/ImageAdjusterModal";
 import { resolvePlanPermissions } from "@/lib/planPermissions";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
+import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
 
 // Context to pass sidebarCollapsed + expand function to nav components
 const SidebarCtx = createContext<{ collapsed: boolean; expand: () => void }>({ collapsed: false, expand: () => {} });
@@ -185,6 +187,49 @@ export default function DashboardLayout({
   const [activeBranchId, setActiveBranchId] = useState<string>("all");
   // Admin-controlled business module enablement
   const [enabledTypes, setEnabledTypes] = useState<Set<string> | null>(null);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
+
+  async function refreshCompanySummary() {
+    try {
+      const res = await fetch("/api/me/company", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.name) setCompanyName(data.name);
+      if (data?.plan) setCompanyPlan(String(data.plan));
+      setCompanyDetail(data);
+    } catch {}
+  }
+
+  function syncStoredAvatar(avatar: string | null) {
+    updateStoredUser((parsed) => ({
+      ...(parsed || {}),
+      avatar,
+      user: parsed?.user ? { ...parsed.user, avatar } : undefined,
+    }));
+  }
+
+  async function uploadAvatarFromAdjustedImage(dataUrl: string) {
+    try {
+      setAvatarUploading(true);
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      const formData = new FormData();
+      formData.append("avatar", new File([blob], "avatar.png", { type: blob.type || "image/png" }));
+      const uploadRes = await fetch("/api/me/avatar", { method: "POST", body: formData });
+      if (!uploadRes.ok) return;
+      const data = await uploadRes.json();
+      setUserAvatar(data.avatar || null);
+      syncStoredAvatar(data.avatar || null);
+      setCurrentUser((prev) => (prev ? { ...prev, avatar: data.avatar || null } : prev));
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent(FINOVA_USER_PROFILE_UPDATED, { detail: { avatar: data.avatar || null } }));
+      }
+    } catch {
+    } finally {
+      setAvatarUploading(false);
+      setPendingAvatarFile(null);
+    }
+  }
 
   useEffect(() => {
     async function fetchCompany() {
@@ -213,6 +258,38 @@ export default function DashboardLayout({
       } catch (err) {}
     }
     fetchCompany();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const onUserUpdated = (event: Event) => {
+      const detail = (event as CustomEvent<{ name?: string; email?: string; avatar?: string | null }>).detail;
+      if (detail?.avatar !== undefined) setUserAvatar(detail.avatar || null);
+      if (detail?.name || detail?.email || detail?.avatar !== undefined) {
+        setCurrentUser((prev) =>
+          prev
+            ? {
+                ...prev,
+                name: detail?.name || prev.name,
+                email: detail?.email || prev.email,
+                avatar: detail?.avatar !== undefined ? detail.avatar : prev.avatar,
+              }
+            : prev
+        );
+      }
+    };
+
+    const onCompanyUpdated = () => {
+      refreshCompanySummary();
+    };
+
+    window.addEventListener(FINOVA_USER_PROFILE_UPDATED, onUserUpdated as EventListener);
+    window.addEventListener(FINOVA_COMPANY_PROFILE_UPDATED, onCompanyUpdated as EventListener);
+    return () => {
+      window.removeEventListener(FINOVA_USER_PROFILE_UPDATED, onUserUpdated as EventListener);
+      window.removeEventListener(FINOVA_COMPANY_PROFILE_UPDATED, onCompanyUpdated as EventListener);
+    };
   }, []);
 
   useEffect(() => {
@@ -1697,6 +1774,7 @@ export default function DashboardLayout({
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <NavLink href="/dashboard/budget" pathname={pathname}>Budget Planning</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <NavLink href="/dashboard/backup-restore" pathname={pathname}>Backup & Restore</NavLink>}
               {/* {(!isCustomPlan || hasCustomActiveModule("whatsapp")) && <NavLink href="/dashboard/notifications" pathname={pathname}>Notifications & SMS</NavLink>} */}
+              <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
               {(!isCustomPlan || hasCustomActiveModule("api_access")) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
             </NavGroup>
@@ -1754,14 +1832,10 @@ export default function DashboardLayout({
                         <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
                       </div>
                     </label>
-                    <input id="sidebar-avatar-input" type="file" accept="image/*" style={{display:"none"}} onChange={async(e)=>{
+                    <input id="sidebar-avatar-input" type="file" accept="image/*" style={{display:"none"}} onChange={(e)=>{
                       const f=e.target.files?.[0]; if(!f)return;
-                      setAvatarUploading(true);
-                      try{
-                        const fd=new FormData(); fd.append("avatar",f);
-                        const r=await fetch("/api/me/avatar",{method:"POST",body:fd});
-                        if(r.ok){const d=await r.json();setUserAvatar(d.avatar);}
-                      }catch{}finally{setAvatarUploading(false);e.target.value="";}
+                      setPendingAvatarFile(f);
+                      e.target.value="";
                     }}/>
                     <div style={{minWidth:0}}>
                       <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
@@ -1784,6 +1858,7 @@ export default function DashboardLayout({
 
                 {/* Menu items */}
                 {[
+                  { icon:"👤", label:"Account Settings", href:"/dashboard/account-settings" },
                   { icon:"👥", label:"Team Members",        href:"/dashboard/users" },
                   { icon:"🔔", label:"Notifications",       href:"/dashboard/notifications" },
                   { icon:"⭐", label:"Share Your Review",   href:"/dashboard/feedback" },
@@ -1816,6 +1891,15 @@ export default function DashboardLayout({
       </aside>
 
       {/* ═══════════════ MAIN AREA ═══════════════ */}
+      <ImageAdjusterModal
+        open={!!pendingAvatarFile}
+        file={pendingAvatarFile}
+        title="Adjust Profile Photo"
+        description="Apni photo ko drag aur zoom karke sidebar aur navbar ke liye set karen."
+        shape="circle"
+        onCancel={() => setPendingAvatarFile(null)}
+        onConfirm={uploadAvatarFromAdjustedImage}
+      />
       <main style={{flex:1,display:"flex",flexDirection:"column",minHeight:"100vh",minWidth:0,marginLeft:isMobileViewport ? 0 : SW,transition:"margin-left .25s ease"}}>
 
         {/* ---- TOPBAR ---- */}

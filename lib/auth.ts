@@ -18,6 +18,7 @@ function normalizeBrowserUser(raw: string | null) {
     name: user.name || user.email,
     email: user.email,
     role: (user.role || "VIEWER").trim().toUpperCase(),
+    avatar: user.avatar || null,
     businessType: user.businessType || null,
     permissions: Array.isArray(user.permissions) ? user.permissions : [],
     rolePermissions: Array.isArray(user.rolePermissions) ? user.rolePermissions : [],
