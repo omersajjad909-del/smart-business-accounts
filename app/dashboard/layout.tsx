@@ -838,7 +838,7 @@ export default function DashboardLayout({
         <div style={{padding: sidebarCollapsed ? "12px 8px" : "12px 14px", borderBottom:"1px solid var(--sidebar-border)", display:"flex", alignItems:"center", justifyContent: sidebarCollapsed ? "center" : "space-between", gap:10}}>
           {!sidebarCollapsed && (
             <Link prefetch={false} href="/dashboard" style={{display:"flex",alignItems:"center",gap:9,textDecoration:"none"}}>
-              <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{flexShrink:0,objectFit:"contain"}}/>
+              <img src="/icon1.png" alt="FinovaOS" width={32} height={32} style={{flexShrink:0,objectFit:"contain"}}/>
               <div style={{display:"flex",flexDirection:"column",gap:1}}>
                 <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1}}>FinovaOS</div>
                 <div style={{fontSize:9,color:"var(--text-muted)",letterSpacing:".05em",textTransform:"uppercase"}}>Business Suite</div>
