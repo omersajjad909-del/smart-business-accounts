@@ -2053,7 +2053,9 @@ export default function DashboardLayout({
                 </div>
                 <span style={{fontSize:14,fontWeight:800,color:"white",letterSpacing:"-.2px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
               </div>
-              {/* Bell only */}
+              {/* Theme toggle */}
+              <div style={{flexShrink:0,marginRight:4}}><ModeToggle /></div>
+              {/* Bell */}
               <div style={{position:"relative",flexShrink:0}} data-panel-anchor="notif">
                 <button
                   onClick={()=>{ const next=!showNotifPanel; setShowNotifPanel(next); setShowHelpPanel(false); setShowUserMenu(false); if(next&&!notifsFetched)fetchNotifs(); }}
