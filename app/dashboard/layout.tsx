@@ -352,19 +352,20 @@ export default function DashboardLayout({
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  // Close notification/help panels on outside click
+  // Close panels on outside click
   useEffect(() => {
-    if (!showNotifPanel && !showHelpPanel) return;
+    if (!showNotifPanel && !showHelpPanel && !showUserMenu) return;
     const handler = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target.closest("[data-panel-anchor]")) {
         setShowNotifPanel(false);
         setShowHelpPanel(false);
+        setShowUserMenu(false);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [showNotifPanel, showHelpPanel]);
+  }, [showNotifPanel, showHelpPanel, showUserMenu]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1909,118 +1910,28 @@ export default function DashboardLayout({
           </div>
         )}
 
-        {/* ---- SIDEBAR FOOTER ---- */}
-        <div style={{borderTop:"1px solid var(--border)",background:"var(--panel-bg-2)",position:"relative"}}>
-
-          {/* ── User Menu Popup ── */}
-          {showUserMenu && (
-            <>
-              {/* Backdrop */}
-              <div style={{position:"fixed",inset:0,zIndex:40}} onClick={()=>setShowUserMenu(false)}/>
-              {/* Popup panel — slides up from footer */}
-              <div style={{
-                position:"absolute",bottom:"100%",left:12,right:12,marginBottom:8,
-                background:"#0e1120",border:"1px solid rgba(255,255,255,0.12)",
-                borderRadius:14,padding:"6px",zIndex:50,
-                boxShadow:"0 -20px 60px rgba(0,0,0,0.6)",
-              }}>
-                {/* User + avatar at top */}
-                <div style={{padding:"12px 12px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)",marginBottom:4}}>
-                  <div style={{display:"flex",alignItems:"center",gap:10}}>
-                    {/* Clickable avatar for upload */}
-                    <label htmlFor="sidebar-avatar-input" style={{cursor:"pointer",flexShrink:0,position:"relative"}}>
-                      <div style={{width:42,height:42,borderRadius:12,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"white",overflow:"hidden",border:"2px solid rgba(99,102,241,0.35)"}}>
-                        {userAvatar
-                          ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                          : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
-                        }
-                      </div>
-                      {/* Camera overlay */}
-                      <div style={{position:"absolute",bottom:-3,right:-3,width:16,height:16,borderRadius:"50%",background:"#4f46e5",border:"1.5px solid #0e1120",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                      </div>
-                    </label>
-                    <input id="sidebar-avatar-input" type="file" accept="image/*" style={{display:"none"}} onChange={(e)=>{
-                      const f=e.target.files?.[0]; if(!f)return;
-                      setPendingAvatarFile(f);
-                      e.target.value="";
-                    }}/>
-                    <div style={{minWidth:0}}>
-                      <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
-                      <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:1,textTransform:"capitalize"}}>
-                        {(currentUser.role||"User").toLowerCase()} · {avatarUploading?"Upload ho raha hai…":"Photo change karne ke liye tap karein"}
-                      </div>
-                    </div>
-                  </div>
-                  {/* Company row below */}
-                  <div style={{display:"flex",alignItems:"center",gap:8,marginTop:10,padding:"8px 10px",borderRadius:9,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)"}}>
-                    <div style={{width:26,height:26,borderRadius:8,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0,overflow:"hidden"}}>
-                      {companyDetail?.logoUrl
-                        ? <img src={companyDetail.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                        : "🏢"}
-                    </div>
-                    <div style={{minWidth:0}}>
-                      <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.8)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</div>
-                      <div style={{fontSize:9,color:"rgba(255,255,255,0.3)",textTransform:"capitalize"}}>
-                        {companyDetail?.businessType ? companyDetail.businessType.replace(/_/g," ") : "Business"} · {companyDetail?.plan || "STARTER"}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Menu items */}
-                {[
-                  ...(currentUser?.role === "ADMIN" ? [{ icon:"🏢", label:"Company Profile", href:"/dashboard/company-profile" }] : []),
-                  { icon:"👤", label:"Account Settings", href:"/dashboard/account-settings" },
-                  { icon:"👥", label:"Team Members",        href:"/dashboard/users" },
-                  { icon:"🔔", label:"Notifications",       href:"/dashboard/notifications" },
-                  { icon:"⭐", label:"Share Your Review",   href:"/dashboard/feedback" },
-                ].map(item => (
-                  <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
-                    style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(255,255,255,0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
-                    onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="white";}}
-                    onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(255,255,255,0.65)";}}>
-                    <span style={{fontSize:14,width:18,textAlign:"center"}}>{item.icon}</span>
-                    {item.label}
-                  </a>
-                ))}
-
-                <div style={{borderTop:"1px solid rgba(255,255,255,0.07)",marginTop:4,paddingTop:4}}>
-                  <button onClick={logout}
-                    style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,background:"transparent",border:"none",color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",textAlign:"left"}}
-                    onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.1)";}}
-                    onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{flexShrink:0}}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* ── Clickable User Row ── */}
-          <div
-            style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",cursor:"pointer",transition:"background .15s"}}
-            onClick={()=>setShowUserMenu(v=>!v)}
-            onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.04)"}
-            onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+        {/* ---- SIDEBAR FOOTER — Collapse button only ---- */}
+        <div style={{borderTop:"1px solid var(--border)",background:"var(--panel-bg-2)"}}>
+          <button
+            onClick={()=>setSidebarCollapsed(v=>!v)}
+            style={{
+              width:"100%",display:"flex",alignItems:"center",gap:10,
+              padding: sidebarCollapsed ? "12px 8px" : "11px 14px",
+              justifyContent: sidebarCollapsed ? "center" : "flex-start",
+              background:"transparent",border:"none",cursor:"pointer",
+              color:"var(--text-muted)",transition:"background .15s, color .15s",
+            }}
+            onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";e.currentTarget.style.color="var(--text-primary)";}}
+            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="var(--text-muted)";}}
           >
-            <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"white",overflow:"hidden",flexShrink:0}}>
-              {userAvatar
-                ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              {sidebarCollapsed
+                ? <><line x1="3" y1="12" x2="21" y2="12"/><polyline points="14 5 21 12 14 19"/></>
+                : <><line x1="3" y1="12" x2="21" y2="12"/><polyline points="10 5 3 12 10 19"/></>
               }
-            </div>
-            {!sidebarCollapsed && (
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:12,fontWeight:600,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
-                <div style={{fontSize:10,color:"var(--text-muted)",textTransform:"capitalize"}}>{(currentUser.role||"User").toLowerCase()}</div>
-              </div>
-            )}
-            {!sidebarCollapsed && (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" style={{flexShrink:0}}><polyline points="18 15 12 9 6 15"/></svg>
-            )}
-          </div>
+            </svg>
+            {!sidebarCollapsed && <span style={{fontSize:12,fontWeight:600}}>Collapse</span>}
+          </button>
         </div>
 
       </aside>
@@ -2030,7 +1941,7 @@ export default function DashboardLayout({
         open={!!pendingAvatarFile}
         file={pendingAvatarFile}
         title="Adjust Profile Photo"
-        description="Apni photo ko drag aur zoom karke sidebar aur navbar ke liye set karen."
+        description="Drag and zoom to position your profile photo."
         shape="circle"
         onCancel={() => setPendingAvatarFile(null)}
         onConfirm={uploadAvatarFromAdjustedImage}
@@ -2328,20 +2239,92 @@ export default function DashboardLayout({
             )}
 
 
-            {/* User avatar */}
-            <div
-              className="hidden md:flex"
-              style={{display:"flex",alignItems:"center",padding:"3px",borderRadius:10,cursor:"pointer",transition:"background .15s",background:"transparent"}}
-              onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.05)"}
-              onMouseLeave={e=>e.currentTarget.style.background="transparent"}
-              onClick={()=>setShowUserMenu(v=>!v)}
-            >
-              <div style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:"white",overflow:"hidden",flexShrink:0}}>
-                {userAvatar
-                  ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                  : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
-                }
+            {/* User avatar + info + dropdown */}
+            <div style={{position:"relative"}} data-panel-anchor="user">
+              <div
+                className="hidden md:flex"
+                style={{display:"flex",alignItems:"center",gap:8,padding:"4px 8px 4px 4px",borderRadius:10,cursor:"pointer",transition:"background .15s",background:showUserMenu?"rgba(99,102,241,0.1)":"transparent"}}
+                onMouseEnter={e=>{ if(!showUserMenu) e.currentTarget.style.background="rgba(255,255,255,0.06)"; }}
+                onMouseLeave={e=>{ if(!showUserMenu) e.currentTarget.style.background="transparent"; }}
+                onClick={()=>{ setShowUserMenu(v=>!v); setShowNotifPanel(false); setShowHelpPanel(false); }}
+              >
+                <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"white",overflow:"hidden",flexShrink:0,border:"2px solid rgba(99,102,241,0.3)"}}>
+                  {(userAvatar || companyDetail?.logoUrl)
+                    ? <img src={userAvatar || companyDetail?.logoUrl} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                    : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
+                  }
+                </div>
+                <div style={{display:"flex",flexDirection:"column",minWidth:0}}>
+                  <span style={{fontSize:13,fontWeight:700,color:"var(--text-primary)",whiteSpace:"nowrap",lineHeight:1.3}}>{currentUser.name || "User"}</span>
+                  <span style={{fontSize:10,color:"var(--text-muted)",textTransform:"capitalize",lineHeight:1.2}}>{(currentUser.role||"User").toLowerCase()}</span>
+                </div>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5" style={{flexShrink:0,marginLeft:2,transform:showUserMenu?"rotate(180deg)":"none",transition:"transform .2s"}}><polyline points="6 9 12 15 18 9"/></svg>
               </div>
+
+              {/* User dropdown — positioned below navbar */}
+              {showUserMenu && (
+                <>
+                  <div style={{position:"fixed",inset:0,zIndex:40}} onClick={()=>setShowUserMenu(false)}/>
+                  <div style={{
+                    position:"absolute",top:"calc(100% + 10px)",right:0,width:240,
+                    background:"#0e1120",border:"1px solid rgba(255,255,255,0.12)",
+                    borderRadius:14,padding:"6px",zIndex:9999,
+                    boxShadow:"0 20px 60px rgba(0,0,0,0.6)",
+                  }}>
+                    {/* User header */}
+                    <div style={{padding:"10px 12px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)",marginBottom:4,display:"flex",alignItems:"center",gap:10}}>
+                      <label htmlFor="navbar-avatar-input" style={{cursor:"pointer",flexShrink:0,position:"relative"}}>
+                        <div style={{width:40,height:40,borderRadius:11,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"white",overflow:"hidden",border:"2px solid rgba(99,102,241,0.35)"}}>
+                          {(userAvatar || companyDetail?.logoUrl)
+                            ? <img src={userAvatar || companyDetail?.logoUrl} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                            : (currentUser.name || "U")[0].toUpperCase()
+                          }
+                        </div>
+                        <div style={{position:"absolute",bottom:-3,right:-3,width:16,height:16,borderRadius:"50%",background:"#4f46e5",border:"1.5px solid #0e1120",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </div>
+                      </label>
+                      <input id="navbar-avatar-input" type="file" accept="image/*" style={{display:"none"}} onChange={(e)=>{
+                        const f=e.target.files?.[0]; if(!f) return;
+                        setPendingAvatarFile(f); e.target.value="";
+                      }}/>
+                      <div style={{minWidth:0}}>
+                        <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
+                        <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:1,textTransform:"capitalize"}}>
+                          {(currentUser.role||"User").toLowerCase()} · {avatarUploading ? "Uploading..." : "Tap photo to change"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Menu items */}
+                    {[
+                      ...(currentUser?.role === "ADMIN" ? [{ icon:"🏢", label:"Company Profile", href:"/dashboard/company-profile" }] : []),
+                      { icon:"👤", label:"Account Settings", href:"/dashboard/account-settings" },
+                      { icon:"👥", label:"Team Members",     href:"/dashboard/users" },
+                      { icon:"🔔", label:"Notifications",    href:"/dashboard/notifications" },
+                      { icon:"⭐", label:"Share Your Review",href:"/dashboard/feedback" },
+                    ].map(item => (
+                      <a key={item.href} href={item.href} onClick={()=>setShowUserMenu(false)}
+                        style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,color:"rgba(255,255,255,0.65)",fontSize:12,fontWeight:500,textDecoration:"none",transition:"all .15s"}}
+                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="white";}}
+                        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(255,255,255,0.65)";}}>
+                        <span style={{fontSize:14,width:18,textAlign:"center"}}>{item.icon}</span>
+                        {item.label}
+                      </a>
+                    ))}
+
+                    <div style={{borderTop:"1px solid rgba(255,255,255,0.07)",marginTop:4,paddingTop:4}}>
+                      <button onClick={logout}
+                        style={{width:"100%",display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:9,background:"transparent",border:"none",color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s",textAlign:"left"}}
+                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.1)";}}
+                        onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{flexShrink:0}}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
             </>
