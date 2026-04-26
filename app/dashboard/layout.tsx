@@ -847,7 +847,7 @@ export default function DashboardLayout({
           )}
           {sidebarCollapsed && (
             <Link prefetch={false} href="/dashboard" style={{textDecoration:"none",display:"flex"}}>
-              <img src="/logo-icon.svg" alt="FinovaOS" width={32} height={32} style={{objectFit:"contain"}}/>
+              <img src="/icon1.png" alt="FinovaOS" width={32} height={32} style={{objectFit:"contain"}}/>
             </Link>
           )}
           {/* Hamburger/collapse toggle */}
@@ -1982,7 +1982,7 @@ export default function DashboardLayout({
                 <div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>
                   {companyDetail?.logoUrl
                     ? <img src={companyDetail.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                    : <img src="/logo-icon.svg" alt="FinovaOS" width={18} height={18} style={{objectFit:"contain"}}/>}
+                    : <img src="/icon1.png" alt="FinovaOS" width={18} height={18} style={{objectFit:"contain"}}/>}
                 </div>
                 <span style={{fontSize:14,fontWeight:800,color:"white",letterSpacing:"-.2px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
               </div>
