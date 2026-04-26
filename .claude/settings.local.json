@@ -132,7 +132,8 @@
       "Bash(grep -v \"\\\\\\\\[\")",
       "Bash(findstr /r /s /i \"FinovaOS is a product\" app\\\\*.tsx app\\\\*.ts)",
       "Bash(findstr /r /s /i \"product of Finova\\\\|FinovaOS is\" \"app\\\\dashboard\\\\DashboardContent\\\\page.tsx\")",
-      "Bash(findstr /r /s /i \"product of Finova\\\\|FinovaOS is\" \"app\\\\dashboard\\\\layout.tsx\")"
+      "Bash(findstr /r /s /i \"product of Finova\\\\|FinovaOS is\" \"app\\\\dashboard\\\\layout.tsx\")",
+      "Bash(npx eslint *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
