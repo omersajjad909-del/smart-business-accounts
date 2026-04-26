@@ -103,15 +103,15 @@ export default function CompanyProfilePage() {
             dispatchUserProfileUpdated({ avatar: avatarData.avatar || null });
           }
         }
-        setSaveMsg({ text: "لوگو کامیابی سے اپڈیٹ ہو گیا", ok: true });
+        setSaveMsg({ text: "Logo updated successfully", ok: true });
         setTimeout(() => setSaveMsg(null), 3000);
       } else {
         const d = await r.json().catch(() => ({}));
-        setSaveMsg({ text: d.error || "لوگو اپلوڈ نہیں ہو سکا", ok: false });
+        setSaveMsg({ text: d.error || "Failed to upload logo", ok: false });
         setTimeout(() => setSaveMsg(null), 3000);
       }
     } catch {
-      setSaveMsg({ text: "لوگو اپلوڈ نہیں ہو سکا", ok: false });
+      setSaveMsg({ text: "Failed to upload logo", ok: false });
       setTimeout(() => setSaveMsg(null), 3000);
     } finally {
       setLogoUploading(false);
@@ -176,14 +176,14 @@ export default function CompanyProfilePage() {
       if (res.ok) {
         setCompany((prev) => (prev ? { ...prev, ...form } : prev));
         dispatchCompanyProfileUpdated({ name: form.name, country: form.country, baseCurrency: form.baseCurrency });
-        setSaveMsg({ text: "پروفائل کامیابی سے اپڈیٹ ہو گیا", ok: true });
+        setSaveMsg({ text: "Profile updated successfully", ok: true });
         setEditing(false);
       } else {
         const j = await res.json().catch(() => ({}));
-        setSaveMsg({ text: j.error || "محفوظ نہیں ہو سکا", ok: false });
+        setSaveMsg({ text: j.error || "Failed to save", ok: false });
       }
     } catch {
-      setSaveMsg({ text: "نیٹ ورک ایرر", ok: false });
+      setSaveMsg({ text: "Network error", ok: false });
     } finally {
       setSaving(false);
       setTimeout(() => setSaveMsg(null), 3500);
@@ -262,7 +262,7 @@ export default function CompanyProfilePage() {
 
   if (!company)
     return (
-      <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>کمپنی نہیں ملی۔</div>
+      <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>Company not found.</div>
     );
 
   const planCode = String(company.plan || "STARTER").toUpperCase();
@@ -281,8 +281,8 @@ export default function CompanyProfilePage() {
       <ImageAdjusterModal
         open={!!pendingLogoFile}
         file={pendingLogoFile}
-        title="کمپنی فوٹو ایڈجسٹ کریں"
-        description="Photo ya logo ko drag aur zoom karke card me sahi framing set karein."
+        title="Adjust Company Photo"
+        description="Drag and zoom to position your logo or photo exactly how you want."
         shape="rounded"
         onCancel={() => setPendingLogoFile(null)}
         onConfirm={uploadAdjustedLogo}
@@ -291,10 +291,10 @@ export default function CompanyProfilePage() {
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{ fontSize: "22px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
-            کمپنی پروفائل
+            Company Profile
           </h1>
           <p style={{ fontSize: "13px", color: "var(--text-muted)", marginTop: "4px" }}>
-            کمپنی کی معلومات، سبسکرپشن اور سیٹنگز
+            Your business identity, subscription &amp; settings
           </p>
         </div>
         {isAdmin && !editing && (
@@ -311,7 +311,7 @@ export default function CompanyProfilePage() {
               cursor: "pointer",
             }}
           >
-            پروفائل تبدیل کریں
+            Edit Profile
           </button>
         )}
       </div>
@@ -338,7 +338,7 @@ export default function CompanyProfilePage() {
       {/* ── COMPANY IDENTITY ── */}
       <div style={card}>
         <div style={sectionLabel as React.CSSProperties}>
-          <span>🏢</span> کمپنی کی پہچان
+          <span>🏢</span> Company Identity
         </div>
 
         {/* Top row: avatar + info */}
@@ -434,16 +434,15 @@ export default function CompanyProfilePage() {
               )}
               {company.createdAt && (
                 <span style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
-                  📅 رکنیت: {fmtDate(company.createdAt)}
+                  📅 Member since {fmtDate(company.createdAt)}
                 </span>
               )}
             </div>
             <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "12px", lineHeight: 1.6 }}>
-              Yahan upload ki hui photo company card par dikh jayegi, aur admin ke navbar/sidebar preview ko bhi sync kar degi. Personal photo ko baad me{" "}
+              The uploaded photo will appear on the company card and sync to the admin&apos;s navbar &amp; sidebar preview. To change your personal photo separately, visit{" "}
               <Link href="/dashboard/account-settings" style={{ color: "#a5b4fc", fontWeight: 700, textDecoration: "none" }}>
                 Account Settings
-              </Link>{" "}
-              se change hogi.
+              </Link>.
             </div>
           </div>
 
@@ -471,22 +470,22 @@ export default function CompanyProfilePage() {
             <div style={{ height: "1px", background: "var(--border)", marginBottom: "20px" }} />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px", marginBottom: "16px" }}>
               <div>
-                <label style={fieldLabel}>کمپنی کا نام</label>
+                <label style={fieldLabel}>Company Name</label>
                 <input
                   style={inputStyle}
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  placeholder="کمپنی کا نام"
+                  placeholder="Company name"
                 />
               </div>
               <div>
-                <label style={fieldLabel}>ملک</label>
+                <label style={fieldLabel}>Country</label>
                 <select
                   style={{ ...inputStyle, paddingRight: 32 }}
                   value={form.country}
                   onChange={(e) => updateCountry(e.target.value)}
                 >
-                  <option value="">ملک منتخب کریں</option>
+                  <option value="">Select country</option>
                   {countryOptions.map((c) => (
                     <option key={c} value={c}>
                       {c}
@@ -495,7 +494,7 @@ export default function CompanyProfilePage() {
                 </select>
               </div>
               <div>
-                <label style={fieldLabel}>بنیادی کرنسی</label>
+                <label style={fieldLabel}>Base Currency</label>
                 <select
                   style={{ ...inputStyle, paddingRight: 32 }}
                   value={form.baseCurrency}
@@ -524,7 +523,7 @@ export default function CompanyProfilePage() {
                   cursor: saving ? "not-allowed" : "pointer",
                 }}
               >
-                {saving ? "محفوظ ہو رہا ہے…" : "تبدیلیاں محفوظ کریں"}
+                {saving ? "Saving…" : "Save Changes"}
               </button>
               <button
                 onClick={() => {
@@ -542,7 +541,7 @@ export default function CompanyProfilePage() {
                   cursor: "pointer",
                 }}
               >
-                منسوخ
+                Cancel
               </button>
             </div>
           </div>
@@ -552,10 +551,10 @@ export default function CompanyProfilePage() {
       {/* ── QUICK STATS ROW ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "16px" }}>
         {[
-          { label: "ٹیم ممبرز", value: userCount, icon: "👥", color: "#6366f1" },
-          { label: "شاخیں", value: branches.length, sub: `${activeBranches} فعال`, icon: "🏢", color: "#0891b2" },
-          { label: "اکاؤنٹس", value: accountCount, icon: "📊", color: "#0d9488" },
-          { label: "پلان حد", value: maxUsers === null ? "∞" : maxUsers, sub: "زیادہ سے زیادہ صارفین", icon: "🔢", color: "#d97706" },
+          { label: "Team Members", value: userCount, icon: "👥", color: "#6366f1" },
+          { label: "Branches", value: branches.length, sub: `${activeBranches} active`, icon: "🏢", color: "#0891b2" },
+          { label: "Accounts", value: accountCount, icon: "📊", color: "#0d9488" },
+          { label: "Plan Limit", value: maxUsers === null ? "∞" : maxUsers, sub: "max users", icon: "🔢", color: "#d97706" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -589,22 +588,22 @@ export default function CompanyProfilePage() {
           }}
         >
           <div style={{ ...sectionLabel, color: plan.color } as React.CSSProperties}>
-            <span>{plan.icon}</span> موجودہ پلان
+            <span>{plan.icon}</span> Current Plan
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "16px" }}>
             <div>
               <div style={{ fontSize: "26px", fontWeight: 900, color: plan.color }}>{plan.label}</div>
               <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "3px" }}>
-                {maxUsers === null ? "لامحدود صارفین" : `زیادہ سے زیادہ ${maxUsers} صارفین`}
+                {maxUsers === null ? "Unlimited users" : `Up to ${maxUsers} users`}
               </div>
               {!!company.extraSeats && company.extraSeats > 0 && (
                 <div style={{ fontSize: "11px", color: "#34d399", marginTop: "2px" }}>
-                  +{company.extraSeats} اضافی سیٹس شامل
+                  Includes +{company.extraSeats} extra seats add-on
                 </div>
               )}
               {periodEnd && (
                 <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>
-                  تجدید: {periodEnd}
+                  Renews {periodEnd}
                 </div>
               )}
             </div>
@@ -623,10 +622,10 @@ export default function CompanyProfilePage() {
                 }}
               >
                 <span>
-                  {userCount} / {maxUsers} صارفین
+                  {userCount} / {maxUsers} users
                 </span>
                 <span style={{ color: userCount >= maxUsers ? "#f87171" : "var(--text-muted)" }}>
-                  {userCount >= maxUsers ? "حد پہنچ گئی" : `${maxUsers - userCount} جگہیں باقی`}
+                  {userCount >= maxUsers ? "Limit reached" : `${maxUsers - userCount} slots left`}
                 </span>
               </div>
               <div
@@ -670,7 +669,7 @@ export default function CompanyProfilePage() {
                 textDecoration: "none",
               }}
             >
-              پلان منیج کریں ←
+              Manage Plan →
             </Link>
           )}
         </div>
@@ -690,7 +689,7 @@ export default function CompanyProfilePage() {
               color: statusActive ? "#34d399" : "#f87171",
             } as React.CSSProperties}
           >
-            <span>💳</span> سبسکرپشن
+            <span>💳</span> Subscription
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
@@ -727,7 +726,7 @@ export default function CompanyProfilePage() {
                 marginBottom: "12px",
               }}
             >
-              🔔 ٹرائل پیریڈ جاری ہے۔ ٹرائل ختم ہونے کے بعد رسائی برقرار رکھنے کے لیے اپگریڈ کریں۔
+              🔔 Trial period active. Upgrade to keep access after trial ends.
             </div>
           )}
 
@@ -743,16 +742,16 @@ export default function CompanyProfilePage() {
                 marginBottom: "12px",
               }}
             >
-              ⚠️ سبسکرپشن غیر فعال ہے۔{" "}
+              ⚠️ Subscription inactive.{" "}
               <Link prefetch={false} href="/dashboard/billing" style={{ color: "#f87171", fontWeight: 700 }}>
-                ابھی تجدید کریں ←
+                Renew now →
               </Link>
             </div>
           )}
 
           {periodEnd && (
             <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-              مدت ختم: <strong style={{ color: "var(--text-primary)" }}>{periodEnd}</strong>
+              Period ends: <strong style={{ color: "var(--text-primary)" }}>{periodEnd}</strong>
             </div>
           )}
 
@@ -766,7 +765,7 @@ export default function CompanyProfilePage() {
                 wordBreak: "break-all",
               }}
             >
-              کسٹمر: {company.stripeCustomerId}
+              Customer: {company.stripeCustomerId}
             </div>
           )}
         </div>
@@ -776,7 +775,7 @@ export default function CompanyProfilePage() {
       <div style={card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
           <div style={sectionLabel as React.CSSProperties}>
-            <span>🏢</span> شاخیں{" "}
+            <span>🏢</span> Branches{" "}
             <span
               style={{
                 padding: "1px 7px",
@@ -796,7 +795,7 @@ export default function CompanyProfilePage() {
               href="/dashboard/branches"
               style={{ fontSize: "12px", color: "#6366f1", fontWeight: 600, textDecoration: "none" }}
             >
-              شاخیں منیج کریں ←
+              Manage Branches →
             </Link>
           )}
         </div>
@@ -812,12 +811,12 @@ export default function CompanyProfilePage() {
               borderRadius: "10px",
             }}
           >
-            ابھی تک کوئی شاخ شامل نہیں۔
+            No branches added yet.
             {isAdmin && (
               <>
                 {" "}
                 <Link prefetch={false} href="/dashboard/branches" style={{ color: "#6366f1", fontWeight: 600, textDecoration: "none" }}>
-                  پہلی شاخ شامل کریں ←
+                  Add your first branch →
                 </Link>
               </>
             )}
@@ -863,7 +862,7 @@ export default function CompanyProfilePage() {
                       border: `1px solid ${branch.isActive ? "rgba(52,211,153,0.3)" : "rgba(248,113,113,0.3)"}`,
                     }}
                   >
-                    {branch.isActive ? "فعال" : "غیر فعال"}
+                    {branch.isActive ? "Active" : "Inactive"}
                   </span>
                 </div>
                 <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{branch.name}</div>
@@ -871,7 +870,7 @@ export default function CompanyProfilePage() {
                   <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>📍 {branch.city}</div>
                 )}
                 <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "2px" }}>
-                  شامل: {fmtDate(branch.createdAt)}
+                  Added {fmtDate(branch.createdAt)}
                 </div>
               </div>
             ))}
@@ -883,14 +882,14 @@ export default function CompanyProfilePage() {
       <div style={card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
           <div style={sectionLabel as React.CSSProperties}>
-            <span>👥</span> ٹیم ممبرز
+            <span>👥</span> Team Members
           </div>
           {isAdmin && (
             <Link prefetch={false}
               href="/dashboard/users"
               style={{ fontSize: "12px", color: "#6366f1", fontWeight: 600, textDecoration: "none" }}
             >
-              صارفین منیج کریں ←
+              Manage Users →
             </Link>
           )}
         </div>
@@ -913,7 +912,7 @@ export default function CompanyProfilePage() {
           >
             <div style={{ fontSize: "22px", fontWeight: 800, color: "#6366f1", lineHeight: 1 }}>{userCount}</div>
             <div style={{ fontSize: "9px", color: "var(--text-muted)", fontWeight: 600, marginTop: "2px" }}>
-              صارفین
+              USERS
             </div>
           </div>
 
@@ -930,10 +929,10 @@ export default function CompanyProfilePage() {
                   }}
                 >
                   <span>
-                    {userCount} میں سے {maxUsers} سیٹس استعمال
+                    {userCount} of {maxUsers} seats used
                   </span>
                   <span style={{ color: userCount >= maxUsers ? "#f87171" : "var(--text-muted)" }}>
-                    {userCount >= maxUsers ? "حد پہنچ گئی" : `${maxUsers - userCount} دستیاب`}
+                    {userCount >= maxUsers ? "Limit reached" : `${maxUsers - userCount} available`}
                   </span>
                 </div>
                 <div style={{ height: "8px", borderRadius: "10px", background: "var(--border)", overflow: "hidden" }}>
@@ -952,16 +951,16 @@ export default function CompanyProfilePage() {
                 </div>
                 {userCount >= maxUsers && (
                   <div style={{ marginTop: "10px", fontSize: "12px", color: "#f87171" }}>
-                    صارف کی حد پہنچ گئی۔{" "}
+                    User limit reached.{" "}
                     <Link prefetch={false} href="/dashboard/billing" style={{ color: "#f87171", fontWeight: 700 }}>
-                      پلان اپگریڈ کریں ←
+                      Upgrade your plan →
                     </Link>
                   </div>
                 )}
               </>
             ) : (
               <div style={{ fontSize: "13px", color: "var(--text-muted)" }}>
-                {userCount} ٹیم ممبر — {plan.label} پلان پر لامحدود سیٹس
+                {userCount} team member{userCount !== 1 ? "s" : ""} — unlimited seats on {plan.label} plan
               </div>
             )}
           </div>
@@ -972,7 +971,7 @@ export default function CompanyProfilePage() {
       {company.activeModules && planCode === "CUSTOM" && (
         <div style={card}>
           <div style={sectionLabel as React.CSSProperties}>
-            <span>⭐</span> فعال ماڈیولز
+            <span>⭐</span> Active Modules
           </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             {company.activeModules
@@ -1002,16 +1001,16 @@ export default function CompanyProfilePage() {
       {isAdmin && (
         <div style={card}>
           <div style={sectionLabel as React.CSSProperties}>
-            <span>🔗</span> فوری لنکس
+            <span>🔗</span> Quick Links
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "10px" }}>
             {[
-              { href: "/dashboard/users", label: "صارفین منیج کریں", icon: "👥", color: "#6366f1" },
-              { href: "/dashboard/branches", label: "شاخیں منیج کریں", icon: "🏢", color: "#0891b2" },
-              { href: "/dashboard/billing", label: "بلنگ اور پلان", icon: "💳", color: "#0d9488" },
-              { href: "/dashboard/team", label: "ممبر مدعو کریں", icon: "✉️", color: "#d97706" },
-              { href: "/dashboard/users/roles", label: "کردار اور رسائی", icon: "🔐", color: "#7c3aed" },
-              { href: "/dashboard/users/logs", label: "سرگرمی لاگز", icon: "📋", color: "#64748b" },
+              { href: "/dashboard/users", label: "Manage Users", icon: "👥", color: "#6366f1" },
+              { href: "/dashboard/branches", label: "Manage Branches", icon: "🏢", color: "#0891b2" },
+              { href: "/dashboard/billing", label: "Billing & Plan", icon: "💳", color: "#0d9488" },
+              { href: "/dashboard/team", label: "Invite Member", icon: "✉️", color: "#d97706" },
+              { href: "/dashboard/users/roles", label: "Roles & Access", icon: "🔐", color: "#7c3aed" },
+              { href: "/dashboard/users/logs", label: "Activity Logs", icon: "📋", color: "#64748b" },
             ].map((link) => (
               <Link prefetch={false}
                 key={link.href}

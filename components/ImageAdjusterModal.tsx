@@ -221,7 +221,7 @@ export default function ImageAdjusterModal({
           <div>
             <div style={{ fontSize: 20, fontWeight: 800 }}>{title}</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 5 }}>
-              {description || "Photo ko drag karein aur zoom karein — jo hissa chahiyein center mein layen."}
+              {description || "Drag and zoom to position exactly what you want in frame."}
             </div>
           </div>
           <button
@@ -294,7 +294,7 @@ export default function ImageAdjusterModal({
               whiteSpace: "nowrap",
               pointerEvents: "none",
             }}>
-              drag karein ↕↔
+              drag to reposition ↕↔
             </div>
           )}
         </div>
@@ -331,7 +331,7 @@ export default function ImageAdjusterModal({
               fontWeight: 600, fontSize: 13, cursor: "pointer",
             }}
           >
-            منسوخ
+            Cancel
           </button>
           <button
             type="button"
@@ -345,7 +345,7 @@ export default function ImageAdjusterModal({
               boxShadow: "0 4px 16px rgba(99,102,241,0.35)",
             }}
           >
-            یہ فوٹو استعمال کریں
+            Use This Photo
           </button>
         </div>
       </div>
