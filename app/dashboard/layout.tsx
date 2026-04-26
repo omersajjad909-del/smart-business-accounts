@@ -1999,6 +1999,28 @@ export default function DashboardLayout({
           )}
 
           {/* ── Clickable User Row ── */}
+          <div
+            style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",cursor:"pointer",transition:"background .15s"}}
+            onClick={()=>setShowUserMenu(v=>!v)}
+            onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.04)"}
+            onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+          >
+            <div style={{width:32,height:32,borderRadius:9,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"white",overflow:"hidden",flexShrink:0}}>
+              {userAvatar
+                ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
+              }
+            </div>
+            {!sidebarCollapsed && (
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:12,fontWeight:600,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
+                <div style={{fontSize:10,color:"var(--text-muted)",textTransform:"capitalize"}}>{(currentUser.role||"User").toLowerCase()}</div>
+              </div>
+            )}
+            {!sidebarCollapsed && (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" style={{flexShrink:0}}><polyline points="18 15 12 9 6 15"/></svg>
+            )}
+          </div>
         </div>
 
       </aside>
@@ -2306,10 +2328,10 @@ export default function DashboardLayout({
             )}
 
 
-            {/* User avatar + name */}
+            {/* User avatar */}
             <div
               className="hidden md:flex"
-              style={{display:"flex",alignItems:"center",gap:7,padding:"4px 8px 4px 4px",borderRadius:10,cursor:"pointer",transition:"background .15s",background:"transparent"}}
+              style={{display:"flex",alignItems:"center",padding:"3px",borderRadius:10,cursor:"pointer",transition:"background .15s",background:"transparent"}}
               onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.05)"}
               onMouseLeave={e=>e.currentTarget.style.background="transparent"}
               onClick={()=>setShowUserMenu(v=>!v)}
@@ -2319,10 +2341,6 @@ export default function DashboardLayout({
                   ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                   : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
                 }
-              </div>
-              <div style={{display:"flex",flexDirection:"column"}}>
-                <span style={{fontSize:12,fontWeight:700,color:"var(--text-primary)",whiteSpace:"nowrap",lineHeight:1.2}}>{currentUser.name || "User"}</span>
-                <span style={{fontSize:9,color:"var(--text-muted)",textTransform:"capitalize",lineHeight:1.2}}>{(currentUser.role||"User").toLowerCase()}</span>
               </div>
             </div>
           </div>
