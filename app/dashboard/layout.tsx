@@ -1882,7 +1882,6 @@ export default function DashboardLayout({
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <NavLink href="/dashboard/budget" pathname={pathname}>Budget Planning</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <NavLink href="/dashboard/backup-restore" pathname={pathname}>Backup & Restore</NavLink>}
               {/* {(!isCustomPlan || hasCustomActiveModule("whatsapp")) && <NavLink href="/dashboard/notifications" pathname={pathname}>Notifications & SMS</NavLink>} */}
-              {currentUser?.role === "ADMIN" && <NavLink href="/dashboard/company-profile" pathname={pathname}>Company Profile</NavLink>}
               <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
               {(!isCustomPlan || hasCustomActiveModule("api_access")) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
@@ -1971,6 +1970,7 @@ export default function DashboardLayout({
 
                 {/* Menu items */}
                 {[
+                  ...(currentUser?.role === "ADMIN" ? [{ icon:"🏢", label:"Company Profile", href:"/dashboard/company-profile" }] : []),
                   { icon:"👤", label:"Account Settings", href:"/dashboard/account-settings" },
                   { icon:"👥", label:"Team Members",        href:"/dashboard/users" },
                   { icon:"🔔", label:"Notifications",       href:"/dashboard/notifications" },
@@ -2256,22 +2256,6 @@ export default function DashboardLayout({
               </div>
             )}
 
-            {/* Company logo badge — desktop only, admin only */}
-            {!isMobileViewport && currentUser?.role === "ADMIN" && (
-              <Link prefetch={false} href="/dashboard/company-profile"
-                title={companyName}
-                style={{display:"flex",alignItems:"center",gap:7,padding:"4px 10px 4px 4px",borderRadius:10,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",textDecoration:"none",transition:"all .15s"}}
-                onMouseEnter={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";}}
-                onMouseLeave={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";}}
-              >
-                <div style={{width:26,height:26,borderRadius:7,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>
-                  {companyDetail?.logoUrl
-                    ? <img src={companyDetail.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                    : "🏢"}
-                </div>
-                <span style={{fontSize:12,fontWeight:600,color:"var(--text-muted)",whiteSpace:"nowrap",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis"}}>{companyName}</span>
-              </Link>
-            )}
 
             {/* User avatar + name */}
             <div
