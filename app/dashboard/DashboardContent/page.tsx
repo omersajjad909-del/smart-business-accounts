@@ -751,7 +751,7 @@ export default function DashboardContent() {
             ):(dueData.overdueReceivables.length===0&&dueData.dueSoon.length===0)?(
               <div style={{textAlign:"center",padding:"20px 0",color:"var(--text-muted)",fontSize:12}}>
                 <div style={{fontSize:24,marginBottom:6}}>✅</div>
-                Koi pending payment nahi
+                No Any Due Balance
               </div>
             ):(
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
