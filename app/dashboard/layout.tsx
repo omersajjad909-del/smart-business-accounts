@@ -1882,6 +1882,7 @@ export default function DashboardLayout({
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <NavLink href="/dashboard/budget" pathname={pathname}>Budget Planning</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <NavLink href="/dashboard/backup-restore" pathname={pathname}>Backup & Restore</NavLink>}
               {/* {(!isCustomPlan || hasCustomActiveModule("whatsapp")) && <NavLink href="/dashboard/notifications" pathname={pathname}>Notifications & SMS</NavLink>} */}
+              {currentUser?.role === "ADMIN" && <NavLink href="/dashboard/company-profile" pathname={pathname}>Company Profile</NavLink>}
               <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
               {(!isCustomPlan || hasCustomActiveModule("api_access")) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
@@ -1948,13 +1949,17 @@ export default function DashboardLayout({
                     <div style={{minWidth:0}}>
                       <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
                       <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:1,textTransform:"capitalize"}}>
-                        {(currentUser.role||"User").toLowerCase()} · {avatarUploading?"Uploading…":"Tap photo to change"}
+                        {(currentUser.role||"User").toLowerCase()} · {avatarUploading?"Upload ho raha hai…":"Photo change karne ke liye tap karein"}
                       </div>
                     </div>
                   </div>
                   {/* Company row below */}
                   <div style={{display:"flex",alignItems:"center",gap:8,marginTop:10,padding:"8px 10px",borderRadius:9,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)"}}>
-                    <div style={{width:26,height:26,borderRadius:8,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0}}>🏢</div>
+                    <div style={{width:26,height:26,borderRadius:8,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,flexShrink:0,overflow:"hidden"}}>
+                      {companyDetail?.logoUrl
+                        ? <img src={companyDetail.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                        : "🏢"}
+                    </div>
                     <div style={{minWidth:0}}>
                       <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.8)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</div>
                       <div style={{fontSize:9,color:"rgba(255,255,255,0.3)",textTransform:"capitalize"}}>
@@ -2039,7 +2044,11 @@ export default function DashboardLayout({
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
               </button>
               <div style={{display:"flex",alignItems:"center",gap:7,padding:"2px 0"}}>
-                <img src="/logo-icon.svg" alt="FinovaOS" width={24} height={24} style={{objectFit:"contain",flexShrink:0}}/>
+                <div style={{width:26,height:26,borderRadius:7,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>
+                  {companyDetail?.logoUrl
+                    ? <img src={companyDetail.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                    : <img src="/logo-icon.svg" alt="FinovaOS" width={18} height={18} style={{objectFit:"contain"}}/>}
+                </div>
                 <span style={{fontSize:13,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.2px",whiteSpace:"nowrap"}}>{companyName}</span>
               </div>
             </div>
@@ -2247,14 +2256,20 @@ export default function DashboardLayout({
               </div>
             )}
 
-            {!isMobileViewport && (
+            {/* Company logo badge — desktop only, admin only */}
+            {!isMobileViewport && currentUser?.role === "ADMIN" && (
               <Link prefetch={false} href="/dashboard/company-profile"
-                style={{display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:10,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",color:"var(--text-muted)",fontSize:12,fontWeight:600,textDecoration:"none",whiteSpace:"nowrap",transition:"all .15s"}}
-                onMouseEnter={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";e.currentTarget.style.color="var(--text-primary)";}}
-                onMouseLeave={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";e.currentTarget.style.color="var(--text-muted)";}}
+                title={companyName}
+                style={{display:"flex",alignItems:"center",gap:7,padding:"4px 10px 4px 4px",borderRadius:10,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",textDecoration:"none",transition:"all .15s"}}
+                onMouseEnter={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.08)";}}
+                onMouseLeave={(e:any)=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";}}
               >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                {companyName}
+                <div style={{width:26,height:26,borderRadius:7,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>
+                  {companyDetail?.logoUrl
+                    ? <img src={companyDetail.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                    : "🏢"}
+                </div>
+                <span style={{fontSize:12,fontWeight:600,color:"var(--text-muted)",whiteSpace:"nowrap",maxWidth:120,overflow:"hidden",textOverflow:"ellipsis"}}>{companyName}</span>
               </Link>
             )}
 
