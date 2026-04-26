@@ -2020,42 +2020,89 @@ export default function DashboardLayout({
         <div
           style={{
             background:isMobileViewport
-              ? "linear-gradient(180deg, rgba(15,26,48,.96), rgba(15,26,48,.88))"
+              ? "rgba(10,15,35,0.97)"
               : "var(--panel-bg)",
             borderBottom:"1px solid var(--border)",
-            padding:isMobileViewport ? "8px 10px" : "8px 12px",
-            minHeight:isMobileViewport ? 0 : 56,
+            padding:isMobileViewport ? "10px 14px" : "8px 12px",
+            minHeight:isMobileViewport ? 52 : 56,
             display:"flex",
             alignItems:"center",
-            gap:isMobileViewport ? 8 : 12,
+            gap:isMobileViewport ? 0 : 12,
             position:"sticky",
             top:0,
             zIndex:10,
-            flexWrap:"wrap",
-            boxShadow:isMobileViewport ? "0 10px 24px rgba(2,6,23,.14)" : "none",
+            flexWrap: isMobileViewport ? "nowrap" : "wrap",
+            boxShadow:isMobileViewport ? "0 1px 0 rgba(255,255,255,0.05)" : "none",
           }}
           className="print:hidden sm:px-4"
         >
 
-          {/* MOBILE: Hamburger + Logo + company name */}
-          {isMobileViewport && (
-            <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-              <button onClick={()=>setIsMobileMenuOpen(true)} style={{width:34,height:34,borderRadius:9,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"var(--text-muted)",flexShrink:0}}>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          {/* MOBILE: clean single-row header */}
+          {isMobileViewport ? (
+            <>
+              {/* Hamburger */}
+              <button onClick={()=>setIsMobileMenuOpen(true)} style={{width:36,height:36,borderRadius:10,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.07)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,0.6)",flexShrink:0,marginRight:10}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
               </button>
-              <div style={{display:"flex",alignItems:"center",gap:7,padding:"2px 0"}}>
-                <div style={{width:26,height:26,borderRadius:7,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>
+              {/* Company logo + name */}
+              <div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}>
+                <div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>
                   {companyDetail?.logoUrl
                     ? <img src={companyDetail.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                     : <img src="/logo-icon.svg" alt="FinovaOS" width={18} height={18} style={{objectFit:"contain"}}/>}
                 </div>
-                <span style={{fontSize:13,fontWeight:800,color:"var(--text-primary)",letterSpacing:"-.2px",whiteSpace:"nowrap"}}>{companyName}</span>
+                <span style={{fontSize:14,fontWeight:800,color:"white",letterSpacing:"-.2px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{companyName}</span>
               </div>
-            </div>
-          )}
-
-          {/* Global Search */}
-          <div style={{flex:isMobileViewport ? "1 1 100%" : "1 1 auto",minWidth:isMobileViewport ? "100%" : 240,order:isMobileViewport ? 3 : 0}}>
+              {/* Bell only */}
+              <div style={{position:"relative",flexShrink:0}} data-panel-anchor="notif">
+                <button
+                  onClick={()=>{ const next=!showNotifPanel; setShowNotifPanel(next); setShowHelpPanel(false); setShowUserMenu(false); if(next&&!notifsFetched)fetchNotifs(); }}
+                  style={{width:38,height:38,borderRadius:11,background:showNotifPanel?"rgba(99,102,241,0.15)":"rgba(255,255,255,0.06)",border:showNotifPanel?"1px solid rgba(99,102,241,0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:showNotifPanel?"#818cf8":"rgba(255,255,255,0.65)"}}>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                  {unreadCount > 0 && (
+                    <span style={{position:"absolute",top:7,right:7,minWidth:8,height:8,borderRadius:"50%",background:"#f87171",border:"1.5px solid rgba(10,15,35,0.97)"}}/>
+                  )}
+                </button>
+                {/* Notification dropdown — reuse same panel */}
+                {showNotifPanel && (
+                  <div style={{position:"fixed",top:60,right:12,width:"calc(100vw - 24px)",maxWidth:360,background:"var(--panel-bg)",border:"1px solid var(--border)",borderRadius:14,boxShadow:"0 20px 60px rgba(0,0,0,0.5)",zIndex:9999,overflow:"hidden"}}>
+                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderBottom:"1px solid var(--border)"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8}}>
+                        <span style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>Notifications</span>
+                        {unreadCount > 0 && <span style={{padding:"2px 7px",borderRadius:10,background:"rgba(248,113,113,0.12)",border:"1px solid rgba(248,113,113,0.25)",fontSize:10,fontWeight:700,color:"#f87171"}}>{unreadCount} new</span>}
+                      </div>
+                      {unreadCount > 0 && <button onClick={markAllRead} style={{fontSize:11,color:"#818cf8",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:0}}>Mark all read</button>}
+                    </div>
+                    <div style={{maxHeight:300,overflowY:"auto"}}>
+                      {notifsLoading ? (
+                        <div style={{padding:"32px 16px",textAlign:"center",color:"var(--text-muted)",fontSize:13}}><div style={{width:22,height:22,border:"2px solid var(--border)",borderTopColor:"#6366f1",borderRadius:"50%",animation:"finova-spin .7s linear infinite",margin:"0 auto 8px"}}/>Loading…</div>
+                      ) : notifs.length === 0 ? (
+                        <div style={{padding:"36px 16px",textAlign:"center"}}><div style={{fontSize:28,marginBottom:8}}>🔔</div><div style={{fontSize:13,color:"var(--text-muted)",fontWeight:500}}>No notifications yet</div></div>
+                      ) : notifs.map(n=>{
+                        const col=({INFO:"#818cf8",SUCCESS:"#34d399",WARNING:"#fbbf24",ERROR:"#f87171"} as any)[n.type]||"#818cf8";
+                        return (
+                          <div key={n.id} onClick={()=>{markRead(n.id);if(n.link){router.push(n.link);setShowNotifPanel(false);}}} style={{display:"flex",gap:12,padding:"12px 16px",borderBottom:"1px solid var(--border)",cursor:n.link?"pointer":"default",background:n.isRead?"transparent":"rgba(99,102,241,0.04)"}}>
+                            <div style={{width:8,height:8,borderRadius:"50%",background:col,flexShrink:0,marginTop:5,opacity:n.isRead?0.3:1}}/>
+                            <div style={{flex:1,minWidth:0}}>
+                              <div style={{fontSize:12,fontWeight:700,color:"var(--text-primary)",marginBottom:2,opacity:n.isRead?0.6:1}}>{n.title}</div>
+                              <div style={{fontSize:11,color:"var(--text-muted)",lineHeight:1.5,opacity:n.isRead?0.5:1}}>{n.message}</div>
+                              <div style={{fontSize:10,color:"var(--text-muted)",marginTop:4,opacity:0.5}}>{new Date(n.createdAt).toLocaleDateString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{padding:"10px 16px",borderTop:"1px solid var(--border)"}}>
+                      <Link prefetch={false} href="/dashboard/notifications" onClick={()=>setShowNotifPanel(false)} style={{fontSize:12,color:"#818cf8",fontWeight:600,textDecoration:"none",display:"block",textAlign:"center"}}>View all notifications →</Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+          {/* Global Search — DESKTOP only */}
+          <div style={{flex:"1 1 auto",minWidth:240,order:0}}>
             <Suspense fallback={<div style={{width:"100%",maxWidth:340,height:36,background:"rgba(255,255,255,0.04)",borderRadius:8,animation:"pulse 1.5s infinite"}} />}>
               <GlobalSearch />
             </Suspense>
@@ -2277,6 +2324,8 @@ export default function DashboardLayout({
               </div>
             </div>
           </div>
+            </>
+          )}
         </div>
         )}
 
