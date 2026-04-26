@@ -146,6 +146,11 @@ export default function DashboardContent() {
   const [userAvatar,setUserAvatar]   = useState<string|null>(null);
   const [unreadNotifs,setUnreadNotifs] = useState(0);
   const [todayStats,setTodayStats]   = useState<{todaySales:number;todayOrders:number;pendingCount:number;lowStockCount:number}|null>(null);
+  const [dueData,setDueData] = useState<{
+    overdueReceivables:{id:string;invoiceNo:string;party:string;amount:number;dueDate:string;daysOverdue:number}[];
+    dueSoon:{id:string;invoiceNo:string;party:string;amount:number;dueDate:string;daysLeft:number}[];
+    banks:{id:string;bankName:string;accountName:string;balance:number}[];
+  }|null>(null);
   const [businessType,setBT]  = useState<BusinessType>(initDemo||(storedUser?.businessType as BusinessType)||"trading");
   const [stats,setStats]      = useState<DashStats>({
     revenue:0,expenses:0,profit:0,cashBalance:0,revenueGrowth:0,
@@ -222,6 +227,11 @@ export default function DashboardContent() {
           const t=await tR.value.json();
           setTodayStats({todaySales:Number(t.todaySales||0),todayOrders:Number(t.todayOrders||0),pendingCount:Number(t.pendingCount||0),lowStockCount:Number(t.lowStockCount||0)});
         }
+        // due-this-week (non-blocking, best-effort)
+        fetch("/api/reports/due-this-week",{headers:h,cache:"no-store"})
+          .then(r=>r.ok?r.json():null)
+          .then(d=>{ if(d) setDueData(d); })
+          .catch(()=>{});
         // load avatar from stored user or me API
         const meUser = getCurrentUser() as any;
         if(meUser?.avatar) setUserAvatar(meUser.avatar);
@@ -278,11 +288,6 @@ export default function DashboardContent() {
     {name:"Others",   value:stats.expenses*.04,color:EC[4]},
   ]:[];
 
-  const tasks=[
-    stats.overdueAmount>0&&{label:"Collect overdue receivables",   detail:"Accounting",due:"ASAP",      color:"#ef4444"},
-    stats.invoicesPending>0&&{label:`Follow up ${stats.invoicesPending} pending invoice${stats.invoicesPending>1?"s":""}`,detail:"Sales",due:"This week",color:"#f59e0b"},
-    {label:"Review monthly P&L",detail:"Reports",due:"End of month",color:"#6366f1"},
-  ].filter(Boolean) as {label:string;detail:string;due:string;color:string}[];
 
   const QA=[
     {label:"+ Invoice",href:"/dashboard/sales-invoice",  bg:"linear-gradient(135deg,#6366f1,#4f46e5)",icon:"📄"},
@@ -733,29 +738,67 @@ export default function DashboardContent() {
               ))}
             </div>
           </div>
-          {/* Upcoming Tasks */}
-          <div style={{borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",padding:"17px 18px",flex:1}}>
+          {/* Due This Week */}
+          <div style={{borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",padding:"17px 18px",flex:1,overflow:"hidden"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:13}}>
-              <div style={{fontSize:13,fontWeight:800,color:"var(--text-primary)"}}>Upcoming Tasks</div>
-              <span style={{fontSize:11,color:"#818cf8",fontWeight:600,cursor:"pointer"}}>View all</span>
+              <div style={{fontSize:13,fontWeight:800,color:"var(--text-primary)"}}>Due This Week</div>
+              <Link prefetch={false} href="/dashboard/sales-invoice" style={{fontSize:11,color:"#818cf8",fontWeight:600,textDecoration:"none"}}>View all</Link>
             </div>
-            <div style={{display:"flex",flexDirection:"column",gap:11}}>
-              {tasks.slice(0,3).map((t,i)=>(
-                <div key={i} style={{display:"flex",alignItems:"flex-start",gap:11}}>
-                  <div style={{width:16,height:16,borderRadius:5,border:`2px solid ${t.color}55`,flexShrink:0,marginTop:2}}/>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:12,fontWeight:600,color:"var(--text-primary)",marginBottom:3}}>{t.label}</div>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                      <span style={{fontSize:10,color:"var(--text-muted)"}}>{t.detail}</span>
-                      <span style={{fontSize:10,fontWeight:700,color:t.color}}>{t.due}</span>
+            {!dueData?(
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {[1,2,3].map(i=><div key={i} style={{height:32,borderRadius:8,background:"rgba(255,255,255,.04)",animation:"db-up .6s ease both"}}/>)}
+              </div>
+            ):(dueData.overdueReceivables.length===0&&dueData.dueSoon.length===0)?(
+              <div style={{textAlign:"center",padding:"20px 0",color:"var(--text-muted)",fontSize:12}}>
+                <div style={{fontSize:24,marginBottom:6}}>✅</div>
+                Koi pending payment nahi
+              </div>
+            ):(
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {dueData.overdueReceivables.slice(0,3).map((r,i)=>(
+                  <Link prefetch={false} key={r.id} href="/dashboard/sales-invoice" style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",borderRadius:9,background:"rgba(248,113,113,.06)",border:"1px solid rgba(248,113,113,.15)",textDecoration:"none"}}>
+                    <div style={{width:7,height:7,borderRadius:"50%",background:"#f87171",flexShrink:0}}/>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:11,fontWeight:700,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.party}</div>
+                      <div style={{fontSize:10,color:"#f87171",fontWeight:600}}>{r.daysOverdue}d overdue · {r.invoiceNo}</div>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                    <div style={{fontSize:11,fontWeight:800,color:"#f87171",flexShrink:0}}>{cur} {fmt(r.amount)}</div>
+                  </Link>
+                ))}
+                {dueData.dueSoon.slice(0,2).map((r,i)=>(
+                  <Link prefetch={false} key={r.id} href="/dashboard/purchase-invoice" style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",borderRadius:9,background:"rgba(245,158,11,.06)",border:"1px solid rgba(245,158,11,.15)",textDecoration:"none"}}>
+                    <div style={{width:7,height:7,borderRadius:"50%",background:"#f59e0b",flexShrink:0}}/>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:11,fontWeight:700,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.party}</div>
+                      <div style={{fontSize:10,color:"#f59e0b",fontWeight:600}}>{r.daysLeft===0?"Due today":`${r.daysLeft}d left`} · {r.invoiceNo}</div>
+                    </div>
+                    <div style={{fontSize:11,fontWeight:800,color:"#f59e0b",flexShrink:0}}>{cur} {fmt(r.amount)}</div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* ── Bank Balances (desktop) ── */}
+      {dueData?.banks && dueData.banks.length>0 && (
+        <div className="db-desk-header" style={{marginBottom:20,borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",padding:"17px 20px"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+            <div style={{fontSize:14,fontWeight:800,color:"var(--text-primary)"}}>🏦 Bank Balances</div>
+            <Link prefetch={false} href="/dashboard/bank-reconciliation" style={{fontSize:12,color:"#818cf8",textDecoration:"none",fontWeight:600}}>Reconcile →</Link>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:`repeat(${Math.min(dueData.banks.length,4)},1fr)`,gap:12}}>
+            {dueData.banks.map(b=>(
+              <div key={b.id} style={{borderRadius:12,padding:"14px 16px",background:"rgba(99,102,241,.06)",border:"1px solid rgba(99,102,241,.15)"}}>
+                <div style={{fontSize:10,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{b.bankName}</div>
+                <div style={{fontSize:16,fontWeight:900,color:"#818cf8",letterSpacing:"-.5px"}}>{cur} {fmt(b.balance)}</div>
+                <div style={{fontSize:10,color:"var(--text-muted)",marginTop:3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{b.accountName}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Getting Started ── */}
       {!hasData&&!loading&&(
