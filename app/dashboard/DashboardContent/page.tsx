@@ -37,9 +37,10 @@ function Sparkline({data,color}:{data:number[];color:string}) {
 
 /* ── AI Insight Panel (right sidebar on desktop) ── */
 function AIInsightPanel({companyId,role,userId}:{companyId:string;role:string;userId:string}) {
-  const [topAlert,setTopAlert]=useState<string|null>(null);
-  const [score,setScore]=useState<number|null>(null);
+  const [insights,setInsights]=useState<string[]>([]);
   const [loading,setLoading]=useState(true);
+  const [activeSlide,setActiveSlide]=useState(0);
+
   useEffect(()=>{
     const h:Record<string,string>={"x-company-id":companyId,"x-user-id":userId,"x-user-role":role};
     const ctrl=new AbortController(); const tid=setTimeout(()=>ctrl.abort(),8000);
@@ -49,25 +50,53 @@ function AIInsightPanel({companyId,role,userId}:{companyId:string;role:string;us
     ]).then(([ar,ir])=>{
       const alerts=ar.status==="fulfilled"?(ar.value.alerts||[]):[];
       const ctx=ir.status==="fulfilled"?ir.value.context:null;
+      const list:string[]=[];
       if(ctx){
-        const rv=ctx.revenue?.change||0,ev=ctx.expenses?.change||0,pr=ctx.profit?.thisMonth||0,od=ctx.receivables?.overdue||0,re=ctx.revenue?.thisMonth||0;
-        let s=60;
-        if(rv>0)s+=Math.min(rv,15); if(rv<0)s+=Math.max(rv,-15);
-        if(ev<rv)s+=10; if(ev>20)s-=10;
-        if(pr>0)s+=10; if(pr<0)s-=20; if(od>re*0.3)s-=8;
-        setScore(Math.max(20,Math.min(100,Math.round(s))));
+        const rv=ctx.revenue?.change||0;
+        const ev=ctx.expenses?.change||0;
+        const pr=ctx.profit?.thisMonth||0;
+        const od=ctx.receivables?.overdue||0;
+        const re=ctx.revenue?.thisMonth||0;
+        if(pr!==0){
+          const dir=pr>=0?"profitable":"running at a loss";
+          const pct=Math.abs(rv).toFixed(1);
+          const suffix=pr>=0?` Revenue is up ${pct}% — keep it up!`:" Review your expenses to improve margins.";
+          list.push(`Your business is ${dir} this month.${suffix}`);
+        }
+        if(re>0){
+          const ratio=Math.round(((ctx.expenses?.thisMonth||0)/re)*100);
+          if(ratio>0){
+            const status=ratio<70?"healthy — well controlled":ratio<90?"moderate — watch closely":"high — consider cutting costs";
+            list.push(`Expenses are ${ratio}% of revenue this month — ${status}.`);
+          }
+        }
+        if(rv!==0&&ev!==0){
+          if(ev>rv)list.push(`Expenses grew ${ev.toFixed(1)}% while revenue grew ${rv.toFixed(1)}%. Costs are rising faster than income.`);
+          else if(rv>ev&&rv>0)list.push(`Revenue grew ${rv.toFixed(1)}% vs expenses at ${ev.toFixed(1)}%. Your margins are improving.`);
+        }
+        if(od>0)list.push(`You have overdue receivables worth outstanding. Follow up with customers to improve your cash flow.`);
       }
-      const c=alerts.find((a:any)=>a.severity==="critical");
-      const w=alerts.find((a:any)=>a.severity==="warning");
-      setTopAlert(c?.description||w?.description||alerts[0]?.description||null);
+      const topAlert=alerts.find((a:any)=>a.severity==="critical")||alerts.find((a:any)=>a.severity==="warning")||alerts[0];
+      if(topAlert?.description)list.push(topAlert.description);
+      if(list.length===0){
+        list.push("Your business financials look healthy. Keep tracking expenses consistently to maintain profitability.");
+        list.push("Tip: Regular invoice follow-ups reduce overdue balances and can improve cash flow significantly.");
+        list.push("Review your top expense categories monthly to identify opportunities for cost savings.");
+      }
+      setInsights(list);
       setLoading(false);
-    }).catch(()=>setLoading(false)).finally(()=>clearTimeout(tid));
+    }).catch(()=>{
+      setInsights(["Your business financials look healthy. Keep tracking expenses to maintain profitability."]);
+      setLoading(false);
+    }).finally(()=>clearTimeout(tid));
     return()=>{clearTimeout(tid);ctrl.abort();};
   },[companyId,role,userId]);
 
-  const sc=score||0;
-  const scoreColor=sc>=75?"#10b981":sc>=55?"#f59e0b":"#ef4444";
-  const scoreLabel=sc>=75?"Good":sc>=55?"Fair":"Poor";
+  useEffect(()=>{
+    if(insights.length<=1)return;
+    const t=setInterval(()=>setActiveSlide(p=>(p+1)%insights.length),5000);
+    return()=>clearInterval(t);
+  },[insights.length]);
 
   return (
     <div style={{borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",display:"flex",flexDirection:"column",height:"100%",overflow:"hidden",position:"relative"}}>
@@ -75,23 +104,20 @@ function AIInsightPanel({companyId,role,userId}:{companyId:string;role:string;us
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 18px 0"}}>
         <div style={{display:"flex",alignItems:"center",gap:7}}>
           <div style={{fontSize:14,fontWeight:800,color:"var(--text-primary)"}}>AI Insights</div>
-          <span style={{padding:"1px 7px",borderRadius:20,background:"rgba(99,102,241,.2)",border:"1px solid rgba(99,102,241,.3)",fontSize:9,fontWeight:700,color:"#818cf8"}}>NEW</span>
+          <span style={{padding:"1px 7px",borderRadius:20,background:"rgba(99,102,241,.2)",border:"1px solid rgba(99,102,241,.3)",fontSize:9,fontWeight:700,color:"#818cf8"}}>LIVE</span>
         </div>
         <Link prefetch={false} href="/dashboard/ai" style={{fontSize:11,color:"#818cf8",textDecoration:"none",fontWeight:600}}>View all →</Link>
       </div>
 
       {/* Brain illustration */}
       <div style={{display:"flex",justifyContent:"center",alignItems:"center",padding:"18px 0 8px",position:"relative"}}>
-        {/* Stars/sparkles */}
         <div style={{position:"absolute",top:8,left:"20%",fontSize:12,opacity:.7,animation:"ai-twinkle 2s ease-in-out infinite"}}>✦</div>
         <div style={{position:"absolute",top:14,right:"18%",fontSize:9,opacity:.5,animation:"ai-twinkle 2.4s ease-in-out .6s infinite"}}>✦</div>
         <div style={{position:"absolute",bottom:14,left:"16%",fontSize:8,opacity:.4,animation:"ai-twinkle 1.8s ease-in-out 1s infinite"}}>✦</div>
         <div style={{position:"absolute",bottom:10,right:"22%",fontSize:11,opacity:.6,animation:"ai-twinkle 2.2s ease-in-out .3s infinite"}}>✦</div>
-        {/* Glowing rings */}
         <div style={{position:"relative",width:110,height:110,display:"flex",alignItems:"center",justifyContent:"center"}}>
           <div style={{position:"absolute",inset:0,borderRadius:"50%",background:"radial-gradient(circle,rgba(99,102,241,.18) 0%,transparent 70%)",animation:"ai-pulse 3s ease-in-out infinite"}}/>
           <div style={{position:"absolute",inset:10,borderRadius:"50%",background:"radial-gradient(circle,rgba(139,92,246,.22) 0%,transparent 70%)",animation:"ai-pulse 3s ease-in-out .8s infinite"}}/>
-          {/* Brain circle */}
           <div style={{width:86,height:86,borderRadius:"50%",background:"radial-gradient(circle at 38% 35%,rgba(167,139,250,.55),rgba(79,70,229,.85))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:42,boxShadow:"0 0 36px rgba(99,102,241,.5),0 0 64px rgba(139,92,246,.25)",border:"1.5px solid rgba(129,140,248,.3)"}}>
             🧠
           </div>
@@ -103,31 +129,38 @@ function AIInsightPanel({companyId,role,userId}:{companyId:string;role:string;us
         <div style={{display:"flex",alignItems:"center",gap:6}}>
           <span style={{fontSize:13}}>✨</span>
           <span style={{fontSize:12,fontWeight:700,color:"var(--text-primary)"}}>Smart Insight</span>
+          {!loading&&insights.length>1&&(
+            <span style={{marginLeft:"auto",fontSize:10,color:"var(--text-muted)",fontWeight:600}}>{activeSlide+1}/{insights.length}</span>
+          )}
         </div>
         <div style={{flex:1}}>
-          {loading ? (
+          {loading?(
             <div style={{display:"flex",gap:5,alignItems:"center"}}>
               <div style={{width:8,height:8,borderRadius:"50%",background:"#6366f1",animation:"ai-dot 1.2s ease 0s infinite"}}/>
               <div style={{width:8,height:8,borderRadius:"50%",background:"#6366f1",animation:"ai-dot 1.2s ease .2s infinite"}}/>
               <div style={{width:8,height:8,borderRadius:"50%",background:"#6366f1",animation:"ai-dot 1.2s ease .4s infinite"}}/>
             </div>
-          ) : <>
-            <p style={{margin:"0 0 10px",fontSize:11.5,color:"rgba(255,255,255,.75)",lineHeight:1.7}}>
-              {topAlert||"Your business financials look healthy. Keep tracking expenses to maintain profitability."}
-            </p>
-            {sc>0&&<div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
-              <span style={{fontSize:10,color:"var(--text-muted)"}}>Health Score:</span>
-              <span style={{padding:"2px 9px",borderRadius:20,background:`${scoreColor}18`,border:`1px solid ${scoreColor}30`,fontSize:10,fontWeight:700,color:scoreColor}}>{scoreLabel} · {sc}/100</span>
-            </div>}
-            <Link prefetch={false} href="/dashboard/ai" style={{display:"inline-flex",alignItems:"center",gap:5,padding:"7px 14px",borderRadius:9,background:"linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.18))",border:"1px solid rgba(99,102,241,.3)",color:"#c4b5fd",fontSize:11,fontWeight:700,textDecoration:"none"}}>
-              View Full Insight →
-            </Link>
-            </>}
-          </div>
+          ):(
+            <>
+              <p style={{margin:"0 0 12px",fontSize:11.5,color:"rgba(255,255,255,.78)",lineHeight:1.75}}>
+                {insights[activeSlide]||insights[0]}
+              </p>
+              <Link prefetch={false} href="/dashboard/ai" style={{display:"inline-flex",alignItems:"center",gap:5,padding:"7px 14px",borderRadius:9,background:"linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.18))",border:"1px solid rgba(99,102,241,.3)",color:"#c4b5fd",fontSize:11,fontWeight:700,textDecoration:"none"}}>
+                View Full Insight →
+              </Link>
+            </>
+          )}
+        </div>
       </div>
-      {/* Page indicator dots */}
+
+      {/* Dot indicators */}
       <div style={{display:"flex",justifyContent:"center",gap:5,padding:"10px 0 12px"}}>
-        {[0,1,2].map(i=><div key={i} style={{width:i===0?18:6,height:4,borderRadius:3,background:i===0?"#6366f1":"rgba(99,102,241,.2)",transition:"width .2s"}}/>)}
+        {(loading?[0,1,2]:insights).map((_,i)=>(
+          <div key={i} onClick={()=>!loading&&setActiveSlide(i)}
+            style={{width:i===activeSlide?18:6,height:4,borderRadius:3,
+              background:i===activeSlide?"#6366f1":"rgba(99,102,241,.2)",
+              transition:"width .3s",cursor:loading?"default":"pointer"}}/>
+        ))}
       </div>
     </div>
   );
@@ -738,43 +771,61 @@ export default function DashboardContent() {
               ))}
             </div>
           </div>
-          {/* Due This Week */}
+          {/* Upcoming Tasks */}
           <div style={{borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",padding:"17px 18px",flex:1,overflow:"hidden"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:13}}>
-              <div style={{fontSize:13,fontWeight:800,color:"var(--text-primary)"}}>Due This Week</div>
+              <div style={{fontSize:13,fontWeight:800,color:"var(--text-primary)"}}>Upcoming Tasks</div>
               <Link prefetch={false} href="/dashboard/sales-invoice" style={{fontSize:11,color:"#818cf8",fontWeight:600,textDecoration:"none"}}>View all</Link>
             </div>
             {!dueData?(
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                {[1,2,3].map(i=><div key={i} style={{height:32,borderRadius:8,background:"rgba(255,255,255,.04)",animation:"db-up .6s ease both"}}/>)}
+                {[1,2,3].map(i=><div key={i} style={{height:44,borderRadius:10,background:"rgba(255,255,255,.04)",animation:"db-up .6s ease both"}}/>)}
               </div>
             ):(dueData.overdueReceivables.length===0&&dueData.dueSoon.length===0)?(
               <div style={{textAlign:"center",padding:"20px 0",color:"var(--text-muted)",fontSize:12}}>
                 <div style={{fontSize:24,marginBottom:6}}>✅</div>
-                No Any Due Balance
+                All caught up! No tasks due.
               </div>
             ):(
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                {dueData.overdueReceivables.slice(0,3).map((r,i)=>(
-                  <Link prefetch={false} key={r.id} href="/dashboard/sales-invoice" style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",borderRadius:9,background:"rgba(248,113,113,.06)",border:"1px solid rgba(248,113,113,.15)",textDecoration:"none"}}>
-                    <div style={{width:7,height:7,borderRadius:"50%",background:"#f87171",flexShrink:0}}/>
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontSize:11,fontWeight:700,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.party}</div>
-                      <div style={{fontSize:10,color:"#f87171",fontWeight:600}}>{r.daysOverdue}d overdue · {r.invoiceNo}</div>
-                    </div>
-                    <div style={{fontSize:11,fontWeight:800,color:"#f87171",flexShrink:0}}>{cur} {fmt(r.amount)}</div>
-                  </Link>
-                ))}
-                {dueData.dueSoon.slice(0,2).map((r,i)=>(
-                  <Link prefetch={false} key={r.id} href="/dashboard/purchase-invoice" style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",borderRadius:9,background:"rgba(245,158,11,.06)",border:"1px solid rgba(245,158,11,.15)",textDecoration:"none"}}>
-                    <div style={{width:7,height:7,borderRadius:"50%",background:"#f59e0b",flexShrink:0}}/>
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontSize:11,fontWeight:700,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.party}</div>
-                      <div style={{fontSize:10,color:"#f59e0b",fontWeight:600}}>{r.daysLeft===0?"Due today":`${r.daysLeft}d left`} · {r.invoiceNo}</div>
-                    </div>
-                    <div style={{fontSize:11,fontWeight:800,color:"#f59e0b",flexShrink:0}}>{cur} {fmt(r.amount)}</div>
-                  </Link>
-                ))}
+                {dueData.overdueReceivables.slice(0,3).map((r)=>{
+                  const d=new Date(r.dueDate);
+                  const ds=`${String(d.getDate()).padStart(2,"0")}-${String(d.getMonth()+1).padStart(2,"0")}-${d.getFullYear()}`;
+                  return (
+                    <Link prefetch={false} key={r.id} href="/dashboard/sales-invoice" style={{display:"flex",alignItems:"center",gap:10,padding:"10px 11px",borderRadius:11,background:"rgba(248,113,113,.07)",border:"1px solid rgba(248,113,113,.18)",textDecoration:"none"}}>
+                      <div style={{width:32,height:32,borderRadius:9,background:"rgba(248,113,113,.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      </div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:11.5,fontWeight:700,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>Follow up {r.party}</div>
+                        <div style={{fontSize:10,color:"#f87171",fontWeight:600,marginTop:1}}>{r.daysOverdue}d overdue · {ds}</div>
+                      </div>
+                      <div style={{textAlign:"right",flexShrink:0}}>
+                        <div style={{fontSize:11,fontWeight:800,color:"#f87171"}}>{cur} {fmt(r.amount)}</div>
+                        <div style={{fontSize:9,fontWeight:700,color:"rgba(248,113,113,.6)",textTransform:"uppercase",letterSpacing:".04em"}}>Collect</div>
+                      </div>
+                    </Link>
+                  );
+                })}
+                {dueData.dueSoon.slice(0,2).map((r)=>{
+                  const d=new Date(r.dueDate);
+                  const ds=`${String(d.getDate()).padStart(2,"0")}-${String(d.getMonth()+1).padStart(2,"0")}-${d.getFullYear()}`;
+                  return (
+                    <Link prefetch={false} key={r.id} href="/dashboard/purchase-invoice" style={{display:"flex",alignItems:"center",gap:10,padding:"10px 11px",borderRadius:11,background:"rgba(245,158,11,.07)",border:"1px solid rgba(245,158,11,.18)",textDecoration:"none"}}>
+                      <div style={{width:32,height:32,borderRadius:9,background:"rgba(245,158,11,.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      </div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:11.5,fontWeight:700,color:"var(--text-primary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>Pay {r.party}</div>
+                        <div style={{fontSize:10,color:"#f59e0b",fontWeight:600,marginTop:1}}>{r.daysLeft===0?"Due today":`Due ${ds}`}</div>
+                      </div>
+                      <div style={{textAlign:"right",flexShrink:0}}>
+                        <div style={{fontSize:11,fontWeight:800,color:"#f59e0b"}}>{cur} {fmt(r.amount)}</div>
+                        <div style={{fontSize:9,fontWeight:700,color:"rgba(245,158,11,.6)",textTransform:"uppercase",letterSpacing:".04em"}}>Pay</div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>
