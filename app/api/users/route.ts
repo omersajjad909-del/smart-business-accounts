@@ -26,12 +26,22 @@ export async function GET(req: NextRequest) {
     }
 
     if (role === "ADMIN") {
-      const users = await prisma.user.findMany({
-        where: { companies: { some: { companyId } } },
-        include: { permissions: true },
-        orderBy: { createdAt: "desc" },
-      });
-      return NextResponse.json(users);
+      try {
+        const users = await prisma.user.findMany({
+          where: { companies: { some: { companyId } } },
+          include: { permissions: true },
+          orderBy: { createdAt: "desc" },
+        });
+        return NextResponse.json(users);
+      } catch {
+        // Fallback if UserPermission table not yet migrated
+        const users = await prisma.user.findMany({
+          where: { companies: { some: { companyId } } },
+          select: { id: true, name: true, email: true, role: true, active: true, createdAt: true, avatar: true },
+          orderBy: { createdAt: "desc" },
+        });
+        return NextResponse.json(users);
+      }
     }
 
     const publicUsers = await prisma.user.findMany({
@@ -132,6 +142,7 @@ export async function PUT(req: NextRequest) {
     const updatedUser = await prisma.user.update({
       where: { id },
       data: updateData,
+      select: { id: true, name: true, email: true, role: true, active: true, createdAt: true },
     });
     return NextResponse.json(updatedUser);
   } catch (error: any) {
@@ -152,7 +163,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    const { id } = await req.json();
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id") || (await req.json().catch(() => ({}))).id;
     const target = await prisma.userCompany.findFirst({
       where: { userId: id, companyId },
       select: { userId: true },
