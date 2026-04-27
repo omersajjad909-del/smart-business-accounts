@@ -303,9 +303,9 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     ],
     quickActions: [
       { label: "POS Sale", href: "/dashboard/retail/pos", icon: "🖥️", color: "#ec4899" },
-      { label: "Sync Store", href: "/dashboard/retail/sync", icon: "🔄", color: "#38bdf8" },
+      { label: "Sync Store", href: "/dashboard/retail/online-sync", icon: "🔄", color: "#38bdf8" },
       { label: "Stock Transfer", href: "/dashboard/retail/stock-transfer", icon: "🔄", color: "#34d399" },
-      { label: "Supplier Portal", href: "/dashboard/retail/suppliers", icon: "🤝", color: "#f59e0b" },
+      { label: "Supplier Portal", href: "/dashboard/retail/supplier-portal", icon: "🤝", color: "#f59e0b" },
     ],
   },
 

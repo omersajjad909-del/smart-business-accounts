@@ -141,7 +141,8 @@
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
-      "d:\\projects\\smart-business-accounts\\app\\(marketing)\\for"
+      "d:\\projects\\smart-business-accounts\\app\\(marketing)\\for",
+      "\\tmp"
     ]
   }
 }
