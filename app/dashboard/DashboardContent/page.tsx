@@ -175,7 +175,7 @@ export default function DashboardContent() {
   const initDemo  = typeof window!=="undefined"&&storedUser?.email==="finovaos.app@gmail.com"
     ?(getStoredDemoBusinessPreference() as BusinessType|null):null;
 
-  const [companyInfo,setCompanyInfo] = useState<{plan:string;subscriptionStatus:string;baseCurrency:string;name?:string}|null>(null);
+  const [companyInfo,setCompanyInfo] = useState<{plan:string;subscriptionStatus:string;baseCurrency:string;name?:string;logoUrl?:string|null}|null>(null);
   const [userAvatar,setUserAvatar]   = useState<string|null>(null);
   const [unreadNotifs,setUnreadNotifs] = useState(0);
   const [todayStats,setTodayStats]   = useState<{todaySales:number;todayOrders:number;pendingCount:number;lowStockCount:number}|null>(null);
@@ -247,6 +247,7 @@ export default function DashboardContent() {
             subscriptionStatus:String(s.subscriptionStatus||"ACTIVE"),
             baseCurrency:CURRENCY_SYMBOL[String(s.baseCurrency||"")]||CURRENCY_SYMBOL["USD"],
             name:String(s.name || s.companyName || ""),
+            logoUrl:s.logoUrl||null,
           });
         }
         if(eR.status==="fulfilled"&&eR.value.ok){
@@ -458,10 +459,10 @@ export default function DashboardContent() {
       {/* ── Mobile Header: Avatar + Name + Notification ── */}
       <div className="db-mo db-mo-flex" style={{marginBottom:18,alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
         <div style={{display:"flex",alignItems:"flex-start",gap:12,minWidth:0}}>
-          {/* Avatar — shows real photo if uploaded */}
+          {/* Avatar — profile photo, then company logo, then initials */}
           <div style={{width:52,height:52,borderRadius:"50%",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:800,color:"#fff",flexShrink:0,boxShadow:"0 8px 24px rgba(99,102,241,.28)",overflow:"hidden"}}>
-            {userAvatar
-              ? <img src={userAvatar} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+            {(userAvatar || companyInfo?.logoUrl)
+              ? <img src={userAvatar || companyInfo?.logoUrl!} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
               : userInitials}
           </div>
           <div style={{minWidth:0,paddingTop:2}}>
@@ -547,24 +548,55 @@ export default function DashboardContent() {
         </div>
       </div>
 
-      {/* ── Today's Overview (4 in a row) ── */}
+      {/* ── Business Overview (mobile) ── */}
       <div className="db-mo" style={{marginBottom:20}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
-          <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>Today's Overview</div>
-          <Link prefetch={false} href="/dashboard/reports" style={{fontSize:12,color:"#818cf8",textDecoration:"none",fontWeight:600}}>View All</Link>
+          <div style={{fontSize:15,fontWeight:800,color:"var(--text-primary)"}}>Business Overview</div>
+          <Link prefetch={false} href="/dashboard/reports" style={{fontSize:12,color:"#818cf8",textDecoration:"none",fontWeight:600}}>Full Report</Link>
         </div>
-        <div className="db-grid-exempt" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+        {/* Mini chart */}
+        <div style={{borderRadius:16,padding:"14px 4px 10px",background:"var(--panel-bg)",border:"1px solid var(--border)",marginBottom:10}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,fontSize:10,color:"var(--text-muted)",paddingLeft:14,marginBottom:8}}>
+            {[["Revenue","#818cf8"],["Expenses","#f87171"],["Profit","#10b981"]].map(([l,c])=>(
+              <span key={l} style={{display:"flex",alignItems:"center",gap:4}}>
+                <span style={{display:"inline-block",width:10,height:2.5,borderRadius:1,background:c}}/>
+                {l}
+              </span>
+            ))}
+          </div>
+          {chartData.length>0?(
+            <ResponsiveContainer width="100%" height={148}>
+              <LineChart data={chartData} margin={{top:2,right:8,left:-24,bottom:0}}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false}/>
+                <XAxis dataKey="label" tick={{fill:"var(--text-muted)",fontSize:9} as any} axisLine={false} tickLine={false}/>
+                <YAxis tick={{fill:"var(--text-muted)",fontSize:9} as any} axisLine={false} tickLine={false}/>
+                <Tooltip {...TT} formatter={(v?:number,n?:string)=>[`${cur} ${(v??0).toLocaleString()}`,n||""]}/>
+                <Line type="monotone" dataKey="Revenue"  stroke="#818cf8" strokeWidth={1.5} dot={false} activeDot={{r:4}}/>
+                <Line type="monotone" dataKey="Expenses" stroke="#f87171" strokeWidth={1.5} dot={false} activeDot={{r:4}}/>
+                <Line type="monotone" dataKey="Profit"   stroke="#10b981" strokeWidth={1.5} dot={false} activeDot={{r:4}}/>
+              </LineChart>
+            </ResponsiveContainer>
+          ):(
+            <div style={{height:148,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6}}>
+              <span style={{fontSize:28}}>📊</span>
+              <div style={{fontSize:11,color:"var(--text-muted)",textAlign:"center",padding:"0 20px"}}>No data yet. Start adding sales to see your trend.</div>
+            </div>
+          )}
+        </div>
+        {/* Today's stat tiles — 2×2 grid */}
+        <div className="db-grid-exempt" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
           {[
-            {l:"Sales",      v:todayStats?`${cur} ${fmt(todayStats.todaySales)}`:"—",  c:"#10b981", bg:"rgba(16,185,129,.12)",  icon:"🛍️"},
-            {l:"Orders",     v:todayStats?String(todayStats.todayOrders):"—",           c:"#818cf8", bg:"rgba(129,140,248,.12)", icon:"📦"},
-            {l:"Pending",    v:todayStats?String(todayStats.pendingCount):"—",          c:"#f59e0b", bg:"rgba(245,158,11,.12)",  icon:"🧾"},
-            {l:"Low Stock",  v:todayStats?String(todayStats.lowStockCount):"—",         c:"#f87171", bg:"rgba(248,113,113,.12)", icon:"⚠️"},
+            {l:"Today's Sales",     v:todayStats?`${cur} ${fmt(todayStats.todaySales)}`:"—", c:"#10b981", icon:"🛍️"},
+            {l:"Orders Today",      v:todayStats?String(todayStats.todayOrders):"—",           c:"#818cf8", icon:"📦"},
+            {l:"Pending Invoices",  v:todayStats?String(todayStats.pendingCount):"—",          c:"#f59e0b", icon:"🧾"},
+            {l:"Low Stock Items",   v:todayStats?String(todayStats.lowStockCount):"—",         c:"#f87171", icon:"⚠️"},
           ].map((it,i)=>(
-            <div key={i} style={{borderRadius:14,padding:"12px 8px 10px",background:"var(--panel-bg)",border:"1px solid var(--border)",display:"flex",flexDirection:"column",alignItems:"center",gap:6,textAlign:"center",overflow:"hidden"}}>
-              <div style={{width:38,height:38,borderRadius:12,background:it.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>{it.icon}</div>
-              <div style={{fontSize:12,fontWeight:900,color:"var(--text-primary)",letterSpacing:"-.3px",lineHeight:1,wordBreak:"break-all"}}>{it.v}</div>
-              <div style={{fontSize:9,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".04em",lineHeight:1.2}}>{it.l}</div>
-              <div style={{width:"100%",height:2,borderRadius:1,background:`${it.c}20`}}><div style={{height:"100%",width:"70%",borderRadius:1,background:it.c}}/></div>
+            <div key={i} style={{borderRadius:13,padding:"12px 14px",background:"var(--panel-bg)",border:"1px solid var(--border)",display:"flex",alignItems:"center",gap:10}}>
+              <div style={{fontSize:22,lineHeight:1,flexShrink:0}}>{it.icon}</div>
+              <div style={{minWidth:0}}>
+                <div style={{fontSize:15,fontWeight:900,color:it.c,letterSpacing:"-.5px",lineHeight:1}}>{it.v}</div>
+                <div style={{fontSize:9,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".04em",marginTop:3,lineHeight:1.2}}>{it.l}</div>
+              </div>
             </div>
           ))}
         </div>
