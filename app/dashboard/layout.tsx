@@ -2261,6 +2261,12 @@ export default function DashboardLayout({
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5" style={{flexShrink:0,marginLeft:2,transform:showUserMenu?"rotate(180deg)":"none",transition:"transform .2s"}}><polyline points="6 9 12 15 18 9"/></svg>
               </div>
 
+              {/* File input lives outside the dropdown so it stays mounted while the OS picker is open */}
+              <input id="navbar-avatar-input" type="file" accept="image/*" style={{display:"none"}} onChange={(e)=>{
+                const f=e.target.files?.[0]; if(!f) return;
+                setPendingAvatarFile(f); e.target.value="";
+              }}/>
+
               {/* User dropdown — positioned below navbar */}
               {showUserMenu && (
                 <>
@@ -2284,10 +2290,6 @@ export default function DashboardLayout({
                           <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
                         </div>
                       </label>
-                      <input id="navbar-avatar-input" type="file" accept="image/*" style={{display:"none"}} onChange={(e)=>{
-                        const f=e.target.files?.[0]; if(!f) return;
-                        setPendingAvatarFile(f); e.target.value="";
-                      }}/>
                       <div style={{minWidth:0}}>
                         <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
                         <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:1,textTransform:"capitalize"}}>
