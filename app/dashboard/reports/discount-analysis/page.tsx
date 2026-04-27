@@ -16,7 +16,7 @@ export default function DiscountAnalysisPage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch(`/api/reports/discount-analysis?period=${period}&view=${view}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period, view]);
+  useEffect(() => { setLoading(true); fetch(`/api/reports/discount-analysis?period=${period}&view=${view}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period, view]);
 
   const totals = { gross: data.reduce((s, r) => s + r.grossSales, 0), disc: data.reduce((s, r) => s + r.discountAmount, 0), net: data.reduce((s, r) => s + r.netSales, 0) };
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };

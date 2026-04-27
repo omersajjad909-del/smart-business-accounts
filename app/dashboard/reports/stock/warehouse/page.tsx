@@ -17,7 +17,7 @@ export default function WarehouseStockPage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch("/api/reports/stock/warehouse", { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setRows(d.rows || []); setWarehouses(d.warehouses || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
+  useEffect(() => { setLoading(true); fetch("/api/reports/stock/warehouse", { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setRows(d.rows || []); setWarehouses(d.warehouses || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
   const filtered = selected === "all" ? rows : rows.filter(r => r.warehouseName === selected);
 

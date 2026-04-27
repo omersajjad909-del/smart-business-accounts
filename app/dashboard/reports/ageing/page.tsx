@@ -156,7 +156,7 @@ export default function AgeingReportPage() {
               )}
             </div>
 
-            <button onClick={loadData} disabled={!partyId} style={{ width:"100%", padding:"13px 0", borderRadius:12, border:"none", cursor:partyId?"pointer":"not-allowed", background:partyId?"linear-gradient(135deg,#f59e0b,#ef4444)":"rgba(255,255,255,.06)", color:"white", fontSize:15, fontWeight:700, fontFamily:"inherit", opacity:partyId?1:.5, boxShadow:partyId?"0 6px 24px rgba(245,158,11,.3)":"none" }}>
+            <button onClick={() => loadData()} disabled={!partyId} style={{ width:"100%", padding:"13px 0", borderRadius:12, border:"none", cursor:partyId?"pointer":"not-allowed", background:partyId?"linear-gradient(135deg,#f59e0b,#ef4444)":"rgba(255,255,255,.06)", color:"white", fontSize:15, fontWeight:700, fontFamily:"inherit", opacity:partyId?1:.5, boxShadow:partyId?"0 6px 24px rgba(245,158,11,.3)":"none" }}>
               Generate Report →
             </button>
           </div>

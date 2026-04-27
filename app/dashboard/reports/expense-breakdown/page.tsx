@@ -27,7 +27,7 @@ export default function ExpenseBreakdownPage() {
     setLoading(true);
     fetch(`/api/reports/expense-breakdown?period=${period}&groupBy=${groupBy}`, { headers: h() })
       .then(r => r.ok ? r.json() : {})
-      .then(d => { setData(d.rows || []); setLoading(false); })
+      .then((d: any) => { setData(d.rows || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, [period, groupBy]);
 
@@ -143,7 +143,7 @@ export default function ExpenseBreakdownPage() {
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
                 <Pie data={pieData} cx="50%" cy="45%" outerRadius={85} dataKey="value"
-                  label={({ percent }) => `${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                  label={({ percent }: { percent?: number }) => `${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false}>
                   {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 11 }}

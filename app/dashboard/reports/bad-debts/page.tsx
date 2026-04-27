@@ -21,7 +21,7 @@ export default function BadDebtsPage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch("/api/reports/bad-debts", { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
+  useEffect(() => { setLoading(true); fetch("/api/reports/bad-debts", { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
   const filtered = filter === "all" ? data : data.filter(r => r.status === filter);
   const totalAtRisk = data.filter(r => r.status !== "written_off").reduce((s, r) => s + r.amount, 0);

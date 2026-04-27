@@ -21,7 +21,7 @@ export default function GrossMarginPage() {
   useEffect(() => {
     setLoading(true);
     fetch(`/api/reports/gross-margin?period=${period}&view=${view}`, { headers: h() })
-      .then(r => r.ok ? r.json() : {}).then(d => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false));
+      .then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false));
   }, [period, view]);
 
   const sorted = [...data].sort((a, b) => b.marginPct - a.marginPct);

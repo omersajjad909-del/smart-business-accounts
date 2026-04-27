@@ -116,7 +116,7 @@ export default function BalanceSheetPage() {
           {data && !loading && (
             <>
               {/* Report header */}
-              <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:"28px 32px", marginBottom:20, background:"linear-gradient(135deg,rgba(59,130,246,.1),rgba(37,99,235,.05))" }}>
+              <div style={{ border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:"28px 32px", marginBottom:20, background:"linear-gradient(135deg,rgba(59,130,246,.1),rgba(37,99,235,.05))" }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12 }}>
                   <div>
                     <div style={{ fontSize:22, fontWeight:900, color:"white", letterSpacing:"-.5px" }}>{companyName}</div>

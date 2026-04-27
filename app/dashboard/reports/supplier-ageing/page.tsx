@@ -14,7 +14,7 @@ export default function SupplierAgeingPage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch("/api/reports/supplier-ageing", { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
+  useEffect(() => { setLoading(true); fetch("/api/reports/supplier-ageing", { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
   const totals = { current: data.reduce((s, r) => s + r.current, 0), d30: data.reduce((s, r) => s + r.days30, 0), d60: data.reduce((s, r) => s + r.days60, 0), d90: data.reduce((s, r) => s + r.days90, 0), over90: data.reduce((s, r) => s + r.over90, 0), total: data.reduce((s, r) => s + r.total, 0) };
   const overdue = totals.d30 + totals.d60 + totals.d90 + totals.over90;

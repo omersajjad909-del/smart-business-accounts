@@ -16,7 +16,7 @@ export default function SalesRegionPage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch(`/api/reports/sales-region?period=${period}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period]);
+  useEffect(() => { setLoading(true); fetch(`/api/reports/sales-region?period=${period}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period]);
 
   const inp: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "7px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 12, outline: "none" };
   const topRegion = [...data].sort((a, b) => b.totalSales - a.totalSales)[0];
@@ -52,7 +52,7 @@ export default function SalesRegionPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis dataKey="region" tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: ff }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: ff }} axisLine={false} tickLine={false} tickFormatter={v => `${cur} ${fmt(v)}`} width={90} />
-              <Tooltip formatter={(v: number) => [`${cur} ${fmt(v)}`, "Sales"]} contentStyle={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: ff }} />
+              <Tooltip formatter={((v: number) => [`${cur} ${fmt(v)}`, "Sales"]) as any} contentStyle={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: ff }} />
               <Bar dataKey="totalSales" fill="#6366f1" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

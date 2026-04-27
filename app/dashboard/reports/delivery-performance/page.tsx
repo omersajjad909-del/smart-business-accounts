@@ -16,7 +16,7 @@ export default function DeliveryPerformancePage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch(`/api/reports/delivery-performance?period=${period}&groupBy=${groupBy}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period, groupBy]);
+  useEffect(() => { setLoading(true); fetch(`/api/reports/delivery-performance?period=${period}&groupBy=${groupBy}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period, groupBy]);
 
   const totals = { deliveries: data.reduce((s, r) => s + r.totalDeliveries, 0), onTime: data.reduce((s, r) => s + r.onTimeCount, 0), late: data.reduce((s, r) => s + r.lateCount, 0), failed: data.reduce((s, r) => s + r.failedCount, 0) };
   const overallOnTime = totals.deliveries > 0 ? (totals.onTime / totals.deliveries) * 100 : 0;

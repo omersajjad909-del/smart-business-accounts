@@ -217,7 +217,7 @@ export default function LedgerReportPage() {
             {/* Buttons */}
             <div style={{ display: "flex", gap: 12 }}>
               <button
-                onClick={loadLedger}
+                onClick={() => loadLedger()}
                 disabled={!accountId}
                 style={{
                   flex: 1, padding: "12px", borderRadius: 10, border: "none", cursor: accountId ? "pointer" : "not-allowed",

@@ -21,7 +21,7 @@ export default function CreditAnalysisPage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch("/api/reports/credit-analysis", { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
+  useEffect(() => { setLoading(true); fetch("/api/reports/credit-analysis", { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
   const filtered = riskFilter === "all" ? data : data.filter(r => r.riskRating === riskFilter);
   const highRiskCount = data.filter(r => r.riskRating === "high").length;

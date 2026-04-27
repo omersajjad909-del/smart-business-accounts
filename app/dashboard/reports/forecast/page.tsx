@@ -18,7 +18,7 @@ export default function ForecastPage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch(`/api/reports/forecast?horizon=${horizon}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setPoints(d.points || []); setSummary(d.summary || null); setLoading(false); }).catch(() => setLoading(false)); }, [horizon]);
+  useEffect(() => { setLoading(true); fetch(`/api/reports/forecast?horizon=${horizon}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setPoints(d.points || []); setSummary(d.summary || null); setLoading(false); }).catch(() => setLoading(false)); }, [horizon]);
 
   const todayIndex = points.findIndex(p => p.actual === null);
   const splitMonth = todayIndex > 0 ? points[todayIndex - 1]?.month : undefined;
@@ -66,7 +66,7 @@ export default function ForecastPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis dataKey="month" tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: ff }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: ff }} axisLine={false} tickLine={false} tickFormatter={v => `${cur} ${fmt(v)}`} width={90} />
-              <Tooltip formatter={(v: number, name: string) => [`${cur} ${fmt(v)}`, name === "actual" ? "Actual" : name === "forecast" ? "Forecast" : name === "upperBound" ? "Upper Bound" : "Lower Bound"]} contentStyle={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: ff }} />
+              <Tooltip formatter={((v: number, name: string) => [`${cur} ${fmt(v)}`, name === "actual" ? "Actual" : name === "forecast" ? "Forecast" : name === "upperBound" ? "Upper Bound" : "Lower Bound"]) as any} contentStyle={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: ff }} />
               {splitMonth && <ReferenceLine x={splitMonth} stroke="var(--border)" strokeDasharray="4 4" label={{ value: "Today", fill: "var(--text-muted)", fontSize: 10, fontFamily: ff }} />}
               <Line dataKey="actual" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 3, fill: "#6366f1" }} connectNulls={false} name="actual" />
               <Line dataKey="forecast" stroke="#818cf8" strokeWidth={2} strokeDasharray="5 5" dot={false} name="forecast" />

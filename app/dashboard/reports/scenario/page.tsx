@@ -21,10 +21,10 @@ export default function ScenarioPage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch("/api/reports/scenario/base", { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setBase(d.base || null); setLoading(false); }).catch(() => setLoading(false)); }, []);
+  useEffect(() => { setLoading(true); fetch("/api/reports/scenario/base", { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setBase(d.base || null); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
   const scenarios: ScenarioResult[] = base ? [
-    { label: "Base (Actual)", ...base },
+    { ...base, label: "Base (Actual)" },
     {
       label: "Your Scenario",
       revenue:   base.revenue   * (1 + revenueChg  / 100),
@@ -98,7 +98,7 @@ export default function ScenarioPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="name" tick={{ fill: "var(--text-muted)", fontSize: 10, fontFamily: ff }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: ff }} axisLine={false} tickLine={false} tickFormatter={v => `${cur} ${fmt(v)}`} width={90} />
-                <Tooltip formatter={(v: number, name: string) => [`${cur} ${fmt(v)}`, name]} contentStyle={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: ff }} />
+                <Tooltip formatter={((v: number, name: string) => [`${cur} ${fmt(v)}`, name]) as any} contentStyle={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: ff }} />
                 <Legend wrapperStyle={{ fontFamily: ff, fontSize: 12 }} />
                 <Bar dataKey="Revenue" fill="#6366f1" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Profit"  fill="#34d399" radius={[4, 4, 0, 0]} />

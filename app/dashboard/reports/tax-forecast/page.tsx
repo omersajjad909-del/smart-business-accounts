@@ -17,7 +17,7 @@ export default function TaxForecastPage() {
   const cur = "Rs";
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
-  useEffect(() => { setLoading(true); fetch("/api/reports/tax-forecast", { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setMonths(d.months || []); setSummary(d.summary || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
+  useEffect(() => { setLoading(true); fetch("/api/reports/tax-forecast", { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setMonths(d.months || []); setSummary(d.summary || []); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
   const totalLiability = summary.reduce((s, r) => s + r.ytdLiability, 0);
   const totalPaid      = summary.reduce((s, r) => s + r.ytdPaid, 0);
@@ -51,7 +51,7 @@ export default function TaxForecastPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis dataKey="month" tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: ff }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "var(--text-muted)", fontSize: 11, fontFamily: ff }} axisLine={false} tickLine={false} tickFormatter={v => `${cur} ${fmt(v)}`} width={90} />
-              <Tooltip formatter={(v: number, name: string) => [`${cur} ${fmt(v)}`, name === "estimatedTax" ? "Estimated" : "Paid"]} contentStyle={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: ff }} />
+              <Tooltip formatter={((v: number, name: string) => [`${cur} ${fmt(v)}`, name === "estimatedTax" ? "Estimated" : "Paid"]) as any} contentStyle={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: ff }} />
               <Legend formatter={v => v === "estimatedTax" ? "Estimated Tax" : "Paid Tax"} wrapperStyle={{ fontFamily: ff, fontSize: 12 }} />
               <Bar dataKey="estimatedTax" fill="#818cf8" radius={[4, 4, 0, 0]} />
               <Bar dataKey="paidTax" fill="#34d399" radius={[4, 4, 0, 0]} />

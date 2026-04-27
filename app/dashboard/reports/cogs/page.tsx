@@ -17,7 +17,7 @@ export default function COGSPage() {
 
   const h = (): Record<string, string> => ({ "x-user-role": user?.role || "", "x-user-id": user?.id || "", "x-company-id": user?.companyId || "" });
 
-  useEffect(() => { fetch(`/api/reports/cogs?period=${period}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then(d => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period]);
+  useEffect(() => { fetch(`/api/reports/cogs?period=${period}`, { headers: h() }).then(r => r.ok ? r.json() : {}).then((d: any) => { setData(d.rows || []); setLoading(false); }).catch(() => setLoading(false)); }, [period]);
 
   const filtered = data.filter(r => r.itemName?.toLowerCase().includes(search.toLowerCase()));
   const totals = { cost: filtered.reduce((s, r) => s + r.totalCost, 0), rev: filtered.reduce((s, r) => s + r.revenue, 0), profit: filtered.reduce((s, r) => s + r.grossProfit, 0) };

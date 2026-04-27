@@ -54,27 +54,14 @@ export async function PATCH(req: NextRequest) {
 
     const body = await req.json();
     const name = String(body?.name || "").trim();
-    const email = String(body?.email || "").trim().toLowerCase();
 
-    if (!name || !email) {
-      return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
-    }
-
-    const existing = await prisma.user.findFirst({
-      where: {
-        email,
-        NOT: { id: String(payload.userId) },
-      },
-      select: { id: true },
-    });
-
-    if (existing) {
-      return NextResponse.json({ error: "Email is already in use" }, { status: 400 });
+    if (!name) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
     const user = await prisma.user.update({
       where: { id: String(payload.userId) },
-      data: { name, email },
+      data: { name },
       select: {
         id: true,
         name: true,
