@@ -1667,6 +1667,7 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
   // ── Phase 1 — LIVE (Commerce / Trade) ───────────────────────
   trading:              { phase:1, status:"live",        category:"Commerce",          label:"Trading",     emoji:"🛒", description:"Buy & sell goods — general merchandise, hardware, electronics" },
   distribution:         { phase:1, status:"live",        category:"Commerce",          label:"Distribution",            emoji:"🚚", description:"Route-based distribution, van sales, multi-depot operations" },
+ retail:               { phase:2, status:"coming_soon", category:"Commerce",          label:"Retail & Multi-Store",    emoji:"🏪", description:"POS, loyalty, multi-branch retail management" },
   wholesale:            { phase:1, status:"live",        category:"Commerce",          label:"Wholesale",               emoji:"📦", description:"Bulk pricing, dealer management, warehouse operations" },
   import_company:       { phase:1, status:"live",        category:"Commerce",          label:"Import Company",          emoji:"🚢", description:"International trade, landed cost, customs clearance" },
   export_company:       { phase:1, status:"live",        category:"Commerce",          label:"Export Company",          emoji:"📤", description:"Export management, commercial invoices, packing lists" },
@@ -1675,7 +1676,6 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
   // ── Phase 2 — COMING SOON (Production + Retail + Food) ──────
   manufacturing:        { phase:2, status:"coming_soon", category:"Production",        label:"Manufacturing",           emoji:"🏭", description:"BOM, production orders, work orders, finished goods" },
   food_processing:      { phase:2, status:"coming_soon", category:"Production",        label:"Food Processing",         emoji:"🥫", description:"Recipe-based production, batch tracking, food costing" },
-  retail:               { phase:2, status:"coming_soon", category:"Commerce",          label:"Retail & Multi-Store",    emoji:"🏪", description:"POS, loyalty, multi-branch retail management" },
   ecommerce:            { phase:2, status:"coming_soon", category:"Commerce",          label:"E-Commerce",              emoji:"🛍️", description:"Online orders, product listings, shipping, returns" },
   restaurant:           { phase:2, status:"coming_soon", category:"Food & Beverage",   label:"Restaurant / Café",       emoji:"🍽️", description:"Tables, kitchen display, menu, recipe costing" },
   franchise_restaurant: { phase:2, status:"coming_soon", category:"Food & Beverage",   label:"Franchise / Chain",       emoji:"🍔", description:"Multi-outlet restaurant chain with royalty tracking" },
