@@ -1667,7 +1667,7 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
   // ── Phase 1 — LIVE (Commerce / Trade) ───────────────────────
   trading:              { phase:1, status:"live",        category:"Commerce",          label:"Trading",     emoji:"🛒", description:"Buy & sell goods — general merchandise, hardware, electronics" },
   distribution:         { phase:1, status:"live",        category:"Commerce",          label:"Distribution",            emoji:"🚚", description:"Route-based distribution, van sales, multi-depot operations" },
-  retail:               { phase:2, status:"live",        category:"Commerce",          label:"Retail & Multi-Store",    emoji:"🏪", description:"POS, loyalty, multi-branch retail management" },
+  retail:               { phase:2, status:"coming_soon", category:"Commerce",          label:"Retail & Multi-Store",    emoji:"🏪", description:"POS, loyalty, multi-branch retail management" },
   wholesale:            { phase:1, status:"live",        category:"Commerce",          label:"Wholesale",               emoji:"📦", description:"Bulk pricing, dealer management, warehouse operations" },
   import_company:       { phase:1, status:"live",        category:"Commerce",          label:"Import Company",          emoji:"🚢", description:"International trade, landed cost, customs clearance" },
   export_company:       { phase:1, status:"live",        category:"Commerce",          label:"Export Company",          emoji:"📤", description:"Export management, commercial invoices, packing lists" },
