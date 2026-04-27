@@ -83,34 +83,37 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Send OTP to new email
-    await sendEmail({
-      to: newEmail,
-      subject: "Confirm your new email — FinovaOS",
-      html: `
-        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0d1035;color:#fff;border-radius:16px">
-          <h2 style="margin:0 0 8px;font-size:22px">Verify your new email</h2>
-          <p style="color:#94a3b8;margin:0 0 24px">Someone requested to change a FinovaOS account email to this address. Use the code below to confirm.</p>
-          <div style="font-size:36px;font-weight:900;letter-spacing:12px;text-align:center;padding:20px;background:rgba(99,102,241,.15);border-radius:12px;color:#818cf8;margin-bottom:24px">${code}</div>
-          <p style="color:#64748b;font-size:12px">This code expires in 15 minutes. If you did not request this, ignore this email.</p>
-        </div>
-      `,
-    });
-
-    // Security alert to old email
+    // OTP goes to CURRENT email — only the real account owner can confirm
     await sendEmail({
       to: user.email,
-      subject: "Email change requested — FinovaOS",
+      subject: "Verify your identity — Email change request",
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0d1035;color:#fff;border-radius:16px">
-          <h2 style="margin:0 0 8px;font-size:22px;color:#f59e0b">Security Alert</h2>
-          <p style="color:#94a3b8;margin:0 0 16px">A request was made to change the email on your FinovaOS account to <strong style="color:#fff">${maskEmail(newEmail)}</strong>.</p>
-          <p style="color:#94a3b8;margin:0">If this was you, verify the new email to complete the change. If not, your password may be compromised — change it immediately.</p>
+          <h2 style="margin:0 0 8px;font-size:22px">Confirm email change</h2>
+          <p style="color:#94a3b8;margin:0 0 8px">You requested to change your FinovaOS account email to:</p>
+          <p style="color:#fff;font-weight:700;margin:0 0 24px">${maskEmail(newEmail)}</p>
+          <p style="color:#94a3b8;margin:0 0 16px">Enter this code in the app to confirm:</p>
+          <div style="font-size:36px;font-weight:900;letter-spacing:12px;text-align:center;padding:20px;background:rgba(99,102,241,.15);border-radius:12px;color:#818cf8;margin-bottom:24px">${code}</div>
+          <p style="color:#64748b;font-size:12px">Code expires in 15 minutes. If you did not request this, someone has your password — change it immediately.</p>
         </div>
       `,
     });
 
-    return NextResponse.json({ ok: true, maskedEmail: maskEmail(newEmail) });
+    // Notification to new email — just informational, no OTP
+    await sendEmail({
+      to: newEmail,
+      subject: "Email change pending confirmation — FinovaOS",
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0d1035;color:#fff;border-radius:16px">
+          <h2 style="margin:0 0 8px;font-size:22px;color:#34d399">Email change requested</h2>
+          <p style="color:#94a3b8;margin:0 0 16px">A request was made to link this email address to a FinovaOS account.</p>
+          <p style="color:#94a3b8;margin:0">The account owner must verify this change from their current email. If this request is completed, you will receive future login emails here.</p>
+          <p style="color:#64748b;font-size:12px;margin-top:16px">If you did not request this, no action is needed — this email address has not been changed yet.</p>
+        </div>
+      `,
+    });
+
+    return NextResponse.json({ ok: true, maskedEmail: maskEmail(user.email) });
   } catch (e: any) {
     console.error("CHANGE EMAIL REQUEST ERROR:", e);
     return NextResponse.json({ error: e.message || "Failed" }, { status: 500 });
