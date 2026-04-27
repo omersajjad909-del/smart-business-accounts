@@ -268,14 +268,25 @@ function FloatingInput({
 
 /* â”€â”€â”€ Phone input with editable dial code prefix â”€â”€â”€ */
 function PhoneInput({
-  dialCode, onDialChange, phone, onPhoneChange, color,
+  dialCode, onDialChange, phone, onPhoneChange, color, country,
 }: {
   dialCode: string; onDialChange: (v: string) => void;
-  phone: string; onPhoneChange: (v: string) => void; color: string;
+  phone: string; onPhoneChange: (v: string) => void;
+  color: string; country: string;
 }) {
   const [focused, setFocused] = useState<"dial"|"phone"|null>(null);
   const borderColor = focused ? "rgba(129,140,248,.6)" : "rgba(255,255,255,.09)";
   const bg         = focused ? "rgba(99,102,241,.08)"  : "rgba(255,255,255,.04)";
+
+  const groups = PHONE_FORMATS[country];
+  const placeholder = groups
+    ? groups.map((n, i) => "X".repeat(n)).join(" ")
+    : "300 1234567";
+
+  function handlePhoneInput(raw: string) {
+    const formatted = formatPhoneNumber(raw, country);
+    onPhoneChange(formatted);
+  }
 
   return (
     <div style={{
@@ -306,13 +317,13 @@ function PhoneInput({
           }}
         />
       </div>
-      {/* Phone number */}
+      {/* Phone number with auto-format */}
       <input
         type="tel" value={phone}
-        onChange={e => onPhoneChange(e.target.value.replace(/[^\d\s\-]/g,""))}
+        onChange={e => handlePhoneInput(e.target.value)}
         onFocus={() => setFocused("phone")}
         onBlur={() => setFocused(null)}
-        placeholder="300 1234567"
+        placeholder={placeholder}
         autoComplete="tel"
         style={{
           flex:1, background:"none", border:"none", outline:"none",
@@ -422,6 +433,25 @@ export default function SignupByPlanPage() {
         else setLiveTypes(BUSINESS_TYPES.map(b => ({ id: b.id, label: b.label, category: b.category, description: b.description })));
       })
       .catch(() => setLiveTypes(BUSINESS_TYPES.map(b => ({ id: b.id, label: b.label, category: b.category, description: b.description }))));
+  }, []);
+
+  // Auto-detect country from IP on mount
+  useEffect(() => {
+    fetch("/api/public/geo", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(geo => {
+        if (!geo?.country) return;
+        const cc = String(geo.country).toUpperCase();
+        const countryName = COUNTRIES.find(c => c.code === cc)?.name;
+        if (!countryName) return;
+        setPhoneCountry(cc);
+        setLocation(countryName);
+        const dial = DIAL_CODES[cc] || "";
+        if (dial) setDialCode(dial);
+        // reset phone so placeholder updates
+        setPhone("");
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -845,6 +875,7 @@ export default function SignupByPlanPage() {
                       if (FX_USD[cur]) setCurrency(cur as any);
                       const dial = DIAL_CODES[code] || "";
                       setDialCode(dial);
+                      setPhone(""); // reset number format when country changes
                     }}
                     style={{
                       width:"100%", borderRadius:12,
@@ -872,14 +903,14 @@ export default function SignupByPlanPage() {
                   }}>Phone number (optional)</label>
                   <PhoneInput
                     dialCode={dialCode}
+                    country={phoneCountry}
                     onDialChange={raw => {
-                      // strip leading + or zeros
                       const digits = raw.replace(/\D/g, "");
                       setDialCode(digits);
-                      // try to match country
                       const matched = DIAL_TO_COUNTRY[digits];
                       if (matched) {
                         setPhoneCountry(matched);
+                        setPhone(""); // reset format on country change
                         const cn = COUNTRIES.find(c => c.code === matched)?.name;
                         if (cn) setLocation(cn);
                         const cur = currencyByCountry(matched);

@@ -136,7 +136,8 @@
       "Bash(npx eslint *)",
       "Bash(grep -E \"^accounts$|^customers$|^suppliers$\")",
       "Bash([ ! -d \"/d/projects/smart-business-accounts/app/api/reports/$report\" ])",
-      "Bash(xargs -I {} basename {} route.ts)"
+      "Bash(xargs -I {} basename {} route.ts)",
+      "Bash(git stash *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
