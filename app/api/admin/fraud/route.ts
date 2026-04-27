@@ -77,6 +77,7 @@ export async function GET(req: NextRequest) {
     // Group vouchers by company
     const vouchersByCompany = new Map<string, typeof vouchers>();
     for (const v of vouchers) {
+      if (!v.companyId) continue;
       if (!vouchersByCompany.has(v.companyId)) vouchersByCompany.set(v.companyId, []);
       vouchersByCompany.get(v.companyId)!.push(v);
     }

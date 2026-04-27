@@ -69,12 +69,13 @@ export async function sendSms({
     }
   }
 
-  const whatsappSent = await sendWhatsApp({
+  const whatsappResult = await sendWhatsApp("", {
     to: phone,
-    message,
+    type: "text",
+    text: message,
   });
 
-  if (whatsappSent) {
+  if (whatsappResult.success) {
     return { success: true, provider: "whatsapp" };
   }
 

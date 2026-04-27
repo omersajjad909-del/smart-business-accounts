@@ -198,7 +198,7 @@ export default function FeedbackPage() {
                   key={t.id}
                   onClick={() => { setFbType(t.id); setError(""); }}
                   style={{
-                    padding: "12px 8px", borderRadius: "10px", border: "none", cursor: "pointer",
+                    padding: "12px 8px", borderRadius: "10px", cursor: "pointer",
                     background: fbType === t.id ? `${t.color}18` : "var(--app-bg)",
                     border: `1.5px solid ${fbType === t.id ? t.color + "60" : "var(--border)"}`,
                     textAlign: "center", transition: "all .15s",
@@ -240,7 +240,7 @@ export default function FeedbackPage() {
                     key={p.value}
                     onClick={() => setPriority(p.value)}
                     style={{
-                      flex: 1, padding: "7px 4px", borderRadius: "7px", border: "none",
+                      flex: 1, padding: "7px 4px", borderRadius: "7px",
                       cursor: "pointer", fontSize: "11px", fontWeight: 600,
                       background: priority === p.value ? `${p.color}18` : "var(--app-bg)",
                       border: `1px solid ${priority === p.value ? p.color + "50" : "var(--border)"}`,

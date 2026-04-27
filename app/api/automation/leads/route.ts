@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAutomationCompanyId } from "@/lib/automationHelpers";
 import { prisma } from "@/lib/prisma";
+import { fireWebhookEvent } from "@/lib/webhookFire";
 
 
 
@@ -89,9 +90,7 @@ export async function POST(req: NextRequest) {
     `;
 
     // Fire webhook event (non-blocking)
-    import("@/app/api/automation/webhooks/route").then(({ fireWebhookEvent }) => {
-      fireWebhookEvent(companyId, "lead.created", { name, email, phone, source });
-    }).catch(() => {});
+    fireWebhookEvent(companyId, "lead.created", { name, email, phone, source });
 
     // Auto-WhatsApp if phone present and configured
     if (phone) {

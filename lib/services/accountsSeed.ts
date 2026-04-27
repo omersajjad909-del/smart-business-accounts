@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-export async function seedMinimalChart(prisma: PrismaClient, companyId: string) {
+export async function seedMinimalChart(prisma: any, companyId: string) {
   const existing = await prisma.account.count({ where: { companyId, deletedAt: null } });
   if (existing > 0) return 0;
   const defs = [

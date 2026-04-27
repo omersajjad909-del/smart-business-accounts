@@ -13,7 +13,7 @@ export type ShortcutItem = {
 
 const ACTION_LOG = "COMPANY_SHORTCUTS_V1";
 
-export const DEFAULT_SHORTCUTS: ShortcutItem[] = [
+const DEFAULT_SHORTCUTS: ShortcutItem[] = [
   { id: "search",    keys: ["Alt","S"],           label: "Global Search",      action: "focus_search",    enabled: true },
   { id: "sidebar",   keys: ["Alt","B"],           label: "Toggle Sidebar",     action: "toggle_sidebar",  enabled: true },
   { id: "invoice",   keys: ["Alt","I"],           label: "New Sales Invoice",  action: "navigate", route: "/dashboard/sales-invoice",  enabled: true },

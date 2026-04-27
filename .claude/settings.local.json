@@ -137,7 +137,9 @@
       "Bash(grep -E \"^accounts$|^customers$|^suppliers$\")",
       "Bash([ ! -d \"/d/projects/smart-business-accounts/app/api/reports/$report\" ])",
       "Bash(xargs -I {} basename {} route.ts)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(sed -n '197,210p' \"d:/projects/smart-business-accounts/app/dashboard/feedback/page.tsx\")",
+      "Bash(sed -n '240,250p' \"d:/projects/smart-business-accounts/app/dashboard/feedback/page.tsx\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",

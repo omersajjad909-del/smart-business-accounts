@@ -60,7 +60,7 @@ Write ONLY the image prompt, nothing else. Keep it under 150 words.`,
       style:   "vivid",
     });
 
-    const imageUrl = response.data[0]?.url;
+    const imageUrl = response.data?.[0]?.url;
     if (!imageUrl) return NextResponse.json({ error: "Image generation failed" }, { status: 500 });
 
     return NextResponse.json({

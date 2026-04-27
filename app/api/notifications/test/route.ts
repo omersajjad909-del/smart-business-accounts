@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
     const testMsg = "✅ This is a test notification from FinovaOS. Your notifications are working correctly!";
 
     if (channel === "whatsapp") {
-      const ok = await sendWhatsApp({ to: phone, message: testMsg, companyId: companyId || undefined });
-      return NextResponse.json({ success: ok, error: ok ? null : "WhatsApp not configured for this company" });
+      const result = await sendWhatsApp(companyId || "", { to: phone, type: "text", text: testMsg });
+      return NextResponse.json({ success: result.success, error: result.success ? null : "WhatsApp not configured for this company" });
     }
 
     if (channel === "sms") {

@@ -164,8 +164,8 @@ async function fireWebhook(id: string, companyId: string, payload: any) {
   }
 }
 
-// ─── Exported helper: fire event for a company ───────────────────────────────
-export async function fireWebhookEvent(companyId: string, event: string, data: any) {
+// ─── Internal helper: fire event for a company (exported from lib/webhookFire.ts) ───
+async function fireWebhookEvent(companyId: string, event: string, data: any) {
   try {
     await ensureWebhookTable();
     const hooks = await prisma.$queryRaw<{ id: string; url: string; secret: string; events: string }[]>`

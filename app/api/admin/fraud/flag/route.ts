@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         targetType:  "Company",
         targetId:    companyId,
         targetLabel: company.name,
-        details:     JSON.stringify({ note }),
+        details:     { note },
         companyId,
       });
 

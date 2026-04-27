@@ -132,7 +132,7 @@ export async function GET(req: NextRequest) {
         branches: branchPins.length,
         exactBranches: branchPins.filter((pin) => pin.precision === "exact").length,
         visitors: visitorPins.length,
-        exactVisitors: visitorPins.filter((pin) => pin.precision === "exact").length,
+        exactVisitors: visitorPins.filter((pin: any) => pin.precision === "exact").length,
       },
     });
   } catch (error: any) {

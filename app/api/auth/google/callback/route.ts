@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
           code: null,
           isActive: true,
         },
-      } as never);
+      } as any);
       companyId = company.id;
       user = await prisma.user.create({
         data: {
@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
           defaultCompanyId: companyId,
           companies: { create: { companyId, isDefault: true } },
         },
-      } as never);
+      } as any);
     } else if (!companyId) {
       const company = await prisma.company.create({
         data: {
@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
           code: null,
           isActive: true,
         },
-      } as never);
+      } as any);
       companyId = company.id;
       await prisma.user.update({
         where: { id: user.id },

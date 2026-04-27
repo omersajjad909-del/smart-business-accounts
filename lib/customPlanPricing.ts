@@ -14,7 +14,7 @@ export const CUSTOM_PLAN_MODULES = [
   { id: "tax_filing", name: "Tax & Compliance", price: 10 },
 ] as const;
 
-const CUSTOM_MODULE_MAP = new Map(CUSTOM_PLAN_MODULES.map((m) => [m.id, m]));
+const CUSTOM_MODULE_MAP = new Map<string, typeof CUSTOM_PLAN_MODULES[number]>(CUSTOM_PLAN_MODULES.map((m) => [m.id, m]));
 
 export function parseCustomModules(modules: unknown): string[] {
   const raw =

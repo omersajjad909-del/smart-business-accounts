@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     const arr = mrr * 12;
 
     const countByPlan: Record<string, number> = {};
-    activeCompanies.forEach((r) => {
+    activeCompanies.forEach((r: any) => {
       const code = String(r.plan || "STARTER").toUpperCase();
       const cnt = (r as any)?._count?.plan ?? 0;
       countByPlan[code] = (countByPlan[code] || 0) + cnt;

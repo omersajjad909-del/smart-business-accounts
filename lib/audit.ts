@@ -1,5 +1,3 @@
-import { PrismaClient } from "@prisma/client";
-
 type AuditInput = {
   companyId: string;
   userId?: string | null;
@@ -8,7 +6,7 @@ type AuditInput = {
 };
 
 export async function logActivity(
-  prisma: PrismaClient,
+  prisma: any,
   input: AuditInput
 ) {
   try {
