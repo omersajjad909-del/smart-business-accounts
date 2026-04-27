@@ -21,109 +21,105 @@ export async function POST(req: NextRequest) {
 
     if (action === "DELETE") {
       try {
-        await prisma.user.updateMany({
-          where: { defaultCompanyId: companyId },
-          data: { defaultCompanyId: null },
-        });
-
-        try { await prisma.purchaseOrderItem.deleteMany({ where: { po: { companyId } } }); } catch {}
-        try { await prisma.purchaseInvoiceItem.deleteMany({ where: { invoice: { companyId } } }); } catch {}
-        try { await prisma.salesInvoiceItem.deleteMany({ where: { invoice: { companyId } } }); } catch {}
-        try { await prisma.quotationItem.deleteMany({ where: { quotation: { companyId } } }); } catch {}
-        try { await prisma.deliveryChallanItem.deleteMany({ where: { challan: { companyId } } }); } catch {}
-        try { await prisma.outwardItem.deleteMany({ where: { outward: { companyId } } }); } catch {}
-        try { await prisma.saleReturnItem.deleteMany({ where: { saleReturn: { companyId } } }); } catch {}
-        try { await prisma.voucherEntry.deleteMany({ where: { companyId } }); } catch {}
-        try { await prisma.ledgerEntry.deleteMany({ where: { companyId } }); } catch {}
-        try { await prisma.invoiceTax.deleteMany({ where: { taxConfiguration: { companyId } } }); } catch {}
-        try { await prisma.taxAccount.deleteMany({ where: { taxConfiguration: { companyId } } }); } catch {}
-        try { await prisma.loanPayment.deleteMany({ where: { loan: { companyId } } }); } catch {}
-        try { await prisma.depreciation.deleteMany({ where: { fixedAsset: { companyId } } }); } catch {}
-        try { await prisma.expenseItem.deleteMany({ where: { expenseVoucher: { companyId } } }); } catch {}
-        try { await prisma.expenseAttachment.deleteMany({ where: { expenseVoucher: { companyId } } }); } catch {}
-        try { await prisma.expenseApproval.deleteMany({ where: { expenseVoucher: { companyId } } }); } catch {}
-        try { await (prisma as any).advanceAdjustment?.deleteMany?.({ where: { advancePayment: { companyId } } }); } catch {}
-
-        await prisma.paymentReceipt.deleteMany({ where: { companyId } }).catch(() => {});
-
-        await prisma.bankReconciliation.deleteMany({ where: { bankAccount: { companyId } } }).catch(() => {});
-        await prisma.bankStatement.deleteMany({ where: { companyId } }).catch(() => {});
-
-        await prisma.expenseVoucher.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.creditNote.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.debitNote.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.advancePayment.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.loan.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.fixedAsset.deleteMany({ where: { companyId } }).catch(() => {});
-
-        await prisma.purchaseInvoice.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.purchaseOrder.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.salesInvoice.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.saleReturn.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.quotation.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.deliveryChallan.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.outward.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.voucher.deleteMany({ where: { companyId } }).catch(() => {});
-
-        await prisma.taxConfiguration.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.recurringTransaction.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.budget.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.inventoryTxn.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.stockRate.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.currency.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.financialYear.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.departmentBudget.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.backupSchedule.deleteMany({ where: { companyId } }).catch(() => {});
-
-        try { await (prisma as any).leave?.deleteMany?.({ where: { employee: { companyId } } }); } catch {}
-        try { await (prisma as any).employeeDocument?.deleteMany?.({ where: { employee: { companyId } } }); } catch {}
-        await prisma.attendance.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.payroll.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.advanceSalary.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.employee.deleteMany({ where: { companyId } }).catch(() => {});
-
-        try { await (prisma as any).opportunityActivity?.deleteMany?.({ where: { opportunity: { contact: { companyId } } } }); } catch {}
-        try { await (prisma as any).opportunity?.deleteMany?.({ where: { contact: { companyId } } }); } catch {}
-        try { await (prisma as any).interaction?.deleteMany?.({ where: { contact: { companyId } } }); } catch {}
-        try { await (prisma as any).contactDocument?.deleteMany?.({ where: { contact: { companyId } } }); } catch {}
-        try { await (prisma as any).contactNote?.deleteMany?.({ where: { contact: { companyId } } }); } catch {}
-        await prisma.contact.deleteMany({ where: { companyId } }).catch(() => {});
-
-        await prisma.activityLog.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.auditLog.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.loginLog.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.rolePermission.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.userPermission.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.session.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.userCompany.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.subscription.deleteMany({ where: { companyId } }).catch(() => {});
-
-        await prisma.branch.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.costCenter.deleteMany({ where: { companyId } }).catch(() => {});
-
-        await prisma.bankAccount.deleteMany({ where: { companyId } }).catch(() => {});
-
-        // GRN items then GRN
-        try { await (prisma as any).goodsReceiptNoteItem?.deleteMany?.({ where: { grn: { companyId } } }); } catch {}
-        await (prisma as any).goodsReceiptNote?.deleteMany?.({ where: { companyId } }).catch(() => {});
-
-        // System backups
-        await (prisma as any).systemBackup?.deleteMany?.({ where: { companyId } }).catch(() => {});
-
-        await prisma.itemNew.deleteMany({ where: { companyId } }).catch(() => {});
-        await prisma.account.deleteMany({ where: { companyId } }).catch(() => {});
-
-        // Find users who ONLY belonged to this company (no other company)
+        // Snapshot orphan users BEFORE any deletes
         const orphanUsers = await prisma.userCompany.findMany({
           where: { companyId },
           select: { userId: true },
         });
         const orphanUserIds = orphanUsers.map((u: { userId: string }) => u.userId);
 
-        // Delete the company
+        await prisma.user.updateMany({
+          where: { defaultCompanyId: companyId },
+          data: { defaultCompanyId: null },
+        });
+
+        // Wave 1 — child/detail rows (all independent, run in parallel)
+        await Promise.allSettled([
+          prisma.purchaseOrderItem.deleteMany({ where: { po: { companyId } } }),
+          prisma.purchaseInvoiceItem.deleteMany({ where: { invoice: { companyId } } }),
+          prisma.salesInvoiceItem.deleteMany({ where: { invoice: { companyId } } }),
+          prisma.quotationItem.deleteMany({ where: { quotation: { companyId } } }),
+          prisma.deliveryChallanItem.deleteMany({ where: { challan: { companyId } } }),
+          prisma.outwardItem.deleteMany({ where: { outward: { companyId } } }),
+          prisma.saleReturnItem.deleteMany({ where: { saleReturn: { companyId } } }),
+          prisma.voucherEntry.deleteMany({ where: { companyId } }),
+          prisma.ledgerEntry.deleteMany({ where: { companyId } }),
+          prisma.invoiceTax.deleteMany({ where: { taxConfiguration: { companyId } } }),
+          prisma.taxAccount.deleteMany({ where: { taxConfiguration: { companyId } } }),
+          prisma.loanPayment.deleteMany({ where: { loan: { companyId } } }),
+          prisma.depreciation.deleteMany({ where: { fixedAsset: { companyId } } }),
+          prisma.expenseItem.deleteMany({ where: { expenseVoucher: { companyId } } }),
+          prisma.expenseAttachment.deleteMany({ where: { expenseVoucher: { companyId } } }),
+          prisma.expenseApproval.deleteMany({ where: { expenseVoucher: { companyId } } }),
+          (prisma as any).advanceAdjustment?.deleteMany?.({ where: { advancePayment: { companyId } } }),
+          (prisma as any).goodsReceiptNoteItem?.deleteMany?.({ where: { grn: { companyId } } }),
+          (prisma as any).leave?.deleteMany?.({ where: { employee: { companyId } } }),
+          (prisma as any).employeeDocument?.deleteMany?.({ where: { employee: { companyId } } }),
+          (prisma as any).opportunityActivity?.deleteMany?.({ where: { opportunity: { contact: { companyId } } } }),
+          (prisma as any).opportunity?.deleteMany?.({ where: { contact: { companyId } } }),
+          (prisma as any).interaction?.deleteMany?.({ where: { contact: { companyId } } }),
+          (prisma as any).contactDocument?.deleteMany?.({ where: { contact: { companyId } } }),
+          (prisma as any).contactNote?.deleteMany?.({ where: { contact: { companyId } } }),
+        ]);
+
+        // Wave 2 — parent/header rows (run in parallel after children gone)
+        await Promise.allSettled([
+          prisma.paymentReceipt.deleteMany({ where: { companyId } }),
+          prisma.bankReconciliation.deleteMany({ where: { bankAccount: { companyId } } }),
+          prisma.bankStatement.deleteMany({ where: { companyId } }),
+          prisma.expenseVoucher.deleteMany({ where: { companyId } }),
+          prisma.creditNote.deleteMany({ where: { companyId } }),
+          prisma.debitNote.deleteMany({ where: { companyId } }),
+          prisma.advancePayment.deleteMany({ where: { companyId } }),
+          prisma.loan.deleteMany({ where: { companyId } }),
+          prisma.fixedAsset.deleteMany({ where: { companyId } }),
+          prisma.purchaseInvoice.deleteMany({ where: { companyId } }),
+          prisma.purchaseOrder.deleteMany({ where: { companyId } }),
+          prisma.salesInvoice.deleteMany({ where: { companyId } }),
+          prisma.saleReturn.deleteMany({ where: { companyId } }),
+          prisma.quotation.deleteMany({ where: { companyId } }),
+          prisma.deliveryChallan.deleteMany({ where: { companyId } }),
+          prisma.outward.deleteMany({ where: { companyId } }),
+          prisma.voucher.deleteMany({ where: { companyId } }),
+          prisma.taxConfiguration.deleteMany({ where: { companyId } }),
+          prisma.recurringTransaction.deleteMany({ where: { companyId } }),
+          prisma.budget.deleteMany({ where: { companyId } }),
+          prisma.inventoryTxn.deleteMany({ where: { companyId } }),
+          prisma.stockRate.deleteMany({ where: { companyId } }),
+          prisma.currency.deleteMany({ where: { companyId } }),
+          prisma.financialYear.deleteMany({ where: { companyId } }),
+          prisma.departmentBudget.deleteMany({ where: { companyId } }),
+          prisma.backupSchedule.deleteMany({ where: { companyId } }),
+          prisma.attendance.deleteMany({ where: { companyId } }),
+          prisma.payroll.deleteMany({ where: { companyId } }),
+          prisma.advanceSalary.deleteMany({ where: { companyId } }),
+          prisma.employee.deleteMany({ where: { companyId } }),
+          prisma.contact.deleteMany({ where: { companyId } }),
+          (prisma as any).goodsReceiptNote?.deleteMany?.({ where: { companyId } }),
+          (prisma as any).systemBackup?.deleteMany?.({ where: { companyId } }),
+        ]);
+
+        // Wave 3 — logs, permissions, accounts, bank (all parallel)
+        await Promise.allSettled([
+          prisma.activityLog.deleteMany({ where: { companyId } }),
+          prisma.auditLog.deleteMany({ where: { companyId } }),
+          prisma.loginLog.deleteMany({ where: { companyId } }),
+          prisma.rolePermission.deleteMany({ where: { companyId } }),
+          prisma.userPermission.deleteMany({ where: { companyId } }),
+          prisma.session.deleteMany({ where: { companyId } }),
+          prisma.userCompany.deleteMany({ where: { companyId } }),
+          prisma.subscription.deleteMany({ where: { companyId } }),
+          prisma.branch.deleteMany({ where: { companyId } }),
+          prisma.costCenter.deleteMany({ where: { companyId } }),
+          prisma.bankAccount.deleteMany({ where: { companyId } }),
+          prisma.itemNew.deleteMany({ where: { companyId } }),
+          prisma.account.deleteMany({ where: { companyId } }),
+        ]);
+
+        // Wave 4 — delete company itself
         await prisma.company.delete({ where: { id: companyId } });
 
-        // Now delete orphan users (those with no remaining companies)
+        // Wave 5 — clean up orphan users (no remaining companies)
         if (orphanUserIds.length > 0) {
           const stillLinked = await prisma.userCompany.findMany({
             where: { userId: { in: orphanUserIds } },
@@ -132,11 +128,13 @@ export async function POST(req: NextRequest) {
           const stillLinkedIds = new Set(stillLinked.map((u: { userId: string }) => u.userId));
           const toDelete = orphanUserIds.filter((id: string) => !stillLinkedIds.has(id));
           if (toDelete.length > 0) {
-            await prisma.session.deleteMany({ where: { userId: { in: toDelete } } }).catch(() => {});
-            await prisma.loginLog.deleteMany({ where: { userId: { in: toDelete } } }).catch(() => {});
-            await prisma.auditLog.deleteMany({ where: { userId: { in: toDelete } } }).catch(() => {});
-            await prisma.activityLog.deleteMany({ where: { userId: { in: toDelete } } }).catch(() => {});
-            await prisma.user.deleteMany({ where: { id: { in: toDelete } } }).catch(() => {});
+            await Promise.allSettled([
+              prisma.session.deleteMany({ where: { userId: { in: toDelete } } }),
+              prisma.loginLog.deleteMany({ where: { userId: { in: toDelete } } }),
+              prisma.auditLog.deleteMany({ where: { userId: { in: toDelete } } }),
+              prisma.activityLog.deleteMany({ where: { userId: { in: toDelete } } }),
+            ]);
+            await prisma.user.deleteMany({ where: { id: { in: toDelete } } });
           }
         }
 
