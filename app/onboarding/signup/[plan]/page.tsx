@@ -28,7 +28,7 @@ const PHONE_FORMATS: Record<string, number[]> = {
 
 function formatPhoneNumber(raw: string, country: string): string {
   const groups = PHONE_FORMATS[country];
-  const digits = raw.replace(/D/g, '');
+  const digits = raw.replace(/\D/g, '');
   if (!groups) return digits;
   const max = groups.reduce((a, b) => a + b, 0);
   const trimmed = digits.slice(0, max);
