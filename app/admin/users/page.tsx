@@ -177,6 +177,22 @@ export default function AdminUsersPage() {
     }
   }
 
+  async function deleteUser(user: AdminUser) {
+    if (!confirm(`Permanently delete "${user.name}" (${user.email})? This cannot be undone.`)) return;
+    try {
+      const r = await fetch(`/api/admin/users/${user.id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: adminHeaders(),
+      });
+      if (!r.ok) { const d = await r.json(); throw new Error(d?.error || "Failed"); }
+      showToast(`User "${user.name}" deleted`);
+      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "Failed to delete user", false);
+    }
+  }
+
   const filtered = users.filter((u) => {
     const q = search.toLowerCase();
     if (q && !u.name.toLowerCase().includes(q) && !u.email.toLowerCase().includes(q)) return false;
@@ -348,6 +364,12 @@ export default function AdminUsersPage() {
                       <td>
                         <button className="users-edit-btn" onClick={() => openEdit(u)}>
                           Edit
+                        </button>
+                        <button
+                          onClick={() => deleteUser(u)}
+                          style={{ marginLeft: 6, padding: "4px 10px", borderRadius: 7, border: "1px solid rgba(239,68,68,.3)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                        >
+                          Delete
                         </button>
                       </td>
                     </tr>

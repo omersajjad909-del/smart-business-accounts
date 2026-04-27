@@ -30,12 +30,12 @@ export async function POST(req: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-    // Create company
+    // Create company — inactive until email is verified
     const company = await prisma.company.create({
       data: {
         name: companyName,
         code: companyName.substring(0, 10).toUpperCase().replace(/\s+/g, ""),
-        isActive: true,
+        isActive: false,
       },
     });
 

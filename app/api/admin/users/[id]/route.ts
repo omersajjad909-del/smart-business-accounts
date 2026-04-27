@@ -47,3 +47,33 @@ export async function PATCH(
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const admin = requireAdmin(req);
+    if (admin instanceof NextResponse) return admin;
+
+    const { id } = await params;
+    const user = await prisma.user.findUnique({ where: { id }, select: { id: true, name: true, email: true } });
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    await Promise.allSettled([
+      prisma.session.deleteMany({ where: { userId: id } }),
+      prisma.loginLog.deleteMany({ where: { userId: id } }),
+      prisma.auditLog.deleteMany({ where: { userId: id } }),
+      prisma.activityLog.deleteMany({ where: { userId: id } }),
+      prisma.userPermission.deleteMany({ where: { userId: id } }),
+      prisma.userCompany.deleteMany({ where: { userId: id } }),
+    ]);
+
+    await prisma.user.delete({ where: { id } });
+
+    await logAdminAction(req, "DELETE_USER", { userId: id, name: user.name, email: user.email });
+    return NextResponse.json({ success: true });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}

@@ -53,12 +53,15 @@ export async function POST(req: NextRequest) {
           companyId,
           userId,
           action: "ACCOUNT_VERIFIED",
-          details: JSON.stringify({
-            at: Date.now(),
-            channel,
-          }),
+          details: JSON.stringify({ at: Date.now(), channel }),
         },
       });
+
+      // Activate the company now that email is confirmed
+      await prisma.company.update({
+        where: { id: companyId },
+        data: { isActive: true },
+      }).catch(() => {});
     }
 
     const user = await prisma.user.findUnique({
