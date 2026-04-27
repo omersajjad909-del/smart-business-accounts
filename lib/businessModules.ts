@@ -1665,7 +1665,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
 export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: PhaseStatus; category: string; label: string; emoji: string; description: string }> = {
 
   // ── Phase 1 — LIVE (Commerce / Trade) ───────────────────────
-  trading:              { phase:1, status:"live",        category:"Commerce",          label:"Wholesale & Trading",     emoji:"🛒", description:"Buy & sell goods — general merchandise, hardware, electronics" },
+  trading:              { phase:1, status:"live",        category:"Commerce",          label:"Trading",     emoji:"🛒", description:"Buy & sell goods — general merchandise, hardware, electronics" },
   distribution:         { phase:1, status:"live",        category:"Commerce",          label:"Distribution",            emoji:"🚚", description:"Route-based distribution, van sales, multi-depot operations" },
   wholesale:            { phase:1, status:"live",        category:"Commerce",          label:"Wholesale",               emoji:"📦", description:"Bulk pricing, dealer management, warehouse operations" },
   import_company:       { phase:1, status:"live",        category:"Commerce",          label:"Import Company",          emoji:"🚢", description:"International trade, landed cost, customs clearance" },
