@@ -236,6 +236,9 @@ model SalesInvoice {
   items   SalesInvoiceItem[]
   returns SaleReturn[]       @relation("InvoiceReturns")
 
+  salesmanId String?
+  salesman   User?   @relation("SalesmanInvoices", fields: [salesmanId], references: [id])
+
   driverName String?
   vehicleNo  String?
 
@@ -588,6 +591,7 @@ model User {
   sessions         Session[]
 
   avatar    String?  // Profile photo stored as base64 data URL
+  salesInvoices SalesInvoice[] @relation("SalesmanInvoices")
 
   // 2FA / TOTP
   twoFactorEnabled Boolean @default(false)
