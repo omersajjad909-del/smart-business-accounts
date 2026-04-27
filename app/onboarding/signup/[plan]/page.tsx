@@ -11,6 +11,39 @@ import { BUSINESS_TYPES } from "@/lib/businessModules";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 
 /* â”€â”€â”€ Country dial codes â”€â”€â”€ */
+/* ─── Phone number format groups per country ─── */
+const PHONE_FORMATS: Record<string, number[]> = {
+  PK:[3,7],   US:[3,3,4],  CA:[3,3,4],  GB:[4,6],   IN:[5,5],   CN:[3,4,4],
+  AE:[2,3,4], SA:[2,3,4],  BD:[4,6],    NG:[3,7],   EG:[3,7],   TR:[3,3,4],
+  PH:[3,7],   ID:[4,4,4],  BR:[2,5,4],  MX:[2,4,4], DE:[3,7],   FR:[2,2,2,2,2],
+  IT:[3,7],   ES:[3,3,3],  RU:[3,3,4],  JP:[2,4,4], KR:[2,4,4], AU:[3,3,3],
+  NZ:[2,3,4], ZA:[2,3,4],  MY:[2,8],    SG:[4,4],   TH:[2,3,4], VN:[3,3,4],
+  IR:[3,3,4], KW:[4,4],    QA:[4,4],    OM:[4,4],   JO:[2,4,4], LB:[2,6],
+  PL:[3,3,3], NL:[2,8],    SE:[3,3,3],  NO:[3,2,3], DK:[2,2,2,2],CH:[3,3,3],
+  AT:[3,7],   PT:[3,3,3],  GR:[3,7],    CZ:[3,3,3], HU:[2,3,4], RO:[3,3,3],
+  UA:[3,3,4], KZ:[3,3,4],  UZ:[2,3,4],  MM:[2,3,4], LK:[2,3,4], NP:[2,7],
+  GH:[2,3,4], KE:[3,6],    TZ:[3,6],    MA:[3,2,4], TN:[2,3,3], CO:[3,7],
+  AR:[3,4,4], CL:[1,4,4],  PE:[3,5,2],  VE:[3,7],   IQ:[3,4,4],
+};
+
+function formatPhoneNumber(raw: string, country: string): string {
+  const groups = PHONE_FORMATS[country];
+  const digits = raw.replace(/D/g, '');
+  if (!groups) return digits;
+  const max = groups.reduce((a, b) => a + b, 0);
+  const trimmed = digits.slice(0, max);
+  let result = '';
+  let pos = 0;
+  for (let i = 0; i < groups.length; i++) {
+    const chunk = trimmed.slice(pos, pos + groups[i]);
+    if (!chunk) break;
+    if (i > 0) result += ' ';
+    result += chunk;
+    pos += groups[i];
+  }
+  return result;
+}
+
 const DIAL_CODES: Record<string, string> = {
   AF:"93",AL:"355",DZ:"213",AD:"376",AO:"244",AG:"1268",AR:"54",AM:"374",
   AU:"61",AT:"43",AZ:"994",BS:"1242",BH:"973",BD:"880",BB:"1246",BY:"375",
