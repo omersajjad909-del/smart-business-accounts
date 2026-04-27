@@ -28,7 +28,7 @@ type SalesInvoice = {
   id: string; invoiceNo: string; date: string; customerId: string;
   customer?: { name: string }; total: number;
   items: Array<{ item: { name: string; description?: string }; qty: number; rate: number }>;
-  driverName?: string; vehicleNo?: string;
+  driverName?: string; vehicleNo?: string; salesmanId?: string;
 };
 type TaxConfig = { id: string; taxType: string; taxCode: string; taxRate: number; description?: string };
 type Currency = { id: string; code: string; name: string; exchangeRate: number };
@@ -73,6 +73,8 @@ function SalesInvoiceContent() {
   const [location, setLocation]         = useState("MAIN");
   const [driverName, setDriverName]     = useState("");
   const [vehicleNo, setVehicleNo]       = useState("");
+  const [salesmanId, setSalesmanId]     = useState("");
+  const [teamMembers, setTeamMembers]   = useState<{id:string;name:string}[]>([]);
   const [notes, setNotes]               = useState("");
   const [rows, setRows]                 = useState<Row[]>([{ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]);
   const [freight, setFreight]           = useState<number | "">("");
@@ -131,6 +133,7 @@ function SalesInvoiceContent() {
       setItems(list.map((i: any) => ({ id: i.id, name: i.name, description: i.description || "", availableQty: 0, barcode: i.barcode || "", salePrice: i.rate ?? 0 })));
     });
     fetch("/api/tax-configuration").then(r => r.json()).then(d => setTaxes(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch("/api/users", { headers: h }).then(r => r.ok ? r.json() : []).then(d => setTeamMembers((Array.isArray(d) ? d : []).map((u: any) => ({ id: u.id, name: u.name })))).catch(() => {});
     fetch("/api/sales-invoice", { headers: { "x-user-role": user.role || "", "x-user-id": user.id || "" } })
       .then(r => { if (r.status === 403) throw new Error("No Permission"); return r.json(); })
       .then(d => { if (d?.nextNo) setInvoiceNo(d.nextNo); })
@@ -235,7 +238,7 @@ function SalesInvoiceContent() {
     try {
       const method = editing ? "PUT" : "POST";
       const baseBody = {
-        invoiceNo, customerId, date, location, driverName, vehicleNo,
+        invoiceNo, customerId, date, location, driverName, vehicleNo, salesmanId: salesmanId || null,
         freight: freight || 0,
         items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) })),
         applyTax, taxConfigId: applyTax ? selectedTaxId : null,
@@ -258,7 +261,7 @@ function SalesInvoiceContent() {
   function startEdit(inv: SalesInvoice) {
     setEditing(inv); setInvoiceNo(inv.invoiceNo); setCustomerId(inv.customerId);
     setCustomerName(inv.customer?.name || ""); setDate(new Date(inv.date).toISOString().slice(0, 10));
-    setDriverName(inv.driverName || ""); setVehicleNo(inv.vehicleNo || "");
+    setDriverName(inv.driverName || ""); setVehicleNo(inv.vehicleNo || ""); setSalesmanId(inv.salesmanId || "");
     setRows(inv.items.map((it: any) => ({ itemId: it.itemId || "", name: it.item?.name || "", description: it.item?.description || "", availableQty: it.qty || 0, qty: it.qty.toString(), rate: it.rate.toString() })));
     setShowForm(true); setShowList(false);
   }
@@ -450,6 +453,13 @@ function SalesInvoiceContent() {
                       <select style={inputStyle} value={location} onChange={e => setLocation(e.target.value)}>
                         <option value="MAIN">Main</option>
                         <option value="SHOP">Shop</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Salesman</label>
+                      <select style={inputStyle} value={salesmanId} onChange={e => setSalesmanId(e.target.value)}>
+                        <option value="">— None —</option>
+                        {teamMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                       </select>
                     </div>
                     <div>

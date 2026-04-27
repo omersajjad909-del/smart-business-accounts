@@ -163,6 +163,7 @@ export async function POST(req: NextRequest) {
       taxConfigId = null,
       driverName = null,
       vehicleNo = null,
+      salesmanId = null,
       currencyId = null,
       exchangeRate = 1,
       soId = null,
@@ -195,6 +196,7 @@ export async function POST(req: NextRequest) {
         customerId,
         driverName,
         vehicleNo,
+        salesmanId: salesmanId || null,
         total: total + freight + taxAmount,
         approvalStatus: "PENDING",
         items: {
@@ -336,6 +338,7 @@ export async function PUT(req: NextRequest) {
       taxConfigId = null,
       driverName = null,
       vehicleNo = null,
+      salesmanId = null,
       currencyId = null,
       exchangeRate = 1,
     } = body;
@@ -377,6 +380,7 @@ export async function PUT(req: NextRequest) {
           date: new Date(date),
           driverName,
           vehicleNo,
+          salesmanId: salesmanId || null,
           total: total + freight + taxAmount,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
