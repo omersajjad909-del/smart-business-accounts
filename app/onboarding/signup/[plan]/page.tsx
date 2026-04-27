@@ -7,7 +7,7 @@ import {
   setStoredCurrencyPreference,
 } from "@/lib/currencyPreference";
 import { COUNTRIES, sortCountries } from "@/lib/countries";
-import { BUSINESS_TYPES } from "@/lib/businessModules";
+import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
 import { clearCurrentUser, getCurrentUser } from "@/lib/auth";
 
 /* â”€â”€â”€ Country dial codes â”€â”€â”€ */
