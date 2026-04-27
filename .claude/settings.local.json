@@ -133,7 +133,10 @@
       "Bash(findstr /r /s /i \"FinovaOS is a product\" app\\\\*.tsx app\\\\*.ts)",
       "Bash(findstr /r /s /i \"product of Finova\\\\|FinovaOS is\" \"app\\\\dashboard\\\\DashboardContent\\\\page.tsx\")",
       "Bash(findstr /r /s /i \"product of Finova\\\\|FinovaOS is\" \"app\\\\dashboard\\\\layout.tsx\")",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(grep -E \"^accounts$|^customers$|^suppliers$\")",
+      "Bash([ ! -d \"/d/projects/smart-business-accounts/app/api/reports/$report\" ])",
+      "Bash(xargs -I {} basename {} route.ts)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
