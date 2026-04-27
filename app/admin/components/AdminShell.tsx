@@ -575,7 +575,7 @@ const shellStyles = `
   box-shadow:0 16px 30px rgba(124,58,237,.3);
   color:#fff;font-size:14px;font-weight:800;flex-shrink:0;
 }
-.fin-admin-brandTitle{font-size:28px;line-height:1;font-weight:800;letter-spacing:-.05em;color:var(--text);}
+.fin-admin-brandTitle{font-size:28px;line-height:1;font-weight:800;letter-spacing:-.05em;background:linear-gradient(135deg,#a78bfa,#818cf8,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .fin-admin-brandSub{margin-top:4px;font-size:12px;color:var(--text-soft);}
 .fin-admin-closeBtn,.fin-admin-menuBtn{
   display:none;align-items:center;justify-content:center;
@@ -646,7 +646,7 @@ const shellStyles = `
 }
 .fin-admin-topbarLeft,.fin-admin-topbarRight{display:flex;align-items:center;gap:10px;min-width:0;}
 .fin-admin-mobileBrand{display:none;line-height:1;}
-.fin-admin-mobileBrandTitle{font-size:20px;font-weight:800;letter-spacing:-.04em;color:var(--text);}
+.fin-admin-mobileBrandTitle{font-size:20px;font-weight:800;letter-spacing:-.04em;background:linear-gradient(135deg,#a78bfa,#818cf8,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .fin-admin-mobileBrandSub{margin-top:1px;font-size:11px;color:var(--text-muted);}
 
 /* Search bar (button-styled) */
