@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { confirmToast } from "@/lib/toast-feedback";
 
 type AdminUser = {
   id: string;
@@ -52,7 +53,10 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
+const PROTECTED_EMAILS = ["finovaos.app@gmail.com", "demo@finova.com"];
+
 export default function AdminUsersPage() {
+  const currentUser = getCurrentUser();
   const [users, setUsers]         = useState<AdminUser[]>([]);
   const [stats, setStats]         = useState<Stats | null>(null);
   const [loading, setLoading]     = useState(true);
@@ -178,7 +182,7 @@ export default function AdminUsersPage() {
   }
 
   async function deleteUser(user: AdminUser) {
-    if (!confirm(`Permanently delete "${user.name}" (${user.email})? This cannot be undone.`)) return;
+    if (!await confirmToast(`Permanently delete "${user.name}" (${user.email})? This cannot be undone.`)) return;
     try {
       const r = await fetch(`/api/admin/users/${user.id}`, {
         method: "DELETE",
@@ -365,12 +369,14 @@ export default function AdminUsersPage() {
                         <button className="users-edit-btn" onClick={() => openEdit(u)}>
                           Edit
                         </button>
-                        <button
-                          onClick={() => deleteUser(u)}
-                          style={{ marginLeft: 6, padding: "4px 10px", borderRadius: 7, border: "1px solid rgba(239,68,68,.3)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
-                        >
-                          Delete
-                        </button>
+                        {!PROTECTED_EMAILS.includes(u.email) && u.id !== currentUser?.id && (
+                          <button
+                            onClick={() => deleteUser(u)}
+                            style={{ marginLeft: 6, padding: "4px 10px", borderRadius: 7, border: "1px solid rgba(239,68,68,.3)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                          >
+                            Delete
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
