@@ -31,7 +31,7 @@ export default function CustomerProfitabilityPage() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Customer Profitability</h1>
-          <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--text-muted)" }}>Smart log "profit kis se hua" dekhte hain — sirf "sale kitni hui" nahi</p>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--text-muted)" }}>See which customers generate the most profit — not just the most sales</p>
         </div>
         <select value={period} onChange={e => setPeriod(e.target.value)} style={inp}>
           <option value="month">This Month</option><option value="quarter">This Quarter</option><option value="year">This Year</option>
