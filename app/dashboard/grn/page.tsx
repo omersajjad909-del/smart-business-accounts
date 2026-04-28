@@ -116,7 +116,7 @@ export default function GRNPage() {
   }
 
   function resetForm() {
-    setDate(today); setPoId(""); setSupplierId(""); setRemarks("");
+    setDate(today); setPoId(""); setSupplierId(""); setRemarks(""); setNotes("");
     setRows([{ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" }]);
     setPreview(false);
     loadNextGrnNo();
@@ -239,114 +239,100 @@ export default function GRNPage() {
       {/* ── Form ── */}
       {!showList && !preview && (
         <div className="no-print">
-          <div style={{ background: PANEL, border: `1.5px solid ${BORDER}`, borderRadius: 16, overflow: "hidden" }}>
-
-            {/* Form Header */}
-            <div style={{ padding: "16px 22px", borderBottom: `1px solid ${BORDER}`, background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(52,211,153,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
-                </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 15 }}>New Goods Receipt Note</div>
-                  <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>Record items received from supplier</div>
-                </div>
+          {/* Page Header */}
+          <div style={{ background: PANEL, border: `1.5px solid ${BORDER}`, borderRadius: 14, padding: "14px 22px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(52,211,153,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button onClick={handleSubmit} disabled={saving}
-                  style={{ padding: "9px 22px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1, boxShadow: "0 4px 14px rgba(99,102,241,0.35)" }}>
-                  {saving ? "Saving…" : "Save & Preview"}
-                </button>
-                <button onClick={resetForm} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>Clear</button>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 15 }}>New Goods Receipt Note</div>
+                <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>Record items received from supplier</div>
               </div>
             </div>
+          </div>
 
-            <div style={{ padding: "22px" }}>
-              {/* Row 1: GRN No, Date, Against PO, Supplier */}
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
-                <div>
-                  <Label>GRN Number *</Label>
-                  <input value={grnNo} disabled placeholder="Auto..."
-                    style={{ ...inp(), fontFamily: "monospace", fontWeight: 700, color: ACCENT, background: "rgba(99,102,241,0.06)", cursor: "not-allowed" }} />
-                </div>
-                <div>
-                  <Label>Receipt Date *</Label>
-                  <DateInput value={date} onChange={setDate} style={inp()} />
-                </div>
-                <div>
-                  <Label>Against PO (optional)</Label>
-                  <select value={poId} onChange={e => handlePOSelect(e.target.value)} style={{ ...inp(), colorScheme: "dark", cursor: "pointer" }}>
-                    <option value="">— No PO Reference —</option>
-                    {pos.map(p => <option key={p.id} value={p.id}>{p.poNo} · {p.supplier.name}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <Label>Supplier *</Label>
-                  <select value={supplierId} onChange={e => setSupplierId(e.target.value)} style={{ ...inp(), colorScheme: "dark", cursor: "pointer" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 320px", gap: 20, alignItems: "start" }}>
+
+            {/* LEFT COLUMN */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+              {/* Supplier + Business Details */}
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
+                <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Supplier Details</div>
+                  <select value={supplierId} onChange={e => setSupplierId(e.target.value)} style={{ ...inp(), marginBottom: 10 }}>
                     <option value="">— Select Supplier —</option>
-                    {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    {suppliers.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
+                  {supplierId && suppliers.find((s: any) => s.id === supplierId) && (() => {
+                    const s = suppliers.find((x: any) => x.id === supplierId);
+                    return (
+                      <div style={{ padding: "10px 12px", background: "var(--panel-bg-2,rgba(255,255,255,0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{s.name}</div>
+                        {(s.email || s.phone) && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3, display: "flex", gap: 12, flexWrap: "wrap" }}>{s.email && <span>{s.email}</span>}{s.phone && <span>{s.phone}</span>}</div>}
+                        {s.address && <div style={{ fontSize: 12, color: MUTED }}>{s.address}</div>}
+                      </div>
+                    );
+                  })()}
                 </div>
-              </div>
-
-              {/* Remarks */}
-              <div style={{ marginBottom: 20 }}>
-                <Label>Remarks / Notes</Label>
-                <input value={remarks} onChange={e => setRemarks(e.target.value)} placeholder="Optional notes..." style={inp()} />
-              </div>
-
-              {/* Section Title */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: 1 }}>Items Received</span>
-                <div style={{ flex: 1, height: 1, background: BORDER }} />
+                <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Your Business</div>
+                  {companyInfo ? (
+                    <div style={{ padding: "10px 12px", background: "var(--panel-bg-2,rgba(255,255,255,0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{companyInfo.name}</div>
+                      {companyInfo.address && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>{companyInfo.address}</div>}
+                      {companyInfo.phone && <div style={{ fontSize: 12, color: MUTED }}>{companyInfo.phone}</div>}
+                    </div>
+                  ) : <div style={{ fontSize: 12, color: MUTED, fontStyle: "italic" }}>Loading company info…</div>}
+                  <div style={{ marginTop: 10 }}>
+                    <Label>Against PO (optional)</Label>
+                    <select value={poId} onChange={e => handlePOSelect(e.target.value)} style={inp()}>
+                      <option value="">— No PO Reference —</option>
+                      {pos.map(p => <option key={p.id} value={p.id}>{p.poNo} · {p.supplier.name}</option>)}
+                    </select>
+                  </div>
+                </div>
               </div>
 
               {/* Items Table */}
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 11, color: MUTED, marginBottom: 10 }}>new row appears automatically</div>
+              <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>
+                <div style={{ padding: "12px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>Items Received</div>
+                  <div style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => r.itemId && r.receivedQty).length} items</div>
+                </div>
                 {isMobile ? (
-                  <div>
+                  <div style={{ padding: "10px 14px" }}>
                     {rows.map((row, idx) => {
                       const amt = (Number(row.receivedQty) || 0) * (Number(row.rate) || 0);
                       const isShort = row.orderedQty && row.receivedQty && Number(row.receivedQty) < Number(row.orderedQty);
                       return (
-                        <div key={idx} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
+                        <div key={idx} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" }}>Item {idx + 1}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" as const }}>Item {idx + 1}</span>
                             <button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 18, lineHeight: 1, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
                           </div>
-                          <select value={row.itemId} onChange={e => updateRow(idx, "itemId", e.target.value)} style={{ ...inp({ padding: "9px 13px", marginBottom: 8 }), colorScheme: "dark", width: "100%" }}>
+                          <select value={row.itemId} onChange={e => updateRow(idx, "itemId", e.target.value)} style={{ ...inp({ marginBottom: 8 }) }}>
                             <option value="">— Select Item —</option>
                             {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                           </select>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
-                            <div>
-                              <div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Ordered</div>
-                              <input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: MUTED })} />
-                            </div>
-                            <div>
-                              <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 4, textTransform: "uppercase", color: isShort ? "#fbbf24" : "#34d399" }}>Received</div>
-                              <input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} />
-                            </div>
-                            <div>
-                              <div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Rate</div>
-                              <input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00" style={inp({ textAlign: "right" })} />
-                            </div>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                            <div><Label>Ordered</Label><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center" })} /></div>
+                            <div><Label><span style={{ color: isShort ? "#fbbf24" : "#34d399" }}>Received</span></Label><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></div>
+                            <div><Label>Rate</Label><input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00" style={inp({ textAlign: "right" })} /></div>
                           </div>
-                          <input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..." style={inp({ fontSize: 12, marginBottom: 4 })} />
-                          {amt > 0 && <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 4, color: ACCENT }}>= {amt.toLocaleString()}</div>}
+                          {amt > 0 && <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 6, color: ACCENT }}>= {amt.toLocaleString()}</div>}
                         </div>
                       );
                     })}
                   </div>
                 ) : (
-                  <div style={{ border: `1px solid ${BORDER}`, borderRadius: 10, overflow: "hidden" }}>
-                    <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 540, fontSize: 13 }}>
                       <thead>
-                        <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
-                          {[["#","left",36],["Item","left","auto"],["Ordered","center",100],["Received","center",100],["Rate","right",100],["Amount","right",110],["Note","left",140],["","center",36]].map(([h,a,w]) => (
-                            <th key={h as string} style={{ padding: "10px 12px", textAlign: a as any, color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: 0.5, width: w as any }}>{h}</th>
+                        <tr style={{ background: "rgba(99,102,241,0.07)" }}>
+                          {[["#","left",30],["Item","left","auto"],["Ordered","center",90],["Received","center",90],["Rate","right",90],["Amount","right",100],["Note","left",120],["","center",30]].map(([h,a,w]) => (
+                            <th key={h as string} style={{ padding: "10px 8px", textAlign: a as any, color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.6, width: w as any }}>{h}</th>
                           ))}
                         </tr>
                       </thead>
@@ -355,48 +341,72 @@ export default function GRNPage() {
                           const amt = (Number(row.receivedQty) || 0) * (Number(row.rate) || 0);
                           const isShort = row.orderedQty && row.receivedQty && Number(row.receivedQty) < Number(row.orderedQty);
                           return (
-                            <tr key={idx} style={{ borderBottom: `1px solid ${BORDER}` }}>
-                              <td style={{ padding: "7px 12px", color: MUTED, fontSize: 12, fontWeight: 600 }}>{idx + 1}</td>
-                              <td style={{ padding: "7px 8px" }}>
-                                <select value={row.itemId} onChange={e => updateRow(idx, "itemId", e.target.value)} style={{ ...inp({ padding: "7px 10px" }), colorScheme: "dark" }}>
+                            <tr key={idx} style={{ borderTop: `1px solid ${BORDER}` }}>
+                              <td style={{ padding: "6px 8px", color: MUTED, fontSize: 12 }}>{idx + 1}</td>
+                              <td style={{ padding: "6px 8px" }}>
+                                <select value={row.itemId} onChange={e => updateRow(idx, "itemId", e.target.value)} style={inp({ padding: "6px 10px" })}>
                                   <option value="">Select Item</option>
                                   {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
                                 </select>
                               </td>
-                              <td style={{ padding: "7px 6px" }}><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={{ ...inp({ padding: "7px 8px", textAlign: "center", color: MUTED }) }} /></td>
-                              <td style={{ padding: "7px 6px" }}><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={{ ...inp({ padding: "7px 8px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 }) }} /></td>
-                              <td style={{ padding: "7px 6px" }}><input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00" style={{ ...inp({ padding: "7px 8px", textAlign: "right" }) }} /></td>
-                              <td style={{ padding: "7px 12px", textAlign: "right", fontWeight: 700, color: amt > 0 ? TEXT : MUTED }}>{amt > 0 ? amt.toLocaleString() : "—"}</td>
-                              <td style={{ padding: "7px 6px" }}><input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..." style={{ ...inp({ padding: "7px 8px", fontSize: 12 }) }} /></td>
-                              <td style={{ padding: "7px 8px", textAlign: "center" }}><button onClick={() => setRows(rows.filter((_, i) => i !== idx))} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button></td>
+                              <td style={{ padding: "6px 8px" }}><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: MUTED })} /></td>
+                              <td style={{ padding: "6px 8px" }}><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></td>
+                              <td style={{ padding: "6px 8px" }}><input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right" })} /></td>
+                              <td style={{ padding: "6px 8px", textAlign: "right", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap" }}>{amt > 0 ? amt.toLocaleString() : "—"}</td>
+                              <td style={{ padding: "6px 8px" }}><input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..." style={inp({ padding: "5px 8px", fontSize: 12 })} /></td>
+                              <td style={{ padding: "6px 8px" }}><button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button></td>
                             </tr>
                           );
                         })}
                       </tbody>
                     </table>
-                    </div>
-                    <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-                        <span style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => r.itemId && r.receivedQty).length} items filled</span>
-                        <div style={{ background: "rgba(99,102,241,0.1)", border: `1px solid rgba(99,102,241,0.2)`, borderRadius: 8, padding: "8px 18px", textAlign: "right" }}>
-                          <span style={{ fontSize: 11, color: MUTED, marginRight: 10, fontWeight: 600 }}>TOTAL</span>
-                          <span style={{ fontSize: 18, fontWeight: 800, color: ACCENT }}>{totalAmt.toLocaleString()}</span>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 )}
-                {isMobile && totalAmt > 0 && (
-                  <div style={{ textAlign: "right", marginTop: 10 }}>
-                    <span style={{ fontSize: 11, color: MUTED, marginRight: 10, fontWeight: 600, textTransform: "uppercase" }}>Total</span>
-                    <span style={{ fontSize: 20, fontWeight: 800, color: ACCENT }}>{totalAmt.toLocaleString()}</span>
+              </div>
+
+              {/* Remarks + Notes */}
+              <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Notes & Remarks</div>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+                  <div><Label>Remarks</Label><input value={remarks} onChange={e => setRemarks(e.target.value)} placeholder="Optional remarks..." style={inp()} /></div>
+                  <div><Label>Internal Notes</Label><input value={notes} onChange={e => setNotes(e.target.value)} placeholder="Internal notes..." style={inp()} /></div>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 16, position: isMobile ? "static" : "sticky", top: 24 }}>
+
+              {/* GRN Header */}
+              <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: 1, textTransform: "uppercase" as const, marginBottom: 6 }}>GRN</div>
+                <div style={{ fontSize: 17, fontWeight: 800, fontFamily: "monospace", color: ACCENT, marginBottom: 16 }}>{grnNo || "Auto #"}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div><Label>Receipt Date</Label><DateInput value={date} onChange={setDate} style={inp()} /></div>
+                </div>
+              </div>
+
+              {/* Totals */}
+              <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}><span style={{ color: MUTED }}>Items</span><span>{rows.filter(r => r.itemId && r.receivedQty).length} line(s)</span></div>
+                  <div style={{ display: "flex", justifyContent: "space-between", borderTop: `2px solid ${BORDER}`, paddingTop: 12, fontSize: 18, fontWeight: 800 }}>
+                    <span>Total Value</span>
+                    <span style={{ color: ACCENT }}>{totalAmt.toLocaleString()}</span>
                   </div>
-                )}
+                </div>
+              </div>
+
+              {/* Save Buttons */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <button onClick={handleSubmit} disabled={saving} style={{ padding: "12px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 15, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1, boxShadow: "0 4px 14px rgba(99,102,241,0.35)" }}>{saving ? "Saving…" : "Save & Preview"}</button>
+                <button onClick={resetForm} style={{ padding: "10px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>Clear Form</button>
               </div>
             </div>
           </div>
         </div>
       )}
+
 
       {/* ── Preview Action Bar ── */}
       {!showList && preview && (

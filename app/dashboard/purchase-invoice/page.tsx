@@ -1067,7 +1067,7 @@ const [searchTerm, setSearchTerm] = useState("");
                     <tbody>
                       <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
                         <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>Sub Total</td>
-                        <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{total.toLocaleString()}</td>
+                        <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{subtotal.toLocaleString()}</td>
                       </tr>
                       {Number(freight) > 0 && (
                         <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
@@ -1078,7 +1078,7 @@ const [searchTerm, setSearchTerm] = useState("");
                       {selectedTax && (
                         <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
                           <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>{selectedTax.taxType} ({selectedTax.taxRate}%)</td>
-                          <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{taxAmount.toLocaleString()}</td>
+                          <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{globalTaxAmt.toLocaleString()}</td>
                         </tr>
                       )}
                       <tr style={{ background: "#0f172a" }}>
@@ -1142,9 +1142,9 @@ const [searchTerm, setSearchTerm] = useState("");
               </div>
               {/* Totals */}
               <div style={{ fontSize: 9 }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}><span>Sub Total:</span><span>{total.toLocaleString()}</span></div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}><span>Sub Total:</span><span>{subtotal.toLocaleString()}</span></div>
                 {Number(freight) > 0 && <div style={{ display: "flex", justifyContent: "space-between" }}><span>Freight:</span><span>{Number(freight).toLocaleString()}</span></div>}
-                {selectedTax && <div style={{ display: "flex", justifyContent: "space-between" }}><span>{selectedTax.taxType}:</span><span>{taxAmount.toLocaleString()}</span></div>}
+                {selectedTax && <div style={{ display: "flex", justifyContent: "space-between" }}><span>{selectedTax.taxType}:</span><span>{globalTaxAmt.toLocaleString()}</span></div>}
                 <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 11, borderTop: "1px solid #000", paddingTop: 3, marginTop: 3 }}>
                   <span>NET:</span><span>{netTotal.toLocaleString()}</span>
                 </div>
