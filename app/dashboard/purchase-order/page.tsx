@@ -126,10 +126,12 @@ export default function PurchaseOrderPage() {
   }
 
   function updateRow(i: number, key: string, val: any) {
-    const copy = [...rows]; (copy[i] as any)[key] = val; setRows(copy);
+    const copy = [...rows]; (copy[i] as any)[key] = val;
+    if (i === copy.length - 1 && val !== "" && val != null)
+      copy.push({ itemId: "", name: "", desc: "", qty: "", rate: "" });
+    setRows(copy);
   }
   function removeRow(i: number) { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }
-  function addRow() { setRows([...rows, { itemId: "", name: "", desc: "", qty: "", rate: "" }]); }
 
   const subTotal = rows.reduce((s, r) => s + (r.qty && r.rate ? Number(r.qty) * Number(r.rate) : 0), 0);
   const freightAmt = Number(freight) || 0;
@@ -408,6 +410,7 @@ export default function PurchaseOrderPage() {
                             if (!it) return;
                             const copy = [...rows];
                             copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: String(it.rate || it.purchasePrice || "") };
+                            if (i === copy.length - 1) copy.push({ itemId: "", name: "", desc: "", qty: "", rate: "" });
                             setRows(copy);
                           }} style={{ ...inp({ padding: "7px 10px" }), colorScheme: "dark" }}>
                             <option value="">Select Item</option>
@@ -431,9 +434,8 @@ export default function PurchaseOrderPage() {
                   </tbody>
                 </table>
                 </div>
-                <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between" }}>
-                  <button onClick={addRow} style={{ background: "none", border: "none", cursor: "pointer", color: ACCENT, fontFamily: FONT, fontSize: 13, fontWeight: 700, padding: 0 }}>+ Add Row</button>
-                  <div style={{ fontSize: 12, color: MUTED }}>{rows.filter(r => r.itemId && r.qty).length} of {rows.length} rows filled</div>
+                <div style={{ padding: "8px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "flex-end" }}>
+                  <div style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => r.itemId && r.qty).length} items filled · new row auto-adds</div>
                 </div>
               </div>
 

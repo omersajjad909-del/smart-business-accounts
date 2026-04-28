@@ -107,6 +107,8 @@ export default function GRNPage() {
     const u = [...rows];
     u[idx] = { ...u[idx], [field]: value };
     if (field === "itemId") { const f = allItems.find((it: any) => it.id === value); if (f) u[idx].name = f.name; }
+    if (idx === u.length - 1 && value !== "")
+      u.push({ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" });
     setRows(u);
   }
 
@@ -348,11 +350,9 @@ export default function GRNPage() {
                   </tbody>
                 </table>
                 </div>
-                <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <button onClick={() => setRows([...rows, { itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" }])}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: ACCENT, fontFamily: FONT, fontSize: 13, fontWeight: 700, padding: 0 }}>+ Add Row</button>
+                <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-                    <span style={{ fontSize: 12, color: MUTED }}>{rows.filter(r => r.itemId && r.receivedQty).length} of {rows.length} rows filled</span>
+                    <span style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => r.itemId && r.receivedQty).length} items filled · new row auto-adds</span>
                     <div style={{ background: "rgba(99,102,241,0.1)", border: `1px solid rgba(99,102,241,0.2)`, borderRadius: 8, padding: "8px 18px", textAlign: "right" }}>
                       <span style={{ fontSize: 11, color: MUTED, marginRight: 10, fontWeight: 600 }}>TOTAL</span>
                       <span style={{ fontSize: 18, fontWeight: 800, color: ACCENT }}>{totalAmt.toLocaleString()}</span>
