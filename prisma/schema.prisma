@@ -114,12 +114,19 @@ model PurchaseOrder {
 
   poNo            String
   date            DateTime
+  dueDate         DateTime?
   remarks         String
   status          String    @default("PENDING")
   approvalStatus  String    @default("DRAFT")
   approvedBy      String?
   approvedAt      DateTime?
   approvalRemarks String?
+
+  paymentTerms    String?
+  notes           String?
+  discount        Float?    @default(0)
+  discountType    String?   @default("flat")
+  freight         Float?    @default(0)
 
   supplierId String
   supplier   Account @relation("PurchaseSupplier", fields: [supplierId], references: [id])
@@ -132,12 +139,14 @@ model PurchaseOrder {
 }
 
 model PurchaseOrderItem {
-  id          String @id @default(uuid())
-  poId        String
-  itemId      String
-  qty         Int
-  rate        Float
-  invoicedQty Int    @default(0)
+  id              String @id @default(uuid())
+  poId            String
+  itemId          String
+  qty             Int
+  rate            Float
+  invoicedQty     Int    @default(0)
+  discountPercent Float  @default(0)
+  taxPercent      Float  @default(0)
 
   po   PurchaseOrder @relation(fields: [poId], references: [id])
   item ItemNew       @relation(fields: [itemId], references: [id])
@@ -154,6 +163,7 @@ model PurchaseInvoice {
 
   invoiceNo String
   date      DateTime
+  dueDate   DateTime?
 
   poId String?
   po   PurchaseOrder? @relation(fields: [poId], references: [id])
@@ -168,6 +178,14 @@ model PurchaseInvoice {
 
   items PurchaseInvoiceItem[]
 
+  discount      Float?  @default(0)
+  discountType  String? @default("flat")
+  freight       Float?  @default(0)
+  notes         String?
+  reference     String?
+  paymentMethod String?
+  paymentTerms  String?
+
   approvalStatus  String    @default("DRAFT") // DRAFT | PENDING | APPROVED | REJECTED
   approvedBy      String?
   approvedAt      DateTime?
@@ -179,12 +197,14 @@ model PurchaseInvoice {
 }
 
 model PurchaseInvoiceItem {
-  id        String @id @default(uuid())
-  invoiceId String
-  itemId    String
-  qty       Int
-  rate      Float
-  amount    Float
+  id              String @id @default(uuid())
+  invoiceId       String
+  itemId          String
+  qty             Int
+  rate            Float
+  amount          Float
+  discountPercent Float  @default(0)
+  taxPercent      Float  @default(0)
 
   invoice PurchaseInvoice @relation(fields: [invoiceId], references: [id])
   item    ItemNew         @relation(fields: [itemId], references: [id])
@@ -225,6 +245,7 @@ model SalesInvoice {
 
   invoiceNo String
   date      DateTime
+  dueDate   DateTime?
   total     Float
 
   customerId String
@@ -239,8 +260,19 @@ model SalesInvoice {
   salesmanId String?
   salesman   User?   @relation("SalesmanInvoices", fields: [salesmanId], references: [id])
 
-  driverName String?
-  vehicleNo  String?
+  driverName      String?
+  vehicleNo       String?
+  location        String?   @default("MAIN")
+  linkedSoId      String?
+
+  discount        Float?    @default(0)
+  discountType    String?   @default("flat")
+  freight         Float?    @default(0)
+  notes           String?
+  termsConditions String?
+  reference       String?
+  paymentMethod   String?
+  paymentTerms    String?
 
   approvalStatus  String    @default("DRAFT") // DRAFT | PENDING | APPROVED | REJECTED
   approvedBy      String?
@@ -253,12 +285,14 @@ model SalesInvoice {
 }
 
 model SalesInvoiceItem {
-  id        String @id @default(uuid())
-  invoiceId String
-  itemId    String
-  qty       Int
-  rate      Float
-  amount    Float
+  id              String @id @default(uuid())
+  invoiceId       String
+  itemId          String
+  qty             Int
+  rate            Float
+  amount          Float
+  discountPercent Float  @default(0)
+  taxPercent      Float  @default(0)
 
   invoice SalesInvoice @relation(fields: [invoiceId], references: [id])
   item    ItemNew      @relation(fields: [itemId], references: [id])
@@ -321,29 +355,37 @@ model SaleReturn {
 
   returnNo String
   date     DateTime
+  dueDate  DateTime?
 
-  invoiceId String? // ðŸ‘ˆ OPTIONAL
+  invoiceId String?
   invoice   SalesInvoice? @relation("InvoiceReturns", fields: [invoiceId], references: [id])
 
   customerId String
   customer   Account @relation("SaleReturnCustomer", fields: [customerId], references: [id])
 
-  total      Float
-  driverName String?
-  vehicleNo  String?
-  remarks    String?
-  items      SaleReturnItem[]
+  total        Float
+  driverName   String?
+  vehicleNo    String?
+  remarks      String?
+  notes        String?
+  discount     Float?  @default(0)
+  discountType String? @default("flat")
+  freight      Float?  @default(0)
+  reference    String?
+  items        SaleReturnItem[]
 
   createdAt DateTime @default(now())
 }
 
 model SaleReturnItem {
-  id       String @id @default(uuid())
-  returnId String
-  itemId   String
-  qty      Int
-  rate     Float
-  amount   Float
+  id              String @id @default(uuid())
+  returnId        String
+  itemId          String
+  qty             Int
+  rate            Float
+  amount          Float
+  discountPercent Float  @default(0)
+  taxPercent      Float  @default(0)
 
   saleReturn SaleReturn @relation(fields: [returnId], references: [id])
   item       ItemNew    @relation(fields: [itemId], references: [id])
