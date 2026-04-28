@@ -386,6 +386,8 @@ const [searchTerm, setSearchTerm] = useState("");
   function updateRow(index: number, key: "qty" | "rate", value: string) {
     const copy = [...rows];
     copy[index][key] = value === "" ? "" : Number(value);
+    if (index === copy.length - 1 && value !== "")
+      copy.push({ itemId: "", name: "", description: "", qty: "", rate: "" });
     setRows(copy);
   }
 
@@ -778,8 +780,32 @@ const [searchTerm, setSearchTerm] = useState("");
                     </div>
                     <div style={{ fontSize: 12, color: MUTED }}>{rows.length} line items</div>
                   </div>
+                  {isMobile ? (
+                    <div style={{ padding: "10px 14px" }}>
+                      {rows.map((r, i) => (
+                        <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 6, textTransform: "uppercase" }}>Item {i + 1}</div>
+                          <div style={{ fontWeight: 700, color: TEXT, marginBottom: 4 }}>{r.name || <span style={{ color: MUTED, fontStyle: "italic" }}>No item selected</span>}</div>
+                          {r.description && <div style={{ fontSize: 12, color: MUTED, marginBottom: 8 }}>{r.description}</div>}
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                            <div>
+                              <div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Qty</div>
+                              <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={{ ...inp({ textAlign: "right", padding: "8px 10px" }) }} />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Rate</div>
+                              <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={{ ...inp({ textAlign: "right", padding: "8px 10px" }) }} />
+                            </div>
+                          </div>
+                          {(Number(r.qty) > 0 || Number(r.rate) > 0) && (
+                            <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 8, color: "#6366f1" }}>= {(Number(r.qty) * Number(r.rate) || 0).toLocaleString()}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
                   <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
                   <tr style={{ background: "rgba(99,102,241,0.07)" }}>
                     <th style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Item</th>
@@ -807,6 +833,7 @@ const [searchTerm, setSearchTerm] = useState("");
                 </tbody>
                 </table>
                   </div>
+                  )}
                 </div>
 
                 <div style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}`, borderRadius: 14, padding: 18, position: isMobile ? "static" : "sticky", top: 24 }}>

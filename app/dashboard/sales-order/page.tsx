@@ -66,6 +66,16 @@ export default function SalesOrderPage() {
   // Saved customers + items
   const [customers, setCustomers] = useState<{ id: string; name: string }[]>([]);
   const [itemList,  setItemList]  = useState<{ id: string; name: string; salePrice?: number }[]>([]);
+  const [isMobile,  setIsMobile]  = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(max-width: 900px)");
+    const onChange = () => setIsMobile(media.matches);
+    onChange();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     const u = getCurrentUser();
@@ -144,12 +154,10 @@ export default function SalesOrderPage() {
       const items = prev.items.map((it, i) =>
         i === index ? { ...it, [field]: field === "name" ? value : Number(value) } : it
       );
+      if (index === items.length - 1 && value !== "" && value !== 0)
+        items.push({ name: "", qty: 1, unitPrice: 0 });
       return { ...prev, items };
     });
-  }
-
-  function addItem() {
-    setForm((prev) => ({ ...prev, items: [...prev.items, { name: "", qty: 1, unitPrice: 0 }] }));
   }
 
   function removeItem(index: number) {
@@ -605,114 +613,78 @@ export default function SalesOrderPage() {
 
             {/* Line items */}
             <div style={{ marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div style={{ marginBottom: 10 }}>
                 <span style={{ fontSize: 14, fontWeight: 600 }}>Line Items</span>
-                <button
-                  onClick={addItem}
-                  style={{
-                    ...btnGhost,
-                    padding: "5px 12px",
-                    fontSize: 12,
-                    color: accent,
-                    borderColor: accent + "55",
-                  }}
-                >
-                  + Add Item
-                </button>
+                <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 10 }}>new row appears automatically</span>
               </div>
 
-              {/* Items table header */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 80px 110px 90px 32px",
-                  gap: 8,
-                  marginBottom: 6,
-                }}
-              >
-                {["Item Name", "Qty", "Unit Price", "Total", ""].map((h) => (
-                  <span key={h} style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
-                    {h}
-                  </span>
-                ))}
-              </div>
-
-              {form.items.map((item, idx) => {
-                const total = item.qty * item.unitPrice;
-                return (
-                  <div
-                    key={idx}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 80px 110px 90px 32px",
-                      gap: 8,
-                      marginBottom: 8,
-                      alignItems: "center",
-                    }}
-                  >
-                    <select
-                      style={inputStyle}
-                      value={item.itemId || item.name}
-                      onChange={(e) => {
-                        const selected = itemList.find(i => i.id === e.target.value);
-                        setForm(prev => {
-                          const items = prev.items.map((it, i) => i === idx
-                            ? { ...it, itemId: selected?.id || "", name: selected?.name || e.target.value, unitPrice: selected?.salePrice ?? it.unitPrice }
-                            : it
-                          );
-                          return { ...prev, items };
-                        });
-                      }}
-                    >
-                      <option value="">— Select Item —</option>
-                      {itemList.map(i => (
-                        <option key={i.id} value={i.id}>{i.name}</option>
-                      ))}
-                    </select>
-                    <input
-                      type="number"
-                      min={1}
-                      style={{ ...inputStyle, textAlign: "right" }}
-                      value={item.qty}
-                      onChange={(e) => updateItem(idx, "qty", e.target.value)}
-                    />
-                    <input
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      style={{ ...inputStyle, textAlign: "right" }}
-                      value={item.unitPrice}
-                      onChange={(e) => updateItem(idx, "unitPrice", e.target.value)}
-                    />
-                    <span
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: "var(--text-primary)",
-                        textAlign: "right",
-                        padding: "0 4px",
-                      }}
-                    >
-                      {fmt(total)}
-                    </span>
-                    <button
-                      onClick={() => removeItem(idx)}
-                      disabled={form.items.length === 1}
-                      style={{
-                        background: "transparent",
-                        border: "none",
-                        cursor: form.items.length === 1 ? "not-allowed" : "pointer",
-                        color: form.items.length === 1 ? "var(--text-muted)" : "#f87171",
-                        fontSize: 18,
-                        lineHeight: 1,
-                        padding: 0,
-                      }}
-                    >
-                      ×
-                    </button>
+              {isMobile ? (
+                <div>
+                  {form.items.map((item, idx) => (
+                    <div key={idx} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {idx + 1}</span>
+                        <button onClick={() => removeItem(idx)} disabled={form.items.length === 1} style={{ background: "transparent", border: "none", cursor: form.items.length === 1 ? "not-allowed" : "pointer", color: form.items.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
+                      </div>
+                      <select style={{ ...inputStyle, marginBottom: 8 }} value={item.itemId || item.name}
+                        onChange={(e) => {
+                          const selected = itemList.find(i => i.id === e.target.value);
+                          setForm(prev => {
+                            const items = prev.items.map((it, i) => i === idx ? { ...it, itemId: selected?.id || "", name: selected?.name || e.target.value, unitPrice: selected?.salePrice ?? it.unitPrice } : it);
+                            if (idx === items.length - 1 && e.target.value) items.push({ name: "", qty: 1, unitPrice: 0 });
+                            return { ...prev, items };
+                          });
+                        }}
+                      >
+                        <option value="">— Select Item —</option>
+                        {itemList.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
+                      </select>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                        <div>
+                          <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Qty</div>
+                          <input type="number" min={1} style={{ ...inputStyle, textAlign: "right" }} value={item.qty} onChange={(e) => updateItem(idx, "qty", e.target.value)} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Unit Price</div>
+                          <input type="number" min={0} step="0.01" style={{ ...inputStyle, textAlign: "right" }} value={item.unitPrice} onChange={(e) => updateItem(idx, "unitPrice", e.target.value)} />
+                        </div>
+                      </div>
+                      {(item.qty > 0 || item.unitPrice > 0) && (
+                        <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 8, color: accent }}>= {fmt(item.qty * item.unitPrice)}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 6 }}>
+                    {["Item Name", "Qty", "Unit Price", "Total", ""].map((h) => (
+                      <span key={h} style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>{h}</span>
+                    ))}
                   </div>
-                );
-              })}
+                  {form.items.map((item, idx) => (
+                    <div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr 80px 110px 90px 32px", gap: 8, marginBottom: 8, alignItems: "center" }}>
+                      <select style={inputStyle} value={item.itemId || item.name}
+                        onChange={(e) => {
+                          const selected = itemList.find(i => i.id === e.target.value);
+                          setForm(prev => {
+                            const items = prev.items.map((it, i) => i === idx ? { ...it, itemId: selected?.id || "", name: selected?.name || e.target.value, unitPrice: selected?.salePrice ?? it.unitPrice } : it);
+                            if (idx === items.length - 1 && e.target.value) items.push({ name: "", qty: 1, unitPrice: 0 });
+                            return { ...prev, items };
+                          });
+                        }}
+                      >
+                        <option value="">— Select Item —</option>
+                        {itemList.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
+                      </select>
+                      <input type="number" min={1} style={{ ...inputStyle, textAlign: "right" }} value={item.qty} onChange={(e) => updateItem(idx, "qty", e.target.value)} />
+                      <input type="number" min={0} step="0.01" style={{ ...inputStyle, textAlign: "right" }} value={item.unitPrice} onChange={(e) => updateItem(idx, "unitPrice", e.target.value)} />
+                      <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", textAlign: "right", padding: "0 4px" }}>{fmt(item.qty * item.unitPrice)}</span>
+                      <button onClick={() => removeItem(idx)} disabled={form.items.length === 1} style={{ background: "transparent", border: "none", cursor: form.items.length === 1 ? "not-allowed" : "pointer", color: form.items.length === 1 ? "var(--text-muted)" : "#f87171", fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
 
             {/* Notes */}

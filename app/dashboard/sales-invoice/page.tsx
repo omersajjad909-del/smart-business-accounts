@@ -206,19 +206,20 @@ function SalesInvoiceContent() {
     }
   }
 
-  function addRow() { setRows(r => [...r, { itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]); }
-
   function selectItem(idx: number, itemId: string) {
     const item = items.find(i => i.id === itemId);
     if (!item) return;
     const copy = [...rows];
     copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: item.salePrice || "" };
+    if (idx === copy.length - 1) copy.push({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" });
     setRows(copy);
   }
 
   function updateRow(idx: number, key: "qty" | "rate", val: string) {
     const copy = [...rows];
     copy[idx][key] = val === "" ? "" : Number(val);
+    if (idx === copy.length - 1 && val !== "")
+      copy.push({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" });
     setRows(copy);
   }
 
@@ -494,12 +495,41 @@ function SalesInvoiceContent() {
 
                 {/* Items Table */}
                 <div style={panelStyle}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <div style={{ marginBottom: 14 }}>
                     <span style={{ fontSize: 14, fontWeight: 700 }}>Line Items</span>
-                    <button style={{ ...btnGhost, padding: "5px 14px", fontSize: 12, color: accent, borderColor: accent + "55" }} onClick={addRow}>+ Add Row</button>
+                    <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 10 }}>new row appears automatically</span>
                   </div>
+                  {isMobile ? (
+                    <div>
+                      {rows.map((r, i) => (
+                        <div key={i} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {i + 1}</span>
+                            <button style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
+                          </div>
+                          <select style={{ ...inputStyle, marginBottom: 8 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
+                            <option value="">— Select Item —</option>
+                            {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
+                          </select>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                            <div>
+                              <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Qty</div>
+                              <input type="number" style={{ ...inputStyle, textAlign: "right" }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Rate</div>
+                              <input type="number" style={{ ...inputStyle, textAlign: "right" }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" />
+                            </div>
+                          </div>
+                          {(Number(r.qty) > 0 || Number(r.rate) > 0) && (
+                            <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 8, color: accent }}>= {fmt(Number(r.qty) * Number(r.rate) || 0)}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
                   <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <thead>
                         <tr style={{ borderBottom: "1px solid var(--border)" }}>
                           {["Item", "Qty", "Rate", "Amount", ""].map(h => (
@@ -533,6 +563,7 @@ function SalesInvoiceContent() {
                       </tbody>
                     </table>
                   </div>
+                  )}
 
                   {/* Totals */}
                   <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>

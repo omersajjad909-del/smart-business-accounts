@@ -102,6 +102,16 @@ export default function CRVPage() {
   const [company,    setCompany]    = useState<any>(null);
   const [loading,    setLoading]    = useState(false);
   const [saving,     setSaving]     = useState(false);
+  const [isMobile,   setIsMobile]   = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(max-width: 900px)");
+    const onChange = () => setIsMobile(media.matches);
+    onChange();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
   // Form state
   const [date,       setDate]       = useState(today);
