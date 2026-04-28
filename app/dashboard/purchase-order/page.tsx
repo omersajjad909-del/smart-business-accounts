@@ -390,53 +390,93 @@ export default function PurchaseOrderPage() {
               </div>
 
               {/* Items Table */}
-              <div style={{ border: `1px solid ${BORDER}`, borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
-                <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 760 }}>
-                  <thead>
-                    <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
-                      {["#", "Item", "Qty", "Rate", "Amount", ""].map((h, i) => (
-                        <th key={i} style={{ padding: "10px 14px", textAlign: i >= 2 && i <= 4 ? "center" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.5, width: i === 0 ? 36 : i === 2 ? 90 : i === 3 ? 120 : i === 4 ? 120 : i === 5 ? 36 : "auto" }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 11, color: MUTED, marginBottom: 10 }}>new row appears automatically</div>
+                {isMobile ? (
+                  <div>
                     {rows.map((r, i) => (
-                      <tr key={i} style={{ borderBottom: `1px solid ${BORDER}` }}>
-                        <td style={{ padding: "8px 14px", color: MUTED, fontSize: 12, fontWeight: 600 }}>{i + 1}</td>
-                        <td style={{ padding: "8px 10px" }}>
-                          <select value={r.itemId} onChange={e => {
-                            const it = items.find(x => x.id === e.target.value);
-                            if (!it) return;
-                            const copy = [...rows];
-                            copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: String(it.rate || it.purchasePrice || "") };
-                            if (i === copy.length - 1) copy.push({ itemId: "", name: "", desc: "", qty: "", rate: "" });
-                            setRows(copy);
-                          }} style={{ ...inp({ padding: "7px 10px" }), colorScheme: "dark" }}>
-                            <option value="">Select Item</option>
-                            {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
-                          </select>
-                        </td>
-                        <td style={{ padding: "8px 6px" }}>
-                          <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={{ ...inp({ padding: "7px 8px", textAlign: "center" }) }} />
-                        </td>
-                        <td style={{ padding: "8px 6px" }}>
-                          <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={{ ...inp({ padding: "7px 8px", textAlign: "right" }) }} />
-                        </td>
-                        <td style={{ padding: "8px 14px", textAlign: "right", fontWeight: 700, fontSize: 13, color: r.qty && r.rate ? TEXT : MUTED }}>
-                          {r.qty && r.rate ? (Number(r.qty) * Number(r.rate)).toLocaleString() : "—"}
-                        </td>
-                        <td style={{ padding: "8px 8px", textAlign: "center" }}>
-                          <button onClick={() => removeRow(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button>
-                        </td>
-                      </tr>
+                      <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" }}>Item {i + 1}</span>
+                          <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 18, lineHeight: 1, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
+                        </div>
+                        <select value={r.itemId} onChange={e => {
+                          const it = items.find(x => x.id === e.target.value);
+                          if (!it) return;
+                          const copy = [...rows];
+                          copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: String(it.rate || it.purchasePrice || "") };
+                          if (i === copy.length - 1) copy.push({ itemId: "", name: "", desc: "", qty: "", rate: "" });
+                          setRows(copy);
+                        }} style={{ ...inp({ padding: "9px 13px", marginBottom: 8 }), colorScheme: "dark", width: "100%" }}>
+                          <option value="">— Select Item —</option>
+                          {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
+                        </select>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                          <div>
+                            <div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Qty</div>
+                            <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ textAlign: "right" })} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Rate</div>
+                            <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={inp({ textAlign: "right" })} />
+                          </div>
+                        </div>
+                        {r.qty && r.rate ? (
+                          <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 8, color: ACCENT }}>= {(Number(r.qty) * Number(r.rate)).toLocaleString()}</div>
+                        ) : null}
+                      </div>
                     ))}
-                  </tbody>
-                </table>
-                </div>
-                <div style={{ padding: "8px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "flex-end" }}>
-                  <div style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => r.itemId && r.qty).length} items filled · new row auto-adds</div>
-                </div>
+                  </div>
+                ) : (
+                  <div style={{ border: `1px solid ${BORDER}`, borderRadius: 10, overflow: "hidden" }}>
+                    <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
+                          {["#", "Item", "Qty", "Rate", "Amount", ""].map((h, i) => (
+                            <th key={i} style={{ padding: "10px 14px", textAlign: i >= 2 && i <= 4 ? "center" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.5, width: i === 0 ? 36 : i === 2 ? 90 : i === 3 ? 120 : i === 4 ? 120 : i === 5 ? 36 : "auto" }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((r, i) => (
+                          <tr key={i} style={{ borderBottom: `1px solid ${BORDER}` }}>
+                            <td style={{ padding: "8px 14px", color: MUTED, fontSize: 12, fontWeight: 600 }}>{i + 1}</td>
+                            <td style={{ padding: "8px 10px" }}>
+                              <select value={r.itemId} onChange={e => {
+                                const it = items.find(x => x.id === e.target.value);
+                                if (!it) return;
+                                const copy = [...rows];
+                                copy[i] = { ...copy[i], itemId: it.id, name: it.name, desc: it.description || "", rate: String(it.rate || it.purchasePrice || "") };
+                                if (i === copy.length - 1) copy.push({ itemId: "", name: "", desc: "", qty: "", rate: "" });
+                                setRows(copy);
+                              }} style={{ ...inp({ padding: "7px 10px" }), colorScheme: "dark" }}>
+                                <option value="">Select Item</option>
+                                {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
+                              </select>
+                            </td>
+                            <td style={{ padding: "8px 6px" }}>
+                              <input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={{ ...inp({ padding: "7px 8px", textAlign: "center" }) }} />
+                            </td>
+                            <td style={{ padding: "8px 6px" }}>
+                              <input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={{ ...inp({ padding: "7px 8px", textAlign: "right" }) }} />
+                            </td>
+                            <td style={{ padding: "8px 14px", textAlign: "right", fontWeight: 700, fontSize: 13, color: r.qty && r.rate ? TEXT : MUTED }}>
+                              {r.qty && r.rate ? (Number(r.qty) * Number(r.rate)).toLocaleString() : "—"}
+                            </td>
+                            <td style={{ padding: "8px 8px", textAlign: "center" }}>
+                              <button onClick={() => removeRow(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    </div>
+                    <div style={{ padding: "8px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "flex-end" }}>
+                      <div style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => r.itemId && r.qty).length} items filled</div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Freight + Remarks + Total */}

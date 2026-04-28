@@ -140,9 +140,13 @@ export default function CRVPage() {
   }, []);
 
   function setEntryField(id: number, field: keyof EntryRow, val: string) {
-    setEntries(prev => prev.map(e => e.id === id ? { ...e, [field]: val } : e));
+    setEntries(prev => {
+      const next = prev.map(e => e.id === id ? { ...e, [field]: val } : e);
+      const idx = next.findIndex(e => e.id === id);
+      if (idx === next.length - 1 && val !== "") next.push(newRow());
+      return next;
+    });
   }
-  function addRow() { setEntries(prev => [...prev, newRow()]); }
   function removeRow(id: number) { setEntries(prev => prev.length > 1 ? prev.filter(e => e.id !== id) : prev); }
   function selectAccount(rowId: number, acc: Account) {
     setEntries(prev => prev.map(e => e.id === rowId ? { ...e, accountId: acc.id, accountName: acc.name } : e));
@@ -223,90 +227,97 @@ export default function CRVPage() {
           </div>
         </div>
 
-        {/* Entry table */}
-        <div style={{ border:"1px solid rgba(255,255,255,.08)", borderRadius:10, overflow:"hidden", marginBottom:14 }}>
-          <table style={{ width:"100%", borderCollapse:"collapse" }}>
-            <thead>
-              <tr style={{ background:"rgba(255,255,255,.04)", borderBottom:"1px solid rgba(255,255,255,.08)" }}>
-                <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left", width:32 }}>#</th>
-                <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Account / Party</th>
-                <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Narration</th>
-                <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"right", width:130 }}>Amount</th>
-                <th style={{ padding:"9px 12px", width:80 }}></th>
-              </tr>
-            </thead>
-            <tbody>
+        {/* Entry rows */}
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 10 }}>new row appears automatically when you fill in the last entry</div>
+          {isMobile ? (
+            <div>
               {entries.map((row, i) => {
-                const filtered = accounts.filter(a =>
-                  !search[row.id] || a.name.toLowerCase().includes((search[row.id]||"").toLowerCase())
-                );
+                const filtered = accounts.filter(a => !search[row.id] || a.name.toLowerCase().includes((search[row.id]||"").toLowerCase()));
                 return (
-                  <tr key={row.id} style={{ borderBottom:"1px solid rgba(255,255,255,.05)" }}>
-                    <td style={{ padding:"8px 12px", fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:600 }}>{i + 1}</td>
-
-                    {/* Account search */}
-                    <td style={{ padding:"6px 8px", position:"relative" }}>
-                      <input
-                        value={row.accountId ? row.accountName : (search[row.id] || "")}
-                        placeholder="Type account name…"
-                        style={{ ...inp, fontSize:12 }}
-                        onChange={e => {
-                          setSearch(prev => ({ ...prev, [row.id]: e.target.value }));
-                          setEntryField(row.id, "accountId", "");
-                          setEntryField(row.id, "accountName", "");
-                          setDropOpen(prev => ({ ...prev, [row.id]: true }));
-                        }}
-                        onFocus={() => setDropOpen(prev => ({ ...prev, [row.id]: true }))}
-                        onBlur={() => setTimeout(() => setDropOpen(prev => ({ ...prev, [row.id]: false })), 180)}
+                  <div key={row.id} style={{ border:"1px solid rgba(255,255,255,.1)", borderRadius:10, padding:"12px 14px", marginBottom:10, background:"rgba(255,255,255,.02)" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                      <span style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase" }}>Entry {i+1}</span>
+                      <button onClick={() => removeRow(row.id)} style={{ padding:"3px 8px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:12, cursor:"pointer", fontFamily:ff }}>✕</button>
+                    </div>
+                    <div style={{ position:"relative", marginBottom:8 }}>
+                      <input value={row.accountId ? row.accountName : (search[row.id]||"")} placeholder="Type account name…" style={{ ...inp, fontSize:12 }}
+                        onChange={e => { setSearch(p=>({...p,[row.id]:e.target.value})); setEntryField(row.id,"accountId",""); setEntryField(row.id,"accountName",""); setDropOpen(p=>({...p,[row.id]:true})); }}
+                        onFocus={() => setDropOpen(p=>({...p,[row.id]:true}))}
+                        onBlur={() => setTimeout(()=>setDropOpen(p=>({...p,[row.id]:false})),180)}
                       />
                       {dropOpen[row.id] && filtered.length > 0 && (
-                        <div style={{ position:"absolute", top:"calc(100% + 2px)", left:8, right:8, background:"#0e1120", border:"1px solid rgba(255,255,255,.12)", borderRadius:9, zIndex:100, maxHeight:200, overflowY:"auto", boxShadow:"0 8px 30px rgba(0,0,0,.5)" }}>
-                          {filtered.slice(0, 20).map(a => (
-                            <div key={a.id} onMouseDown={() => selectAccount(row.id, a)}
-                              style={{ padding:"8px 12px", fontSize:12, cursor:"pointer", color:"rgba(255,255,255,.75)" }}
-                              onMouseEnter={e => (e.currentTarget.style.background="rgba(34,197,94,.1)")}
-                              onMouseLeave={e => (e.currentTarget.style.background="transparent")}
-                            >
-                              <span style={{ color:"rgba(255,255,255,.35)", fontSize:11, marginRight:8 }}>{a.code}</span>
-                              {a.name}
+                        <div style={{ position:"absolute", top:"calc(100% + 2px)", left:0, right:0, background:"#0e1120", border:"1px solid rgba(255,255,255,.12)", borderRadius:9, zIndex:100, maxHeight:200, overflowY:"auto", boxShadow:"0 8px 30px rgba(0,0,0,.5)" }}>
+                          {filtered.slice(0,20).map(a=>(
+                            <div key={a.id} onMouseDown={()=>selectAccount(row.id,a)} style={{ padding:"8px 12px", fontSize:12, cursor:"pointer", color:"rgba(255,255,255,.75)" }} onMouseEnter={e=>(e.currentTarget.style.background="rgba(34,197,94,.1)")} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
+                              <span style={{ color:"rgba(255,255,255,.35)", fontSize:11, marginRight:8 }}>{a.code}</span>{a.name}
                             </div>
                           ))}
                         </div>
                       )}
-                    </td>
-
-                    <td style={{ padding:"6px 8px" }}>
-                      <input value={row.narration} onChange={e => setEntryField(row.id, "narration", e.target.value)} placeholder="Narration…" style={{ ...inp, fontSize:12 }} />
-                    </td>
-                    <td style={{ padding:"6px 8px" }}>
-                      <input value={row.amount} onChange={e => setEntryField(row.id, "amount", e.target.value)} placeholder="0.00" type="number" min="0" style={{ ...inp, fontSize:13, fontWeight:700, textAlign:"right", color:GREEN }} />
-                    </td>
-                    <td style={{ padding:"6px 8px", textAlign:"center" }}>
-                      <div style={{ display:"flex", gap:4, justifyContent:"center" }}>
-                        {/* Receipt preview button */}
-                        <button
-                          title="Party Receipt Preview"
-                          onClick={() => row.accountId && printReceipt(row, "NEW", date, mode, company)}
-                          disabled={!row.accountId || !Number(row.amount)}
-                          style={{ padding:"4px 8px", borderRadius:6, background:"rgba(34,197,94,.1)", border:"1px solid rgba(34,197,94,.25)", color:GREEN, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId || !Number(row.amount)) ? 0.3 : 1 }}
-                        >🧾</button>
-                        {/* Delete row */}
-                        <button onClick={() => removeRow(row.id)} style={{ padding:"4px 8px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:12, cursor:"pointer", fontFamily:ff }}>✕</button>
-                      </div>
-                    </td>
-                  </tr>
+                    </div>
+                    <input value={row.narration} onChange={e=>setEntryField(row.id,"narration",e.target.value)} placeholder="Narration…" style={{ ...inp, fontSize:12, marginBottom:8 }} />
+                    <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                      <input value={row.amount} onChange={e=>setEntryField(row.id,"amount",e.target.value)} placeholder="0.00" type="number" min="0" style={{ ...inp, flex:1, fontSize:14, fontWeight:700, textAlign:"right" as const, color:GREEN }} />
+                      <button title="Party Receipt" onClick={()=>row.accountId&&printReceipt(row,"NEW",date,mode,company)} disabled={!row.accountId||!Number(row.amount)} style={{ padding:"9px 12px", borderRadius:7, background:"rgba(34,197,94,.1)", border:"1px solid rgba(34,197,94,.25)", color:GREEN, fontSize:13, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId||!Number(row.amount))?0.3:1 }}>🧾</button>
+                    </div>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
+            </div>
+          ) : (
+            <div style={{ border:"1px solid rgba(255,255,255,.08)", borderRadius:10, overflow:"hidden" }}>
+              <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                <thead>
+                  <tr style={{ background:"rgba(255,255,255,.04)", borderBottom:"1px solid rgba(255,255,255,.08)" }}>
+                    <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left", width:32 }}>#</th>
+                    <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Account / Party</th>
+                    <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Narration</th>
+                    <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"right", width:130 }}>Amount</th>
+                    <th style={{ padding:"9px 12px", width:80 }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {entries.map((row, i) => {
+                    const filtered = accounts.filter(a => !search[row.id] || a.name.toLowerCase().includes((search[row.id]||"").toLowerCase()));
+                    return (
+                      <tr key={row.id} style={{ borderBottom:"1px solid rgba(255,255,255,.05)" }}>
+                        <td style={{ padding:"8px 12px", fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:600 }}>{i + 1}</td>
+                        <td style={{ padding:"6px 8px", position:"relative" }}>
+                          <input value={row.accountId ? row.accountName : (search[row.id]||"")} placeholder="Type account name…" style={{ ...inp, fontSize:12 }}
+                            onChange={e => { setSearch(p=>({...p,[row.id]:e.target.value})); setEntryField(row.id,"accountId",""); setEntryField(row.id,"accountName",""); setDropOpen(p=>({...p,[row.id]:true})); }}
+                            onFocus={() => setDropOpen(p=>({...p,[row.id]:true}))}
+                            onBlur={() => setTimeout(()=>setDropOpen(p=>({...p,[row.id]:false})),180)}
+                          />
+                          {dropOpen[row.id] && filtered.length > 0 && (
+                            <div style={{ position:"absolute", top:"calc(100% + 2px)", left:8, right:8, background:"#0e1120", border:"1px solid rgba(255,255,255,.12)", borderRadius:9, zIndex:100, maxHeight:200, overflowY:"auto", boxShadow:"0 8px 30px rgba(0,0,0,.5)" }}>
+                              {filtered.slice(0,20).map(a=>(
+                                <div key={a.id} onMouseDown={()=>selectAccount(row.id,a)} style={{ padding:"8px 12px", fontSize:12, cursor:"pointer", color:"rgba(255,255,255,.75)" }} onMouseEnter={e=>(e.currentTarget.style.background="rgba(34,197,94,.1)")} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
+                                  <span style={{ color:"rgba(255,255,255,.35)", fontSize:11, marginRight:8 }}>{a.code}</span>{a.name}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ padding:"6px 8px" }}><input value={row.narration} onChange={e=>setEntryField(row.id,"narration",e.target.value)} placeholder="Narration…" style={{ ...inp, fontSize:12 }} /></td>
+                        <td style={{ padding:"6px 8px" }}><input value={row.amount} onChange={e=>setEntryField(row.id,"amount",e.target.value)} placeholder="0.00" type="number" min="0" style={{ ...inp, fontSize:13, fontWeight:700, textAlign:"right" as const, color:GREEN }} /></td>
+                        <td style={{ padding:"6px 8px", textAlign:"center" }}>
+                          <div style={{ display:"flex", gap:4, justifyContent:"center" }}>
+                            <button title="Party Receipt Preview" onClick={()=>row.accountId&&printReceipt(row,"NEW",date,mode,company)} disabled={!row.accountId||!Number(row.amount)} style={{ padding:"4px 8px", borderRadius:6, background:"rgba(34,197,94,.1)", border:"1px solid rgba(34,197,94,.25)", color:GREEN, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId||!Number(row.amount))?0.3:1 }}>🧾</button>
+                            <button onClick={()=>removeRow(row.id)} style={{ padding:"4px 8px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:12, cursor:"pointer", fontFamily:ff }}>✕</button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
-        {/* Add row + total + buttons */}
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
-          <button onClick={addRow} style={{ padding:"8px 18px", borderRadius:8, background:"rgba(34,197,94,.08)", border:"1px solid rgba(34,197,94,.2)", color:GREEN, fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff }}>
-            + Add Row
-          </button>
-
+        {/* Total + buttons */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", flexWrap:"wrap", gap:12 }}>
           <div style={{ display:"flex", alignItems:"center", gap:16 }}>
             <div style={{ textAlign:"right" }}>
               <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Total Amount</div>

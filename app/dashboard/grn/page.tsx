@@ -299,64 +299,86 @@ export default function GRNPage() {
               </div>
 
               {/* Items Table */}
-              <div style={{ border: `1px solid ${BORDER}`, borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
-                <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 920 }}>
-                  <thead>
-                    <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
-                      {[["#","left",36],["Item","left","auto"],["Ordered Qty","center",110],["Received Qty","center",110],["Rate","right",110],["Amount","right",120],["Note","left",140],["","center",36]].map(([h,a,w]) => (
-                        <th key={h as string} style={{ padding: "10px 12px", textAlign: a as any, color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: 0.5, width: w as any }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 11, color: MUTED, marginBottom: 10 }}>new row appears automatically</div>
+                {isMobile ? (
+                  <div>
                     {rows.map((row, idx) => {
                       const amt = (Number(row.receivedQty) || 0) * (Number(row.rate) || 0);
                       const isShort = row.orderedQty && row.receivedQty && Number(row.receivedQty) < Number(row.orderedQty);
                       return (
-                        <tr key={idx} style={{ borderBottom: `1px solid ${BORDER}` }}>
-                          <td style={{ padding: "7px 12px", color: MUTED, fontSize: 12, fontWeight: 600 }}>{idx + 1}</td>
-                          <td style={{ padding: "7px 8px" }}>
-                            <select value={row.itemId} onChange={e => updateRow(idx, "itemId", e.target.value)} style={{ ...inp({ padding: "7px 10px" }), colorScheme: "dark" }}>
-                              <option value="">Select Item</option>
-                              {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
-                            </select>
-                          </td>
-                          <td style={{ padding: "7px 6px" }}>
-                            <input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0"
-                              style={{ ...inp({ padding: "7px 8px", textAlign: "center", color: MUTED }) }} />
-                          </td>
-                          <td style={{ padding: "7px 6px" }}>
-                            <input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0"
-                              style={{ ...inp({ padding: "7px 8px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 }) }} />
-                          </td>
-                          <td style={{ padding: "7px 6px" }}>
-                            <input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00"
-                              style={{ ...inp({ padding: "7px 8px", textAlign: "right" }) }} />
-                          </td>
-                          <td style={{ padding: "7px 12px", textAlign: "right", fontWeight: 700, color: amt > 0 ? TEXT : MUTED }}>
-                            {amt > 0 ? amt.toLocaleString() : "—"}
-                          </td>
-                          <td style={{ padding: "7px 6px" }}>
-                            <input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..."
-                              style={{ ...inp({ padding: "7px 8px", fontSize: 12 }) }} />
-                          </td>
-                          <td style={{ padding: "7px 8px", textAlign: "center" }}>
-                            <button onClick={() => setRows(rows.filter((_, i) => i !== idx))} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button>
-                          </td>
-                        </tr>
+                        <div key={idx} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" }}>Item {idx + 1}</span>
+                            <button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: rows.length === 1 ? "not-allowed" : "pointer", color: "#f87171", fontSize: 18, lineHeight: 1, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button>
+                          </div>
+                          <select value={row.itemId} onChange={e => updateRow(idx, "itemId", e.target.value)} style={{ ...inp({ padding: "9px 13px", marginBottom: 8 }), colorScheme: "dark", width: "100%" }}>
+                            <option value="">— Select Item —</option>
+                            {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
+                          </select>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
+                            <div>
+                              <div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Ordered</div>
+                              <input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: MUTED })} />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 10, fontWeight: 700, marginBottom: 4, textTransform: "uppercase", color: isShort ? "#fbbf24" : "#34d399" }}>Received</div>
+                              <input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Rate</div>
+                              <input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00" style={inp({ textAlign: "right" })} />
+                            </div>
+                          </div>
+                          <input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..." style={inp({ fontSize: 12, marginBottom: 4 })} />
+                          {amt > 0 && <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 4, color: ACCENT }}>= {amt.toLocaleString()}</div>}
+                        </div>
                       );
                     })}
-                  </tbody>
-                </table>
-                </div>
-                <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-                    <span style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => r.itemId && r.receivedQty).length} items filled · new row auto-adds</span>
-                    <div style={{ background: "rgba(99,102,241,0.1)", border: `1px solid rgba(99,102,241,0.2)`, borderRadius: 8, padding: "8px 18px", textAlign: "right" }}>
-                      <span style={{ fontSize: 11, color: MUTED, marginRight: 10, fontWeight: 600 }}>TOTAL</span>
-                      <span style={{ fontSize: 18, fontWeight: 800, color: ACCENT }}>{totalAmt.toLocaleString()}</span>
+                  </div>
+                ) : (
+                  <div style={{ border: `1px solid ${BORDER}`, borderRadius: 10, overflow: "hidden" }}>
+                    <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ background: "rgba(99,102,241,0.07)", borderBottom: `1px solid ${BORDER}` }}>
+                          {[["#","left",36],["Item","left","auto"],["Ordered","center",100],["Received","center",100],["Rate","right",100],["Amount","right",110],["Note","left",140],["","center",36]].map(([h,a,w]) => (
+                            <th key={h as string} style={{ padding: "10px 12px", textAlign: a as any, color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: 0.5, width: w as any }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((row, idx) => {
+                          const amt = (Number(row.receivedQty) || 0) * (Number(row.rate) || 0);
+                          const isShort = row.orderedQty && row.receivedQty && Number(row.receivedQty) < Number(row.orderedQty);
+                          return (
+                            <tr key={idx} style={{ borderBottom: `1px solid ${BORDER}` }}>
+                              <td style={{ padding: "7px 12px", color: MUTED, fontSize: 12, fontWeight: 600 }}>{idx + 1}</td>
+                              <td style={{ padding: "7px 8px" }}>
+                                <select value={row.itemId} onChange={e => updateRow(idx, "itemId", e.target.value)} style={{ ...inp({ padding: "7px 10px" }), colorScheme: "dark" }}>
+                                  <option value="">Select Item</option>
+                                  {allItems.map((it: any) => <option key={it.id} value={it.id}>{it.name}</option>)}
+                                </select>
+                              </td>
+                              <td style={{ padding: "7px 6px" }}><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={{ ...inp({ padding: "7px 8px", textAlign: "center", color: MUTED }) }} /></td>
+                              <td style={{ padding: "7px 6px" }}><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={{ ...inp({ padding: "7px 8px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 }) }} /></td>
+                              <td style={{ padding: "7px 6px" }}><input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00" style={{ ...inp({ padding: "7px 8px", textAlign: "right" }) }} /></td>
+                              <td style={{ padding: "7px 12px", textAlign: "right", fontWeight: 700, color: amt > 0 ? TEXT : MUTED }}>{amt > 0 ? amt.toLocaleString() : "—"}</td>
+                              <td style={{ padding: "7px 6px" }}><input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..." style={{ ...inp({ padding: "7px 8px", fontSize: 12 }) }} /></td>
+                              <td style={{ padding: "7px 8px", textAlign: "center" }}><button onClick={() => setRows(rows.filter((_, i) => i !== idx))} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button></td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                     </div>
+                    <div style={{ padding: "10px 14px", borderTop: `1px solid ${BORDER}`, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                        <span style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => r.itemId && r.receivedQty).length} items filled</span>
+                        <div style={{ background: "rgba(99,102,241,0.1)", border: `1px solid rgba(99,102,241,0.2)`, borderRadius: 8, padding: "8px 18px", textAlign: "right" }}>
+                          <span style={{ fontSize: 11, color: MUTED, marginRight: 10, fontWeight: 600 }}>TOTAL</span>
+                          <span style={{ fontSize: 18, fontWeight: 800, color: ACCENT }}>{totalAmt.toLocaleString()}</span>
+                        </div>
                   </div>
                 </div>
               </div>
