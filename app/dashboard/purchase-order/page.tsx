@@ -61,9 +61,15 @@ export default function PurchaseOrderPage() {
   const [supplierName, setSupplierName] = useState("");
   const [date, setDate] = useState(today);
   const [remarks, setRemarks] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [paymentTerms, setPaymentTerms] = useState("");
+  const [notes, setNotes] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [discountType, setDiscountType] = useState("flat");
   const [freight, setFreight] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("PENDING");
-  const [rows, setRows] = useState([{ itemId: "", name: "", desc: "", qty: "", rate: "" }]);
+  const emptyRow = () => ({ itemId: "", name: "", desc: "", qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "" });
+  const [rows, setRows] = useState([emptyRow()]);
   const [saving, setSaving] = useState(false);
   // "none" | "a4" | "58mm"
   const [printMode, setPrintMode] = useState<"none" | "a4" | "58mm">("none");
@@ -127,15 +133,15 @@ export default function PurchaseOrderPage() {
 
   function updateRow(i: number, key: string, val: any) {
     const copy = [...rows]; (copy[i] as any)[key] = val;
-    if (i === copy.length - 1 && val !== "" && val != null)
-      copy.push({ itemId: "", name: "", desc: "", qty: "", rate: "" });
+    if (i === copy.length - 1 && val !== "" && val != null) copy.push(emptyRow());
     setRows(copy);
   }
   function removeRow(i: number) { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }
 
   const subTotal = rows.reduce((s, r) => s + (r.qty && r.rate ? Number(r.qty) * Number(r.rate) : 0), 0);
+  const discountAmt = discountType === "percent" ? subTotal * Number(discount) / 100 : Number(discount) || 0;
   const freightAmt = Number(freight) || 0;
-  const grandTotal = subTotal + freightAmt;
+  const grandTotal = subTotal - discountAmt + freightAmt;
   const cur = companyInfo?.baseCurrency || "Rs.";
 
   async function savePO() {
@@ -145,8 +151,8 @@ export default function PurchaseOrderPage() {
     try {
       const method = editing ? "PUT" : "POST";
       const body = editing
-        ? { id: editing.id, poNo, supplierId, date, remarks, approvalStatus, items: clean }
-        : { poNo, supplierId, date, remarks, approvalStatus, items: clean };
+        ? { id: editing.id, poNo, supplierId, date, dueDate: dueDate || null, remarks, notes: notes || null, approvalStatus, paymentTerms: paymentTerms || null, discount: Number(discount) || 0, discountType, freight: Number(freight) || 0, items: clean.map((r: any) => ({ ...r, discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0 })) }
+        : { poNo, supplierId, date, dueDate: dueDate || null, remarks, notes: notes || null, approvalStatus, paymentTerms: paymentTerms || null, discount: Number(discount) || 0, discountType, freight: Number(freight) || 0, items: clean.map((r: any) => ({ ...r, discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0 })) };
       const res = await fetch("/api/purchase-order", {
         method, headers: { "Content-Type": "application/json", "x-user-role": user?.role || "ADMIN" },
         body: JSON.stringify(body),
@@ -160,10 +166,13 @@ export default function PurchaseOrderPage() {
   }
 
   function startEdit(po: PO) {
+    const po2 = po as any;
     setEditing(po); setPoNo(po.poNo); setSupplierId(po.supplierId);
     setSupplierName(po.supplier?.name || ""); setDate(new Date(po.date).toISOString().slice(0, 10));
-    setRemarks(po.remarks || ""); setApprovalStatus(po.approvalStatus || "PENDING");
-    setRows(po.items.map((it: any) => ({ itemId: it.itemId || "", name: it.item?.name || "", desc: it.item?.description || "", qty: it.qty.toString(), rate: it.rate.toString() })));
+    setDueDate(po2.dueDate ? new Date(po2.dueDate).toISOString().slice(0, 10) : "");
+    setRemarks(po.remarks || ""); setNotes(po2.notes || ""); setApprovalStatus(po.approvalStatus || "PENDING");
+    setPaymentTerms(po2.paymentTerms || ""); setDiscount(po2.discount ?? ""); setDiscountType(po2.discountType || "flat"); setFreight(po2.freight ?? "");
+    setRows(po.items.map((it: any) => ({ itemId: it.itemId || it.item?.id || "", name: it.item?.name || "", desc: it.item?.description || "", qty: it.qty.toString(), rate: it.rate.toString(), discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "", unit: it.item?.unit || "", sku: it.item?.code || "" })));
     setShowForm(true); setShowList(false); setPreview(false); setPrintMode("none");
   }
 
@@ -194,8 +203,8 @@ export default function PurchaseOrderPage() {
 
   function resetForm() {
     setEditing(null); setPoNo(""); setSupplierId(""); setSupplierName("");
-    setDate(today); setRemarks(""); setFreight(""); setApprovalStatus("PENDING");
-    setRows([{ itemId: "", name: "", desc: "", qty: "", rate: "" }]);
+    setDate(today); setDueDate(""); setRemarks(""); setNotes(""); setFreight(""); setDiscount(""); setDiscountType("flat"); setPaymentTerms(""); setApprovalStatus("PENDING");
+    setRows([emptyRow()]);
     setPreview(false); setPrintMode("none");
   }
 

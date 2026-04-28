@@ -204,7 +204,7 @@ function SalesInvoiceContent() {
       if (!scanCode) return;
       const found = items.find(i => i.barcode === scanCode || i.id === scanCode);
       if (found) {
-        const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", availableQty: found.availableQty, qty: 1, rate: "" };
+        const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", availableQty: found.availableQty, qty: 1, rate: "", discountPercent: "", taxPercent: found.taxRate || "", unit: found.unit || "", sku: found.code || "" };
         const last = rows[rows.length - 1];
         if (!last.itemId) { const r = [...rows]; r[rows.length - 1] = newRow; setRows(r); } else setRows([...rows, newRow]);
         toast.success(`Added ${found.name}`); setScanCode("");
@@ -273,10 +273,15 @@ function SalesInvoiceContent() {
   }
 
   function startEdit(inv: SalesInvoice) {
+    const inv2 = inv as any;
     setEditing(inv); setInvoiceNo(inv.invoiceNo); setCustomerId(inv.customerId);
     setCustomerName(inv.customer?.name || ""); setDate(new Date(inv.date).toISOString().slice(0, 10));
+    setDueDate(inv2.dueDate ? new Date(inv2.dueDate).toISOString().slice(0, 10) : "");
     setDriverName(inv.driverName || ""); setVehicleNo(inv.vehicleNo || ""); setSalesmanId(inv.salesmanId || "");
-    setRows(inv.items.map((it: any) => ({ itemId: it.itemId || "", name: it.item?.name || "", description: it.item?.description || "", availableQty: it.qty || 0, qty: it.qty.toString(), rate: it.rate.toString() })));
+    setDiscount(inv2.discount ?? ""); setDiscountType(inv2.discountType || "flat"); setFreight(inv2.freight ?? "");
+    setNotes(inv2.notes || ""); setTermsConditions(inv2.termsConditions || ""); setReference(inv2.reference || "");
+    setPaymentMethod(inv2.paymentMethod || ""); setPaymentTerms(inv2.paymentTerms || "");
+    setRows(inv.items.map((it: any) => ({ itemId: it.itemId || it.item?.id || "", name: it.item?.name || "", description: it.item?.description || "", availableQty: it.qty || 0, qty: it.qty.toString(), rate: it.rate.toString(), discountPercent: it.discountPercent ?? "", taxPercent: it.taxPercent ?? "", unit: it.item?.unit || "", sku: it.item?.code || "" })));
     setShowForm(true); setShowList(false);
   }
 
@@ -288,9 +293,9 @@ function SalesInvoiceContent() {
 
   function resetForm() {
     setEditing(null); setCustomerId(""); setCustomerName(""); setLinkedSoId(""); setLinkedSoNo("");
-    setDate(today); setLocation("MAIN"); setDriverName(""); setVehicleNo(""); setFreight("");
-    setDiscount(""); setNotes("");
-    setRows([{ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]);
+    setDate(today); setDueDate(""); setLocation("MAIN"); setDriverName(""); setVehicleNo(""); setFreight("");
+    setDiscount(""); setNotes(""); setTermsConditions(""); setReference(""); setPaymentMethod(""); setPaymentTerms("");
+    setRows([emptyRow()]);
     setApplyTax(false); setSelectedTaxId(""); setPreview(false); setSavedInvoice(null);
   }
 
@@ -314,11 +319,12 @@ function SalesInvoiceContent() {
   }
 
   // ── Styles ──
-  const panelStyle: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
-  const inputStyle: React.CSSProperties = { width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
-  const labelStyle: React.CSSProperties = { fontSize: 12, color: "var(--text-muted)", fontWeight: 600, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
+  const panelStyle: React.CSSProperties = { background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
+  const inputStyle: React.CSSProperties = { width: "100%", background: "var(--input-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
+  const labelStyle: React.CSSProperties = { fontSize: 11, color: "var(--text-muted)", fontWeight: 600, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.5 };
   const btnPrimary: React.CSSProperties = { background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 14, fontWeight: 600, cursor: "pointer" };
   const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 14, cursor: "pointer" };
+  const selectedCustomer = customers.find(c => c.id === customerId);
 
   if (!canCreate) return <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontFamily: ff }}>Access Denied</div>;
   if (loading) return <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontFamily: ff }}>Loading…</div>;
@@ -433,209 +439,295 @@ function SalesInvoiceContent() {
 
             {/* ── Entry Form ── */}
             {!preview && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                {/* Row 1: Invoice No, Customer, Date */}
-                <div style={{ ...panelStyle }}>
-                  <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 16, fontWeight: 600 }}>
-                    Keyboard: <strong style={{ color: accent }}>F7</strong> = Clear Customer/Date &nbsp;|&nbsp; <strong style={{ color: accent }}>F8</strong> = Search Customer
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
-                    <div>
-                      <label style={labelStyle}>Invoice No</label>
-                      <input style={{ ...inputStyle, background: "rgba(255,255,255,0.02)", color: "var(--text-muted)" }} value={invoiceNo} readOnly />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Customer *</label>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: 20, alignItems: "start" }}>
+
+                {/* LEFT COLUMN */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+
+                  {/* Customer + Business Details */}
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
+                    <div style={panelStyle}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Customer Details</div>
                       <select style={inputStyle} value={customerId} onChange={e => { setCustomerId(e.target.value); setCustomerName(customers.find(c => c.id === e.target.value)?.name || ""); }}>
                         <option value="">— Select Customer —</option>
                         {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </select>
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Date</label>
-                      <DateInput value={date} onChange={setDate} style={inputStyle} />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Currency</label>
-                      <select style={inputStyle} value={currencyId} onChange={e => { const id = e.target.value; setCurrencyId(id); const cur = currencies.find(c => c.id === id); if (cur) setExchangeRate(cur.exchangeRate || 1); }}>
-                        <option value="">Base Currency</option>
-                        {currencies.map(c => <option key={c.id} value={c.id}>{c.code} — {c.name}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Location</label>
-                      <select style={inputStyle} value={location} onChange={e => setLocation(e.target.value)}>
-                        <option value="MAIN">Main</option>
-                        <option value="SHOP">Shop</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Salesman</label>
-                      <select style={inputStyle} value={salesmanId} onChange={e => setSalesmanId(e.target.value)}>
-                        <option value="">— None —</option>
-                        {teamMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Driver Name</label>
-                      <input style={inputStyle} value={driverName} onChange={e => setDriverName(e.target.value)} placeholder="Optional" />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Vehicle No</label>
-                      <input style={inputStyle} value={vehicleNo} onChange={e => setVehicleNo(e.target.value)} placeholder="Optional" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Barcode Scanner */}
-                <div
-                  onClick={() => setScanActive(true)}
-                  style={{ ...panelStyle, display: "flex", alignItems: "center", gap: 16, cursor: "pointer",
-                    background: scanActive ? "rgba(99,102,241,0.12)" : "rgba(99,102,241,0.05)",
-                    border: scanActive ? "1.5px solid rgba(99,102,241,0.55)" : "1px dashed rgba(99,102,241,0.25)",
-                  }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="14"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="10" x2="14" y2="14"/><line x1="18" y1="9" x2="18" y2="15"/></svg>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 6 }}>Scan Barcode / SKU to Add Item</div>
-                    <input value={scanCode} onChange={e => setScanCode(e.target.value)} onKeyDown={handleScan} onFocus={() => setScanActive(true)} onBlur={() => setScanActive(false)}
-                      placeholder="Click here and scan barcode or type SKU…"
-                      style={{ width: "100%", padding: "9px 14px", borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(99,102,241,0.3)", color: "white", fontSize: 14, fontFamily: "monospace", outline: "none" }} />
-                  </div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", textAlign: "center", lineHeight: 1.6, flexShrink: 0 }}>Press<br/><span style={{ color: "#a5b4fc", fontWeight: 700 }}>Enter</span><br/>to add</div>
-                </div>
-
-                {/* Items Table */}
-                <div style={panelStyle}>
-                  <div style={{ marginBottom: 14 }}>
-                    <span style={{ fontSize: 14, fontWeight: 700 }}>Line Items</span>
-                    <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 10 }}>new row appears automatically</span>
-                  </div>
-                  {isMobile ? (
-                    <div>
-                      {rows.map((r, i) => (
-                        <div key={i} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", marginBottom: 10, background: "rgba(255,255,255,0.02)" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {i + 1}</span>
-                            <button style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
-                          </div>
-                          <select style={{ ...inputStyle, marginBottom: 8 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
-                            <option value="">— Select Item —</option>
-                            {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
-                          </select>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                            <div>
-                              <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Qty</div>
-                              <input type="number" style={{ ...inputStyle, textAlign: "right" }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
+                      {selectedCustomer && (
+                        <div style={{ marginTop: 10, padding: "10px 12px", background: "var(--panel-bg)", borderRadius: 8, border: "1px solid var(--border)" }}>
+                          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 5 }}>{selectedCustomer.name}</div>
+                          {(selectedCustomer.email || selectedCustomer.phone) && (
+                            <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 3, display: "flex", gap: 12, flexWrap: "wrap" }}>
+                              {selectedCustomer.email && <span>{selectedCustomer.email}</span>}
+                              {selectedCustomer.phone && <span>{selectedCustomer.phone}</span>}
                             </div>
-                            <div>
-                              <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Rate</div>
-                              <input type="number" style={{ ...inputStyle, textAlign: "right" }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" />
+                          )}
+                          {selectedCustomer.address && <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 3 }}>{selectedCustomer.address}{selectedCustomer.city ? `, ${selectedCustomer.city}` : ""}</div>}
+                          {(selectedCustomer.ntn || selectedCustomer.strn) && (
+                            <div style={{ fontSize: 11, color: "var(--text-muted)", display: "flex", gap: 12 }}>
+                              {selectedCustomer.ntn && <span>NTN: {selectedCustomer.ntn}</span>}
+                              {selectedCustomer.strn && <span>STRN: {selectedCustomer.strn}</span>}
                             </div>
-                          </div>
-                          {(Number(r.qty) > 0 || Number(r.rate) > 0) && (
-                            <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 8, color: accent }}>= {fmt(Number(r.qty) * Number(r.rate) || 0)}</div>
                           )}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  ) : (
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                          {["Item", "Qty", "Rate", "Amount", ""].map(h => (
-                            <th key={h} style={{ padding: "8px 10px", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5, textAlign: h === "Amount" ? "right" : "left" }}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {rows.map((r, i) => (
-                          <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
-                            <td style={{ padding: "8px 10px", minWidth: 180 }}>
-                              <select style={{ ...inputStyle, padding: "7px 10px" }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
+
+                    <div style={panelStyle}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Your Business Details</div>
+                      {companyInfo ? (
+                        <div style={{ padding: "10px 12px", background: "var(--panel-bg)", borderRadius: 8, border: "1px solid var(--border)" }}>
+                          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 5 }}>{companyInfo.name}</div>
+                          {companyInfo.address && <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 3 }}>{companyInfo.address}</div>}
+                          <div style={{ fontSize: 12, color: "var(--text-muted)", display: "flex", gap: 12, flexWrap: "wrap" }}>
+                            {companyInfo.phone && <span>Phone: {companyInfo.phone}</span>}
+                            {companyInfo.email && <span>{companyInfo.email}</span>}
+                          </div>
+                          {(companyInfo.ntn || companyInfo.gst) && (
+                            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3, display: "flex", gap: 12 }}>
+                              {companyInfo.ntn && <span>NTN: {companyInfo.ntn}</span>}
+                              {companyInfo.gst && <span>GST: {companyInfo.gst}</span>}
+                            </div>
+                          )}
+                        </div>
+                      ) : <div style={{ fontSize: 13, color: "var(--text-muted)" }}>Loading…</div>}
+                    </div>
+                  </div>
+
+                  {/* Barcode Scanner */}
+                  <div onClick={() => setScanActive(true)} style={{ ...panelStyle, display: "flex", alignItems: "center", gap: 14, cursor: "pointer", background: scanActive ? "var(--accent-soft)" : "var(--panel-bg)", border: `1px ${scanActive ? "solid" : "dashed"} ${scanActive ? "var(--accent)" : "var(--border)"}` }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="14"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="10" x2="14" y2="14"/><line x1="18" y1="9" x2="18" y2="15"/></svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 4 }}>Scan Barcode / SKU</div>
+                      <input value={scanCode} onChange={e => setScanCode(e.target.value)} onKeyDown={handleScan} onFocus={() => setScanActive(true)} onBlur={() => setScanActive(false)}
+                        placeholder="Click here and scan barcode or type SKU…"
+                        style={{ width: "100%", padding: "7px 12px", borderRadius: 8, background: "var(--input-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 13, fontFamily: "monospace", outline: "none" }} />
+                    </div>
+                  </div>
+
+                  {/* Items Table */}
+                  <div style={panelStyle}>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14 }}>Invoice Items</div>
+                    {isMobile ? (
+                      <div>
+                        {rows.map((r, i) => {
+                          const lineBase = (Number(r.qty) * Number(r.rate)) || 0;
+                          const lineDisc = lineBase * (Number(r.discountPercent) || 0) / 100;
+                          const lineTaxable = lineBase - lineDisc;
+                          const lineTax = lineTaxable * (Number(r.taxPercent) || 0) / 100;
+                          return (
+                            <div key={i} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: 12, marginBottom: 10, background: "var(--panel-bg)" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {i + 1}</span>
+                                <button style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 18, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
+                              </div>
+                              <select style={{ ...inputStyle, marginBottom: 8 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
                                 <option value="">— Select Item —</option>
                                 {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
                               </select>
-                            </td>
-                            <td style={{ padding: "8px 10px", width: 90 }}>
-                              <input type="number" style={{ ...inputStyle, padding: "7px 10px", textAlign: "right" }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
-                            </td>
-                            <td style={{ padding: "8px 10px", width: 110 }}>
-                              <input type="number" style={{ ...inputStyle, padding: "7px 10px", textAlign: "right" }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0" />
-                            </td>
-                            <td style={{ padding: "8px 10px", textAlign: "right", fontWeight: 600, fontSize: 14, width: 110 }}>
-                              {fmt(Number(r.qty) * Number(r.rate) || 0)}
-                            </td>
-                            <td style={{ padding: "8px 10px", width: 36 }}>
-                              <button style={{ background: "transparent", border: "none", color: "#f87171", cursor: "pointer", fontSize: 18, lineHeight: 1, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  )}
-
-                  {/* Totals */}
-                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
-                    <div style={{ width: isMobile ? "100%" : 300, display: "flex", flexDirection: "column", gap: 10 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
-                        <span style={{ color: "var(--text-muted)" }}>Subtotal</span>
-                        <span style={{ fontWeight: 600 }}>{fmt(subtotal)}</span>
+                              {r.sku && <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>SKU: {r.sku}{r.unit ? ` | Unit: ${r.unit}` : ""}</div>}
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                                {(["qty","rate","discountPercent","taxPercent"] as const).map(k => (
+                                  <div key={k}>
+                                    <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, marginBottom: 3, textTransform: "uppercase" }}>{k === "qty" ? "Qty" : k === "rate" ? "Unit Price" : k === "discountPercent" ? "Disc %" : "Tax %"}</div>
+                                    <input type="number" style={{ ...inputStyle, textAlign: "right" }} value={r[k]} onChange={e => updateRow(i, k, e.target.value)} placeholder="0" />
+                                  </div>
+                                ))}
+                              </div>
+                              {lineBase > 0 && <div style={{ textAlign: "right", fontWeight: 700, fontSize: 13, marginTop: 8, color: "var(--accent)" }}>Total: {fmt(lineTaxable + lineTax)}</div>}
+                            </div>
+                          );
+                        })}
                       </div>
+                    ) : (
+                      <div style={{ overflowX: "auto" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                          <thead>
+                            <tr style={{ borderBottom: "2px solid var(--border)" }}>
+                              {["#","Item / Description","SKU","Qty","Unit","Unit Price","Disc %","Tax %","Total",""].map((h,hi) => (
+                                <th key={h+hi} style={{ padding: "8px 7px", fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.4, textAlign: hi >= 3 && hi <= 8 ? "right" : "left", whiteSpace: "nowrap" }}>{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rows.map((r, i) => {
+                              const lineBase = (Number(r.qty) * Number(r.rate)) || 0;
+                              const lineDisc = lineBase * (Number(r.discountPercent) || 0) / 100;
+                              const lineTaxable = lineBase - lineDisc;
+                              const lineTax = lineTaxable * (Number(r.taxPercent) || 0) / 100;
+                              return (
+                                <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
+                                  <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 28 }}>{i + 1}</td>
+                                  <td style={{ padding: "6px 7px", minWidth: 150 }}>
+                                    <select style={{ ...inputStyle, padding: "5px 7px", fontSize: 13 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
+                                      <option value="">— Select —</option>
+                                      {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
+                                    </select>
+                                    {r.description && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
+                                  </td>
+                                  <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 72 }}>{r.sku || "—"}</td>
+                                  <td style={{ padding: "6px 7px", width: 68 }}>
+                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" />
+                                  </td>
+                                  <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 52 }}>{r.unit || "—"}</td>
+                                  <td style={{ padding: "6px 7px", width: 94 }}>
+                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" />
+                                  </td>
+                                  <td style={{ padding: "6px 7px", width: 66 }}>
+                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" />
+                                  </td>
+                                  <td style={{ padding: "6px 7px", width: 66 }}>
+                                    <input type="number" style={{ ...inputStyle, padding: "5px 7px", textAlign: "right", fontSize: 13 }} value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" />
+                                  </td>
+                                  <td style={{ padding: "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 94, whiteSpace: "nowrap" }}>{fmt(lineTaxable + lineTax)}</td>
+                                  <td style={{ padding: "6px 7px", width: 30 }}>
+                                    <button style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 17, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
 
-                      {/* Discount */}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 14 }}>
-                        <span style={{ color: "var(--text-muted)" }}>Discount</span>
-                        <div style={{ display: "flex", gap: 6 }}>
-                          <select style={{ ...inputStyle, width: 70, padding: "4px 8px", fontSize: 13 }} value={discountType} onChange={e => setDiscountType(e.target.value as "flat" | "percent")}>
-                            <option value="flat">Flat</option>
-                            <option value="percent">%</option>
+                  {/* Payment + Notes */}
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
+                    <div style={panelStyle}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Payment Details</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        <div><label style={labelStyle}>Payment Method</label>
+                          <select style={inputStyle} value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+                            <option value="">Select Method</option>
+                            <option value="CASH">Cash</option>
+                            <option value="BANK">Bank Transfer</option>
+                            <option value="CHEQUE">Cheque</option>
+                            <option value="CREDIT">Credit</option>
                           </select>
-                          <input type="number" style={{ ...inputStyle, width: 90, padding: "4px 8px", fontSize: 13, textAlign: "right" }} value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" />
+                        </div>
+                        <div><label style={labelStyle}>Payment Terms</label>
+                          <select style={inputStyle} value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)}>
+                            <option value="">Select Terms</option>
+                            <option value="Immediate">Immediate</option>
+                            <option value="Net 15">Net 15 Days</option>
+                            <option value="Net 30">Net 30 Days</option>
+                            <option value="Net 45">Net 45 Days</option>
+                            <option value="Net 60">Net 60 Days</option>
+                          </select>
+                        </div>
+                        <div><label style={labelStyle}>Driver Name</label><input style={inputStyle} value={driverName} onChange={e => setDriverName(e.target.value)} placeholder="Optional" /></div>
+                        <div><label style={labelStyle}>Vehicle No</label><input style={inputStyle} value={vehicleNo} onChange={e => setVehicleNo(e.target.value)} placeholder="Optional" /></div>
+                      </div>
+                    </div>
+                    <div style={panelStyle}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Notes & Terms</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        <div><label style={labelStyle}>Notes</label>
+                          <textarea style={{ ...inputStyle, minHeight: 68, resize: "vertical" }} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any notes…" />
+                        </div>
+                        <div><label style={labelStyle}>Terms & Conditions</label>
+                          <textarea style={{ ...inputStyle, minHeight: 68, resize: "vertical" }} value={termsConditions} onChange={e => setTermsConditions(e.target.value)} placeholder="1. Payment due within terms..." />
                         </div>
                       </div>
-                      {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#f87171" }}><span>Discount applied</span><span>— {fmt(discountAmt)}</span></div>}
+                    </div>
+                  </div>
+                </div>
 
-                      {/* Freight */}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 14 }}>
-                        <span style={{ color: "var(--text-muted)" }}>Freight</span>
-                        <input type="number" style={{ ...inputStyle, width: 110, padding: "4px 8px", fontSize: 13, textAlign: "right" }} value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" />
+                {/* RIGHT COLUMN */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 16, position: isMobile ? "static" : "sticky", top: 24 }}>
+
+                  {/* Invoice Header */}
+                  <div style={panelStyle}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Sales Invoice</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                      <div style={{ fontSize: 19, fontWeight: 800, fontFamily: "monospace" }}>{invoiceNo || "—"}</div>
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: "var(--accent-soft)", color: "var(--accent)", border: "1px solid var(--accent)" }}>DRAFT</span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        <div><label style={labelStyle}>Invoice Date</label><DateInput value={date} onChange={setDate} style={inputStyle} /></div>
+                        <div><label style={labelStyle}>Due Date</label><DateInput value={dueDate} onChange={setDueDate} style={inputStyle} /></div>
                       </div>
+                      <div><label style={labelStyle}>Currency</label>
+                        <select style={inputStyle} value={currencyId} onChange={e => { const cid = e.target.value; setCurrencyId(cid); const cur = currencies.find(c => c.id === cid); if (cur) setExchangeRate(cur.exchangeRate || 1); }}>
+                          <option value="">Base Currency</option>
+                          {currencies.map(c => <option key={c.id} value={c.id}>{c.code} — {c.name}</option>)}
+                        </select>
+                      </div>
+                      {currencyId && <div><label style={labelStyle}>Exchange Rate</label><input type="number" style={inputStyle} value={exchangeRate} onChange={e => setExchangeRate(Number(e.target.value))} /></div>}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        <div><label style={labelStyle}>Sales Person</label>
+                          <select style={inputStyle} value={salesmanId} onChange={e => setSalesmanId(e.target.value)}>
+                            <option value="">— None —</option>
+                            {teamMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                          </select>
+                        </div>
+                        <div><label style={labelStyle}>Reference</label><input style={inputStyle} value={reference} onChange={e => setReference(e.target.value)} placeholder="PO-2024-…" /></div>
+                      </div>
+                      <div><label style={labelStyle}>Location</label>
+                        <select style={inputStyle} value={location} onChange={e => setLocation(e.target.value)}>
+                          <option value="MAIN">Main</option>
+                          <option value="SHOP">Shop</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
 
-                      {/* Tax */}
-                      <div style={{ borderTop: "1px solid var(--border)", paddingTop: 10 }}>
-                        <button style={{ ...btnGhost, width: "100%", fontSize: 13, padding: "7px 12px", background: applyTax ? accent + "22" : "transparent", color: applyTax ? accent : "var(--text-muted)", borderColor: applyTax ? accent + "55" : "var(--border)" }}
+                  {/* Totals */}
+                  <div style={panelStyle}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                        <span style={{ color: "var(--text-muted)" }}>Subtotal</span><span>{fmt(subtotal)}</span>
+                      </div>
+                      {perItemDiscountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--danger)" }}><span>Item Discounts</span><span>— {fmt(perItemDiscountAmt)}</span></div>}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                        <span style={{ color: "var(--text-muted)" }}>Discount</span>
+                        <div style={{ display: "flex", gap: 5 }}>
+                          <select style={{ ...inputStyle, width: 58, padding: "3px 6px", fontSize: 12 }} value={discountType} onChange={e => setDiscountType(e.target.value as "flat" | "percent")}>
+                            <option value="flat">Flat</option><option value="percent">%</option>
+                          </select>
+                          <input type="number" style={{ ...inputStyle, width: 78, padding: "3px 7px", fontSize: 12, textAlign: "right" }} value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" />
+                        </div>
+                      </div>
+                      {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger)" }}><span>Discount Amount</span><span>— {fmt(discountAmt)}</span></div>}
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, borderTop: "1px solid var(--border)", paddingTop: 8 }}>
+                        <span style={{ color: "var(--text-muted)" }}>Taxable Amount</span><span>{fmt(taxableAmount)}</span>
+                      </div>
+                      {perItemTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--warning)" }}><span>Total Tax</span><span>{fmt(perItemTaxAmt)}</span></div>}
+                      <div style={{ borderTop: "1px solid var(--border)", paddingTop: 8 }}>
+                        <button style={{ ...btnGhost, width: "100%", fontSize: 12, padding: "5px 10px", background: applyTax ? "var(--accent-soft)" : "transparent", color: applyTax ? "var(--accent)" : "var(--text-muted)", borderColor: applyTax ? "var(--accent)" : "var(--border)" }}
                           onClick={() => { setApplyTax(!applyTax); if (!applyTax) setSelectedTaxId(""); }}>
-                          {applyTax ? "✔ Tax Applied" : "+ Add Tax"}
-                        </button>
+                          {applyTax ? "✔ Global Tax Applied" : "+ Add Global Tax"}</button>
                         {applyTax && (
                           <select style={{ ...inputStyle, marginTop: 8 }} value={selectedTaxId} onChange={e => setSelectedTaxId(e.target.value)}>
                             <option value="">— Select Tax —</option>
                             {taxes.map(t => <option key={t.id} value={t.id}>{t.taxType} ({t.taxCode}) — {t.taxRate}%</option>)}
                           </select>
                         )}
-                        {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: accent, marginTop: 6 }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>{fmt(taxAmt)}</span></div>}
+                        {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--accent)", marginTop: 6 }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>{fmt(globalTaxAmt)}</span></div>}
                       </div>
-
-                      {/* Net Total */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                        <span style={{ color: "var(--text-muted)" }}>Shipping Charges</span>
+                        <input type="number" style={{ ...inputStyle, width: 100, padding: "3px 7px", fontSize: 12, textAlign: "right" }} value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0.00" />
+                      </div>
                       <div style={{ display: "flex", justifyContent: "space-between", borderTop: "2px solid var(--border)", paddingTop: 12, fontSize: 18, fontWeight: 800 }}>
-                        <span>Net Total</span>
-                        <span style={{ color: accent }}>{fmt(netTotal)}</span>
+                        <span>Grand Total</span>
+                        <span style={{ color: "var(--accent)" }}>{fmt(netTotal)}</span>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Notes */}
-                <div style={panelStyle}>
-                  <label style={labelStyle}>Notes / Remarks</label>
-                  <textarea style={{ ...inputStyle, minHeight: 72, resize: "vertical" }} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any notes or references…" />
+                  {/* Save Buttons */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <button style={{ ...btnPrimary, width: "100%", padding: "12px", fontSize: 15 }} onClick={saveInvoice} disabled={saving}>{saving ? "Saving…" : editing ? "Update Invoice" : "Save & Preview"}</button>
+                    <button style={{ ...btnGhost, width: "100%", padding: "10px" }} onClick={() => { setShowForm(false); setEditing(null); resetForm(); }}>Cancel</button>
+                  </div>
                 </div>
               </div>
             )}
+
 
             {/* ── Invoice Preview (screen) ── */}
             {preview && (
@@ -718,7 +810,7 @@ function SalesInvoiceContent() {
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
                       {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, color: "#d00" }}><span>Discount</span><span>— {fmt(discountAmt)}</span></div>}
                       {Number(freight) > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Freight</span><span>{fmt(Number(freight))}</span></div>}
-                      {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>{fmt(taxAmt)}</span></div>}
+                      {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>{fmt(globalTaxAmt)}</span></div>}
                       <div style={{ display: "flex", justifyContent: "space-between", borderTop: "3px solid #111", paddingTop: 10, fontWeight: 900, fontSize: 17 }}><span>Net Total</span><span>{fmt(invTotal)}</span></div>
                     </div>
                   </div>
@@ -809,7 +901,7 @@ function SalesInvoiceContent() {
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
                 {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}><span>Discount</span><span>— {fmt(discountAmt)}</span></div>}
                 {Number(freight) > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}><span>Freight</span><span>{fmt(Number(freight))}</span></div>}
-                {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>{fmt(taxAmt)}</span></div>}
+                {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>{fmt(globalTaxAmt)}</span></div>}
                 <div style={{ display: "flex", justifyContent: "space-between", borderTop: "3px solid #000", paddingTop: 8, fontWeight: 900, fontSize: 16 }}><span>Net Total</span><span>{fmt(invTotal)}</span></div>
               </div>
             </div>
@@ -868,7 +960,7 @@ function SalesInvoiceContent() {
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Subtotal:</span><span>{fmt(subtotal)}</span></div>
               {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between" }}><span>Discount:</span><span>-{fmt(discountAmt)}</span></div>}
               {Number(freight) > 0 && <div style={{ display: "flex", justifyContent: "space-between" }}><span>Freight:</span><span>{fmt(Number(freight))}</span></div>}
-              {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between" }}><span>{selectedTax.taxCode} {selectedTax.taxRate}%:</span><span>{fmt(taxAmt)}</span></div>}
+              {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between" }}><span>{selectedTax.taxCode} {selectedTax.taxRate}%:</span><span>{fmt(globalTaxAmt)}</span></div>}
               <div style={{ display: "flex", justifyContent: "space-between", borderTop: "2px solid #000", paddingTop: 4, fontWeight: 900, fontSize: 13 }}><span>TOTAL:</span><span>{fmt(invTotal)}</span></div>
             </div>
           )}
