@@ -99,7 +99,7 @@ function AIInsightPanel({companyId,role,userId}:{companyId:string;role:string;us
   },[insights.length]);
 
   return (
-    <div style={{borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",display:"flex",flexDirection:"column",height:"100%",overflow:"hidden",position:"relative"}}>
+    <div style={{borderRadius:16,background:"var(--panel-bg)",border:"1px solid var(--border)",display:"flex",flexDirection:"column",height:"100%",overflow:"hidden"}}>
       {/* Header */}
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 18px 0"}}>
         <div style={{display:"flex",alignItems:"center",gap:7}}>
@@ -109,16 +109,11 @@ function AIInsightPanel({companyId,role,userId}:{companyId:string;role:string;us
         <Link prefetch={false} href="/dashboard/ai" style={{fontSize:11,color:"#818cf8",textDecoration:"none",fontWeight:600}}>View all →</Link>
       </div>
 
-      {/* Brain illustration */}
-      <div style={{display:"flex",justifyContent:"center",alignItems:"center",padding:"18px 0 8px",position:"relative"}}>
-        <div style={{position:"absolute",top:8,left:"20%",fontSize:12,opacity:.7,animation:"ai-twinkle 2s ease-in-out infinite"}}>✦</div>
-        <div style={{position:"absolute",top:14,right:"18%",fontSize:9,opacity:.5,animation:"ai-twinkle 2.4s ease-in-out .6s infinite"}}>✦</div>
-        <div style={{position:"absolute",bottom:14,left:"16%",fontSize:8,opacity:.4,animation:"ai-twinkle 1.8s ease-in-out 1s infinite"}}>✦</div>
-        <div style={{position:"absolute",bottom:10,right:"22%",fontSize:11,opacity:.6,animation:"ai-twinkle 2.2s ease-in-out .3s infinite"}}>✦</div>
-        <div style={{position:"relative",width:110,height:110,display:"flex",alignItems:"center",justifyContent:"center"}}>
-          <div style={{position:"absolute",inset:0,borderRadius:"50%",background:"radial-gradient(circle,rgba(99,102,241,.18) 0%,transparent 70%)",animation:"ai-pulse 3s ease-in-out infinite"}}/>
-          <div style={{position:"absolute",inset:10,borderRadius:"50%",background:"radial-gradient(circle,rgba(139,92,246,.22) 0%,transparent 70%)",animation:"ai-pulse 3s ease-in-out .8s infinite"}}/>
-          <div style={{width:86,height:86,borderRadius:"50%",background:"radial-gradient(circle at 38% 35%,rgba(167,139,250,.55),rgba(79,70,229,.85))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:42,boxShadow:"0 0 36px rgba(99,102,241,.5),0 0 64px rgba(139,92,246,.25)",border:"1.5px solid rgba(129,140,248,.3)"}}>
+      {/* Compact brain icon */}
+      <div style={{display:"flex",justifyContent:"center",padding:"18px 0 10px"}}>
+        <div style={{position:"relative",width:72,height:72,display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <div style={{position:"absolute",inset:-6,borderRadius:"50%",border:"1.5px solid rgba(99,102,241,.25)",animation:"ai-pulse 3s ease-in-out infinite"}}/>
+          <div style={{width:72,height:72,borderRadius:"50%",background:"radial-gradient(circle at 40% 38%,rgba(167,139,250,.5),rgba(79,70,229,.88))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,boxShadow:"0 0 24px rgba(99,102,241,.45),0 0 48px rgba(139,92,246,.2)",border:"1.5px solid rgba(129,140,248,.3)"}}>
             🧠
           </div>
         </div>
