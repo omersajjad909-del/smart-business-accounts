@@ -379,8 +379,16 @@ export default function GRNPage() {
                           <span style={{ fontSize: 11, color: MUTED, marginRight: 10, fontWeight: 600 }}>TOTAL</span>
                           <span style={{ fontSize: 18, fontWeight: 800, color: ACCENT }}>{totalAmt.toLocaleString()}</span>
                         </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
+                {isMobile && totalAmt > 0 && (
+                  <div style={{ textAlign: "right", marginTop: 10 }}>
+                    <span style={{ fontSize: 11, color: MUTED, marginRight: 10, fontWeight: 600, textTransform: "uppercase" }}>Total</span>
+                    <span style={{ fontSize: 20, fontWeight: 800, color: ACCENT }}>{totalAmt.toLocaleString()}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

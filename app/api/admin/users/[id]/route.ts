@@ -71,7 +71,7 @@ export async function DELETE(
 
     await prisma.user.delete({ where: { id } });
 
-    await logAdminAction(req, "DELETE_USER", { userId: id, name: user.name, email: user.email });
+    await logAdminAction({ adminId: (admin as any).id, adminEmail: (admin as any).email, action: "DELETE_USER", targetType: "User", targetId: id, targetLabel: user.email, details: { name: user.name } });
     return NextResponse.json({ success: true });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
