@@ -45,11 +45,13 @@ export default function GRNPage() {
   const [preview,   setPreview]   = useState(false);
   const [printMode, setPrintMode] = useState<"a4"|"58mm">("a4");
 
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
   const [grnNo,      setGrnNo]      = useState("");
   const [date,       setDate]       = useState(today);
   const [poId,       setPoId]       = useState("");
   const [supplierId, setSupplierId] = useState("");
   const [remarks,    setRemarks]    = useState("");
+  const [notes,      setNotes]      = useState("");
   const [rows, setRows] = useState<GRNItem[]>([
     { itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" },
   ]);
@@ -68,6 +70,7 @@ export default function GRNPage() {
   }
 
   useEffect(() => {
+    fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo(d); }).catch(() => {});
     fetch("/api/accounts?type=SUPPLIER", { headers: bh() }).then(r => r.json()).then(d => {
       const list = Array.isArray(d) ? d : [];
       setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER" || a.partyType === "SUPPLIER"));
