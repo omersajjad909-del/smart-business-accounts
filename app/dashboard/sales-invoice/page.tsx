@@ -21,9 +21,9 @@ const ff = "'Outfit','Inter',sans-serif";
 const accent = "#6366f1";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-type Account = { id: string; name: string };
-type Item = { id: string; name: string; description?: string; availableQty: number; barcode?: string; salePrice?: number };
-type Row = { itemId: string; name: string; description: string; availableQty: number; qty: number | ""; rate: number | "" };
+type Account = { id: string; name: string; email?: string; phone?: string; address?: string; city?: string; ntn?: string; strn?: string };
+type Item = { id: string; name: string; code?: string; unit?: string; description?: string; availableQty: number; barcode?: string; salePrice?: number; taxRate?: number };
+type Row = { itemId: string; name: string; description: string; availableQty: number; qty: number | ""; rate: number | ""; discountPercent: number | ""; taxPercent: number | ""; unit: string; sku: string };
 type SalesInvoice = {
   id: string; invoiceNo: string; date: string; customerId: string;
   customer?: { name: string }; total: number;
@@ -76,7 +76,13 @@ function SalesInvoiceContent() {
   const [salesmanId, setSalesmanId]     = useState("");
   const [teamMembers, setTeamMembers]   = useState<{id:string;name:string}[]>([]);
   const [notes, setNotes]               = useState("");
-  const [rows, setRows]                 = useState<Row[]>([{ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" }]);
+  const [termsConditions, setTermsConditions] = useState("");
+  const [reference, setReference]       = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentTerms, setPaymentTerms] = useState("");
+  const [dueDate, setDueDate]           = useState("");
+  const emptyRow = (): Row => ({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "" });
+  const [rows, setRows]                 = useState<Row[]>([emptyRow()]);
   const [freight, setFreight]           = useState<number | "">("");
   const [discount, setDiscount]         = useState<number | "">("");
   const [discountType, setDiscountType] = useState<"flat" | "percent">("flat");
@@ -130,7 +136,7 @@ function SalesInvoiceContent() {
     });
     fetch("/api/items-new", { headers: h }).then(r => r.json()).then(d => {
       const list = Array.isArray(d) ? d : [];
-      setItems(list.map((i: any) => ({ id: i.id, name: i.name, description: i.description || "", availableQty: 0, barcode: i.barcode || "", salePrice: i.rate ?? 0 })));
+      setItems(list.map((i: any) => ({ id: i.id, name: i.name, code: i.code || "", unit: i.unit || "", description: i.description || "", availableQty: 0, barcode: i.barcode || "", salePrice: i.rate ?? 0, taxRate: i.taxRate ?? 0 })));
     });
     fetch("/api/tax-configuration").then(r => r.json()).then(d => setTaxes(Array.isArray(d) ? d : [])).catch(() => {});
     fetch("/api/users", { headers: h }).then(r => r.ok ? r.json() : []).then(d => setTeamMembers((Array.isArray(d) ? d : []).map((u: any) => ({ id: u.id, name: u.name })))).catch(() => {});
@@ -210,27 +216,32 @@ function SalesInvoiceContent() {
     const item = items.find(i => i.id === itemId);
     if (!item) return;
     const copy = [...rows];
-    copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: item.salePrice || "" };
-    if (idx === copy.length - 1) copy.push({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" });
+    copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: item.salePrice || "", discountPercent: "", taxPercent: item.taxRate || "", unit: item.unit || "", sku: item.code || "" };
+    if (idx === copy.length - 1) copy.push(emptyRow());
     setRows(copy);
   }
 
-  function updateRow(idx: number, key: "qty" | "rate", val: string) {
+  function updateRow(idx: number, key: keyof Pick<Row, "qty" | "rate" | "discountPercent" | "taxPercent">, val: string) {
     const copy = [...rows];
-    copy[idx][key] = val === "" ? "" : Number(val);
-    if (idx === copy.length - 1 && val !== "")
-      copy.push({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "" });
+    (copy[idx] as any)[key] = val === "" ? "" : Number(val);
+    if (idx === copy.length - 1 && val !== "") copy.push(emptyRow());
     setRows(copy);
   }
 
   function removeRow(idx: number) { if (rows.length > 1) setRows(rows.filter((_, i) => i !== idx)); }
 
-  const subtotal      = rows.reduce((s, r) => s + (Number(r.qty) * Number(r.rate) || 0), 0);
+  const subtotal = rows.reduce((s, r) => s + (Number(r.qty) * Number(r.rate) || 0), 0);
+  const perItemDiscountAmt = rows.reduce((s, r) => s + ((Number(r.qty) * Number(r.rate) || 0) * (Number(r.discountPercent) || 0) / 100), 0);
+  const perItemTaxAmt = rows.reduce((s, r) => {
+    const base = (Number(r.qty) * Number(r.rate) || 0) * (1 - (Number(r.discountPercent) || 0) / 100);
+    return s + base * (Number(r.taxPercent) || 0) / 100;
+  }, 0);
   const discountAmt   = discount === "" ? 0 : discountType === "percent" ? (subtotal * Number(discount) / 100) : Number(discount);
-  const afterDiscount = subtotal - discountAmt;
+  const taxableAmount = subtotal - perItemDiscountAmt - discountAmt;
   const selectedTax   = taxes.find(t => t.id === selectedTaxId);
-  const taxAmt        = applyTax && selectedTax ? (afterDiscount * selectedTax.taxRate / 100) : 0;
-  const netTotal      = afterDiscount + (freight === "" ? 0 : Number(freight)) + taxAmt;
+  const globalTaxAmt  = applyTax && selectedTax ? (taxableAmount * selectedTax.taxRate / 100) : 0;
+  const totalTax      = perItemTaxAmt + globalTaxAmt;
+  const netTotal      = taxableAmount + totalTax + (freight === "" ? 0 : Number(freight));
 
   async function saveInvoice() {
     const clean = rows.filter(r => r.itemId && r.qty && r.rate);
@@ -239,9 +250,11 @@ function SalesInvoiceContent() {
     try {
       const method = editing ? "PUT" : "POST";
       const baseBody = {
-        invoiceNo, customerId, date, location, driverName, vehicleNo, salesmanId: salesmanId || null,
-        freight: freight || 0,
-        items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate) })),
+        invoiceNo, customerId, date, dueDate: dueDate || null, location, driverName, vehicleNo, salesmanId: salesmanId || null,
+        freight: freight || 0, discount: discount || 0, discountType,
+        notes: notes || null, termsConditions: termsConditions || null, reference: reference || null,
+        paymentMethod: paymentMethod || null, paymentTerms: paymentTerms || null,
+        items: clean.map(r => ({ itemId: r.itemId, qty: Number(r.qty), rate: Number(r.rate), discountPercent: Number(r.discountPercent) || 0, taxPercent: Number(r.taxPercent) || 0 })),
         applyTax, taxConfigId: applyTax ? selectedTaxId : null,
         currencyId: currencyId || null, exchangeRate,
         soId: (!editing && linkedSoId) ? linkedSoId : undefined,

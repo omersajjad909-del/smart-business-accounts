@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   }
   const branchId = await resolveBranchIdOrDefault(req, companyId);
 
-  const { poNo, supplierId, date, items, remarks, approvalStatus } = await req.json();
+  const { poNo, supplierId, date, dueDate, items, remarks, approvalStatus, paymentTerms, notes, discount = 0, discountType = "flat", freight = 0 } = await req.json();
 
   const supplier = await prisma.account.findFirst({ where: { id: supplierId, companyId } });
   if (!supplier) {
@@ -33,16 +33,24 @@ export async function POST(req: NextRequest) {
       poNo,
       supplierId,
       date: new Date(date),
+      dueDate: dueDate ? new Date(dueDate) : null,
       remarks: remarks || "",
       companyId,
       branchId,
       status: "PENDING",
       approvalStatus: approvalStatus || "PENDING",
+      paymentTerms: paymentTerms || null,
+      notes: notes || null,
+      discount: Number(discount),
+      discountType,
+      freight: Number(freight),
       items: {
         create: items.map((i: any) => ({
           itemId: i.itemId,
           qty: Number(i.qty),
           rate: Number(i.rate || 0),
+          discountPercent: Number(i.discountPercent || 0),
+          taxPercent: Number(i.taxPercent || 0),
         })),
       },
     },
@@ -124,7 +132,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Company required" }, { status: 400 });
   }
 
-  const { id, poNo, supplierId, date, items, remarks, approvalStatus } = await req.json();
+  const { id, poNo, supplierId, date, dueDate, items, remarks, approvalStatus, paymentTerms, notes, discount = 0, discountType = "flat", freight = 0 } = await req.json();
 
   if (!id) {
     return NextResponse.json({ error: "PO ID required" }, { status: 400 });
@@ -147,14 +155,22 @@ export async function PUT(req: NextRequest) {
         poNo,
         supplierId,
         date: new Date(date),
+        dueDate: dueDate ? new Date(dueDate) : null,
         remarks: remarks || "",
         companyId,
         approvalStatus,
+        paymentTerms: paymentTerms || null,
+        notes: notes || null,
+        discount: Number(discount),
+        discountType,
+        freight: Number(freight),
         items: {
           create: items.map((i: any) => ({
             itemId: i.itemId,
             qty: Number(i.qty || 0),
             rate: Number(i.rate || 0),
+            discountPercent: Number(i.discountPercent || 0),
+            taxPercent: Number(i.taxPercent || 0),
           })),
         },
       },

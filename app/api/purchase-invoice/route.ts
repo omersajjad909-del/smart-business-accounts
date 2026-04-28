@@ -111,13 +111,20 @@ export async function POST(req: NextRequest) {
       supplierId,
       poId,
       date,
+      dueDate = null,
       items,
       location,
       freight = 0,
+      discount = 0,
+      discountType = "flat",
       applyTax = false,
       taxConfigId = null,
       currencyId = null,
       exchangeRate = 1,
+      notes = null,
+      reference = null,
+      paymentMethod = null,
+      paymentTerms = null,
     } = body;
 
     // 1. Validation
@@ -165,40 +172,53 @@ export async function POST(req: NextRequest) {
       }
       const invoiceNo = `PI-${nextNo}`;
 
-      const totalItemsAmount = validItems.reduce((s: number, i: any) => s + (Number(i.qty) * Number(i.rate)), 0);
-      
-      // Calculate tax if applied
-      let taxAmount = 0;
+      const subtotal = validItems.reduce((s: number, i: any) => s + (Number(i.qty) * Number(i.rate)), 0);
+      const discountAmt = discountType === "percent" ? subtotal * Number(discount) / 100 : Number(discount);
+      const itemsTax = validItems.reduce((s: number, i: any) => {
+        const lineBase = Number(i.qty) * Number(i.rate) * (1 - (Number(i.discountPercent) || 0) / 100);
+        return s + lineBase * (Number(i.taxPercent) || 0) / 100;
+      }, 0);
+      let globalTax = 0;
       if (applyTax && taxConfigId) {
-        const tax = await tx.taxConfiguration.findFirst({
-          where: { id: taxConfigId, companyId }
-        });
-        if (tax) {
-          taxAmount = (totalItemsAmount * tax.taxRate) / 100;
-        }
+        const tax = await tx.taxConfiguration.findFirst({ where: { id: taxConfigId, companyId } });
+        if (tax) globalTax = (subtotal - discountAmt) * tax.taxRate / 100;
       }
-      
-      const netTotal = totalItemsAmount + Number(freight) + taxAmount;
+      const netTotal = subtotal - discountAmt + itemsTax + globalTax + Number(freight);
 
       // C. Purchase Invoice ریکارڈ کریں
       const invoice = await tx.purchaseInvoice.create({
         data: {
           invoiceNo,
           date: new Date(date),
+          dueDate: dueDate ? new Date(dueDate) : null,
           supplierId,
           poId: poId || null,
           companyId,
           branchId,
           total: netTotal,
+          discount: Number(discount),
+          discountType,
+          freight: Number(freight),
+          notes,
+          reference,
+          paymentMethod,
+          paymentTerms,
           approvalStatus: "PENDING",
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
-            create: validItems.map((i: any) => ({
+            create: validItems.map((i: any) => {
+              const lineBase = Number(i.qty) * Number(i.rate);
+              const lineDisc = lineBase * (Number(i.discountPercent) || 0) / 100;
+              const lineTax = (lineBase - lineDisc) * (Number(i.taxPercent) || 0) / 100;
+              return {
               itemId: i.itemId,
               qty: Number(i.qty),
               rate: Number(i.rate),
-              amount: Number(i.qty) * Number(i.rate),
-            })),
+              discountPercent: Number(i.discountPercent || 0),
+              taxPercent: Number(i.taxPercent || 0),
+              amount: lineBase - lineDisc + lineTax,
+              };
+            }),
           },
         },
       });

@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     }
     const branchId = await resolveBranchIdOrDefault(req, companyId);
 
-    const { customerId, invoiceId, date, items, freight = 0, driverName, vehicleNo, remarks } = await req.json();
+    const { customerId, invoiceId, date, items, freight = 0, discount = 0, discountType = "flat", driverName, vehicleNo, remarks, notes = null, reference = null } = await req.json();
 
     if (!customerId || !date || !items?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -98,11 +98,9 @@ export async function POST(req: NextRequest) {
 
     // 2. ٹرانزیکشن شروع کریں تاکہ سارا ڈیٹا ایک ساتھ سیو ہو
    const result = await prisma.$transaction(async (tx: TxClient) => {
-  const subtotal = items.reduce(
-    (s: number, i: any) => s + Number(i.qty) * Number(i.rate),
-    0
-  );
-  const total = subtotal + Number(freight);
+  const subtotal = items.reduce((s: number, i: any) => s + Number(i.qty) * Number(i.rate), 0);
+  const discountAmt = discountType === "percent" ? subtotal * Number(discount) / 100 : Number(discount);
+  const total = subtotal - discountAmt + Number(freight);
 
   let salesReturnAcc = await tx.account.findFirst({
     where: { name: { equals: "Sales Return", mode: "insensitive" }, companyId },
@@ -122,16 +120,28 @@ export async function POST(req: NextRequest) {
       invoiceId: invoiceId || null,
       companyId,
       total,
+      discount: Number(discount),
+      discountType,
+      freight: Number(freight),
+      notes,
+      reference,
       driverName: driverName || null,
       vehicleNo: vehicleNo || null,
       remarks: remarks || null,
       items: {
-        create: items.map((i: any) => ({
-          itemId: i.itemId,
-          qty: Number(i.qty),
-          rate: Number(i.rate),
-          amount: Number(i.qty) * Number(i.rate),
-        })),
+        create: items.map((i: any) => {
+          const lineBase = Number(i.qty) * Number(i.rate);
+          const lineDisc = lineBase * (Number(i.discountPercent) || 0) / 100;
+          const lineTax = (lineBase - lineDisc) * (Number(i.taxPercent) || 0) / 100;
+          return {
+            itemId: i.itemId,
+            qty: Number(i.qty),
+            rate: Number(i.rate),
+            discountPercent: Number(i.discountPercent || 0),
+            taxPercent: Number(i.taxPercent || 0),
+            amount: lineBase - lineDisc + lineTax,
+          };
+        }),
       },
     },
   });

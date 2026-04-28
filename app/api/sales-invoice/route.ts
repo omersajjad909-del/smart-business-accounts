@@ -156,8 +156,11 @@ export async function POST(req: NextRequest) {
       invoiceNo,
       customerId,
       date,
+      dueDate = null,
       location,
       freight = 0,
+      discount = 0,
+      discountType = "flat",
       items,
       applyTax = false,
       taxConfigId = null,
@@ -167,25 +170,28 @@ export async function POST(req: NextRequest) {
       currencyId = null,
       exchangeRate = 1,
       soId = null,
+      notes = null,
+      termsConditions = null,
+      reference = null,
+      paymentMethod = null,
+      paymentTerms = null,
     } = body;
 
     await ensureOpenPeriod(prisma, companyId, new Date(date));
 
-    const total = items.reduce(
-      (s: number, i: any) => s + i.qty * i.rate,
-      0
-    );
-
-    // Calculate tax if applied
-    let taxAmount = 0;
+    const subtotal = items.reduce((s: number, i: any) => s + i.qty * i.rate, 0);
+    const discountAmt = discountType === "percent" ? subtotal * Number(discount) / 100 : Number(discount);
+    const itemsTax = items.reduce((s: number, i: any) => {
+      const lineBase = i.qty * i.rate * (1 - (i.discountPercent || 0) / 100);
+      return s + lineBase * (i.taxPercent || 0) / 100;
+    }, 0);
+    let globalTax = 0;
     if (applyTax && taxConfigId) {
-      const tax = await prisma.taxConfiguration.findFirst({
-        where: { id: taxConfigId, companyId }
-      });
-      if (tax) {
-        taxAmount = (total * tax.taxRate) / 100;
-      }
+      const tax = await prisma.taxConfiguration.findFirst({ where: { id: taxConfigId, companyId } });
+      if (tax) globalTax = (subtotal - discountAmt) * tax.taxRate / 100;
     }
+    const taxAmount = itemsTax + globalTax;
+    const total = subtotal - discountAmt + taxAmount + Number(freight);
 
     const invoice = await prisma.salesInvoice.create({
       data: {
@@ -193,19 +199,37 @@ export async function POST(req: NextRequest) {
         branchId,
         invoiceNo,
         date: new Date(date),
+        dueDate: dueDate ? new Date(dueDate) : null,
         customerId,
         driverName,
         vehicleNo,
         salesmanId: salesmanId || null,
-        total: total + freight + taxAmount,
+        location: location || "MAIN",
+        linkedSoId: soId || null,
+        discount: Number(discount),
+        discountType,
+        freight: Number(freight),
+        notes,
+        termsConditions,
+        reference,
+        paymentMethod,
+        paymentTerms,
+        total,
         approvalStatus: "PENDING",
         items: {
-          create: items.map((i: any) => ({
-            itemId: i.itemId,
-            qty: i.qty,
-            rate: i.rate,
-            amount: i.qty * i.rate,
-          })),
+          create: items.map((i: any) => {
+            const lineBase = i.qty * i.rate;
+            const lineDisc = lineBase * (i.discountPercent || 0) / 100;
+            const lineTax = (lineBase - lineDisc) * (i.taxPercent || 0) / 100;
+            return {
+              itemId: i.itemId,
+              qty: i.qty,
+              rate: i.rate,
+              discountPercent: i.discountPercent || 0,
+              taxPercent: i.taxPercent || 0,
+              amount: lineBase - lineDisc + lineTax,
+            };
+          }),
         },
         taxConfigId: applyTax ? taxConfigId : null,
       },
@@ -331,8 +355,11 @@ export async function PUT(req: NextRequest) {
       id,
       customerId: _customerId,
       date,
+      dueDate = null,
       location: _location,
       freight = 0,
+      discount = 0,
+      discountType = "flat",
       items,
       applyTax = false,
       taxConfigId = null,
@@ -341,6 +368,11 @@ export async function PUT(req: NextRequest) {
       salesmanId = null,
       currencyId = null,
       exchangeRate = 1,
+      notes = null,
+      termsConditions = null,
+      reference = null,
+      paymentMethod = null,
+      paymentTerms = null,
     } = body;
 
     if (!id) {
@@ -358,18 +390,19 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    const total = items.reduce((s: number, i: any) => s + i.qty * i.rate, 0);
-
-    // Calculate tax if applied
-    let taxAmount = 0;
+    const subtotal = items.reduce((s: number, i: any) => s + i.qty * i.rate, 0);
+    const discountAmt = discountType === "percent" ? subtotal * Number(discount) / 100 : Number(discount);
+    const itemsTax = items.reduce((s: number, i: any) => {
+      const lineBase = i.qty * i.rate * (1 - (i.discountPercent || 0) / 100);
+      return s + lineBase * (i.taxPercent || 0) / 100;
+    }, 0);
+    let globalTax = 0;
     if (applyTax && taxConfigId) {
-      const tax = await prisma.taxConfiguration.findFirst({
-        where: { id: taxConfigId, companyId }
-      });
-      if (tax) {
-        taxAmount = (total * tax.taxRate) / 100;
-      }
+      const tax = await prisma.taxConfiguration.findFirst({ where: { id: taxConfigId, companyId } });
+      if (tax) globalTax = (subtotal - discountAmt) * tax.taxRate / 100;
     }
+    const taxAmount = itemsTax + globalTax;
+    const total = subtotal - discountAmt + taxAmount + Number(freight);
 
     const result = await prisma.$transaction(async (tx: TxClient) => {
       await tx.salesInvoiceItem.deleteMany({ where: { invoiceId: id } });
@@ -378,18 +411,34 @@ export async function PUT(req: NextRequest) {
         where: { id },
         data: {
           date: new Date(date),
+          dueDate: dueDate ? new Date(dueDate) : null,
           driverName,
           vehicleNo,
           salesmanId: salesmanId || null,
-          total: total + freight + taxAmount,
+          discount: Number(discount),
+          discountType,
+          freight: Number(freight),
+          notes,
+          termsConditions,
+          reference,
+          paymentMethod,
+          paymentTerms,
+          total,
           taxConfigId: applyTax ? taxConfigId : null,
           items: {
-            create: items.map((i: any) => ({
-              itemId: i.itemId,
-              qty: i.qty,
-              rate: i.rate,
-              amount: i.qty * i.rate,
-            })),
+            create: items.map((i: any) => {
+              const lineBase = i.qty * i.rate;
+              const lineDisc = lineBase * (i.discountPercent || 0) / 100;
+              const lineTax = (lineBase - lineDisc) * (i.taxPercent || 0) / 100;
+              return {
+                itemId: i.itemId,
+                qty: i.qty,
+                rate: i.rate,
+                discountPercent: i.discountPercent || 0,
+                taxPercent: i.taxPercent || 0,
+                amount: lineBase - lineDisc + lineTax,
+              };
+            }),
           },
         },
         include: {
