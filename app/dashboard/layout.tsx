@@ -1246,6 +1246,7 @@ export default function DashboardLayout({
               onToggle={() => toggle("retailPos")}
             >
               {hasDashboardFeature("RETAIL_POS") && <NavLink href="/dashboard/retail/pos" pathname={pathname}>POS Terminal</NavLink>}
+              {hasDashboardFeature("RETAIL_POS") && <NavLink href="/dashboard/retail/sales-history" pathname={pathname}>🧾 Sales History</NavLink>}
               {hasDashboardFeature("RETAIL_POS_SESSIONS") && <NavLink href="/dashboard/retail/pos-sessions" pathname={pathname}>POS Sessions</NavLink>}
               {hasDashboardFeature("RETAIL_DISCOUNTS") && <NavLink href="/dashboard/retail/discounts" pathname={pathname}>Discounts & Promotions</NavLink>}
               {hasDashboardFeature("RETAIL_ONLINE_SYNC") && <NavLink href="/dashboard/retail/online-sync" pathname={pathname}>Online Store Sync</NavLink>}
