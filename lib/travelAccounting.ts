@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-export type TravelSourceCategory = "travel_ticket" | "visa_case";
+export type TravelSourceCategory = "travel_ticket" | "visa_case" | "travel_hotel" | "travel_tour";
 
 type TravelInvoiceSource = {
   category: TravelSourceCategory;
@@ -40,7 +40,7 @@ export async function buildTravelSource(companyId: string, recordId: string) {
     where: {
       id: recordId,
       companyId,
-      category: { in: ["travel_ticket", "visa_case"] },
+      category: { in: ["travel_ticket", "visa_case", "travel_hotel", "travel_tour"] },
     },
   });
 
@@ -65,6 +65,50 @@ export async function buildTravelSource(companyId: string, recordId: string) {
         issueDate,
         dueDate,
         notes: `Ticket booking for ${String(data.route || "travel itinerary").trim() || "travel itinerary"} | PNR: ${String(data.pnr || "-")}`,
+        reference: record.title,
+        title: record.title,
+        data,
+      },
+    };
+  }
+
+  if (record.category === "travel_hotel") {
+    return {
+      record,
+      source: {
+        category: "travel_hotel" as const,
+        invoiceLabel: "Hotel Booking Revenue",
+        revenueAccount: "Hotel Booking Revenue",
+        serviceItemName: "Hotel Booking Service",
+        customerName: String(data.guestName || record.title || "").trim(),
+        supplierName: String(data.supplier || data.hotelName || "").trim(),
+        amount: Number(record.amount || 0),
+        costAmount: Number(data.cost || 0),
+        issueDate,
+        dueDate,
+        notes: `Hotel booking at ${String(data.hotelName || "hotel").trim()} | ${String(data.destination || "")} | Check-in: ${String(record.date || "").slice(0, 10)}`,
+        reference: record.title,
+        title: record.title,
+        data,
+      },
+    };
+  }
+
+  if (record.category === "travel_tour") {
+    return {
+      record,
+      source: {
+        category: "travel_tour" as const,
+        invoiceLabel: "Tour Package Revenue",
+        revenueAccount: "Tour Package Revenue",
+        serviceItemName: "Tour Package Service",
+        customerName: String(data.leader || record.title || "").trim(),
+        supplierName: String(data.supplier || "").trim(),
+        amount: Number(record.amount || 0),
+        costAmount: Number(data.cost || 0),
+        issueDate,
+        dueDate,
+        notes: `Group tour: ${String(data.tourName || record.title).trim()} | ${String(data.destination || "")} | Pax: ${String(data.pax || 1)}`,
         reference: record.title,
         title: record.title,
         data,
@@ -144,6 +188,8 @@ export async function ensureRevenueAccount(companyId: string, name: string) {
   const codeMap: Record<string, string> = {
     "Air Ticket Revenue": "4001",
     "Visa Processing Revenue": "4002",
+    "Hotel Booking Revenue": "4003",
+    "Tour Package Revenue": "4004",
   };
 
   return prisma.account.create({
