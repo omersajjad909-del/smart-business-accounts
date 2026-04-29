@@ -233,7 +233,7 @@ export default function RetailCategoriesPage() {
                 <label style={{ display: "block", fontSize: 12, color: "var(--text-muted)", fontWeight: 600, marginBottom: 6 }}>Category Name *</label>
                 <input
                   value={form.name}
-                  onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                  onChange={e => setForm(p => ({ ...p, name: e.target.value.toUpperCase() }))}
                   onKeyDown={e => e.key === "Enter" && handleSave()}
                   placeholder="e.g. Beverages, Snacks, Electronics…"
                   style={inp}
