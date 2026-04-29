@@ -1724,9 +1724,13 @@ export default function DashboardLayout({
                 onToggle={() => toggle("travel")}
               >
                 {hasDashboardFeature("TRAVEL_OVERVIEW") && <NavLink href="/dashboard/travel" pathname={pathname}>Overview</NavLink>}
-                {hasDashboardFeature("TRAVEL_TICKETS") && <NavLink href="/dashboard/travel/tickets" pathname={pathname}>Airline Tickets</NavLink>}
-                {hasDashboardFeature("TRAVEL_VISAS") && <NavLink href="/dashboard/travel/visas" pathname={pathname}>Visa Cases</NavLink>}
-                {hasDashboardFeature("TRAVEL_SETTLEMENTS") && <NavLink href="/dashboard/travel/settlements" pathname={pathname}>Supplier Settlements</NavLink>}
+                {hasDashboardFeature("TRAVEL_TICKETS") && <NavLink href="/dashboard/travel/tickets" pathname={pathname}>✈️ Airline Tickets</NavLink>}
+                {hasDashboardFeature("TRAVEL_VISAS") && <NavLink href="/dashboard/travel/visas" pathname={pathname}>🛂 Visa Cases</NavLink>}
+                {hasDashboardFeature("TRAVEL_HOTELS") && <NavLink href="/dashboard/travel/hotel-packages" pathname={pathname}>🏨 Hotel Packages</NavLink>}
+                {hasDashboardFeature("TRAVEL_TOURS") && <NavLink href="/dashboard/travel/tours" pathname={pathname}>🚌 Group Tours</NavLink>}
+                {hasDashboardFeature("TRAVEL_SETTLEMENTS") && <NavLink href="/dashboard/travel/settlements" pathname={pathname}>🧾 Supplier Settlements</NavLink>}
+                {hasDashboardFeature("TRAVEL_PASSPORTS") && <NavLink href="/dashboard/travel/passports" pathname={pathname}>🛂 Passport Database</NavLink>}
+                {hasDashboardFeature("TRAVEL_ANALYTICS") && <NavLink href="/dashboard/travel/analytics" pathname={pathname}>📊 Analytics</NavLink>}
                 <NavLink href="/dashboard/quotation" pathname={pathname}>Quotations</NavLink>
                 <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoices</NavLink>
               </NavGroup>
