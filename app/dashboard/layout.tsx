@@ -2292,6 +2292,7 @@ export default function DashboardLayout({
                       </label>
                       <div style={{minWidth:0}}>
                         <div style={{fontSize:13,fontWeight:700,color:"white",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.name || "User"}</div>
+                        <div style={{fontSize:10,color:"rgba(255,255,255,0.55)",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.email}</div>
                         <div style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginTop:1,textTransform:"capitalize"}}>
                           {(currentUser.role||"User").toLowerCase()} · {avatarUploading ? "Uploading..." : "Tap photo to change"}
                         </div>
