@@ -23,7 +23,7 @@ const accent = "#6366f1";
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Account = { id: string; name: string; email?: string; phone?: string; address?: string; city?: string; ntn?: string; strn?: string };
 type Item = { id: string; name: string; code?: string; unit?: string; description?: string; availableQty: number; barcode?: string; salePrice?: number; taxRate?: number };
-type Row = { itemId: string; name: string; description: string; availableQty: number; qty: number | ""; rate: number | ""; discountPercent: number | ""; taxPercent: number | ""; unit: string; sku: string };
+type Row = { itemId: string; name: string; description: string; availableQty: number; qty: number | ""; rate: number | ""; discountPercent: number | ""; taxPercent: number | ""; unit: string; sku: string; isManual?: boolean };
 type SalesInvoice = {
   id: string; invoiceNo: string; date: string; customerId: string;
   customer?: { name: string }; total: number;
@@ -81,7 +81,7 @@ function SalesInvoiceContent() {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
   const [dueDate, setDueDate]           = useState("");
-  const emptyRow = (): Row => ({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "" });
+  const emptyRow = (): Row => ({ itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "", isManual: false });
   const [rows, setRows]                 = useState<Row[]>([emptyRow()]);
   const [freight, setFreight]           = useState<number | "">("");
   const [discount, setDiscount]         = useState<number | "">("");
@@ -204,19 +204,34 @@ function SalesInvoiceContent() {
       if (!scanCode) return;
       const found = items.find(i => i.barcode === scanCode || i.id === scanCode);
       if (found) {
-        const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", availableQty: found.availableQty, qty: 1, rate: "", discountPercent: "", taxPercent: found.taxRate || "", unit: found.unit || "", sku: found.code || "" };
+        const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", availableQty: found.availableQty, qty: 1, rate: found.salePrice || "", discountPercent: "", taxPercent: found.taxRate || "", unit: found.unit || "", sku: found.code || "" };
         const last = rows[rows.length - 1];
-        if (!last.itemId) { const r = [...rows]; r[rows.length - 1] = newRow; setRows(r); } else setRows([...rows, newRow]);
+        const existing = rows.findIndex(r => r.itemId === found.id);
+        if (existing >= 0) {
+          const r = [...rows];
+          r[existing] = { ...r[existing], qty: Number(r[existing].qty || 0) + 1 };
+          setRows(r);
+        } else if (!last.itemId) {
+          const r = [...rows]; r[rows.length - 1] = newRow; setRows(r);
+        } else {
+          setRows([...rows, newRow]);
+        }
         toast.success(`Added ${found.name}`); setScanCode("");
       } else { toast.error("Item not found"); setScanCode(""); }
     }
   }
 
   function selectItem(idx: number, itemId: string) {
+    const copy = [...rows];
+    if (itemId === "__manual__") {
+      copy[idx] = { ...copy[idx], itemId: "", name: "", description: "", availableQty: 0, qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "PCS", sku: "", isManual: true };
+      if (idx === copy.length - 1) copy.push(emptyRow());
+      setRows(copy);
+      return;
+    }
     const item = items.find(i => i.id === itemId);
     if (!item) return;
-    const copy = [...rows];
-    copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: item.salePrice || "", discountPercent: "", taxPercent: item.taxRate || "", unit: item.unit || "", sku: item.code || "" };
+    copy[idx] = { ...copy[idx], itemId: item.id, name: item.name, description: item.description || "", availableQty: item.availableQty, qty: "", rate: item.salePrice || "", discountPercent: "", taxPercent: item.taxRate || "", unit: item.unit || "", sku: item.code || "", isManual: false };
     if (idx === copy.length - 1) copy.push(emptyRow());
     setRows(copy);
   }
@@ -522,11 +537,19 @@ function SalesInvoiceContent() {
                                 <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Item {i + 1}</span>
                                 <button style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 18, padding: 0 }} onClick={() => removeRow(i)} disabled={rows.length === 1}>×</button>
                               </div>
-                              <select style={{ ...inputStyle, marginBottom: 8 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
-                                <option value="">— Select Item —</option>
-                                {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
-                              </select>
-                              {r.sku && <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>SKU: {r.sku}{r.unit ? ` | Unit: ${r.unit}` : ""}</div>}
+                              {r.isManual ? (
+                                <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
+                                  <input placeholder="Item / Service name..." value={r.name} onChange={e => { const c=[...rows]; c[i]={...c[i],name:e.target.value}; setRows(c); }} style={{ ...inputStyle, flex: 1 }} />
+                                  <button onClick={() => { const c=[...rows]; c[i]={...emptyRow()}; setRows(c); }} style={{ background:"none", border:"none", color:"var(--text-muted)", cursor:"pointer", fontSize:16 }}>⊗</button>
+                                </div>
+                              ) : (
+                                <select style={{ ...inputStyle, marginBottom: 8 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
+                                  <option value="">— Select Item —</option>
+                                  <option value="__manual__">✎ Type manually...</option>
+                                  {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
+                                </select>
+                              )}
+                              {r.sku && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 6 }}>SKU: {r.sku}{r.unit ? ` | Unit: ${r.unit}` : ""}</div>}
                               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                                 {(["qty","rate","discountPercent","taxPercent"] as const).map(k => (
                                   <div key={k}>
@@ -559,12 +582,26 @@ function SalesInvoiceContent() {
                               return (
                                 <tr key={i} style={{ borderBottom: "1px solid var(--border)" }}>
                                   <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 28 }}>{i + 1}</td>
-                                  <td style={{ padding: "6px 7px", minWidth: 150 }}>
-                                    <select style={{ ...inputStyle, padding: "5px 7px", fontSize: 13 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
-                                      <option value="">— Select —</option>
-                                      {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
-                                    </select>
-                                    {r.description && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
+                                  <td style={{ padding: "6px 7px", minWidth: 180 }}>
+                                    {r.isManual ? (
+                                      <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                                        <input
+                                          placeholder="Item / Service name..."
+                                          value={r.name}
+                                          onChange={e => { const c=[...rows]; c[i]={...c[i],name:e.target.value}; setRows(c); }}
+                                          style={{ ...inputStyle, padding: "5px 7px", fontSize: 13, flex: 1 }}
+                                          autoFocus
+                                        />
+                                        <button title="Switch to catalog" onClick={() => { const c=[...rows]; c[i]={...emptyRow()}; setRows(c); }} style={{ background:"none", border:"none", color:"var(--text-muted)", cursor:"pointer", fontSize:14, padding:"0 2px" }}>⊗</button>
+                                      </div>
+                                    ) : (
+                                      <select style={{ ...inputStyle, padding: "5px 7px", fontSize: 13 }} value={r.itemId} onChange={e => selectItem(i, e.target.value)}>
+                                        <option value="">— Select —</option>
+                                        <option value="__manual__">✎ Type manually...</option>
+                                        {items.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
+                                      </select>
+                                    )}
+                                    {r.description && !r.isManual && <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
                                   </td>
                                   <td style={{ padding: "6px 7px", fontSize: 12, color: "var(--text-muted)", width: 72 }}>{r.sku || "—"}</td>
                                   <td style={{ padding: "6px 7px", width: 68 }}>
