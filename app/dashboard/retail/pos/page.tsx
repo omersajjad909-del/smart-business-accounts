@@ -6,7 +6,7 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
 const ff = "'Outfit','Inter',sans-serif";
 
-type CartItem = { id: string; name: string; price: number; qty: number; category: string };
+type CartItem = { id: string; name: string; price: number; qty: number; category: string; sku: string };
 
 type ReceiptData = {
   receiptNo: string;
@@ -14,6 +14,8 @@ type ReceiptData = {
   items: CartItem[];
   subtotal: number;
   discount: number;
+  taxRate: number;
+  taxAmt: number;
   total: number;
   payMethod: string;
   tendered: number;
@@ -36,7 +38,10 @@ export default function POSPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cat, setCat] = useState("All");
   const [search, setSearch] = useState("");
+  const [barcode, setBarcode] = useState("");
+  const [barcodeMsg, setBarcodeMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [discount, setDiscount] = useState("");
+  const [taxRate, setTaxRate] = useState("0");
   const [tendered, setTendered] = useState("");
   const [payMethod, setPayMethod] = useState<"cash" | "card" | "easypaisa" | "jazzcash">("cash");
   const [company, setCompany] = useState<CompanyInfo>({ name: "My Store" });
@@ -44,6 +49,7 @@ export default function POSPage() {
   const [checkoutError, setCheckoutError] = useState("");
   const [processingCheckout, setProcessingCheckout] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const barcodeRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const h = user as { id?: string; role?: string; companyId?: string; name?: string } | null;
@@ -56,7 +62,7 @@ export default function POSPage() {
 
   const products = productRecords
     .filter(r => r.status !== "inactive")
-    .map(r => ({ id: r.id, name: r.title, category: (r.data?.category as string) || "General", price: r.amount || 0 }));
+    .map(r => ({ id: r.id, name: r.title, category: (r.data?.category as string) || "General", price: r.amount || 0, sku: (r.data?.sku as string) || "" }));
 
   const categories = ["All", ...Array.from(new Set(products.map(p => p.category)))];
 
@@ -74,7 +80,9 @@ export default function POSPage() {
 
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const discAmt = Math.min(subtotal, Math.max(0, Number(discount) || 0));
-  const total = subtotal - discAmt;
+  const taxPct = Math.max(0, Math.min(100, Number(taxRate) || 0));
+  const taxAmt = Math.round((subtotal - discAmt) * taxPct / 100);
+  const total = subtotal - discAmt + taxAmt;
   const tenderedAmt = Number(tendered) || 0;
   const change = payMethod === "cash" && tenderedAmt >= total ? tenderedAmt - total : 0;
 
@@ -96,6 +104,23 @@ export default function POSPage() {
     setCart(prev => prev.filter(i => i.id !== id));
   }
 
+  function handleBarcodeEnter(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter") return;
+    const q = barcode.trim();
+    if (!q) return;
+    const match = products.find(p => p.sku && p.sku.toLowerCase() === q.toLowerCase())
+      || products.find(p => p.name.toLowerCase().includes(q.toLowerCase()));
+    if (match) {
+      addToCart(match);
+      setBarcode("");
+      setBarcodeMsg({ text: `✓ ${match.name} added`, ok: true });
+    } else {
+      setBarcodeMsg({ text: `No product found for "${q}"`, ok: false });
+    }
+    setTimeout(() => setBarcodeMsg(null), 2000);
+    if (barcodeRef.current) barcodeRef.current.select();
+  }
+
   async function checkout() {
     if (cart.length === 0) { setCheckoutError("Cart is empty."); return; }
     if (total <= 0) { setCheckoutError("Total must be greater than zero."); return; }
@@ -110,13 +135,13 @@ export default function POSPage() {
         title: nextReceiptNo,
         status: "completed",
         amount: total,
-        data: { payMethod, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName },
+        data: { payMethod, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt, taxRate: taxPct, taxAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName },
       });
       setReceipt({
         receiptNo: saved.title || nextReceiptNo,
         soldAt: now.toISOString(),
         items: snapshot,
-        subtotal, discount: discAmt, total,
+        subtotal, discount: discAmt, taxRate: taxPct, taxAmt, total,
         payMethod, tendered: tenderedAmt, change,
         cashierName,
       });
@@ -180,14 +205,37 @@ export default function POSPage() {
 
         {/* LEFT — Products */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          {/* Barcode Scanner Bar */}
+          <div style={{ padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,.08)", background: "#0a1020" }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <div style={{ flex: 1, position: "relative" }}>
+                <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 16 }}>📷</span>
+                <input
+                  ref={barcodeRef}
+                  value={barcode}
+                  onChange={e => setBarcode(e.target.value)}
+                  onKeyDown={handleBarcodeEnter}
+                  placeholder="Scan barcode or type SKU → Enter to add"
+                  style={{ ...inp, paddingLeft: 38, background: "rgba(99,102,241,.08)", border: `1px solid ${barcodeMsg ? (barcodeMsg.ok ? "rgba(52,211,153,.4)" : "rgba(248,113,113,.4)") : "rgba(99,102,241,.25)"}`, fontSize: 13, fontWeight: 600 }}
+                  autoFocus
+                />
+              </div>
+              {barcodeMsg && (
+                <div style={{ fontSize: 12, fontWeight: 700, color: barcodeMsg.ok ? "#34d399" : "#f87171", whiteSpace: "nowrap", padding: "8px 12px", background: barcodeMsg.ok ? "rgba(52,211,153,.1)" : "rgba(248,113,113,.1)", borderRadius: 8, border: `1px solid ${barcodeMsg.ok ? "rgba(52,211,153,.25)" : "rgba(248,113,113,.25)"}` }}>
+                  {barcodeMsg.text}
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Search + Category */}
-          <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,.05)", background: "#0d1424" }}>
+          <div style={{ padding: "10px 20px", borderBottom: "1px solid rgba(255,255,255,.05)", background: "#0d1424" }}>
             <input
               ref={searchRef}
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="🔍 Search products..."
-              style={{ ...inp, marginBottom: 12 }}
+              placeholder="🔍 Browse / search products..."
+              style={{ ...inp, marginBottom: 10 }}
             />
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {categories.map(c => (
@@ -214,8 +262,9 @@ export default function POSPage() {
                   onClick={() => addToCart(p)}
                   style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "16px 14px", cursor: "pointer", userSelect: "none" }}
                 >
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".05em" }}>{p.category}</div>
-                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10, lineHeight: 1.3 }}>{p.name}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".05em" }}>{p.category}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6, lineHeight: 1.3 }}>{p.name}</div>
+                  {p.sku && <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginBottom: 6, letterSpacing: ".04em" }}>SKU: {p.sku}</div>}
                   <div style={{ fontSize: 18, fontWeight: 800, color: "#6366f1" }}>Rs. {p.price.toLocaleString()}</div>
                 </div>
               ))}
@@ -284,6 +333,17 @@ export default function POSPage() {
             {discAmt > 0 && (
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#f87171", marginBottom: 8 }}>
                 <span>Discount</span><span>− Rs. {discAmt.toLocaleString()}</span>
+              </div>
+            )}
+
+            {/* Tax */}
+            <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,.4)", whiteSpace: "nowrap" }}>Tax (%)</span>
+              <input value={taxRate} onChange={e => setTaxRate(e.target.value)} placeholder="0" type="number" min="0" max="100" style={{ ...inp, padding: "7px 10px", flex: 1 }} />
+            </div>
+            {taxAmt > 0 && (
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#fbbf24", marginBottom: 8 }}>
+                <span>Tax ({taxPct}%)</span><span>+ Rs. {taxAmt.toLocaleString()}</span>
               </div>
             )}
 
@@ -413,6 +473,11 @@ export default function POSPage() {
                     <span>Discount</span><span>− Rs. {receipt.discount.toLocaleString()}</span>
                   </div>
                 )}
+                {receipt.taxAmt > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, color: "#d97706" }}>
+                    <span>Tax ({receipt.taxRate}%)</span><span>+ Rs. {receipt.taxAmt.toLocaleString()}</span>
+                  </div>
+                )}
                 <div style={{ borderTop: "1px solid #999", paddingTop: 6, marginTop: 4, display: "flex", justifyContent: "space-between", fontSize: 16, fontWeight: 800 }}>
                   <span>TOTAL</span><span>Rs. {receipt.total.toLocaleString()}</span>
                 </div>
@@ -476,6 +541,7 @@ export default function POSPage() {
             <div style={{ fontSize: 12, marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span>Subtotal</span><span>Rs. {receipt.subtotal.toLocaleString()}</span></div>
               {receipt.discount > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span>Discount</span><span>− Rs. {receipt.discount.toLocaleString()}</span></div>}
+              {receipt.taxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span>Tax ({receipt.taxRate}%)</span><span>+ Rs. {receipt.taxAmt.toLocaleString()}</span></div>}
               <div style={{ borderTop: "1px solid #999", paddingTop: 6, marginTop: 4, display: "flex", justifyContent: "space-between", fontSize: 16, fontWeight: 800 }}><span>TOTAL</span><span>Rs. {receipt.total.toLocaleString()}</span></div>
             </div>
             <div style={{ borderTop: "1px dashed #999", paddingTop: 10, fontSize: 12, marginBottom: 10 }}>
@@ -495,10 +561,3 @@ export default function POSPage() {
     </div>
   );
 }
-
-const PAY_METHODS = [
-  { id: "cash" as const, label: "Cash", color: "#10b981" },
-  { id: "card" as const, label: "Card", color: "#6366f1" },
-  { id: "easypaisa" as const, label: "EasyPaisa", color: "#10b981" },
-  { id: "jazzcash" as const, label: "JazzCash", color: "#dc2626" },
-];
