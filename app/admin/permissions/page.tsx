@@ -151,6 +151,7 @@ const MODULE_LABELS: Record<string, string> = {
   event_budget: "Event Budget",
   travel_bookings: "Travel Bookings",
   visa_processing: "Visa Processing",
+  travel_settlements: "Travel Settlements",
   rental_items: "Rental Items",
   rental_agreements: "Rental Agreements",
   maintenance_schedule: "Maintenance Schedule",

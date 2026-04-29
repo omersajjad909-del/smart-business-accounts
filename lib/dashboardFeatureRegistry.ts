@@ -890,6 +890,15 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessTypes: ["travel"],
   },
   {
+    id: "TRAVEL_SETTLEMENTS",
+    label: "Supplier Settlements",
+    route: "/dashboard/travel/settlements",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Finance Desk",
+    businessTypes: ["travel"],
+  },
+  {
     id: "RENTALS_OVERVIEW",
     label: "Rentals Overview",
     route: "/dashboard/rentals",

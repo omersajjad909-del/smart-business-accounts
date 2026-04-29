@@ -11,10 +11,14 @@ export type TravelControlCenter = {
     pendingTickets: number;
     visaCases: number;
     activeVisaCases: number;
+    settlements: number;
+    pendingSettlements: number;
     monthlySales: number;
+    supplierExposure: number;
   };
   tickets: ReturnType<typeof mapTravelTicket>[];
   visas: ReturnType<typeof mapVisaCase>[];
+  settlements: ReturnType<typeof mapTravelSettlement>[];
 };
 
 export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
@@ -33,11 +37,17 @@ export function mapTravelTicket(record: BusinessRecord) {
     booking: record.title,
     passenger: String(record.data?.passenger || ""),
     airline: String(record.data?.airline || ""),
+    supplier: String(record.data?.supplier || record.data?.airline || ""),
     route: String(record.data?.route || ""),
     pnr: String(record.data?.pnr || ""),
     travelDate: String(record.date || "").slice(0, 10),
     amount: Number(record.amount || 0),
+    cost: Number(record.data?.cost || 0),
     status: record.status || "quoted",
+    invoiceId: String(record.data?.invoiceId || ""),
+    invoiceNo: String(record.data?.invoiceNo || ""),
+    settlementId: String(record.data?.settlementId || ""),
+    settlementRef: String(record.data?.settlementRef || ""),
   };
 }
 
@@ -47,9 +57,29 @@ export function mapVisaCase(record: BusinessRecord) {
     caseRef: record.title,
     applicant: String(record.data?.applicant || ""),
     country: String(record.data?.country || ""),
+    supplier: String(record.data?.supplier || record.data?.embassy || ""),
     passportNo: String(record.data?.passportNo || ""),
     submissionDate: String(record.date || "").slice(0, 10),
     amount: Number(record.amount || 0),
+    cost: Number(record.data?.cost || 0),
     status: record.status || "document_check",
+    invoiceId: String(record.data?.invoiceId || ""),
+    invoiceNo: String(record.data?.invoiceNo || ""),
+    settlementId: String(record.data?.settlementId || ""),
+    settlementRef: String(record.data?.settlementRef || ""),
+  };
+}
+
+export function mapTravelSettlement(record: BusinessRecord) {
+  return {
+    id: record.id,
+    settlementRef: record.title,
+    supplierName: String(record.data?.supplierName || ""),
+    customerName: String(record.data?.customerName || ""),
+    sourceTitle: String(record.data?.sourceTitle || ""),
+    invoiceNo: String(record.data?.invoiceNo || ""),
+    dueDate: String(record.date || "").slice(0, 10),
+    amount: Number(record.amount || 0),
+    status: record.status || "pending",
   };
 }

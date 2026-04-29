@@ -74,7 +74,7 @@ export type ModuleKey =
   | "solar_projects" | "utility_billing" | "meter_reading"
   | "shipments" | "customs_clearance" | "lc_management"
   | "event_bookings" | "vendor_management" | "event_budget"
-  | "travel_bookings" | "visa_processing"
+  | "travel_bookings" | "visa_processing" | "travel_settlements"
   | "rental_items" | "rental_agreements" | "maintenance_schedule"
   | "franchise_outlets" | "royalty_tracking" | "brand_compliance";
 
@@ -1660,7 +1660,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Airline ticketing, visa processing, and travel-service billing for agencies and consultants",
     tagline: "Quote → Book → Issue → Support",
     color: "#38bdf8", gradient: "linear-gradient(135deg,#0ea5e9,#38bdf8)", category: "Services",
-    modules: [...CORE, "sales_invoice", "quotation", "expense_vouchers", "crm", "travel_bookings", "visa_processing"],
+    modules: [...CORE, "sales_invoice", "quotation", "expense_vouchers", "crm", "travel_bookings", "visa_processing", "travel_settlements"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Customer Receivables", type: "Asset" },

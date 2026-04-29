@@ -25,6 +25,16 @@ type SummaryCard = {
   color: string;
 };
 
+type WorkspaceAction = {
+  label: string | ((row: Record<string, unknown>) => string);
+  tone?: "accent" | "success" | "neutral";
+  hidden?: (row: Record<string, unknown>) => boolean;
+  onClick: (
+    row: Record<string, unknown>,
+    helpers: { refetch: () => Promise<void>; setError: (message: string | null) => void },
+  ) => Promise<void> | void;
+};
+
 type BusinessRecordWorkspaceProps = {
   title: string;
   subtitle: string;
@@ -44,6 +54,7 @@ type BusinessRecordWorkspaceProps = {
     date?: string;
   };
   summarize: (rows: Record<string, unknown>[]) => SummaryCard[];
+  actions?: WorkspaceAction[];
 };
 
 const shellFont = "'Outfit','Inter',sans-serif";
@@ -70,6 +81,7 @@ export function BusinessRecordWorkspace({
   mapRecord,
   buildCreatePayload,
   summarize,
+  actions = [],
 }: BusinessRecordWorkspaceProps) {
   const initialForm = useMemo(
     () =>
@@ -80,12 +92,13 @@ export function BusinessRecordWorkspace({
     [defaultValues, fields],
   );
 
-  const { records, loading, create, remove, setStatus } = useBusinessRecords(category);
+  const { records, loading, create, remove, setStatus, refetch } = useBusinessRecords(category);
   const [form, setForm] = useState<Record<string, string>>(initialForm);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [actionKey, setActionKey] = useState<string | null>(null);
 
   const rows = useMemo(() => records.map(mapRecord), [mapRecord, records]);
   const summaries = useMemo(() => summarize(rows), [rows, summarize]);
@@ -130,6 +143,19 @@ export function BusinessRecordWorkspace({
       await setStatus(id, nextStatus);
     } catch (statusError) {
       setError(statusError instanceof Error ? statusError.message : "Failed to update status");
+    }
+  }
+
+  async function handleAction(action: WorkspaceAction, row: Record<string, unknown>) {
+    const nextActionKey = `${String(row.id)}:${typeof action.label === "function" ? action.label(row) : action.label}`;
+    setActionKey(nextActionKey);
+    setError(null);
+    try {
+      await action.onClick(row, { refetch, setError });
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : "Action failed");
+    } finally {
+      setActionKey(null);
     }
   }
 
@@ -337,6 +363,38 @@ export function BusinessRecordWorkspace({
                                   {option}
                                 </button>
                               ))}
+                            {actions
+                              .filter((action) => !action.hidden?.(row))
+                              .map((action) => {
+                                const label = typeof action.label === "function" ? action.label(row) : action.label;
+                                const busy = actionKey === `${rowId}:${label}`;
+                                const tone =
+                                  action.tone === "success"
+                                    ? { border: "1px solid rgba(52,211,153,.35)", background: "rgba(52,211,153,.12)", color: "#34d399" }
+                                    : action.tone === "neutral"
+                                      ? { border: "1px solid rgba(255,255,255,.16)", background: "rgba(255,255,255,.05)", color: "#e2e8f0" }
+                                      : { border: `1px solid ${accent}55`, background: `${accent}18`, color: accent };
+
+                                return (
+                                  <button
+                                    key={label}
+                                    type="button"
+                                    disabled={busy}
+                                    onClick={() => handleAction(action, row)}
+                                    style={{
+                                      borderRadius: 999,
+                                      fontSize: 11,
+                                      fontWeight: 700,
+                                      padding: "5px 10px",
+                                      cursor: busy ? "wait" : "pointer",
+                                      opacity: busy ? 0.7 : 1,
+                                      ...tone,
+                                    }}
+                                  >
+                                    {busy ? "Working..." : label}
+                                  </button>
+                                );
+                              })}
                             <button
                               type="button"
                               onClick={() => handleDelete(rowId)}

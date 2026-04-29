@@ -303,7 +303,7 @@ export default function ProductCatalogPage() {
             <div style={{ fontSize: 40, marginBottom: 12 }}>🗑️</div>
             <h3 style={{ fontSize: 16, fontWeight: 700, margin: "0 0 8px" }}>Delete Product?</h3>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,.45)", margin: "0 0 22px", lineHeight: 1.6 }}>
-              Ye product permanently delete ho jayega. Yeh action undo nahi ho sakta.
+             This product will be permanently deleted. This action cannot be undone.
             </p>
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <button
