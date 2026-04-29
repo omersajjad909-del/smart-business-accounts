@@ -52,7 +52,7 @@ export default function StockReceiptsPage() {
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>📦 Stock Receipts</h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>
-            History of all stock received — maal aane ka record
+            History of all stock received
           </p>
         </div>
         <Link
