@@ -32,7 +32,7 @@ type CompanyInfo = {
 
 export default function POSPage() {
   const user = getCurrentUser();
-  const { records: productRecords, loading: loadingProducts } = useBusinessRecords("catalog_product");
+  const { records: productRecords, loading: loadingProducts, update: updateProduct } = useBusinessRecords("catalog_product");
   const { records: saleRecords, create: createSale } = useBusinessRecords("pos_sale");
 
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -137,6 +137,16 @@ export default function POSPage() {
         amount: total,
         data: { payMethod, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt, taxRate: taxPct, taxAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName },
       });
+
+      // Deduct stock from each product in Product Catalog
+      for (const item of snapshot) {
+        const rec = productRecords.find(r => r.id === item.id);
+        if (rec) {
+          const currentStock = Number(rec.data?.stock ?? 0);
+          await updateProduct(item.id, { data: { stock: Math.max(0, currentStock - item.qty) } });
+        }
+      }
+
       setReceipt({
         receiptNo: saved.title || nextReceiptNo,
         soldAt: now.toISOString(),
