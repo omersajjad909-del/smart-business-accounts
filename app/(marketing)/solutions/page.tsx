@@ -2,7 +2,6 @@
 import Link from "next/link";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
 
 /* ─── Data ─── */
 const INDUSTRIES = [
@@ -966,7 +965,6 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
 
 /* ─── Page ─── */
 export default function SolutionsPage() {
-  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("trading");
   const [heroRef, heroVisible] = useVisible(0.2);
   const [crossRef, crossVisible] = useVisible(0.1);
@@ -982,7 +980,9 @@ export default function SolutionsPage() {
   }, []);
 
   useEffect(() => {
-    const requested = String(searchParams.get("industry") || "").trim().toLowerCase();
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const requested = String(params.get("industry") || "").trim().toLowerCase();
     if (!requested) return;
     const aliases: Record<string, string> = {
       import: "import",
@@ -999,7 +999,7 @@ export default function SolutionsPage() {
       document.getElementById(resolved)?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 150);
     return () => window.clearTimeout(timer);
-  }, [searchParams]);
+  }, []);
 
   // Determine if an industry is live (fallback: phase 1 is live, others are coming soon)
   const isLive = (ind: typeof INDUSTRIES[0]) => {
