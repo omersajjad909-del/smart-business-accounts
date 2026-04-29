@@ -1248,10 +1248,7 @@ export default function DashboardLayout({
               {hasDashboardFeature("RETAIL_POS") && <NavLink href="/dashboard/retail/pos" pathname={pathname}>POS Terminal</NavLink>}
               {hasDashboardFeature("RETAIL_POS_SESSIONS") && <NavLink href="/dashboard/retail/pos-sessions" pathname={pathname}>POS Sessions</NavLink>}
               {hasDashboardFeature("RETAIL_DISCOUNTS") && <NavLink href="/dashboard/retail/discounts" pathname={pathname}>Discounts & Promotions</NavLink>}
-              {hasDashboardFeature("RETAIL_LOYALTY") && <NavLink href="/dashboard/retail/loyalty" pathname={pathname}>Loyalty Points</NavLink>}
-              {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
               {hasDashboardFeature("RETAIL_ONLINE_SYNC") && <NavLink href="/dashboard/retail/online-sync" pathname={pathname}>Online Store Sync</NavLink>}
-              {hasDashboardFeature("RETAIL_SUPPLIER_PORTAL") && <NavLink href="/dashboard/retail/supplier-portal" pathname={pathname}>Supplier Portal</NavLink>}
             </NavGroup>
 
             {/* ── 2. Sales ── */}
@@ -1289,16 +1286,13 @@ export default function DashboardLayout({
               open={openSection === "retailInventory"}
               onToggle={() => toggle("retailInventory")}
             >
-              <NavLink href="/dashboard/items-new" pathname={pathname}>📋 Item Master</NavLink>
               {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/catalog" pathname={pathname}>Product Catalog</NavLink>}
               {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/categories" pathname={pathname}>Categories</NavLink>}
-              {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/stock-receipts" pathname={pathname}>📦 Stock Receipts</NavLink>}
+              {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/stock-receipts" pathname={pathname}>Stock Receipts</NavLink>}
               <NavLink href="/dashboard/barcode" pathname={pathname}>🔲 Barcode Management</NavLink>
               {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
               {hasDashboardFeature("RETAIL_STOCK_ADJUSTMENT") && <NavLink href="/dashboard/retail/stock-adjustment" pathname={pathname}>Stock Adjustment</NavLink>}
               {hasDashboardFeature("RETAIL_BATCH_EXPIRY") && <NavLink href="/dashboard/retail/batch-expiry" pathname={pathname}>Batch & Expiry</NavLink>}
-              <NavLink href="/dashboard/inventory" pathname={pathname}>📊 Inventory Overview</NavLink>
-              <NavLink href="/dashboard/stock-rate" pathname={pathname}>💰 Stock Rates</NavLink>
               <NavLink href="/dashboard/reports/stock/low" pathname={pathname}>🚨 Reorder Alerts</NavLink>
             </NavGroup>
 
@@ -1310,11 +1304,10 @@ export default function DashboardLayout({
               onToggle={() => toggle("retailCustomers")}
             >
               {hasDashboardFeature("RETAIL_CUSTOMERS") && <NavLink href="/dashboard/retail/customers" pathname={pathname}>Customer List</NavLink>}
-              <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>
-              <NavLink href="/dashboard/reports/ledger" pathname={pathname}>📒 Customer Ledger</NavLink>
-              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>📅 Ageing Report</NavLink>
               {hasDashboardFeature("RETAIL_LOYALTY") && <NavLink href="/dashboard/retail/loyalty" pathname={pathname}>Loyalty Points</NavLink>}
-              <NavLink href="/dashboard/crm/contacts" pathname={pathname}>🤝 CRM Contacts</NavLink>
+              <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>
+              <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Customer Ledger</NavLink>
+              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>
             </NavGroup>
 
             {/* ── 6. Suppliers ── */}
@@ -1325,7 +1318,8 @@ export default function DashboardLayout({
               onToggle={() => toggle("retailSuppliers")}
             >
               {hasDashboardFeature("RETAIL_SUPPLIERS") && <NavLink href="/dashboard/retail/suppliers" pathname={pathname}>Supplier List</NavLink>}
-              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>📅 Supplier Ageing</NavLink>
+              {hasDashboardFeature("RETAIL_SUPPLIER_PORTAL") && <NavLink href="/dashboard/retail/supplier-portal" pathname={pathname}>Supplier Portal</NavLink>}
+              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Supplier Ageing</NavLink>
             </NavGroup>
 
             {/* ── 11. Multi-Store ── */}
