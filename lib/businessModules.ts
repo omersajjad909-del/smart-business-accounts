@@ -13,6 +13,7 @@ export type BusinessType =
   | "school" | "hospital" | "hotel" | "pharmacy" | "salon"
   | "gym" | "transport" | "agriculture" | "ngo" | "ecommerce"
   | "law_firm" | "it_company" | "food_processing" | "clinic"
+  | "travel"
   // Automotive
   | "car_showroom" | "car_workshop" | "spare_parts" | "car_rental"
   // Media & Advertising
@@ -73,6 +74,7 @@ export type ModuleKey =
   | "solar_projects" | "utility_billing" | "meter_reading"
   | "shipments" | "customs_clearance" | "lc_management"
   | "event_bookings" | "vendor_management" | "event_budget"
+  | "travel_bookings" | "visa_processing"
   | "rental_items" | "rental_agreements" | "maintenance_schedule"
   | "franchise_outlets" | "royalty_tracking" | "brand_compliance";
 
@@ -1653,6 +1655,35 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
   },
   */
 
+  {
+    id: "travel", label: "Travel Agency", icon: "✈️", emoji: "✈️",
+    description: "Airline ticketing, visa processing, and travel-service billing for agencies and consultants",
+    tagline: "Quote → Book → Issue → Support",
+    color: "#38bdf8", gradient: "linear-gradient(135deg,#0ea5e9,#38bdf8)", category: "Services",
+    modules: [...CORE, "sales_invoice", "quotation", "expense_vouchers", "crm", "travel_bookings", "visa_processing"],
+    defaultAccounts: [
+      ...COMMON_ACCOUNTS,
+      { code: "1100", name: "Customer Receivables", type: "Asset" },
+      { code: "4001", name: "Air Ticket Revenue", type: "Revenue" },
+      { code: "4002", name: "Visa Processing Revenue", type: "Revenue" },
+      { code: "4003", name: "Travel Service Charges", type: "Revenue" },
+      { code: "5100", name: "Airline Settlement Cost", type: "Expense" },
+      { code: "5101", name: "Embassy / Visa Fee", type: "Expense" },
+      { code: "5102", name: "Travel & Courier Expense", type: "Expense" },
+    ],
+    kpis: [
+      { key: "tickets_issued", label: "Tickets Issued", icon: "🎫", color: "#38bdf8" },
+      { key: "visa_cases", label: "Visa Cases", icon: "🛂", color: "#a78bfa" },
+      { key: "monthly_sales", label: "Monthly Sales", icon: "💰", color: "#34d399" },
+      { key: "pending_travel", label: "Pending Cases", icon: "🧳", color: "#fbbf24" },
+    ],
+    quickActions: [
+      { label: "New Ticket", href: "/dashboard/travel/tickets", icon: "🎫", color: "#38bdf8" },
+      { label: "New Visa Case", href: "/dashboard/travel/visas", icon: "🛂", color: "#a78bfa" },
+      { label: "Quotation", href: "/dashboard/quotation", icon: "📄", color: "#fbbf24" },
+      { label: "Sales Invoice", href: "/dashboard/sales-invoice", icon: "🧾", color: "#34d399" },
+    ],
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -1684,6 +1715,7 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
 
   // ── Phase 3 — COMING SOON (Services + Healthcare + RE) ──────
   service:              { phase:3, status:"coming_soon", category:"Services",          label:"Services / Agency",       emoji:"💼", description:"Projects, contracts, time billing, recurring invoices" },
+  travel:               { phase:3, status:"live",        category:"Services",          label:"Travel Agency",           emoji:"✈️", description:"Airline tickets, visa processing, and travel-service billing" },
   construction:         { phase:3, status:"coming_soon", category:"Construction",      label:"Construction",            emoji:"🏗️", description:"Sites, BOQ, subcontractors, material requests" },
   real_estate:          { phase:3, status:"coming_soon", category:"Real Estate",       label:"Real Estate",             emoji:"🏠", description:"Properties, tenants, rent collection, leases" },
   law_firm:             { phase:3, status:"coming_soon", category:"Services",          label:"Law Firm",                emoji:"⚖️", description:"Cases, client billing, time tracking, retainers" },

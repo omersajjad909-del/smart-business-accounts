@@ -44,6 +44,7 @@ const BADGE_MAP: Record<string, { labels: string[]; color: string; bg: string }>
   clearing_forwarding: { labels: ["Files", "Customs", "Delivery"], color: "#fbbf24", bg: "rgba(120,53,15,.15)" },
   event_planner:       { labels: ["Events", "Vendors", "Budget"], color: "#e879f9", bg: "rgba(192,38,211,.15)" },
   wedding_planner:     { labels: ["Bookings", "Vendors", "Decor"], color: "#fda4af", bg: "rgba(225,29,72,.15)" },
+  travel:              { labels: ["Tickets", "Visas", "Quotations"], color: "#7dd3fc", bg: "rgba(56,189,248,.15)" },
   equipment_rental:    { labels: ["Rentals", "Utilization", "Maintenance"], color: "#fdba74", bg: "rgba(234,88,12,.15)" },
   franchise_brand:     { labels: ["Outlets", "Royalty", "Brand"], color: "#c4b5fd", bg: "rgba(124,58,237,.15)" },
 };

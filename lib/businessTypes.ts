@@ -57,7 +57,7 @@ export const ALL_BUSINESS_TYPES: BusinessType[] = [
   { id: "bakery",           label: "Bakery / Confectionery",   icon: "🥐", phase: 3, liveByDefault: false, category: "Food",          description: "Daily production, ingredient stock, and outlet billing" },
   { id: "hardware",         label: "Hardware / Building Materials", icon: "🔩", phase: 3, liveByDefault: false, category: "Commerce", description: "SKU management, credit sales, and site delivery tracking" },
   { id: "courier",          label: "Courier / Delivery",       icon: "📮", phase: 3, liveByDefault: false, category: "Logistics",     description: "Shipment tracking, COD reconciliation, and route costing" },
-  { id: "travel",           label: "Travel Agency",            icon: "✈️", phase: 3, liveByDefault: false, category: "Services",      description: "Tour packages, ticket billing, and visa cost tracking" },
+  { id: "travel",           label: "Travel Agency",            icon: "✈️", phase: 3, liveByDefault: true, category: "Services",       description: "Tour packages, ticket billing, and visa cost tracking" },
   { id: "security",         label: "Security Services",        icon: "🔐", phase: 3, liveByDefault: false, category: "Services",      description: "Guard deployment, site billing, and uniform inventory" },
 
   // ── PHASE 4 ───────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 export type DashboardFeaturePlanCode = "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
 
-export type DashboardBusinessGroup = "retail" | "distribution" | "trading" | "wholesale" | "manufacturing" | "service" | "restaurant" | "healthcare" | "real_estate" | "construction" | "school" | "hotel" | "pharmacy" | "transport" | "trade" | "ecommerce" | "salon" | "gym" | "agriculture" | "ngo" | "law_firm" | "it" | "automotive" | "repair" | "maintenance" | "media" | "subscriptions" | "isp" | "solar" | "events" | "rentals" | "firm" | "franchise";
+export type DashboardBusinessGroup = "retail" | "distribution" | "trading" | "wholesale" | "manufacturing" | "service" | "restaurant" | "healthcare" | "real_estate" | "construction" | "school" | "hotel" | "pharmacy" | "transport" | "trade" | "ecommerce" | "salon" | "gym" | "agriculture" | "ngo" | "law_firm" | "it" | "automotive" | "repair" | "maintenance" | "media" | "subscriptions" | "isp" | "solar" | "events" | "rentals" | "travel" | "firm" | "franchise";
 
 export type DashboardFeatureDefinition = {
   id: string;
@@ -861,6 +861,33 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessLabel: "Event Management",
     section: "Control Center",
     businessTypes: ["event_planner", "wedding_planner", "decorator", "sound_services"],
+  },
+  {
+    id: "TRAVEL_OVERVIEW",
+    label: "Travel Overview",
+    route: "/dashboard/travel",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Control Center",
+    businessTypes: ["travel"],
+  },
+  {
+    id: "TRAVEL_TICKETS",
+    label: "Airline Tickets",
+    route: "/dashboard/travel/tickets",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Ticketing Desk",
+    businessTypes: ["travel"],
+  },
+  {
+    id: "TRAVEL_VISAS",
+    label: "Visa Cases",
+    route: "/dashboard/travel/visas",
+    business: "travel",
+    businessLabel: "Travel Agency",
+    section: "Visa Desk",
+    businessTypes: ["travel"],
   },
   {
     id: "RENTALS_OVERVIEW",

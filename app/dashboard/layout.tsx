@@ -1716,6 +1716,22 @@ export default function DashboardLayout({
             )}
 
           {/* Rental Business */}
+            {hasModule(businessType, "travel_bookings") && isBusinessEnabled(businessType) && (
+              <NavGroup
+                title="Travel"
+                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>}
+                open={openSection === "travel"}
+                onToggle={() => toggle("travel")}
+              >
+                {hasDashboardFeature("TRAVEL_OVERVIEW") && <NavLink href="/dashboard/travel" pathname={pathname}>Overview</NavLink>}
+                {hasDashboardFeature("TRAVEL_TICKETS") && <NavLink href="/dashboard/travel/tickets" pathname={pathname}>Airline Tickets</NavLink>}
+                {hasDashboardFeature("TRAVEL_VISAS") && <NavLink href="/dashboard/travel/visas" pathname={pathname}>Visa Cases</NavLink>}
+                <NavLink href="/dashboard/quotation" pathname={pathname}>Quotations</NavLink>
+                <NavLink href="/dashboard/sales-invoice" pathname={pathname}>Sales Invoices</NavLink>
+              </NavGroup>
+            )}
+
+          {/* Rental Business */}
             {hasModule(businessType, "rental_items") && (
               <NavGroup
                 title="Rentals"
