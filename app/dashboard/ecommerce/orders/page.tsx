@@ -61,13 +61,13 @@ export default function EcommerceOrdersPage() {
     const quantity = Number(form.quantity);
     const amount = Number(form.amount);
 
-    if (!customer) return setError("Customer name zaroori hai.");
+    if (!customer) return setError("Customer name is required.");
     if (!selectedProduct) return setError("Valid product select karein.");
-    if (!address) return setError("Delivery address zaroori hai.");
-    if (!Number.isFinite(quantity) || quantity <= 0) return setError("Quantity zero se bari honi chahiye.");
-    if (!Number.isFinite(amount) || amount <= 0) return setError("Order amount zero se bari honi chahiye.");
-    if (selectedProduct.stock <= 0) return setError("Selected product out of stock hai.");
-    if (quantity > selectedProduct.stock) return setError("Selected quantity available stock se zyada hai.");
+    if (!address) return setError("Delivery address is required.");
+    if (!Number.isFinite(quantity) || quantity <= 0) return setError("Quantity must be greater than zero.");
+    if (!Number.isFinite(amount) || amount <= 0) return setError("Order amount must be greater than zero.");
+    if (selectedProduct.stock <= 0) return setError("The selected product is out of stock.");
+    if (quantity > selectedProduct.stock) return setError("The selected quantity exceeds available stock.");
 
     setSaving(true);
     setError("");
@@ -90,7 +90,7 @@ export default function EcommerceOrdersPage() {
       setShowModal(false);
       setForm(emptyForm);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Order create nahi ho saka.");
+      setError(err instanceof Error ? err.message : "The order could not be created.");
     } finally {
       setSaving(false);
     }
@@ -115,7 +115,7 @@ export default function EcommerceOrdersPage() {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Order update nahi ho saka.");
+      setError(err instanceof Error ? err.message : "The order could not be updated.");
     }
   }
 
@@ -203,7 +203,7 @@ export default function EcommerceOrdersPage() {
               {!orders.length && (
                 <tr>
                   <td colSpan={9} style={{ padding: 42, textAlign: "center", color: "rgba(255,255,255,.28)" }}>
-                    Orders abhi create nahi hue.
+                    No orders have been created yet.
                   </td>
                 </tr>
               )}

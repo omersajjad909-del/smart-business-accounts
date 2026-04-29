@@ -85,11 +85,11 @@ export default function ContractsPage() {
     const value = Number(form.value);
     const duplicateContract = contracts.some(c => c.client.toLowerCase() === client.toLowerCase() && c.project.toLowerCase() === project.toLowerCase() && c.status !== 'Terminated');
     if (!client || !project || !form.start || !form.end) {
-      toast.error('Client, project, start, aur end date required hain.');
+      toast.error('Client, project, start date, and end date are required.');
       return;
     }
     if (new Date(form.end) < new Date(form.start)) {
-      toast('Contract end date start se pehle nahi ho sakti.');
+      toast('Contract end date cannot be earlier than the start date.');
       return;
     }
     if (value <= 0) {
@@ -97,7 +97,7 @@ export default function ContractsPage() {
       return;
     }
     if (duplicateContract) {
-      toast.error('Is client project ke liye active contract already maujood hai.');
+      toast.error('An active contract for this client project already exists.');
       return;
     }
     const days = form.end ? Math.round((new Date(form.end).getTime() - todayTs) / 86400000) : 0;

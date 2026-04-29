@@ -81,7 +81,7 @@ export default function ItemsNewPage() {
   }
 
   async function saveItem() {
-    if (!name.trim() || !unit) { toast("Item name aur unit zaroori hai"); return; }
+    if (!name.trim() || !unit) { toast("Item name and unit are required."); return; }
     setSaving(true);
     try {
       const res = await fetch("/api/items-new", {

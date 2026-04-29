@@ -264,7 +264,7 @@ export default function QuotationPage() {
   async function saveQuotation() {
     const clean = rows.filter(r => r.itemId && r.qty && r.rate);
     if (!customerId || !clean.length) {
-      toast.error("Customer aur items zaroori hain");
+      toast.error("Customer and items are required.");
       return;
     }
 

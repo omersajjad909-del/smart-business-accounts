@@ -267,7 +267,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // E. اگر PO ہے تو اس کا اسٹیٹس چیک کریں
+      // E. If a PO exists, check its status.
       if (poId) {
         const allItems = await tx.purchaseOrderItem.findMany({ where: { poId } });
         const isDone = allItems.every((pi: any) => pi.invoicedQty >= pi.qty);

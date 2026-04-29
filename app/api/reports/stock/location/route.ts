@@ -41,14 +41,14 @@ export async function GET(req: NextRequest) {
       }
 
       // اگر آپ کے ڈیٹا بیس میں qty پہلے ہی سیلز کے لیے مائنس میں ہے تو صرف جمع کریں
-      // ورنہ آپ کی موجودہ ٹائپ وائز لاجک (جو نیچے ہے) استعمال کریں:
+      // Otherwise use the existing type-based logic below:
       map[key].qty += t.qty; 
     }
 
     // صرف وہ آئٹمز دکھائیں جن کا اسٹاک 0 نہیں ہے
     const result = Object.values(map).filter((r: any) => r.qty !== 0);
     
-    // لوکیشن کے حساب سے ترتیب دیں (Sorting)
+    // Sort by location.
     result.sort((a: any, b: any) => a.location.localeCompare(b.location));
 
     return NextResponse.json(result);

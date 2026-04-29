@@ -79,15 +79,15 @@ export default function FirmClientsPage() {
     const phone = form.phone.trim();
     const duplicateClient = clients.some(c => c.name.toLowerCase() === name.toLowerCase() || (email && c.email.trim().toLowerCase() === email) || (phone && c.phone.trim() === phone));
     if (!name) {
-      toast.error("Client name required hai.");
+      toast.error("Client name is required.");
       return;
     }
     if (form.retainerAmt && Number(form.retainerAmt) < 0) {
-      toast("Retainer negative nahi ho sakta.");
+      toast("Retainer cannot be negative.");
       return;
     }
     if (duplicateClient) {
-      toast("Yeh client name, phone, ya email pehle se maujood hai.");
+      toast("A client with this name, phone, or email already exists.");
       return;
     }
     setSaving(true);

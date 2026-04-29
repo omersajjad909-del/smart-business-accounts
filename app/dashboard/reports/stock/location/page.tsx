@@ -33,7 +33,7 @@ export default function LocationStockPage() {
     }
   }
 
-  // 📂 لوکیشن کے حساب سے ڈیٹا کو گروپ کرنا
+  // Group data by location.
   const locations = [...new Set(rows.map(r => r.location))];
 
   return (
@@ -53,7 +53,7 @@ export default function LocationStockPage() {
         <div className="space-y-8">
           {locations.map(loc => (
             <div key={loc} className="border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              {/* لوکیشن ہیڈر */}
+              {/* Location header */}
               <div className="bg-black text-white p-3 uppercase font-black flex justify-between items-center">
                 <span>📍 Location: {loc}</span>
                 <span className="text-[10px] bg-gray-700 px-2 py-1 italic">Warehouse Record</span>

@@ -47,7 +47,7 @@ export default function DealsPage() {
     const customer = form.customer.trim();
     const vehicle = vehicles.find((item) => item.id === form.vehicleId);
     const amount = Number(form.amount);
-    if (!customer) return toast.error("Customer required hai.");
+    if (!customer) return toast.error("Customer is required.");
     if (!vehicle) return toast.error("Vehicle select karein.");
     if (amount <= 0) return toast("Deal amount valid honi chahiye.");
     if (deals.some((item) => item.customer.trim().toLowerCase() === customer.toLowerCase() && item.vehicleId === vehicle.id && item.status !== "lost")) {

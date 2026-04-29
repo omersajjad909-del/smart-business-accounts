@@ -59,9 +59,9 @@ export default function MembershipContentTiersPage() {
       .filter(Boolean);
     if (!title) return toast.error("Tier title required hai.");
     if (!plan) return toast.error("Active plan select karein.");
-    if (!modules.length) return toast.error("Kam az kam aik content/module access required hai.");
+    if (!modules.length) return toast.error("At least one content or module access item is required.");
     if (tiers.some((item) => item.title.trim().toLowerCase() === title.toLowerCase() && item.status !== "inactive")) {
-      return toast.error("Is naam ka content tier already maujood hai.");
+      return toast.error("A content tier with this name already exists.");
     }
 
     await create({

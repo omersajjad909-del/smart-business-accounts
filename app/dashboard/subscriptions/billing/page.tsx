@@ -47,7 +47,7 @@ export default function RecurringBillingPage() {
     const subscriber = subscribers.find((item) => item.id === subscriberId);
     if (!subscriber) return toast.error("Subscriber select karein.");
     if (billings.some((item) => item.subscriberId === subscriber.id && item.status !== "failed" && item.status !== "paid")) {
-      return toast.error("Is subscriber ka open billing run already maujood hai.");
+      return toast.error("This subscriber already has an open billing run.");
     }
     await create({
       title: subscriber.company,

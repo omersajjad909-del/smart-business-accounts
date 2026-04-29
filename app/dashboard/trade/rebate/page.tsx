@@ -139,12 +139,12 @@ export default function TradeRebatePage() {
     const amount = Number(form.amount);
     if (!form.claimNo.trim()) return setError("Claim number required.");
     if (!form.scheme.trim()) return setError("Scheme is required.");
-    if (!form.invoiceRef.trim() && !form.shipmentRef.trim()) return setError("Invoice ref ya shipment ref me se kam az kam ek chahiye.");
+    if (!form.invoiceRef.trim() && !form.shipmentRef.trim()) return setError("At least one of invoice reference or shipment reference is required.");
     if (!Number.isFinite(amount) || amount <= 0) return setError("Valid claim amount required.");
     if (!form.date) return setError("Claim date required.");
 
     const duplicate = rebates.find((row) => row.claimNo.toLowerCase() === form.claimNo.trim().toLowerCase() && row.id !== editingId);
-    if (duplicate) return setError("Ye claim number already maujood hai.");
+    if (duplicate) return setError("This claim number already exists.");
 
     const payload = {
       title: form.claimNo.trim(),

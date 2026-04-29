@@ -47,7 +47,7 @@ export default function LoyaltyPage() {
       return;
     }
     if (!phone && !email) {
-      setFormError("Phone or email me se kam az kam aik field required hai.");
+      setFormError("At least one of phone or email is required.");
       return;
     }
     if (form.points < 0) {

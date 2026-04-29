@@ -144,15 +144,15 @@ export default function BOMPage() {
           <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 20 }}>
             <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>Flow</div>
             <div style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,.55)" }}>
-              1. Raw materials define karo.
+              1. Define raw materials.
               <br />
               2. BOM banao.
               <br />
-              3. BOM ke against production order issue karo.
+              3. Issue a production order against the BOM.
               <br />
-              4. Work orders aur quality checks complete karo.
+              4. Complete work orders and quality checks.
               <br />
-              5. Finished goods batch receive karo.
+              5. Receive the finished goods batch.
             </div>
           </div>
         </div>

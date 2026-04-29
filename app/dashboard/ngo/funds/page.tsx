@@ -45,7 +45,7 @@ export default function FundsPage() {
 
   const addTransaction = async () => {
     if (!form.description.trim() || !form.amount || !form.fund) {
-      toast.error("Fund, description, aur amount required hain.");
+      toast.error("Fund, description, and amount are required.");
       return;
     }
     await createTx({ title: form.description, status: form.type, date: today, amount: Number(form.amount), data: { fund: form.fund || (funds[0]?.name || ""), reference: form.reference } });

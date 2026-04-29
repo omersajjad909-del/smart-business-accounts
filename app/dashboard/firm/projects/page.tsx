@@ -80,19 +80,19 @@ export default function FirmProjectsPage() {
     const fee = Number(form.fee);
     const duplicateProject = projects.some(p => p.name.toLowerCase() === name.toLowerCase() && p.client.toLowerCase() === client.toLowerCase());
     if (!name || !client || !form.startDate || !form.endDate) {
-      toast.error("Project name, client, start, aur end date required hain.");
+      toast.error("Project name, client, start date, and end date are required.");
       return;
     }
     if (new Date(form.endDate) < new Date(form.startDate)) {
-      toast("End date start date se pehle nahi ho sakti.");
+      toast("End date cannot be earlier than the start date.");
       return;
     }
     if (fee < 0) {
-      toast("Project fee negative nahi ho sakti.");
+      toast("Project fee cannot be negative.");
       return;
     }
     if (duplicateProject) {
-      toast("Yeh engagement is client ke liye pehle se maujood hai.");
+      toast("This engagement already exists for the client.");
       return;
     }
     setSaving(true);

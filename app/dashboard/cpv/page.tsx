@@ -354,7 +354,7 @@ export default function CPVPage() {
           </thead>
           <tbody>
             {vouchers.length === 0 ? (
-              <tr><td colSpan={6} style={{ padding:40, textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:13 }}>Koi CPV nahi mila</td></tr>
+              <tr><td colSpan={6} style={{ padding:40, textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:13 }}>No CPV records found</td></tr>
             ) : vouchers.map((v, idx) => (
               <tr key={v.id} style={{ borderBottom: idx < vouchers.length-1 ? "1px solid rgba(255,255,255,.04)" : "none" }}
                 onMouseEnter={e => (e.currentTarget.style.background="rgba(255,255,255,.02)")}

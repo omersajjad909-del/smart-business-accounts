@@ -49,7 +49,7 @@ export default function SubscribersPage() {
     if (!form.company.trim() || !form.contact.trim() || !form.email.trim()) return toast.error("Company, contact, aur email required hain.");
     if (!selectedPlan) return toast.error("Active plan select karein.");
     if (subscribers.some((row) => row.email.trim().toLowerCase() === form.email.trim().toLowerCase() && row.status !== "cancelled")) {
-      return toast.error("Is email ka active subscriber already maujood hai.");
+      return toast.error("An active subscriber with this email already exists.");
     }
     await create({
       title: form.company.trim(),

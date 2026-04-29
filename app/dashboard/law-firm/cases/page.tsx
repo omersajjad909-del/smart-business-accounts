@@ -71,15 +71,15 @@ export default function CasesPage() {
     const lawyer = form.lawyer.trim();
     const duplicateCase = cases.some(c => c.title.toLowerCase() === title.toLowerCase() && c.client.toLowerCase() === client.toLowerCase());
     if (!title || !client || !court || !form.fileDate || !lawyer) {
-      toast.success('Case title, client, court, file date, aur assigned lawyer required hain.');
+      toast.success('Case title, client, court, file date, and assigned lawyer are required.');
       return;
     }
     if (duplicateCase) {
-      toast('Is client ke liye yeh case pehle se maujood hai.');
+      toast('This case already exists for the client.');
       return;
     }
     if (form.nextHearing && new Date(form.nextHearing) < new Date(form.fileDate)) {
-      toast('Next hearing file date se pehle nahi ho sakti.');
+      toast('The next hearing date cannot be earlier than the file date.');
       return;
     }
     await create({ title: form.title, status: form.status, date: form.fileDate, data: { caseNo: `CASE-${String(records.length + 1).padStart(3, '0')}`, client: form.client, type: form.type, court: form.court, fileDate: form.fileDate, nextHearing: form.nextHearing, lawyer: form.lawyer } });

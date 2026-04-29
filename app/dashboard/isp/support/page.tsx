@@ -46,9 +46,9 @@ export default function IspSupportPage() {
   const saveTicket = async () => {
     const connection = connections.find((item) => item.id === form.connectionId);
     if (!connection) return toast.error("Connection select karein.");
-    if (!form.issue.trim()) return toast.error("Issue detail required hai.");
+    if (!form.issue.trim()) return toast.error("Issue details are required.");
     if (tickets.some((item) => item.connectionId === connection.id && item.issue.trim().toLowerCase() === form.issue.trim().toLowerCase() && item.status !== "closed")) {
-      return toast.error("Same issue ka open ticket already maujood hai.");
+      return toast.error("An open ticket for the same issue already exists.");
     }
     await create({
       title: connection.customer,

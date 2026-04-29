@@ -1,5 +1,5 @@
 -- Professional Accounting System - Standard Chart of Accounts
--- یہ script تمام ضروری accounts کو setup کر دے گا
+-- This script sets up all required accounts.
 
 -- ==================== ASSETS (اثاثے) ====================
 INSERT INTO "Account" (id, code, name, type, "partyType", "createdAt")
@@ -65,5 +65,5 @@ VALUES
 (gen_random_uuid(), 'CONTRA003', 'Sales Discount', 'INCOME', NULL, NOW()),
 (gen_random_uuid(), 'CONTRA004', 'Purchase Discount', 'EXPENSE', NULL, NOW());
 
--- یہ commands run کرنے سے پہلے DATABASE میں duplicates نہیں ہونی چاہئیں
+-- Make sure there are no duplicate records in the database before running these commands.
 -- اگر duplicates ہوں تو delete کریں۔

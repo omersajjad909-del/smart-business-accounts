@@ -73,15 +73,15 @@ export default function ConsultancyProposalsPage() {
     const value = Number(form.value);
     const duplicateProposal = proposalNo && proposals.some((p) => p.proposalNo.trim().toLowerCase() === proposalNo.toLowerCase());
     if (!client || !proposalNo || !form.dueDate) {
-      toast.error("Client, proposal number, aur due date required hain.");
+      toast.error("Client, proposal number, and due date are required.");
       return;
     }
     if (value <= 0) {
-      toast("Proposal value positive honi chahiye.");
+      toast("Proposal value must be positive.");
       return;
     }
     if (duplicateProposal) {
-      toast("Yeh proposal number pehle se maujood hai.");
+      toast("This proposal number already exists.");
       return;
     }
     setSaving(true);

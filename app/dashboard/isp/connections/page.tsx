@@ -48,10 +48,10 @@ export default function IspConnectionsPage() {
     const phone = form.phone.trim();
     const address = form.address.trim();
     const selectedPackage = packages.find((item) => item.id === form.packageId);
-    if (!customer || !phone || !address) return toast.error("Customer, phone, aur address required hain.");
+    if (!customer || !phone || !address) return toast.error("Customer, phone, and address are required.");
     if (!selectedPackage) return toast.error("Active package select karein.");
     if (connections.some((item) => item.phone.trim() === phone && item.status !== "closed")) {
-      return toast.error("Is phone ka active connection already maujood hai.");
+      return toast.error("An active connection with this phone number already exists.");
     }
     await create({
       title: customer,

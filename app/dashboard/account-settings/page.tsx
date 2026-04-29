@@ -371,7 +371,7 @@ export default function AccountSettingsPage() {
             <div style={{ marginBottom: 18 }}>
               <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Change Email</div>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,.42)" }}>
-                OTP aapki <strong>current (purani) email</strong> pe bheja jayega. Verify karne ke baad hi email change hogi.
+                The OTP will be sent to your <strong>current email address</strong>. Your email will be changed only after verification.
               </div>
             </div>
 

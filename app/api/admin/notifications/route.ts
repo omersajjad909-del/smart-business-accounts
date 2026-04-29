@@ -1,6 +1,6 @@
 // FILE: app/api/admin/notifications/route.ts
 // Notifications — Prisma Notification model use karta hai
-// Agar model nahi hai toh empty array return karta hai (no crash)
+// If the model is missing, return an empty array without crashing
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";

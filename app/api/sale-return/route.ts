@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 1. تمام موجودہ SR نمبرز حاصل کر کے اگلا نمبر (SR-1, SR-2...) نکالنا
+    // 1. Read the existing SR numbers and determine the next one (SR-1, SR-2, ...).
     const allReturns = await prisma.saleReturn.findMany({
       where: { returnNo: { startsWith: 'SR-' }, companyId },
       select: { returnNo: true }

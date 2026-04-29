@@ -78,7 +78,7 @@ export default function SalonAnalyticsPage() {
         <div style={{ fontSize: 12, color: "#f472b6", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Salon Analytics</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Revenue, stylist load, aur service mix</h1>
         <p style={{ margin: 0, fontSize: 14, color: salonMuted, maxWidth: 760 }}>
-          Salon owner ko yahan se pata chalta hai ke kaunsi services sabse zyada revenue la rahi hain, kaunsa stylist most loaded hai, aur cancellations kitni pressure create kar rahi hain.
+          This view helps the salon owner see which services generate the most revenue, which stylist is carrying the heaviest load, and how much pressure cancellations are creating.
         </p>
       </div>
 

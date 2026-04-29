@@ -84,7 +84,7 @@ export default function FirmTimesheetsPage() {
     const rate = parseFloat(form.rate) || 0;
     const duplicateEntry = entries.some(e => e.staffName.toLowerCase() === staffName.toLowerCase() && e.project.trim().toLowerCase() === form.project.trim().toLowerCase() && e.date === date);
     if (!staffName || !date) {
-      toast.error("Staff name aur date required hain.");
+      toast.error("Staff name and date are required.");
       return;
     }
     if (hours <= 0 || rate < 0) {
@@ -92,7 +92,7 @@ export default function FirmTimesheetsPage() {
       return;
     }
     if (duplicateEntry) {
-      toast.error("Is staff ke liye isi project aur date par entry already maujood hai.");
+      toast.error("An entry for this staff member, project, and date already exists.");
       return;
     }
     setSaving(true);

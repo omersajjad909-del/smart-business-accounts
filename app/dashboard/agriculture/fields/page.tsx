@@ -28,11 +28,11 @@ export default function FieldsPage() {
   async function save() {
     const name = form.name.trim();
     if (!name || !form.area || !form.location.trim()) {
-      toast.error("Field name, area, aur location required hain.");
+      toast.error("Field name, area, and location are required.");
       return;
     }
     if (fields.some(f => f.name.trim().toLowerCase() === name.toLowerCase())) {
-      toast.error("Ye field already maujood hai.");
+      toast.error("This field already exists.");
       return;
     }
     await create({ title: form.name, status: "active", data: { area: form.area, soilType: form.soilType, irrigationType: form.irrigationType, location: form.location } });

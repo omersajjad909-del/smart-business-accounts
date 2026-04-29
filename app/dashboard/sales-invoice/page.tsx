@@ -260,7 +260,7 @@ function SalesInvoiceContent() {
 
   async function saveInvoice() {
     const clean = rows.filter(r => r.itemId && r.qty && r.rate);
-    if (!customerId || !clean.length) { toast.error("Customer aur items zaroori hain"); return; }
+    if (!customerId || !clean.length) { toast.error("Customer and items are required."); return; }
     setSaving(true);
     try {
       const method = editing ? "PUT" : "POST";

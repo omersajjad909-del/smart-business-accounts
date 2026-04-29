@@ -59,7 +59,7 @@ export default function MemberAccessPage() {
     if (!subscriber) return toast.error("Subscriber select karein.");
     if (!tier) return toast.error("Content tier select karein.");
     if (accessRows.some((row) => row.data?.subscriberId === subscriber.id && row.data?.tierId === tier.id && row.status !== "revoked")) {
-      return toast("Is subscriber ka ye access pehle se active hai.");
+      return toast("This access is already active for the subscriber.");
     }
     await create({
       title: subscriber.company,

@@ -89,7 +89,7 @@ export default function SupportPage() {
     const project = form.project.trim();
     const duplicateTicket = tickets.some(t => t.title.toLowerCase() === title.toLowerCase() && t.client.toLowerCase() === client.toLowerCase() && t.status !== 'Closed');
     if (!title || !client || !project) {
-      toast.error('Title, client, aur project required hain.');
+      toast.error('Title, client, and project are required.');
       return;
     }
     if (duplicateTicket) {

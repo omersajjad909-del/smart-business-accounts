@@ -56,12 +56,12 @@ export default function SubscriptionBoxCatalogPage() {
     const plan = plans.find((item) => item.id === form.planId);
     const items = form.items.split(",").map((item) => item.trim()).filter(Boolean);
     const price = Number(form.price);
-    if (!title) return toast.error("Box name required hai.");
+    if (!title) return toast.error("Box name is required.");
     if (!plan) return toast.error("Active plan select karein.");
     if (!items.length) return toast("Kam az kam aik curated item add karein.");
     if (price <= 0) return toast("Box price valid honi chahiye.");
     if (boxes.some((item) => item.title.trim().toLowerCase() === title.toLowerCase() && item.status !== "archived")) {
-      return toast.error("Is naam ka box already maujood hai.");
+      return toast.error("A box with this name already exists.");
     }
     await create({
       title,

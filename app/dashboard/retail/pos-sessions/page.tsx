@@ -255,7 +255,7 @@ export default function POSSessionsPage() {
                   </div>
                   <div style={{ display: "flex", gap: 14, alignItems: "flex-end" }}>
                     <div style={{ flex: 1 }}>
-                      <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Actual Cash in Drawer (Count karo) *</label>
+                      <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Actual Cash in Drawer (Count it) *</label>
                       <input
                         type="number" min="0" autoFocus
                         value={closingCash}
@@ -326,7 +326,7 @@ export default function POSSessionsPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <div>
                 <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800 }}>🟢 Open New Session</h2>
-                <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>Cashier shift shuru karo</p>
+                <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>Start cashier shift</p>
               </div>
               <button onClick={() => setShowOpen(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>

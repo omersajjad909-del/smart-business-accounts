@@ -29,7 +29,7 @@ export default function CropsPage() {
     const name = form.name.trim();
     const field = form.field.trim();
     if (!name || !field || !form.plantDate) {
-      toast.error("Crop name, field, aur plant date required hain.");
+      toast.error("Crop name, field, and planting date are required.");
       return;
     }
     if (crops.some(c => c.name.trim().toLowerCase() === name.toLowerCase() && c.field.trim().toLowerCase() === field.toLowerCase() && c.status !== "harvested" && c.status !== "failed")) {

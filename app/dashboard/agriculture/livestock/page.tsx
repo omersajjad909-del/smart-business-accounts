@@ -28,7 +28,7 @@ export default function LivestockPage() {
 
   async function save() {
     if (!form.type || !form.breed.trim() || form.count <= 0) {
-      toast.error("Animal type, breed, aur valid count required hain.");
+      toast.error("Animal type, breed, and a valid count are required.");
       return;
     }
     await create({ title: form.type, status: "healthy", date: form.dob, data: { breed: form.breed, count: form.count, weight: form.weight, notes: form.notes } });

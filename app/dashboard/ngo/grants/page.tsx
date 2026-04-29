@@ -40,11 +40,11 @@ export default function GrantsPage() {
   const addGrant = async () => {
     const title = form.title.trim();
     if (!title || !form.donor.trim() || !form.amount) {
-      toast.error("Grant title, donor, aur amount required hain.");
+      toast.error("Grant title, donor, and amount are required.");
       return;
     }
     if (grants.some(g => g.title.trim().toLowerCase() === title.toLowerCase() || (form.grantNo && g.grantNo.trim().toLowerCase() === form.grantNo.trim().toLowerCase()))) {
-      toast.error("Ye grant already registered hai.");
+      toast.error("This grant is already registered.");
       return;
     }
     await create({ title: form.title, status: "active", date: form.startDate, amount: Number(form.amount), data: { grantNo: form.grantNo || `GRT-${String(records.length + 1).padStart(3, '0')}`, donor: form.donor, currency: form.currency, startDate: form.startDate, endDate: form.endDate, purpose: form.purpose, spent: 0, reportDue: form.reportDue || undefined } });

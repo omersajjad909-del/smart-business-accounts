@@ -39,11 +39,11 @@ export default function ServicesPage() {
 
   const handleAdd = async () => {
     setError("");
-    if (!form.name.trim()) return setError("Service name required hai.");
-    if (!form.duration || Number(form.duration) <= 0) return setError("Duration positive honi chahiye.");
-    if (!form.price || Number(form.price) <= 0) return setError("Price positive honi chahiye.");
+    if (!form.name.trim()) return setError("Service name is required.");
+    if (!form.duration || Number(form.duration) <= 0) return setError("Duration must be positive.");
+    if (!form.price || Number(form.price) <= 0) return setError("Price must be positive.");
     if (services.some((service) => service.name.toLowerCase() === form.name.trim().toLowerCase())) {
-      return setError("Ye service pehle se menu me hai.");
+      return setError("This service is already on the menu.");
     }
 
     await servicesHook.create({
@@ -70,7 +70,7 @@ export default function ServicesPage() {
         (appointment.status === "booked" || appointment.status === "confirmed" || appointment.status === "in_progress"),
       );
       if (hasOpenAppointments) {
-        setError("Is service ke active appointments hain. Pehle unhein close karein.");
+        setError("This service has active appointments. Close them first.");
         return;
       }
     }
@@ -82,7 +82,7 @@ export default function ServicesPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>Service Menu</h1>
-          <p style={{ fontSize: 14, color: salonMuted, marginTop: 6 }}>Salon cards, duration, pricing, aur live menu status yahan se manage hota hai.</p>
+          <p style={{ fontSize: 14, color: salonMuted, marginTop: 6 }}>Manage salon cards, duration, pricing, and live menu status from here.</p>
         </div>
         <button style={{ background: "#ec4899", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontWeight: 700, cursor: "pointer", fontSize: 14 }} onClick={() => setShowModal(true)}>+ Add Service</button>
       </div>

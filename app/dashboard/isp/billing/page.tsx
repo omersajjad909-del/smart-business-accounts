@@ -49,11 +49,11 @@ export default function IspBillingPage() {
     const connection = connections.find((item) => item.id === connectionId);
     if (!connection) return toast.error("Connection select karein.");
     if (bills.some((item) => item.connectionId === connection.id && item.status !== "paid" && item.status !== "waived")) {
-      return toast.error("Is connection ka open bill already maujood hai.");
+      return toast.error("This connection already has an open bill.");
     }
     const pack = packages.find((item) => item.id === connection.packageId);
     const amount = Number(pack?.price || 0);
-    if (amount <= 0) return toast.success("Assigned package price valid nahi hai.");
+    if (amount <= 0) return toast.success("The assigned package price is invalid.");
     await create({
       title: connection.customer,
       status: "generated",

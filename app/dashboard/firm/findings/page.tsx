@@ -79,7 +79,7 @@ export default function AuditFindingsPage() {
     const issue = form.issue.trim();
     const duplicateFinding = findings.some((f) => f.engagement.toLowerCase() === engagement.toLowerCase() && f.area.toLowerCase() === area.toLowerCase() && f.issue.toLowerCase() === issue.toLowerCase() && f.status !== "Cleared");
     if (!engagement || !area || !issue) {
-      toast.error("Engagement, area, aur issue detail required hain.");
+      toast.error("Engagement, area, and issue details are required.");
       return;
     }
     if (duplicateFinding) {

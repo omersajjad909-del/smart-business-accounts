@@ -260,7 +260,7 @@ export const emailTemplates = {
     const countryProfile = (): CountryProfile => {
       if (cc === "PK") return {
         flag: "🇵🇰",
-        greeting: "خوش آمدید! Welcome",
+        greeting: "Welcome!",
         currency: "PKR",
         taxLabel: "FBR / Tax Compliance",
         taxTips: [
@@ -278,7 +278,7 @@ export const emailTemplates = {
       };
       if (GULF.includes(cc)) return {
         flag: cc === "AE" ? "🇦🇪" : cc === "SA" ? "🇸🇦" : cc === "QA" ? "🇶🇦" : "🌍",
-        greeting: "أهلاً وسهلاً! Welcome",
+        greeting: "Welcome!",
         currency: cc === "AE" ? "AED" : cc === "SA" ? "SAR" : cc === "QA" ? "QAR" : "USD",
         taxLabel: "VAT Compliance (5%)",
         taxTips: [

@@ -41,12 +41,12 @@ export default function EcommerceProductsPage() {
     const price = Number(form.price);
     const stock = Number(form.stock);
 
-    if (!name) return setError("Product name zaroori hai.");
+    if (!name) return setError("Product name is required.");
     if (!category) return setError("Category select ya enter karein.");
-    if (!sku) return setError("SKU zaroori hai.");
-    if (!Number.isFinite(price) || price <= 0) return setError("Price zero se bari honi chahiye.");
-    if (!Number.isFinite(stock) || stock < 0) return setError("Stock negative nahi ho sakta.");
-    if (products.some((product) => product.sku.toUpperCase() === sku)) return setError("Ye SKU already maujood hai.");
+    if (!sku) return setError("SKU is required.");
+    if (!Number.isFinite(price) || price <= 0) return setError("Price must be greater than zero.");
+    if (!Number.isFinite(stock) || stock < 0) return setError("Stock cannot be negative.");
+    if (products.some((product) => product.sku.toUpperCase() === sku)) return setError("This SKU already exists.");
 
     setSaving(true);
     setError("");
@@ -60,7 +60,7 @@ export default function EcommerceProductsPage() {
       setShowModal(false);
       setForm(emptyForm);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Product save nahi ho saka.");
+      setError(err instanceof Error ? err.message : "The product could not be saved.");
     } finally {
       setSaving(false);
     }
@@ -145,7 +145,7 @@ export default function EcommerceProductsPage() {
               {!products.length && (
                 <tr>
                   <td colSpan={8} style={{ padding: 42, textAlign: "center", color: "rgba(255,255,255,.28)" }}>
-                    Catalog abhi empty hai. Pehla product add karein.
+                    The catalog is currently empty. Add your first product.
                   </td>
                 </tr>
               )}

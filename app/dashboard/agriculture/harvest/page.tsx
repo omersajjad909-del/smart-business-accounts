@@ -32,7 +32,7 @@ export default function HarvestPage() {
     const crop = form.crop.trim();
     const field = form.field.trim();
     if (!crop || !field || !form.date || form.quantity <= 0 || form.salePrice <= 0) {
-      toast.error("Crop, field, date, quantity, aur sale price required hain.");
+      toast.error("Crop, field, date, quantity, and sale price are required.");
       return;
     }
     if (harvests.some(h => h.crop.trim().toLowerCase() === crop.toLowerCase() && h.field.trim().toLowerCase() === field.toLowerCase() && h.date === form.date)) {

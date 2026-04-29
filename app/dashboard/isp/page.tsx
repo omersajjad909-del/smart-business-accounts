@@ -96,7 +96,7 @@ export default function IspOverviewPage() {
             <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Collection Watchlist</div>
             <div style={{ display: "grid", gap: 10 }}>
               {bills.length === 0 ? (
-                <div style={{ color: ispMuted, fontSize: 13 }}>Monthly billing records add karne ke baad collection watchlist show hogi.</div>
+                <div style={{ color: ispMuted, fontSize: 13 }}>The collection watchlist will appear after monthly billing records are added.</div>
               ) : bills.slice(0, 4).map((bill) => (
                 <div key={bill.id} style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>{bill.customer}</div>

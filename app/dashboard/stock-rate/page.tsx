@@ -55,7 +55,7 @@ export default function StockRatePage() {
 
   async function saveRate() {
     if (!itemId || !rate) {
-      toast.error("Item aur rate zaroori hai");
+      toast.error("Item and rate are required.");
       return;
     }
 

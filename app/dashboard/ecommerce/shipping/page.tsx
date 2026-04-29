@@ -71,13 +71,13 @@ export default function ShippingPage() {
 
     if (!orderId) return setError("Order select karein.");
     if (!selectedOrder) return setError("Valid order select karein.");
-    if (!customer) return setError("Customer name zaroori hai.");
-    if (!city) return setError("City zaroori hai.");
-    if (!expected) return setError("Expected delivery date zaroori hai.");
-    if (!Number.isFinite(weight) || weight <= 0) return setError("Weight zero se bari honi chahiye.");
-    if (!Number.isFinite(charges) || charges < 0) return setError("Charges negative nahi ho sakte.");
+    if (!customer) return setError("Customer name is required.");
+    if (!city) return setError("City is required.");
+    if (!expected) return setError("Expected delivery date is required.");
+    if (!Number.isFinite(weight) || weight <= 0) return setError("Weight must be greater than zero.");
+    if (!Number.isFinite(charges) || charges < 0) return setError("Charges cannot be negative.");
     if (shipments.some((shipment) => shipment.orderId === orderId && shipment.status !== "failed")) {
-      return setError("Is order ke liye active shipment already maujood hai.");
+      return setError("An active shipment for this order already exists.");
     }
 
     setSaving(true);
@@ -105,7 +105,7 @@ export default function ShippingPage() {
       setShowAdd(false);
       setForm(emptyForm);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Shipment create nahi ho saka.");
+      setError(err instanceof Error ? err.message : "The shipment could not be created.");
     } finally {
       setSaving(false);
     }
@@ -128,7 +128,7 @@ export default function ShippingPage() {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Shipment update nahi ho saka.");
+      setError(err instanceof Error ? err.message : "The shipment could not be updated.");
     }
   }
 
@@ -236,7 +236,7 @@ export default function ShippingPage() {
               {!filtered.length && (
                 <tr>
                   <td colSpan={9} style={{ padding: 42, textAlign: "center", color: "rgba(255,255,255,.28)" }}>
-                    Is filter me koi shipment nahi mila.
+                    No shipments matched this filter.
                   </td>
                 </tr>
               )}

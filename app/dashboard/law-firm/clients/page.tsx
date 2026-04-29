@@ -64,11 +64,11 @@ export default function ClientsPage() {
     const duplicatePhone = phone && clients.some(c => c.phone.trim() === phone);
     const duplicateEmail = email && clients.some(c => c.email.trim().toLowerCase() === email);
     if (!name || !phone || !city) {
-      toast.error('Client name, phone, aur city required hain.');
+      toast.error('Client name, phone, and city are required.');
       return;
     }
     if (duplicateName || duplicatePhone || duplicateEmail) {
-      toast('Yeh client name, phone, ya email pehle se maujood hai.');
+      toast('A client with this name, phone, or email already exists.');
       return;
     }
     const today = new Date().toISOString().split('T')[0];

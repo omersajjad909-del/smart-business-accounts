@@ -35,7 +35,7 @@ export default function GrossMarginPage() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.3px" }}>Gross Margin Analysis</h1>
-          <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--text-muted)" }}>Konsa item paisa bana raha hai, konsa sirf shelf garam kar raha hai</p>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--text-muted)" }}>See which item is generating profit and which one is only taking up shelf space</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <div style={{ display: "flex", borderRadius: 9, overflow: "hidden", border: "1px solid var(--border)" }}>

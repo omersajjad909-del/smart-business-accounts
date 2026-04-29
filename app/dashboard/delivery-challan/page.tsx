@@ -242,7 +242,7 @@ const [searchTerm, _setSearchTerm] = useState("");
   async function saveChallan() {
     const clean = rows.filter(r => r.itemId && r.qty);
     if (!customerId || !clean.length) {
-      toast.error("Customer aur items zaroori hain");
+      toast.error("Customer and items are required.");
       return;
     }
 

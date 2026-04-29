@@ -76,15 +76,15 @@ export default function FirmBillingPage() {
     const amount = Number(form.amount);
     const duplicateInvoice = invoiceNo && invoices.some(i => i.invoiceNo.trim().toLowerCase() === invoiceNo.toLowerCase());
     if (!client || !invoiceNo || !form.dueDate) {
-      toast.error("Client, invoice number, aur due date required hain.");
+      toast.error("Client, invoice number, and due date are required.");
       return;
     }
     if (amount <= 0) {
-      toast("Invoice amount positive hona chahiye.");
+      toast("Invoice amount must be positive.");
       return;
     }
     if (duplicateInvoice) {
-      toast("Yeh invoice number pehle se maujood hai.");
+      toast("This invoice number already exists.");
       return;
     }
     setSaving(true);

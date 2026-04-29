@@ -61,12 +61,12 @@ export default function ReturnsPage() {
 
     if (!orderId) return setError("Order select karein.");
     if (!selectedOrder) return setError("Valid order select karein.");
-    if (!customer) return setError("Customer name zaroori hai.");
-    if (!product) return setError("Product name zaroori hai.");
-    if (!Number.isFinite(qty) || qty <= 0) return setError("Qty zero se bari honi chahiye.");
-    if (!Number.isFinite(amount) || amount <= 0) return setError("Return amount zero se bari honi chahiye.");
+    if (!customer) return setError("Customer name is required.");
+    if (!product) return setError("Product name is required.");
+    if (!Number.isFinite(qty) || qty <= 0) return setError("Quantity must be greater than zero.");
+    if (!Number.isFinite(amount) || amount <= 0) return setError("Return amount must be greater than zero.");
     if (returns.some((record) => record.orderId === orderId && record.product.toLowerCase() === product.toLowerCase() && record.status !== "rejected")) {
-      return setError("Is order/product ke liye active return request already maujood hai.");
+      return setError("An active return request for this order and product already exists.");
     }
 
     setSaving(true);
@@ -82,7 +82,7 @@ export default function ReturnsPage() {
       setShowAdd(false);
       setForm(emptyForm);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Return save nahi ho saka.");
+      setError(err instanceof Error ? err.message : "The return could not be saved.");
     } finally {
       setSaving(false);
     }
@@ -109,7 +109,7 @@ export default function ReturnsPage() {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Return update nahi ho saka.");
+      setError(err instanceof Error ? err.message : "The return could not be updated.");
     }
   }
 
@@ -215,7 +215,7 @@ export default function ReturnsPage() {
               {!filtered.length && (
                 <tr>
                   <td colSpan={8} style={{ padding: 42, textAlign: "center", color: "rgba(255,255,255,.28)" }}>
-                    Is filter me koi return case nahi mila.
+                    No return cases matched this filter.
                   </td>
                 </tr>
               )}

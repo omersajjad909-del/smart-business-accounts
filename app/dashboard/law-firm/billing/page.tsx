@@ -69,7 +69,7 @@ export default function BillingPage() {
     const hours = Number(form.hours); const rate = Number(form.rate); const disb = Number(form.disbursements);
     const duplicateInvoice = invoices.some(i => i.client.toLowerCase() === client.toLowerCase() && i.caseId.toLowerCase() === caseId.toLowerCase() && i.description.toLowerCase() === description.toLowerCase() && i.dueDate === form.dueDate);
     if (!client || !caseId || !description || !form.dueDate) {
-      toast.error('Client, case ID, description, aur due date required hain.');
+      toast.error('Client, case ID, description, and due date are required.');
       return;
     }
     if (hours <= 0 || rate <= 0 || disb < 0) {
@@ -77,7 +77,7 @@ export default function BillingPage() {
       return;
     }
     if (duplicateInvoice) {
-      toast.error('Yeh invoice is case ke liye already draft ho chuki hai.');
+      toast.error('An invoice draft for this case already exists.');
       return;
     }
     const amount = hours * rate; const total = amount + disb;
@@ -89,7 +89,7 @@ export default function BillingPage() {
   const markPaid = async (id: string) => {
     const invoice = invoices.find(i => i.id === id);
     if (!invoice || invoice.status === 'Draft') {
-      toast.success('Draft invoice ko pehle send karein, phir paid mark karein.');
+      toast.success('Send the draft invoice first, then mark it as paid.');
       return;
     }
     await update(id, { status: 'Paid' });
@@ -97,7 +97,7 @@ export default function BillingPage() {
   const sendInvoice = async (id: string) => {
     const invoice = invoices.find(i => i.id === id);
     if (!invoice || invoice.total <= 0) {
-      toast.error('Invalid invoice total ke saath send nahi ki ja sakti.');
+      toast.error('An invoice with an invalid total cannot be sent.');
       return;
     }
     await update(id, { status: 'Sent' });

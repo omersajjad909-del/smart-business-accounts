@@ -77,15 +77,15 @@ export default function AuditPlanningPage() {
     const client = form.client.trim();
     const duplicatePlan = plans.some((p) => p.engagement.toLowerCase() === engagement.toLowerCase() && p.client.toLowerCase() === client.toLowerCase() && p.status !== "Closed");
     if (!engagement || !client || !form.startDate || !form.targetDate) {
-      toast.error("Engagement, client, start date, aur target date required hain.");
+      toast.error("Engagement, client, start date, and target date are required.");
       return;
     }
     if (new Date(form.targetDate) < new Date(form.startDate)) {
-      toast("Target date start date se pehle nahi ho sakti.");
+      toast("Target date cannot be earlier than the start date.");
       return;
     }
     if (duplicatePlan) {
-      toast("Yeh audit engagement pehle se planning me maujood hai.");
+      toast("This audit engagement already exists in planning.");
       return;
     }
     setSaving(true);

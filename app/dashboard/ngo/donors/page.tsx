@@ -45,11 +45,11 @@ export default function DonorsPage() {
   const addDonor = async () => {
     const name = form.name.trim();
     if (!name) {
-      toast.error("Donor name required hai.");
+      toast.error("Donor name is required.");
       return;
     }
     if (donors.some(d => d.name.trim().toLowerCase() === name.toLowerCase() || (form.email && d.email.trim().toLowerCase() === form.email.trim().toLowerCase()))) {
-      toast.error("Is donor ka record already maujood hai.");
+      toast.error("A record for this donor already exists.");
       return;
     }
     await create({ title: form.name, status: "active", data: { donorId: form.donorId || `DON-${String(records.length + 1).padStart(3, '0')}`, phone: form.phone, email: form.email, type: form.type, totalDonated: 0, lastDonation: 0, frequency: form.frequency, category: form.category } });

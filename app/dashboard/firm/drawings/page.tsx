@@ -50,8 +50,8 @@ export default function DrawingsPage() {
     const drawingNo = form.drawingNo.trim();
     const packageName = form.packageName.trim();
     const duplicateDrawing = drawingNo && drawings.some((d) => d.drawingNo.trim().toLowerCase() === drawingNo.toLowerCase());
-    if (!project || !drawingNo || !packageName || !form.dueDate) return toast.error("Project, drawing no, package, aur due date required hain.");
-    if (duplicateDrawing) return toast("Yeh drawing number pehle se maujood hai.");
+    if (!project || !drawingNo || !packageName || !form.dueDate) return toast.error("Project, drawing number, package, and due date are required.");
+    if (duplicateDrawing) return toast("This drawing number already exists.");
     setSaving(true);
     try {
       await create({ title: packageName, status: form.status, date: form.dueDate, refId: drawingNo, data: { project, drawingNo, packageName, submittedTo: form.submittedTo, dueDate: form.dueDate } });

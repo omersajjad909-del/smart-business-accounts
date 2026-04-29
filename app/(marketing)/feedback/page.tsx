@@ -68,7 +68,7 @@ export default function PublicFeedbackPage() {
         {done ? (
           <div style={{ background: "rgba(52,211,153,.08)", border: "1.5px solid rgba(52,211,153,.2)", borderRadius: 24, padding: "60px 32px", textAlign: "center" }}>
             <div style={{ fontSize: 56, marginBottom: 20 }}>🙏</div>
-            <h2 style={{ margin: "0 0 12px", fontSize: 24, fontWeight: 800, color: "#34d399" }}>شکریہ!</h2>
+            <h2 style={{ margin: "0 0 12px", fontSize: 24, fontWeight: 800, color: "#34d399" }}>Thank you!</h2>
             <p style={{ margin: "0 0 32px", fontSize: 15, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
               آپ کا {active.label} ہمیں مل گیا ہے۔<br />ہماری team جلد review کرے گی۔
             </p>

@@ -74,11 +74,11 @@ export default function DesignBriefsPage() {
     const scope = form.scope.trim();
     const duplicateBrief = briefNo && briefs.some((b) => b.briefNo.trim().toLowerCase() === briefNo.toLowerCase());
     if (!client || !project || !briefNo || !scope || !form.dueDate) {
-      toast.error("Client, project, brief no, scope, aur due date required hain.");
+      toast.error("Client, project, brief number, scope, and due date are required.");
       return;
     }
     if (duplicateBrief) {
-      toast("Yeh brief number pehle se maujood hai.");
+      toast("This brief number already exists.");
       return;
     }
     setSaving(true);

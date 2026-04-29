@@ -54,13 +54,13 @@ export default function StylistsPage() {
 
   const handleAdd = async () => {
     setError("");
-    if (!form.name.trim()) return setError("Stylist name required hai.");
-    if (!form.phone.trim()) return setError("Phone required hai.");
+    if (!form.name.trim()) return setError("Stylist name is required.");
+    if (!form.phone.trim()) return setError("Phone is required.");
     if (stylistsWithLiveStats.some((stylist) => stylist.name.toLowerCase() === form.name.trim().toLowerCase())) {
-      return setError("Ye stylist pehle se maujood hai.");
+      return setError("This stylist already exists.");
     }
     if (stylistsWithLiveStats.some((stylist) => stylist.phone === form.phone.trim())) {
-      return setError("Ye phone number pehle se use ho raha hai.");
+      return setError("This phone number is already in use.");
     }
 
     await stylistsHook.create({
@@ -88,7 +88,7 @@ export default function StylistsPage() {
         (appointment.status === "booked" || appointment.status === "confirmed" || appointment.status === "in_progress"),
       );
       if (hasOpenAppointments) {
-        setError("Is stylist ke open appointments hain. Pehle schedule clear karein.");
+        setError("This stylist has open appointments. Clear the schedule first.");
         return;
       }
     }

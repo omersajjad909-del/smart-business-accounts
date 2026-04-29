@@ -133,7 +133,7 @@ export default function RawMaterialsPage() {
           <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 14, padding: 20 }}>
             <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>BOM Dependents</div>
             <div style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,.55)" }}>
-              Yeh page BOM planning ko support karta hai. Kisi material ka stock low ho to linked production delay ho sakti hai.
+              This page supports BOM planning. If any material runs low on stock, linked production may be delayed.
             </div>
           </div>
         </div>

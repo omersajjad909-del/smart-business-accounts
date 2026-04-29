@@ -9,7 +9,7 @@ export default function UsersPage() {
   const isAdmin = userSession?.role === "ADMIN";
 
   const [users, setUsers] = useState<any[]>([]);
-  const [roles, setRoles] = useState<any[]>([]); // رولز کے لیے اسٹیٹ
+  const [roles, setRoles] = useState<any[]>([]); // State for roles
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -67,14 +67,14 @@ export default function UsersPage() {
   };
 
 
-  // Guard - صرف ADMIN رسائی کر سکتے ہیں
+  // Guard: only ADMIN users can access this page.
   if (!userSession) return null;
   if (!isAdmin) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <h2 className="text-xl font-bold text-red-600 mb-2">❌ رسائی مسترد</h2>
-          <p className="text-red-700">صرف ADMIN صارفین رولز کو سنبھال سکتے ہیں</p>
+          <h2 className="text-xl font-bold text-red-600 mb-2">❌ Access denied</h2>
+          <p className="text-red-700">Only ADMIN users can manage roles.</p>
         </div>
       </div>
     );
@@ -100,7 +100,7 @@ export default function UsersPage() {
           {/* رولز ڈراپ ڈاؤن */}
           <select className="border p-2 rounded" value={form.roleId} onChange={e => setForm({...form, roleId: e.target.value})}>
             <option value="">-- Dynamic Role --</option>
-            {/* یہاں چیک لگایا گیا ہے تاکہ کریش نہ ہو */}
+            {/* Guard added here to prevent crashes */}
             {Array.isArray(roles) && roles.map((r) => (
               <option key={r.id} value={r.id}>{r.name}</option>
             ))}

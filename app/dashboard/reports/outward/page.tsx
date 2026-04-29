@@ -25,7 +25,7 @@ export default function OutwardReportPage() {
       .catch(err => console.error("Customer fetch error:", err));
   }, []);
 
-  // 🛠️ رپورٹ ڈیٹا لوڈ کرنا (With Auth Headers)
+  // Load report data with auth headers.
   async function loadReport() {
     setLoading(true);
     const user = getCurrentUser(); // رول حاصل کریں
@@ -33,7 +33,7 @@ export default function OutwardReportPage() {
       const res = await fetch(`/api/reports/outward?from=${fromDate}&to=${toDate}&customerId=${customerId}`, {
         method: "GET",
         headers: {
-          "x-user-role": user?.role || "ADMIN" // یہ ہیڈر لازمی ہے
+          "x-user-role": user?.role || "ADMIN" // This header is required.
         },
         cache: 'no-store'
       });

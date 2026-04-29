@@ -52,12 +52,12 @@ export default function SalonPackagesPage() {
 
   async function savePackage() {
     setError("");
-    if (!form.name.trim()) return setError("Package name required hai.");
+    if (!form.name.trim()) return setError("Package name is required.");
     if (form.services.length === 0) return setError("Kam az kam aik service select karein.");
-    if (!form.price || Number(form.price) <= 0) return setError("Package price positive honi chahiye.");
-    if (!form.sessions || Number(form.sessions) <= 0) return setError("Sessions positive honi chahiye.");
+    if (!form.price || Number(form.price) <= 0) return setError("Package price must be positive.");
+    if (!form.sessions || Number(form.sessions) <= 0) return setError("Sessions must be positive.");
     if (packages.some((pkg) => pkg.name.toLowerCase() === form.name.trim().toLowerCase())) {
-      return setError("Ye package pehle se maujood hai.");
+      return setError("This package already exists.");
     }
 
     await packagesHook.create({
@@ -146,7 +146,7 @@ export default function SalonPackagesPage() {
             </div>
             <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 14, padding: "14px 16px", border: "1px solid rgba(255,255,255,.06)" }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Upsell Tip</div>
-              <div style={{ fontSize: 13, color: salonMuted }}>Hair + nails + skincare combo packages repeat clients ke liye strong offer banti hain.</div>
+              <div style={{ fontSize: 13, color: salonMuted }}>Hair, nails, and skincare combo packages can be a strong offer for repeat clients.</div>
             </div>
             <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 14, padding: "14px 16px", border: "1px solid rgba(255,255,255,.06)" }}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Pricing Control</div>

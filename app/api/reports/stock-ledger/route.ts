@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
     });
 
     // 3. LOOP THROUGH TRANSACTIONS
-    // یہاں ہم ان ٹرانزیکشنز کے لیے کسٹمر کا نام ڈھونڈیں گے جن کا partyId خالی ہے
+    // Resolve customer names for transactions where partyId is missing.
     const updatedRows: StockLedgerRow[] = await Promise.all(
   txns.map(async (t: InventoryTxnWithParty) => {
     runningBalance += Number(t.qty || 0);

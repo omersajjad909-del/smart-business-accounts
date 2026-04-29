@@ -74,13 +74,13 @@ export default function SalonAppointmentsPage() {
 
   async function save() {
     setError("");
-    if (!form.client.trim()) return setError("Client name required hai.");
+    if (!form.client.trim()) return setError("Client name is required.");
     if (!form.phone.trim()) return setError("Phone required hai.");
     if (!form.stylist) return setError("Stylist select karein.");
     if (!form.service) return setError("Service select karein.");
-    if (!form.date || !form.time) return setError("Date aur time required hain.");
+    if (!form.date || !form.time) return setError("Date and time are required.");
     if (form.duration <= 0) return setError("Duration positive honi chahiye.");
-    if (form.price <= 0) return setError("Price zero se zyada honi chahiye.");
+    if (form.price <= 0) return setError("Price must be greater than zero.");
 
     const clash = appointments.some((appointment) =>
       appointment.stylist === form.stylist &&
@@ -88,7 +88,7 @@ export default function SalonAppointmentsPage() {
       appointment.time === form.time &&
       appointment.status !== "cancelled",
     );
-    if (clash) return setError("Is stylist ka ye slot already booked hai.");
+    if (clash) return setError("This time slot is already booked for the stylist.");
 
     await appointmentsHook.create({
       title: form.client.trim(),

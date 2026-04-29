@@ -1,5 +1,5 @@
 // Standard Chart of Accounts Setup
-// یہ script اپنے آپ تمام ضروری accounts کو setup کر دیتا ہے
+// This script automatically sets up all required accounts.
 
 const { PrismaClient } = require('@prisma/client');
 

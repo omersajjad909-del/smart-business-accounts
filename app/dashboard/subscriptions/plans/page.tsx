@@ -48,12 +48,12 @@ export default function SubscriptionPlansPage() {
     const price = Number(form.price);
     const trialDays = Number(form.trialDays);
     const seats = Number(form.seats);
-    if (!name) return toast.error("Plan name required hai.");
+    if (!name) return toast.error("Plan name is required.");
     if (plans.some((plan) => plan.name.trim().toLowerCase() === name.toLowerCase() && plan.status !== "retired")) {
-      return toast.error("Is name ka plan already maujood hai.");
+      return toast.error("A plan with this name already exists.");
     }
-    if (price <= 0) return toast("Plan price zero se zyada honi chahiye.");
-    if (trialDays < 0 || seats <= 0) return toast("Trial days aur seat limit valid honi chahiye.");
+    if (price <= 0) return toast("Plan price must be greater than zero.");
+    if (trialDays < 0 || seats <= 0) return toast("Trial days and seat limit must be valid.");
     await create({
       title: name,
       status: "active",

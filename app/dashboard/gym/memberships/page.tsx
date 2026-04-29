@@ -64,11 +64,11 @@ export default function MembershipsPage() {
   const handleAdd = async () => {
     const name = form.name.trim();
     if (!name) {
-      toast.error('Member name required hai.');
+      toast.error('Member name is required.');
       return;
     }
     if (members.some(m => m.name.trim().toLowerCase() === name.toLowerCase() && m.status !== 'Expired')) {
-      toast.error('Is member ka active record already maujood hai.');
+      toast.error('An active record for this member already exists.');
       return;
     }
     const fee = PLAN_FEE[form.plan];
