@@ -149,8 +149,8 @@ export default function POSSessionsPage() {
       {!loading && sessions.length === 0 && (
         <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.2)" }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
-          <div style={{ fontSize: 16, marginBottom: 6 }}>Koi session nahi</div>
-          <div style={{ fontSize: 13 }}>Apni pehli cashier shift shuru karo</div>
+          <div style={{ fontSize: 16, marginBottom: 6 }}>No session</div>
+          <div style={{ fontSize: 13 }}>Start your first cashier shift</div>
         </div>
       )}
 
