@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
 
 const ff = "'Outfit','Inter',sans-serif";
@@ -11,6 +12,14 @@ const emptyForm = { name: "", category: "", sku: "", price: 0, costPrice: 0, sto
 const emptyReceive = { qty: 0, costPrice: 0, supplierName: "", notes: "" };
 
 export default function ProductCatalogPage() {
+  const user = getCurrentUser();
+  const authHeaders: HeadersInit = {
+    "Content-Type": "application/json",
+    "x-user-id": (user as { id?: string } | null)?.id || "",
+    "x-user-role": "ADMIN",
+    "x-company-id": (user as { companyId?: string } | null)?.companyId || "",
+  };
+
   const { records, loading, create, update, remove } = useBusinessRecords("catalog_product");
   const { records: catRecords } = useBusinessRecords("retail_category");
   const { create: createReceipt } = useBusinessRecords("stock_receipt");
@@ -80,27 +89,88 @@ export default function ProductCatalogPage() {
     if (skuExists) { setFormError("SKU already exists. Use a different SKU."); return; }
 
     setFormError("");
+
     if (editId) {
+      const existing = records.find(r => r.id === editId);
+      const itemNewId = existing?.data?.itemNewId as string | undefined;
       await update(editId, {
         title: name,
         amount: form.price,
         data: { category, sku, costPrice: form.costPrice, stock: form.stock, description },
       });
+      // Sync to Item Master
+      if (itemNewId) {
+        await fetch(`/api/items-new`, {
+          method: "PUT",
+          headers: authHeaders,
+          body: JSON.stringify({ id: itemNewId, name, category: "TRADING", unit: "PCS", rate: form.price, purchaseRate: form.costPrice, taxRate: 0, barcode: sku, description }),
+        });
+      } else {
+        const res = await fetch("/api/items-new", {
+          method: "POST",
+          headers: authHeaders,
+          body: JSON.stringify({ name, category: "TRADING", unit: "PCS", rate: form.price, purchaseRate: form.costPrice, taxRate: 0, barcode: sku, description }),
+        });
+        if (res.ok) {
+          const created = await res.json();
+          await update(editId, { data: { itemNewId: created.id } });
+        }
+      }
     } else {
-      await create({
+      const saved = await create({
         title: name,
         status: "active",
         amount: form.price,
         data: { category, sku, costPrice: form.costPrice, stock: form.stock, description },
       });
+      // Sync to Item Master
+      const res = await fetch("/api/items-new", {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({ name, category: "TRADING", unit: "PCS", rate: form.price, purchaseRate: form.costPrice, taxRate: 0, barcode: sku, description }),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        await update(saved.id, { data: { itemNewId: created.id } });
+      }
     }
+
     setShowModal(false);
     setForm(emptyForm);
   }
 
   async function handleDelete(id: string) {
+    const existing = records.find(r => r.id === id);
+    const itemNewId = existing?.data?.itemNewId as string | undefined;
     await remove(id);
+    if (itemNewId) {
+      await fetch(`/api/items-new?id=${itemNewId}`, { method: "DELETE", headers: authHeaders });
+    }
     setDeleteId(null);
+  }
+
+  async function syncAllToItemMaster() {
+    const unsynced = records.filter(r => !r.data?.itemNewId);
+    for (const r of unsynced) {
+      const res = await fetch("/api/items-new", {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({
+          name: r.title,
+          category: "TRADING",
+          unit: "PCS",
+          rate: r.amount || 0,
+          purchaseRate: Number(r.data?.costPrice || 0),
+          taxRate: 0,
+          barcode: (r.data?.sku as string) || "",
+          description: (r.data?.description as string) || "",
+        }),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        await update(r.id, { data: { itemNewId: created.id } });
+      }
+    }
   }
 
   async function receiveStock() {
@@ -150,6 +220,15 @@ export default function ProductCatalogPage() {
           <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Manage retail product catalog</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
+          {records.some(r => !r.data?.itemNewId) && (
+            <button
+              onClick={syncAllToItemMaster}
+              title="Sync all catalog products to Item Master (Sales Invoice)"
+              style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+            >
+              🔗 Sync to Item Master
+            </button>
+          )}
           <Link prefetch={false} href="/dashboard/retail/categories" style={{ padding: "10px 16px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(255,255,255,.7)", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
             📂 Categories
           </Link>

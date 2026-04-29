@@ -34,6 +34,8 @@ export default function POSPage() {
   const user = getCurrentUser();
   const { records: productRecords, loading: loadingProducts, update: updateProduct } = useBusinessRecords("catalog_product");
   const { records: saleRecords, create: createSale } = useBusinessRecords("pos_sale");
+  const { records: sessionRecords, update: updateSession } = useBusinessRecords("pos_session");
+  const activeSession = sessionRecords.find(s => s.status === "OPEN") || null;
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cat, setCat] = useState("All");
@@ -135,8 +137,21 @@ export default function POSPage() {
         title: nextReceiptNo,
         status: "completed",
         amount: total,
-        data: { payMethod, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt, taxRate: taxPct, taxAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName },
+        data: { payMethod, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt, taxRate: taxPct, taxAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName, sessionId: activeSession?.id || null, sessionRef: activeSession?.title || null },
       });
+
+      // Update session running totals
+      if (activeSession) {
+        const isCash = payMethod === "cash";
+        await updateSession(activeSession.id, {
+          amount: (activeSession.amount || 0) + total,
+          data: {
+            cashSales: Number(activeSession.data?.cashSales || 0) + (isCash ? total : 0),
+            cardSales: Number(activeSession.data?.cardSales || 0) + (!isCash ? total : 0),
+            transactions: Number(activeSession.data?.transactions || 0) + 1,
+          },
+        });
+      }
 
       // Deduct stock from each product in Product Catalog
       for (const item of snapshot) {
@@ -193,6 +208,24 @@ export default function POSPage() {
         .prod-card:hover { background: rgba(99,102,241,.18) !important; border-color: rgba(99,102,241,.4) !important; transform: translateY(-1px); }
         .prod-card { transition: all .15s; }
       `}</style>
+
+      {/* Session Banner */}
+      {!activeSession && (
+        <div style={{ background: "rgba(245,158,11,.1)", borderBottom: "1px solid rgba(245,158,11,.2)", padding: "8px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 13, color: "#fbbf24", fontWeight: 600 }}>⚠️ No active session — sales will not be linked to any cashier shift.</span>
+          <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 12, color: "#fbbf24", fontWeight: 700, textDecoration: "underline" }}>Open Session →</a>
+        </div>
+      )}
+      {activeSession && (
+        <div style={{ background: "rgba(16,185,129,.08)", borderBottom: "1px solid rgba(16,185,129,.15)", padding: "7px 24px", display: "flex", alignItems: "center", gap: 20 }}>
+          <span style={{ fontSize: 12, color: "#34d399", fontWeight: 700 }}>🟢 Active Session: {activeSession.title}</span>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Cashier: {String(activeSession.data?.cashier || "—")}</span>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Branch: {String(activeSession.data?.branch || "—")}</span>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Txns: {Number(activeSession.data?.transactions || 0)}</span>
+          <span style={{ fontSize: 12, color: "#34d399", fontWeight: 700, marginLeft: "auto" }}>Session Sales: Rs. {(activeSession.amount || 0).toLocaleString()}</span>
+          <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 12, color: "rgba(255,255,255,.4)", textDecoration: "none", border: "1px solid rgba(255,255,255,.1)", borderRadius: 6, padding: "3px 10px" }}>Close Session</a>
+        </div>
+      )}
 
       {/* Top Stats Bar */}
       <div style={{ display: "flex", background: "#0f172a", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
