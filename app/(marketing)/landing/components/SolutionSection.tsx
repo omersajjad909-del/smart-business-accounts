@@ -114,6 +114,16 @@ const FOCUSED_INDUSTRIES = [
     modules: ["Bill of Materials", "Production Orders", "Work Orders", "Quality Control"],
     flow: ["Plan BOM", "Launch production", "Run work orders", "Inspect and finish"],
   },
+  {
+    icon: "✈️",
+    label: "Travel Agency",
+    slug: "travel",
+    color: "#38bdf8",
+    audience: "For travel agencies and visa consultants managing passenger files and service billing.",
+    desc: "Track airline tickets, PNRs, travel dates, visa cases, quotations, and customer follow-up from one travel operations desk.",
+    modules: ["Airline Tickets", "Visa Cases", "Quotations", "Sales Invoice"],
+    flow: ["Capture inquiry", "Quote and book", "Issue or submit", "Collect and follow up"],
+  },
 ] as const;
 
 export default function SolutionSection() {
@@ -410,7 +420,7 @@ export default function SolutionSection() {
             }}
           >
             {[
-              { value: "05", label: "Focused Businesses", color: "#818cf8" },
+              { value: "06", label: "Focused Businesses", color: "#818cf8" },
               { value: "4-8", label: "Core Modules Each", color: "#34d399" },
               { value: "100%", label: "Workflow Guided", color: "#fbbf24" },
             ].map((stat) => (

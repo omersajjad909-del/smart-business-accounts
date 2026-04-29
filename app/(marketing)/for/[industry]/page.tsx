@@ -15,6 +15,14 @@ interface BizType {
 
 // Category-based feature sets
 const CATEGORY_FEATURES: Record<string, { icon: string; title: string; desc: string }[]> = {
+  travel: [
+    { icon: "🎫", title: "Airline Ticket Desk",        desc: "Track booking refs, airlines, routes, travel dates, and PNR per passenger file." },
+    { icon: "🛂", title: "Visa Processing Workflow",    desc: "Manage document check, submission, approval, and rejection statuses in one place." },
+    { icon: "📄", title: "Travel Quotations",          desc: "Send ticket and visa quotations before converting the case into confirmed work." },
+    { icon: "💳", title: "Service Billing",            desc: "Raise invoices for ticketing, visa fees, and service charges with full balance tracking." },
+    { icon: "👥", title: "Passenger File History",     desc: "Keep each client’s route, passport reference, and case notes together." },
+    { icon: "📊", title: "Travel Revenue Reports",     desc: "View issued tickets, active visa cases, and service revenue from one dashboard." },
+  ],
   Commerce: [
     { icon: "🧾", title: "Sales & Purchase Invoicing",     desc: "Create professional invoices, POs, and delivery challans in seconds." },
     { icon: "📦", title: "Inventory Management",           desc: "Real-time stock tracking, GRN, barcode scanning, and reorder alerts." },
@@ -87,6 +95,16 @@ const PHASE_LABELS: Record<number, string> = { 1:"Live Now", 2:"Phase 2 — Comi
 
 // Category-based plan feature rows
 const PLAN_ROWS: Record<string, { feature: string; starter: string | boolean; pro: string | boolean; enterprise: string | boolean }[]> = {
+  travel: [
+    { feature: "Airline ticket tracking",     starter: true,       pro: true,             enterprise: true },
+    { feature: "Visa processing cases",       starter: "Basic",    pro: true,             enterprise: true },
+    { feature: "Travel quotations",           starter: true,       pro: true,             enterprise: true },
+    { feature: "Service billing",             starter: true,       pro: true,             enterprise: true },
+    { feature: "CRM & passenger history",     starter: false,      pro: true,             enterprise: true },
+    { feature: "Revenue analytics",           starter: "Basic",    pro: "Advanced",       enterprise: "Full suite" },
+    { feature: "Multi-user control",          starter: false,      pro: "Up to 3",        enterprise: "Unlimited" },
+    { feature: "API access",                  starter: false,      pro: false,            enterprise: true },
+  ],
   Healthcare: [
     { feature: "Patient billing",          starter: true,         pro: true,             enterprise: true },
     { feature: "Pharmacy inventory",       starter: "Basic",      pro: true,             enterprise: true },
@@ -304,7 +322,7 @@ export default function IndustryPage() {
     </div>
   );
 
-  const features = CATEGORY_FEATURES[type.category] ?? CATEGORY_FEATURES.default;
+  const features = CATEGORY_FEATURES[type.id] ?? CATEGORY_FEATURES[type.category] ?? CATEGORY_FEATURES.default;
   const phaseColor = PHASE_COLORS[type.phase];
 
   return (
@@ -431,7 +449,7 @@ export default function IndustryPage() {
       </div>
 
       {/* ── Plan Comparison ── */}
-      <PlanComparison label={type.label} category={type.category} />
+      <PlanComparison label={type.label} category={type.id in PLAN_ROWS ? type.id : type.category} />
 
       {/* ── CTA ── */}
       <div style={{ maxWidth:800, margin:"0 auto 80px", padding:"0 24px", textAlign:"center" }}>

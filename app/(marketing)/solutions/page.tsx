@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 /* ─── Data ─── */
 const INDUSTRIES = [
@@ -244,6 +245,30 @@ const INDUSTRIES = [
     ],
     quote: "We cleared Rs. 80,000 in near-expiry stock we didn't even know we had. The alerts paid for everything.",
     quoteName: "Zubair Ahmed", quoteTitle: "Owner, CityMed Pharmacy — Karachi",
+  },
+  {
+    id: "travel",
+    phase: 3,
+    emoji: "✈️",
+    label: "Travel Agency",
+    title: "Travel Agencies & Visa Consultants",
+    subtitle: "Airline tickets, visa processing, and customer travel files — all in one desk.",
+    color: "#38bdf8",
+    glow: "rgba(56,189,248,.22)",
+    dim:  "rgba(56,189,248,.08)",
+    border:"rgba(56,189,248,.3)",
+    pain: "Passenger details, PNRs, travel dates, embassy submissions, and service fees get scattered fast without a proper workflow.",
+    stats: [{ val:"Live", label:"Ticketing pipeline" },{ val:"Zero", label:"Missed visa follow-up" },{ val:"Full", label:"Quote to invoice visibility" }],
+    features:[
+      { icon:"🎫", title:"Airline Ticket Desk",         desc:"Track booking refs, airlines, routes, travel dates, and PNRs per passenger." },
+      { icon:"🛂", title:"Visa Processing Cases",       desc:"Manage document check, submission, approval, and rejection states per applicant." },
+      { icon:"📄", title:"Travel Quotations",           desc:"Prepare ticket and visa quotes before issuing services to the customer." },
+      { icon:"💳", title:"Service Billing",             desc:"Convert confirmed work into invoices and collect fees with clear balances." },
+      { icon:"👥", title:"Passenger File History",      desc:"Keep each client’s travel file, route, passport reference, and case status together." },
+      { icon:"📊", title:"Travel Revenue Visibility",   desc:"See total ticket value, active visa cases, and pending files from one dashboard." },
+    ],
+    quote: "Before this, our tickets were in one sheet and visas in another. Now every passenger file is finally in one place.",
+    quoteName: "SkyBridge Travels", quoteTitle: "Karachi, Pakistan",
   },
   {
     id: "construction",
@@ -651,8 +676,9 @@ const TAB_GROUPS = [
   { label: "Commerce",     ids: ["trading","distribution","import","ecommerce"] },
   { label: "Production",   ids: ["manufacturing","agriculture"] },
   { label: "F&B",          ids: ["restaurant","hotel"] },
+  { label: "Services",     ids: ["services","travel","events"] },
   { label: "Healthcare",   ids: ["hospital","pharmacy"] },
-  { label: "Retail",       ids: ["retail","services","enterprise"] },
+  { label: "Retail",       ids: ["retail","enterprise"] },
   { label: "Build",        ids: ["construction","real_estate"] },
   { label: "Tech & Media", ids: ["saas","advertising"] },
   { label: "Lifestyle",    ids: ["salon","school","ngo"] },
@@ -940,6 +966,7 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
 
 /* ─── Page ─── */
 export default function SolutionsPage() {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("trading");
   const [heroRef, heroVisible] = useVisible(0.2);
   const [crossRef, crossVisible] = useVisible(0.1);
@@ -953,6 +980,26 @@ export default function SolutionsPage() {
       .then(d => { if (d?.enabledTypes) setLiveTypes(new Set(d.enabledTypes)); })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const requested = String(searchParams.get("industry") || "").trim().toLowerCase();
+    if (!requested) return;
+    const aliases: Record<string, string> = {
+      import: "import",
+      export: "import",
+      travel: "travel",
+      services: "services",
+      events: "events",
+      hotel: "hotel",
+    };
+    const resolved = aliases[requested] || requested;
+    if (!INDUSTRIES.some((entry) => entry.id === resolved)) return;
+    setActiveTab(resolved);
+    const timer = window.setTimeout(() => {
+      document.getElementById(resolved)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [searchParams]);
 
   // Determine if an industry is live (fallback: phase 1 is live, others are coming soon)
   const isLive = (ind: typeof INDUSTRIES[0]) => {

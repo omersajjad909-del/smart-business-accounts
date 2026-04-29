@@ -39,6 +39,7 @@ export default function DemoBusinessShowcase({
     transport: ["Trip dispatch", "Driver assignment", "Fuel and expense capture", "Trip closure"],
     import_company: ["Commercial documents", "Shipment tracking", "Customs and costing", "Remittance matching"],
     export_company: ["Buyer quotation", "Commercial invoice", "Packing and shipment", "Rebate and collection"],
+    travel: ["Passenger inquiry", "Quotation and booking", "Ticket or visa processing", "Issue and follow-up"],
   };
   const businessFlow = flowMap[businessMeta.id] || [
     "Business setup",

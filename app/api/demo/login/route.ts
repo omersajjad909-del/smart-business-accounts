@@ -24,6 +24,7 @@ const DEMO_BUSINESS_LABELS: Record<string, string> = {
   wholesale: "Wholesale Demo Co.",
   import_company: "Importer Demo Co.",
   export_company: "Exporter Demo Co.",
+  travel: "Travel Agency Demo Co.",
 };
 
 const SALES_INVOICES = [
@@ -90,6 +91,56 @@ async function seedBusinessRecords(companyId: string) {
   await prisma.businessRecord.createMany({ data: records });
 }
 
+async function seedTravelBusinessRecords(companyId: string) {
+  const existingCount = await prisma.businessRecord.count({
+    where: { companyId, category: { in: ["travel_ticket", "visa_case"] } },
+  });
+
+  if (existingCount >= 4) return;
+
+  const today = new Date();
+  const travelRecords = [
+    {
+      companyId,
+      category: "travel_ticket",
+      title: "TRV-24018",
+      amount: 185000,
+      status: "issued",
+      data: { passenger: "Ali Raza", airline: "Qatar Airways", route: "KHI -> DOH -> LHR", pnr: "A1B2C3" },
+      date: today,
+    },
+    {
+      companyId,
+      category: "travel_ticket",
+      title: "TRV-24019",
+      amount: 92000,
+      status: "booked",
+      data: { passenger: "Sara Khan", airline: "Air Arabia", route: "KHI -> SHJ", pnr: "D4E5F6" },
+      date: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000),
+    },
+    {
+      companyId,
+      category: "visa_case",
+      title: "VISA-24007",
+      amount: 25000,
+      status: "submitted",
+      data: { applicant: "Hassan Ali", country: "United Kingdom", passportNo: "AB1234567" },
+      date: new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000),
+    },
+    {
+      companyId,
+      category: "visa_case",
+      title: "VISA-24008",
+      amount: 32000,
+      status: "document_check",
+      data: { applicant: "Ayesha Noor", country: "Canada", passportNo: "CD7654321" },
+      date: today,
+    },
+  ];
+
+  await prisma.businessRecord.createMany({ data: travelRecords });
+}
+
 async function applyDemoBusinessType(companyId: string, businessType?: string | null) {
   if (!businessType) return;
   const nextBusinessType = businessType === "wholesale" ? "trading" : businessType;
@@ -117,6 +168,9 @@ async function getOrCreateDemoUser(businessType?: string | null) {
     if (companyId) {
       await applyDemoBusinessType(companyId, businessType);
       await seedBusinessRecords(companyId);
+      if (businessType === "travel") {
+        await seedTravelBusinessRecords(companyId);
+      }
     }
     return user;
   }
@@ -152,6 +206,9 @@ async function getOrCreateDemoUser(businessType?: string | null) {
   // Seed sample business records
   await seedBusinessRecords(company.id);
   await applyDemoBusinessType(company.id, businessType);
+  if (businessType === "travel") {
+    await seedTravelBusinessRecords(company.id);
+  }
 
   return user;
 }
@@ -237,6 +294,7 @@ const ALLOWED_DEMO_TYPES = new Set([
   "wholesale",
   "import_company",
   "export_company",
+  "travel",
 ]);
 
 function normalizeBusinessType(input?: string | null) {
@@ -279,4 +337,3 @@ export async function POST(req: NextRequest) {
     return handleDemoLogin(req, requested);
   }
 }
-

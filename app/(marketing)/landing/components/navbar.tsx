@@ -85,6 +85,7 @@ const SOLUTIONS_COLS = [
       { label: "Trading & Wholesale",    href: "/solutions?industry=trading",    icon: "🛒" },
       { label: "Distribution & FMCG",   href: "/solutions?industry=distribution",icon: "🚚" },
       { label: "Retail & Multi-Store",   href: "/solutions?industry=retail",     icon: "🏪" },
+      { label: "Travel Agency",          href: "/solutions?industry=travel",     icon: "✈️" },
       { label: "Import Business",        href: "/solutions?industry=import",     icon: "📦" },
       { label: "Export Business",        href: "/solutions?industry=export",     icon: "🚢" },
       { label: "View All Solutions",     href: "/solutions",                     icon: "🌐" },

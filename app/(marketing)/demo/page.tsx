@@ -19,7 +19,8 @@ type DemoBusinessId =
   | "pharmacy"
   | "transport"
   | "real_estate"
-  | "import_company";
+  | "import_company"
+  | "travel";
 
 type DemoBusiness = {
   id: DemoBusinessId;
@@ -519,6 +520,40 @@ const BUSINESSES: DemoBusiness[] = [
     sampleDocs: ["Commercial Invoice", "Packing List", "Shipment Record", "LC Register", "Landed Cost Sheet"],
     users: "890+",
   },
+  {
+    id: "travel",
+    liveBusinessType: "travel",
+    demoAvailable: true,
+    icon: "✈️",
+    label: "Travel Agency",
+    category: "Services",
+    tagline: "Ticketing, visas, and customer travel files — properly organized.",
+    description:
+      "Built for travel consultants and agencies handling airline tickets, visa processing, travel quotes, and passenger case follow-up.",
+    color: "#38bdf8",
+    gradient: "linear-gradient(135deg,#0ea5e9,#38bdf8)",
+    modules: ["Airline Tickets", "Visa Cases", "Quotations", "Sales Invoice", "Expense Vouchers", "CRM", "Payment Receipts", "Owner Dashboard"],
+    workflow: [
+      { step: "Customer inquiry", detail: "Capture passenger route, airline preference, and travel date instantly" },
+      { step: "Quote and booking", detail: "Send quotation, confirm booking, and record PNR against the file" },
+      { step: "Issue or process", detail: "Mark ticket as issued or move visa case from document check to submitted" },
+      { step: "Collect and follow up", detail: "Track service fee, outstanding balance, and travel-case status in one place" },
+    ],
+    insights: ["Issued vs pending ticketing pipeline", "Visa cases waiting on documents or embassy submission", "Sales value across tickets and visa services"],
+    aiFeatures: [
+      "🤖 AI highlights ticket files still not issued before travel date",
+      "🛂 Flags visa cases that are stuck in document check too long",
+      "📈 Summarizes travel revenue split between airline and visa services",
+    ],
+    proof: ["Travel-specific booking refs, PNR, passport, and submission statuses", "Same dashboard supports both airline tickets and visa processing", "Works with quotations, invoicing, and expense tracking already in FinovaOS"],
+    highlights: [
+      { label: "Ticket Pipeline", value: "Live", sub: "Quoted, booked, issued, or cancelled" },
+      { label: "Visa Desk", value: "Tracked", sub: "Document check through approval" },
+      { label: "Service Billing", value: "Ready", sub: "Quotes and invoices linked to operations" },
+    ],
+    sampleDocs: ["Ticket Booking Ref", "Visa Case File", "Quotation", "Sales Invoice", "Customer Follow-up Note"],
+    users: "350+",
+  },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -540,7 +575,7 @@ const TRUST_STATS = [
   { value: "18,000+", label: "Businesses on FinovaOS", icon: "🏢" },
   { value: "4.8 / 5", label: "Average rating", icon: "⭐" },
   { value: "99.9%", label: "Uptime SLA", icon: "🔒" },
-  { value: "14 Types", label: "Business verticals", icon: "📊" },
+  { value: "15 Types", label: "Business verticals", icon: "📊" },
 ];
 
 export default function DemoPage() {
@@ -843,7 +878,7 @@ export default function DemoPage() {
 
             {!biz.demoAvailable && (
               <div style={{ marginTop: -8, marginBottom: 20, padding: "14px 18px", borderRadius: 16, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", color: "rgba(255,255,255,.72)", fontSize: 13, lineHeight: 1.6 }}>
-                This business preview is available, but its live demo workspace has not launched yet. For now, only Trading, Wholesale, Distribution, and Import / Export open into a real live demo.
+                This business preview is available, but its live demo workspace has not launched yet. For now, Trading, Wholesale, Distribution, Import / Export, and Travel Agency open into a real live demo.
               </div>
             )}
 
