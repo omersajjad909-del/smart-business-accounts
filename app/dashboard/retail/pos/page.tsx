@@ -197,15 +197,20 @@ export default function POSPage() {
       {/* Top Stats Bar */}
       <div style={{ display: "flex", background: "#0f172a", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
         {[
-          { label: "TODAY SALES", value: `Rs. ${todayTotal.toLocaleString()}`, color: "#34d399" },
-          { label: "TRANSACTIONS", value: todaySales.length, color: "#fff" },
-          { label: "CASH", value: `Rs. ${cashTotal.toLocaleString()}`, color: "#10b981" },
-          { label: "CARD / DIGITAL", value: `Rs. ${cardTotal.toLocaleString()}`, color: "#6366f1" },
-          { label: "NEXT RECEIPT #", value: nextReceiptNo, color: "#f59e0b" },
+          { label: "TODAY SALES", value: `Rs. ${todayTotal.toLocaleString()}`, color: "#34d399", href: null },
+          { label: "TRANSACTIONS", value: todaySales.length, color: "#fff", href: "/dashboard/retail/sales-history" },
+          { label: "CASH", value: `Rs. ${cashTotal.toLocaleString()}`, color: "#10b981", href: null },
+          { label: "CARD / DIGITAL", value: `Rs. ${cardTotal.toLocaleString()}`, color: "#6366f1", href: null },
+          { label: "NEXT RECEIPT #", value: nextReceiptNo, color: "#f59e0b", href: "/dashboard/retail/sales-history" },
         ].map(s => (
-          <div key={s.label} style={{ flex: 1, padding: "12px 20px", borderRight: "1px solid rgba(255,255,255,.05)" }}>
+          <div
+            key={s.label}
+            onClick={() => s.href && (window.location.href = s.href)}
+            style={{ flex: 1, padding: "12px 20px", borderRight: "1px solid rgba(255,255,255,.05)", cursor: s.href ? "pointer" : "default" }}
+          >
             <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", letterSpacing: ".06em", marginBottom: 4 }}>{s.label}</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: s.color }}>{s.value}</div>
+            {s.href && <div style={{ fontSize: 9, color: "rgba(255,255,255,.2)", marginTop: 2 }}>click to view →</div>}
           </div>
         ))}
       </div>
