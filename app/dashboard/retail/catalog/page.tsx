@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import Link from "next/link";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
@@ -8,11 +9,14 @@ const border = "rgba(255,255,255,0.07)";
 
 export default function ProductCatalogPage() {
   const { records, loading, create, update } = useBusinessRecords("catalog_product");
+  const { records: catRecords } = useBusinessRecords("retail_category");
+  const categoryNames = catRecords.map(r => r.title);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: "", category: "", sku: "", price: 0, costPrice: 0, stock: 0, description: "" });
   const [formError, setFormError] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
 
-  const products = records.map(r => ({
+  const allProducts = records.map(r => ({
     id: r.id,
     name: r.title,
     category: (r.data?.category as string) || "",
@@ -25,9 +29,13 @@ export default function ProductCatalogPage() {
     margin: r.amount ? Math.round((r.amount - Number(r.data?.costPrice || 0)) / r.amount * 100) : 0,
   }));
 
-  const totalProducts = products.length;
-  const activeProducts = products.filter(p => p.status === "active").length;
-  const avgMargin = products.length ? Math.round(products.reduce((a, p) => a + p.margin, 0) / products.length) : 0;
+  const products = filterCategory
+    ? allProducts.filter(p => p.category.toLowerCase() === filterCategory.toLowerCase())
+    : allProducts;
+
+  const totalProducts = allProducts.length;
+  const activeProducts = allProducts.filter(p => p.status === "active").length;
+  const avgMargin = allProducts.length ? Math.round(allProducts.reduce((a, p) => a + p.margin, 0) / allProducts.length) : 0;
 
   async function save() {
     const name = form.name.trim();
@@ -50,7 +58,7 @@ export default function ProductCatalogPage() {
       setFormError("Cost price and stock cannot be negative.");
       return;
     }
-    if (products.some((product) => product.sku.toLowerCase() === sku.toLowerCase())) {
+    if (allProducts.some((product) => product.sku.toLowerCase() === sku.toLowerCase())) {
       setFormError("SKU must be unique within this catalog.");
       return;
     }
@@ -65,7 +73,10 @@ export default function ProductCatalogPage() {
     <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>📦 Product Catalog</h1><p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Manage retail product catalog</p></div>
-        <button onClick={() => { setShowModal(true); setFormError(""); }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Product</button>
+        <div style={{ display: "flex", gap: 10 }}>
+          <Link prefetch={false} href="/dashboard/retail/categories" style={{ padding: "10px 16px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(255,255,255,.7)", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>📂 Categories</Link>
+          <button onClick={() => { setShowModal(true); setFormError(""); }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f97316", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Product</button>
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>
@@ -75,6 +86,26 @@ export default function ProductCatalogPage() {
       </div>
 
       {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,0.4)" }}>Loading...</div>}
+
+      {categoryNames.length > 0 && (
+        <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+          <button
+            onClick={() => setFilterCategory("")}
+            style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${filterCategory === "" ? "#f97316" : border}`, background: filterCategory === "" ? "rgba(249,115,22,.15)" : "transparent", color: filterCategory === "" ? "#f97316" : "rgba(255,255,255,.5)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+          >
+            All
+          </button>
+          {categoryNames.map(n => (
+            <button
+              key={n}
+              onClick={() => setFilterCategory(n === filterCategory ? "" : n)}
+              style={{ padding: "6px 14px", borderRadius: 20, border: `1px solid ${filterCategory === n ? "#f97316" : border}`, background: filterCategory === n ? "rgba(249,115,22,.15)" : "transparent", color: filterCategory === n ? "#f97316" : "rgba(255,255,255,.5)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12 }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -110,12 +141,27 @@ export default function ProductCatalogPage() {
             <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>Add Product</h2>
             {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              {[["Product Name", "name", "text", "span 2"], ["Category", "category", "text", ""], ["SKU", "sku", "text", ""], ["Description", "description", "text", "span 2"]].map(([label, key, type, col]) => (
+              {[["Product Name", "name", "text", "span 2"], ["SKU", "sku", "text", ""], ["Description", "description", "text", "span 2"]].map(([label, key, type, col]) => (
                 <div key={key} style={{ gridColumn: col || undefined }}>
                   <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>{label}</label>
                   <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
                 </div>
               ))}
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Category</label>
+                {categoryNames.length > 0 ? (
+                  <select
+                    value={form.category}
+                    onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                    style={{ width: "100%", background: "#1e2535", border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: form.category ? "#fff" : "rgba(255,255,255,.35)", fontSize: 14, boxSizing: "border-box", cursor: "pointer" }}
+                  >
+                    <option value="">-- Select --</option>
+                    {categoryNames.map(n => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                ) : (
+                  <input type="text" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="Type category name" style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
+                )}
+              </div>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Cost Price (Rs.)</label>
                 <input type="number" value={form.costPrice} onChange={e => setForm(f => ({ ...f, costPrice: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />

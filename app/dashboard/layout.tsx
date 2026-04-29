@@ -1291,6 +1291,7 @@ export default function DashboardLayout({
             >
               <NavLink href="/dashboard/items-new" pathname={pathname}>📋 Item Master</NavLink>
               {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/catalog" pathname={pathname}>Product Catalog</NavLink>}
+              {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/categories" pathname={pathname}>Categories</NavLink>}
               <NavLink href="/dashboard/barcode" pathname={pathname}>🔲 Barcode Management</NavLink>
               {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
               {hasDashboardFeature("RETAIL_STOCK_ADJUSTMENT") && <NavLink href="/dashboard/retail/stock-adjustment" pathname={pathname}>Stock Adjustment</NavLink>}
