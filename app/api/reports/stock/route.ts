@@ -18,8 +18,8 @@ export async function GET(req: NextRequest) {
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
     const { searchParams } = new URL(req.url);
-    const asOn = searchParams.get("asOn");
-    const unitFilter = searchParams.get("unit"); // "" or specific unit
+    const asOn       = searchParams.get("asOn");
+    const unitFilter = searchParams.get("unit");
 
     const asOnDate = asOn ? new Date(asOn + "T23:59:59.999") : new Date();
 
@@ -30,12 +30,10 @@ export async function GET(req: NextRequest) {
         name: true,
         unit: true,
         description: true,
+        code: true,
         inventoryTxns: {
-          where: {
-            companyId,
-            date: { lte: asOnDate },
-          },
-          select: { qty: true, rate: true },
+          where: { companyId, date: { lte: asOnDate } },
+          select: { qty: true, rate: true, type: true },
         },
       },
       orderBy: { name: "asc" },
@@ -44,19 +42,45 @@ export async function GET(req: NextRequest) {
     const result = items
       .filter(item => !unitFilter || item.unit === unitFilter)
       .map(item => {
-        let totalQty = 0;
-        let calculatedValue = 0;
+        let purchasedQty  = 0;
+        let soldQty       = 0;
+        let purchasedAmt  = 0;
+        let soldAmt       = 0;
+
         item.inventoryTxns.forEach(t => {
-          totalQty += Number(t.qty || 0);
-          calculatedValue += Number(t.qty || 0) * Number(t.rate || 0);
+          const q = Number(t.qty || 0);
+          const r = Number(t.rate || 0);
+          if (q > 0) {
+            // PURCHASE or SALE_RETURN — inward
+            purchasedQty += q;
+            purchasedAmt += q * r;
+          } else if (q < 0) {
+            // SALE — outward (qty stored as negative)
+            soldQty  += Math.abs(q);
+            soldAmt  += Math.abs(q) * r;
+          }
         });
+
+        const remainingQty = purchasedQty - soldQty;
+        // Weighted average rate for remaining value
+        const avgRate      = purchasedQty > 0 ? purchasedAmt / purchasedQty : 0;
+        const remainingAmt = remainingQty > 0 ? Math.round(remainingQty * avgRate) : 0;
+
         return {
-          itemId: item.id,
-          itemName: item.name,
-          unit: item.unit,
-          description: item.description || "",
-          stockQty: totalQty,
-          stockValue: totalQty <= 0 ? 0 : Math.round(calculatedValue),
+          itemId:       item.id,
+          itemCode:     item.code || "",
+          itemName:     item.name,
+          unit:         item.unit,
+          description:  item.description || "",
+          purchasedQty,
+          soldQty,
+          remainingQty,
+          purchasedAmt: Math.round(purchasedAmt),
+          soldAmt:      Math.round(soldAmt),
+          remainingAmt,
+          // legacy fields kept for backward compat
+          stockQty:     remainingQty,
+          stockValue:   remainingAmt,
         };
       });
 
