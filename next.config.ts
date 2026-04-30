@@ -1,8 +1,13 @@
 import type { NextConfig } from "next";
 
+// unsafe-eval removed in production — only kept in dev for Next.js HMR/fast-refresh
+const SCRIPT_SRC = process.env.NODE_ENV === "production"
+  ? "'self' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com https://static.cloudflareinsights.com"
+  : "'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://www.googletagmanager.com https://static.cloudflareinsights.com";
+
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://www.googletagmanager.com https://static.cloudflareinsights.com",
+  `script-src ${SCRIPT_SRC}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",

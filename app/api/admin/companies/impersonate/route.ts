@@ -15,6 +15,17 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { signJwt } from "@/lib/auth";
 
+// In-memory revocation list: set of "adminId:companyId:issuedAt" tokens
+// Cleared on server restart — acceptable since impersonation tokens are short-lived (1h)
+const revokedTokens = new Set<string>();
+
+export function revokeImpersonation(key: string) {
+  revokedTokens.add(key);
+}
+export function isImpersonationRevoked(key: string) {
+  return revokedTokens.has(key);
+}
+
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
@@ -61,7 +72,8 @@ export async function POST(req: NextRequest) {
       select: { permission: true },
     }).catch(() => []);
 
-    // 5. Issue a short-lived JWT (2 hours) for the company user
+    // 5. Issue a short-lived JWT (1 hour) for the company user
+    const issuedAt = Math.floor(Date.now() / 1000);
     const impersonateToken = signJwt({
       id: owner.id,
       email: owner.email,
@@ -69,8 +81,9 @@ export async function POST(req: NextRequest) {
       role: owner.role,
       companyId,
       defaultCompanyId: companyId,
-      impersonatedBy: admin.email,  // marks this as an impersonation session
-      exp: Math.floor(Date.now() / 1000) + 2 * 60 * 60, // 2 hours
+      impersonatedBy: admin.id,     // store admin ID, not email (less data exposure in JWT)
+      impersonationKey: `${admin.id}:${companyId}:${issuedAt}`,
+      exp: issuedAt + 60 * 60,     // 1 hour (reduced from 2h)
     });
 
     // 6. Audit log — this action is always recorded
