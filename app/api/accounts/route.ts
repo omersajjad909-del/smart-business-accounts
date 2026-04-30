@@ -65,6 +65,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ nextCode });
   }
 
+  const q = searchParams.get("search");
+  if (q !== null) {
+    const results = await prisma.account.findMany({
+      where: {
+        companyId,
+        deletedAt: null,
+        ...(q.trim() ? { name: { contains: q.trim(), mode: "insensitive" } } : {}),
+      },
+      orderBy: { name: "asc" },
+      take: 30,
+    });
+    return NextResponse.json(results.map(a => safeDecryptFields(a, ACCOUNT_PII_FIELDS)));
+  }
+
   const accounts = await prisma.account.findMany({
     where: { companyId, deletedAt: null },
     orderBy: { name: "asc" },

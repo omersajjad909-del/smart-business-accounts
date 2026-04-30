@@ -121,6 +121,8 @@ export default function CRVPage() {
   const [entries,    setEntries]    = useState<EntryRow[]>([newRow()]);
   const [search,     setSearch]     = useState<Record<number, string>>({});
   const [dropOpen,   setDropOpen]   = useState<Record<number, boolean>>({});
+  const [dropResults, setDropResults] = useState<Record<number, Account[]>>({});
+  const timerRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
 
   const h = () => ({ "x-user-role": user?.role||"", "x-user-id": user?.id||"", "x-company-id": user?.companyId||"", "Content-Type": "application/json" });
 
@@ -152,6 +154,24 @@ export default function CRVPage() {
     setEntries(prev => prev.map(e => e.id === rowId ? { ...e, accountId: acc.id, accountName: acc.name } : e));
     setSearch(prev => ({ ...prev, [rowId]: acc.name }));
     setDropOpen(prev => ({ ...prev, [rowId]: false }));
+  }
+
+  function onAccountSearch(rowId: number, q: string) {
+    setSearch(p => ({ ...p, [rowId]: q }));
+    setEntryField(rowId, "accountId", "");
+    setEntryField(rowId, "accountName", "");
+    setDropOpen(p => ({ ...p, [rowId]: true }));
+    if (timerRef.current[rowId]) clearTimeout(timerRef.current[rowId]);
+    timerRef.current[rowId] = setTimeout(async () => {
+      try {
+        const r = await fetch(`/api/accounts?search=${encodeURIComponent(q)}`, { headers: h() });
+        if (r.ok) {
+          const data = await r.json();
+          if (Array.isArray(data))
+            setDropResults(p => ({ ...p, [rowId]: data }));
+        }
+      } catch {}
+    }, 300);
   }
 
   const total = entries.reduce((s, e) => s + (Number(e.amount) || 0), 0);
@@ -233,7 +253,7 @@ export default function CRVPage() {
           {isMobile ? (
             <div>
               {entries.map((row, i) => {
-                const filtered = accounts.filter(a => !search[row.id] || a.name.toLowerCase().includes((search[row.id]||"").toLowerCase()));
+                const listed = search[row.id] ? (dropResults[row.id] ?? accounts.filter(a => a.name.toLowerCase().includes((search[row.id]||"").toLowerCase()))) : accounts;
                 return (
                   <div key={row.id} style={{ border:"1px solid rgba(255,255,255,.1)", borderRadius:10, padding:"12px 14px", marginBottom:10, background:"rgba(255,255,255,.02)" }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
@@ -242,13 +262,13 @@ export default function CRVPage() {
                     </div>
                     <div style={{ position:"relative", marginBottom:8 }}>
                       <input value={row.accountId ? row.accountName : (search[row.id]||"")} placeholder="Type account name…" style={{ ...inp, fontSize:12 }}
-                        onChange={e => { setSearch(p=>({...p,[row.id]:e.target.value})); setEntryField(row.id,"accountId",""); setEntryField(row.id,"accountName",""); setDropOpen(p=>({...p,[row.id]:true})); }}
+                        onChange={e => onAccountSearch(row.id, e.target.value)}
                         onFocus={() => setDropOpen(p=>({...p,[row.id]:true}))}
                         onBlur={() => setTimeout(()=>setDropOpen(p=>({...p,[row.id]:false})),180)}
                       />
-                      {dropOpen[row.id] && filtered.length > 0 && (
+                      {dropOpen[row.id] && listed.length > 0 && (
                         <div style={{ position:"absolute", top:"calc(100% + 2px)", left:0, right:0, background:"#0e1120", border:"1px solid rgba(255,255,255,.12)", borderRadius:9, zIndex:100, maxHeight:200, overflowY:"auto", boxShadow:"0 8px 30px rgba(0,0,0,.5)" }}>
-                          {filtered.slice(0,20).map(a=>(
+                          {listed.slice(0,20).map(a=>(
                             <div key={a.id} onMouseDown={()=>selectAccount(row.id,a)} style={{ padding:"8px 12px", fontSize:12, cursor:"pointer", color:"rgba(255,255,255,.75)" }} onMouseEnter={e=>(e.currentTarget.style.background="rgba(34,197,94,.1)")} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
                               <span style={{ color:"rgba(255,255,255,.35)", fontSize:11, marginRight:8 }}>{a.code}</span>{a.name}
                             </div>
@@ -279,19 +299,19 @@ export default function CRVPage() {
                 </thead>
                 <tbody>
                   {entries.map((row, i) => {
-                    const filtered = accounts.filter(a => !search[row.id] || a.name.toLowerCase().includes((search[row.id]||"").toLowerCase()));
+                    const listed = search[row.id] ? (dropResults[row.id] ?? accounts.filter(a => a.name.toLowerCase().includes((search[row.id]||"").toLowerCase()))) : accounts;
                     return (
                       <tr key={row.id} style={{ borderBottom:"1px solid rgba(255,255,255,.05)" }}>
                         <td style={{ padding:"8px 12px", fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:600 }}>{i + 1}</td>
                         <td style={{ padding:"6px 8px", position:"relative" }}>
                           <input value={row.accountId ? row.accountName : (search[row.id]||"")} placeholder="Type account name…" style={{ ...inp, fontSize:12 }}
-                            onChange={e => { setSearch(p=>({...p,[row.id]:e.target.value})); setEntryField(row.id,"accountId",""); setEntryField(row.id,"accountName",""); setDropOpen(p=>({...p,[row.id]:true})); }}
+                            onChange={e => onAccountSearch(row.id, e.target.value)}
                             onFocus={() => setDropOpen(p=>({...p,[row.id]:true}))}
                             onBlur={() => setTimeout(()=>setDropOpen(p=>({...p,[row.id]:false})),180)}
                           />
-                          {dropOpen[row.id] && filtered.length > 0 && (
+                          {dropOpen[row.id] && listed.length > 0 && (
                             <div style={{ position:"absolute", top:"calc(100% + 2px)", left:8, right:8, background:"#0e1120", border:"1px solid rgba(255,255,255,.12)", borderRadius:9, zIndex:100, maxHeight:200, overflowY:"auto", boxShadow:"0 8px 30px rgba(0,0,0,.5)" }}>
-                              {filtered.slice(0,20).map(a=>(
+                              {listed.slice(0,20).map(a=>(
                                 <div key={a.id} onMouseDown={()=>selectAccount(row.id,a)} style={{ padding:"8px 12px", fontSize:12, cursor:"pointer", color:"rgba(255,255,255,.75)" }} onMouseEnter={e=>(e.currentTarget.style.background="rgba(34,197,94,.1)")} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
                                   <span style={{ color:"rgba(255,255,255,.35)", fontSize:11, marginRight:8 }}>{a.code}</span>{a.name}
                                 </div>
