@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const channels   = channel === "both" ? ["whatsapp", "email"] : [channel];
 
     const langMap: Record<string, string> = {
-      urdu:        "proper Urdu script (اردو)",
+      urdu:        "proper Urdu script",
       english:     "professional English",
       roman_urdu:  "Roman Urdu (Urdu words written in English letters, e.g. 'Aap ka hisaab kitaab...')",
     };

@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     let runningBalance = openingTxns._sum.qty || 0;
 
     // 2. FETCH TRANSACTIONS
-    // ہم نے SalesInvoiceItem کو بھی شامل کیا ہے تاکہ وہاں سے لنک ڈھونڈ سکیں
+    // Include SalesInvoiceItem so related links can be resolved from it as well.
     const txns = await prisma.inventoryTxn.findMany({
       where: { itemId, date: { gte: fromDate, lte: toDate }, companyId },
       include: {

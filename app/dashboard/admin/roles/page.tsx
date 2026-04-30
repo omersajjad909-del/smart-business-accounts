@@ -19,7 +19,7 @@ export default function UsersPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // دونوں APIs کو ایک ساتھ کال کرنا
+      // Call both APIs together.
       const [uRes, rRes] = await Promise.all([
         fetch("/api/users", { headers: { "x-user-role": "ADMIN" } }),
         fetch("/api/admin/roles", { headers: { "x-user-role": "ADMIN" } })
@@ -28,7 +28,7 @@ export default function UsersPage() {
       const uData = await uRes.json();
       const rData = await rRes.json();
 
-      // 🔥 اہم چیک: اگر ڈیٹا ایریے نہیں ہے تو خالی ایریے سیٹ کریں
+      // Important guard: if the response is not an array, fall back to an empty array.
       setUsers(Array.isArray(uData) ? uData : []);
       setRoles(Array.isArray(rData) ? rData : []);
 
@@ -85,7 +85,7 @@ export default function UsersPage() {
     <div className="p-8 space-y-6">
       <h1 className="text-2xl font-bold">User Management</h1>
 
-      {/* یوزر فارم */}
+      {/* User form */}
       <div className="bg-white p-6 rounded-lg border shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <input className="border p-2 rounded" placeholder="Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
@@ -97,7 +97,7 @@ export default function UsersPage() {
             <option value="ACCOUNTANT">ACCOUNTANT</option>
           </select>
 
-          {/* رولز ڈراپ ڈاؤن */}
+          {/* Roles dropdown */}
           <select className="border p-2 rounded" value={form.roleId} onChange={e => setForm({...form, roleId: e.target.value})}>
             <option value="">-- Dynamic Role --</option>
             {/* Guard added here to prevent crashes */}
@@ -111,7 +111,7 @@ export default function UsersPage() {
         </button>
       </div>
 
-      {/* یوزر ٹیبل */}
+      {/* User table */}
       <div className="border rounded-lg bg-white overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50">

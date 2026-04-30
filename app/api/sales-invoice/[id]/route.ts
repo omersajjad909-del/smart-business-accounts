@@ -44,7 +44,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // ================= GET FUNCTION =================
-// انوائس کی تفصیل لانا اور چیک کرنا کہ کتنا مال باقی ہے
+// Load invoice details and check how much stock is still available.
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       include: {
         customer: true,
         items: { include: { item: true } },
-        returns: { include: { items: true } } // تمام پرانی ریٹرنز بھی شامل کریں
+        returns: { include: { items: true } } // Include all previous returns as well.
       },
     });
 
@@ -71,7 +71,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    // 1. حساب لگائیں کہ کون سا آئٹم کتنا واپس ہو چکا ہے
+    // 1. Calculate how much of each item has already been returned.
     const returnedQtyMap: Record<string, number> = {};
     invoice.returns.forEach((ret: SaleReturnWithItems) => {
   ret.items.forEach((item: SaleReturnItem) => {
@@ -112,7 +112,7 @@ const pendingItems = invoice.items
 }
 
 // ================= POST FUNCTION =================
-// سیلز ریٹرن کو سیو کرنا، اسٹاک اپ ڈیٹ کرنا اور واؤچر بنانا
+// Save the sales return, update stock, and create the voucher.
 export async function POST(req: NextRequest) {
   try {
     const companyId = await resolveCompanyId(req);
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 1. اگلا SR نمبر جنریٹ کرنا (SR-1, SR-2...)
+    // 1. Generate the next SR number (SR-1, SR-2, ...).
     const allReturns = await prisma.saleReturn.findMany({
       where: { returnNo: { startsWith: 'SR-' }, companyId },
       select: { returnNo: true }
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
       const subtotal = items.reduce((s: number, i: any) => s + Number(i.qty) * Number(i.rate), 0);
       const total = subtotal + Number(freight);
 
-      // 2. سیلز ریٹرن ریکارڈ بنانا
+      // 2. Create the sales return record.
       const saleReturn = await tx.saleReturn.create({
         data: {
           returnNo: nextNo,
@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // 3. اسٹاک میں واپسی (Inventory Transaction)
+      // 3. Return the stock to inventory.
       for (const i of items) {
         await tx.inventoryTxn.create({
           data: {
@@ -191,7 +191,7 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // 4. اکاؤنٹنگ واؤچر اینٹری
+      // 4. Create the accounting voucher entry.
       await tx.voucher.create({
         data: {
           voucherNo: nextNo,

@@ -1196,6 +1196,15 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessTypes: ["import_company", "export_company", "clearing_forwarding"],
   },
   {
+    id: "TRADE_HS_CODES",
+    label: "HS Code Master",
+    route: "/dashboard/trade/hs-codes",
+    business: "trade",
+    businessLabel: "Import / Export",
+    section: "Costing & Compliance",
+    businessTypes: ["import_company", "export_company", "clearing_forwarding"],
+  },
+  {
     id: "TRADE_IMPORT_COSTING",
     label: "Import Costing",
     route: "/dashboard/trade/costing",

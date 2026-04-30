@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
     // const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const tx = prisma;
       
-      // A. Supplier اور Inventory Account تلاش کریں
+      // A. Find the supplier and inventory account.
       const supplier = await tx.account.findFirst({ where: { id: supplierId, companyId } });
       if (!supplier) throw new Error("Supplier not found");
 
@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // B. Invoice Number جنریٹ کریں (PI-1, PI-2...)
+      // B. Generate the invoice number (PI-1, PI-2, ...).
       const last = await tx.purchaseInvoice.findFirst({
         where: { invoiceNo: { startsWith: "PI-" }, companyId, ...(branchId ? { branchId } : {}) },
         orderBy: { createdAt: "desc" },
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
       }
       const netTotal = subtotal - discountAmt + itemsTax + globalTax + Number(freight);
 
-      // C. Purchase Invoice ریکارڈ کریں
+      // C. Create the purchase invoice record.
       const invoice = await tx.purchaseInvoice.create({
         data: {
           invoiceNo,
@@ -237,19 +237,19 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // D. اسٹاک اور PO اپڈیٹ کریں
+      // D. Update stock and the PO.
       if (poId) {
         const po = await tx.purchaseOrder.findFirst({ where: { id: poId, companyId } });
         if (!po) throw new Error("Purchase order not found");
       }
       for (const i of validItems) {
-        // 1. Inventory میں مال داخل کریں (Stock In)
+        // 1. Add stock into inventory (stock in).
         await tx.inventoryTxn.create({
           data: {
             type: "PURCHASE",
             date: new Date(date),
             itemId: i.itemId,
-            qty: Math.abs(Number(i.qty)), // پلس میں اسٹاک
+            qty: Math.abs(Number(i.qty)), // Store stock movement as a positive quantity.
             rate: Number(i.rate),
             amount: Number(i.qty) * Number(i.rate),
             location: location || "MAIN",
@@ -258,7 +258,7 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // 2. اگر PO سلیکٹڈ ہے تو اس کی invoicedQty اپڈیٹ کریں
+        // 2. If a PO is selected, update its invoiced quantity.
         if (poId) {
           await tx.purchaseOrderItem.updateMany({
             where: { poId: poId, itemId: i.itemId },
@@ -279,7 +279,7 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // F. اکاؤنٹنگ واؤچر (Double Entry) – Inventory (Asset) کو Debit کریں
+      // F. Create the accounting voucher (double entry) and debit inventory (asset).
       await tx.voucher.create({
         data: {
           voucherNo: invoiceNo,

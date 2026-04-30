@@ -3,10 +3,10 @@ import { useState } from "react";
 import Link from "next/link";
 
 const TYPES = [
-  { id: "complaint",  label: "Complaint",  emoji: "⚠️", color: "#f87171", desc: "کوئی مسئلہ یا شکایت" },
-  { id: "suggestion", label: "Suggestion", emoji: "💡", color: "#fbbf24", desc: "بہتری کا کوئی idea" },
-  { id: "bug",        label: "Bug Report", emoji: "🐛", color: "#a78bfa", desc: "کوئی technical خرابی" },
-  { id: "general",    label: "General",    emoji: "💬", color: "#34d399", desc: "کوئی اور بات" },
+  { id: "complaint",  label: "Complaint",  emoji: "⚠️", color: "#f87171", desc: "A problem or complaint" },
+  { id: "suggestion", label: "Suggestion", emoji: "💡", color: "#fbbf24", desc: "An idea for improvement" },
+  { id: "bug",        label: "Bug Report", emoji: "🐛", color: "#a78bfa", desc: "A technical issue" },
+  { id: "general",    label: "General",    emoji: "💬", color: "#34d399", desc: "Anything else" },
 ];
 
 export default function PublicFeedbackPage() {
@@ -23,7 +23,7 @@ export default function PublicFeedbackPage() {
 
   async function submit() {
     if (!subject.trim() || message.trim().length < 20) {
-      setError("Subject لکھیں اور message کم از کم 20 حروف ہو"); return;
+      setError("Enter a subject and make sure the message is at least 20 characters long."); return;
     }
     setLoad(true); setError("");
     try {
@@ -58,10 +58,10 @@ export default function PublicFeedbackPage() {
             <span style={{ fontSize: 20, fontWeight: 800, color: "white" }}>FinovaOS</span>
           </Link>
           <h1 style={{ margin: "0 0 12px", fontSize: "clamp(26px,4vw,38px)", fontWeight: 800, letterSpacing: "-0.5px" }}>
-            آپ کی بات اہم ہے
+            Your feedback matters
           </h1>
           <p style={{ margin: 0, fontSize: 15, color: "rgba(255,255,255,.45)", lineHeight: 1.7 }}>
-            کوئی شکایت، suggestion، یا bug — ہمیں بتائیں۔<br />ہماری team ہر feedback پڑھتی ہے۔
+            Whether it is a complaint, suggestion, or bug, let us know.<br />Our team reads every piece of feedback.
           </p>
         </div>
 
@@ -70,15 +70,15 @@ export default function PublicFeedbackPage() {
             <div style={{ fontSize: 56, marginBottom: 20 }}>🙏</div>
             <h2 style={{ margin: "0 0 12px", fontSize: 24, fontWeight: 800, color: "#34d399" }}>Thank you!</h2>
             <p style={{ margin: "0 0 32px", fontSize: 15, color: "rgba(255,255,255,.5)", lineHeight: 1.7 }}>
-              آپ کا {active.label} ہمیں مل گیا ہے۔<br />ہماری team جلد review کرے گی۔
+              We received your {active.label.toLowerCase()}.<br />Our team will review it soon.
             </p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               <button onClick={() => { setDone(false); setSubject(""); setMessage(""); setName(""); setEmail(""); }}
                 style={{ padding: "11px 24px", borderRadius: 10, border: "1px solid rgba(255,255,255,.15)", background: "transparent", color: "white", fontFamily: "inherit", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                مزید لکھیں
+                Submit another response
               </button>
               <Link href="/" style={{ padding: "11px 24px", borderRadius: 10, border: "none", background: "#6366f1", color: "white", fontFamily: "inherit", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-                Home پر جائیں
+                Go to Home
               </Link>
             </div>
           </div>
@@ -108,23 +108,23 @@ export default function PublicFeedbackPage() {
             <div style={{ background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: "28px 28px", display: "flex", flexDirection: "column", gap: 16 }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", display: "block", marginBottom: 7 }}>آپ کا نام (optional)</label>
-                  <input className="pf-input" placeholder="نام" value={name} onChange={e => setName(e.target.value)} />
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", display: "block", marginBottom: 7 }}>Your name (optional)</label>
+                  <input className="pf-input" placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
                 </div>
                 <div>
                   <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", display: "block", marginBottom: 7 }}>Email (optional)</label>
-                  <input className="pf-input" type="email" placeholder="reply کے لیے" value={email} onChange={e => setEmail(e.target.value)} />
+                  <input className="pf-input" type="email" placeholder="For a reply" value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
               </div>
 
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", display: "block", marginBottom: 7 }}>SUBJECT *</label>
-                <input className="pf-input" placeholder={`${active.label} کا مختصر عنوان`} value={subject} onChange={e => setSubject(e.target.value)} />
+                <input className="pf-input" placeholder={`Short ${active.label.toLowerCase()} title`} value={subject} onChange={e => setSubject(e.target.value)} />
               </div>
 
               <div>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", display: "block", marginBottom: 7 }}>DETAILS *</label>
-                <textarea className="pf-input" rows={6} placeholder="تفصیل سے لکھیں..."
+                <textarea className="pf-input" rows={6} placeholder="Write the details here..."
                   value={message} onChange={e => setMessage(e.target.value)}
                   style={{ resize: "vertical", lineHeight: 1.7 }} />
                 <div style={{ fontSize: 11, marginTop: 5, textAlign: "right", color: message.length < 20 ? "rgba(248,113,113,.5)" : "rgba(255,255,255,.2)" }}>
@@ -145,7 +145,7 @@ export default function PublicFeedbackPage() {
                 cursor: loading ? "not-allowed" : "pointer", transition: "all .2s",
                 boxShadow: loading ? "none" : `0 4px 20px ${active.color}30`,
               }}>
-                {loading ? "بھیجا جا رہا ہے..." : `${active.emoji} Submit کریں`}
+                {loading ? "Sending..." : `${active.emoji} Submit`}
               </button>
             </div>
           </>

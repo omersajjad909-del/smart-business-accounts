@@ -422,7 +422,7 @@ export default function AccountSettingsPage() {
               <form onSubmit={handleEmailVerify}>
                 <div style={{ display: "grid", gap: 14 }}>
                   <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.25)", fontSize: 13, color: "#c7d2fe", lineHeight: 1.6 }}>
-                    6-digit OTP bheja gaya hai aapki <strong>current email</strong> <strong>{maskedNewEmail}</strong> pe. 15 minutes mein expire hoga.
+                    A 6-digit OTP has been sent to your <strong>current email</strong> <strong>{maskedNewEmail}</strong>. It will expire in 15 minutes.
                   </div>
                   <label>
                     <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(255,255,255,.36)", marginBottom: 8 }}>Enter OTP</div>

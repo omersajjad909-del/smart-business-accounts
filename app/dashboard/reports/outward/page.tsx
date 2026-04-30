@@ -13,12 +13,12 @@ export default function OutwardReportPage() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // 🛠️ کسٹمرز لوڈ کرنا (With Safety Fix)
+  // Load customers safely.
   useEffect(() => {
     fetch("/api/accounts")
       .then((r) => r.json())
       .then((d) => {
-        // چیک کریں کہ d ایرے ہے، اگر نہیں تو خالی ایرے سیٹ کریں
+        // Ensure the response is an array; otherwise fall back to an empty array.
         const data = Array.isArray(d) ? d : (d.accounts || []);
         setCustomers(data.filter((a: any) => a.partyType === "CUSTOMER"));
       })
@@ -28,7 +28,7 @@ export default function OutwardReportPage() {
   // Load report data with auth headers.
   async function loadReport() {
     setLoading(true);
-    const user = getCurrentUser(); // رول حاصل کریں
+    const user = getCurrentUser(); // Read the current user role.
     try {
       const res = await fetch(`/api/reports/outward?from=${fromDate}&to=${toDate}&customerId=${customerId}`, {
         method: "GET",
@@ -38,7 +38,7 @@ export default function OutwardReportPage() {
         cache: 'no-store'
       });
       const data = await res.json();
-      // اگر ڈیٹا ایرے نہیں ہے تو خالی ایرے سیٹ کریں تاکہ کریش نہ ہو
+      // Prevent crashes by falling back to an empty array if the response is not an array.
       setRows(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Report load error:", error);

@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 async function setupStandardAccounts() {
   const accounts = [
-    // ASSETS (اثاثے)
+    // ASSETS
     { code: 'CASH001', name: 'Cash in Hand', type: 'ASSET' },
     { code: 'BANK001', name: 'Bank Account - Main', type: 'ASSET', partyType: 'BANKS' },
     { code: 'BANK002', name: 'Bank Account - Savings', type: 'ASSET', partyType: 'BANKS' },
@@ -20,25 +20,25 @@ async function setupStandardAccounts() {
     { code: 'FA005', name: 'Accumulated Depreciation - Building', type: 'ASSET' },
     { code: 'FA006', name: 'Accumulated Depreciation - Machinery', type: 'ASSET' },
 
-    // LIABILITIES (ذمہ داریاں)
+    // LIABILITIES
     { code: 'AP001', name: 'Accounts Payable', type: 'LIABILITY' },
     { code: 'LOAN001', name: 'Bank Loan', type: 'LIABILITY' },
     { code: 'LOAN002', name: 'Short Term Loan', type: 'LIABILITY' },
     { code: 'TAX001', name: 'Sales Tax Payable', type: 'LIABILITY' },
     { code: 'TAX002', name: 'Income Tax Payable', type: 'LIABILITY' },
 
-    // EQUITY (رأس مال)
+    // EQUITY
     { code: 'EQUITY001', name: 'Opening Balance', type: 'EQUITY' },
     { code: 'EQUITY002', name: 'Capital/Owner Equity', type: 'EQUITY' },
     { code: 'EQUITY003', name: 'Retained Earnings', type: 'EQUITY' },
 
-    // INCOME (آمدنی)
+    // INCOME
     { code: 'SALES001', name: 'Sales Revenue', type: 'INCOME' },
     { code: 'SALES002', name: 'Service Income', type: 'INCOME' },
     { code: 'SALES003', name: 'Interest Income', type: 'INCOME' },
     { code: 'SALES004', name: 'Other Income', type: 'INCOME' },
 
-    // EXPENSES (اخراجات)
+    // EXPENSES
     { code: 'EXP001', name: 'Purchase', type: 'EXPENSE' },
     { code: 'EXP002', name: 'Salary & Wages', type: 'EXPENSE' },
     { code: 'EXP003', name: 'Rent Expense', type: 'EXPENSE' },
@@ -56,7 +56,7 @@ async function setupStandardAccounts() {
     { code: 'EXP015', name: 'Professional Fees', type: 'EXPENSE' },
     { code: 'EXP016', name: 'Miscellaneous Expense', type: 'EXPENSE' },
 
-    // CONTRA ACCOUNTS (منفی)
+    // CONTRA ACCOUNTS
     { code: 'CONTRA001', name: 'Sales Return', type: 'INCOME' },
     { code: 'CONTRA002', name: 'Purchase Return', type: 'EXPENSE' },
     { code: 'CONTRA003', name: 'Sales Discount', type: 'INCOME' },

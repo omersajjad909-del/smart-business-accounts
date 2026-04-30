@@ -1010,7 +1010,7 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
   if (/^(hi|hello|hey|salam|assalam|assalamualaikum|adaab|helo|good morning|good afternoon|good evening|howdy|greetings|hii|helo|helloo|namaste)[\s!?.]*$/.test(q)) {
     const name = ctx?.company.name ? ` for ${ctx.company.name}` : "";
     return [
-      `👋 Assalam o Alaikum! I am FinovaOS AI — your financial intelligence assistant${name}.`,
+      `👋 Hello! I am FinovaOS AI — your financial intelligence assistant${name}.`,
       ``,
       `Ask me anything about your business:`,
       `• "What is my profit this month?"`,
@@ -1029,7 +1029,7 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
       return [
         `FinovaOS AI — 9 powerful features built into your dashboard at /dashboard/ai:`,
         `1. ⚡ Overview — Business health score, KPIs, deep analysis`,
-        `2. 💬 Ask AI — Chat with your financial data in English or Urdu`,
+        `2. 💬 Ask AI — Chat with your financial data in natural language`,
         `3. 🧠 Insights — Revenue, profitability, inventory & risk analysis`,
         `4. 🔔 Alerts — Automatic anomaly detection (overdue, cash risk, spikes)`,
         `5. 📈 Forecast — 30/60/90 day revenue & cashflow projection`,
@@ -1041,10 +1041,10 @@ function localAIReply(message: string, ctx: FinancialContext | null): string {
       ].join("\n");
     }
     return [
-      `Main FinovaOS AI hun — aap ka financial intelligence assistant.`,
-      `Company data access ke liye please login karein aur main aap ki real financials ke saath kaam kar sakta hun.`,
-      `FinovaOS AI me 9 features hain: Overview, Chat, Insights, Alerts, Forecast, Recommendations, Monthly Report, Market Intelligence, aur Business Advisor.`,
-      `Sab features /dashboard/ai pe milte hain.`,
+      `I am FinovaOS AI — your financial intelligence assistant.`,
+      `Please log in to access company data so I can work with your real financials.`,
+      `FinovaOS AI includes 9 features: Overview, Chat, Insights, Alerts, Forecast, Recommendations, Monthly Report, Market Intelligence, and Business Advisor.`,
+      `All features are available at /dashboard/ai.`,
     ].join("\n");
   }
 

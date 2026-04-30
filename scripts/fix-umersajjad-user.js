@@ -63,7 +63,7 @@ async function fixUmerSajjadUser() {
         console.log(`   ${i + 1}. ${u.name} (${u.email}) - ${u.role}`);
       });
       
-      console.log("\n💡 Agar aapka user dusre name se hai, run:");
+      console.log("\n💡 If your user has a different name, run:");
       console.log("   npm run user:fix 'email@example.com' 'us786'\n");
       return;
     }

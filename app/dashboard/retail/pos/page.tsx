@@ -6,7 +6,7 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 
 const ff = "'Outfit','Inter',sans-serif";
 
-type CartItem = { id: string; name: string; price: number; qty: number; category: string; sku: string };
+type CartItem = { id: string; name: string; price: number; qty: number; category: string; sku: string; itemNewId?: string };
 
 type ReceiptData = {
   receiptNo: string;
@@ -50,8 +50,25 @@ export default function POSPage() {
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [checkoutError, setCheckoutError] = useState("");
   const [processingCheckout, setProcessingCheckout] = useState(false);
+  const [stockMap, setStockMap] = useState<Record<string, number>>({});
   const searchRef = useRef<HTMLInputElement>(null);
   const barcodeRef = useRef<HTMLInputElement>(null);
+
+  const authHeaders = (): HeadersInit => {
+    const h = user as { id?: string; role?: string; companyId?: string } | null;
+    return { "x-user-id": h?.id || "", "x-user-role": h?.role || "ADMIN", "x-company-id": h?.companyId || "" };
+  };
+
+  function loadStock() {
+    fetch("/api/inventory", { headers: authHeaders() })
+      .then(r => r.ok ? r.json() : [])
+      .then((data: { itemId: string; qty: number }[]) => {
+        const map: Record<string, number> = {};
+        data.forEach(d => { map[d.itemId] = d.qty; });
+        setStockMap(map);
+      })
+      .catch(() => {});
+  }
 
   useEffect(() => {
     const h = user as { id?: string; role?: string; companyId?: string; name?: string } | null;
@@ -60,11 +77,19 @@ export default function POSPage() {
       .then(r => r.json())
       .then(d => { if (d?.name) setCompany({ name: d.name, address: d.address, phone: d.phone, ntn: d.ntn }); })
       .catch(() => {});
+    loadStock();
   }, [user]);
 
   const products = productRecords
     .filter(r => r.status !== "inactive")
-    .map(r => ({ id: r.id, name: r.title, category: (r.data?.category as string) || "General", price: r.amount || 0, sku: (r.data?.sku as string) || "" }));
+    .map(r => ({
+      id: r.id,
+      name: r.title,
+      category: (r.data?.category as string) || "General",
+      price: r.amount || 0,
+      sku: (r.data?.sku as string) || "",
+      itemNewId: (r.data?.itemNewId as string) || "",
+    }));
 
   const categories = ["All", ...Array.from(new Set(products.map(p => p.category)))];
 
@@ -88,8 +113,19 @@ export default function POSPage() {
   const tenderedAmt = Number(tendered) || 0;
   const change = payMethod === "cash" && tenderedAmt >= total ? tenderedAmt - total : 0;
 
+  function availableStock(prod: typeof products[0]): number {
+    if (!prod.itemNewId) return 9999; // not synced to item master — no restriction
+    return stockMap[prod.itemNewId] ?? 0;
+  }
+
   function addToCart(prod: typeof products[0]) {
     setCheckoutError("");
+    const inCart = cart.find(i => i.id === prod.id)?.qty || 0;
+    const avail = availableStock(prod);
+    if (inCart + 1 > avail) {
+      setCheckoutError(`"${prod.name}" — stock nahi hai. Available: ${avail}`);
+      return;
+    }
     setCart(prev => {
       const ex = prev.find(i => i.id === prod.id);
       if (ex) return prev.map(i => i.id === prod.id ? { ...i, qty: i.qty + 1 } : i);
@@ -127,12 +163,43 @@ export default function POSPage() {
     if (cart.length === 0) { setCheckoutError("Cart is empty."); return; }
     if (total <= 0) { setCheckoutError("Total must be greater than zero."); return; }
     if (payMethod === "cash" && tendered && tenderedAmt < total) { setCheckoutError(`Cash tendered (Rs. ${tenderedAmt}) is less than total (Rs. ${total}).`); return; }
+
+    // Final stock re-check before checkout
+    for (const item of cart) {
+      const avail = availableStock(item as any);
+      if (item.qty > avail) {
+        setCheckoutError(`"${item.name}" — insufficient stock. Available: ${avail}, In cart: ${item.qty}`);
+        return;
+      }
+    }
+
     setProcessingCheckout(true);
     setCheckoutError("");
     try {
       const snapshot = cart.map(i => ({ ...i }));
       const now = new Date();
       const cashierName = (user as { name?: string } | null)?.name || "Cashier";
+
+      // Deduct stock from InventoryTxn via API
+      const syncedItems = snapshot.filter(i => i.itemNewId);
+      if (syncedItems.length > 0) {
+        const stockRes = await fetch("/api/pos-checkout", {
+          method: "POST",
+          headers: { ...authHeaders(), "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: now.toISOString(),
+            items: syncedItems.map(i => ({ itemNewId: i.itemNewId, name: i.name, qty: i.qty, rate: i.price })),
+          }),
+        });
+        if (!stockRes.ok) {
+          const err = await stockRes.json();
+          setCheckoutError(err.error || "Stock deduction failed");
+          setProcessingCheckout(false);
+          return;
+        }
+        loadStock(); // refresh stock display
+      }
+
       const saved = await createSale({
         title: nextReceiptNo,
         status: "completed",
@@ -140,7 +207,6 @@ export default function POSPage() {
         data: { payMethod, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt, taxRate: taxPct, taxAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName, sessionId: activeSession?.id || null, sessionRef: activeSession?.title || null },
       });
 
-      // Update session running totals
       if (activeSession) {
         const isCash = payMethod === "cash";
         await updateSession(activeSession.id, {
@@ -151,15 +217,6 @@ export default function POSPage() {
             transactions: Number(activeSession.data?.transactions || 0) + 1,
           },
         });
-      }
-
-      // Deduct stock from each product in Product Catalog
-      for (const item of snapshot) {
-        const rec = productRecords.find(r => r.id === item.id);
-        if (rec) {
-          const currentStock = Number(rec.data?.stock ?? 0);
-          await updateProduct(item.id, { data: { stock: Math.max(0, currentStock - item.qty) } });
-        }
       }
 
       setReceipt({
@@ -308,12 +365,17 @@ export default function POSPage() {
                   key={p.id}
                   className="prod-card"
                   onClick={() => addToCart(p)}
-                  style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "16px 14px", cursor: "pointer", userSelect: "none" }}
+                  style={{ background: "rgba(255,255,255,.04)", border: `1px solid ${p.itemNewId && (stockMap[p.itemNewId] ?? 0) <= 0 ? "rgba(239,68,68,.4)" : "rgba(255,255,255,.08)"}`, borderRadius: 14, padding: "16px 14px", cursor: p.itemNewId && (stockMap[p.itemNewId] ?? 0) <= 0 ? "not-allowed" : "pointer", userSelect: "none", opacity: p.itemNewId && (stockMap[p.itemNewId] ?? 0) <= 0 ? 0.5 : 1 }}
                 >
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".05em" }}>{p.category}</div>
                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6, lineHeight: 1.3 }}>{p.name}</div>
                   {p.sku && <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginBottom: 6, letterSpacing: ".04em" }}>SKU: {p.sku}</div>}
                   <div style={{ fontSize: 18, fontWeight: 800, color: "#6366f1" }}>Rs. {p.price.toLocaleString()}</div>
+                  {p.itemNewId && (
+                    <div style={{ fontSize: 10, marginTop: 6, fontWeight: 700, color: (stockMap[p.itemNewId] ?? 0) <= 0 ? "#ef4444" : (stockMap[p.itemNewId] ?? 0) <= 5 ? "#f59e0b" : "#10b981" }}>
+                      Stock: {stockMap[p.itemNewId] ?? 0}
+                    </div>
+                  )}
                 </div>
               ))}
               {!loadingProducts && filtered.length === 0 && products.length > 0 && (

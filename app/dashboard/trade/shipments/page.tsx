@@ -165,7 +165,8 @@ function genRef(count: number) {
 
 function fmtDate(iso: string) {
   if (!iso) return "—";
-  return fmtDate(iso);
+  try { return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }); }
+  catch { return iso; }
 }
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
@@ -496,6 +497,130 @@ function NewShipmentModal({
   );
 }
 
+// ─── Bill of Lading Modal ─────────────────────────────────────────────────────
+
+function BillOfLadingModal({ ship, onClose }: { ship: Shipment; onClose: () => void }) {
+  return (
+    <>
+      <style>{`
+        @media print {
+          body * { visibility: hidden !important; }
+          #bl-print, #bl-print * { visibility: visible !important; }
+          #bl-print { position: fixed; inset: 0; }
+          @page { margin: 10mm 12mm; size: A4; }
+        }
+        @media screen { #bl-print-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.8); display: flex; align-items: center; justify-content: center; z-index: 1200; } }
+      `}</style>
+      <div id="bl-print-overlay">
+        <div style={{ background: "#fff", color: "#000", width: 780, maxHeight: "92vh", overflowY: "auto", borderRadius: 4, fontFamily: "Arial,sans-serif", fontSize: 12 }}>
+          {/* Screen-only buttons */}
+          <div style={{ background: "#1e293b", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>Bill of Lading Preview</span>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => window.print()} style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 6, padding: "7px 18px", cursor: "pointer", fontWeight: 600 }}>🖨 Print</button>
+              <button onClick={onClose} style={{ background: "rgba(255,255,255,.1)", color: "#fff", border: "none", borderRadius: 6, padding: "7px 14px", cursor: "pointer" }}>Close</button>
+            </div>
+          </div>
+
+          <div id="bl-print" style={{ padding: "20mm 18mm", background: "#fff" }}>
+            {/* Header */}
+            <div style={{ textAlign: "center", borderBottom: "3px double #000", paddingBottom: 12, marginBottom: 16 }}>
+              <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: 2, textTransform: "uppercase" }}>BILL OF LADING</div>
+              <div style={{ fontSize: 11, color: "#555", marginTop: 4 }}>NON-NEGOTIABLE COPY — FOR REFERENCE ONLY</div>
+            </div>
+
+            {/* BL No + Date */}
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16, borderBottom: "1px solid #ccc", paddingBottom: 10 }}>
+              <div><span style={{ fontWeight: 700 }}>B/L No:</span> <span style={{ fontFamily: "monospace" }}>{ship.blAwbNo || "—"}</span></div>
+              <div><span style={{ fontWeight: 700 }}>Date of Issue:</span> {fmtDate(ship.etd || new Date().toISOString())}</div>
+              <div><span style={{ fontWeight: 700 }}>Shipment Ref:</span> {ship.ref}</div>
+            </div>
+
+            {/* Shipper / Consignee */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+              <div style={{ border: "1px solid #ccc", padding: "10px 14px" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", marginBottom: 6, letterSpacing: 1 }}>Shipper / Exporter</div>
+                <div style={{ fontWeight: 700 }}>{ship.type === "Export" ? "Your Company" : ship.counterparty}</div>
+                <div style={{ color: "#555", marginTop: 4, fontSize: 11 }}>{ship.originPort}</div>
+              </div>
+              <div style={{ border: "1px solid #ccc", padding: "10px 14px" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", marginBottom: 6, letterSpacing: 1 }}>Consignee / Importer</div>
+                <div style={{ fontWeight: 700 }}>{ship.type === "Import" ? "Your Company" : ship.counterparty}</div>
+                <div style={{ color: "#555", marginTop: 4, fontSize: 11 }}>{ship.destinationPort}</div>
+              </div>
+            </div>
+
+            {/* Vessel / Route */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 0, border: "1px solid #ccc", marginBottom: 16 }}>
+              {[
+                ["Mode of Transport", ship.mode],
+                ["Port of Loading", ship.originPort],
+                ["Port of Discharge", ship.destinationPort],
+                ["Incoterm", ship.incoterm],
+                ["ETD", fmtDate(ship.etd)],
+                ["ETA", fmtDate(ship.eta)],
+                ["Freight", "PREPAID"],
+                ["Status", STATUS_META[ship.status].label],
+              ].map(([k, v]) => (
+                <div key={k} style={{ borderRight: "1px solid #ccc", borderBottom: "1px solid #ccc", padding: "8px 12px" }}>
+                  <div style={{ fontSize: 10, textTransform: "uppercase", color: "#666", marginBottom: 3 }}>{k}</div>
+                  <div style={{ fontWeight: 600 }}>{v}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Cargo */}
+            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16, border: "1px solid #ccc" }}>
+              <thead>
+                <tr style={{ background: "#f0f0f0" }}>
+                  {["Marks & Numbers", "Description of Goods", "HS Code", "Gross Weight", "Measurement"].map(h => (
+                    <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, borderBottom: "1px solid #ccc", borderRight: "1px solid #ccc" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ padding: "12px", borderRight: "1px solid #ccc", verticalAlign: "top" }}>{ship.ref}</td>
+                  <td style={{ padding: "12px", borderRight: "1px solid #ccc" }}>{ship.cargoDescription || "General Cargo"}</td>
+                  <td style={{ padding: "12px", borderRight: "1px solid #ccc", fontFamily: "monospace" }}>{ship.hsCode || "—"}</td>
+                  <td style={{ padding: "12px", borderRight: "1px solid #ccc" }}>—</td>
+                  <td style={{ padding: "12px" }}>—</td>
+                </tr>
+              </tbody>
+            </table>
+
+            {/* Totals */}
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+              <div style={{ width: 260, border: "1px solid #ccc", padding: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Cargo Value</span><span style={{ fontWeight: 700 }}>${ship.amount.toLocaleString()}</span></div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Freight</span><span>${ship.freightCost.toLocaleString()}</span></div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}><span>Insurance</span><span>${ship.insurance.toLocaleString()}</span></div>
+              </div>
+            </div>
+
+            {/* Notes */}
+            {ship.notes && <div style={{ border: "1px solid #ccc", padding: "10px 14px", marginBottom: 16, fontSize: 11, color: "#444" }}><b>Notes:</b> {ship.notes}</div>}
+
+            {/* Signatures */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginTop: 32 }}>
+              {["Shipper's Signature", "Carrier's Signature", "Consignee's Signature"].map(s => (
+                <div key={s}>
+                  <div style={{ borderTop: "1px solid #000", paddingTop: 8, fontSize: 11, color: "#555" }}>{s}</div>
+                  <div style={{ marginTop: 24, fontSize: 10, color: "#999" }}>Date: _______________</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ textAlign: "center", fontSize: 9, color: "#999", borderTop: "1px solid #ddd", paddingTop: 10, marginTop: 24 }}>
+              This document is generated by FinovaOS. Subject to standard terms and conditions of carriage.
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ShipmentsPage() {
@@ -506,6 +631,7 @@ export default function ShipmentsPage() {
   const [showNew,    setShowNew]    = useState(false);
   const [editTarget, setEditTarget] = useState<Shipment | null>(null);
   const [viewTarget, setViewTarget] = useState<Shipment | null>(null);
+  const [blTarget,   setBlTarget]   = useState<Shipment | null>(null);
 
   const shipments = useMemo(() => records.map(mapRecord), [records]);
 
@@ -769,6 +895,16 @@ export default function ShipmentsPage() {
                           >
                             View
                           </button>
+                          <button
+                            onClick={() => setBlTarget(s)}
+                            style={btn("rgba(74,222,128,.1)", {
+                              padding: "5px 11px", fontSize: 12,
+                              color:  "#4ade80",
+                              border: "1px solid rgba(74,222,128,.35)",
+                            })}
+                          >
+                            B/L
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -801,6 +937,13 @@ export default function ShipmentsPage() {
         <ViewModal
           ship={viewTarget}
           onClose={() => setViewTarget(null)}
+        />
+      )}
+
+      {blTarget && (
+        <BillOfLadingModal
+          ship={blTarget}
+          onClose={() => setBlTarget(null)}
         />
       )}
     </div>

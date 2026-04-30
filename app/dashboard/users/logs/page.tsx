@@ -42,7 +42,7 @@ export default function ActivityLogsPage() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || "ڈیٹا لوڈ کرنے میں ناکامی");
+          throw new Error(errorData.message || "Failed to load data");
         }
 
         const data = await response.json();

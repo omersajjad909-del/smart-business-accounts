@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // 3. Legacy InvoiceTax entries (پرانی system سے)
+    // 3. Legacy InvoiceTax entries from the old system.
     const legacyTaxes = await prisma.invoiceTax.findMany({
       where: {
         createdAt: where.createdAt,
@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
         };
       }
 
-      // ✅ صحیح calculation: Total میں سے subtotal نکالیں
+      // Correct calculation: subtract subtotal from total.
       const taxRate = inv.taxConfig.taxRate / 100;
       const subtotal = inv.total / (1 + taxRate);
       const taxAmount = inv.total - subtotal;
@@ -130,7 +130,7 @@ export async function GET(req: NextRequest) {
         };
       }
 
-      // ✅ صحیح calculation: Total میں سے subtotal نکالیں
+      // Correct calculation: subtract subtotal from total.
       const taxRate = inv.taxConfig.taxRate / 100;
       const subtotal = inv.total / (1 + taxRate);
       const taxAmount = inv.total - subtotal;
@@ -173,4 +173,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
-

@@ -27,8 +27,10 @@ interface DeclarationData {
   cifFobValue: number;
   dutyRate: number;
   additionalTaxRate: number;
+  whtRate: number;
   dutyAmount: number;
   vatTaxAmount: number;
+  whtAmount: number;
   otherCharges: number;
   totalPayable: number;
   customsAgent: string;
@@ -53,8 +55,10 @@ interface DeclarationRecord {
   cifFobValue: number;
   dutyRate: number;
   additionalTaxRate: number;
+  whtRate: number;
   dutyAmount: number;
   vatTaxAmount: number;
+  whtAmount: number;
   otherCharges: number;
   totalPayable: number;
   customsAgent: string;
@@ -118,8 +122,10 @@ function mapRecord(r: BusinessRecord): DeclarationRecord {
     cifFobValue: Number(d.cifFobValue ?? 0),
     dutyRate: Number(d.dutyRate ?? 0),
     additionalTaxRate: Number(d.additionalTaxRate ?? 0),
+    whtRate: Number(d.whtRate ?? 0),
     dutyAmount: Number(d.dutyAmount ?? 0),
     vatTaxAmount: Number(d.vatTaxAmount ?? 0),
+    whtAmount: Number(d.whtAmount ?? 0),
     otherCharges: Number(d.otherCharges ?? 0),
     totalPayable: Number(d.totalPayable ?? r.amount ?? 0),
     customsAgent: d.customsAgent ?? "",
@@ -168,8 +174,10 @@ const INITIAL_FORM = {
   cifFobValue: "",
   dutyRate: "",
   additionalTaxRate: "",
+  whtRate: "",
   dutyAmount: "",
   vatTaxAmount: "",
+  whtAmount: "",
   otherCharges: "",
   customsAgent: "",
   agentContact: "",
@@ -237,18 +245,21 @@ export default function CustomsClearancePage() {
     const cif    = parseFloat(f.cifFobValue || "0") || 0;
     const rate   = parseFloat(f.dutyRate || "0") || 0;
     const vatR   = parseFloat(f.additionalTaxRate || "0") || 0;
+    const whtR   = parseFloat(f.whtRate || "0") || 0;
     const duty   = parseFloat(f.dutyAmount || "") || parseFloat(((cif * rate) / 100).toFixed(2));
     const vat    = parseFloat(f.vatTaxAmount || "") || parseFloat(((cif * vatR) / 100).toFixed(2));
-    return { duty, vat };
+    const wht    = parseFloat(f.whtAmount || "") || parseFloat(((cif * whtR) / 100).toFixed(2));
+    return { duty, vat, wht };
   }, []);
 
   const setField = useCallback((key: keyof typeof INITIAL_FORM, val: string) => {
     setForm(prev => {
       const next = { ...prev, [key]: val };
-      if (["cifFobValue", "dutyRate", "additionalTaxRate"].includes(key)) {
-        const { duty, vat } = recalc(next);
-        next.dutyAmount  = String(duty);
+      if (["cifFobValue", "dutyRate", "additionalTaxRate", "whtRate"].includes(key)) {
+        const { duty, vat, wht } = recalc(next);
+        next.dutyAmount   = String(duty);
         next.vatTaxAmount = String(vat);
+        next.whtAmount    = String(wht);
       }
       return next;
     });
@@ -287,8 +298,9 @@ export default function CustomsClearancePage() {
       consigneeName: d.consigneeName, portOfEntryExit: d.portOfEntryExit,
       countryOriginDest: d.countryOriginDest, mode: d.mode, blAwbNo: d.blAwbNo,
       cifFobValue: String(d.cifFobValue), dutyRate: String(d.dutyRate),
-      additionalTaxRate: String(d.additionalTaxRate), dutyAmount: String(d.dutyAmount),
-      vatTaxAmount: String(d.vatTaxAmount), otherCharges: String(d.otherCharges),
+      additionalTaxRate: String(d.additionalTaxRate), whtRate: String(d.whtRate),
+      dutyAmount: String(d.dutyAmount),
+      vatTaxAmount: String(d.vatTaxAmount), whtAmount: String(d.whtAmount), otherCharges: String(d.otherCharges),
       customsAgent: d.customsAgent, agentContact: d.agentContact,
       filingDate: d.filingDate, expectedClearanceDate: d.expectedClearanceDate,
       clearanceDate: d.clearanceDate, notes: d.notes, status: d.status,
@@ -312,8 +324,9 @@ export default function CustomsClearancePage() {
     const cif   = parseFloat(form.cifFobValue || "0") || 0;
     const duty  = parseFloat(form.dutyAmount || "0") || 0;
     const vat   = parseFloat(form.vatTaxAmount || "0") || 0;
+    const wht   = parseFloat(form.whtAmount || "0") || 0;
     const other = parseFloat(form.otherCharges || "0") || 0;
-    const total = duty + vat + other;
+    const total = duty + vat + wht + other;
 
     const data: DeclarationData = {
       declarationNo: form.declarationNo.trim(),
@@ -328,8 +341,10 @@ export default function CustomsClearancePage() {
       cifFobValue: cif,
       dutyRate: parseFloat(form.dutyRate || "0") || 0,
       additionalTaxRate: parseFloat(form.additionalTaxRate || "0") || 0,
+      whtRate: parseFloat(form.whtRate || "0") || 0,
       dutyAmount: duty,
       vatTaxAmount: vat,
+      whtAmount: wht,
       otherCharges: other,
       totalPayable: total,
       customsAgent: form.customsAgent.trim(),
@@ -635,19 +650,27 @@ export default function CustomsClearancePage() {
                 <input type="number" min="0" max="100" step="0.01" value={form.dutyRate} onChange={e => setField("dutyRate", e.target.value)} style={s.inp} placeholder="0.00" />
               </div>
               <div>
-                <label style={s.label}>Additional Taxes (%)</label>
+                <label style={s.label}>Additional Taxes / VAT (%)</label>
                 <input type="number" min="0" max="100" step="0.01" value={form.additionalTaxRate} onChange={e => setField("additionalTaxRate", e.target.value)} style={s.inp} placeholder="0.00" />
+              </div>
+              <div>
+                <label style={s.label}>WHT Rate (%) <span style={{ color: "#f59e0b", fontWeight: 400 }}>Withholding Tax on Import</span></label>
+                <input type="number" min="0" max="100" step="0.01" value={form.whtRate} onChange={e => setField("whtRate", e.target.value)} style={{ ...s.inp, borderColor: "#f59e0b66" }} placeholder="e.g. 6 (registered) or 9 (unregistered)" />
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 14 }}>
               <div>
-                <label style={s.label}>Duty Amount ($) <span style={{ color: "#9ca3af", fontWeight: 400 }}>(auto-calc)</span></label>
+                <label style={s.label}>Duty Amount ($) <span style={{ color: "#9ca3af", fontWeight: 400 }}>(auto)</span></label>
                 <input type="number" min="0" step="0.01" value={form.dutyAmount} onChange={e => setField("dutyAmount", e.target.value)} style={{ ...s.inp, borderColor: "#fbbf2466" }} placeholder="0.00" />
               </div>
               <div>
-                <label style={s.label}>VAT / Tax Amount ($) <span style={{ color: "#9ca3af", fontWeight: 400 }}>(auto-calc)</span></label>
+                <label style={s.label}>VAT / Tax Amount ($) <span style={{ color: "#9ca3af", fontWeight: 400 }}>(auto)</span></label>
                 <input type="number" min="0" step="0.01" value={form.vatTaxAmount} onChange={e => setField("vatTaxAmount", e.target.value)} style={{ ...s.inp, borderColor: "#a78bfa66" }} placeholder="0.00" />
+              </div>
+              <div>
+                <label style={s.label}>WHT Amount ($) <span style={{ color: "#9ca3af", fontWeight: 400 }}>(auto)</span></label>
+                <input type="number" min="0" step="0.01" value={form.whtAmount} onChange={e => setField("whtAmount", e.target.value)} style={{ ...s.inp, borderColor: "#f59e0b66" }} placeholder="0.00" />
               </div>
               <div>
                 <label style={s.label}>Other Charges ($)</label>
@@ -656,15 +679,24 @@ export default function CustomsClearancePage() {
             </div>
 
             {/* Total Payable summary */}
-            <div style={{ background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.25)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Total Payable (Duty + VAT + Other)</span>
-              <span style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>
-                {fmt(
-                  (parseFloat(form.dutyAmount || "0") || 0) +
-                  (parseFloat(form.vatTaxAmount || "0") || 0) +
-                  (parseFloat(form.otherCharges || "0") || 0)
-                )}
-              </span>
+            <div style={{ background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.25)", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Total Payable (Duty + VAT + WHT + Other)</span>
+                <span style={{ fontSize: 18, fontWeight: 800, color: "#22c55e" }}>
+                  {fmt(
+                    (parseFloat(form.dutyAmount || "0") || 0) +
+                    (parseFloat(form.vatTaxAmount || "0") || 0) +
+                    (parseFloat(form.whtAmount || "0") || 0) +
+                    (parseFloat(form.otherCharges || "0") || 0)
+                  )}
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--text-muted)" }}>
+                <span>Duty: {fmt(parseFloat(form.dutyAmount || "0") || 0)}</span>
+                <span>VAT: {fmt(parseFloat(form.vatTaxAmount || "0") || 0)}</span>
+                {(parseFloat(form.whtAmount || "0") || 0) > 0 && <span style={{ color: "#f59e0b" }}>WHT: {fmt(parseFloat(form.whtAmount || "0") || 0)}</span>}
+                <span>Other: {fmt(parseFloat(form.otherCharges || "0") || 0)}</span>
+              </div>
             </div>
 
             {/* Agent */}

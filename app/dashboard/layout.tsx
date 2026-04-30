@@ -1688,6 +1688,7 @@ export default function DashboardLayout({
               {hasDashboardFeature("TRADE_PACKING_LIST") && <NavLink href="/dashboard/packing-list" pathname={pathname}>Packing List</NavLink>}
               {hasDashboardFeature("TRADE_LC") && <NavLink href="/dashboard/trade/lc" pathname={pathname}>LC / TT</NavLink>}
               {hasDashboardFeature("TRADE_CUSTOMS") && <NavLink href="/dashboard/trade/customs" pathname={pathname}>Customs</NavLink>}
+              {hasDashboardFeature("TRADE_HS_CODES") && <NavLink href="/dashboard/trade/hs-codes" pathname={pathname}>HS Code Master</NavLink>}
               {hasDashboardFeature("TRADE_IMPORT_COSTING") && <NavLink href="/dashboard/trade/costing" pathname={pathname}>Import Costing</NavLink>}
               {hasDashboardFeature("TRADE_REBATE") && <NavLink href="/dashboard/trade/rebate" pathname={pathname}>Rebate / Drawback</NavLink>}
               {hasDashboardFeature("TRADE_ANALYTICS") && <NavLink href="/dashboard/trade/analytics" pathname={pathname}>Analytics</NavLink>}

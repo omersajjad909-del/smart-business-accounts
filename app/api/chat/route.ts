@@ -357,8 +357,8 @@ export async function POST(req: NextRequest) {
       if (result.shouldEscalate && result.intentId === "fallback") {
         const hints: Record<string, string> = {
           en: "\n\nWould you like me to connect you with a human agent? 👤",
-          ur_roman: "\n\nKya main aapko human agent se connect karun? 👤",
-          ur_script: "\n\nکیا میں آپ کو انسانی ایجنٹ سے جوڑوں؟ 👤",
+          ur_roman: "\n\nWould you like me to connect you to a human agent? 👤",
+          ur_script: "\n\nWould you like me to connect you to a human agent? 👤",
         };
         const lang = result.language;
         reply += hints[lang] ?? hints.en;

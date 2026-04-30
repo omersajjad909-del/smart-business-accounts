@@ -40,12 +40,12 @@ export async function GET(req: NextRequest) {
         };
       }
 
-      // اگر آپ کے ڈیٹا بیس میں qty پہلے ہی سیلز کے لیے مائنس میں ہے تو صرف جمع کریں
+      // If sales quantities are already stored as negative values, simply sum them.
       // Otherwise use the existing type-based logic below:
       map[key].qty += t.qty; 
     }
 
-    // صرف وہ آئٹمز دکھائیں جن کا اسٹاک 0 نہیں ہے
+    // Show only items with a non-zero stock balance.
     const result = Object.values(map).filter((r: any) => r.qty !== 0);
     
     // Sort by location.

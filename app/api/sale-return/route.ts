@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       nextNo = `SR-${maxNum + 1}`;
     }
 
-    // 2. ٹرانزیکشن شروع کریں تاکہ سارا ڈیٹا ایک ساتھ سیو ہو
+    // 2. Start a transaction so all related data is saved together.
    const result = await prisma.$transaction(async (tx: TxClient) => {
   const subtotal = items.reduce((s: number, i: any) => s + Number(i.qty) * Number(i.rate), 0);
   const discountAmt = discountType === "percent" ? subtotal * Number(discount) / 100 : Number(discount);
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
     },
   });
 
-      // اسٹاک واپس پلس کرنا
+      // Add the returned quantity back into stock.
       for (const i of items) {
         await tx.inventoryTxn.create({
           data: {
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // اکاؤنٹنگ واؤچر بنانا
+      // Create the accounting voucher.
       await tx.voucher.create({
         data: {
           voucherNo: nextNo,

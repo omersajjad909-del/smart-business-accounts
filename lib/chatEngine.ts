@@ -30,7 +30,7 @@ function detectLanguage(text: string): ChatLanguage {
   // Arabic script block (Urdu, Arabic, Persian all share U+0600–U+06FF)
   const arabicChars = text.match(/[\u0600-\u06FF]/g);
   if (arabicChars && arabicChars.length > 1) {
-    // Urdu-specific characters: ے ی ں گ ک ٹ ڈ
+    // Urdu-specific characters used to distinguish Urdu script from Arabic
     const urduSpecific = /[\u06BE\u06CC\u06BA\u06AF\u06A9\u0679\u0688]/;
     if (urduSpecific.test(text)) return "ur_script";
     return "ar";

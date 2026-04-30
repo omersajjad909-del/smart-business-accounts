@@ -193,6 +193,24 @@ export async function POST(req: NextRequest) {
     const taxAmount = itemsTax + globalTax;
     const total = subtotal - discountAmt + taxAmount + Number(freight);
 
+    // ── Stock availability check ──────────────────────────────────────────────
+    for (const i of items) {
+      if (!i.itemId) continue;
+      const agg = await prisma.inventoryTxn.aggregate({
+        where: { itemId: i.itemId, companyId },
+        _sum: { qty: true },
+      });
+      const available = agg._sum.qty ?? 0;
+      if (available < i.qty) {
+        const itm = await prisma.itemNew.findUnique({ where: { id: i.itemId }, select: { name: true } });
+        return NextResponse.json(
+          { error: `Insufficient stock for "${itm?.name || i.itemId}". Available: ${available}, Required: ${i.qty}` },
+          { status: 400 }
+        );
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const invoice = await prisma.salesInvoice.create({
       data: {
         companyId,

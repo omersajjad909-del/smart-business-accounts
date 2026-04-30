@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
           name: `${bankName} - ${accountNo}`,
           type: 'BANK',
           partyType: 'BANKS', // This will be shown in the ledger.
-          openDebit: balance || 0, // شروعاتی balance
+          openDebit: balance || 0, // Opening balance
           companyId,
         },
       });
