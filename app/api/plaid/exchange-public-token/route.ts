@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { plaidClient } from '@/lib/plaid';
 import { prisma } from '@/lib/prisma';
 import { getTokenFromRequest, verifyJwt } from '@/lib/auth';
+import { encryptField } from '@/lib/fieldEncrypt';
 
 export async function POST(req: NextRequest) {
   try {
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
             accountName,
             balance,
             accountId: ledgerAccount.id,
-            plaidAccessToken: access_token,
+            plaidAccessToken: encryptField(access_token),
             plaidItemId: item_id,
             institutionId: acc.account_id,
             isPlaidLinked: true,
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
             accountName,
             balance,
             accountId: ledgerAccount.id,
-            plaidAccessToken: access_token,
+            plaidAccessToken: encryptField(access_token),
             plaidItemId: item_id,
             institutionId: acc.account_id,
             isPlaidLinked: true,

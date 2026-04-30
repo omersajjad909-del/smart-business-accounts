@@ -2,11 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { signJwt } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
+// Normalized error — never reveal whether email exists or not
+const INVALID_CREDS = { message: "Invalid credentials" };
+
 export async function POST(req: NextRequest) {
   try {
+    // ── Rate limiting: max 10 attempts per IP per 15 minutes ────────────────
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || req.headers.get("x-real-ip")
+      || "unknown";
+    const rl = rateLimit(`admin_login:${ip}`, 10, 15 * 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { message: "Too many login attempts. Try again in 15 minutes." },
+        { status: 429, headers: { "Retry-After": "900" } }
+      );
+    }
+
     let body;
     try { body = JSON.parse(await req.text()); }
     catch { return NextResponse.json({ message: "Invalid JSON" }, { status: 400 }); }
@@ -20,7 +36,7 @@ export async function POST(req: NextRequest) {
     const superAdmin = await prisma.user.findUnique({ where: { email } });
     if (superAdmin && superAdmin.role === "ADMIN") {
       const match = await bcrypt.compare(password, superAdmin.password);
-      if (!match) return NextResponse.json({ message: "Invalid password" }, { status: 401 });
+      if (!match) return NextResponse.json(INVALID_CREDS, { status: 401 });
 
       const token = await signJwt({ id: superAdmin.id, email: superAdmin.email, role: "ADMIN", name: superAdmin.name });
       const response = NextResponse.json({
@@ -38,7 +54,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "Account is disabled. Contact super admin." }, { status: 403 });
 
       const match = await bcrypt.compare(password, teamMember.passwordHash);
-      if (!match) return NextResponse.json({ message: "Invalid password" }, { status: 401 });
+      if (!match) return NextResponse.json(INVALID_CREDS, { status: 401 });
 
       await (prisma as any).adminUser.update({ where: { id: teamMember.id }, data: { lastLoginAt: new Date() } });
 
@@ -55,8 +71,9 @@ export async function POST(req: NextRequest) {
       return response;
     }
 
-    return NextResponse.json({ message: "Invalid admin credentials" }, { status: 401 });
+    // Always return same error regardless of whether email exists (prevent user enumeration)
+    return NextResponse.json(INVALID_CREDS, { status: 401 });
   } catch (e: any) {
-    return NextResponse.json({ message: e.message }, { status: 500 });
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

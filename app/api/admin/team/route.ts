@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     const existing = await (prisma as any).adminUser.findUnique({ where: { email: email.toLowerCase().trim() } });
     if (existing) return NextResponse.json({ error: "Email already exists" }, { status: 409 });
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 12);
     const member = await (prisma as any).adminUser.create({
       data: {
         name: name.trim(),
@@ -63,7 +63,7 @@ export async function PATCH(req: NextRequest) {
     if (team         !== undefined) data.team         = team;
     if (allowedPages !== undefined) data.allowedPages = JSON.stringify(allowedPages);
     if (active       !== undefined) data.active       = Boolean(active);
-    if (password)                   data.passwordHash = await bcrypt.hash(password, 10);
+    if (password)                   data.passwordHash = await bcrypt.hash(password, 12);
 
     const updated = await (prisma as any).adminUser.update({ where: { id }, data });
     return NextResponse.json({ success: true, member: { id: updated.id, name: updated.name, active: updated.active } });

@@ -803,10 +803,11 @@ export default function PurchaseOrderPage() {
             <Label>Recipient Email</Label>
             <input type="email" value={recipientEmail} onChange={e => setRecipientEmail(e.target.value)} placeholder="supplier@example.com" style={{ ...inp(), marginBottom: 18 }} />
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button onClick={() => setEmailModalOpen(false)} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>Cancel</button>
               <button onClick={confirmSendEmail} disabled={sendingEmail} style={{ padding: "9px 22px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: sendingEmail ? 0.7 : 1 }}>
                 {sendingEmail ? "Sending…" : "Send Email"}
               </button>
+              <button onClick={() => setEmailModalOpen(false)} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              
             </div>
           </div>
         </div>
