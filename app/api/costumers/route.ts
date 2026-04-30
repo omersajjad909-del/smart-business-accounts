@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
+import { safeDecryptField } from "@/lib/fieldEncrypt";
 
 // ✅ Prisma singleton (dev safe)
 const prisma =
@@ -39,7 +40,7 @@ export async function GET(req: NextRequest) {
       orderBy: { name: "asc" },
     });
 
-    return NextResponse.json(customers);
+    return NextResponse.json(customers.map(c => ({ ...c, phone: safeDecryptField(c.phone) })));
   } catch (err) {
     console.error("❌ CUSTOMERS API ERROR:", err);
     return NextResponse.json(

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { safeEncryptField } from "@/lib/fieldEncrypt";
 
 // Supported sources and their column mappings
 const COLUMN_MAPS: Record<string, Record<string, Record<string, string>>> = {
@@ -132,7 +133,7 @@ export async function POST(req: NextRequest) {
             name: row.name,
             type: "DEBTOR",
             email: row.email || null,
-            phone: row.phone || null,
+            phone: row.phone ? safeEncryptField(row.phone) : null,
             city: row.city || null,
           },
         });

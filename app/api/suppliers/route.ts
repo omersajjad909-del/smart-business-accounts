@@ -27,6 +27,6 @@ export async function GET(req: NextRequest) {
     orderBy: { name: "asc" },
   });
 
-  return NextResponse.json(suppliers);
+  return NextResponse.json(suppliers.map(s => safeDecryptFields(s, ACCOUNT_PII_FIELDS)));
 }
 

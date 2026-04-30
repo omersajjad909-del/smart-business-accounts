@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { resolveCompanyId } from "@/lib/tenant";
+import { safeEncryptField } from "@/lib/fieldEncrypt";
 
 const prisma =
   (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
           partyType: r.partyType || null,
           type,
           city: r.city || null,
-          phone: r.phone || null,
+          phone: r.phone ? safeEncryptField(r.phone) : null,
           openDebit: r.openDebit ? Number(r.openDebit) : 0,
           openCredit: r.openCredit ? Number(r.openCredit) : 0,
           openDate: r.openDate ? new Date(r.openDate) : undefined,
