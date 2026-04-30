@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { type, invoiceId, to, subject, message } = body;
+    const { type, invoiceId, to, subject, message, daysOverdue } = body;
 
     if (!type || !to) {
       return NextResponse.json(
@@ -112,6 +112,56 @@ export async function POST(req: NextRequest) {
 
   html = emailTemplates.purchaseOrder(po, po.supplier, companyName);
   emailSubject = subject || `Purchase Order ${po.poNo}${companyName ? ` - ${companyName}` : ""}`;
+
+    } else if (type === "quotation" && invoiceId) {
+      const quotation = await prisma.quotation.findFirst({
+        where: { id: invoiceId, companyId },
+        include: {
+          customer: true,
+          items: { include: { item: true } },
+        },
+      });
+      if (!quotation) return NextResponse.json({ error: "Quotation not found" }, { status: 404 });
+
+      html = emailTemplates.quotation(quotation, quotation.customer, companyName);
+      emailSubject = subject || `Quotation ${quotation.quotationNo}${companyName ? ` - ${companyName}` : ""}`;
+
+    } else if (type === "delivery-challan" && invoiceId) {
+      const challan = await prisma.deliveryChallan.findFirst({
+        where: { id: invoiceId, companyId },
+        include: {
+          customer: true,
+          items: { include: { item: true } },
+        },
+      });
+      if (!challan) return NextResponse.json({ error: "Delivery challan not found" }, { status: 404 });
+
+      html = emailTemplates.deliveryChallan(challan, challan.customer, companyName);
+      emailSubject = subject || `Delivery Challan ${challan.challanNo}${companyName ? ` - ${companyName}` : ""}`;
+
+    } else if (type === "sale-return" && invoiceId) {
+      const saleReturn = await prisma.saleReturn.findFirst({
+        where: { id: invoiceId, companyId },
+        include: {
+          customer: true,
+          items: { include: { item: true } },
+        },
+      });
+      if (!saleReturn) return NextResponse.json({ error: "Sale return not found" }, { status: 404 });
+
+      html = emailTemplates.saleReturn(saleReturn, saleReturn.customer, companyName);
+      emailSubject = subject || `Sale Return ${saleReturn.returnNo}${companyName ? ` - ${companyName}` : ""}`;
+
+    } else if (type === "payment-reminder" && invoiceId) {
+      const invoice = await prisma.salesInvoice.findFirst({
+        where: { id: invoiceId, companyId },
+        include: { customer: true },
+      });
+      if (!invoice) return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+
+      const overdue = typeof daysOverdue === "number" ? daysOverdue : 0;
+      html = emailTemplates.paymentReminder(invoice, invoice.customer, overdue, companyName);
+      emailSubject = subject || `Payment Reminder: Invoice ${invoice.invoiceNo}${companyName ? ` - ${companyName}` : ""}`;
 
     } else if (type === 'custom' && message) {
       const customTitle = subject || (companyName ? `Message from ${companyName}` : "Message");
