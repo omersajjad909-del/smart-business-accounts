@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId } from "@/lib/tenant";
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 // Get all roles and their permissions
 export async function GET(req: NextRequest) {

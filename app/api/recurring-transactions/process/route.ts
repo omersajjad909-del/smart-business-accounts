@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
+import { prisma } from "@/lib/prisma";
 
 // Process recurring transactions that are due
 export async function POST(_req: NextRequest) {

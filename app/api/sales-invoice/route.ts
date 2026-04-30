@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
@@ -20,12 +22,6 @@ type SalesInvoiceFull = Prisma.SalesInvoiceGetPayload<{
 
 type TxClient = Prisma.TransactionClient;
 
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 export async function GET(req: NextRequest) {
   try {

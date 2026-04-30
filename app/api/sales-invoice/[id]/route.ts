@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient , Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 
 type SaleReturnWithItems = Prisma.SaleReturnGetPayload<{
@@ -36,12 +38,6 @@ type PendingItem = {
 
 
 
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 // ================= GET FUNCTION =================
 // Load invoice details and check how much stock is still available.

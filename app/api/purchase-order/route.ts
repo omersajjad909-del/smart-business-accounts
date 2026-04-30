@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient,Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
-const prisma =
-  (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
-
-
 export async function POST(req: NextRequest) {
   const role = req.headers.get("x-user-role");
   if (role !== "ADMIN" && role !== "ACCOUNTANT") {

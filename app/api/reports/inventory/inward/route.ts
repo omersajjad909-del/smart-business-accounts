@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient , Prisma} from "@prisma/client";
-import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
 type PurchaseWithItems = Prisma.PurchaseInvoiceGetPayload<{
   include: {

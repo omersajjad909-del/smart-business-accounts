@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { resolveBranchId } from "@/lib/tenant";
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 const MAX_RESULTS = 8;
 

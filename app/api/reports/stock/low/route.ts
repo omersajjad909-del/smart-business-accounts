@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 
 type ItemWithInventory = Prisma.ItemNewGetPayload<{
@@ -27,12 +28,6 @@ type LowStockItem = {
 };
 
 
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 export async function GET(req: NextRequest) {
   try {

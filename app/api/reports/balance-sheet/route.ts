@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient , Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { requireEntitlement } from "@/lib/subscriptionGuard";
 
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 type AccountWithEntries = Prisma.AccountGetPayload<{
   include: {
     voucherEntries: true;

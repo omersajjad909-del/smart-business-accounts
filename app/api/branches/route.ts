@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { logActivity } from "@/lib/audit";
 import { getBaseBranchLimitForPlan, getCompanyBranchCount } from "@/lib/branchLimit";
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 async function getCompanyId(req: NextRequest): Promise<string | null> {
   try {

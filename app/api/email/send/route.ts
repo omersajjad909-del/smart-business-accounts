@@ -2,13 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { PERMISSIONS } from "@/lib/permissions";
-import { PrismaClient } from "@prisma/client";
-import { resolveCompanyId } from "@/lib/tenant";
+import { prisma } from "@/lib/prisma";
 
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
+import { resolveCompanyId } from "@/lib/tenant";
 
 export async function POST(req: NextRequest) {
   try {

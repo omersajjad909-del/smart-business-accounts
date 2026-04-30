@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+
 import { z } from "zod";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
@@ -9,12 +10,6 @@ import { logActivity } from "@/lib/audit";
 import { logAuditFromReq } from "@/lib/auditLogger";
 import { rateLimit } from "@/lib/rateLimit";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 const receiptSchema = z.object({
   receiptNo: z.string().optional(),

@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { logActivity } from "@/lib/audit";
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 export async function POST(req: NextRequest) {
   try {

@@ -7,12 +7,6 @@ import { apiHasPermission } from "@/lib/apiPermission";
 import { requireActiveSubscription } from "@/lib/subscriptionGuard";
 import { logAuditFromReq } from "@/lib/auditLogger";
 
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
-
 /* ================= GET: Pending POs for Selection OR All Purchase Invoices ================= */
 export async function GET(req: NextRequest) {
   try {

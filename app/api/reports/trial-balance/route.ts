@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 type VoucherEntry = Prisma.VoucherEntryGetPayload<Prisma.VoucherEntryDefaultArgs>;
 
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 /* ================= CATEGORY RESOLVER ================= */
 function resolveCategory(acc: any) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
 import { logAuditFromReq } from "@/lib/auditLogger";
 import { resolveCompanyId } from "@/lib/tenant";
@@ -8,11 +8,6 @@ import {
   getBusinessRecordMeta,
   sanitizeBusinessRecordInput,
 } from "@/lib/businessRecordHardening";
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 async function resolveBusinessRecordScope(req: NextRequest, companyId: string) {
   const headerBranchId = req.headers.get("x-branch-id");

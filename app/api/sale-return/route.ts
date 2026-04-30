@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient , Prisma} from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 type SaleReturn = Prisma.SaleReturnGetPayload<{
   select: {
@@ -10,12 +11,6 @@ type SaleReturn = Prisma.SaleReturnGetPayload<{
 type TxClient = Prisma.TransactionClient;
 
 
-
-const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
 
 // GET - List all Sale Returns
 export async function GET(req: NextRequest) {
