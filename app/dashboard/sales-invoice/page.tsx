@@ -778,15 +778,10 @@ function SalesInvoiceContent() {
                     <div style={{ fontSize: 13, marginBottom: 4 }}><b>Invoice #:</b> {invNo}</div>
                     <div style={{ fontSize: 13, marginBottom: 4 }}><b>Date:</b> {invDate}</div>
                     {location && <div style={{ fontSize: 13, marginBottom: 8 }}><b>Location:</b> {location}</div>}
-                    {invNo && (
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-                        <Barcode value={invNo} width={1.5} height={36} fontSize={11} displayValue={false} />
-                        {origin && savedInvoice?.id && (
-                          <div style={{ textAlign: "center" }}>
-                            <QRCodeSVG value={`${origin}/view/sales-invoice?id=${savedInvoice.id}`} size={72} />
-                            <div style={{ fontSize: 9, fontWeight: 700, background: "#111", color: "#fff", padding: "2px 4px", marginTop: 2 }}>SCAN FOR ONLINE BILL</div>
-                          </div>
-                        )}
+                    {origin && savedInvoice?.id && (
+                      <div style={{ textAlign: "center" }}>
+                        <QRCodeSVG value={`${origin}/view/sales-invoice?id=${savedInvoice.id}`} size={72} />
+                        <div style={{ fontSize: 9, fontWeight: 700, background: "#111", color: "#fff", padding: "2px 4px", marginTop: 2 }}>SCAN FOR ONLINE BILL</div>
                       </div>
                     )}
                   </div>
@@ -863,6 +858,7 @@ function SalesInvoiceContent() {
                 {printPrefs.footerNote && (
                   <div style={{ textAlign: "center", fontSize: 12, color: "#888", borderTop: "1px solid #eee", paddingTop: 12 }}>{printPrefs.footerNote}</div>
                 )}
+                <div style={{ textAlign: "center", fontSize: 10, color: "#bbb", marginTop: 10 }}>Powered by <b style={{ color: "#6366f1" }}>FinovaOS</b></div>
               </div>
             )}
           </>
@@ -884,8 +880,7 @@ function SalesInvoiceContent() {
             <div style={{ textAlign: "right" }}>
               <div style={{ marginBottom: 3 }}><b>Invoice #:</b> {invNo}</div>
               <div style={{ marginBottom: 3 }}><b>Date:</b> {invDate}</div>
-              {location && <div style={{ marginBottom: 8 }}><b>Location:</b> {location}</div>}
-              <Barcode value={invNo || "SI-0"} width={1.5} height={32} fontSize={10} displayValue={false} />
+              {location && <div style={{ marginBottom: 3 }}><b>Location:</b> {location}</div>}
             </div>
           </div>
 
@@ -949,6 +944,7 @@ function SalesInvoiceContent() {
           </div>
 
           {printPrefs.footerNote && <div style={{ textAlign: "center", fontSize: 10, color: "#666", borderTop: "1px solid #ddd", paddingTop: 8 }}>{printPrefs.footerNote}</div>}
+          <div style={{ textAlign: "center", fontSize: 9, color: "#aaa", marginTop: 8 }}>Powered by <b>FinovaOS</b></div>
         </div>
       )}
 
@@ -998,15 +994,10 @@ function SalesInvoiceContent() {
             </div>
           )}
 
-          {invNo && (
-            <div style={{ textAlign: "center", marginBottom: 6 }}>
-              <Barcode value={invNo} width={1} height={30} fontSize={9} displayValue={true} />
-            </div>
-          )}
-
-          <div style={{ textAlign: "center", fontSize: 9, borderTop: "1px dashed #000", paddingTop: 6 }}>
+          <div style={{ textAlign: "center", fontSize: 9, borderTop: "1px dashed #000", paddingTop: 6, marginBottom: 4 }}>
             {printPrefs.footerNote || "Thank you for your business!"}
           </div>
+          <div style={{ textAlign: "center", fontSize: 8, color: "#999" }}>Powered by <b>FinovaOS</b></div>
         </div>
       )}
     </>
