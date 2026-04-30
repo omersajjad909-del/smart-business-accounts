@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
     unit:     item.unit,
     rate:     item.rate,
     minStock: item.minStock,
+    barcode:  item.barcode || "",
     qty:      item.inventoryTxns.reduce((s, t) => s + t.qty, 0),
   }));
 

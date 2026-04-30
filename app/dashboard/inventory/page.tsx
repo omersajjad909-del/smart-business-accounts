@@ -13,6 +13,7 @@ interface StockRow {
   unit?: string;
   rate?: number;
   minStock?: number;
+  barcode?: string;
 }
 
 type StockStatus = "OK" | "LOW" | "OUT";
@@ -201,6 +202,7 @@ export default function InventoryPage() {
               <tr>
                 <th style={th("name")} onClick={() => toggleSort("name")}>Item Name <SortIcon col="name" /></th>
                 <th style={{ ...th(), width: 100 }}>Code</th>
+                <th style={{ ...th(), width: 140 }}>Barcode</th>
                 <th style={{ ...th(), width: 80 }}>Unit</th>
                 <th style={{ ...th("qty"), textAlign: "right", width: 120 }} onClick={() => toggleSort("qty")}>
                   Stock Qty <SortIcon col="qty" />
@@ -222,6 +224,20 @@ export default function InventoryPage() {
                       <div style={{ fontWeight: 600 }}>{s.name}</div>
                     </td>
                     <td style={{ ...td, fontFamily: "monospace", fontSize: 12, color: "var(--text-muted)" }}>{s.code || "—"}</td>
+                    <td style={{ ...td }}>
+                      {s.barcode ? (
+                        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                          <span style={{ fontFamily: "monospace", fontSize: 12, color: "var(--text-primary)", letterSpacing: 0.5 }}>{s.barcode}</span>
+                          <span style={{ fontSize: 15, lineHeight: 1, display: "flex", gap: 1 }}>
+                            {[3,2,4,1,3,2,3,4,2,3,1,4].map((h, i) => (
+                              <span key={i} style={{ display: "inline-block", width: i % 3 === 0 ? 2 : 1, height: h * 3, background: "var(--text-muted)", borderRadius: 0.5, opacity: 0.7 }} />
+                            ))}
+                          </span>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>No barcode</span>
+                      )}
+                    </td>
                     <td style={{ ...td, fontSize: 12, color: "var(--text-muted)" }}>{s.unit || "pcs"}</td>
                     <td style={{ ...td, textAlign: "right", fontWeight: 700 }}>
                       <div>{s.qty.toLocaleString()}</div>
@@ -247,7 +263,7 @@ export default function InventoryPage() {
             </tbody>
             <tfoot>
               <tr style={{ background: "rgba(99,102,241,0.06)", borderTop: "1px solid var(--border)" }}>
-                <td colSpan={5} style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>
+                <td colSpan={6} style={{ padding: "12px 14px", fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>
                   Showing {filtered.length} of {enriched.length} items
                 </td>
                 <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 800, color: "#a5b4fc", fontSize: 14 }}>
