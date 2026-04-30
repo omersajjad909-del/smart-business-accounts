@@ -983,6 +983,112 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
+          {/* ══════════════════════════════════════════
+              RETAIL & MULTI-STORE MODULES
+              (visible when businessType === "retail")
+          ══════════════════════════════════════════ */}
+          {hasModule(businessType, "pos") && isBusinessEnabled(businessType) && (<>
+
+            {/* ── 1. POS ── */}
+            <NavGroup
+              title="🖥️ Point of Sale"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>}
+              open={openSection === "retailPos"}
+              onToggle={() => toggle("retailPos")}
+            >
+              {hasDashboardFeature("RETAIL_POS") && <NavLink href="/dashboard/retail/pos" pathname={pathname}>POS Terminal</NavLink>}
+              {hasDashboardFeature("RETAIL_POS") && <NavLink href="/dashboard/retail/sales-history" pathname={pathname}>🧾 Sales History</NavLink>}
+              {hasDashboardFeature("RETAIL_POS_SESSIONS") && <NavLink href="/dashboard/retail/pos-sessions" pathname={pathname}>POS Sessions</NavLink>}
+              {hasDashboardFeature("RETAIL_DISCOUNTS") && <NavLink href="/dashboard/retail/discounts" pathname={pathname}>Discounts & Promotions</NavLink>}
+              {hasDashboardFeature("RETAIL_ONLINE_SYNC") && <NavLink href="/dashboard/retail/online-sync" pathname={pathname}>Online Store Sync</NavLink>}
+            </NavGroup>
+
+            {/* ── 2. Sales ── */}
+            <NavGroup
+              title="📋 Sales"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>}
+              open={openSection === "retailSales"}
+              onToggle={() => toggle("retailSales")}
+            >
+              <NavLink href="/dashboard/sales-invoice" pathname={pathname}>🧾 Sales Invoices</NavLink>
+              <NavLink href="/dashboard/sale-return" pathname={pathname}>↩️ Sales Returns</NavLink>
+              <NavLink href="/dashboard/quotation" pathname={pathname}>📄 Quotations</NavLink>
+              <NavLink href="/dashboard/delivery-challan" pathname={pathname}>🚚 Delivery Challan</NavLink>
+              <NavLink href="/dashboard/payment-receipts" pathname={pathname}>💳 Payment Collection</NavLink>
+            </NavGroup>
+
+            {/* ── 3. Purchases ── */}
+            <NavGroup
+              title="🛒 Purchases"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>}
+              open={openSection === "retailPurchases"}
+              onToggle={() => toggle("retailPurchases")}
+            >
+              <NavLink href="/dashboard/purchase-order" pathname={pathname}>📦 Purchase Orders</NavLink>
+              <NavLink href="/dashboard/grn" pathname={pathname}>📥 GRN (Goods Receipt)</NavLink>
+              <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>🧾 Purchase Invoices</NavLink>
+              <NavLink href="/dashboard/purchase-return" pathname={pathname}>↩️ Purchase Returns</NavLink>
+              <NavLink href="/dashboard/cpv" pathname={pathname}>💸 Supplier Payments</NavLink>
+            </NavGroup>
+
+            {/* ── 4. Inventory ── */}
+            <NavGroup
+              title="📦 Inventory"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>}
+              open={openSection === "retailInventory"}
+              onToggle={() => toggle("retailInventory")}
+            >
+              {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/catalog" pathname={pathname}>Product Catalog</NavLink>}
+              {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/categories" pathname={pathname}>Categories</NavLink>}
+              {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/stock-receipts" pathname={pathname}>Stock Receipts</NavLink>}
+              <NavLink href="/dashboard/barcode" pathname={pathname}>🔲 Barcode Management</NavLink>
+              {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
+              {hasDashboardFeature("RETAIL_STOCK_ADJUSTMENT") && <NavLink href="/dashboard/retail/stock-adjustment" pathname={pathname}>Stock Adjustment</NavLink>}
+              {hasDashboardFeature("RETAIL_BATCH_EXPIRY") && <NavLink href="/dashboard/retail/batch-expiry" pathname={pathname}>Batch & Expiry</NavLink>}
+              <NavLink href="/dashboard/reports/stock/low" pathname={pathname}>🚨 Reorder Alerts</NavLink>
+            </NavGroup>
+
+            {/* ── 5. Customers ── */}
+            <NavGroup
+              title="👥 Customers"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>}
+              open={openSection === "retailCustomers"}
+              onToggle={() => toggle("retailCustomers")}
+            >
+              {hasDashboardFeature("RETAIL_CUSTOMERS") && <NavLink href="/dashboard/retail/customers" pathname={pathname}>Customer List</NavLink>}
+              {hasDashboardFeature("RETAIL_LOYALTY") && <NavLink href="/dashboard/retail/loyalty" pathname={pathname}>Loyalty Points</NavLink>}
+              <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>
+              <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Customer Ledger</NavLink>
+              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>
+            </NavGroup>
+
+            {/* ── 6. Suppliers ── */}
+            <NavGroup
+              title="🏭 Suppliers"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>}
+              open={openSection === "retailSuppliers"}
+              onToggle={() => toggle("retailSuppliers")}
+            >
+              {hasDashboardFeature("RETAIL_SUPPLIERS") && <NavLink href="/dashboard/retail/suppliers" pathname={pathname}>Supplier List</NavLink>}
+              {hasDashboardFeature("RETAIL_SUPPLIER_PORTAL") && <NavLink href="/dashboard/retail/supplier-portal" pathname={pathname}>Supplier Portal</NavLink>}
+              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Supplier Ageing</NavLink>
+            </NavGroup>
+
+            {/* ── 7. Multi-Store ── */}
+            <NavGroup
+              title="🏪 Multi-Store"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
+              open={openSection === "multiStore"}
+              onToggle={() => toggle("multiStore")}
+            >
+              {hasDashboardFeature("RETAIL_BRANCHES") && <NavLink href="/dashboard/retail/branches" pathname={pathname}>Branches</NavLink>}
+              {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Inter-Branch Transfer</NavLink>}
+              {hasDashboardFeature("RETAIL_BRANCH_USERS") && <NavLink href="/dashboard/retail/branch-users" pathname={pathname}>Branch Users</NavLink>}
+              {hasDashboardFeature("RETAIL_BRANCH_REPORTS") && <NavLink href="/dashboard/retail/branch-reports" pathname={pathname}>Branch Reports</NavLink>}
+            </NavGroup>
+
+          </>)}
+
           {/* ── FINANCIAL REPORTS ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
             <NavGroup
@@ -1220,112 +1326,6 @@ export default function DashboardLayout({
               {hasDashboardFeature("DISTRIBUTION_TRIP_SHEET") && <NavLink href="/dashboard/distribution/trip-sheet" pathname={pathname}>Trip Sheet</NavLink>}
             </NavGroup>
           )}
-
-          {/* ══════════════════════════════════════════
-              RETAIL & MULTI-STORE MODULES
-              (visible when businessType === "retail")
-          ══════════════════════════════════════════ */}
-          {hasModule(businessType, "pos") && isBusinessEnabled(businessType) && (<>
-
-            {/* ── 1. POS ── */}
-            <NavGroup
-              title="🖥️ Point of Sale"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>}
-              open={openSection === "retailPos"}
-              onToggle={() => toggle("retailPos")}
-            >
-              {hasDashboardFeature("RETAIL_POS") && <NavLink href="/dashboard/retail/pos" pathname={pathname}>POS Terminal</NavLink>}
-              {hasDashboardFeature("RETAIL_POS") && <NavLink href="/dashboard/retail/sales-history" pathname={pathname}>🧾 Sales History</NavLink>}
-              {hasDashboardFeature("RETAIL_POS_SESSIONS") && <NavLink href="/dashboard/retail/pos-sessions" pathname={pathname}>POS Sessions</NavLink>}
-              {hasDashboardFeature("RETAIL_DISCOUNTS") && <NavLink href="/dashboard/retail/discounts" pathname={pathname}>Discounts & Promotions</NavLink>}
-              {hasDashboardFeature("RETAIL_ONLINE_SYNC") && <NavLink href="/dashboard/retail/online-sync" pathname={pathname}>Online Store Sync</NavLink>}
-            </NavGroup>
-
-            {/* ── 2. Sales ── */}
-            <NavGroup
-              title="📋 Sales"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>}
-              open={openSection === "retailSales"}
-              onToggle={() => toggle("retailSales")}
-            >
-              <NavLink href="/dashboard/sales-invoice" pathname={pathname}>🧾 Sales Invoices</NavLink>
-              <NavLink href="/dashboard/sale-return" pathname={pathname}>↩️ Sales Returns</NavLink>
-              <NavLink href="/dashboard/quotation" pathname={pathname}>📄 Quotations</NavLink>
-              <NavLink href="/dashboard/delivery-challan" pathname={pathname}>🚚 Delivery Challan</NavLink>
-              <NavLink href="/dashboard/payment-receipts" pathname={pathname}>💳 Payment Collection</NavLink>
-            </NavGroup>
-
-            {/* ── 3. Purchases ── */}
-            <NavGroup
-              title="🛒 Purchases"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>}
-              open={openSection === "retailPurchases"}
-              onToggle={() => toggle("retailPurchases")}
-            >
-              <NavLink href="/dashboard/purchase-order" pathname={pathname}>📦 Purchase Orders</NavLink>
-              <NavLink href="/dashboard/grn" pathname={pathname}>📥 GRN (Goods Receipt)</NavLink>
-              <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>🧾 Purchase Invoices</NavLink>
-              <NavLink href="/dashboard/purchase-return" pathname={pathname}>↩️ Purchase Returns</NavLink>
-              <NavLink href="/dashboard/cpv" pathname={pathname}>💸 Supplier Payments</NavLink>
-            </NavGroup>
-
-            {/* ── 4. Inventory ── */}
-            <NavGroup
-              title="📦 Inventory"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>}
-              open={openSection === "retailInventory"}
-              onToggle={() => toggle("retailInventory")}
-            >
-              {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/catalog" pathname={pathname}>Product Catalog</NavLink>}
-              {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/categories" pathname={pathname}>Categories</NavLink>}
-              {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/stock-receipts" pathname={pathname}>Stock Receipts</NavLink>}
-              <NavLink href="/dashboard/barcode" pathname={pathname}>🔲 Barcode Management</NavLink>
-              {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
-              {hasDashboardFeature("RETAIL_STOCK_ADJUSTMENT") && <NavLink href="/dashboard/retail/stock-adjustment" pathname={pathname}>Stock Adjustment</NavLink>}
-              {hasDashboardFeature("RETAIL_BATCH_EXPIRY") && <NavLink href="/dashboard/retail/batch-expiry" pathname={pathname}>Batch & Expiry</NavLink>}
-              <NavLink href="/dashboard/reports/stock/low" pathname={pathname}>🚨 Reorder Alerts</NavLink>
-            </NavGroup>
-
-            {/* ── 5. Customers ── */}
-            <NavGroup
-              title="👥 Customers"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>}
-              open={openSection === "retailCustomers"}
-              onToggle={() => toggle("retailCustomers")}
-            >
-              {hasDashboardFeature("RETAIL_CUSTOMERS") && <NavLink href="/dashboard/retail/customers" pathname={pathname}>Customer List</NavLink>}
-              {hasDashboardFeature("RETAIL_LOYALTY") && <NavLink href="/dashboard/retail/loyalty" pathname={pathname}>Loyalty Points</NavLink>}
-              <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>
-              <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Customer Ledger</NavLink>
-              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>
-            </NavGroup>
-
-            {/* ── 6. Suppliers ── */}
-            <NavGroup
-              title="🏭 Suppliers"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>}
-              open={openSection === "retailSuppliers"}
-              onToggle={() => toggle("retailSuppliers")}
-            >
-              {hasDashboardFeature("RETAIL_SUPPLIERS") && <NavLink href="/dashboard/retail/suppliers" pathname={pathname}>Supplier List</NavLink>}
-              {hasDashboardFeature("RETAIL_SUPPLIER_PORTAL") && <NavLink href="/dashboard/retail/supplier-portal" pathname={pathname}>Supplier Portal</NavLink>}
-              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Supplier Ageing</NavLink>
-            </NavGroup>
-
-            {/* ── 11. Multi-Store ── */}
-            <NavGroup
-              title="🏪 Multi-Store"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
-              open={openSection === "multiStore"}
-              onToggle={() => toggle("multiStore")}
-            >
-              {hasDashboardFeature("RETAIL_BRANCHES") && <NavLink href="/dashboard/retail/branches" pathname={pathname}>Branches</NavLink>}
-              {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Inter-Branch Transfer</NavLink>}
-              {hasDashboardFeature("RETAIL_BRANCH_USERS") && <NavLink href="/dashboard/retail/branch-users" pathname={pathname}>Branch Users</NavLink>}
-              {hasDashboardFeature("RETAIL_BRANCH_REPORTS") && <NavLink href="/dashboard/retail/branch-reports" pathname={pathname}>Branch Reports</NavLink>}
-            </NavGroup>
-
-          </>)}
 
           {/* ── SCHOOL ── */}
           {hasModule(businessType, "student_mgmt") && isBusinessEnabled(businessType) && (
