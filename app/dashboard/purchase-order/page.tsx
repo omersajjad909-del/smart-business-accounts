@@ -399,7 +399,9 @@ export default function PurchaseOrderPage() {
                         <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: 12, marginBottom: 10, background: "var(--panel-bg-2)" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                             <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase" }}>Item {i + 1}</span>
-                            <button onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 18, padding: 0 }}>×</button>
+                            <button type="button" tabIndex={-1} onKeyDown={e => e.preventDefault()} onClick={() => removeRow(i)} disabled={rows.length === 1} style={{ background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: 6, color: "#f87171", cursor: rows.length === 1 ? "not-allowed" : "pointer", opacity: rows.length === 1 ? 0.3 : 1, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                            </button>
                           </div>
                           <select value={r.itemId} onChange={e => {
                             const it = items.find((x: any) => x.id === e.target.value);
@@ -439,8 +441,13 @@ export default function PurchaseOrderPage() {
                           const lineBase = (Number(r.qty) * Number(r.rate)) || 0;
                           const lineDisc = lineBase * ((r as any).discountPercent ? Number((r as any).discountPercent) / 100 : 0);
                           const lineTax = (lineBase - lineDisc) * ((r as any).taxPercent ? Number((r as any).taxPercent) / 100 : 0);
+                          const isEmpty = !r.itemId && !r.qty && !r.rate;
                           return (
-                            <tr key={i} style={{ borderBottom: `1px solid ${BORDER}` }}>
+                            <tr key={i}
+                              style={{ borderBottom: `1px solid ${BORDER}`, position: "relative" }}
+                              onMouseEnter={e => { const btn = (e.currentTarget as HTMLElement).querySelector(".row-del-btn") as HTMLElement; if (btn) btn.style.opacity = "1"; }}
+                              onMouseLeave={e => { const btn = (e.currentTarget as HTMLElement).querySelector(".row-del-btn") as HTMLElement; if (btn) btn.style.opacity = "0"; }}
+                            >
                               <td style={{ padding: "6px 7px", fontSize: 12, color: MUTED, width: 28 }}>{i + 1}</td>
                               <td style={{ padding: "6px 7px", minWidth: 140 }}>
                                 <select value={r.itemId} onChange={e => {
@@ -462,8 +469,23 @@ export default function PurchaseOrderPage() {
                               <td style={{ padding: "6px 7px", width: 94 }}><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
                               <td style={{ padding: "6px 7px", width: 66 }}><input type="number" value={(r as any).discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
                               <td style={{ padding: "6px 7px", width: 66 }}><input type="number" value={(r as any).taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                              <td style={{ padding: "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 94, whiteSpace: "nowrap" }}>{(lineBase - lineDisc + lineTax).toLocaleString()}</td>
-                              <td style={{ padding: "6px 7px", width: 30 }}><button onClick={() => removeRow(i)} style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 17, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button></td>
+                              <td style={{ padding: "6px 7px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 94, whiteSpace: "nowrap" }}>{lineBase > 0 ? (lineBase - lineDisc + lineTax).toLocaleString() : <span style={{ color: MUTED }}>—</span>}</td>
+                              {/* DELETE — hover only, NOT in tab order, NEVER triggered by Enter */}
+                              <td style={{ padding: "6px 4px", width: 34, textAlign: "center" }}>
+                                {rows.length > 1 && !isEmpty && (
+                                  <button
+                                    type="button"
+                                    tabIndex={-1}
+                                    className="row-del-btn"
+                                    onClick={() => removeRow(i)}
+                                    onKeyDown={e => e.preventDefault()}
+                                    title="Remove row"
+                                    style={{ opacity: 0, transition: "opacity .15s", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: 6, color: "#f87171", cursor: "pointer", width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
+                                  >
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                                  </button>
+                                )}
+                              </td>
                             </tr>
                           );
                         })}

@@ -141,7 +141,9 @@
       "Bash(sed -n '197,210p' \"d:/projects/smart-business-accounts/app/dashboard/feedback/page.tsx\")",
       "Bash(sed -n '240,250p' \"d:/projects/smart-business-accounts/app/dashboard/feedback/page.tsx\")",
       "Bash(python3 -c ' *)",
-      "Bash(grep -E \"\\\\.\\(ts|js\\)$\")"
+      "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
+      "Bash(grep -E \"^/d/projects/smart-business-accounts/\\(lib|app|src\\)$\")",
+      "Bash(shuf)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
