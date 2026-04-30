@@ -9,10 +9,6 @@ import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/lib/auth";
 
-const Barcode = dynamic(() => import("react-barcode"), { 
-  ssr: false,
-  loading: () => <p>Loading Barcode...</p>
-});
 import { QRCodeSVG } from "qrcode.react";
 
 type Supplier = { id: string; name: string; partyType: string };
@@ -474,10 +470,32 @@ const [searchTerm, setSearchTerm] = useState("");
         }
       }
       if (res.ok && data) {
-        setInvoiceId((typeof data === "object" && data.invoiceNo) ? data.invoiceNo : (data?.id || invoiceId));
-        setSavedInvoiceId((typeof data === "object" && data.id) ? data.id : (editing?.id || null));
-        setShowPreview(true);
+        const newInvoiceNo = (typeof data === "object" && data.invoiceNo) ? data.invoiceNo : (data?.id || invoiceId);
+        const newDbId = (typeof data === "object" && data.id) ? data.id : (editing?.id || null);
+        setInvoiceId(newInvoiceNo);
+        setSavedInvoiceId(newDbId);
         await loadInvoices();
+        // Re-fetch saved invoice so rows are correct even if useEffect reset them
+        if (newDbId) {
+          try {
+            const invRes = await fetch(`/api/purchase-invoice?id=${newDbId}`, { headers: requestHeaders });
+            const inv = await invRes.json();
+            if (inv?.items?.length > 0) {
+              setRows(inv.items.map((it: any) => ({
+                itemId: it.itemId || "",
+                name: it.item?.name || "",
+                description: it.item?.description || "",
+                qty: it.qty,
+                rate: it.rate,
+                discountPercent: it.discountPercent ?? "",
+                taxPercent: it.taxPercent ?? "",
+                unit: it.item?.unit || "",
+                sku: it.item?.code || "",
+              })));
+            }
+          } catch {}
+        }
+        setShowPreview(true);
         if (editing) {
           setEditing(null);
           setShowForm(false);
@@ -1015,19 +1033,13 @@ const [searchTerm, setSearchTerm] = useState("");
                       ))}
                     </tbody>
                   </table>
-                  {/* Barcode + QR */}
-                  {invoiceId && (
+                  {/* QR Code */}
+                  {origin && savedInvoiceId && (
                     <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-                      <div style={{ textAlign: "center" }}>
-                        <Barcode value={invoiceId} width={1.2} height={36} fontSize={10} displayValue={false} background="white" lineColor="#111" />
-                        <div style={{ fontSize: 9, fontWeight: 700, color: "#475569" }}>INV: {invoiceId}</div>
+                      <div style={{ textAlign: "center", borderTop: "1px solid #e2e8f0", paddingTop: 6 }}>
+                        <QRCodeSVG value={`${origin}/view/purchase-invoice?id=${savedInvoiceId}`} size={64} />
+                        <div style={{ fontSize: 8, fontWeight: 800, background: "#111", color: "white", padding: "1px 4px", marginTop: 3 }}>SCAN FOR ONLINE BILL</div>
                       </div>
-                      {origin && (
-                        <div style={{ textAlign: "center", borderTop: "1px solid #e2e8f0", paddingTop: 6 }}>
-                          <QRCodeSVG value={`${origin}/view/purchase-invoice?id=${savedInvoiceId || invoiceId}`} size={64} />
-                          <div style={{ fontSize: 8, fontWeight: 800, background: "#111", color: "white", padding: "1px 4px", marginTop: 3 }}>SCAN FOR ONLINE BILL</div>
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
@@ -1149,12 +1161,6 @@ const [searchTerm, setSearchTerm] = useState("");
                   <span>NET:</span><span>{netTotal.toLocaleString()}</span>
                 </div>
               </div>
-              {/* Barcode */}
-              {invoiceId && (
-                <div style={{ textAlign: "center", marginTop: 8, borderTop: "1px dashed #555", paddingTop: 6 }}>
-                  <Barcode value={invoiceId} width={1} height={28} fontSize={8} displayValue={true} background="white" lineColor="#000" />
-                </div>
-              )}
               {/* QR */}
               {origin && invoiceId && (
                 <div style={{ textAlign: "center", marginTop: 6 }}>

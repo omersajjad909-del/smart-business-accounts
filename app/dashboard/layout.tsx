@@ -1266,7 +1266,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/grn" pathname={pathname}>📥 GRN (Goods Receipt)</NavLink>
               <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>🧾 Purchase Invoices</NavLink>
               <NavLink href="/dashboard/purchase-return" pathname={pathname}>↩️ Purchase Returns</NavLink>
-              <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>💸 Supplier Payments</NavLink>
+              <NavLink href="/dashboard/cpv" pathname={pathname}>💸 Supplier Payments</NavLink>
             </NavGroup>
 
             {/* ── 4. Inventory ── */}
