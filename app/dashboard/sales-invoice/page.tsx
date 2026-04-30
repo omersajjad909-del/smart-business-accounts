@@ -11,10 +11,6 @@ import { QRCodeSVG } from "qrcode.react";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 
-const Barcode = dynamic(() => import("react-barcode"), {
-  ssr: false,
-  loading: () => <span />,
-});
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const ff = "'Outfit','Inter',sans-serif";

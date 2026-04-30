@@ -192,17 +192,23 @@ export async function POST(req: NextRequest) {
     // ── Stock availability check ──────────────────────────────────────────────
     for (const i of items) {
       if (!i.itemId) continue;
-      const agg = await prisma.inventoryTxn.aggregate({
-        where: { itemId: i.itemId, companyId },
-        _sum: { qty: true },
-      });
-      const available = agg._sum.qty ?? 0;
-      if (available < i.qty) {
-        const itm = await prisma.itemNew.findUnique({ where: { id: i.itemId }, select: { name: true } });
-        return NextResponse.json(
-          { error: `Insufficient stock for "${itm?.name || i.itemId}". Available: ${available}, Required: ${i.qty}` },
-          { status: 400 }
-        );
+      try {
+        const agg = await prisma.inventoryTxn.aggregate({
+          where: { itemId: i.itemId, companyId },
+          _sum: { qty: true },
+        });
+        const available = Number(agg._sum.qty ?? 0);
+        const required = Number(i.qty);
+        // Only block if stock has ever been tracked (available !== 0) AND is insufficient
+        if (available > 0 && available < required) {
+          const itm = await prisma.itemNew.findUnique({ where: { id: i.itemId }, select: { name: true } });
+          return NextResponse.json(
+            { error: `Insufficient stock for "${itm?.name || i.itemId}". Available: ${available}, Required: ${required}` },
+            { status: 400 }
+          );
+        }
+      } catch {
+        // If stock check fails, allow the invoice (don't block on DB errors)
       }
     }
     // ─────────────────────────────────────────────────────────────────────────
