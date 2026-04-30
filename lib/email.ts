@@ -26,7 +26,7 @@ const getEmailConfig = async (companyId?: string) => {
           pass: companyConfig.email.pass,
         },
         from: companyConfig.email.from,
-        fromName: companyConfig.email.fromName || "FinovaOS",
+        fromName: companyConfig.email.fromName || "",
       };
     }
   }
@@ -114,7 +114,8 @@ export const emailTemplates = {
     </body>
     </html>
   `,
-  salesInvoice: (invoice: any, customer: any) => {
+  salesInvoice: (invoice: any, customer: any, companyName?: string) => {
+    const coName = companyName || "Sales Invoice";
     const itemsHtml = invoice.items?.map((item: any) => `
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;">${item.item?.name || 'N/A'}</td>
@@ -140,7 +141,7 @@ export const emailTemplates = {
       </head>
       <body>
         <div class="header">
-          <h1>US TRADERS</h1>
+          <h1>${coName.toUpperCase()}</h1>
           <p>SALES INVOICE</p>
         </div>
         <div class="content">
@@ -173,7 +174,8 @@ export const emailTemplates = {
     `;
   },
 
-  purchaseOrder: (po: any, supplier: any) => {
+  purchaseOrder: (po: any, supplier: any, companyName?: string) => {
+  const coName = companyName || "Purchase Order";
   const itemsHtml = po.items?.map((item: any) => `
     <tr>
       <td style="padding:8px;border:1px solid #ddd;">${item.item?.name || "N/A"}</td>
@@ -207,7 +209,7 @@ export const emailTemplates = {
     </head>
     <body>
       <div class="header">
-        <h1>US TRADERS</h1>
+        <h1>${coName.toUpperCase()}</h1>
         <p>PURCHASE ORDER</p>
       </div>
 
@@ -240,7 +242,8 @@ export const emailTemplates = {
 },
 
 
-  purchaseInvoice: (invoice: any, supplier: any) => {
+  purchaseInvoice: (invoice: any, supplier: any, companyName?: string) => {
+    const coName = companyName || "Purchase Invoice";
     const itemsHtml = invoice.items?.map((item: any) => `
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;">${item.item?.name || 'N/A'}</td>
@@ -266,7 +269,7 @@ export const emailTemplates = {
       </head>
       <body>
         <div class="header">
-          <h1>US TRADERS</h1>
+          <h1>${coName.toUpperCase()}</h1>
           <p>PURCHASE INVOICE</p>
         </div>
         <div class="content">
@@ -297,7 +300,8 @@ export const emailTemplates = {
     `;
   },
 
-  report: (title: string, content: string, _reportType: string) => {
+  report: (title: string, content: string, _reportType: string, companyName?: string) => {
+    const coName = companyName || "";
     return `
       <!DOCTYPE html>
       <html>
@@ -311,7 +315,7 @@ export const emailTemplates = {
       </head>
       <body>
         <div class="header">
-          <h1>US TRADERS</h1>
+          ${coName ? `<h1>${coName.toUpperCase()}</h1>` : ""}
           <p>${title}</p>
         </div>
         <div class="content">
@@ -371,7 +375,12 @@ export async function sendEmail(options: {
 
   try {
     const fromEmail = config.from || config.auth.user || 'noreply@finovaos.app';
-    const fromName = config.fromName || "FinovaOS";
+    let fromName = config.fromName && config.fromName !== "FinovaOS" ? config.fromName : "";
+    if (!fromName && options.companyId) {
+      const co = await prisma.company.findUnique({ where: { id: options.companyId }, select: { name: true } }).catch(() => null);
+      fromName = co?.name || "FinovaOS";
+    }
+    if (!fromName) fromName = "FinovaOS";
 
     const info = await transport.sendMail({
       from: `"${fromName}" <${fromEmail}>`,

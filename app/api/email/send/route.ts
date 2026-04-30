@@ -40,6 +40,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const company = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } });
+    const companyName = company?.name || "";
+
     let html = '';
     let emailSubject = subject || '';
 
@@ -64,8 +67,8 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      html = emailTemplates.salesInvoice(invoice, invoice.customer);
-      emailSubject = subject || `Sales Invoice ${invoice.invoiceNo} - US Traders`;
+      html = emailTemplates.salesInvoice(invoice, invoice.customer, companyName);
+      emailSubject = subject || `Sales Invoice ${invoice.invoiceNo}${companyName ? ` - ${companyName}` : ""}`;
     } else if (type === 'purchase-invoice' && invoiceId) {
       const invoice = await prisma.purchaseInvoice.findFirst({
         where: { id: invoiceId, companyId },
@@ -86,8 +89,8 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      html = emailTemplates.purchaseInvoice(invoice, invoice.supplier);
-      emailSubject = subject || `Purchase Invoice ${invoice.invoiceNo} - US Traders`;
+      html = emailTemplates.purchaseInvoice(invoice, invoice.supplier, companyName);
+      emailSubject = subject || `Purchase Invoice ${invoice.invoiceNo}${companyName ? ` - ${companyName}` : ""}`;
     } else if (type === "purchase-order" && invoiceId) {
 
   const po = await prisma.purchaseOrder.findFirst({
@@ -107,12 +110,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  html = emailTemplates.purchaseOrder(po, po.supplier);
-  emailSubject = subject || `Purchase Order ${po.poNo} - US Traders`;
+  html = emailTemplates.purchaseOrder(po, po.supplier, companyName);
+  emailSubject = subject || `Purchase Order ${po.poNo}${companyName ? ` - ${companyName}` : ""}`;
 
     } else if (type === 'custom' && message) {
-      html = emailTemplates.report(subject || 'Message from US Traders', message, 'custom');
-      emailSubject = subject || 'Message from US Traders';
+      const customTitle = subject || (companyName ? `Message from ${companyName}` : "Message");
+      html = emailTemplates.report(customTitle, message, 'custom', companyName);
+      emailSubject = customTitle;
     } else {
       return NextResponse.json(
         { error: 'Invalid email type or missing data' },

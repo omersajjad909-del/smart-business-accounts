@@ -8,10 +8,9 @@ import {
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 
 function requireAdmin(req: NextRequest) {
-  const headerRole = String(req.headers.get("x-user-role") || "").toUpperCase();
-  if (headerRole === "ADMIN") return true;
   const token = getTokenFromRequest(req);
-  const payload = token ? verifyJwt(token) : null;
+  if (!token) return false;
+  const payload = verifyJwt(token);
   return String(payload?.role || "").toUpperCase() === "ADMIN";
 }
 
