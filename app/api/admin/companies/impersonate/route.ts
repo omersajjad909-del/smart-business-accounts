@@ -15,16 +15,6 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
 import { signJwt } from "@/lib/auth";
 
-// In-memory revocation list: set of "adminId:companyId:issuedAt" tokens
-// Cleared on server restart — acceptable since impersonation tokens are short-lived (1h)
-const revokedTokens = new Set<string>();
-
-export function revokeImpersonation(key: string) {
-  revokedTokens.add(key);
-}
-export function isImpersonationRevoked(key: string) {
-  return revokedTokens.has(key);
-}
 
 export const runtime = "nodejs";
 

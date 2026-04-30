@@ -629,7 +629,7 @@ export default function PurchaseOrderPage() {
             <div style={{ textAlign: "right" }}>
               <div style={{ background: "#0f172a", color: "white", padding: "5px 16px", borderRadius: 6, fontSize: 11, fontWeight: 800, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 10, display: "inline-block" }}>Purchase Order</div>
               <table style={{ fontSize: 12, borderCollapse: "collapse", marginLeft: "auto" }}>
-                {[["PO Number", poNo], ["Date", fmtDate(date)], ["Status", approvalStatus]].map(([k, v]) => (
+                {[["PO Number", savedPO?.poNo ?? poNo], ["Date", fmtDate(date)], ["Status", approvalStatus]].map(([k, v]) => (
                   <tr key={k}>
                     <td style={{ padding: "2px 12px 2px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right" }}>{k}</td>
                     <td style={{ padding: "2px 0", fontWeight: 800, color: "#0f172a", fontFamily: k === "PO Number" ? "monospace" : "inherit" }}>{v}</td>
@@ -748,7 +748,7 @@ export default function PurchaseOrderPage() {
           </div>
           {/* Info */}
           <div style={{ fontSize: 9, marginBottom: 5 }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}><span>PO No:</span><span style={{ fontWeight: 700 }}>{poNo}</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>PO No:</span><span style={{ fontWeight: 700 }}>{savedPO?.poNo ?? poNo}</span></div>
             <div style={{ display: "flex", justifyContent: "space-between" }}><span>Date:</span><span>{fmtDate(date)}</span></div>
             <div style={{ display: "flex", justifyContent: "space-between" }}><span>Status:</span><span style={{ fontWeight: 700 }}>{approvalStatus}</span></div>
           </div>

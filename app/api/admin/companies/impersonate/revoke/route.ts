@@ -5,7 +5,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin, logAdminAction } from "@/lib/adminAuth";
-import { revokeImpersonation } from "../route";
+import { revokeImpersonation } from "@/lib/impersonationRevocation";
 
 export async function POST(req: NextRequest) {
   const admin = requireAdmin(req);
