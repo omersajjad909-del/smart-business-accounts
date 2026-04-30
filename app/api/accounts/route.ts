@@ -6,6 +6,9 @@ import { logAuditFromReq } from "@/lib/auditLogger";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { seedMinimalChart } from "@/lib/services/accountsSeed";
+import { safeEncryptField, safeDecryptFields } from "@/lib/fieldEncrypt";
+
+const ACCOUNT_PII_FIELDS = ["phone", "ntn", "strn", "bankIban"] as const;
 
 const CATEGORY_TYPE_MAP: Record<string, string> = {
   CUSTOMER: "ASSET",
@@ -112,7 +115,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  return NextResponse.json(accounts);
+  return NextResponse.json(accounts.map(a => safeDecryptFields(a, ACCOUNT_PII_FIELDS)));
 }
 
 export async function POST(req: NextRequest) {
@@ -170,7 +173,10 @@ export async function POST(req: NextRequest) {
         type: fixedType,
         partyType: body.partyType || "GENERAL",
         city: body.city || null,
-        phone: body.phone || null,
+        phone: body.phone ? safeEncryptField(body.phone) : null,
+        ntn: body.ntn ? safeEncryptField(body.ntn) : null,
+        strn: body.strn ? safeEncryptField(body.strn) : null,
+        bankIban: body.bankIban ? safeEncryptField(body.bankIban) : null,
         openDate: body.openDate ? new Date(body.openDate) : new Date(),
         openDebit: Number(body.openDebit || 0),
         openCredit: Number(body.openCredit || 0),
@@ -248,6 +254,10 @@ export async function PUT(req: NextRequest) {
     const formattedData = {
       ...updateData,
       type: fixedType,
+      phone: updateData.phone ? safeEncryptField(updateData.phone) : updateData.phone,
+      ntn: updateData.ntn ? safeEncryptField(updateData.ntn) : updateData.ntn,
+      strn: updateData.strn ? safeEncryptField(updateData.strn) : updateData.strn,
+      bankIban: updateData.bankIban ? safeEncryptField(updateData.bankIban) : updateData.bankIban,
       openDate: updateData.openDate ? new Date(updateData.openDate) : undefined,
       openDebit: updateData.openDebit !== undefined ? Number(updateData.openDebit) : undefined,
       openCredit: updateData.openCredit !== undefined ? Number(updateData.openCredit) : undefined,
@@ -282,7 +292,7 @@ export async function PUT(req: NextRequest) {
       description: `Updated account ${updatedAccount?.code} - ${updatedAccount?.name}`,
     });
 
-    return NextResponse.json(updatedAccount);
+    return NextResponse.json(updatedAccount ? safeDecryptFields(updatedAccount, ACCOUNT_PII_FIELDS) : null);
   } catch (_e) {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }

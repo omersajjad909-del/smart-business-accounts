@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { resolveCompanyId } from "@/lib/tenant";
+import { safeEncryptField, safeDecryptField } from "@/lib/fieldEncrypt";
 
 export async function GET(req: NextRequest) {
   try {
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
     // Combine both: BankAccount table se + Account table se (jo BankAccount mein nahi hain)
     const combinedAccounts = bankAccountsFromTable.map((ba: any) => ({
       id: ba.id,
-      accountNo: ba.accountNo,
+      accountNo: safeDecryptField(ba.accountNo),
       bankName: ba.bankName,
       accountName: ba.accountName,
       balance: ba.balance,
@@ -93,12 +94,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if account number already exists
-    const existingBank = await prisma.bankAccount.findFirst({
-      where: { accountNo, companyId },
-    });
-
-    if (existingBank) {
+    // Uniqueness check — decrypt stored values since accountNo is encrypted
+    const allBanks = await prisma.bankAccount.findMany({ where: { companyId }, select: { accountNo: true } });
+    const duplicate = allBanks.some(b => safeDecryptField(b.accountNo) === accountNo);
+    if (duplicate) {
       return NextResponse.json(
         { error: 'Bank account number already exists' },
         { status: 400 }
@@ -141,7 +140,7 @@ export async function POST(req: NextRequest) {
     // Now create the BankAccount in BankAccount table
     const bankAccount = await prisma.bankAccount.create({
       data: {
-        accountNo,
+        accountNo: safeEncryptField(accountNo),
         bankName,
         accountName,
         accountId: account.id,
@@ -151,7 +150,7 @@ export async function POST(req: NextRequest) {
       include: { account: true },
     });
 
-    return NextResponse.json(bankAccount, { status: 201 });
+    return NextResponse.json({ ...bankAccount, accountNo: safeDecryptField(bankAccount.accountNo) }, { status: 201 });
   } catch (error) {
     console.error('Error creating bank account:', error);
     return NextResponse.json(
@@ -188,7 +187,7 @@ export async function PUT(req: NextRequest) {
     const updated = await prisma.bankAccount.update({
       where: { id },
       data: {
-        ...(accountNo && { accountNo }),
+        ...(accountNo && { accountNo: safeEncryptField(accountNo) }),
         ...(bankName && { bankName }),
         ...(accountName && { accountName }),
         ...(balance !== undefined && { balance }),
@@ -207,7 +206,7 @@ export async function PUT(req: NextRequest) {
       });
     }
 
-    return NextResponse.json(updated);
+    return NextResponse.json({ ...updated, accountNo: safeDecryptField(updated.accountNo) });
   } catch (error) {
     console.error('Error updating bank account:', error);
     return NextResponse.json(

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { safeEncryptField, safeDecryptFields } from "@/lib/fieldEncrypt";
+
+const EMP_PII_FIELDS = ["cnic", "phone"] as const;
 
 async function ensureEmployeeScopedUniqueIndexes() {
   await prisma.$executeRawUnsafe(`DROP INDEX IF EXISTS "Employee_email_key"`);
@@ -45,7 +48,7 @@ export async function GET(req: NextRequest) {
       orderBy: { firstName: "asc" },
     });
 
-    return NextResponse.json(employees);
+    return NextResponse.json(employees.map(e => safeDecryptFields(e, EMP_PII_FIELDS)));
   } catch (error) {
     console.error("Error fetching employees:", error);
     return NextResponse.json({ error: "Failed to fetch employees" }, { status: 500 });
@@ -108,6 +111,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const { cnic } = body;
     const employee = await prisma.employee.create({
       data: {
         companyId,
@@ -115,7 +119,8 @@ export async function POST(req: NextRequest) {
         firstName,
         lastName,
         email: normalizedEmail,
-        phone,
+        phone: phone ? safeEncryptField(phone) : undefined,
+        cnic: cnic ? safeEncryptField(cnic) : undefined,
         designations,
         department,
         dateOfJoining: dateOfJoining ? new Date(dateOfJoining) : new Date(),
@@ -124,7 +129,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(employee, { status: 201 });
+    return NextResponse.json(safeDecryptFields(employee, EMP_PII_FIELDS), { status: 201 });
   } catch (error: any) {
     if (error.code === "P2002") {
       return NextResponse.json(
@@ -198,6 +203,9 @@ export async function PUT(req: NextRequest) {
     delete body.createdAt;
     delete body.updatedAt;
 
+    if (body.phone) body.phone = safeEncryptField(body.phone);
+    if (body.cnic) body.cnic = safeEncryptField(body.cnic);
+
     const updated = await prisma.employee.updateMany({
       where: { id, companyId },
       data: body,
@@ -207,7 +215,7 @@ export async function PUT(req: NextRequest) {
     }
     const employee = await prisma.employee.findUnique({ where: { id } });
 
-    return NextResponse.json(employee);
+    return NextResponse.json(employee ? safeDecryptFields(employee, EMP_PII_FIELDS) : null);
   } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Employee not found" }, { status: 404 });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
+import { safeEncryptField, safeDecryptField } from "@/lib/fieldEncrypt";
 
 async function ensureContactScopedUniqueIndexes() {
   await prisma.$executeRawUnsafe(`DROP INDEX IF EXISTS "Contact_email_key"`);
@@ -47,7 +48,7 @@ export async function GET(req: NextRequest) {
       orderBy: { name: "asc" },
     });
 
-    return NextResponse.json(contacts);
+    return NextResponse.json(contacts.map(c => ({ ...c, phone: safeDecryptField(c.phone) })));
   } catch (error) {
     console.error("Error fetching contacts:", error);
     return NextResponse.json({ error: "Failed to fetch contacts" }, { status: 500 });
@@ -102,14 +103,14 @@ export async function POST(req: NextRequest) {
         ...(branchId ? { branchId } : {}),
         name,
         email: normalizedEmail,
-        phone,
+        phone: safeEncryptField(phone),
         companyName: company,
         position,
         type,
       },
     });
 
-    return NextResponse.json(contact, { status: 201 });
+    return NextResponse.json({ ...contact, phone: safeDecryptField(contact.phone) }, { status: 201 });
   } catch (error: any) {
     if (error.code === "P2002") {
       return NextResponse.json(
@@ -153,6 +154,10 @@ export async function PUT(req: NextRequest) {
       body.email = normalizedEmail;
     }
 
+    if (body.phone) {
+      body.phone = safeEncryptField(body.phone);
+    }
+
     if (normalizedEmail) {
       const duplicate = await prisma.contact.findFirst({
         where: {
@@ -182,7 +187,7 @@ export async function PUT(req: NextRequest) {
 
     const contact = await prisma.contact.findUnique({ where: { id } });
 
-    return NextResponse.json(contact);
+    return NextResponse.json(contact ? { ...contact, phone: safeDecryptField(contact.phone) } : null);
   } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Contact not found" }, { status: 404 });

@@ -105,3 +105,58 @@ export function secureCompare(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   return timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
+
+/**
+ * Safe encrypt — silently skips if FIELD_ENCRYPTION_KEY is not set.
+ * Use this for PII fields where graceful degradation is acceptable.
+ */
+export function safeEncryptField(value: string): string {
+  if (!value) return value;
+  try {
+    return encryptField(value);
+  } catch {
+    return value;
+  }
+}
+
+/**
+ * Safe decrypt — silently returns the original value on any error.
+ * Handles both plain-text (pass-through) and encrypted values.
+ */
+export function safeDecryptField(value: string | null | undefined): string {
+  if (!value) return value as string;
+  if (!value.startsWith(PREFIX)) return value; // not encrypted
+  try {
+    return decryptField(value);
+  } catch {
+    return value;
+  }
+}
+
+/** Safe bulk encrypt — same as encryptFields but never throws */
+export function safeEncryptFields<T extends Record<string, any>>(
+  obj: T,
+  fields: (keyof T)[],
+): T {
+  const result = { ...obj };
+  for (const field of fields) {
+    if (typeof result[field] === "string") {
+      result[field] = safeEncryptField(result[field] as string) as any;
+    }
+  }
+  return result;
+}
+
+/** Safe bulk decrypt — same as decryptFields but never throws */
+export function safeDecryptFields<T extends Record<string, any>>(
+  obj: T,
+  fields: (keyof T)[],
+): T {
+  const result = { ...obj };
+  for (const field of fields) {
+    if (typeof result[field] === "string") {
+      result[field] = safeDecryptField(result[field] as string) as any;
+    }
+  }
+  return result;
+}
