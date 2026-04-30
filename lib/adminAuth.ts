@@ -51,21 +51,8 @@ export function requireAdmin(req: NextRequest): AdminContext | NextResponse {
     }
   }
 
-  // 2. Fall back to proxy-verified headers (set by middleware ONLY from JWT)
-  //    The proxy strips incoming headers and re-sets them from JWT, so these
-  //    are safe as long as the proxy is running.
-  const roleHeader = req.headers.get("x-user-role");
-  const idHeader = req.headers.get("x-user-id");
-  if (roleHeader?.toUpperCase() === "ADMIN" && idHeader) {
-    return {
-      id: idHeader,
-      email: req.headers.get("x-user-email") || "",
-      name: req.headers.get("x-user-name") || "",
-      role: "ADMIN",
-      isSuperAdmin: true,
-    };
-  }
-
+  // Header-based fallback intentionally removed — headers are client-controllable
+  // and cannot be trusted for authentication. JWT from cookie is the only valid path.
   return NextResponse.json({ error: "Admin authentication required" }, { status: 401 });
 }
 

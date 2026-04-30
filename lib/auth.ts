@@ -116,8 +116,21 @@ export function setStoredDemoBusinessPreference(businessType: string | null) {
 // ===== Server-side auth helpers =====
 // Minimal HS256 JWT sign/verify without external deps
 // Used by API routes and proxy/auth middleware helpers
+function getSessionSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret || secret.length < 32) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("SESSION_SECRET env var is missing or too short (min 32 chars). Set it in your deployment environment.");
+    }
+    // Dev-only fallback — will cause a startup warning
+    console.warn("[SECURITY WARNING] SESSION_SECRET not set. Using insecure dev secret. NEVER do this in production.");
+    return "dev-only-insecure-secret-set-SESSION_SECRET-in-env";
+  }
+  return secret;
+}
+
 export function signJwt(payload: Record<string, any>): string {
-  const secret = process.env.SESSION_SECRET || "dev-insecure-secret";
+  const secret = getSessionSecret();
   const header = { alg: "HS256", typ: "JWT" };
   const enc = (obj: any) => Buffer.from(JSON.stringify(obj)).toString("base64url");
   const data = `${enc(header)}.${enc(payload)}`;
@@ -127,7 +140,7 @@ export function signJwt(payload: Record<string, any>): string {
 
 export function verifyJwt(token: string): Record<string, any> | null {
   try {
-    const secret = process.env.SESSION_SECRET || "dev-insecure-secret";
+    const secret = getSessionSecret();
     const [h, p, s] = token.split(".");
     if (!h || !p || !s) return null;
     const data = `${h}.${p}`;
