@@ -209,8 +209,24 @@ function AIInsightPanel({
         flexDirection: "column",
         height: "100%",
         overflow: "hidden",
+        position: "relative",
       }}
     >
+      {/* Top spotlight glow */}
+      <div style={{
+        position: "absolute",
+        top: 40,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: 180,
+        height: 180,
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(139,92,246,.35), transparent 70%)",
+        filter: "blur(20px)",
+        pointerEvents: "none",
+        zIndex: 0,
+      }} />
+
       {/* Header */}
       <div
         style={{
@@ -218,6 +234,8 @@ function AIInsightPanel({
           alignItems: "center",
           justifyContent: "space-between",
           padding: "16px 18px 0",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
@@ -264,6 +282,8 @@ function AIInsightPanel({
           display: "flex",
           justifyContent: "center",
           padding: "18px 0 10px",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <div
@@ -303,8 +323,8 @@ function AIInsightPanel({
           >
             <div
               style={{
-                width: 90,
-                height: 90,
+                width: 40,
+                height: 40,
                 borderRadius: "50%",
                 background:
                   "radial-gradient(circle at 40% 40%, #a78bfa, #4f46e5)",
@@ -317,10 +337,10 @@ function AIInsightPanel({
             >
               <div
                 style={{
-                  width: 50,
-                  height: 50,
+                  width: 20,
+                  height: 20,
                   borderRadius: "50%",
-                  background: "rgba(255,255,255,.1)",
+                  background: "rgba(255,255,255,.15)",
                   backdropFilter: "blur(6px)",
                 }}
               />
@@ -335,7 +355,7 @@ function AIInsightPanel({
           margin: "0 14px 14px",
           borderRadius: 14,
           background:
-            "linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4f46e5 100%)",
+            "linear-gradient(135deg, #4f46e5 0%, #6366f1 40%, #7c3aed 100%)",
           boxShadow:
             "0 10px 40px rgba(99,102,241,.35), inset 0 0 60px rgba(139,92,246,.15)",
           border: "1px solid rgba(99,102,241,.22)",
@@ -344,6 +364,8 @@ function AIInsightPanel({
           display: "flex",
           flexDirection: "column",
           gap: 10,
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -407,9 +429,9 @@ function AIInsightPanel({
               <p
                 style={{
                   margin: "0 0 12px",
-                  fontSize: 11.5,
-                  color: "rgba(255,255,255,.78)",
-                  lineHeight: 1.75,
+                  fontSize: 14.5,
+                  color: "rgba(255,255,255,.88)",
+                  lineHeight: 1.6,
                 }}
               >
                 {insights[activeSlide] || insights[0]}
@@ -426,8 +448,8 @@ function AIInsightPanel({
                   background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
                   boxShadow: "0 4px 20px rgba(99,102,241,.4)",
                   border: "1px solid rgba(99,102,241,.3)",
-                  color: "#c4b5fd",
-                  fontSize: 11,
+                  color: "#fff",
+                  fontSize: 12,
                   fontWeight: 700,
                   textDecoration: "none",
                 }}
@@ -446,6 +468,8 @@ function AIInsightPanel({
           justifyContent: "center",
           gap: 5,
           padding: "10px 0 12px",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         {(loading ? [0, 1, 2] : insights).map((_, i) => (
@@ -456,7 +480,7 @@ function AIInsightPanel({
               width: i === activeSlide ? 18 : 6,
               height: 4,
               borderRadius: 3,
-              background: i === activeSlide ? "#6366f1" : "rgba(99,102,241,.2)",
+              background: i === activeSlide ? "linear-gradient(90deg,#6366f1,#8b5cf6)" : "rgba(99,102,241,.2)",
               transition: "width .3s",
               cursor: loading ? "default" : "pointer",
             }}
