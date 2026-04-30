@@ -1088,115 +1088,170 @@ export default function AICommandCenter() {
 
         {/* ══ CHAT ════════════════════════════════════════════════════════ */}
         {tab === "chat" && (
-          <div className="chat-shell" style={{ height: "calc(100vh - 240px)", minHeight: 520, animation: "fadeUp .35s ease both" }}>
+          <div className="chat-shell" style={{ height: "calc(100vh - 240px)", minHeight: 520, animation: "fadeUp .35s ease both", display: "flex", flexDirection: "column" }}>
 
             {/* ── Messages area ── */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px 8px", display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
 
-              {/* Empty / welcome state */}
-              {messages.length <= 1 && messages[0]?.role !== "user" && (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, padding: "24px 16px 8px", textAlign: "center" }}>
-                  <div style={{ width: 56, height: 56, borderRadius: 18, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 16px 40px rgba(79,70,229,.3)", marginBottom: 18 }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                      <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-                    </svg>
-                  </div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: "white", marginBottom: 6 }}>FinovaOS AI Assistant</div>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,.42)", marginBottom: 28, maxWidth: 380, lineHeight: 1.6 }}>
-                    Ask anything about your business — profit, expenses, customers, stock, or cash flow. Urdu ya English dono chalti hain.
+              {/* ── EMPTY / WELCOME STATE ── */}
+              {messages.filter(m => m.role === "user").length === 0 ? (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, padding: "32px 20px 16px", textAlign: "center" }}>
+                  {/* AI Avatar */}
+                  <div style={{ position: "relative", marginBottom: 20 }}>
+                    <div style={{ width: 76, height: 76, borderRadius: 26, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 20px 60px rgba(79,70,229,.5), 0 0 0 1px rgba(99,102,241,.3)", fontSize: 36 }}>
+                      🧠
+                    </div>
+                    <div style={{ position: "absolute", bottom: -3, right: -3, width: 22, height: 22, borderRadius: "50%", background: "#10b981", border: "2.5px solid rgba(15,15,40,1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ width: 7, height: 7, borderRadius: "50%", background: "white" }} />
+                    </div>
                   </div>
 
-                  {/* Suggestion cards 2x2 */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%", maxWidth: 560 }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: "white", marginBottom: 8, letterSpacing: "-.5px" }}>FinovaOS AI</div>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,.42)", marginBottom: 32, maxWidth: 400, lineHeight: 1.7 }}>
+                    Your financial intelligence assistant — connected to your live business data.<br />
+                    <span style={{ color: "rgba(255,255,255,.28)" }}>Urdu ya English dono chalti hain.</span>
+                  </div>
+
+                  {/* Suggestion cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%", maxWidth: 600 }}>
                     {[
-                      { icon: "📊", label: "Profit", q: "What is my profit this month?" },
-                      { icon: "👥", label: "Customers", q: "Which customers owe me money?" },
-                      { icon: "💸", label: "Expenses", q: "Why are my expenses high this month?" },
-                      { icon: "📦", label: "Inventory", q: "Which items are running low on stock?" },
-                      { icon: "💰", label: "Cash Flow", q: "How can I improve my cash flow?" },
-                      { icon: "🏆", label: "Top Sales", q: "Which products are selling the most?" },
-                      { icon: "🔔", label: "Reminders", q: "Which invoices need reminders now?" },
-                      { icon: "📈", label: "Forecast", q: "Predict my revenue next month" },
+                      { icon: "📊", title: "Profit This Month", q: "What is my profit this month?" },
+                      { icon: "👥", title: "Customer Dues", q: "Which customers owe me money?" },
+                      { icon: "💸", title: "Expense Breakdown", q: "Why are my expenses high this month?" },
+                      { icon: "📦", title: "Stock Alerts", q: "Which items are running low on stock?" },
+                      { icon: "💰", title: "Cash Flow", q: "How can I improve my cash flow?" },
+                      { icon: "🏆", title: "Top Products", q: "Which products are selling the most?" },
+                      { icon: "🔔", title: "Overdue Invoices", q: "Which invoices need reminders now?" },
+                      { icon: "📈", title: "Revenue Forecast", q: "Predict my revenue next month" },
                     ].map(s => (
-                      <button key={s.q} className="suggest-card" onClick={() => sendChat(s.q)}>
-                        <span className="sq-icon">{s.icon}</span>
-                        <span className="sq-label">{s.label}</span>
-                        {s.q}
+                      <button
+                        key={s.q}
+                        onClick={() => sendChat(s.q)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 13, padding: "14px 16px",
+                          borderRadius: 16, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
+                          color: "white", cursor: "pointer", textAlign: "left", fontFamily: "inherit",
+                          transition: "all .18s",
+                        }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,.14)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(99,102,241,.35)"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,.04)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,.08)"; }}
+                      >
+                        <span style={{ fontSize: 24, flexShrink: 0 }}>{s.icon}</span>
+                        <div>
+                          <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,.9)", marginBottom: 2 }}>{s.title}</div>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", lineHeight: 1.4 }}>{s.q}</div>
+                        </div>
                       </button>
                     ))}
                   </div>
 
-                  {/* Provider badge */}
-                  <div style={{ marginTop: 28, display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 999, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.18)", color: "#6ee7b7", fontSize: 11.5, fontWeight: 700 }}>
+                  <div style={{ marginTop: 24, display: "flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 999, background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", color: "#6ee7b7", fontSize: 11, fontWeight: 700 }}>
                     <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
-                    {aiProviderLabel} · Connected to your live data
+                    {aiProviderLabel} · Connected to live data
                   </div>
                 </div>
-              )}
+              ) : (
+                /* ── MESSAGES ── */
+                <div style={{ display: "flex", flexDirection: "column", padding: "20px 0 8px" }}>
+                  {messages.filter(m => m.content).map((m, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: "flex",
+                        flexDirection: m.role === "user" ? "row-reverse" : "row",
+                        gap: 12, padding: "8px 20px", alignItems: "flex-start",
+                      }}
+                    >
+                      {/* Avatar */}
+                      <div style={{
+                        width: 34, height: 34, borderRadius: "50%", flexShrink: 0, marginTop: 3,
+                        background: m.role === "assistant" ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "linear-gradient(135deg,#34d399,#059669)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        boxShadow: m.role === "assistant" ? "0 4px 16px rgba(79,70,229,.4)" : "0 4px 16px rgba(5,150,105,.35)",
+                        fontSize: m.role === "assistant" ? 16 : 13,
+                        fontWeight: 800, color: "white",
+                      }}>
+                        {m.role === "assistant" ? "🧠" : companyInitial}
+                      </div>
 
-              {/* Message bubbles */}
-              {messages.filter(m => m.content).map((m, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-end", flexDirection: m.role === "user" ? "row-reverse" : "row" }}>
-                  {m.role === "assistant" ? (
-                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginBottom: 2 }}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                        <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-                      </svg>
+                      {/* Bubble */}
+                      <div style={{
+                        maxWidth: "72%",
+                        padding: "13px 17px",
+                        borderRadius: m.role === "user" ? "20px 4px 20px 20px" : "4px 20px 20px 20px",
+                        background: m.role === "user" ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.07)",
+                        border: m.role === "assistant" ? "1px solid rgba(255,255,255,.09)" : "none",
+                        boxShadow: m.role === "user" ? "0 8px 28px rgba(79,70,229,.35)" : "none",
+                        fontSize: 14, lineHeight: 1.75, color: "white",
+                      }}>
+                        {m.role === "assistant"
+                          ? <div>{renderMarkdown(m.content)}{streaming && i === messages.filter(x => x.content).length - 1 && m.content && <span className="cursor-blink" />}</div>
+                          : <span>{m.content}</span>
+                        }
+                      </div>
                     </div>
-                  ) : (
-                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#34d399,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, flexShrink: 0, marginBottom: 2 }}>{companyInitial}</div>
-                  )}
-                  <div className={m.role === "user" ? "chat-msg-user" : "chat-msg-bot"}>
-                    {m.role === "assistant" ? (
-                      <div>{renderMarkdown(m.content)}{streaming && i === messages.filter(x => x.content).length - 1 && m.content && <span className="cursor-blink" />}</div>
-                    ) : (
-                      <span style={{ color: "white" }}>{m.content}</span>
-                    )}
-                  </div>
-                </div>
-              ))}
+                  ))}
 
-              {/* Typing indicator */}
-              {chatLoading && messages[messages.length - 1]?.content === "" && (
-                <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
-                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></svg>
-                  </div>
-                  <div className="chat-msg-bot" style={{ display: "flex", gap: 5, alignItems: "center", padding: "14px 18px" }}>
-                    {[0, 1, 2].map(j => <div key={j} style={{ width: 7, height: 7, borderRadius: "50%", background: "rgba(99,102,241,.7)", animation: `pulse 1.1s ease ${j * .18}s infinite` }} />)}
-                  </div>
+                  {/* Typing indicator */}
+                  {chatLoading && messages[messages.length - 1]?.content === "" && (
+                    <div style={{ display: "flex", gap: 12, padding: "8px 20px", alignItems: "flex-start" }}>
+                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 16, boxShadow: "0 4px 16px rgba(79,70,229,.4)" }}>🧠</div>
+                      <div style={{ padding: "14px 18px", borderRadius: "4px 20px 20px 20px", background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.09)", display: "flex", gap: 5, alignItems: "center" }}>
+                        {[0,1,2].map(j => <div key={j} style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(99,102,241,.8)", animation: `pulse 1.1s ease ${j * .18}s infinite` }} />)}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
+
               <div ref={chatBottomRef} />
             </div>
 
             {/* ── Input composer ── */}
-            <div className="chat-composer">
-              <div style={{ display: "flex", gap: 10, alignItems: "center", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "10px 10px 10px 18px", transition: "border-color .2s" }}>
+            <div className="chat-composer" style={{ padding: "10px 16px 16px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
+              {/* Quick pills (shown after first message) */}
+              {messages.filter(m => m.role === "user").length > 0 && (
+                <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+                  {["Show my profit", "Low stock items", "Overdue invoices", "Top customers", "Cash flow tips"].map(q => (
+                    <button key={q} onClick={() => sendChat(q)} style={{
+                      padding: "5px 12px", borderRadius: 999, fontSize: 11.5, fontWeight: 600,
+                      background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)",
+                      color: "rgba(255,255,255,.75)", cursor: "pointer", fontFamily: "inherit", transition: "all .15s",
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,.25)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(99,102,241,.12)"; }}
+                    >{q}</button>
+                  ))}
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 10, alignItems: "center", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 16, padding: "12px 12px 12px 20px" }}>
                 <input
                   ref={chatInputRef}
                   value={chatInput}
                   onChange={e => setChatInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } }}
-                  placeholder="Ask any Question about your business..."
-                  style={{ flex: 1, background: "none", border: "none", color: "white", fontSize: 13.5, fontFamily: "inherit", outline: "none", padding: "2px 0" }}
+                  placeholder="Ask anything about your business..."
+                  style={{ flex: 1, background: "none", border: "none", color: "white", fontSize: 14, fontFamily: "inherit", outline: "none", padding: "2px 0" }}
                 />
                 <button
                   onClick={() => sendChat()}
                   disabled={!chatInput.trim() || chatLoading}
                   style={{
-                    width: 40, height: 40, borderRadius: 11, border: "none", flexShrink: 0,
+                    width: 42, height: 42, borderRadius: 13, border: "none", flexShrink: 0,
                     cursor: chatInput.trim() && !chatLoading ? "pointer" : "not-allowed",
                     background: chatInput.trim() && !chatLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.07)",
                     display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s",
-                    boxShadow: chatInput.trim() && !chatLoading ? "0 8px 20px rgba(79,70,229,.28)" : "none",
+                    boxShadow: chatInput.trim() && !chatLoading ? "0 8px 24px rgba(79,70,229,.4)" : "none",
                   }}
                 >
                   {chatLoading
-                    ? <Spinner size={15} />
-                    : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+                    ? <Spinner size={16} />
+                    : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
                   }
                 </button>
+              </div>
+              <div style={{ textAlign: "center", fontSize: 10.5, color: "rgba(255,255,255,.2)", marginTop: 8 }}>
+                Powered by <b style={{ color: "rgba(255,255,255,.35)" }}>FinovaOS AI</b> · Responses based on your real business data
               </div>
             </div>
           </div>
