@@ -1,6 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { resolveCompanyId } from "@/lib/tenant";
+import { safeDecryptFields } from "@/lib/fieldEncrypt";
+
+const ACCOUNT_PII_FIELDS = ["phone", "ntn", "strn", "bankIban"] as const;
 
 const prisma = (globalThis as { prisma?: PrismaClient }).prisma || new PrismaClient();
 
