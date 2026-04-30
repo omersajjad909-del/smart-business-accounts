@@ -276,77 +276,55 @@ function AIInsightPanel({
         </Link>
       </div>
 
-      {/* Compact brain icon */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          padding: "18px 0 10px",
+      {/* Holographic Brain */}
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "flex-end",
+        padding: "8px 0 4px",
+        position: "relative",
+        zIndex: 1,
+        minHeight: 130,
+      }}>
+        {/* Deep glow behind brain */}
+        <div style={{
+          position: "absolute",
+          top: "50%", left: "50%",
+          transform: "translate(-50%,-60%)",
+          width: 130, height: 130,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(139,92,246,.55) 0%, rgba(99,102,241,.25) 50%, transparent 75%)",
+          filter: "blur(18px)",
+        }} />
+        {/* Sparkles */}
+        <span style={{ position:"absolute", top:14, left:"22%", fontSize:13, color:"#c4b5fd", animation:"ai-twinkle 2.2s ease infinite" }}>✦</span>
+        <span style={{ position:"absolute", top:22, right:"20%", fontSize:9,  color:"#a78bfa", animation:"ai-twinkle 1.9s ease .4s infinite" }}>✦</span>
+        <span style={{ position:"absolute", top:8,  right:"35%", fontSize:11, color:"#818cf8", animation:"ai-twinkle 2.6s ease .2s infinite" }}>✦</span>
+        <span style={{ position:"absolute", top:46, left:"15%", fontSize:8,  color:"#c4b5fd", animation:"ai-twinkle 2s ease .7s infinite" }}>✦</span>
+        <span style={{ position:"absolute", top:50, right:"12%", fontSize:12, color:"#a78bfa", animation:"ai-twinkle 2.4s ease .1s infinite" }}>✦</span>
+        {/* Brain emoji with float */}
+        <div style={{
+          fontSize: 72,
+          lineHeight: 1,
+          filter: "drop-shadow(0 0 18px rgba(139,92,246,1)) drop-shadow(0 0 36px rgba(99,102,241,.8)) drop-shadow(0 0 60px rgba(139,92,246,.5))",
+          animation: "brain-float 3.5s ease-in-out infinite",
           position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <div
-          style={{
-            position: "relative",
-            width: 72,
-            height: 72,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              inset: -6,
-              borderRadius: "50%",
-              border: "1.5px solid rgba(99,102,241,.25)",
-              animation: "ai-pulse 3s ease-in-out infinite",
-            }}
-          />
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle at 40% 38%,rgba(167,139,250,.5),rgba(79,70,229,.88))",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 32,
-              boxShadow:
-                "0 0 24px rgba(99,102,241,.45),0 0 48px rgba(139,92,246,.2)",
-              border: "1.5px solid rgba(129,140,248,.3)",
-            }}
-          >
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle at 40% 40%, #a78bfa, #4f46e5)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 0 40px #6366f1, 0 0 80px rgba(139,92,246,.4)",
-                position: "relative",
-              }}
-            >
-              <div
-                style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: "50%",
-                  background: "rgba(255,255,255,.15)",
-                  backdropFilter: "blur(6px)",
-                }}
-              />
-            </div>
-          </div>
-        </div>
+          zIndex: 2,
+          marginBottom: 8,
+          userSelect: "none",
+        }}>🧠</div>
+        {/* Hologram platform disc */}
+        <div style={{
+          position: "absolute",
+          bottom: 4,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 110, height: 18,
+          borderRadius: "50%",
+          background: "radial-gradient(ellipse at center, rgba(99,102,241,.75) 0%, rgba(139,92,246,.45) 45%, transparent 70%)",
+          filter: "blur(6px)",
+          animation: "ai-pulse 3s ease-in-out infinite",
+        }} />
       </div>
 
       {/* Insight card */}
@@ -876,8 +854,9 @@ export default function DashboardContent() {
         @keyframes db-spin{to{transform:rotate(360deg)}}
         @keyframes db-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes ai-pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
-        @keyframes ai-twinkle{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+        @keyframes ai-twinkle{0%,100%{opacity:.3;transform:scale(.8) rotate(-10deg)}50%{opacity:1;transform:scale(1.3) rotate(10deg)}}
         @keyframes ai-dot{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+        @keyframes brain-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
         .db-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
         @media(max-width:1100px){.db-kpi{grid-template-columns:repeat(2,1fr);}}
