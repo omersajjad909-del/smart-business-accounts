@@ -21,15 +21,17 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 
 const CRON_SECRET = process.env.CRON_SECRET || "";
 
 export async function POST(req: NextRequest) {
   // Allow admin role OR valid cron secret
-  const userRole = req.headers.get("x-user-role");
   const cronSecret = req.headers.get("x-cron-secret");
-  const isAdmin = userRole?.toUpperCase() === "ADMIN";
   const isCron = CRON_SECRET && cronSecret === CRON_SECRET;
+  const jwtToken = getTokenFromRequest(req as any);
+  const jwtPayload = jwtToken ? verifyJwt(jwtToken) : null;
+  const isAdmin = String(jwtPayload?.role || "").toUpperCase() === "ADMIN";
 
   if (!isAdmin && !isCron) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -145,10 +147,11 @@ export async function POST(req: NextRequest) {
 
 // GET — preview which companies are due for cleanup (dry run)
 export async function GET(req: NextRequest) {
-  const userRole = req.headers.get("x-user-role");
   const cronSecret = req.headers.get("x-cron-secret");
-  const isAdmin = userRole?.toUpperCase() === "ADMIN";
   const isCron = CRON_SECRET && cronSecret === CRON_SECRET;
+  const jwtToken2 = getTokenFromRequest(req as any);
+  const jwtPayload2 = jwtToken2 ? verifyJwt(jwtToken2) : null;
+  const isAdmin = String(jwtPayload2?.role || "").toUpperCase() === "ADMIN";
   if (!isAdmin && !isCron) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

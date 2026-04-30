@@ -143,7 +143,8 @@
       "Bash(python3 -c ' *)",
       "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
       "Bash(grep -E \"^/d/projects/smart-business-accounts/\\(lib|app|src\\)$\")",
-      "Bash(shuf)"
+      "Bash(shuf)",
+      "Bash(perl -i -0pe 's/  const userRole = req\\\\.headers\\\\.get\\\\\\(\"x-user-role\"\\\\\\);\\\\n  const cronSecret = req\\\\.headers\\\\.get\\\\\\(\"x-cron-secret\"\\\\\\);\\\\n  const isAdmin = userRole\\\\?\\\\.toUpperCase\\\\\\(\\\\\\) === \"ADMIN\";\\\\n  const isCron = CRON_SECRET && cronSecret === CRON_SECRET;\\\\n\\\\n  if \\\\\\(!isAdmin && !isCron\\\\\\) \\\\{/  const cronSecret = req.headers.get\\(\"x-cron-secret\"\\);\\\\n  const isCron = CRON_SECRET \\\\&\\\\& cronSecret === CRON_SECRET;\\\\n  const jwtToken = getTokenFromRequest\\(req as any\\);\\\\n  const jwtPayload = jwtToken ? verifyJwt\\(jwtToken\\) : null;\\\\n  const isAdmin = String\\(jwtPayload?.role || \"\"\\).toUpperCase\\(\\) === \"ADMIN\";\\\\n\\\\n  if \\(!isAdmin \\\\&\\\\& !isCron\\) {/g' \"d:/projects/smart-business-accounts/app/api/admin/cron/data-cleanup/route.ts\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
