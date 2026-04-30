@@ -7,9 +7,9 @@ import { sendEmail } from "@/lib/email";
 import { sendWhatsApp } from "@/lib/whatsapp";
 
 function isAdmin(req: NextRequest) {
-  const role = String(req.headers.get("x-user-role") || "").toUpperCase();
-  if (role === "ADMIN") return true;
-  try { const p = verifyJwt(getTokenFromRequest(req as any)!); return String(p?.role||"").toUpperCase()==="ADMIN"; } catch { return false; }
+  const token = getTokenFromRequest(req as any);
+  if (!token) return false;
+  try { const p = verifyJwt(token); return String(p?.role || "").toUpperCase() === "ADMIN"; } catch { return false; }
 }
 
 // Build audience where clause for User queries
