@@ -139,7 +139,7 @@ export default function StockReportPage() {
             <div style={{ marginBottom: 18 }}>
               <label style={labelStyle}>Unit Filter</label>
               <select value={unitParam} onChange={e => setUnitParam(e.target.value)} style={selectStyle}>
-                <option value="">— All Units —</option>
+                <option value="">All</option>
                 {units.map(u => <option key={u} value={u}>{u}</option>)}
               </select>
             </div>
@@ -147,9 +147,9 @@ export default function StockReportPage() {
             <div style={{ marginBottom: 18 }}>
               <label style={labelStyle}>View</label>
               <select value={viewOf} onChange={e => setViewOf(e.target.value as ViewOf)} style={selectStyle}>
-                <option value="all">All Items</option>
-                <option value="remaining">Remaining (In Stock)</option>
-                <option value="nill">Nill (Out of Stock)</option>
+                <option value="all">All</option>
+                <option value="remaining">Remaining</option>
+                <option value="nill">Nill</option>
               </select>
             </div>
 
