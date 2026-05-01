@@ -353,7 +353,7 @@ export default function CRVPage() {
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = findSelected === v.id ? "rgba(34,197,94,.18)" : "transparent"; }}
                       >
                         <td style={{ padding:"10px 14px", fontWeight:800, color:GREEN, fontSize:13 }}>{v.voucherNo}</td>
-                        <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(255,255,255,.55)" }}>{v.date}</td>
+                        <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(255,255,255,.55)" }}>{fmtDate(v.date)}</td>
                         <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(255,255,255,.75)" }}>
                           {v.entries.map((e, i) => <div key={i}>{e.accountName}</div>)}
                         </td>
