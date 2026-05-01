@@ -151,16 +151,18 @@ export default function CRVPage() {
 
   function confirmPicker(acc: Account) {
     if (pickerRowId === null) return;
+    const rowId = pickerRowId;
     setEntries(prev => {
-      const updated = prev.map(e => e.id === pickerRowId
+      const updated = prev.map(e => e.id === rowId
         ? { ...e, accountId: acc.id, accountCode: acc.code || "", accountName: acc.name }
         : e
       );
-      const idx = updated.findIndex(e => e.id === pickerRowId);
+      const idx = updated.findIndex(e => e.id === rowId);
       if (idx === updated.length - 1) return [...updated, newRow()];
       return updated;
     });
     closePicker();
+    setTimeout(() => document.getElementById(`crv-nar-${rowId}`)?.focus(), 30);
   }
 
   const filteredPickerAccts = pickerSearch.trim()
@@ -392,6 +394,7 @@ export default function CRVPage() {
                   </td>
                   <td style={{ padding:"4px 6px" }}>
                     <input
+                      id={`crv-nar-${row.id}`}
                       value={row.narration}
                       onChange={e => setEntryField(row.id, "narration", e.target.value)}
                       placeholder="Narration…"
