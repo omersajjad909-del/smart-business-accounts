@@ -411,14 +411,15 @@ export default function CRVPage() {
                       onKeyDown={e => {
                         if (e.key === "Enter") {
                           e.preventDefault();
+                          e.stopPropagation();
                           const idx = entries.findIndex(r => r.id === row.id);
                           const nextRow = entries[idx + 1];
                           if (nextRow) {
-                            document.getElementById(`crv-code-${nextRow.id}`)?.focus();
+                            openPicker(nextRow.id);
                           } else {
                             const nr = newRow();
                             setEntries(prev => [...prev, nr]);
-                            setTimeout(() => document.getElementById(`crv-code-${nr.id}`)?.focus(), 30);
+                            setTimeout(() => openPicker(nr.id), 50);
                           }
                         }
                       }}
