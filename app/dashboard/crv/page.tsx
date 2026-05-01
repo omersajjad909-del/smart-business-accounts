@@ -266,9 +266,11 @@ export default function CRVPage() {
                     {filteredPickerAccts.map(a => (
                       <tr
                         key={a.id}
+                        tabIndex={0}
                         onClick={() => setPickerSelected(a.id)}
                         onDoubleClick={() => confirmPicker(a)}
-                        style={{ background: pickerSelected === a.id ? "rgba(34,197,94,.2)" : "transparent", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,.04)", transition:"background .1s" }}
+                        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); confirmPicker(a); } }}
+                        style={{ background: pickerSelected === a.id ? "rgba(34,197,94,.2)" : "transparent", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,.04)", transition:"background .1s", outline:"none" }}
                         onMouseEnter={e => { if (pickerSelected !== a.id) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.05)"; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = pickerSelected === a.id ? "rgba(34,197,94,.2)" : "transparent"; }}
                       >
