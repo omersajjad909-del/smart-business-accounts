@@ -304,7 +304,7 @@ export default function CPVPage() {
       <div style={{ marginBottom:20, display:"flex", alignItems:"flex-start", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
         <div>
           <h1 style={{ margin:0, fontSize:22, fontWeight:800, color:BLUE }}>Cash Payment Voucher (CPV)</h1>
-          <p style={{ margin:"4px 0 0", fontSize:12, color:"rgba(255,255,255,.35)" }}>Suppliers, expenses, ya banks ko cash ya bank payment karein</p>
+          <p style={{ margin:"4px 0 0", fontSize:12, color:"rgba(255,255,255,.35)" }}>Make cash or bank payments to suppliers, e-commerce sites, or banks.</p>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
