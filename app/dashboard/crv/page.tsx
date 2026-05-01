@@ -20,6 +20,22 @@ let nextId = 1;
 function newRow(): EntryRow { return { id: nextId++, accountId: "", accountCode: "", accountName: "", amount: "", narration: "" }; }
 function initRows() { return Array.from({ length: 8 }, () => newRow()); }
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtDate(iso: string) { const [y, m, d] = iso.split("-"); return `${d}-${m}-${y}`; }
+function dateMatchesQuery(iso: string, q: string): boolean {
+  const [y, m, d] = iso.split("-");
+  const display = `${d}-${m}-${y}`;
+  if (display.includes(q) || iso.includes(q)) return true;
+  const digits = q.replace(/[-\/\.]/g, "");
+  if (/^\d{6}$/.test(digits)) {
+    const yy = digits.slice(4, 6);
+    const yyyy = parseInt(yy) >= 50 ? `19${yy}` : `20${yy}`;
+    return iso === `${yyyy}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
+  }
+  if (/^\d{8}$/.test(digits)) {
+    return iso === `${digits.slice(4, 8)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
+  }
+  return false;
+}
 
 function printReceipt(entry: EntryRow, voucherNo: string, date: string, mode: string, company: any) {
   const co  = company?.name || "Company";
@@ -158,7 +174,7 @@ export default function CRVPage() {
   const filteredFindVouchers = findSearch.trim()
     ? vouchers.filter(v =>
         v.voucherNo.toLowerCase().includes(findSearch.toLowerCase()) ||
-        v.date.includes(findSearch) ||
+        dateMatchesQuery(v.date, findSearch.trim()) ||
         v.entries.some(e => e.accountName.toLowerCase().includes(findSearch.toLowerCase()))
       )
     : vouchers;
@@ -285,7 +301,7 @@ export default function CRVPage() {
             <div style={{ padding:"10px 20px", borderBottom:"1px solid rgba(255,255,255,.06)" }}>
               <input
                 autoFocus
-                placeholder="Search by voucher no, date (YYYY-MM-DD), or account name…"
+                placeholder="Search by voucher no, date (e.g. 01-05-2026 or 010526), or account name…"
                 value={findSearch}
                 onChange={e => { setFindSearch(e.target.value); setFindSelected(filteredFindVouchers[0]?.id || ""); }}
                 onKeyDown={e => {
