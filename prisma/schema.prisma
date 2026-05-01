@@ -67,6 +67,10 @@ model Account {
   createdAt DateTime  @default(now())
   deletedAt DateTime?
   deletedBy String?
+
+  @@index([companyId, deletedAt])
+  @@index([companyId, name])
+  @@index([companyId, partyType])
 }
 
 model ItemNew {
@@ -101,6 +105,9 @@ model ItemNew {
   deletedAt            DateTime?
   deletedBy            String?
   deliveryChallanItems DeliveryChallanItem[]
+
+  @@index([companyId, deletedAt])
+  @@index([companyId, name])
 }
 
 model PurchaseOrder {
@@ -194,6 +201,10 @@ model PurchaseInvoice {
   createdAt DateTime  @default(now())
   deletedAt DateTime?
   deletedBy String?
+
+  @@index([companyId, deletedAt])
+  @@index([companyId, date])
+  @@index([companyId, supplierId])
 }
 
 model PurchaseInvoiceItem {
@@ -232,6 +243,9 @@ model InventoryTxn {
   item ItemNew @relation(fields: [itemId], references: [id])
 
   createdAt DateTime @default(now())
+
+  @@index([companyId, itemId])
+  @@index([companyId, date])
 }
 
 model SalesInvoice {
@@ -282,6 +296,10 @@ model SalesInvoice {
   createdAt DateTime  @default(now())
   deletedAt DateTime?
   deletedBy String?
+
+  @@index([companyId, deletedAt])
+  @@index([companyId, date])
+  @@index([companyId, customerId])
 }
 
 model SalesInvoiceItem {
@@ -319,6 +337,10 @@ model Voucher {
 
   deletedAt DateTime?
   deletedBy String?
+
+  @@index([companyId, type])
+  @@index([companyId, date])
+  @@index([companyId, deletedAt])
 }
 
 model VoucherEntry {

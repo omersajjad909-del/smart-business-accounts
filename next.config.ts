@@ -42,13 +42,20 @@ const SECURITY_HEADERS = [
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  compress: true,
+  poweredByHeader: false,
   transpilePackages: ["bcryptjs"],
-  serverExternalPackages: [],
+  serverExternalPackages: ["bcryptjs", "@prisma/client"],
   typescript: {
     ignoreBuildErrors: true,
   },
   experimental: {
-    cpus: 1,
+    optimizePackageImports: [
+      "recharts",
+      "lucide-react",
+      "react-hot-toast",
+      "date-fns",
+    ],
   },
   async redirects() {
     return [
@@ -62,9 +69,18 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Apply to all routes
         source: "/(.*)",
         headers: SECURITY_HEADERS,
+      },
+      {
+        // Cache static assets for 1 year
+        source: "/_next/static/(.*)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        // Cache public images/fonts for 7 days
+        source: "/(.*)\\.(ico|png|jpg|jpeg|svg|webp|woff|woff2|ttf)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
       },
     ];
   },

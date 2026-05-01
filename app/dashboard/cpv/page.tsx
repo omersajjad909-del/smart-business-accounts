@@ -301,9 +301,29 @@ export default function CPVPage() {
       )}
 
       {/* Title */}
-      <div style={{ marginBottom:20 }}>
-        <h1 style={{ margin:0, fontSize:22, fontWeight:800, color:BLUE }}>Cash Payment Voucher (CPV)</h1>
-        <p style={{ margin:"4px 0 0", fontSize:12, color:"rgba(255,255,255,.35)" }}>Suppliers, expenses, ya banks ko cash ya bank payment karein</p>
+      <div style={{ marginBottom:20, display:"flex", alignItems:"flex-start", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
+        <div>
+          <h1 style={{ margin:0, fontSize:22, fontWeight:800, color:BLUE }}>Cash Payment Voucher (CPV)</h1>
+          <p style={{ margin:"4px 0 0", fontSize:12, color:"rgba(255,255,255,.35)" }}>Suppliers, expenses, ya banks ko cash ya bank payment karein</p>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
+            <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Next CPV #</div>
+            <div style={{ fontSize:16, fontWeight:800, color:BLUE }}>
+              CPV-{vouchers.length + 1}
+            </div>
+          </div>
+          <div style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
+            <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Saved Vouchers</div>
+            <div style={{ fontSize:16, fontWeight:800, color:"rgba(255,255,255,.7)" }}>{vouchers.length}</div>
+          </div>
+          <button
+            onClick={() => document.getElementById("cpv-history")?.scrollIntoView({ behavior:"smooth" })}
+            style={{ padding:"8px 16px", borderRadius:10, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", fontSize:12, cursor:"pointer", fontFamily:ff }}
+          >
+            📋 View History ↓
+          </button>
+        </div>
       </div>
 
       {/* ── FORM ── */}
@@ -359,6 +379,7 @@ export default function CPVPage() {
                   <td style={{ padding:"5px 10px", fontSize:11, color:"rgba(255,255,255,.28)", fontWeight:600, textAlign:"center" }}>{i + 1}</td>
                   <td style={{ padding:"4px 6px", width:120 }}>
                     <input
+                      id={`cpv-code-${row.id}`}
                       value={row.accountCode}
                       placeholder="—"
                       readOnly
@@ -381,21 +402,38 @@ export default function CPVPage() {
                       onChange={e => setEntryField(row.id, "narration", e.target.value)}
                       placeholder="Narration…"
                       style={{ ...inp, fontSize:12 }}
+                      onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); document.getElementById(`cpv-amt-${row.id}`)?.focus(); } }}
                     />
                   </td>
                   <td style={{ padding:"4px 6px" }}>
                     <input
+                      id={`cpv-amt-${row.id}`}
                       value={row.amount}
                       onChange={e => setEntryField(row.id, "amount", e.target.value)}
                       placeholder="0.00"
                       type="number"
                       min="0"
                       style={{ ...inp, fontSize:13, fontWeight:700, textAlign:"right" as const, color:BLUE }}
+                      onKeyDown={e => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const idx = entries.findIndex(r => r.id === row.id);
+                          const nextRow = entries[idx + 1];
+                          if (nextRow) {
+                            document.getElementById(`cpv-code-${nextRow.id}`)?.focus();
+                          } else {
+                            const nr = newRow();
+                            setEntries(prev => [...prev, nr]);
+                            setTimeout(() => document.getElementById(`cpv-code-${nr.id}`)?.focus(), 30);
+                          }
+                        }
+                      }}
                     />
                   </td>
                   <td style={{ padding:"4px 8px", textAlign:"center" }}>
                     <div style={{ display:"flex", gap:4, justifyContent:"center" }}>
                       <button
+                        type="button"
                         title="Print Receipt"
                         onClick={() => row.accountId && printReceipt(row, "NEW", date, mode, company)}
                         disabled={!row.accountId || !Number(row.amount)}
@@ -443,10 +481,13 @@ export default function CPVPage() {
       </div>
 
       {/* ── HISTORY ── */}
-      <div style={{ background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.07)", borderRadius:14, overflow:"hidden" }}>
+      <div id="cpv-history" style={{ background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.07)", borderRadius:14, overflow:"hidden" }}>
         <div style={{ padding:"14px 20px", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.7)" }}>Past CPV Vouchers</div>
-          <div style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>{vouchers.length} vouchers</div>
+          <div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.7)" }}>
+            Past CPV Vouchers
+            {vouchers.length > 0 && <span style={{ marginLeft:10, fontSize:12, background:"rgba(99,102,241,.15)", color:BLUE, borderRadius:20, padding:"2px 10px", fontWeight:600 }}>{vouchers.length}</span>}
+          </div>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>Last: <b style={{ color:"rgba(255,255,255,.6)" }}>{vouchers[0]?.voucherNo || "—"}</b></div>
         </div>
         <table style={{ width:"100%", borderCollapse:"collapse" }}>
           <thead>
