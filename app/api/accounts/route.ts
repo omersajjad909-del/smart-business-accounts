@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
         ...(q.trim() ? { name: { contains: q.trim(), mode: "insensitive" } } : {}),
       },
       orderBy: { name: "asc" },
-      take: 30,
+      take: q.trim() ? 50 : 1000,
     });
     return NextResponse.json(results.map(a => safeDecryptFields(a, ACCOUNT_PII_FIELDS)));
   }

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { toast } from "react-hot-toast";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
@@ -7,9 +7,9 @@ import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 const ff = "'Outfit','Inter',sans-serif";
 const BLUE = "#6366f1";
 
-type Account  = { id: string; name: string; code?: string; phone?: string };
+type Account  = { id: string; name: string; code?: string; partyType?: string };
 type BankAcc  = { id: string; name: string };
-type EntryRow = { id: number; accountId: string; accountName: string; amount: string; narration: string };
+type EntryRow = { id: number; accountId: string; accountCode: string; accountName: string; amount: string; narration: string };
 type Voucher  = {
   id: string; voucherNo: string; date: string; narration: string;
   paymentMode: string; paymentAccName: string; totalAmount: number;
@@ -17,10 +17,10 @@ type Voucher  = {
 };
 
 let nextId = 1;
-function newRow(): EntryRow { return { id: nextId++, accountId: "", accountName: "", amount: "", narration: "" }; }
+function newRow(): EntryRow { return { id: nextId++, accountId: "", accountCode: "", accountName: "", amount: "", narration: "" }; }
+function initRows() { return Array.from({ length: 8 }, () => newRow()); }
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-// ── Receipt print for one party ──────────────────────────────────────────────
 function printReceipt(entry: EntryRow, voucherNo: string, date: string, mode: string, company: any) {
   const co  = company?.name || "Company";
   const cur = company?.baseCurrency || "PKR";
@@ -48,7 +48,6 @@ function printReceipt(entry: EntryRow, voucherNo: string, date: string, mode: st
   w.document.close();
 }
 
-// ── Full voucher print ────────────────────────────────────────────────────────
 function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode: string, totalAmt: number, company: any, narration: string) {
   const co  = company?.name || "Company";
   const cur = company?.baseCurrency || "PKR";
@@ -76,12 +75,12 @@ function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode
     <div style="font-size:12px;text-align:right">Mode: ${mode}</div></div>
   </div>
   <table>
-    <thead><tr><th>#</th><th>Account</th><th>Narration</th><th style="text-align:right">Amount (${cur})</th></tr></thead>
+    <thead><tr><th>#</th><th>Code</th><th>Account</th><th>Narration</th><th style="text-align:right">Amount (${cur})</th></tr></thead>
     <tbody>
-      ${rows.map((r, i) => `<tr><td>${i + 1}</td><td>${r.accountName}</td><td>${r.narration || "—"}</td><td class="amt">${fmt(Number(r.amount))}</td></tr>`).join("")}
+      ${rows.map((r, i) => `<tr><td>${i + 1}</td><td>${r.accountCode||"—"}</td><td>${r.accountName}</td><td>${r.narration || "—"}</td><td class="amt">${fmt(Number(r.amount))}</td></tr>`).join("")}
     </tbody>
     <tfoot>
-      <tr style="background:#eff6ff"><td colspan="3" style="text-align:right;font-weight:800;border-top:2px solid #111">TOTAL PAID</td>
+      <tr style="background:#eff6ff"><td colspan="4" style="text-align:right;font-weight:800;border-top:2px solid #111">TOTAL PAID</td>
       <td style="text-align:right;font-weight:900;font-size:15px;border-top:2px solid #111;color:#1e40af">${cur} ${fmt(totalAmt)}</td></tr>
     </tfoot>
   </table>
@@ -93,83 +92,90 @@ function printVoucher(entries: EntryRow[], voucherNo: string, date: string, mode
 }
 
 export default function CPVPage() {
-  const user    = getCurrentUser();
-  const today   = new Date().toISOString().slice(0, 10);
+  const user  = getCurrentUser();
+  const today = new Date().toISOString().slice(0, 10);
 
-  const [accounts,   setAccounts]   = useState<Account[]>([]);
-  const [bankAccs,   setBankAccs]   = useState<BankAcc[]>([]);
-  const [vouchers,   setVouchers]   = useState<Voucher[]>([]);
-  const [company,    setCompany]    = useState<any>(null);
-  const [saving,     setSaving]     = useState(false);
-  const [isMobile,   setIsMobile]   = useState(false);
+  const [bankAccs,  setBankAccs]  = useState<BankAcc[]>([]);
+  const [vouchers,  setVouchers]  = useState<Voucher[]>([]);
+  const [company,   setCompany]   = useState<any>(null);
+  const [saving,    setSaving]    = useState(false);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(max-width: 900px)");
-    const onChange = () => setIsMobile(media.matches);
-    onChange();
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
+  const [date,      setDate]      = useState(today);
+  const [mode,      setMode]      = useState<"CASH"|"BANK">("CASH");
+  const [bankId,    setBankId]    = useState("");
+  const [narration, setNarration] = useState("");
+  const [entries,   setEntries]   = useState<EntryRow[]>(initRows);
 
-  const [date,       setDate]       = useState(today);
-  const [mode,       setMode]       = useState<"CASH"|"BANK">("CASH");
-  const [bankId,     setBankId]     = useState("");
-  const [narration,  setNarration]  = useState("");
-  const [entries,    setEntries]    = useState<EntryRow[]>([newRow()]);
-  const [search,     setSearch]     = useState<Record<number, string>>({});
-  const [dropOpen,   setDropOpen]   = useState<Record<number, boolean>>({});
-  const [dropResults, setDropResults] = useState<Record<number, Account[]>>({});
-  const timerRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  // ── Account Picker ──────────────────────────────────────────────────────────
+  const [pickerOpen,     setPickerOpen]     = useState(false);
+  const [pickerRowId,    setPickerRowId]    = useState<number | null>(null);
+  const [pickerSearch,   setPickerSearch]   = useState("");
+  const [pickerSelected, setPickerSelected] = useState<string>("");
+  const [pickerAccts,    setPickerAccts]    = useState<Account[]>([]);
+  const [pickerLoading,  setPickerLoading]  = useState(false);
 
   const h = () => ({ "x-user-role": user?.role||"", "x-user-id": user?.id||"", "x-company-id": user?.companyId||"", "Content-Type": "application/json" });
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/cpv",          { headers: h() }).then(r => r.json()),
-      fetch("/api/accounts",     { headers: h() }).then(r => r.json()),
-      fetch("/api/bank-accounts",{ headers: h() }).then(r => r.json()),
-      fetch("/api/me/company",   { headers: h() }).then(r => r.ok ? r.json() : null),
-    ]).then(([v, a, b, co]) => {
+      fetch("/api/cpv",           { headers: h() }).then(r => r.json()),
+      fetch("/api/bank-accounts", { headers: h() }).then(r => r.json()),
+      fetch("/api/me/company",    { headers: h() }).then(r => r.ok ? r.json() : null),
+    ]).then(([v, b, co]) => {
       if (Array.isArray(v)) setVouchers(v);
-      if (Array.isArray(a)) setAccounts(a.filter((x: any) => x.partyType !== "CUSTOMER"));
       if (Array.isArray(b)) setBankAccs(b.map((x: any) => ({ id: x.id, name: x.accountName || `${x.bankName} - ${x.accountNo}` })));
       if (co) setCompany(co);
     }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function setEntryField(id: number, field: keyof EntryRow, val: string) {
-    setEntries(prev => {
-      const next = prev.map(e => e.id === id ? { ...e, [field]: val } : e);
-      const idx = next.findIndex(e => e.id === id);
-      if (idx === next.length - 1 && val !== "") next.push(newRow());
-      return next;
-    });
-  }
-  function removeRow(id: number) { setEntries(prev => prev.length > 1 ? prev.filter(e => e.id !== id) : prev); }
-  function selectAccount(rowId: number, acc: Account) {
-    setEntries(prev => prev.map(e => e.id === rowId ? { ...e, accountId: acc.id, accountName: acc.name } : e));
-    setSearch(prev => ({ ...prev, [rowId]: acc.name }));
-    setDropOpen(prev => ({ ...prev, [rowId]: false }));
-  }
-
-  function onAccountSearch(rowId: number, q: string) {
-    setSearch(p => ({ ...p, [rowId]: q }));
-    setEntryField(rowId, "accountId", "");
-    setEntryField(rowId, "accountName", "");
-    setDropOpen(p => ({ ...p, [rowId]: true }));
-    if (timerRef.current[rowId]) clearTimeout(timerRef.current[rowId]);
-    timerRef.current[rowId] = setTimeout(async () => {
+  async function openPicker(rowId: number) {
+    setPickerRowId(rowId);
+    setPickerSearch("");
+    setPickerSelected("");
+    setPickerOpen(true);
+    if (pickerAccts.length === 0) {
+      setPickerLoading(true);
       try {
-        const r = await fetch(`/api/accounts?search=${encodeURIComponent(q)}`, { headers: h() });
+        const r = await fetch("/api/accounts?search=", { headers: h() });
         if (r.ok) {
           const data = await r.json();
           if (Array.isArray(data))
-            setDropResults(p => ({ ...p, [rowId]: data.filter((x: any) => x.partyType !== "CUSTOMER") }));
+            setPickerAccts(data.filter((x: any) => x.partyType !== "CUSTOMER"));
         }
       } catch {}
-    }, 300);
+      setPickerLoading(false);
+    }
+  }
+
+  function closePicker() { setPickerOpen(false); setPickerRowId(null); }
+
+  function confirmPicker(acc: Account) {
+    if (pickerRowId === null) return;
+    setEntries(prev => {
+      const updated = prev.map(e => e.id === pickerRowId
+        ? { ...e, accountId: acc.id, accountCode: acc.code || "", accountName: acc.name }
+        : e
+      );
+      const idx = updated.findIndex(e => e.id === pickerRowId);
+      if (idx === updated.length - 1) return [...updated, newRow()];
+      return updated;
+    });
+    closePicker();
+  }
+
+  const filteredPickerAccts = pickerSearch.trim()
+    ? pickerAccts.filter(a =>
+        a.name.toLowerCase().includes(pickerSearch.toLowerCase()) ||
+        (a.code || "").toLowerCase().includes(pickerSearch.toLowerCase())
+      )
+    : pickerAccts;
+
+  function setEntryField(id: number, field: keyof EntryRow, val: string) {
+    setEntries(prev => prev.map(e => e.id === id ? { ...e, [field]: val } : e));
+  }
+  function removeRow(id: number) {
+    setEntries(prev => prev.length > 1 ? prev.filter(e => e.id !== id) : prev);
   }
 
   const total = entries.reduce((s, e) => s + (Number(e.amount) || 0), 0);
@@ -187,7 +193,7 @@ export default function CPVPage() {
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
       toast.success(`CPV ${d.voucherNo} save ho gaya!`);
-      setEntries([newRow()]); setNarration(""); setMode("CASH"); setBankId("");
+      setEntries(initRows()); setNarration(""); setMode("CASH"); setBankId("");
       fetch("/api/cpv", { headers: h() }).then(r => r.json()).then(v => Array.isArray(v) && setVouchers(v));
     } catch (e: any) { toast.error(e.message); }
     finally { setSaving(false); }
@@ -196,16 +202,103 @@ export default function CPVPage() {
   async function deleteVoucher(id: string) {
     if (!confirm("Ye voucher delete karein?")) return;
     const r = await fetch(`/api/cpv?id=${id}`, { method: "DELETE", headers: h() });
-    if (r.ok) {
-      toast.success("Deleted"); setVouchers(prev => prev.filter(v => v.id !== id));
-    }
+    if (r.ok) { toast.success("Deleted"); setVouchers(prev => prev.filter(v => v.id !== id)); }
   }
 
   const inp: React.CSSProperties = { background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", borderRadius:8, color:"rgba(255,255,255,.85)", padding:"8px 12px", fontSize:13, fontFamily:ff, outline:"none", width:"100%", boxSizing:"border-box" };
   const lbl: React.CSSProperties = { fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:5, display:"block" };
+  const clickInp: React.CSSProperties = { ...inp, cursor:"pointer", caretColor:"transparent" };
 
   return (
-    <div style={{ padding:"24px 28px", fontFamily:ff, color:"rgba(255,255,255,.85)", maxWidth:1100 }}>
+    <div style={{ padding:"24px 28px", fontFamily:ff, color:"rgba(255,255,255,.85)", maxWidth:1200 }}>
+
+      {/* ── CHART OF ACCOUNT MODAL ── */}
+      {pickerOpen && (
+        <div
+          style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.78)", zIndex:2000, display:"flex", alignItems:"center", justifyContent:"center" }}
+          onClick={closePicker}
+        >
+          <div
+            style={{ background:"#0c0e1a", border:"1px solid rgba(255,255,255,.15)", borderRadius:14, width:640, maxHeight:580, display:"flex", flexDirection:"column", boxShadow:"0 24px 80px rgba(0,0,0,.9)" }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* header */}
+            <div style={{ padding:"14px 20px", borderBottom:"1px solid rgba(255,255,255,.1)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <span style={{ fontWeight:800, fontSize:15, color:"rgba(255,255,255,.9)", letterSpacing:".05em" }}>CHART OF ACCOUNT</span>
+              <span style={{ fontSize:11, color:"rgba(255,255,255,.35)" }}>Choices in list: {filteredPickerAccts.length}</span>
+            </div>
+            {/* find box */}
+            <div style={{ padding:"10px 20px", borderBottom:"1px solid rgba(255,255,255,.07)" }}>
+              <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                <span style={{ fontSize:12, color:"rgba(255,255,255,.4)", minWidth:30 }}>Find</span>
+                <input
+                  autoFocus
+                  placeholder="Search by name or code…"
+                  value={pickerSearch}
+                  onChange={e => setPickerSearch(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter" && filteredPickerAccts.length > 0) {
+                      const acc = filteredPickerAccts.find(a => a.id === pickerSelected) || filteredPickerAccts[0];
+                      confirmPicker(acc);
+                    }
+                    if (e.key === "Escape") closePicker();
+                  }}
+                  style={{ ...inp, flex:1, fontSize:13 }}
+                />
+              </div>
+            </div>
+            {/* list */}
+            <div style={{ flex:1, overflowY:"auto", maxHeight:380 }}>
+              {pickerLoading ? (
+                <div style={{ padding:48, textAlign:"center", color:"rgba(255,255,255,.35)", fontSize:13 }}>Loading accounts…</div>
+              ) : filteredPickerAccts.length === 0 ? (
+                <div style={{ padding:48, textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:13, lineHeight:1.6 }}>
+                  No accounts found.<br />
+                  <span style={{ fontSize:12, color:"rgba(255,255,255,.18)" }}>Please add accounts in Chart of Accounts first.</span>
+                </div>
+              ) : (
+                <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                  <thead>
+                    <tr style={{ background:"rgba(255,255,255,.05)", position:"sticky", top:0, zIndex:1 }}>
+                      <th style={{ padding:"8px 16px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", textAlign:"left", width:130 }}>CODE</th>
+                      <th style={{ padding:"8px 16px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", textAlign:"left" }}>TITLE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredPickerAccts.map(a => (
+                      <tr
+                        key={a.id}
+                        onClick={() => setPickerSelected(a.id)}
+                        onDoubleClick={() => confirmPicker(a)}
+                        style={{ background: pickerSelected === a.id ? "rgba(99,102,241,.3)" : "transparent", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,.04)", transition:"background .1s" }}
+                        onMouseEnter={e => { if (pickerSelected !== a.id) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.05)"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = pickerSelected === a.id ? "rgba(99,102,241,.3)" : "transparent"; }}
+                      >
+                        <td style={{ padding:"9px 16px", fontSize:12, color:"rgba(255,255,255,.45)", fontFamily:"monospace", letterSpacing:".04em" }}>{a.code}</td>
+                        <td style={{ padding:"9px 16px", fontSize:13, color:"rgba(255,255,255,.82)", fontWeight: pickerSelected === a.id ? 700 : 400 }}>{a.name}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+            {/* footer */}
+            <div style={{ padding:"12px 20px", borderTop:"1px solid rgba(255,255,255,.08)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <span style={{ fontSize:11, color:"rgba(255,255,255,.28)" }}>Double-click or select + OK to confirm</span>
+              <div style={{ display:"flex", gap:8 }}>
+                <button onClick={closePicker} style={{ padding:"8px 20px", borderRadius:8, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.6)", fontSize:13, cursor:"pointer", fontFamily:ff }}>Cancel</button>
+                <button
+                  onClick={() => { const acc = filteredPickerAccts.find(a => a.id === pickerSelected) || filteredPickerAccts[0]; if (acc) confirmPicker(acc); }}
+                  disabled={filteredPickerAccts.length === 0}
+                  style={{ padding:"8px 28px", borderRadius:8, background:BLUE, border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:filteredPickerAccts.length === 0 ? 0.4 : 1 }}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Title */}
       <div style={{ marginBottom:20 }}>
@@ -217,7 +310,7 @@ export default function CPVPage() {
       <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:24, marginBottom:28 }}>
 
         {/* Header row */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 2fr", gap:14, marginBottom:20 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"160px 160px 1fr 2fr", gap:14, marginBottom:20 }}>
           <div>
             <label style={lbl}>Date</label>
             <DateInput value={date} onChange={setDate} style={inp} />
@@ -229,7 +322,7 @@ export default function CPVPage() {
               <option value="BANK">Bank Transfer</option>
             </select>
           </div>
-          {mode === "BANK" && (
+          {mode === "BANK" ? (
             <div>
               <label style={lbl}>Bank Account</label>
               <select value={bankId} onChange={e => setBankId(e.target.value)} style={{ ...inp, cursor:"pointer" }}>
@@ -237,116 +330,107 @@ export default function CPVPage() {
                 {bankAccs.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             </div>
-          )}
-          <div style={{ gridColumn: mode === "BANK" ? "auto" : "3 / span 2" }}>
+          ) : <div />}
+          <div>
             <label style={lbl}>Voucher Narration</label>
             <input value={narration} onChange={e => setNarration(e.target.value)} placeholder="Optional overall narration…" style={inp} />
           </div>
         </div>
 
-        {/* Entry rows */}
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginBottom: 10 }}>new row appears automatically when you fill in the last entry</div>
-          {isMobile ? (
-            <div>
-              {entries.map((row, i) => {
-                const listed = search[row.id] ? (dropResults[row.id] ?? accounts.filter(a => a.name.toLowerCase().includes((search[row.id]||"").toLowerCase()))) : accounts;
-                return (
-                  <div key={row.id} style={{ border:"1px solid rgba(255,255,255,.1)", borderRadius:10, padding:"12px 14px", marginBottom:10, background:"rgba(255,255,255,.02)" }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                      <span style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase" }}>Entry {i+1}</span>
-                      <button onClick={()=>removeRow(row.id)} style={{ padding:"3px 8px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:12, cursor:"pointer", fontFamily:ff }}>✕</button>
+        {/* Entry table */}
+        <div style={{ border:"1px solid rgba(255,255,255,.08)", borderRadius:10, overflow:"hidden", marginBottom:14 }}>
+          <table style={{ width:"100%", borderCollapse:"collapse" }}>
+            <thead>
+              <tr style={{ background:"rgba(255,255,255,.05)", borderBottom:"1px solid rgba(255,255,255,.1)" }}>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"center", width:36 }}>#</th>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left", width:120 }}>A/c Code</th>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Account Title</th>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Narration</th>
+                <th style={{ padding:"9px 10px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"right", width:140 }}>Amount</th>
+                <th style={{ padding:"9px 10px", width:70 }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((row, i) => (
+                <tr key={row.id} style={{ borderBottom:"1px solid rgba(255,255,255,.04)" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.015)")}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                >
+                  <td style={{ padding:"5px 10px", fontSize:11, color:"rgba(255,255,255,.28)", fontWeight:600, textAlign:"center" }}>{i + 1}</td>
+                  <td style={{ padding:"4px 6px", width:120 }}>
+                    <input
+                      value={row.accountCode}
+                      placeholder="—"
+                      readOnly
+                      onClick={() => openPicker(row.id)}
+                      style={{ ...clickInp, fontSize:12, fontFamily:"monospace", letterSpacing:".03em" }}
+                    />
+                  </td>
+                  <td style={{ padding:"4px 6px" }}>
+                    <input
+                      value={row.accountName}
+                      placeholder="Click to select account…"
+                      readOnly
+                      onClick={() => openPicker(row.id)}
+                      style={{ ...clickInp, fontSize:12 }}
+                    />
+                  </td>
+                  <td style={{ padding:"4px 6px" }}>
+                    <input
+                      value={row.narration}
+                      onChange={e => setEntryField(row.id, "narration", e.target.value)}
+                      placeholder="Narration…"
+                      style={{ ...inp, fontSize:12 }}
+                    />
+                  </td>
+                  <td style={{ padding:"4px 6px" }}>
+                    <input
+                      value={row.amount}
+                      onChange={e => setEntryField(row.id, "amount", e.target.value)}
+                      placeholder="0.00"
+                      type="number"
+                      min="0"
+                      style={{ ...inp, fontSize:13, fontWeight:700, textAlign:"right" as const, color:BLUE }}
+                    />
+                  </td>
+                  <td style={{ padding:"4px 8px", textAlign:"center" }}>
+                    <div style={{ display:"flex", gap:4, justifyContent:"center" }}>
+                      <button
+                        title="Print Receipt"
+                        onClick={() => row.accountId && printReceipt(row, "NEW", date, mode, company)}
+                        disabled={!row.accountId || !Number(row.amount)}
+                        style={{ padding:"4px 8px", borderRadius:6, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", color:BLUE, fontSize:11, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId || !Number(row.amount)) ? 0.3 : 1 }}
+                      >🧾</button>
+                      <button
+                        onClick={() => removeRow(row.id)}
+                        style={{ padding:"4px 8px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:12, cursor:"pointer", fontFamily:ff }}
+                      >✕</button>
                     </div>
-                    <div style={{ position:"relative", marginBottom:8 }}>
-                      <input value={row.accountId ? row.accountName : (search[row.id]||"")} placeholder="Type account name…" style={{ ...inp, fontSize:12 }}
-                        onChange={e=>onAccountSearch(row.id, e.target.value)}
-                        onFocus={()=>setDropOpen(p=>({...p,[row.id]:true}))}
-                        onBlur={()=>setTimeout(()=>setDropOpen(p=>({...p,[row.id]:false})),180)}
-                      />
-                      {dropOpen[row.id] && listed.length > 0 && (
-                        <div style={{ position:"absolute", top:"calc(100% + 2px)", left:0, right:0, background:"#0e1120", border:"1px solid rgba(255,255,255,.12)", borderRadius:9, zIndex:100, maxHeight:200, overflowY:"auto", boxShadow:"0 8px 30px rgba(0,0,0,.5)" }}>
-                          {listed.slice(0,20).map(a=>(
-                            <div key={a.id} onMouseDown={()=>selectAccount(row.id,a)} style={{ padding:"8px 12px", fontSize:12, cursor:"pointer", color:"rgba(255,255,255,.75)" }} onMouseEnter={e=>(e.currentTarget.style.background="rgba(99,102,241,.1)")} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
-                              <span style={{ color:"rgba(255,255,255,.35)", fontSize:11, marginRight:8 }}>{a.code}</span>{a.name}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <input value={row.narration} onChange={e=>setEntryField(row.id,"narration",e.target.value)} placeholder="Narration…" style={{ ...inp, fontSize:12, marginBottom:8 }} />
-                    <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                      <input value={row.amount} onChange={e=>setEntryField(row.id,"amount",e.target.value)} placeholder="0.00" type="number" min="0" style={{ ...inp, flex:1, fontSize:14, fontWeight:700, textAlign:"right" as const, color:BLUE }} />
-                      <button title="Party Receipt" onClick={()=>row.accountId&&printReceipt(row,"NEW",date,mode,company)} disabled={!row.accountId||!Number(row.amount)} style={{ padding:"9px 12px", borderRadius:7, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", color:BLUE, fontSize:13, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId||!Number(row.amount))?0.3:1 }}>🧾</button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div style={{ border:"1px solid rgba(255,255,255,.08)", borderRadius:10, overflow:"hidden" }}>
-              <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                <thead>
-                  <tr style={{ background:"rgba(255,255,255,.04)", borderBottom:"1px solid rgba(255,255,255,.08)" }}>
-                    <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left", width:32 }}>#</th>
-                    <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Account / Party</th>
-                    <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"left" }}>Narration</th>
-                    <th style={{ padding:"9px 12px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em", textAlign:"right", width:130 }}>Amount</th>
-                    <th style={{ padding:"9px 12px", width:80 }}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map((row, i) => {
-                    const listed = search[row.id] ? (dropResults[row.id] ?? accounts.filter(a => a.name.toLowerCase().includes((search[row.id]||"").toLowerCase()))) : accounts;
-                    return (
-                      <tr key={row.id} style={{ borderBottom:"1px solid rgba(255,255,255,.05)" }}>
-                        <td style={{ padding:"8px 12px", fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:600 }}>{i + 1}</td>
-                        <td style={{ padding:"6px 8px", position:"relative" }}>
-                          <input value={row.accountId ? row.accountName : (search[row.id]||"")} placeholder="Type account name…" style={{ ...inp, fontSize:12 }}
-                            onChange={e=>onAccountSearch(row.id, e.target.value)}
-                            onFocus={()=>setDropOpen(p=>({...p,[row.id]:true}))}
-                            onBlur={()=>setTimeout(()=>setDropOpen(p=>({...p,[row.id]:false})),180)}
-                          />
-                          {dropOpen[row.id] && listed.length > 0 && (
-                            <div style={{ position:"absolute", top:"calc(100% + 2px)", left:8, right:8, background:"#0e1120", border:"1px solid rgba(255,255,255,.12)", borderRadius:9, zIndex:100, maxHeight:200, overflowY:"auto", boxShadow:"0 8px 30px rgba(0,0,0,.5)" }}>
-                              {listed.slice(0,20).map(a=>(
-                                <div key={a.id} onMouseDown={()=>selectAccount(row.id,a)} style={{ padding:"8px 12px", fontSize:12, cursor:"pointer", color:"rgba(255,255,255,.75)" }} onMouseEnter={e=>(e.currentTarget.style.background="rgba(99,102,241,.1)")} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
-                                  <span style={{ color:"rgba(255,255,255,.35)", fontSize:11, marginRight:8 }}>{a.code}</span>{a.name}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </td>
-                        <td style={{ padding:"6px 8px" }}><input value={row.narration} onChange={e=>setEntryField(row.id,"narration",e.target.value)} placeholder="Narration…" style={{ ...inp, fontSize:12 }} /></td>
-                        <td style={{ padding:"6px 8px" }}><input value={row.amount} onChange={e=>setEntryField(row.id,"amount",e.target.value)} placeholder="0.00" type="number" min="0" style={{ ...inp, fontSize:13, fontWeight:700, textAlign:"right" as const, color:BLUE }} /></td>
-                        <td style={{ padding:"6px 8px", textAlign:"center" }}>
-                          <div style={{ display:"flex", gap:4, justifyContent:"center" }}>
-                            <button title="Party Receipt Preview" onClick={()=>row.accountId&&printReceipt(row,"NEW",date,mode,company)} disabled={!row.accountId||!Number(row.amount)} style={{ padding:"4px 8px", borderRadius:6, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", color:BLUE, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId||!Number(row.amount))?0.3:1 }}>🧾</button>
-                            <button onClick={()=>removeRow(row.id)} style={{ padding:"4px 8px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:12, cursor:"pointer", fontFamily:ff }}>✕</button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        {/* Total + buttons */}
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", flexWrap:"wrap", gap:12 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+        {/* Add row + total + save */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
+          <button
+            onClick={() => setEntries(prev => [...prev, newRow()])}
+            style={{ padding:"8px 18px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.45)", fontSize:12, cursor:"pointer", fontFamily:ff }}
+          >
+            + Add Row
+          </button>
+          <div style={{ display:"flex", alignItems:"center", gap:14 }}>
             <div style={{ textAlign:"right" }}>
-              <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Total Amount</div>
+              <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Total Amount</div>
               <div style={{ fontSize:22, fontWeight:900, color:BLUE }}>{company?.baseCurrency || "PKR"} {fmt(total)}</div>
             </div>
             <button
               onClick={() => printVoucher(entries, "PREVIEW", date, mode, total, company, narration)}
               disabled={total <= 0}
               style={{ padding:"10px 18px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.65)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:total<=0?0.4:1 }}
-            >
-              🖨 Print Voucher
-            </button>
+            >🖨 Print Voucher</button>
             <button
               onClick={save}
               disabled={saving || total <= 0}
@@ -367,7 +451,7 @@ export default function CPVPage() {
         <table style={{ width:"100%", borderCollapse:"collapse" }}>
           <thead>
             <tr style={{ background:"rgba(255,255,255,.02)", borderBottom:"1px solid rgba(255,255,255,.07)" }}>
-              {["CPV #","Date","Accounts","Mode","Total","Actions"].map((h,i) => (
+              {["CPV #","Date","Accounts","Mode","Total","Actions"].map((h, i) => (
                 <th key={h} style={{ padding:"10px 14px", fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em", textAlign: i===4?"right":"left" }}>{h}</th>
               ))}
             </tr>
@@ -378,12 +462,14 @@ export default function CPVPage() {
             ) : vouchers.map((v, idx) => (
               <tr key={v.id} style={{ borderBottom: idx < vouchers.length-1 ? "1px solid rgba(255,255,255,.04)" : "none" }}
                 onMouseEnter={e => (e.currentTarget.style.background="rgba(255,255,255,.02)")}
-                onMouseLeave={e => (e.currentTarget.style.background="transparent")}>
+                onMouseLeave={e => (e.currentTarget.style.background="transparent")}
+              >
                 <td style={{ padding:"11px 14px", fontWeight:700, color:BLUE, fontSize:13 }}>{v.voucherNo}</td>
                 <td style={{ padding:"11px 14px", fontSize:12, color:"rgba(255,255,255,.5)" }}>{v.date}</td>
                 <td style={{ padding:"11px 14px", fontSize:12 }}>
                   {v.entries.map((e, i) => (
                     <div key={i} style={{ color:"rgba(255,255,255,.7)", marginBottom:i<v.entries.length-1?2:0 }}>
+                      <span style={{ color:"rgba(255,255,255,.3)", fontSize:11, marginRight:6, fontFamily:"monospace" }}>{e.accountCode}</span>
                       {e.accountName} <span style={{ color:BLUE, fontWeight:700 }}>Rs {fmt(e.amount)}</span>
                     </div>
                   ))}
@@ -394,13 +480,15 @@ export default function CPVPage() {
                   <div style={{ display:"flex", gap:6 }}>
                     <button
                       onClick={() => {
-                        const fakeEntries: EntryRow[] = v.entries.map(e => ({ id: nextId++, accountId: e.accountId, accountName: e.accountName, amount: String(e.amount), narration: e.narration }));
+                        const fakeEntries: EntryRow[] = v.entries.map(e => ({ id: nextId++, accountId: e.accountId, accountCode: e.accountCode, accountName: e.accountName, amount: String(e.amount), narration: e.narration }));
                         printVoucher(fakeEntries, v.voucherNo, v.date, v.paymentMode, v.totalAmount, company, v.narration);
                       }}
-                      style={{ padding:"5px 12px", borderRadius:7, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", color:BLUE, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:ff }}>
-                      🖨 Print
-                    </button>
-                    <button onClick={() => deleteVoucher(v.id)} style={{ padding:"5px 10px", borderRadius:7, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", fontFamily:ff }}>✕</button>
+                      style={{ padding:"5px 12px", borderRadius:7, background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)", color:BLUE, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:ff }}
+                    >🖨 Print</button>
+                    <button
+                      onClick={() => deleteVoucher(v.id)}
+                      style={{ padding:"5px 10px", borderRadius:7, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", fontFamily:ff }}
+                    >✕</button>
                   </div>
                 </td>
               </tr>
