@@ -354,6 +354,10 @@ model VoucherEntry {
 
   voucher Voucher @relation(fields: [voucherId], references: [id])
   account Account @relation(fields: [accountId], references: [id])
+
+  @@index([voucherId])
+  @@index([accountId])
+  @@index([companyId, accountId])
 }
 
 model StockRate {
