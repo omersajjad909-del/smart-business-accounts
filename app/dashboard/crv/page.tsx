@@ -59,10 +59,17 @@ function matchesDateOp(vIso: string, query: string): boolean {
   return false;
 }
 
-function runQuery(vouchers: Voucher[], crvNo: string, dateQ: string): Voucher[] {
+function runQuery(vouchers: Voucher[], crvNo: string, dateQ: string, party: string): Voucher[] {
   let r = [...vouchers];
   if (crvNo.trim()) { const q = crvNo.trim().toLowerCase(); r = r.filter(v => v.voucherNo.toLowerCase().includes(q)); }
   if (dateQ.trim()) r = r.filter(v => matchesDateOp(v.date, dateQ));
+  if (party.trim()) {
+    const q = party.trim().toLowerCase();
+    r = r.filter(v => v.entries.some(e =>
+      e.accountName.toLowerCase().includes(q) ||
+      (e.accountCode || "").toLowerCase().includes(q)
+    ));
+  }
   return r.sort((a, b) => a.date.localeCompare(b.date));
 }
 
@@ -155,6 +162,7 @@ export default function CRVPage() {
   const [queryMode,    setQueryMode]    = useState(false);
   const [queryCrvNo,   setQueryCrvNo]   = useState("");
   const [queryDate,    setQueryDate]    = useState("");
+  const [queryParty,   setQueryParty]   = useState("");
   const [queryResults, setQueryResults] = useState<Voucher[]>([]);
   const [queryIdx,     setQueryIdx]     = useState(-1);
 
@@ -224,6 +232,7 @@ export default function CRVPage() {
     setQueryMode(true);
     setQueryCrvNo("");
     setQueryDate("");
+    setQueryParty("");
     setQueryResults([]);
     setQueryIdx(-1);
   }
@@ -234,8 +243,8 @@ export default function CRVPage() {
     setQueryResults([]);
   }
 
-  function executeQuery(crvNo: string, dateQ: string) {
-    const results = runQuery(vouchers, crvNo, dateQ);
+  function executeQuery(crvNo: string, dateQ: string, party: string) {
+    const results = runQuery(vouchers, crvNo, dateQ, party);
     if (results.length === 0) { toast.error("Koi record nahi mila"); return; }
     setQueryResults(results);
     setQueryIdx(0);
@@ -474,7 +483,7 @@ export default function CRVPage() {
           <div style={{ marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
             <span style={{ fontSize:12, color:"rgba(250,204,21,.7)" }}>Enter criteria below — leave blank to get all records. Use <b style={{color:"#facc15"}}>&gt;</b>, <b style={{color:"#facc15"}}>&lt;</b>, <b style={{color:"#facc15"}}>&gt;=</b> for date range.</span>
           </div>
-          <div style={{ display:"grid", gridTemplateColumns:"200px 260px 1fr", gap:16, marginBottom:24 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"180px 240px 1fr", gap:16, marginBottom:24 }}>
             <div>
               <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>CRV # (e.g. CRV-5)</label>
               <input
@@ -483,7 +492,7 @@ export default function CRVPage() {
                 onChange={e => setQueryCrvNo(e.target.value)}
                 placeholder="CRV-1 or blank for all…"
                 style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)", color:"rgba(255,255,255,.85)" }}
-                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCrvNo, queryDate); } if (e.key === "Escape") exitQueryMode(); }}
+                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCrvNo, queryDate, queryParty); } if (e.key === "Escape") exitQueryMode(); }}
               />
             </div>
             <div>
@@ -493,13 +502,23 @@ export default function CRVPage() {
                 onChange={e => setQueryDate(e.target.value)}
                 placeholder=">010125 or 01-01-2025 or blank…"
                 style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)", color:"rgba(255,255,255,.85)" }}
-                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCrvNo, queryDate); } if (e.key === "Escape") exitQueryMode(); }}
+                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCrvNo, queryDate, queryParty); } if (e.key === "Escape") exitQueryMode(); }}
+              />
+            </div>
+            <div>
+              <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>Party / Account (name or code)</label>
+              <input
+                value={queryParty}
+                onChange={e => setQueryParty(e.target.value)}
+                placeholder="e.g. Ali, AR-CUST, or blank…"
+                style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)", color:"rgba(255,255,255,.85)" }}
+                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCrvNo, queryDate, queryParty); } if (e.key === "Escape") exitQueryMode(); }}
               />
             </div>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <button
-              onClick={() => executeQuery(queryCrvNo, queryDate)}
+              onClick={() => executeQuery(queryCrvNo, queryDate, queryParty)}
               style={{ padding:"10px 32px", borderRadius:9, background:"linear-gradient(135deg,#facc15,#ca8a04)", border:"none", color:"#000", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:ff, display:"flex", alignItems:"center", gap:8 }}
             >
               <span style={{ background:"rgba(0,0,0,.2)", borderRadius:4, padding:"1px 7px", fontSize:11 }}>F8</span>
