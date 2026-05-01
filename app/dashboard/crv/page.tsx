@@ -245,12 +245,12 @@ export default function CRVPage() {
 
   function executeQuery(crvNo: string, dateQ: string, party: string) {
     const results = runQuery(vouchers, crvNo, dateQ, party);
-    if (results.length === 0) { toast.error("Koi record nahi mila"); return; }
+    if (results.length === 0) { toast.error("No records found matching your criteria"); return; }
     setQueryResults(results);
     setQueryIdx(0);
     setQueryMode(false);
     applyVoucher(results[0]);
-    toast.success(`${results.length} record${results.length > 1 ? "s" : ""} mila — ${results[0].voucherNo}`);
+    toast.success(`${results.length} record${results.length > 1 ? "s" : ""} found — ${results[0].voucherNo}`);
   }
 
   function navTo(idx: number) {
@@ -306,8 +306,8 @@ export default function CRVPage() {
 
   async function save() {
     const valid = entries.filter(e => e.accountId && Number(e.amount) > 0);
-    if (!valid.length) { toast.error("Kam az kam aik valid entry add karein"); return; }
-    if (mode === "BANK" && !bankId) { toast.error("Bank account select karein"); return; }
+    if (!valid.length) { toast.error("At least one valid entry with an account and amount is required"); return; }
+    if (mode === "BANK" && !bankId) { toast.error("Please select a bank account"); return; }
     setSaving(true);
     try {
       const r = await fetch("/api/crv", {
@@ -316,7 +316,7 @@ export default function CRVPage() {
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
-      toast.success(`CRV ${d.voucherNo} save ho gaya!`);
+      toast.success(`CRV ${d.voucherNo} saved successfully!`);
       setEntries(initRows()); setNarration(""); setMode("CASH"); setBankId("");
       fetch("/api/crv", { headers: h() }).then(r => r.json()).then(v => Array.isArray(v) && setVouchers(v));
     } catch (e: any) { toast.error(e.message); }
@@ -324,7 +324,7 @@ export default function CRVPage() {
   }
 
   async function deleteVoucher(id: string) {
-    if (!confirm("Ye voucher delete karein?")) return;
+    if (!confirm("Delete this voucher? This action cannot be undone.")) return;
     const r = await fetch(`/api/crv?id=${id}`, { method: "DELETE", headers: h() });
     if (r.ok) { toast.success("Deleted"); setVouchers(prev => prev.filter(v => v.id !== id)); }
   }
@@ -429,7 +429,7 @@ export default function CRVPage() {
             {queryMode ? "🔍 QUERY MODE — CRV" : "Cash Receipt Voucher (CRV)"}
           </h1>
           <p style={{ margin:"4px 0 0", fontSize:12, color: queryMode ? "rgba(250,204,21,.5)" : "rgba(255,255,255,.35)" }}>
-            {queryMode ? "Search criteria likho phir F8 press karo" : "Customers se cash ya bank payment receive karein"}
+            {queryMode ? "Enter search criteria then press F8 to execute" : "Receive cash or bank payments from customers"}
           </p>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
