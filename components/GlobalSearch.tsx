@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { hasPermission } from "@/lib/hasPermission";
+import { PERMISSIONS } from "@/lib/permissions";
 
 type SearchResultItem = {
   id: string;
@@ -36,47 +38,49 @@ type NavPage = {
   url: string;
   icon: string;
   tags: string[];
+  permission?: string | null;
 };
 
 const NAV_PAGES: NavPage[] = [
-  { title: "Dashboard", url: "/dashboard", icon: "🏠", tags: ["home", "overview", "dashboard"] },
-  { title: "Owner Dashboard", url: "/dashboard/owner-dashboard", icon: "👑", tags: ["owner", "kpi", "summary"] },
-  { title: "Accounts", url: "/dashboard/accounts", icon: "📒", tags: ["accounts", "ledger", "chart"] },
-  { title: "Items / Products", url: "/dashboard/items-new", icon: "📦", tags: ["items", "products", "inventory", "stock"] },
-  { title: "Inventory", url: "/dashboard/inventory", icon: "🏷️", tags: ["inventory", "stock", "warehouse", "godown"] },
-  { title: "Sales Invoice", url: "/dashboard/sales-invoice", icon: "🧾", tags: ["sales", "invoice", "bill"] },
-  { title: "Purchase Invoice", url: "/dashboard/purchase-invoice", icon: "📥", tags: ["purchase", "invoice", "buy"] },
-  { title: "Quotation", url: "/dashboard/quotation", icon: "📋", tags: ["quotation", "quote", "estimate"] },
-  { title: "Purchase Order", url: "/dashboard/purchase-order", icon: "🛒", tags: ["purchase", "order", "po"] },
-  { title: "Goods Receipt Note", url: "/dashboard/grn", icon: "📦", tags: ["grn", "goods receipt", "received"] },
-  { title: "Delivery Challan", url: "/dashboard/delivery-challan", icon: "🚚", tags: ["delivery", "challan", "dispatch"] },
-  { title: "Sales Return", url: "/dashboard/sale-return", icon: "↩️", tags: ["return", "sales", "refund"] },
-  { title: "Payment Receipts", url: "/dashboard/payment-receipts", icon: "💳", tags: ["payment", "receipt", "receive"] },
-  { title: "Journal Voucher", url: "/dashboard/jv", icon: "📝", tags: ["journal", "voucher", "entry", "jv"] },
-  { title: "CRV", url: "/dashboard/crv", icon: "💰", tags: ["crv", "cash", "receipt voucher"] },
-  { title: "CPV", url: "/dashboard/cpv", icon: "💸", tags: ["cpv", "cash", "payment voucher"] },
-  { title: "Expense Vouchers", url: "/dashboard/expense-vouchers", icon: "🧾", tags: ["expense", "voucher"] },
-  { title: "Bank Reconciliation", url: "/dashboard/bank-reconciliation", icon: "🏦", tags: ["bank", "reconciliation", "statement"] },
-  { title: "Employees", url: "/dashboard/employees", icon: "👥", tags: ["employees", "staff", "hr", "team"] },
-  { title: "Attendance", url: "/dashboard/attendance", icon: "📅", tags: ["attendance", "present", "leave"] },
-  { title: "Payroll", url: "/dashboard/payroll", icon: "💵", tags: ["payroll", "salary", "wages"] },
-      { title: "CRM", url: "/dashboard/crm", icon: "🤝", tags: ["crm", "customers", "contacts", "leads"] },
-  { title: "CRM Contacts", url: "/dashboard/crm/contacts", icon: "📇", tags: ["crm", "contacts", "customer", "supplier", "lead", "partner"] },
-  { title: "CRM Opportunities", url: "/dashboard/crm/opportunities", icon: "🎯", tags: ["crm", "opportunity", "pipeline", "deal"] },
-  { title: "CRM Interactions", url: "/dashboard/crm/interactions", icon: "💬", tags: ["crm", "interaction", "calls", "meetings", "followup"] },
-  { title: "Reports Hub", url: "/dashboard/reports", icon: "📊", tags: ["reports", "analytics"] },
-  { title: "Ledger Report", url: "/dashboard/reports/ledger", icon: "📘", tags: ["report", "ledger"] },
-  { title: "Sales Report", url: "/dashboard/reports/sales", icon: "📈", tags: ["report", "sales"] },
-  { title: "Stock Report", url: "/dashboard/reports/stock/valuation", icon: "📦", tags: ["report", "stock", "valuation"] },
-  { title: "Ageing Report", url: "/dashboard/reports/ageing", icon: "⏳", tags: ["report", "ageing", "receivable", "payable"] },
-  { title: "AI Center", url: "/dashboard/ai-center", icon: "🤖", tags: ["ai", "assistant", "insights"] },
-  { title: "AI Assistant", url: "/dashboard/ai-assistant", icon: "🧠", tags: ["ai", "assistant", "chat"] },
+  { title: "Dashboard",            url: "/dashboard",                          icon: "🏠", tags: ["home", "overview", "dashboard"],                           permission: PERMISSIONS.VIEW_DASHBOARD },
+  { title: "Owner Dashboard",      url: "/dashboard/owner-dashboard",          icon: "👑", tags: ["owner", "kpi", "summary"],                                permission: PERMISSIONS.VIEW_DASHBOARD },
+  { title: "Accounts",             url: "/dashboard/accounts",                 icon: "📒", tags: ["accounts", "ledger", "chart"],                            permission: PERMISSIONS.VIEW_ACCOUNTS },
+  { title: "Items / Products",     url: "/dashboard/items-new",                icon: "📦", tags: ["items", "products", "inventory", "stock"],                permission: PERMISSIONS.CREATE_ITEMS },
+  { title: "Inventory",            url: "/dashboard/inventory",                icon: "🏷️", tags: ["inventory", "stock", "warehouse", "godown"],             permission: PERMISSIONS.VIEW_INVENTORY },
+  { title: "Sales Invoice",        url: "/dashboard/sales-invoice",            icon: "🧾", tags: ["sales", "invoice", "bill"],                              permission: PERMISSIONS.CREATE_SALES_INVOICE },
+  { title: "Purchase Invoice",     url: "/dashboard/purchase-invoice",         icon: "📥", tags: ["purchase", "invoice", "buy"],                            permission: PERMISSIONS.CREATE_PURCHASE_INVOICE },
+  { title: "Quotation",            url: "/dashboard/quotation",                icon: "📋", tags: ["quotation", "quote", "estimate"],                        permission: PERMISSIONS.CREATE_QUOTATION },
+  { title: "Purchase Order",       url: "/dashboard/purchase-order",           icon: "🛒", tags: ["purchase", "order", "po"],                               permission: PERMISSIONS.CREATE_PURCHASE_ORDER },
+  { title: "Goods Receipt Note",   url: "/dashboard/grn",                      icon: "📦", tags: ["grn", "goods receipt", "received"],                      permission: PERMISSIONS.VIEW_INVENTORY },
+  { title: "Delivery Challan",     url: "/dashboard/delivery-challan",         icon: "🚚", tags: ["delivery", "challan", "dispatch"],                       permission: PERMISSIONS.CREATE_DELIVERY_CHALLAN },
+  { title: "Sales Return",         url: "/dashboard/sale-return",              icon: "↩️", tags: ["return", "sales", "refund"],                             permission: PERMISSIONS.CREATE_SALE_RETURN },
+  { title: "Payment Receipts",     url: "/dashboard/payment-receipts",         icon: "💳", tags: ["payment", "receipt", "receive"],                         permission: PERMISSIONS.PAYMENT_RECEIPTS },
+  { title: "Journal Voucher (JV)", url: "/dashboard/jv",                       icon: "📝", tags: ["journal", "voucher", "entry", "jv"],                     permission: PERMISSIONS.CREATE_JV },
+  { title: "CRV (Cash Receipt)",   url: "/dashboard/crv",                      icon: "💰", tags: ["crv", "cash", "receipt voucher"],                        permission: PERMISSIONS.CREATE_CRV },
+  { title: "CPV (Cash Payment)",   url: "/dashboard/cpv",                      icon: "💸", tags: ["cpv", "cash", "payment voucher"],                        permission: PERMISSIONS.CREATE_CPV },
+  { title: "Expense Vouchers",     url: "/dashboard/expense-vouchers",         icon: "🧾", tags: ["expense", "voucher"],                                    permission: PERMISSIONS.EXPENSE_VOUCHERS },
+  { title: "Bank Reconciliation",  url: "/dashboard/bank-reconciliation",      icon: "🏦", tags: ["bank", "reconciliation", "statement"],                   permission: PERMISSIONS.BANK_RECONCILIATION },
+  { title: "Employees",            url: "/dashboard/employees",                icon: "👥", tags: ["employees", "staff", "hr", "team"],                      permission: PERMISSIONS.VIEW_HR_PAYROLL },
+  { title: "Attendance",           url: "/dashboard/attendance",               icon: "📅", tags: ["attendance", "present", "leave"],                        permission: PERMISSIONS.VIEW_HR_PAYROLL },
+  { title: "Payroll",              url: "/dashboard/payroll",                  icon: "💵", tags: ["payroll", "salary", "wages"],                            permission: PERMISSIONS.VIEW_HR_PAYROLL },
+  { title: "CRM",                  url: "/dashboard/crm",                      icon: "🤝", tags: ["crm", "customers", "contacts", "leads"],                 permission: PERMISSIONS.VIEW_CRM },
+  { title: "CRM Contacts",         url: "/dashboard/crm/contacts",             icon: "📇", tags: ["crm", "contacts", "customer", "supplier", "lead"],       permission: PERMISSIONS.VIEW_CRM },
+  { title: "CRM Opportunities",    url: "/dashboard/crm/opportunities",        icon: "🎯", tags: ["crm", "opportunity", "pipeline", "deal"],                permission: PERMISSIONS.VIEW_CRM },
+  { title: "CRM Interactions",     url: "/dashboard/crm/interactions",         icon: "💬", tags: ["crm", "interaction", "calls", "meetings", "followup"],   permission: PERMISSIONS.VIEW_CRM },
+  { title: "Reports Hub",          url: "/dashboard/reports",                  icon: "📊", tags: ["reports", "analytics"],                                  permission: PERMISSIONS.VIEW_REPORTS },
+  { title: "Ledger Report",        url: "/dashboard/reports/ledger",           icon: "📘", tags: ["report", "ledger"],                                      permission: PERMISSIONS.VIEW_LEDGER_REPORT },
+  { title: "Sales Report",         url: "/dashboard/reports/sales",            icon: "📈", tags: ["report", "sales"],                                       permission: PERMISSIONS.VIEW_SALES_REPORT },
+  { title: "Stock Report",         url: "/dashboard/reports/stock/valuation",  icon: "📦", tags: ["report", "stock", "valuation"],                          permission: PERMISSIONS.VIEW_INVENTORY_REPORTS },
+  { title: "Ageing Report",        url: "/dashboard/reports/ageing",           icon: "⏳", tags: ["report", "ageing", "receivable", "payable"],             permission: PERMISSIONS.VIEW_AGEING_REPORT },
+  { title: "AI Center",            url: "/dashboard/ai-center",                icon: "🤖", tags: ["ai", "assistant", "insights"],                           permission: PERMISSIONS.AI_ASSISTANT },
+  { title: "AI Assistant",         url: "/dashboard/ai-assistant",             icon: "🧠", tags: ["ai", "assistant", "chat"],                               permission: PERMISSIONS.AI_ASSISTANT },
 ];
 
-function searchPages(query: string) {
+function searchPages(query: string, user: ReturnType<typeof getCurrentUser>) {
   const normalized = query.toLowerCase().trim();
   if (normalized.length < 2) return [];
   return NAV_PAGES.filter((page) => {
+    if (page.permission && !hasPermission(user, page.permission)) return false;
     const titleHit = page.title.toLowerCase().includes(normalized);
     const tagHit = page.tags.some((tag) => tag.toLowerCase().includes(normalized));
     return titleHit || tagHit;
@@ -90,6 +94,7 @@ export default function GlobalSearch() {
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const currentUser = getCurrentUser();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -143,7 +148,7 @@ export default function GlobalSearch() {
     router.push(url);
   }
 
-  const pageMatches = searchPages(query);
+  const pageMatches = searchPages(query, currentUser);
   const dataSections = results
     ? [
         { label: "Customers", items: results.customers || [], icon: "👤" },
