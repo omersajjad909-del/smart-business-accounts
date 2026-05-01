@@ -21,20 +21,49 @@ function newRow(): EntryRow { return { id: nextId++, accountId: "", accountCode:
 function initRows() { return Array.from({ length: 8 }, () => newRow()); }
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function fmtDate(iso: string) { const [y, m, d] = iso.split("-"); return `${d}-${m}-${y}`; }
-function dateMatchesQuery(iso: string, q: string): boolean {
-  const [y, m, d] = iso.split("-");
-  const display = `${d}-${m}-${y}`;
-  if (display.includes(q) || iso.includes(q)) return true;
-  const digits = q.replace(/[-\/\.]/g, "");
+
+function parseIsoFromInput(raw: string): string {
+  const digits = raw.replace(/[-\/\.]/g, "");
   if (/^\d{6}$/.test(digits)) {
     const yy = digits.slice(4, 6);
     const yyyy = parseInt(yy) >= 50 ? `19${yy}` : `20${yy}`;
-    return iso === `${yyyy}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
+    return `${yyyy}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
   }
-  if (/^\d{8}$/.test(digits)) {
-    return iso === `${digits.slice(4, 8)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
-  }
+  if (/^\d{8}$/.test(digits)) return `${digits.slice(4, 8)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  return "";
+}
+
+function parseDateOp(raw: string): { op: string; iso: string } | null {
+  let op = "=", rest = raw.trim();
+  if (rest.startsWith(">=")) { op = ">="; rest = rest.slice(2).trim(); }
+  else if (rest.startsWith("<=")) { op = "<="; rest = rest.slice(2).trim(); }
+  else if (rest.startsWith(">"))  { op = ">";  rest = rest.slice(1).trim(); }
+  else if (rest.startsWith("<"))  { op = "<";  rest = rest.slice(1).trim(); }
+  else if (rest.startsWith("="))  { op = "=";  rest = rest.slice(1).trim(); }
+  const iso = parseIsoFromInput(rest);
+  if (!iso) return null;
+  return { op, iso };
+}
+
+function matchesDateOp(vIso: string, query: string): boolean {
+  if (!query.trim()) return true;
+  const p = parseDateOp(query);
+  if (!p) return false;
+  const { op, iso } = p;
+  if (op === "=")  return vIso === iso;
+  if (op === ">")  return vIso > iso;
+  if (op === "<")  return vIso < iso;
+  if (op === ">=") return vIso >= iso;
+  if (op === "<=") return vIso <= iso;
   return false;
+}
+
+function runQuery(vouchers: Voucher[], crvNo: string, dateQ: string): Voucher[] {
+  let r = [...vouchers];
+  if (crvNo.trim()) { const q = crvNo.trim().toLowerCase(); r = r.filter(v => v.voucherNo.toLowerCase().includes(q)); }
+  if (dateQ.trim()) r = r.filter(v => matchesDateOp(v.date, dateQ));
+  return r.sort((a, b) => a.date.localeCompare(b.date));
 }
 
 function printReceipt(entry: EntryRow, voucherNo: string, date: string, mode: string, company: any) {
@@ -122,10 +151,12 @@ export default function CRVPage() {
   const [narration, setNarration] = useState("");
   const [entries,   setEntries]   = useState<EntryRow[]>(initRows);
 
-  // ── Find Record (F7/F8) ─────────────────────────────────────────────────────
-  const [findOpen,     setFindOpen]     = useState(false);
-  const [findSearch,   setFindSearch]   = useState("");
-  const [findSelected, setFindSelected] = useState<string>("");
+  // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
+  const [queryMode,    setQueryMode]    = useState(false);
+  const [queryCrvNo,   setQueryCrvNo]   = useState("");
+  const [queryDate,    setQueryDate]    = useState("");
+  const [queryResults, setQueryResults] = useState<Voucher[]>([]);
+  const [queryIdx,     setQueryIdx]     = useState(-1);
 
   // ── Account Picker ──────────────────────────────────────────────────────────
   const [pickerOpen,     setPickerOpen]     = useState(false);
@@ -170,23 +201,8 @@ export default function CRVPage() {
 
   function closePicker() { setPickerOpen(false); setPickerRowId(null); }
 
-  // ── F7/F8 Find ──────────────────────────────────────────────────────────────
-  const filteredFindVouchers = findSearch.trim()
-    ? vouchers.filter(v =>
-        v.voucherNo.toLowerCase().includes(findSearch.toLowerCase()) ||
-        dateMatchesQuery(v.date, findSearch.trim()) ||
-        v.entries.some(e => e.accountName.toLowerCase().includes(findSearch.toLowerCase()))
-      )
-    : vouchers;
-
-  function openFind() {
-    setFindSearch("");
-    setFindSelected(vouchers[0]?.id || "");
-    setFindOpen(true);
-  }
-  function closeFind() { setFindOpen(false); }
-
-  function loadVoucher(v: Voucher) {
+  // ── Query Mode helpers ───────────────────────────────────────────────────────
+  function applyVoucher(v: Voucher) {
     setDate(v.date);
     setMode(v.paymentMode as "CASH" | "BANK");
     setNarration(v.narration || "");
@@ -202,18 +218,50 @@ export default function CRVPage() {
     }));
     while (loaded.length < 8) loaded.push(newRow());
     setEntries(loaded);
-    closeFind();
-    toast.success(`${v.voucherNo} loaded`);
+  }
+
+  function enterQueryMode() {
+    setQueryMode(true);
+    setQueryCrvNo("");
+    setQueryDate("");
+    setQueryResults([]);
+    setQueryIdx(-1);
+  }
+
+  function exitQueryMode() {
+    setQueryMode(false);
+    setQueryIdx(-1);
+    setQueryResults([]);
+  }
+
+  function executeQuery(crvNo: string, dateQ: string) {
+    const results = runQuery(vouchers, crvNo, dateQ);
+    if (results.length === 0) { toast.error("Koi record nahi mila"); return; }
+    setQueryResults(results);
+    setQueryIdx(0);
+    setQueryMode(false);
+    applyVoucher(results[0]);
+    toast.success(`${results.length} record${results.length > 1 ? "s" : ""} mila — ${results[0].voucherNo}`);
+  }
+
+  function navTo(idx: number) {
+    if (idx < 0 || idx >= queryResults.length) return;
+    setQueryIdx(idx);
+    applyVoucher(queryResults[idx]);
   }
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "F7") { e.preventDefault(); if (!pickerOpen) openFind(); }
+      if (pickerOpen) return;
+      if (e.key === "F7") { e.preventDefault(); enterQueryMode(); }
+      if (e.key === "Escape" && queryMode) { e.preventDefault(); exitQueryMode(); }
+      if (e.key === "PageDown" && queryIdx >= 0) { e.preventDefault(); navTo(queryIdx + 1); }
+      if (e.key === "PageUp"   && queryIdx >= 0) { e.preventDefault(); navTo(queryIdx - 1); }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pickerOpen]);
+  }, [pickerOpen, queryMode, queryIdx, queryResults]);
 
   function confirmPicker(acc: Account) {
     if (pickerRowId === null) return;
@@ -278,112 +326,6 @@ export default function CRVPage() {
 
   return (
     <div style={{ padding:"24px 28px", fontFamily:ff, color:"rgba(255,255,255,.85)", maxWidth:1200 }}>
-
-      {/* ── F7 FIND RECORD MODAL ── */}
-      {findOpen && (
-        <div
-          style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.82)", zIndex:3000, display:"flex", alignItems:"center", justifyContent:"center" }}
-          onClick={closeFind}
-        >
-          <div
-            style={{ background:"#0a0f1e", border:"1px solid rgba(34,197,94,.25)", borderRadius:14, width:780, maxHeight:600, display:"flex", flexDirection:"column", boxShadow:"0 24px 80px rgba(0,0,0,.95)" }}
-            onClick={e => e.stopPropagation()}
-          >
-            {/* header */}
-            <div style={{ padding:"14px 20px", borderBottom:"1px solid rgba(255,255,255,.08)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                <span style={{ fontSize:11, fontWeight:800, background:GREEN, color:"#000", borderRadius:5, padding:"2px 8px", letterSpacing:".05em" }}>F7</span>
-                <span style={{ fontWeight:800, fontSize:15, color:"rgba(255,255,255,.9)", letterSpacing:".04em" }}>FIND CRV RECORD</span>
-              </div>
-              <span style={{ fontSize:11, color:"rgba(255,255,255,.3)" }}>{filteredFindVouchers.length} records</span>
-            </div>
-            {/* search */}
-            <div style={{ padding:"10px 20px", borderBottom:"1px solid rgba(255,255,255,.06)" }}>
-              <input
-                autoFocus
-                placeholder="Search by voucher no, date (e.g. 01-05-2026 or 010526), or account name…"
-                value={findSearch}
-                onChange={e => { setFindSearch(e.target.value); setFindSelected(filteredFindVouchers[0]?.id || ""); }}
-                onKeyDown={e => {
-                  if (e.key === "ArrowDown") {
-                    e.preventDefault();
-                    const idx = filteredFindVouchers.findIndex(v => v.id === findSelected);
-                    const next = filteredFindVouchers[Math.min(idx + 1, filteredFindVouchers.length - 1)];
-                    if (next) setFindSelected(next.id);
-                  }
-                  if (e.key === "ArrowUp") {
-                    e.preventDefault();
-                    const idx = filteredFindVouchers.findIndex(v => v.id === findSelected);
-                    const prev = filteredFindVouchers[Math.max(idx - 1, 0)];
-                    if (prev) setFindSelected(prev.id);
-                  }
-                  if (e.key === "Enter" || e.key === "F8") {
-                    e.preventDefault();
-                    const v = filteredFindVouchers.find(v => v.id === findSelected) || filteredFindVouchers[0];
-                    if (v) loadVoucher(v);
-                  }
-                  if (e.key === "Escape") closeFind();
-                }}
-                style={{ ...inp, fontSize:13, width:"100%", boxSizing:"border-box" }}
-              />
-            </div>
-            {/* list */}
-            <div style={{ flex:1, overflowY:"auto", maxHeight:400 }}>
-              {filteredFindVouchers.length === 0 ? (
-                <div style={{ padding:48, textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:13 }}>No records found</div>
-              ) : (
-                <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                  <thead>
-                    <tr style={{ background:"rgba(255,255,255,.04)", position:"sticky", top:0 }}>
-                      {["CRV #","Date","Account(s)","Mode","Total"].map((h, i) => (
-                        <th key={h} style={{ padding:"8px 14px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em", textAlign: i===4 ? "right" : "left" }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredFindVouchers.map(v => (
-                      <tr
-                        key={v.id}
-                        tabIndex={0}
-                        onClick={() => setFindSelected(v.id)}
-                        onDoubleClick={() => loadVoucher(v)}
-                        onKeyDown={e => { if (e.key === "Enter" || e.key === "F8") { e.preventDefault(); loadVoucher(v); } }}
-                        style={{ background: findSelected === v.id ? "rgba(34,197,94,.18)" : "transparent", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,.04)", outline:"none" }}
-                        onMouseEnter={e => { if (findSelected !== v.id) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.04)"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = findSelected === v.id ? "rgba(34,197,94,.18)" : "transparent"; }}
-                      >
-                        <td style={{ padding:"10px 14px", fontWeight:800, color:GREEN, fontSize:13 }}>{v.voucherNo}</td>
-                        <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(255,255,255,.55)" }}>{fmtDate(v.date)}</td>
-                        <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(255,255,255,.75)" }}>
-                          {v.entries.map((e, i) => <div key={i}>{e.accountName}</div>)}
-                        </td>
-                        <td style={{ padding:"10px 14px", fontSize:11, color:"rgba(255,255,255,.4)" }}>{v.paymentMode}</td>
-                        <td style={{ padding:"10px 14px", fontSize:13, fontWeight:700, color:GREEN, textAlign:"right" }}>Rs {fmt(v.totalAmount)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-            {/* footer */}
-            <div style={{ padding:"12px 20px", borderTop:"1px solid rgba(255,255,255,.07)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <span style={{ fontSize:11, color:"rgba(255,255,255,.25)" }}>
-                <b style={{ color:"rgba(255,255,255,.45)" }}>↑↓</b> Navigate &nbsp;·&nbsp; <b style={{ color:"rgba(255,255,255,.45)" }}>Enter / F8</b> Open &nbsp;·&nbsp; <b style={{ color:"rgba(255,255,255,.45)" }}>Esc</b> Cancel
-              </span>
-              <div style={{ display:"flex", gap:8 }}>
-                <button onClick={closeFind} style={{ padding:"8px 18px", borderRadius:8, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.55)", fontSize:13, cursor:"pointer", fontFamily:ff }}>Cancel</button>
-                <button
-                  onClick={() => { const v = filteredFindVouchers.find(v => v.id === findSelected) || filteredFindVouchers[0]; if (v) loadVoucher(v); }}
-                  disabled={filteredFindVouchers.length === 0}
-                  style={{ padding:"8px 24px", borderRadius:8, background:`linear-gradient(135deg,${GREEN},#16a34a)`, border:"none", color:"#000", fontSize:13, fontWeight:800, cursor:"pointer", fontFamily:ff, opacity:filteredFindVouchers.length===0?0.4:1, letterSpacing:".04em" }}
-                >
-                  F8 — Open
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── CHART OF ACCOUNT MODAL ── */}
       {pickerOpen && (
@@ -474,38 +416,105 @@ export default function CRVPage() {
       {/* Title */}
       <div style={{ marginBottom:20, display:"flex", alignItems:"flex-start", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
         <div>
-          <h1 style={{ margin:0, fontSize:22, fontWeight:800, color:GREEN }}>Cash Receipt Voucher (CRV)</h1>
-          <p style={{ margin:"4px 0 0", fontSize:12, color:"rgba(255,255,255,.35)" }}>Customers se cash ya bank payment receive karein</p>
+          <h1 style={{ margin:0, fontSize:22, fontWeight:800, color: queryMode ? "#facc15" : GREEN }}>
+            {queryMode ? "🔍 QUERY MODE — CRV" : "Cash Receipt Voucher (CRV)"}
+          </h1>
+          <p style={{ margin:"4px 0 0", fontSize:12, color: queryMode ? "rgba(250,204,21,.5)" : "rgba(255,255,255,.35)" }}>
+            {queryMode ? "Search criteria likho phir F8 press karo" : "Customers se cash ya bank payment receive karein"}
+          </p>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <div style={{ background:"rgba(34,197,94,.1)", border:"1px solid rgba(34,197,94,.25)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
-            <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Next CRV #</div>
-            <div style={{ fontSize:16, fontWeight:800, color:GREEN }}>
-              CRV-{vouchers.length + 1}
+          {/* Browse mode: navigation */}
+          {queryIdx >= 0 && !queryMode && (
+            <div style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(34,197,94,.08)", border:"1px solid rgba(34,197,94,.2)", borderRadius:10, padding:"6px 12px" }}>
+              <button onClick={() => navTo(queryIdx - 1)} disabled={queryIdx === 0}
+                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:queryIdx===0?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize:13, cursor:queryIdx===0?"default":"pointer", fontFamily:ff }}>◀</button>
+              <span style={{ fontSize:12, color:GREEN, fontWeight:700, minWidth:80, textAlign:"center" }}>
+                {queryResults[queryIdx]?.voucherNo} &nbsp;·&nbsp; {queryIdx + 1} / {queryResults.length}
+              </span>
+              <button onClick={() => navTo(queryIdx + 1)} disabled={queryIdx === queryResults.length - 1}
+                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:queryIdx===queryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize:13, cursor:queryIdx===queryResults.length-1?"default":"pointer", fontFamily:ff }}>▶</button>
+              <button onClick={exitQueryMode}
+                style={{ padding:"4px 10px", borderRadius:6, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", fontFamily:ff }}>✕ Clear</button>
             </div>
-          </div>
-          <div style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
-            <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Saved Vouchers</div>
-            <div style={{ fontSize:16, fontWeight:800, color:"rgba(255,255,255,.7)" }}>{vouchers.length}</div>
-          </div>
+          )}
+          {!queryMode && queryIdx < 0 && (
+            <>
+              <div style={{ background:"rgba(34,197,94,.1)", border:"1px solid rgba(34,197,94,.25)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
+                <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Next CRV #</div>
+                <div style={{ fontSize:16, fontWeight:800, color:GREEN }}>CRV-{vouchers.length + 1}</div>
+              </div>
+              <div style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", borderRadius:10, padding:"8px 16px", textAlign:"right" }}>
+                <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Saved Vouchers</div>
+                <div style={{ fontSize:16, fontWeight:800, color:"rgba(255,255,255,.7)" }}>{vouchers.length}</div>
+              </div>
+            </>
+          )}
           <button
-            onClick={openFind}
-            style={{ padding:"8px 16px", borderRadius:10, background:"rgba(34,197,94,.08)", border:"1px solid rgba(34,197,94,.25)", color:GREEN, fontSize:12, cursor:"pointer", fontFamily:ff, fontWeight:700, display:"flex", alignItems:"center", gap:6 }}
+            onClick={queryMode ? () => exitQueryMode() : () => enterQueryMode()}
+            style={{ padding:"8px 16px", borderRadius:10, background: queryMode ? "rgba(250,204,21,.1)" : "rgba(34,197,94,.08)", border:`1px solid ${queryMode ? "rgba(250,204,21,.3)" : "rgba(34,197,94,.25)"}`, color: queryMode ? "#facc15" : GREEN, fontSize:12, cursor:"pointer", fontFamily:ff, fontWeight:700, display:"flex", alignItems:"center", gap:6 }}
           >
-            <span style={{ background:GREEN, color:"#000", borderRadius:4, padding:"1px 6px", fontSize:10, fontWeight:800 }}>F7</span>
-            Find Record
+            <span style={{ background: queryMode ? "#facc15" : GREEN, color:"#000", borderRadius:4, padding:"1px 6px", fontSize:10, fontWeight:800 }}>F7</span>
+            {queryMode ? "Cancel Query" : "Query Mode"}
           </button>
-          <button
-            onClick={() => document.getElementById("crv-history")?.scrollIntoView({ behavior:"smooth" })}
-            style={{ padding:"8px 16px", borderRadius:10, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", fontSize:12, cursor:"pointer", fontFamily:ff }}
-          >
-            📋 View History ↓
-          </button>
+          {!queryMode && (
+            <button
+              onClick={() => document.getElementById("crv-history")?.scrollIntoView({ behavior:"smooth" })}
+              style={{ padding:"8px 16px", borderRadius:10, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", fontSize:12, cursor:"pointer", fontFamily:ff }}
+            >
+              📋 View History ↓
+            </button>
+          )}
         </div>
       </div>
 
+      {/* ── QUERY MODE FORM ── */}
+      {queryMode && (
+        <div style={{ background:"rgba(250,204,21,.04)", border:"2px solid rgba(250,204,21,.3)", borderRadius:16, padding:28, marginBottom:28 }}>
+          <div style={{ marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
+            <span style={{ fontSize:12, color:"rgba(250,204,21,.7)" }}>Enter criteria below — leave blank to get all records. Use <b style={{color:"#facc15"}}>&gt;</b>, <b style={{color:"#facc15"}}>&lt;</b>, <b style={{color:"#facc15"}}>&gt;=</b> for date range.</span>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"200px 260px 1fr", gap:16, marginBottom:24 }}>
+            <div>
+              <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>CRV # (e.g. CRV-5)</label>
+              <input
+                autoFocus
+                value={queryCrvNo}
+                onChange={e => setQueryCrvNo(e.target.value)}
+                placeholder="CRV-1 or blank for all…"
+                style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)", color:"rgba(255,255,255,.85)" }}
+                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCrvNo, queryDate); } if (e.key === "Escape") exitQueryMode(); }}
+              />
+            </div>
+            <div>
+              <label style={{ ...lbl, color:"rgba(250,204,21,.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
+              <input
+                value={queryDate}
+                onChange={e => setQueryDate(e.target.value)}
+                placeholder=">010125 or 01-01-2025 or blank…"
+                style={{ ...inp, border:"1px solid rgba(250,204,21,.3)", background:"rgba(250,204,21,.05)", color:"rgba(255,255,255,.85)" }}
+                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); executeQuery(queryCrvNo, queryDate); } if (e.key === "Escape") exitQueryMode(); }}
+              />
+            </div>
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <button
+              onClick={() => executeQuery(queryCrvNo, queryDate)}
+              style={{ padding:"10px 32px", borderRadius:9, background:"linear-gradient(135deg,#facc15,#ca8a04)", border:"none", color:"#000", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:ff, display:"flex", alignItems:"center", gap:8 }}
+            >
+              <span style={{ background:"rgba(0,0,0,.2)", borderRadius:4, padding:"1px 7px", fontSize:11 }}>F8</span>
+              Execute Query
+            </button>
+            <button onClick={exitQueryMode} style={{ padding:"10px 20px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", fontSize:13, cursor:"pointer", fontFamily:ff }}>Cancel (Esc)</button>
+            <span style={{ fontSize:11, color:"rgba(250,204,21,.4)", marginLeft:8 }}>
+              Operators: <b style={{color:"rgba(250,204,21,.7)"}}>&gt;010425</b> (after) &nbsp; <b style={{color:"rgba(250,204,21,.7)"}}>&lt;010425</b> (before) &nbsp; <b style={{color:"rgba(250,204,21,.7)"}}>010425</b> (exact)
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* ── FORM ── */}
-      <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:24, marginBottom:28 }}>
+      <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:24, marginBottom:28, display: queryMode ? "none" : undefined }}>
 
         <div style={{ display:"grid", gridTemplateColumns:"160px 160px 1fr 2fr", gap:14, marginBottom:20 }}>
           <div>
@@ -660,14 +669,21 @@ export default function CRVPage() {
 
       {/* ── Oracle-style status bar ── */}
       <div style={{ display:"flex", gap:6, marginBottom:16, flexWrap:"wrap" }}>
-        {[
-          { key:"F7", label:"Find Record" },
-          { key:"F8", label:"Open (in Find)" },
-          { key:"Enter", label:"Next Field" },
-          { key:"Esc", label:"Cancel Popup" },
-        ].map(s => (
+        {(queryMode ? [
+          { key:"F8", label:"Execute Query", color:"#facc15" },
+          { key:"Esc", label:"Cancel Query", color:undefined },
+        ] : queryIdx >= 0 ? [
+          { key:"F7", label:"New Query", color:GREEN },
+          { key:"PageDown", label:"Next Record", color:undefined },
+          { key:"PageUp", label:"Prev Record", color:undefined },
+          { key:"Enter", label:"Next Field", color:undefined },
+        ] : [
+          { key:"F7", label:"Query Mode", color:GREEN },
+          { key:"Enter", label:"Next Field", color:undefined },
+          { key:"Esc", label:"Close Popup", color:undefined },
+        ]).map(s => (
           <div key={s.key} style={{ display:"flex", alignItems:"center", gap:4, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:6, padding:"4px 10px" }}>
-            <span style={{ background:"rgba(34,197,94,.15)", color:GREEN, borderRadius:4, padding:"1px 7px", fontSize:10, fontWeight:800, fontFamily:"monospace" }}>{s.key}</span>
+            <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || "rgba(255,255,255,.5)", borderRadius:4, padding:"1px 7px", fontSize:10, fontWeight:800, fontFamily:"monospace", border:`1px solid ${s.color ? `${s.color}44` : "rgba(255,255,255,.1)"}` }}>{s.key}</span>
             <span style={{ fontSize:11, color:"rgba(255,255,255,.3)" }}>{s.label}</span>
           </div>
         ))}
