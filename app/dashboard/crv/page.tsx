@@ -466,14 +466,6 @@ export default function CRVPage() {
             <span style={{ background: queryMode ? "#facc15" : GREEN, color:"#000", borderRadius:4, padding:"1px 6px", fontSize:10, fontWeight:800 }}>F7</span>
             {queryMode ? "Cancel Query" : "Query Mode"}
           </button>
-          {!queryMode && (
-            <button
-              onClick={() => document.getElementById("crv-history")?.scrollIntoView({ behavior:"smooth" })}
-              style={{ padding:"8px 16px", borderRadius:10, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", fontSize:12, cursor:"pointer", fontFamily:ff }}
-            >
-              📋 View History ↓
-            </button>
-          )}
         </div>
       </div>
 
@@ -708,63 +700,6 @@ export default function CRVPage() {
         ))}
       </div>
 
-      {/* ── HISTORY ── */}
-      <div id="crv-history" style={{ background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.07)", borderRadius:14, overflow:"hidden" }}>
-        <div style={{ padding:"14px 20px", borderBottom:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <div style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.7)" }}>
-            Past CRV Vouchers
-            {vouchers.length > 0 && <span style={{ marginLeft:10, fontSize:12, background:"rgba(34,197,94,.15)", color:GREEN, borderRadius:20, padding:"2px 10px", fontWeight:600 }}>{vouchers.length}</span>}
-          </div>
-          <div style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>Last: <b style={{ color:"rgba(255,255,255,.6)" }}>{vouchers[0]?.voucherNo || "—"}</b></div>
-        </div>
-        <table style={{ width:"100%", borderCollapse:"collapse" }}>
-          <thead>
-            <tr style={{ background:"rgba(255,255,255,.02)", borderBottom:"1px solid rgba(255,255,255,.07)" }}>
-              {["CRV #","Date","Accounts","Mode","Total","Actions"].map((h, i) => (
-                <th key={h} style={{ padding:"10px 14px", fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em", textAlign: i===4?"right":"left" }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {vouchers.length === 0 ? (
-              <tr><td colSpan={6} style={{ padding:40, textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:13 }}>No CRV records found</td></tr>
-            ) : vouchers.map((v, idx) => (
-              <tr key={v.id} style={{ borderBottom: idx < vouchers.length-1 ? "1px solid rgba(255,255,255,.04)" : "none" }}
-                onMouseEnter={e => (e.currentTarget.style.background="rgba(255,255,255,.02)")}
-                onMouseLeave={e => (e.currentTarget.style.background="transparent")}
-              >
-                <td style={{ padding:"11px 14px", fontWeight:700, color:GREEN, fontSize:13 }}>{v.voucherNo}</td>
-                <td style={{ padding:"11px 14px", fontSize:12, color:"rgba(255,255,255,.5)" }}>{v.date}</td>
-                <td style={{ padding:"11px 14px", fontSize:12 }}>
-                  {v.entries.map((e, i) => (
-                    <div key={i} style={{ color:"rgba(255,255,255,.7)", marginBottom:i<v.entries.length-1?2:0 }}>
-                      <span style={{ color:"rgba(255,255,255,.3)", fontSize:11, marginRight:6, fontFamily:"monospace" }}>{e.accountCode}</span>
-                      {e.accountName} <span style={{ color:GREEN, fontWeight:700 }}>Rs {fmt(e.amount)}</span>
-                    </div>
-                  ))}
-                </td>
-                <td style={{ padding:"11px 14px", fontSize:11, color:"rgba(255,255,255,.4)" }}>{v.paymentMode}</td>
-                <td style={{ padding:"11px 14px", fontSize:14, fontWeight:800, color:GREEN, textAlign:"right" }}>Rs {fmt(v.totalAmount)}</td>
-                <td style={{ padding:"11px 14px" }}>
-                  <div style={{ display:"flex", gap:6 }}>
-                    <button
-                      onClick={() => {
-                        const fakeEntries: EntryRow[] = v.entries.map(e => ({ id: nextId++, accountId: e.accountId, accountCode: e.accountCode, accountName: e.accountName, amount: String(e.amount), narration: e.narration }));
-                        printVoucher(fakeEntries, v.voucherNo, v.date, v.paymentMode, v.totalAmount, company, v.narration);
-                      }}
-                      style={{ padding:"5px 12px", borderRadius:7, background:"rgba(34,197,94,.08)", border:"1px solid rgba(34,197,94,.2)", color:GREEN, fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:ff }}
-                    >🖨 Print</button>
-                    <button
-                      onClick={() => deleteVoucher(v.id)}
-                      style={{ padding:"5px 10px", borderRadius:7, background:"rgba(248,113,113,.08)", border:"1px solid rgba(248,113,113,.2)", color:"#f87171", fontSize:11, cursor:"pointer", fontFamily:ff }}
-                    >✕</button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }

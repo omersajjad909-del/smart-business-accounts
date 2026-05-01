@@ -33,6 +33,42 @@ function fmt(n: number) {
   return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// ─── Query helpers ────────────────────────────────────────────────────────────
+function parseIsoFromInput(raw: string): string {
+  const digits = raw.replace(/[-\/\.]/g, "");
+  if (/^\d{6}$/.test(digits)) { const yy = digits.slice(4,6); return `${parseInt(yy)>=50?`19${yy}`:`20${yy}`}-${digits.slice(2,4)}-${digits.slice(0,2)}`; }
+  if (/^\d{8}$/.test(digits)) return `${digits.slice(4,8)}-${digits.slice(2,4)}-${digits.slice(0,2)}`;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  return "";
+}
+function parseDateOp(raw: string): { op: string; iso: string } | null {
+  let op = "=", rest = raw.trim();
+  if (rest.startsWith(">=")) { op = ">="; rest = rest.slice(2).trim(); }
+  else if (rest.startsWith("<=")) { op = "<="; rest = rest.slice(2).trim(); }
+  else if (rest.startsWith(">")) { op = ">"; rest = rest.slice(1).trim(); }
+  else if (rest.startsWith("<")) { op = "<"; rest = rest.slice(1).trim(); }
+  else if (rest.startsWith("=")) { op = "="; rest = rest.slice(1).trim(); }
+  const iso = parseIsoFromInput(rest);
+  if (!iso) return null;
+  return { op, iso };
+}
+function matchesDateOp(vIso: string, query: string): boolean {
+  if (!query.trim()) return true;
+  const p = parseDateOp(query);
+  if (!p) return false;
+  const { op, iso } = p;
+  if (op === "=") return vIso === iso; if (op === ">") return vIso > iso;
+  if (op === "<") return vIso < iso; if (op === ">=") return vIso >= iso;
+  if (op === "<=") return vIso <= iso; return false;
+}
+function siRunQuery(invoices: SalesInvoice[], invNo: string, dateQ: string, party: string): SalesInvoice[] {
+  let r = [...invoices];
+  if (invNo.trim()) { const q = invNo.trim().toLowerCase(); r = r.filter(v => v.invoiceNo.toLowerCase().includes(q)); }
+  if (dateQ.trim()) r = r.filter(v => matchesDateOp(new Date(v.date).toISOString().slice(0,10), dateQ));
+  if (party.trim()) { const q = party.trim().toLowerCase(); r = r.filter(v => (v.customer?.name||"").toLowerCase().includes(q)); }
+  return r.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 function SalesInvoiceContent() {
   const searchParams = useSearchParams();
@@ -92,6 +128,14 @@ function SalesInvoiceContent() {
   const [scanActive, setScanActive]     = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [origin, setOrigin]             = useState("");
+
+  // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
+  const [siQueryMode,    setSiQueryMode]    = useState(false);
+  const [siQueryInvNo,   setSiQueryInvNo]   = useState("");
+  const [siQueryDate,    setSiQueryDate]    = useState("");
+  const [siQueryParty,   setSiQueryParty]   = useState("");
+  const [siQueryResults, setSiQueryResults] = useState<SalesInvoice[]>([]);
+  const [siQueryIdx,     setSiQueryIdx]     = useState(-1);
 
   // ── Logo / print prefs ──
   const [printPrefs, setPrintPrefs] = useState({ showLogo: true, logoUrl: "", headerNote: "", footerNote: "Thank you for your business." });
@@ -172,19 +216,35 @@ function SalesInvoiceContent() {
       }).catch(() => {});
   }, [queryId, user]);
 
+  // ── Query Mode helpers ───────────────────────────────────────────────────────
+  function siEnterQuery() { setSiQueryMode(true); setSiQueryInvNo(""); setSiQueryDate(""); setSiQueryParty(""); setSiQueryResults([]); setSiQueryIdx(-1); }
+  function siExitQuery()  { setSiQueryMode(false); setSiQueryIdx(-1); setSiQueryResults([]); }
+  function siNavTo(idx: number) {
+    if (idx < 0 || idx >= siQueryResults.length) return;
+    setSiQueryIdx(idx);
+    startEdit(siQueryResults[idx]);
+    setPreview(false); setSavedInvoice(null);
+  }
+  function siExecuteQuery(invNo: string, dateQ: string, party: string) {
+    const results = siRunQuery(invoices, invNo, dateQ, party);
+    if (results.length === 0) { toast.error("No invoices found matching your criteria"); return; }
+    setSiQueryResults(results); setSiQueryIdx(0); setSiQueryMode(false);
+    startEdit(results[0]); setPreview(false); setSavedInvoice(null);
+    toast.success(`${results.length} invoice${results.length > 1 ? "s" : ""} found — ${results[0].invoiceNo}`);
+  }
+
   // ── Keyboard shortcuts ──
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if ((e.code === "F7" || e.key === "F7") && showForm && !preview) { e.preventDefault(); setDate(today); setCustomerId(""); setCustomerName(""); }
-      if ((e.code === "F8" || e.key === "F8") && showForm && !preview) {
-        e.preventDefault();
-        const q = prompt("Enter customer name or invoice no:");
-        if (q) { const found = customers.find(c => c.name.toLowerCase().includes(q.toLowerCase())); if (found) { setCustomerId(found.id); setCustomerName(found.name); } else toast.error(`No customer found for "${q}"`); }
-      }
+      if (e.key === "F7") { e.preventDefault(); siEnterQuery(); }
+      if (e.key === "Escape" && siQueryMode) { e.preventDefault(); siExitQuery(); }
+      if (e.key === "PageDown" && siQueryIdx >= 0) { e.preventDefault(); siNavTo(siQueryIdx + 1); }
+      if (e.key === "PageUp"   && siQueryIdx >= 0) { e.preventDefault(); siNavTo(siQueryIdx - 1); }
     }
-    document.addEventListener("keydown", onKey, true);
-    return () => document.removeEventListener("keydown", onKey, true);
-  }, [today, showForm, preview, customers]);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [siQueryMode, siQueryIdx, siQueryResults]);
 
   async function loadInvoices() {
     try {
@@ -365,18 +425,71 @@ function SalesInvoiceContent() {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: 24, gap: 10, flexWrap: "wrap" }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700 }}>Sales Invoice</h1>
-            <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-muted)" }}>Create and manage sales invoices</p>
+            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: siQueryMode ? "#facc15" : undefined }}>
+              {siQueryMode ? "🔍 QUERY MODE — Sales Invoice" : "Sales Invoice"}
+            </h1>
+            <p style={{ margin: "4px 0 0", fontSize: 13, color: siQueryMode ? "rgba(250,204,21,.5)" : "var(--text-muted)" }}>
+              {siQueryMode ? "Enter search criteria then press F8 to execute" : "Create and manage sales invoices"}
+            </p>
           </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            {siQueryIdx >= 0 && !siQueryMode && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", borderRadius: 10, padding: "6px 12px" }}>
+                <button onClick={() => siNavTo(siQueryIdx - 1)} disabled={siQueryIdx === 0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: siQueryIdx===0?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: siQueryIdx===0?"default":"pointer", fontFamily: ff }}>◀</button>
+                <span style={{ fontSize: 12, color: accent, fontWeight: 700, minWidth: 100, textAlign: "center" }}>{siQueryResults[siQueryIdx]?.invoiceNo} · {siQueryIdx+1}/{siQueryResults.length}</span>
+                <button onClick={() => siNavTo(siQueryIdx + 1)} disabled={siQueryIdx === siQueryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: siQueryIdx===siQueryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: siQueryIdx===siQueryResults.length-1?"default":"pointer", fontFamily: ff }}>▶</button>
+                <button onClick={siExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕</button>
+              </div>
+            )}
+            <button style={{ ...btnGhost, background: siQueryMode ? "rgba(250,204,21,.1)" : undefined, color: siQueryMode ? "#facc15" : undefined, borderColor: siQueryMode ? "rgba(250,204,21,.3)" : undefined }} onClick={siQueryMode ? siExitQuery : siEnterQuery}>
+              <span style={{ background: siQueryMode ? "#facc15" : accent, color: "#fff", borderRadius: 3, padding: "0 5px", fontSize: 10, fontWeight: 800, marginRight: 5 }}>F7</span>
+              {siQueryMode ? "Cancel Query" : "Query Mode"}
+            </button>
             <button style={btnGhost} onClick={() => { setShowList(!showList); if (!showList) { setShowForm(false); loadInvoices(); } else setShowForm(true); }}>
               {showList ? "Hide List" : "Show List"}
             </button>
-            <button style={btnPrimary} onClick={() => { setShowForm(true); setShowList(false); resetForm(); loadInvoices(); }}>
+            <button style={btnPrimary} onClick={() => { setShowForm(true); setShowList(false); resetForm(); loadInvoices(); siExitQuery(); }}>
               + New Invoice
             </button>
           </div>
         </div>
+
+        {/* ── QUERY MODE FORM ── */}
+        {siQueryMode && (
+          <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 16, padding: 28, marginBottom: 28 }}>
+            <div style={{ marginBottom: 18 }}>
+              <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
+              <div>
+                <label style={{ ...labelStyle, color: "rgba(250,204,21,.6)" }}>Invoice # (e.g. INV-5)</label>
+                <input autoFocus value={siQueryInvNo} onChange={e => setSiQueryInvNo(e.target.value)} placeholder="INV-1 or blank…"
+                  style={{ ...inputStyle, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
+                  onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); siExecuteQuery(siQueryInvNo, siQueryDate, siQueryParty); } if (e.key === "Escape") siExitQuery(); }} />
+              </div>
+              <div>
+                <label style={{ ...labelStyle, color: "rgba(250,204,21,.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
+                <input value={siQueryDate} onChange={e => setSiQueryDate(e.target.value)} placeholder=">010125 or blank…"
+                  style={{ ...inputStyle, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
+                  onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); siExecuteQuery(siQueryInvNo, siQueryDate, siQueryParty); } if (e.key === "Escape") siExitQuery(); }} />
+              </div>
+              <div>
+                <label style={{ ...labelStyle, color: "rgba(250,204,21,.6)" }}>Customer (name)</label>
+                <input value={siQueryParty} onChange={e => setSiQueryParty(e.target.value)} placeholder="e.g. Ali, or blank…"
+                  style={{ ...inputStyle, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
+                  onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); siExecuteQuery(siQueryInvNo, siQueryDate, siQueryParty); } if (e.key === "Escape") siExitQuery(); }} />
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <button onClick={() => siExecuteQuery(siQueryInvNo, siQueryDate, siQueryParty)}
+                style={{ padding: "10px 32px", borderRadius: 9, background: "linear-gradient(135deg,#facc15,#ca8a04)", border: "none", color: "#000", fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: ff, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 4, padding: "1px 7px", fontSize: 11 }}>F8</span>Execute Query
+              </button>
+              <button onClick={siExitQuery} style={{ padding: "10px 20px", borderRadius: 9, background: "transparent", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
+              <span style={{ fontSize: 11, color: "rgba(250,204,21,.4)", marginLeft: 8 }}>Operators: <b style={{ color: "rgba(250,204,21,.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>&lt;010425</b> (before)</span>
+            </div>
+          </div>
+        )}
 
         {/* ── Invoices List ── */}
         {showList && (
@@ -762,7 +875,28 @@ function SalesInvoiceContent() {
             )}
 
 
-            {/* ── Invoice Preview (screen) ── */}
+            {/* ── Shortcuts Bar ── */}
+            {!preview && (
+              <div style={{ display: "flex", gap: 6, marginTop: 16, flexWrap: "wrap" }}>
+                {(siQueryMode ? [
+                  { key: "F8", label: "Execute Query", color: "#facc15" },
+                  { key: "Esc", label: "Cancel Query", color: undefined },
+                ] : siQueryIdx >= 0 ? [
+                  { key: "F7", label: "New Query", color: accent },
+                  { key: "PageDown", label: "Next Invoice", color: undefined },
+                  { key: "PageUp", label: "Prev Invoice", color: undefined },
+                ] : [
+                  { key: "F7", label: "Query Mode", color: accent },
+                ]).map(s => (
+                  <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px" }}>
+                    <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || "var(--text-muted)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "var(--border)"}` }}>{s.key}</span>
+                    <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+        {/* ── Invoice Preview (screen) ── */}
             {preview && (
               <div style={{ ...panelStyle, background: "#fff", color: "#111", padding: 40, maxWidth: 860, margin: "0 auto", fontFamily: "'Outfit','Arial',sans-serif" }}>
                 {/* Header */}

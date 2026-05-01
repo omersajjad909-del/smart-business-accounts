@@ -83,6 +83,38 @@ type Currency = {
   exchangeRate: number;
 };
 
+// ─── Query helpers ────────────────────────────────────────────────────────────
+function piParseIso(raw: string): string {
+  const d = raw.replace(/[-\/\.]/g, "");
+  if (/^\d{6}$/.test(d)) { const yy=d.slice(4,6); return `${parseInt(yy)>=50?`19${yy}`:`20${yy}`}-${d.slice(2,4)}-${d.slice(0,2)}`; }
+  if (/^\d{8}$/.test(d)) return `${d.slice(4,8)}-${d.slice(2,4)}-${d.slice(0,2)}`;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  return "";
+}
+function piDateOp(raw: string): { op: string; iso: string } | null {
+  let op="=", rest=raw.trim();
+  if (rest.startsWith(">=")) { op=">="; rest=rest.slice(2).trim(); }
+  else if (rest.startsWith("<=")) { op="<="; rest=rest.slice(2).trim(); }
+  else if (rest.startsWith(">")) { op=">"; rest=rest.slice(1).trim(); }
+  else if (rest.startsWith("<")) { op="<"; rest=rest.slice(1).trim(); }
+  else if (rest.startsWith("=")) { op="="; rest=rest.slice(1).trim(); }
+  const iso=piParseIso(rest); if (!iso) return null; return {op,iso};
+}
+function piMatchDate(vIso: string, q: string): boolean {
+  if (!q.trim()) return true; const p=piDateOp(q); if (!p) return false;
+  const {op,iso}=p;
+  if (op==="=") return vIso===iso; if (op===">") return vIso>iso;
+  if (op==="<") return vIso<iso; if (op===">=") return vIso>=iso;
+  if (op==="<=") return vIso<=iso; return false;
+}
+function piRunQuery(invoices: PurchaseInvoice[], invNo: string, dateQ: string, party: string): PurchaseInvoice[] {
+  let r=[...invoices];
+  if (invNo.trim()) { const q=invNo.trim().toLowerCase(); r=r.filter(v=>v.invoiceNo.toLowerCase().includes(q)); }
+  if (dateQ.trim()) r=r.filter(v=>piMatchDate(new Date(v.date).toISOString().slice(0,10), dateQ));
+  if (party.trim()) { const q=party.trim().toLowerCase(); r=r.filter(v=>(v.supplier?.name||"").toLowerCase().includes(q)); }
+  return r.sort((a,b)=>new Date(a.date).getTime()-new Date(b.date).getTime());
+}
+
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
 const PANEL = "var(--panel-bg)";
@@ -173,6 +205,14 @@ const [searchTerm, setSearchTerm] = useState("");
   const [exchangeRate, setExchangeRate] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
+
+  // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
+  const [piQueryMode,    setPiQueryMode]    = useState(false);
+  const [piQueryInvNo,   setPiQueryInvNo]   = useState("");
+  const [piQueryDate,    setPiQueryDate]    = useState("");
+  const [piQueryParty,   setPiQueryParty]   = useState("");
+  const [piQueryResults, setPiQueryResults] = useState<PurchaseInvoice[]>([]);
+  const [piQueryIdx,     setPiQueryIdx]     = useState(-1);
   const [dueDate, setDueDate] = useState("");
   const [discount, setDiscount] = useState<number | "">("");
   const [discountType, setDiscountType] = useState("flat");
@@ -202,41 +242,35 @@ const [searchTerm, setSearchTerm] = useState("");
 
   const supplierRef = useRef<HTMLSelectElement>(null);
 
-  // Keyboard shortcuts - F7: Clear date/supplier, F8: Query dialog
+  // ── Query Mode helpers ───────────────────────────────────────────────────────
+  function piEnterQuery() { setPiQueryMode(true); setPiQueryInvNo(""); setPiQueryDate(""); setPiQueryParty(""); setPiQueryResults([]); setPiQueryIdx(-1); }
+  function piExitQuery()  { setPiQueryMode(false); setPiQueryIdx(-1); setPiQueryResults([]); }
+  function piNavTo(idx: number) {
+    if (idx < 0 || idx >= piQueryResults.length) return;
+    setPiQueryIdx(idx);
+    startEdit(piQueryResults[idx]);
+    setShowPreview(false);
+  }
+  function piExecuteQuery(invNo: string, dateQ: string, party: string) {
+    const results = piRunQuery(invoices, invNo, dateQ, party);
+    if (results.length === 0) { toast.error("No invoices found matching your criteria"); return; }
+    setPiQueryResults(results); setPiQueryIdx(0); setPiQueryMode(false);
+    startEdit(results[0]); setShowPreview(false);
+    toast.success(`${results.length} invoice${results.length > 1 ? "s" : ""} found — ${results[0].invoiceNo}`);
+  }
+
+  // ── Keyboard shortcuts ──
   useEffect(() => {
-    function handleKeyPress(e: KeyboardEvent) {
-      if (e.code === "F7" || e.key === "F7") {
-        e.preventDefault();
-        e.stopPropagation();
-        if (showForm && !showPreview) {
-          setDate(today);
-          setSupplierId("");
-          setSupplierName("");
-        }
-      }
-      if (e.code === "F8" || e.key === "F8") {
-        e.preventDefault();
-        e.stopPropagation();
-        if (showForm && !showPreview) {
-          const query = prompt("Enter search query (Invoice No, Supplier Name, etc.):");
-          if (query) {
-            const foundSupplier = suppliers.find(s => 
-              s.name.toLowerCase().includes(query.toLowerCase())
-            );
-            if (foundSupplier) {
-              setSupplierId(foundSupplier.id);
-              setSupplierName(foundSupplier.name);
-              handleSupplierChange(foundSupplier.id);
-            } else {
-              toast.error(`No supplier found matching "${query}"`);
-            }
-          }
-        }
-      }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "F7") { e.preventDefault(); piEnterQuery(); }
+      if (e.key === "Escape" && piQueryMode) { e.preventDefault(); piExitQuery(); }
+      if (e.key === "PageDown" && piQueryIdx >= 0) { e.preventDefault(); piNavTo(piQueryIdx + 1); }
+      if (e.key === "PageUp"   && piQueryIdx >= 0) { e.preventDefault(); piNavTo(piQueryIdx - 1); }
     }
-    document.addEventListener("keydown", handleKeyPress, true);
-    return () => document.removeEventListener("keydown", handleKeyPress, true);
-  }, [today, showForm, showPreview, suppliers]);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [piQueryMode, piQueryIdx, piQueryResults]);
 
   useEffect(() => {
     fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo(d); }).catch(() => {});
@@ -647,10 +681,29 @@ const [searchTerm, setSearchTerm] = useState("");
     <div style={{ padding: isMobile ? 12 : 24, maxWidth: 1380, margin: "0 auto", fontFamily: FONT, color: TEXT }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Purchase Invoice</h1>
-          <p style={{ margin: "3px 0 0", fontSize: 13, color: MUTED }}>{invoices.length} total purchase invoices</p>
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.5, color: piQueryMode ? "#facc15" : undefined }}>
+            {piQueryMode ? "🔍 QUERY MODE — Purchase Invoice" : "Purchase Invoice"}
+          </h1>
+          <p style={{ margin: "3px 0 0", fontSize: 13, color: piQueryMode ? "rgba(250,204,21,.5)" : MUTED }}>
+            {piQueryMode ? "Enter search criteria then press F8 to execute" : `${invoices.length} total purchase invoices`}
+          </p>
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          {piQueryIdx >= 0 && !piQueryMode && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", borderRadius: 10, padding: "6px 12px" }}>
+              <button onClick={() => piNavTo(piQueryIdx - 1)} disabled={piQueryIdx === 0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: piQueryIdx===0?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: piQueryIdx===0?"default":"pointer", fontFamily: FONT }}>◀</button>
+              <span style={{ fontSize: 12, color: ACCENT, fontWeight: 700, minWidth: 100, textAlign: "center" }}>{piQueryResults[piQueryIdx]?.invoiceNo} · {piQueryIdx+1}/{piQueryResults.length}</span>
+              <button onClick={() => piNavTo(piQueryIdx + 1)} disabled={piQueryIdx === piQueryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: piQueryIdx===piQueryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: piQueryIdx===piQueryResults.length-1?"default":"pointer", fontFamily: FONT }}>▶</button>
+              <button onClick={piExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: FONT }}>✕</button>
+            </div>
+          )}
+          <button
+            onClick={piQueryMode ? piExitQuery : piEnterQuery}
+            style={{ padding: "9px 16px", borderRadius: 8, border: `1px solid ${piQueryMode ? "rgba(250,204,21,.3)" : BORDER}`, background: piQueryMode ? "rgba(250,204,21,.1)" : PANEL, color: piQueryMode ? "#facc15" : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+          >
+            <span style={{ background: piQueryMode ? "#facc15" : ACCENT, color: piQueryMode ? "#000" : "#fff", borderRadius: 3, padding: "0 5px", fontSize: 10, fontWeight: 800 }}>F7</span>
+            {piQueryMode ? "Cancel Query" : "Query Mode"}
+          </button>
           <button
             onClick={() => { setShowList(!showList); setShowForm(showList); setEditing(null); }}
             style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(99,102,241,0.12)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}
@@ -658,13 +711,50 @@ const [searchTerm, setSearchTerm] = useState("");
             {showList ? "Hide List" : "Show List"}
           </button>
           <button
-            onClick={() => { setShowForm(true); setShowList(false); resetForm(); }}
+            onClick={() => { setShowForm(true); setShowList(false); resetForm(); piExitQuery(); }}
             style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(37,99,235,0.35)" }}
           >
             + New Invoice
           </button>
         </div>
       </div>
+
+      {/* ── QUERY MODE FORM ── */}
+      {piQueryMode && (
+        <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 16, padding: 28, marginBottom: 28 }}>
+          <div style={{ marginBottom: 18 }}>
+            <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
+            <div>
+              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Invoice # (e.g. PI-5)</div>
+              <input autoFocus value={piQueryInvNo} onChange={e => setPiQueryInvNo(e.target.value)} placeholder="PI-1 or blank…"
+                style={{ ...inp(), border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
+                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty); } if (e.key === "Escape") piExitQuery(); }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Date (e.g. &gt;010425 or 01-05-2026)</div>
+              <input value={piQueryDate} onChange={e => setPiQueryDate(e.target.value)} placeholder=">010125 or blank…"
+                style={{ ...inp(), border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
+                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty); } if (e.key === "Escape") piExitQuery(); }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Supplier (name)</div>
+              <input value={piQueryParty} onChange={e => setPiQueryParty(e.target.value)} placeholder="e.g. ABC Suppliers, or blank…"
+                style={{ ...inp(), border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
+                onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty); } if (e.key === "Escape") piExitQuery(); }} />
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button onClick={() => piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty)}
+              style={{ padding: "10px 32px", borderRadius: 9, background: "linear-gradient(135deg,#facc15,#ca8a04)", border: "none", color: "#000", fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: FONT, display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 4, padding: "1px 7px", fontSize: 11 }}>F8</span>Execute Query
+            </button>
+            <button onClick={piExitQuery} style={{ padding: "10px 20px", borderRadius: 9, background: "transparent", border: `1px solid ${BORDER}`, color: MUTED, fontSize: 13, cursor: "pointer", fontFamily: FONT }}>Cancel (Esc)</button>
+            <span style={{ fontSize: 11, color: "rgba(250,204,21,.4)", marginLeft: 8 }}>Operators: <b style={{ color: "rgba(250,204,21,.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>&lt;010425</b> (before)</span>
+          </div>
+        </div>
+      )}
 
       {/* LIST VIEW */}
       {showList && (
@@ -717,7 +807,7 @@ const [searchTerm, setSearchTerm] = useState("");
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 15 }}>{editing ? "Edit Purchase Invoice" : "New Purchase Invoice"}</div>
-                  <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>F7 = Clear Supplier &amp; Date &nbsp;|&nbsp; F8 = Search Supplier</div>
+                  <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>F7 = Query Mode &nbsp;|&nbsp; F8 = Execute Query &nbsp;|&nbsp; PageDown/PageUp = Navigate</div>
                 </div>
               </div>
               {showPreview && (
@@ -985,6 +1075,27 @@ const [searchTerm, setSearchTerm] = useState("");
             </div>
           )}
 
+
+          {/* ── Shortcuts Bar ── */}
+          {!showPreview && (
+            <div style={{ display: "flex", gap: 6, marginTop: 16, flexWrap: "wrap", padding: "0 22px 22px" }}>
+              {(piQueryMode ? [
+                { key: "F8", label: "Execute Query", color: "#facc15" },
+                { key: "Esc", label: "Cancel Query", color: undefined },
+              ] : piQueryIdx >= 0 ? [
+                { key: "F7", label: "New Query", color: ACCENT },
+                { key: "PageDown", label: "Next Invoice", color: undefined },
+                { key: "PageUp", label: "Prev Invoice", color: undefined },
+              ] : [
+                { key: "F7", label: "Query Mode", color: ACCENT },
+              ]).map(s => (
+                <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,.03)", border: `1px solid ${BORDER}`, borderRadius: 6, padding: "4px 10px" }}>
+                  <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || MUTED, borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : BORDER}` }}>{s.key}</span>
+                  <span style={{ fontSize: 11, color: MUTED }}>{s.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* ── PRINT STYLES ── */}
           {showPreview && (
