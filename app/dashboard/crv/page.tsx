@@ -12,7 +12,7 @@ type BankAcc  = { id: string; name: string };
 type EntryRow = { id: number; accountId: string; accountCode: string; accountName: string; amount: string; narration: string };
 type Voucher  = {
   id: string; voucherNo: string; date: string; narration: string;
-  paymentMode: string; paymentAccName: string; totalAmount: number;
+  paymentMode: string; paymentAccId: string; paymentAccName: string; totalAmount: number;
   entries: { accountId: string; accountName: string; accountCode: string; amount: number; narration: string }[];
 };
 
@@ -106,6 +106,11 @@ export default function CRVPage() {
   const [narration, setNarration] = useState("");
   const [entries,   setEntries]   = useState<EntryRow[]>(initRows);
 
+  // ── Find Record (F7/F8) ─────────────────────────────────────────────────────
+  const [findOpen,     setFindOpen]     = useState(false);
+  const [findSearch,   setFindSearch]   = useState("");
+  const [findSelected, setFindSelected] = useState<string>("");
+
   // ── Account Picker ──────────────────────────────────────────────────────────
   const [pickerOpen,     setPickerOpen]     = useState(false);
   const [pickerRowId,    setPickerRowId]    = useState<number | null>(null);
@@ -148,6 +153,51 @@ export default function CRVPage() {
   }
 
   function closePicker() { setPickerOpen(false); setPickerRowId(null); }
+
+  // ── F7/F8 Find ──────────────────────────────────────────────────────────────
+  const filteredFindVouchers = findSearch.trim()
+    ? vouchers.filter(v =>
+        v.voucherNo.toLowerCase().includes(findSearch.toLowerCase()) ||
+        v.date.includes(findSearch) ||
+        v.entries.some(e => e.accountName.toLowerCase().includes(findSearch.toLowerCase()))
+      )
+    : vouchers;
+
+  function openFind() {
+    setFindSearch("");
+    setFindSelected(vouchers[0]?.id || "");
+    setFindOpen(true);
+  }
+  function closeFind() { setFindOpen(false); }
+
+  function loadVoucher(v: Voucher) {
+    setDate(v.date);
+    setMode(v.paymentMode as "CASH" | "BANK");
+    setNarration(v.narration || "");
+    if (v.paymentMode === "BANK") {
+      const matched = bankAccs.find(b => b.name === v.paymentAccName);
+      setBankId(matched?.id || "");
+    } else {
+      setBankId("");
+    }
+    const loaded: EntryRow[] = v.entries.map(e => ({
+      id: nextId++, accountId: e.accountId, accountCode: e.accountCode,
+      accountName: e.accountName, amount: String(e.amount), narration: e.narration || "",
+    }));
+    while (loaded.length < 8) loaded.push(newRow());
+    setEntries(loaded);
+    closeFind();
+    toast.success(`${v.voucherNo} loaded`);
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "F7") { e.preventDefault(); if (!pickerOpen) openFind(); }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pickerOpen]);
 
   function confirmPicker(acc: Account) {
     if (pickerRowId === null) return;
@@ -212,6 +262,112 @@ export default function CRVPage() {
 
   return (
     <div style={{ padding:"24px 28px", fontFamily:ff, color:"rgba(255,255,255,.85)", maxWidth:1200 }}>
+
+      {/* ── F7 FIND RECORD MODAL ── */}
+      {findOpen && (
+        <div
+          style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.82)", zIndex:3000, display:"flex", alignItems:"center", justifyContent:"center" }}
+          onClick={closeFind}
+        >
+          <div
+            style={{ background:"#0a0f1e", border:"1px solid rgba(34,197,94,.25)", borderRadius:14, width:780, maxHeight:600, display:"flex", flexDirection:"column", boxShadow:"0 24px 80px rgba(0,0,0,.95)" }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* header */}
+            <div style={{ padding:"14px 20px", borderBottom:"1px solid rgba(255,255,255,.08)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                <span style={{ fontSize:11, fontWeight:800, background:GREEN, color:"#000", borderRadius:5, padding:"2px 8px", letterSpacing:".05em" }}>F7</span>
+                <span style={{ fontWeight:800, fontSize:15, color:"rgba(255,255,255,.9)", letterSpacing:".04em" }}>FIND CRV RECORD</span>
+              </div>
+              <span style={{ fontSize:11, color:"rgba(255,255,255,.3)" }}>{filteredFindVouchers.length} records</span>
+            </div>
+            {/* search */}
+            <div style={{ padding:"10px 20px", borderBottom:"1px solid rgba(255,255,255,.06)" }}>
+              <input
+                autoFocus
+                placeholder="Search by voucher no, date (YYYY-MM-DD), or account name…"
+                value={findSearch}
+                onChange={e => { setFindSearch(e.target.value); setFindSelected(filteredFindVouchers[0]?.id || ""); }}
+                onKeyDown={e => {
+                  if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    const idx = filteredFindVouchers.findIndex(v => v.id === findSelected);
+                    const next = filteredFindVouchers[Math.min(idx + 1, filteredFindVouchers.length - 1)];
+                    if (next) setFindSelected(next.id);
+                  }
+                  if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    const idx = filteredFindVouchers.findIndex(v => v.id === findSelected);
+                    const prev = filteredFindVouchers[Math.max(idx - 1, 0)];
+                    if (prev) setFindSelected(prev.id);
+                  }
+                  if (e.key === "Enter" || e.key === "F8") {
+                    e.preventDefault();
+                    const v = filteredFindVouchers.find(v => v.id === findSelected) || filteredFindVouchers[0];
+                    if (v) loadVoucher(v);
+                  }
+                  if (e.key === "Escape") closeFind();
+                }}
+                style={{ ...inp, fontSize:13, width:"100%", boxSizing:"border-box" }}
+              />
+            </div>
+            {/* list */}
+            <div style={{ flex:1, overflowY:"auto", maxHeight:400 }}>
+              {filteredFindVouchers.length === 0 ? (
+                <div style={{ padding:48, textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:13 }}>No records found</div>
+              ) : (
+                <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                  <thead>
+                    <tr style={{ background:"rgba(255,255,255,.04)", position:"sticky", top:0 }}>
+                      {["CRV #","Date","Account(s)","Mode","Total"].map((h, i) => (
+                        <th key={h} style={{ padding:"8px 14px", fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em", textAlign: i===4 ? "right" : "left" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredFindVouchers.map(v => (
+                      <tr
+                        key={v.id}
+                        tabIndex={0}
+                        onClick={() => setFindSelected(v.id)}
+                        onDoubleClick={() => loadVoucher(v)}
+                        onKeyDown={e => { if (e.key === "Enter" || e.key === "F8") { e.preventDefault(); loadVoucher(v); } }}
+                        style={{ background: findSelected === v.id ? "rgba(34,197,94,.18)" : "transparent", cursor:"pointer", borderBottom:"1px solid rgba(255,255,255,.04)", outline:"none" }}
+                        onMouseEnter={e => { if (findSelected !== v.id) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.04)"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = findSelected === v.id ? "rgba(34,197,94,.18)" : "transparent"; }}
+                      >
+                        <td style={{ padding:"10px 14px", fontWeight:800, color:GREEN, fontSize:13 }}>{v.voucherNo}</td>
+                        <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(255,255,255,.55)" }}>{v.date}</td>
+                        <td style={{ padding:"10px 14px", fontSize:12, color:"rgba(255,255,255,.75)" }}>
+                          {v.entries.map((e, i) => <div key={i}>{e.accountName}</div>)}
+                        </td>
+                        <td style={{ padding:"10px 14px", fontSize:11, color:"rgba(255,255,255,.4)" }}>{v.paymentMode}</td>
+                        <td style={{ padding:"10px 14px", fontSize:13, fontWeight:700, color:GREEN, textAlign:"right" }}>Rs {fmt(v.totalAmount)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+            {/* footer */}
+            <div style={{ padding:"12px 20px", borderTop:"1px solid rgba(255,255,255,.07)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <span style={{ fontSize:11, color:"rgba(255,255,255,.25)" }}>
+                <b style={{ color:"rgba(255,255,255,.45)" }}>↑↓</b> Navigate &nbsp;·&nbsp; <b style={{ color:"rgba(255,255,255,.45)" }}>Enter / F8</b> Open &nbsp;·&nbsp; <b style={{ color:"rgba(255,255,255,.45)" }}>Esc</b> Cancel
+              </span>
+              <div style={{ display:"flex", gap:8 }}>
+                <button onClick={closeFind} style={{ padding:"8px 18px", borderRadius:8, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.55)", fontSize:13, cursor:"pointer", fontFamily:ff }}>Cancel</button>
+                <button
+                  onClick={() => { const v = filteredFindVouchers.find(v => v.id === findSelected) || filteredFindVouchers[0]; if (v) loadVoucher(v); }}
+                  disabled={filteredFindVouchers.length === 0}
+                  style={{ padding:"8px 24px", borderRadius:8, background:`linear-gradient(135deg,${GREEN},#16a34a)`, border:"none", color:"#000", fontSize:13, fontWeight:800, cursor:"pointer", fontFamily:ff, opacity:filteredFindVouchers.length===0?0.4:1, letterSpacing:".04em" }}
+                >
+                  F8 — Open
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── CHART OF ACCOUNT MODAL ── */}
       {pickerOpen && (
@@ -316,6 +472,13 @@ export default function CRVPage() {
             <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Saved Vouchers</div>
             <div style={{ fontSize:16, fontWeight:800, color:"rgba(255,255,255,.7)" }}>{vouchers.length}</div>
           </div>
+          <button
+            onClick={openFind}
+            style={{ padding:"8px 16px", borderRadius:10, background:"rgba(34,197,94,.08)", border:"1px solid rgba(34,197,94,.25)", color:GREEN, fontSize:12, cursor:"pointer", fontFamily:ff, fontWeight:700, display:"flex", alignItems:"center", gap:6 }}
+          >
+            <span style={{ background:GREEN, color:"#000", borderRadius:4, padding:"1px 6px", fontSize:10, fontWeight:800 }}>F7</span>
+            Find Record
+          </button>
           <button
             onClick={() => document.getElementById("crv-history")?.scrollIntoView({ behavior:"smooth" })}
             style={{ padding:"8px 16px", borderRadius:10, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", fontSize:12, cursor:"pointer", fontFamily:ff }}
@@ -477,6 +640,21 @@ export default function CRVPage() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ── Oracle-style status bar ── */}
+      <div style={{ display:"flex", gap:6, marginBottom:16, flexWrap:"wrap" }}>
+        {[
+          { key:"F7", label:"Find Record" },
+          { key:"F8", label:"Open (in Find)" },
+          { key:"Enter", label:"Next Field" },
+          { key:"Esc", label:"Cancel Popup" },
+        ].map(s => (
+          <div key={s.key} style={{ display:"flex", alignItems:"center", gap:4, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:6, padding:"4px 10px" }}>
+            <span style={{ background:"rgba(34,197,94,.15)", color:GREEN, borderRadius:4, padding:"1px 7px", fontSize:10, fontWeight:800, fontFamily:"monospace" }}>{s.key}</span>
+            <span style={{ fontSize:11, color:"rgba(255,255,255,.3)" }}>{s.label}</span>
+          </div>
+        ))}
       </div>
 
       {/* ── HISTORY ── */}
