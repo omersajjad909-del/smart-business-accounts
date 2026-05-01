@@ -45,7 +45,7 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   transpilePackages: ["bcryptjs"],
-  serverExternalPackages: ["bcryptjs", "@prisma/client"],
+  serverExternalPackages: ["@prisma/client"],
   typescript: {
     ignoreBuildErrors: true,
   },
