@@ -183,7 +183,7 @@ export default function ProductCatalogPage() {
     const newStock = product.stock + receiveForm.qty;
     const newCost = receiveForm.costPrice > 0 ? receiveForm.costPrice : product.costPrice;
 
-    await update(receiveId, { data: { category: product.category, sku: product.sku, description: product.description, stock: newStock, costPrice: newCost } });
+    await update(receiveId, { data: { stock: newStock, costPrice: newCost } });
     await createReceipt({
       title: `Stock In — ${product.name}`,
       status: "received",
@@ -361,7 +361,7 @@ export default function ProductCatalogPage() {
 
               <div style={{ gridColumn: "span 2" }}>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Product Name *</label>
-                <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Lays Chips Masala" style={inp} autoFocus />
+                <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}  style={inp} autoFocus />
               </div>
 
               <div>
