@@ -148,7 +148,12 @@
       "Bash(grep -v \"^$\")",
       "Bash(npx cross-env *)",
       "Bash(Get-ChildItem \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\" -Directory)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(grep -E \"\\\\.\\(tsx|ts|jsx|js\\)$\")",
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\\\\retail\" -Recurse -Force)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\\\\retail\" -Recurse | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\retail\" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",

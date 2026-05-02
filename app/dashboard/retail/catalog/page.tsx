@@ -183,7 +183,7 @@ export default function ProductCatalogPage() {
     const newStock = product.stock + receiveForm.qty;
     const newCost = receiveForm.costPrice > 0 ? receiveForm.costPrice : product.costPrice;
 
-    await update(receiveId, { data: { stock: newStock, costPrice: newCost } });
+    await update(receiveId, { data: { category: product.category, sku: product.sku, description: product.description, stock: newStock, costPrice: newCost } });
     await createReceipt({
       title: `Stock In — ${product.name}`,
       status: "received",

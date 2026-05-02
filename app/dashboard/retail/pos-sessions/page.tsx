@@ -94,7 +94,15 @@ export default function POSSessionsPage() {
     if (!await confirmToast(`Close session ${session.sessionRef}? This cannot be reopened.`)) return;
     await update(session.id, {
       status: "CLOSED",
-      data: { closingCash: cash },
+      data: {
+        cashier: session.cashier,
+        branch: session.branch,
+        openingCash: session.openingCash,
+        cashSales: session.cashSales,
+        cardSales: session.cardSales,
+        transactions: session.transactions,
+        closingCash: cash,
+      },
     });
     setClosingId(null);
     setClosingCash("");

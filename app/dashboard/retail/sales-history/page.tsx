@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { confirmToast } from "@/lib/toast-feedback";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 
 const ff = "'Outfit','Inter',sans-serif";
 
@@ -136,11 +137,11 @@ export default function SalesHistoryPage() {
         />
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)", whiteSpace: "nowrap" }}>From</span>
-          <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} style={{ ...inp, width: 145 }} />
+          <DateInput value={dateFrom} onChange={setDateFrom} style={{ ...inp, width: 145 }} />
         </div>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)", whiteSpace: "nowrap" }}>To</span>
-          <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} style={{ ...inp, width: 145 }} />
+          <DateInput value={dateTo} onChange={setDateTo} style={{ ...inp, width: 145 }} />
         </div>
         <select value={payFilter} onChange={e => setPayFilter(e.target.value)} style={{ ...inp, width: 130, cursor: "pointer" }}>
           <option value="all">All Payments</option>

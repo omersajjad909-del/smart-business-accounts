@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
+import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 
 const F = "'Outfit','Inter',sans-serif";
 const BG = "rgba(255,255,255,0.03)";
@@ -332,7 +333,7 @@ export default function SupplierPortalPage() {
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 5 }}>Expected Delivery</label>
-                <input type="date" value={ordForm.expectedDate} onChange={e => setOrdForm(p => ({ ...p, expectedDate: e.target.value }))} style={inp} />
+                <DateInput value={ordForm.expectedDate} onChange={v => setOrdForm(p => ({ ...p, expectedDate: v }))} style={inp} />
               </div>
               <div style={{ gridColumn: "1 / -1" }}>
                 <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 5 }}>Notes</label>
