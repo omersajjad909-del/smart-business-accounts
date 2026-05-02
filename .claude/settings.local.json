@@ -153,7 +153,9 @@
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\\\\retail\" -Recurse -Force)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\\\\retail\" -Recurse | ForEach-Object { $_.FullName })",
-      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\retail\" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })"
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\retail\" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })",
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Force)",
+      "Bash(xargs ls *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
