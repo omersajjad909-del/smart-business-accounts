@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
 
       // 2. Try catalog products (BusinessRecord)
       const records = await prisma.businessRecord.findMany({
-        where: { companyId, category: "catalog_product", deletedAt: null },
+        where: { companyId, category: "catalog_product" },
       });
       const match = records.find(r => {
         const d = r.data as Record<string, unknown>;
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
         select: { id: true, name: true, code: true, barcode: true, unit: true, rate: true, description: true },
       }),
       prisma.businessRecord.findMany({
-        where: { companyId, category: "catalog_product", deletedAt: null },
+        where: { companyId, category: "catalog_product" },
         orderBy: { title: "asc" },
       }),
     ]);
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Try catalog product (BusinessRecord)
     const record = await prisma.businessRecord.findFirst({
-      where: { id: itemId, companyId, category: "catalog_product", deletedAt: null },
+      where: { id: itemId, companyId, category: "catalog_product" },
     });
     if (!record) return NextResponse.json({ error: "Item not found" }, { status: 404 });
 
@@ -179,7 +179,7 @@ export async function DELETE(req: NextRequest) {
 
     // Try catalog product
     const record = await prisma.businessRecord.findFirst({
-      where: { id: itemId, companyId, category: "catalog_product", deletedAt: null },
+      where: { id: itemId, companyId, category: "catalog_product" },
     });
     if (!record) return NextResponse.json({ error: "Item not found" }, { status: 404 });
     const d = (record.data || {}) as Record<string, unknown>;
