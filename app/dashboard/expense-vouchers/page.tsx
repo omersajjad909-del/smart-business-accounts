@@ -22,6 +22,37 @@ type Acct = { id: string; code?: string; name: string; type?: string | null; par
 
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
+function parseIsoFromInput(raw: string): string {
+  const d = raw.replace(/[-\/\.]/g, "");
+  if (/^\d{6}$/.test(d)) { const yy=d.slice(4,6); return `${parseInt(yy)>=50?`19${yy}`:`20${yy}`}-${d.slice(2,4)}-${d.slice(0,2)}`; }
+  if (/^\d{8}$/.test(d)) return `${d.slice(4,8)}-${d.slice(2,4)}-${d.slice(0,2)}`;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  return "";
+}
+function parseDateOp(raw: string): { op: string; iso: string } | null {
+  let op="=", rest=raw.trim();
+  if (rest.startsWith(">=")) { op=">="; rest=rest.slice(2).trim(); }
+  else if (rest.startsWith("<=")) { op="<="; rest=rest.slice(2).trim(); }
+  else if (rest.startsWith(">")) { op=">"; rest=rest.slice(1).trim(); }
+  else if (rest.startsWith("<")) { op="<"; rest=rest.slice(1).trim(); }
+  else if (rest.startsWith("=")) { op="="; rest=rest.slice(1).trim(); }
+  const iso=parseIsoFromInput(rest); if (!iso) return null; return {op,iso};
+}
+function matchesDateOp(vIso: string, q: string): boolean {
+  if (!q.trim()) return true; const p=parseDateOp(q); if (!p) return false;
+  const {op,iso}=p;
+  if (op==="=") return vIso===iso; if (op===">") return vIso>iso;
+  if (op==="<") return vIso<iso; if (op===">=") return vIso>=iso;
+  if (op==="<=") return vIso<=iso; return false;
+}
+function evRunQuery(vouchers: ExpenseVoucher[], vNo: string, dateQ: string, desc: string): ExpenseVoucher[] {
+  let r=[...vouchers];
+  if (vNo.trim()) { const q=vNo.trim().toLowerCase(); r=r.filter(v=>v.voucherNo.toLowerCase().includes(q)); }
+  if (dateQ.trim()) r=r.filter(v=>matchesDateOp(new Date(v.date).toISOString().slice(0,10), dateQ));
+  if (desc.trim()) { const q=desc.trim().toLowerCase(); r=r.filter(v=>v.description.toLowerCase().includes(q)||(v.expenseAccount?.name||"").toLowerCase().includes(q)); }
+  return r.sort((a,b)=>new Date(a.date).getTime()-new Date(b.date).getTime());
+}
+
 const STATUS_COLOR: Record<string, { bg: string; text: string }> = {
   DRAFT:    { bg: "rgba(148,163,184,0.15)", text: "#94a3b8" },
   PENDING:  { bg: "rgba(251,191,36,0.15)",  text: "#fbbf24" },
@@ -40,6 +71,14 @@ export default function ExpenseVouchersPage() {
   const [saving,      setSaving]      = useState(false);
   const [editingId,   setEditingId]   = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+
+  // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
+  const [queryMode,    setQueryMode]    = useState(false);
+  const [queryVNo,     setQueryVNo]     = useState("");
+  const [queryDate,    setQueryDate]    = useState("");
+  const [queryDesc,    setQueryDesc]    = useState("");
+  const [queryResults, setQueryResults] = useState<ExpenseVoucher[]>([]);
+  const [queryIdx,     setQueryIdx]     = useState(-1);
   const [items,       setItems]       = useState<ExpenseItem[]>([{ description: "", amount: 0, category: "" }]);
   const [form,        setForm]        = useState({
     voucherNo: "", date: new Date().toISOString().slice(0, 10),
@@ -54,6 +93,18 @@ export default function ExpenseVouchersPage() {
   });
 
   useEffect(() => { fetchVouchers(); fetchAccounts(); }, [statusFilter]);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key==="F7") { e.preventDefault(); evEnterQuery(); }
+      if (e.key==="Escape" && queryMode) { e.preventDefault(); evExitQuery(); }
+      if (e.key==="PageDown" && queryIdx>=0) { e.preventDefault(); evNavTo(queryIdx+1); }
+      if (e.key==="PageUp"   && queryIdx>=0) { e.preventDefault(); evNavTo(queryIdx-1); }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryMode, queryIdx, queryResults]);
 
   async function fetchVouchers() {
     try {
@@ -94,6 +145,20 @@ export default function ExpenseVouchersPage() {
       }
     } catch { toast.error("Failed"); }
     finally { setSaving(false); }
+  }
+
+  function evEnterQuery() { setQueryMode(true); setQueryVNo(""); setQueryDate(""); setQueryDesc(""); setQueryResults([]); setQueryIdx(-1); }
+  function evExitQuery()  { setQueryMode(false); setQueryIdx(-1); setQueryResults([]); }
+  function evNavTo(idx: number) {
+    if (idx<0||idx>=queryResults.length) return;
+    setQueryIdx(idx); handleEdit(queryResults[idx]);
+  }
+  function evExecuteQuery(vNo: string, dateQ: string, desc: string) {
+    const results = evRunQuery(vouchers, vNo, dateQ, desc);
+    if (results.length===0) { toast.error("No records found"); return; }
+    setQueryResults(results); setQueryIdx(0); setQueryMode(false);
+    handleEdit(results[0]);
+    toast.success(`${results.length} record${results.length>1?"s":""} found — ${results[0].voucherNo}`);
   }
 
   function resetForm() {
@@ -148,15 +213,70 @@ export default function ExpenseVouchersPage() {
     <div style={{ padding: "24px 28px", fontFamily: ff, color: "var(--text-primary)", maxWidth: 1100 }}>
 
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: accent }}>Expense Vouchers</h1>
-          <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-muted)" }}>Record and track business expenses with approval workflow</p>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: queryMode ? "#facc15" : accent }}>
+            {queryMode ? "🔍 QUERY MODE — Expense Vouchers" : "Expense Vouchers"}
+          </h1>
+          <p style={{ margin: "4px 0 0", fontSize: 13, color: queryMode ? "rgba(250,204,21,.5)" : "var(--text-muted)" }}>
+            {queryMode ? "Enter search criteria then press F8 to execute" : "Record and track business expenses with approval workflow"}
+          </p>
         </div>
-        <button onClick={() => { if (showForm) { resetForm(); } else { setShowForm(true); } }} style={{ background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-          {showForm ? "Cancel" : "+ New Expense"}
-        </button>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          {queryIdx >= 0 && !queryMode && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(249,115,22,.08)", border: "1px solid rgba(249,115,22,.2)", borderRadius: 10, padding: "6px 12px" }}>
+              <button onClick={() => evNavTo(queryIdx-1)} disabled={queryIdx===0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: queryIdx===0?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: queryIdx===0?"default":"pointer", fontFamily: ff }}>◀</button>
+              <span style={{ fontSize: 12, color: accent, fontWeight: 700, minWidth: 80, textAlign: "center" }}>{queryResults[queryIdx]?.voucherNo} · {queryIdx+1}/{queryResults.length}</span>
+              <button onClick={() => evNavTo(queryIdx+1)} disabled={queryIdx===queryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: queryIdx===queryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: queryIdx===queryResults.length-1?"default":"pointer", fontFamily: ff }}>▶</button>
+              <button onClick={evExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>✕ Clear</button>
+            </div>
+          )}
+          <button onClick={queryMode ? evExitQuery : evEnterQuery}
+            style={{ background: queryMode ? "rgba(250,204,21,.1)" : "rgba(249,115,22,.08)", border: `1px solid ${queryMode?"rgba(250,204,21,.3)":"rgba(249,115,22,.3)"}`, color: queryMode?"#facc15":accent, borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ background: queryMode?"#facc15":accent, color: "#fff", borderRadius: 3, padding: "0 5px", fontSize: 10, fontWeight: 800 }}>F7</span>
+            {queryMode ? "Cancel Query" : "Query Mode"}
+          </button>
+          <button onClick={() => { if (showForm) { resetForm(); } else { setShowForm(true); evExitQuery(); } }} style={{ background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+            {showForm ? "Cancel" : "+ New Expense"}
+          </button>
+        </div>
       </div>
+
+      {/* Query Mode Form */}
+      {queryMode && (
+        <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 16, padding: 28, marginBottom: 28 }}>
+          <div style={{ marginBottom: 18 }}>
+            <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all records. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
+            <div>
+              <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Voucher # (e.g. EV-5)</label>
+              <input autoFocus value={queryVNo} onChange={e=>setQueryVNo(e.target.value)} placeholder="EV-1 or blank…"
+                style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
+                onKeyDown={e=>{ if(e.key==="F8"){e.preventDefault();evExecuteQuery(queryVNo,queryDate,queryDesc);} if(e.key==="Escape")evExitQuery(); }} />
+            </div>
+            <div>
+              <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Date (e.g. &gt;010425 or 01-05-2026)</label>
+              <input value={queryDate} onChange={e=>setQueryDate(e.target.value)} placeholder=">010125 or blank…"
+                style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
+                onKeyDown={e=>{ if(e.key==="F8"){e.preventDefault();evExecuteQuery(queryVNo,queryDate,queryDesc);} if(e.key==="Escape")evExitQuery(); }} />
+            </div>
+            <div>
+              <label style={{ ...lbl, color: "rgba(250,204,21,.6)" }}>Description / Account</label>
+              <input value={queryDesc} onChange={e=>setQueryDesc(e.target.value)} placeholder="e.g. Travel, Rent, or blank…"
+                style={{ ...inp, border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
+                onKeyDown={e=>{ if(e.key==="F8"){e.preventDefault();evExecuteQuery(queryVNo,queryDate,queryDesc);} if(e.key==="Escape")evExitQuery(); }} />
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button onClick={() => evExecuteQuery(queryVNo, queryDate, queryDesc)}
+              style={{ padding: "10px 32px", borderRadius: 9, background: "linear-gradient(135deg,#facc15,#ca8a04)", border: "none", color: "#000", fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: ff, display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 4, padding: "1px 7px", fontSize: 11 }}>F8</span>Execute Query
+            </button>
+            <button onClick={evExitQuery} style={{ padding: "10px 20px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>Cancel (Esc)</button>
+          </div>
+        </div>
+      )}
 
       {/* Form */}
       {showForm && (
@@ -262,6 +382,25 @@ export default function ExpenseVouchersPage() {
           <option value="APPROVED">Approved</option>
           <option value="REJECTED">Rejected</option>
         </select>
+      </div>
+
+      {/* Shortcuts Bar */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+        {(queryMode ? [
+          { key: "F8", label: "Execute Query", color: "#facc15" },
+          { key: "Esc", label: "Cancel Query", color: undefined },
+        ] : queryIdx >= 0 ? [
+          { key: "F7", label: "New Query", color: accent },
+          { key: "PageDown", label: "Next Record", color: undefined },
+          { key: "PageUp", label: "Prev Record", color: undefined },
+        ] : [
+          { key: "F7", label: "Query Mode", color: accent },
+        ]).map(s => (
+          <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 6, padding: "4px 10px" }}>
+            <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || "var(--text-muted)", borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : "rgba(255,255,255,.1)"}` }}>{s.key}</span>
+            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{s.label}</span>
+          </div>
+        ))}
       </div>
 
       {/* Table */}

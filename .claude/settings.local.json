@@ -146,7 +146,9 @@
       "Bash(shuf)",
       "Bash(perl -i -0pe 's/  const userRole = req\\\\.headers\\\\.get\\\\\\(\"x-user-role\"\\\\\\);\\\\n  const cronSecret = req\\\\.headers\\\\.get\\\\\\(\"x-cron-secret\"\\\\\\);\\\\n  const isAdmin = userRole\\\\?\\\\.toUpperCase\\\\\\(\\\\\\) === \"ADMIN\";\\\\n  const isCron = CRON_SECRET && cronSecret === CRON_SECRET;\\\\n\\\\n  if \\\\\\(!isAdmin && !isCron\\\\\\) \\\\{/  const cronSecret = req.headers.get\\(\"x-cron-secret\"\\);\\\\n  const isCron = CRON_SECRET \\\\&\\\\& cronSecret === CRON_SECRET;\\\\n  const jwtToken = getTokenFromRequest\\(req as any\\);\\\\n  const jwtPayload = jwtToken ? verifyJwt\\(jwtToken\\) : null;\\\\n  const isAdmin = String\\(jwtPayload?.role || \"\"\\).toUpperCase\\(\\) === \"ADMIN\";\\\\n\\\\n  if \\(!isAdmin \\\\&\\\\& !isCron\\) {/g' \"d:/projects/smart-business-accounts/app/api/admin/cron/data-cleanup/route.ts\")",
       "Bash(grep -v \"^$\")",
-      "Bash(npx cross-env *)"
+      "Bash(npx cross-env *)",
+      "Bash(Get-ChildItem \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\" -Directory)",
+      "Bash(Select-Object Name)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
