@@ -29,6 +29,8 @@ interface DashStats {
   profit: number;
   cashBalance: number;
   revenueGrowth: number;
+  expensesGrowth: number;
+  profitGrowth: number;
   overdueAmount: number;
   invoicesPending: number;
   revenueHistory: number[];
@@ -532,6 +534,8 @@ export default function DashboardContent() {
     profit: 0,
     cashBalance: 0,
     revenueGrowth: 0,
+    expensesGrowth: 0,
+    profitGrowth: 0,
     overdueAmount: 0,
     invoicesPending: 0,
     revenueHistory: [],
@@ -587,7 +591,9 @@ export default function DashboardContent() {
             expenses: Number(d.expenses || 0),
             profit: Number(d.profit || 0),
             cashBalance: Number(d.cashBalance || 0),
-            revenueGrowth: Number(d.revenueGrowth || 0),
+            revenueGrowth:  Number(d.revenueGrowth  ?? 0),
+            expensesGrowth: Number(d.expensesGrowth ?? 0),
+            profitGrowth:   Number(d.profitGrowth   ?? 0),
             overdueAmount: Number(d.overdueAmount || 0),
             invoicesPending: Number(d.invoicesPending || 0),
             revenueHistory: Array.isArray(d.revenueHistory)
@@ -779,7 +785,9 @@ export default function DashboardContent() {
       .map((part) => part[0]?.toUpperCase() || "")
       .join("") || "U";
   const profC = stats.profit >= 0 ? "#10b981" : "#ef4444";
-  const grC = stats.revenueGrowth >= 0 ? "#10b981" : "#ef4444";
+  const grC  = stats.revenueGrowth  >= 0 ? "#10b981" : "#ef4444";
+  const expC = stats.expensesGrowth >= 0 ? "#ef4444" : "#10b981"; // expenses up = bad (red)
+  const prfC = stats.profitGrowth   >= 0 ? "#10b981" : "#ef4444";
   const MO = [
     "Jan",
     "Feb",
@@ -1222,8 +1230,9 @@ export default function DashboardContent() {
           >
             {cur} {fmt(stats.expenses)}
           </div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#f87171" }}>
-            ↑ 5.4%{" "}
+          <div style={{ fontSize: 11, fontWeight: 700, color: expC }}>
+            {stats.expensesGrowth >= 0 ? "↑" : "↓"}{" "}
+            {Math.abs(stats.expensesGrowth).toFixed(1)}%{" "}
             <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
               vs last month
             </span>
@@ -1278,9 +1287,9 @@ export default function DashboardContent() {
           >
             {cur} {fmt(stats.profit)}
           </div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: profC }}>
-            {stats.revenueGrowth >= 0 ? "↑" : "↓"}{" "}
-            {Math.abs(stats.revenueGrowth).toFixed(1)}%{" "}
+          <div style={{ fontSize: 11, fontWeight: 700, color: prfC }}>
+            {stats.profitGrowth >= 0 ? "↑" : "↓"}{" "}
+            {Math.abs(stats.profitGrowth).toFixed(1)}%{" "}
             <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
               vs last month
             </span>

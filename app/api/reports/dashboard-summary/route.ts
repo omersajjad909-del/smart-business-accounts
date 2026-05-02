@@ -107,29 +107,38 @@ export async function GET(req: NextRequest) {
       [revenueRow],
       [expensesRow],
       [prevRevenueRow],
+      [prevExpensesRow],
       [receivablesRow],
       [payablesRow],
       bankAgg,
       monthlySales,
       monthlyExp,
     ] = await Promise.all([
-      buildRevenueSQL("SalesInvoice",   companyId, branchId, startDate, now),
+      buildRevenueSQL("SalesInvoice",    companyId, branchId, startDate, now),
       buildRevenueSQL("PurchaseInvoice", companyId, branchId, startDate, now),
-      buildRevenueSQL("SalesInvoice",   companyId, branchId, prevStart, startDate),
-      buildAllTimeSQL("SalesInvoice",   companyId, branchId),
+      buildRevenueSQL("SalesInvoice",    companyId, branchId, prevStart, startDate),
+      buildRevenueSQL("PurchaseInvoice", companyId, branchId, prevStart, startDate),
+      buildAllTimeSQL("SalesInvoice",    companyId, branchId),
       buildAllTimeSQL("PurchaseInvoice", companyId, branchId),
       prisma.bankAccount.aggregate({ where: { companyId }, _sum: { balance: true } }),
-      buildMonthlySQL("SalesInvoice",   companyId, twelveMonthsAgo),
+      buildMonthlySQL("SalesInvoice",    companyId, twelveMonthsAgo),
       buildMonthlySQL("PurchaseInvoice", companyId, twelveMonthsAgo),
     ]);
 
-    const revenue     = Number(revenueRow.total     || 0);
-    const expenses    = Number(expensesRow.total    || 0);
-    const prevRevenue = Number(prevRevenueRow.total || 0);
-    const receivables = Number(receivablesRow.total || 0);
-    const payables    = Number(payablesRow.total    || 0);
-    const cashBalance = Number(bankAgg._sum.balance || 0);
-    const revenueGrowth = prevRevenue > 0 ? ((revenue - prevRevenue) / prevRevenue) * 100 : 0;
+    const revenue      = Number(revenueRow.total      || 0);
+    const expenses     = Number(expensesRow.total     || 0);
+    const prevRevenue  = Number(prevRevenueRow.total  || 0);
+    const prevExpenses = Number(prevExpensesRow.total || 0);
+    const receivables  = Number(receivablesRow.total  || 0);
+    const payables     = Number(payablesRow.total     || 0);
+    const cashBalance  = Number(bankAgg._sum.balance  || 0);
+
+    const profit     = revenue - expenses;
+    const prevProfit = prevRevenue - prevExpenses;
+
+    const revenueGrowth  = prevRevenue  > 0 ? ((revenue  - prevRevenue)  / prevRevenue)  * 100 : (revenue  > 0 ? 100 : 0);
+    const expensesGrowth = prevExpenses > 0 ? ((expenses - prevExpenses) / prevExpenses) * 100 : (expenses > 0 ? 100 : 0);
+    const profitGrowth   = prevProfit !== 0 ? ((profit   - prevProfit)   / Math.abs(prevProfit)) * 100 : (profit !== 0 ? 100 : 0);
 
     // Overdue invoices (creditDays-based) — currency-aware
     const overdueRows = await prisma.$queryRaw<{ total: number; date: Date; creditDays: number | null }[]>`
@@ -251,8 +260,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       revenue,
       expenses,
-      profit: revenue - expenses,
-      revenueGrowth: Math.round(revenueGrowth * 10) / 10,
+      profit,
+      revenueGrowth:  Math.round(revenueGrowth  * 10) / 10,
+      expensesGrowth: Math.round(expensesGrowth * 10) / 10,
+      profitGrowth:   Math.round(profitGrowth   * 10) / 10,
       receivables,
       payables,
       cashBalance,
