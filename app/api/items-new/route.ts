@@ -144,9 +144,37 @@ export async function PUT(req: NextRequest) {
         description: description || "",
       },
     });
+
+    // If not found in ItemNew, try catalog product (BusinessRecord)
     if (!updated.count) {
-      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+      const record = await prisma.businessRecord.findFirst({
+        where: { id, companyId, category: "catalog_product" },
+      });
+      if (!record) {
+        return NextResponse.json({ error: "Item not found" }, { status: 404 });
+      }
+      const d = (record.data || {}) as Record<string, unknown>;
+      const updatedRecord = await prisma.businessRecord.update({
+        where: { id },
+        data: {
+          title: name,
+          amount: Number(rate) || 0,
+          data: {
+            ...d,
+            costPrice: Number(purchaseRate) || 0,
+            description: description || d.description || "",
+          },
+        },
+      });
+      const ud = updatedRecord.data as Record<string, unknown>;
+      return NextResponse.json({
+        id: updatedRecord.id, name: updatedRecord.title,
+        rate: updatedRecord.amount, purchaseRate: Number(ud?.costPrice || 0),
+        unit: "PCS", barcode: (ud?.barcode as string) || null,
+        category: "TRADING", taxRate: 0, minStock: 0,
+      });
     }
+
     const item = await prisma.itemNew.findUnique({ where: { id } });
 
     await logActivity(prisma, {
