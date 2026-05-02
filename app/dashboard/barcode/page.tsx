@@ -363,7 +363,7 @@ export default function BarcodePage() {
         {/* Header */}
         <div style={{ marginBottom: 20 }}>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", margin: "0 0 4px" }}>Barcode Management</h1>
-          <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>Assign, print, scan — aur price ek ek scan karke update karo.</p>
+          <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>Assign barcodes, print labels, and update prices by scanning items one by one.</p>
         </div>
 
         {/* Tabs */}
@@ -379,7 +379,7 @@ export default function BarcodePage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
               {/* Scanner */}
               <div style={{ borderRadius: 14, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.2)", padding: 20 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 10 }}>🔍 Scanner — barcode scan karke item dhundho</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 10 }}>🔍 Scanner — scan or type a barcode to find an item</div>
                 <form onSubmit={handleScan} style={{ display: "flex", gap: 8 }}>
                   <input ref={scanRef} value={scanInput} onChange={e => setScanInput(e.target.value)} placeholder="Scan or type barcode…" autoFocus
                     style={{ flex: 1, padding: "10px 14px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid rgba(99,102,241,.3)", color: "var(--text-primary)", fontSize: 13, fontFamily: "inherit", outline: "none" }} />
@@ -485,19 +485,19 @@ export default function BarcodePage() {
               <div style={{ borderRadius: 14, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.25)", padding: 24, marginBottom: 16 }}>
                 <div style={{ fontSize: 15, fontWeight: 800, color: "#f59e0b", marginBottom: 6 }}>💰 Price Update Scanner</div>
                 <p style={{ fontSize: 12.5, color: "var(--text-muted)", margin: "0 0 18px", lineHeight: 1.6 }}>
-                  Barcode scan karo → current price dikhega → naya price daalo → Save → agla item scan karo. Koi list nahi dhundni!
+                  Scan a barcode → current price appears → enter new price → Save → scan next item. No need to search through lists.
                 </p>
 
                 {/* Step 1 — Scan */}
                 {!puItem && (
                   <>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Step 1 — Item Scan Karo</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Step 1 — Scan Item</div>
                     <form onSubmit={handlePuScan} style={{ display: "flex", gap: 8 }}>
                       <input
                         ref={puScanRef}
                         value={puScan}
                         onChange={e => setPuScan(e.target.value)}
-                        placeholder="Barcode scan karo ya type karo…"
+                        placeholder="Scan or type barcode…"
                         autoFocus
                         style={{ flex: 1, padding: "12px 16px", borderRadius: 10, background: "var(--app-bg)", border: "1.5px solid rgba(245,158,11,.4)", color: "var(--text-primary)", fontSize: 14, fontFamily: "inherit", outline: "none" }}
                       />
@@ -529,7 +529,7 @@ export default function BarcodePage() {
                     </div>
 
                     <form onSubmit={savePuPrice}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 12 }}>Step 2 — Naya Price Likho</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 12 }}>Step 2 — Enter New Price</div>
 
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
                         <div>
