@@ -200,7 +200,7 @@ export default function BarcodePage() {
       setTimeout(() => puPriceRef.current?.focus(), 80);
     } else {
       setPuItem(null);
-      setPuErr(`"${val}" — item nahi mila`);
+      setPuErr(`"${val}" — item not found`);
     }
     setPuScan("");
     if (!found) puScanRef.current?.focus();
