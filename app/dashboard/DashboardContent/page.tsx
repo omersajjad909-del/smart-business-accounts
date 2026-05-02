@@ -999,6 +999,19 @@ export default function DashboardContent() {
               </span>
             </div>
           )}
+          {/* Period selector */}
+          <div style={{ display: "flex", gap: 4, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 10, padding: 3 }}>
+            {(["month","quarter","year","all"] as const).map(p => (
+              <button key={p} onClick={() => setPeriod(p)} style={{
+                padding: "4px 11px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 11.5, fontWeight: 700, fontFamily: "inherit",
+                background: period === p ? "rgba(99,102,241,.25)" : "transparent",
+                color: period === p ? "#818cf8" : "var(--text-muted)",
+                transition: "all .15s",
+              }}>
+                {p === "month" ? "This Month" : p === "quarter" ? "Quarter" : p === "year" ? "This Year" : "All Time"}
+              </button>
+            ))}
+          </div>
           <div
             style={{
               display: "flex",
