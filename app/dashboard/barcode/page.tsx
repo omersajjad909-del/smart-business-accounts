@@ -181,6 +181,8 @@ export default function BarcodePage() {
     scanRef.current?.focus();
   }
 
+  const [testScanItem, setTestScanItem] = useState<Item | null>(null);
+
   function openPrint(item: Item) { setPrintItem(item); setPrintQty(1); setShowPrintModal(true); }
   function executePrint() { setShowPrintModal(false); setTimeout(() => window.print(), 200); }
 
@@ -324,10 +326,18 @@ export default function BarcodePage() {
     <div style={{ padding: "24px 28px", fontFamily: "'Outfit','DM Sans',sans-serif" }}>
       <style>{`
         @media print {
-          .no-print { display: none !important; }
-          .print-area { display: block !important; }
+          body * { visibility: hidden !important; }
+          .print-area, .print-area * { visibility: visible !important; }
+          .print-area {
+            display: block !important;
+            position: fixed !important;
+            top: 0 !important; left: 0 !important;
+            width: 100% !important;
+            background: white !important;
+            z-index: 99999 !important;
+          }
           body { background: white !important; }
-          @page { margin: 8mm; }
+          @page { margin: 8mm; size: auto; }
         }
         .print-area { display: none; }
       `}</style>
@@ -442,7 +452,10 @@ export default function BarcodePage() {
                         <td style={{ padding: "11px 16px", color: "var(--text-muted)" }}>{item.rate != null ? `${currency}${item.rate}` : "—"}</td>
                         <td style={{ padding: "8px 16px" }}>
                           {item.barcode ? (
-                            <button onClick={() => openPrint(item)} style={{ padding: "5px 12px", borderRadius: 7, background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>🖨 Print</button>
+                            <div style={{ display: "flex", gap: 5 }}>
+                              <button onClick={() => openPrint(item)} style={{ padding: "5px 10px", borderRadius: 7, background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>🖨 Print</button>
+                              <button onClick={() => setTestScanItem(item)} style={{ padding: "5px 10px", borderRadius: 7, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.2)", color: "#34d399", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>📱 Test</button>
+                            </div>
                           ) : (
                             <div style={{ display: "flex", gap: 6 }}>
                               <input value={assignInput[item.id] || ""} onChange={e => setAssignInput(p => ({ ...p, [item.id]: e.target.value }))} placeholder="Type or leave blank"
@@ -718,6 +731,33 @@ export default function BarcodePage() {
           </div>
         )}
       </div>
+
+      {/* Test Scan Modal */}
+      {testScanItem && testScanItem.barcode && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.85)", backdropFilter: "blur(10px)", zIndex: 99, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setTestScanItem(null)}>
+          <div style={{ background: "#fff", borderRadius: 20, padding: 32, maxWidth: 560, width: "90%", textAlign: "center" }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#000", marginBottom: 6 }}>{testScanItem.name}</div>
+            <div style={{ fontSize: 11, color: "#666", marginBottom: 20 }}>{testScanItem.barcode}</div>
+            {/* Large barcode for screen scanning */}
+            <div style={{ background: "white", border: "2px solid #e5e7eb", borderRadius: 10, padding: "20px 24px", display: "inline-block", marginBottom: 20 }}>
+              <Barcode128 value={testScanItem.barcode} moduleWidth={3} height={90} bg="white" fg="black" />
+            </div>
+            <div style={{ background: "#fef3c7", border: "1px solid #f59e0b", borderRadius: 10, padding: "12px 16px", textAlign: "left", marginBottom: 16, fontSize: 12.5, color: "#92400e", lineHeight: 1.7 }}>
+              <strong>📱 iPhone se scan karne ke liye:</strong><br/>
+              Native Camera app Code128 support nahi karta.<br/>
+              Ye free apps try karo:<br/>
+              • <strong>Barcode Scanner & QR Reader</strong> (App Store)<br/>
+              • <strong>QR Code Reader</strong> by Scan<br/>
+              • <strong>ShopSavvy</strong>
+            </div>
+            <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 10, padding: "10px 16px", textAlign: "left", fontSize: 12.5, color: "#166534", marginBottom: 20, lineHeight: 1.7 }}>
+              <strong>✅ Android se scan karne ke liye:</strong><br/>
+              Google Lens ya default camera app — seedha scan ho jata hai!
+            </div>
+            <button onClick={() => setTestScanItem(null)} style={{ padding: "10px 28px", borderRadius: 10, background: "#111", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Close</button>
+          </div>
+        </div>
+      )}
 
       {/* Print Qty Modal */}
       {showPrintModal && printItem && (
