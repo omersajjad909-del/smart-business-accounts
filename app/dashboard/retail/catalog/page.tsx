@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
@@ -29,7 +29,6 @@ export default function ProductCatalogPage() {
   const [formError, setFormError] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [syncing, setSyncing] = useState(false);
 
   const allProducts = records.map(r => ({
     id: r.id,
@@ -145,49 +144,26 @@ export default function ProductCatalogPage() {
     setDeleteId(null);
   }
 
-  async function syncAllToItemMaster(recs = records) {
-    const unsynced = recs.filter(r => !r.data?.itemNewId);
+  async function syncAllToItemMaster() {
+    const unsynced = records.filter(r => !r.data?.itemNewId);
     if (!unsynced.length) return;
-    setSyncing(true);
     for (const r of unsynced) {
       const res = await fetch("/api/items-new", {
         method: "POST",
         headers: authHeaders,
         body: JSON.stringify({
-          name: r.title,
-          category: "TRADING",
-          unit: "PCS",
-          rate: r.amount || 0,
-          purchaseRate: Number(r.data?.costPrice || 0),
-          taxRate: 0,
-          barcode: (r.data?.sku as string) || "",
+          name: r.title, category: "TRADING", unit: "PCS",
+          rate: r.amount || 0, purchaseRate: Number(r.data?.costPrice || 0),
+          taxRate: 0, barcode: (r.data?.sku as string) || "",
           description: (r.data?.description as string) || "",
         }),
       });
       if (res.ok) {
         const created = await res.json();
-        await update(r.id, {
-          data: {
-            category: r.data?.category,
-            sku: r.data?.sku,
-            costPrice: r.data?.costPrice,
-            stock: r.data?.stock,
-            description: r.data?.description,
-            itemNewId: created.id,
-          },
-        });
+        await update(r.id, { data: { ...r.data, itemNewId: created.id } });
       }
     }
-    setSyncing(false);
   }
-
-  // Auto-sync any unsynced products when records load
-  useEffect(() => {
-    if (!loading && records.length > 0) {
-      syncAllToItemMaster(records);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
 
   const inp: React.CSSProperties = {
     width: "100%", background: bg, border: `1px solid ${border}`,
@@ -204,12 +180,11 @@ export default function ProductCatalogPage() {
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button
-            onClick={() => syncAllToItemMaster()}
-            disabled={syncing}
+            onClick={syncAllToItemMaster}
             title="Sync all catalog products to Item Master"
-            style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 13, fontWeight: 600, cursor: syncing ? "not-allowed" : "pointer", opacity: syncing ? .6 : 1 }}
+            style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
           >
-            {syncing ? "Syncing…" : "🔗 Sync to Item Master"}
+            🔗 Sync to Item Master
           </button>
           <Link prefetch={false} href="/dashboard/retail/categories" style={{ padding: "10px 16px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(255,255,255,.7)", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
             📂 Categories
