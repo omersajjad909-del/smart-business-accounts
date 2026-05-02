@@ -176,7 +176,7 @@ export default function BarcodePage() {
     if (!val) return;
     const found = findItemByBarcode(val);
     if (found) { setScanned(found); setScanErr(""); }
-    else { setScanned(null); setScanErr(`"${val}" — koi item nahi mila`); }
+    else { setScanned(null); setScanErr(`"${val}" — no item found`); }
     setScanInput("");
     scanRef.current?.focus();
   }
@@ -584,8 +584,8 @@ export default function BarcodePage() {
 
               {/* Tip box */}
               <div style={{ borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", padding: "14px 16px", fontSize: 12.5, color: "var(--text-muted)", lineHeight: 1.8 }}>
-                <strong style={{ color: "#818cf8" }}>Tip:</strong> USB barcode scanner lagao — scan karo, price type karo, Enter dabao, agla item scan karo. <br/>
-                Iss tarah 100 items ka price 10 minute mein update ho jata hai.
+                <strong style={{ color: "#818cf8" }}>Tip:</strong> Connect a USB barcode scanner — scan item, type new price, press Enter, scan next item. <br/>
+                Update 100 items in under 10 minutes.
               </div>
             </div>
 
@@ -597,7 +597,7 @@ export default function BarcodePage() {
               </div>
               {puLog.length === 0 ? (
                 <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>
-                  Abhi koi update nahi hua.<br/>Scan karo to yahan record aayega.
+                  No updates yet.<br/>Scan an item to start recording changes.
                 </div>
               ) : (
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
@@ -636,7 +636,7 @@ export default function BarcodePage() {
             <div style={{ borderRadius: 14, background: "rgba(239,68,68,.05)", border: "1px solid rgba(239,68,68,.2)", padding: 24, marginBottom: 20 }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: "#f87171", marginBottom: 6 }}>⚡ Bulk Price Change</div>
               <p style={{ fontSize: 12.5, color: "var(--text-muted)", margin: "0 0 20px", lineHeight: 1.6 }}>
-                Poori category ya sab items ka price ek baar mein change karo — percentage ya fixed amount se.
+                Update prices for an entire category or all items at once — by percentage or fixed amount.
               </p>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 16 }}>
@@ -743,16 +743,16 @@ export default function BarcodePage() {
               <Barcode128 value={testScanItem.barcode} moduleWidth={3} height={90} bg="white" fg="black" />
             </div>
             <div style={{ background: "#fef3c7", border: "1px solid #f59e0b", borderRadius: 10, padding: "12px 16px", textAlign: "left", marginBottom: 16, fontSize: 12.5, color: "#92400e", lineHeight: 1.7 }}>
-              <strong>📱 iPhone se scan karne ke liye:</strong><br/>
-              Native Camera app Code128 support nahi karta.<br/>
-              Ye free apps try karo:<br/>
+              <strong>📱 iPhone scanning:</strong><br/>
+              Native Camera app does not support Code128 barcodes.<br/>
+              Use one of these free apps instead:<br/>
               • <strong>Barcode Scanner & QR Reader</strong> (App Store)<br/>
               • <strong>QR Code Reader</strong> by Scan<br/>
               • <strong>ShopSavvy</strong>
             </div>
             <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 10, padding: "10px 16px", textAlign: "left", fontSize: 12.5, color: "#166534", marginBottom: 20, lineHeight: 1.7 }}>
-              <strong>✅ Android se scan karne ke liye:</strong><br/>
-              Google Lens ya default camera app — seedha scan ho jata hai!
+              <strong>✅ Android scanning:</strong><br/>
+              Google Lens or the default camera app — scans Code128 natively.
             </div>
             <button onClick={() => setTestScanItem(null)} style={{ padding: "10px 28px", borderRadius: 10, background: "#111", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Close</button>
           </div>
@@ -775,7 +775,7 @@ export default function BarcodePage() {
               )}
             </div>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>Kitne labels? (max 100)</label>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>How many labels? (max 100)</label>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <button onClick={() => setPrintQty(q => Math.max(1, q - 1))} style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 18, cursor: "pointer" }}>−</button>
                 <input type="number" min={1} max={100} value={printQty} onChange={e => setPrintQty(Math.max(1, Math.min(100, Number(e.target.value))))}
