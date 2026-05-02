@@ -5,10 +5,14 @@ import { useEffect, useRef, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { useCurrency } from "@/lib/useCurrency";
 
-type Item = { id: string; name: string; code?: string; barcode?: string; unit?: string; salePrice?: number; stockQty?: number };
+type Item = {
+  id: string; name: string; code?: string; barcode?: string;
+  unit?: string; category?: string; rate?: number; purchaseRate?: number;
+  taxRate?: number; minStock?: number; description?: string;
+  salePrice?: number; stockQty?: number;
+};
 
-// ─── Pure Code128B barcode generator — no library, pure SVG ───────────────────
-// Code128 pattern table: each value maps to an 11-bit binary string (1=bar, 0=space)
+// ─── Pure Code128B barcode generator — no library, pure SVG ──────────────────
 const C128: string[] = [
   "11011001100","11001101100","11001100110","10010011000","10010001100",
   "10001001100","10011001000","10011000100","10001100100","11001001000",
@@ -31,18 +35,16 @@ const C128: string[] = [
   "11011110110","11110110110","10101111000","10100011110","10001011110",
   "10111101000","10111100010","11110101000","11110100010","10111011110",
   "10111101110","11101011110","11110101110",
-  "11010000100", // 103 = START A
-  "11010010000", // 104 = START B  ← we use this
-  "11010011100", // 105 = START C
+  "11010000100","11010010000","11010011100",
 ];
-const C128_STOP = "1100011101011"; // 13 modules
+const C128_STOP = "1100011101011";
 
 function encodeCode128B(text: string): string {
   if (!text) return "";
   const vals: number[] = [];
   for (const ch of text) {
     const c = ch.charCodeAt(0);
-    if (c < 32 || c > 126) continue; // skip unsupported chars
+    if (c < 32 || c > 126) continue;
     vals.push(c - 32);
   }
   if (vals.length === 0) return "";
@@ -52,109 +54,91 @@ function encodeCode128B(text: string): string {
 }
 
 interface BarcodeProps {
-  value: string;
-  label?: string;
-  moduleWidth?: number;
-  height?: number;
-  showText?: boolean;
-  bg?: string;
-  fg?: string;
-  style?: React.CSSProperties;
+  value: string; label?: string; moduleWidth?: number; height?: number;
+  showText?: boolean; bg?: string; fg?: string; style?: React.CSSProperties;
 }
-
 function Barcode128({ value, label, moduleWidth = 2, height = 60, showText = true, bg = "white", fg = "black", style }: BarcodeProps) {
   const bits = encodeCode128B(value);
   if (!bits) return null;
   const svgW = bits.length * moduleWidth;
   const svgH = height + (showText ? 20 : 4);
-
   return (
     <svg width={svgW} height={svgH} style={style} xmlns="http://www.w3.org/2000/svg">
       <rect width={svgW} height={svgH} fill={bg} />
-      {bits.split("").map((bit, i) =>
-        bit === "1" ? (
-          <rect key={i} x={i * moduleWidth} y={2} width={moduleWidth} height={height} fill={fg} />
-        ) : null
-      )}
-      {showText && (
-        <text
-          x={svgW / 2} y={height + 16}
-          textAnchor="middle"
-          fontSize={11}
-          fontFamily="'Courier New',monospace"
-          fill={fg}
-          letterSpacing="1.5"
-        >
-          {label ?? value}
-        </text>
-      )}
+      {bits.split("").map((bit, i) => bit === "1" ? <rect key={i} x={i * moduleWidth} y={2} width={moduleWidth} height={height} fill={fg} /> : null)}
+      {showText && <text x={svgW / 2} y={height + 16} textAnchor="middle" fontSize={11} fontFamily="'Courier New',monospace" fill={fg} letterSpacing="1.5">{label ?? value}</text>}
     </svg>
   );
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+type Tab = "assign" | "price-update" | "bulk";
+type UpdateLog = { name: string; barcode: string; oldPrice: number; newPrice: number; ts: string };
+
 export default function BarcodePage() {
+  const [tab, setTab] = useState<Tab>("assign");
+
+  // ── Assign / Scan / Print tab ──────────────────────────────────────────────
   const [items, setItems]         = useState<Item[]>([]);
   const [filtered, setFiltered]   = useState<Item[]>([]);
   const [search, setSearch]       = useState("");
   const [scanInput, setScanInput] = useState("");
   const [scanned, setScanned]     = useState<Item | null>(null);
   const [scanErr, setScanErr]     = useState("");
-  const [printItem, setPrintItem]       = useState<Item | null>(null);
-  const [printQty, setPrintQty]         = useState(1);
+  const [printItem, setPrintItem]         = useState<Item | null>(null);
+  const [printQty, setPrintQty]           = useState(1);
   const [showPrintModal, setShowPrintModal] = useState(false);
-  const [loading, setLoading]           = useState(true);
-  const [assigning, setAssigning]       = useState<string | null>(null);
-  const [assignInput, setAssignInput]   = useState<Record<string, string>>({});
+  const [loading, setLoading]     = useState(true);
+  const [assigning, setAssigning] = useState<string | null>(null);
+  const [assignInput, setAssignInput] = useState<Record<string, string>>({});
   const scanRef = useRef<HTMLInputElement>(null);
+
+  // ── Price Update tab ───────────────────────────────────────────────────────
+  const [puScan, setPuScan]       = useState("");
+  const [puItem, setPuItem]       = useState<Item | null>(null);
+  const [puErr, setPuErr]         = useState("");
+  const [puSalePrice, setPuSalePrice]   = useState("");
+  const [puCostPrice, setPuCostPrice]   = useState("");
+  const [puSaving, setPuSaving]         = useState(false);
+  const [puLog, setPuLog]               = useState<UpdateLog[]>([]);
+  const puScanRef = useRef<HTMLInputElement>(null);
+  const puPriceRef = useRef<HTMLInputElement>(null);
+
+  // ── Bulk price change tab ──────────────────────────────────────────────────
+  const [bulkCategory, setBulkCategory] = useState("ALL");
+  const [bulkType, setBulkType]         = useState<"percent" | "fixed">("percent");
+  const [bulkValue, setBulkValue]       = useState("");
+  const [bulkDirection, setBulkDirection] = useState<"increase" | "decrease">("increase");
+  const [bulkPreview, setBulkPreview]   = useState<{id:string;name:string;old:number;newRate:number}[]>([]);
+  const [bulkSaving, setBulkSaving]     = useState(false);
+
   const currency = useCurrency();
 
-  const headers = () => {
+  const getHeaders = () => {
     const user = getCurrentUser();
-    const h: Record<string, string> = {};
-    if (user?.id)        h["x-user-id"]    = user.id;
-    if (user?.role)      h["x-user-role"]  = user.role;
-    if (user?.companyId) h["x-company-id"] = user.companyId;
-    return h;
+    return {
+      "x-user-id":    user?.id        || "",
+      "x-user-role":  user?.role      || "ADMIN",
+      "x-company-id": user?.companyId || "",
+    } as Record<string, string>;
   };
 
   function loadItems() {
-    fetch("/api/barcode", { credentials: "include", headers: headers() })
+    fetch("/api/barcode", { credentials: "include", headers: getHeaders() })
       .then(r => r.json())
       .then(d => {
-        const list: Item[] = d.items || [];
+        const list: Item[] = (d.items || []).map((i: Item) => ({ ...i, salePrice: i.rate }));
         setItems(list);
         setFiltered(list);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }
-
   useEffect(() => { loadItems(); }, []);
 
-  async function handleAssignBarcode(item: Item) {
-    const barcode = (assignInput[item.id] || "").trim();
-    setAssigning(item.id);
-    try {
-      const res = await fetch("/api/barcode", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", ...headers() },
-        body: JSON.stringify({ itemId: item.id, barcode: barcode || undefined }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setItems(prev => prev.map(i => i.id === item.id ? { ...i, barcode: data.item.barcode } : i));
-        setAssignInput(prev => ({ ...prev, [item.id]: "" }));
-        toast.success("Barcode assigned");
-      } else {
-        toast.error(data.error || "Failed to assign barcode");
-      }
-    } catch {
-      toast.error("Error assigning barcode");
-    } finally {
-      setAssigning(null);
-    }
+  // full item details for price update (includes unit, category etc.)
+  function findItemByBarcode(val: string): Item | undefined {
+    return items.find(i => i.barcode === val || i.code === val);
   }
 
   useEffect(() => {
@@ -166,34 +150,175 @@ export default function BarcodePage() {
     ) : items);
   }, [search, items]);
 
+  // ── Assign tab handlers ────────────────────────────────────────────────────
+  async function handleAssignBarcode(item: Item) {
+    const barcode = (assignInput[item.id] || "").trim();
+    setAssigning(item.id);
+    try {
+      const res = await fetch("/api/barcode", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json", ...getHeaders() },
+        body: JSON.stringify({ itemId: item.id, barcode: barcode || undefined }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setItems(prev => prev.map(i => i.id === item.id ? { ...i, barcode: data.item.barcode } : i));
+        setAssignInput(prev => ({ ...prev, [item.id]: "" }));
+        toast.success("Barcode assigned ✓");
+      } else toast.error(data.error || "Failed");
+    } catch { toast.error("Error"); }
+    finally { setAssigning(null); }
+  }
+
   function handleScan(e: React.FormEvent) {
     e.preventDefault();
     const val = scanInput.trim();
     if (!val) return;
-    const found = items.find(i => i.barcode === val || i.code === val);
-    if (found) {
-      setScanned(found);
-      setScanErr("");
-    } else {
-      setScanned(null);
-      setScanErr(`No item found for: "${val}"`);
-    }
+    const found = findItemByBarcode(val);
+    if (found) { setScanned(found); setScanErr(""); }
+    else { setScanned(null); setScanErr(`"${val}" — koi item nahi mila`); }
     setScanInput("");
     scanRef.current?.focus();
   }
 
-  function openPrint(item: Item) {
-    setPrintItem(item);
-    setPrintQty(1);
-    setShowPrintModal(true);
+  function openPrint(item: Item) { setPrintItem(item); setPrintQty(1); setShowPrintModal(true); }
+  function executePrint() { setShowPrintModal(false); setTimeout(() => window.print(), 200); }
+
+  // ── Price Update tab handlers ──────────────────────────────────────────────
+  function handlePuScan(e: React.FormEvent) {
+    e.preventDefault();
+    const val = puScan.trim();
+    if (!val) return;
+    const found = findItemByBarcode(val);
+    if (found) {
+      setPuItem(found);
+      setPuSalePrice(String(found.rate ?? found.salePrice ?? ""));
+      setPuCostPrice(String(found.purchaseRate ?? ""));
+      setPuErr("");
+      setTimeout(() => puPriceRef.current?.focus(), 80);
+    } else {
+      setPuItem(null);
+      setPuErr(`"${val}" — item nahi mila`);
+    }
+    setPuScan("");
+    if (!found) puScanRef.current?.focus();
   }
 
-  function executePrint() {
-    setShowPrintModal(false);
-    setTimeout(() => window.print(), 200);
+  async function savePuPrice(e: React.FormEvent) {
+    e.preventDefault();
+    if (!puItem) return;
+    const newSale = Number(puSalePrice);
+    const newCost = Number(puCostPrice) || puItem.purchaseRate || 0;
+    if (!newSale || newSale <= 0) { toast.error("Valid sale price daalo"); return; }
+
+    setPuSaving(true);
+    try {
+      const res = await fetch("/api/items-new", {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json", ...getHeaders() },
+        body: JSON.stringify({
+          id:           puItem.id,
+          name:         puItem.name,
+          category:     puItem.category     || "TRADING",
+          unit:         puItem.unit         || "PCS",
+          rate:         newSale,
+          purchaseRate: newCost,
+          taxRate:      puItem.taxRate      || 0,
+          minStock:     puItem.minStock     || 0,
+          barcode:      puItem.barcode      || "",
+          description:  puItem.description  || "",
+        }),
+      });
+      if (res.ok) {
+        const oldPrice = puItem.rate ?? puItem.salePrice ?? 0;
+        // update local items list
+        setItems(prev => prev.map(i => i.id === puItem.id ? { ...i, rate: newSale, salePrice: newSale, purchaseRate: newCost } : i));
+        setPuLog(prev => [{
+          name: puItem.name,
+          barcode: puItem.barcode || puItem.code || "",
+          oldPrice,
+          newPrice: newSale,
+          ts: new Date().toLocaleTimeString("en-PK", { hour: "2-digit", minute: "2-digit" }),
+        }, ...prev].slice(0, 50));
+        toast.success(`${puItem.name} — price updated ✓`);
+        setPuItem(null);
+        setPuSalePrice("");
+        setPuCostPrice("");
+        setTimeout(() => puScanRef.current?.focus(), 80);
+      } else {
+        const d = await res.json();
+        toast.error(d.error || "Save failed");
+      }
+    } catch { toast.error("Error saving"); }
+    finally { setPuSaving(false); }
+  }
+
+  // ── Bulk price change handlers ─────────────────────────────────────────────
+  const categories = ["ALL", ...Array.from(new Set(items.map(i => i.category || "TRADING").filter(Boolean)))];
+
+  function calcBulkPreview() {
+    const v = Number(bulkValue);
+    if (!v || v <= 0) { toast.error("Valid value daalo"); return; }
+    const targetItems = bulkCategory === "ALL" ? items : items.filter(i => (i.category || "TRADING") === bulkCategory);
+    const preview = targetItems
+      .filter(i => (i.rate ?? 0) > 0)
+      .map(i => {
+        const old = i.rate ?? 0;
+        let newRate = old;
+        if (bulkType === "percent") {
+          newRate = bulkDirection === "increase" ? old * (1 + v / 100) : old * (1 - v / 100);
+        } else {
+          newRate = bulkDirection === "increase" ? old + v : old - v;
+        }
+        newRate = Math.max(0, Math.round(newRate * 100) / 100);
+        return { id: i.id, name: i.name, old, newRate };
+      });
+    setBulkPreview(preview);
+  }
+
+  async function applyBulkChange() {
+    if (!bulkPreview.length) return;
+    setBulkSaving(true);
+    let done = 0;
+    try {
+      for (const p of bulkPreview) {
+        const item = items.find(i => i.id === p.id);
+        if (!item) continue;
+        await fetch("/api/items-new", {
+          method: "PUT", credentials: "include",
+          headers: { "Content-Type": "application/json", ...getHeaders() },
+          body: JSON.stringify({
+            id: item.id, name: item.name,
+            category: item.category || "TRADING", unit: item.unit || "PCS",
+            rate: p.newRate, purchaseRate: item.purchaseRate || 0,
+            taxRate: item.taxRate || 0, minStock: item.minStock || 0,
+            barcode: item.barcode || "", description: item.description || "",
+          }),
+        });
+        done++;
+      }
+      // refresh local
+      setItems(prev => prev.map(i => {
+        const p = bulkPreview.find(b => b.id === i.id);
+        return p ? { ...i, rate: p.newRate, salePrice: p.newRate } : i;
+      }));
+      toast.success(`${done} items updated ✓`);
+      setBulkPreview([]);
+      setBulkValue("");
+    } catch { toast.error("Kuch galat hua"); }
+    finally { setBulkSaving(false); }
   }
 
   const printLabels = printItem ? Array.from({ length: Math.max(1, Math.min(printQty, 100)) }) : [];
+
+  // ── UI ─────────────────────────────────────────────────────────────────────
+  const TAB_STYLE = (active: boolean): React.CSSProperties => ({
+    padding: "9px 20px", borderRadius: 9, fontSize: 13, fontWeight: 700,
+    cursor: "pointer", border: `1px solid ${active ? "rgba(99,102,241,.5)" : "var(--border)"}`,
+    background: active ? "rgba(99,102,241,.15)" : "transparent",
+    color: active ? "#818cf8" : "var(--text-muted)",
+    fontFamily: "inherit",
+  });
 
   return (
     <div style={{ padding: "24px 28px", fontFamily: "'Outfit','DM Sans',sans-serif" }}>
@@ -207,31 +332,16 @@ export default function BarcodePage() {
         .print-area { display: none; }
       `}</style>
 
-      {/* ── Print Area ───────────────────────────────────────────── */}
+      {/* Print area */}
       {printItem && (
         <div className="print-area">
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 4 }}>
             {printLabels.map((_, idx) => (
-              <div key={idx} style={{
-                border: "1px dashed #ccc", borderRadius: 6,
-                padding: "10px 14px", textAlign: "center",
-                display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 4,
-                pageBreakInside: "avoid",
-              }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#000", maxWidth: 180, textAlign: "center", lineHeight: 1.3 }}>
-                  {printItem.name}
-                </div>
-                <Barcode128
-                  value={printItem.barcode!}
-                  moduleWidth={1.5}
-                  height={48}
-                  bg="white"
-                  fg="black"
-                />
-                {printItem.salePrice != null && (
-                  <div style={{ fontSize: 12, fontWeight: 800, color: "#000" }}>
-                    {currency}{printItem.salePrice}
-                  </div>
+              <div key={idx} style={{ border: "1px dashed #ccc", borderRadius: 6, padding: "10px 14px", textAlign: "center", display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 4, pageBreakInside: "avoid" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#000", maxWidth: 180, textAlign: "center", lineHeight: 1.3 }}>{printItem.name}</div>
+                <Barcode128 value={printItem.barcode!} moduleWidth={1.5} height={48} bg="white" fg="black" />
+                {(printItem.rate ?? printItem.salePrice) != null && (
+                  <div style={{ fontSize: 12, fontWeight: 800, color: "#000" }}>{currency}{printItem.rate ?? printItem.salePrice}</div>
                 )}
               </div>
             ))}
@@ -239,219 +349,411 @@ export default function BarcodePage() {
         </div>
       )}
 
-      {/* ── Main UI ──────────────────────────────────────────────── */}
       <div className="no-print">
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", margin: "0 0 4px" }}>
-            Barcode Management
-          </h1>
-          <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>
-            Real Code128 barcodes — assign, preview, and print labels for any item.
-          </p>
+        {/* Header */}
+        <div style={{ marginBottom: 20 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", margin: "0 0 4px" }}>Barcode Management</h1>
+          <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>Assign, print, scan — aur price ek ek scan karke update karo.</p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+          <button style={TAB_STYLE(tab === "assign")}       onClick={() => setTab("assign")}>       📦 Assign & Print</button>
+          <button style={TAB_STYLE(tab === "price-update")} onClick={() => setTab("price-update")}> 💰 Price Update Scanner</button>
+          <button style={TAB_STYLE(tab === "bulk")}         onClick={() => setTab("bulk")}>         ⚡ Bulk Price Change</button>
+        </div>
 
-          {/* Scanner */}
-          <div style={{ borderRadius: 14, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.2)", padding: "20px" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2">
-                <rect x="2" y="6" width="20" height="12" rx="2"/>
-                <line x1="6" y1="10" x2="6" y2="14"/><line x1="10" y1="8" x2="10" y2="16"/>
-                <line x1="14" y1="10" x2="14" y2="14"/><line x1="18" y1="9" x2="18" y2="15"/>
-              </svg>
-              Barcode Scanner
-            </div>
-            <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 14, lineHeight: 1.6 }}>
-              USB scanner ya phone scanner se scan karo, ya manually barcode type karo.
-            </p>
-            <form onSubmit={handleScan} style={{ display: "flex", gap: 8 }}>
-              <input
-                ref={scanRef}
-                value={scanInput}
-                onChange={e => setScanInput(e.target.value)}
-                placeholder="Scan or type barcode…"
-                autoFocus
-                style={{ flex: 1, padding: "10px 14px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid rgba(99,102,241,.3)", color: "var(--text-primary)", fontSize: 13, fontFamily: "inherit", outline: "none" }}
-              />
-              <button type="submit" style={{ padding: "10px 16px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
-                Find
-              </button>
-            </form>
-
-            {scanned && (
-              <div style={{ marginTop: 14, padding: "14px 16px", borderRadius: 10, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.2)" }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#34d399", marginBottom: 4 }}>✓ Item Found</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{scanned.name}</div>
-                <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 4 }}>
-                  Code: {scanned.code || "—"} · Barcode: {scanned.barcode || "—"}
-                  {scanned.salePrice != null && ` · Price: ${currency}${scanned.salePrice}`}
-                  {scanned.stockQty  != null && ` · Stock: ${scanned.stockQty} ${scanned.unit || ""}`}
-                </div>
-                {scanned.barcode && (
-                  <>
-                    <div style={{ marginTop: 10, padding: "10px", borderRadius: 8, background: "white", display: "inline-block" }}>
-                      <Barcode128 value={scanned.barcode} height={44} moduleWidth={1.5} />
+        {/* ══ TAB 1: Assign & Print ═══════════════════════════════════════════ */}
+        {tab === "assign" && (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+              {/* Scanner */}
+              <div style={{ borderRadius: 14, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.2)", padding: 20 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 10 }}>🔍 Scanner — barcode scan karke item dhundho</div>
+                <form onSubmit={handleScan} style={{ display: "flex", gap: 8 }}>
+                  <input ref={scanRef} value={scanInput} onChange={e => setScanInput(e.target.value)} placeholder="Scan or type barcode…" autoFocus
+                    style={{ flex: 1, padding: "10px 14px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid rgba(99,102,241,.3)", color: "var(--text-primary)", fontSize: 13, fontFamily: "inherit", outline: "none" }} />
+                  <button type="submit" style={{ padding: "10px 16px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Find</button>
+                </form>
+                {scanned && (
+                  <div style={{ marginTop: 14, padding: "14px 16px", borderRadius: 10, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.2)" }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{scanned.name}</div>
+                    <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 4 }}>
+                      {scanned.code && `Code: ${scanned.code} · `}Barcode: {scanned.barcode || "—"}
+                      {scanned.salePrice != null && ` · Price: ${currency}${scanned.salePrice}`}
+                      {scanned.stockQty  != null && ` · Stock: ${scanned.stockQty} ${scanned.unit || ""}`}
                     </div>
-                    <br />
-                    <button onClick={() => openPrint(scanned)} style={{ marginTop: 8, padding: "7px 14px", borderRadius: 8, background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-                      🖨 Print Label
-                    </button>
+                    {scanned.barcode && (
+                      <>
+                        <div style={{ marginTop: 10, padding: 8, background: "white", display: "inline-block", borderRadius: 6 }}>
+                          <Barcode128 value={scanned.barcode} height={40} moduleWidth={1.5} />
+                        </div>
+                        <br />
+                        <button onClick={() => openPrint(scanned)} style={{ marginTop: 8, padding: "6px 14px", borderRadius: 8, background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>🖨 Print Label</button>
+                      </>
+                    )}
+                  </div>
+                )}
+                {scanErr && <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 9, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12.5, color: "#f87171" }}>{scanErr}</div>}
+              </div>
+
+              {/* Stats */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {[
+                  { label: "Total Items",     val: items.length,                         color: "#818cf8" },
+                  { label: "With Barcode",    val: items.filter(i => i.barcode).length,  color: "#34d399" },
+                  { label: "Without Barcode", val: items.filter(i => !i.barcode).length, color: "#f87171" },
+                ].map(({ label, val, color }) => (
+                  <div key={label} style={{ flex: 1, borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid var(--border)", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{label}</span>
+                    <span style={{ fontSize: 24, fontWeight: 800, color }}>{val}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Items Table */}
+            <div style={{ borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid var(--border)", overflow: "hidden" }}>
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>All Items</span>
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, code, barcode…"
+                  style={{ width: 280, padding: "7px 12px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 12.5, fontFamily: "inherit", outline: "none" }} />
+              </div>
+              {loading ? <div style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>Loading…</div> : (
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                      {["Item","Code","Barcode Preview","Unit","Price","Action"].map(h => (
+                        <th key={h} style={{ padding: "10px 16px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: ".05em" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.slice(0, 100).map(item => (
+                      <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                        <td style={{ padding: "11px 16px", color: "var(--text-primary)", fontWeight: 600 }}>{item.name}</td>
+                        <td style={{ padding: "11px 16px", color: "var(--text-muted)", fontFamily: "monospace" }}>{item.code || "—"}</td>
+                        <td style={{ padding: "8px 16px" }}>
+                          {item.barcode
+                            ? <div style={{ display: "inline-block", background: "white", padding: "3px 5px", borderRadius: 4 }}><Barcode128 value={item.barcode} moduleWidth={1} height={28} showText={false} bg="white" fg="black" /></div>
+                            : <span style={{ color: "rgba(255,255,255,.2)", fontSize: 11 }}>Not set</span>}
+                        </td>
+                        <td style={{ padding: "11px 16px", color: "var(--text-muted)" }}>{item.unit || "—"}</td>
+                        <td style={{ padding: "11px 16px", color: "var(--text-muted)" }}>{item.rate != null ? `${currency}${item.rate}` : "—"}</td>
+                        <td style={{ padding: "8px 16px" }}>
+                          {item.barcode ? (
+                            <button onClick={() => openPrint(item)} style={{ padding: "5px 12px", borderRadius: 7, background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", fontSize: 11.5, fontWeight: 600, cursor: "pointer" }}>🖨 Print</button>
+                          ) : (
+                            <div style={{ display: "flex", gap: 6 }}>
+                              <input value={assignInput[item.id] || ""} onChange={e => setAssignInput(p => ({ ...p, [item.id]: e.target.value }))} placeholder="Type or leave blank"
+                                style={{ width: 140, padding: "4px 8px", borderRadius: 6, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 11.5, fontFamily: "inherit", outline: "none" }} />
+                              <button onClick={() => handleAssignBarcode(item)} disabled={assigning === item.id}
+                                style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", fontSize: 11.5, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>
+                                {assigning === item.id ? "…" : "Assign"}
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    {filtered.length === 0 && <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>No items found</td></tr>}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ══ TAB 2: Price Update Scanner ══════════════════════════════════════ */}
+        {tab === "price-update" && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            {/* Left — scanner + form */}
+            <div>
+              <div style={{ borderRadius: 14, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.25)", padding: 24, marginBottom: 16 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#f59e0b", marginBottom: 6 }}>💰 Price Update Scanner</div>
+                <p style={{ fontSize: 12.5, color: "var(--text-muted)", margin: "0 0 18px", lineHeight: 1.6 }}>
+                  Barcode scan karo → current price dikhega → naya price daalo → Save → agla item scan karo. Koi list nahi dhundni!
+                </p>
+
+                {/* Step 1 — Scan */}
+                {!puItem && (
+                  <>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>Step 1 — Item Scan Karo</div>
+                    <form onSubmit={handlePuScan} style={{ display: "flex", gap: 8 }}>
+                      <input
+                        ref={puScanRef}
+                        value={puScan}
+                        onChange={e => setPuScan(e.target.value)}
+                        placeholder="Barcode scan karo ya type karo…"
+                        autoFocus
+                        style={{ flex: 1, padding: "12px 16px", borderRadius: 10, background: "var(--app-bg)", border: "1.5px solid rgba(245,158,11,.4)", color: "var(--text-primary)", fontSize: 14, fontFamily: "inherit", outline: "none" }}
+                      />
+                      <button type="submit" style={{ padding: "12px 18px", borderRadius: 10, background: "linear-gradient(135deg,#f59e0b,#d97706)", border: "none", color: "#000", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Scan</button>
+                    </form>
+                    {puErr && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 12.5 }}>{puErr}</div>}
+                  </>
+                )}
+
+                {/* Step 2 — Price entry */}
+                {puItem && (
+                  <>
+                    <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(52,211,153,.06)", border: "1px solid rgba(52,211,153,.2)", marginBottom: 16 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text-primary)" }}>{puItem.name}</div>
+                      <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>
+                        {puItem.barcode && `Barcode: ${puItem.barcode} · `}
+                        Unit: {puItem.unit || "PCS"} · Category: {puItem.category || "—"}
+                      </div>
+                      <div style={{ display: "flex", gap: 20, marginTop: 10 }}>
+                        <div>
+                          <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Current Sale Price</div>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: "#f87171" }}>{currency}{puItem.rate ?? puItem.salePrice ?? "—"}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Current Cost Price</div>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text-muted)" }}>{currency}{puItem.purchaseRate ?? "—"}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <form onSubmit={savePuPrice}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 12 }}>Step 2 — Naya Price Likho</div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                        <div>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#f59e0b", marginBottom: 6 }}>New Sale Price (Rs.) *</label>
+                          <input
+                            ref={puPriceRef}
+                            type="number" min="0" step="0.01"
+                            value={puSalePrice}
+                            onChange={e => setPuSalePrice(e.target.value)}
+                            placeholder="e.g. 90"
+                            style={{ width: "100%", padding: "12px 14px", borderRadius: 10, background: "var(--app-bg)", border: "1.5px solid rgba(245,158,11,.4)", color: "var(--text-primary)", fontSize: 16, fontWeight: 700, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 6 }}>New Cost Price (Rs.)</label>
+                          <input
+                            type="number" min="0" step="0.01"
+                            value={puCostPrice}
+                            onChange={e => setPuCostPrice(e.target.value)}
+                            placeholder="Optional"
+                            style={{ width: "100%", padding: "12px 14px", borderRadius: 10, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 16, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
+                          />
+                        </div>
+                      </div>
+
+                      {puSalePrice && Number(puSalePrice) !== (puItem.rate ?? puItem.salePrice) && (
+                        <div style={{ marginBottom: 14, padding: "10px 14px", borderRadius: 8, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.25)", fontSize: 13 }}>
+                          <span style={{ color: "#f87171" }}>{currency}{puItem.rate ?? puItem.salePrice}</span>
+                          {" → "}
+                          <span style={{ fontWeight: 800, color: "#34d399" }}>{currency}{puSalePrice}</span>
+                          {" "}
+                          <span style={{ color: "var(--text-muted)", fontSize: 11 }}>
+                            ({Number(puSalePrice) > (puItem.rate ?? 0) ? "▲" : "▼"} {Math.abs(Number(puSalePrice) - (puItem.rate ?? 0)).toFixed(0)} Rs.)
+                          </span>
+                        </div>
+                      )}
+
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <button type="submit" disabled={puSaving}
+                          style={{ flex: 1, padding: "12px 0", borderRadius: 10, background: puSaving ? "var(--border)" : "linear-gradient(135deg,#f59e0b,#d97706)", border: "none", color: "#000", fontSize: 14, fontWeight: 800, cursor: puSaving ? "not-allowed" : "pointer" }}>
+                          {puSaving ? "Saving…" : "✓ Save & Next Item"}
+                        </button>
+                        <button type="button" onClick={() => { setPuItem(null); setPuScan(""); setTimeout(() => puScanRef.current?.focus(), 80); }}
+                          style={{ padding: "12px 18px", borderRadius: 10, background: "transparent", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer" }}>
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
                   </>
                 )}
               </div>
-            )}
-            {scanErr && (
-              <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 10, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12.5, color: "#f87171" }}>
-                {scanErr}
-              </div>
-            )}
-          </div>
 
-          {/* Stats */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {[
-              { label: "Total Items",      val: items.length,                        color: "#818cf8" },
-              { label: "With Barcode",     val: items.filter(i => i.barcode).length, color: "#34d399" },
-              { label: "Without Barcode",  val: items.filter(i => !i.barcode).length,color: "#f87171" },
-            ].map(({ label, val, color }) => (
-              <div key={label} style={{ flex: 1, borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid var(--border)", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{label}</span>
-                <span style={{ fontSize: 24, fontWeight: 800, color }}>{val}</span>
+              {/* Tip box */}
+              <div style={{ borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.15)", padding: "14px 16px", fontSize: 12.5, color: "var(--text-muted)", lineHeight: 1.8 }}>
+                <strong style={{ color: "#818cf8" }}>Tip:</strong> USB barcode scanner lagao — scan karo, price type karo, Enter dabao, agla item scan karo. <br/>
+                Iss tarah 100 items ka price 10 minute mein update ho jata hai.
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* Items List */}
-        <div style={{ borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid var(--border)", overflow: "hidden" }}>
-          <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>All Items</span>
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search by name, code, or barcode…"
-              style={{ width: 280, padding: "7px 12px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 12.5, fontFamily: "inherit", outline: "none" }}
-            />
+            {/* Right — session log */}
+            <div style={{ borderRadius: 14, background: "rgba(255,255,255,.02)", border: "1px solid var(--border)", overflow: "hidden" }}>
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>Session Log</span>
+                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{puLog.length} updated today</span>
+              </div>
+              {puLog.length === 0 ? (
+                <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>
+                  Abhi koi update nahi hua.<br/>Scan karo to yahan record aayega.
+                </div>
+              ) : (
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                      {["Time","Item","Old","New","Change"].map(h => (
+                        <th key={h} style={{ padding: "9px 14px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700, fontSize: 11 }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {puLog.map((l, i) => {
+                      const diff = l.newPrice - l.oldPrice;
+                      return (
+                        <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding: "10px 14px", color: "var(--text-muted)", fontSize: 11, whiteSpace: "nowrap" }}>{l.ts}</td>
+                          <td style={{ padding: "10px 14px", fontWeight: 600 }}>{l.name}</td>
+                          <td style={{ padding: "10px 14px", color: "#f87171" }}>{currency}{l.oldPrice}</td>
+                          <td style={{ padding: "10px 14px", color: "#34d399", fontWeight: 700 }}>{currency}{l.newPrice}</td>
+                          <td style={{ padding: "10px 14px", fontWeight: 700, color: diff >= 0 ? "#818cf8" : "#f87171" }}>
+                            {diff >= 0 ? "▲" : "▼"} {Math.abs(diff).toFixed(0)}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
-          {loading ? (
-            <div style={{ padding: 32, textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>Loading items…</div>
-          ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                  {["Item Name","Code","Barcode Preview","Unit","Sale Price","Action"].map(h => (
-                    <th key={h} style={{ padding: "10px 16px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: ".05em" }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.slice(0, 100).map(item => (
-                  <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
-                    <td style={{ padding: "11px 16px", color: "var(--text-primary)", fontWeight: 600 }}>{item.name}</td>
-                    <td style={{ padding: "11px 16px", color: "var(--text-muted)", fontFamily: "monospace" }}>{item.code || "—"}</td>
-                    <td style={{ padding: "8px 16px" }}>
-                      {item.barcode ? (
-                        <div style={{ display: "inline-block", background: "white", padding: "4px 6px", borderRadius: 4 }}>
-                          <Barcode128 value={item.barcode} moduleWidth={1} height={32} showText={false} bg="white" fg="black" />
-                        </div>
-                      ) : (
-                        <span style={{ color: "rgba(255,255,255,.2)", fontSize: 11 }}>Not set</span>
-                      )}
-                    </td>
-                    <td style={{ padding: "11px 16px", color: "var(--text-muted)" }}>{item.unit || "—"}</td>
-                    <td style={{ padding: "11px 16px", color: "var(--text-muted)" }}>{item.salePrice != null ? `${currency}${item.salePrice}` : "—"}</td>
-                    <td style={{ padding: "8px 16px" }}>
-                      {item.barcode ? (
-                        <button onClick={() => openPrint(item)} style={{ padding: "5px 12px", borderRadius: 7, background: "rgba(129,140,248,.12)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", fontSize: 11.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-                          🖨 Print
-                        </button>
-                      ) : (
-                        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                          <input
-                            value={assignInput[item.id] || ""}
-                            onChange={e => setAssignInput(prev => ({ ...prev, [item.id]: e.target.value }))}
-                            placeholder="Barcode or leave blank to auto"
-                            style={{ width: 160, padding: "4px 8px", borderRadius: 6, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 11.5, fontFamily: "inherit", outline: "none" }}
-                          />
-                          <button
-                            onClick={() => handleAssignBarcode(item)}
-                            disabled={assigning === item.id}
-                            style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(52,211,153,.15)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", fontSize: 11.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}
-                          >
-                            {assigning === item.id ? "…" : "Assign"}
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr><td colSpan={6} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>No items found</td></tr>
+        )}
+
+        {/* ══ TAB 3: Bulk Price Change ══════════════════════════════════════════ */}
+        {tab === "bulk" && (
+          <div>
+            <div style={{ borderRadius: 14, background: "rgba(239,68,68,.05)", border: "1px solid rgba(239,68,68,.2)", padding: 24, marginBottom: 20 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "#f87171", marginBottom: 6 }}>⚡ Bulk Price Change</div>
+              <p style={{ fontSize: 12.5, color: "var(--text-muted)", margin: "0 0 20px", lineHeight: 1.6 }}>
+                Poori category ya sab items ka price ek baar mein change karo — percentage ya fixed amount se.
+              </p>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 16 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 6 }}>Category</label>
+                  <select value={bulkCategory} onChange={e => setBulkCategory(e.target.value)}
+                    style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 13, outline: "none" }}>
+                    {categories.map(c => <option key={c} value={c}>{c === "ALL" ? "All Categories" : c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 6 }}>Change Type</label>
+                  <select value={bulkType} onChange={e => setBulkType(e.target.value as "percent" | "fixed")}
+                    style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 13, outline: "none" }}>
+                    <option value="percent">% Percentage</option>
+                    <option value="fixed">Rs. Fixed Amount</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 6 }}>Direction</label>
+                  <select value={bulkDirection} onChange={e => setBulkDirection(e.target.value as "increase" | "decrease")}
+                    style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 13, outline: "none" }}>
+                    <option value="increase">▲ Increase</option>
+                    <option value="decrease">▼ Decrease</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 6 }}>
+                    Value ({bulkType === "percent" ? "%" : "Rs."})
+                  </label>
+                  <input type="number" min="0" step="0.01" value={bulkValue} onChange={e => setBulkValue(e.target.value)}
+                    placeholder={bulkType === "percent" ? "e.g. 10" : "e.g. 5"}
+                    style={{ width: "100%", padding: "10px 12px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <button onClick={calcBulkPreview}
+                  style={{ padding: "10px 22px", borderRadius: 10, background: "rgba(239,68,68,.15)", border: "1px solid rgba(239,68,68,.3)", color: "#f87171", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  Preview Changes
+                </button>
+                {bulkPreview.length > 0 && (
+                  <button onClick={applyBulkChange} disabled={bulkSaving}
+                    style={{ padding: "10px 22px", borderRadius: 10, background: bulkSaving ? "var(--border)" : "linear-gradient(135deg,#ef4444,#dc2626)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: bulkSaving ? "not-allowed" : "pointer" }}>
+                    {bulkSaving ? "Updating…" : `✓ Apply to ${bulkPreview.length} Items`}
+                  </button>
                 )}
-              </tbody>
-            </table>
-          )}
-        </div>
+                {bulkPreview.length > 0 && (
+                  <button onClick={() => setBulkPreview([])}
+                    style={{ padding: "10px 18px", borderRadius: 10, background: "transparent", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 13, cursor: "pointer" }}>
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {bulkPreview.length > 0 && (
+              <div style={{ borderRadius: 14, background: "rgba(255,255,255,.02)", border: "1px solid var(--border)", overflow: "hidden" }}>
+                <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)" }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>Preview — {bulkPreview.length} items</span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 10 }}>
+                    {bulkDirection === "increase" ? "▲ Increase" : "▼ Decrease"} by {bulkValue}{bulkType === "percent" ? "%" : " Rs."}
+                  </span>
+                </div>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                      {["Item","Category","Old Price","New Price","Change"].map(h => (
+                        <th key={h} style={{ padding: "9px 16px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700, fontSize: 11 }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bulkPreview.slice(0, 200).map(p => {
+                      const diff = p.newRate - p.old;
+                      return (
+                        <tr key={p.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding: "9px 16px", fontWeight: 600 }}>{p.name}</td>
+                          <td style={{ padding: "9px 16px", color: "var(--text-muted)" }}>{items.find(i => i.id === p.id)?.category || "—"}</td>
+                          <td style={{ padding: "9px 16px", color: "#f87171" }}>{currency}{p.old}</td>
+                          <td style={{ padding: "9px 16px", color: "#34d399", fontWeight: 700 }}>{currency}{p.newRate}</td>
+                          <td style={{ padding: "9px 16px", fontWeight: 700, color: diff >= 0 ? "#818cf8" : "#f87171" }}>
+                            {diff >= 0 ? "+" : ""}{diff.toFixed(0)} Rs.
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* ── Print Quantity Modal ──────────────────────────────────── */}
+      {/* Print Qty Modal */}
       {showPrintModal && printItem && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(8px)", zIndex: 99, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ background: "var(--panel-bg, #1a1d2e)", border: "1px solid var(--border)", borderRadius: 18, padding: 28, width: 460, fontFamily: "'Outfit',sans-serif" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>🖨 Print Barcode Labels</h2>
+              <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>🖨 Print Labels</h2>
               <button onClick={() => setShowPrintModal(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
-
-            {/* Live preview */}
-            <div style={{ background: "white", borderRadius: 10, padding: "16px", textAlign: "center", marginBottom: 20 }}>
+            <div style={{ background: "white", borderRadius: 10, padding: 16, textAlign: "center", marginBottom: 20 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#000", marginBottom: 8 }}>{printItem.name}</div>
               <Barcode128 value={printItem.barcode!} moduleWidth={2} height={56} bg="white" fg="black" />
-              {printItem.salePrice != null && (
-                <div style={{ fontSize: 13, fontWeight: 800, color: "#000", marginTop: 6 }}>
-                  {currency}{printItem.salePrice}
-                </div>
+              {(printItem.rate ?? printItem.salePrice) != null && (
+                <div style={{ fontSize: 13, fontWeight: 800, color: "#000", marginTop: 6 }}>{currency}{printItem.rate ?? printItem.salePrice}</div>
               )}
             </div>
-
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>
-                Kitne labels print karni hain? (max 100)
-              </label>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>Kitne labels? (max 100)</label>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <button
-                  onClick={() => setPrintQty(q => Math.max(1, q - 1))}
-                  style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 18, cursor: "pointer", fontWeight: 700 }}
-                >−</button>
-                <input
-                  type="number" min={1} max={100}
-                  value={printQty}
-                  onChange={e => setPrintQty(Math.max(1, Math.min(100, Number(e.target.value))))}
-                  style={{ width: 80, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 16, fontWeight: 700, textAlign: "center", outline: "none" }}
-                />
-                <button
-                  onClick={() => setPrintQty(q => Math.min(100, q + 1))}
-                  style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 18, cursor: "pointer", fontWeight: 700 }}
-                >+</button>
-                <div style={{ display: "flex", gap: 6, marginLeft: 8 }}>
-                  {[1, 4, 8, 12, 24].map(n => (
+                <button onClick={() => setPrintQty(q => Math.max(1, q - 1))} style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 18, cursor: "pointer" }}>−</button>
+                <input type="number" min={1} max={100} value={printQty} onChange={e => setPrintQty(Math.max(1, Math.min(100, Number(e.target.value))))}
+                  style={{ width: 70, padding: "8px 0", borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 16, fontWeight: 700, textAlign: "center", outline: "none" }} />
+                <button onClick={() => setPrintQty(q => Math.min(100, q + 1))} style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 18, cursor: "pointer" }}>+</button>
+                <div style={{ display: "flex", gap: 5, marginLeft: 6 }}>
+                  {[1, 4, 8, 12, 24, 48].map(n => (
                     <button key={n} onClick={() => setPrintQty(n)}
-                      style={{ padding: "6px 10px", borderRadius: 7, border: `1px solid ${printQty === n ? "rgba(99,102,241,.5)" : "var(--border)"}`, background: printQty === n ? "rgba(99,102,241,.15)" : "transparent", color: printQty === n ? "#818cf8" : "var(--text-muted)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                      style={{ padding: "6px 9px", borderRadius: 7, border: `1px solid ${printQty === n ? "rgba(99,102,241,.5)" : "var(--border)"}`, background: printQty === n ? "rgba(99,102,241,.15)" : "transparent", color: printQty === n ? "#818cf8" : "var(--text-muted)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                       {n}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
-
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-              <button onClick={() => setShowPrintModal(false)}
-                style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontSize: 13, cursor: "pointer" }}>
-                Cancel
-              </button>
-              <button onClick={executePrint}
-                style={{ padding: "10px 24px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+              <button onClick={() => setShowPrintModal(false)} style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              <button onClick={executePrint} style={{ padding: "10px 24px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                 🖨 Print {printQty} Label{printQty > 1 ? "s" : ""}
               </button>
             </div>
