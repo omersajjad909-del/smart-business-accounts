@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
@@ -9,7 +9,6 @@ const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
 
 const emptyForm = { name: "", category: "", sku: "", price: 0, costPrice: 0, stock: 0, description: "" };
-const emptyReceive = { qty: 0, costPrice: 0, supplierName: "", notes: "" };
 
 export default function ProductCatalogPage() {
   const user = getCurrentUser();
@@ -22,20 +21,15 @@ export default function ProductCatalogPage() {
 
   const { records, loading, create, update, remove } = useBusinessRecords("catalog_product");
   const { records: catRecords } = useBusinessRecords("retail_category");
-  const { create: createReceipt } = useBusinessRecords("stock_receipt");
   const categoryNames = catRecords.map(r => r.title);
 
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState("");
-
-  // Receive Stock
-  const [receiveId, setReceiveId] = useState<string | null>(null);
-  const [receiveForm, setReceiveForm] = useState(emptyReceive);
-  const [receiveError, setReceiveError] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
 
   const allProducts = records.map(r => ({
     id: r.id,
@@ -93,10 +87,12 @@ export default function ProductCatalogPage() {
     if (editId) {
       const existing = records.find(r => r.id === editId);
       const itemNewId = existing?.data?.itemNewId as string | undefined;
+      const existingStock = Number(existing?.data?.stock ?? form.stock);
       await update(editId, {
         title: name,
         amount: form.price,
-        data: { category, sku, costPrice: form.costPrice, stock: form.stock, description },
+        // preserve itemNewId so sync link is never lost
+        data: { category, sku, costPrice: form.costPrice, stock: existingStock, description, ...(itemNewId ? { itemNewId } : {}) },
       });
       // Sync to Item Master
       if (itemNewId) {
@@ -149,8 +145,10 @@ export default function ProductCatalogPage() {
     setDeleteId(null);
   }
 
-  async function syncAllToItemMaster() {
-    const unsynced = records.filter(r => !r.data?.itemNewId);
+  async function syncAllToItemMaster(recs = records) {
+    const unsynced = recs.filter(r => !r.data?.itemNewId);
+    if (!unsynced.length) return;
+    setSyncing(true);
     for (const r of unsynced) {
       const res = await fetch("/api/items-new", {
         method: "POST",
@@ -168,43 +166,28 @@ export default function ProductCatalogPage() {
       });
       if (res.ok) {
         const created = await res.json();
-        await update(r.id, { data: { itemNewId: created.id } });
+        await update(r.id, {
+          data: {
+            category: r.data?.category,
+            sku: r.data?.sku,
+            costPrice: r.data?.costPrice,
+            stock: r.data?.stock,
+            description: r.data?.description,
+            itemNewId: created.id,
+          },
+        });
       }
     }
+    setSyncing(false);
   }
 
-  async function receiveStock() {
-    if (!receiveId) return;
-    if (receiveForm.qty <= 0) { setReceiveError("Quantity must be greater than zero."); return; }
-    const product = allProducts.find(p => p.id === receiveId);
-    if (!product) return;
-    setReceiveError("");
-
-    const newStock = product.stock + receiveForm.qty;
-    const newCost = receiveForm.costPrice > 0 ? receiveForm.costPrice : product.costPrice;
-
-    await update(receiveId, { data: { stock: newStock, costPrice: newCost } });
-    await createReceipt({
-      title: `Stock In — ${product.name}`,
-      status: "received",
-      amount: receiveForm.qty * (receiveForm.costPrice || product.costPrice),
-      date: new Date().toISOString().slice(0, 10),
-      data: {
-        productId: receiveId,
-        productName: product.name,
-        sku: product.sku,
-        qtyReceived: receiveForm.qty,
-        costPrice: receiveForm.costPrice || product.costPrice,
-        supplierName: receiveForm.supplierName,
-        notes: receiveForm.notes,
-        stockBefore: product.stock,
-        stockAfter: newStock,
-      },
-    });
-
-    setReceiveId(null);
-    setReceiveForm(emptyReceive);
-  }
+  // Auto-sync any unsynced products when records load
+  useEffect(() => {
+    if (!loading && records.length > 0) {
+      syncAllToItemMaster(records);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   const inp: React.CSSProperties = {
     width: "100%", background: bg, border: `1px solid ${border}`,
@@ -220,15 +203,14 @@ export default function ProductCatalogPage() {
           <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Manage retail product catalog</p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          {records.some(r => !r.data?.itemNewId) && (
-            <button
-              onClick={syncAllToItemMaster}
-              title="Sync all catalog products to Item Master (Sales Invoice)"
-              style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
-            >
-              🔗 Sync to Item Master
-            </button>
-          )}
+          <button
+            onClick={() => syncAllToItemMaster()}
+            disabled={syncing}
+            title="Sync all catalog products to Item Master"
+            style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(99,102,241,.35)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 13, fontWeight: 600, cursor: syncing ? "not-allowed" : "pointer", opacity: syncing ? .6 : 1 }}
+          >
+            {syncing ? "Syncing…" : "🔗 Sync to Item Master"}
+          </button>
           <Link prefetch={false} href="/dashboard/retail/categories" style={{ padding: "10px 16px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(255,255,255,.7)", fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
             📂 Categories
           </Link>
@@ -305,12 +287,6 @@ export default function ProductCatalogPage() {
                 </td>
                 <td style={{ padding: "13px 16px" }}>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    <button
-                      onClick={() => { setReceiveId(p.id); setReceiveForm({ qty: 0, costPrice: p.costPrice, supplierName: "", notes: "" }); setReceiveError(""); }}
-                      style={{ padding: "5px 10px", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 700 }}
-                    >
-                      📦 Receive
-                    </button>
                     <button
                       onClick={() => openEdit(p)}
                       style={{ padding: "5px 10px", background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.3)", color: "#818cf8", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
@@ -454,102 +430,6 @@ export default function ProductCatalogPage() {
         </div>
       )}
 
-      {/* Receive Stock Modal */}
-      {receiveId && (() => {
-        const product = allProducts.find(p => p.id === receiveId);
-        if (!product) return null;
-        return (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.78)", backdropFilter: "blur(8px)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 460, fontFamily: ff }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
-                <div>
-                  <h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 800, color: "#34d399" }}>📦 Receive Stock</h2>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>{product.name} · Current: {product.stock} units</div>
-                </div>
-                <button onClick={() => setReceiveId(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
-              </div>
-
-              {receiveError && (
-                <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>
-                  {receiveError}
-                </div>
-              )}
-
-              <div style={{ display: "grid", gap: 14 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                  <div>
-                    <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Qty Received *</label>
-                    <input
-                      type="number" min="1" autoFocus
-                      value={receiveForm.qty || ""}
-                      onChange={e => setReceiveForm(f => ({ ...f, qty: Number(e.target.value) }))}
-                      placeholder="e.g. 50"
-                      style={inp}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Cost Price (per unit)</label>
-                    <input
-                      type="number" min="0"
-                      value={receiveForm.costPrice || ""}
-                      onChange={e => setReceiveForm(f => ({ ...f, costPrice: Number(e.target.value) }))}
-                      placeholder={`${product.costPrice}`}
-                      style={inp}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Supplier Name</label>
-                  <input
-                    type="text"
-                    value={receiveForm.supplierName}
-                    onChange={e => setReceiveForm(f => ({ ...f, supplierName: e.target.value }))}
-                    placeholder="e.g. Al-Fateh Distributors"
-                    style={inp}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Notes</label>
-                  <input
-                    type="text"
-                    value={receiveForm.notes}
-                    onChange={e => setReceiveForm(f => ({ ...f, notes: e.target.value }))}
-                    placeholder="Optional"
-                    style={inp}
-                  />
-                </div>
-
-                {/* Preview */}
-                {receiveForm.qty > 0 && (
-                  <div style={{ background: "rgba(52,211,153,.07)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 10, padding: "12px 16px", fontSize: 13 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                      <span style={{ color: "rgba(255,255,255,.5)" }}>Stock after receiving</span>
-                      <span style={{ fontWeight: 700, color: "#34d399" }}>{product.stock} + {receiveForm.qty} = {product.stock + receiveForm.qty} units</span>
-                    </div>
-                    {receiveForm.costPrice > 0 && (
-                      <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ color: "rgba(255,255,255,.5)" }}>Total purchase cost</span>
-                        <span style={{ fontWeight: 700, color: "#fbbf24" }}>Rs. {(receiveForm.qty * receiveForm.costPrice).toLocaleString()}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 4 }}>
-                  <button onClick={() => setReceiveId(null)} style={{ background: "transparent", border: `1px solid ${border}`, color: "rgba(255,255,255,.6)", borderRadius: 10, padding: "10px 20px", fontSize: 13, cursor: "pointer" }}>
-                    Cancel
-                  </button>
-                  <button onClick={receiveStock} style={{ background: "linear-gradient(135deg,#34d399,#059669)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                    ✅ Confirm Receipt
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
     </div>
   );
 }
