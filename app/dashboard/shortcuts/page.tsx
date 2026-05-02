@@ -369,6 +369,35 @@ export default function ShortcutsPage() {
         </div>
       </div>
 
+      {/* Built-in Voucher Shortcuts */}
+      <div style={{ ...card, background: "rgba(20,184,166,0.04)", border: "1px solid rgba(20,184,166,0.2)", marginBottom: 20 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: "#14b8a6", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>
+          Built-in Voucher Query Shortcuts (Oracle F7/F8 Mode)
+        </div>
+        <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 14px" }}>
+          These shortcuts are built into every voucher form — CRV, CPV, JV, Contra, Expense Voucher, Advance Payment, Sales Invoice, Purchase Invoice. They cannot be customized.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 8 }}>
+          {[
+            { key: "F7",       desc: "Enter Query Mode",          detail: "Clears form — type search criteria" },
+            { key: "F8",       desc: "Execute Query",             detail: "Finds matching records" },
+            { key: "PageDown", desc: "Next Record",               detail: "Browse to next result" },
+            { key: "PageUp",   desc: "Previous Record",           detail: "Browse to previous result" },
+            { key: "Escape",   desc: "Cancel / Exit Query Mode",  detail: "Returns to normal entry mode" },
+          ].map(({ key, desc, detail }) => (
+            <div key={key} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", borderRadius: 8, background: "var(--app-bg)", border: "1px solid var(--border)" }}>
+              <kbd style={{ padding: "3px 9px", borderRadius: 6, background: "rgba(20,184,166,0.12)", border: "1px solid rgba(20,184,166,0.3)", fontSize: 11, fontWeight: 800, color: "#14b8a6", fontFamily: "inherit", flexShrink: 0, whiteSpace: "nowrap" }}>
+                {key}
+              </kbd>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-primary)" }}>{desc}</div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{detail}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Shortcuts list */}
       {!isAdmin && (
         <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.25)", fontSize: 13, color: "#fbbf24", marginBottom: 16 }}>
