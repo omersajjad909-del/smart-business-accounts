@@ -87,7 +87,9 @@ export async function GET(req: NextRequest) {
     const period = req.nextUrl.searchParams.get("period") || "month";
     const now = new Date();
     let startDate: Date;
-    if (period === "quarter") {
+    if (period === "all") {
+      startDate = new Date(2000, 0, 1); // effectively all-time
+    } else if (period === "quarter") {
       const q = Math.floor(now.getMonth() / 3);
       startDate = new Date(now.getFullYear(), q * 3, 1);
     } else if (period === "year") {

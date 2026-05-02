@@ -542,11 +542,13 @@ export default function DashboardContent() {
   const [chartData, setChart] = useState<ChartPoint[]>([]);
   const [donut, setDonut] = useState<ExpSlice[]>([]);
   const [loading, setLoad] = useState(true);
+  const [period, setPeriod] = useState<"month" | "quarter" | "year" | "all">("month");
 
   useEffect(() => {
     if (allowed !== true) return;
     (async () => {
       try {
+        setLoad(true);
         const user = getCurrentUser();
         if (!user?.companyId) {
           setLoad(false);
@@ -558,7 +560,7 @@ export default function DashboardContent() {
         if (user.companyId) h["x-company-id"] = user.companyId;
 
         const [sR, cR, mR, bR, eR, tR] = await Promise.allSettled([
-          fetch("/api/reports/dashboard-summary", {
+          fetch(`/api/reports/dashboard-summary?period=${period}`, {
             headers: h,
             cache: "no-store",
           }),
@@ -716,7 +718,7 @@ export default function DashboardContent() {
         setLoad(false);
       }
     })();
-  }, [allowed]);
+  }, [allowed, period]);
 
   useEffect(() => {
     if (storedUser?.email !== "finovaos.app@gmail.com") return;
