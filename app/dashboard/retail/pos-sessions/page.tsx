@@ -46,29 +46,58 @@ export default function POSSessionsPage() {
 
   // Fetch cashiers and branches when modal opens
   useEffect(() => {
-    if (!showOpen) return;
+    if (!showOpen || !user?.companyId) return;
     
     setLoadingOptions(true);
     const headers = {
       "Content-Type": "application/json",
-      "x-company-id": user?.companyId || "",
-      "x-user-role": user?.role || "",
-      "x-user-id": user?.id || "",
+      "x-company-id": user.companyId,
+      "x-user-role": user.role || "",
+      "x-user-id": user.id || "",
     };
 
-    Promise.all([
-      fetch("/api/users", { headers }).then(r => r.json()).catch(() => []),
-      fetch("/api/branches", { headers }).then(r => r.json()).catch(() => []),
-    ]).then(([usersData, branchesData]) => {
-      const usersList = Array.isArray(usersData) ? usersData : [];
-      const branchesList = Array.isArray(branchesData) ? branchesData : [];
-      
-      setCashiers(usersList.filter((u: any) => u.active !== false));
-      setBranches(branchesList.filter((b: any) => b.isActive !== false));
-      
-      setLoadingOptions(false);
-    });
-  }, [showOpen, user]);
+    async function fetchData() {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+      try {
+        // Fetch users
+        const usersRes = await fetch("/api/users", { 
+          headers, 
+          method: "GET",
+          signal: controller.signal 
+        });
+        const usersData = usersRes.ok ? await usersRes.json() : [];
+        
+        // Fetch branches
+        const branchesRes = await fetch("/api/branches", { 
+          headers, 
+          method: "GET",
+          signal: controller.signal 
+        });
+        const branchesData = branchesRes.ok ? await branchesRes.json() : [];
+
+        // Set cashiers - include all returned users (API already filters by company)
+        const usersList = Array.isArray(usersData) ? usersData : [];
+        console.log("[POS] Cashiers loaded:", usersList.length, usersList);
+        setCashiers(usersList);
+
+        // Set branches - only include active ones
+        const branchesList = Array.isArray(branchesData) ? branchesData : [];
+        console.log("[POS] Branches loaded:", branchesList.length, branchesList);
+        setBranches(branchesList.filter((b: any) => b.isActive !== false));
+      } catch (error: any) {
+        console.error("[POS] Error fetching options:", error.message);
+        setCashiers([]);
+        setBranches([]);
+      } finally {
+        clearTimeout(timeoutId);
+        setLoadingOptions(false);
+      }
+    }
+
+    fetchData();
+  }, [showOpen, user?.companyId, user?.role, user?.id]);
 
   const sessions: Session[] = records.map(r => {
     const d = r.data || {};
@@ -382,7 +411,9 @@ export default function POSSessionsPage() {
                     <option disabled>Loading cashiers...</option>
                   ) : cashiers.length > 0 ? (
                     cashiers.map((c: any) => (
-                      <option key={c.id} value={c.name}>{c.name}</option>
+                      <option key={c.id} value={c.name || c.email}>
+                        {c.name || c.email}{c.role ? ` (${c.role})` : ""}
+                      </option>
                     ))
                   ) : (
                     <option disabled>No cashiers available</option>
