@@ -14,7 +14,7 @@ const TEXT  = "var(--text-primary)";
 const MUTED = "var(--text-muted)";
 const BG    = "var(--app-bg)";
 
-type GRNItem = { itemId: string; name: string; orderedQty: string; receivedQty: string; rate: string; remarks: string };
+type GRNItem = { itemId: string; name: string; orderedQty: string; receivedQty: string; remarks: string };
 type GRN = { id: string; grnNo: string; date: string; status: string; supplier?: { name: string }; po?: { poNo: string } | null; items: Array<{ item: { name: string }; orderedQty: number; receivedQty: number; rate: number }> };
 type PO  = { id: string; poNo: string; supplier: { id: string; name: string }; items: Array<{ itemId: string; item: { id: string; name: string }; qty: number; rate: number }> };
 
@@ -331,7 +331,7 @@ export default function GRNPage() {
                     <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 540, fontSize: 13 }}>
                       <thead>
                         <tr style={{ background: "rgba(99,102,241,0.07)" }}>
-                          {[["#","left",30],["Item","left","auto"],["Ordered","center",90],["Received","center",90],["Rate","right",90],["Amount","right",100],["Note","left",120],["","center",30]].map(([h,a,w]) => (
+                          {[["#","left",30],["Item","left","auto"],["Ordered","center",90],["Received","center",90],["Note","left",120],["","center",30]].map(([h,a,w]) => (
                             <th key={h as string} style={{ padding: "10px 8px", textAlign: a as any, color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.6, width: w as any }}>{h}</th>
                           ))}
                         </tr>
@@ -351,8 +351,6 @@ export default function GRNPage() {
                               </td>
                               <td style={{ padding: "6px 8px" }}><input type="number" value={row.orderedQty} onChange={e => updateRow(idx, "orderedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: MUTED })} /></td>
                               <td style={{ padding: "6px 8px" }}><input type="number" value={row.receivedQty} onChange={e => updateRow(idx, "receivedQty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "center", color: isShort ? "#fbbf24" : "#34d399", fontWeight: 700 })} /></td>
-                              <td style={{ padding: "6px 8px" }}><input type="number" value={row.rate} onChange={e => updateRow(idx, "rate", e.target.value)} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right" })} /></td>
-                              <td style={{ padding: "6px 8px", textAlign: "right", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap" }}>{amt > 0 ? amt.toLocaleString() : "—"}</td>
                               <td style={{ padding: "6px 8px" }}><input value={row.remarks} onChange={e => updateRow(idx, "remarks", e.target.value)} placeholder="Note..." style={inp({ padding: "5px 8px", fontSize: 12 })} /></td>
                               <td style={{ padding: "6px 8px" }}><button onClick={() => setRows(rows.filter((_, i) => i !== idx))} disabled={rows.length === 1} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", fontSize: 16, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }}>×</button></td>
                             </tr>
