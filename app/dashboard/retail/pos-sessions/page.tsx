@@ -57,41 +57,39 @@ export default function POSSessionsPage() {
     };
 
     async function fetchData() {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
       try {
+        console.log("[POS] Fetching cashiers and branches...", headers);
+        
         // Fetch users
         const usersRes = await fetch("/api/users", { 
           headers, 
-          method: "GET",
-          signal: controller.signal 
+          method: "GET"
         });
+        console.log("[POS] Users response status:", usersRes.status);
         const usersData = usersRes.ok ? await usersRes.json() : [];
+        console.log("[POS] Cashiers loaded:", usersData);
         
         // Fetch branches
         const branchesRes = await fetch("/api/branches", { 
           headers, 
-          method: "GET",
-          signal: controller.signal 
+          method: "GET"
         });
+        console.log("[POS] Branches response status:", branchesRes.status);
         const branchesData = branchesRes.ok ? await branchesRes.json() : [];
+        console.log("[POS] Branches loaded:", branchesData);
 
-        // Set cashiers - include all returned users (API already filters by company)
+        // Set cashiers - include all returned users
         const usersList = Array.isArray(usersData) ? usersData : [];
-        console.log("[POS] Cashiers loaded:", usersList.length, usersList);
         setCashiers(usersList);
 
         // Set branches - only include active ones
         const branchesList = Array.isArray(branchesData) ? branchesData : [];
-        console.log("[POS] Branches loaded:", branchesList.length, branchesList);
         setBranches(branchesList.filter((b: any) => b.isActive !== false));
       } catch (error: any) {
-        console.error("[POS] Error fetching options:", error.message);
+        console.error("[POS] Error fetching options:", error);
         setCashiers([]);
         setBranches([]);
       } finally {
-        clearTimeout(timeoutId);
         setLoadingOptions(false);
       }
     }
