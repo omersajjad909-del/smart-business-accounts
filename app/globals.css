@@ -935,3 +935,85 @@ img, video, svg { max-width: 100%; }
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   INVOICE VIEW PAGES — Force Light Mode for Print/Online View
+═══════════════════════════════════════════════════════════════ */
+
+/* Force light mode for all invoice preview pages */
+.invoice-print {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Parent containers for invoice views */
+body > div:has(.invoice-print),
+.min-h-screen:has(.invoice-print) {
+  background-color: #f3f4f6 !important;
+  color: #000000 !important;
+}
+
+/* Ensure tables in invoices are always readable */
+.invoice-print table,
+.invoice-print th,
+.invoice-print td {
+  background-color: transparent;
+  color: inherit;
+  border-color: #000000 !important;
+}
+
+.invoice-print th {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.invoice-print td {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Override any inherited dark theme */
+html.dark .invoice-print,
+html.dark body > div:has(.invoice-print),
+html.dark .min-h-screen:has(.invoice-print) {
+  background-color: #f3f4f6 !important;
+  color: #000000 !important;
+  --app-bg: #f3f4f6;
+  --surface: #ffffff;
+  --text-primary: #000000;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SELECT DROPDOWNS — Dark Mode Option Text Fix
+═══════════════════════════════════════════════════════════════ */
+
+/* Fix select dropdowns in dark modals to have readable options */
+select {
+  color-scheme: dark;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+select option {
+  background-color: #1f2937;
+  color: #ffffff;
+  padding: 8px;
+}
+
+select option:hover,
+select option:checked {
+  background-color: #374151;
+  color: #ffffff;
+}
+
+/* Light mode overrides */
+html:not(.dark) select {
+  color-scheme: light;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+html:not(.dark) select option {
+  background-color: #ffffff;
+  color: #000000;
+}
+

@@ -45,13 +45,13 @@ export default async function PublicPurchaseInvoicePage({
   const origin = process.env.NEXT_PUBLIC_APP_URL || "";
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-10 flex flex-col items-center">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-10 flex flex-col items-center" style={{ backgroundColor: "#f3f4f6", backgroundImage: "none" }}>
         {/* Print Button */}
         <div className="mb-6 w-full max-w-4xl flex justify-end print:hidden">
             <PrintButton />
         </div>
 
-      <div className="invoice-print bg-white p-10 shadow-lg max-w-4xl w-full mx-auto text-black print:shadow-none print:p-0">
+      <div className="invoice-print bg-white p-10 shadow-lg max-w-4xl w-full mx-auto text-black print:shadow-none print:p-0" style={{ backgroundColor: "#ffffff", color: "#000000" }}>
         <div className="flex justify-between border-b-4 border-black pb-4 mb-6">
           <div>
             <h1 className="text-4xl font-black italic tracking-tighter">US TRADERS</h1>

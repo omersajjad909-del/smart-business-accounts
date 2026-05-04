@@ -103,7 +103,7 @@ export default function GRNPage() {
     const po = pos.find(p => p.id === id);
     if (!po) return;
     setSupplierId(po.supplier.id);
-    setRows(po.items.map(i => ({ itemId: i.itemId, name: i.item.name, orderedQty: String(i.qty), receivedQty: String(i.qty), rate: String(i.rate), remarks: "" })));
+    setRows(po.items.map(i => ({ itemId: i.itemId, name: i.item.name, orderedQty: String(i.qty), receivedQty: String(i.qty), remarks: "" })));
   }
 
   function updateRow(idx: number, field: keyof GRNItem, value: string) {
@@ -111,13 +111,13 @@ export default function GRNPage() {
     u[idx] = { ...u[idx], [field]: value };
     if (field === "itemId") { const f = allItems.find((it: any) => it.id === value); if (f) u[idx].name = f.name; }
     if (idx === u.length - 1 && value !== "")
-      u.push({ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" });
+      u.push({ itemId: "", name: "", orderedQty: "", receivedQty: "", remarks: "" });
     setRows(u);
   }
 
   function resetForm() {
     setDate(today); setPoId(""); setSupplierId(""); setRemarks(""); setNotes("");
-    setRows([{ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" }]);
+    setRows([{ itemId: "", name: "", orderedQty: "", receivedQty: "", remarks: "" }]);
     setPreview(false);
     loadNextGrnNo();
   }

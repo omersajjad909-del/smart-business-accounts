@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { confirmToast } from "@/lib/toast-feedback";
+import { getCurrentUser } from "@/lib/auth";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,.03)";
@@ -27,10 +28,14 @@ type Session = {
 export default function POSSessionsPage() {
   const { records, loading, create, update } = useBusinessRecords("pos_session");
   const { records: saleRecords } = useBusinessRecords("pos_sale");
+  const user = getCurrentUser();
 
   const [showOpen, setShowOpen] = useState(false);
   const [openForm, setOpenForm] = useState({ cashier: "", branch: "Main Store", openingCash: "" });
   const [saving, setSaving] = useState(false);
+  const [cashiers, setCashiers] = useState<any[]>([]);
+  const [branches, setBranches] = useState<any[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
 
   const [closingId, setClosingId] = useState<string | null>(null);
   const [closingCash, setClosingCash] = useState("");
@@ -38,6 +43,32 @@ export default function POSSessionsPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
+
+  // Fetch cashiers and branches when modal opens
+  useEffect(() => {
+    if (!showOpen) return;
+    
+    setLoadingOptions(true);
+    const headers = {
+      "Content-Type": "application/json",
+      "x-company-id": user?.companyId || "",
+      "x-user-role": user?.role || "",
+      "x-user-id": user?.id || "",
+    };
+
+    Promise.all([
+      fetch("/api/users", { headers }).then(r => r.json()).catch(() => []),
+      fetch("/api/branches", { headers }).then(r => r.json()).catch(() => []),
+    ]).then(([usersData, branchesData]) => {
+      const usersList = Array.isArray(usersData) ? usersData : [];
+      const branchesList = Array.isArray(branchesData) ? branchesData : [];
+      
+      setCashiers(usersList.filter((u: any) => u.active !== false));
+      setBranches(branchesList.filter((b: any) => b.isActive !== false));
+      
+      setLoadingOptions(false);
+    });
+  }, [showOpen, user]);
 
   const sessions: Session[] = records.map(r => {
     const d = r.data || {};
@@ -342,17 +373,36 @@ export default function POSSessionsPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Cashier Name *</label>
-                <input
+                <select
                   value={openForm.cashier} onChange={e => setOpenForm(f => ({ ...f, cashier: e.target.value }))}
-                  placeholder="e.g. Ahmed Khan" style={inp} autoFocus
-                />
+                  style={inp} autoFocus
+                >
+                  <option value="">— Select Cashier —</option>
+                  {loadingOptions ? (
+                    <option disabled>Loading cashiers...</option>
+                  ) : cashiers.length > 0 ? (
+                    cashiers.map((c: any) => (
+                      <option key={c.id} value={c.name}>{c.name}</option>
+                    ))
+                  ) : (
+                    <option disabled>No cashiers available</option>
+                  )}
+                </select>
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Branch / Counter</label>
-                <input
+                <select
                   value={openForm.branch} onChange={e => setOpenForm(f => ({ ...f, branch: e.target.value }))}
-                  placeholder="Main Store" style={inp}
-                />
+                  style={inp}
+                >
+                  {branches.length > 0 ? (
+                    branches.map((b: any) => (
+                      <option key={b.id} value={b.name}>{b.name}</option>
+                    ))
+                  ) : (
+                    <option value="Main Store">Main Store</option>
+                  )}
+                </select>
               </div>
               <div>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Opening Cash (drawer mein kitna daala)</label>
