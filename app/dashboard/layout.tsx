@@ -1885,7 +1885,6 @@ export default function DashboardLayout({
               open={openSection === "settings"}
               onToggle={() => toggle("settings")}
             >
-              {(!isCustomPlan || hasCustomActiveModule("multi_branch")) && <NavLink href="/dashboard/branches" pathname={pathname}>Branches</NavLink>}
               {(!isCustomPlan || hasCustomActiveModule("multi_branch")) && <NavLink href="/dashboard/cost-centers" pathname={pathname}>Cost Centers</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.FINANCIAL_YEAR) && <NavLink href="/dashboard/financial-year" pathname={pathname}>Financial Year</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BUDGET_PLANNING) && <NavLink href="/dashboard/budget" pathname={pathname}>Budget Planning</NavLink>}
