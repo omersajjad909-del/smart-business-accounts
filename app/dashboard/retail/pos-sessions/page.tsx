@@ -434,7 +434,7 @@ export default function POSSessionsPage() {
                 </select>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Opening Cash (drawer mein kitna daala)</label>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Opening Cash</label>
                 <input
                   type="number" min="0"
                   value={openForm.openingCash} onChange={e => setOpenForm(f => ({ ...f, openingCash: e.target.value }))}
