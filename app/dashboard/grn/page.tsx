@@ -113,20 +113,21 @@ export default function GRNPage() {
 
   function resetForm() {
     setDate(today); setPoId(""); setSupplierId(""); setRemarks(""); setNotes("");
-    setRows([{ itemId: "", name: "", orderedQty: "", receivedQty: "", remarks: "" }]);
+    setRows([{ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" }]);
     setPreview(false);
     loadNextGrnNo();
   }
 
   async function handleSubmit() {
-    if (!grnNo || !supplierId || rows.some(r => !r.itemId || !r.receivedQty)) {
-      toast.error("GRN No, Supplier, and all item rows are required"); return;
+    const filledItems = rows.filter(r => r.itemId && r.receivedQty);
+    if (!grnNo || !supplierId || filledItems.length === 0) {
+      toast.error("GRN No, Supplier, and at least one item are required"); return;
     }
     setSaving(true);
     try {
       const res = await fetch("/api/grn", {
         method: "POST", headers: bh(),
-        body: JSON.stringify({ grnNo, date, poId: poId || null, supplierId, remarks, items: rows.map(r => ({ itemId: r.itemId, orderedQty: Number(r.orderedQty) || 0, receivedQty: Number(r.receivedQty), rate: Number(r.rate) || 0, remarks: r.remarks })) }),
+        body: JSON.stringify({ grnNo, date, poId: poId || null, supplierId, remarks, items: filledItems.map(r => ({ itemId: r.itemId, orderedQty: Number(r.orderedQty) || 0, receivedQty: Number(r.receivedQty), rate: Number(r.rate) || 0, remarks: r.remarks })) }),
       });
       if (!res.ok) { const e = await res.json(); throw new Error(e.error || "Failed"); }
       toast.success("GRN saved successfully!");
