@@ -14,7 +14,7 @@ const TEXT  = "var(--text-primary)";
 const MUTED = "var(--text-muted)";
 const BG    = "var(--app-bg)";
 
-type GRNItem = { itemId: string; name: string; orderedQty: string; receivedQty: string; remarks: string };
+type GRNItem = { itemId: string; name: string; orderedQty: string; receivedQty: string; rate: string; remarks: string };
 type GRN = { id: string; grnNo: string; date: string; status: string; supplier?: { name: string }; po?: { poNo: string } | null; items: Array<{ item: { name: string }; orderedQty: number; receivedQty: number; rate: number }> };
 type PO  = { id: string; poNo: string; supplier: { id: string; name: string }; items: Array<{ itemId: string; item: { id: string; name: string }; qty: number; rate: number }> };
 
@@ -71,16 +71,12 @@ export default function GRNPage() {
 
   useEffect(() => {
     fetch("/api/me/company").then(r => r.ok ? r.json() : null).then(d => { if (d) setCompanyInfo(d); }).catch(() => {});
-    fetch("/api/accounts?type=SUPPLIER", { headers: bh() }).then(r => r.json()).then(d => {
-      const list = Array.isArray(d) ? d : [];
-      setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER" || a.partyType === "SUPPLIER"));
-    }).catch(() => {});
-    fetch("/api/items-new",     { headers: bh() }).then(r => r.json()).then(d => setAllItems(Array.isArray(d) ? d : [])).catch(() => {});
-    fetch("/api/purchase-order",{ headers: bh() }).then(r => r.json()).then(d => setPos(Array.isArray(d) ? d : [])).catch(() => {});
-    fetch("/api/accounts",      { headers: bh() }).then(r => r.json()).then(d => {
+    fetch("/api/accounts",       { headers: bh() }).then(r => r.json()).then(d => {
       const list = Array.isArray(d) ? d : [];
       setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER"));
     }).catch(() => {});
+    fetch("/api/items-new",     { headers: bh() }).then(r => r.json()).then(d => setAllItems(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch("/api/purchase-order",{ headers: bh() }).then(r => r.json()).then(d => setPos(Array.isArray(d) ? d : [])).catch(() => {});
     loadGRNs();
     loadNextGrnNo();
   }, []);
@@ -103,7 +99,7 @@ export default function GRNPage() {
     const po = pos.find(p => p.id === id);
     if (!po) return;
     setSupplierId(po.supplier.id);
-    setRows(po.items.map(i => ({ itemId: i.itemId, name: i.item.name, orderedQty: String(i.qty), receivedQty: String(i.qty), remarks: "" })));
+    setRows(po.items.map(i => ({ itemId: i.itemId, name: i.item.name, orderedQty: String(i.qty), receivedQty: String(i.qty), rate: String(i.rate || ""), remarks: "" })));
   }
 
   function updateRow(idx: number, field: keyof GRNItem, value: string) {
@@ -111,7 +107,7 @@ export default function GRNPage() {
     u[idx] = { ...u[idx], [field]: value };
     if (field === "itemId") { const f = allItems.find((it: any) => it.id === value); if (f) u[idx].name = f.name; }
     if (idx === u.length - 1 && value !== "")
-      u.push({ itemId: "", name: "", orderedQty: "", receivedQty: "", remarks: "" });
+      u.push({ itemId: "", name: "", orderedQty: "", receivedQty: "", rate: "", remarks: "" });
     setRows(u);
   }
 

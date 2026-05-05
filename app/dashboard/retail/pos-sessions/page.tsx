@@ -406,7 +406,7 @@ export default function POSSessionsPage() {
                 >
                   <option value="">— Select Cashier —</option>
                   {loadingOptions ? (
-                    <option disabled>Loading cashiers...</option>
+                    <option disabled>Loading cashier...</option>
                   ) : cashiers.length > 0 ? (
                     cashiers.map((c: any) => (
                       <option key={c.id} value={c.name || c.email}>

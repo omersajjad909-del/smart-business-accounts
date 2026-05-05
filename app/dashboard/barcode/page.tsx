@@ -9,7 +9,7 @@ type Item = {
   id: string; name: string; code?: string; barcode?: string;
   unit?: string; category?: string; rate?: number; purchaseRate?: number;
   taxRate?: number; minStock?: number; description?: string;
-  salePrice?: number; stockQty?: number;
+  salePrice?: number; stockQty?: number; _source?: string;
 };
 
 // ─── Pure Code128B barcode generator — no library, pure SVG ──────────────────
@@ -442,7 +442,14 @@ export default function BarcodePage() {
                     {filtered.slice(0, 100).map(item => (
                       <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                         <td style={{ padding: "11px 16px", color: "var(--text-primary)", fontWeight: 600 }}>{item.name}</td>
-                        <td style={{ padding: "11px 16px", color: "var(--text-muted)", fontFamily: "monospace" }}>{item.code || "—"}</td>
+                        <td style={{ padding: "11px 16px", color: "var(--text-muted)", fontFamily: "monospace" }}>
+                          {item._source === "catalog" && item.code
+                            ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                                <span style={{ fontSize: 9, fontWeight: 700, background: "rgba(245,158,11,.15)", color: "#f59e0b", border: "1px solid rgba(245,158,11,.3)", borderRadius: 4, padding: "1px 5px", letterSpacing: ".04em", fontFamily: "inherit" }}>SKU</span>
+                                {item.code}
+                              </span>
+                            : (item.code || "—")}
+                        </td>
                         <td style={{ padding: "8px 16px" }}>
                           {item.barcode
                             ? <div style={{ display: "inline-block", background: "white", padding: "3px 5px", borderRadius: 4 }}><Barcode128 value={item.barcode} moduleWidth={1} height={28} showText={false} bg="white" fg="black" /></div>
