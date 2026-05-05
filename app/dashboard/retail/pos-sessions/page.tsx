@@ -104,7 +104,8 @@ export default function POSSessionsPage() {
     const openingCash = Number(d.openingCash || 0);
     const closingCash = Number(d.closingCash || 0);
     const expectedCash = openingCash + cashSales;
-    const discrepancy = r.status === "CLOSED" ? closingCash - expectedCash : 0;
+    const isClosed = r.status?.toLowerCase() === "closed";
+    const discrepancy = isClosed ? closingCash - expectedCash : 0;
     return {
       id: r.id,
       sessionRef: r.title,
@@ -119,7 +120,7 @@ export default function POSSessionsPage() {
       totalSales: (r.amount || 0),
       expectedCash,
       discrepancy,
-      status: r.status || "OPEN",
+      status: isClosed ? "CLOSED" : "OPEN",
     };
   });
 

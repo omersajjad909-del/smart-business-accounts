@@ -35,7 +35,7 @@ export default function POSPage() {
   const { records: productRecords, loading: loadingProducts, update: updateProduct } = useBusinessRecords("catalog_product");
   const { records: saleRecords, create: createSale } = useBusinessRecords("pos_sale");
   const { records: sessionRecords, update: updateSession } = useBusinessRecords("pos_session");
-  const activeSession = sessionRecords.find(s => s.status === "OPEN") || null;
+  const activeSession = sessionRecords.find(s => s.status?.toLowerCase() === "open") || null;
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cat, setCat] = useState("All");
