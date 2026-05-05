@@ -387,22 +387,13 @@ export default function AICommandCenter() {
   useEffect(() => {
     const nextTab = searchParams.get("tab");
     const allowedTabs = new Set<Tab>([
-      "overview",
-      "chat",
-      "insights",
-      "alerts",
-      "forecast",
-      "recommendations",
-      "reminders",
-      "tax",
-      "report",
-      "market",
-      "advisor",
+      "overview", "chat", "insights", "alerts", "forecast",
+      "recommendations", "reminders", "tax", "report", "market", "advisor",
     ]);
-    if (nextTab && allowedTabs.has(nextTab as Tab) && nextTab !== tab) {
+    if (nextTab && allowedTabs.has(nextTab as Tab)) {
       setTab(nextTab as Tab);
     }
-  }, [searchParams, tab]);
+  }, [searchParams]);
 
   const getHeaders = useCallback((): Record<string, string> => {
     const user = getCurrentUser();
