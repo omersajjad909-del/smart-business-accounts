@@ -28,7 +28,7 @@ interface FinCtx {
   profit: { thisMonth: number; lastMonth: number; change: number };
   receivables: { total: number; overdue: number; overdueCount: number };
   payables: { total: number; overdue: number };
-  inventory: { totalItems: number; lowStockItems: number; lowStockNames: string[] };
+  inventory: { totalItems: number; lowStockItems: number; lowStockNames: string[]; stockValue: number };
   topCustomers: { name: string; amount: number }[];
   topExpenses: { category: string; amount: number }[];
   recentInvoices: { ref: string; customer: string; amount: number; status: string; daysAgo: number }[];
@@ -263,6 +263,12 @@ function healthScore(ctx: FinCtx): number {
   if (ctx.profit.thisMonth < 0) score -= 20;
   if (ctx.receivables.overdue > ctx.revenue.thisMonth * 0.3) score -= 8;
   if (ctx.inventory.lowStockItems > 5) score -= 5;
+  // Stock value as an asset — offsets poor monthly P&L
+  const stockVal = ctx.inventory.stockValue || 0;
+  const monthlyExp = ctx.expenses.thisMonth || 1;
+  if (stockVal >= monthlyExp * 2) score += 15;       // stock covers 2+ months expenses
+  else if (stockVal >= monthlyExp) score += 10;      // stock covers 1+ month expenses
+  else if (stockVal >= monthlyExp * 0.5) score += 5; // stock covers 50%+ of expenses
   return Math.max(20, Math.min(100, Math.round(score)));
 }
 function riskLevel(score: number): { label: string; color: string } {
@@ -810,6 +816,17 @@ export default function AICommandCenter() {
                         ⚠ {fmt(ctx?.receivables.overdue || 0, currency)} overdue
                       </div>
                     )}
+                  </div>
+
+                  {/* Stock Value */}
+                  <div className="kpi-card">
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Stock Value (Inventory)</div>
+                    <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4, color: (ctx?.inventory.stockValue || 0) > 0 ? "#34d399" : "rgba(255,255,255,.6)" }}>
+                      {fmt(ctx?.inventory.stockValue || 0, currency)}
+                    </div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+                      {ctx?.inventory.totalItems || 0} items · {ctx?.inventory.lowStockItems || 0} low stock
+                    </div>
                   </div>
                 </div>
 

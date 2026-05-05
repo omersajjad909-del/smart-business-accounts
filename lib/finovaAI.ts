@@ -438,6 +438,7 @@ export interface FinancialContext {
     totalItems: number;
     lowStockItems: number;
     lowStockNames: string[];
+    stockValue: number;
   };
   topCustomers: { name: string; amount: number }[];
   topExpenses: { category: string; amount: number }[];
@@ -569,7 +570,7 @@ export async function buildFinancialContext(companyId: string): Promise<Financia
     // Inventory items
     prisma.itemNew.findMany({
       where: { companyId, deletedAt: null },
-      select: { id: true, name: true, minStock: true },
+      select: { id: true, name: true, minStock: true, purchaseRate: true, rate: true },
       take: 200,
     }),
 
@@ -704,13 +705,16 @@ export async function buildFinancialContext(companyId: string): Promise<Financia
     if (dueDate < now) overduePayables += amt;
   });
 
-  // ── Low stock
+  // ── Low stock + stock value
   const qtyMap = new Map<string, number>();
   stockAgg.forEach((row) => qtyMap.set(row.itemId, Number(row._sum?.qty || 0)));
   const lowItems: string[] = [];
+  let totalStockValue = 0;
   inventoryItems.forEach((item) => {
     const qty = qtyMap.get(item.id) ?? 0;
     if (qty < Number(item.minStock || 5)) lowItems.push(item.name);
+    const costRate = Number(item.purchaseRate || item.rate || 0);
+    if (qty > 0 && costRate > 0) totalStockValue += qty * costRate;
   });
 
   // ── Top customers (resolve names)
@@ -845,7 +849,7 @@ export async function buildFinancialContext(companyId: string): Promise<Financia
     profit: { thisMonth: profitThis, lastMonth: profitLast, change: profitChange },
     receivables: { total: totalReceivables, overdue: overdueReceivables, overdueCount },
     payables: { total: totalPayables, overdue: overduePayables },
-    inventory: { totalItems: inventoryItems.length, lowStockItems: lowItems.length, lowStockNames: lowItems.slice(0, 5) },
+    inventory: { totalItems: inventoryItems.length, lowStockItems: lowItems.length, lowStockNames: lowItems.slice(0, 5), stockValue: Math.round(totalStockValue) },
     topCustomers: topCustList,
     topExpenses: topExpList,
     recentInvoices: recentInv,
