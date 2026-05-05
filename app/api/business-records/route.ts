@@ -126,6 +126,8 @@ export async function PUT(req: NextRequest) {
   const companyId = await resolveCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
+  const role = (req.headers.get("x-user-role") || "").toUpperCase();
+
   const body = await req.json();
   const { id: rawId, ...updates } = body as Record<string, unknown>;
   const id = String(rawId || "").trim();
@@ -138,6 +140,29 @@ export async function PUT(req: NextRequest) {
   if (assignedBranchIds?.length && existing.branchId && !assignedBranchIds.includes(existing.branchId)) {
     return NextResponse.json({ error: "Branch access denied" }, { status: 403 });
   }
+
+  // ── Role-based write protection ──────────────────────────────────────────
+  const isPrivileged = role === "ADMIN" || role === "MANAGER";
+  if (!isPrivileged) {
+    // CASHIER: only allowed to update their own OPEN pos_session (real-time sales tracking)
+    if (role === "CASHIER" && existing.category === "pos_session" && existing.status === "open") {
+      // allowed — fall through
+    } else {
+      return NextResponse.json(
+        { error: "Permission denied: only ADMIN or MANAGER can update records" },
+        { status: 403 }
+      );
+    }
+  }
+
+  // Closed session protection — even MANAGER cannot reopen/edit a closed session (ADMIN only)
+  if (existing.category === "pos_session" && existing.status === "closed" && role !== "ADMIN") {
+    return NextResponse.json(
+      { error: "Closed sessions are locked. Only ADMIN can modify them." },
+      { status: 403 }
+    );
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   const nextBranchId =
     updates.branchId !== undefined
@@ -185,6 +210,12 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const companyId = await resolveCompanyId(req);
   if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+
+  // Only ADMIN can delete any business record
+  const role = (req.headers.get("x-user-role") || "").toUpperCase();
+  if (role !== "ADMIN") {
+    return NextResponse.json({ error: "Permission denied: only ADMIN can delete records" }, { status: 403 });
+  }
 
   const id = String(new URL(req.url).searchParams.get("id") || "").trim();
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
