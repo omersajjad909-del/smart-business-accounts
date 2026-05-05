@@ -238,7 +238,7 @@ export default function POSSessionsPage() {
                 {/* Session ref */}
                 <div>
                   <div style={{ fontWeight: 800, fontSize: 13, color: "#818cf8" }}>{session.sessionRef}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{session.date}</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{fmtDate(session.date)}</div>
                 </div>
 
                 {/* Status */}
@@ -276,8 +276,8 @@ export default function POSSessionsPage() {
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 3 }}>Reconciliation</div>
                       <div style={{ fontSize: 12 }}>Expected: <strong>Rs. {session.expectedCash.toLocaleString()}</strong></div>
                       <div style={{ fontSize: 12 }}>Actual: <strong>Rs. {session.closingCash.toLocaleString()}</strong></div>
-                      <div style={{ fontSize: 12, fontWeight: 800, marginTop: 3, color: session.discrepancy === 0 ? "#34d399" : session.discrepancy > 0 ? "#818cf8" : "#f87171" }}>
-                        {session.discrepancy === 0 ? "✅ Balanced" : session.discrepancy > 0 ? `▲ Over Rs. ${session.discrepancy.toLocaleString()}` : `▼ Short Rs. ${Math.abs(session.discrepancy).toLocaleString()}`}
+                      <div style={{ fontSize: 12, fontWeight: 800, marginTop: 3, color: session.discrepancy === 0 && session.closingCash > 0 ? "#34d399" : session.discrepancy > 0 ? "#818cf8" : "#f87171" }}>
+                        {session.discrepancy === 0 && session.closingCash > 0 ? "✅ Balanced" : session.discrepancy > 0 ? `▲ Over Rs. ${session.discrepancy.toLocaleString()}` : session.closingCash === 0 ? "⚠️ No closing cash entered" : `▼ Short Rs. ${Math.abs(session.discrepancy).toLocaleString()}`}
                       </div>
                     </>
                   ) : (
