@@ -1289,8 +1289,68 @@ export default function AICommandCenter() {
                 Powered by <b style={{ color: "rgba(255,255,255,.35)" }}>FinovaOS AI</b> · Responses based on your real business data
               </div>
             </div>
+            </div>{/* end left conversation */}
+
+            {/* ── Right: Context Panel ── */}
+            <div style={{ width: 272, background: "rgba(255,255,255,.018)", overflowY: "auto", padding: "18px 14px", flexShrink: 0, display: "flex", flexDirection: "column", gap: 18 }}>
+
+              {/* Health Ring */}
+              <div style={{ textAlign: "center", padding: "16px 0 4px" }}>
+                <HealthRing score={score} />
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>Financial Health</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: risk.color, marginTop: 2 }}>{risk.label} Risk</div>
+              </div>
+
+              {/* KPI mini cards */}
+              {ctx && (
+                <div style={{ display: "grid", gap: 7 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 2 }}>Live Snapshot</div>
+                  {[
+                    { label: "Revenue", value: fmt(ctx.revenue.thisMonth, currency), color: "#10b981" },
+                    { label: "Profit",  value: fmt(ctx.profit.thisMonth, currency),  color: ctx.profit.thisMonth >= 0 ? "#10b981" : "#ef4444" },
+                    { label: "Overdue", value: fmt(ctx.receivables.overdue, currency), color: "#f59e0b" },
+                    { label: "Stock",   value: fmt(ctx.inventory.stockValue, currency), color: "#34d399" },
+                  ].map(kpi => (
+                    <div key={kpi.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 11px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)" }}>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>{kpi.label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: kpi.color }}>{kpi.value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Active alerts */}
+              {alerts.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Active Alerts</div>
+                  {alerts.slice(0, 3).map((a, i) => (
+                    <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "7px 10px", borderRadius: 9, marginBottom: 5, background: a.severity === "critical" ? "rgba(239,68,68,.08)" : a.severity === "warning" ? "rgba(245,158,11,.08)" : "rgba(99,102,241,.08)", border: `1px solid ${a.severity === "critical" ? "rgba(239,68,68,.22)" : a.severity === "warning" ? "rgba(245,158,11,.22)" : "rgba(99,102,241,.22)"}` }}>
+                      <span style={{ fontSize: 13, flexShrink: 0 }}>{a.severity === "critical" ? "🚨" : a.severity === "warning" ? "⚠️" : "ℹ️"}</span>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.72)", lineHeight: 1.45 }}>{a.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Quick questions */}
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Quick Questions</div>
+                {[
+                  "Show my profit this month",
+                  "Which items are low on stock?",
+                  "Which invoices are overdue?",
+                  "Who are my top customers?",
+                  "Predict my revenue next month",
+                  "Give me a cost reduction plan",
+                ].map(q => (
+                  <button key={q} className="ctx-quick-btn" onClick={() => sendChat(q)}>{q}</button>
+                ))}
+              </div>
+
+            </div>{/* end right context panel */}
+
           </div>
-        )}
+        )}{/* end chat tab */}
 
         {/* ══ INSIGHTS ════════════════════════════════════════════════════ */}
         {tab === "insights" && (
@@ -2106,6 +2166,8 @@ export default function AICommandCenter() {
           </div>
         )}
 
+          </div>
+        </div>
       </div>
     </div>
   );
