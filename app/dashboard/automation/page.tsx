@@ -19,6 +19,438 @@ function authHeaders(): Record<string, string> {
   return h;
 }
 
+// ─── ANIMATED DEMO COMPONENTS ────────────────────────────────────────────────
+function WADemo() {
+  const messages = [
+    { from: "user", text: "Hi, what's the status of my order #1234?" },
+    { from: "ai",   text: "Hello! 👋 Your order #1234 is being packed and ships today. You'll get a tracking SMS shortly." },
+    { from: "user", text: "Can I change the delivery address?" },
+    { from: "ai",   text: "Of course! Share your new address and I'll update it right away ✅" },
+  ];
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    setCount(0);
+    const t = setInterval(() => setCount(p => Math.min(p + 1, messages.length)), 1100);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div>
+      <div style={{ fontSize: 11, color: "#22c55e", fontWeight: 700, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", display: "inline-block", animation: "demoPing 1.2s infinite" }} />
+        LIVE PREVIEW — WhatsApp AI Auto-Reply
+      </div>
+      <div style={{ background: "#0a1929", borderRadius: 14, overflow: "hidden", border: "1px solid rgba(34,197,94,.2)" }}>
+        <div style={{ background: "#075e54", padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#128c7e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15 }}>🏪</div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "white" }}>Your Business</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.6)" }}>🤖 AI Auto-Reply Active</div>
+          </div>
+        </div>
+        <div style={{ padding: "12px 14px", minHeight: 180, display: "flex", flexDirection: "column", gap: 8 }}>
+          {messages.slice(0, count).map((m, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: m.from === "user" ? "flex-start" : "flex-end", animation: m.from === "user" ? "demoSlideL 0.4s ease" : "demoSlideR 0.4s ease" }}>
+              <div style={{ maxWidth: "78%", padding: "7px 11px", borderRadius: m.from === "user" ? "0 10px 10px 10px" : "10px 0 10px 10px", background: m.from === "user" ? "rgba(255,255,255,.1)" : "#005c4b", fontSize: 11.5, color: "rgba(255,255,255,.9)", lineHeight: 1.4 }}>
+                {m.text}
+                {m.from === "ai" && <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", marginTop: 2, textAlign: "right" }}>🤖 AI ✓✓</div>}
+              </div>
+            </div>
+          ))}
+          {count > 0 && count < messages.length && (
+            <div style={{ display: "flex", gap: 3, padding: "6px 10px", background: "rgba(255,255,255,.06)", borderRadius: "0 10px 10px 10px", width: "fit-content" }}>
+              {[0, 0.2, 0.4].map((d, i) => <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e", animation: `demoDot 1s ${d}s infinite` }} />)}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DripDemo() {
+  const steps = [
+    { day: "Day 1",  subject: "Welcome to our store! 👋",          color: "#38bdf8" },
+    { day: "Day 3",  subject: "Did you know about our rewards?",    color: "#818cf8" },
+    { day: "Day 7",  subject: "Exclusive 10% off — just for you",   color: "#a78bfa" },
+    { day: "Day 14", subject: "We miss you! Come back for a deal",  color: "#f472b6" },
+  ];
+  const [active, setActive] = useState(-1);
+  useEffect(() => {
+    setActive(-1);
+    let i = -1;
+    const t = setInterval(() => { i++; setActive(i); if (i >= steps.length - 1) clearInterval(t); }, 900);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div>
+      <div style={{ fontSize: 11, color: "#38bdf8", fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#38bdf8", display: "inline-block", animation: "demoPing 1.2s infinite" }} />
+        LIVE PREVIEW — Email Drip Campaign
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {steps.map((s, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 14px", borderRadius: 10, border: `1px solid ${i <= active ? s.color + "50" : "rgba(255,255,255,.07)"}`, background: i === active ? s.color + "12" : "transparent", transition: "all 0.5s ease" }}>
+            <div style={{ fontSize: 16 }}>{i <= active ? "📧" : "📭"}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 10, color: i <= active ? s.color : "rgba(255,255,255,.3)", fontWeight: 700 }}>{s.day}</div>
+              <div style={{ fontSize: 12, color: i <= active ? "rgba(255,255,255,.85)" : "rgba(255,255,255,.3)", fontWeight: i === active ? 600 : 400 }}>{s.subject}</div>
+            </div>
+            {i <= active && <div style={{ fontSize: 11, color: s.color, fontWeight: 700 }}>✓</div>}
+          </div>
+        ))}
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", textAlign: "right", marginTop: 4 }}>📊 1,234 subscribers • 32% avg open rate</div>
+      </div>
+    </div>
+  );
+}
+
+function SocialDemo() {
+  const phases = ["writing", "scheduling", "publishing", "posted"] as const;
+  type Phase = typeof phases[number];
+  const [phase, setPhase] = useState<Phase>("writing");
+  useEffect(() => {
+    setPhase("writing");
+    let i = 0;
+    const t = setInterval(() => { i++; if (i < phases.length) setPhase(phases[i]); else clearInterval(t); }, 1300);
+    return () => clearInterval(t);
+  }, []);
+  const platforms = [{ icon: "📘", name: "Facebook", color: "#3b82f6" }, { icon: "📸", name: "Instagram", color: "#ec4899" }, { icon: "💼", name: "LinkedIn", color: "#0ea5e9" }];
+  return (
+    <div>
+      <div style={{ fontSize: 11, color: "#f472b6", fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#f472b6", display: "inline-block", animation: "demoPing 1.2s infinite" }} />
+        LIVE PREVIEW — Social Media Auto-Post
+      </div>
+      <div style={{ background: "rgba(0,0,0,.3)", borderRadius: 12, padding: "16px", border: "1px solid rgba(244,114,182,.2)" }}>
+        <div style={{ background: "rgba(255,255,255,.05)", borderRadius: 8, padding: "10px 12px", marginBottom: 12, fontSize: 12, color: "rgba(255,255,255,.8)", lineHeight: 1.5 }}>
+          🚀 Summer Sale is here! Up to 50% off select items. Shop in-store or online. Limited stock — act now! 🛍️ #SummerSale
+        </div>
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          {platforms.map(p => (
+            <div key={p.name} style={{ flex: 1, padding: "8px 4px", borderRadius: 8, background: phase === "posted" ? p.color + "20" : "rgba(255,255,255,.04)", border: `1px solid ${phase === "posted" ? p.color + "60" : "rgba(255,255,255,.08)"}`, textAlign: "center", transition: "all 0.5s ease" }}>
+              <div style={{ fontSize: 18 }}>{p.icon}</div>
+              <div style={{ fontSize: 10, color: phase === "posted" ? p.color : "rgba(255,255,255,.4)", fontWeight: 600, marginTop: 2 }}>{phase === "posted" ? "✓ Posted" : p.name}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ padding: "8px 12px", borderRadius: 8, textAlign: "center", fontSize: 12, fontWeight: 700, transition: "all 0.4s", background: phase === "posted" ? "rgba(34,197,94,.1)" : "rgba(255,255,255,.05)", border: `1px solid ${phase === "posted" ? "rgba(34,197,94,.3)" : "rgba(255,255,255,.08)"}`, color: phase === "posted" ? "#22c55e" : "rgba(255,255,255,.5)" }}>
+          {phase === "writing"    && "✏️ Composing..."}
+          {phase === "scheduling" && "📅 Scheduling..."}
+          {phase === "publishing" && "📤 Publishing to 3 platforms..."}
+          {phase === "posted"     && "✅ Published to all 3 platforms!"}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ContentDemo() {
+  const full = "🚀 Big announcement! Our summer collection just dropped — 50+ new styles, up to 50% off. Available in-store & online. Shop now before it sells out! ✨ #NewArrival #SummerSale";
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    setShown(0);
+    const t = setInterval(() => setShown(p => Math.min(p + 4, full.length)), 55);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div>
+      <div style={{ fontSize: 11, color: "#fbbf24", fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fbbf24", display: "inline-block", animation: "demoPing 1.2s infinite" }} />
+        LIVE PREVIEW — AI Content Generator
+      </div>
+      <div style={{ background: "rgba(0,0,0,.3)", borderRadius: 12, padding: "14px 16px", border: "1px solid rgba(251,191,36,.2)" }}>
+        <div style={{ fontSize: 11, color: "#fbbf24", marginBottom: 8, fontWeight: 600 }}>Prompt: "Write a social post for our summer sale"</div>
+        <div style={{ background: "rgba(255,255,255,.04)", borderRadius: 8, padding: "10px 12px", minHeight: 90, fontSize: 12.5, color: "rgba(255,255,255,.85)", lineHeight: 1.6 }}>
+          {full.slice(0, shown)}
+          {shown < full.length && <span style={{ display: "inline-block", width: 2, height: 13, background: "#fbbf24", marginLeft: 2, animation: "demoBlink 0.7s infinite", verticalAlign: "middle" }} />}
+        </div>
+        {shown >= full.length && (
+          <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+            {["📱 Post to Instagram", "📘 Post to Facebook", "📧 Use in Email", "📝 Generate variation"].map(t => (
+              <span key={t} style={{ padding: "3px 8px", borderRadius: 6, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.2)", fontSize: 10.5, color: "#fbbf24" }}>{t}</span>
+            ))}
+          </div>
+        )}
+        <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 8, textAlign: "right" }}>⚡ Generated in 1.2s by Claude AI</div>
+      </div>
+    </div>
+  );
+}
+
+function LeadsDemo() {
+  const leads = [
+    { name: "Ahmed Khan",  source: "Facebook Ad",   status: "New",       color: "#38bdf8", val: "$450" },
+    { name: "Sara Malik",  source: "Website Form",  status: "Contacted", color: "#a78bfa", val: "$780" },
+    { name: "Bilal Raza",  source: "WhatsApp",      status: "Qualified", color: "#22c55e", val: "$1,200" },
+  ];
+  const [visible, setVisible] = useState(0);
+  useEffect(() => {
+    setVisible(0);
+    const t = setInterval(() => setVisible(p => Math.min(p + 1, leads.length)), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div>
+      <div style={{ fontSize: 11, color: "#fb923c", fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fb923c", display: "inline-block", animation: "demoPing 1.2s infinite" }} />
+        LIVE PREVIEW — CRM Lead Capture
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {leads.slice(0, visible).map((lead, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.04)", border: `1px solid ${lead.color}30`, animation: "demoSlideD 0.4s ease" }}>
+            <div style={{ width: 34, height: 34, borderRadius: "50%", background: `${lead.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, border: `1px solid ${lead.color}35`, flexShrink: 0 }}>👤</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: "white" }}>{lead.name}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>via {lead.source}</div>
+            </div>
+            <div style={{ textAlign: "right", flexShrink: 0 }}>
+              <div style={{ padding: "2px 8px", borderRadius: 20, background: `${lead.color}15`, color: lead.color, fontSize: 10.5, fontWeight: 700, border: `1px solid ${lead.color}30`, marginBottom: 3 }}>{lead.status}</div>
+              <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 700 }}>{lead.val}</div>
+            </div>
+          </div>
+        ))}
+        {visible < leads.length && <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", textAlign: "center", padding: 8 }}>Capturing new lead...</div>}
+        {visible >= leads.length && <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", textAlign: "right", marginTop: 2 }}>✅ 3 leads captured automatically • 0 manual work</div>}
+      </div>
+    </div>
+  );
+}
+
+function WebhooksDemo() {
+  const nodes = [
+    { icon: "🛒", label: "New Order",       sub: "Shopify / WooCommerce",      color: "#38bdf8" },
+    { icon: "⚡", label: "Your System",      sub: "Automation trigger",          color: "#a78bfa" },
+    { icon: "📊", label: "Google Sheets",    sub: "Row added automatically",     color: "#22c55e" },
+    { icon: "💬", label: "WhatsApp Alert",   sub: "Owner notified instantly",    color: "#22c55e" },
+  ];
+  const [flow, setFlow] = useState(-1);
+  useEffect(() => {
+    setFlow(-1);
+    let i = -1;
+    const t = setInterval(() => {
+      i++;
+      setFlow(i);
+      if (i >= nodes.length - 1) { clearInterval(t); setTimeout(() => setFlow(-1), 900); }
+    }, 900);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div>
+      <div style={{ fontSize: 11, color: "#a78bfa", fontWeight: 700, marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#a78bfa", display: "inline-block", animation: "demoPing 1.2s infinite" }} />
+        LIVE PREVIEW — Webhook Automation Flow
+      </div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {nodes.map((node, i) => (
+          <div key={i}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 14px", borderRadius: 10, background: flow >= i ? `${node.color}10` : "rgba(255,255,255,.03)", border: `1px solid ${flow >= i ? node.color + "40" : "rgba(255,255,255,.07)"}`, transition: "all 0.5s ease" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: flow >= i ? `${node.color}20` : "rgba(255,255,255,.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, transition: "all 0.4s", border: `1px solid ${flow >= i ? node.color + "35" : "rgba(255,255,255,.08)"}` }}>
+                {node.icon}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12.5, color: flow >= i ? "rgba(255,255,255,.9)" : "rgba(255,255,255,.3)", fontWeight: flow >= i ? 600 : 400, transition: "all 0.3s" }}>{node.label}</div>
+                <div style={{ fontSize: 10.5, color: flow >= i ? node.color : "rgba(255,255,255,.2)", transition: "all 0.3s" }}>{node.sub}</div>
+              </div>
+              {flow >= i && <div style={{ fontSize: 14, color: node.color }}>✓</div>}
+            </div>
+            {i < nodes.length - 1 && (
+              <div style={{ marginLeft: 31, width: 2, height: 12, background: flow > i ? "#a78bfa50" : "rgba(255,255,255,.08)", transition: "all 0.4s" }} />
+            )}
+          </div>
+        ))}
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", textAlign: "center", marginTop: 6 }}>Connect 5,000+ apps via Zapier &amp; Make.com</div>
+      </div>
+    </div>
+  );
+}
+
+function UpsellGate() {
+  type DemoId = "whatsapp" | "drip" | "social" | "content" | "leads" | "webhooks";
+  const [demoTab, setDemoTab] = useState<DemoId>("whatsapp");
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [chatMessages, setChatMessages] = useState<{ role: "user" | "bot"; text: string }[]>([
+    { role: "bot", text: "👋 Hi! I can answer any question about the Automation Add-on. What would you like to know?" },
+  ]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatTyping, setChatTyping] = useState(false);
+
+  const demoOrder: DemoId[] = ["whatsapp", "drip", "social", "content", "leads", "webhooks"];
+
+  useEffect(() => {
+    if (!autoPlay) return;
+    const t = setInterval(() => setDemoTab(prev => {
+      const i = demoOrder.indexOf(prev);
+      return demoOrder[(i + 1) % demoOrder.length];
+    }), 4200);
+    return () => clearInterval(t);
+  }, [autoPlay]);
+
+  const FAQ: { kw: string[]; ans: string }[] = [
+    { kw: ["price", "cost", "much", "79", "dollar", "expensive"], ans: "The Automation Add-on is $79/month — far less than individual tools: WATI $99, Mailchimp $99, Intercom $74, HubSpot $50, Zapier $49, Buffer $18 = $438+/mo. You save over $350 every month." },
+    { kw: ["whatsapp", "reply", "message", "wa", "auto"], ans: "WhatsApp AI automatically replies to every customer message 24/7 using Claude AI. You set a system prompt once, and it handles order status, FAQs, bookings — everything, instantly." },
+    { kw: ["email", "drip", "campaign", "sequence", "nurture"], ans: "Email Drip Campaigns send a series of emails over time (Day 1 → Day 3 → Day 7...). Perfect for automatically onboarding new customers, nurturing leads, or re-engaging customers who haven't purchased recently." },
+    { kw: ["social", "facebook", "instagram", "linkedin", "post", "schedule", "publish"], ans: "Social Media Scheduler lets you write a post once and publish to Facebook, Instagram, and LinkedIn simultaneously. Schedule in advance or publish instantly — zero manual work per platform." },
+    { kw: ["content", "generate", "write", "copy", "ad"], ans: "AI Content Generator uses Claude AI to write social posts, email copy, product descriptions, and ads in seconds. Just describe what you need and get professional copy instantly." },
+    { kw: ["lead", "crm", "capture", "form", "contact"], ans: "CRM Lead Capture automatically saves leads from website forms, Facebook Lead Ads, and webhooks into your account. Every potential customer is captured and tracked — nothing falls through the cracks." },
+    { kw: ["webhook", "zapier", "make", "connect", "integrate", "app"], ans: "Webhooks connect your account to 5,000+ apps via Zapier or Make.com. Trigger actions when orders are placed, send data to Google Sheets, notify your team on Slack — automate any workflow." },
+    { kw: ["sheets", "google", "sync", "export", "spreadsheet"], ans: "Google Sheets Sync exports your leads, orders, and contacts to Google Sheets in real-time. Great for custom reports, sharing live data with your team, or feeding into your own analytics." },
+    { kw: ["chatbot", "website", "embed", "widget", "bot"], ans: "Website Chatbot embeds on any website with one script tag. It answers visitor questions 24/7 using your business information as context — handles FAQs, pricing, hours, and more automatically." },
+    { kw: ["trial", "free", "test", "try"], ans: "No free trial, but at $79/mo vs $438+/mo in individual tools, the ROI is immediate from day one. You can cancel anytime — no contracts, no lock-in." },
+    { kw: ["cancel", "refund", "contract"], ans: "Cancel anytime — no long-term contracts. Billing is monthly. We offer pro-rated credits within the first 7 days if you're not satisfied." },
+    { kw: ["setup", "easy", "start", "how", "begin", "install", "difficult"], ans: "Setup takes under 10 minutes. Each tool has a simple form — no coding required. WhatsApp, social, and chatbot tools are especially plug-and-play." },
+  ];
+
+  function getBotResponse(input: string): string {
+    const lower = input.toLowerCase();
+    for (const { kw, ans } of FAQ) {
+      if (kw.some(k => lower.includes(k))) return ans;
+    }
+    return "Great question! The Add-on includes: 💬 WhatsApp AI, 📧 Email Drip, 📱 Social Scheduler, ✍️ AI Content, 👥 CRM Leads, 🔗 Webhooks, 📊 Sheets Sync, and 🤖 Website Chatbot — all for $79/month. Which feature would you like to know more about?";
+  }
+
+  function doSendChat(msg: string) {
+    if (!msg.trim()) return;
+    setChatMessages(prev => [...prev, { role: "user", text: msg }]);
+    setChatTyping(true);
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, { role: "bot", text: getBotResponse(msg) }]);
+      setChatTyping(false);
+    }, 700 + Math.random() * 500);
+  }
+
+  const DEMO_TABS: { id: DemoId; label: string; icon: string; color: string }[] = [
+    { id: "whatsapp", label: "WhatsApp AI", icon: "💬", color: "#22c55e" },
+    { id: "drip",     label: "Email Drip",  icon: "📧", color: "#38bdf8" },
+    { id: "social",   label: "Social",      icon: "📱", color: "#f472b6" },
+    { id: "content",  label: "AI Content",  icon: "✍️", color: "#fbbf24" },
+    { id: "leads",    label: "CRM Leads",   icon: "👥", color: "#fb923c" },
+    { id: "webhooks", label: "Webhooks",    icon: "🔗", color: "#a78bfa" },
+  ];
+
+  const QUICK_QS = ["How much does it cost?", "How does WhatsApp AI work?", "What social platforms?", "Is setup easy?", "Can I cancel anytime?"];
+
+  return (
+    <div style={{ marginBottom: 28, fontFamily: FONT }}>
+      <style>{`
+        @keyframes demoPing   { 0%,100%{opacity:.4;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
+        @keyframes demoDot    { 0%,80%,100%{transform:scale(.6);opacity:.4} 40%{transform:scale(1);opacity:1} }
+        @keyframes demoSlideL { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes demoSlideR { from{opacity:0;transform:translateX(8px)}  to{opacity:1;transform:translateX(0)} }
+        @keyframes demoSlideD { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes demoBlink  { 0%,100%{opacity:1} 50%{opacity:0} }
+        @keyframes demoFadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+      `}</style>
+
+      <div style={{ borderRadius: 20, background: "linear-gradient(135deg,rgba(124,58,237,.2),rgba(37,99,235,.14))", border: "1px solid rgba(124,58,237,.4)", overflow: "hidden", marginBottom: 16 }}>
+        <div style={{ height: 3, background: "linear-gradient(90deg,#7c3aed,#2563eb,#a78bfa,#38bdf8)" }} />
+        <div style={{ padding: "22px 26px", display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" }}>
+          <div style={{ width: 50, height: 50, borderRadius: 14, background: "linear-gradient(135deg,#7c3aed,#2563eb)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>⚡</div>
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "white" }}>Business Automation Add-on</h2>
+              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(251,191,36,.15)", color: "#fbbf24", fontSize: 11, fontWeight: 700, border: "1px solid rgba(251,191,36,.3)" }}>$79/month</span>
+              <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(34,197,94,.1)", color: "#22c55e", fontSize: 11, fontWeight: 700, border: "1px solid rgba(34,197,94,.25)" }}>Save $358+/mo</span>
+            </div>
+            <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.6 }}>
+              8+ AI-powered tools in one — replaces WATI, Mailchimp, HubSpot, Zapier, Buffer &amp; Intercom. See them live below, then add to your plan.
+            </p>
+          </div>
+          <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "11px 22px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none", display: "inline-block", flexShrink: 0, whiteSpace: "nowrap" }}>
+            Add to my plan →
+          </a>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 350px", gap: 14 }}>
+        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, overflow: "hidden" }}>
+          <div style={{ display: "flex", overflowX: "auto", borderBottom: "1px solid rgba(255,255,255,.08)", scrollbarWidth: "none" as const }}>
+            {DEMO_TABS.map(dt => (
+              <button key={dt.id} onClick={() => { setAutoPlay(false); setDemoTab(dt.id); }} style={{ padding: "11px 15px", border: "none", background: "transparent", cursor: "pointer", fontFamily: FONT, fontSize: 12, fontWeight: demoTab === dt.id ? 700 : 400, color: demoTab === dt.id ? dt.color : "rgba(255,255,255,.4)", borderBottom: demoTab === dt.id ? `2px solid ${dt.color}` : "2px solid transparent", whiteSpace: "nowrap" as const, transition: "all 0.15s" }}>
+                {dt.icon} {dt.label}
+              </button>
+            ))}
+          </div>
+          <div style={{ padding: "18px 20px", minHeight: 280, position: "relative" as const }}>
+            {demoTab === "whatsapp" && <WADemo key="wa" />}
+            {demoTab === "drip"     && <DripDemo key="drip" />}
+            {demoTab === "social"   && <SocialDemo key="social" />}
+            {demoTab === "content"  && <ContentDemo key="content" />}
+            {demoTab === "leads"    && <LeadsDemo key="leads" />}
+            {demoTab === "webhooks" && <WebhooksDemo key="hooks" />}
+            {autoPlay && (
+              <div style={{ position: "absolute" as const, bottom: 10, right: 14, fontSize: 10.5, color: "rgba(255,255,255,.25)", display: "flex", alignItems: "center", gap: 4 }}>
+                <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e", animation: "demoPing 1.2s infinite" }} />
+                auto-play
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(124,58,237,.25)", borderRadius: 16, overflow: "hidden", display: "flex", flexDirection: "column" as const }}>
+          <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.07)", background: "rgba(124,58,237,.08)", display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#7c3aed,#2563eb)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🤖</div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>Automation Assistant</div>
+              <div style={{ fontSize: 10.5, color: "#22c55e", display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+                Online — ask me anything
+              </div>
+            </div>
+          </div>
+
+          <div style={{ flex: 1, overflowY: "auto" as const, padding: "12px 14px", display: "flex", flexDirection: "column" as const, gap: 8, maxHeight: 240 }}>
+            {chatMessages.map((m, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", animation: "demoFadeUp 0.25s ease" }}>
+                <div style={{ maxWidth: "88%", padding: "7px 11px", borderRadius: m.role === "user" ? "12px 12px 4px 12px" : "12px 12px 12px 4px", background: m.role === "user" ? "linear-gradient(135deg,#7c3aed,#2563eb)" : "rgba(255,255,255,.07)", border: m.role === "bot" ? "1px solid rgba(255,255,255,.09)" : "none", fontSize: 12, color: "rgba(255,255,255,.9)", lineHeight: 1.55 }}>
+                  {m.text}
+                </div>
+              </div>
+            ))}
+            {chatTyping && (
+              <div style={{ display: "flex", alignItems: "center", gap: 3, padding: "6px 10px", background: "rgba(255,255,255,.06)", borderRadius: "10px 10px 10px 3px", width: "fit-content", border: "1px solid rgba(255,255,255,.08)" }}>
+                {[0, 0.2, 0.4].map((d, i) => <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: "#a78bfa", animation: `demoDot 1.1s ${d}s infinite` }} />)}
+              </div>
+            )}
+          </div>
+
+          <div style={{ padding: "6px 12px 4px", display: "flex", gap: 5, overflowX: "auto" as const, scrollbarWidth: "none" as const, borderTop: "1px solid rgba(255,255,255,.05)" }}>
+            {QUICK_QS.map(q => (
+              <button key={q} onClick={() => doSendChat(q)} style={{ padding: "4px 9px", borderRadius: 20, border: "1px solid rgba(124,58,237,.3)", background: "rgba(124,58,237,.07)", color: "#a78bfa", fontSize: 10.5, cursor: "pointer", fontFamily: FONT, whiteSpace: "nowrap" as const }}>{q}</button>
+            ))}
+          </div>
+
+          <div style={{ padding: "8px 12px", borderTop: "1px solid rgba(255,255,255,.07)", display: "flex", gap: 6 }}>
+            <input
+              value={chatInput}
+              onChange={e => setChatInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") { const v = chatInput; setChatInput(""); doSendChat(v); } }}
+              placeholder="Ask about any feature..."
+              style={{ flex: 1, padding: "7px 11px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "#e2e8f0", fontSize: 12, fontFamily: FONT, outline: "none" }}
+            />
+            <button onClick={() => { const v = chatInput; setChatInput(""); doSendChat(v); }} style={{ padding: "7px 13px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 13, cursor: "pointer" }}>→</button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 12, padding: "12px 18px", borderRadius: 12, background: "rgba(0,0,0,.25)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+        <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700 }}>ALTERNATIVES:</div>
+        <div style={{ display: "flex", gap: 10, flex: 1, flexWrap: "wrap" }}>
+          {[["WATI","$99"],["Mailchimp","$99"],["Intercom","$74"],["HubSpot","$50"],["Zapier","$49"],["Buffer","$18"]].map(([tool, price]) => (
+            <span key={tool} style={{ fontSize: 11.5, color: "#475569" }}>{tool} <span style={{ color: "#f87171", fontWeight: 700 }}>{price}</span></span>
+          ))}
+        </div>
+        <div style={{ fontSize: 13 }}>
+          <span style={{ color: "#f87171", fontWeight: 900, textDecoration: "line-through" }}>$438+/mo</span>
+          <span style={{ color: "#22c55e", fontWeight: 900, marginLeft: 8 }}>vs $79/mo</span>
+        </div>
+        <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
+          Get Started →
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 export default function AutomationPage() {
   const [tab, setTab] = useState<Tab>("overview");
@@ -79,61 +511,7 @@ export default function AutomationPage() {
         </div>
       )}
 
-      {/* Add-on gate — show upgrade prompt if not subscribed */}
-      {addonEnabled === false && (
-        <div style={{ marginBottom: 28, borderRadius: 20, background: "linear-gradient(135deg,rgba(124,58,237,.18),rgba(37,99,235,.12))", border: "1px solid rgba(124,58,237,.35)", overflow: "hidden" }}>
-          {/* Top accent bar */}
-          <div style={{ height: 3, background: "linear-gradient(90deg,#7c3aed,#2563eb,#a78bfa)" }} />
-          <div style={{ padding: "28px 30px 30px" }}>
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 20, flexWrap: "wrap" }}>
-              {/* Icon */}
-              <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#7c3aed,#2563eb)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>⚡</div>
-
-              {/* Text */}
-              <div style={{ flex: 1, minWidth: 260 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
-                  <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "white" }}>Automation Add-on Not Active</h2>
-                  <span style={{ padding: "3px 10px", borderRadius: 20, background: "rgba(251,191,36,.15)", color: "#fbbf24", fontSize: 11, fontWeight: 700, border: "1px solid rgba(251,191,36,.3)" }}>$79/month</span>
-                </div>
-                <p style={{ margin: "0 0 16px", fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
-                  Unlock AI-powered automation tools that replace 6+ separate tools costing $438+/month. WhatsApp AI replies, email drip campaigns, lead capture, social media scheduling, AI content generation, and more.
-                </p>
-
-                {/* Feature pills */}
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
-                  {["💬 WhatsApp AI", "📧 Email Drip", "🤖 AI Chatbot", "👥 CRM Leads", "📱 Social Auto-post", "✍️ AI Content", "🔗 Webhooks", "📊 Sheets Sync"].map(f => (
-                    <span key={f} style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.7)", fontSize: 12, fontWeight: 500 }}>{f}</span>
-                  ))}
-                </div>
-
-                {/* Value comparison */}
-                <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(0,0,0,.25)", marginBottom: 20, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                  <div style={{ fontSize: 12, color: "#94a3b8" }}>Individual tools cost:</div>
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    {[["WATI","$99"],["Mailchimp","$99"],["Intercom","$74"],["HubSpot","$50"],["Zapier","$49"],["Buffer","$18"]].map(([t, p]) => (
-                      <span key={t} style={{ fontSize: 11, color: "#475569" }}>{t} <span style={{ color: "#f87171", fontWeight: 700 }}>{p}</span></span>
-                    ))}
-                  </div>
-                  <div style={{ marginLeft: "auto", fontSize: 13, color: "#94a3b8" }}>
-                    = <span style={{ fontWeight: 900, color: "#f87171", textDecoration: "line-through" }}>$438+/mo</span>
-                    <span style={{ color: "#22c55e", fontWeight: 900, marginLeft: 8 }}>vs $79/mo</span>
-                  </div>
-                </div>
-
-                {/* CTAs */}
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  <a href="/automation" style={{ padding: "11px 24px", borderRadius: 10, background: "linear-gradient(135deg,#7c3aed,#2563eb)", color: "white", fontSize: 14, fontWeight: 700, textDecoration: "none", display: "inline-block" }}>
-                    See full details →
-                  </a>
-                  <a href="/onboarding/payment/addon-automation?cycle=monthly" style={{ padding: "11px 24px", borderRadius: 10, background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.15)", color: "white", fontSize: 14, fontWeight: 700, textDecoration: "none", display: "inline-block" }}>
-                    Add to my plan — $79/mo
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {addonEnabled === false && <UpsellGate />}
 
       {/* Tabs + content — only show if addon active (or still loading) */}
       {addonEnabled !== false && (
