@@ -1,15 +1,30 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { getCurrentUser } from "@/lib/auth";
 
 const STATUS_COLOR: Record<string, string> = { COMPLETED: "#10b981", IN_TRANSIT: "#f59e0b", PENDING: "#6366f1" };
 const BLANK = { fromBranch: "", toBranch: "", items: "", notes: "" };
+
+type Branch = { id: string; name: string; code: string; isActive: boolean };
 
 export default function StockTransferPage() {
   const { records, loading, create, setStatus } = useBusinessRecords("stock_transfer");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(BLANK);
   const [saving, setSaving] = useState(false);
+  const [branches, setBranches] = useState<Branch[]>([]);
+
+  useEffect(() => {
+    const u = getCurrentUser();
+    const headers: Record<string, string> = {};
+    if (u?.role)      headers["x-user-role"]  = u.role;
+    if (u?.id)        headers["x-user-id"]    = u.id;
+    if (u?.companyId) headers["x-company-id"] = u.companyId;
+    fetch("/api/branches", { headers })
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setBranches(Array.isArray(d) ? d.filter((b: Branch) => b.isActive) : []));
+  }, []);
 
   const transfers = useMemo(() =>
     records.map(r => ({
@@ -125,11 +140,21 @@ export default function StockTransferPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>From Branch *</label>
-                  <input value={form.fromBranch} onChange={e => setForm(p => ({ ...p, fromBranch: e.target.value }))} placeholder="Main Store" style={{ ...inp, marginTop: 6 }} />
+                  <select value={form.fromBranch} onChange={e => setForm(p => ({ ...p, fromBranch: e.target.value }))} style={{ ...inp, marginTop: 6 }}>
+                    <option value="">— Select branch —</option>
+                    {branches.filter(b => b.name !== form.toBranch).map(b => (
+                      <option key={b.id} value={b.name}>{b.name} ({b.code})</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>To Branch *</label>
-                  <input value={form.toBranch} onChange={e => setForm(p => ({ ...p, toBranch: e.target.value }))} placeholder="Karachi Branch" style={{ ...inp, marginTop: 6 }} />
+                  <select value={form.toBranch} onChange={e => setForm(p => ({ ...p, toBranch: e.target.value }))} style={{ ...inp, marginTop: 6 }}>
+                    <option value="">— Select branch —</option>
+                    {branches.filter(b => b.name !== form.fromBranch).map(b => (
+                      <option key={b.id} value={b.name}>{b.name} ({b.code})</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div>
