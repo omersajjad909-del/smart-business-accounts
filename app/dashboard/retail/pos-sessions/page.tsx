@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { confirmToast } from "@/lib/toast-feedback";
 import { getCurrentUser } from "@/lib/auth";
+import { fmtDate } from "@/lib/dateUtils";
 
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,.03)";
