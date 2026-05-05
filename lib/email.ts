@@ -648,6 +648,62 @@ export const emailTemplates = {
   },
 };
 
+// ─── Login alert email ────────────────────────────────────────────────────────
+export async function sendLoginAlertEmail(opts: {
+  to: string;
+  name: string;
+  ip: string | null;
+  city: string | null;
+  country: string | null;
+  userAgent: string | null;
+  time: Date;
+}): Promise<void> {
+  const device = opts.userAgent
+    ? opts.userAgent.includes("Mobile") ? "Mobile" : "Desktop/Laptop"
+    : "Unknown Device";
+  const browser = (() => {
+    const ua = opts.userAgent || "";
+    if (ua.includes("Chrome")) return "Chrome";
+    if (ua.includes("Firefox")) return "Firefox";
+    if (ua.includes("Safari")) return "Safari";
+    if (ua.includes("Edge")) return "Edge";
+    return "Browser";
+  })();
+  const location = [opts.city, opts.country].filter(Boolean).join(", ") || "Unknown location";
+  const timeStr = opts.time.toLocaleString("en-PK", { timeZone: "Asia/Karachi", dateStyle: "medium", timeStyle: "short" });
+
+  const html = emailBase({
+    companyName: "FinovaOS Security",
+    badgeText: "Login Alert",
+    badgeColor: "#f59e0b",
+    content: `
+      <p style="margin:0 0 6px;font-size:22px;font-weight:800;color:#0f172a;">New Login Detected</p>
+      <p style="margin:0 0 20px;font-size:14px;color:#64748b;">Hi ${opts.name}, a new login was made to your account.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
+        ${[
+          ["🕐 Time",     timeStr],
+          ["📍 Location", location],
+          ["🌐 IP Address", opts.ip || "Unknown"],
+          ["💻 Device",   `${device} · ${browser}`],
+        ].map(([k, v]) => `
+          <tr style="border-bottom:1px solid #f1f5f9;">
+            <td style="padding:10px 0;color:#94a3b8;font-weight:600;width:120px;">${k}</td>
+            <td style="padding:10px 0;color:#0f172a;font-weight:700;">${v}</td>
+          </tr>
+        `).join("")}
+      </table>
+      <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;font-size:13px;color:#92400e;line-height:1.7;">
+        <strong>⚠️ Not you?</strong><br/>
+        If you did not log in, please change your password immediately and contact your system administrator.
+      </div>
+    `,
+  });
+
+  try {
+    await sendEmail({ to: opts.to, subject: `🔐 New Login Alert — ${timeStr}`, html });
+  } catch {}
+}
+
 // ─── Send email ───────────────────────────────────────────────────────────────
 export async function sendEmail(options: {
   to: string | string[];

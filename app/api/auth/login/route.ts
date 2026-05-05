@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { signJwt } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
+import { sendLoginAlertEmail } from "@/lib/email";
 import {
   createVerificationCodeLog,
   getAvailableChannels,
@@ -310,7 +311,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Best-effort geo lookup and login logging
+    // Best-effort geo lookup, login logging, and login alert email
     try {
       const rawIp = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
       const ip = rawIp || undefined;
@@ -350,6 +351,18 @@ export async function POST(req: NextRequest) {
             details: JSON.stringify({ ip, country, city, ua: req.headers.get("user-agent") || null }),
           },
         });
+      }
+      // Fire-and-forget login alert email to the user
+      if (safeUser.email) {
+        sendLoginAlertEmail({
+          to: safeUser.email,
+          name: safeUser.name || safeUser.email,
+          ip: ip || null,
+          city,
+          country,
+          userAgent: req.headers.get("user-agent") || null,
+          time: new Date(),
+        }).catch(() => {});
       }
     } catch {}
 
