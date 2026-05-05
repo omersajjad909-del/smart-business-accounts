@@ -52,6 +52,10 @@ type SecurityPayload = {
     action: string;
     createdAt: string;
     details: string | null;
+    ip: string | null;
+    city: string | null;
+    country: string | null;
+    userAgent: string | null;
     user?: {
       name?: string;
       email?: string;
@@ -64,6 +68,33 @@ function statusPill(active: boolean) {
     ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700"
     : "border-slate-500/20 bg-slate-500/10 text-slate-700";
 }
+
+function parseDevice(ua: string | null): string {
+  if (!ua) return "Unknown device";
+  const s = ua.toLowerCase();
+  let browser = "Browser";
+  if (s.includes("chrome") && !s.includes("chromium") && !s.includes("edg")) browser = "Chrome";
+  else if (s.includes("firefox")) browser = "Firefox";
+  else if (s.includes("safari") && !s.includes("chrome")) browser = "Safari";
+  else if (s.includes("edg")) browser = "Edge";
+  else if (s.includes("opr") || s.includes("opera")) browser = "Opera";
+  let os = "Unknown OS";
+  if (s.includes("windows nt")) os = "Windows";
+  else if (s.includes("mac os")) os = "macOS";
+  else if (s.includes("android")) os = "Android";
+  else if (s.includes("iphone") || s.includes("ipad")) os = "iOS";
+  else if (s.includes("linux")) os = "Linux";
+  return `${browser} on ${os}`;
+}
+
+const ACTION_STYLES: Record<string, { label: string; color: string }> = {
+  LOGIN:              { label: "Login",           color: "#22c55e" },
+  SSO_LOGIN:          { label: "SSO Login",       color: "#3b82f6" },
+  API_KEY_CREATED:    { label: "API Key Created", color: "#f59e0b" },
+  API_KEY_REVOKED:    { label: "API Key Revoked", color: "#ef4444" },
+  API_KEY_USED:       { label: "API Key Used",    color: "#a78bfa" },
+  SSO_CONFIG_UPDATED: { label: "SSO Updated",     color: "#06b6d4" },
+};
 
 export default function SecurityAccessPage() {
   const [data, setData] = useState<SecurityPayload | null>(null);
@@ -253,24 +284,50 @@ export default function SecurityAccessPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel-bg)] p-6">
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Recent authentication events</h2>
-            <div className="mt-4 space-y-3">
+          <div className="rounded-2xl border border-(--border) bg-(--panel-bg) p-6">
+            <h2 className="mb-4 text-lg font-semibold text-(--text-primary)">Recent authentication events</h2>
+            <div className="space-y-3">
               {data.authEvents.length === 0 ? (
-                <div className="text-sm text-[var(--text-muted)]">No recent auth events found.</div>
+                <div className="text-sm text-(--text-muted)">No recent auth events found.</div>
               ) : (
-                data.authEvents.map((event) => (
-                  <div key={event.id} className="rounded-xl border border-[var(--border)] bg-[var(--panel-bg-2)] p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="font-medium text-[var(--text-primary)]">{event.action}</div>
-                      <div className="text-xs text-[var(--text-muted)]">{new Date(event.createdAt).toLocaleString()}</div>
+                data.authEvents.map((event) => {
+                  const style = ACTION_STYLES[event.action] || { label: event.action, color: "#64748b" };
+                  const location = [event.city, event.country].filter(Boolean).join(", ") || "Unknown location";
+                  const device = parseDevice(event.userAgent);
+                  return (
+                    <div key={event.id} className="rounded-xl border border-(--border) bg-(--panel-bg-2) p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span style={{
+                            display: "inline-block",
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            background: style.color,
+                            flexShrink: 0,
+                            marginTop: 2,
+                          }} />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-semibold text-(--text-primary)">{style.label}</span>
+                              {event.user?.email && (
+                                <span className="text-xs text-(--text-muted)">·&nbsp;{event.user.name || event.user.email}</span>
+                              )}
+                            </div>
+                            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-(--text-muted)">
+                              {event.ip && <span>IP: {event.ip}</span>}
+                              <span>📍 {location}</span>
+                              <span>💻 {device}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-xs text-(--text-muted)">
+                          {new Date(event.createdAt).toLocaleString()}
+                        </div>
+                      </div>
                     </div>
-                    <div className="mt-2 text-xs text-[var(--text-muted)]">
-                      {event.user?.email || event.user?.name || "System event"}
-                    </div>
-                    {event.details && <div className="mt-2 text-xs text-[var(--text-muted)]">{event.details}</div>}
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

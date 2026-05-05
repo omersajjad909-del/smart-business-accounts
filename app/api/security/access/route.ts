@@ -116,13 +116,20 @@ export async function GET(req: NextRequest) {
         domainHint: String(ssoConfig?.domainHint || ""),
         updatedAt: ssoConfigLog?.createdAt?.toISOString() || null,
       },
-      authEvents: authEvents.map((event) => ({
-        id: event.id,
-        action: event.action,
-        createdAt: event.createdAt.toISOString(),
-        details: event.details,
-        user: event.user,
-      })),
+      authEvents: authEvents.map((event) => {
+        const parsed = safeParse(event.details);
+        return {
+          id: event.id,
+          action: event.action,
+          createdAt: event.createdAt.toISOString(),
+          details: event.details,
+          ip: parsed?.ip as string | null ?? null,
+          city: parsed?.city as string | null ?? null,
+          country: parsed?.country as string | null ?? null,
+          userAgent: (parsed?.ua ?? parsed?.userAgent) as string | null ?? null,
+          user: event.user,
+        };
+      }),
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || "Failed to load security center" }, { status: 500 });
