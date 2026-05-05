@@ -78,9 +78,9 @@ export default function POSSessionsPage() {
         const branchesData = branchesRes.ok ? await branchesRes.json() : [];
         console.log("[POS] Branches loaded:", branchesData);
 
-        // Set cashiers - include all returned users
+        // Set cashiers - only CASHIER role users
         const usersList = Array.isArray(usersData) ? usersData : [];
-        setCashiers(usersList);
+        setCashiers(usersList.filter((u: any) => u.role === "CASHIER"));
 
         // Set branches - only include active ones
         const branchesList = Array.isArray(branchesData) ? branchesData : [];
