@@ -5,6 +5,69 @@ import { buildForecastBundle, buildRiskAnalyzer } from "@/lib/aiAnalytics";
 export const runtime = "nodejs";
 export const maxDuration = 90;
 
+function buildFallbackReportText(
+  monthName: string,
+  ctx: Awaited<ReturnType<typeof buildFinancialContext>>,
+  forecastBundle: ReturnType<typeof buildForecastBundle>,
+  riskBundle: ReturnType<typeof buildRiskAnalyzer>,
+) {
+  const c = ctx.company.currency;
+  const fmt = (n: number) => `${c} ${n.toLocaleString("en-PK", { maximumFractionDigits: 0 })}`;
+  const sign = (n: number) => `${n >= 0 ? "+" : ""}${n}%`;
+  const marginPct = ctx.revenue.thisMonth > 0 ? Math.round((ctx.profit.thisMonth / ctx.revenue.thisMonth) * 100) : 0;
+
+  return [
+    `# Monthly Financial Report - ${monthName}`,
+    ``,
+    `## Executive Summary`,
+    `${ctx.company.name} closed the month with revenue of ${fmt(ctx.revenue.thisMonth)} and net profit of ${fmt(ctx.profit.thisMonth)}. Revenue moved ${sign(ctx.revenue.change)} versus last month, while expenses moved ${sign(ctx.expenses.change)}.`,
+    ``,
+    `## Revenue Performance`,
+    `- This month revenue: ${fmt(ctx.revenue.thisMonth)}`,
+    `- Last month revenue: ${fmt(ctx.revenue.lastMonth)}`,
+    `- Year-to-date revenue: ${fmt(ctx.revenue.thisYear)}`,
+    `- Top customer: ${ctx.topCustomers[0]?.name || "n/a"}${ctx.topCustomers[0] ? ` (${fmt(ctx.topCustomers[0].amount)})` : ""}`,
+    ``,
+    `## Expense Analysis`,
+    `- This month expenses: ${fmt(ctx.expenses.thisMonth)}`,
+    `- Last month expenses: ${fmt(ctx.expenses.lastMonth)}`,
+    `- Largest expense category: ${ctx.topExpenses[0]?.category || "n/a"}${ctx.topExpenses[0] ? ` (${fmt(ctx.topExpenses[0].amount)})` : ""}`,
+    ``,
+    `## Profitability`,
+    `- Net profit: ${fmt(ctx.profit.thisMonth)}`,
+    `- Net margin: ${marginPct}%`,
+    `- Profit change vs last month: ${sign(ctx.profit.change)}`,
+    ``,
+    `## Cash Flow & Liquidity`,
+    `- Receivables outstanding: ${fmt(ctx.receivables.total)}`,
+    `- Overdue receivables: ${fmt(ctx.receivables.overdue)} across ${ctx.receivables.overdueCount} invoice(s)`,
+    `- Payables outstanding: ${fmt(ctx.payables.total)}`,
+    `- Forecast closing cash in 30 days: ${fmt(forecastBundle.projections.closingCash30d)}`,
+    `- Cash risk: ${forecastBundle.projections.cashRisk}`,
+    ``,
+    `## Inventory Status`,
+    `- Inventory value: ${fmt(ctx.inventory.stockValue)}`,
+    `- Low stock items: ${ctx.inventory.lowStockItems}`,
+    `- Dead stock items: ${ctx.deadStockItems.length}`,
+    ``,
+    `## Business Health Score`,
+    `${riskBundle.healthScore}/100 (${riskBundle.scoreLabel} risk)`,
+    ``,
+    `## Key Risks`,
+    ...riskBundle.items.slice(0, 3).map((item) => `- ${item.title}: ${item.note}`),
+    ``,
+    `## Recommended Actions`,
+    `- Accelerate collections on overdue receivables.`,
+    `- Review the highest expense categories before next month closes.`,
+    `- Replenish low stock items that support active sales.`,
+    `- Reduce exposure to dead or slow-moving inventory.`,
+    `- Monitor 30-day closing cash against the recommended buffer.`,
+    ``,
+    `## Outlook for Next Month`,
+    `If current trends continue, the next 30 to 90 days remain ${forecastBundle.projections.cashRisk === "high" ? "sensitive" : "manageable"}, but collections discipline and expense control will be important.`,
+  ].join("\n");
+}
+
 export async function GET(req: NextRequest) {
   try {
     const companyId = req.headers.get("x-company-id");
@@ -77,11 +140,16 @@ Generate a structured, professional financial report with:
 
 Write professionally but in plain language that a business owner can understand without accounting knowledge. Use actual numbers throughout.`;
 
-    const reportText = await openAITextResponse(
-      FINOVA_SYSTEM_PROMPT,
-      [{ role: "user", content: prompt }],
-      2500,
-    );
+    let reportText = buildFallbackReportText(monthName, ctx, forecastBundle, riskBundle);
+    try {
+      reportText = await openAITextResponse(
+        FINOVA_SYSTEM_PROMPT,
+        [{ role: "user", content: prompt }],
+        2500,
+      ) || reportText;
+    } catch (error) {
+      console.error("AI report narrative fallback:", error);
+    }
 
     return NextResponse.json({
       report: reportText,

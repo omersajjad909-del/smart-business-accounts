@@ -72,14 +72,13 @@ Return ONLY valid JSON. Format:
 ]
 `;
 
-    const text = await openAITextResponse(
-      FINOVA_SYSTEM_PROMPT,
-      [{ role: "user", content: dataPrompt }],
-      1200,
-    );
-
     let recs: Recommendation[] = [];
     try {
+      const text = await openAITextResponse(
+        FINOVA_SYSTEM_PROMPT,
+        [{ role: "user", content: dataPrompt }],
+        1200,
+      );
       const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
       const parsed = JSON.parse(cleaned);
       recs = (Array.isArray(parsed) ? parsed : []).slice(0, 6).map((item: Partial<Recommendation>) => ({

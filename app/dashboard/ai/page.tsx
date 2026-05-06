@@ -113,6 +113,63 @@ interface ReportResponse {
   };
 }
 
+function normalizeForecast(data: any): ForecastResponse | null {
+  if (!data || typeof data !== "object") return null;
+  return {
+    text: typeof data.forecast === "string" ? data.forecast : "",
+    projections: {
+      revenue30d: Number(data.projections?.revenue30d || 0),
+      expense30d: Number(data.projections?.expense30d || 0),
+      cashflow30d: Number(data.projections?.cashflow30d || 0),
+      closingCash30d: Number(data.projections?.closingCash30d || 0),
+      revenue60d: Number(data.projections?.revenue60d || 0),
+      expense60d: Number(data.projections?.expense60d || 0),
+      cashflow60d: Number(data.projections?.cashflow60d || 0),
+      closingCash60d: Number(data.projections?.closingCash60d || 0),
+      revenue90d: Number(data.projections?.revenue90d || 0),
+      expense90d: Number(data.projections?.expense90d || 0),
+      cashflow90d: Number(data.projections?.cashflow90d || 0),
+      closingCash90d: Number(data.projections?.closingCash90d || 0),
+      cashRisk: data.projections?.cashRisk || "low",
+      receivablesDue: Number(data.projections?.receivablesDue || 0),
+      payablesDue: Number(data.projections?.payablesDue || 0),
+      daysUntilCashLow: typeof data.projections?.daysUntilCashLow === "number" ? data.projections.daysUntilCashLow : null,
+      recommendedBuffer: Number(data.projections?.recommendedBuffer || 0),
+    },
+    chartData: Array.isArray(data.chartData) ? data.chartData : [],
+  };
+}
+
+function normalizeReport(data: any): ReportResponse | null {
+  if (!data || typeof data !== "object" || typeof data.report !== "string") return null;
+  return {
+    report: data.report,
+    month: data.month || "",
+    company: data.company || "",
+    generatedAt: data.generatedAt || new Date().toISOString(),
+    summary: {
+      revenue: Number(data.summary?.revenue || 0),
+      expenses: Number(data.summary?.expenses || 0),
+      profit: Number(data.summary?.profit || 0),
+      revenueChange: Number(data.summary?.revenueChange || 0),
+      expenseChange: Number(data.summary?.expenseChange || 0),
+      profitChange: Number(data.summary?.profitChange || 0),
+    },
+    highlights: {
+      topCustomer: data.highlights?.topCustomer,
+      topExpense: data.highlights?.topExpense,
+      lowStockCount: Number(data.highlights?.lowStockCount || 0),
+      overdueReceivables: Number(data.highlights?.overdueReceivables || 0),
+      cashRisk: data.highlights?.cashRisk || "low",
+    },
+    riskSnapshot: data.riskSnapshot ? {
+      score: Number(data.riskSnapshot.score || 0),
+      label: data.riskSnapshot.label || "Medium",
+      items: Array.isArray(data.riskSnapshot.items) ? data.riskSnapshot.items : [],
+    } : undefined,
+  };
+}
+
 interface RevenueAnalyzer {
   summary: string[];
   topCustomer?: { name: string; amount: number };
@@ -452,8 +509,11 @@ export default function AICommandCenter() {
     if (recommendations.length > 0 || loadingRecs) return;
     setLoadingRecs(true);
     fetch("/api/ai/recommendations", { headers: getHeaders() })
-      .then(r => r.json())
-      .then(d => { setRecommendations(d.recommendations || []); setLoadingRecs(false); })
+      .then(async (r) => ({ ok: r.ok, data: await r.json() }))
+      .then(({ ok, data }) => {
+        setRecommendations(ok && Array.isArray(data.recommendations) ? data.recommendations : []);
+        setLoadingRecs(false);
+      })
       .catch(() => setLoadingRecs(false));
   }
 
@@ -482,13 +542,9 @@ export default function AICommandCenter() {
     if (forecast || loadingForecast) return;
     setLoadingForecast(true);
     fetch("/api/ai/forecast", { headers: getHeaders() })
-      .then(r => r.json())
-      .then(d => {
-        setForecast({
-          text: d.forecast || "",
-          projections: d.projections || {},
-          chartData: d.chartData || [],
-        });
+      .then(async (r) => ({ ok: r.ok, data: await r.json() }))
+      .then(({ ok, data }) => {
+        setForecast(ok ? normalizeForecast(data) : null);
         setLoadingForecast(false);
       })
       .catch(() => setLoadingForecast(false));
@@ -498,8 +554,11 @@ export default function AICommandCenter() {
     if (report || loadingReport) return;
     setLoadingReport(true);
     fetch("/api/ai/report", { headers: getHeaders() })
-      .then(r => r.json())
-      .then(d => { setReport(d); setLoadingReport(false); })
+      .then(async (r) => ({ ok: r.ok, data: await r.json() }))
+      .then(({ ok, data }) => {
+        setReport(ok ? normalizeReport(data) : null);
+        setLoadingReport(false);
+      })
       .catch(() => setLoadingReport(false));
   }
 
