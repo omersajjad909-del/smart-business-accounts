@@ -97,7 +97,11 @@ export default function SalesHistoryPage() {
   return (
     <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh", background: "#0a0f1a" }}>
       <style>{`
-        @media print { body > * { display:none!important; } #sh-print { display:block!important; position:fixed; inset:0; } }
+        @media print {
+          body * { visibility: hidden !important; }
+          #sh-print { display: block !important; visibility: visible !important; position: fixed; top:0; left:0; width:100%; z-index:99999; }
+          #sh-print * { visibility: visible !important; }
+        }
         #sh-print { display: none; }
         .sale-row:hover { background: rgba(255,255,255,.025) !important; }
       `}</style>

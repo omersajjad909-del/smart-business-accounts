@@ -437,8 +437,9 @@ export default function POSPage() {
     <div style={{ minHeight: "100vh", background: "#0a0f1a", color: "#fff", fontFamily: ff, display: "flex", flexDirection: "column" }}>
       <style>{`
         @media print {
-          body > * { display: none !important; }
-          #pos-receipt { display: block !important; position: fixed; inset: 0; }
+          body * { visibility: hidden !important; }
+          #pos-receipt { display: block !important; visibility: visible !important; position: fixed; top:0; left:0; width:100%; z-index:99999; }
+          #pos-receipt * { visibility: visible !important; }
           #pos-receipt-paper { margin: 0 auto; }
         }
         #pos-receipt { display: none; }
