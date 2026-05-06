@@ -118,7 +118,6 @@ export default function RetailCustomersPage() {
                 <td style={{ padding: "11px 14px" }}>
                   <div style={{ display: "flex", gap: 6 }}>
                     <Link prefetch={false} href={`/dashboard/reports/ledger?account=${c.id}`} style={{ background: "rgba(99,102,241,.1)", color: "#818cf8", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 600, textDecoration: "none" }}>Ledger</Link>
-                    <button style={{ background: "rgba(16,185,129,.1)", color: "#10b981", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Edit</button>
                   </div>
                 </td>
               </tr>

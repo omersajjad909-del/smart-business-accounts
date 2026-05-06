@@ -164,7 +164,7 @@ export default function SalesHistoryPage() {
       )}
       {!loading && filtered.length === 0 && (
         <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.2)", fontSize: 14 }}>
-          {sales.length === 0 ? "Abhi koi sale nahi hui. POS Terminal se pehli sale karo." : "Koi bill match nahi karta."}
+          {sales.length === 0 ? "There are no connections yet. Please make the first connection from the POS terminal." : "Koi bill match nahi karta."}
         </div>
       )}
 

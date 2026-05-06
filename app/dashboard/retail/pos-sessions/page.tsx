@@ -59,35 +59,18 @@ export default function POSSessionsPage() {
 
     async function fetchData() {
       try {
-        console.log("[POS] Fetching cashiers and branches...", headers);
-        
-        // Fetch users
-        const usersRes = await fetch("/api/users", { 
-          headers, 
-          method: "GET"
-        });
-        console.log("[POS] Users response status:", usersRes.status);
+        const usersRes = await fetch("/api/users", { headers, method: "GET" });
         const usersData = usersRes.ok ? await usersRes.json() : [];
-        console.log("[POS] Cashiers loaded:", usersData);
-        
-        // Fetch branches
-        const branchesRes = await fetch("/api/branches", { 
-          headers, 
-          method: "GET"
-        });
-        console.log("[POS] Branches response status:", branchesRes.status);
-        const branchesData = branchesRes.ok ? await branchesRes.json() : [];
-        console.log("[POS] Branches loaded:", branchesData);
 
-        // Set cashiers - only CASHIER role users
+        const branchesRes = await fetch("/api/branches", { headers, method: "GET" });
+        const branchesData = branchesRes.ok ? await branchesRes.json() : [];
+
         const usersList = Array.isArray(usersData) ? usersData : [];
         setCashiers(usersList.filter((u: any) => u.role === "CASHIER"));
 
-        // Set branches - only include active ones
         const branchesList = Array.isArray(branchesData) ? branchesData : [];
         setBranches(branchesList.filter((b: any) => b.isActive !== false));
-      } catch (error: any) {
-        console.error("[POS] Error fetching options:", error);
+      } catch {
         setCashiers([]);
         setBranches([]);
       } finally {
