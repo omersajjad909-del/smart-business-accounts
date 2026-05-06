@@ -1613,3 +1613,87 @@ ${contextStr}`;
 
   return text || "Could not generate forecast.";
 }
+
+// ─── Market Intelligence — GPT Enhanced Summary ───────────────────────────────
+export async function generateMarketIntelligenceSummary(
+  companyId: string,
+  baseResult: { businessLabel: string; suggestedNewProducts: { name: string; reason: string }[]; trendsThisIndustry: string[]; seasonalOpportunities: { month: string; opportunities: string[] }[] },
+): Promise<string> {
+  let ctx: FinancialContext;
+  try {
+    ctx = await buildFinancialContext(companyId);
+  } catch {
+    return "";
+  }
+
+  if (!HAS_OPENAI_KEY) return "";
+
+  const contextStr = buildContextString(ctx);
+  const top3Products = baseResult.suggestedNewProducts.slice(0, 3).map(p => `• ${p.name}: ${p.reason}`).join("\n");
+  const upcomingSeasons = baseResult.seasonalOpportunities.map(s => `${s.month}: ${s.opportunities[0] || ""}`).join(", ");
+
+  const prompt = `You are a business advisor for a ${baseResult.businessLabel} business. Based on the live financial data and market context below, write a short (3-4 sentences) personalized market intelligence summary.
+
+Be specific — mention their actual revenue numbers, top products, or trends that directly apply to their situation.
+Focus on the biggest opportunity they should act on RIGHT NOW.
+Do not use generic phrases. Sound like a real advisor who has studied their books.
+
+MARKET CONTEXT:
+- Top suggested additions: ${top3Products}
+- Industry trends: ${baseResult.trendsThisIndustry.slice(0, 2).join("; ")}
+- Upcoming seasonal opportunities: ${upcomingSeasons}
+
+${contextStr}`;
+
+  const text = await openAITextResponse(
+    FINOVA_SYSTEM_PROMPT,
+    [{ role: "user", content: prompt }],
+    300,
+  );
+
+  return text || "";
+}
+
+// ─── Business Advisor — GPT Enhanced Quick Wins ───────────────────────────────
+export async function generateAdvisorQuickWins(
+  companyId: string,
+  baseResult: { growthPlan: { title: string; impact: string }[]; riskWarnings: { title: string; description: string }[] },
+): Promise<string[]> {
+  let ctx: FinancialContext;
+  try {
+    ctx = await buildFinancialContext(companyId);
+  } catch {
+    return [];
+  }
+
+  if (!HAS_OPENAI_KEY) return [];
+
+  const contextStr = buildContextString(ctx);
+  const risks = baseResult.riskWarnings.slice(0, 2).map(r => `• ${r.title}: ${r.description}`).join("\n");
+  const plan = baseResult.growthPlan.slice(0, 2).map(p => `• ${p.title}: ${p.impact}`).join("\n");
+
+  const prompt = `You are a business advisor. Based on this company's live financial data, generate exactly 3 specific quick-win actions they can take THIS WEEK.
+
+Rules:
+- Each action must be ONE sentence, direct, and actionable
+- Reference their actual numbers where possible (revenue, overdue, top customers)
+- No fluff, no generic advice
+- Format: return ONLY 3 lines, one action per line, no numbering or bullets
+
+GROWTH CONTEXT:
+${plan}
+
+KEY RISKS:
+${risks}
+
+${contextStr}`;
+
+  const text = await openAITextResponse(
+    FINOVA_SYSTEM_PROMPT,
+    [{ role: "user", content: prompt }],
+    200,
+  );
+
+  if (!text) return [];
+  return text.split("\n").map(l => l.trim()).filter(Boolean).slice(0, 3);
+}

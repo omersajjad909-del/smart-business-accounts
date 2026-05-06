@@ -1236,6 +1236,61 @@ function getCurrentAndNextMonths(count = 3): string[] {
   return result;
 }
 
+// Approximate Gregorian months for Islamic holidays per year.
+// Islamic calendar shifts ~11 days earlier each solar year.
+// Source: astronomical pre-calculation (moon sighting may vary ±1 day).
+const EID_CALENDAR: Record<number, { fitr: string; azha: string }> = {
+  2024: { fitr: "Apr", azha: "Jun" },
+  2025: { fitr: "Mar", azha: "Jun" },
+  2026: { fitr: "Mar", azha: "May" },
+  2027: { fitr: "Mar", azha: "May" },
+  2028: { fitr: "Feb", azha: "May" },
+  2029: { fitr: "Feb", azha: "Apr" },
+  2030: { fitr: "Feb", azha: "Apr" },
+};
+
+// Business-type specific Eid opportunity text (injected dynamically based on actual year)
+const EID_FITR_OPPS: Record<string, string> = {
+  retail:      "Eid ul Fitr — biggest shopping event of the year in Muslim markets",
+  trading:     "Eid ul Fitr gifting and packaging demand peaks",
+  restaurant:  "Eid ul Fitr feasting — family packages, catering for home parties",
+  wholesale:   "Eid ul Fitr — massive gifting and fashion spending",
+  salon:       "Eid ul Fitr — walk-in surge, extend hours",
+  default:     "Eid ul Fitr — elevated consumer spending across all categories",
+};
+const EID_AZHA_OPPS: Record<string, string> = {
+  retail:      "Eid ul Azha — major shopping event: clothing, accessories, gifts",
+  trading:     "Eid ul Azha — livestock supplies, packaging, and gifting demand",
+  restaurant:  "Eid ul Azha — catering demand for family gatherings and meat-based dishes",
+  wholesale:   "Eid ul Azha — bulk orders for gifting and food distribution",
+  salon:       "Eid ul Azha — pre-Eid salon bookings surge",
+  default:     "Eid ul Azha — significant consumer activity across categories",
+};
+
+function injectEidOpportunities(
+  month: string,
+  opportunities: string[],
+  businessType: string,
+  year: number,
+): string[] {
+  const cal = EID_CALENDAR[year];
+  if (!cal) return opportunities;
+
+  const bt = businessType.toLowerCase();
+  const result = opportunities.filter(o => !/eid ul fitr|eid ul azha|eid-ul/i.test(o));
+
+  if (cal.fitr === month) {
+    const text = EID_FITR_OPPS[bt] || EID_FITR_OPPS.default;
+    result.unshift(text);
+  }
+  if (cal.azha === month) {
+    const text = EID_AZHA_OPPS[bt] || EID_AZHA_OPPS.default;
+    // avoid duplicate if both eids happen to fall in the same month in edge years
+    if (!result.some(o => /eid ul azha/i.test(o))) result.unshift(text);
+  }
+  return result;
+}
+
 function fuzzyMatchItems(currentItems: string[], referenceList: string[]): string[] {
   const currentLower = currentItems.map(i => i.toLowerCase());
   return referenceList.filter(ref => {
@@ -1295,10 +1350,14 @@ export function buildMarketIntelligence(ctx: FinancialContext): MarketIntelligen
     currentProducts,
     suggestedNewProducts: suggestedNew.slice(0, 8),
     trendsThisIndustry: profile.marketTrends,
-    seasonalOpportunities: upcomingMonths.map(month => ({
-      month,
-      opportunities: profile.seasonalOpportunities[month] || ["Plan inventory and staffing for the upcoming period"],
-    })),
+    seasonalOpportunities: upcomingMonths.map(month => {
+      const year = new Date().getFullYear();
+      const base = profile.seasonalOpportunities[month] || ["Plan inventory and staffing for the upcoming period"];
+      return {
+        month,
+        opportunities: injectEidOpportunities(month, base, ctx.company.businessType, year),
+      };
+    }),
     revenueDiversification: profile.revenueDiversification,
     competitorEdge: profile.competitorEdge,
     score,

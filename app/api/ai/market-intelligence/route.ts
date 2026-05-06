@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildFinancialContext } from "@/lib/finovaAI";
+import { buildFinancialContext, generateMarketIntelligenceSummary } from "@/lib/finovaAI";
 import { buildMarketIntelligence } from "@/lib/marketIntelligence";
 
 export const runtime = "nodejs";
@@ -12,7 +12,15 @@ export async function GET(req: NextRequest) {
 
     const ctx = await buildFinancialContext(companyId);
     const result = buildMarketIntelligence(ctx);
-    return NextResponse.json(result);
+
+    // Enhance summary with GPT — runs in parallel, falls back to rule-based if GPT fails
+    const aiSummary = await generateMarketIntelligenceSummary(companyId, result).catch(() => "");
+
+    return NextResponse.json({
+      ...result,
+      summary: aiSummary || result.summary,
+      aiEnhanced: Boolean(aiSummary),
+    });
   } catch (err) {
     console.error("Market intelligence error:", err);
     return NextResponse.json({ error: "Failed to build market intelligence" }, { status: 500 });
