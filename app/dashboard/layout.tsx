@@ -1177,6 +1177,28 @@ export default function DashboardLayout({
               {hasDashboardFeature("RETAIL_BRANCH_REPORTS") && <NavLink href="/dashboard/retail/branch-reports" pathname={pathname}>Branch Reports</NavLink>}
             </NavGroup>
 
+            {/* ── 8. Reports ── */}
+            <NavGroup
+              title="📊 Reports"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>}
+              open={openSection === "retailReports"}
+              onToggle={() => toggle("retailReports")}
+            >
+              <NavLink href="/dashboard/reports/sales" pathname={pathname}>📈 Sales Report</NavLink>
+              <NavLink href="/dashboard/reports/stock" pathname={pathname}>📦 Stock Report</NavLink>
+              <NavLink href="/dashboard/reports/stock-ledger" pathname={pathname}>📒 Stock Ledger</NavLink>
+              <NavLink href="/dashboard/reports/inventory/inward" pathname={pathname}>📥 Inward Report</NavLink>
+              <NavLink href="/dashboard/reports/outward" pathname={pathname}>📤 Outward Report</NavLink>
+              <NavLink href="/dashboard/reports/stock/movement" pathname={pathname}>🔄 Stock Movement</NavLink>
+              <NavLink href="/dashboard/reports/inventory/stock-summary" pathname={pathname}>📋 Stock Summary</NavLink>
+              <NavLink href="/dashboard/reports/stock/valuation" pathname={pathname}>💰 Stock Valuation</NavLink>
+              <NavLink href="/dashboard/reports/stock/dead" pathname={pathname}>💀 Dead Stock</NavLink>
+              <NavLink href="/dashboard/reports/stock/expiry" pathname={pathname}>⏰ Expiry Report</NavLink>
+              <NavLink href="/dashboard/reports/stock/turnover" pathname={pathname}>🔁 Stock Turnover</NavLink>
+              <NavLink href="/dashboard/reports/cogs" pathname={pathname}>🏭 COGS Report</NavLink>
+              <NavLink href="/dashboard/reports/discount-analysis" pathname={pathname}>🏷️ Discount Analysis</NavLink>
+            </NavGroup>
+
           </>)}
 
           {/* ── MANUFACTURING ── */}
