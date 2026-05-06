@@ -30,6 +30,11 @@ export default function ProductCatalogPage() {
   const [filterCategory, setFilterCategory] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  // Receive stock modal
+  const [receiveProduct, setReceiveProduct] = useState<{ id: string; name: string; itemNewId: string; costPrice: number; stock: number } | null>(null);
+  const [receiveForm, setReceiveForm] = useState({ qty: 1, costPrice: 0, supplier: "", notes: "" });
+  const [receiveSaving, setReceiveSaving] = useState(false);
+
   const allProducts = records.map(r => ({
     id: r.id,
     name: r.title,
@@ -127,6 +132,14 @@ export default function ProductCatalogPage() {
       if (res.ok) {
         const created = await res.json();
         await update(saved.id, { data: { itemNewId: created.id } });
+        // Create opening InventoryTxn if initial stock > 0
+        if (form.stock > 0) {
+          await fetch("/api/retail/stock-receipt", {
+            method: "POST",
+            headers: authHeaders,
+            body: JSON.stringify({ itemNewId: created.id, qty: form.stock, costPrice: form.costPrice }),
+          });
+        }
       }
     }
 
@@ -161,8 +174,54 @@ export default function ProductCatalogPage() {
       if (res.ok) {
         const created = await res.json();
         await update(r.id, { data: { ...r.data, itemNewId: created.id } });
+        // Create opening InventoryTxn if product has existing stock
+        const openingStock = Number(r.data?.stock || 0);
+        if (openingStock > 0) {
+          await fetch("/api/retail/stock-receipt", {
+            method: "POST",
+            headers: authHeaders,
+            body: JSON.stringify({ itemNewId: created.id, qty: openingStock, costPrice: Number(r.data?.costPrice || 0) }),
+          });
+        }
       }
     }
+  }
+
+  function openReceive(p: typeof allProducts[0]) {
+    setReceiveProduct({ id: p.id, name: p.name, itemNewId: (records.find(r => r.id === p.id)?.data?.itemNewId as string) || "", costPrice: p.costPrice, stock: p.stock });
+    setReceiveForm({ qty: 1, costPrice: p.costPrice, supplier: "", notes: "" });
+  }
+
+  async function handleReceive() {
+    if (!receiveProduct || receiveForm.qty <= 0) return;
+    setReceiveSaving(true);
+    try {
+      const stockBefore = receiveProduct.stock;
+      const stockAfter = stockBefore + receiveForm.qty;
+
+      // 1. Create InventoryTxn (if linked to ItemNew)
+      if (receiveProduct.itemNewId) {
+        const res = await fetch("/api/retail/stock-receipt", {
+          method: "POST",
+          headers: authHeaders,
+          body: JSON.stringify({ itemNewId: receiveProduct.itemNewId, qty: receiveForm.qty, costPrice: receiveForm.costPrice }),
+        });
+        if (!res.ok) throw new Error("InventoryTxn failed");
+      }
+
+      // 2. Save stock_receipt business_record
+      const { create: createReceipt } = { create: async (d: object) => { await fetch("/api/business-records", { method: "POST", headers: authHeaders, body: JSON.stringify({ type: "stock_receipt", title: receiveProduct.name, amount: receiveForm.qty * receiveForm.costPrice, data: d }) }); } };
+      await createReceipt({ productName: receiveProduct.name, itemNewId: receiveProduct.itemNewId, qtyReceived: receiveForm.qty, costPrice: receiveForm.costPrice, supplierName: receiveForm.supplier || "—", notes: receiveForm.notes, stockBefore, stockAfter });
+
+      // 3. Update catalog_product data.stock
+      const existing = records.find(r => r.id === receiveProduct.id);
+      await update(receiveProduct.id, { data: { ...existing?.data, stock: stockAfter } });
+
+      setReceiveProduct(null);
+    } catch (e) {
+      console.error(e);
+    }
+    setReceiveSaving(false);
   }
 
   const inp: React.CSSProperties = {
@@ -262,6 +321,12 @@ export default function ProductCatalogPage() {
                 </td>
                 <td style={{ padding: "13px 16px" }}>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <button
+                      onClick={() => openReceive(p)}
+                      style={{ padding: "5px 10px", background: "rgba(52,211,153,.12)", border: "1px solid rgba(52,211,153,.3)", color: "#34d399", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
+                    >
+                      📦 Receive
+                    </button>
                     <button
                       onClick={() => openEdit(p)}
                       style={{ padding: "5px 10px", background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.3)", color: "#818cf8", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
@@ -399,6 +464,61 @@ export default function ProductCatalogPage() {
                 style={{ background: "rgba(239,68,68,.15)", color: "#f87171", border: "1px solid rgba(239,68,68,.3)", borderRadius: 10, padding: "10px 22px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Receive Stock Modal */}
+      {receiveProduct && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 440, fontFamily: ff }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>📦 Receive Stock</h2>
+              <button onClick={() => setReceiveProduct(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ background: "rgba(52,211,153,.07)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 10, padding: "10px 14px", marginBottom: 20, fontSize: 13 }}>
+              <strong>{receiveProduct.name}</strong>
+              <span style={{ marginLeft: 10, color: "rgba(255,255,255,.4)", fontSize: 12 }}>Current stock: {receiveProduct.stock}</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {[
+                { label: "Qty Received *", key: "qty", type: "number" },
+                { label: "Cost Price (Rs.)", key: "costPrice", type: "number" },
+                { label: "Supplier", key: "supplier", type: "text" },
+                { label: "Notes", key: "notes", type: "text" },
+              ].map(f => (
+                <div key={f.key}>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>{f.label}</label>
+                  <input
+                    type={f.type}
+                    value={(receiveForm as Record<string, number | string>)[f.key]}
+                    onChange={e => setReceiveForm(p => ({ ...p, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value }))}
+                    style={inp}
+                  />
+                </div>
+              ))}
+            </div>
+            {receiveForm.qty > 0 && (
+              <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(99,102,241,.08)", borderRadius: 8, fontSize: 12, color: "rgba(255,255,255,.6)" }}>
+                Stock after: <strong style={{ color: "#34d399" }}>{receiveProduct.stock + receiveForm.qty}</strong>
+                {receiveForm.costPrice > 0 && <span style={{ marginLeft: 14 }}>Total cost: <strong style={{ color: "#f59e0b" }}>Rs. {(receiveForm.qty * receiveForm.costPrice).toLocaleString()}</strong></span>}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+              <button
+                onClick={handleReceive}
+                disabled={receiveSaving || receiveForm.qty <= 0}
+                style={{ flex: 1, padding: "11px 0", background: "#34d399", border: "none", borderRadius: 8, color: "#0a0f1a", fontSize: 14, fontWeight: 700, cursor: "pointer", opacity: receiveForm.qty <= 0 ? 0.5 : 1 }}
+              >
+                {receiveSaving ? "Saving…" : "✓ Receive Stock"}
+              </button>
+              <button
+                onClick={() => setReceiveProduct(null)}
+                style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}
+              >
+                Cancel
               </button>
             </div>
           </div>
