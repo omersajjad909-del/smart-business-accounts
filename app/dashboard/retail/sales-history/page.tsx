@@ -1,8 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { confirmToast } from "@/lib/toast-feedback";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
+import { getCurrentUser } from "@/lib/auth";
+import { ThermalReceipt, generateFBRInvoice, type CompanyInfo } from "@/app/dashboard/retail/_components/ThermalReceipt";
 
 const ff = "'Outfit','Inter',sans-serif";
 
@@ -10,6 +12,7 @@ type CartItem = { id: string; name: string; price: number; qty: number };
 type Sale = {
   id: string;
   receiptNo: string;
+  soldAt: string;
   date: string;
   time: string;
   items: CartItem[];
@@ -33,6 +36,7 @@ const PAY_BG: Record<string, string> = {
 };
 
 export default function SalesHistoryPage() {
+  const user = getCurrentUser();
   const { records, loading, remove } = useBusinessRecords("pos_sale");
   const [search, setSearch] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -40,6 +44,16 @@ export default function SalesHistoryPage() {
   const [payFilter, setPayFilter] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [printSale, setPrintSale] = useState<Sale | null>(null);
+  const [company, setCompany] = useState<CompanyInfo>({ name: "My Store" });
+
+  useEffect(() => {
+    const h = user as { id?: string; role?: string; companyId?: string } | null;
+    const headers: HeadersInit = { "x-user-id": h?.id || "", "x-user-role": h?.role || "ADMIN", "x-company-id": h?.companyId || "" };
+    fetch("/api/me/company", { headers })
+      .then(r => r.json())
+      .then(d => { if (d?.name) setCompany({ name: d.name, address: d.address, phone: d.phone, ntn: d.ntn }); })
+      .catch(() => {});
+  }, []);
 
   const sales: Sale[] = records.map(r => {
     const d = r.data || {};
@@ -48,6 +62,7 @@ export default function SalesHistoryPage() {
     return {
       id: r.id,
       receiptNo: r.title,
+      soldAt: r.createdAt,
       date: dt.toLocaleDateString("en-GB"),
       time: dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       items: cart,
@@ -322,43 +337,29 @@ export default function SalesHistoryPage() {
       {/* Hidden print receipt */}
       {printSale && (
         <div id="sh-print">
-          <div style={{ width: 320, margin: "0 auto", fontFamily: "'Courier New',Courier,monospace", fontSize: 13, color: "#000", background: "#fff", padding: "20px 18px" }}>
-            <div style={{ textAlign: "center", borderBottom: "1px dashed #999", paddingBottom: 12, marginBottom: 12 }}>
-              <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: ".02em" }}>SALES RECEIPT</div>
-            </div>
-            <div style={{ fontSize: 12, marginBottom: 10 }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Receipt #</span><strong>{printSale.receiptNo}</strong></div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}><span>Date</span><span>{printSale.date} {printSale.time}</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}><span>Cashier</span><span>{printSale.cashierName}</span></div>
-            </div>
-            <div style={{ borderTop: "1px dashed #999", borderBottom: "1px dashed #999", padding: "10px 0", marginBottom: 10 }}>
-              {printSale.items.map((item, i) => (
-                <div key={i} style={{ marginBottom: 6 }}>
-                  <div style={{ fontWeight: 700 }}>{item.name}</div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-                    <span>  {item.qty} × Rs. {item.price.toLocaleString()}</span>
-                    <span style={{ fontWeight: 700 }}>Rs. {(item.qty * item.price).toLocaleString()}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 12, marginBottom: 10 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}><span>Subtotal</span><span>Rs. {printSale.subtotal.toLocaleString()}</span></div>
-              {printSale.discount > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}><span>Discount</span><span>− Rs. {printSale.discount.toLocaleString()}</span></div>}
-              {printSale.taxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}><span>Tax ({printSale.taxRate}%)</span><span>+ Rs. {printSale.taxAmt.toLocaleString()}</span></div>}
-              <div style={{ borderTop: "1px solid #999", paddingTop: 6, marginTop: 4, display: "flex", justifyContent: "space-between", fontSize: 16, fontWeight: 800 }}><span>TOTAL</span><span>Rs. {printSale.total.toLocaleString()}</span></div>
-            </div>
-            <div style={{ borderTop: "1px dashed #999", paddingTop: 10, fontSize: 12, marginBottom: 10 }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Payment</span><span style={{ textTransform: "capitalize", fontWeight: 700 }}>{printSale.payMethod}</span></div>
-              {printSale.payMethod === "cash" && printSale.tendered > 0 && <>
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}><span>Cash Received</span><span>Rs. {printSale.tendered.toLocaleString()}</span></div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3, fontWeight: 700 }}><span>Change</span><span>Rs. {printSale.change.toLocaleString()}</span></div>
-              </>}
-            </div>
-            <div style={{ borderTop: "1px dashed #999", paddingTop: 10, textAlign: "center", fontSize: 11 }}>
-              <div>Thank you for your business!</div>
-              <div style={{ marginTop: 3 }}>Please come again</div>
-            </div>
+          <div style={{ margin: "0 auto", width: "fit-content" }}>
+            <ThermalReceipt
+              company={company}
+              receipt={{
+                receiptNo: printSale.receiptNo,
+                fbrInvoice: generateFBRInvoice(printSale.receiptNo, new Date(printSale.soldAt)),
+                soldAt: printSale.soldAt,
+                items: printSale.items.map(i => ({ id: i.id || "", name: i.name, price: i.price, qty: i.qty, category: "", sku: "" })),
+                subtotal: printSale.subtotal,
+                discount: printSale.discount,
+                taxRate: printSale.taxRate,
+                taxAmt: printSale.taxAmt,
+                rounding: 0,
+                total: printSale.total,
+                totalQty: printSale.items.reduce((s, i) => s + i.qty, 0),
+                payMethod: printSale.payMethod,
+                tendered: printSale.tendered,
+                change: printSale.change,
+                cashierName: printSale.cashierName,
+                loyaltyEarned: 0,
+                loyaltyTotal: 0,
+              }}
+            />
           </div>
         </div>
       )}
