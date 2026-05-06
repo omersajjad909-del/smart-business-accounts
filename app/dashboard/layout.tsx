@@ -10,6 +10,7 @@ import { hasPermission as baseHasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
 import GlobalSearch from "@/components/GlobalSearch";
 import { useGlobalEnterNavigation } from "@/hooks/useGlobalEnterNavigation";
+import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { ModeToggle } from "@/components/mode-toggle";
 import WhatsNew from "@/components/WhatsNew";
 import ImageAdjusterModal from "@/components/ImageAdjusterModal";
@@ -382,6 +383,9 @@ export default function DashboardLayout({
   // Enable global Enter key navigation
   useGlobalEnterNavigation();
 
+  // ── Auto-logout on idle ─────────────────────────────────────
+  const { showWarning: showIdleWarning, secondsLeft: idleSecondsLeft, stayLoggedIn } = useAutoLogout(logout);
+
   // Global keyboard shortcuts — driven by per-company config from API
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -688,6 +692,42 @@ export default function DashboardLayout({
     }
   }, [ready, subInfo, pathname, router]);
 
+  // ── Role-based page guard ────────────────────────────────────
+  // Protects sensitive routes from direct URL access by under-privileged roles.
+  // ADMIN always passes. Other roles are checked against their permissions.
+  useEffect(() => {
+    if (!ready || !currentUser) return;
+    if (currentUser.role?.toUpperCase() === "ADMIN") return;
+
+    const ROUTE_GUARDS: Array<{ prefix: string; permission: string }> = [
+      { prefix: "/dashboard/trial-balance",       permission: PERMISSIONS.VIEW_TRIAL_BALANCE_REPORT },
+      { prefix: "/dashboard/reports",             permission: PERMISSIONS.VIEW_REPORTS },
+      { prefix: "/dashboard/audit-trail",         permission: PERMISSIONS.VIEW_AUDIT_LOG },
+      { prefix: "/dashboard/roles-permissions",   permission: PERMISSIONS.MANAGE_ROLES },
+      { prefix: "/dashboard/team",                permission: PERMISSIONS.MANAGE_USERS },
+      { prefix: "/dashboard/admin-control",       permission: PERMISSIONS.MANAGE_USERS },
+      { prefix: "/dashboard/payroll",             permission: PERMISSIONS.VIEW_HR_PAYROLL },
+      { prefix: "/dashboard/employees",           permission: PERMISSIONS.VIEW_HR_PAYROLL },
+      { prefix: "/dashboard/attendance",          permission: PERMISSIONS.VIEW_HR_PAYROLL },
+      { prefix: "/dashboard/advance-salary",      permission: PERMISSIONS.VIEW_HR_PAYROLL },
+      { prefix: "/dashboard/bank-reconciliation", permission: PERMISSIONS.BANK_RECONCILIATION },
+      { prefix: "/dashboard/tax-configuration",   permission: PERMISSIONS.TAX_CONFIGURATION },
+      { prefix: "/dashboard/bulk-payments",       permission: PERMISSIONS.BULK_PAYMENTS },
+      { prefix: "/dashboard/budget",              permission: PERMISSIONS.BUDGET_PLANNING },
+      { prefix: "/dashboard/email-settings",      permission: PERMISSIONS.EMAIL_SETTINGS },
+      { prefix: "/dashboard/backup-restore",      permission: PERMISSIONS.BACKUP_RESTORE },
+      { prefix: "/dashboard/financial-year",      permission: PERMISSIONS.FINANCIAL_YEAR },
+      { prefix: "/dashboard/ai",                  permission: PERMISSIONS.AI_ASSISTANT },
+    ];
+
+    const matched = ROUTE_GUARDS.find(g => pathname.startsWith(g.prefix));
+    if (!matched) return;
+
+    if (!baseHasPermission(currentUser, matched.permission)) {
+      router.replace("/dashboard");
+    }
+  }, [ready, currentUser, pathname, router]);
+
   useEffect(() => {
     if (!currentUser?.companyId) return;
     const originalFetch = window.fetch;
@@ -807,6 +847,56 @@ export default function DashboardLayout({
 
   return (
     <div className="dashboard-root" style={{display:"flex",minHeight:"100vh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
+
+      {/* ── Idle auto-logout warning modal ── */}
+      {showIdleWarning && (
+        <div style={{
+          position:"fixed", inset:0, zIndex:99999,
+          background:"rgba(0,0,0,0.7)", backdropFilter:"blur(4px)",
+          display:"flex", alignItems:"center", justifyContent:"center",
+          fontFamily:"'Outfit','Inter',sans-serif",
+        }}>
+          <div style={{
+            background:"#0d1035", border:"1px solid rgba(99,102,241,0.4)",
+            borderRadius:20, padding:"36px 40px", maxWidth:420, width:"90%",
+            boxShadow:"0 0 60px rgba(99,102,241,0.25)", textAlign:"center",
+          }}>
+            <div style={{fontSize:44, marginBottom:12}}>⏱️</div>
+            <div style={{fontSize:22, fontWeight:800, color:"#fff", marginBottom:8}}>
+              Still there?
+            </div>
+            <div style={{fontSize:14, color:"rgba(255,255,255,0.6)", lineHeight:1.6, marginBottom:24}}>
+              You've been inactive for 25 minutes.<br/>
+              For your security, you'll be logged out in{" "}
+              <span style={{color:"#f87171", fontWeight:700}}>
+                {Math.floor(idleSecondsLeft / 60)}:{String(idleSecondsLeft % 60).padStart(2,"0")}
+              </span>
+            </div>
+            <div style={{display:"flex", gap:12, justifyContent:"center"}}>
+              <button
+                onClick={stayLoggedIn}
+                style={{
+                  padding:"10px 28px", borderRadius:10, border:"none", cursor:"pointer",
+                  background:"linear-gradient(135deg,#6366f1,#818cf8)",
+                  color:"#fff", fontWeight:700, fontSize:14,
+                }}
+              >
+                Stay Logged In
+              </button>
+              <button
+                onClick={logout}
+                style={{
+                  padding:"10px 28px", borderRadius:10, cursor:"pointer",
+                  background:"transparent", border:"1px solid rgba(255,255,255,0.15)",
+                  color:"rgba(255,255,255,0.6)", fontWeight:600, fontSize:14,
+                }}
+              >
+                Logout Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MOBILE OVERLAY */}
       {isMobileViewport && isMobileMenuOpen && (
