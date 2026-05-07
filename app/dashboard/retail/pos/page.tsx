@@ -10,7 +10,9 @@ const ff = "'Outfit','Inter',sans-serif";
 type CartItem = { id: string; name: string; price: number; qty: number; category: string; sku: string; itemNewId?: string };
 
 export default function POSPage() {
-  const user = getCurrentUser();
+  // Stable ref — getCurrentUser() parses JSON each call so must not go in effect deps
+  const userRef = useRef(getCurrentUser());
+  const user = userRef.current;
   const { records: productRecords, loading: loadingProducts, update: updateProduct } = useBusinessRecords("catalog_product");
   const { records: saleRecords, create: createSale } = useBusinessRecords("pos_sale");
   const { records: sessionRecords, update: updateSession } = useBusinessRecords("pos_session");
@@ -57,7 +59,7 @@ export default function POSPage() {
       .then(d => { if (d?.name) setCompany({ name: d.name, address: d.address, phone: d.phone, ntn: d.ntn }); })
       .catch(() => {});
     loadStock();
-  }, [user]);
+  }, []);
 
   const products = productRecords
     .filter(r => r.status !== "inactive")
