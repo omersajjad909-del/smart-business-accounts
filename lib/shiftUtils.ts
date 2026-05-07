@@ -2,22 +2,30 @@ import { ShiftSetting } from "./companyAdminControl";
 
 export const SHIFT_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
-/** Returns current time in Asia/Karachi timezone as a plain Date object */
-export function getPakistanNow(): Date {
-  return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Karachi" }));
+/** Returns current time converted to the given IANA timezone as a plain Date object */
+export function getNowInTimezone(timezone: string): Date {
+  try {
+    return new Date(new Date().toLocaleString("en-US", { timeZone: timezone }));
+  } catch {
+    // Fallback to UTC if timezone is invalid
+    return new Date();
+  }
 }
 
-export function getShiftStatus(shift: ShiftSetting, pkNow: Date): {
+export function getShiftStatus(shift: ShiftSetting, now?: Date): {
   inShift: boolean;
   minutesRemaining: number;
   effectiveEndTime: string;
   startMinutes: number;
   endMinutes: number;
 } {
-  const dayName = SHIFT_DAYS[pkNow.getDay()];
+  const tz = shift.timezone || "Asia/Karachi";
+  const tzNow = now ?? getNowInTimezone(tz);
+
+  const dayName = SHIFT_DAYS[tzNow.getDay()];
   const inAllowedDay = shift.days.includes(dayName);
 
-  const currentMin = pkNow.getHours() * 60 + pkNow.getMinutes();
+  const currentMin = tzNow.getHours() * 60 + tzNow.getMinutes();
   const [sh, sm] = shift.startTime.split(":").map(Number);
   const [eh, em] = shift.endTime.split(":").map(Number);
   const graceMin = shift.graceMinutes ?? 10;

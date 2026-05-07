@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { resolveCompanyId } from "@/lib/tenant";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
-import { getPakistanNow, getShiftStatus } from "@/lib/shiftUtils";
+import { getShiftStatus } from "@/lib/shiftUtils";
 
 function getRequestUserId(req: NextRequest): string | null {
   const token = getTokenFromRequest(req);
@@ -28,8 +28,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ enabled: false });
     }
 
-    const pkNow = getPakistanNow();
-    const { inShift, minutesRemaining, effectiveEndTime } = getShiftStatus(shift, pkNow);
+    const { inShift, minutesRemaining, effectiveEndTime } = getShiftStatus(shift);
 
     return NextResponse.json({
       enabled: true,

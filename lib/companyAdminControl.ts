@@ -66,6 +66,7 @@ export type ShiftSetting = {
   days: string[];          // ["Mon","Tue","Wed","Thu","Fri"]
   startTime: string;       // "09:00"
   endTime: string;         // "17:00"
+  timezone: string;        // IANA timezone e.g. "Asia/Karachi"
   graceMinutes: number;    // grace window at start (default 10)
   overtimeMinutes: number; // admin-added realtime overtime (default 0)
   warnMinutes: number;     // warn user this many mins before shift ends (default 10)
@@ -211,6 +212,7 @@ function normalizeSettings(value: unknown): AdminControlSettings {
           days: Array.isArray(s?.days) ? s.days.filter((d): d is string => typeof d === "string") : [],
           startTime: typeof s?.startTime === "string" ? s.startTime : "09:00",
           endTime: typeof s?.endTime === "string" ? s.endTime : "17:00",
+          timezone: typeof s?.timezone === "string" && s.timezone ? s.timezone : "Asia/Karachi",
           graceMinutes: typeof s?.graceMinutes === "number" ? s.graceMinutes : 10,
           overtimeMinutes: typeof s?.overtimeMinutes === "number" ? s.overtimeMinutes : 0,
           warnMinutes: typeof s?.warnMinutes === "number" ? s.warnMinutes : 10,

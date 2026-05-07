@@ -6,7 +6,7 @@ import { signJwt } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
 import { sendLoginAlertEmail, sendShiftBlockedAlertEmail } from "@/lib/email";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
-import { getPakistanNow, getShiftStatus, SHIFT_DAYS } from "@/lib/shiftUtils";
+import { getNowInTimezone, getShiftStatus, SHIFT_DAYS } from "@/lib/shiftUtils";
 import {
   createVerificationCodeLog,
   getAvailableChannels,
@@ -150,11 +150,11 @@ export async function POST(req: NextRequest) {
         const adminSettings = await getCompanyAdminControlSettings(defaultCompanyId);
         const shift = adminSettings.shiftSettings?.[user.id];
         if (shift?.enabled) {
-          const pkNow = getPakistanNow();
-          const { inShift } = getShiftStatus(shift, pkNow);
+          const tzNow = getNowInTimezone(shift.timezone || "UTC");
+          const { inShift } = getShiftStatus(shift, tzNow);
           if (!inShift) {
-            const dayName = SHIFT_DAYS[pkNow.getDay()];
-            const timeStr = `${String(pkNow.getHours()).padStart(2, "0")}:${String(pkNow.getMinutes()).padStart(2, "0")}`;
+            const dayName = SHIFT_DAYS[tzNow.getDay()];
+            const timeStr = `${String(tzNow.getHours()).padStart(2, "0")}:${String(tzNow.getMinutes()).padStart(2, "0")}`;
             // Log the blocked attempt
             prisma.activityLog.create({
               data: {

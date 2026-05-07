@@ -23,10 +23,35 @@ type UserEntry = {
 const ALL_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const DAY_LABELS: Record<string, string> = { Mon: "Mon", Tue: "Tue", Wed: "Wed", Thu: "Thu", Fri: "Fri", Sat: "Sat", Sun: "Sun" };
 
+const TIMEZONES = [
+  { label: "Pakistan (PKT) — UTC+5", value: "Asia/Karachi" },
+  { label: "India (IST) — UTC+5:30", value: "Asia/Kolkata" },
+  { label: "Bangladesh (BST) — UTC+6", value: "Asia/Dhaka" },
+  { label: "UAE / Dubai (GST) — UTC+4", value: "Asia/Dubai" },
+  { label: "Saudi Arabia (AST) — UTC+3", value: "Asia/Riyadh" },
+  { label: "UK (GMT/BST) — UTC+0/+1", value: "Europe/London" },
+  { label: "USA Eastern (EST/EDT) — UTC-5/-4", value: "America/New_York" },
+  { label: "USA Central (CST/CDT) — UTC-6/-5", value: "America/Chicago" },
+  { label: "USA Mountain (MST/MDT) — UTC-7/-6", value: "America/Denver" },
+  { label: "USA Pacific (PST/PDT) — UTC-8/-7", value: "America/Los_Angeles" },
+  { label: "Canada Eastern — UTC-5/-4", value: "America/Toronto" },
+  { label: "Germany / Berlin — UTC+1/+2", value: "Europe/Berlin" },
+  { label: "France / Paris — UTC+1/+2", value: "Europe/Paris" },
+  { label: "Australia Sydney — UTC+10/+11", value: "Australia/Sydney" },
+  { label: "Japan (JST) — UTC+9", value: "Asia/Tokyo" },
+  { label: "China (CST) — UTC+8", value: "Asia/Shanghai" },
+  { label: "Singapore — UTC+8", value: "Asia/Singapore" },
+  { label: "Turkey — UTC+3", value: "Europe/Istanbul" },
+  { label: "Egypt / Cairo — UTC+2/+3", value: "Africa/Cairo" },
+  { label: "South Africa (SAST) — UTC+2", value: "Africa/Johannesburg" },
+  { label: "UTC (Universal)", value: "UTC" },
+];
+
 const defaultShift = (): ShiftSetting => ({
   days: ["Mon", "Tue", "Wed", "Thu", "Fri"],
   startTime: "09:00",
   endTime: "17:00",
+  timezone: "Asia/Karachi",
   graceMinutes: 10,
   overtimeMinutes: 0,
   warnMinutes: 10,
@@ -274,6 +299,30 @@ export default function ShiftControlPage() {
                                 >{DAY_LABELS[day]}</button>
                               );
                             })}
+                          </div>
+                        </div>
+
+                        {/* Timezone */}
+                        <div style={{ paddingTop: 16 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                            🌍 User Timezone
+                          </div>
+                          <select
+                            value={draft.timezone || "Asia/Karachi"}
+                            onChange={e => updateDraft(u.id, { timezone: e.target.value })}
+                            style={{
+                              width: "100%", padding: "9px 12px", borderRadius: 10,
+                              border: "1.5px solid var(--border)", background: "var(--input-bg)",
+                              color: "var(--text-primary)", fontSize: 14, fontWeight: 600,
+                              outline: "none",
+                            }}
+                          >
+                            {TIMEZONES.map(tz => (
+                              <option key={tz.value} value={tz.value}>{tz.label}</option>
+                            ))}
+                          </select>
+                          <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 5 }}>
+                            Shift times will be checked in this timezone — set it to where the employee physically works.
                           </div>
                         </div>
 
