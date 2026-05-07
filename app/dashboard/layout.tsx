@@ -1089,8 +1089,8 @@ export default function DashboardLayout({
             >
               <NavLink href="/dashboard/invoices" pathname={pathname}>🧾 View All Invoices</NavLink>
               {/* ── Purchase Flow ── */}
-              {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_ORDER) && <NavLink href="/dashboard/purchase-order" pathname={pathname}>Purchase Order</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/grn" pathname={pathname}>GRN (Goods Receipt)</NavLink>}
+              {bizFeatures?.advancedPurchasing && hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_ORDER) && <NavLink href="/dashboard/purchase-order" pathname={pathname}>Purchase Order</NavLink>}
+              {bizFeatures?.advancedPurchasing && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/grn" pathname={pathname}>GRN (Goods Receipt)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>Purchase Invoice</NavLink>}
               {/* ── Sales Flow ── */}
               {hasPermission(currentUser, PERMISSIONS.CREATE_QUOTATION) && <NavLink href="/dashboard/quotation" pathname={pathname}>Quotation</NavLink>}
