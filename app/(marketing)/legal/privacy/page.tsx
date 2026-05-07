@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 const LAST_UPDATED = "14 April 2026";
 const COMPANY = "FinovaOS";
-const EMAIL = "finovaos.app@gmail.com";
+const EMAIL = "legal@finovaos.app";
 const EMAIL_HREF = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}&su=Privacy+Policy+Inquiry`;
 
 const SECTIONS = [
@@ -143,7 +143,7 @@ const SECTIONS = [
       },
       {
         sub: "Explicit Deletion Request",
-        body: "You may request immediate deletion of your account and all associated data at any time by emailing finovaos.app@gmail.com. We will process the request within 7 business days and send written confirmation. Immediate deletion waives any remaining read-only grace period.",
+        body: "You may request immediate deletion of your account and all associated data at any time by emailing legal@finovaos.app. We will process the request within 7 business days and send written confirmation. Immediate deletion waives any remaining read-only grace period.",
       },
       {
         sub: "Backups",

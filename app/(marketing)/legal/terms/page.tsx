@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const LAST_UPDATED = "14 April 2026";
-const EMAIL = "finovaos.app@gmail.com";
+const EMAIL = "legal@finovaos.app";
 const EMAIL_HREF = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}&su=Terms+of+Service+Inquiry`;
 
 const SECTIONS = [
@@ -127,7 +127,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Eligibility",
-        body: "Monthly subscriptions are non-refundable. Yearly subscriptions are refundable within 14 days of first payment. Refund requests must be sent to finovaos.app@gmail.com and are processed within 7–14 business days.",
+        body: "Monthly subscriptions are non-refundable. Yearly subscriptions are refundable within 14 days of first payment. Refund requests must be sent to legal@finovaos.app and are processed within 7–14 business days.",
       },
     ],
   },
@@ -231,7 +231,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Get in Touch",
-        body: "For legal, billing, or privacy questions contact: finovaos.app@gmail.com — FinovaOS Technologies, Lahore, Pakistan.",
+        body: "For legal, billing, or privacy questions contact: legal@finovaos.app — FinovaOS Technologies, Lahore, Pakistan.",
       },
     ],
   },

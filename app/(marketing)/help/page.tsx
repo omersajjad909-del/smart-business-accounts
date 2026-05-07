@@ -414,7 +414,7 @@ export default function HelpPage() {
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 16 }}>
               {[
                 { icon: "💬", label: "Live Chat", sub: "Pro & Enterprise", color: "#818cf8" },
-                { icon: "✉️", label: "Email Us",  sub: "finovaos.app@gmail.com", color: "#34d399" },
+                { icon: "✉️", label: "Email Us",  sub: "support@finovaos.app", color: "#34d399" },
                 { icon: "📱", label: "WhatsApp",  sub: "+1 (800) 555-0200",  color: "#fbbf24" },
               ].map(({ icon, label, sub, color }) => (
                 <div key={label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -435,11 +435,11 @@ export default function HelpPage() {
             >
               Open Support Ticket →
             </Link>
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px 24px", borderRadius: 12, background: "rgba(255,255,255,.05)", color: "rgba(255,255,255,.6)", fontWeight: 600, fontSize: 13, textDecoration: "none", border: "1px solid rgba(255,255,255,.1)", transition: "all .25s", whiteSpace: "nowrap" }}
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@finovaos.app" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "11px 24px", borderRadius: 12, background: "rgba(255,255,255,.05)", color: "rgba(255,255,255,.6)", fontWeight: 600, fontSize: 13, textDecoration: "none", border: "1px solid rgba(255,255,255,.1)", transition: "all .25s", whiteSpace: "nowrap" }}
               onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,.09)"; e.currentTarget.style.color = "white"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.05)"; e.currentTarget.style.color = "rgba(255,255,255,.6)"; }}
             >
-              ✉️ finovaos.app@gmail.com
+              ✉️ support@finovaos.app
             </a>
           </div>
         </div>

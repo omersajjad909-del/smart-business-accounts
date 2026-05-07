@@ -272,11 +272,11 @@ export default function SupportTicketPage() {
                 Quick options
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com" style={{ textDecoration: "none", padding: "12px 12px", borderRadius: 14, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", display: "flex", alignItems: "center", gap: 12 }}>
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@finovaos.app" style={{ textDecoration: "none", padding: "12px 12px", borderRadius: 14, border: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.03)", display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 34, height: 34, borderRadius: 12, background: "rgba(129,140,248,.14)", border: "1px solid rgba(129,140,248,.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>✉️</div>
                   <div>
                     <div style={{ fontSize: 13.5, fontWeight: 800, color: "white", marginBottom: 2 }}>Email support</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>finovaos.app@gmail.com</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>support@finovaos.app</div>
                   </div>
                 </a>
 

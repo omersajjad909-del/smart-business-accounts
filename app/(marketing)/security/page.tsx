@@ -590,7 +590,7 @@ export default function SecurityPage() {
               <p style={{ fontSize:14.5, color:"rgba(255,255,255,.42)", lineHeight:1.8, marginBottom:24 }}>
                 We take all security reports seriously. If you&apos;ve discovered a vulnerability in FinovaOS, please report it directly to our security team. We commit to acknowledging your report within 48 hours and resolving critical issues within 14 days.
               </p>
-              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com" style={{
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@finovaos.app" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"12px 24px", borderRadius:12,
                 background:"rgba(129,140,248,.12)", border:"1.5px solid rgba(129,140,248,.3)",
@@ -600,7 +600,7 @@ export default function SecurityPage() {
                 onMouseEnter={e=>{e.currentTarget.style.background="rgba(129,140,248,.2)";e.currentTarget.style.borderColor="rgba(129,140,248,.5)";}}
                 onMouseLeave={e=>{e.currentTarget.style.background="rgba(129,140,248,.12)";e.currentTarget.style.borderColor="rgba(129,140,248,.3)";}}
               >
-                📧 finovaos.app@gmail.com
+                📧 support@finovaos.app
               </a>
             </div>
           </div>

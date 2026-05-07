@@ -155,7 +155,10 @@
       "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\\\\retail\" -Recurse | ForEach-Object { $_.FullName })",
       "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\retail\" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })",
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Force)",
-      "Bash(xargs ls *)"
+      "Bash(xargs ls *)",
+      "Bash(sed -i 's|finovaos\\\\.app@gmail\\\\.com|legal@finovaos.app|g' 'app/\\(marketing\\)/legal/privacy/page.tsx' 'app/\\(marketing\\)/legal/terms/page.tsx' 'app/\\(marketing\\)/trust/page.tsx')",
+      "Bash(sed -i 's|finovaos\\\\.app@gmail\\\\.com|support@finovaos.app|g' 'app/\\(marketing\\)/support/page.tsx' 'app/\\(marketing\\)/support/ticket/page.tsx' 'app/\\(marketing\\)/help/page.tsx' 'app/\\(marketing\\)/help/[slug]/page.tsx' 'app/\\(marketing\\)/security/page.tsx' 'app/\\(marketing\\)/landing/components/ChatWidget.tsx')",
+      "Bash(sed -i 's|finovaos\\\\.app@gmail\\\\.com|partnerships@finovaos.app|g' 'app/\\(marketing\\)/careers/page.tsx' 'app/\\(marketing\\)/industries/page.tsx')"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",

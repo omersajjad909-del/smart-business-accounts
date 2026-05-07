@@ -15,7 +15,7 @@ const FAQS = [
 ];
 
 const CONTACTS = [
-  { tag: "Most Popular", label: "Email Support", value: "finovaos.app@gmail.com", note: "Reply within 4 business hours", href: "https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com", color: "#818cf8", glow: "rgba(129,140,248,.22)", dim: "rgba(129,140,248,.08)", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> },
+  { tag: "Most Popular", label: "Email Support", value: "support@finovaos.app", note: "Reply within 4 business hours", href: "https://mail.google.com/mail/?view=cm&fs=1&to=support@finovaos.app", color: "#818cf8", glow: "rgba(129,140,248,.22)", dim: "rgba(129,140,248,.08)", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> },
   { tag: "Fastest", label: "Live Chat", value: "Mon–Fri, 9am–6pm UTC", note: "Avg. wait under 2 minutes", href: "#chat", color: "#34d399", glow: "rgba(52,211,153,.22)", dim: "rgba(52,211,153,.08)", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg> },
   { tag: "Self-Serve", label: "Help Center", value: "Browse 200+ articles", note: "Guides, tutorials & video walkthroughs", href: "/help", color: "#fbbf24", glow: "rgba(251,191,36,.22)", dim: "rgba(251,191,36,.08)", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> },
 ];
@@ -210,7 +210,7 @@ export default function SupportPage() {
                   { label:"Bank Integration Setup", icon:"🏦", href:"/help/import-statements" },
                   { label:"Invoice & Billing Docs", icon:"🧾", href:"/help/pl-statement" },
                   { label:"Multi-Branch Setup", icon:"🏢", href:"/help/choose-plan" },
-                  { label:"Submit a Support Ticket", icon:"🎫", href:"https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com" },
+                  { label:"Submit a Support Ticket", icon:"🎫", href:"https://mail.google.com/mail/?view=cm&fs=1&to=support@finovaos.app" },
                 ].map(({ label, icon, href }) => (
                   <Link key={label} href={href} className="sp-quick-link">
                     <span style={{ fontSize:16 }}>{icon}</span>

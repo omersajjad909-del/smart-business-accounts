@@ -744,7 +744,7 @@ const ARTICLES: Record<string, {
       { type:"step", step:2, text:"Click **Update Payment Method**." },
       { type:"step", step:3, text:"Enter your new card details: card number, expiry date, and CVV." },
       { type:"step", step:4, text:"Click **Save Card**. Your new card will be used for the next billing cycle." },
-      { type:"tip", text:"You'll receive an email confirmation whenever your payment method is updated. If you didn't make this change, contact support immediately at finovaos.app@gmail.com." },
+      { type:"tip", text:"You'll receive an email confirmation whenever your payment method is updated. If you didn't make this change, contact support immediately at support@finovaos.app." },
       { type:"warning", text:"If your card fails on the renewal date, your account will enter a 7-day grace period. Update your payment method within this window to avoid service interruption." },
     ],
     related: [
@@ -1067,7 +1067,7 @@ export default async function HelpArticlePage({
             </svg>
             Back to Help Center
           </Link>
-          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com" className="hc-mail">
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@finovaos.app" className="hc-mail">
             Still need help? Contact support →
           </a>
         </div>

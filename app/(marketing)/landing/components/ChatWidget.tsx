@@ -266,7 +266,7 @@ export default function ChatWidget() {
     if (!cid.startsWith("demo-")) {
       apiUpdateConversation(cid, { status: "waiting" }).catch(() => {});
     }
-    const waitText = "Connecting you to a human agent. Someone from our team will join shortly.\n\nYou can also email us at **finovaos.app@gmail.com**.";
+    const waitText = "Connecting you to a human agent. Someone from our team will join shortly.\n\nYou can also email us at **support@finovaos.app**.";
     const waitMsg: Message = { id: makeId("w"), sender: "bot", text: waitText, created_at: new Date().toISOString() };
     setMessages(prev => [...prev, waitMsg]);
     if (!cid.startsWith("demo-")) {
