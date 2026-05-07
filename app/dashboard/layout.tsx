@@ -1115,7 +1115,7 @@ export default function DashboardLayout({
             >
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/inventory" pathname={pathname}>Inventory Overview</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_ITEMS) && <NavLink href="/dashboard/items-new" pathname={pathname}>Inventory Items</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/warehouses" pathname={pathname}>Warehouses</NavLink>}
+              {bizFeatures?.multiWarehouse && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/warehouses" pathname={pathname}>Warehouses</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/price-lists" pathname={pathname}>Price Lists</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_STOCK_RATE) && <NavLink href="/dashboard/stock-rate" pathname={pathname}>Stock Rates</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.MANAGE_BARCODE) && <NavLink href="/dashboard/barcode" pathname={pathname}>Barcode</NavLink>}
@@ -1228,7 +1228,7 @@ export default function DashboardLayout({
               {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/categories" pathname={pathname}>Categories</NavLink>}
               {hasDashboardFeature("RETAIL_CATALOG") && <NavLink href="/dashboard/retail/stock-receipts" pathname={pathname}>Stock Receipts</NavLink>}
               <NavLink href="/dashboard/barcode" pathname={pathname}>🔲 Barcode Management</NavLink>
-              {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
+              {bizFeatures?.multiWarehouse && hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
               {hasDashboardFeature("RETAIL_STOCK_ADJUSTMENT") && <NavLink href="/dashboard/retail/stock-adjustment" pathname={pathname}>Stock Adjustment</NavLink>}
               {hasDashboardFeature("RETAIL_BATCH_EXPIRY") && <NavLink href="/dashboard/retail/batch-expiry" pathname={pathname}>Batch & Expiry</NavLink>}
               <NavLink href="/dashboard/reports/stock/low" pathname={pathname}>🚨 Reorder Alerts</NavLink>
@@ -1829,7 +1829,7 @@ export default function DashboardLayout({
                {hasDashboardFeature("FRANCHISE_ROYALTY") && <NavLink href="/dashboard/franchise/royalty" pathname={pathname}>Royalty</NavLink>}
                {hasDashboardFeature("FRANCHISE_ANALYTICS") && <NavLink href="/dashboard/franchise/analytics" pathname={pathname}>Analytics</NavLink>}
                {hasDashboardFeature("RETAIL_BRANCH_REPORTS") && <NavLink href="/dashboard/retail/branch-reports" pathname={pathname}>Branch Reports</NavLink>}
-               {hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
+               {bizFeatures?.multiWarehouse && hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
               </NavGroup>
           )}
 
@@ -2067,6 +2067,7 @@ export default function DashboardLayout({
               onToggle={() => toggle("admin")}
             >
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
+              <NavLink href="/dashboard/business-features" pathname={pathname}>⚡ Business Features</NavLink>
               <NavLink href="/dashboard/shortcuts" pathname={pathname}>Keyboard Shortcuts</NavLink>
               {/* <NavLink href="/dashboard/users" pathname={pathname}>Users & Permissions</NavLink>
               <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink> */}
