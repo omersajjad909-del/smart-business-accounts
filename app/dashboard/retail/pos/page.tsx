@@ -32,6 +32,7 @@ export default function POSPage() {
   const [checkoutError, setCheckoutError] = useState("");
   const [processingCheckout, setProcessingCheckout] = useState(false);
   const [stockMap, setStockMap] = useState<Record<string, number>>({});
+  const [showStats, setShowStats] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const barcodeRef = useRef<HTMLInputElement>(null);
 
@@ -267,7 +268,15 @@ export default function POSPage() {
       {!activeSession ? (
         <div style={{ background: "rgba(245,158,11,.08)", borderBottom: "1px solid rgba(245,158,11,.18)", padding: "7px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span style={{ fontSize: 12, color: "#fbbf24", fontWeight: 600 }}>⚠️ No active session — sales will not be linked to a cashier shift.</span>
-          <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 12, color: "#fbbf24", fontWeight: 700, textDecoration: "underline" }}>Open Session →</a>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button onClick={() => setShowStats(v => !v)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 10px", borderRadius: 6, border: `1px solid ${showStats ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.1)"}`, background: showStats ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.04)", color: showStats ? "#818cf8" : "rgba(255,255,255,.35)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                {showStats ? <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></> : <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></>}
+              </svg>
+              {showStats ? "Hide Stats" : "Stats"}
+            </button>
+            <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 12, color: "#fbbf24", fontWeight: 700, textDecoration: "underline" }}>Open Session →</a>
+          </div>
         </div>
       ) : (
         <div style={{ background: "rgba(16,185,129,.06)", borderBottom: "1px solid rgba(16,185,129,.12)", padding: "6px 20px", display: "flex", alignItems: "center", gap: 16 }}>
@@ -278,28 +287,44 @@ export default function POSPage() {
           <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Txns: {Number(activeSession.data?.transactions || 0)}</span>
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ fontSize: 12, color: "#34d399", fontWeight: 700 }}>Session Sales: Rs. {(activeSession.amount || 0).toLocaleString()}</span>
-            <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 11, color: "rgba(255,255,255,.3)", textDecoration: "none", border: "1px solid rgba(255,255,255,.1)", borderRadius: 5, padding: "2px 8px" }}>Close</a>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <button
+                onClick={() => setShowStats(v => !v)}
+                title={showStats ? "Hide today's stats" : "Show today's stats"}
+                style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 10px", borderRadius: 6, border: `1px solid ${showStats ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.1)"}`, background: showStats ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.04)", color: showStats ? "#818cf8" : "rgba(255,255,255,.35)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  {showStats
+                    ? <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>
+                    : <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></>
+                  }
+                </svg>
+                {showStats ? "Hide Stats" : "Stats"}
+              </button>
+              <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 11, color: "rgba(255,255,255,.3)", textDecoration: "none", border: "1px solid rgba(255,255,255,.1)", borderRadius: 5, padding: "2px 8px" }}>Close</a>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Stats Bar */}
-      <div style={{ display: "flex", background: "#0c1322", borderBottom: "2px solid rgba(255,255,255,.05)" }}>
-        {[
-          { label: "TODAY SALES", value: `Rs. ${todayTotal.toLocaleString()}`, color: "#34d399", href: null },
-          { label: "TRANSACTIONS", value: String(todaySales.length), color: "#fff", href: "/dashboard/retail/sales-history" },
-          { label: "CASH", value: `Rs. ${cashTotal.toLocaleString()}`, color: "#10b981", href: null },
-          { label: "CARD / DIGITAL", value: `Rs. ${cardTotal.toLocaleString()}`, color: "#818cf8", href: null },
-          { label: "NEXT RECEIPT", value: nextReceiptNo, color: "#f59e0b", href: null },
-        ].map((s, i) => (
-          <div key={s.label} onClick={() => s.href && (window.location.href = s.href)}
-            style={{ flex: 1, padding: "10px 16px", borderRight: "1px solid rgba(255,255,255,.04)", cursor: s.href ? "pointer" : "default", borderLeft: i === 0 ? "none" : undefined }}>
-            <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)", letterSpacing: ".09em", marginBottom: 3, textTransform: "uppercase" }}>{s.label}</div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: s.color, letterSpacing: "-.01em" }}>{s.value}</div>
-            {s.href && <div style={{ fontSize: 9, color: "rgba(255,255,255,.18)", marginTop: 1 }}>view →</div>}
-          </div>
-        ))}
-      </div>
+      {/* Stats Bar — hidden by default, toggle via button in session bar */}
+      {showStats && (
+        <div style={{ display: "flex", background: "#0c1322", borderBottom: "2px solid rgba(255,255,255,.05)" }}>
+          {[
+            { label: "TODAY SALES",   value: `Rs. ${todayTotal.toLocaleString()}`,  color: "#34d399", href: null },
+            { label: "TRANSACTIONS",  value: String(todaySales.length),              color: "#fff",    href: "/dashboard/retail/sales-history" },
+            { label: "CASH",          value: `Rs. ${cashTotal.toLocaleString()}`,    color: "#10b981", href: null },
+            { label: "CARD / DIGITAL",value: `Rs. ${cardTotal.toLocaleString()}`,   color: "#818cf8", href: null },
+            { label: "NEXT RECEIPT",  value: nextReceiptNo,                          color: "#f59e0b", href: null },
+          ].map((s, i) => (
+            <div key={s.label} onClick={() => s.href && (window.location.href = s.href)}
+              style={{ flex: 1, padding: "10px 16px", borderRight: "1px solid rgba(255,255,255,.04)", cursor: s.href ? "pointer" : "default", borderLeft: i === 0 ? "none" : undefined }}>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)", letterSpacing: ".09em", marginBottom: 3, textTransform: "uppercase" }}>{s.label}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: s.color, letterSpacing: "-.01em" }}>{s.value}</div>
+              {s.href && <div style={{ fontSize: 9, color: "rgba(255,255,255,.18)", marginTop: 1 }}>view →</div>}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Main */}
       <div style={{ display: "flex", flex: 1, overflow: "hidden", minHeight: 0 }}>
