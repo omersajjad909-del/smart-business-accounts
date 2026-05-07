@@ -68,6 +68,7 @@ export default function POSPage() {
       price: r.amount || 0,
       sku: (r.data?.sku as string) || "",
       itemNewId: (r.data?.itemNewId as string) || "",
+      catalogStock: typeof r.data?.stock === "number" ? r.data.stock as number : null,
     }));
 
   const categories = ["All", ...Array.from(new Set(products.map(p => p.category)))];
@@ -351,7 +352,10 @@ export default function POSPage() {
             )}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 9 }}>
               {filtered.map(p => {
-                const stockQty = p.itemNewId ? (stockMap[p.itemNewId] ?? 0) : null;
+                // itemNewId linked → use live inventory; fallback to catalog stock
+                const stockQty = p.itemNewId
+                  ? (stockMap[p.itemNewId] ?? 0)
+                  : (p.catalogStock !== null ? p.catalogStock : null);
                 const outOfStock = stockQty !== null && stockQty <= 0;
                 const lowStock = stockQty !== null && stockQty > 0 && stockQty <= 5;
                 return (
