@@ -8,7 +8,9 @@ const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
 
-const emptyForm = { name: "", category: "", sku: "", price: 0, costPrice: 0, stock: 0, description: "" };
+const UNITS = ["Pcs", "Kg", "Gram", "Ltr", "ML", "Meter", "Foot", "Box", "Pack", "Dozen", "Pair", "Set", "Bag", "Bottle", "Can", "Carton"];
+
+const emptyForm = { name: "", category: "", sku: "", unit: "Pcs", price: 0, costPrice: 0, stock: 0, description: "" };
 
 export default function ProductCatalogPage() {
   const user = getCurrentUser();
@@ -40,6 +42,7 @@ export default function ProductCatalogPage() {
     name: r.title,
     category: (r.data?.category as string) || "",
     sku: (r.data?.sku as string) || "",
+    unit: (r.data?.unit as string) || "Pcs",
     price: r.amount || 0,
     costPrice: Number(r.data?.costPrice) || 0,
     stock: Number(r.data?.stock) || 0,
@@ -67,7 +70,7 @@ export default function ProductCatalogPage() {
 
   function openEdit(p: typeof allProducts[0]) {
     setEditId(p.id);
-    setForm({ name: p.name, category: p.category, sku: p.sku, price: p.price, costPrice: p.costPrice, stock: p.stock, description: p.description });
+    setForm({ name: p.name, category: p.category, sku: p.sku, unit: p.unit, price: p.price, costPrice: p.costPrice, stock: p.stock, description: p.description });
     setFormError("");
     setShowModal(true);
   }
@@ -95,21 +98,20 @@ export default function ProductCatalogPage() {
       await update(editId, {
         title: name,
         amount: form.price,
-        // preserve itemNewId so sync link is never lost
-        data: { category, sku, costPrice: form.costPrice, stock: existingStock, description, ...(itemNewId ? { itemNewId } : {}) },
+        data: { category, sku, unit: form.unit, costPrice: form.costPrice, stock: existingStock, description, ...(itemNewId ? { itemNewId } : {}) },
       });
       // Sync to Item Master
       if (itemNewId) {
         await fetch(`/api/items-new`, {
           method: "PUT",
           headers: authHeaders,
-          body: JSON.stringify({ id: itemNewId, name, category: "TRADING", unit: "PCS", rate: form.price, purchaseRate: form.costPrice, taxRate: 0, barcode: sku, description }),
+          body: JSON.stringify({ id: itemNewId, name, category: "TRADING", unit: form.unit, rate: form.price, purchaseRate: form.costPrice, taxRate: 0, barcode: sku, description }),
         });
       } else {
         const res = await fetch("/api/items-new", {
           method: "POST",
           headers: authHeaders,
-          body: JSON.stringify({ name, category: "TRADING", unit: "PCS", rate: form.price, purchaseRate: form.costPrice, taxRate: 0, barcode: sku, description }),
+          body: JSON.stringify({ name, category: "TRADING", unit: form.unit, rate: form.price, purchaseRate: form.costPrice, taxRate: 0, barcode: sku, description }),
         });
         if (res.ok) {
           const created = await res.json();
@@ -121,13 +123,13 @@ export default function ProductCatalogPage() {
         title: name,
         status: "active",
         amount: form.price,
-        data: { category, sku, costPrice: form.costPrice, stock: form.stock, description },
+        data: { category, sku, unit: form.unit, costPrice: form.costPrice, stock: form.stock, description },
       });
       // Sync to Item Master
       const res = await fetch("/api/items-new", {
         method: "POST",
         headers: authHeaders,
-        body: JSON.stringify({ name, category: "TRADING", unit: "PCS", rate: form.price, purchaseRate: form.costPrice, taxRate: 0, barcode: sku, description }),
+        body: JSON.stringify({ name, category: "TRADING", unit: form.unit, rate: form.price, purchaseRate: form.costPrice, taxRate: 0, barcode: sku, description }),
       });
       if (res.ok) {
         const created = await res.json();
@@ -293,7 +295,7 @@ export default function ProductCatalogPage() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              {["Product", "Category", "SKU", "Cost", "Sale Price", "Margin", "Stock", "Status", "Actions"].map(h => (
+              {["Product", "Category", "SKU", "Unit", "Cost", "Sale Price", "Margin", "Stock", "Status", "Actions"].map(h => (
                 <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(255,255,255,.5)", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>{h}</th>
               ))}
             </tr>
@@ -304,6 +306,9 @@ export default function ProductCatalogPage() {
                 <td style={{ padding: "13px 16px", fontWeight: 600 }}>{p.name}</td>
                 <td style={{ padding: "13px 16px", fontSize: 13 }}>{p.category || <span style={{ color: "rgba(255,255,255,.2)" }}>—</span>}</td>
                 <td style={{ padding: "13px 16px", fontSize: 11, color: "rgba(255,255,255,.4)" }}>{p.sku}</td>
+                <td style={{ padding: "13px 16px" }}>
+                  <span style={{ background: "rgba(99,102,241,.12)", color: "#a5b4fc", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>{p.unit}</span>
+                </td>
                 <td style={{ padding: "13px 16px", fontSize: 13 }}>Rs. {p.costPrice.toLocaleString()}</td>
                 <td style={{ padding: "13px 16px", color: "#34d399", fontWeight: 600 }}>Rs. {p.price.toLocaleString()}</td>
                 <td style={{ padding: "13px 16px", fontWeight: 600, color: p.margin > 30 ? "#34d399" : "#f59e0b" }}>{p.margin}%</td>
@@ -353,6 +358,7 @@ export default function ProductCatalogPage() {
               <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>
                 {filterCategory ? `No products in "${filterCategory}"` : "No products yet."}
               </td></tr>
+
             )}
           </tbody>
         </table>
@@ -401,6 +407,14 @@ export default function ProductCatalogPage() {
                   SKU * <span style={{ color: "rgba(255,255,255,.2)", fontWeight: 400 }}>(unique code)</span>
                 </label>
                 <input type="text" value={form.sku} onChange={e => setForm(f => ({ ...f, sku: e.target.value }))} style={inp} />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Unit *</label>
+                <select value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
+                  style={{ ...inp, background: "#1e2535", cursor: "pointer" }}>
+                  {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+                </select>
               </div>
 
               <div style={{ gridColumn: "span 2" }}>
