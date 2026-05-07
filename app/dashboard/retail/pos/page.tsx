@@ -120,6 +120,16 @@ export default function POSPage() {
     setCheckoutError("");
     setCart(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(0, i.qty + delta) } : i).filter(i => i.qty > 0));
   }
+  function setQty(id: string, val: string) {
+    setCheckoutError("");
+    const n = parseInt(val, 10);
+    if (!isNaN(n) && n >= 1) setCart(prev => prev.map(i => i.id === id ? { ...i, qty: n } : i));
+    else if (val === "") setCart(prev => prev.map(i => i.id === id ? { ...i, qty: 0 } : i)); // allow clearing while typing
+  }
+  function commitQty(id: string, val: string) {
+    const n = parseInt(val, 10);
+    if (isNaN(n) || n < 1) setCart(prev => prev.map(i => i.id === id ? { ...i, qty: 1 } : i));
+  }
 
   function removeItem(id: string) {
     setCart(prev => prev.filter(i => i.id !== id));
@@ -255,6 +265,9 @@ export default function POSPage() {
           #pos-receipt-paper { margin: 0 auto; }
         }
         #pos-receipt { display: none; }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
         .prod-card { transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
         .prod-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(99,102,241,.2) !important; border-color: rgba(99,102,241,.5) !important; }
         .prod-card:active { transform: scale(.97); }
@@ -440,7 +453,14 @@ export default function POSPage() {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", background: "rgba(255,255,255,.07)", borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
                   <button onClick={() => changeQty(item.id, -1)} style={{ width: 28, height: 28, background: "none", border: "none", color: "rgba(255,255,255,.6)", fontSize: 17, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: ff }}>−</button>
-                  <span style={{ width: 26, textAlign: "center", fontSize: 13, fontWeight: 800, color: "#fff" }}>{item.qty}</span>
+                  <input
+                    type="number" min={1}
+                    value={item.qty === 0 ? "" : item.qty}
+                    onChange={e => setQty(item.id, e.target.value)}
+                    onBlur={e => commitQty(item.id, e.target.value)}
+                    onFocus={e => e.target.select()}
+                    style={{ width: 38, textAlign: "center", fontSize: 13, fontWeight: 800, color: "#fff", background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.15)", borderRadius: 5, padding: "2px 0", outline: "none", fontFamily: ff, MozAppearance: "textfield" as any }}
+                  />
                   <button onClick={() => changeQty(item.id, 1)} style={{ width: 28, height: 28, background: "#6366f1", border: "none", color: "#fff", fontSize: 17, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: ff }}>+</button>
                 </div>
                 <div style={{ minWidth: 68, textAlign: "right", fontSize: 13, fontWeight: 700, color: "#a5b4fc", flexShrink: 0 }}>Rs. {(item.price * item.qty).toLocaleString()}</div>
