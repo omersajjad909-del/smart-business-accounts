@@ -62,6 +62,18 @@ export type BranchGeoProfile = {
   geoSource: "exact" | "manual" | "country" | "unset";
 };
 
+export type BusinessFeatureFlags = {
+  advancedPurchasing: boolean;  // PO → GRN → Purchase Invoice full flow
+  multiWarehouse:     boolean;  // Warehouses, Stock Transfers
+  approvalWorkflow:   boolean;  // Manager approval on PO / GRN
+};
+
+export const DEFAULT_FEATURE_FLAGS: BusinessFeatureFlags = {
+  advancedPurchasing: false,
+  multiWarehouse:     false,
+  approvalWorkflow:   false,
+};
+
 export type ShiftSetting = {
   days: string[];          // ["Mon","Tue","Wed","Thu","Fri"]
   startTime: string;       // "09:00"
@@ -83,6 +95,7 @@ export type AdminControlSettings = {
   bankDetails: BankDetailsProfile;
   branchLocations: Record<string, BranchGeoProfile>;
   shiftSettings: ShiftSettingsMap;
+  features: BusinessFeatureFlags;
 };
 
 export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
@@ -137,6 +150,7 @@ export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
   },
   branchLocations: {},
   shiftSettings: {},
+  features: { ...DEFAULT_FEATURE_FLAGS },
 };
 
 function normalizeSettings(value: unknown): AdminControlSettings {
@@ -161,6 +175,9 @@ function normalizeSettings(value: unknown): AdminControlSettings {
     : {};
   const shiftSettingsRaw = (parsed.shiftSettings && typeof parsed.shiftSettings === "object")
     ? parsed.shiftSettings as Record<string, Partial<ShiftSetting>>
+    : {};
+  const featuresRaw = (parsed.features && typeof parsed.features === "object")
+    ? parsed.features as Partial<BusinessFeatureFlags>
     : {};
 
   return {
@@ -205,6 +222,10 @@ function normalizeSettings(value: unknown): AdminControlSettings {
         } satisfies BranchGeoProfile,
       ])
     ),
+    features: {
+      ...DEFAULT_FEATURE_FLAGS,
+      ...featuresRaw,
+    },
     shiftSettings: Object.fromEntries(
       Object.entries(shiftSettingsRaw).map(([userId, s]) => [
         userId,
@@ -278,6 +299,10 @@ export async function saveCompanyAdminControlSettings(
     shiftSettings: {
       ...current.shiftSettings,
       ...(patch.shiftSettings || {}),
+    },
+    features: {
+      ...current.features,
+      ...(patch.features || {}),
     },
   });
 

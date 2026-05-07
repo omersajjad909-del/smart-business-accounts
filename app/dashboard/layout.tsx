@@ -140,6 +140,11 @@ type Branch = {
 
 type AdminControlSettings = {
   branchAssignments?: Record<string, string[]>;
+  features?: {
+    advancedPurchasing?: boolean;
+    multiWarehouse?: boolean;
+    approvalWorkflow?: boolean;
+  };
 };
 
 export default function DashboardLayout({
@@ -158,6 +163,7 @@ export default function DashboardLayout({
   const [ready, setReady] = useState(false);
   const [allowedPlanPerms, setAllowedPlanPerms] = useState<Set<string> | null>(null);
   const [allowedDashboardFeatures, setAllowedDashboardFeatures] = useState<Set<string> | null>(null);
+  const [bizFeatures, setBizFeatures] = useState<AdminControlSettings["features"]>({});
 
   // SIDEBAR STATES — single accordion state for top-level sections
   const [openSection, setOpenSection] = useState<string | null>(null);
@@ -829,6 +835,7 @@ export default function DashboardLayout({
         const data: AdminControlSettings = await res.json();
         const assigned = data?.branchAssignments?.[currentUser.id];
         setAllowedBranchIds(Array.isArray(assigned) && assigned.length > 0 ? assigned : null);
+        setBizFeatures(data?.features || {});
       } catch {}
     })();
   }, [currentUser?.companyId, currentUser?.id, currentUser?.role]);
