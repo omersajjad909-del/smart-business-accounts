@@ -333,24 +333,40 @@ export default function ShiftControlPage() {
                             { label: "End Time", key: "endTime" as const },
                             { label: "Grace (mins)", key: "graceMinutes" as const, type: "number" },
                             { label: "Warn Before End (mins)", key: "warnMinutes" as const, type: "number" },
-                          ].map(({ label, key, type }) => (
-                            <div key={key}>
-                              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
-                              <input
-                                type={type === "number" ? "number" : "time"}
-                                value={draft[key] as string | number}
-                                min={type === "number" ? 0 : undefined}
-                                max={type === "number" ? 120 : undefined}
-                                onChange={e => updateDraft(u.id, { [key]: type === "number" ? Number(e.target.value) : e.target.value })}
-                                style={{
-                                  width: "100%", padding: "9px 12px", borderRadius: 10,
-                                  border: "1.5px solid var(--border)", background: "var(--input-bg)",
-                                  color: "var(--text-primary)", fontSize: 14, fontWeight: 600,
-                                  outline: "none", boxSizing: "border-box",
-                                }}
-                              />
-                            </div>
-                          ))}
+                          ].map(({ label, key, type }) => {
+                            const val = draft[key] as string | number;
+                            // Compute AM/PM hint for time fields
+                            let ampmHint = "";
+                            if (!type && typeof val === "string" && val.includes(":")) {
+                              const [hh, mm] = val.split(":").map(Number);
+                              const ampm = hh < 12 ? "AM" : "PM";
+                              const h12 = hh % 12 || 12;
+                              ampmHint = `${h12}:${String(mm).padStart(2,"0")} ${ampm}`;
+                            }
+                            return (
+                              <div key={key}>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
+                                <input
+                                  type={type === "number" ? "number" : "time"}
+                                  value={val}
+                                  min={type === "number" ? 0 : undefined}
+                                  max={type === "number" ? 120 : undefined}
+                                  onChange={e => updateDraft(u.id, { [key]: type === "number" ? Number(e.target.value) : e.target.value })}
+                                  style={{
+                                    width: "100%", padding: "9px 12px", borderRadius: 10,
+                                    border: "1.5px solid var(--border)", background: "var(--input-bg)",
+                                    color: "var(--text-primary)", fontSize: 14, fontWeight: 600,
+                                    outline: "none", boxSizing: "border-box",
+                                  }}
+                                />
+                                {ampmHint && (
+                                  <div style={{ fontSize: 11, color: "#818cf8", fontWeight: 700, marginTop: 4 }}>
+                                    = {ampmHint}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
 
                         {/* Overtime section */}

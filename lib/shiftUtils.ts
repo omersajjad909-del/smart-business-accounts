@@ -34,10 +34,38 @@ export function getShiftStatus(shift: ShiftSetting, now?: Date): {
   const startMinutes = sh * 60 + sm - graceMin;
   const endMinutes = eh * 60 + em + overtimeMin;
 
-  const inShift = inAllowedDay && currentMin >= startMinutes && currentMin < endMinutes;
-  const minutesRemaining = inShift ? endMinutes - currentMin : 0;
+  // Handle overnight shifts (e.g. 22:00–06:00 where endMinutes < startMinutes)
+  const isOvernightShift = endMinutes <= (sh * 60 + sm);
 
-  const effH = Math.floor(endMinutes / 60);
+  let inShift: boolean;
+  let minutesRemaining: number;
+
+  if (isOvernightShift) {
+    // Overnight: in shift if currentMin >= startMinutes OR currentMin < endMinutes
+    // Also check previous day is an allowed day for the "after midnight" portion
+    const prevDayIdx = (tzNow.getDay() + 6) % 7;
+    const prevDayName = SHIFT_DAYS[prevDayIdx];
+    const inPrevAllowedDay = shift.days.includes(prevDayName);
+
+    const inShiftAfterStart = inAllowedDay && currentMin >= startMinutes;
+    const inShiftBeforeEnd = inPrevAllowedDay && currentMin < endMinutes;
+    inShift = inShiftAfterStart || inShiftBeforeEnd;
+
+    if (inShiftAfterStart) {
+      // Minutes remaining = from now to midnight + endMinutes
+      minutesRemaining = (1440 - currentMin) + endMinutes;
+    } else if (inShiftBeforeEnd) {
+      minutesRemaining = endMinutes - currentMin;
+    } else {
+      minutesRemaining = 0;
+    }
+  } else {
+    // Normal same-day shift
+    inShift = inAllowedDay && currentMin >= startMinutes && currentMin < endMinutes;
+    minutesRemaining = inShift ? endMinutes - currentMin : 0;
+  }
+
+  const effH = Math.floor(endMinutes / 60) % 24;
   const effM = endMinutes % 60;
   const effectiveEndTime = `${String(effH).padStart(2, "0")}:${String(effM).padStart(2, "0")}`;
 
