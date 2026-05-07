@@ -216,7 +216,7 @@ export default function POSPage() {
         totalQty: snapshot.reduce((s, i) => s + i.qty, 0),
         payMethod, tendered: tenderedAmt, change,
         cashierName,
-        loyaltyEarned, loyaltyTotal,
+        loyaltyEarned, loyaltyRedeemed: 0, loyaltyTotal,
       });
       setCart([]);
       setDiscount("");

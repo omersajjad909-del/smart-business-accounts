@@ -17,6 +17,7 @@ export type ReceiptData = {
   change: number;
   cashierName: string;
   loyaltyEarned: number;
+  loyaltyRedeemed: number;
   loyaltyTotal: number;
 };
 
@@ -58,12 +59,15 @@ function SimpleBarcode({ value }: { value: string }) {
     s = Math.abs((s * 1664525 + 1013904223) & 0x7fffffff);
     bars.push(1 + (s % 3));
   }
+  const totalW = bars.reduce((a, b) => a + b, 0);
+  let x = 0;
   return (
-    <div style={{ display: "flex", height: 50, justifyContent: "center", marginTop: 6 }}>
-      {bars.map((w, i) => (
-        <div key={i} style={{ width: w, background: i % 2 === 0 ? "#000" : "#fff", flexShrink: 0 }} />
-      ))}
-    </div>
+    <svg width="100%" height="50" viewBox={`0 0 ${totalW} 50`} style={{ display: "block", marginTop: 6 }} preserveAspectRatio="none">
+      {bars.map((w, i) => {
+        const rx = x; x += w;
+        return i % 2 === 0 ? <rect key={i} x={rx} y={0} width={w} height={50} fill="#000" /> : null;
+      })}
+    </svg>
   );
 }
 
@@ -74,6 +78,8 @@ export function ThermalReceipt({ receipt, company }: { receipt: ReceiptData; com
   const dt = new Date(receipt.soldAt);
   const dateStr = dt.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   const timeStr = dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  // Strip any "POS-000" style prefix — show just the numeric part e.g. "3"
+  const txNo = receipt.receiptNo.replace(/^[A-Za-z]+-0*/g, "") || receipt.receiptNo;
 
   return (
     <div style={{ width: 300, fontFamily: "'Courier New',Courier,monospace", fontSize: 11, color: "#000", background: "#fff", padding: "14px 12px", lineHeight: 1.5 }}>
@@ -90,7 +96,7 @@ export function ThermalReceipt({ receipt, company }: { receipt: ReceiptData; com
       {/* FBR Info */}
       <Row label="FBR Invoice #:" value={receipt.fbrInvoice} />
       {company.ntn && <Row label="NTN #" value={company.ntn} />}
-      <Row label="Transaction No.:" value={receipt.receiptNo} />
+      <Row label="Transaction No.:" value={txNo} />
       <Row label="Transaction Date:" value={`${dateStr} ${timeStr}`} />
       <Row label="Cashier:" value={receipt.cashierName} />
       <Row label="POS:" value="FSD-POS-SAL-01" />
@@ -172,8 +178,8 @@ export function ThermalReceipt({ receipt, company }: { receipt: ReceiptData; com
       {/* Loyalty */}
       <div style={{ fontWeight: 800, fontSize: 11, marginBottom: 4 }}>Loyalty Information</div>
       <Row label="Points Earned:" value={receipt.loyaltyEarned.toFixed(2)} />
-      <Row label="Redeemed Points:" value="0.00" />
-      <Row label="Available Points:" value={receipt.loyaltyTotal.toFixed(2)} />
+      <Row label="Redeemed Points:" value={(receipt.loyaltyRedeemed ?? 0).toFixed(2)} />
+      <Row label="Available Points:" value={(receipt.loyaltyTotal - (receipt.loyaltyRedeemed ?? 0)).toFixed(2)} />
 
       <Divider />
 
