@@ -214,7 +214,7 @@ export default function TrustPage() {
                 Our security team responds to all enquiries within 24 hours. Enterprise customers can request our full security documentation pack.
               </p>
               <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
-                <a href="mailto:finovaos.app@gmail.com" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"linear-gradient(135deg,#059669,#34d399)", color:"white", textDecoration:"none" }}>
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"linear-gradient(135deg,#059669,#34d399)", color:"white", textDecoration:"none" }}>
                   finovaos.app@gmail.com
                 </a>
                 <Link href="/contact" style={{ padding:"12px 26px", borderRadius:11, fontWeight:700, fontSize:13, background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.8)", textDecoration:"none" }}>

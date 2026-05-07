@@ -503,7 +503,7 @@ export default function CareersPage() {
               <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", lineHeight:1.7, margin:"0 auto 28px", maxWidth:420 }}>
                 We're always looking for exceptional people. Send us your CV and tell us how you'd contribute — we read every email.
               </p>
-              <a href="mailto:finovaos.app@gmail.com" style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"13px 30px", borderRadius:12, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", textDecoration:"none", fontWeight:800, fontSize:14, boxShadow:"0 4px 24px rgba(79,70,229,.4)" }}>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com" style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"13px 30px", borderRadius:12, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", textDecoration:"none", fontWeight:800, fontSize:14, boxShadow:"0 4px 24px rgba(79,70,229,.4)" }}>
                 📧 Email finovaos.app@gmail.com
               </a>
             </div>

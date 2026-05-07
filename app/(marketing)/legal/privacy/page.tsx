@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 const LAST_UPDATED = "14 April 2026";
 const COMPANY = "FinovaOS";
 const EMAIL = "finovaos.app@gmail.com";
+const EMAIL_HREF = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}`;
 const ADDRESS = "Global Operations";
 
 const SECTIONS = [
@@ -438,7 +439,7 @@ export default function PrivacyPage() {
                   <div style={{ marginTop:16, paddingTop:16, borderTop:"1px solid rgba(255,255,255,.07)" }}>
                     <div style={{ fontSize:11, color:"rgba(255,255,255,.22)", lineHeight:1.6 }}>
                       Questions? Email us at<br/>
-                      <a href={`mailto:${EMAIL}`} style={{ color:"#818cf8", textDecoration:"none", fontWeight:600 }}>{EMAIL}</a>
+                      <a href={EMAIL_HREF} target="_blank" rel="noopener noreferrer" style={{ color:"#818cf8", textDecoration:"none", fontWeight:600 }}>{EMAIL}</a>
                     </div>
                   </div>
                 </div>
@@ -495,10 +496,10 @@ export default function PrivacyPage() {
                 </p>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
                   {[
-                    { icon:"📧", label:"Email", val:EMAIL, href:`mailto:${EMAIL}` },
+                    { icon:"📧", label:"Email", val:EMAIL, href:EMAIL_HREF },
                     { icon:"📍", label:"Address", val:ADDRESS, href:"#" },
                   ].map(({ icon, label, val, href }) => (
-                    <a key={label} href={href} style={{
+                    <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" style={{
                       display:"inline-flex", alignItems:"center", gap:10,
                       padding:"10px 16px", borderRadius:12,
                       background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.25)",

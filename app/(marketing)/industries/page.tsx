@@ -279,7 +279,7 @@ export default function IndustriesPage() {
       {/* Bottom CTA */}
       <div style={{ borderTop: "1px solid rgba(255,255,255,.05)", padding: "48px 24px", textAlign: "center" }}>
         <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.3)", marginBottom: 8 }}>Don&apos;t see your industry?</p>
-        <a href="mailto:finovaos.app@gmail.com" style={{ fontSize: 14, fontWeight: 700, color: "#818cf8", textDecoration: "none" }}>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com" style={{ fontSize: 14, fontWeight: 700, color: "#818cf8", textDecoration: "none" }}>
           Contact us — we&apos;ll add it to the roadmap →
         </a>
       </div>

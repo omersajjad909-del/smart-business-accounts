@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 const LAST_UPDATED = "14 April 2026";
 const EMAIL = "finovaos.app@gmail.com";
+const EMAIL_HREF = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}`;
 
 const SECTIONS = [
   {
@@ -446,7 +447,7 @@ export default function TermsPage() {
                 <div style={{ marginTop:14, paddingTop:14, borderTop:"1px solid rgba(255,255,255,.07)" }}>
                   <div style={{ fontSize:11, color:"rgba(255,255,255,.22)", lineHeight:1.6 }}>
                     Questions? Contact us at<br/>
-                    <a href={`mailto:${EMAIL}`} style={{ color:"#fbbf24", textDecoration:"none", fontWeight:600 }}>{EMAIL}</a>
+                    <a href={EMAIL_HREF} target="_blank" rel="noopener noreferrer" style={{ color:"#fbbf24", textDecoration:"none", fontWeight:600 }}>{EMAIL}</a>
                   </div>
                 </div>
               </div>
@@ -500,7 +501,7 @@ export default function TermsPage() {
               <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.8, marginBottom:16 }}>
                 For any questions about these terms, billing, refunds, or privacy — contact us directly.
               </p>
-              <a href={`mailto:${EMAIL}`} style={{
+              <a href={EMAIL_HREF} target="_blank" rel="noopener noreferrer" style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 padding:"10px 18px", borderRadius:12,
                 background:"rgba(251,191,36,.08)", border:"1px solid rgba(251,191,36,.25)",

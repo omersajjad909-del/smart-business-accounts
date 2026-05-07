@@ -1067,7 +1067,7 @@ export default async function HelpArticlePage({
             </svg>
             Back to Help Center
           </Link>
-          <a href="mailto:finovaos.app@gmail.com" className="hc-mail">
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=finovaos.app@gmail.com" className="hc-mail">
             Still need help? Contact support →
           </a>
         </div>
