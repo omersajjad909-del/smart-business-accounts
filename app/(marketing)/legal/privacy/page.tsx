@@ -6,8 +6,7 @@ import { useEffect, useRef, useState } from "react";
 const LAST_UPDATED = "14 April 2026";
 const COMPANY = "FinovaOS";
 const EMAIL = "finovaos.app@gmail.com";
-const EMAIL_HREF = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}`;
-const ADDRESS = "Global Operations";
+const EMAIL_HREF = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}&su=Privacy+Policy+Inquiry`;
 
 const SECTIONS = [
   {
@@ -497,7 +496,6 @@ export default function PrivacyPage() {
                 <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
                   {[
                     { icon:"📧", label:"Email", val:EMAIL, href:EMAIL_HREF },
-                    { icon:"📍", label:"Address", val:ADDRESS, href:"#" },
                   ].map(({ icon, label, val, href }) => (
                     <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" style={{
                       display:"inline-flex", alignItems:"center", gap:10,
@@ -519,14 +517,6 @@ export default function PrivacyPage() {
                 </div>
               </div>
 
-              {/* Footer note */}
-              <div style={{ marginTop:32, padding:"16px 20px", borderRadius:12,
-                background:"rgba(251,191,36,.05)", border:"1px solid rgba(251,191,36,.15)" }}>
-                <p style={{ fontSize:12.5, color:"rgba(255,255,255,.35)", lineHeight:1.7, margin:0 }}>
-                  <span style={{ fontWeight:700, color:"rgba(251,191,36,.7)" }}>Note: </span>
-                  This is a placeholder privacy policy. It should be reviewed and finalized by a qualified legal professional before the platform goes live in production. Laws vary by jurisdiction and your specific use case may require additional clauses.
-                </p>
-              </div>
             </div>
           </div>
         </div>
