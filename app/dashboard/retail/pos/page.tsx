@@ -46,9 +46,19 @@ export default function POSPage() {
   const [page, setPage] = useState(0);
   const [customerName, setCustomerName] = useState("");
   const [clockStr, setClockStr] = useState("");
+  const [flashKey, setFlashKey] = useState<string | null>(null);
+  const [fKeyMsg, setFKeyMsg] = useState<string | null>(null);
 
   const searchRef = useRef<HTMLInputElement>(null);
+  const discountRef = useRef<HTMLInputElement>(null);
+  const tenderedRef = useRef<HTMLInputElement>(null);
   const checkoutFnRef = useRef<() => Promise<void>>(async () => {});
+
+  function fKeyComingSoon(key: string, label: string) {
+    setFlashKey(key);
+    setFKeyMsg(`${key} — ${label} (Coming Soon)`);
+    setTimeout(() => { setFlashKey(null); setFKeyMsg(null); }, 1800);
+  }
 
   useEffect(() => {
     const tick = () => {
@@ -299,10 +309,9 @@ export default function POSPage() {
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      const isInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
-      if (e.key === "F2") { e.preventDefault(); searchRef.current?.focus(); }
-      if (e.key === "F10") { e.preventDefault(); checkoutFnRef.current(); }
-      if (isInput && e.key !== "F2" && e.key !== "F10") return;
+      if (e.key === "F2")  { e.preventDefault(); searchRef.current?.focus(); return; }
+      if (e.key === "F5")  { e.preventDefault(); discountRef.current?.focus(); discountRef.current?.select(); return; }
+      if (e.key === "F10") { e.preventDefault(); checkoutFnRef.current(); return; }
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
@@ -446,20 +455,31 @@ export default function POSPage() {
 
       {/* ── Shortcut Keys Bar ── */}
       <div style={{ background: "#080d18", borderBottom: "1px solid rgba(255,255,255,.04)", padding: "4px 14px", display: "flex", gap: 4, alignItems: "center", flexWrap: "wrap", flexShrink: 0 }}>
+        {fKeyMsg && (
+          <span style={{ fontSize: 10, color: "#fbbf24", fontWeight: 600, marginRight: 4, padding: "2px 8px", background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 5 }}>{fKeyMsg}</span>
+        )}
         {([
-          ["F2",  "Search",       () => searchRef.current?.focus()],
-          ["F3",  "Hold Sale",    () => {}],
-          ["F4",  "Price Check",  () => {}],
-          ["F5",  "Discount",     () => {}],
-          ["F6",  "Note",         () => {}],
-          ["F7",  "Hold Invoice", () => {}],
-          ["F8",  "Preview",      () => { if (receipt) printReceipt(); }],
+          ["F2",  "Search",       () => { searchRef.current?.focus(); }],
+          ["F3",  "Hold Sale",    () => fKeyComingSoon("F3", "Hold Sale")],
+          ["F4",  "Price Check",  () => fKeyComingSoon("F4", "Price Check")],
+          ["F5",  "Discount",     () => { discountRef.current?.focus(); discountRef.current?.select(); }],
+          ["F6",  "Note",         () => fKeyComingSoon("F6", "Note")],
+          ["F7",  "Hold Invoice", () => fKeyComingSoon("F7", "Hold Invoice")],
+          ["F8",  "Preview",      () => {
+            if (receipt) { printReceipt(); }
+            else { setFKeyMsg("F8 — No receipt yet. Complete a sale first."); setFlashKey("F8"); setTimeout(() => { setFKeyMsg(null); setFlashKey(null); }, 2000); }
+          }],
           ["F10", "Pay Now",      () => checkoutFnRef.current()],
         ] as [string, string, () => void][]).map(([key, label, action]) => (
           <button key={key} className="fkey" onClick={action}
-            style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 5, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", cursor: "pointer", fontFamily: ff, transition: "all .12s" }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: "#6366f1", background: "rgba(99,102,241,.15)", padding: "1px 5px", borderRadius: 3, letterSpacing: ".04em" }}>{key}</span>
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,.38)", fontWeight: 600 }}>{label}</span>
+            style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 5, cursor: "pointer", fontFamily: ff, transition: "all .12s",
+              background: flashKey === key ? "rgba(245,158,11,.15)" : key === "F10" ? "rgba(16,185,129,.08)" : "rgba(255,255,255,.04)",
+              border: flashKey === key ? "1px solid rgba(245,158,11,.35)" : key === "F10" ? "1px solid rgba(16,185,129,.2)" : "1px solid rgba(255,255,255,.07)" }}>
+            <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 5px", borderRadius: 3, letterSpacing: ".04em",
+              color: key === "F10" ? "#34d399" : "#6366f1",
+              background: key === "F10" ? "rgba(16,185,129,.18)" : "rgba(99,102,241,.15)" }}>{key}</span>
+            <span style={{ fontSize: 10, fontWeight: 600,
+              color: flashKey === key ? "#fbbf24" : key === "F10" ? "#6ee7b7" : "rgba(255,255,255,.38)" }}>{label}</span>
           </button>
         ))}
       </div>
@@ -628,7 +648,7 @@ export default function POSPage() {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                 <span style={{ fontSize: 11, color: "rgba(255,255,255,.32)", flex: 1 }}>Discount (Rs.)</span>
-                <input value={discount} onChange={e => setDiscount(e.target.value)} placeholder="0" type="number" min="0"
+                <input ref={discountRef} value={discount} onChange={e => setDiscount(e.target.value)} placeholder="0" type="number" min="0"
                   style={{ width: 75, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 6, padding: "3px 7px", color: "#fff", fontSize: 11, fontFamily: ff, outline: "none", textAlign: "right" }} />
               </div>
               {itemDiscAmt > 0 && (
@@ -673,7 +693,7 @@ export default function POSPage() {
             {/* Cash tendered + Quick Amounts */}
             {payMethod === "cash" && (
               <div style={{ marginBottom: 8 }}>
-                <input value={tendered} onChange={e => setTendered(e.target.value)} placeholder="Amount received (Rs.)" type="number" min="0"
+                <input ref={tenderedRef} value={tendered} onChange={e => setTendered(e.target.value)} placeholder="Amount received (Rs.)" type="number" min="0"
                   style={{ width: "100%", boxSizing: "border-box" as const, background: "rgba(255,255,255,.04)", border: "1px solid rgba(16,185,129,.2)", borderRadius: 7, padding: "8px 10px", color: "#fff", fontSize: 12, fontFamily: ff, outline: "none", marginBottom: 5 }} />
                 <div style={{ display: "flex", gap: 4, marginBottom: 5 }}>
                   {QUICK_AMTS.map(amt => (
