@@ -1,7 +1,7 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
 
-import { useEffect, useState, Suspense, createContext, useContext } from "react";
+import { useEffect, useState, useRef, Suspense, createContext, useContext } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { getCurrentUser, setCurrentUser as storeUser, updateStoredUser } from "@/lib/auth";
@@ -385,6 +385,53 @@ export default function DashboardLayout({
 
   // ── Auto-logout on idle ─────────────────────────────────────
   const { showWarning: showIdleWarning, secondsLeft: idleSecondsLeft, stayLoggedIn } = useAutoLogout(logout);
+
+  // ── Shift-based auto-logout ──────────────────────────────────
+  const [showShiftWarning, setShowShiftWarning] = useState(false);
+  const [shiftSecsLeft, setShiftSecsLeft] = useState(0);
+  const shiftEndMsRef = useRef(0);
+  const shiftWarningActiveRef = useRef(false);
+
+  useEffect(() => {
+    let pollHandle: ReturnType<typeof setInterval>;
+    let countHandle: ReturnType<typeof setInterval>;
+
+    async function pollShift() {
+      try {
+        const res = await fetch("/api/user/shift-status");
+        if (!res.ok) return;
+        const d = await res.json() as {
+          enabled: boolean; isInShift: boolean;
+          minutesRemaining: number; warnMinutes: number;
+        };
+        if (!d.enabled) return;
+        if (!d.isInShift || d.minutesRemaining <= 0) {
+          logout();
+          return;
+        }
+        if (d.minutesRemaining <= d.warnMinutes) {
+          shiftEndMsRef.current = Date.now() + d.minutesRemaining * 60_000;
+          shiftWarningActiveRef.current = true;
+          setShiftSecsLeft(d.minutesRemaining * 60);
+          setShowShiftWarning(true);
+        } else {
+          shiftWarningActiveRef.current = false;
+          setShowShiftWarning(false);
+        }
+      } catch {}
+    }
+
+    pollShift();
+    pollHandle = setInterval(pollShift, 60_000);
+    countHandle = setInterval(() => {
+      if (!shiftWarningActiveRef.current) return;
+      const s = Math.max(0, Math.floor((shiftEndMsRef.current - Date.now()) / 1000));
+      setShiftSecsLeft(s);
+      if (s <= 0) logout();
+    }, 1000);
+
+    return () => { clearInterval(pollHandle); clearInterval(countHandle); };
+  }, []);
 
   // Global keyboard shortcuts — driven by per-company config from API
   useEffect(() => {
@@ -894,6 +941,48 @@ export default function DashboardLayout({
                 Logout Now
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Shift end auto-logout warning modal ── */}
+      {showShiftWarning && (
+        <div style={{
+          position:"fixed", inset:0, zIndex:99999,
+          background:"rgba(0,0,0,0.75)", backdropFilter:"blur(4px)",
+          display:"flex", alignItems:"center", justifyContent:"center",
+          fontFamily:"'Outfit','Inter',sans-serif",
+        }}>
+          <div style={{
+            background:"#0d1035", border:"1px solid rgba(239,68,68,0.4)",
+            borderRadius:20, padding:"36px 40px", maxWidth:420, width:"90%",
+            boxShadow:"0 0 60px rgba(239,68,68,0.25)", textAlign:"center",
+          }}>
+            <div style={{fontSize:44, marginBottom:12}}>🕐</div>
+            <div style={{fontSize:22, fontWeight:800, color:"#fff", marginBottom:8}}>
+              Shift Ending Soon
+            </div>
+            <div style={{fontSize:14, color:"rgba(255,255,255,0.6)", lineHeight:1.6, marginBottom:24}}>
+              Your shift is about to end.<br/>
+              You will be automatically logged out in{" "}
+              <span style={{color:"#f87171", fontWeight:700}}>
+                {Math.floor(shiftSecsLeft / 60)}:{String(shiftSecsLeft % 60).padStart(2,"0")}
+              </span>
+              <br/>
+              <span style={{fontSize:12, color:"rgba(255,255,255,0.4)"}}>
+                Please save your work. Contact admin to extend shift.
+              </span>
+            </div>
+            <button
+              onClick={logout}
+              style={{
+                padding:"10px 28px", borderRadius:10, cursor:"pointer",
+                background:"transparent", border:"1px solid rgba(255,255,255,0.15)",
+                color:"rgba(255,255,255,0.6)", fontWeight:600, fontSize:14,
+              }}
+            >
+              Logout Now
+            </button>
           </div>
         </div>
       )}
@@ -2004,6 +2093,7 @@ export default function DashboardLayout({
               {/* {(!isCustomPlan || hasCustomActiveModule("whatsapp")) && <NavLink href="/dashboard/notifications" pathname={pathname}>Notifications & SMS</NavLink>} */}
               <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
+              {isAdmin && <NavLink href="/dashboard/settings/shift-control" pathname={pathname}>🕐 Shift Control</NavLink>}
               {(!isCustomPlan || hasCustomActiveModule("api_access")) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
             </NavGroup>
           )}

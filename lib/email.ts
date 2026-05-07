@@ -704,6 +704,52 @@ export async function sendLoginAlertEmail(opts: {
   } catch {}
 }
 
+// ─── Shift-blocked alert email (sent to admin when user login is blocked) ─────
+export async function sendShiftBlockedAlertEmail(opts: {
+  to: string;
+  adminName: string;
+  blockedUserName: string;
+  blockedUserEmail: string;
+  attemptDay: string;
+  attemptTime: string;
+  shiftDays: string[];
+  shiftStart: string;
+  shiftEnd: string;
+}): Promise<void> {
+  const html = emailBase({
+    companyName: "FinovaOS Security",
+    badgeText: "Shift Alert",
+    badgeColor: "#ef4444",
+    content: `
+      <p style="margin:0 0 6px;font-size:22px;font-weight:800;color:#0f172a;">⛔ Blocked Login Attempt</p>
+      <p style="margin:0 0 20px;font-size:14px;color:#64748b;">Hi ${opts.adminName}, a staff member tried to log in outside their scheduled shift.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
+        ${[
+          ["👤 Employee",    `${opts.blockedUserName} (${opts.blockedUserEmail})`],
+          ["📅 Day",         opts.attemptDay],
+          ["🕐 Attempt Time", opts.attemptTime],
+          ["📋 Allowed Days", opts.shiftDays.join(", ")],
+          ["🟢 Shift Start",  opts.shiftStart],
+          ["🔴 Shift End",    opts.shiftEnd],
+        ].map(([k, v]) => `
+          <tr style="border-bottom:1px solid #f1f5f9;">
+            <td style="padding:10px 0;color:#94a3b8;font-weight:600;width:130px;">${k}</td>
+            <td style="padding:10px 0;color:#0f172a;font-weight:700;">${v}</td>
+          </tr>
+        `).join("")}
+      </table>
+      <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:14px 16px;font-size:13px;color:#991b1b;line-height:1.7;">
+        <strong>Action Required:</strong><br/>
+        If this was an authorised request, you can extend the employee's shift from the <strong>Shift Control</strong> settings page. Otherwise, no action is needed — the login was blocked.
+      </div>
+    `,
+  });
+
+  try {
+    await sendEmail({ to: opts.to, subject: `⛔ Blocked Login: ${opts.blockedUserName} — Outside Shift Hours`, html });
+  } catch {}
+}
+
 // ─── Send email ───────────────────────────────────────────────────────────────
 export async function sendEmail(options: {
   to: string | string[];

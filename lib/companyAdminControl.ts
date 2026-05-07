@@ -62,6 +62,17 @@ export type BranchGeoProfile = {
   geoSource: "exact" | "manual" | "country" | "unset";
 };
 
+export type ShiftSetting = {
+  days: string[];          // ["Mon","Tue","Wed","Thu","Fri"]
+  startTime: string;       // "09:00"
+  endTime: string;         // "17:00"
+  graceMinutes: number;    // grace window at start (default 10)
+  overtimeMinutes: number; // admin-added realtime overtime (default 0)
+  warnMinutes: number;     // warn user this many mins before shift ends (default 10)
+  enabled: boolean;
+};
+export type ShiftSettingsMap = Record<string, ShiftSetting>;
+
 export type AdminControlSettings = {
   branchAssignments: BranchAssignmentMap;
   printPreferences: PrintPreferences;
@@ -70,6 +81,7 @@ export type AdminControlSettings = {
   invoiceContact: InvoiceContactProfile;
   bankDetails: BankDetailsProfile;
   branchLocations: Record<string, BranchGeoProfile>;
+  shiftSettings: ShiftSettingsMap;
 };
 
 export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
@@ -123,6 +135,7 @@ export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
     branchCode: "",
   },
   branchLocations: {},
+  shiftSettings: {},
 };
 
 function normalizeSettings(value: unknown): AdminControlSettings {
@@ -144,6 +157,9 @@ function normalizeSettings(value: unknown): AdminControlSettings {
     : {};
   const branchLocations = (parsed.branchLocations && typeof parsed.branchLocations === "object")
     ? parsed.branchLocations as Record<string, Partial<BranchGeoProfile>>
+    : {};
+  const shiftSettingsRaw = (parsed.shiftSettings && typeof parsed.shiftSettings === "object")
+    ? parsed.shiftSettings as Record<string, Partial<ShiftSetting>>
     : {};
 
   return {
@@ -186,6 +202,20 @@ function normalizeSettings(value: unknown): AdminControlSettings {
             ? value.geoSource
             : "unset",
         } satisfies BranchGeoProfile,
+      ])
+    ),
+    shiftSettings: Object.fromEntries(
+      Object.entries(shiftSettingsRaw).map(([userId, s]) => [
+        userId,
+        {
+          days: Array.isArray(s?.days) ? s.days.filter((d): d is string => typeof d === "string") : [],
+          startTime: typeof s?.startTime === "string" ? s.startTime : "09:00",
+          endTime: typeof s?.endTime === "string" ? s.endTime : "17:00",
+          graceMinutes: typeof s?.graceMinutes === "number" ? s.graceMinutes : 10,
+          overtimeMinutes: typeof s?.overtimeMinutes === "number" ? s.overtimeMinutes : 0,
+          warnMinutes: typeof s?.warnMinutes === "number" ? s.warnMinutes : 10,
+          enabled: Boolean(s?.enabled),
+        } satisfies ShiftSetting,
       ])
     ),
   };
@@ -242,6 +272,10 @@ export async function saveCompanyAdminControlSettings(
     branchLocations: {
       ...current.branchLocations,
       ...(patch.branchLocations || {}),
+    },
+    shiftSettings: {
+      ...current.shiftSettings,
+      ...(patch.shiftSettings || {}),
     },
   });
 

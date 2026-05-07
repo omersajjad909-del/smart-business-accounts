@@ -4,7 +4,9 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { signJwt } from "@/lib/auth";
 import { rateLimit } from "@/lib/rateLimit";
-import { sendLoginAlertEmail } from "@/lib/email";
+import { sendLoginAlertEmail, sendShiftBlockedAlertEmail } from "@/lib/email";
+import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
+import { getPakistanNow, getShiftStatus, SHIFT_DAYS } from "@/lib/shiftUtils";
 import {
   createVerificationCodeLog,
   getAvailableChannels,
@@ -141,6 +143,59 @@ export async function POST(req: NextRequest) {
       companies.find((c: any) => c.isDefault)?.companyId ||
       companies[0]?.companyId ||
       null;
+
+    // ── Shift-based access control ─────────────────────────────────────────────
+    if (defaultCompanyId) {
+      try {
+        const adminSettings = await getCompanyAdminControlSettings(defaultCompanyId);
+        const shift = adminSettings.shiftSettings?.[user.id];
+        if (shift?.enabled) {
+          const pkNow = getPakistanNow();
+          const { inShift } = getShiftStatus(shift, pkNow);
+          if (!inShift) {
+            const dayName = SHIFT_DAYS[pkNow.getDay()];
+            const timeStr = `${String(pkNow.getHours()).padStart(2, "0")}:${String(pkNow.getMinutes()).padStart(2, "0")}`;
+            // Log the blocked attempt
+            prisma.activityLog.create({
+              data: {
+                companyId: defaultCompanyId,
+                userId: user.id,
+                action: "LOGIN_BLOCKED_SHIFT",
+                details: JSON.stringify({ day: dayName, time: timeStr, shiftDays: shift.days, shiftStart: shift.startTime, shiftEnd: shift.endTime }),
+              },
+            }).catch(() => {});
+            // Alert all admins in this company
+            prisma.userCompany.findMany({
+              where: { companyId: defaultCompanyId },
+              include: { user: { select: { email: true, name: true, role: true } } },
+            }).then((members) => {
+              members
+                .filter((m) => m.user?.role?.toUpperCase() === "ADMIN" && m.user.email)
+                .forEach((m) => {
+                  sendShiftBlockedAlertEmail({
+                    to: m.user!.email!,
+                    adminName: m.user!.name || "Admin",
+                    blockedUserName: user.name,
+                    blockedUserEmail: user.email,
+                    attemptDay: dayName,
+                    attemptTime: timeStr,
+                    shiftDays: shift.days,
+                    shiftStart: shift.startTime,
+                    shiftEnd: shift.endTime,
+                  }).catch(() => {});
+                });
+            }).catch(() => {});
+            return NextResponse.json(
+              { message: `Login not allowed. Your shift is ${shift.startTime}–${shift.endTime} on ${shift.days.join(", ")}. Contact your administrator.` },
+              { status: 403 }
+            );
+          }
+        }
+      } catch (shiftErr) {
+        console.error("SHIFT CHECK ERROR:", shiftErr);
+        // Never block login due to shift-check failure
+      }
+    }
 
     // Fetch role-based permissions
     let rolePermissions: Array<{ permission: string }> = [];

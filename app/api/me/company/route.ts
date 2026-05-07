@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { currencyByCountry } from "@/lib/currency";
 import { getCompanyExtraSeats, getEffectiveUserLimitForCompany } from "@/lib/companySeatLimit";
+
+function isDatabaseUnavailable(error: unknown): boolean {
+  if (error instanceof Prisma.PrismaClientInitializationError) return true;
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes("Can't reach database server");
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -42,7 +49,7 @@ export async function GET(req: NextRequest) {
     const extraSeats = await getCompanyExtraSeats(companyId);
     const effectiveUserLimit = await getEffectiveUserLimitForCompany(companyId, company.plan);
 
-    const baseCurrency = (company as any).baseCurrency || currencyByCountry((company as any).country);
+    const baseCurrency = company.baseCurrency || currencyByCountry(company.country);
 
     return NextResponse.json({
       ...company,
@@ -53,7 +60,34 @@ export async function GET(req: NextRequest) {
       extraSeats,
       effectiveUserLimit,
     });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    if (isDatabaseUnavailable(e)) {
+      const companyId = (await resolveCompanyId(req)) || "unknown";
+      const country = "Pakistan";
+      return NextResponse.json({
+        id: companyId,
+        name: "My Company",
+        country,
+        baseCurrency: currencyByCountry(country),
+        plan: "STARTER",
+        subscriptionStatus: "UNKNOWN",
+        activeModules: null,
+        currentPeriodEnd: null,
+        stripeCustomerId: null,
+        businessType: null,
+        businessSetupDone: false,
+        logoUrl: null,
+        totalUsers: 0,
+        totalAccounts: 0,
+        introOfferClaimed: false,
+        extraSeats: 0,
+        effectiveUserLimit: null,
+        degraded: true,
+      }, {
+        headers: { "x-finova-degraded": "company-db-unavailable" },
+      });
+    }
+    const message = e instanceof Error ? e.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
