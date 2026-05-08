@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import { decryptField } from "@/lib/fieldEncrypt";
 
 type LoyaltyRecord = {
   title: string;
@@ -91,8 +92,8 @@ export async function GET(req: NextRequest) {
       id: account.id,
       code: account.code,
       name: account.name,
-      phone: account.phone || "",
-      email: account.email || "",
+      phone: account.phone ? decryptField(account.phone) : "",
+      email: account.email ? decryptField(account.email) : "",
       city: account.city || "",
       creditLimit: Number(account.creditLimit || 0),
       balance: Number(account.openDebit || 0) - Number(account.openCredit || 0),
@@ -167,8 +168,8 @@ export async function POST(req: NextRequest) {
     id: created.id,
     code: created.code,
     name: created.name,
-    phone: created.phone || "",
-    email: created.email || "",
+    phone: created.phone ? decryptField(created.phone) : "",
+    email: created.email ? decryptField(created.email) : "",
     city: created.city || "",
     creditLimit: Number(created.creditLimit || 0),
     balance: 0,
