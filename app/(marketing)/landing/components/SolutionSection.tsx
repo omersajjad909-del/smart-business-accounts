@@ -247,97 +247,111 @@ export default function SolutionSection() {
             </p>
           </div>
 
+          {/* ── Comparison Panel ── */}
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill,minmax(330px,1fr))",
-              gap: 12,
               marginBottom: 100,
+              borderRadius: 22,
+              overflow: "hidden",
+              border: "1px solid rgba(255,255,255,.07)",
+              opacity: painVis ? 1 : 0,
+              transform: painVis ? "translateY(0)" : "translateY(24px)",
+              transition: "opacity .6s ease .1s, transform .6s ease .1s",
             }}
           >
+            {/* Column headers */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 52px 1fr" }}>
+              <div style={{ padding: "18px 28px", background: "rgba(248,113,113,.07)", borderBottom: "1px solid rgba(248,113,113,.1)", display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(248,113,113,.15)", border: "1px solid rgba(248,113,113,.22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✕</div>
+                <span style={{ fontSize: 12, fontWeight: 800, color: "#f87171", letterSpacing: ".09em" }}>WITHOUT FINOVA</span>
+              </div>
+              <div style={{ background: "rgba(255,255,255,.03)", borderBottom: "1px solid rgba(255,255,255,.07)", borderLeft: "1px solid rgba(255,255,255,.06)", borderRight: "1px solid rgba(255,255,255,.06)" }} />
+              <div style={{ padding: "18px 28px", background: "rgba(99,102,241,.07)", borderBottom: "1px solid rgba(99,102,241,.14)", borderLeft: "1px solid rgba(99,102,241,.1)", display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(99,102,241,.2)", border: "1px solid rgba(99,102,241,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✓</div>
+                <span style={{ fontSize: 12, fontWeight: 800, color: "#a5b4fc", letterSpacing: ".09em" }}>WITH FINOVA</span>
+              </div>
+            </div>
+
+            {/* Rows */}
             {PAINS.map((pain, index) => (
               <div
                 key={pain.problem}
                 onMouseEnter={() => setHovPain(index)}
                 onMouseLeave={() => setHovPain(null)}
                 style={{
-                  borderRadius: 16,
-                  padding: "22px",
-                  background: hovPain === index ? "rgba(255,255,255,.05)" : "rgba(255,255,255,.03)",
-                  border: `1px solid ${hovPain === index ? "rgba(255,255,255,.12)" : "rgba(255,255,255,.06)"}`,
-                  opacity: painVis ? 1 : 0,
-                  transform: painVis ? "translateY(0)" : "translateY(20px)",
-                  transition: `opacity .5s ease ${index * 60}ms, transform .5s ease ${index * 60}ms, background .2s, border .2s`,
+                  display: "grid",
+                  gridTemplateColumns: "1fr 52px 1fr",
+                  borderBottom: index < PAINS.length - 1 ? "1px solid rgba(255,255,255,.04)" : "none",
+                  transition: "background .15s",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+                {/* Problem side */}
+                <div
+                  style={{
+                    padding: "20px 28px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 14,
+                    background: hovPain === index ? "rgba(248,113,113,.06)" : "rgba(248,113,113,.02)",
+                    transition: "background .15s",
+                  }}
+                >
                   <div
                     style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 10,
-                      flexShrink: 0,
-                      background: "rgba(248,113,113,.1)",
-                      border: "1px solid rgba(248,113,113,.2)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 10, fontWeight: 800, color: "#f87171",
+                      background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.18)",
                     }}
                   >
-                    ❌
+                    {index + 1}
                   </div>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#f87171", letterSpacing: ".06em", marginBottom: 4 }}>
-                      BEFORE FINOVA
-                    </div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,.55)", lineHeight: 1.4 }}>
-                      {pain.problem}
-                    </div>
-                  </div>
+                  <span style={{ fontSize: 14.5, fontWeight: 600, color: hovPain === index ? "rgba(255,255,255,.65)" : "rgba(255,255,255,.42)", lineHeight: 1.45, transition: "color .15s" }}>
+                    {pain.problem}
+                  </span>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                  <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,.06)" }} />
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: pain.color,
-                      fontWeight: 700,
-                      padding: "2px 10px",
-                      borderRadius: 20,
-                      background: `${pain.color}12`,
-                      border: `1px solid ${pain.color}25`,
-                    }}
-                  >
-                    ↓ FinovaOS fixes this
-                  </div>
-                  <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,.06)" }} />
+                {/* Center arrow */}
+                <div
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    borderLeft: "1px solid rgba(255,255,255,.05)",
+                    borderRight: "1px solid rgba(99,102,241,.08)",
+                    background: hovPain === index ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.015)",
+                    transition: "background .15s",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hovPain === index ? pain.color : "rgba(255,255,255,.2)"} strokeWidth="2.5" style={{ transition: "stroke .15s" }}>
+                    <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                  </svg>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                {/* Solution side */}
+                <div
+                  style={{
+                    padding: "20px 28px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 14,
+                    background: hovPain === index ? "rgba(99,102,241,.08)" : "rgba(99,102,241,.03)",
+                    transition: "background .15s",
+                  }}
+                >
                   <div
                     style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 10,
-                      flexShrink: 0,
-                      background: `${pain.color}12`,
-                      border: `1px solid ${pain.color}25`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 17,
+                      background: hovPain === index ? `${pain.color}18` : `${pain.color}0d`,
+                      border: `1px solid ${hovPain === index ? pain.color + "40" : pain.color + "1a"}`,
+                      transition: "background .15s, border .15s",
                     }}
                   >
                     {pain.icon}
                   </div>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: pain.color, letterSpacing: ".06em", marginBottom: 4 }}>
-                      WITH FINOVA
-                    </div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,.8)", lineHeight: 1.4 }}>
-                      {pain.solution}
-                    </div>
-                  </div>
+                  <span style={{ fontSize: 14.5, fontWeight: 600, color: hovPain === index ? "#fff" : "rgba(255,255,255,.75)", lineHeight: 1.45, transition: "color .15s" }}>
+                    {pain.solution}
+                  </span>
                 </div>
               </div>
             ))}
