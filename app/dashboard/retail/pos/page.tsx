@@ -21,6 +21,7 @@ export default function POSPage() {
   const { records: productRecords, loading: loadingProducts } = useBusinessRecords("catalog_product");
   const { records: saleRecords, create: createSale } = useBusinessRecords("pos_sale");
   const { records: sessionRecords, update: updateSession } = useBusinessRecords("pos_session");
+  const { records: loyaltyRecords, create: createLoyaltyRec, update: updateLoyaltyRec } = useBusinessRecords("loyalty_customer");
   const activeSession = sessionRecords.find(s => s.status?.toLowerCase() === "open") || null;
 
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -53,6 +54,14 @@ export default function POSPage() {
   const [showPriceCheck, setShowPriceCheck] = useState(false);
   const [priceCheckQ, setPriceCheckQ] = useState("");
   const priceCheckRef = useRef<HTMLInputElement>(null);
+
+  // Loyalty
+  type LoyaltyCustomer = { id: string; name: string; cardNo: string; phone: string; points: number; totalSpent: number; };
+  const [loyaltyCustomer, setLoyaltyCustomer] = useState<LoyaltyCustomer | null>(null);
+  const [loyaltyQ, setLoyaltyQ] = useState("");
+  const [showLoyaltySearch, setShowLoyaltySearch] = useState(false);
+  const [redeemPts, setRedeemPts] = useState(0);
+  const [loyaltyConfig, setLoyaltyConfig] = useState({ enabled: true, pointsPerHundred: 1, redeemValue: 1, minRedeemPoints: 50, cardPrefix: "LC" });
 
   const searchRef    = useRef<HTMLInputElement>(null);
   const discountRef  = useRef<HTMLInputElement>(null);
@@ -97,6 +106,10 @@ export default function POSPage() {
       .then(r => r.json())
       .then(d => { if (d?.name) setCompany({ name: d.name, address: d.address, phone: d.phone, ntn: d.ntn }); })
       .catch(() => {});
+    fetch("/api/company/admin-control", { headers })
+      .then(r => r.json())
+      .then(d => { if (d?.loyaltySettings) setLoyaltyConfig(lc => ({ ...lc, ...d.loyaltySettings })); })
+      .catch(() => {});
     loadStock();
   }, []);
 
@@ -138,9 +151,25 @@ export default function POSPage() {
   const total       = subtotal - discAmt + taxAmt;
   const rounded     = Math.round(total);
   const rounding    = rounded - total;
+
+  // Loyalty calculations
+  const safeRedeemPts    = Math.min(redeemPts, loyaltyCustomer?.points || 0);
+  const loyaltyDiscount  = loyaltyConfig.enabled && loyaltyCustomer ? safeRedeemPts * loyaltyConfig.redeemValue : 0;
+  const finalTotal       = Math.max(0, rounded - loyaltyDiscount);
+  const pointsToEarn     = loyaltyConfig.enabled && loyaltyCustomer ? Math.floor(finalTotal / 100) * loyaltyConfig.pointsPerHundred : 0;
+
   const tenderedAmt = Number(tendered) || 0;
-  const change      = payMethod === "cash" && tenderedAmt >= rounded ? tenderedAmt - rounded : 0;
+  const change      = payMethod === "cash" && tenderedAmt >= finalTotal ? tenderedAmt - finalTotal : 0;
   const totalQty    = cart.reduce((s, i) => s + i.qty, 0);
+
+  // Loyalty customer search
+  const lcResults = loyaltyQ.length >= 2
+    ? loyaltyRecords.filter(r => r.status !== "inactive" && (
+        String(r.data?.phone || "").includes(loyaltyQ) ||
+        String(r.data?.cardNo || "").toLowerCase().includes(loyaltyQ.toLowerCase()) ||
+        r.title.toLowerCase().includes(loyaltyQ.toLowerCase())
+      )).slice(0, 6)
+    : [];
 
   function availableStock(prod: typeof products[0]) {
     if (!prod.itemNewId) return 9999;
@@ -230,9 +259,9 @@ export default function POSPage() {
 
   async function checkout() {
     if (cart.length === 0) { setCheckoutError("Cart is empty."); return; }
-    if (rounded <= 0) { setCheckoutError("Total must be greater than zero."); return; }
-    if (payMethod === "cash" && tendered && tenderedAmt < rounded) {
-      setCheckoutError(`Cash tendered (Rs. ${tenderedAmt}) is less than total (Rs. ${rounded}).`); return;
+    if (finalTotal <= 0 && rounded > 0 && loyaltyDiscount < rounded) { setCheckoutError("Total must be greater than zero."); return; }
+    if (payMethod === "cash" && tendered && tenderedAmt < finalTotal) {
+      setCheckoutError(`Cash tendered (Rs. ${tenderedAmt}) is less than total (Rs. ${finalTotal}).`); return;
     }
     for (const item of cart) {
       const avail = availableStock(item as any);
@@ -253,21 +282,47 @@ export default function POSPage() {
         loadStock();
       }
       const saved = await createSale({
-        title: nextReceiptNo, status: "completed", amount: rounded,
-        data: { payMethod, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt, taxRate: taxPct, taxAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName, sessionId: activeSession?.id || null, sessionRef: activeSession?.title || null, customerName: customerName || null, itemNote: itemNote || null },
+        title: nextReceiptNo, status: "completed", amount: finalTotal,
+        data: { payMethod, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt + loyaltyDiscount, taxRate: taxPct, taxAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName, sessionId: activeSession?.id || null, sessionRef: activeSession?.title || null, customerName: loyaltyCustomer?.name || customerName || null, itemNote: itemNote || null, loyaltyCard: loyaltyCustomer?.cardNo || null, loyaltyRedeemed: safeRedeemPts, loyaltyEarned: pointsToEarn },
       });
       if (activeSession) {
         const isCash = payMethod === "cash";
         await updateSession(activeSession.id, {
-          amount: (activeSession.amount || 0) + rounded,
-          data: { cashSales: Number(activeSession.data?.cashSales || 0) + (isCash ? rounded : 0), cardSales: Number(activeSession.data?.cardSales || 0) + (!isCash ? rounded : 0), transactions: Number(activeSession.data?.transactions || 0) + 1 },
+          amount: (activeSession.amount || 0) + finalTotal,
+          data: { cashSales: Number(activeSession.data?.cashSales || 0) + (isCash ? finalTotal : 0), cardSales: Number(activeSession.data?.cardSales || 0) + (!isCash ? finalTotal : 0), transactions: Number(activeSession.data?.transactions || 0) + 1 },
         });
       }
-      const loyaltyEarned = Math.floor(rounded / 10) * 0.1;
-      const prevTotal = saleRecords.reduce((a, r) => a + (r.amount || 0), 0);
-      const loyaltyTotal = Math.floor(prevTotal / 10) * 0.1 + loyaltyEarned;
-      setReceipt({ receiptNo: saved.title || nextReceiptNo, fbrInvoice: generateFBRInvoice(saved.title || nextReceiptNo, nowDate), soldAt: nowDate.toISOString(), items: snapshot, subtotal, discount: discAmt, taxRate: taxPct, taxAmt, rounding, total: rounded, totalQty: snapshot.reduce((s, i) => s + i.qty, 0), payMethod, tendered: tenderedAmt, change, cashierName, loyaltyEarned, loyaltyRedeemed: 0, loyaltyTotal });
+      // Update loyalty customer points
+      if (loyaltyCustomer && loyaltyConfig.enabled) {
+        const existingRec = loyaltyRecords.find(r => r.id === loyaltyCustomer.id);
+        const newBalance = loyaltyCustomer.points + pointsToEarn - safeRedeemPts;
+        await updateLoyaltyRec(loyaltyCustomer.id, {
+          amount: newBalance,
+          data: {
+            ...(existingRec?.data || {}),
+            phone: loyaltyCustomer.phone,
+            cardNo: loyaltyCustomer.cardNo,
+            totalSpent: Number(existingRec?.data?.totalSpent || 0) + finalTotal,
+            lastPurchase: nowDate.toISOString(),
+            history: [
+              ...(Array.isArray(existingRec?.data?.history) ? (existingRec.data.history as any[]).slice(-49) : []),
+              { date: nowDate.toISOString(), saleRef: saved.title, earned: pointsToEarn, redeemed: safeRedeemPts, amount: finalTotal }
+            ],
+          },
+        });
+      }
+      setReceipt({
+        receiptNo: saved.title || nextReceiptNo,
+        fbrInvoice: generateFBRInvoice(saved.title || nextReceiptNo, nowDate),
+        soldAt: nowDate.toISOString(), items: snapshot, subtotal,
+        discount: discAmt + loyaltyDiscount, taxRate: taxPct, taxAmt, rounding,
+        total: finalTotal, totalQty: snapshot.reduce((s, i) => s + i.qty, 0),
+        payMethod, tendered: tenderedAmt, change, cashierName,
+        loyaltyEarned: pointsToEarn, loyaltyRedeemed: safeRedeemPts,
+        loyaltyTotal: loyaltyCustomer ? loyaltyCustomer.points + pointsToEarn - safeRedeemPts : 0,
+      });
       setCart([]); setDiscount(""); setTendered(""); setCustomerName(""); setItemNote("");
+      setLoyaltyCustomer(null); setLoyaltyQ(""); setRedeemPts(0);
     } catch { setCheckoutError("Checkout failed. Please try again."); }
     setProcessingCheckout(false);
   }
@@ -642,6 +697,85 @@ export default function POSPage() {
             <div style={{ padding: "6px 14px", borderTop: "1px solid rgba(255,255,255,.05)", flexShrink: 0 }}>
               <input ref={noteRef} value={itemNote} onChange={e => setItemNote(e.target.value)} placeholder="✏ Add item note..."
                 style={{ width: "100%", boxSizing: "border-box" as const, background: "transparent", border: "none", borderBottom: "1px dashed rgba(255,255,255,.1)", color: "rgba(255,255,255,.4)", fontSize: 11, fontFamily: ff, outline: "none", padding: "4px 2px" }} />
+            </div>
+          )}
+
+          {/* ── Loyalty Customer ── */}
+          {loyaltyConfig.enabled && (
+            <div style={{ padding: "8px 14px", borderTop: "1px solid rgba(245,158,11,.12)", background: "rgba(245,158,11,.04)", flexShrink: 0 }}>
+              <div style={{ fontSize: 10, color: "rgba(245,158,11,.7)", fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 6 }}>🎁 Loyalty Customer</div>
+              {loyaltyCustomer ? (
+                <div style={{ background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.22)", borderRadius: 10, padding: "9px 12px", position: "relative" }}>
+                  <button onClick={() => { setLoyaltyCustomer(null); setLoyaltyQ(""); setRedeemPts(0); }}
+                    style={{ position: "absolute", top: 7, right: 8, background: "none", border: "none", color: "rgba(255,255,255,.35)", fontSize: 14, cursor: "pointer", lineHeight: 1, padding: 0 }}>✕</button>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: "#fbbf24", marginBottom: 1, paddingRight: 20 }}>{loyaltyCustomer.name}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>Card: {loyaltyCustomer.cardNo} · {loyaltyCustomer.phone}</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: loyaltyCustomer.points >= loyaltyConfig.minRedeemPoints ? 7 : 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>Balance:</span>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: "#f59e0b" }}>{loyaltyCustomer.points} pts</span>
+                    </div>
+                    {pointsToEarn > 0 && (
+                      <span style={{ fontSize: 10, fontWeight: 700, color: "#34d399", background: "rgba(52,211,153,.1)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 5, padding: "2px 7px" }}>+{pointsToEarn} pts this sale</span>
+                    )}
+                  </div>
+                  {loyaltyCustomer.points >= loyaltyConfig.minRedeemPoints && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.45)" }}>Redeem:</span>
+                      <input type="number" min={0} max={loyaltyCustomer.points}
+                        value={redeemPts || ""}
+                        onChange={e => { const v = Math.max(0, Math.min(loyaltyCustomer.points, parseInt(e.target.value) || 0)); setRedeemPts(v); }}
+                        placeholder="0"
+                        style={{ width: 64, textAlign: "center", background: "rgba(255,255,255,.07)", border: "1px solid rgba(245,158,11,.3)", borderRadius: 6, padding: "3px 8px", color: "#fff", fontSize: 12, fontFamily: ff, outline: "none" }} />
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>/ {loyaltyCustomer.points} pts</span>
+                      {safeRedeemPts > 0 && (
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>= −Rs. {loyaltyDiscount}</span>
+                      )}
+                    </div>
+                  )}
+                  {loyaltyCustomer.points < loyaltyConfig.minRedeemPoints && (
+                    <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
+                      Need {loyaltyConfig.minRedeemPoints - loyaltyCustomer.points} more pts to redeem
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ position: "relative" }}>
+                  <input
+                    value={loyaltyQ}
+                    onChange={e => { setLoyaltyQ(e.target.value); setShowLoyaltySearch(true); }}
+                    onFocus={() => setShowLoyaltySearch(true)}
+                    onBlur={() => setTimeout(() => setShowLoyaltySearch(false), 200)}
+                    placeholder="🔍 Phone, card no., or name..."
+                    style={{ width: "100%", boxSizing: "border-box" as const, background: "rgba(255,255,255,.04)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 8, padding: "7px 12px", color: "#fff", fontSize: 12, fontFamily: ff, outline: "none" }} />
+                  {showLoyaltySearch && lcResults.length > 0 && (
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#1a2540", border: "1px solid rgba(245,158,11,.25)", borderRadius: 8, zIndex: 50, marginTop: 3, overflow: "hidden", boxShadow: "0 8px 24px rgba(0,0,0,.5)" }}>
+                      {lcResults.map(r => (
+                        <div key={r.id}
+                          onMouseDown={() => {
+                            setLoyaltyCustomer({ id: r.id, name: r.title, cardNo: String(r.data?.cardNo || ""), phone: String(r.data?.phone || ""), points: r.amount || 0, totalSpent: Number(r.data?.totalSpent) || 0 });
+                            setLoyaltyQ(""); setShowLoyaltySearch(false); setRedeemPts(0);
+                          }}
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+                          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(245,158,11,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#f59e0b", fontWeight: 800, flexShrink: 0 }}>
+                            {r.title.charAt(0).toUpperCase()}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{r.title}</div>
+                            <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>{String(r.data?.cardNo || "")} · {String(r.data?.phone || "")}</div>
+                          </div>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: "#f59e0b", flexShrink: 0 }}>{r.amount || 0} pts</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {showLoyaltySearch && loyaltyQ.length >= 2 && lcResults.length === 0 && (
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#1a2540", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, zIndex: 50, marginTop: 3, padding: "10px", textAlign: "center", color: "rgba(255,255,255,.35)", fontSize: 12 }}>
+                      No loyalty customers found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

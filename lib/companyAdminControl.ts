@@ -86,6 +86,24 @@ export type ShiftSetting = {
 };
 export type ShiftSettingsMap = Record<string, ShiftSetting>;
 
+export type LoyaltySettings = {
+  enabled: boolean;
+  pointsPerHundred: number;  // points earned per Rs. 100 spent (default: 1)
+  redeemValue: number;        // Rs. discount per 1 point redeemed (default: 1)
+  minRedeemPoints: number;    // minimum points required to redeem (default: 50)
+  cardPrefix: string;         // prefix for auto-generated card numbers (default: "LC")
+  expiryDays: number;         // 0 = never expire
+};
+
+export const DEFAULT_LOYALTY_SETTINGS: LoyaltySettings = {
+  enabled: true,
+  pointsPerHundred: 1,
+  redeemValue: 1,
+  minRedeemPoints: 50,
+  cardPrefix: "LC",
+  expiryDays: 0,
+};
+
 export type AdminControlSettings = {
   branchAssignments: BranchAssignmentMap;
   printPreferences: PrintPreferences;
@@ -96,6 +114,7 @@ export type AdminControlSettings = {
   branchLocations: Record<string, BranchGeoProfile>;
   shiftSettings: ShiftSettingsMap;
   features: BusinessFeatureFlags;
+  loyaltySettings: LoyaltySettings;
 };
 
 export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
@@ -151,6 +170,7 @@ export const DEFAULT_ADMIN_CONTROL_SETTINGS: AdminControlSettings = {
   branchLocations: {},
   shiftSettings: {},
   features: { ...DEFAULT_FEATURE_FLAGS },
+  loyaltySettings: { ...DEFAULT_LOYALTY_SETTINGS },
 };
 
 function normalizeSettings(value: unknown): AdminControlSettings {
@@ -225,6 +245,10 @@ function normalizeSettings(value: unknown): AdminControlSettings {
     features: {
       ...DEFAULT_FEATURE_FLAGS,
       ...featuresRaw,
+    },
+    loyaltySettings: {
+      ...DEFAULT_LOYALTY_SETTINGS,
+      ...((parsed.loyaltySettings && typeof parsed.loyaltySettings === "object") ? parsed.loyaltySettings as Partial<LoyaltySettings> : {}),
     },
     shiftSettings: Object.fromEntries(
       Object.entries(shiftSettingsRaw).map(([userId, s]) => [
@@ -303,6 +327,10 @@ export async function saveCompanyAdminControlSettings(
     features: {
       ...current.features,
       ...(patch.features || {}),
+    },
+    loyaltySettings: {
+      ...current.loyaltySettings,
+      ...(patch.loyaltySettings || {}),
     },
   });
 
