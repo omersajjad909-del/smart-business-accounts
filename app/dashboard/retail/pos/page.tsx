@@ -44,10 +44,12 @@ export default function POSPage() {
   const [flashKey, setFlashKey] = useState<string | null>(null);
   const [fKeyMsg, setFKeyMsg] = useState<string | null>(null);
 
-  const searchRef  = useRef<HTMLInputElement>(null);
-  const discountRef = useRef<HTMLInputElement>(null);
-  const tenderedRef = useRef<HTMLInputElement>(null);
+  const searchRef   = useRef<HTMLInputElement>(null);
+  const discountRef  = useRef<HTMLInputElement>(null);
+  const tenderedRef  = useRef<HTMLInputElement>(null);
+  const noteRef      = useRef<HTMLInputElement>(null);
   const checkoutFnRef = useRef<() => Promise<void>>(async () => {});
+  const fKeyTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const tick = () => setClockStr(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
@@ -56,10 +58,12 @@ export default function POSPage() {
     return () => clearInterval(id);
   }, []);
 
-  function fKeyComingSoon(key: string, label: string) {
-    setFlashKey(key); setFKeyMsg(`${key} — ${label} (Coming Soon)`);
-    setTimeout(() => { setFlashKey(null); setFKeyMsg(null); }, 1800);
+  function showFKeyMsg(key: string, msg: string, color: "amber" | "green") {
+    if (fKeyTimerRef.current) clearTimeout(fKeyTimerRef.current);
+    setFlashKey(key); setFKeyMsg(`${msg}__${color}`);
+    fKeyTimerRef.current = setTimeout(() => { setFlashKey(null); setFKeyMsg(null); }, 2000);
   }
+  function fKeyComingSoon(key: string, label: string) { showFKeyMsg(key, `${key} — ${label} komming soon`, "amber"); }
 
   const authHeaders = (): HeadersInit => {
     const h = user as { id?: string; role?: string; companyId?: string } | null;
@@ -416,20 +420,42 @@ export default function POSPage() {
             {/* Quick Access */}
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
               <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 600, marginRight: 2 }}>Quick Access</span>
-              {fKeyMsg && <span style={{ fontSize: 10, color: "#fbbf24", padding: "2px 8px", background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 5, fontWeight: 600 }}>{fKeyMsg}</span>}
+              {fKeyMsg && (() => {
+                const isGreen = fKeyMsg.endsWith("__green");
+                const text = fKeyMsg.replace(/__amber$|__green$/, "");
+                return (
+                  <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 10px", borderRadius: 5,
+                    color: isGreen ? "#34d399" : "#fbbf24",
+                    background: isGreen ? "rgba(52,211,153,.1)" : "rgba(245,158,11,.1)",
+                    border: `1px solid ${isGreen ? "rgba(52,211,153,.25)" : "rgba(245,158,11,.22)"}` }}>
+                    {text}
+                  </span>
+                );
+              })()}
               {([
-                ["F2", "Recent Items", () => searchRef.current?.focus()],
+                ["F2", "Recent Items", () => { searchRef.current?.focus(); showFKeyMsg("F2", "✓ Search focused", "green"); }],
                 ["F3", "Hold Sale",    () => fKeyComingSoon("F3", "Hold Sale")],
                 ["F4", "Price Check",  () => fKeyComingSoon("F4", "Price Check")],
-                ["F5", "Discount",     () => { discountRef.current?.focus(); discountRef.current?.select(); }],
-                ["F6", "Note",         () => fKeyComingSoon("F6", "Note")],
-              ] as [string, string, () => void][]).map(([key, label, action]) => (
-                <button key={key} className="qfkey" onClick={action}
-                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 6, background: flashKey === key ? "rgba(245,158,11,.12)" : "rgba(255,255,255,.05)", border: `1px solid ${flashKey === key ? "rgba(245,158,11,.3)" : "rgba(255,255,255,.1)"}`, cursor: "pointer", fontFamily: ff, transition: "all .12s" }}>
-                  <span style={{ fontSize: 9, fontWeight: 800, color: flashKey === key ? "#fbbf24" : "#6366f1", background: flashKey === key ? "rgba(245,158,11,.15)" : "rgba(99,102,241,.15)", padding: "1px 5px", borderRadius: 3 }}>{key}</span>
-                  <span style={{ fontSize: 11, color: flashKey === key ? "#fbbf24" : "rgba(255,255,255,.5)", fontWeight: 600 }}>{label}</span>
-                </button>
-              ))}
+                ["F5", "Discount",     () => { discountRef.current?.focus(); discountRef.current?.select(); showFKeyMsg("F5", "✓ Discount field — type amount", "green"); }],
+                ["F6", "Note",         () => { noteRef.current?.focus(); showFKeyMsg("F6", "✓ Note field active", "green"); }],
+              ] as [string, string, () => void][]).map(([key, label, action]) => {
+                const isActive = flashKey === key;
+                const msgColor = fKeyMsg?.endsWith("green") ? "green" : "amber";
+                const isGreen  = isActive && msgColor === "green";
+                const isAmber  = isActive && msgColor === "amber";
+                return (
+                  <button key={key} className="qfkey" onClick={action}
+                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 6, cursor: "pointer", fontFamily: ff, transition: "all .12s",
+                      background: isGreen ? "rgba(52,211,153,.1)" : isAmber ? "rgba(245,158,11,.1)" : "rgba(255,255,255,.05)",
+                      border: `1px solid ${isGreen ? "rgba(52,211,153,.3)" : isAmber ? "rgba(245,158,11,.3)" : "rgba(255,255,255,.1)"}` }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 5px", borderRadius: 3,
+                      color: isGreen ? "#34d399" : isAmber ? "#fbbf24" : "#6366f1",
+                      background: isGreen ? "rgba(52,211,153,.15)" : isAmber ? "rgba(245,158,11,.15)" : "rgba(99,102,241,.15)" }}>{key}</span>
+                    <span style={{ fontSize: 11, fontWeight: 600,
+                      color: isGreen ? "#34d399" : isAmber ? "#fbbf24" : "rgba(255,255,255,.5)" }}>{label}</span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Category Pills */}
@@ -502,7 +528,7 @@ export default function POSPage() {
                 <button onClick={printReceipt} style={{ padding: "6px 12px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>🖨 Receipt</button>
               )}
               <button onClick={clearCart} style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(239,68,68,.25)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Clear Cart</button>
-              <button onClick={() => fKeyComingSoon("F7", "Hold Invoice")} style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#818cf8", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Hold</button>
+              <button onClick={() => fKeyComingSoon("F7", "Hold")} style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#818cf8", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Hold</button>
             </div>
           </div>
 
@@ -560,7 +586,7 @@ export default function POSPage() {
           {/* Add item note */}
           {cart.length > 0 && (
             <div style={{ padding: "6px 14px", borderTop: "1px solid rgba(255,255,255,.05)", flexShrink: 0 }}>
-              <input value={itemNote} onChange={e => setItemNote(e.target.value)} placeholder="✏ Add item note..."
+              <input ref={noteRef} value={itemNote} onChange={e => setItemNote(e.target.value)} placeholder="✏ Add item note..."
                 style={{ width: "100%", boxSizing: "border-box" as const, background: "transparent", border: "none", borderBottom: "1px dashed rgba(255,255,255,.1)", color: "rgba(255,255,255,.4)", fontSize: 11, fontFamily: ff, outline: "none", padding: "4px 2px" }} />
             </div>
           )}
@@ -677,7 +703,7 @@ export default function POSPage() {
           Hold Invoice
         </button>
         {/* F8 Print Preview */}
-        <button onClick={() => { if (receipt) printReceipt(); else { setFKeyMsg("F8 — No receipt yet. Complete a sale first."); setFlashKey("F8"); setTimeout(() => { setFKeyMsg(null); setFlashKey(null); }, 2000); } }}
+        <button onClick={() => { if (receipt) printReceipt(); else showFKeyMsg("F8", "F8 — No receipt yet, complete a sale first", "amber"); }}
           style={{ height: "100%", padding: "0 22px", display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.04)", border: "none", borderRight: "1px solid rgba(255,255,255,.07)", color: flashKey === "F8" ? "#fbbf24" : "rgba(255,255,255,.55)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s", flexShrink: 0 }}>
           <span style={{ fontSize: 10, fontWeight: 800, color: flashKey === "F8" ? "#fbbf24" : "#6366f1", background: flashKey === "F8" ? "rgba(245,158,11,.15)" : "rgba(99,102,241,.15)", padding: "2px 6px", borderRadius: 3 }}>F8</span>
           Print Preview
