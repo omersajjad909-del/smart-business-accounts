@@ -817,11 +817,18 @@ export default function POSPage() {
                   <span>Rounding</span><span>Rs. {rounding.toFixed(2)}</span>
                 </div>
               )}
+              {/* Loyalty Discount */}
+              {loyaltyDiscount > 0 && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#34d399", fontWeight: 700, marginBottom: 7, padding: "5px 8px", background: "rgba(52,211,153,.06)", borderRadius: 6, border: "1px solid rgba(52,211,153,.15)" }}>
+                  <span>🎁 Loyalty Redeem ({safeRedeemPts} pts)</span>
+                  <span>−Rs. {loyaltyDiscount.toLocaleString()}</span>
+                </div>
+              )}
               {/* Grand Total */}
               <div style={{ borderTop: "1px solid rgba(255,255,255,.08)", paddingTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Grand Total</span>
                 <span style={{ fontSize: 26, fontWeight: 800, color: cart.length > 0 ? "#818cf8" : "rgba(255,255,255,.2)", letterSpacing: "-.02em" }}>
-                  Rs. {rounded.toLocaleString()}
+                  Rs. {finalTotal.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -850,7 +857,7 @@ export default function POSPage() {
                   <input ref={tenderedRef} value={tendered} onChange={e => setTendered(e.target.value)} placeholder="0.00" type="number" min="0"
                     style={{ width: 110, textAlign: "right", background: "rgba(255,255,255,.05)", border: "1px solid rgba(16,185,129,.25)", borderRadius: 7, padding: "5px 10px", color: "#fff", fontSize: 13, fontFamily: ff, outline: "none", fontWeight: 600 }} />
                 </div>
-                {tenderedAmt >= rounded && rounded > 0 && (
+                {tenderedAmt >= finalTotal && finalTotal > 0 && (
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#34d399", fontWeight: 700, padding: "7px 12px", background: "rgba(52,211,153,.08)", borderRadius: 8, border: "1px solid rgba(52,211,153,.18)", marginBottom: 6 }}>
                     <span>Change</span><span>Rs. {change.toLocaleString()}</span>
                   </div>
@@ -863,7 +870,7 @@ export default function POSPage() {
                       {amt >= 1000 ? `${amt / 1000}K` : amt}
                     </button>
                   ))}
-                  <button className="quick-amt" onClick={() => setTendered(String(rounded))}
+                  <button className="quick-amt" onClick={() => setTendered(String(finalTotal))}
                     style={{ flex: 1, padding: "6px 0", borderRadius: 7, border: "1px solid rgba(52,211,153,.25)", background: "rgba(52,211,153,.07)", color: "#34d399", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
                     Exact
                   </button>
@@ -912,7 +919,7 @@ export default function POSPage() {
           <div style={{ width: 1, height: 18, background: "rgba(255,255,255,.1)" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Total</span>
-            <span style={{ fontSize: 16, fontWeight: 800, color: cart.length > 0 ? "#818cf8" : "rgba(255,255,255,.25)" }}>Rs. {rounded.toLocaleString()}</span>
+            <span style={{ fontSize: 16, fontWeight: 800, color: cart.length > 0 ? "#818cf8" : "rgba(255,255,255,.25)" }}>Rs. {finalTotal.toLocaleString()}</span>
           </div>
         </div>
 

@@ -1,159 +1,393 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { getCurrentUser } from "@/lib/auth";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
-import { alertToast } from "@/lib/toast-feedback";
+type LoyaltySettings = {
+  enabled: boolean; pointsPerHundred: number; redeemValue: number;
+  minRedeemPoints: number; cardPrefix: string; expiryDays: number;
+};
+const DEFAULT_LOYALTY_SETTINGS: LoyaltySettings = {
+  enabled: true, pointsPerHundred: 1, redeemValue: 1,
+  minRedeemPoints: 50, cardPrefix: "LC", expiryDays: 0,
+};
 
 const ff = "'Outfit','Inter',sans-serif";
-const bg = "rgba(255,255,255,0.03)";
-const border = "rgba(255,255,255,0.07)";
 
-const getTier = (points: number) => {
-  if (points >= 10000) return { label: "Platinum", color: "#e5e7eb" };
-  if (points >= 5000) return { label: "Gold", color: "#f59e0b" };
-  if (points >= 1000) return { label: "Silver", color: "#94a3b8" };
-  return { label: "Bronze", color: "#b45309" };
+type Customer = {
+  id: string; name: string; cardNo: string; phone: string;
+  points: number; totalSpent: number; lastPurchase: string;
+  history: { date: string; saleRef: string; earned: number; redeemed: number; amount: number }[];
+  status: string;
 };
 
 export default function LoyaltyPage() {
-  const { records, loading, create, update } = useBusinessRecords("loyalty_member");
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ name: "", phone: "", email: "", points: 0 });
-  const [formError, setFormError] = useState("");
-  const [pointsModal, setPointsModal] = useState({ open: false, id: "", name: "", current: 0, value: "" });
+  const userRef = useRef(getCurrentUser());
+  const user = userRef.current;
 
-  const members = records.map(r => {
-    const points = r.amount || 0;
-    const tier = getTier(points);
-    return {
-      id: r.id,
-      name: r.title,
-      phone: (r.data?.phone as string) || "",
-      email: (r.data?.email as string) || "",
-      points,
-      tier,
-      visits: Number(r.data?.visits) || 0,
-      status: r.status || "active",
-    };
-  });
+  const { records, loading, create, update } = useBusinessRecords("loyalty_customer");
 
-  const totalPoints = members.reduce((a, m) => a + m.points, 0);
+  const [config, setConfig] = useState<LoyaltySettings>({ ...DEFAULT_LOYALTY_SETTINGS });
+  const [configDraft, setConfigDraft] = useState<LoyaltySettings>({ ...DEFAULT_LOYALTY_SETTINGS });
+  const [showConfig, setShowConfig] = useState(false);
+  const [savingConfig, setSavingConfig] = useState(false);
+  const [configSaved, setConfigSaved] = useState(false);
 
-  async function save() {
-    const name = form.name.trim();
-    const phone = form.phone.trim();
-    const email = form.email.trim().toLowerCase();
-    if (!name) {
-      setFormError("Member name is required.");
-      return;
-    }
-    if (!phone && !email) {
-      setFormError("At least one of phone or email is required.");
-      return;
-    }
-    if (form.points < 0) {
-      setFormError("Starting points cannot be negative.");
-      return;
-    }
-    setFormError("");
-    await create({ title: name, status: "active", amount: form.points, data: { phone, email, visits: 0 } });
-    setShowModal(false);
-    setForm({ name: "", phone: "", email: "", points: 0 });
-    setFormError("");
+  const [showRegister, setShowRegister] = useState(false);
+  const [regForm, setRegForm] = useState({ name: "", phone: "" });
+  const [regError, setRegError] = useState("");
+  const [registering, setRegistering] = useState(false);
+
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [searchQ, setSearchQ] = useState("");
+
+  function authHeaders(): HeadersInit {
+    const h = user as { id?: string; role?: string; companyId?: string } | null;
+    return { "x-user-id": h?.id || "", "x-user-role": h?.role || "ADMIN", "x-company-id": h?.companyId || "" };
   }
 
-  async function addPoints() {
-    const pts = Number(pointsModal.value || 0);
-    if (!pts || pts < 1) {
-      await alertToast("Enter a valid points amount.");
-      return;
-    }
-    await update(pointsModal.id, { amount: pointsModal.current + pts });
-    setPointsModal({ open: false, id: "", name: "", current: 0, value: "" });
+  useEffect(() => {
+    fetch("/api/company/admin-control", { headers: authHeaders() })
+      .then(r => r.json())
+      .then(d => {
+        if (d?.loyaltySettings) {
+          const merged = { ...DEFAULT_LOYALTY_SETTINGS, ...d.loyaltySettings };
+          setConfig(merged);
+          setConfigDraft(merged);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const customers: Customer[] = records.map(r => ({
+    id: r.id,
+    name: r.title,
+    cardNo: String(r.data?.cardNo || ""),
+    phone: String(r.data?.phone || ""),
+    points: r.amount || 0,
+    totalSpent: Number(r.data?.totalSpent) || 0,
+    lastPurchase: String(r.data?.lastPurchase || ""),
+    history: Array.isArray(r.data?.history) ? (r.data.history as Customer["history"]) : [],
+    status: r.status || "active",
+  }));
+
+  const activeCustomers = customers.filter(c => c.status !== "inactive");
+  const filtered = activeCustomers.filter(c =>
+    !searchQ || c.name.toLowerCase().includes(searchQ.toLowerCase()) ||
+    c.phone.includes(searchQ) || c.cardNo.toLowerCase().includes(searchQ.toLowerCase())
+  );
+
+  const totalPoints = activeCustomers.reduce((a, c) => a + c.points, 0);
+  const totalSpent = activeCustomers.reduce((a, c) => a + c.totalSpent, 0);
+  const totalRedeemed = activeCustomers.reduce((a, c) =>
+    a + c.history.reduce((s, h) => s + (h.redeemed || 0), 0), 0
+  );
+
+  function generateCardNo(): string {
+    const prefix = config.cardPrefix || "LC";
+    const nums = customers.map(c => {
+      const n = parseInt(c.cardNo.replace(/\D/g, ""), 10);
+      return isNaN(n) ? 0 : n;
+    });
+    const next = (nums.length > 0 ? Math.max(...nums) : 0) + 1;
+    return `${prefix}-${String(next).padStart(6, "0")}`;
   }
+
+  async function registerCustomer() {
+    const name = regForm.name.trim();
+    const phone = regForm.phone.trim();
+    if (!name) { setRegError("Name is required."); return; }
+    if (!phone) { setRegError("Phone number is required."); return; }
+    if (activeCustomers.find(c => c.phone === phone)) {
+      setRegError("A customer with this phone is already registered."); return;
+    }
+    setRegistering(true);
+    try {
+      const cardNo = generateCardNo();
+      await create({ title: name, status: "active", amount: 0, data: { phone, cardNo, totalSpent: 0, lastPurchase: null, history: [] } });
+      setShowRegister(false);
+      setRegForm({ name: "", phone: "" });
+      setRegError("");
+    } catch { setRegError("Registration failed. Please try again."); }
+    setRegistering(false);
+  }
+
+  async function saveConfig() {
+    setSavingConfig(true);
+    try {
+      await fetch("/api/company/admin-control", {
+        method: "POST",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ loyaltySettings: configDraft }),
+      });
+      setConfig({ ...configDraft });
+      setConfigSaved(true);
+      setTimeout(() => setConfigSaved(false), 2500);
+    } catch {}
+    setSavingConfig(false);
+  }
+
+  async function toggleCustomer(id: string, active: boolean) {
+    await update(id, { status: active ? "active" : "inactive" });
+  }
+
+  const detailCustomer = detailId ? customers.find(c => c.id === detailId) : null;
+
+  const dateStr = (iso: string) => {
+    if (!iso) return "—";
+    try { return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }); }
+    catch { return "—"; }
+  };
 
   return (
     <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <div><h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>⭐ Loyalty Points</h1><p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Manage customer loyalty program</p></div>
-        <button onClick={() => { setShowModal(true); setFormError(""); }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#f59e0b", color: "#0f1117", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>+ Add Member</button>
+      <style>{`
+        .lc-row:hover { background: rgba(255,255,255,.03) !important; }
+        .lc-btn:hover { opacity: .8; }
+        .lc-input { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 13px; font-family: ${ff}; outline: none; width: 100%; box-sizing: border-box; }
+        .lc-input:focus { border-color: rgba(99,102,241,.45); }
+      `}</style>
+
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>🎁 Loyalty Program</h1>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0 }}>Register customers, track points &amp; manage redemptions</p>
+        </div>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => { setShowConfig(v => !v); setConfigDraft({ ...config }); }} className="lc-btn"
+            style={{ padding: "9px 18px", borderRadius: 9, border: `1px solid ${showConfig ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.12)"}`, background: showConfig ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.05)", color: showConfig ? "#818cf8" : "rgba(255,255,255,.7)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+            ⚙ Settings
+          </button>
+          <button onClick={() => { setShowRegister(true); setRegForm({ name: "", phone: "" }); setRegError(""); }} className="lc-btn"
+            style={{ padding: "9px 18px", borderRadius: 9, border: "none", background: "linear-gradient(135deg,#f59e0b,#d97706)", color: "#0f1117", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+            + Register Customer
+          </button>
+        </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
-        {[{ label: "Total Members", val: members.length, color: "#f59e0b" }, { label: "Total Points", val: totalPoints.toLocaleString(), color: "#818cf8" }, { label: "Gold+", val: members.filter(m => m.tier.label !== "Bronze").length, color: "#f59e0b" }, { label: "Platinum", val: members.filter(m => m.tier.label === "Platinum").length, color: "#e5e7eb" }].map(s => (
-          <div key={s.label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: "20px 24px" }}><div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{s.label}</div><div style={{ fontSize: 22, fontWeight: 700, color: s.color }}>{s.val}</div></div>
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
+        {[
+          { label: "Total Customers", value: activeCustomers.length, color: "#818cf8", icon: "👥" },
+          { label: "Points in Circulation", value: totalPoints.toLocaleString(), color: "#f59e0b", icon: "⭐" },
+          { label: "Total Redeemed", value: `${totalRedeemed.toLocaleString()} pts`, color: "#34d399", icon: "🔄" },
+          { label: "Total Customer Spend", value: `Rs. ${totalSpent.toLocaleString()}`, color: "#a5b4fc", icon: "💰" },
+        ].map(s => (
+          <div key={s.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 20px" }}>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>{s.icon} {s.label}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
+          </div>
         ))}
       </div>
 
-      {loading && <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,0.4)" }}>Loading...</div>}
+      {/* Settings Panel */}
+      {showConfig && (
+        <div style={{ background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)", borderRadius: 14, padding: "20px 24px", marginBottom: 24 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#818cf8" }}>⚙ Loyalty Settings</div>
+            {configSaved && <span style={{ fontSize: 12, color: "#34d399", fontWeight: 700 }}>✓ Saved</span>}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 18 }}>
+            {[
+              { label: "Points per Rs.100", key: "pointsPerHundred", type: "number", hint: "Points earned per Rs.100 spent" },
+              { label: "Redeem Value (Rs./pt)", key: "redeemValue", type: "number", hint: "Rs. discount per 1 point redeemed" },
+              { label: "Min Redeem Points", key: "minRedeemPoints", type: "number", hint: "Minimum points needed to redeem" },
+              { label: "Card Prefix", key: "cardPrefix", type: "text", hint: 'Prefix for card numbers (e.g. "LC")' },
+              { label: "Points Expiry (days)", key: "expiryDays", type: "number", hint: "0 = never expire" },
+            ].map(f => (
+              <div key={f.key}>
+                <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 5 }}>{f.label}</label>
+                <input type={f.type} className="lc-input"
+                  value={String((configDraft as Record<string, unknown>)[f.key] ?? "")}
+                  onChange={e => setConfigDraft(d => ({ ...d, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value }))} />
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginTop: 3 }}>{f.hint}</div>
+              </div>
+            ))}
+            <div>
+              <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,.45)", marginBottom: 5 }}>Program Status</label>
+              <button onClick={() => setConfigDraft(d => ({ ...d, enabled: !d.enabled }))}
+                style={{ padding: "8px 18px", borderRadius: 8, border: `1.5px solid ${configDraft.enabled ? "rgba(52,211,153,.4)" : "rgba(255,255,255,.15)"}`, background: configDraft.enabled ? "rgba(52,211,153,.12)" : "rgba(255,255,255,.04)", color: configDraft.enabled ? "#34d399" : "rgba(255,255,255,.45)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+                {configDraft.enabled ? "✓ Enabled" : "○ Disabled"}
+              </button>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginTop: 3 }}>Toggle loyalty program on/off</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={saveConfig} disabled={savingConfig} className="lc-btn"
+              style={{ padding: "9px 24px", borderRadius: 8, border: "none", background: savingConfig ? "rgba(99,102,241,.4)" : "#6366f1", color: "#fff", fontSize: 13, fontWeight: 700, cursor: savingConfig ? "not-allowed" : "pointer", fontFamily: ff }}>
+              {savingConfig ? "Saving..." : "Save Settings"}
+            </button>
+            <button onClick={() => { setShowConfig(false); setConfigDraft({ ...config }); }} className="lc-btn"
+              style={{ padding: "9px 18px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
-      <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12 }}>
+      {/* Search */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ position: "relative", maxWidth: 380 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2.5"
+            style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search by name, phone, or card no..."
+            style={{ width: "100%", boxSizing: "border-box" as const, paddingLeft: 36, paddingRight: 12, paddingTop: 9, paddingBottom: 9, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 9, color: "#fff", fontSize: 13, fontFamily: ff, outline: "none" }} />
+        </div>
+      </div>
+
+      {/* Customer Table */}
+      <div style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead><tr>{["Member", "Phone", "Email", "Points", "Tier", "Visits", "Action"].map(h => (
-            <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(255,255,255,.5)", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>{h}</th>
-          ))}</tr></thead>
+          <thead>
+            <tr style={{ background: "rgba(255,255,255,.03)" }}>
+              {["Customer", "Card No.", "Phone", "Points", "Total Spent", "Last Purchase", "Actions"].map(h => (
+                <th key={h} style={{ textAlign: "left", padding: "11px 16px", fontSize: 11, color: "rgba(255,255,255,.4)", borderBottom: "1px solid rgba(255,255,255,.07)", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase" }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
           <tbody>
-            {members.map(m => (
-              <tr key={m.id}>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 600 }}>{m.name}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{m.phone}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 12, color: "rgba(255,255,255,.5)" }}>{m.email}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontWeight: 700, color: "#f59e0b" }}>{m.points.toLocaleString()}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
-                  <span style={{ fontWeight: 700, color: m.tier.color }}>{m.tier.label}</span>
+            {loading && (
+              <tr><td colSpan={7} style={{ padding: "40px 0", textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13 }}>Loading...</td></tr>
+            )}
+            {!loading && filtered.length === 0 && (
+              <tr><td colSpan={7} style={{ padding: "48px 0", textAlign: "center", color: "rgba(255,255,255,.25)" }}>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>🎁</div>
+                <div style={{ fontSize: 13, marginBottom: 4 }}>{searchQ ? "No customers match your search." : "No loyalty customers registered yet."}</div>
+                {!searchQ && <div style={{ fontSize: 12, color: "rgba(255,255,255,.2)" }}>Click "Register Customer" to get started.</div>}
+              </td></tr>
+            )}
+            {filtered.map(c => (
+              <tr key={c.id} className="lc-row" style={{ borderBottom: "1px solid rgba(255,255,255,.04)", cursor: "pointer" }} onClick={() => setDetailId(c.id)}>
+                <td style={{ padding: "13px 16px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#818cf8", flexShrink: 0 }}>{c.name.charAt(0).toUpperCase()}</div>
+                    <span style={{ fontWeight: 600, fontSize: 13 }}>{c.name}</span>
+                  </div>
                 </td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", fontSize: 13 }}>{m.visits}</td>
-                <td style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
-                  <button onClick={() => setPointsModal({ open: true, id: m.id, name: m.name, current: m.points, value: "" })} style={{ padding: "5px 10px", background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", color: "#f59e0b", borderRadius: 6, fontSize: 11, cursor: "pointer" }}>+ Points</button>
+                <td style={{ padding: "13px 16px", fontSize: 12, color: "#f59e0b", fontWeight: 700 }}>{c.cardNo || "—"}</td>
+                <td style={{ padding: "13px 16px", fontSize: 13, color: "rgba(255,255,255,.6)" }}>{c.phone}</td>
+                <td style={{ padding: "13px 16px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{c.points.toLocaleString()}</span>
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>pts</span>
+                  </div>
+                </td>
+                <td style={{ padding: "13px 16px", fontSize: 12, color: "rgba(255,255,255,.5)" }}>Rs. {c.totalSpent.toLocaleString()}</td>
+                <td style={{ padding: "13px 16px", fontSize: 12, color: "rgba(255,255,255,.4)" }}>{dateStr(c.lastPurchase)}</td>
+                <td style={{ padding: "13px 16px" }} onClick={e => e.stopPropagation()}>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button onClick={() => setDetailId(c.id)} className="lc-btn"
+                      style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+                      History
+                    </button>
+                    <button onClick={() => toggleCustomer(c.id, false)} className="lc-btn"
+                      style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: ff }}>
+                      Deactivate
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
-            {!loading && members.length === 0 && <tr><td colSpan={7} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>No loyalty members yet.</td></tr>}
           </tbody>
         </table>
       </div>
 
-      {showModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 32, width: 440, fontFamily: ff }}>
-            <h2 style={{ margin: "0 0 24px", fontSize: 18, fontWeight: 700 }}>Add Member</h2>
-            {formError && <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>{formError}</div>}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              {[["Name", "name", "text", "span 2"], ["Phone", "phone", "text", ""], ["Email", "email", "email", ""]].map(([label, key, type, col]) => (
-                <div key={key} style={{ gridColumn: col || undefined }}>
-                  <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>{label}</label>
-                  <input type={type} value={String((form as Record<string, unknown>)[key] ?? "")} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
-                </div>
-              ))}
-              <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Starting Points</label>
-                <input type="number" value={form.points} onChange={e => setForm(f => ({ ...f, points: Number(e.target.value) }))} style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "9px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }} />
-              </div>
+      {/* Register Customer Modal */}
+      {showRegister && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.72)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}
+          onClick={() => setShowRegister(false)}>
+          <div onClick={e => e.stopPropagation()}
+            style={{ background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 18, padding: "28px 32px", width: "min(96vw,440px)", fontFamily: ff }}>
+            <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 6 }}>Register New Customer</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 22 }}>A loyalty card number will be auto-generated.</div>
+            {regError && (
+              <div style={{ marginBottom: 14, padding: "9px 12px", borderRadius: 8, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "#fca5a5", fontSize: 12 }}>{regError}</div>
+            )}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Full Name *</label>
+              <input className="lc-input" placeholder="e.g. Ahmed Ali" value={regForm.name}
+                onChange={e => setRegForm(f => ({ ...f, name: e.target.value }))}
+                onKeyDown={e => e.key === "Enter" && registerCustomer()} autoFocus />
             </div>
-            <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-              <button onClick={save} style={{ flex: 1, padding: "11px 0", background: "#f59e0b", border: "none", borderRadius: 8, color: "#0f1117", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Add Member</button>
-              <button onClick={() => { setShowModal(false); setFormError(""); }} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Phone Number *</label>
+              <input className="lc-input" placeholder="e.g. 03001234567" value={regForm.phone}
+                onChange={e => setRegForm(f => ({ ...f, phone: e.target.value }))}
+                onKeyDown={e => e.key === "Enter" && registerCustomer()} />
+            </div>
+            <div style={{ padding: "12px 14px", background: "rgba(245,158,11,.07)", border: "1px solid rgba(245,158,11,.18)", borderRadius: 9, marginBottom: 20, fontSize: 12, color: "rgba(255,255,255,.55)" }}>
+              Card will be generated: <span style={{ fontWeight: 700, color: "#f59e0b" }}>{generateCardNo()}</span>
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={registerCustomer} disabled={registering} className="lc-btn"
+                style={{ flex: 1, padding: "11px 0", background: registering ? "rgba(245,158,11,.4)" : "linear-gradient(135deg,#f59e0b,#d97706)", border: "none", borderRadius: 9, color: "#0f1117", fontSize: 14, fontWeight: 700, cursor: registering ? "not-allowed" : "pointer", fontFamily: ff }}>
+                {registering ? "Registering..." : "Register Customer"}
+              </button>
+              <button onClick={() => setShowRegister(false)} className="lc-btn"
+                style={{ padding: "11px 22px", background: "transparent", border: "1px solid rgba(255,255,255,.1)", borderRadius: 9, color: "rgba(255,255,255,.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>
+                Cancel
+              </button>
             </div>
           </div>
         </div>
       )}
-      {pointsModal.open && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 55, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 16, padding: 28, width: 400, fontFamily: ff }}>
-            <h2 style={{ margin: "0 0 10px", fontSize: 18, fontWeight: 700 }}>Add Loyalty Points</h2>
-            <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,.5)", fontSize: 13 }}>
-              Update points for {pointsModal.name}. Current balance: {pointsModal.current.toLocaleString()} points.
-            </p>
-            <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Points to Add</label>
-            <input
-              type="number"
-              min="1"
-              value={pointsModal.value}
-              onChange={(e) => setPointsModal((prev) => ({ ...prev, value: e.target.value }))}
-              style={{ width: "100%", background: bg, border: `1px solid ${border}`, borderRadius: 8, padding: "10px 12px", color: "#fff", fontSize: 14, boxSizing: "border-box" }}
-            />
-            <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
-              <button onClick={addPoints} style={{ flex: 1, padding: "11px 0", background: "#f59e0b", border: "none", borderRadius: 8, color: "#0f1117", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Apply Points</button>
-              <button onClick={() => setPointsModal({ open: false, id: "", name: "", current: 0, value: "" })} style={{ padding: "11px 24px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}>Cancel</button>
+
+      {/* Customer Detail Modal */}
+      {detailCustomer && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(6px)", zIndex: 55, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={() => setDetailId(null)}>
+          <div onClick={e => e.stopPropagation()}
+            style={{ background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 18, width: "min(96vw,580px)", maxHeight: "85vh", overflow: "hidden", display: "flex", flexDirection: "column", fontFamily: ff }}>
+            {/* Header */}
+            <div style={{ padding: "18px 22px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: "#818cf8" }}>
+                  {detailCustomer.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div style={{ fontSize: 17, fontWeight: 800 }}>{detailCustomer.name}</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 1 }}>{detailCustomer.phone} · Card: <span style={{ color: "#f59e0b" }}>{detailCustomer.cardNo}</span></div>
+                </div>
+              </div>
+              <button onClick={() => setDetailId(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", fontSize: 22, cursor: "pointer" }}>✕</button>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 0, borderBottom: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
+              {[
+                { label: "Points Balance", value: `${detailCustomer.points.toLocaleString()} pts`, color: "#f59e0b" },
+                { label: "Total Spent", value: `Rs. ${detailCustomer.totalSpent.toLocaleString()}`, color: "#a5b4fc" },
+                { label: "Last Purchase", value: dateStr(detailCustomer.lastPurchase), color: "#34d399" },
+              ].map((s, i) => (
+                <div key={s.label} style={{ padding: "14px 18px", borderRight: i < 2 ? "1px solid rgba(255,255,255,.06)" : "none" }}>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", marginBottom: 4, textTransform: "uppercase", letterSpacing: ".07em" }}>{s.label}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: s.color }}>{s.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* History */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px" }}>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 10, fontWeight: 600 }}>Transaction History ({detailCustomer.history.length})</div>
+              {detailCustomer.history.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "28px 0", color: "rgba(255,255,255,.25)", fontSize: 13 }}>No transactions yet</div>
+              ) : [...detailCustomer.history].reverse().map((h, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", marginBottom: 6, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.05)", borderRadius: 9 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{h.saleRef}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 1 }}>{dateStr(h.date)}</div>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)" }}>Rs. {(h.amount || 0).toLocaleString()}</div>
+                    <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 2 }}>
+                      {h.earned > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>+{h.earned} pts</span>}
+                      {h.redeemed > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#f87171" }}>−{h.redeemed} pts</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
