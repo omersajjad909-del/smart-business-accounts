@@ -44,7 +44,17 @@ export default function POSPage() {
   const [flashKey, setFlashKey] = useState<string | null>(null);
   const [fKeyMsg, setFKeyMsg] = useState<string | null>(null);
 
-  const searchRef   = useRef<HTMLInputElement>(null);
+  // Hold Sales
+  type HeldSale = { id: string; cart: CartItem[]; discount: string; taxRate: string; itemNote: string; customer: string; savedAt: string; total: number; };
+  const [heldSales, setHeldSales] = useState<HeldSale[]>([]);
+  const [showHeld, setShowHeld] = useState(false);
+
+  // Price Check
+  const [showPriceCheck, setShowPriceCheck] = useState(false);
+  const [priceCheckQ, setPriceCheckQ] = useState("");
+  const priceCheckRef = useRef<HTMLInputElement>(null);
+
+  const searchRef    = useRef<HTMLInputElement>(null);
   const discountRef  = useRef<HTMLInputElement>(null);
   const tenderedRef  = useRef<HTMLInputElement>(null);
   const noteRef      = useRef<HTMLInputElement>(null);
@@ -168,6 +178,42 @@ export default function POSPage() {
   }
   function removeItem(id: string) { setCart(prev => prev.filter(i => i.id !== id)); }
 
+  function holdCart() {
+    if (cart.length === 0) { showFKeyMsg("F3", "Cart khali hai — hold karne ke liye items add karo", "amber"); return; }
+    const heldTotal = cart.reduce((s, i) => s + i.price * i.qty - (i.itemDiscount || 0) * i.qty, 0);
+    const held: HeldSale = {
+      id: `HOLD-${Date.now()}`,
+      cart: [...cart], discount, taxRate, itemNote,
+      customer: customerName,
+      savedAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      total: Math.round(heldTotal),
+    };
+    setHeldSales(prev => [...prev, held]);
+    setCart([]); setDiscount(""); setItemNote(""); setCustomerName(""); setTendered("");
+    showFKeyMsg("F3", `✓ Sale held — ${cart.length} items saved (Hold #${heldSales.length + 1})`, "green");
+    setShowHeld(false);
+  }
+
+  function recallHeld(id: string) {
+    const held = heldSales.find(h => h.id === id);
+    if (!held) return;
+    if (cart.length > 0) {
+      holdCart(); // auto-hold current cart first
+    }
+    setCart(held.cart);
+    setDiscount(held.discount);
+    setTaxRate(held.taxRate);
+    setItemNote(held.itemNote);
+    setCustomerName(held.customer);
+    setHeldSales(prev => prev.filter(h => h.id !== id));
+    setShowHeld(false);
+    showFKeyMsg("F3", `✓ Sale recalled — ${held.cart.length} items restored`, "green");
+  }
+
+  function deleteHeld(id: string) {
+    setHeldSales(prev => prev.filter(h => h.id !== id));
+  }
+
   function handleSearchKey(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
     const q = search.trim(); if (!q) return;
@@ -237,13 +283,18 @@ export default function POSPage() {
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      if (e.key === "F2")  { e.preventDefault(); searchRef.current?.focus(); return; }
-      if (e.key === "F5")  { e.preventDefault(); discountRef.current?.focus(); discountRef.current?.select(); return; }
+      if (e.key === "F2")  { e.preventDefault(); searchRef.current?.focus(); showFKeyMsg("F2", "✓ Search focused", "green"); return; }
+      if (e.key === "F3")  { e.preventDefault(); holdCart(); return; }
+      if (e.key === "F4")  { e.preventDefault(); setShowPriceCheck(true); setPriceCheckQ(""); setTimeout(() => priceCheckRef.current?.focus(), 80); return; }
+      if (e.key === "F5")  { e.preventDefault(); discountRef.current?.focus(); discountRef.current?.select(); showFKeyMsg("F5", "✓ Discount field — type amount", "green"); return; }
+      if (e.key === "F6")  { e.preventDefault(); noteRef.current?.focus(); showFKeyMsg("F6", "✓ Note field active", "green"); return; }
+      if (e.key === "F7")  { e.preventDefault(); holdCart(); return; }
       if (e.key === "F10") { e.preventDefault(); checkoutFnRef.current(); return; }
+      if (e.key === "Escape") { setShowPriceCheck(false); setShowHeld(false); }
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, []);
+  }, [cart, discount, taxRate, itemNote, customerName, heldSales]);
 
   const PAY_METHODS = [
     { id: "cash", label: "Cash", color: "#10b981" }, { id: "card", label: "Card", color: "#6366f1" },
@@ -434,8 +485,8 @@ export default function POSPage() {
               })()}
               {([
                 ["F2", "Recent Items", () => { searchRef.current?.focus(); showFKeyMsg("F2", "✓ Search focused", "green"); }],
-                ["F3", "Hold Sale",    () => fKeyComingSoon("F3", "Hold Sale")],
-                ["F4", "Price Check",  () => fKeyComingSoon("F4", "Price Check")],
+                ["F3", "Hold Sale",    () => holdCart()],
+                ["F4", "Price Check",  () => { setShowPriceCheck(true); setPriceCheckQ(""); setTimeout(() => priceCheckRef.current?.focus(), 80); showFKeyMsg("F4", "✓ Price Check open", "green"); }],
                 ["F5", "Discount",     () => { discountRef.current?.focus(); discountRef.current?.select(); showFKeyMsg("F5", "✓ Discount field — type amount", "green"); }],
                 ["F6", "Note",         () => { noteRef.current?.focus(); showFKeyMsg("F6", "✓ Note field active", "green"); }],
               ] as [string, string, () => void][]).map(([key, label, action]) => {
@@ -528,7 +579,10 @@ export default function POSPage() {
                 <button onClick={printReceipt} style={{ padding: "6px 12px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>🖨 Receipt</button>
               )}
               <button onClick={clearCart} style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(239,68,68,.25)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Clear Cart</button>
-              <button onClick={() => fKeyComingSoon("F7", "Hold")} style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#818cf8", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Hold</button>
+              <button onClick={() => { setShowHeld(v => !v); }} style={{ position: "relative", padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: showHeld ? "rgba(99,102,241,.2)" : "rgba(99,102,241,.1)", color: "#818cf8", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+                Hold
+                {heldSales.length > 0 && <span style={{ position: "absolute", top: -6, right: -6, background: "#f59e0b", color: "#000", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{heldSales.length}</span>}
+              </button>
             </div>
           </div>
 
@@ -697,10 +751,11 @@ export default function POSPage() {
       {/* ══════════════════════════════════════════════════════ */}
       <div style={{ display: "flex", alignItems: "center", background: "#080e1c", borderTop: "1px solid rgba(255,255,255,.08)", flexShrink: 0, height: 58 }}>
         {/* F7 Hold Invoice */}
-        <button onClick={() => fKeyComingSoon("F7", "Hold Invoice")}
-          style={{ height: "100%", padding: "0 22px", display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.04)", border: "none", borderRight: "1px solid rgba(255,255,255,.07)", color: flashKey === "F7" ? "#fbbf24" : "rgba(255,255,255,.55)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s", flexShrink: 0 }}>
-          <span style={{ fontSize: 10, fontWeight: 800, color: flashKey === "F7" ? "#fbbf24" : "#6366f1", background: flashKey === "F7" ? "rgba(245,158,11,.15)" : "rgba(99,102,241,.15)", padding: "2px 6px", borderRadius: 3 }}>F7</span>
+        <button onClick={holdCart}
+          style={{ height: "100%", padding: "0 22px", display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.04)", border: "none", borderRight: "1px solid rgba(255,255,255,.07)", color: "rgba(255,255,255,.55)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s", flexShrink: 0, position: "relative" }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: "#6366f1", background: "rgba(99,102,241,.15)", padding: "2px 6px", borderRadius: 3 }}>F7</span>
           Hold Invoice
+          {heldSales.length > 0 && <span style={{ position: "absolute", top: 8, right: 8, background: "#f59e0b", color: "#000", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{heldSales.length}</span>}
         </button>
         {/* F8 Print Preview */}
         <button onClick={() => { if (receipt) printReceipt(); else showFKeyMsg("F8", "F8 — No receipt yet, complete a sale first", "amber"); }}
@@ -741,6 +796,124 @@ export default function POSPage() {
           Pay  →
         </button>
       </div>
+
+      {/* ── Held Sales Panel ── */}
+      {showHeld && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 90 }} onClick={() => setShowHeld(false)}>
+          <div onClick={e => e.stopPropagation()}
+            style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "min(94vw,520px)", background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 16, overflow: "hidden", boxShadow: "0 24px 60px rgba(0,0,0,.6)" }}>
+            <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Held Sales</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 1 }}>{heldSales.length} sale{heldSales.length !== 1 ? "s" : ""} on hold — click to recall</div>
+              </div>
+              <button onClick={() => setShowHeld(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", fontSize: 20, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ maxHeight: 400, overflowY: "auto", padding: "8px 14px" }}>
+              {heldSales.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "32px 0", color: "rgba(255,255,255,.3)", fontSize: 13 }}>No held sales</div>
+              ) : heldSales.map((h, i) => (
+                <div key={h.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 10px", marginBottom: 6, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 10 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 12, fontWeight: 800, color: "#818cf8" }}>{i + 1}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0" }}>
+                      Hold #{i + 1} — {h.cart.length} item{h.cart.length !== 1 ? "s" : ""}
+                      {h.customer && <span style={{ marginLeft: 6, fontSize: 10, color: "#34d399" }}>· {h.customer}</span>}
+                    </div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 2 }}>
+                      {h.cart.map(c => c.name).join(", ").slice(0, 55)}{h.cart.map(c => c.name).join(", ").length > 55 ? "…" : ""}
+                    </div>
+                    <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginTop: 1 }}>Saved at {h.savedAt}</div>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "#818cf8" }}>Rs. {h.total.toLocaleString()}</div>
+                    <div style={{ display: "flex", gap: 5, marginTop: 5 }}>
+                      <button onClick={() => recallHeld(h.id)}
+                        style={{ padding: "4px 12px", borderRadius: 6, background: "#6366f1", border: "none", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Recall</button>
+                      <button onClick={() => deleteHeld(h.id)}
+                        style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>✕</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: "10px 18px", borderTop: "1px solid rgba(255,255,255,.07)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>F3 / F7 to hold current cart</span>
+              <button onClick={holdCart} disabled={cart.length === 0}
+                style={{ padding: "6px 16px", borderRadius: 8, background: cart.length > 0 ? "rgba(99,102,241,.2)" : "rgba(255,255,255,.05)", border: "1px solid rgba(99,102,241,.3)", color: cart.length > 0 ? "#818cf8" : "rgba(255,255,255,.2)", fontSize: 12, fontWeight: 700, cursor: cart.length > 0 ? "pointer" : "not-allowed", fontFamily: ff }}>
+                Hold Current Cart ({cart.length} items)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Price Check Modal (F4) ── */}
+      {showPriceCheck && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", backdropFilter: "blur(6px)", zIndex: 90, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={() => setShowPriceCheck(false)}>
+          <div onClick={e => e.stopPropagation()}
+            style={{ width: "min(94vw,560px)", background: "#111c30", border: "1px solid rgba(255,255,255,.1)", borderRadius: 16, overflow: "hidden", boxShadow: "0 24px 60px rgba(0,0,0,.6)" }}>
+            <div style={{ padding: "14px 18px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>🔍 Price Check</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 1 }}>Search product to check price — press Enter to add to cart</div>
+              </div>
+              <button onClick={() => setShowPriceCheck(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", fontSize: 20, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: "12px 16px" }}>
+              <div style={{ position: "relative", marginBottom: 12 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2.5"
+                  style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input ref={priceCheckRef} value={priceCheckQ} onChange={e => setPriceCheckQ(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Escape") setShowPriceCheck(false); if (e.key === "Enter") { const res = products.filter(p => p.name.toLowerCase().includes(priceCheckQ.toLowerCase()) || p.sku.toLowerCase().includes(priceCheckQ.toLowerCase())); if (res.length === 1) { addToCart(res[0]); setShowPriceCheck(false); showFKeyMsg("F4", `✓ ${res[0].name} added to cart`, "green"); } } }}
+                  placeholder="Type product name or SKU..."
+                  style={{ width: "100%", boxSizing: "border-box" as const, paddingLeft: 38, paddingRight: 12, paddingTop: 11, paddingBottom: 11, background: "rgba(255,255,255,.05)", border: "1.5px solid rgba(99,102,241,.3)", borderRadius: 10, color: "#fff", fontSize: 14, fontFamily: ff, outline: "none" }} />
+              </div>
+              <div style={{ maxHeight: 360, overflowY: "auto" }}>
+                {priceCheckQ.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "24px 0", color: "rgba(255,255,255,.25)", fontSize: 13 }}>Start typing to search products</div>
+                ) : (() => {
+                  const res = products.filter(p =>
+                    p.name.toLowerCase().includes(priceCheckQ.toLowerCase()) ||
+                    p.sku.toLowerCase().includes(priceCheckQ.toLowerCase())
+                  );
+                  if (res.length === 0) return <div style={{ textAlign: "center", padding: "24px 0", color: "#f87171", fontSize: 13 }}>No product found for "{priceCheckQ}"</div>;
+                  return res.map(p => {
+                    const stockQty = p.itemNewId ? (stockMap[p.itemNewId] ?? 0) : (p.catalogStock !== null ? p.catalogStock : null);
+                    const outOfStock = stockQty !== null && stockQty <= 0;
+                    return (
+                      <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 12px", marginBottom: 6, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 10, cursor: outOfStock ? "not-allowed" : "pointer", opacity: outOfStock ? 0.5 : 1 }}
+                        onClick={() => { if (!outOfStock) { addToCart(p); setShowPriceCheck(false); showFKeyMsg("F4", `✓ ${p.name} added`, "green"); } }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 8, background: "rgba(99,102,241,.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 18 }}>📦</div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0" }}>{p.name}</div>
+                          {p.sku && <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>SKU: {p.sku} · {p.category}</div>}
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: "#818cf8" }}>Rs. {p.price.toLocaleString()}</div>
+                          <div style={{ fontSize: 10, marginTop: 2, fontWeight: 600, color: outOfStock ? "#f87171" : stockQty !== null && stockQty <= 5 ? "#f59e0b" : "#34d399" }}>
+                            {stockQty !== null ? (outOfStock ? "Out of stock" : `${stockQty} in stock`) : "Stock N/A"}
+                          </div>
+                        </div>
+                        {!outOfStock && (
+                          <button style={{ padding: "5px 12px", borderRadius: 7, background: "#6366f1", border: "none", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, flexShrink: 0 }}>+ Add</button>
+                        )}
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            </div>
+            <div style={{ padding: "8px 18px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>Press Esc to close · Enter to add single match</span>
+              <button onClick={() => setShowPriceCheck(false)} style={{ padding: "6px 16px", borderRadius: 8, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.5)", fontSize: 12, cursor: "pointer", fontFamily: ff }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Receipt Modal */}
       {receipt && (
