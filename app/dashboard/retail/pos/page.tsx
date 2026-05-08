@@ -31,7 +31,8 @@ export default function POSPage() {
   const [discount, setDiscount] = useState("");
   const [taxRate, setTaxRate] = useState("0");
   const [tendered, setTendered] = useState("");
-  const [payMethod, setPayMethod] = useState<"cash" | "card" | "easypaisa" | "jazzcash">("cash");
+  const [payMethod, setPayMethod] = useState<"cash" | "card" | "bank_transfer" | "cheque">("cash");
+  const [txRef, setTxRef] = useState("");
   const [company, setCompany] = useState<CompanyInfo>({ name: "My Store" });
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [checkoutError, setCheckoutError] = useState("");
@@ -159,7 +160,7 @@ export default function POSPage() {
   const pointsToEarn     = loyaltyConfig.enabled && loyaltyCustomer ? Math.floor(finalTotal / 100) * loyaltyConfig.pointsPerHundred : 0;
 
   const tenderedAmt = Number(tendered) || 0;
-  const change      = payMethod === "cash" && tenderedAmt >= finalTotal ? tenderedAmt - finalTotal : 0;
+  const change      = tenderedAmt > 0 && tenderedAmt >= finalTotal ? tenderedAmt - finalTotal : 0;
   const totalQty    = cart.reduce((s, i) => s + i.qty, 0);
 
   // Loyalty customer search
@@ -268,7 +269,7 @@ export default function POSPage() {
     if (cart.length === 0) { setCheckoutError("Cart is empty."); return; }
     if (finalTotal <= 0 && rounded > 0 && loyaltyDiscount < rounded) { setCheckoutError("Total must be greater than zero."); return; }
     if (payMethod === "cash" && tendered && tenderedAmt < finalTotal) {
-      setCheckoutError(`Cash tendered (Rs. ${tenderedAmt}) is less than total (Rs. ${finalTotal}).`); return;
+      setCheckoutError(`Amount received (Rs. ${tenderedAmt}) is less than total (Rs. ${finalTotal}).`); return;
     }
     for (const item of cart) {
       const avail = availableStock(item as any);
@@ -290,7 +291,7 @@ export default function POSPage() {
       }
       const saved = await createSale({
         title: nextReceiptNo, status: "completed", amount: finalTotal,
-        data: { payMethod, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt + loyaltyDiscount, taxRate: taxPct, taxAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName, sessionId: activeSession?.id || null, sessionRef: activeSession?.title || null, customerName: loyaltyCustomer?.name || customerName || null, itemNote: itemNote || null, loyaltyCard: loyaltyCustomer?.cardNo || null, loyaltyRedeemed: safeRedeemPts, loyaltyEarned: pointsToEarn },
+        data: { payMethod, txRef: txRef || null, items: snapshot.map(i => `${i.name} x${i.qty}`).join(", "), discount: discAmt + loyaltyDiscount, taxRate: taxPct, taxAmt, subtotal, cart: snapshot, tendered: tenderedAmt, change, cashierName, sessionId: activeSession?.id || null, sessionRef: activeSession?.title || null, customerName: loyaltyCustomer?.name || customerName || null, itemNote: itemNote || null, loyaltyCard: loyaltyCustomer?.cardNo || null, loyaltyRedeemed: safeRedeemPts, loyaltyEarned: pointsToEarn },
       });
       if (activeSession) {
         const isCash = payMethod === "cash";
@@ -328,7 +329,7 @@ export default function POSPage() {
         loyaltyEarned: pointsToEarn, loyaltyRedeemed: safeRedeemPts,
         loyaltyTotal: loyaltyCustomer ? loyaltyCustomer.points + pointsToEarn - safeRedeemPts : 0,
       });
-      setCart([]); setDiscount(""); setTendered(""); setCustomerName(""); setItemNote("");
+      setCart([]); setDiscount(""); setTendered(""); setTxRef(""); setCustomerName(""); setItemNote("");
       setLoyaltyCustomer(null); setLoyaltyQ(""); setRedeemPts(0);
     } catch { setCheckoutError("Checkout failed. Please try again."); }
     setProcessingCheckout(false);
@@ -338,7 +339,7 @@ export default function POSPage() {
   async function clearCart() {
     if (cart.length === 0) return;
     if (!await confirmToast("Clear the current cart?")) return;
-    setCart([]); setDiscount(""); setTendered(""); setCheckoutError(""); setItemNote("");
+    setCart([]); setDiscount(""); setTendered(""); setTxRef(""); setCheckoutError(""); setItemNote("");
   }
 
   function printReceipt() { window.print(); }
@@ -359,10 +360,12 @@ export default function POSPage() {
   }, [cart, discount, taxRate, itemNote, customerName, heldSales]);
 
   const PAY_METHODS = [
-    { id: "cash", label: "Cash", color: "#10b981" }, { id: "card", label: "Card", color: "#6366f1" },
-    { id: "easypaisa", label: "EasyPaisa", color: "#10b981" }, { id: "jazzcash", label: "JazzCash", color: "#dc2626" },
+    { id: "cash",          label: "💵 Cash",          color: "#10b981" },
+    { id: "card",          label: "💳 Card",           color: "#6366f1" },
+    { id: "bank_transfer", label: "🏦 Bank Transfer",  color: "#3b82f6" },
+    { id: "cheque",        label: "📄 Cheque",         color: "#f59e0b" },
   ] as const;
-  const QUICK_AMTS = [500, 1000, 1500, 2000];
+  const QUICK_AMTS = [500, 1000, 2000, 5000];
   const dateStr = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
   function PaginationBar() {
@@ -833,39 +836,42 @@ export default function POSPage() {
             </div>
 
             {/* Payment Method */}
-            <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 5 }}>Payment Method</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 5 }}>
+            <div style={{ marginBottom: 10 }}>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>Payment Method</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                 {PAY_METHODS.map(m => (
-                  <button key={m.id} className="pay-opt" onClick={() => setPayMethod(m.id)}
-                    style={{ padding: "7px 0", borderRadius: 7, border: `1.5px solid ${payMethod === m.id ? m.color : "rgba(255,255,255,.08)"}`,
-                      background: payMethod === m.id ? `${m.color}22` : "rgba(255,255,255,.03)",
+                  <button key={m.id} className="pay-opt" onClick={() => { setPayMethod(m.id as typeof payMethod); setTendered(""); setTxRef(""); }}
+                    style={{ padding: "9px 8px", borderRadius: 9, border: `1.5px solid ${payMethod === m.id ? m.color : "rgba(255,255,255,.08)"}`,
+                      background: payMethod === m.id ? `${m.color}1a` : "rgba(255,255,255,.03)",
                       color: payMethod === m.id ? m.color : "rgba(255,255,255,.35)",
-                      fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s" }}>
+                      fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s", textAlign: "center" }}>
                     {m.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Cash tendered */}
-            {payMethod === "cash" && (
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Amount Received</span>
-                  <input ref={tenderedRef} value={tendered} onChange={e => setTendered(e.target.value)} placeholder="0.00" type="number" min="0"
-                    style={{ width: 110, textAlign: "right", background: "rgba(255,255,255,.05)", border: "1px solid rgba(16,185,129,.25)", borderRadius: 7, padding: "5px 10px", color: "#fff", fontSize: 13, fontFamily: ff, outline: "none", fontWeight: 600 }} />
+            {/* Amount Received — prominent input, always visible */}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>Amount Received</div>
+              <input ref={tenderedRef} value={tendered} onChange={e => setTendered(e.target.value)}
+                placeholder="Enter amount…" type="number" min="0"
+                style={{ width: "100%", textAlign: "left", background: "rgba(255,255,255,.06)", border: `2px solid ${tenderedAmt >= finalTotal && finalTotal > 0 ? "rgba(52,211,153,.5)" : "rgba(255,255,255,.12)"}`, borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 18, fontFamily: ff, outline: "none", fontWeight: 700, boxSizing: "border-box", transition: "border-color .15s" }} />
+
+              {/* Change due */}
+              {tenderedAmt >= finalTotal && finalTotal > 0 && (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 14, color: "#34d399", fontWeight: 700, padding: "8px 14px", background: "rgba(52,211,153,.08)", borderRadius: 9, border: "1px solid rgba(52,211,153,.2)", marginTop: 8 }}>
+                  <span>Change Due</span>
+                  <span style={{ fontSize: 16 }}>Rs. {change.toLocaleString()}</span>
                 </div>
-                {tenderedAmt >= finalTotal && finalTotal > 0 && (
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#34d399", fontWeight: 700, padding: "7px 12px", background: "rgba(52,211,153,.08)", borderRadius: 8, border: "1px solid rgba(52,211,153,.18)", marginBottom: 6 }}>
-                    <span>Change</span><span>Rs. {change.toLocaleString()}</span>
-                  </div>
-                )}
-                {/* Quick amounts */}
-                <div style={{ display: "flex", gap: 5 }}>
+              )}
+
+              {/* Quick amounts — only for Cash */}
+              {payMethod === "cash" && (
+                <div style={{ display: "flex", gap: 5, marginTop: 7 }}>
                   {QUICK_AMTS.map(amt => (
                     <button key={amt} className="quick-amt" onClick={() => setTendered(String(amt))}
-                      style={{ flex: 1, padding: "6px 0", borderRadius: 7, border: `1px solid ${Number(tendered) === amt ? "rgba(16,185,129,.4)" : "rgba(255,255,255,.1)"}`, background: Number(tendered) === amt ? "rgba(16,185,129,.12)" : "rgba(255,255,255,.04)", color: Number(tendered) === amt ? "#34d399" : "rgba(255,255,255,.5)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .1s" }}>
+                      style={{ flex: 1, padding: "6px 0", borderRadius: 7, border: `1px solid ${Number(tendered) === amt ? "rgba(16,185,129,.4)" : "rgba(255,255,255,.1)"}`, background: Number(tendered) === amt ? "rgba(16,185,129,.12)" : "rgba(255,255,255,.04)", color: Number(tendered) === amt ? "#34d399" : "rgba(255,255,255,.45)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .1s" }}>
                       {amt >= 1000 ? `${amt / 1000}K` : amt}
                     </button>
                   ))}
@@ -874,8 +880,15 @@ export default function POSPage() {
                     Exact
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Reference / Transaction No. — for non-cash */}
+              {payMethod !== "cash" && (
+                <input value={txRef} onChange={e => setTxRef(e.target.value)}
+                  placeholder={payMethod === "card" ? "Card last 4 digits or ref…" : payMethod === "cheque" ? "Cheque number…" : "Transaction / reference no…"}
+                  style={{ width: "100%", marginTop: 8, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 9, padding: "9px 12px", color: "rgba(255,255,255,.7)", fontSize: 12, fontFamily: ff, outline: "none", boxSizing: "border-box" }} />
+              )}
+            </div>
 
             {checkoutError && (
               <div style={{ marginTop: 8, padding: "7px 10px", borderRadius: 7, background: "rgba(248,113,113,.09)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5", fontSize: 11 }}>
