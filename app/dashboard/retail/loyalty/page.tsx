@@ -71,10 +71,17 @@ export default function LoyaltyPage() {
   }));
 
   const activeCustomers = customers.filter(c => c.status !== "inactive");
-  const filtered = activeCustomers.filter(c =>
-    !searchQ || c.name.toLowerCase().includes(searchQ.toLowerCase()) ||
-    c.phone.includes(searchQ) || c.cardNo.toLowerCase().includes(searchQ.toLowerCase())
-  );
+  const filtered = activeCustomers.filter(c => {
+    if (!searchQ) return true;
+    const q = searchQ.toLowerCase();
+    const digits = searchQ.replace(/\D/g, "");
+    return (
+      c.name.toLowerCase().includes(q) ||
+      c.phone.includes(searchQ) ||
+      c.cardNo.toLowerCase().includes(q) ||
+      (digits.length >= 4 && c.cardNo.replace(/\D/g, "").endsWith(digits))
+    );
+  });
 
   const totalPoints = activeCustomers.reduce((a, c) => a + c.points, 0);
   const totalSpent = activeCustomers.reduce((a, c) => a + c.totalSpent, 0);
@@ -89,7 +96,7 @@ export default function LoyaltyPage() {
       return isNaN(n) ? 0 : n;
     });
     const next = (nums.length > 0 ? Math.max(...nums) : 0) + 1;
-    return `${prefix}-${String(next).padStart(6, "0")}`;
+    return `${prefix}-${String(next).padStart(10, "0")}`;
   }
 
   async function registerCustomer() {

@@ -164,11 +164,18 @@ export default function POSPage() {
 
   // Loyalty customer search
   const lcResults = loyaltyQ.length >= 2
-    ? loyaltyRecords.filter(r => r.status !== "inactive" && (
-        String(r.data?.phone || "").includes(loyaltyQ) ||
-        String(r.data?.cardNo || "").toLowerCase().includes(loyaltyQ.toLowerCase()) ||
-        r.title.toLowerCase().includes(loyaltyQ.toLowerCase())
-      )).slice(0, 6)
+    ? loyaltyRecords.filter(r => {
+        if (r.status === "inactive") return false;
+        const q = loyaltyQ.toLowerCase();
+        const digits = loyaltyQ.replace(/\D/g, "");
+        const cardDigits = String(r.data?.cardNo || "").replace(/\D/g, "");
+        return (
+          r.title.toLowerCase().includes(q) ||
+          String(r.data?.phone || "").includes(loyaltyQ) ||
+          String(r.data?.cardNo || "").toLowerCase().includes(q) ||
+          (digits.length >= 4 && cardDigits.endsWith(digits))
+        );
+      }).slice(0, 6)
     : [];
 
   function availableStock(prod: typeof products[0]) {
@@ -746,7 +753,7 @@ export default function POSPage() {
                     onChange={e => { setLoyaltyQ(e.target.value); setShowLoyaltySearch(true); }}
                     onFocus={() => setShowLoyaltySearch(true)}
                     onBlur={() => setTimeout(() => setShowLoyaltySearch(false), 200)}
-                    placeholder="🔍 Phone, card no., or name..."
+                    placeholder="🔍 Name, phone, card no., or last 4+ digits..."
                     style={{ width: "100%", boxSizing: "border-box" as const, background: "rgba(255,255,255,.04)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 8, padding: "7px 12px", color: "#fff", fontSize: 12, fontFamily: ff, outline: "none" }} />
                   {showLoyaltySearch && lcResults.length > 0 && (
                     <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#1a2540", border: "1px solid rgba(245,158,11,.25)", borderRadius: 8, zIndex: 50, marginTop: 3, overflow: "hidden", boxShadow: "0 8px 24px rgba(0,0,0,.5)" }}>
