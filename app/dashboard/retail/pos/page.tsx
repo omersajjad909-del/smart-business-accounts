@@ -631,20 +631,91 @@ export default function POSPage() {
         <div style={{ width: 460, background: "#0c1322", display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
           {/* Cart Header */}
-          <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 700 }}>
-              Cart
-              <span style={{ marginLeft: 6, fontSize: 12, color: "rgba(255,255,255,.45)", fontWeight: 500 }}>({cart.length} Items)</span>
+          <div style={{ padding: "10px 14px 8px", borderBottom: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
+            {/* Top row: Cart title + buttons */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>
+                Cart
+                <span style={{ marginLeft: 6, fontSize: 12, color: "rgba(255,255,255,.45)", fontWeight: 500 }}>({cart.length} Items)</span>
+              </div>
+              <div style={{ display: "flex", gap: 7 }}>
+                {receipt && (
+                  <button onClick={printReceipt} style={{ padding: "5px 10px", borderRadius: 6, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>🖨 Receipt</button>
+                )}
+                <button onClick={clearCart} style={{ padding: "5px 12px", borderRadius: 6, border: "1px solid rgba(239,68,68,.25)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Clear</button>
+                <button onClick={() => setShowHeld(v => !v)} style={{ position: "relative", padding: "5px 12px", borderRadius: 6, border: "1px solid rgba(99,102,241,.3)", background: showHeld ? "rgba(99,102,241,.2)" : "rgba(99,102,241,.1)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+                  Hold
+                  {heldSales.length > 0 && <span style={{ position: "absolute", top: -6, right: -6, background: "#f59e0b", color: "#000", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{heldSales.length}</span>}
+                </button>
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              {receipt && (
-                <button onClick={printReceipt} style={{ padding: "6px 12px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>🖨 Receipt</button>
+
+            {/* ── Loyalty Customer Row ── always visible ── */}
+            <div style={{ position: "relative" }}>
+              {loyaltyCustomer ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.28)", borderRadius: 9 }}>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>🎁</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", lineHeight: 1.2 }}>{loyaltyCustomer.name}</div>
+                    <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginTop: 1 }}>
+                      {loyaltyCustomer.cardNo} · <span style={{ color: "#f59e0b", fontWeight: 700 }}>{loyaltyCustomer.points} pts</span>
+                      {pointsToEarn > 0 && <span style={{ color: "#34d399", marginLeft: 4 }}>+{pointsToEarn} pts this sale</span>}
+                    </div>
+                  </div>
+                  {loyaltyCustomer.points >= loyaltyConfig.minRedeemPoints && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>Redeem:</span>
+                      <input type="number" min={0} max={loyaltyCustomer.points}
+                        value={redeemPts || ""}
+                        onChange={e => { const v = Math.max(0, Math.min(loyaltyCustomer.points, parseInt(e.target.value) || 0)); setRedeemPts(v); }}
+                        placeholder="0"
+                        style={{ width: 50, textAlign: "center", background: "rgba(255,255,255,.07)", border: "1px solid rgba(245,158,11,.35)", borderRadius: 5, padding: "2px 6px", color: "#fff", fontSize: 11, fontFamily: ff, outline: "none" }} />
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)" }}>pts</span>
+                      {safeRedeemPts > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>= −Rs.{loyaltyDiscount}</span>}
+                    </div>
+                  )}
+                  <button onClick={() => { setLoyaltyCustomer(null); setLoyaltyQ(""); setRedeemPts(0); }}
+                    style={{ background: "none", border: "none", color: "rgba(255,255,255,.3)", fontSize: 15, cursor: "pointer", padding: 0, flexShrink: 0, lineHeight: 1 }}>✕</button>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    value={loyaltyQ}
+                    onChange={e => { setLoyaltyQ(e.target.value); setShowLoyaltySearch(true); }}
+                    onFocus={() => setShowLoyaltySearch(true)}
+                    onBlur={() => setTimeout(() => setShowLoyaltySearch(false), 200)}
+                    placeholder="🎁 Loyalty customer — name, phone, or last 4+ card digits..."
+                    style={{ width: "100%", boxSizing: "border-box" as const, background: "rgba(245,158,11,.05)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,255,255,.65)", fontSize: 11, fontFamily: ff, outline: "none" }} />
+                  {showLoyaltySearch && lcResults.length > 0 && (
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#141e33", border: "1px solid rgba(245,158,11,.3)", borderRadius: 9, zIndex: 60, marginTop: 4, overflow: "hidden", boxShadow: "0 12px 32px rgba(0,0,0,.65)" }}>
+                      {lcResults.map(r => (
+                        <div key={r.id}
+                          onMouseDown={() => {
+                            setLoyaltyCustomer({ id: r.id, name: r.title, cardNo: String(r.data?.cardNo || ""), phone: String(r.data?.phone || ""), points: r.amount || 0, totalSpent: Number(r.data?.totalSpent) || 0 });
+                            setLoyaltyQ(""); setShowLoyaltySearch(false); setRedeemPts(0);
+                          }}
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 13px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+                          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(245,158,11,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#f59e0b", fontWeight: 800, flexShrink: 0 }}>{r.title.charAt(0).toUpperCase()}</div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{r.title}</div>
+                            <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>{String(r.data?.cardNo || "")} · {String(r.data?.phone || "")}</div>
+                          </div>
+                          <div style={{ textAlign: "right", flexShrink: 0 }}>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{r.amount || 0}</div>
+                            <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)" }}>pts</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {showLoyaltySearch && loyaltyQ.length >= 2 && lcResults.length === 0 && (
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#141e33", border: "1px solid rgba(255,255,255,.1)", borderRadius: 9, zIndex: 60, marginTop: 4, padding: "12px 14px", textAlign: "center", color: "rgba(255,255,255,.35)", fontSize: 12 }}>
+                      No loyalty customers found ·{" "}
+                      <a href="/dashboard/retail/loyalty" style={{ color: "#f59e0b", textDecoration: "none", fontWeight: 700 }}>Register one →</a>
+                    </div>
+                  )}
+                </div>
               )}
-              <button onClick={clearCart} style={{ padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(239,68,68,.25)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Clear Cart</button>
-              <button onClick={() => { setShowHeld(v => !v); }} style={{ position: "relative", padding: "6px 14px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: showHeld ? "rgba(99,102,241,.2)" : "rgba(99,102,241,.1)", color: "#818cf8", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
-                Hold
-                {heldSales.length > 0 && <span style={{ position: "absolute", top: -6, right: -6, background: "#f59e0b", color: "#000", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{heldSales.length}</span>}
-              </button>
             </div>
           </div>
 
@@ -704,85 +775,6 @@ export default function POSPage() {
             <div style={{ padding: "6px 14px", borderTop: "1px solid rgba(255,255,255,.05)", flexShrink: 0 }}>
               <input ref={noteRef} value={itemNote} onChange={e => setItemNote(e.target.value)} placeholder="✏ Add item note..."
                 style={{ width: "100%", boxSizing: "border-box" as const, background: "transparent", border: "none", borderBottom: "1px dashed rgba(255,255,255,.1)", color: "rgba(255,255,255,.4)", fontSize: 11, fontFamily: ff, outline: "none", padding: "4px 2px" }} />
-            </div>
-          )}
-
-          {/* ── Loyalty Customer ── */}
-          {loyaltyConfig.enabled && (
-            <div style={{ padding: "8px 14px", borderTop: "1px solid rgba(245,158,11,.12)", background: "rgba(245,158,11,.04)", flexShrink: 0 }}>
-              <div style={{ fontSize: 10, color: "rgba(245,158,11,.7)", fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 6 }}>🎁 Loyalty Customer</div>
-              {loyaltyCustomer ? (
-                <div style={{ background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.22)", borderRadius: 10, padding: "9px 12px", position: "relative" }}>
-                  <button onClick={() => { setLoyaltyCustomer(null); setLoyaltyQ(""); setRedeemPts(0); }}
-                    style={{ position: "absolute", top: 7, right: 8, background: "none", border: "none", color: "rgba(255,255,255,.35)", fontSize: 14, cursor: "pointer", lineHeight: 1, padding: 0 }}>✕</button>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: "#fbbf24", marginBottom: 1, paddingRight: 20 }}>{loyaltyCustomer.name}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>Card: {loyaltyCustomer.cardNo} · {loyaltyCustomer.phone}</div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: loyaltyCustomer.points >= loyaltyConfig.minRedeemPoints ? 7 : 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>Balance:</span>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: "#f59e0b" }}>{loyaltyCustomer.points} pts</span>
-                    </div>
-                    {pointsToEarn > 0 && (
-                      <span style={{ fontSize: 10, fontWeight: 700, color: "#34d399", background: "rgba(52,211,153,.1)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 5, padding: "2px 7px" }}>+{pointsToEarn} pts this sale</span>
-                    )}
-                  </div>
-                  {loyaltyCustomer.points >= loyaltyConfig.minRedeemPoints && (
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.45)" }}>Redeem:</span>
-                      <input type="number" min={0} max={loyaltyCustomer.points}
-                        value={redeemPts || ""}
-                        onChange={e => { const v = Math.max(0, Math.min(loyaltyCustomer.points, parseInt(e.target.value) || 0)); setRedeemPts(v); }}
-                        placeholder="0"
-                        style={{ width: 64, textAlign: "center", background: "rgba(255,255,255,.07)", border: "1px solid rgba(245,158,11,.3)", borderRadius: 6, padding: "3px 8px", color: "#fff", fontSize: 12, fontFamily: ff, outline: "none" }} />
-                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>/ {loyaltyCustomer.points} pts</span>
-                      {safeRedeemPts > 0 && (
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>= −Rs. {loyaltyDiscount}</span>
-                      )}
-                    </div>
-                  )}
-                  {loyaltyCustomer.points < loyaltyConfig.minRedeemPoints && (
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 2 }}>
-                      Need {loyaltyConfig.minRedeemPoints - loyaltyCustomer.points} more pts to redeem
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div style={{ position: "relative" }}>
-                  <input
-                    value={loyaltyQ}
-                    onChange={e => { setLoyaltyQ(e.target.value); setShowLoyaltySearch(true); }}
-                    onFocus={() => setShowLoyaltySearch(true)}
-                    onBlur={() => setTimeout(() => setShowLoyaltySearch(false), 200)}
-                    placeholder="🔍 Name, phone, card no., or last 4+ digits..."
-                    style={{ width: "100%", boxSizing: "border-box" as const, background: "rgba(255,255,255,.04)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 8, padding: "7px 12px", color: "#fff", fontSize: 12, fontFamily: ff, outline: "none" }} />
-                  {showLoyaltySearch && lcResults.length > 0 && (
-                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#1a2540", border: "1px solid rgba(245,158,11,.25)", borderRadius: 8, zIndex: 50, marginTop: 3, overflow: "hidden", boxShadow: "0 8px 24px rgba(0,0,0,.5)" }}>
-                      {lcResults.map(r => (
-                        <div key={r.id}
-                          onMouseDown={() => {
-                            setLoyaltyCustomer({ id: r.id, name: r.title, cardNo: String(r.data?.cardNo || ""), phone: String(r.data?.phone || ""), points: r.amount || 0, totalSpent: Number(r.data?.totalSpent) || 0 });
-                            setLoyaltyQ(""); setShowLoyaltySearch(false); setRedeemPts(0);
-                          }}
-                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
-                          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(245,158,11,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#f59e0b", fontWeight: 800, flexShrink: 0 }}>
-                            {r.title.charAt(0).toUpperCase()}
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{r.title}</div>
-                            <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>{String(r.data?.cardNo || "")} · {String(r.data?.phone || "")}</div>
-                          </div>
-                          <div style={{ fontSize: 13, fontWeight: 800, color: "#f59e0b", flexShrink: 0 }}>{r.amount || 0} pts</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {showLoyaltySearch && loyaltyQ.length >= 2 && lcResults.length === 0 && (
-                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#1a2540", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, zIndex: 50, marginTop: 3, padding: "10px", textAlign: "center", color: "rgba(255,255,255,.35)", fontSize: 12 }}>
-                      No loyalty customers found
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           )}
 

@@ -1244,8 +1244,8 @@ export default function DashboardLayout({
               {hasDashboardFeature("RETAIL_CUSTOMERS") && <NavLink href="/dashboard/retail/customers" pathname={pathname}>Customer List</NavLink>}
               {hasDashboardFeature("RETAIL_LOYALTY") && <NavLink href="/dashboard/retail/loyalty" pathname={pathname}>Loyalty Points</NavLink>}
               <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>
-              <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Customer Ledger</NavLink>
-              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>
+              {/* <NavLink href="/dashboard/reports/ledger" pathname={pathname}>Customer Ledger</NavLink>
+              <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink> */}
             </NavGroup>
 
             {/* ── 6. Suppliers ── */}
