@@ -31,6 +31,7 @@ export default function LoyaltyPage() {
   const [showConfig, setShowConfig] = useState(false);
   const [savingConfig, setSavingConfig] = useState(false);
   const [configSaved, setConfigSaved] = useState(false);
+  const [configError, setConfigError] = useState("");
 
   const [showRegister, setShowRegister] = useState(false);
   const [regForm, setRegForm] = useState({ name: "", phone: "" });
@@ -46,7 +47,7 @@ export default function LoyaltyPage() {
   }
 
   useEffect(() => {
-    fetch("/api/company/admin-control", { headers: authHeaders() })
+    fetch("/api/company/admin-control", { headers: authHeaders(), credentials: "include" })
       .then(r => r.json())
       .then(d => {
         if (d?.loyaltySettings) {
@@ -120,17 +121,27 @@ export default function LoyaltyPage() {
 
   async function saveConfig() {
     setSavingConfig(true);
+    setConfigError("");
     try {
-      await fetch("/api/company/admin-control", {
+      const res = await fetch("/api/company/admin-control", {
         method: "POST",
+        credentials: "include",
         headers: { ...authHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({ loyaltySettings: configDraft }),
       });
-      setConfig({ ...configDraft });
-      setConfigSaved(true);
-      setTimeout(() => setConfigSaved(false), 2500);
-    } catch {}
-    setSavingConfig(false);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setConfigError(err?.error || `Save failed (${res.status})`);
+      } else {
+        setConfig({ ...configDraft });
+        setConfigSaved(true);
+        setTimeout(() => setConfigSaved(false), 3000);
+      }
+    } catch {
+      setConfigError("Network error — could not save settings.");
+    } finally {
+      setSavingConfig(false);
+    }
   }
 
   async function toggleCustomer(id: string, active: boolean) {
@@ -219,15 +230,18 @@ export default function LoyaltyPage() {
               <div style={{ fontSize: 10, color: "rgba(255,255,255,.25)", marginTop: 3 }}>Toggle loyalty program on/off</div>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <button onClick={saveConfig} disabled={savingConfig} className="lc-btn"
               style={{ padding: "9px 24px", borderRadius: 8, border: "none", background: savingConfig ? "rgba(99,102,241,.4)" : "#6366f1", color: "#fff", fontSize: 13, fontWeight: 700, cursor: savingConfig ? "not-allowed" : "pointer", fontFamily: ff }}>
               {savingConfig ? "Saving..." : "Save Settings"}
             </button>
-            <button onClick={() => { setShowConfig(false); setConfigDraft({ ...config }); }} className="lc-btn"
+            <button onClick={() => { setShowConfig(false); setConfigDraft({ ...config }); setConfigError(""); }} className="lc-btn"
               style={{ padding: "9px 18px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.5)", fontSize: 13, cursor: "pointer", fontFamily: ff }}>
               Cancel
             </button>
+            {configError && (
+              <span style={{ fontSize: 12, color: "#f87171", fontWeight: 600 }}>✕ {configError}</span>
+            )}
           </div>
         </div>
       )}
