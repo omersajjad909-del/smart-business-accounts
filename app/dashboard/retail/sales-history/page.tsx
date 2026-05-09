@@ -125,7 +125,7 @@ export default function SalesHistoryPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px", color: "#fff" }}>🧾 Sales History</h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", margin: 0 }}>Sab POS bills — dekho, print karo, ya delete karo</p>
+          {/* <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", margin: 0 }}>SabAll POS Bills — View, Print, or Delete</p> */}
         </div>
         <a href="/dashboard/retail/pos" style={{ padding: "10px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.6)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
           ← POS Terminal
