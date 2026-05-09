@@ -175,15 +175,12 @@ export function ThermalReceipt({ receipt, company }: { receipt: ReceiptData; com
 
       <Divider />
 
-      {(receipt.loyaltyEarned > 0 || (receipt.loyaltyRedeemed ?? 0) > 0 || receipt.loyaltyTotal > 0) && (
-        <>
-          <Divider />
-          <div style={{ fontWeight: 800, fontSize: 11, marginBottom: 4 }}>Loyalty Information</div>
-          <Row label="Points Earned:" value={receipt.loyaltyEarned.toFixed(2)} />
-          <Row label="Redeemed Points:" value={(receipt.loyaltyRedeemed ?? 0).toFixed(2)} />
-          <Row label="Available Points:" value={(receipt.loyaltyTotal - (receipt.loyaltyRedeemed ?? 0)).toFixed(2)} />
-        </>
-      )}
+      <Divider />
+
+      <div style={{ fontWeight: 800, fontSize: 11, marginBottom: 4 }}>Loyalty Information</div>
+      <Row label="Points Earned:" value={receipt.loyaltyEarned.toFixed(2)} />
+      <Row label="Redeemed Points:" value={(receipt.loyaltyRedeemed ?? 0).toFixed(2)} />
+      <Row label="Available Points:" value={(receipt.loyaltyTotal - (receipt.loyaltyRedeemed ?? 0)).toFixed(2)} />
 
       <Divider />
 
