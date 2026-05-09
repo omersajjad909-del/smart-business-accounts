@@ -105,11 +105,18 @@ export default function POSPage() {
     const headers: HeadersInit = { "x-user-id": h?.id || "", "x-user-role": h?.role || "ADMIN", "x-company-id": h?.companyId || "" };
     fetch("/api/me/company", { headers })
       .then(r => r.json())
-      .then(d => { if (d?.name) setCompany({ name: d.name, address: d.address, phone: d.phone, ntn: d.ntn }); })
+      .then(d => { if (d?.name) setCompany(c => ({ ...c, name: d.name, address: d.address, phone: d.phone })); })
       .catch(() => {});
-    fetch("/api/company/admin-control", { headers })
+    fetch("/api/company/admin-control", { headers, credentials: "include" })
       .then(r => r.json())
-      .then(d => { if (d?.loyaltySettings) setLoyaltyConfig(lc => ({ ...lc, ...d.loyaltySettings })); })
+      .then(d => {
+        if (d?.loyaltySettings) setLoyaltyConfig(lc => ({ ...lc, ...d.loyaltySettings }));
+        if (d?.taxProfile) setCompany(c => ({
+          ...c,
+          taxIdLabel: d.taxProfile.taxIdLabel || "",
+          taxIdValue: d.taxProfile.taxIdValue || d.taxProfile.vatNumber || d.taxProfile.gstNumber || "",
+        }));
+      })
       .catch(() => {});
     loadStock();
   }, []);

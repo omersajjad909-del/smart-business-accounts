@@ -26,6 +26,9 @@ export type CompanyInfo = {
   address?: string;
   phone?: string;
   ntn?: string;
+  taxIdLabel?: string;
+  taxIdValue?: string;
+  posId?: string;
 };
 
 export function generateFBRInvoice(receiptNo: string, date: Date): string {
@@ -89,17 +92,21 @@ export function ThermalReceipt({ receipt, company }: { receipt: ReceiptData; com
         <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: ".04em" }}>{company.name.toUpperCase()}</div>
         {company.address && <div style={{ fontSize: 10 }}>{company.address}</div>}
         {company.phone && <div style={{ fontSize: 10 }}>Ph: {company.phone}</div>}
+        {(company.taxIdValue || company.ntn) && (
+          <div style={{ fontSize: 10 }}>
+            {company.taxIdLabel || "Tax ID"}: {company.taxIdValue || company.ntn}
+          </div>
+        )}
       </div>
 
       <Divider />
 
-      {/* FBR Info */}
-      <Row label="FBR Invoice #:" value={receipt.fbrInvoice} />
-      {company.ntn && <Row label="NTN #" value={company.ntn} />}
+      {/* Receipt Info */}
+      <Row label="Receipt Ref #:" value={receipt.fbrInvoice} />
       <Row label="Transaction No.:" value={txNo} />
       <Row label="Transaction Date:" value={`${dateStr} ${timeStr}`} />
       <Row label="Cashier:" value={receipt.cashierName} />
-      <Row label="POS:" value="FSD-POS-SAL-01" />
+      {company.posId && <Row label="Terminal:" value={company.posId} />}
 
       <Divider />
       <div style={{ textAlign: "center", fontWeight: 800, fontSize: 12, marginBottom: 4 }}>Original Receipt</div>
@@ -184,9 +191,9 @@ export function ThermalReceipt({ receipt, company }: { receipt: ReceiptData; com
 
       <Divider />
 
-      {/* Barcode */}
+      {/* Receipt barcode — encodes unique receipt reference for scanning */}
       <SimpleBarcode value={receipt.fbrInvoice} />
-      <div style={{ textAlign: "center", fontSize: 10, marginTop: 2, letterSpacing: ".1em" }}>{receipt.fbrInvoice}</div>
+      <div style={{ textAlign: "center", fontSize: 9, marginTop: 2, letterSpacing: ".08em", color: "#444" }}>{receipt.fbrInvoice}</div>
 
       <Divider />
 
