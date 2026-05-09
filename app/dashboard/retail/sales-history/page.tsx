@@ -367,6 +367,7 @@ export default function SalesHistoryPage() {
                 change: printSale.change,
                 cashierName: printSale.cashierName,
                 loyaltyEarned: 0,
+                loyaltyRedeemed: 0,
                 loyaltyTotal: 0,
               }}
             />

@@ -1958,6 +1958,7 @@ export default function DashboardContent() {
                   tick={{ fill: "var(--text-muted)", fontSize: 9 } as any}
                   axisLine={false}
                   tickLine={false}
+                  tickFormatter={fmt}
                 />
                 <Tooltip
                   {...TT}
@@ -2519,6 +2520,7 @@ export default function DashboardContent() {
                   tick={{ fill: "var(--text-muted)", fontSize: 10 } as any}
                   axisLine={false}
                   tickLine={false}
+                  tickFormatter={fmt}
                 />
                 <Tooltip
                   {...TT}
