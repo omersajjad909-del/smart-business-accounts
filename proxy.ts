@@ -1,7 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 
+const FORGE_HOSTS = ["finovaforge.com", "www.finovaforge.com"];
+
 export function proxy(req: NextRequest) {
+  // ── Forge hostname routing ──────────────────────────────────────
+  const host = (req.headers.get("host") ?? "").split(":")[0];
+  if (FORGE_HOSTS.includes(host)) {
+    const { pathname, search } = req.nextUrl;
+    if (!pathname.startsWith("/forge") && !pathname.startsWith("/_next") && !pathname.startsWith("/api")) {
+      const target = pathname === "/" ? "/forge/home" : `/forge${pathname}`;
+      return NextResponse.rewrite(new URL(target + search, req.url));
+    }
+    return NextResponse.next();
+  }
+  // ───────────────────────────────────────────────────────────────
+
   const headers = new Headers(req.headers);
 
   // 🔥 Clear incoming sensitive headers to prevent spoofing
@@ -90,5 +104,12 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/dashboard/:path*", "/onboarding/:path*", "/admin/:path*"],
+  matcher: [
+    "/api/:path*",
+    "/dashboard/:path*",
+    "/onboarding/:path*",
+    "/admin/:path*",
+    // Catch all non-static paths for forge hostname routing
+    "/((?!_next/static|_next/image|favicon.ico|icon.png|robots.txt|sitemap.xml).*)",
+  ],
 };
