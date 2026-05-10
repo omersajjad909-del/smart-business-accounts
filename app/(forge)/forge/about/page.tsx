@@ -47,7 +47,7 @@ function Hero() {
             lineHeight: 1.1,
           }}
         >
-          Built in Lahore. For South Asia.
+          Purpose-built software. Global reach.
         </h1>
 
         <p
@@ -58,7 +58,7 @@ function Hero() {
             lineHeight: 1.7,
           }}
         >
-          FinovaForge is on a mission to build the software that emerging markets actually need.
+          Finova Forge is on a mission to build software that works the way real businesses actually operate.
         </p>
       </div>
     </section>
@@ -106,19 +106,19 @@ function Story() {
           }}
         >
           <p style={{ marginBottom: 24 }}>
-            In 2024, Umer Sajjad looked at the accounting software landscape and saw a massive gap. Most enterprise accounting tools were built for Fortune 500 companies in the US and Europe. They were expensive, complex, and required months to implement.
+            In 2024, Umer Sajjad looked at the accounting software landscape and saw a massive gap. Most enterprise tools were built for large corporations — expensive, complex, and requiring months to implement.
           </p>
 
           <p style={{ marginBottom: 24 }}>
-            Meanwhile, millions of businesses across South Asia—Pakistan, UAE, India—were still running on spreadsheets. They needed something better, but nothing was built for them. They needed software that understood their industries, worked in their regions, and could be set up in minutes, not months.
+            Meanwhile, millions of growing businesses worldwide were still running on spreadsheets. They needed something better — software that understood their industries, adapted to how they actually work, and could be set up in minutes, not months.
           </p>
 
           <p style={{ marginBottom: 24 }}>
-            FinovaForge was born to fix this. We're building products for the businesses that legacy software ignores. Industry-first. Simple. Affordable. And built right here in Lahore, Pakistan.
+            Finova Forge was founded to fix this. We build products for the businesses that legacy software ignores. Industry-first. Modular. Affordable. And designed to scale with you.
           </p>
 
           <p>
-            Our first product, FinovaOS, makes accounting effortless. No more spreadsheets. No more complex spreadsheets. Just real financial control.
+            Our first product, FinovaOS, makes financial management effortless — real-time accounting, inventory, HR, CRM and more in one platform.
           </p>
         </div>
       </div>
@@ -141,8 +141,8 @@ function Values() {
     },
     {
       icon: "🌍",
-      title: "Built for Emerging Markets",
-      desc: "Designed for Pakistan, UAE, India — and every market where businesses are underserved by legacy software.",
+      title: "Built for Real Businesses",
+      desc: "Designed for businesses underserved by legacy software — wherever they operate in the world.",
     },
     {
       icon: "💪",
@@ -296,7 +296,7 @@ function Team() {
                 margin: 0,
               }}
             >
-              Building FinovaForge from Lahore, Pakistan. Passionate about making enterprise-grade software accessible to every business.
+              Founder of Finova Forge. Passionate about building software that actually fits how real businesses work — without the enterprise complexity.
             </p>
           </div>
         </div>
@@ -373,7 +373,7 @@ function CTA() {
             lineHeight: 1.7,
           }}
         >
-          Learn why thousands of businesses in South Asia trust FinovaOS for their accounting needs.
+          See FinovaOS in action — the product built by Finova Forge for businesses worldwide.
         </p>
         <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
           <a

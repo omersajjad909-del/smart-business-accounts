@@ -58,7 +58,7 @@ function Hero() {
             lineHeight: 1.7,
           }}
         >
-          FinovaForge builds products that let businesses in South Asia move beyond spreadsheets and into real financial control. Starting with FinovaOS.
+          Finova Forge builds products that help businesses move beyond spreadsheets and into real financial control. Starting with FinovaOS.
         </p>
 
         <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
@@ -118,10 +118,10 @@ function Hero() {
 
         <div style={{ marginTop: 80, display: "flex", alignItems: "center", justifyContent: "center", gap: 20, flexWrap: "wrap", fontSize: 13, color: "rgba(255,255,255,.35)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span>✓</span> Built in Lahore, Pakistan
+            <span>✓</span> Founded 2024
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span>✓</span> For South Asian Businesses
+            <span>✓</span> Serving 40+ Countries
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span>✓</span> Fast Setup, Simple Use
@@ -137,7 +137,7 @@ function Highlights() {
   const items = [
     { icon: "📊", title: "Real-Time Accounting", desc: "See your exact financial position, instantly. No delayed reports, no guesswork." },
     { icon: "⚙️", title: "Built for Your Industry", desc: "Whether retail, services, or manufacturing — our tools work the way you do." },
-    { icon: "🌍", title: "Made for Emerging Markets", desc: "Designed for Pakistan, UAE, India. Works offline, handles local requirements." },
+    { icon: "🌍", title: "Built for Global Scale", desc: "Multi-currency, 40+ countries, jurisdiction-ready reports. Works everywhere businesses operate." },
     { icon: "🔒", title: "Bank-Level Security", desc: "Your financial data is encrypted and protected with enterprise-grade security." },
   ];
 
@@ -253,7 +253,7 @@ function CTA() {
             lineHeight: 1.7,
           }}
         >
-          Join businesses across South Asia already using FinovaOS to manage their finances with confidence.
+          Join growing businesses worldwide already using FinovaOS to manage their finances with confidence.
         </p>
         <a
           href="https://finovaos.app"

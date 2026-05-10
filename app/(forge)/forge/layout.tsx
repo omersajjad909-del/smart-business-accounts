@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://finovaforge.com"),
-  title: "FinovaForge — We Build Intelligent Business Software",
-  description: "FinovaForge is a software company building intelligent, industry-specific business tools for growing companies across South Asia and beyond.",
+  title: "Finova Forge — We Build Intelligent Business Software",
+  description: "Finova Forge is a software company building intelligent, industry-specific business tools for growing companies worldwide.",
 };
 
 // Override the (marketing) layout — no FinovaOS navbar/footer on the company site

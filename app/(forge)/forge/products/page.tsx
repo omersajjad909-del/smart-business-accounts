@@ -58,7 +58,7 @@ function Hero() {
             lineHeight: 1.7,
           }}
         >
-          The accounting software built for businesses in South Asia. Real-time insights, zero complexity.
+          The business management platform built for growing companies worldwide. Real-time insights, zero complexity.
         </p>
 
         <a
