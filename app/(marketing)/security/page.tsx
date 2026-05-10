@@ -571,6 +571,28 @@ export default function SecurityPage() {
         {/* ── SECURITY PILLARS ── */}
         {PILLARS.map((p,i) => <PillarSection key={p.id} p={p} index={i}/>)}
 
+        {/* ── INCIDENT RESPONSE ── */}
+        <section style={{ padding:"80px 24px", borderTop:"1px solid rgba(255,255,255,.05)" }}>
+          <div style={{ maxWidth:760, margin:"0 auto", textAlign:"center" }}>
+            <div style={{
+              borderRadius:24, padding:"48px 40px",
+              background:"rgba(248,113,113,.04)",
+              border:"1.5px solid rgba(248,113,113,.15)",
+              position:"relative", overflow:"hidden",
+            }}>
+              <div style={{ position:"absolute", top:0, left:"20%", right:"20%", height:1,
+                background:"linear-gradient(90deg,transparent,rgba(248,113,113,.4),transparent)" }}/>
+              <div style={{ fontSize:40, marginBottom:20 }}>🚨</div>
+              <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,30px)", fontWeight:700, color:"white", letterSpacing:"-.5px", lineHeight:1.2, marginBottom:12 }}>
+                Security Incident Response
+              </h2>
+              <p style={{ fontSize:14.5, color:"rgba(255,255,255,.42)", lineHeight:1.8, marginBottom:0 }}>
+                In the event of a confirmed security incident affecting customer data, FinovaOS will take reasonable steps to investigate, contain, and notify affected parties in a timely manner. We maintain internal procedures to respond to and recover from security events, and will communicate transparently with customers when appropriate.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* ── RESPONSIBLE DISCLOSURE ── */}
         <section style={{ padding:"80px 24px", borderTop:"1px solid rgba(255,255,255,.05)" }}>
           <div style={{ maxWidth:760, margin:"0 auto", textAlign:"center" }}>
