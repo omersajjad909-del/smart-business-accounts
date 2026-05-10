@@ -3,31 +3,9 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
-type SalesInvoice = Prisma.SalesInvoiceGetPayload<{
-  select: {
-    date: true;
-    total: true;
-  };
-}>;
-
-type PurchaseInvoice = Prisma.PurchaseInvoiceGetPayload<{
-  select: {
-    date: true;
-    total: true;
-  };
-}>;
-
-type TopCustomer = {
-  customerId: string;
-  _sum: { total: number | null };
-};
-
-
-
-
-if (process.env.NODE_ENV === "development") {
-  // globalThis logic is handled in lib/prisma
-}
+type SalesInvoice = Prisma.SalesInvoiceGetPayload<{ select: { date: true; total: true } }>;
+type PurchaseInvoice = Prisma.PurchaseInvoiceGetPayload<{ select: { date: true; total: true } }>;
+type TopCustomer = { customerId: string; _sum: { total: number | null } };
 
 export async function GET(req: NextRequest) {
   try {
@@ -43,134 +21,93 @@ export async function GET(req: NextRequest) {
     const branchId = await resolveBranchId(req, companyId);
 
     const { searchParams } = new URL(req.url);
-    const period = searchParams.get("period") || "month"; // month, week, year
+    const period = searchParams.get("period") || "month";
 
     const now = new Date();
     let startDate: Date;
+    let groupBy: "day" | "month" | "year";
 
     switch (period) {
       case "week":
         startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        groupBy = "day";
         break;
       case "month":
         startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        groupBy = "day";
+        break;
+      case "quarter":
+        startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        groupBy = "day";
         break;
       case "year":
         startDate = new Date(now.getFullYear(), 0, 1);
+        groupBy = "month";
+        break;
+      case "all":
+        startDate = new Date(now.getFullYear() - 5, 0, 1);
+        groupBy = "month";
         break;
       default:
         startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        groupBy = "day";
     }
 
-    // Sales by day/week/month
-    const salesInvoices = await prisma.salesInvoice.findMany({
-      where: {
-        date: { gte: startDate },
-        companyId,
-        ...(branchId ? { branchId } : {}),
-      },
-      select: {
-        date: true,
-        total: true,
-      },
-    });
+    const whereClause = {
+      date: { gte: startDate },
+      companyId,
+      deletedAt: null,
+      ...(branchId ? { branchId } : {}),
+    };
 
-    // Purchases by day/week/month
-    const purchaseInvoices = await prisma.purchaseInvoice.findMany({
-      where: {
-        date: { gte: startDate },
-        companyId,
-        ...(branchId ? { branchId } : {}),
-      },
-      select: {
-        date: true,
-        total: true,
-      },
-    });
+    const [salesInvoices, purchaseInvoices] = await Promise.all([
+      prisma.salesInvoice.findMany({ where: whereClause, select: { date: true, total: true } }),
+      prisma.purchaseInvoice.findMany({ where: whereClause, select: { date: true, total: true } }),
+    ]);
 
-    // Group sales by period
-    const salesByPeriod: Record<string, number> = {};
-    salesInvoices.forEach((inv: SalesInvoice) => {
+    function getKey(date: Date): string {
+      if (groupBy === "day") return date.toISOString().split("T")[0];
+      if (groupBy === "month") return date.toISOString().slice(0, 7);
+      return date.getFullYear().toString();
+    }
 
-      let key: string;
-      if (period === "week") {
-        key = inv.date.toISOString().split("T")[0];
-      } else if (period === "month") {
-        key = inv.date.toISOString().slice(0, 7); // YYYY-MM
-      } else {
-        key = inv.date.getFullYear().toString();
-      }
-      salesByPeriod[key] = (salesByPeriod[key] || 0) + Number(inv.total || 0);
-    });
+    function groupInvoices(invoices: { date: Date; total: any }[]) {
+      const map: Record<string, number> = {};
+      invoices.forEach(inv => {
+        const key = getKey(inv.date);
+        map[key] = (map[key] || 0) + Number(inv.total || 0);
+      });
+      return map;
+    }
 
-    // Group purchases by period
-    const purchasesByPeriod: Record<string, number> = {};
-    purchaseInvoices.forEach((inv: PurchaseInvoice) => {
-
-
-      let key: string;
-      if (period === "week") {
-        key = inv.date.toISOString().split("T")[0];
-      } else if (period === "month") {
-        key = inv.date.toISOString().slice(0, 7);
-      } else {
-        key = inv.date.getFullYear().toString();
-      }
-      purchasesByPeriod[key] =
-        (purchasesByPeriod[key] || 0) + Number(inv.total || 0);
-    });
+    const salesByPeriod = groupInvoices(salesInvoices as SalesInvoice[]);
+    const purchasesByPeriod = groupInvoices(purchaseInvoices as PurchaseInvoice[]);
 
     // Top customers
     const topCustomers = await prisma.salesInvoice.groupBy({
       by: ["customerId"],
-      where: {
-        date: { gte: startDate },
-        companyId,
-        ...(branchId ? { branchId } : {}),
-      },
-      _sum: {
-        total: true,
-      },
-      orderBy: {
-        _sum: {
-          total: "desc",
-        },
-      },
+      where: whereClause,
+      _sum: { total: true },
+      orderBy: { _sum: { total: "desc" } },
       take: 5,
     });
 
     const customerDetails = await Promise.all(
-      topCustomers.map(async (item: TopCustomer) => {
+      (topCustomers as TopCustomer[]).map(async item => {
         const customer = await prisma.account.findFirst({
           where: { id: item.customerId, companyId },
           select: { name: true },
         });
-        return {
-          name: customer?.name || "Unknown",
-          total: Number(item._sum.total || 0),
-        };
+        return { name: customer?.name || "Unknown", total: Number(item._sum.total || 0) };
       })
     );
 
     // Top items
     const topItems = await prisma.salesInvoiceItem.groupBy({
       by: ["itemId"],
-      where: {
-        invoice: {
-          date: { gte: startDate },
-          companyId,
-          ...(branchId ? { branchId } : {}),
-        },
-      },
-      _sum: {
-        qty: true,
-        amount: true,
-      },
-      orderBy: {
-        _sum: {
-          amount: "desc",
-        },
-      },
+      where: { invoice: whereClause },
+      _sum: { qty: true, amount: true },
+      orderBy: { _sum: { amount: "desc" } },
       take: 5,
     });
 
@@ -189,24 +126,13 @@ export async function GET(req: NextRequest) {
     );
 
     return NextResponse.json({
-      salesTrend: Object.entries(salesByPeriod).map(([key, value]) => ({
-        label: key,
-        value,
-      })),
-      purchasesTrend: Object.entries(purchasesByPeriod).map(([key, value]) => ({
-        label: key,
-        value,
-      })),
+      salesTrend: Object.entries(salesByPeriod).map(([label, value]) => ({ label, value })),
+      purchasesTrend: Object.entries(purchasesByPeriod).map(([label, value]) => ({ label, value })),
       topCustomers: customerDetails,
       topItems: itemDetails,
     });
   } catch (e: any) {
     console.error("❌ DASHBOARD CHARTS ERROR:", e);
-    return NextResponse.json(
-      { error: e.message || "Charts data failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e.message || "Charts data failed" }, { status: 500 });
   }
 }
-
-

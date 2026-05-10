@@ -568,7 +568,7 @@ export default function DashboardContent() {
             headers: h,
             cache: "no-store",
           }),
-          fetch("/api/reports/dashboard-charts?period=week", {
+          fetch(`/api/reports/dashboard-charts?period=${period}`, {
             headers: h,
             cache: "no-store",
           }),
@@ -638,8 +638,11 @@ export default function DashboardContent() {
               const ex = pA.find((p: any) => p.label === l)?.value || 0;
               let dl = l;
               if (/^\d{4}-\d{2}-\d{2}$/.test(l)) {
-                const d = new Date(l);
+                const d = new Date(l + "T00:00:00");
                 dl = `${MN[d.getMonth()]} ${d.getDate()}`;
+              } else if (/^\d{4}-\d{2}$/.test(l)) {
+                const [yr, mo] = l.split("-");
+                dl = `${MN[parseInt(mo, 10) - 1]} ${yr}`;
               }
               return { label: dl, Revenue: rv, Expenses: ex, Profit: rv - ex };
             }),

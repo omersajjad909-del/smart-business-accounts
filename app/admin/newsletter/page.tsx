@@ -25,6 +25,7 @@ export default function AdminNewsletterPage() {
   const [preview, setPreview] = useState<number | null>(null);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState<{ sent: number; total: number } | null>(null);
+  const [showPreviewPane, setShowPreviewPane] = useState(false);
 
   async function load() {
     setLoad(true);
@@ -57,16 +58,70 @@ export default function AdminNewsletterPage() {
     setSending(false);
   }
 
+  function buildEmailHtml(subj: string, body: string) {
+    const escaped = body.replace(/\n/g, "<br/>");
+    return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
+<body style="margin:0;padding:0;background:#f4f6fb;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb;padding:40px 0;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+      <!-- Header -->
+      <tr><td style="background:linear-gradient(135deg,#4f46e5,#6366f1);border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Finova<span style="color:#a5b4fc;">OS</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:4px;letter-spacing:.08em;text-transform:uppercase;">Business Suite</div>
+      </td></tr>
+
+      <!-- Body -->
+      <tr><td style="background:#ffffff;padding:40px 40px 32px;">
+        <h1 style="margin:0 0 20px;font-size:22px;font-weight:800;color:#0f172a;line-height:1.3;">${subj}</h1>
+        <div style="width:48px;height:3px;background:linear-gradient(90deg,#6366f1,#818cf8);border-radius:2px;margin-bottom:28px;"></div>
+        <div style="font-size:15px;color:#334155;line-height:1.75;">${escaped}</div>
+      </td></tr>
+
+      <!-- CTA -->
+      <tr><td style="background:#ffffff;padding:0 40px 36px;text-align:center;">
+        <a href="https://finovaos.app" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:13px 32px;border-radius:10px;letter-spacing:.02em;">
+          Visit FinovaOS →
+        </a>
+      </td></tr>
+
+      <!-- Divider -->
+      <tr><td style="background:#ffffff;padding:0 40px;">
+        <div style="border-top:1px solid #e2e8f0;"></div>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="background:#ffffff;border-radius:0 0 16px 16px;padding:24px 40px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:12px;color:#94a3b8;">You are receiving this email because you subscribed to FinovaOS updates.</p>
+        <p style="margin:0;font-size:12px;color:#94a3b8;">
+          <a href="https://finovaos.app/unsubscribe" style="color:#6366f1;text-decoration:none;">Unsubscribe</a>
+          &nbsp;·&nbsp;
+          <a href="https://finovaos.app" style="color:#6366f1;text-decoration:none;">finovaos.app</a>
+        </p>
+      </td></tr>
+
+      <!-- Bottom strip -->
+      <tr><td style="padding:20px 0;text-align:center;">
+        <p style="margin:0;font-size:11px;color:#94a3b8;">© 2026 FinovaOS. All rights reserved.</p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+  }
+
   async function broadcast() {
     if (!subject || !bodyText) return;
     setSending(true);
     const r = await fetch("/api/admin/newsletter", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        subject,
-        html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">${bodyText}</div>`,
-      }),
+      body: JSON.stringify({ subject, html: buildEmailHtml(subject, bodyText) }),
     });
     const d = await r.json();
     setSent({ sent: d.sent, total: d.total });
@@ -189,36 +244,70 @@ export default function AdminNewsletterPage() {
             ) : (
               <>
                 <div style={{ background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", borderRadius: 10, padding: "12px 16px", marginBottom: 20, fontSize: 13, color: "#a5b4fc" }}>
-                  This email will be sent to {activeCount} active subscribers.
+                  📧 This email will be sent to <strong>{activeCount}</strong> active subscribers.
                 </div>
 
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 8 }}>EMAIL SUBJECT *</label>
-                  <input className="nl-input" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Example: New feature release from FinovaOS" />
+                {/* Tab Toggle */}
+                <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,.05)", borderRadius: 10, padding: 4, marginBottom: 20 }}>
+                  {["Compose", "Preview"].map(tab => (
+                    <button key={tab} onClick={() => setShowPreviewPane(tab === "Preview")}
+                      style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                        background: (tab === "Preview") === showPreviewPane ? "#6366f1" : "transparent",
+                        color: (tab === "Preview") === showPreviewPane ? "#fff" : "rgba(255,255,255,.45)" }}>
+                      {tab === "Compose" ? "✏️ Compose" : "👁 Preview"}
+                    </button>
+                  ))}
                 </div>
 
-                <div style={{ marginBottom: 20 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 8 }}>MESSAGE / HTML *</label>
-                  <textarea className="nl-input" rows={8} value={bodyText} onChange={(e) => setBodyText(e.target.value)} placeholder="Write your email content here (plain text or HTML)..." style={{ resize: "vertical" }} />
-                </div>
+                {!showPreviewPane ? (
+                  <>
+                    <div style={{ marginBottom: 16 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 8 }}>EMAIL SUBJECT *</label>
+                      <input className="nl-input" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="e.g. New features just launched — FinovaOS" />
+                    </div>
+                    <div style={{ marginBottom: 20 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", display: "block", marginBottom: 8 }}>MESSAGE *</label>
+                      <textarea className="nl-input" rows={9} value={bodyText} onChange={(e) => setBodyText(e.target.value)}
+                        placeholder={"Write your message here...\n\nNew paragraphs will be preserved.\nNo HTML needed — just write naturally."} style={{ resize: "vertical", lineHeight: 1.6 }} />
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", marginTop: 6 }}>Plain text only — the professional email design is applied automatically.</div>
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ marginBottom: 20, borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,.1)" }}>
+                    {subject && bodyText ? (
+                      <iframe
+                        srcDoc={buildEmailHtml(subject || "Your Subject", bodyText || "Your message here.")}
+                        style={{ width: "100%", height: 480, border: "none", background: "#fff" }}
+                        title="Email Preview"
+                      />
+                    ) : (
+                      <div style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 13 }}>
+                        Fill in subject and message first to see the preview.
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {preview !== null && (
-                  <div style={{ background: "rgba(251,191,36,.08)", border: "1px solid rgba(251,191,36,.2)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#fbbf24" }}>
-                    Preview looks good. This campaign will be sent to {preview} subscribers.
+                  <div style={{ background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#34d399" }}>
+                    ✓ Ready to send to {preview} subscribers.
                   </div>
                 )}
 
                 <div style={{ display: "flex", gap: 10 }}>
                   {preview === null ? (
-                    <button className="nl-btn" onClick={checkPreview} disabled={!subject || !bodyText || sending} style={{ background: "rgba(251,191,36,.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,.25)", flex: 1 }}>
-                      {sending ? "Checking Preview..." : "Check Preview"}
+                    <button className="nl-btn" onClick={checkPreview} disabled={!subject || !bodyText || sending}
+                      style={{ background: "rgba(251,191,36,.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,.25)", flex: 1 }}>
+                      {sending ? "Checking..." : "Check & Confirm"}
                     </button>
                   ) : (
-                    <button className="nl-btn" onClick={broadcast} disabled={sending} style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", flex: 1 }}>
-                      {sending ? "Sending..." : `Confirm Send to ${activeCount}`}
+                    <button className="nl-btn" onClick={broadcast} disabled={sending}
+                      style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", flex: 1 }}>
+                      {sending ? "Sending..." : `🚀 Send to ${activeCount} subscribers`}
                     </button>
                   )}
-                  <button className="nl-btn" onClick={() => setPreview(null)} style={{ background: "rgba(255,255,255,.07)", color: "rgba(255,255,255,.6)" }}>Cancel</button>
+                  <button className="nl-btn" onClick={() => { setShowBroadcast(false); setPreview(null); setShowPreviewPane(false); }}
+                    style={{ background: "rgba(255,255,255,.07)", color: "rgba(255,255,255,.6)" }}>Cancel</button>
                 </div>
               </>
             )}
