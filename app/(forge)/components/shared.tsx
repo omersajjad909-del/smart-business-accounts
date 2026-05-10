@@ -18,6 +18,8 @@ export function ForgeNav() {
   const links = [
     { label: "Home", href: "/forge/home" },
     { label: "Products", href: "/forge/products" },
+    { label: "Solutions", href: "/forge/solutions" },
+    { label: "Industries", href: "/forge/industries" },
     { label: "About", href: "/forge/about" },
     { label: "Contact", href: "/forge/contact" },
   ];
@@ -30,19 +32,20 @@ export function ForgeNav() {
         left: 0,
         right: 0,
         zIndex: 100,
-        padding: "0 clamp(20px,4vw,48px)",
+        padding: "0 clamp(16px,3vw,40px)",
         height: 64,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        background: scrolled ? "rgba(7,8,15,.92)" : "transparent",
+        background: scrolled ? "rgba(7,8,15,.93)" : "transparent",
         backdropFilter: scrolled ? "blur(24px)" : "none",
         borderBottom: scrolled ? "1px solid rgba(255,255,255,.06)" : "none",
         transition: "all .3s ease",
         fontFamily: ff,
       }}
     >
-      <Link href="/forge/home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+      {/* Logo */}
+      <Link href="/forge/home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}>
         <div
           style={{
             width: 36,
@@ -69,7 +72,8 @@ export function ForgeNav() {
         </div>
       </Link>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+      {/* Nav links */}
+      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
         {links.map((l) => {
           const active = pathname === l.href;
           return (
@@ -79,12 +83,13 @@ export function ForgeNav() {
               style={{
                 fontSize: 13,
                 fontWeight: 600,
-                color: active ? "white" : "rgba(255,255,255,.42)",
+                color: active ? "white" : "rgba(255,255,255,.4)",
                 textDecoration: "none",
                 transition: "color .2s",
+                whiteSpace: "nowrap",
               }}
               onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "white")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = active ? "white" : "rgba(255,255,255,.42)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = active ? "white" : "rgba(255,255,255,.4)")}
             >
               {l.label}
             </Link>
@@ -95,15 +100,16 @@ export function ForgeNav() {
           target="_blank"
           rel="noreferrer"
           style={{
-            padding: "8px 18px",
+            padding: "8px 16px",
             borderRadius: 9,
             background: "linear-gradient(135deg,#f59e0b,#ef4444)",
             color: "white",
             fontWeight: 700,
-            fontSize: 13,
+            fontSize: 12.5,
             textDecoration: "none",
             boxShadow: "0 4px 14px rgba(245,158,11,.25)",
             transition: "all .2s",
+            whiteSpace: "nowrap",
           }}
           onMouseEnter={(e) => {
             const el = e.currentTarget as HTMLAnchorElement;
@@ -126,53 +132,58 @@ export function ForgeNav() {
 export function ForgeFooter() {
   const yr = new Date().getFullYear();
 
+  const cols = [
+    {
+      title: "Products",
+      links: [
+        { l: "FinovaOS", h: "https://finovaos.app", ext: true },
+        { l: "Features", h: "https://finovaos.app/features", ext: true },
+        { l: "Pricing", h: "https://finovaos.app/pricing", ext: true },
+        { l: "Product Roadmap", h: "/forge/products" },
+      ],
+    },
+    {
+      title: "Company",
+      links: [
+        { l: "About", h: "/forge/about" },
+        { l: "Careers", h: "/forge/careers" },
+        { l: "Blog", h: "/forge/blog" },
+        { l: "Contact", h: "/forge/contact" },
+      ],
+    },
+    {
+      title: "Solutions",
+      links: [
+        { l: "Solutions", h: "/forge/solutions" },
+        { l: "Industries", h: "/forge/industries" },
+        { l: "Security", h: "/security" },
+        { l: "Status", h: "/forge/status" },
+      ],
+    },
+    {
+      title: "Support & Legal",
+      links: [
+        { l: "Help & Support", h: "/forge/support" },
+        { l: "Privacy Policy", h: "/forge/privacy" },
+        { l: "Terms of Service", h: "/forge/terms" },
+      ],
+    },
+  ];
+
   return (
-    <footer
-      style={{
-        borderTop: "1px solid rgba(255,255,255,.06)",
-        padding: "56px clamp(20px,4vw,48px) 32px",
-        fontFamily: ff,
-      }}
-    >
+    <footer style={{ borderTop: "1px solid rgba(255,255,255,.06)", padding: "56px clamp(16px,3vw,40px) 32px", fontFamily: ff }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
-            gap: "0 48px",
-            marginBottom: 48,
-          }}
-        >
+        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", gap: "0 40px", marginBottom: 48 }}>
           {/* Brand */}
           <div>
-            <Link
-              href="/forge/home"
-              style={{ display: "inline-flex", alignItems: "center", gap: 9, textDecoration: "none", marginBottom: 14 }}
-            >
-              <div
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 9,
-                  background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 12,
-                  fontWeight: 900,
-                  color: "white",
-                }}
-              >
-                FF
-              </div>
+            <Link href="/forge/home" style={{ display: "inline-flex", alignItems: "center", gap: 9, textDecoration: "none", marginBottom: 14 }}>
+              <div style={{ width: 30, height: 30, borderRadius: 9, background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "white" }}>FF</div>
               <span style={{ fontSize: 14, fontWeight: 900, color: "white" }}>Finova Forge</span>
             </Link>
-            <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.28)", lineHeight: 1.85, maxWidth: 240, margin: "0 0 20px" }}>
-              Building intelligent software for growing businesses worldwide.
+            <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.28)", lineHeight: 1.85, maxWidth: 240, margin: "0 0 16px" }}>
+              Building intelligent systems for modern businesses.
             </p>
-            <a
-              href="mailto:hello@finovaforge.com"
-              style={{ fontSize: 12, color: "rgba(245,158,11,.65)", textDecoration: "none", fontWeight: 600, transition: "color .2s" }}
+            <a href="mailto:hello@finovaforge.com" style={{ fontSize: 12, color: "rgba(245,158,11,.65)", textDecoration: "none", fontWeight: 600, transition: "color .2s" }}
               onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#f59e0b")}
               onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,158,11,.65)")}
             >
@@ -180,117 +191,33 @@ export function ForgeFooter() {
             </a>
           </div>
 
-          {/* Products */}
-          <div>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                color: "rgba(255,255,255,.25)",
-                textTransform: "uppercase",
-                letterSpacing: ".1em",
-                marginBottom: 16,
-              }}
-            >
-              Products
-            </div>
-            {[
-              { l: "FinovaOS", h: "https://finovaos.app", ext: true },
-              { l: "Features", h: "https://finovaos.app/features", ext: true },
-              { l: "Pricing", h: "https://finovaos.app/pricing", ext: true },
-              { l: "Updates", h: "https://finovaos.app/updates", ext: true },
-            ].map(({ l, h, ext }) => (
-              <div key={l} style={{ marginBottom: 10 }}>
-                <a
-                  href={h}
-                  target={ext ? "_blank" : undefined}
-                  rel={ext ? "noreferrer" : undefined}
-                  style={{ fontSize: 13, color: "rgba(255,255,255,.38)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.85)")}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.38)")}
-                >
-                  {l}
-                </a>
+          {cols.map((col) => (
+            <div key={col.title}>
+              <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.25)", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 16 }}>
+                {col.title}
               </div>
-            ))}
-          </div>
-
-          {/* Company */}
-          <div>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                color: "rgba(255,255,255,.25)",
-                textTransform: "uppercase",
-                letterSpacing: ".1em",
-                marginBottom: 16,
-              }}
-            >
-              Company
+              {col.links.map(({ l, h, ext }: { l: string; h: string; ext?: boolean }) => (
+                <div key={l} style={{ marginBottom: 10 }}>
+                  {ext ? (
+                    <a href={h} target="_blank" rel="noreferrer"
+                      style={{ fontSize: 13, color: "rgba(255,255,255,.38)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.85)")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.38)}")}
+                    >{l}</a>
+                  ) : (
+                    <Link href={h}
+                      style={{ fontSize: 13, color: "rgba(255,255,255,.38)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.85)")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.38)")}
+                    >{l}</Link>
+                  )}
+                </div>
+              ))}
             </div>
-            {[
-              { l: "About", h: "/forge/about" },
-              { l: "Products", h: "/forge/products" },
-              { l: "Contact", h: "/forge/contact" },
-              { l: "Careers", h: "/forge/careers" },
-            ].map(({ l, h }) => (
-              <div key={l} style={{ marginBottom: 10 }}>
-                <Link
-                  href={h}
-                  style={{ fontSize: 13, color: "rgba(255,255,255,.38)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.85)")}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.38)")}
-                >
-                  {l}
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          {/* Legal */}
-          <div>
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 700,
-                color: "rgba(255,255,255,.25)",
-                textTransform: "uppercase",
-                letterSpacing: ".1em",
-                marginBottom: 16,
-              }}
-            >
-              Legal
-            </div>
-            {[
-              { l: "Privacy Policy", h: "/forge/privacy" },
-              { l: "Terms of Service", h: "/forge/terms" },
-            ].map(({ l, h }) => (
-              <div key={l} style={{ marginBottom: 10 }}>
-                <Link
-                  href={h}
-                  style={{ fontSize: 13, color: "rgba(255,255,255,.38)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.85)")}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.38)")}
-                >
-                  {l}
-                </Link>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
 
-        <div
-          style={{
-            borderTop: "1px solid rgba(255,255,255,.05)",
-            paddingTop: 20,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 12,
-            flexWrap: "wrap",
-          }}
-        >
+        <div style={{ borderTop: "1px solid rgba(255,255,255,.05)", paddingTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span style={{ fontSize: 12, color: "rgba(255,255,255,.18)", fontWeight: 500 }}>
             © {yr} Finova Forge. All rights reserved.
           </span>
@@ -306,12 +233,7 @@ export function useInView(threshold = 0.12) {
   const [vis, setVis] = useState(false);
   useEffect(() => {
     const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setVis(true);
-          obs.disconnect();
-        }
-      },
+      ([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect(); } },
       { threshold }
     );
     if (ref.current) obs.observe(ref.current);

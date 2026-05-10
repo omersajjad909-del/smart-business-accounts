@@ -4,193 +4,51 @@ import { ForgeNav, ForgeFooter, useInView } from "../../components/shared";
 
 const ff = "'Outfit','DM Sans',sans-serif";
 
-function Chip({ children }: { children: React.ReactNode }) {
+function Chip({ children, color = "#fbbf24", bg = "rgba(245,158,11,.08)", border = "rgba(245,158,11,.2)" }: {
+  children: React.ReactNode; color?: string; bg?: string; border?: string;
+}) {
   return (
-    <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        padding: "5px 14px",
-        borderRadius: 100,
-        background: "rgba(245,158,11,.08)",
-        border: "1px solid rgba(245,158,11,.2)",
-        fontSize: 11,
-        fontWeight: 700,
-        color: "#fbbf24",
-        letterSpacing: ".08em",
-        marginBottom: 20,
-      }}
-    >
+    <div style={{ display: "inline-flex", alignItems: "center", padding: "5px 14px", borderRadius: 100, background: bg, border: `1px solid ${border}`, fontSize: 11, fontWeight: 700, color, letterSpacing: ".08em", marginBottom: 20 }}>
       {children}
     </div>
   );
 }
 
+/* ── 1. HERO ── */
 function Hero() {
   return (
-    <section
-      style={{
-        minHeight: "100vh",
-        padding: "140px clamp(20px,4vw,48px) 100px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        background: `
-          radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,158,11,.18), transparent),
-          radial-gradient(ellipse 50% 80% at 80% 50%, rgba(239,68,68,.06), transparent)
-        `,
-        fontFamily: ff,
-        position: "relative",
-      }}
-    >
-      {/* Subtle grid */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: 0.04,
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)",
-          backgroundSize: "60px 60px",
-          pointerEvents: "none",
-        }}
-      />
-
-      <div style={{ maxWidth: 860, position: "relative", zIndex: 1 }}>
-        <Chip>SOFTWARE COMPANY</Chip>
-
-        <h1
-          style={{
-            fontSize: "clamp(44px,8vw,80px)",
-            fontWeight: 900,
-            color: "white",
-            letterSpacing: "-3px",
-            margin: "0 0 28px",
-            lineHeight: 1.05,
-          }}
-        >
-          We Build Software
+    <section style={{ minHeight: "100vh", padding: "140px clamp(16px,3vw,48px) 100px", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", position: "relative", fontFamily: ff,
+      background: "radial-gradient(ellipse 80% 50% at 50% -5%, rgba(245,158,11,.18), transparent), radial-gradient(ellipse 50% 70% at 80% 60%, rgba(239,68,68,.07), transparent)" }}>
+      <div style={{ position: "absolute", inset: 0, opacity: .04, backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
+      <div style={{ maxWidth: 880, position: "relative", zIndex: 1 }}>
+        <Chip>AI-DRIVEN SOFTWARE COMPANY</Chip>
+        <h1 style={{ fontSize: "clamp(42px,8vw,82px)", fontWeight: 900, color: "white", letterSpacing: "-3px", margin: "0 0 28px", lineHeight: 1.04 }}>
+          Building intelligent systems
           <br />
-          <span
-            style={{
-              background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Businesses Run On
+          <span style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            for modern businesses
           </span>
         </h1>
-
-        <p
-          style={{
-            fontSize: "clamp(15px,2vw,19px)",
-            color: "rgba(255,255,255,.45)",
-            margin: "0 auto 48px",
-            lineHeight: 1.75,
-            maxWidth: 640,
-          }}
-        >
-          Finova Forge creates intelligent, industry-specific tools for growing companies. Our flagship product, FinovaOS,
-          replaces spreadsheets and legacy systems for businesses worldwide.
+        <p style={{ fontSize: "clamp(15px,2vw,19px)", color: "rgba(255,255,255,.45)", margin: "0 auto 48px", lineHeight: 1.75, maxWidth: 660 }}>
+          Finova Forge develops AI-powered business platforms, automation systems, and scalable digital infrastructure for modern operations.
         </p>
-
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-          <a
-            href="https://finovaos.app"
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              padding: "14px 32px",
-              borderRadius: 12,
-              background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-              color: "white",
-              fontWeight: 700,
-              fontSize: 14,
-              textDecoration: "none",
-              boxShadow: "0 8px 28px rgba(245,158,11,.3)",
-              transition: "all .25s",
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.transform = "translateY(-2px)";
-              el.style.boxShadow = "0 12px 36px rgba(245,158,11,.45)";
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.transform = "translateY(0)";
-              el.style.boxShadow = "0 8px 28px rgba(245,158,11,.3)";
-            }}
-          >
-            Explore FinovaOS →
-          </a>
-          <Link
-            href="/forge/about"
-            style={{
-              padding: "14px 32px",
-              borderRadius: 12,
-              background: "rgba(255,255,255,.04)",
-              border: "1px solid rgba(255,255,255,.12)",
-              color: "rgba(255,255,255,.8)",
-              fontWeight: 700,
-              fontSize: 14,
-              textDecoration: "none",
-              transition: "all .25s",
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.background = "rgba(245,158,11,.08)";
-              el.style.borderColor = "rgba(245,158,11,.25)";
-              el.style.color = "white";
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.background = "rgba(255,255,255,.04)";
-              el.style.borderColor = "rgba(255,255,255,.12)";
-              el.style.color = "rgba(255,255,255,.8)";
-            }}
-          >
-            Our Story
+          <Link href="/forge/products" style={{ padding: "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#f59e0b,#ef4444)", color: "white", fontWeight: 700, fontSize: 14, textDecoration: "none", boxShadow: "0 8px 28px rgba(245,158,11,.3)", transition: "all .25s" }}
+            onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.transform = "translateY(-2px)"; el.style.boxShadow = "0 12px 36px rgba(245,158,11,.45)"; }}
+            onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.transform = "translateY(0)"; el.style.boxShadow = "0 8px 28px rgba(245,158,11,.3)"; }}>
+            Explore Products →
+          </Link>
+          <Link href="/forge/contact" style={{ padding: "14px 32px", borderRadius: 12, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.12)", color: "rgba(255,255,255,.8)", fontWeight: 700, fontSize: 14, textDecoration: "none", transition: "all .25s" }}
+            onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = "rgba(245,158,11,.08)"; el.style.borderColor = "rgba(245,158,11,.25)"; el.style.color = "white"; }}
+            onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = "rgba(255,255,255,.04)"; el.style.borderColor = "rgba(255,255,255,.12)"; el.style.color = "rgba(255,255,255,.8)"; }}>
+            Contact Us
           </Link>
         </div>
-
-        <div
-          style={{
-            marginTop: 72,
-            display: "flex",
-            gap: 48,
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          {[
-            { label: "Founded", value: "2024" },
-            { label: "Countries Served", value: "40+" },
-            { label: "Flagship Product", value: "FinovaOS" },
-          ].map((s) => (
-            <div key={s.label} style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  fontSize: "clamp(22px,3vw,32px)",
-                  fontWeight: 900,
-                  color: "white",
-                  letterSpacing: "-1px",
-                }}
-              >
-                {s.value}
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "rgba(255,255,255,.3)",
-                  fontWeight: 600,
-                  letterSpacing: ".04em",
-                  marginTop: 5,
-                }}
-              >
-                {s.label}
-              </div>
+        <div style={{ marginTop: 72, display: "flex", gap: 48, justifyContent: "center", flexWrap: "wrap" }}>
+          {[{ v: "2024", l: "Founded" }, { v: "40+", l: "Countries" }, { v: "1", l: "Live Product" }, { v: "∞", l: "Ambition" }].map(s => (
+            <div key={s.l} style={{ textAlign: "center" }}>
+              <div style={{ fontSize: "clamp(20px,3vw,30px)", fontWeight: 900, color: "white", letterSpacing: "-1px" }}>{s.v}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600, letterSpacing: ".04em", marginTop: 4 }}>{s.l}</div>
             </div>
           ))}
         </div>
@@ -199,423 +57,42 @@ function Hero() {
   );
 }
 
-function ProductSpotlight() {
-  const [ref, vis] = useInView();
-  const features = [
-    { icon: "📊", label: "Real-Time Accounting" },
-    { icon: "🏦", label: "Bank Reconciliation" },
-    { icon: "📝", label: "Expense Vouchers" },
-    { icon: "💰", label: "Multi-Account Mgmt" },
-    { icon: "🔐", label: "Role-Based Access" },
-    { icon: "📈", label: "Reports & Analytics" },
-    { icon: "🧾", label: "Invoicing & Billing" },
-    { icon: "🔗", label: "API & Integrations" },
-  ];
-
-  return (
-    <section style={{ padding: "100px clamp(20px,4vw,48px)", fontFamily: ff }}>
-      <div
-        ref={ref}
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          opacity: vis ? 1 : 0,
-          transform: vis ? "none" : "translateY(28px)",
-          transition: "all .65s ease",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: 60 }}>
-          <Chip>OUR FLAGSHIP PRODUCT</Chip>
-          <h2
-            style={{
-              fontSize: "clamp(32px,5vw,56px)",
-              fontWeight: 900,
-              color: "white",
-              letterSpacing: "-2px",
-              margin: "0 0 16px",
-              lineHeight: 1.08,
-            }}
-          >
-            Introducing FinovaOS
-          </h2>
-          <p
-            style={{
-              fontSize: 16,
-              color: "rgba(255,255,255,.4)",
-              maxWidth: 560,
-              margin: "0 auto",
-              lineHeight: 1.7,
-            }}
-          >
-            The all-in-one business management platform built for growing companies. Real-time insights, zero enterprise
-            complexity.
-          </p>
-        </div>
-
-        <div
-          style={{
-            borderRadius: 24,
-            background: "linear-gradient(145deg,rgba(245,158,11,.07),rgba(239,68,68,.04),rgba(0,0,0,.2))",
-            border: "1px solid rgba(245,158,11,.18)",
-            padding: "clamp(28px,4vw,48px)",
-          }}
-        >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
-              gap: 48,
-              alignItems: "center",
-            }}
-          >
-            {/* Copy */}
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                <div
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 13,
-                    background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 18,
-                    fontWeight: 900,
-                    color: "white",
-                    boxShadow: "0 6px 20px rgba(245,158,11,.3)",
-                  }}
-                >
-                  OS
-                </div>
-                <div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: "white" }}>FinovaOS</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", fontWeight: 600 }}>
-                    Business Management Platform
-                  </div>
-                </div>
-              </div>
-              <p
-                style={{
-                  fontSize: 14.5,
-                  color: "rgba(255,255,255,.5)",
-                  lineHeight: 1.85,
-                  margin: "0 0 28px",
-                }}
-              >
-                Replace your spreadsheets and fragmented tools with a single, intelligent platform. From accounting to
-                inventory, invoicing to payroll — FinovaOS covers it all with industry-specific workflows built for the
-                way you actually work.
-              </p>
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <a
-                  href="https://finovaos.app"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    padding: "11px 22px",
-                    borderRadius: 10,
-                    background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-                    color: "white",
-                    fontWeight: 700,
-                    fontSize: 13,
-                    textDecoration: "none",
-                    boxShadow: "0 4px 16px rgba(245,158,11,.3)",
-                    transition: "all .2s",
-                  }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)")}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)")}
-                >
-                  Launch FinovaOS →
-                </a>
-                <Link
-                  href="/forge/products"
-                  style={{
-                    padding: "11px 22px",
-                    borderRadius: 10,
-                    background: "rgba(255,255,255,.06)",
-                    border: "1px solid rgba(255,255,255,.12)",
-                    color: "rgba(255,255,255,.7)",
-                    fontWeight: 700,
-                    fontSize: 13,
-                    textDecoration: "none",
-                    transition: "all .2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget as HTMLAnchorElement;
-                    el.style.background = "rgba(255,255,255,.1)";
-                    el.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget as HTMLAnchorElement;
-                    el.style.background = "rgba(255,255,255,.06)";
-                    el.style.color = "rgba(255,255,255,.7)";
-                  }}
-                >
-                  View Details
-                </Link>
-              </div>
-            </div>
-
-            {/* Feature grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {features.map((f, i) => (
-                <div
-                  key={i}
-                  style={{
-                    padding: "13px 15px",
-                    borderRadius: 11,
-                    background: "rgba(255,255,255,.03)",
-                    border: "1px solid rgba(255,255,255,.06)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    transition: "all .2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget as HTMLDivElement;
-                    el.style.background = "rgba(245,158,11,.06)";
-                    el.style.borderColor = "rgba(245,158,11,.18)";
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget as HTMLDivElement;
-                    el.style.background = "rgba(255,255,255,.03)";
-                    el.style.borderColor = "rgba(255,255,255,.06)";
-                  }}
-                >
-                  <span style={{ fontSize: 18 }}>{f.icon}</span>
-                  <span style={{ fontSize: 11.5, fontWeight: 600, color: "rgba(255,255,255,.6)" }}>{f.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Principles() {
-  const [ref, vis] = useInView();
-  const pillars = [
-    {
-      number: "01",
-      title: "Industry First",
-      body: "We don't build generic tools. Every product is shaped around how a specific industry actually operates — so there's no six-month customization project before you can get to work.",
-    },
-    {
-      number: "02",
-      title: "Zero Complexity",
-      body: "Enterprise-grade power without the enterprise overhead. Setup in minutes, not months. Your team should be productive from the very first day.",
-    },
-    {
-      number: "03",
-      title: "Built to Scale",
-      body: "Start with one user, grow to a full organization. Our architecture scales with your ambition — no painful migrations, no hitting ceilings.",
-    },
-  ];
-
-  return (
-    <section
-      style={{
-        padding: "100px clamp(20px,4vw,48px)",
-        background: "rgba(255,255,255,.015)",
-        borderTop: "1px solid rgba(255,255,255,.05)",
-        fontFamily: ff,
-      }}
-    >
-      <div
-        ref={ref}
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          opacity: vis ? 1 : 0,
-          transform: vis ? "none" : "translateY(28px)",
-          transition: "all .65s ease",
-        }}
-      >
-        <div style={{ marginBottom: 64 }}>
-          <Chip>HOW WE BUILD</Chip>
-          <h2
-            style={{
-              fontSize: "clamp(28px,4vw,48px)",
-              fontWeight: 900,
-              color: "white",
-              letterSpacing: "-1.5px",
-              margin: 0,
-              maxWidth: 480,
-            }}
-          >
-            Three principles we never compromise on
-          </h2>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 24 }}>
-          {pillars.map((p, i) => (
-            <div
-              key={i}
-              style={{
-                padding: "36px 32px",
-                borderRadius: 20,
-                background: "rgba(255,255,255,.025)",
-                border: "1px solid rgba(255,255,255,.07)",
-                transition: "all .3s",
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLDivElement;
-                el.style.background = "rgba(245,158,11,.04)";
-                el.style.borderColor = "rgba(245,158,11,.18)";
-                el.style.transform = "translateY(-4px)";
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLDivElement;
-                el.style.background = "rgba(255,255,255,.025)";
-                el.style.borderColor = "rgba(255,255,255,.07)";
-                el.style.transform = "translateY(0)";
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 900,
-                  color: "rgba(245,158,11,.4)",
-                  letterSpacing: ".04em",
-                  marginBottom: 16,
-                }}
-              >
-                {p.number}
-              </div>
-              <h3
-                style={{
-                  fontSize: 19,
-                  fontWeight: 900,
-                  color: "white",
-                  margin: "0 0 14px",
-                  letterSpacing: "-.5px",
-                }}
-              >
-                {p.title}
-              </h3>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0, lineHeight: 1.75 }}>{p.body}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function AboutSnippet() {
+/* ── 2. COMPANY INTRO ── */
+function CompanyIntro() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "100px clamp(20px,4vw,48px)", fontFamily: ff }}>
-      <div
-        ref={ref}
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
-          gap: 64,
-          alignItems: "center",
-          opacity: vis ? 1 : 0,
-          transform: vis ? "none" : "translateY(28px)",
-          transition: "all .65s ease",
-        }}
-      >
+    <section style={{ padding: "100px clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 64, alignItems: "center", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <div>
           <Chip>WHO WE ARE</Chip>
-          <h2
-            style={{
-              fontSize: "clamp(28px,4vw,48px)",
-              fontWeight: 900,
-              color: "white",
-              letterSpacing: "-1.5px",
-              margin: "0 0 20px",
-              lineHeight: 1.1,
-            }}
-          >
-            A focused team building software the world actually needs
+          <h2 style={{ fontSize: "clamp(28px,4vw,48px)", fontWeight: 900, color: "white", letterSpacing: "-1.5px", margin: "0 0 20px", lineHeight: 1.1 }}>
+            We don&apos;t just build software.<br />We build operations.
           </h2>
-          <p
-            style={{
-              fontSize: 14.5,
-              color: "rgba(255,255,255,.45)",
-              lineHeight: 1.85,
-              margin: "0 0 24px",
-            }}
-          >
-            Founded in 2024, Finova Forge started with a simple observation: the best software for growing businesses
-            didn't exist. Enterprise tools were too complex and expensive. Simple tools lacked depth.
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,.45)", lineHeight: 1.85, margin: "0 0 20px" }}>
+            Finova Forge is a software company focused on building intelligent, modular systems that replace fragmented tools and manual processes for growing businesses.
           </p>
-          <p
-            style={{
-              fontSize: 14.5,
-              color: "rgba(255,255,255,.45)",
-              lineHeight: 1.85,
-              margin: "0 0 32px",
-            }}
-          >
-            We set out to close that gap. FinovaOS is our first answer — and we're just getting started.
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,.45)", lineHeight: 1.85, margin: "0 0 32px" }}>
+            Our flagship product, FinovaOS, is a full ERP platform — and it&apos;s just the beginning. We&apos;re building an ecosystem of AI-powered business tools designed to scale with you.
           </p>
-          <Link
-            href="/forge/about"
-            style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: "rgba(255,255,255,.55)",
-              textDecoration: "none",
-              transition: "color .2s",
-            }}
+          <Link href="/forge/about" style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.55)", textDecoration: "none", transition: "color .2s" }}
             onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "white")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.55)")}
-          >
-            Read our full story →
+            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.55)")}>
+            Our full story →
           </Link>
         </div>
-
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
-            { val: "2024", label: "Year Founded" },
-            { val: "40+", label: "Countries Served" },
-            { val: "1", label: "Flagship Product" },
-            { val: "∞", label: "Ambition" },
-          ].map((s) => (
-            <div
-              key={s.label}
-              style={{
-                padding: "28px 24px",
-                borderRadius: 16,
-                background: "rgba(255,255,255,.025)",
-                border: "1px solid rgba(255,255,255,.07)",
-                textAlign: "center",
-                transition: "all .3s",
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLDivElement;
-                el.style.background = "rgba(245,158,11,.04)";
-                el.style.borderColor = "rgba(245,158,11,.18)";
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLDivElement;
-                el.style.background = "rgba(255,255,255,.025)";
-                el.style.borderColor = "rgba(255,255,255,.07)";
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "clamp(28px,3vw,40px)",
-                  fontWeight: 900,
-                  color: "white",
-                  letterSpacing: "-1.5px",
-                  marginBottom: 6,
-                }}
-              >
-                {s.val}
-              </div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", fontWeight: 600, letterSpacing: ".04em" }}>
-                {s.label}
-              </div>
+            { icon: "🏗️", title: "We Build", body: "SaaS platforms, ERP systems, AI tools, and business automation infrastructure." },
+            { icon: "🎯", title: "We Focus", body: "Industry-specific solutions, not generic tools. Built for how your business actually works." },
+            { icon: "🤖", title: "We Automate", body: "AI-driven workflows that replace manual, repetitive processes across your operations." },
+            { icon: "🌍", title: "We Scale", body: "Systems designed for global operations — multi-currency, multi-branch, multi-company." },
+          ].map((c, i) => (
+            <div key={i} style={{ padding: "24px 20px", borderRadius: 16, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", transition: "all .3s" }}
+              onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = "rgba(245,158,11,.04)"; el.style.borderColor = "rgba(245,158,11,.18)"; }}
+              onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = "rgba(255,255,255,.025)"; el.style.borderColor = "rgba(255,255,255,.07)"; }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>{c.icon}</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "white", marginBottom: 6 }}>{c.title}</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", lineHeight: 1.7 }}>{c.body}</div>
             </div>
           ))}
         </div>
@@ -624,115 +101,187 @@ function AboutSnippet() {
   );
 }
 
+/* ── 3. PRODUCTS ── */
+function Products() {
+  const [ref, vis] = useInView();
+  return (
+    <section style={{ padding: "100px clamp(16px,3vw,48px)", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <Chip>OUR PRODUCTS</Chip>
+          <h2 style={{ fontSize: "clamp(28px,4vw,48px)", fontWeight: 900, color: "white", letterSpacing: "-1.5px", margin: "0 0 12px" }}>What we&apos;ve built — and what&apos;s coming</h2>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,.35)", maxWidth: 500, margin: "0 auto" }}>Each product targets a specific gap in how modern businesses operate.</p>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 20 }}>
+          {/* FinovaOS — Live */}
+          <div style={{ padding: "36px 32px", borderRadius: 22, background: "linear-gradient(145deg,rgba(245,158,11,.08),rgba(239,68,68,.04))", border: "1px solid rgba(245,158,11,.22)", position: "relative" }}>
+            <div style={{ position: "absolute", top: 16, right: 16, padding: "3px 10px", borderRadius: 8, background: "rgba(34,197,94,.12)", border: "1px solid rgba(34,197,94,.25)", fontSize: 10, fontWeight: 700, color: "#4ade80" }}>LIVE</div>
+            <div style={{ width: 52, height: 52, borderRadius: 14, background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 900, color: "white", marginBottom: 20, boxShadow: "0 6px 20px rgba(245,158,11,.3)" }}>OS</div>
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: "white", margin: "0 0 6px", letterSpacing: "-.5px" }}>FinovaOS</h3>
+            <p style={{ fontSize: 12, color: "#f59e0b", fontWeight: 700, margin: "0 0 16px", letterSpacing: ".04em", textTransform: "uppercase" }}>AI-Powered ERP Platform</p>
+            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.5)", lineHeight: 1.8, margin: "0 0 24px" }}>
+              A modular, full-stack ERP system covering accounting, inventory, payroll, invoicing, HR, CRM, and more. Built for industry-specific workflows — from retail to manufacturing.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 28 }}>
+              {["Accounting", "Inventory", "Invoicing", "Payroll", "CRM", "Reports"].map(t => (
+                <span key={t} style={{ padding: "4px 10px", borderRadius: 7, background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.2)", fontSize: 11, fontWeight: 600, color: "rgba(245,158,11,.8)" }}>{t}</span>
+              ))}
+            </div>
+            <a href="https://finovaos.app" target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "11px 22px", borderRadius: 10, background: "linear-gradient(135deg,#f59e0b,#ef4444)", color: "white", fontWeight: 700, fontSize: 13, textDecoration: "none", boxShadow: "0 4px 16px rgba(245,158,11,.3)", transition: "all .2s" }}
+              onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)")}>
+              Open FinovaOS →
+            </a>
+          </div>
+
+          {/* Future products */}
+          {[
+            { name: "FinovaAI", sub: "Business Intelligence Layer", desc: "AI-powered analytics, demand forecasting, anomaly detection, and natural-language reporting across all your business data.", tag: "In Development", icon: "🤖" },
+            { name: "FinovaPOS", sub: "Point of Sale System", desc: "A standalone POS built for retail, F&B, and multi-branch operations — integrated directly with FinovaOS inventory and accounting.", tag: "Planned", icon: "🖥️" },
+          ].map((p, i) => (
+            <div key={i} style={{ padding: "36px 32px", borderRadius: 22, background: "rgba(255,255,255,.02)", border: "1px dashed rgba(255,255,255,.09)", position: "relative", transition: "all .3s" }}
+              onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = "rgba(255,255,255,.04)"; el.style.borderColor = "rgba(255,255,255,.14)"; }}
+              onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = "rgba(255,255,255,.02)"; el.style.borderColor = "rgba(255,255,255,.09)"; }}>
+              <div style={{ position: "absolute", top: 16, right: 16, padding: "3px 10px", borderRadius: 8, background: "rgba(255,255,255,.06)", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.3)", letterSpacing: ".04em" }}>{p.tag}</div>
+              <div style={{ fontSize: 44, marginBottom: 20, opacity: .5 }}>{p.icon}</div>
+              <h3 style={{ fontSize: 20, fontWeight: 900, color: "rgba(255,255,255,.5)", margin: "0 0 6px", letterSpacing: "-.4px" }}>{p.name}</h3>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,.25)", fontWeight: 700, margin: "0 0 16px", letterSpacing: ".04em", textTransform: "uppercase" }}>{p.sub}</p>
+              <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.28)", lineHeight: 1.8, margin: 0 }}>{p.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{ textAlign: "center", marginTop: 24 }}>
+          <Link href="/forge/products" style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.3)", textDecoration: "none", transition: "color .2s" }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.7)")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.3)")}>
+            View full product details →
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── 4. SERVICES ── */
+function Services() {
+  const [ref, vis] = useInView();
+  const services = [
+    { icon: "🏗️", title: "ERP & Business Software", color: "#f59e0b", desc: "End-to-end ERP systems covering accounting, inventory, HR, invoicing, and operations. Industry-specific, not generic." },
+    { icon: "🤖", title: "AI Automation", color: "#818cf8", desc: "Intelligent workflows that automate repetitive tasks — from purchase approvals to financial reconciliation to demand forecasting." },
+    { icon: "☁️", title: "SaaS Development", color: "#34d399", desc: "We build scalable, multi-tenant SaaS platforms from architecture to deployment — with real-time data, role-based access, and API-first design." },
+    { icon: "🔧", title: "Business Infrastructure", color: "#f87171", desc: "Cloud infrastructure, data pipelines, monitoring, and security systems that form the backbone of modern business operations." },
+  ];
+  return (
+    <section style={{ padding: "100px clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
+        <div style={{ marginBottom: 56 }}>
+          <Chip>WHAT WE BUILD</Chip>
+          <h2 style={{ fontSize: "clamp(28px,4vw,48px)", fontWeight: 900, color: "white", letterSpacing: "-1.5px", margin: 0, maxWidth: 500 }}>Our capabilities</h2>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 20 }}>
+          {services.map((s, i) => (
+            <div key={i} style={{ padding: "32px 28px", borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", transition: "all .3s" }}
+              onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = `${s.color}0a`; el.style.borderColor = `${s.color}30`; el.style.transform = "translateY(-4px)"; }}
+              onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = "rgba(255,255,255,.025)"; el.style.borderColor = "rgba(255,255,255,.07)"; el.style.transform = "translateY(0)"; }}>
+              <div style={{ fontSize: 36, marginBottom: 16 }}>{s.icon}</div>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: "white", margin: "0 0 12px" }}>{s.title}</h3>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0, lineHeight: 1.75 }}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── 5. TECH STACK ── */
+function TechStack() {
+  const [ref, vis] = useInView();
+  const stack = [
+    { label: "Next.js", cat: "Frontend", color: "rgba(255,255,255,.8)" },
+    { label: "Node.js", cat: "Backend", color: "#68a063" },
+    { label: "PostgreSQL", cat: "Database", color: "#336791" },
+    { label: "Supabase", cat: "Platform", color: "#3ecf8e" },
+    { label: "OpenAI", cat: "AI", color: "#74aa9c" },
+    { label: "Vercel", cat: "Cloud", color: "rgba(255,255,255,.7)" },
+    { label: "TypeScript", cat: "Language", color: "#3178c6" },
+    { label: "AES-256", cat: "Security", color: "#f87171" },
+  ];
+  return (
+    <section style={{ padding: "100px clamp(16px,3vw,48px)", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <Chip>TECHNOLOGY</Chip>
+          <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 900, color: "white", letterSpacing: "-1.5px", margin: "0 0 12px" }}>Built on solid foundations</h2>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", maxWidth: 460, margin: "0 auto" }}>Modern, proven technologies — chosen for reliability, scalability, and developer velocity.</p>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
+          {stack.map((t, i) => (
+            <div key={i} style={{ padding: "14px 20px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minWidth: 100, transition: "all .25s" }}
+              onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = "rgba(255,255,255,.07)"; el.style.borderColor = "rgba(255,255,255,.16)"; el.style.transform = "translateY(-3px)"; }}
+              onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = "rgba(255,255,255,.03)"; el.style.borderColor = "rgba(255,255,255,.08)"; el.style.transform = "translateY(0)"; }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: t.color }}>{t.label}</span>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)", fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase" }}>{t.cat}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 48, padding: "28px 32px", borderRadius: 16, background: "rgba(245,158,11,.04)", border: "1px solid rgba(245,158,11,.12)", display: "flex", gap: 32, flexWrap: "wrap", justifyContent: "center" }}>
+          {[{ icon: "⚡", label: "Realtime data sync" }, { icon: "🔐", label: "End-to-end encryption" }, { icon: "🌍", label: "Multi-region ready" }, { icon: "📈", label: "Scales to millions of records" }].map((f, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.45)", fontWeight: 600 }}>
+              <span style={{ fontSize: 16 }}>{f.icon}</span>{f.label}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── 6. VISION ── */
+function Vision() {
+  const [ref, vis] = useInView();
+  return (
+    <section style={{ padding: "100px clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 900, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
+        <Chip>OUR VISION</Chip>
+        <blockquote style={{ fontSize: "clamp(22px,3.5vw,38px)", fontWeight: 900, color: "white", letterSpacing: "-1.5px", lineHeight: 1.25, margin: "0 0 32px", borderLeft: "3px solid rgba(245,158,11,.4)", paddingLeft: 32 }}>
+          &ldquo;Every modern business deserves intelligent operations. We&apos;re building the infrastructure to make that possible.&rdquo;
+        </blockquote>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,.45)", lineHeight: 1.85, margin: "0 0 16px" }}>
+          The world runs on businesses — millions of them operating daily on spreadsheets, disconnected software, and manual processes. The tools exist to automate all of it. They&apos;re just not accessible enough.
+        </p>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,.45)", lineHeight: 1.85 }}>
+          Finova Forge is building that access layer — starting with FinovaOS, expanding into AI automation, and eventually covering every operational need a modern business has. Industry by industry. System by system.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ── 7. CTA ── */
 function CTA() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "100px clamp(20px,4vw,48px) 120px", fontFamily: ff }}>
-      <div
-        ref={ref}
-        style={{
-          maxWidth: 860,
-          margin: "0 auto",
-          textAlign: "center",
-          padding: "clamp(48px,6vw,72px) clamp(28px,5vw,56px)",
-          borderRadius: 28,
-          background: "linear-gradient(135deg,rgba(245,158,11,.09),rgba(239,68,68,.05))",
-          border: "1px solid rgba(245,158,11,.2)",
-          position: "relative",
-          overflow: "hidden",
-          opacity: vis ? 1 : 0,
-          transform: vis ? "none" : "translateY(28px)",
-          transition: "all .65s ease",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: -60,
-            right: -60,
-            width: 220,
-            height: 220,
-            borderRadius: "50%",
-            background: "radial-gradient(circle,rgba(245,158,11,.14),transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
+    <section style={{ padding: "100px clamp(16px,3vw,48px) 120px", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 900, margin: "0 auto", textAlign: "center", padding: "72px clamp(28px,5vw,64px)", borderRadius: 28, background: "linear-gradient(135deg,rgba(245,158,11,.09),rgba(239,68,68,.05))", border: "1px solid rgba(245,158,11,.2)", position: "relative", overflow: "hidden", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
+        <div style={{ position: "absolute", top: -60, right: -60, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle,rgba(245,158,11,.14),transparent 70%)", pointerEvents: "none" }} />
         <Chip>GET STARTED</Chip>
-        <h2
-          style={{
-            fontSize: "clamp(28px,4vw,44px)",
-            fontWeight: 900,
-            color: "white",
-            margin: "0 0 16px",
-            letterSpacing: "-1.5px",
-          }}
-        >
-          Ready to see FinovaOS in action?
+        <h2 style={{ fontSize: "clamp(26px,4vw,44px)", fontWeight: 900, color: "white", margin: "0 0 16px", letterSpacing: "-1.5px" }}>
+          Build smarter operations<br />with Finova Forge
         </h2>
-        <p
-          style={{
-            fontSize: 15,
-            color: "rgba(255,255,255,.45)",
-            margin: "0 0 36px",
-            lineHeight: 1.75,
-          }}
-        >
-          See FinovaOS in action — the all-in-one business management platform.
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,.45)", margin: "0 0 36px", lineHeight: 1.75, maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
+          Whether you&apos;re replacing spreadsheets, scaling your operations, or building the next generation of your business — we have the tools.
         </p>
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-          <a
-            href="https://finovaos.app"
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              padding: "14px 32px",
-              borderRadius: 12,
-              background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-              color: "white",
-              fontWeight: 700,
-              fontSize: 14,
-              textDecoration: "none",
-              boxShadow: "0 8px 28px rgba(245,158,11,.3)",
-              transition: "all .25s",
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.transform = "translateY(-2px)";
-              el.style.boxShadow = "0 12px 36px rgba(245,158,11,.45)";
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.transform = "translateY(0)";
-              el.style.boxShadow = "0 8px 28px rgba(245,158,11,.3)";
-            }}
-          >
+          <a href="https://finovaos.app" target="_blank" rel="noreferrer" style={{ padding: "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#f59e0b,#ef4444)", color: "white", fontWeight: 700, fontSize: 14, textDecoration: "none", boxShadow: "0 8px 28px rgba(245,158,11,.3)", transition: "all .25s" }}
+            onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.transform = "translateY(-2px)"; el.style.boxShadow = "0 12px 36px rgba(245,158,11,.45)"; }}
+            onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.transform = "translateY(0)"; el.style.boxShadow = "0 8px 28px rgba(245,158,11,.3)"; }}>
             Open FinovaOS →
           </a>
-          <Link
-            href="/forge/products"
-            style={{
-              padding: "14px 32px",
-              borderRadius: 12,
-              background: "rgba(255,255,255,.06)",
-              border: "1px solid rgba(255,255,255,.12)",
-              color: "rgba(255,255,255,.8)",
-              fontWeight: 700,
-              fontSize: 14,
-              textDecoration: "none",
-              transition: "all .25s",
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.background = "rgba(255,255,255,.1)";
-              el.style.color = "white";
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.background = "rgba(255,255,255,.06)";
-              el.style.color = "rgba(255,255,255,.8)";
-            }}
-          >
-            View Products
+          <Link href="/forge/contact" style={{ padding: "14px 32px", borderRadius: 12, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.12)", color: "rgba(255,255,255,.8)", fontWeight: 700, fontSize: 14, textDecoration: "none", transition: "all .25s" }}
+            onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = "rgba(255,255,255,.1)"; el.style.color = "white"; }}
+            onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = "rgba(255,255,255,.06)"; el.style.color = "rgba(255,255,255,.8)"; }}>
+            Talk to Us
           </Link>
         </div>
       </div>
@@ -743,16 +292,14 @@ function CTA() {
 export default function HomePage() {
   return (
     <div style={{ fontFamily: ff, color: "white" }}>
-      <style>{`
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        html{scroll-behavior:smooth}
-        body{background:rgb(7,8,15)}
-      `}</style>
+      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:rgb(7,8,15)}`}</style>
       <ForgeNav />
       <Hero />
-      <ProductSpotlight />
-      <Principles />
-      <AboutSnippet />
+      <CompanyIntro />
+      <Products />
+      <Services />
+      <TechStack />
+      <Vision />
       <CTA />
       <ForgeFooter />
     </div>
