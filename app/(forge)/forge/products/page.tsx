@@ -475,7 +475,7 @@ function Pricing() {
             Simple, transparent pricing
           </h2>
           <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", margin: 0 }}>
-            All plans include a 14-day free trial. No credit card required.
+            Choose the plan that fits your business.
           </p>
         </div>
 
@@ -571,7 +571,7 @@ function Pricing() {
                     (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,.07)";
                 }}
               >
-                {plan.name === "Enterprise" ? "Contact Sales" : "Start Free Trial"} →
+                {plan.name === "Enterprise" ? "Contact Sales" : "Get Started"} →
               </a>
             </div>
           ))}
@@ -609,7 +609,7 @@ function CTA() {
             letterSpacing: "-1.5px",
           }}
         >
-          Start your free trial today
+          Ready to get started with FinovaOS?
         </h2>
         <p
           style={{
@@ -619,7 +619,7 @@ function CTA() {
             lineHeight: 1.75,
           }}
         >
-          14 days free. No credit card required. Full access from day one.
+          The all-in-one business management platform for growing companies worldwide.
         </p>
         <a
           href="https://finovaos.app"
@@ -648,7 +648,7 @@ function CTA() {
             el.style.boxShadow = "0 8px 28px rgba(245,158,11,.3)";
           }}
         >
-          Try FinovaOS Free →
+          Open FinovaOS →
         </a>
       </div>
     </section>

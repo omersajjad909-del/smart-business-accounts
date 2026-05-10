@@ -512,7 +512,7 @@ function CTA() {
               el.style.boxShadow = "0 8px 28px rgba(245,158,11,.3)";
             }}
           >
-            Start Free Trial →
+            Open FinovaOS →
           </a>
           <Link
             href="/forge/contact"

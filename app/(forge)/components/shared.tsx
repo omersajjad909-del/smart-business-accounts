@@ -233,7 +233,7 @@ export function ForgeFooter() {
               { l: "About", h: "/forge/about" },
               { l: "Products", h: "/forge/products" },
               { l: "Contact", h: "/forge/contact" },
-              { l: "Careers", h: "/careers" },
+              { l: "Careers", h: "/forge/careers" },
             ].map(({ l, h }) => (
               <div key={l} style={{ marginBottom: 10 }}>
                 <Link
@@ -263,8 +263,8 @@ export function ForgeFooter() {
               Legal
             </div>
             {[
-              { l: "Privacy Policy", h: "/privacy" },
-              { l: "Terms of Service", h: "/terms" },
+              { l: "Privacy Policy", h: "/forge/privacy" },
+              { l: "Terms of Service", h: "/forge/terms" },
             ].map(({ l, h }) => (
               <div key={l} style={{ marginBottom: 10 }}>
                 <Link

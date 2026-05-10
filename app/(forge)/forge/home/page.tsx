@@ -677,7 +677,7 @@ function CTA() {
             lineHeight: 1.75,
           }}
         >
-          14 days free. No credit card required. Full access from day one.
+          See FinovaOS in action — the all-in-one business management platform.
         </p>
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
           <a
@@ -706,7 +706,7 @@ function CTA() {
               el.style.boxShadow = "0 8px 28px rgba(245,158,11,.3)";
             }}
           >
-            Start Free Trial →
+            Open FinovaOS →
           </a>
           <Link
             href="/forge/products"
