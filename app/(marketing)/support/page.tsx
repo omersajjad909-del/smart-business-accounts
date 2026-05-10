@@ -103,10 +103,10 @@ const CATEGORIES = [
   {
     icon: "💡",
     label: "Feature Requests",
-    desc: "Submit ideas, vote on the product roadmap, and track the status of your suggestions.",
-    count: "View Roadmap →",
+    desc: "Submit ideas and suggestions for new features. Our team reviews every request.",
+    count: "Submit request →",
     color: "#f87171",
-    href: "/roadmap",
+    href: "/support/ticket",
   },
 ] as const;
 
@@ -642,8 +642,8 @@ export default function SupportPage() {
                   </div>
                   {[
                     { label: "Getting Started Guide", icon: "🚀", href: "/help" },
-                    { label: "Video Tutorials", icon: "🎬", href: "/help" },
                     { label: "Data Import Guide", icon: "📥", href: "/help" },
+                    { label: "Changelog & Updates", icon: "📋", href: "/changelog" },
                     { label: "Submit a Support Ticket", icon: "🎫", href: "/support/ticket" },
                   ].map(({ label, icon, href }) => (
                     <Link key={label} href={href} className="ql">
