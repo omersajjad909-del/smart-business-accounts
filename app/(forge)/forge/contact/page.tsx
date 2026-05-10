@@ -4,437 +4,479 @@ import { ForgeNav, ForgeFooter, useInView } from "../../components/shared";
 
 const ff = "'Outfit','DM Sans',sans-serif";
 
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        padding: "5px 14px",
+        borderRadius: 100,
+        background: "rgba(245,158,11,.08)",
+        border: "1px solid rgba(245,158,11,.2)",
+        fontSize: 11,
+        fontWeight: 700,
+        color: "#fbbf24",
+        letterSpacing: ".08em",
+        marginBottom: 20,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "12px 16px",
+  borderRadius: 12,
+  background: "rgba(255,255,255,.05)",
+  border: "1px solid rgba(255,255,255,.12)",
+  color: "white",
+  fontSize: 14,
+  outline: "none",
+  fontFamily: ff,
+  boxSizing: "border-box",
+  transition: "all .2s",
+};
+
 function Hero() {
   return (
     <section
       style={{
-        minHeight: "60vh",
-        padding: "120px 40px",
+        minHeight: "50vh",
+        padding: "140px clamp(20px,4vw,48px) 60px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        background:
-          "radial-gradient(ellipse 80% 40% at 50% 0%, rgba(245,158,11,.15), transparent)",
+        background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,158,11,.16), transparent)",
         fontFamily: ff,
+        position: "relative",
       }}
     >
-      <div style={{ maxWidth: 700 }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          opacity: 0.04,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)",
+          backgroundSize: "60px 60px",
+          pointerEvents: "none",
+        }}
+      />
+      <div style={{ maxWidth: 640, position: "relative", zIndex: 1 }}>
+        <Chip>CONTACT</Chip>
         <h1
           style={{
-            fontSize: "clamp(36px,6vw,60px)",
+            fontSize: "clamp(36px,6vw,62px)",
             fontWeight: 900,
             color: "white",
             letterSpacing: "-2px",
             margin: "0 0 20px",
-            lineHeight: 1.1,
+            lineHeight: 1.08,
           }}
         >
-          Get in Touch
+          Let&apos;s Talk
         </h1>
-
         <p
           style={{
-            fontSize: 16,
+            fontSize: "clamp(14px,2vw,17px)",
             color: "rgba(255,255,255,.4)",
+            lineHeight: 1.8,
             margin: 0,
-            lineHeight: 1.7,
           }}
         >
-          Questions, partnership opportunities, or just want to say hello? We'd love to hear from you.
+          Questions, partnership opportunities, or just want to say hello? We&apos;d love to hear from you.
         </p>
       </div>
     </section>
   );
 }
 
-function ContactForm() {
+function ContactSection() {
   const [ref, vis] = useInView();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
     try {
-      // In a real implementation, you would send this to your backend
-      // For now, we'll just simulate a successful submission
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 1000));
       setSent(true);
       setFormData({ name: "", email: "", subject: "", message: "" });
-      setTimeout(() => setSent(false), 5000);
-    } catch (error) {
-      console.error(error);
+      setTimeout(() => setSent(false), 6000);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <section
-      style={{
-        padding: "80px 40px",
-        background: "rgba(255,255,255,.01)",
-        borderTop: "1px solid rgba(255,255,255,.05)",
-        fontFamily: ff,
-      }}
-    >
-      <div
-        ref={ref}
-        style={{
-          maxWidth: 600,
-          margin: "0 auto",
-          opacity: vis ? 1 : 0,
-          transform: vis ? "translateY(0)" : "translateY(24px)",
-          transition: "all .65s ease",
-        }}
-      >
-        <div
-          style={{
-            padding: "40px",
-            borderRadius: 20,
-            background: "linear-gradient(135deg,rgba(245,158,11,.08),rgba(239,68,68,.04))",
-            border: "1px solid rgba(245,158,11,.2)",
-          }}
-        >
-          {sent ? (
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
-              <h3 style={{ fontSize: 20, fontWeight: 900, color: "white", margin: "0 0 8px" }}>
-                Message Sent!
-              </h3>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,.5)", margin: 0 }}>
-                Thanks for reaching out. We'll get back to you soon.
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "rgba(255,255,255,.7)",
-                    marginBottom: 8,
-                  }}
-                >
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "12px 16px",
-                    borderRadius: 12,
-                    background: "rgba(255,255,255,.05)",
-                    border: "1px solid rgba(255,255,255,.15)",
-                    color: "white",
-                    fontSize: 14,
-                    outline: "none",
-                    fontFamily: ff,
-                  }}
-                  onFocus={(e) => {
-                    (e.currentTarget as HTMLInputElement).style.borderColor = "rgba(245,158,11,.3)";
-                    (e.currentTarget as HTMLInputElement).style.background = "rgba(255,255,255,.08)";
-                  }}
-                  onBlur={(e) => {
-                    (e.currentTarget as HTMLInputElement).style.borderColor = "rgba(255,255,255,.15)";
-                    (e.currentTarget as HTMLInputElement).style.background = "rgba(255,255,255,.05)";
-                  }}
-                />
-              </div>
-
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "rgba(255,255,255,.7)",
-                    marginBottom: 8,
-                  }}
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "12px 16px",
-                    borderRadius: 12,
-                    background: "rgba(255,255,255,.05)",
-                    border: "1px solid rgba(255,255,255,.15)",
-                    color: "white",
-                    fontSize: 14,
-                    outline: "none",
-                    fontFamily: ff,
-                  }}
-                  onFocus={(e) => {
-                    (e.currentTarget as HTMLInputElement).style.borderColor = "rgba(245,158,11,.3)";
-                    (e.currentTarget as HTMLInputElement).style.background = "rgba(255,255,255,.08)";
-                  }}
-                  onBlur={(e) => {
-                    (e.currentTarget as HTMLInputElement).style.borderColor = "rgba(255,255,255,.15)";
-                    (e.currentTarget as HTMLInputElement).style.background = "rgba(255,255,255,.05)";
-                  }}
-                />
-              </div>
-
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "rgba(255,255,255,.7)",
-                    marginBottom: 8,
-                  }}
-                >
-                  Subject
-                </label>
-                <select
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "12px 16px",
-                    borderRadius: 12,
-                    background: "rgba(255,255,255,.05)",
-                    border: "1px solid rgba(255,255,255,.15)",
-                    color: "white",
-                    fontSize: 14,
-                    outline: "none",
-                    fontFamily: ff,
-                  }}
-                  onFocus={(e) => {
-                    (e.currentTarget as HTMLSelectElement).style.borderColor = "rgba(245,158,11,.3)";
-                    (e.currentTarget as HTMLSelectElement).style.background = "rgba(255,255,255,.08)";
-                  }}
-                  onBlur={(e) => {
-                    (e.currentTarget as HTMLSelectElement).style.borderColor = "rgba(255,255,255,.15)";
-                    (e.currentTarget as HTMLSelectElement).style.background = "rgba(255,255,255,.05)";
-                  }}
-                >
-                  <option style={{ background: "rgb(7,8,15)", color: "white" }} value="">
-                    Select a subject...
-                  </option>
-                  <option style={{ background: "rgb(7,8,15)", color: "white" }} value="sales">
-                    Sales Inquiry
-                  </option>
-                  <option style={{ background: "rgb(7,8,15)", color: "white" }} value="support">
-                    Technical Support
-                  </option>
-                  <option style={{ background: "rgb(7,8,15)", color: "white" }} value="partnership">
-                    Partnership
-                  </option>
-                  <option style={{ background: "rgb(7,8,15)", color: "white" }} value="other">
-                    Other
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "rgba(255,255,255,.7)",
-                    marginBottom: 8,
-                  }}
-                >
-                  Message
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows={5}
-                  style={{
-                    width: "100%",
-                    padding: "12px 16px",
-                    borderRadius: 12,
-                    background: "rgba(255,255,255,.05)",
-                    border: "1px solid rgba(255,255,255,.15)",
-                    color: "white",
-                    fontSize: 14,
-                    outline: "none",
-                    fontFamily: ff,
-                    resize: "none",
-                  }}
-                  onFocus={(e) => {
-                    (e.currentTarget as HTMLTextAreaElement).style.borderColor = "rgba(245,158,11,.3)";
-                    (e.currentTarget as HTMLTextAreaElement).style.background = "rgba(255,255,255,.08)";
-                  }}
-                  onBlur={(e) => {
-                    (e.currentTarget as HTMLTextAreaElement).style.borderColor = "rgba(255,255,255,.15)";
-                    (e.currentTarget as HTMLTextAreaElement).style.background = "rgba(255,255,255,.05)";
-                  }}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  padding: "14px 24px",
-                  borderRadius: 12,
-                  background: loading
-                    ? "rgba(245,158,11,.4)"
-                    : "linear-gradient(135deg,#f59e0b,#ef4444)",
-                  color: "white",
-                  fontWeight: 700,
-                  fontSize: 14,
-                  border: "none",
-                  cursor: loading ? "default" : "pointer",
-                  transition: "all .3s",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) {
-                    (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) {
-                    (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
-                  }
-                }}
-              >
-                {loading ? "Sending..." : "Send Message"}
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function DirectContact() {
-  const [ref, vis] = useInView();
   const methods = [
-    {
-      icon: "✉️",
-      label: "Email",
-      value: "hello@finovaforge.com",
-      href: "mailto:hello@finovaforge.com",
-    },
-    {
-      icon: "🐦",
-      label: "Twitter",
-      value: "@finovaforge",
-      href: "https://twitter.com/finovaforge",
-    },
-    {
-      icon: "💼",
-      label: "LinkedIn",
-      value: "FinovaForge",
-      href: "https://linkedin.com/company/finovaforge",
-    },
+    { icon: "✉️", label: "Email", value: "hello@finovaforge.com", href: "mailto:hello@finovaforge.com" },
+    { icon: "💼", label: "LinkedIn", value: "FinovaForge", href: "https://linkedin.com/company/finovaforge" },
+    { icon: "🐦", label: "Twitter / X", value: "@finovaforge", href: "https://twitter.com/finovaforge" },
   ];
 
   return (
     <section
       style={{
-        padding: "80px 40px",
+        padding: "80px clamp(20px,4vw,48px) 120px",
         fontFamily: ff,
       }}
     >
       <div
         ref={ref}
         style={{
-          maxWidth: 900,
+          maxWidth: 1100,
           margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
+          gap: 48,
           opacity: vis ? 1 : 0,
-          transform: vis ? "translateY(0)" : "translateY(24px)",
+          transform: vis ? "none" : "translateY(28px)",
           transition: "all .65s ease",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
+        {/* Left — form */}
+        <div>
           <h2
             style={{
-              fontSize: "clamp(28px,4vw,40px)",
+              fontSize: "clamp(22px,3vw,32px)",
               fontWeight: 900,
               color: "white",
-              letterSpacing: "-1.5px",
-              margin: "0 0 12px",
+              letterSpacing: "-1px",
+              margin: "0 0 8px",
             }}
           >
-            Other Ways to Reach Us
+            Send us a message
           </h2>
-          <p
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", margin: "0 0 32px", lineHeight: 1.7 }}>
+            We typically respond within one business day.
+          </p>
+
+          <div
             style={{
-              fontSize: 14,
-              color: "rgba(255,255,255,.4)",
-              margin: 0,
+              padding: "36px",
+              borderRadius: 20,
+              background: "linear-gradient(135deg,rgba(245,158,11,.06),rgba(239,68,68,.03))",
+              border: "1px solid rgba(245,158,11,.16)",
             }}
           >
-            Pick your preferred channel.
-          </p>
+            {sent ? (
+              <div style={{ textAlign: "center", padding: "24px 0" }}>
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: "50%",
+                    background: "rgba(34,197,94,.15)",
+                    border: "1px solid rgba(34,197,94,.3)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 16px",
+                    fontSize: 22,
+                    color: "#4ade80",
+                  }}
+                >
+                  ✓
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 900, color: "white", margin: "0 0 8px" }}>Message Sent!</h3>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,.45)", margin: 0 }}>
+                  Thanks for reaching out. We&apos;ll get back to you soon.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: "rgba(255,255,255,.55)",
+                        marginBottom: 7,
+                        letterSpacing: ".02em",
+                      }}
+                    >
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      placeholder="Your name"
+                      style={inputStyle}
+                      onFocus={(e) => {
+                        (e.currentTarget as HTMLInputElement).style.borderColor = "rgba(245,158,11,.4)";
+                        (e.currentTarget as HTMLInputElement).style.background = "rgba(255,255,255,.08)";
+                      }}
+                      onBlur={(e) => {
+                        (e.currentTarget as HTMLInputElement).style.borderColor = "rgba(255,255,255,.12)";
+                        (e.currentTarget as HTMLInputElement).style.background = "rgba(255,255,255,.05)";
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: "rgba(255,255,255,.55)",
+                        marginBottom: 7,
+                        letterSpacing: ".02em",
+                      }}
+                    >
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      placeholder="you@company.com"
+                      style={inputStyle}
+                      onFocus={(e) => {
+                        (e.currentTarget as HTMLInputElement).style.borderColor = "rgba(245,158,11,.4)";
+                        (e.currentTarget as HTMLInputElement).style.background = "rgba(255,255,255,.08)";
+                      }}
+                      onBlur={(e) => {
+                        (e.currentTarget as HTMLInputElement).style.borderColor = "rgba(255,255,255,.12)";
+                        (e.currentTarget as HTMLInputElement).style.background = "rgba(255,255,255,.05)";
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,.55)",
+                      marginBottom: 7,
+                      letterSpacing: ".02em",
+                    }}
+                  >
+                    Subject
+                  </label>
+                  <select
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
+                    style={inputStyle}
+                    onFocus={(e) => {
+                      (e.currentTarget as HTMLSelectElement).style.borderColor = "rgba(245,158,11,.4)";
+                      (e.currentTarget as HTMLSelectElement).style.background = "rgba(255,255,255,.08)";
+                    }}
+                    onBlur={(e) => {
+                      (e.currentTarget as HTMLSelectElement).style.borderColor = "rgba(255,255,255,.12)";
+                      (e.currentTarget as HTMLSelectElement).style.background = "rgba(255,255,255,.05)";
+                    }}
+                  >
+                    <option style={{ background: "rgb(7,8,15)" }} value="">
+                      Select a subject...
+                    </option>
+                    <option style={{ background: "rgb(7,8,15)" }} value="sales">
+                      Sales Inquiry
+                    </option>
+                    <option style={{ background: "rgb(7,8,15)" }} value="support">
+                      Technical Support
+                    </option>
+                    <option style={{ background: "rgb(7,8,15)" }} value="partnership">
+                      Partnership
+                    </option>
+                    <option style={{ background: "rgb(7,8,15)" }} value="press">
+                      Press & Media
+                    </option>
+                    <option style={{ background: "rgb(7,8,15)" }} value="other">
+                      Other
+                    </option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,.55)",
+                      marginBottom: 7,
+                      letterSpacing: ".02em",
+                    }}
+                  >
+                    Message
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    rows={5}
+                    placeholder="Tell us what's on your mind..."
+                    style={{ ...inputStyle, resize: "none" }}
+                    onFocus={(e) => {
+                      (e.currentTarget as HTMLTextAreaElement).style.borderColor = "rgba(245,158,11,.4)";
+                      (e.currentTarget as HTMLTextAreaElement).style.background = "rgba(255,255,255,.08)";
+                    }}
+                    onBlur={(e) => {
+                      (e.currentTarget as HTMLTextAreaElement).style.borderColor = "rgba(255,255,255,.12)";
+                      (e.currentTarget as HTMLTextAreaElement).style.background = "rgba(255,255,255,.05)";
+                    }}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    padding: "13px 24px",
+                    borderRadius: 11,
+                    background: loading ? "rgba(245,158,11,.4)" : "linear-gradient(135deg,#f59e0b,#ef4444)",
+                    color: "white",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    border: "none",
+                    cursor: loading ? "default" : "pointer",
+                    transition: "all .3s",
+                    fontFamily: ff,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading) (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+                  }}
+                >
+                  {loading ? "Sending..." : "Send Message →"}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
-          {methods.map((method, i) => (
-            <a
-              key={i}
-              href={method.href}
-              target="_blank"
-              rel="noreferrer"
+        {/* Right — contact methods + info */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+          <div>
+            <h2
               style={{
-                padding: "32px 24px",
-                borderRadius: 16,
-                background: "rgba(255,255,255,.025)",
-                border: "1px solid rgba(255,255,255,.07)",
-                textDecoration: "none",
-                textAlign: "center",
-                transition: "all .3s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "rgba(245,158,11,.08)";
-                (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(245,158,11,.2)";
-                (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-3px)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,.025)";
-                (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,.07)";
-                (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
+                fontSize: "clamp(20px,3vw,28px)",
+                fontWeight: 900,
+                color: "white",
+                letterSpacing: "-1px",
+                margin: "0 0 8px",
               }}
             >
-              <div style={{ fontSize: 32, marginBottom: 12 }}>{method.icon}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.5)", marginBottom: 4 }}>
-                {method.label}
-              </div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "white" }}>
-                {method.value}
-              </div>
-            </a>
-          ))}
+              Other ways to reach us
+            </h2>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", margin: "0 0 24px" }}>
+              Pick your preferred channel.
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {methods.map((m, i) => (
+                <a
+                  key={i}
+                  href={m.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    padding: "18px 20px",
+                    borderRadius: 14,
+                    background: "rgba(255,255,255,.025)",
+                    border: "1px solid rgba(255,255,255,.07)",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 16,
+                    transition: "all .25s",
+                  }}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.background = "rgba(245,158,11,.06)";
+                    el.style.borderColor = "rgba(245,158,11,.2)";
+                    el.style.transform = "translateX(4px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.background = "rgba(255,255,255,.025)";
+                    el.style.borderColor = "rgba(255,255,255,.07)";
+                    el.style.transform = "translateX(0)";
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: "rgba(255,255,255,.05)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 18,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {m.icon}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".04em", marginBottom: 2 }}>
+                      {m.label}
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "white" }}>{m.value}</div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Response time */}
+          <div
+            style={{
+              padding: "24px",
+              borderRadius: 16,
+              background: "rgba(255,255,255,.02)",
+              border: "1px solid rgba(255,255,255,.06)",
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 8 }}>
+              Response times
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { type: "Sales inquiries", time: "Same day" },
+                { type: "Support", time: "Within 24 hours" },
+                { type: "Partnerships", time: "2–3 business days" },
+              ].map((r) => (
+                <div
+                  key={r.type}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.38)" }}>{r.type}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(245,158,11,.7)" }}>{r.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -448,11 +490,12 @@ export default function ContactPage() {
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
         body{background:rgb(7,8,15)}
+        input::placeholder,textarea::placeholder{color:rgba(255,255,255,.2)}
+        select option{background:rgb(7,8,15);color:white}
       `}</style>
       <ForgeNav />
       <Hero />
-      <ContactForm />
-      <DirectContact />
+      <ContactSection />
       <ForgeFooter />
     </div>
   );

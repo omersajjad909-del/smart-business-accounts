@@ -4,132 +4,320 @@ import { ForgeNav, ForgeFooter, useInView } from "../../components/shared";
 
 const ff = "'Outfit','DM Sans',sans-serif";
 
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        padding: "5px 14px",
+        borderRadius: 100,
+        background: "rgba(245,158,11,.08)",
+        border: "1px solid rgba(245,158,11,.2)",
+        fontSize: 11,
+        fontWeight: 700,
+        color: "#fbbf24",
+        letterSpacing: ".08em",
+        marginBottom: 20,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function Hero() {
   return (
     <section
       style={{
-        minHeight: "100vh",
-        padding: "120px 40px 80px",
+        minHeight: "60vh",
+        padding: "140px clamp(20px,4vw,48px) 80px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        background:
-          "radial-gradient(ellipse 80% 40% at 50% 0%, rgba(245,158,11,.15), transparent), radial-gradient(ellipse 60% 60% at 50% 50%, rgba(7,8,15,0), rgba(7,8,15,.5))",
+        background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,158,11,.16), transparent)",
         fontFamily: ff,
+        position: "relative",
       }}
     >
-      <div style={{ maxWidth: 820 }}>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "6px 16px",
-            borderRadius: 100,
-            background: "rgba(245,158,11,.08)",
-            border: "1px solid rgba(245,158,11,.2)",
-            marginBottom: 20,
-          }}
-        >
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#fbbf24", letterSpacing: ".08em" }}>
-            OUR PRODUCTS
-          </span>
-        </div>
-
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          opacity: 0.04,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)",
+          backgroundSize: "60px 60px",
+          pointerEvents: "none",
+        }}
+      />
+      <div style={{ maxWidth: 720, position: "relative", zIndex: 1 }}>
+        <Chip>OUR PRODUCTS</Chip>
         <h1
           style={{
-            fontSize: "clamp(48px,8vw,72px)",
+            fontSize: "clamp(40px,7vw,70px)",
             fontWeight: 900,
             color: "white",
-            letterSpacing: "-2px",
-            margin: "0 0 24px",
-            lineHeight: 1.1,
+            letterSpacing: "-2.5px",
+            margin: "0 0 20px",
+            lineHeight: 1.08,
           }}
         >
-          FinovaOS
+          Software built to
+          <br />
+          <span
+            style={{
+              background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            move your business forward
+          </span>
         </h1>
-
         <p
           style={{
-            fontSize: "clamp(16px,2vw,20px)",
+            fontSize: "clamp(14px,2vw,17px)",
             color: "rgba(255,255,255,.4)",
-            margin: "0 0 48px",
-            lineHeight: 1.7,
+            lineHeight: 1.8,
+            margin: 0,
           }}
         >
-          The business management platform built for growing companies worldwide. Real-time insights, zero complexity.
+          Purpose-built tools for growing businesses. We start with the hardest problem — financial management —
+          and go from there.
         </p>
-
-        <a
-          href="https://finovaos.app"
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            display: "inline-block",
-            padding: "14px 36px",
-            borderRadius: 12,
-            background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-            color: "white",
-            fontWeight: 700,
-            fontSize: 14,
-            textDecoration: "none",
-            boxShadow: "0 8px 24px rgba(245,158,11,.3)",
-            transition: "all .3s",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
-          }}
-        >
-          Open FinovaOS Dashboard →
-        </a>
       </div>
     </section>
   );
 }
 
-function Features() {
+function FinovaOSSection() {
   const [ref, vis] = useInView();
-  const features = [
+  const modules = [
+    { icon: "📊", title: "Accounting", desc: "Full double-entry accounting, chart of accounts, journal entries" },
+    { icon: "🏦", title: "Bank Reconciliation", desc: "Auto-match transactions, spot discrepancies instantly" },
+    { icon: "📝", title: "Expense Vouchers", desc: "Record, categorize, and approve every business expense" },
+    { icon: "🧾", title: "Invoicing", desc: "Professional invoices, payment tracking, auto reminders" },
+    { icon: "📦", title: "Inventory", desc: "Stock management, purchase orders, GRN tracking" },
+    { icon: "💰", title: "Payroll", desc: "Salary processing, deductions, and payslip generation" },
+    { icon: "📈", title: "Reports & Analytics", desc: "P&L, balance sheet, cash flow — all real-time" },
+    { icon: "🔐", title: "Role-Based Access", desc: "Granular permission control for every team member" },
+    { icon: "🌍", title: "Multi-Currency", desc: "40+ currencies with automatic exchange rates" },
+    { icon: "👥", title: "HR Management", desc: "Employee records, attendance, and leave tracking" },
+    { icon: "🤝", title: "CRM", desc: "Customer relationships, follow-ups, sales pipeline" },
+    { icon: "🔗", title: "API Access", desc: "Connect your existing tools and third-party systems" },
+  ];
+
+  return (
+    <section style={{ padding: "100px clamp(20px,4vw,48px)", fontFamily: ff }}>
+      <div
+        ref={ref}
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          opacity: vis ? 1 : 0,
+          transform: vis ? "none" : "translateY(28px)",
+          transition: "all .65s ease",
+        }}
+      >
+        {/* Header row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            marginBottom: 48,
+            flexWrap: "wrap",
+            gap: 24,
+          }}
+        >
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: 14,
+                  background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 18,
+                  fontWeight: 900,
+                  color: "white",
+                  boxShadow: "0 8px 24px rgba(245,158,11,.3)",
+                }}
+              >
+                OS
+              </div>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: "white", letterSpacing: "-.6px" }}>FinovaOS</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.3)", fontWeight: 600 }}>
+                  Business Management Platform
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: 8,
+                  background: "rgba(34,197,94,.12)",
+                  border: "1px solid rgba(34,197,94,.25)",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#4ade80",
+                }}
+              >
+                LIVE
+              </div>
+            </div>
+            <p
+              style={{
+                fontSize: 14.5,
+                color: "rgba(255,255,255,.45)",
+                lineHeight: 1.8,
+                maxWidth: 580,
+                margin: 0,
+              }}
+            >
+              Replace your spreadsheets and fragmented tools with a single intelligent system — built for the way
+              your industry actually works. From the first transaction to your year-end report, FinovaOS has you
+              covered.
+            </p>
+          </div>
+          <a
+            href="https://finovaos.app"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              padding: "13px 28px",
+              borderRadius: 12,
+              background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+              color: "white",
+              fontWeight: 700,
+              fontSize: 14,
+              textDecoration: "none",
+              boxShadow: "0 8px 24px rgba(245,158,11,.3)",
+              transition: "all .25s",
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.transform = "translateY(-2px)";
+              el.style.boxShadow = "0 12px 32px rgba(245,158,11,.45)";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.transform = "translateY(0)";
+              el.style.boxShadow = "0 8px 24px rgba(245,158,11,.3)";
+            }}
+          >
+            Launch FinovaOS →
+          </a>
+        </div>
+
+        {/* Modules grid */}
+        <div
+          style={{
+            borderRadius: 24,
+            background: "linear-gradient(145deg,rgba(245,158,11,.05),rgba(239,68,68,.03))",
+            border: "1px solid rgba(245,158,11,.14)",
+            padding: "36px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: "rgba(255,255,255,.25)",
+              textTransform: "uppercase",
+              letterSpacing: ".1em",
+              marginBottom: 24,
+            }}
+          >
+            Included Modules
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))",
+              gap: 12,
+            }}
+          >
+            {modules.map((m, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: "16px 18px",
+                  borderRadius: 12,
+                  background: "rgba(255,255,255,.03)",
+                  border: "1px solid rgba(255,255,255,.06)",
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "flex-start",
+                  transition: "all .2s",
+                }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget as HTMLDivElement;
+                  el.style.background = "rgba(245,158,11,.06)";
+                  el.style.borderColor = "rgba(245,158,11,.16)";
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget as HTMLDivElement;
+                  el.style.background = "rgba(255,255,255,.03)";
+                  el.style.borderColor = "rgba(255,255,255,.06)";
+                }}
+              >
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{m.icon}</span>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,.8)",
+                      marginBottom: 3,
+                    }}
+                  >
+                    {m.title}
+                  </div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", lineHeight: 1.6 }}>{m.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Roadmap() {
+  const [ref, vis] = useInView();
+  const upcoming = [
     {
-      title: "Expense Vouchers",
-      desc: "Record every business expense with full audit trails. Categorize, approve, and reconcile—all in seconds.",
-      icon: "📝",
+      icon: "🏥",
+      name: "FinovaHealth",
+      desc: "Practice management for clinics, hospitals, and healthcare providers. Patient records, billing, appointments.",
+      tag: "Coming Soon",
     },
     {
-      title: "Bank Reconciliation",
-      desc: "Match transactions automatically. Spot discrepancies instantly. Never lose track of cash flow.",
-      icon: "🏦",
+      icon: "🏗️",
+      name: "FinovaConstruct",
+      desc: "Project costing, contractor management, material tracking, and billing for construction businesses.",
+      tag: "Coming Soon",
     },
     {
-      title: "Ledgers & Reports",
-      desc: "Complete financial visibility. P&L, balance sheets, cash flow statements—generated in real-time.",
-      icon: "📊",
-    },
-    {
-      title: "Multi-Account Management",
-      desc: "Manage multiple bank accounts, cash accounts, and payment methods from a single dashboard.",
-      icon: "💰",
-    },
-    {
-      title: "Role-Based Access",
-      desc: "Control who sees what. Assign permissions to your team—CEO, accountant, manager, employee.",
-      icon: "🔐",
-    },
-    {
-      title: "Export & Integration",
-      desc: "Export data to CSV, PDF, or integrate with your existing tools via our API.",
-      icon: "🔗",
+      icon: "🎓",
+      name: "FinovaEdu",
+      desc: "Student enrollment, fee collection, academic reporting, and HR for schools and training institutes.",
+      tag: "Planned",
     },
   ];
 
   return (
     <section
       style={{
-        padding: "100px 40px",
+        padding: "100px clamp(20px,4vw,48px)",
         background: "rgba(255,255,255,.01)",
         borderTop: "1px solid rgba(255,255,255,.05)",
         fontFamily: ff,
@@ -141,66 +329,89 @@ function Features() {
           maxWidth: 1200,
           margin: "0 auto",
           opacity: vis ? 1 : 0,
-          transform: vis ? "translateY(0)" : "translateY(24px)",
+          transform: vis ? "none" : "translateY(28px)",
           transition: "all .65s ease",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <h2
-            style={{
-              fontSize: "clamp(28px,4vw,44px)",
-              fontWeight: 900,
-              color: "white",
-              letterSpacing: "-1.5px",
-              margin: 0,
-            }}
-          >
-            Core Features
-          </h2>
-          <p
-            style={{
-              fontSize: 16,
-              color: "rgba(255,255,255,.4)",
-              marginTop: 16,
-              maxWidth: 600,
-              margin: "16px auto 0",
-            }}
-          >
-            Everything you need to manage your business finances with confidence.
-          </p>
-        </div>
+        <Chip>WHAT&apos;S NEXT</Chip>
+        <h2
+          style={{
+            fontSize: "clamp(28px,4vw,44px)",
+            fontWeight: 900,
+            color: "white",
+            letterSpacing: "-1.5px",
+            margin: "0 0 12px",
+          }}
+        >
+          The Product Roadmap
+        </h2>
+        <p
+          style={{
+            fontSize: 14,
+            color: "rgba(255,255,255,.35)",
+            marginBottom: 48,
+            maxWidth: 520,
+          }}
+        >
+          FinovaOS is the first in a family of industry-specific products. Here&apos;s what we&apos;re building next.
+        </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 24 }}>
-          {features.map((feat, i) => (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 20 }}>
+          {upcoming.map((p, i) => (
             <div
               key={i}
               style={{
                 padding: "32px 28px",
                 borderRadius: 20,
-                background: "rgba(255,255,255,.025)",
+                background: "rgba(255,255,255,.018)",
                 border: "1px solid rgba(255,255,255,.07)",
                 transition: "all .3s",
-                display: "flex",
-                flexDirection: "column",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background = "rgba(245,158,11,.05)";
-                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(245,158,11,.2)";
-                (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)";
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.background = "rgba(255,255,255,.03)";
+                el.style.borderColor = "rgba(255,255,255,.12)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,.025)";
-                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,.07)";
-                (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.background = "rgba(255,255,255,.018)";
+                el.style.borderColor = "rgba(255,255,255,.07)";
               }}
             >
-              <div style={{ fontSize: 36, marginBottom: 14 }}>{feat.icon}</div>
-              <h3 style={{ fontSize: 18, fontWeight: 800, color: "white", margin: "0 0 10px" }}>
-                {feat.title}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: 16,
+                }}
+              >
+                <span style={{ fontSize: 36 }}>{p.icon}</span>
+                <span
+                  style={{
+                    padding: "3px 9px",
+                    borderRadius: 6,
+                    background: "rgba(255,255,255,.06)",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: "rgba(255,255,255,.3)",
+                    letterSpacing: ".06em",
+                  }}
+                >
+                  {p.tag}
+                </span>
+              </div>
+              <h3
+                style={{
+                  fontSize: 17,
+                  fontWeight: 800,
+                  color: "rgba(255,255,255,.5)",
+                  margin: "0 0 10px",
+                }}
+              >
+                {p.name}
               </h3>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: 0, lineHeight: 1.6 }}>
-                {feat.desc}
-              </p>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,.28)", margin: 0, lineHeight: 1.7 }}>{p.desc}</p>
             </div>
           ))}
         </div>
@@ -216,9 +427,9 @@ function Pricing() {
       name: "Starter",
       price: "$29",
       period: "/month",
-      desc: "Perfect for freelancers and small teams",
-      features: ["Up to 5 accounts", "Basic reporting", "1 user seat", "Email support"],
-      cta: "Start Free Trial",
+      desc: "For freelancers and small teams",
+      features: ["Up to 5 bank accounts", "Basic reporting", "1 user seat", "Email support"],
+      featured: false,
     },
     {
       name: "Professional",
@@ -226,7 +437,6 @@ function Pricing() {
       period: "/month",
       desc: "For growing businesses",
       features: ["Unlimited accounts", "Advanced reports", "5 user seats", "Priority support", "API access"],
-      cta: "Start Free Trial",
       featured: true,
     },
     {
@@ -235,69 +445,53 @@ function Pricing() {
       period: "pricing",
       desc: "For large organizations",
       features: ["Everything in Professional", "Unlimited users", "Custom integrations", "Dedicated support", "SLA guarantee"],
-      cta: "Contact Sales",
+      featured: false,
     },
   ];
 
   return (
-    <section
-      style={{
-        padding: "100px 40px",
-        fontFamily: ff,
-      }}
-    >
+    <section style={{ padding: "100px clamp(20px,4vw,48px)", fontFamily: ff }}>
       <div
         ref={ref}
         style={{
-          maxWidth: 1200,
+          maxWidth: 1100,
           margin: "0 auto",
           opacity: vis ? 1 : 0,
-          transform: vis ? "translateY(0)" : "translateY(24px)",
+          transform: vis ? "none" : "translateY(28px)",
           transition: "all .65s ease",
         }}
       >
         <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <Chip>PRICING</Chip>
           <h2
             style={{
-              fontSize: "clamp(28px,4vw,44px)",
+              fontSize: "clamp(28px,4vw,48px)",
               fontWeight: 900,
               color: "white",
               letterSpacing: "-1.5px",
-              margin: 0,
+              margin: "0 0 12px",
             }}
           >
-            Simple Pricing
+            Simple, transparent pricing
           </h2>
-          <p
-            style={{
-              fontSize: 16,
-              color: "rgba(255,255,255,.4)",
-              marginTop: 16,
-              maxWidth: 600,
-              margin: "16px auto 0",
-            }}
-          >
-            Choose the plan that fits your business. All plans include a free 14-day trial.
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", margin: 0 }}>
+            All plans include a 14-day free trial. No credit card required.
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 20 }}>
           {plans.map((plan, i) => (
             <div
               key={i}
               style={{
-                padding: "40px 32px",
+                padding: "36px 28px",
                 borderRadius: 20,
                 background: plan.featured
-                  ? "linear-gradient(135deg,rgba(245,158,11,.12),rgba(239,68,68,.06))"
+                  ? "linear-gradient(145deg,rgba(245,158,11,.1),rgba(239,68,68,.06))"
                   : "rgba(255,255,255,.025)",
-                border: plan.featured
-                  ? "1px solid rgba(245,158,11,.3)"
-                  : "1px solid rgba(255,255,255,.07)",
-                transition: "all .3s",
-                display: "flex",
-                flexDirection: "column",
+                border: plan.featured ? "1px solid rgba(245,158,11,.28)" : "1px solid rgba(255,255,255,.07)",
                 position: "relative",
+                transition: "all .3s",
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)";
@@ -310,49 +504,44 @@ function Pricing() {
                 <div
                   style={{
                     position: "absolute",
-                    top: 16,
-                    right: 16,
-                    padding: "4px 12px",
+                    top: -12,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    padding: "4px 16px",
                     borderRadius: 20,
-                    background: "rgba(245,158,11,.2)",
-                    border: "1px solid rgba(245,158,11,.3)",
-                    fontSize: 11,
+                    background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+                    fontSize: 10,
                     fontWeight: 700,
-                    color: "#fbbf24",
+                    color: "white",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   MOST POPULAR
                 </div>
               )}
-              <h3 style={{ fontSize: 20, fontWeight: 800, color: "white", margin: "0 0 8px" }}>
-                {plan.name}
-              </h3>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", margin: "0 0 20px" }}>
-                {plan.desc}
-              </p>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: "white", margin: "0 0 6px" }}>{plan.name}</h3>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)", margin: "0 0 20px" }}>{plan.desc}</p>
               <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
-                <span style={{ fontSize: 40, fontWeight: 900, color: "white" }}>
+                <span style={{ fontSize: 40, fontWeight: 900, color: "white", letterSpacing: "-2px" }}>
                   {plan.price}
                 </span>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>
-                  {plan.period}
-                </span>
+                <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>{plan.period}</span>
               </div>
-              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 32px", flex: 1 }}>
-                {plan.features.map((feat, j) => (
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 28px" }}>
+                {plan.features.map((f, j) => (
                   <li
                     key={j}
                     style={{
                       fontSize: 13,
-                      color: "rgba(255,255,255,.6)",
-                      marginBottom: 12,
+                      color: "rgba(255,255,255,.55)",
+                      marginBottom: 10,
                       display: "flex",
                       alignItems: "center",
-                      gap: 10,
+                      gap: 8,
                     }}
                   >
-                    <span style={{ color: "#fbbf24" }}>✓</span>
-                    {feat}
+                    <span style={{ color: "#f59e0b", fontSize: 12 }}>✓</span>
+                    {f}
                   </li>
                 ))}
               </ul>
@@ -361,34 +550,28 @@ function Pricing() {
                 target="_blank"
                 rel="noreferrer"
                 style={{
-                  padding: "12px 24px",
-                  borderRadius: 12,
-                  background: plan.featured
-                    ? "linear-gradient(135deg,#f59e0b,#ef4444)"
-                    : "rgba(255,255,255,.08)",
-                  border: plan.featured
-                    ? "none"
-                    : "1px solid rgba(255,255,255,.15)",
+                  display: "block",
+                  textAlign: "center",
+                  padding: "11px 20px",
+                  borderRadius: 10,
+                  background: plan.featured ? "linear-gradient(135deg,#f59e0b,#ef4444)" : "rgba(255,255,255,.07)",
+                  border: plan.featured ? "none" : "1px solid rgba(255,255,255,.12)",
                   color: "white",
                   fontWeight: 700,
                   fontSize: 13,
                   textDecoration: "none",
-                  textAlign: "center",
-                  transition: "all .3s",
-                  cursor: "pointer",
+                  transition: "all .25s",
                 }}
                 onMouseEnter={(e) => {
-                  if (!plan.featured) {
-                    (e.currentTarget as HTMLAnchorElement).style.background = "rgba(245,158,11,.1)";
-                  }
+                  if (!plan.featured)
+                    (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,.12)";
                 }}
                 onMouseLeave={(e) => {
-                  if (!plan.featured) {
-                    (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,.08)";
-                  }
+                  if (!plan.featured)
+                    (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,.07)";
                 }}
               >
-                {plan.cta} →
+                {plan.name === "Enterprise" ? "Contact Sales" : "Start Free Trial"} →
               </a>
             </div>
           ))}
@@ -401,73 +584,71 @@ function Pricing() {
 function CTA() {
   const [ref, vis] = useInView();
   return (
-    <section
-      style={{
-        padding: "100px 40px",
-        background: "rgba(255,255,255,.01)",
-        borderTop: "1px solid rgba(255,255,255,.05)",
-        fontFamily: ff,
-      }}
-    >
+    <section style={{ padding: "100px clamp(20px,4vw,48px) 120px", fontFamily: ff }}>
       <div
         ref={ref}
         style={{
           maxWidth: 800,
           margin: "0 auto",
           textAlign: "center",
-          padding: "60px 40px",
-          borderRadius: 24,
-          background: "linear-gradient(135deg,rgba(245,158,11,.08),rgba(239,68,68,.04))",
+          padding: "clamp(48px,6vw,68px) clamp(28px,5vw,48px)",
+          borderRadius: 28,
+          background: "linear-gradient(135deg,rgba(245,158,11,.09),rgba(239,68,68,.05))",
           border: "1px solid rgba(245,158,11,.2)",
           opacity: vis ? 1 : 0,
-          transform: vis ? "translateY(0)" : "translateY(24px)",
+          transform: vis ? "none" : "translateY(28px)",
           transition: "all .65s ease",
         }}
       >
         <h2
           style={{
-            fontSize: "clamp(28px,4vw,40px)",
+            fontSize: "clamp(26px,4vw,40px)",
             fontWeight: 900,
             color: "white",
             margin: "0 0 16px",
+            letterSpacing: "-1.5px",
           }}
         >
-          Start Your Free Trial
+          Start your free trial today
         </h2>
         <p
           style={{
-            fontSize: 16,
-            color: "rgba(255,255,255,.5)",
+            fontSize: 15,
+            color: "rgba(255,255,255,.45)",
             margin: "0 0 32px",
-            lineHeight: 1.7,
+            lineHeight: 1.75,
           }}
         >
-          14 days free. No credit card required. Full access to all features.
+          14 days free. No credit card required. Full access from day one.
         </p>
         <a
           href="https://finovaos.app"
           target="_blank"
           rel="noreferrer"
           style={{
-            display: "inline-block",
-            padding: "14px 36px",
+            padding: "14px 32px",
             borderRadius: 12,
             background: "linear-gradient(135deg,#f59e0b,#ef4444)",
             color: "white",
             fontWeight: 700,
             fontSize: 14,
             textDecoration: "none",
-            boxShadow: "0 8px 24px rgba(245,158,11,.3)",
-            transition: "all .3s",
+            boxShadow: "0 8px 28px rgba(245,158,11,.3)",
+            transition: "all .25s",
+            display: "inline-block",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
+            const el = e.currentTarget as HTMLAnchorElement;
+            el.style.transform = "translateY(-2px)";
+            el.style.boxShadow = "0 12px 36px rgba(245,158,11,.45)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
+            const el = e.currentTarget as HTMLAnchorElement;
+            el.style.transform = "translateY(0)";
+            el.style.boxShadow = "0 8px 28px rgba(245,158,11,.3)";
           }}
         >
-          Try FinovaOS Now →
+          Try FinovaOS Free →
         </a>
       </div>
     </section>
@@ -484,7 +665,8 @@ export default function ProductsPage() {
       `}</style>
       <ForgeNav />
       <Hero />
-      <Features />
+      <FinovaOSSection />
+      <Roadmap />
       <Pricing />
       <CTA />
       <ForgeFooter />

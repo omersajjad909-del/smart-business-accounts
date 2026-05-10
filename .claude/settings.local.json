@@ -162,7 +162,8 @@
       "Bash(dir \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\\\\retail\\\\_components\\\\\" 2>/dev/null)",
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\\\(marketing\\)\\\\\" -Recurse -File | Select-Object FullName | head -20)",
       "Bash(del \"d:\\\\projects\\\\smart-business-accounts\\\\middleware.ts\")",
-      "Bash(Get-Content \"C:\\\\Users\\\\STANDA~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--projects-smart-business-accounts\\\\a18d44ab-a1fd-43b7-af0a-e605312a2ee0\\\\tasks\\\\b8g6en580.output\" -Tail 40)"
+      "Bash(Get-Content \"C:\\\\Users\\\\STANDA~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--projects-smart-business-accounts\\\\a18d44ab-a1fd-43b7-af0a-e605312a2ee0\\\\tasks\\\\b8g6en580.output\" -Tail 40)",
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\\\(forge\\)\\\\\" -Recurse -Force | Select-Object FullName | Sort-Object FullName)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
