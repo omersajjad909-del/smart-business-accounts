@@ -181,10 +181,10 @@ function InventoryVisual({ vis }: { vis: boolean }) {
 /* ── Feature 4 visual: Multi-branch ── */
 function BranchVisual({ vis }: { vis: boolean }) {
   const branches = [
-    { name:"Head Office — Karachi",  revenue:"$82k", profit:"$24k", status:"Active" },
-    { name:"Branch A — Lahore",      revenue:"$54k", profit:"$15k", status:"Active" },
-    { name:"Branch B — Islamabad",   revenue:"$38k", profit:"$9k",  status:"Active" },
-    { name:"Branch C — Dubai",       revenue:"$96k", profit:"$31k", status:"Active" },
+    { name:"Head Office — Dubai",    revenue:"$82k", profit:"$24k", status:"Active" },
+    { name:"Branch A — London",      revenue:"$54k", profit:"$15k", status:"Active" },
+    { name:"Branch B — Toronto",     revenue:"$38k", profit:"$9k",  status:"Active" },
+    { name:"Branch C — Singapore",   revenue:"$96k", profit:"$31k", status:"Active" },
   ];
   return (
     <div style={{

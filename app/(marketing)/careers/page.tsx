@@ -6,10 +6,10 @@ import { useEffect, useRef, useState } from "react";
    DATA
 ══════════════════════════════════════════════════════════ */
 const STATS = [
-  { value:"120+",  label:"Team Members",    icon:"👥" },
-  { value:"18",    label:"Countries",       icon:"🌍" },
-  { value:"4.8★",  label:"Glassdoor Rating",icon:"⭐" },
-  { value:"94%",   label:"Would Recommend", icon:"❤️" },
+  { value:"Global", label:"Remote Team",      icon:"👥" },
+  { value:"40+",    label:"Countries Served", icon:"🌍" },
+  { value:"Fast",   label:"Shipping Culture", icon:"⭐" },
+  { value:"Weekly", label:"Product Releases", icon:"❤️" },
 ];
 
 const PERKS = [
@@ -37,7 +37,7 @@ const DEPARTMENTS = [
 const JOBS = [
   {
     id:"1", title:"Senior Backend Engineer",     dept:"engineering",  location:"Remote · Worldwide",   type:"Full-time",   level:"Senior",
-    desc:"Build the core financial infrastructure that powers 12,000+ businesses. Work with Prisma, Next.js, PostgreSQL, and distributed systems at scale.",
+    desc:"Build the core financial infrastructure powering businesses across 40+ countries. Work with Prisma, Next.js, PostgreSQL, and distributed systems at scale.",
     tags:["Node.js","TypeScript","PostgreSQL","Redis"],
     posted:"3 days ago", color:"#818cf8",
   },
@@ -61,7 +61,7 @@ const JOBS = [
   },
   {
     id:"5", title:"Security Engineer",            dept:"engineering",  location:"Remote · Worldwide",   type:"Full-time",   level:"Senior",
-    desc:"Protect financial data for 12,000+ businesses. Own pen testing, SOC 2 compliance, security reviews, and incident response.",
+    desc:"Protect financial data across 40+ countries. Own pen testing, SOC 2 compliance, security reviews, and incident response.",
     tags:["Security","SOC2","Penetration Testing"],
     posted:"2 weeks ago", color:"#818cf8",
   },
@@ -79,7 +79,7 @@ const JOBS = [
   },
   {
     id:"8", title:"UX Researcher",                dept:"product",      location:"Remote · Worldwide",   type:"Full-time",   level:"Mid",
-    desc:"Talk to customers, uncover pain points, translate insights into product decisions. Be the voice of 12,000 businesses inside our product team.",
+    desc:"Talk to customers, uncover pain points, translate insights into product decisions. Be the customer's voice inside our product team.",
     tags:["User Research","Qualitative","Usability"],
     posted:"1 week ago", color:"#34d399",
   },
@@ -115,7 +115,7 @@ const JOBS = [
   },
   {
     id:"14", title:"People Operations Manager",    dept:"operations",   location:"Remote · Worldwide",   type:"Full-time",   level:"Mid",
-    desc:"Build the systems that help 120+ remote teammates thrive. Own hiring ops, onboarding, performance cycles, and team culture.",
+    desc:"Build the systems that help our remote team thrive. Own hiring ops, onboarding, performance cycles, and team culture.",
     tags:["HR","People Ops","Remote Culture"],
     posted:"1 week ago", color:"#38bdf8",
   },

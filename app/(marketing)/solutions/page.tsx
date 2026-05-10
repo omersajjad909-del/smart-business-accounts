@@ -195,7 +195,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Revenue & Expense Reports",   desc:"Department-wise profitability and daily collections summary." },
     ],
     quote: "Our pharmacy stock-outs dropped to zero. The expiry tracking alone saved us thousands each month.",
-    quoteName: "Dr. Sana Khalid", quoteTitle: "Medical Director, CareFirst Clinic — Lahore",
+    quoteName: "Dr. Sana Khalid", quoteTitle: "Medical Director, CareFirst Clinic",
   },
   {
     id: "hotel",
@@ -219,7 +219,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Revenue Per Room Reports",    desc:"RevPAR, ADR, and occupancy trends to maximize pricing strategy." },
     ],
     quote: "Front desk is now paperless. Guests check in faster and we bill accurately every single time.",
-    quoteName: "Hassan Mirza", quoteTitle: "GM, The Grand Hospitality — Islamabad",
+    quoteName: "Hassan Mirza", quoteTitle: "GM, The Grand Hospitality",
   },
   {
     id: "pharmacy",
@@ -242,8 +242,8 @@ const INDUSTRIES = [
       { icon:"🏭", title:"Supplier & Purchase Orders",  desc:"Raise POs to distributors. Match deliveries and invoices." },
       { icon:"📊", title:"Sales & Margin Reports",      desc:"Best-selling drugs, category-wise margin, and daily revenue." },
     ],
-    quote: "We cleared Rs. 80,000 in near-expiry stock we didn't even know we had. The alerts paid for everything.",
-    quoteName: "Zubair Ahmed", quoteTitle: "Owner, CityMed Pharmacy — Karachi",
+    quote: "We cleared thousands worth of near-expiry stock we didn't even know we had. The alerts paid for everything.",
+    quoteName: "Zubair Ahmed", quoteTitle: "Owner, CityMed Pharmacy",
   },
   {
     id: "travel",
@@ -267,7 +267,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Travel Revenue Visibility",   desc:"See total ticket value, active visa cases, and pending files from one dashboard." },
     ],
     quote: "Before this, our tickets were in one sheet and visas in another. Now every passenger file is finally in one place.",
-    quoteName: "SkyBridge Travels", quoteTitle: "Karachi, Pakistan",
+    quoteName: "SkyBridge Travels", quoteTitle: "Travel & Tours",
   },
   {
     id: "construction",
@@ -290,8 +290,8 @@ const INDUSTRIES = [
       { icon:"💰", title:"Budget vs Actual Reports",    desc:"Compare planned spend to real cost per project at any time." },
       { icon:"📋", title:"Purchase Orders & GRN",       desc:"Raise POs, receive materials, and match supplier invoices easily." },
     ],
-    quote: "We caught a Rs. 2 million budget overrun at 60% completion — early enough to recover. That's priceless.",
-    quoteName: "Tariq Mahmood", quoteTitle: "Director, BuildRight Contractors — Rawalpindi",
+    quote: "We caught a major budget overrun at 60% completion — early enough to recover. That's priceless.",
+    quoteName: "Tariq Mahmood", quoteTitle: "Director, BuildRight Contractors",
   },
   {
     id: "ecommerce",
@@ -299,7 +299,7 @@ const INDUSTRIES = [
     emoji: "🛒",
     label: "E-Commerce",
     title: "E-Commerce & Online Retail",
-    subtitle: "Daraz, Amazon, website — one dashboard for all.",
+    subtitle: "Every sales channel — one dashboard for all.",
     color: "#a78bfa",
     glow: "rgba(167,139,250,.22)",
     dim:  "rgba(167,139,250,.08)",
@@ -307,7 +307,7 @@ const INDUSTRIES = [
     pain: "Selling on multiple platforms means fragmented orders, inventory discrepancies, and profit blind spots.",
     stats: [{ val:"All platforms", label:"In one dashboard" },{ val:"Real-time", label:"Order & inventory sync" },{ val:"4×", label:"Faster seller reporting" }],
     features:[
-      { icon:"🛒", title:"Multi-Platform Orders",       desc:"Manage Daraz, Amazon, website, and WhatsApp orders in one place." },
+      { icon:"🛒", title:"Multi-Platform Orders",       desc:"Manage marketplace, website, and direct orders in one place." },
       { icon:"📦", title:"Product Listings",            desc:"Track SKUs, prices, and stock across every sales channel." },
       { icon:"🔄", title:"Order Status Workflow",       desc:"Pending → Processing → Shipped → Delivered with one click." },
       { icon:"📊", title:"Platform Revenue Analytics", desc:"Compare which channel drives the most revenue and profit." },
@@ -315,7 +315,7 @@ const INDUSTRIES = [
       { icon:"💰", title:"Seller Profit Reports",       desc:"Deduct platform fees and shipping costs. See real net profit." },
     ],
     quote: "We were selling on 4 platforms with 4 spreadsheets. Now everything is in one place and we actually know our margin.",
-    quoteName: "Nadia Farooq", quoteTitle: "Founder, StyleBox — Lahore",
+    quoteName: "Nadia Farooq", quoteTitle: "Founder, StyleBox",
   },
   {
     id: "agriculture",
@@ -339,7 +339,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Profit per Crop Reports",    desc:"Compare revenue against all direct costs. Know what to grow more." },
     ],
     quote: "First time in 10 years I know exactly how much each crop made me — not just what I sold.",
-    quoteName: "Muhammad Arif", quoteTitle: "Farm Owner — Faisalabad",
+    quoteName: "Muhammad Arif", quoteTitle: "Farm Owner",
   },
   {
     id: "transport",
@@ -363,7 +363,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Fleet Profitability Reports", desc:"Revenue minus all costs per vehicle. Know which trucks earn." },
     ],
     quote: "I run 14 trucks. For the first time I know which 3 are losing money — and why.",
-    quoteName: "Saleem Baig", quoteTitle: "Director, FastMove Logistics — Multan",
+    quoteName: "Saleem Baig", quoteTitle: "Director, FastMove Logistics",
   },
   {
     id: "salon",
@@ -386,8 +386,8 @@ const INDUSTRIES = [
       { icon:"📦", title:"Product Inventory",           desc:"Track shampoos, dyes, and retail products. Reorder alerts." },
       { icon:"📊", title:"Revenue by Service Reports",  desc:"Know your most profitable treatments and peak hours." },
     ],
-    quote: "My front desk used to lose cash every week. Now the daily report catches every rupee.",
-    quoteName: "Aisha Siddiqui", quoteTitle: "Owner, Glow Beauty Salon — Karachi",
+    quote: "My front desk used to lose cash every week. Now the daily report catches every cent.",
+    quoteName: "Aisha Siddiqui", quoteTitle: "Owner, Glow Beauty Salon",
   },
   {
     id: "school",
@@ -411,7 +411,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Academic Performance Reports",desc:"Class-wise and student-wise performance analysis." },
     ],
     quote: "Fee collection improved by 35% after we switched. Parents get reminders automatically now.",
-    quoteName: "Principal Nasreen", quoteTitle: "Bright Futures Academy — Lahore",
+    quoteName: "Principal Nasreen", quoteTitle: "Bright Futures Academy",
   },
   {
     id: "ngo",
@@ -459,7 +459,7 @@ const INDUSTRIES = [
       { icon:"📋", title:"Lease Renewal Alerts",        desc:"Never miss a lease expiry. Get reminded before it's too late." },
     ],
     quote: "I manage 40 rental units. Before this, I had 40 WhatsApp chats for rent. Now it's all in one place.",
-    quoteName: "Imran Sheikh", quoteTitle: "Property Investor — Islamabad",
+    quoteName: "Imran Sheikh", quoteTitle: "Property Investor",
   },
 
   // ── AUTOMOTIVE ──────────────────────────────────────────────
@@ -485,7 +485,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Profit by Job / Vehicle",   desc:"Know your margin on every sale and every repair job." },
     ],
     quote: "We run a showroom and workshop together. FinovaOS ties everything — from test drive to final invoice.",
-    quoteName: "Khalid Motors", quoteTitle: "Lahore, Pakistan",
+    quoteName: "Khalid Motors", quoteTitle: "Automotive Dealer",
   },
 
   // ── MEDIA & ADVERTISING ─────────────────────────────────────
@@ -511,7 +511,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Agency Revenue Reports",     desc:"Retainer vs project vs commission — broken down clearly." },
     ],
     quote: "We handle 30+ clients. FinovaOS gives us real-time visibility on which accounts are actually profitable.",
-    quoteName: "Sana Digital", quoteTitle: "Digital Marketing Agency — Karachi",
+    quoteName: "Sana Digital", quoteTitle: "Digital Marketing Agency",
   },
 
   // ── SaaS / ISP ──────────────────────────────────────────────
@@ -537,7 +537,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Churn & Growth Reports",     desc:"Understand where you're gaining and losing customers." },
     ],
     quote: "Running an ISP with 2,000 customers — FinovaOS handles all monthly billing automatically.",
-    quoteName: "NetSpeed ISP", quoteTitle: "Faisalabad, Pakistan",
+    quoteName: "NetSpeed ISP", quoteTitle: "Internet Service Provider",
   },
 
   // ── SOLAR & ENERGY ──────────────────────────────────────────
@@ -562,8 +562,8 @@ const INDUSTRIES = [
       { icon:"💰", title:"Project Profitability",      desc:"Know your margin on every project before and after completion." },
       { icon:"🛒", title:"Purchase Orders",            desc:"Raise POs for panels and equipment. Match with GRN on delivery." },
     ],
-    quote: "We do 50 installations a month. FinovaOS tracks every panel, every wire, and every rupee.",
-    quoteName: "SunTech Solar", quoteTitle: "Islamabad, Pakistan",
+    quote: "We do 50 installations a month. FinovaOS tracks every panel, every wire, and every cost.",
+    quoteName: "SunTech Solar", quoteTitle: "Solar Energy Business",
   },
 
   // ── IMPORT / EXPORT ─────────────────────────────────────────
@@ -589,7 +589,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Import Cost Reports",        desc:"Landed cost vs selling price — instant margin view." },
     ],
     quote: "Every container has 20+ cost lines. FinovaOS captures every one — our landed cost is finally accurate.",
-    quoteName: "ZamZam Imports", quoteTitle: "Karachi, Pakistan",
+    quoteName: "ZamZam Imports", quoteTitle: "Import & Export",
   },
 
   // ── EVENT MANAGEMENT ────────────────────────────────────────
@@ -615,7 +615,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Event Profitability",       desc:"Revenue vs cost per event — know which events make money." },
     ],
     quote: "We planned 120 weddings last year. FinovaOS kept every vendor, every budget, and every client in order.",
-    quoteName: "Royal Events", quoteTitle: "Lahore, Pakistan",
+    quoteName: "Royal Events", quoteTitle: "Events & Hospitality",
   },
 
   // ── REPAIR & MAINTENANCE ─────────────────────────────────────
@@ -641,7 +641,7 @@ const INDUSTRIES = [
       { icon:"📊", title:"Technician Performance",     desc:"Jobs completed, revenue generated, and parts used per tech." },
     ],
     quote: "50 phones a day through my shop. FinovaOS tracks every job, every part, every payment automatically.",
-    quoteName: "TechFix Mobile", quoteTitle: "Lahore, Pakistan",
+    quoteName: "TechFix Mobile", quoteTitle: "Mobile Repair Services",
   },
 
   // ── FRANCHISE ───────────────────────────────────────────────
@@ -667,9 +667,39 @@ const INDUSTRIES = [
       { icon:"🔒", title:"Role-Based Access",          desc:"Outlet managers see only their data. HQ sees everything." },
     ],
     quote: "12 franchise outlets — I check one dashboard every morning and know exactly how each one is doing.",
-    quoteName: "Spice Chain Foods", quoteTitle: "Multi-City, Pakistan",
+    quoteName: "Spice Chain Foods", quoteTitle: "Food & Beverage Chain",
   },
 ];
+
+const WORKFLOWS: Record<string, string[]> = {
+  trading:       ["Purchase Order", "Stock In (GRN)", "Sales Invoice", "Payment Collection", "Bank Reconcile"],
+  distribution:  ["Supplier PO", "Warehouse Stock", "Route Assignment", "Delivery", "Daily Settlement"],
+  manufacturing: ["Raw Material PO", "Production Order", "BOM Consumption", "Finished Goods", "Customer Invoice"],
+  services:      ["Client Quotation", "Agreement", "Work Delivery", "Invoice", "Payment Receipt"],
+  retail:        ["Purchase Order", "Inventory Update", "POS Sale", "Daily Reconciliation", "Profit Reports"],
+  enterprise:    ["Company Setup", "Branch Assignment", "Transactions", "Consolidation", "Audit Trail"],
+  restaurant:    ["Table Order", "Kitchen Ticket", "Bill Generation", "Payment", "Daily Close"],
+  hospital:      ["Patient Registration", "Consultation", "Prescription", "Billing", "Collection"],
+  hotel:         ["Reservation", "Check-In", "Room Services", "Check-Out Bill", "Revenue Report"],
+  pharmacy:      ["Supplier Purchase", "Drug Stock", "Prescription", "Dispensing & Bill", "Expiry Check"],
+  travel:        ["Client Enquiry", "Quotation", "Booking & Docs", "Invoice", "Payment Collection"],
+  construction:  ["Project Setup", "Material PO", "Site Expenses", "Budget vs Actual", "Final Invoice"],
+  ecommerce:     ["Product Listing", "Order Received", "Pick & Pack", "Dispatch", "Revenue Sync"],
+  agriculture:   ["Season Planning", "Input Purchase", "Crop Management", "Harvest", "Revenue Report"],
+  transport:     ["Trip Assignment", "Fuel & Expenses", "Freight Delivery", "Invoice", "Fleet P&L"],
+  salon:         ["Appointment", "Service Delivery", "Commission Calc", "Cash Close", "Staff Report"],
+  school:        ["Enrollment", "Fee Schedule", "Collection", "Defaulter Alerts", "Payroll & Reports"],
+  ngo:           ["Donor Pledge", "Fund Receipt", "Project Expense", "Impact Report", "Audit Ready"],
+  real_estate:   ["Property Setup", "Tenant Lease", "Rent Collection", "Maintenance", "Property P&L"],
+  automotive:    ["Vehicle Stock", "Job Card", "Parts Used", "Customer Bill", "Profit per Job"],
+  advertising:   ["Client Brief", "Campaign Quote", "Media Booking", "Client Invoice", "P&L Report"],
+  saas:          ["Subscriber Signup", "Plan Assignment", "Auto-Invoice", "Payment", "Churn Tracking"],
+  solar:         ["Site Survey", "Quotation", "Equipment PO", "Installation", "AMC Contract"],
+  import:        ["LC / TT", "Shipment Booking", "Customs Clearance", "Landed Cost", "Local Sale"],
+  events:        ["Client Booking", "Vendor Contracts", "Budget Tracking", "Event Delivery", "Final Invoice"],
+  repair:        ["Device Intake", "Diagnosis", "Parts Order", "Repair", "Customer Bill"],
+  franchise:     ["Outlet Setup", "Daily Operations", "Sales Report", "Royalty Calc", "Group P&L"],
+};
 
 const TAB_GROUPS = [
   { label: "Commerce",     ids: ["trading","distribution","import","ecommerce"] },
@@ -809,6 +839,27 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
               <span style={{ fontSize:16, flexShrink:0 }}>⚠️</span>
               <span><strong style={{ color:"rgba(255,255,255,.7)" }}>The problem: </strong>{ind.pain}</span>
             </div>
+
+            {/* Workflow strip */}
+            {WORKFLOWS[ind.id] && (
+              <div style={{
+                marginBottom:20, padding:"12px 16px", borderRadius:12,
+                background:"rgba(255,255,255,.02)", border:`1px solid ${ind.border}`,
+                opacity:visible?1:0, transition:"opacity .5s ease .18s",
+              }}>
+                <div style={{ fontSize:9.5, fontWeight:700, color:ind.color, letterSpacing:".1em", textTransform:"uppercase" as const, marginBottom:10 }}>Typical Workflow</div>
+                <div style={{ display:"flex", alignItems:"center", gap:4, flexWrap:"wrap" as const }}>
+                  {WORKFLOWS[ind.id].map((step, si) => (
+                    <span key={si} style={{ display:"inline-flex", alignItems:"center", gap:4 }}>
+                      <span style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,.72)", padding:"4px 9px", borderRadius:7, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.08)", whiteSpace:"nowrap" as const }}>{step}</span>
+                      {si < WORKFLOWS[ind.id].length - 1 && (
+                        <span style={{ fontSize:11, color:ind.color, opacity:.5, fontWeight:700 }}>→</span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Stats */}
             <div className="ind-features-grid" style={{

@@ -35,10 +35,10 @@ function CountUp({ to, suffix = "", duration = 1800, start }: { to: number; suff
 }
 
 const STATS = [
-  { to: 2400, suffix: "+", label: "Businesses",    color: "#818cf8" },
-  { to: 99,    suffix: ".9%",label: "Uptime SLA",    color: "#34d399" },
-  { to: 40,    suffix: "+",  label: "Countries",     color: "#fbbf24" },
-  { to: 1400,  suffix: "+",  label: "5-Star Reviews", color: "#f87171" },
+  { to: 40,  suffix: "+",   label: "Modules",      color: "#818cf8" },
+  { to: 99,  suffix: ".9%", label: "Uptime SLA",   color: "#34d399" },
+  { to: 40,  suffix: "+",   label: "Countries",    color: "#fbbf24" },
+  { to: 10,  suffix: " min",label: "Setup Time",   color: "#f87171" },
 ];
 
 const INCLUDES = [
@@ -66,7 +66,7 @@ const TRUST = [
   { icon: "🔒", label: "Bank-grade encryption" },
   { icon: "⚡", label: "Setup in minutes" },
   { icon: "🔄", label: "Cancel anytime" },
-  { icon: "🎧", label: "24/7 support" },
+  { icon: "🎧", label: "Priority support" },
   { icon: "💳", label: "Secure checkout" },
 ];
 
@@ -230,7 +230,7 @@ export default function CTASection() {
                 <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill="#fbbf24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               ))}
             </div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>4.9 / 5 · 2,400+ reviews</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>Trusted by growing businesses</div>
           </div>
           <div style={{ width: 1, height: 26, background: "rgba(255,255,255,.1)" }}/>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,.28)", fontWeight: 500 }}>Secure checkout</div>

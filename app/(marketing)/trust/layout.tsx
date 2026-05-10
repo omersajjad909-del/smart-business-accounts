@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 export const metadata: Metadata = {
   title: "Trust & Compliance — GDPR, Data Privacy & Certifications",
   description:
-    "FinovaOS's commitment to data privacy, GDPR compliance, financial data security, and regulatory standards. Trusted by 12,000+ businesses across 40+ countries worldwide.",
+    "FinovaOS's commitment to data privacy, GDPR compliance, financial data security, and regulatory standards. Trusted by businesses across 40+ countries worldwide.",
   keywords: [
     "GDPR accounting software",
     "data privacy accounting",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Trust & Compliance | FinovaOS",
-    description: "GDPR compliant. Data privacy first. Trusted by 12,000+ businesses worldwide.",
+    description: "GDPR compliant. Data privacy first. Trusted by businesses worldwide.",
     url: `${BASE}/trust`,
     siteName: "FinovaOS",
     images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS Trust & Compliance" }],
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "FinovaOS Trust & Compliance",
-    description: "GDPR compliant. Data privacy first. Trusted by 12,000+ businesses.",
+    description: "GDPR compliant. Data privacy first. Trusted by businesses globally.",
     images: [`${BASE}/icon.png`],
   },
   alternates: { canonical: `${BASE}/trust` },

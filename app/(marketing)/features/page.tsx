@@ -1724,7 +1724,7 @@ export default function FeaturesPage() {
             {[
               { val:`${totalFeatures}+`, label:"Total Features",     color:"#818cf8" },
               { val:"7",                 label:"Core Modules",        color:"#34d399" },
-              { val:"12,000+",           label:"Businesses Using It", color:"#fbbf24" },
+              { val:`${totalFeatures}+`,  label:"Individual Features",  color:"#fbbf24" },
               { val:"10 min",            label:"To Get Started",      color:"#f87171" },
             ].map(({ val, label, color },i)=>(
               <div key={label} className="feat-stat-item" style={{ padding:"0 36px", textAlign:"center", borderRight:i<3?"1px solid rgba(255,255,255,.07)":"none" }}>
@@ -1758,7 +1758,7 @@ export default function FeaturesPage() {
                 </span>
               </h2>
               <p style={{ fontSize:16, color:"rgba(255,255,255,.5)", marginBottom:40, maxWidth:460, margin:"0 auto 40px", lineHeight:1.8 }}>
-                Join 12,000+ SMEs who trust FinovaOS for their daily operations.
+                Purpose-built for SMEs who need accounting software that actually fits how they work.
               </p>
               <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap" }}>
                 <Link href="/pricing" style={{ padding:"14px 36px", borderRadius:14, background:"linear-gradient(135deg,#fbbf24,#f59e0b)", color:"#0f172a", fontWeight:800, fontSize:15, textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8, boxShadow:"0 6px 24px rgba(251,191,36,.4)", transition:"all .25s" }}

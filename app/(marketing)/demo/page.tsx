@@ -69,14 +69,14 @@ const BUSINESSES: DemoBusiness[] = [
       "📈 Predicts next month revenue based on trend",
       "⚠️ Alerts when margins drop below your threshold",
     ],
-    proof: ["100+ trading businesses active on FinovaOS", "Average invoice-to-collection time reduced by 40%", "Multi-currency support for import goods"],
+    proof: ["Built for trading businesses of all sizes", "Average invoice-to-collection time reduced by 40%", "Multi-currency support for import goods"],
     highlights: [
       { label: "Quotation to Order", value: "1-click", sub: "No re-entry, no duplication" },
       { label: "Receivable Visibility", value: "Real-time", sub: "Outstanding by customer always visible" },
       { label: "Margin Tracking", value: "Per Item", sub: "Know exactly what makes money" },
     ],
     sampleDocs: ["Quotation", "Sales Invoice", "Delivery Challan", "Customer Statement", "Purchase Order"],
-    users: "2,400+",
+    users: "Active",
   },
   {
     id: "wholesale",
@@ -212,7 +212,7 @@ const BUSINESSES: DemoBusiness[] = [
       { label: "Loyalty ROI", value: "Proven", sub: "Repeat customers spend 2.3x more" },
     ],
     sampleDocs: ["POS Receipt", "Stock Report", "Loyalty Statement", "Branch Sales Report", "Purchase Order"],
-    users: "4,200+",
+    users: "Active",
   },
   {
     id: "manufacturing",

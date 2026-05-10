@@ -14,7 +14,7 @@ const DEPARTMENTS = [
     glow: "rgba(129,140,248,.15)",
     border: "rgba(129,140,248,.25)",
     headcount: 52,
-    desc: "We build the financial infrastructure powering 12,000+ businesses. Our stack is TypeScript, Next.js, PostgreSQL, and we ship every week.",
+    desc: "We build the financial infrastructure powering businesses across 40+ countries. Our stack is TypeScript, Next.js, PostgreSQL, and we ship every week.",
     leads: ["Omar Khalid — CTO", "Ali Hassan — VP Eng"],
     tools: ["TypeScript", "Next.js", "PostgreSQL", "Redis", "AWS", "Kubernetes"],
     teams: ["Core Platform", "Payments", "Reporting", "Mobile", "Security", "Infrastructure"],
@@ -218,7 +218,7 @@ export default function RolesPage() {
             </span>
           </h1>
           <p style={{ fontSize:"clamp(15px,2vw,17px)", color:"rgba(255,255,255,.5)", lineHeight:1.75, maxWidth:500, margin:"0 auto 36px", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
-            120 people across 5 departments, 18 countries, one mission. Find your place in the team.
+            A focused team across 5 departments, building globally, one mission. Find your place.
           </p>
           <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap", opacity:heroVis?1:0, transition:"all .6s ease .3s" }}>
             <a href="#departments" style={{ padding:"12px 28px", borderRadius:12, fontWeight:800, fontSize:13, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", textDecoration:"none", boxShadow:"0 4px 24px rgba(79,70,229,.4)" }}>

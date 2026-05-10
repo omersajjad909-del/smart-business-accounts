@@ -40,7 +40,7 @@ const BOTTOM_LINKS = [
 
 const STATS = [
   { val: "50+",   label: "Modules",  color: "#818cf8" },
-  { val: "PKR·AED·SAR", label: "Multi-Currency", color: "#fbbf24" },
+  { val: "40+",  label: "Countries",  color: "#fbbf24" },
   { val: "99.9%", label: "Uptime",   color: "#34d399" },
 ];
 
@@ -266,7 +266,7 @@ export default function Footer() {
               {[
                 { Icon: Mail,  text: "hello@finovaos.app", color: "#818cf8", href: "mailto:hello@finovaos.app" },
                 { Icon: Phone, text: "+92 304-7653693",        color: "#34d399", href: "https://wa.me/923047653693" },
-                { Icon: Globe, text: "Pakistan 🇵🇰",           color: "#fbbf24", href: "#" },
+                { Icon: Globe, text: "finovaos.app",            color: "#fbbf24", href: "https://finovaos.app" },
               ].map(({ Icon, text, color, href }) => (
                 <a key={text} href={href} className="ft-contact-item" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
                   <div className="ft-contact-icon" style={{

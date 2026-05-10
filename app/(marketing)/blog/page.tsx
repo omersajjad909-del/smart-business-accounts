@@ -13,23 +13,23 @@ const CATEGORIES = [
 
 const FEATURED = {
   slug: "bank-reconciliation-guide",
-  title: "The Complete Guide to Bank Reconciliation for SMEs in 2025",
+  title: "The Complete Guide to Bank Reconciliation for SMEs in 2026",
   excerpt: "Bank reconciliation doesn't have to take days. Learn how modern businesses close their books in hours using automation, smart matching, and real-time data.",
   category: "accounting", categoryLabel: "Accounting Tips",
-  author: "Nadia Qureshi", authorRole: "Head of Finance", avatar: "NQ",
-  date: "March 10, 2025", readTime: "8 min read",
+  author: "FinovaOS Team", authorRole: "FinovaOS", avatar: "FO",
+  date: "March 10, 2026", readTime: "8 min read",
 };
 
 const POSTS = [
-  { slug: "1", title: "How to Create and Send Professional Invoices with FinovaOS", excerpt: "From custom templates to automatic payment reminders — get paid faster using FinovaOS's invoicing module.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 8, 2025", readTime: "5 min", color: "#34d399", icon: "📄" },
-  { slug: "2", title: "FinovaOS HR & Payroll: Complete Setup Guide for Global Businesses", excerpt: "Social security, gratuity, tax withholding — all automated and adapts to your country's rules.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 6, 2025", readTime: "7 min", color: "#fbbf24", icon: "👥" },
-  { slug: "3", title: "Using FinovaOS CRM to Convert More Leads into Paying Customers", excerpt: "Connect your customer relationships directly to your financial data — close deals faster.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Mar 5, 2025", readTime: "5 min", color: "#818cf8", icon: "🎯" },
-  { slug: "4", title: "FinovaOS Inventory: Track Stock, Purchases, and Sales in Real Time", excerpt: "Every purchase invoice updates stock automatically. Every sales invoice deducts it. No manual counting.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Mar 3, 2025", readTime: "6 min", color: "#38bdf8", icon: "📦" },
-  { slug: "5", title: "Tax Compliance with FinovaOS: A Complete Guide for 2025", excerpt: "Sales tax, VAT, income tax withholding — FinovaOS generates all tax authority reports automatically.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Mar 1, 2025", readTime: "8 min", color: "#c4b5fd", icon: "📊" },
-  { slug: "6", title: "Multi-Branch Accounting: One Dashboard, Every Location", excerpt: "Manage New York, London, and Dubai from one FinovaOS account. Consolidated reports in one click.", category: "business", categoryLabel: "Business Growth", author: "FinovaOS Team", date: "Feb 27, 2025", readTime: "6 min", color: "#f9a8d4", icon: "🌍" },
-  { slug: "7", title: "How to Use FinovaOS's Quotation Module to Close Deals Faster", excerpt: "Create professional quotes in minutes and convert them to invoices with one click — no re-entry.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Feb 25, 2025", readTime: "5 min", color: "#38bdf8", icon: "⚡" },
-  { slug: "8", title: "FinovaOS Custom Plans: Build Your Perfect Accounting Package", excerpt: "Pay only for the modules you use. Accounting, CRM, HR, Inventory — pick and choose.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Feb 22, 2025", readTime: "4 min", color: "#c4b5fd", icon: "🧩" },
-  { slug: "9", title: "FinovaOS Reports: Every Financial Report Your Business Needs", excerpt: "P&L, Balance Sheet, Aging, Tax reports — all in one place, jurisdiction-ready for 40+ countries.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Feb 20, 2025", readTime: "6 min", color: "#fbbf24", icon: "📈" },
+  { slug: "1", title: "How to Create and Send Professional Invoices with FinovaOS", excerpt: "From custom templates to automatic payment reminders — get paid faster using FinovaOS's invoicing module.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 8, 2026", readTime: "5 min", color: "#34d399", icon: "📄" },
+  { slug: "2", title: "FinovaOS HR & Payroll: Complete Setup Guide for Global Businesses", excerpt: "Social security, gratuity, tax withholding — all automated and adapts to your country's rules.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Mar 6, 2026", readTime: "7 min", color: "#fbbf24", icon: "👥" },
+  { slug: "3", title: "Using FinovaOS CRM to Convert More Leads into Paying Customers", excerpt: "Connect your customer relationships directly to your financial data — close deals faster.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Mar 5, 2026", readTime: "5 min", color: "#818cf8", icon: "🎯" },
+  { slug: "4", title: "FinovaOS Inventory: Track Stock, Purchases, and Sales in Real Time", excerpt: "Every purchase invoice updates stock automatically. Every sales invoice deducts it. No manual counting.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Mar 3, 2026", readTime: "6 min", color: "#38bdf8", icon: "📦" },
+  { slug: "5", title: "Tax Compliance with FinovaOS: A Complete Guide for 2026", excerpt: "Sales tax, VAT, income tax withholding — FinovaOS generates all tax authority reports automatically.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Mar 1, 2026", readTime: "8 min", color: "#c4b5fd", icon: "📊" },
+  { slug: "6", title: "Multi-Branch Accounting: One Dashboard, Every Location", excerpt: "Manage New York, London, and Dubai from one FinovaOS account. Consolidated reports in one click.", category: "business", categoryLabel: "Business Growth", author: "FinovaOS Team", date: "Feb 27, 2026", readTime: "6 min", color: "#f9a8d4", icon: "🌍" },
+  { slug: "7", title: "How to Use FinovaOS's Quotation Module to Close Deals Faster", excerpt: "Create professional quotes in minutes and convert them to invoices with one click — no re-entry.", category: "guides", categoryLabel: "How-to Guides", author: "FinovaOS Team", date: "Feb 25, 2026", readTime: "5 min", color: "#38bdf8", icon: "⚡" },
+  { slug: "8", title: "FinovaOS Custom Plans: Build Your Perfect Accounting Package", excerpt: "Pay only for the modules you use. Accounting, CRM, HR, Inventory — pick and choose.", category: "product", categoryLabel: "Product Features", author: "FinovaOS Team", date: "Feb 22, 2026", readTime: "4 min", color: "#c4b5fd", icon: "🧩" },
+  { slug: "9", title: "FinovaOS Reports: Every Financial Report Your Business Needs", excerpt: "P&L, Balance Sheet, Aging, Tax reports — all in one place, jurisdiction-ready for 40+ countries.", category: "accounting", categoryLabel: "Accounting Tips", author: "FinovaOS Team", date: "Feb 20, 2026", readTime: "6 min", color: "#fbbf24", icon: "📈" },
 ];
 
 const catColor = (id: string) => CATEGORIES.find(c => c.id === id)?.color || "#818cf8";
@@ -129,7 +129,7 @@ export default function BlogPage() {
                 {FEATURED.excerpt}
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 6 }}>
-                <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#4f46e5,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: "white", flexShrink: 0 }}>NQ</div>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#4f46e5,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: "white", flexShrink: 0 }}>FO</div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{FEATURED.author}</div>
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{FEATURED.date} · {FEATURED.readTime}</div>
@@ -241,7 +241,7 @@ export default function BlogPage() {
               </button>
             </div>
             <p style={{ fontSize: 11, color: "rgba(255,255,255,.2)", marginTop: 14 }}>
-              Joined by 4,200+ business owners · Unsubscribe anytime
+              Unsubscribe anytime · No spam, ever.
             </p>
           </div>
         </div>

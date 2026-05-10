@@ -219,7 +219,7 @@ export default function NewsletterSection() {
               </div>
 
               <div style={{ fontSize:22, fontWeight:800, color:"white", letterSpacing:"-0.5px", marginBottom:8, lineHeight:1.2 }}>
-                Join 5,000+ business owners
+                Get product updates &amp; growth tips
               </div>
               <p style={{ fontSize:14, color:"rgba(255,255,255,.4)", lineHeight:1.7, marginBottom:28, marginTop:0 }}>
                 Get product updates and growth tips delivered weekly. Unsubscribe anytime.
@@ -348,7 +348,7 @@ export default function NewsletterSection() {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
-                  ), val:"5,000+", label:"Subscribers", color:"#818cf8" },
+                  ), val:"Growing", label:"Subscribers", color:"#818cf8" },
                   { icon: (
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="2" y="4" width="20" height="16" rx="2"/>
@@ -400,7 +400,7 @@ export default function NewsletterSection() {
                 ))}
               </div>
               <span style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>
-                <span style={{ color:"rgba(255,255,255,.6)", fontWeight:600 }}>4.9/5</span> from 2,400+ reviews
+                Trusted by growing businesses worldwide
               </span>
             </div>
           </div>

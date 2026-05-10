@@ -535,7 +535,7 @@ export default function PricingSection() {
             { icon:"🔒", text:"Secure payments" },
             { icon:"🔄", text:"Cancel anytime" },
             { icon:"🌍", text:"Global coverage" },
-            { icon:"💬", text:"24/7 support" },
+            { icon:"💬", text:"Priority support" },
             { icon:"🚀", text:"Setup in minutes" },
           ].map(t => (
             <div key={t.text} style={{ display:"flex", alignItems:"center", gap:7, fontSize:12, color:"rgba(255,255,255,.35)", fontWeight:500 }}>

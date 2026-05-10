@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
 
 export const metadata: Metadata = {
-  title: "Careers at FinovaOS — Join Our Global Team of 120+",
+  title: "Careers at FinovaOS — Join Our Global Team",
   description:
-    "Work at FinovaOS: remote-first, equity included, health coverage, learning budget. 18+ countries, 4.8★ Glassdoor rating. We're hiring in engineering, product, and sales.",
+    "Work at FinovaOS: remote-first, equity included, health coverage, learning budget. Global team, weekly shipping culture. We're hiring in engineering, product, and sales.",
   keywords: [
     "FinovaOS careers",
     "fintech jobs",
@@ -17,9 +17,9 @@ export const metadata: Metadata = {
     "product manager jobs fintech",
   ],
   openGraph: {
-    title: "Careers at FinovaOS — Join Our 120+ Team",
+    title: "Careers at FinovaOS — Join Our Global Team",
     description:
-      "Remote-first. Equity. Health coverage. Learning budget. 4.8★ Glassdoor. Join us and build the future of business finance.",
+      "Remote-first. Equity. Health coverage. Learning budget. Join us and build the future of business finance.",
     url: `${BASE}/careers`,
     siteName: "FinovaOS",
     images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "Careers at FinovaOS" }],

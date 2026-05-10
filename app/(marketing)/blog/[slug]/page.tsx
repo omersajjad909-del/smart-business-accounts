@@ -471,7 +471,7 @@ export default function BlogDetailPage() {
         <div style={{ marginTop:48, padding:"36px 32px", borderRadius:20, background:"linear-gradient(135deg,rgba(79,70,229,.2),rgba(124,58,237,.1))", border:"1px solid rgba(99,102,241,.3)", textAlign:"center" }}>
           <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.5)", textTransform:"uppercase", letterSpacing:".06em", marginBottom:10 }}>READY TO START?</div>
           <h3 style={{ fontSize:22, fontWeight:800, color:"white", fontFamily:"Lora,serif", margin:"0 0 10px" }}>Start using FinovaOS today</h3>
-          <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", margin:"0 auto 22px", maxWidth:380 }}>Join 14k+ businesses worldwide. Full platform access with expert support and 24/7 availability.</p>
+          <p style={{ fontSize:14, color:"rgba(255,255,255,.45)", margin:"0 auto 22px", maxWidth:380 }}>Full platform access with expert support and priority response times.</p>
           <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
             <Link href="/signup" style={{ padding:"12px 28px", borderRadius:11, background:"linear-gradient(135deg,#4f46e5,#7c3aed)", color:"white", fontWeight:800, fontSize:13, textDecoration:"none" }}>
               Get Started →

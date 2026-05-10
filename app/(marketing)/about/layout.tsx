@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "FinovaOS story",
     "cloud accounting company",
     "accounting software company",
-    "SME fintech Pakistan",
+    "SME fintech software",
     "financial management platform",
     "FinovaOS mission",
     "trading business accounting software",

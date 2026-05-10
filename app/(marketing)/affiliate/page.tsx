@@ -75,10 +75,10 @@ export default function AffiliatePage() {
             <span style={{ background:"linear-gradient(90deg,#fbbf24,#f59e0b)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Earn real money.</span>
           </h1>
           <p style={{ fontSize:"clamp(15px,2vw,18px)", color:"rgba(255,255,255,.5)", lineHeight:1.75, maxWidth:500, margin:"0 auto 36px", opacity:heroVis?1:0, transition:"all .6s ease .2s" }}>
-            Join 500+ affiliates earning monthly recurring commissions by recommending FinovaOS to businesses they know.
+            Earn monthly recurring commissions by recommending FinovaOS to businesses you know.
           </p>
           <div style={{ display:"flex", gap:28, justifyContent:"center", flexWrap:"wrap", marginBottom:36, opacity:heroVis?1:0, transition:"all .6s ease .25s" }}>
-            {[["20–35%","Recurring commission"],["$0","Cost to join"],["Monthly","Payout schedule"],["500+","Active affiliates"]].map(([val,label])=>(
+            {[["20–35%","Recurring commission"],["$0","Cost to join"],["Monthly","Payout schedule"],["Open","Affiliate program"]].map(([val,label])=>(
               <div key={label} style={{ textAlign:"center" }}>
                 <div style={{ fontSize:24, fontWeight:900, color:"#fbbf24", fontFamily:"Lora,serif" }}>{val}</div>
                 <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", marginTop:3 }}>{label}</div>
