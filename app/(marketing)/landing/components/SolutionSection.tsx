@@ -137,6 +137,7 @@ export default function SolutionSection() {
 
   return (
     <section
+      className="sol-section"
       style={{
         background: "linear-gradient(180deg,#080c22 0%,#0a0d28 60%,#070a1e 100%)",
         padding: "100px 24px",
@@ -150,7 +151,30 @@ export default function SolutionSection() {
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-        @media(max-width:860px){
+
+        /* ── Comparison panel ── */
+        .cmp-header { display:grid; grid-template-columns:1fr 52px 1fr; }
+        .cmp-row    { display:grid; grid-template-columns:1fr 52px 1fr; }
+        .cmp-arrow  { display:flex; }
+
+        @media(max-width:640px){
+          .cmp-header { grid-template-columns:1fr 1fr; }
+          .cmp-row    { grid-template-columns:1fr 1fr; }
+          .cmp-arrow  { display:none; }
+          .cmp-prob   { padding:14px 14px !important; }
+          .cmp-sol    { padding:14px 14px !important; border-left:1px solid rgba(99,102,241,.12) !important; }
+          .cmp-prob span,.cmp-sol span { font-size:12.5px !important; }
+          .cmp-prob-num { width:22px !important; height:22px !important; font-size:9px !important; }
+          .cmp-sol-icon { width:28px !important; height:28px !important; font-size:14px !important; border-radius:8px !important; }
+          .cmp-hdr-left  { padding:12px 14px !important; }
+          .cmp-hdr-right { padding:12px 14px !important; }
+          .cmp-hdr-left span,.cmp-hdr-right span { font-size:10px !important; }
+          .sol-section { padding:64px 16px !important; }
+          .sol-detail-grid{grid-template-columns:1fr !important;}
+          .sol-stats-grid{grid-template-columns:1fr !important;}
+          .ind-cta { display:none; }
+        }
+        @media(min-width:641px) and (max-width:860px){
           .sol-detail-grid{grid-template-columns:1fr !important;}
           .sol-stats-grid{grid-template-columns:1fr !important;}
         }
@@ -260,13 +284,13 @@ export default function SolutionSection() {
             }}
           >
             {/* Column headers */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 52px 1fr" }}>
-              <div style={{ padding: "18px 28px", background: "rgba(248,113,113,.07)", borderBottom: "1px solid rgba(248,113,113,.1)", display: "flex", alignItems: "center", gap: 10 }}>
+            <div className="cmp-header">
+              <div className="cmp-hdr-left" style={{ padding: "18px 28px", background: "rgba(248,113,113,.07)", borderBottom: "1px solid rgba(248,113,113,.1)", display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(248,113,113,.15)", border: "1px solid rgba(248,113,113,.22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✕</div>
                 <span style={{ fontSize: 12, fontWeight: 800, color: "#f87171", letterSpacing: ".09em" }}>WITHOUT FINOVA</span>
               </div>
-              <div style={{ background: "rgba(255,255,255,.03)", borderBottom: "1px solid rgba(255,255,255,.07)", borderLeft: "1px solid rgba(255,255,255,.06)", borderRight: "1px solid rgba(255,255,255,.06)" }} />
-              <div style={{ padding: "18px 28px", background: "rgba(99,102,241,.07)", borderBottom: "1px solid rgba(99,102,241,.14)", borderLeft: "1px solid rgba(99,102,241,.1)", display: "flex", alignItems: "center", gap: 10 }}>
+              <div className="cmp-arrow" style={{ background: "rgba(255,255,255,.03)", borderBottom: "1px solid rgba(255,255,255,.07)", borderLeft: "1px solid rgba(255,255,255,.06)", borderRight: "1px solid rgba(255,255,255,.06)" }} />
+              <div className="cmp-hdr-right" style={{ padding: "18px 28px", background: "rgba(99,102,241,.07)", borderBottom: "1px solid rgba(99,102,241,.14)", borderLeft: "1px solid rgba(99,102,241,.1)", display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(99,102,241,.2)", border: "1px solid rgba(99,102,241,.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✓</div>
                 <span style={{ fontSize: 12, fontWeight: 800, color: "#a5b4fc", letterSpacing: ".09em" }}>WITH FINOVA</span>
               </div>
@@ -276,17 +300,17 @@ export default function SolutionSection() {
             {PAINS.map((pain, index) => (
               <div
                 key={pain.problem}
+                className="cmp-row"
                 onMouseEnter={() => setHovPain(index)}
                 onMouseLeave={() => setHovPain(null)}
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 52px 1fr",
                   borderBottom: index < PAINS.length - 1 ? "1px solid rgba(255,255,255,.04)" : "none",
                   transition: "background .15s",
                 }}
               >
                 {/* Problem side */}
                 <div
+                  className="cmp-prob"
                   style={{
                     padding: "20px 28px",
                     display: "flex",
@@ -297,6 +321,7 @@ export default function SolutionSection() {
                   }}
                 >
                   <div
+                    className="cmp-prob-num"
                     style={{
                       width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
                       display: "flex", alignItems: "center", justifyContent: "center",
@@ -313,8 +338,9 @@ export default function SolutionSection() {
 
                 {/* Center arrow */}
                 <div
+                  className="cmp-arrow"
                   style={{
-                    display: "flex", alignItems: "center", justifyContent: "center",
+                    alignItems: "center", justifyContent: "center",
                     borderLeft: "1px solid rgba(255,255,255,.05)",
                     borderRight: "1px solid rgba(99,102,241,.08)",
                     background: hovPain === index ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.015)",
@@ -328,6 +354,7 @@ export default function SolutionSection() {
 
                 {/* Solution side */}
                 <div
+                  className="cmp-sol"
                   style={{
                     padding: "20px 28px",
                     display: "flex",
@@ -338,6 +365,7 @@ export default function SolutionSection() {
                   }}
                 >
                   <div
+                    className="cmp-sol-icon"
                     style={{
                       width: 34, height: 34, borderRadius: 10, flexShrink: 0,
                       display: "flex", alignItems: "center", justifyContent: "center",
@@ -590,6 +618,7 @@ export default function SolutionSection() {
                 </div>
                 <Link
                   href={`/solutions#${selectedIndustry.slug}`}
+                  className="ind-cta"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
