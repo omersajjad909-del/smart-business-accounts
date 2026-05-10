@@ -3,7 +3,7 @@ import Link from "next/link";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 
-const LAST_UPDATED = "14 April 2026";
+const LAST_UPDATED = "10 May 2026";
 const COMPANY = "FinovaOS";
 const EMAIL = "legal@finovaos.app";
 const EMAIL_HREF = `mailto:${EMAIL}`;
@@ -97,7 +97,7 @@ const SECTIONS = [
     content: [
       {
         sub: "Third-Party Payment Providers",
-        body: "Payments on FinovaOS are processed through trusted third-party payment providers (such as Stripe, Paddle, or similar licensed gateways, depending on your region). FinovaOS does not store full card numbers, CVV codes, or other sensitive cardholder data on its own servers.",
+        body: "Payments on FinovaOS are processed through LemonSqueezy, a trusted third-party payment provider. FinovaOS does not store full card numbers, CVV codes, or other sensitive cardholder data on its own servers.",
       },
       {
         sub: "Card Data Security",

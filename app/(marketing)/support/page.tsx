@@ -48,7 +48,7 @@ const CHANNELS = [
     tag: "Self-Serve",
     label: "Help Center",
     href: "/help",
-    display: "200+ articles & guides",
+    display: "Guides, FAQs & walkthroughs",
     note: "Videos, walkthroughs, and how-tos",
     color: "#06b6d4",
     glow: "rgba(6,182,212,.22)",
@@ -64,41 +64,41 @@ const CATEGORIES = [
     icon: "🚀",
     label: "Getting Started",
     desc: "First setup, company profile, onboarding walkthrough, and initial configuration.",
-    count: "24 articles",
+    count: "Browse →",
     color: "#6366f1",
-    href: "/help#getting-started",
+    href: "/help",
   },
   {
     icon: "💳",
     label: "Billing & Plans",
     desc: "Subscription management, plan upgrades, invoices, payment methods, and refunds.",
-    count: "12 articles",
+    count: "Browse →",
     color: "#10b981",
-    href: "/help#billing",
+    href: "/help",
   },
   {
     icon: "🔧",
     label: "Technical Issues",
     desc: "Error messages, performance, login issues, and platform troubleshooting steps.",
-    count: "38 articles",
+    count: "Browse →",
     color: "#f59e0b",
-    href: "/help#technical",
+    href: "/help",
   },
   {
     icon: "🔗",
     label: "Integrations & Imports",
     desc: "Bank connections, data import from Excel/CSV, third-party integrations, and APIs.",
-    count: "19 articles",
+    count: "Browse →",
     color: "#06b6d4",
-    href: "/help#integrations",
+    href: "/help",
   },
   {
     icon: "🔒",
     label: "Security & Data",
     desc: "Encryption, backup policy, user permissions, compliance practices, and access logs.",
-    count: "15 articles",
+    count: "Browse →",
     color: "#a78bfa",
-    href: "/help#security",
+    href: "/help",
   },
   {
     icon: "💡",
@@ -472,7 +472,7 @@ export default function SupportPage() {
                   color: "rgba(255,255,255,.38)", textDecoration: "none", transition: "color .2s" }}
                   onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,.7)")}
                   onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.38)")}>
-                  View all 200+ articles
+                  Browse all help articles
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                 </Link>
               </div>
@@ -628,11 +628,11 @@ export default function SupportPage() {
                     <span style={{ color: "#10b981", fontWeight: 700 }}>99.98% uptime</span>
                     <span>Today</span>
                   </div>
-                  <a href="https://status.finovaos.app" style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14,
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14,
                     paddingTop: 12, borderTop: "1px solid rgba(16,185,129,.12)",
-                    fontSize: 12, fontWeight: 600, color: "#34d399", textDecoration: "none" }}>
-                    View full status page →
-                  </a>
+                    fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.28)" }}>
+                    status.finovaos.app — coming soon
+                  </div>
                 </div>
 
                 {/* Quick links */}
@@ -641,11 +641,9 @@ export default function SupportPage() {
                     Helpful Resources
                   </div>
                   {[
-                    { label: "Getting Started Guide", icon: "🚀", href: "/help/getting-started" },
-                    { label: "Video Tutorials", icon: "🎬", href: "/help/videos" },
-                    { label: "API Documentation", icon: "📡", href: "/docs/api" },
-                    { label: "Data Import Guide", icon: "📥", href: "/help/import" },
-                    { label: "Release Notes & Changelog", icon: "📋", href: "/changelog" },
+                    { label: "Getting Started Guide", icon: "🚀", href: "/help" },
+                    { label: "Video Tutorials", icon: "🎬", href: "/help" },
+                    { label: "Data Import Guide", icon: "📥", href: "/help" },
                     { label: "Submit a Support Ticket", icon: "🎫", href: "/support/ticket" },
                   ].map(({ label, icon, href }) => (
                     <Link key={label} href={href} className="ql">
