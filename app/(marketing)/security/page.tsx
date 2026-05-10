@@ -41,7 +41,7 @@ const PILLARS = [
     points:[
       { icon:"🎛️", title:"Role-Based Access (RBAC)", desc:"Granular permissions per user — by module, branch, and action type. A cashier cannot access payroll. Fully configurable by your admin." },
       { icon:"🏢", title:"Company & Branch Isolation", desc:"Multi-company users have strict data boundaries enforced at the database query level. Switching companies never leaks data between entities." },
-      { icon:"📱", title:"Two-Factor Authentication (TOTP)", desc:"2FA is available now via any TOTP authenticator app (Google Authenticator, Authy). Users can enable it from their account settings." },
+      { icon:"🔑", title:"Authentication Security", desc:"Passwords are hashed using bcrypt and never stored in plain text. Sessions are signed, short-lived, and invalidated on logout. 2FA via TOTP (Google Authenticator, Authy) is available from account settings." },
     ],
   },
   {
@@ -321,7 +321,7 @@ export default function SecurityPage() {
     <>
       <Head>
         <title>Security – FinovaOS</title>
-        <meta name="description" content="Bank-grade security for your financial data. 256-bit encryption, role-based access, audit trails, and global cloud infrastructure."/>
+        <meta name="description" content="Industry-standard security for your financial data. AES-256 encryption, role-based access, audit trails, and managed cloud infrastructure."/>
       </Head>
 
       <div style={{
