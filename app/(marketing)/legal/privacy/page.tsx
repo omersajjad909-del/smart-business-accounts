@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 const LAST_UPDATED = "14 April 2026";
 const COMPANY = "FinovaOS";
 const EMAIL = "legal@finovaos.app";
-const EMAIL_HREF = `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}&su=Privacy+Policy+Inquiry`;
+const EMAIL_HREF = `mailto:${EMAIL}`;
 
 const SECTIONS = [
   {
@@ -88,6 +88,28 @@ const SECTIONS = [
     ],
   },
   {
+    id: "payment-processing",
+    icon: "💳",
+    color: "#10b981",
+    dim: "rgba(16,185,129,.08)",
+    border: "rgba(16,185,129,.25)",
+    title: "Payment Processing",
+    content: [
+      {
+        sub: "Third-Party Payment Providers",
+        body: "Payments on FinovaOS are processed through trusted third-party payment providers (such as Stripe, Paddle, or similar licensed gateways, depending on your region). FinovaOS does not store full card numbers, CVV codes, or other sensitive cardholder data on its own servers.",
+      },
+      {
+        sub: "Card Data Security",
+        body: "All payment card data is handled directly by our payment processors under PCI-DSS compliant environments. We receive only a tokenized reference and last-4 digits for billing records. We have no access to your full card details at any time.",
+      },
+      {
+        sub: "Bank & Wire Transfers",
+        body: "For customers who pay via bank transfer, we collect only the information required to verify and reconcile the payment. No banking credentials are stored by FinovaOS.",
+      },
+    ],
+  },
+  {
     id: "data-security",
     icon: "🔒",
     color: "#a78bfa",
@@ -110,6 +132,28 @@ const SECTIONS = [
       {
         sub: "Incident Response",
         body: "In the event of a data breach affecting your information, we will notify you within 72 hours of discovery, as required by applicable law.",
+      },
+    ],
+  },
+  {
+    id: "ai-processing",
+    icon: "🤖",
+    color: "#f59e0b",
+    dim: "rgba(245,158,11,.08)",
+    border: "rgba(245,158,11,.25)",
+    title: "AI & Automated Processing",
+    content: [
+      {
+        sub: "AI Model Training",
+        body: "Customer business data is never used to train public or shared AI models. Your financial records, invoices, contacts, and operational data remain exclusively yours and are never fed into any externally shared machine learning pipeline.",
+      },
+      {
+        sub: "AI-Powered Insights",
+        body: "AI-powered analytics, forecasts, and recommendations in FinovaOS are generated solely using your own workspace data, processed within your isolated environment. No cross-customer data comparison or blending occurs.",
+      },
+      {
+        sub: "Automated Decisions",
+        body: "Where FinovaOS uses automated processing to generate suggestions (such as reorder recommendations or cash-flow forecasts), these are advisory only and do not constitute binding decisions. You retain full control over all business actions.",
       },
     ],
   },
@@ -178,6 +222,28 @@ const SECTIONS = [
     ],
   },
   {
+    id: "workspace-account",
+    icon: "🏢",
+    color: "#06b6d4",
+    dim: "rgba(6,182,212,.08)",
+    border: "rgba(6,182,212,.25)",
+    title: "Workspace Isolation & Account Responsibility",
+    content: [
+      {
+        sub: "Workspace Isolation",
+        body: "Each customer workspace operates within logically isolated environments designed to prevent unauthorized cross-account access between organizations. Business data belonging to one customer is never accessible to another customer under any circumstances.",
+      },
+      {
+        sub: "Account Responsibility",
+        body: "Customers are responsible for maintaining the confidentiality of their login credentials and for all activities performed within their accounts. FinovaOS cannot be held responsible for losses resulting from unauthorized access caused by credential sharing, weak passwords, or failure to secure account access.",
+      },
+      {
+        sub: "User Roles & Permissions",
+        body: "Account administrators are responsible for assigning appropriate roles and permissions to their team members. FinovaOS provides role-based access controls but does not audit how customers configure internal access within their own organization.",
+      },
+    ],
+  },
+  {
     id: "cookies",
     icon: "🍪",
     color: "#34d399",
@@ -196,6 +262,32 @@ const SECTIONS = [
       {
         sub: "No Third-Party Advertising Cookies",
         body: "We do not allow any advertising networks or retargeting pixels on our platform. Your browsing behavior within FinovaOS is never shared with advertisers.",
+      },
+    ],
+  },
+  {
+    id: "compliance-law",
+    icon: "⚖️",
+    color: "#a78bfa",
+    dim: "rgba(167,139,250,.08)",
+    border: "rgba(167,139,250,.25)",
+    title: "Compliance, Legal Entity & Governing Law",
+    content: [
+      {
+        sub: "International Compliance",
+        body: "While FinovaOS is not currently certified under GDPR, SOC 2, or ISO 27001, we follow industry-standard security and privacy practices designed to align with international compliance expectations. We are committed to progressively adopting formal certifications as the platform matures.",
+      },
+      {
+        sub: "Legal Entity",
+        body: "FinovaOS™ is a product of Finova Forge. Finova Forge is the legal entity responsible for operating, maintaining, and delivering the FinovaOS platform and all associated services.",
+      },
+      {
+        sub: "Governing Law",
+        body: "This Privacy Policy shall be governed by and interpreted in accordance with the laws applicable to the jurisdiction in which Finova Forge operates, unless otherwise required by the customer's local laws or regulations. Where conflicts arise between jurisdictions, the parties will act in good faith to resolve them.",
+      },
+      {
+        sub: "Dispute Resolution",
+        body: "Any disputes relating to this privacy policy that cannot be resolved informally will be addressed through the legal processes applicable in Finova Forge's operating jurisdiction.",
       },
     ],
   },
@@ -426,7 +518,9 @@ export default function PrivacyPage() {
                   {[
                     { icon:"🚫", text:"We never sell your data" },
                     { icon:"🔒", text:"256-bit encryption always" },
-                    { icon:"🌐", text:"Global cloud servers" },
+                    { icon:"💳", text:"Card data stored by processors only" },
+                    { icon:"🤖", text:"AI never trains on your data" },
+                    { icon:"🏢", text:"Fully isolated workspaces" },
                     { icon:"📤", text:"Full data export anytime" },
                     { icon:"🗑️", text:"Right to deletion" },
                   ].map(({ icon, text }) => (
@@ -497,7 +591,7 @@ export default function PrivacyPage() {
                   {[
                     { icon:"📧", label:"Email", val:EMAIL, href:EMAIL_HREF },
                   ].map(({ icon, label, val, href }) => (
-                    <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" style={{
+                    <a key={label} href={href} rel="noopener noreferrer" style={{
                       display:"inline-flex", alignItems:"center", gap:10,
                       padding:"10px 16px", borderRadius:12,
                       background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.25)",
