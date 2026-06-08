@@ -19,6 +19,14 @@ interface BankStatement {
   id: string; statementNo: string; date: string; amount: number;
   description: string; referenceNo?: string; isReconciled: boolean;
 }
+interface ReconciliationCandidate {
+  id: string; type: string; label: string; party: string; amount: number;
+  date: string; reference?: string | null; confidence: number; reasons: string[];
+}
+interface ReconciliationSuggestion {
+  statementId: string; statementNo: string; amount: number; description: string;
+  risk: "low" | "medium" | "high"; explanation: string; candidates: ReconciliationCandidate[];
+}
 
 function fmt(n: number) { return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
@@ -32,6 +40,8 @@ export default function BankReconciliationPage() {
   const [systemBalance,      setSystemBalance]      = useState(0);
   const [bankBalance,        setBankBalance]        = useState(0);
   const [loading,            setLoading]            = useState(false);
+  const [loadingAi,          setLoadingAi]          = useState(false);
+  const [aiSuggestions,      setAiSuggestions]      = useState<ReconciliationSuggestion[]>([]);
   const [showBankForm,       setShowBankForm]       = useState(false);
   const [editingBankId,      setEditingBankId]      = useState("");
   const [companyInfo,        setCompanyInfo]        = useState<any>(null);
@@ -87,7 +97,24 @@ export default function BankReconciliationPage() {
       const res  = await fetch(url, { headers: h() });
       const data = await res.json();
       setStatements(Array.isArray(data) ? data : []);
+      fetchAiSuggestions(accountId);
     } catch { setStatements([]); }
+  }
+
+  async function fetchAiSuggestions(accountId: string) {
+    setLoadingAi(true);
+    try {
+      const ba = bankAccounts.find(a => a.id === accountId || a.accountId === accountId);
+      const linked = ba?.source === "BankAccount" ? ba : bankAccounts.find(a => a.accountId === accountId && a.source === "BankAccount");
+      if (!linked?.id) { setAiSuggestions([]); return; }
+      const res = await fetch(`/api/ai/reconciliation?bankAccountId=${linked.id}`, { headers: h() });
+      const data = await res.json();
+      setAiSuggestions(Array.isArray(data.suggestions) ? data.suggestions : []);
+    } catch {
+      setAiSuggestions([]);
+    } finally {
+      setLoadingAi(false);
+    }
   }
 
   async function handleAddBank(e: React.FormEvent) {
@@ -150,6 +177,10 @@ export default function BankReconciliationPage() {
   const difference  = Math.abs((systemBalance || 0) - (bankBalance || 0));
   const isBalanced  = difference < 0.01;
   const currency    = companyInfo?.baseCurrency || "PKR";
+  const confidenceTone = (confidence: number) =>
+    confidence >= 90 ? { color: "#22c55e", bg: "rgba(34,197,94,.1)", border: "rgba(34,197,94,.25)" } :
+    confidence >= 70 ? { color: "#f59e0b", bg: "rgba(245,158,11,.1)", border: "rgba(245,158,11,.25)" } :
+    { color: "#f87171", bg: "rgba(248,113,113,.1)", border: "rgba(248,113,113,.25)" };
 
   const panel: React.CSSProperties = { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, fontFamily: ff };
   const inp:   React.CSSProperties = { width: "100%", background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", color: "var(--text-primary)", fontFamily: ff, fontSize: 14, outline: "none", boxSizing: "border-box" };
@@ -200,6 +231,65 @@ export default function BankReconciliationPage() {
               style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 20px", fontFamily: ff, fontSize: 14, color: "var(--text-muted)", cursor: "pointer" }}>Cancel</button>
           </div>
         </form>
+      )}
+
+      {selectedAccount && (
+        <div style={{ ...panel, marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: accent }}>Smart Reconciliation AI</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 3 }}>Suggested invoice, receipt, vendor, and expense matches with confidence.</div>
+            </div>
+            <button onClick={() => fetchAiSuggestions(selectedAccount)} disabled={loadingAi}
+              style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", color: "var(--text-muted)", fontFamily: ff, fontSize: 12, cursor: loadingAi ? "not-allowed" : "pointer" }}>
+              {loadingAi ? "Analyzing..." : "Refresh AI"}
+            </button>
+          </div>
+
+          {loadingAi ? (
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>AI is comparing statements with invoices, receipts, vendors, and expenses...</div>
+          ) : aiSuggestions.length === 0 ? (
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>No AI suggestions yet. Add unreconciled statements or refresh AI.</div>
+          ) : (
+            <div style={{ display: "grid", gap: 10 }}>
+              {aiSuggestions.slice(0, 5).map((suggestion) => {
+                const top = suggestion.candidates[0];
+                const tone = confidenceTone(top?.confidence || 0);
+                return (
+                  <div key={suggestion.statementId} style={{ border: "1px solid var(--border)", borderRadius: 10, padding: 12, background: "rgba(255,255,255,.025)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                      <div style={{ minWidth: 240, flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 800 }}>{suggestion.statementNo} · {currency} {fmt(Math.abs(suggestion.amount))}</div>
+                        <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{suggestion.description}</div>
+                        <div style={{ fontSize: 12, color: tone.color, marginTop: 7 }}>{suggestion.explanation}</div>
+                      </div>
+                      <button onClick={() => setSelectedStatements(prev => prev.includes(suggestion.statementId) ? prev : [...prev, suggestion.statementId])}
+                        style={{ alignSelf: "flex-start", background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "8px 12px", fontFamily: ff, fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
+                        Select Statement
+                      </button>
+                    </div>
+                    {top && (
+                      <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+                        {suggestion.candidates.map((candidate) => {
+                          const candidateTone = confidenceTone(candidate.confidence);
+                          return (
+                            <div key={`${candidate.type}-${candidate.id}`} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "9px 10px", borderRadius: 8, background: candidateTone.bg, border: `1px solid ${candidateTone.border}` }}>
+                              <div>
+                                <div style={{ fontSize: 12, fontWeight: 800 }}>{candidate.label} · {candidate.party}</div>
+                                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3 }}>{candidate.type.replace(/_/g, " ")} · {candidate.reasons.join(" · ")}</div>
+                              </div>
+                              <div style={{ fontSize: 13, fontWeight: 900, color: candidateTone.color, whiteSpace: "nowrap" }}>{candidate.confidence}%</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Balance Controls */}

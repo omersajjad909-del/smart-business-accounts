@@ -211,6 +211,7 @@ interface LatePaymentPrediction {
 
 interface InvoiceReminderResponse {
   reminders: {
+    invoiceId: string;
     customer: string;
     invoiceRef: string;
     amount: number;

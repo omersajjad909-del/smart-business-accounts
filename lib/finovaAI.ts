@@ -442,7 +442,7 @@ export interface FinancialContext {
   };
   topCustomers: { name: string; amount: number }[];
   topExpenses: { category: string; amount: number }[];
-  recentInvoices: { ref: string; customer: string; amount: number; status: string; daysAgo: number }[];
+  recentInvoices: { id: string; ref: string; customer: string; amount: number; status: string; daysAgo: number }[];
   cashPosition: number;
   // Extended context
   topProducts: { name: string; revenue: number; qty: number }[];
@@ -741,6 +741,7 @@ export async function buildFinancialContext(companyId: string): Promise<Financia
 
   // ── Recent invoices
   const recentInv = recentInvoices.map((inv) => ({
+    id: inv.id,
     ref: inv.invoiceNo || "",
     customer: inv.customer?.name || "Unknown",
     amount: Number(inv.total || 0),

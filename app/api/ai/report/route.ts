@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildFinancialContext, FINOVA_SYSTEM_PROMPT, openAITextResponse } from "@/lib/finovaAI";
-import { buildForecastBundle, buildRiskAnalyzer } from "@/lib/aiAnalytics";
+import { buildForecastBundle, buildPredictiveSignals, buildRiskAnalyzer } from "@/lib/aiAnalytics";
 
 export const runtime = "nodejs";
 export const maxDuration = 90;
 
 function buildFallbackReportText(
+  reportLabel: string,
   monthName: string,
   ctx: Awaited<ReturnType<typeof buildFinancialContext>>,
   forecastBundle: ReturnType<typeof buildForecastBundle>,
@@ -17,7 +18,7 @@ function buildFallbackReportText(
   const marginPct = ctx.revenue.thisMonth > 0 ? Math.round((ctx.profit.thisMonth / ctx.revenue.thisMonth) * 100) : 0;
 
   return [
-    `# Monthly Financial Report - ${monthName}`,
+    `# ${reportLabel} Board Report - ${monthName}`,
     ``,
     `## Executive Summary`,
     `${ctx.company.name} closed the month with revenue of ${fmt(ctx.revenue.thisMonth)} and net profit of ${fmt(ctx.profit.thisMonth)}. Revenue moved ${sign(ctx.revenue.change)} versus last month, while expenses moved ${sign(ctx.expenses.change)}.`,
@@ -63,7 +64,7 @@ function buildFallbackReportText(
     `- Reduce exposure to dead or slow-moving inventory.`,
     `- Monitor 30-day closing cash against the recommended buffer.`,
     ``,
-    `## Outlook for Next Month`,
+    `## Outlook for Next ${reportLabel}`,
     `If current trends continue, the next 30 to 90 days remain ${forecastBundle.projections.cashRisk === "high" ? "sensitive" : "manageable"}, but collections discipline and expense control will be important.`,
   ].join("\n");
 }

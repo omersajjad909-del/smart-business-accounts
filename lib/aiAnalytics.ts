@@ -74,6 +74,17 @@ export interface LatePaymentPrediction {
   summary: string[];
 }
 
+export interface PredictiveSignal {
+  metric: "revenue" | "profit" | "cashflow" | "inventory_demand" | "payroll_growth" | "customer_churn";
+  label: string;
+  forecast: number;
+  lowerBound: number;
+  upperBound: number;
+  confidence: number;
+  risk: "low" | "medium" | "high";
+  explanation: string;
+}
+
 function avg(values: number[]) {
   const nums = values.filter((n) => Number.isFinite(n));
   if (!nums.length) return 0;
@@ -369,4 +380,96 @@ export function buildLatePaymentPrediction(ctx: FinancialContext): LatePaymentPr
         : "No overdue customer invoices right now.",
     ],
   };
+}
+
+export function buildPredictiveSignals(ctx: FinancialContext): PredictiveSignal[] {
+  const forecast = buildForecastBundle(ctx);
+  const recentRevenue = ctx.monthlyRevenue.slice(-6).map((month) => month.revenue);
+  const recentProfit = ctx.monthlyRevenue.slice(-6).map((month) => month.profit);
+  const revenueVolatility = avg(recentRevenue.map((value, index, list) => index === 0 ? 0 : Math.abs(value - list[index - 1]))); 
+  const profitVolatility = avg(recentProfit.map((value, index, list) => index === 0 ? 0 : Math.abs(value - list[index - 1])));
+  const inventoryDemand = ctx.topProducts.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+  const latePaymentCustomers = ctx.customerPaymentHistory.filter((customer) => customer.overdueCount > 0 || customer.avgDaysToPay > 35).length;
+  const customerChurnRisk = ctx.customerPaymentHistory.length
+    ? Math.round((latePaymentCustomers / ctx.customerPaymentHistory.length) * 100)
+    : 0;
+  const payrollPressureProxy = Math.max(0, Math.round(ctx.expenses.thisMonth * 0.22));
+
+  const band = (value: number, volatility: number, minPct = 0.12) => {
+    const width = Math.max(Math.abs(value) * minPct, volatility);
+    return {
+      lowerBound: Math.round(value - width),
+      upperBound: Math.round(value + width),
+    };
+  };
+  const confidenceFromVolatility = (value: number, volatility: number) => {
+    if (!value) return 55;
+    const volatilityPct = Math.abs(volatility / value);
+    return Math.max(45, Math.min(88, Math.round(86 - volatilityPct * 80)));
+  };
+
+  const revenueBand = band(forecast.projections.revenue30d, revenueVolatility);
+  const profit30d = forecast.projections.revenue30d - forecast.projections.expense30d;
+  const profitBand = band(profit30d, profitVolatility);
+  const inventoryBand = band(inventoryDemand, Math.max(2, inventoryDemand * 0.18), 0.18);
+  const payrollBand = band(payrollPressureProxy, Math.max(1, payrollPressureProxy * 0.1), 0.1);
+
+  return [
+    {
+      metric: "revenue",
+      label: "Revenue Forecast",
+      forecast: forecast.projections.revenue30d,
+      ...revenueBand,
+      confidence: confidenceFromVolatility(forecast.projections.revenue30d, revenueVolatility),
+      risk: ctx.revenue.change < -15 ? "high" : ctx.revenue.change < 0 ? "medium" : "low",
+      explanation: "Projected from recent monthly sales trend and live receivable signals.",
+    },
+    {
+      metric: "profit",
+      label: "Profit Forecast",
+      forecast: profit30d,
+      ...profitBand,
+      confidence: confidenceFromVolatility(profit30d || 1, profitVolatility),
+      risk: profit30d < 0 ? "high" : profit30d < forecast.projections.recommendedBuffer ? "medium" : "low",
+      explanation: "Revenue forecast minus expected operating expenses for the next 30 days.",
+    },
+    {
+      metric: "cashflow",
+      label: "Cash Flow Forecast",
+      forecast: forecast.projections.cashflow30d,
+      lowerBound: Math.round(forecast.projections.cashflow30d - forecast.projections.recommendedBuffer),
+      upperBound: Math.round(forecast.projections.cashflow30d + forecast.projections.recommendedBuffer),
+      confidence: forecast.projections.cashRisk === "low" ? 82 : forecast.projections.cashRisk === "medium" ? 68 : 56,
+      risk: forecast.projections.cashRisk,
+      explanation: "Combines forecast sales, expected expenses, receivable collections, and payable settlements.",
+    },
+    {
+      metric: "inventory_demand",
+      label: "Inventory Demand",
+      forecast: Math.round(inventoryDemand),
+      ...inventoryBand,
+      confidence: ctx.topProducts.length >= 3 ? 76 : 55,
+      risk: ctx.inventory.lowStockItems > 5 ? "high" : ctx.inventory.lowStockItems > 0 ? "medium" : "low",
+      explanation: "Uses recent top-product movement as a demand proxy and flags low-stock pressure.",
+    },
+    {
+      metric: "payroll_growth",
+      label: "Payroll Growth Pressure",
+      forecast: payrollPressureProxy,
+      ...payrollBand,
+      confidence: 58,
+      risk: ctx.expenses.change > 20 ? "medium" : "low",
+      explanation: "Estimated from current expense pressure until full payroll history is available.",
+    },
+    {
+      metric: "customer_churn",
+      label: "Customer Churn Risk",
+      forecast: customerChurnRisk,
+      lowerBound: Math.max(0, customerChurnRisk - 8),
+      upperBound: Math.min(100, customerChurnRisk + 12),
+      confidence: ctx.customerPaymentHistory.length >= 5 ? 72 : 52,
+      risk: customerChurnRisk > 35 ? "high" : customerChurnRisk > 15 ? "medium" : "low",
+      explanation: "Uses late-payment behavior and overdue concentration as an early customer-health signal.",
+    },
+  ];
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildFinancialContext, FINOVA_SYSTEM_PROMPT, openAITextResponse } from "@/lib/finovaAI";
-import { buildForecastBundle } from "@/lib/aiAnalytics";
+import { buildForecastBundle, buildPredictiveSignals } from "@/lib/aiAnalytics";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
 
     const ctx = await buildFinancialContext(companyId);
     const bundle = buildForecastBundle(ctx);
+    const predictiveSignals = buildPredictiveSignals(ctx);
     const c = ctx.company.currency;
     const fmt = (n: number) => `${c} ${n.toLocaleString("en-PK", { maximumFractionDigits: 0 })}`;
 
@@ -89,6 +90,7 @@ COMPANY: ${ctx.company.name}
       chartData: bundle.chartData,
       projections: bundle.projections,
       summary: bundle.summary,
+      predictiveSignals,
     });
   } catch (err) {
     console.error("AI forecast error:", err);

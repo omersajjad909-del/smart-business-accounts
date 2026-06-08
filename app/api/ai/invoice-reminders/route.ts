@@ -7,6 +7,7 @@ export const maxDuration = 30;
 type ReminderPriority = "urgent" | "high" | "medium" | "low";
 
 interface InvoiceReminderItem {
+  invoiceId: string;
   customer: string;
   invoiceRef: string;
   amount: number;
@@ -40,6 +41,7 @@ export async function GET(req: NextRequest) {
       if (priority === "low" && !overduePressure) continue;
 
       reminders.push({
+        invoiceId: invoice.id,
         customer: invoice.customer || "Customer",
         invoiceRef: invoice.ref || "Invoice",
         amount,
