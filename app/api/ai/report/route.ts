@@ -74,6 +74,9 @@ export async function GET(req: NextRequest) {
     const companyId = req.headers.get("x-company-id");
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
+    const period = (req.nextUrl.searchParams.get("period") || "monthly") as "weekly" | "monthly" | "quarterly";
+    const periodLabel = period === "quarterly" ? "Quarterly" : period === "weekly" ? "Weekly" : "Monthly";
+
     const ctx = await buildFinancialContext(companyId);
     const forecastBundle = buildForecastBundle(ctx);
     const riskBundle = buildRiskAnalyzer(ctx);
@@ -83,8 +86,11 @@ export async function GET(req: NextRequest) {
 
     const now = new Date();
     const monthName = now.toLocaleString("en-US", { month: "long", year: "numeric" });
+    const quarterName = `Q${Math.ceil((now.getMonth() + 1) / 3)} ${now.getFullYear()}`;
+    const weekLabel = `Week of ${now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+    const periodName = period === "quarterly" ? quarterName : period === "weekly" ? weekLabel : monthName;
 
-    const prompt = `Generate a comprehensive Monthly Financial Report for ${ctx.company.name} for ${monthName}.
+    const prompt = `Generate a comprehensive ${periodLabel} Financial Report for ${ctx.company.name} for ${periodName}.
 
 FINANCIAL DATA:
 - Revenue This Month: ${fmt(ctx.revenue.thisMonth)} (${sign(ctx.revenue.change)} vs last month)
@@ -104,16 +110,16 @@ FINANCIAL DATA:
 
 Generate a structured, professional financial report with:
 
-# Monthly Financial Report — ${monthName}
+# ${periodLabel} Financial Report — ${periodName}
 
 ## Executive Summary
-(3-4 sentence high-level summary of the month's performance)
+(3-4 sentence high-level summary of the ${period}'s performance)
 
 ## Revenue Performance
 (Detailed revenue analysis with trends, comparisons, key drivers)
 
 ## Expense Analysis
-(Breakdown by category, trends, key drivers, comparison to last month)
+(Breakdown by category, trends, key drivers, comparison to prior ${period})
 
 ## Profitability
 (Profit margin analysis, trends, concerns if any)
@@ -131,12 +137,12 @@ Generate a structured, professional financial report with:
 (Score /100 with breakdown: Revenue Health, Expense Control, Cash Flow, Profitability)
 
 ## Key Risks
-(Top 3 financial risks this month with severity)
+(Top 3 financial risks this ${period} with severity)
 
 ## Recommended Actions
-(5 specific, prioritized actions for next month)
+(5 specific, prioritized actions for next ${period})
 
-## Outlook for Next Month
+## Outlook for Next ${periodLabel}
 (Brief prediction and preparation advice)
 
 Write professionally but in plain language that a business owner can understand without accounting knowledge. Use actual numbers throughout.`;
@@ -154,7 +160,8 @@ Write professionally but in plain language that a business owner can understand 
 
     return NextResponse.json({
       report: reportText,
-      month: monthName,
+      month: periodName,
+      period,
       company: ctx.company.name,
       generatedAt: new Date().toISOString(),
       summary: {

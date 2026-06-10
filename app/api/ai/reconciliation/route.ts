@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
         total: suggestions.length,
         highConfidence: suggestions.filter((item) => item.candidates[0]?.confidence >= 90).length,
         needsReview: suggestions.filter((item) => item.risk === "high").length,
+        duplicates: suggestions.filter((item) => item.isDuplicate).length,
       },
     });
   } catch (error) {

@@ -27,6 +27,8 @@ export interface SmartReconciliationSuggestion {
   referenceNo?: string | null;
   risk: "low" | "medium" | "high";
   explanation: string;
+  isDuplicate?: boolean;
+  duplicateOf?: string | null;
   candidates: SmartReconciliationCandidate[];
 }
 
@@ -204,7 +206,7 @@ export async function buildSmartReconciliationSuggestions(
     })),
   ];
 
-  return statements.map((statement) => {
+  const suggestions = statements.map((statement) => {
     const candidates = rawCandidates
       .map((candidate) => {
         const scored = scoreCandidate(statement, candidate);
@@ -232,7 +234,26 @@ export async function buildSmartReconciliationSuggestions(
       explanation: top
         ? `${top.confidence}% match with ${top.label}: ${top.reasons.join(", ")}.`
         : "No confident match found. Review manually for duplicates, missing entries, or unusual transaction activity.",
+      isDuplicate: false,
+      duplicateOf: null as string | null,
       candidates,
     };
   });
+
+  // Detect potential duplicate bank entries (same amount within 3 days, same description tokens)
+  for (let i = 0; i < suggestions.length; i++) {
+    for (let j = i + 1; j < suggestions.length; j++) {
+      const a = suggestions[i];
+      const b = suggestions[j];
+      const amountDiff = Math.abs(a.amount - b.amount);
+      const dayDiff = Math.abs(new Date(a.date).getTime() - new Date(b.date).getTime()) / 86400000;
+      const textSim = tokenOverlap(a.description, b.description);
+      if (amountDiff < 0.01 && dayDiff <= 3 && textSim >= 0.4) {
+        suggestions[j].isDuplicate = true;
+        suggestions[j].duplicateOf = a.statementNo;
+      }
+    }
+  }
+
+  return suggestions;
 }

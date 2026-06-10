@@ -62,6 +62,17 @@ interface InsightCard {
   icon: string;
 }
 
+interface PredictiveSignal {
+  metric: string;
+  label: string;
+  forecast: number;
+  lowerBound: number;
+  upperBound: number;
+  confidence: number;
+  risk: "low" | "medium" | "high";
+  explanation: string;
+}
+
 interface ForecastResponse {
   text: string;
   projections: {
@@ -84,6 +95,7 @@ interface ForecastResponse {
     recommendedBuffer: number;
   };
   chartData: { period: string; revenue: number; expenses: number; closingCash: number }[];
+  predictiveSignals?: PredictiveSignal[];
 }
 
 interface ReportResponse {
@@ -137,6 +149,7 @@ function normalizeForecast(data: any): ForecastResponse | null {
       recommendedBuffer: Number(data.projections?.recommendedBuffer || 0),
     },
     chartData: Array.isArray(data.chartData) ? data.chartData : [],
+    predictiveSignals: Array.isArray(data.predictiveSignals) ? data.predictiveSignals : undefined,
   };
 }
 
@@ -287,6 +300,7 @@ interface ReconciliationItem {
   direction: "debit" | "credit";
   status: "pending" | "auto_matched" | "manually_matched" | "unmatched";
   selectedMatchId?: string;
+  isDuplicate?: boolean;
   matches: ReconciliationMatchCandidate[];
 }
 interface ReconciliationResult {
@@ -359,6 +373,59 @@ function riskLevel(score: number): { label: string; color: string } {
   if (score >= 55) return { label: "Medium", color: "#f59e0b" };
   return { label: "High", color: "#ef4444" };
 }
+function categoryHealthScores(ctx: FinCtx) {
+  const revenue = Math.max(20, Math.min(100, Math.round(
+    65
+    + (ctx.revenue.change > 15 ? 20 : ctx.revenue.change > 5 ? 12 : ctx.revenue.change > 0 ? 5 : ctx.revenue.change > -10 ? -5 : -15)
+    + (ctx.revenue.thisYear > ctx.revenue.thisMonth * 6 ? 5 : 0)
+  )));
+  const marginPct = ctx.revenue.thisMonth > 0 ? (ctx.profit.thisMonth / ctx.revenue.thisMonth) * 100 : 0;
+  const profitability = Math.max(20, Math.min(100, Math.round(
+    60
+    + (marginPct > 20 ? 25 : marginPct > 10 ? 15 : marginPct > 0 ? 5 : marginPct > -10 ? -15 : -25)
+    + (ctx.profit.change > 0 ? 8 : ctx.profit.change < -15 ? -8 : 0)
+  )));
+  const burnCover = ctx.expenses.thisMonth > 0 ? ctx.cashPosition / ctx.expenses.thisMonth : 3;
+  const cashflow = Math.max(20, Math.min(100, Math.round(
+    68
+    + (burnCover >= 3 ? 22 : burnCover >= 1.5 ? 12 : burnCover >= 0.5 ? 0 : -20)
+    + (ctx.receivables.overdue > ctx.receivables.total * 0.4 ? -8 : 0)
+  )));
+  const concentration = ctx.topCustomers.length > 0 && ctx.revenue.thisYear > 0
+    ? ctx.topCustomers[0].amount / ctx.revenue.thisYear : 0;
+  const customers = Math.max(20, Math.min(100, Math.round(
+    75
+    + (concentration > 0.5 ? -20 : concentration > 0.3 ? -10 : concentration > 0 ? 5 : 0)
+    + (ctx.topCustomers.length >= 5 ? 8 : ctx.topCustomers.length >= 3 ? 4 : 0)
+  )));
+  const inventory = Math.max(20, Math.min(100, Math.round(
+    75
+    + (ctx.inventory.lowStockItems > 10 ? -20 : ctx.inventory.lowStockItems > 5 ? -10 : ctx.inventory.lowStockItems > 0 ? -4 : 5)
+    + (ctx.deadStockItems.length > 5 ? -15 : ctx.deadStockItems.length > 0 ? -8 : 5)
+    + (ctx.inventory.stockValue > ctx.expenses.thisMonth * 2 ? 8 : 0)
+  )));
+  const overdueRatio = ctx.receivables.total > 0 ? ctx.receivables.overdue / ctx.receivables.total : 0;
+  const collections = Math.max(20, Math.min(100, Math.round(
+    80
+    + (overdueRatio > 0.5 ? -25 : overdueRatio > 0.3 ? -15 : overdueRatio > 0.1 ? -8 : 5)
+    + (ctx.receivables.overdueCount > 10 ? -10 : ctx.receivables.overdueCount > 5 ? -5 : 0)
+  )));
+  const expRatio = ctx.revenue.thisMonth > 0 ? ctx.expenses.thisMonth / ctx.revenue.thisMonth : 1;
+  const efficiency = Math.max(20, Math.min(100, Math.round(
+    70
+    + (expRatio < 0.5 ? 20 : expRatio < 0.7 ? 10 : expRatio < 0.9 ? 0 : expRatio < 1 ? -10 : -20)
+  )));
+  return [
+    { label: "Revenue", score: revenue, icon: "📈", color: revenue >= 75 ? "#10b981" : revenue >= 55 ? "#f59e0b" : "#ef4444" },
+    { label: "Profitability", score: profitability, icon: "💼", color: profitability >= 75 ? "#10b981" : profitability >= 55 ? "#f59e0b" : "#ef4444" },
+    { label: "Cash Flow", score: cashflow, icon: "💧", color: cashflow >= 75 ? "#10b981" : cashflow >= 55 ? "#f59e0b" : "#ef4444" },
+    { label: "Customers", score: customers, icon: "👥", color: customers >= 75 ? "#10b981" : customers >= 55 ? "#f59e0b" : "#ef4444" },
+    { label: "Inventory", score: inventory, icon: "📦", color: inventory >= 75 ? "#10b981" : inventory >= 55 ? "#f59e0b" : "#ef4444" },
+    { label: "Collections", score: collections, icon: "🧾", color: collections >= 75 ? "#10b981" : collections >= 55 ? "#f59e0b" : "#ef4444" },
+    { label: "Efficiency", score: efficiency, icon: "⚙️", color: efficiency >= 75 ? "#10b981" : efficiency >= 55 ? "#f59e0b" : "#ef4444" },
+  ];
+}
+
 function severityTone(severity: InsightCard["severity"] | AnomalyAlert["severity"]) {
   if (severity === "critical") return { color: "#ef4444", bg: "rgba(239,68,68,.1)", border: "rgba(239,68,68,.25)" };
   if (severity === "warning") return { color: "#f59e0b", bg: "rgba(245,158,11,.1)", border: "rgba(245,158,11,.25)" };
@@ -461,6 +528,7 @@ export default function AICommandCenter() {
   const [reconciliation, setReconciliation] = useState<ReconciliationResult | null>(null);
   const [loadingReconciliation, setLoadingReconciliation] = useState(false);
   const [reconciliationFilter, setReconciliationFilter] = useState<"all" | "pending" | "auto_matched" | "unmatched">("pending");
+  const [reportPeriod, setReportPeriod] = useState<"weekly" | "monthly" | "quarterly">("monthly");
 
   // Chat state
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -579,10 +647,11 @@ export default function AICommandCenter() {
       .catch(() => setLoadingForecast(false));
   }
 
-  function loadReport() {
+  function loadReport(period?: "weekly" | "monthly" | "quarterly") {
     if (report || loadingReport) return;
+    const p = period || reportPeriod;
     setLoadingReport(true);
-    fetch("/api/ai/report", { headers: getHeaders() })
+    fetch(`/api/ai/report?period=${p}`, { headers: getHeaders() })
       .then(async (r) => ({ ok: r.ok, data: await r.json() }))
       .then(({ ok, data }) => {
         setReport(ok ? normalizeReport(data) : null);
@@ -651,8 +720,41 @@ export default function AICommandCenter() {
     fetch("/api/ai/reconciliation", { headers: getHeaders() })
       .then(async (r) => ({ ok: r.ok, data: await r.json() }))
       .then(({ ok, data }) => {
-        if (ok && data.items) { setReconciliation(data); }
-        else {
+        if (ok && Array.isArray(data.suggestions)) {
+          const TYPE_MAP: Record<string, ReconciliationMatchCandidate["type"]> = {
+            payment_receipt: "payment", sales_invoice: "invoice",
+            purchase_invoice: "expense", expense_voucher: "expense",
+          };
+          const items: ReconciliationItem[] = data.suggestions.map((s: any) => ({
+            id: s.statementId,
+            ledgerRef: s.statementNo,
+            date: s.date?.slice(0, 10) ?? "",
+            description: s.description ?? "",
+            amount: Math.abs(Number(s.amount || 0)),
+            direction: Number(s.amount || 0) >= 0 ? "credit" : "debit",
+            status: s.risk === "low" ? "auto_matched"
+              : s.candidates?.length === 0 ? "unmatched"
+              : "pending",
+            selectedMatchId: s.risk === "low" && s.candidates?.[0] ? s.candidates[0].id : undefined,
+            isDuplicate: s.isDuplicate ?? false,
+            matches: (s.candidates ?? []).map((c: any) => ({
+              id: c.id,
+              type: TYPE_MAP[c.type] ?? "journal",
+              ref: c.label ?? c.reference ?? c.id,
+              party: c.party ?? "",
+              amount: Number(c.amount || 0),
+              date: c.date?.slice(0, 10) ?? "",
+              confidence: Number(c.confidence || 0),
+            })),
+          }));
+          const autoMatched = items.filter(i => i.status === "auto_matched").length;
+          const unmatched = items.filter(i => i.status === "unmatched").length;
+          const pending = items.filter(i => i.status === "pending").length;
+          setReconciliation({
+            summary: { total: items.length, autoMatched, manuallyMatched: 0, pending, unmatched },
+            items,
+          });
+        } else {
           // Demo data when API not ready
           setReconciliation({
             summary: { total: 24, autoMatched: 14, manuallyMatched: 3, pending: 5, unmatched: 2 },
@@ -697,6 +799,7 @@ export default function AICommandCenter() {
     if (t === "market") loadMarketIntel();
     if (t === "advisor") loadBusinessAdvisor();
     if (t === "reconciliation") loadReconciliation();
+    if (t === "report") { /* period-aware, loadReport handles it */ }
   }
 
   // ── Chat send with streaming ───────────────────────────────────────────────
@@ -966,6 +1069,29 @@ export default function AICommandCenter() {
                     </div>
                   </div>
                 </div>
+
+                {/* Category Health Scores */}
+                {ctx && (
+                  <div style={{ marginBottom: 20 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 12 }}>Business Health by Category</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7,minmax(0,1fr))", gap: 10 }}>
+                      {categoryHealthScores(ctx).map(cat => (
+                        <div key={cat.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+                          <div style={{ fontSize: 16, marginBottom: 6 }}>{cat.icon}</div>
+                          <div style={{
+                            width: 40, height: 40, borderRadius: "50%",
+                            background: `conic-gradient(${cat.color} ${cat.score}%, rgba(255,255,255,.06) 0%)`,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            margin: "0 auto 8px",
+                          }}>
+                            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#0b0d1a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 900, color: cat.color }}>{cat.score}</div>
+                          </div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.45)", lineHeight: 1.3 }}>{cat.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* AI insights + forecast */}
                 <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 16, marginBottom: 20 }}>
@@ -1686,6 +1812,36 @@ export default function AICommandCenter() {
                   <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "rgba(255,255,255,.6)" }}>🤖 AI Cash Flow Analysis</div>
                   <div style={{ lineHeight: 1.8 }}>{renderMarkdown(forecast.text)}</div>
                 </Panel>
+
+                {/* Predictive Signals — Confidence Intervals */}
+                {forecast.predictiveSignals && forecast.predictiveSignals.length > 0 && (
+                  <Panel>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: "rgba(255,255,255,.6)" }}>📊 Predictive Intelligence — Confidence Intervals</div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+                      {forecast.predictiveSignals.map((sig, i) => {
+                        const riskColor = sig.risk === "high" ? "#ef4444" : sig.risk === "medium" ? "#f59e0b" : "#10b981";
+                        const confColor = sig.confidence >= 75 ? "#10b981" : sig.confidence >= 55 ? "#f59e0b" : "#f87171";
+                        return (
+                          <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 12, padding: "14px 16px", border: "1px solid rgba(255,255,255,.06)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                              <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{sig.label}</div>
+                              <div style={{ display: "flex", gap: 6 }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: `${confColor}18`, border: `1px solid ${confColor}30`, color: confColor }}>{sig.confidence}% conf</span>
+                                <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: `${riskColor}15`, border: `1px solid ${riskColor}30`, color: riskColor, textTransform: "capitalize" }}>{sig.risk}</span>
+                              </div>
+                            </div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: "white", marginBottom: 6 }}>{fmt(sig.forecast, currency)}</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                              <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Range:</span>
+                              <span style={{ fontSize: 11.5, fontWeight: 700, color: "#6366f1" }}>{fmt(sig.lowerBound, currency)} – {fmt(sig.upperBound, currency)}</span>
+                            </div>
+                            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.38)", lineHeight: 1.6 }}>{sig.explanation}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </Panel>
+                )}
               </div>
             ) : null}
           </div>
@@ -1943,11 +2099,25 @@ export default function AICommandCenter() {
         {/* ══ REPORT ══════════════════════════════════════════════════════ */}
         {tab === "report" && (
           <div style={{ animation: "fadeUp .4s ease both" }}>
+            {/* Period selector */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+              {(["weekly", "monthly", "quarterly"] as const).map(p => (
+                <button key={p} onClick={() => { setReportPeriod(p); setReport(null); }} style={{
+                  padding: "7px 18px", borderRadius: 999, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                  border: reportPeriod === p ? "1px solid rgba(99,102,241,.5)" : "1px solid rgba(255,255,255,.1)",
+                  background: reportPeriod === p ? "rgba(99,102,241,.18)" : "rgba(255,255,255,.04)",
+                  color: reportPeriod === p ? "#c7d2fe" : "rgba(255,255,255,.5)",
+                }}>
+                  {{ weekly: "Weekly", monthly: "Monthly", quarterly: "Quarterly" }[p]}
+                </button>
+              ))}
+            </div>
+
             {loadingReport ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 16, color: "rgba(255,255,255,.4)" }}>
                 <Spinner size={32} />
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ marginBottom: 4 }}>AI is generating your Monthly Financial Report…</div>
+                  <div style={{ marginBottom: 4 }}>AI is generating your {reportPeriod.charAt(0).toUpperCase() + reportPeriod.slice(1)} Financial Report…</div>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,.25)" }}>This may take 15–30 seconds</div>
                 </div>
               </div>
@@ -1957,7 +2127,7 @@ export default function AICommandCenter() {
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ fontSize: 24 }}>📄</div>
                       <div>
-                        <div style={{ fontWeight: 800, fontSize: 16 }}>Monthly Financial Report</div>
+                        <div style={{ fontWeight: 800, fontSize: 16 }}>{reportPeriod.charAt(0).toUpperCase() + reportPeriod.slice(1)} Financial Report</div>
                       <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Generated by FinovaOS AI · {new Date(report.generatedAt || Date.now()).toLocaleDateString("en-US", { dateStyle: "long" })}</div>
                       </div>
                   </div>
@@ -2031,11 +2201,11 @@ export default function AICommandCenter() {
             ) : (
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <div style={{ fontSize: 56, marginBottom: 20 }}>📊</div>
-                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Generate Monthly AI Report</div>
+                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Generate {reportPeriod.charAt(0).toUpperCase() + reportPeriod.slice(1)} AI Report</div>
                 <div style={{ fontSize: 14, color: "rgba(255,255,255,.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px" }}>
-                  AI will analyze all your financial data and generate a comprehensive report including revenue, expenses, profit, cash flow, risks, and recommendations.
+                  AI will analyze all your financial data and generate a comprehensive {reportPeriod} report including revenue, expenses, profit, cash flow, risks, and recommendations.
                 </div>
-                <button onClick={loadReport} style={{
+                <button onClick={() => loadReport(reportPeriod)} style={{
                   padding: "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
                   border: "none", color: "white", fontSize: 15, fontWeight: 800, cursor: "pointer",
                   fontFamily: "inherit", boxShadow: "0 8px 24px rgba(99,102,241,.4)", display: "inline-flex", alignItems: "center", gap: 8,
@@ -2370,7 +2540,12 @@ export default function AICommandCenter() {
                                 <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginTop: 2 }}>{item.ledgerRef} · {item.date}</div>
                               </div>
                             </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              {item.isDuplicate && (
+                                <span style={{ padding: "4px 10px", borderRadius: 999, fontSize: 10, fontWeight: 800, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.35)", color: "#fca5a5", whiteSpace: "nowrap" }}>
+                                  ⚠ Duplicate
+                                </span>
+                              )}
                               <div style={{ textAlign: "right" }}>
                                 <div style={{ fontSize: 16, fontWeight: 800, color: item.direction === "credit" ? "#10b981" : "#f87171" }}>
                                   {item.direction === "credit" ? "+" : "−"}{item.amount.toLocaleString()}
