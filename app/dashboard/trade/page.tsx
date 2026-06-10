@@ -62,14 +62,20 @@ export default function TradeOverviewPage() {
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {[
-            { label: "Shipments", href: "/dashboard/trade/shipments" },
-            { label: "Commercial Invoice", href: "/dashboard/commercial-invoice" },
-            { label: "Packing List", href: "/dashboard/packing-list" },
-            { label: "LC / TT", href: "/dashboard/trade/lc" },
-            { label: "Customs", href: "/dashboard/trade/customs" },
-            { label: "Import Costing", href: "/dashboard/trade/costing" },
-            { label: "Rebate", href: "/dashboard/trade/rebate" },
-            { label: "Analytics", href: "/dashboard/trade/analytics" },
+            { label: "Shipments",            href: "/dashboard/trade/shipments" },
+            { label: "Containers",           href: "/dashboard/trade/containers" },
+            { label: "Freight",              href: "/dashboard/trade/freight" },
+            { label: "Commercial Invoice",   href: "/dashboard/commercial-invoice" },
+            { label: "Packing List",         href: "/dashboard/packing-list" },
+            { label: "Certificate of Origin",href: "/dashboard/trade/certificate-of-origin" },
+            { label: "Export Docs",          href: "/dashboard/trade/export-docs" },
+            { label: "LC / TT",              href: "/dashboard/trade/lc" },
+            { label: "Customs",              href: "/dashboard/trade/customs" },
+            { label: "HS Codes",             href: "/dashboard/trade/hs-codes" },
+            { label: "Import Costing",       href: "/dashboard/trade/costing" },
+            { label: "Rebate",               href: "/dashboard/trade/rebate" },
+            { label: "Export Performance",   href: "/dashboard/reports/export-performance" },
+            { label: "Analytics",            href: "/dashboard/trade/analytics" },
           ].map((item) => (
             <Link prefetch={false} key={item.href} href={item.href} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${tradeBorder}`, background: tradeBg, color: "#7dd3fc", textDecoration: "none", fontSize: 12, fontWeight: 700 }}>
               {item.label}
