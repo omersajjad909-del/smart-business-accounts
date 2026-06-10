@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 function useInView() {
   const ref = useRef<HTMLDivElement>(null);
@@ -126,14 +126,57 @@ const FOCUSED_INDUSTRIES = [
   },
 ] as const;
 
+type FocusedIndustry = (typeof FOCUSED_INDUSTRIES)[number];
+type BusinessModuleStatusResponse = {
+  statusMap?: Record<string, "live" | "coming_soon">;
+};
+
+const INDUSTRY_STATUS_IDS: Record<FocusedIndustry["slug"], string[]> = {
+  retail: ["retail"],
+  trading: ["trading", "wholesale"],
+  distribution: ["distribution"],
+  trade: ["import_company", "export_company"],
+  manufacturing: ["manufacturing"],
+  travel: ["travel"],
+};
+
+const isIndustryLive = (industry: FocusedIndustry, statusMap: BusinessModuleStatusResponse["statusMap"]) => {
+  if (!statusMap) return true;
+  const ids = INDUSTRY_STATUS_IDS[industry.slug] ?? [industry.slug];
+  return ids.some((id) => statusMap[id] === "live");
+};
+
 export default function SolutionSection() {
   const [painRef, painVis] = useInView();
   const [indRef, indVis] = useInView();
   const [hovPain, setHovPain] = useState<number | null>(null);
   const [activeIndustry, setActiveIndustry] = useState<string>(FOCUSED_INDUSTRIES[0].slug);
+  const [statusMap, setStatusMap] = useState<BusinessModuleStatusResponse["statusMap"]>();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch("/api/public/business-module-status", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: BusinessModuleStatusResponse | null) => {
+        if (!cancelled) setStatusMap(data?.statusMap);
+      })
+      .catch(() => {
+        if (!cancelled) setStatusMap(undefined);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const visibleIndustries = useMemo(
+    () => FOCUSED_INDUSTRIES.filter((industry) => isIndustryLive(industry, statusMap)),
+    [statusMap],
+  );
 
   const selectedIndustry =
-    FOCUSED_INDUSTRIES.find((industry) => industry.slug === activeIndustry) ?? FOCUSED_INDUSTRIES[0];
+    visibleIndustries.find((industry) => industry.slug === activeIndustry) ?? visibleIndustries[0] ?? FOCUSED_INDUSTRIES[0];
 
   return (
     <section
@@ -462,7 +505,7 @@ export default function SolutionSection() {
             }}
           >
             {[
-              { value: "06", label: "Focused Businesses", color: "#818cf8" },
+              { value: String(visibleIndustries.length).padStart(2, "0"), label: "Focused Businesses", color: "#818cf8" },
               { value: "4-8", label: "Core Modules Each", color: "#34d399" },
               { value: "100%", label: "Workflow Guided", color: "#fbbf24" },
             ].map((stat) => (
@@ -505,7 +548,7 @@ export default function SolutionSection() {
                 transition: "all .45s ease .2s",
               }}
             >
-              {FOCUSED_INDUSTRIES.map((industry, index) => {
+              {visibleIndustries.map((industry, index) => {
                 const isActive = selectedIndustry.slug === industry.slug;
                 return (
                   <button
