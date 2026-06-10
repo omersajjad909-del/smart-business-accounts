@@ -135,7 +135,7 @@ const INDUSTRY_STATUS_IDS: Record<FocusedIndustry["slug"], string[]> = {
   retail: ["retail"],
   trading: ["trading", "wholesale"],
   distribution: ["distribution"],
-  trade: ["import_company", "export_company"],
+  trade: ["import_company", "export_company", "clearing_forwarding"],
   manufacturing: ["manufacturing"],
   travel: ["travel"],
 };

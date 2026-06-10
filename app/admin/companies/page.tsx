@@ -26,7 +26,7 @@ type Row = {
 const BUSINESS_TYPES = [
   "trading","wholesale","distribution","restaurant","retail","manufacturing",
   "hospital","school","hotel","construction","pharmacy","transport",
-  "real_estate","import_company","service","ngo","it","law_firm",
+  "real_estate","import_company","export_company","clearing_forwarding","service","ngo","it","law_firm",
   "salon","gym","ecommerce","agriculture",
 ];
 
@@ -35,7 +35,7 @@ const BIZ_LABELS: Record<string, string> = {
   restaurant:"Restaurant", retail:"Retail", manufacturing:"Manufacturing",
   hospital:"Hospital", school:"School", hotel:"Hotel", construction:"Construction",
   pharmacy:"Pharmacy", transport:"Transport", real_estate:"Real Estate",
-  import_company:"Import/Export", service:"Service", ngo:"NGO / Non-profit",
+  import_company:"Import Company", export_company:"Export Company", clearing_forwarding:"Clearing & Forwarding", service:"Service", ngo:"NGO / Non-profit",
   it:"IT / Software", law_firm:"Law Firm", salon:"Salon / Beauty",
   gym:"Gym / Fitness", ecommerce:"E-commerce", agriculture:"Agriculture",
 };

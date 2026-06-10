@@ -81,6 +81,9 @@ type OperationalContext = {
 const BUSINESS_LABELS: Record<string, string> = {
   trading: "Trading",
   wholesale: "Wholesale",
+  import_company: "Import Company",
+  export_company: "Export Company",
+  clearing_forwarding: "Clearing & Forwarding",
   import_export: "Import / Export",
   trade: "Import / Export",
   retail: "Retail",
