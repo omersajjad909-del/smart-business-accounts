@@ -1747,13 +1747,18 @@ export default function DashboardLayout({
             <NavGroup title="Import / Export" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>} open={openSection === "shipments"} onToggle={() => toggle("shipments")}>
               {hasDashboardFeature("TRADE_OVERVIEW") && <NavLink href="/dashboard/trade" pathname={pathname}>Trade Overview</NavLink>}
               {hasDashboardFeature("TRADE_SHIPMENTS") && <NavLink href="/dashboard/trade/shipments" pathname={pathname}>Shipments</NavLink>}
+              {hasDashboardFeature("TRADE_CONTAINERS") && <NavLink href="/dashboard/trade/containers" pathname={pathname}>Containers</NavLink>}
+              {hasDashboardFeature("TRADE_FREIGHT") && <NavLink href="/dashboard/trade/freight" pathname={pathname}>Freight</NavLink>}
               {hasDashboardFeature("TRADE_COMMERCIAL_INVOICE") && <NavLink href="/dashboard/commercial-invoice" pathname={pathname}>Commercial Invoice</NavLink>}
               {hasDashboardFeature("TRADE_PACKING_LIST") && <NavLink href="/dashboard/packing-list" pathname={pathname}>Packing List</NavLink>}
+              {hasDashboardFeature("TRADE_CERTIFICATE_OF_ORIGIN") && <NavLink href="/dashboard/trade/certificate-of-origin" pathname={pathname}>Certificate of Origin</NavLink>}
+              {hasDashboardFeature("TRADE_EXPORT_DOCS") && <NavLink href="/dashboard/trade/export-docs" pathname={pathname}>Export Documents</NavLink>}
               {hasDashboardFeature("TRADE_LC") && <NavLink href="/dashboard/trade/lc" pathname={pathname}>LC / TT</NavLink>}
               {hasDashboardFeature("TRADE_CUSTOMS") && <NavLink href="/dashboard/trade/customs" pathname={pathname}>Customs</NavLink>}
               {hasDashboardFeature("TRADE_HS_CODES") && <NavLink href="/dashboard/trade/hs-codes" pathname={pathname}>HS Code Master</NavLink>}
               {hasDashboardFeature("TRADE_IMPORT_COSTING") && <NavLink href="/dashboard/trade/costing" pathname={pathname}>Import Costing</NavLink>}
               {hasDashboardFeature("TRADE_REBATE") && <NavLink href="/dashboard/trade/rebate" pathname={pathname}>Rebate / Drawback</NavLink>}
+              {hasDashboardFeature("TRADE_EXPORT_PERFORMANCE") && <NavLink href="/dashboard/reports/export-performance" pathname={pathname}>Export Performance</NavLink>}
               {hasDashboardFeature("TRADE_ANALYTICS") && <NavLink href="/dashboard/trade/analytics" pathname={pathname}>Analytics</NavLink>}
             </NavGroup>
           )}

@@ -147,7 +147,7 @@ Generate a structured, professional financial report with:
 
 Write professionally but in plain language that a business owner can understand without accounting knowledge. Use actual numbers throughout.`;
 
-    let reportText = buildFallbackReportText(monthName, ctx, forecastBundle, riskBundle);
+    let reportText = buildFallbackReportText(periodLabel, periodName, ctx, forecastBundle, riskBundle);
     try {
       reportText = await openAITextResponse(
         FINOVA_SYSTEM_PROMPT,
