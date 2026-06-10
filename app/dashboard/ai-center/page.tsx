@@ -35,6 +35,7 @@ const AI_CATEGORIES = [
       { path: "/dashboard/ai?tab=reminders", name: "Invoice Reminder Center", desc: "Smart follow-up queue for overdue customers." },
       { path: "/dashboard/ai?tab=tax", name: "AI Tax Estimate", desc: "Estimated tax position based on invoices and tax profiles." },
       { path: "/dashboard/ai?tab=report", name: "Monthly AI Report", desc: "Generate the monthly AI summary with risk and highlights." },
+      { path: "/dashboard/ai?tab=reconciliation", name: "Smart Reconciliation AI", desc: "Auto-match bank transactions to invoices and expenses with confidence scoring." },
     ],
   },
 ];

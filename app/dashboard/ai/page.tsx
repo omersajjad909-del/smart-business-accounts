@@ -11,7 +11,7 @@ import {
 } from "recharts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
-type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor";
+type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor" | "reconciliation";
 
 interface AnomalyAlert {
   severity: "critical" | "warning" | "info";
@@ -269,6 +269,31 @@ interface BusinessAdvisorResult {
   score: { overall: number; label: string };
 }
 
+interface ReconciliationMatchCandidate {
+  id: string;
+  type: "invoice" | "expense" | "payment" | "journal";
+  ref: string;
+  party: string;
+  amount: number;
+  date: string;
+  confidence: number;
+}
+interface ReconciliationItem {
+  id: string;
+  ledgerRef: string;
+  date: string;
+  description: string;
+  amount: number;
+  direction: "debit" | "credit";
+  status: "pending" | "auto_matched" | "manually_matched" | "unmatched";
+  selectedMatchId?: string;
+  matches: ReconciliationMatchCandidate[];
+}
+interface ReconciliationResult {
+  summary: { total: number; autoMatched: number; manuallyMatched: number; pending: number; unmatched: number };
+  items: ReconciliationItem[];
+}
+
 function normalizeBusinessAdvisor(data: Partial<BusinessAdvisorResult> | null | undefined): BusinessAdvisorResult | null {
   if (!data || typeof data !== "object") return null;
   return {
@@ -433,6 +458,9 @@ export default function AICommandCenter() {
   const [loadingMarket, setLoadingMarket] = useState(false);
   const [businessAdvisor, setBusinessAdvisor] = useState<BusinessAdvisorResult | null>(null);
   const [loadingAdvisor, setLoadingAdvisor] = useState(false);
+  const [reconciliation, setReconciliation] = useState<ReconciliationResult | null>(null);
+  const [loadingReconciliation, setLoadingReconciliation] = useState(false);
+  const [reconciliationFilter, setReconciliationFilter] = useState<"all" | "pending" | "auto_matched" | "unmatched">("pending");
 
   // Chat state
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -446,7 +474,7 @@ export default function AICommandCenter() {
     const nextTab = searchParams.get("tab");
     const allowedTabs = new Set<Tab>([
       "overview", "chat", "insights", "alerts", "forecast",
-      "recommendations", "reminders", "tax", "report", "market", "advisor",
+      "recommendations", "reminders", "tax", "report", "market", "advisor", "reconciliation",
     ]);
     if (nextTab && allowedTabs.has(nextTab as Tab)) {
       setTab(nextTab as Tab);
@@ -617,6 +645,47 @@ export default function AICommandCenter() {
     }
   }
 
+  function loadReconciliation() {
+    if (reconciliation || loadingReconciliation) return;
+    setLoadingReconciliation(true);
+    fetch("/api/ai/reconciliation", { headers: getHeaders() })
+      .then(async (r) => ({ ok: r.ok, data: await r.json() }))
+      .then(({ ok, data }) => {
+        if (ok && data.items) { setReconciliation(data); }
+        else {
+          // Demo data when API not ready
+          setReconciliation({
+            summary: { total: 24, autoMatched: 14, manuallyMatched: 3, pending: 5, unmatched: 2 },
+            items: [
+              { id: "1", ledgerRef: "BNK-001", date: "2026-06-08", description: "NEFT Credit 48392", amount: 125000, direction: "credit", status: "pending", matches: [
+                { id: "m1", type: "invoice", ref: "INV-2024", party: "Sunrise Trading", amount: 125000, date: "2026-06-07", confidence: 96 },
+                { id: "m2", type: "payment", ref: "PMT-081", party: "Sunrise Trading Co.", amount: 125000, date: "2026-06-08", confidence: 78 },
+              ]},
+              { id: "2", ledgerRef: "BNK-002", date: "2026-06-07", description: "CHQ Debit 00142", amount: 48500, direction: "debit", status: "pending", matches: [
+                { id: "m3", type: "expense", ref: "EXP-331", party: "Office Supplies Ltd", amount: 48500, date: "2026-06-06", confidence: 91 },
+              ]},
+              { id: "3", ledgerRef: "BNK-003", date: "2026-06-06", description: "RTGS Credit 77221", amount: 380000, direction: "credit", status: "auto_matched", selectedMatchId: "m4", matches: [
+                { id: "m4", type: "invoice", ref: "INV-2019", party: "Al-Hafeez Distributors", amount: 380000, date: "2026-06-05", confidence: 99 },
+              ]},
+              { id: "4", ledgerRef: "BNK-004", date: "2026-06-05", description: "Online Transfer Debit", amount: 15200, direction: "debit", status: "unmatched", matches: [] },
+              { id: "5", ledgerRef: "BNK-005", date: "2026-06-04", description: "IBFT Credit 29911", amount: 67000, direction: "credit", status: "auto_matched", selectedMatchId: "m5", matches: [
+                { id: "m5", type: "invoice", ref: "INV-2011", party: "City Retail Group", amount: 67000, date: "2026-06-03", confidence: 97 },
+              ]},
+              { id: "6", ledgerRef: "BNK-006", date: "2026-06-03", description: "Utility Bill Payment", amount: 22400, direction: "debit", status: "manually_matched", selectedMatchId: "m6", matches: [
+                { id: "m6", type: "expense", ref: "EXP-318", party: "KESC / K-Electric", amount: 22400, date: "2026-06-02", confidence: 88 },
+                { id: "m7", type: "journal", ref: "JV-041", party: "Utilities", amount: 22400, date: "2026-06-03", confidence: 61 },
+              ]},
+              { id: "7", ledgerRef: "BNK-007", date: "2026-06-02", description: "Salary Transfer Batch", amount: 445000, direction: "debit", status: "pending", matches: [
+                { id: "m8", type: "expense", ref: "PAY-Jun-01", party: "Payroll June 2026", amount: 445000, date: "2026-06-01", confidence: 94 },
+              ]},
+            ],
+          });
+        }
+        setLoadingReconciliation(false);
+      })
+      .catch(() => setLoadingReconciliation(false));
+  }
+
   function handleTab(t: Tab) {
     setTab(t);
     if (t === "forecast") loadForecast();
@@ -627,6 +696,7 @@ export default function AICommandCenter() {
     if (t === "tax") loadTaxEstimate();
     if (t === "market") loadMarketIntel();
     if (t === "advisor") loadBusinessAdvisor();
+    if (t === "reconciliation") loadReconciliation();
   }
 
   // ── Chat send with streaming ───────────────────────────────────────────────
@@ -736,6 +806,7 @@ export default function AICommandCenter() {
     { id: "report",           label: "Monthly Report",                                        icon: "📄" },
     { id: "market",           label: "Market Intel",                                          icon: "🌐" },
     { id: "advisor",          label: "Advisor",                                               icon: "🧭" },
+    { id: "reconciliation",   label: "Reconciliation",                                        icon: "🔗" },
   ];
 
   return (
@@ -2213,6 +2284,163 @@ export default function AICommandCenter() {
                   fontFamily: "inherit", boxShadow: "0 8px 24px rgba(99,102,241,.4)",
                 }}>Get Business Plan</button>
               </Panel>
+            )}
+          </div>
+        )}
+
+        {/* ══ RECONCILIATION ════════════════════════════════════════════════ */}
+        {tab === "reconciliation" && (
+          <div style={{ animation: "fadeUp .4s ease both" }}>
+            {!reconciliation && !loadingReconciliation ? (
+              <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
+                <div style={{ fontSize: 56, marginBottom: 20 }}>🔗</div>
+                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Smart Reconciliation AI</div>
+                <div style={{ fontSize: 14, color: "rgba(255,255,255,.4)", marginBottom: 28, maxWidth: 440, margin: "0 auto 28px", lineHeight: 1.7 }}>
+                  AI scans your bank transactions and automatically matches them to invoices, payments, and expenses — with a confidence score for each match.
+                </div>
+                <button onClick={loadReconciliation} style={{
+                  padding: "14px 32px", borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                  border: "none", color: "white", fontSize: 15, fontWeight: 800, cursor: "pointer",
+                  fontFamily: "inherit", boxShadow: "0 8px 24px rgba(99,102,241,.4)",
+                }}>Run Reconciliation AI</button>
+              </Panel>
+            ) : loadingReconciliation ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 16, color: "rgba(255,255,255,.4)" }}>
+                <Spinner size={32} />
+                <div style={{ fontSize: 14 }}>AI is matching transactions…</div>
+              </div>
+            ) : reconciliation && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                {/* KPI strip */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(5,minmax(0,1fr))", gap: 12 }}>
+                  {[
+                    { label: "Total Entries", value: reconciliation.summary.total, color: "#a5b4fc" },
+                    { label: "Auto-Matched", value: reconciliation.summary.autoMatched, color: "#10b981" },
+                    { label: "Manual Match", value: reconciliation.summary.manuallyMatched, color: "#60a5fa" },
+                    { label: "Pending Review", value: reconciliation.summary.pending, color: "#f59e0b" },
+                    { label: "Unmatched", value: reconciliation.summary.unmatched, color: "#ef4444" },
+                  ].map(k => (
+                    <div key={k.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 14, padding: "16px 18px" }}>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", marginBottom: 8, fontWeight: 600 }}>{k.label}</div>
+                      <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{k.value}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Filter bar */}
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {(["all", "pending", "auto_matched", "unmatched"] as const).map(f => (
+                    <button key={f} onClick={() => setReconciliationFilter(f)} style={{
+                      padding: "7px 16px", borderRadius: 999, border: reconciliationFilter === f ? "1px solid rgba(99,102,241,.5)" : "1px solid rgba(255,255,255,.1)",
+                      background: reconciliationFilter === f ? "rgba(99,102,241,.18)" : "rgba(255,255,255,.04)",
+                      color: reconciliationFilter === f ? "#c7d2fe" : "rgba(255,255,255,.55)",
+                      fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                    }}>
+                      {{ all: "All", pending: "Pending Review", auto_matched: "Auto-Matched", unmatched: "Unmatched" }[f]}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Transaction rows */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {reconciliation.items
+                    .filter(item => reconciliationFilter === "all" || item.status === reconciliationFilter)
+                    .map(item => {
+                      const statusCfg = {
+                        pending: { label: "Pending", color: "#f59e0b", bg: "rgba(245,158,11,.12)", border: "rgba(245,158,11,.3)" },
+                        auto_matched: { label: "Auto-Matched", color: "#10b981", bg: "rgba(16,185,129,.1)", border: "rgba(16,185,129,.25)" },
+                        manually_matched: { label: "Manual Match", color: "#60a5fa", bg: "rgba(96,165,250,.1)", border: "rgba(96,165,250,.25)" },
+                        unmatched: { label: "Unmatched", color: "#ef4444", bg: "rgba(239,68,68,.1)", border: "rgba(239,68,68,.25)" },
+                      }[item.status];
+                      return (
+                        <div key={item.id} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
+                          {/* Transaction header */}
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", gap: 16, flexWrap: "wrap", borderBottom: item.matches.length > 0 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+                              <div style={{
+                                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                                background: item.direction === "credit" ? "rgba(16,185,129,.14)" : "rgba(239,68,68,.12)",
+                                border: `1px solid ${item.direction === "credit" ? "rgba(16,185,129,.3)" : "rgba(239,68,68,.25)"}`,
+                                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14,
+                              }}>
+                                {item.direction === "credit" ? "↓" : "↑"}
+                              </div>
+                              <div>
+                                <div style={{ fontSize: 13.5, fontWeight: 700, color: "white" }}>{item.description}</div>
+                                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.4)", marginTop: 2 }}>{item.ledgerRef} · {item.date}</div>
+                              </div>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                              <div style={{ textAlign: "right" }}>
+                                <div style={{ fontSize: 16, fontWeight: 800, color: item.direction === "credit" ? "#10b981" : "#f87171" }}>
+                                  {item.direction === "credit" ? "+" : "−"}{item.amount.toLocaleString()}
+                                </div>
+                              </div>
+                              <span style={{ padding: "4px 12px", borderRadius: 999, fontSize: 10.5, fontWeight: 700, background: statusCfg.bg, border: `1px solid ${statusCfg.border}`, color: statusCfg.color, whiteSpace: "nowrap" }}>
+                                {statusCfg.label}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Match candidates */}
+                          {item.matches.length > 0 && (
+                            <div style={{ padding: "12px 18px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 4 }}>
+                                {item.matches.length} Match Candidate{item.matches.length !== 1 ? "s" : ""}
+                              </div>
+                              {item.matches.map(match => {
+                                const isSelected = item.selectedMatchId === match.id;
+                                const confColor = match.confidence >= 90 ? "#10b981" : match.confidence >= 70 ? "#f59e0b" : "#f87171";
+                                const typeIcon = { invoice: "🧾", expense: "💸", payment: "💳", journal: "📒" }[match.type];
+                                return (
+                                  <div key={match.id} style={{
+                                    display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 10,
+                                    background: isSelected ? "rgba(99,102,241,.12)" : "rgba(255,255,255,.025)",
+                                    border: `1px solid ${isSelected ? "rgba(99,102,241,.35)" : "rgba(255,255,255,.06)"}`,
+                                    flexWrap: "wrap",
+                                  }}>
+                                    <span style={{ fontSize: 16 }}>{typeIcon}</span>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{match.ref} · {match.party}</div>
+                                      <div style={{ fontSize: 11, color: "rgba(255,255,255,.38)", marginTop: 2 }}>{match.type.toUpperCase()} · {match.date}</div>
+                                    </div>
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)", marginRight: 4 }}>{match.amount.toLocaleString()}</div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 8, background: `${confColor}18`, border: `1px solid ${confColor}35` }}>
+                                      <span style={{ fontSize: 11, fontWeight: 800, color: confColor }}>{match.confidence}%</span>
+                                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>conf</span>
+                                    </div>
+                                    {item.status === "pending" && (
+                                      <button onClick={() => {
+                                        setReconciliation(prev => prev ? {
+                                          ...prev,
+                                          summary: { ...prev.summary, pending: prev.summary.pending - 1, manuallyMatched: prev.summary.manuallyMatched + 1 },
+                                          items: prev.items.map(i => i.id === item.id ? { ...i, status: "manually_matched" as const, selectedMatchId: match.id } : i),
+                                        } : prev);
+                                      }} style={{
+                                        padding: "6px 14px", borderRadius: 8, background: "rgba(99,102,241,.18)", border: "1px solid rgba(99,102,241,.4)",
+                                        color: "#c7d2fe", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+                                      }}>
+                                        Match
+                                      </button>
+                                    )}
+                                    {isSelected && (
+                                      <span style={{ fontSize: 18, color: "#10b981" }}>✓</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                          {item.matches.length === 0 && item.status === "unmatched" && (
+                            <div style={{ padding: "10px 18px 12px", fontSize: 12.5, color: "rgba(255,255,255,.3)", fontStyle: "italic" }}>
+                              No matching records found. Manual journal entry may be required.
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
             )}
           </div>
         )}

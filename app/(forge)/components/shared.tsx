@@ -156,7 +156,7 @@ export function ForgeFooter() {
       links: [
         { l: "Solutions", h: "/forge/solutions" },
         { l: "Industries", h: "/forge/industries" },
-        { l: "Security", h: "/security" },
+        { l: "Security", h: "/forge/security" },
         { l: "Status", h: "/forge/status" },
       ],
     },
