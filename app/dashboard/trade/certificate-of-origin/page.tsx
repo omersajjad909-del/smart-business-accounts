@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
+import DateInput from "@/app/dashboard/reports/_components/DateInput";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -395,9 +396,9 @@ export default function CertificateOfOriginPage() {
               <div><label style={s.label}>Issuing Country</label>
                 <input value={form.issuingCountry} onChange={e => sf("issuingCountry", e.target.value)} style={s.inp} placeholder="e.g. Pakistan" /></div>
               <div><label style={s.label}>Issue Date</label>
-                <input type="date" value={form.issueDate} onChange={e => sf("issueDate", e.target.value)} style={s.inp} /></div>
+                <DateInput value={form.issueDate || ""} onChange={v => sf("issueDate", v)} style={s.inp} /></div>
               <div><label style={s.label}>Expiry Date</label>
-                <input type="date" value={form.expiryDate} onChange={e => sf("expiryDate", e.target.value)} style={s.inp} /></div>
+                <DateInput value={form.expiryDate || ""} onChange={v => sf("expiryDate", v)} style={s.inp} /></div>
             </div>
 
             {/* Goods Lines */}

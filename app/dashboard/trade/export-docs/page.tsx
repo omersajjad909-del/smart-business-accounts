@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
+import DateInput from "@/app/dashboard/reports/_components/DateInput";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -396,7 +397,7 @@ export default function ExportDocumentationPage() {
               <div><label style={s.label}>Invoice No</label>
                 <input value={form.invoiceNo} onChange={e => sf("invoiceNo", e.target.value)} style={s.inp} placeholder="Export invoice no" /></div>
               <div><label style={s.label}>ETD Date</label>
-                <input type="date" value={form.etd} onChange={e => sf("etd", e.target.value)} style={s.inp} /></div>
+                <DateInput value={form.etd || ""} onChange={v => sf("etd", v)} style={s.inp} /></div>
             </div>
 
             {/* SB No + Authority (for Shipping Bills) */}

@@ -1926,6 +1926,11 @@ export default function DashboardLayout({
               {hasDashboardFeature("TRADING_DISPATCH_BOARD") && <NavLink href="/dashboard/trading/dispatch-board" pathname={pathname}>Dispatch Board</NavLink>}
               {hasDashboardFeature("TRADING_CONVERSION_CENTER") && <NavLink href="/dashboard/trading/conversion-center" pathname={pathname}>Conversion Center</NavLink>}
               {hasDashboardFeature("TRADING_ANALYTICS") && <NavLink href="/dashboard/trading/analytics" pathname={pathname}>Trading Analytics</NavLink>}
+              {hasDashboardFeature("TRADING_DELIVERY_ORDER") && <NavLink href="/dashboard/delivery-order" pathname={pathname}>Delivery Orders</NavLink>}
+              {hasDashboardFeature("TRADING_STOCK_MOVEMENTS") && <NavLink href="/dashboard/stock-movements" pathname={pathname}>Stock Movements</NavLink>}
+              {hasDashboardFeature("TRADING_PRODUCT_CATEGORIES") && <NavLink href="/dashboard/product-categories" pathname={pathname}>Product Categories</NavLink>}
+              {hasDashboardFeature("TRADING_WAREHOUSE_TRANSFERS") && <NavLink href="/dashboard/warehouse-transfers" pathname={pathname}>Warehouse Transfers</NavLink>}
+              {hasDashboardFeature("TRADING_PURCHASE_REQUISITION") && <NavLink href="/dashboard/purchase-requisition" pathname={pathname}>Purchase Requisition</NavLink>}
             </NavGroup>
           )}
 

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
+import DateInput from "@/app/dashboard/reports/_components/DateInput";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -238,9 +239,9 @@ export default function ExportPerformancePage() {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-muted)" }}>
             <span>From</span>
-            <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={{ ...s.inp, width: 148 }} />
+            <DateInput value={from} onChange={v => setFrom(v)} style={{ ...s.inp, width: 148 }} />
             <span>To</span>
-            <input type="date" value={to}   onChange={e => setTo(e.target.value)}   style={{ ...s.inp, width: 148 }} />
+            <DateInput value={to} onChange={v => setTo(v)} style={{ ...s.inp, width: 148 }} />
           </div>
         </div>
       </div>

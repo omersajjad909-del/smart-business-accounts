@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
+import DateInput from "@/app/dashboard/reports/_components/DateInput";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -406,9 +407,9 @@ export default function FreightManagementPage() {
             {/* Dates + Transit */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 14, marginBottom: 14 }}>
               <div><label style={s.label}>ETD (Departure)</label>
-                <input type="date" value={String(form.etd)} onChange={e => sf("etd", e.target.value)} style={s.inp} /></div>
+                <DateInput value={String(form.etd || "")} onChange={v => sf("etd", v)} style={s.inp} /></div>
               <div><label style={s.label}>ETA (Arrival)</label>
-                <input type="date" value={String(form.eta)} onChange={e => sf("eta", e.target.value)} style={s.inp} /></div>
+                <DateInput value={String(form.eta || "")} onChange={v => sf("eta", v)} style={s.inp} /></div>
               <div><label style={s.label}>Incoterm</label>
                 <select value={String(form.incoterm)} onChange={e => sf("incoterm", e.target.value)} style={s.inp}>
                   {INCOTERMS.map(i => <option key={i} value={i}>{i}</option>)}

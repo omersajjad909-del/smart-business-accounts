@@ -166,7 +166,14 @@
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\\\(forge\\)\\\\\" -Recurse -Force | Select-Object FullName | Sort-Object FullName)",
       "Bash(Get-Content \"C:\\\\Users\\\\STANDA~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--projects-smart-business-accounts\\\\a18d44ab-a1fd-43b7-af0a-e605312a2ee0\\\\tasks\\\\b1n0kds2e.output\" -Tail 30)",
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\" -Directory)",
-      "Bash(Select-Object -ExpandProperty Name)"
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(sales)",
+      "Bash(inventory)",
+      "Bash(grn)",
+      "Bash(quotation)",
+      "Bash(warehouse)",
+      "Bash(crv)",
+      "Bash(cpv\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
