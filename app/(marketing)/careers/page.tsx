@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 ══════════════════════════════════════════════════════════ */
 const STATS = [
   { value:"Global", label:"Remote Team",      icon:"👥" },
-  { value:"40+",    label:"Countries Served", icon:"🌍" },
   { value:"Fast",   label:"Shipping Culture", icon:"⭐" },
   { value:"Weekly", label:"Product Releases", icon:"❤️" },
 ];
@@ -37,7 +36,7 @@ const DEPARTMENTS = [
 const JOBS = [
   {
     id:"1", title:"Senior Backend Engineer",     dept:"engineering",  location:"Remote · Worldwide",   type:"Full-time",   level:"Senior",
-    desc:"Build the core financial infrastructure powering businesses across 40+ countries. Work with Prisma, Next.js, PostgreSQL, and distributed systems at scale.",
+    desc:"Build the core financial infrastructure powering businesses worldwide. Work with Prisma, Next.js, PostgreSQL, and distributed systems at scale.",
     tags:["Node.js","TypeScript","PostgreSQL","Redis"],
     posted:"3 days ago", color:"#818cf8",
   },
@@ -61,7 +60,7 @@ const JOBS = [
   },
   {
     id:"5", title:"Security Engineer",            dept:"engineering",  location:"Remote · Worldwide",   type:"Full-time",   level:"Senior",
-    desc:"Protect financial data across 40+ countries. Own pen testing, SOC 2 compliance, security reviews, and incident response.",
+    desc:"Protect financial data globally. Own pen testing, SOC 2 compliance, security reviews, and incident response.",
     tags:["Security","SOC2","Penetration Testing"],
     posted:"2 weeks ago", color:"#818cf8",
   },
@@ -121,7 +120,7 @@ const JOBS = [
   },
   {
     id:"15", title:"Legal & Compliance Counsel",   dept:"operations",   location:"Remote · Worldwide",   type:"Contract",    level:"Senior",
-    desc:"Navigate financial regulations across 40+ countries. Support GDPR, data privacy, commercial contracts, and regional compliance requirements.",
+    desc:"Navigate financial regulations globally. Support GDPR, data privacy, commercial contracts, and regional compliance requirements.",
     tags:["Legal","Compliance","GDPR","Fintech"],
     posted:"2 weeks ago", color:"#38bdf8",
   },

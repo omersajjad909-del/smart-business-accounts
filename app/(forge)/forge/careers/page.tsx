@@ -110,7 +110,7 @@ function WhyUs() {
     {
       icon: "🌍",
       title: "Global Reach",
-      body: "Our software is used by businesses across 40+ countries. The scale is real, the mission is global.",
+      body: "Our software is used by businesses worldwide. The scale is real, the mission is global.",
     },
     {
       icon: "💪",

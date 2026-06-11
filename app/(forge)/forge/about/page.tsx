@@ -109,7 +109,7 @@ function Story() {
     {
       year: "Today",
       title: "FinovaOS — Our First Answer",
-      body: "FinovaOS is our flagship product — a full business management platform covering accounting, inventory, HR, invoicing, and more. It's used by growing companies across 40+ countries. And this is just the beginning.",
+      body: "FinovaOS is our flagship product — a full business management platform covering accounting, inventory, HR, invoicing, and more. It's used by growing companies worldwide. And this is just the beginning.",
     },
   ];
 

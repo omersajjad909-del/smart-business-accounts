@@ -14,7 +14,7 @@ const DEPARTMENTS = [
     glow: "rgba(129,140,248,.15)",
     border: "rgba(129,140,248,.25)",
     headcount: 52,
-    desc: "We build the financial infrastructure powering businesses across 40+ countries. Our stack is TypeScript, Next.js, PostgreSQL, and we ship every week.",
+    desc: "We build the financial infrastructure powering businesses worldwide. Our stack is TypeScript, Next.js, PostgreSQL, and we ship every week.",
     leads: ["Omar Khalid — CTO", "Ali Hassan — VP Eng"],
     tools: ["TypeScript", "Next.js", "PostgreSQL", "Redis", "AWS", "Kubernetes"],
     teams: ["Core Platform", "Payments", "Reporting", "Mobile", "Security", "Infrastructure"],

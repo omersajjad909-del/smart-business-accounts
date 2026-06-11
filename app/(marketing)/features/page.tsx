@@ -63,18 +63,21 @@ const CATEGORIES = [
         description: "Record all cash payments and receipts with structured vouchers. Every CPV and CRV is linked to the correct account, posted in real time, and carries a full audit trail — no untracked cash movements.",
         highlights: ["Cash payment vouchers", "Cash receipt vouchers", "Real-time ledger posting"],
         mockType: "cpv",
+        phase2: true,
       },
       {
         name: "Opening Balances & Financial Year",
         description: "Set your opening balances when migrating from another system. Lock closed financial years to prevent backdated entries. One-click year-end closing posts carry-forward entries automatically.",
         highlights: ["Migration-friendly setup", "Year locking", "Auto carry-forward"],
         mockType: "opening",
+        phase2: true,
       },
       {
         name: "Recurring Transactions",
         description: "Automate repeat entries — monthly rent, utility bills, subscriptions, and standing journal entries. Set frequency, end date, and FinovaOS posts them automatically — zero manual effort.",
         highlights: ["Auto-posting", "Flexible frequency", "Invoice & JV support"],
         mockType: "recurring",
+        phase2: true,
       },
       {
         name: "Journal Vouchers",
@@ -274,6 +277,7 @@ const CATEGORIES = [
         description: "See exactly where your cash is coming from and where it's going. FinovaOS generates a real-time cash flow statement categorized into operating, investing, and financing activities — no manual preparation.",
         highlights: ["Operating / investing / financing", "Real-time view", "Export-ready"],
         mockType: "cashflow",
+        phase2: true,
       },
     ],
   },
@@ -368,6 +372,7 @@ const CATEGORIES = [
         description: "Migrate from any accounting software or spreadsheet in minutes. Import customers, suppliers, inventory items, opening balances, and historical transactions with a guided step-by-step wizard and automatic field mapping.",
         highlights: ["Excel & CSV support", "Auto field mapping", "Validation before import"],
         mockType: "import",
+        phase2: true,
       },
       {
         name: "AI Financial Assistant",
@@ -391,48 +396,56 @@ const CATEGORIES = [
         description: "Manage Bills of Materials (BOM), production orders, work orders, and raw material consumption. Track costs from raw material to finished goods with full costing visibility.",
         highlights: ["BOM management", "Production orders", "Cost tracking"],
         mockType: "manufacturing",
+        phase2: true,
       },
       {
         name: "Restaurant & Food Service",
         description: "Manage tables, menu items, kitchen orders, and recipe costing. Calculate the exact cost of every dish, track food waste, and monitor profitability per menu item.",
         highlights: ["Table management", "Kitchen display", "Recipe costing"],
         mockType: "restaurant",
+        phase2: true,
       },
       {
         name: "Real Estate & Property",
         description: "Track properties, tenants, rent collection, and lease agreements in one place. Automatic rent invoicing, overdue alerts, and property-wise profitability reports.",
         highlights: ["Tenant management", "Auto rent invoicing", "Property P&L"],
         mockType: "realestate",
+        phase2: true,
       },
       {
         name: "School & Academy",
         description: "Manage students, fee collection, class schedules, and exam results. Automate fee reminders, generate fee receipts, and produce financial reports per academic term.",
         highlights: ["Fee management", "Student records", "Exam results"],
         mockType: "school",
+        phase2: true,
       },
       {
         name: "Hospital & Clinic",
         description: "Handle patient records, appointments, prescriptions, and lab tests. Fully integrated with billing so every patient visit is automatically invoiced and posted to accounts.",
         highlights: ["Patient records", "Appointment scheduling", "Lab billing"],
         mockType: "hospital",
+        phase2: true,
       },
       {
         name: "Retail & Point of Sale",
         description: "Run a full POS with barcode scanning, loyalty points, and real-time stock sync. Every sale posts instantly to accounts — no end-of-day reconciliation needed.",
         highlights: ["POS with barcode", "Loyalty program", "Live stock sync"],
         mockType: "retail",
+        phase2: true,
       },
       {
         name: "Services & Agency",
         description: "Built for consultancies, agencies, and professional service firms. Manage client projects, quotations, retainer billing, and expense tracking — all linked to your accounts.",
         highlights: ["Project billing", "Retainer invoices", "Client portal"],
         mockType: "services",
+        phase2: true,
       },
       {
         name: "Distribution & Wholesale",
         description: "Optimise your distribution network with route management, van sales, and delivery tracking. Wholesale-ready with multi-tier pricing, credit limits, and volume discount support.",
         highlights: ["Route management", "Van sales", "Credit limits"],
         mockType: "wholesale",
+        phase2: true,
       },
     ],
   },
@@ -1466,6 +1479,22 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       </div>
     ),
 
+    // Coming Soon (phase-2 fallback)
+    comingSoon: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", gap:14, textAlign:"center" }}>
+        <div style={{ width:54, height:54, borderRadius:16, background:`${color}12`, border:`1px solid ${color}22`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>🚀</div>
+        <div>
+          <div style={{ fontSize:14, fontWeight:800, color:"white", marginBottom:6 }}>Coming Soon</div>
+          <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", lineHeight:1.65, maxWidth:180 }}>
+            This feature is actively in development and will be available in Phase 2.
+          </div>
+        </div>
+        <div style={{ padding:"5px 16px", borderRadius:20, background:`${color}14`, border:`1px solid ${color}28`, fontSize:10, fontWeight:700, color, letterSpacing:".04em" }}>
+          Phase 2 — Launching Soon
+        </div>
+      </div>
+    ),
+
     // AI Assistant
     ai: (
       <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
@@ -1503,7 +1532,7 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       </div>
       {/* Content */}
       <div style={{ flex:1, overflow:"hidden" }}>
-        {screens[type] || screens.ledger}
+        {screens[type] || screens.comingSoon}
       </div>
     </div>
   );
@@ -1543,8 +1572,13 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
           <span style={{ width:5, height:5, borderRadius:"50%", background:color }}/>
           Feature {String(globalIndex+1).padStart(2,"0")}
         </div>
-        <h3 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(20px,2.5vw,28px)", fontWeight:700, color:"white", letterSpacing:"-.5px", lineHeight:1.25, marginBottom:12 }}>
+        <h3 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(20px,2.5vw,28px)", fontWeight:700, color:"white", letterSpacing:"-.5px", lineHeight:1.25, marginBottom:(feature as any).phase2?10:12, display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" as const }}>
           {feature.name}
+          {(feature as any).phase2 && (
+            <span style={{ fontSize:10, fontWeight:700, color:"#fbbf24", padding:"3px 10px", borderRadius:20, background:"rgba(251,191,36,.12)", border:"1px solid rgba(251,191,36,.28)", letterSpacing:".06em", textTransform:"uppercase" as const, fontFamily:"'Outfit',sans-serif", flexShrink:0 }}>
+              Coming Soon
+            </span>
+          )}
         </h3>
         <p style={{ fontSize:14.5, color:"rgba(255,255,255,.45)", lineHeight:1.8, marginBottom:22 }}>
           {feature.description}

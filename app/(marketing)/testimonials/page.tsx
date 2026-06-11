@@ -83,7 +83,6 @@ export default function TestimonialsPage() {
             {[
               {val:"4.9", label:"Average rating"},
               {val:`${all.length || "2,400"}+`, label:"Reviews"},
-              {val:"40+", label:"Countries"},
             ].map(s=>(
               <div key={s.label} style={{textAlign:"center"}}>
                 <div style={{fontSize:22,fontWeight:800,color:"white",letterSpacing:"-.5px"}}>{s.val}</div>

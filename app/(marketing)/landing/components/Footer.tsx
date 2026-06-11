@@ -40,7 +40,6 @@ const BOTTOM_LINKS = [
 
 const STATS = [
   { val: "50+",   label: "Modules",  color: "#818cf8" },
-  { val: "40+",  label: "Countries",  color: "#fbbf24" },
   { val: "99.9%", label: "Uptime",   color: "#34d399" },
 ];
 

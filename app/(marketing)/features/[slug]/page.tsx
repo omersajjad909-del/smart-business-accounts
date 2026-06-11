@@ -37,7 +37,7 @@ const MODULES: Record<string, {
       { icon: "🌍", title: "Multi-Currency", desc: "Book transactions in any currency with automatic exchange rate handling." },
     ],
     whoFor: ["Trading businesses", "Distribution companies", "Manufacturing firms", "Service businesses", "NGOs & nonprofits", "Any business that needs accurate books"],
-    stats: [{ val: "100%", label: "Double-entry" }, { val: "Real-time", label: "P&L updates" }, { val: "Unlimited", label: "Accounts" }, { val: "40+", label: "Country rules" }],
+    stats: [{ val: "100%", label: "Double-entry" }, { val: "Real-time", label: "P&L updates" }, { val: "Unlimited", label: "Accounts" }],
     related: ["invoicing", "bank-reconciliation", "reports"],
   },
 
@@ -287,10 +287,10 @@ const MODULES: Record<string, {
       { icon: "🏦", title: "Foreign Bank Accounts", desc: "Manage bank accounts in any currency with proper revaluation." },
       { icon: "📊", title: "Currency Reports", desc: "See exposure, open positions, and gain/loss by currency." },
       { icon: "🔄", title: "Currency Revaluation", desc: "Revalue foreign balances at period end for accurate reporting." },
-      { icon: "🌏", title: "Global Compliance", desc: "Meets accounting standards for multi-currency in 40+ countries." },
+      { icon: "🌏", title: "Global Compliance", desc: "Meets accounting standards for multi-currency operations worldwide." },
     ],
     whoFor: ["Importers & exporters", "International businesses", "Companies with foreign clients", "Any business dealing in multiple currencies"],
-    stats: [{ val: "150+", label: "Currencies" }, { val: "Auto", label: "Rate fetching" }, { val: "Real-time", label: "Gain/loss calc" }, { val: "40+", label: "Country compliant" }],
+    stats: [{ val: "150+", label: "Currencies" }, { val: "Auto", label: "Rate fetching" }, { val: "Real-time", label: "Gain/loss calc" }],
     related: ["accounting", "invoicing", "bank-reconciliation"],
   },
 };

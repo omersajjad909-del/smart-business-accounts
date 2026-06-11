@@ -5,7 +5,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   title: "Trust & Compliance — GDPR, Data Privacy & Certifications",
   description:
-    "FinovaOS's commitment to data privacy, GDPR compliance, financial data security, and regulatory standards. Trusted by businesses across 40+ countries worldwide.",
+    "FinovaOS's commitment to data privacy, GDPR compliance, financial data security, and regulatory standards. Trusted by businesses worldwide.",
   keywords: [
     "GDPR accounting software",
     "data privacy accounting",

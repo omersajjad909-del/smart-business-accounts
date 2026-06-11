@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | FinovaOS",
   },
   description:
-    "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM - all in one platform. Used by 12,000+ businesses in 40+ countries.",
+    "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM - all in one platform. Used by 12,000+ businesses worldwide.",
   keywords: [
     "accounting software",
     "cloud accounting",
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     creator: "@finova_io",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
-      "Cloud accounting software for modern SMEs. Used by 12,000+ businesses in 40+ countries.",
+      "Cloud accounting software for modern SMEs. Used by 12,000+ businesses worldwide.",
     images: [`${BASE_URL}${BRAND_ICON_PATH}`],
   },
   applicationName: "FinovaOS",

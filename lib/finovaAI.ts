@@ -27,7 +27,7 @@ FinovaOS is a complete cloud accounting and ERP platform for small and medium bu
 - Multi-company, multi-branch, multi-currency support
 - Supports 30+ business types (trading, retail, manufacturing, restaurant, hotel, school, etc.)
 - Available in English and Urdu (Roman & script)
-- Trusted by 12,000+ businesses in 40+ countries
+- Trusted by 12,000+ businesses worldwide
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FINOVA PLANS

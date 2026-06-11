@@ -76,7 +76,7 @@ export const MODULES: Module[] = [
     id: "tax_filing",
     name: "Tax Filing",
     price: 10,
-    description: "Jurisdiction-ready tax reports for 40+ countries",
+    description: "Jurisdiction-ready tax reports for global businesses",
     icon: "📋",
   },
 ];
