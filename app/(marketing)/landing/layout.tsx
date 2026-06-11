@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
 export const metadata: Metadata = {
   title: "FinovaOS — Cloud Accounting & Business Management for SMEs",

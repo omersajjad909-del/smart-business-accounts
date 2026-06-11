@@ -8,7 +8,7 @@ import GeoPrecisionPrompt from "./landing/components/GeoPrecisionPrompt";
 import { Suspense } from "react";
 import VisitorTracker from "./landing/components/VisitorTracker";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),

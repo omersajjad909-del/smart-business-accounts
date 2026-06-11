@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
 export async function POST(req: NextRequest) {
   try {
