@@ -572,10 +572,10 @@ const CATEGORY_COLORS: Record<string, string> = {
 const CATEGORIES = Array.from(new Set(BUSINESSES.map((b) => b.category)));
 
 const TRUST_STATS = [
-  { value: "18,000+", label: "Businesses on FinovaOS", icon: "🏢" },
-  { value: "4.8 / 5", label: "Average rating", icon: "⭐" },
-  { value: "99.9%", label: "Uptime SLA", icon: "🔒" },
-  { value: "15 Types", label: "Business verticals", icon: "📊" },
+  { value: "30+",          label: "Business Types",   icon: "🏢" },
+  { value: "Early Access", label: "Limited Spots",    icon: "🚀" },
+  { value: "99.9%",        label: "Uptime SLA",       icon: "🔒" },
+  { value: "< 2 min",      label: "Setup Time",       icon: "⚡" },
 ];
 
 export default function DemoPage() {
