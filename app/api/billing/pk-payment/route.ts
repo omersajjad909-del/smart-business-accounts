@@ -32,6 +32,20 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    const methodLabel = method === "jazzcash" ? "JazzCash" : "Easypaisa";
+
+    // Admin bell notification
+    prisma.notification.create({
+      data: {
+        title: `🇵🇰 New ${methodLabel} Payment`,
+        message: `PKR ${Number(amountPkr).toLocaleString()} · ${String(plan).toUpperCase()} · ${email} · TX: ${txId}`,
+        type: "INFO",
+        link: "/admin/pk-payments",
+        isRead: false,
+      },
+    }).catch(() => {});
+
+    // Admin email notification
     const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.SMTP_USER || "";
     if (adminEmail) {
       sendPkPaymentReceivedEmail({
