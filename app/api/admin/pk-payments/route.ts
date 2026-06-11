@@ -41,7 +41,6 @@ export async function PATCH(req: NextRequest) {
         data: {
           plan: updated.plan,
           subscriptionStatus: "ACTIVE",
-          currentPeriodStart: now,
           currentPeriodEnd: periodEnd,
           cancelledAt: null,
         },
