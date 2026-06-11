@@ -19,6 +19,7 @@ type EditForm = {
   name: string;
   description: string;
   configJson: string;
+  qrPreview: string;
 };
 
 const CATEGORY_META: Record<string, { label: string; color: string; bg: string }> = {
@@ -41,7 +42,7 @@ export default function AdminPaymentMethodsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingGateway, setEditingGateway] = useState<Gateway | null>(null);
-  const [editForm, setEditForm] = useState<EditForm>({ name: "", description: "", configJson: "" });
+  const [editForm, setEditForm] = useState<EditForm>({ name: "", description: "", configJson: "", qrPreview: "" });
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
   const [togglingId, setTogglingId] = useState<string | null>(null);
@@ -86,26 +87,44 @@ export default function AdminPaymentMethodsPage() {
 
   function openEdit(g: Gateway) {
     let cfg = "";
+    let qrPreview = "";
     if (g.configJson) {
-      try { cfg = JSON.stringify(JSON.parse(g.configJson), null, 2); } catch { cfg = g.configJson; }
+      try {
+        const parsed = JSON.parse(g.configJson);
+        qrPreview = parsed.qrCode || "";
+        const { qrCode: _qr, ...rest } = parsed;
+        cfg = JSON.stringify(rest, null, 2);
+      } catch { cfg = g.configJson; }
     }
-    setEditForm({ name: g.name, description: g.description || "", configJson: cfg });
+    setEditForm({ name: g.name, description: g.description || "", configJson: cfg, qrPreview });
     setEditingGateway(g); setFormError("");
+  }
+
+  function handleQrUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setEditForm(p => ({ ...p, qrPreview: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
   }
 
   async function handleSave() {
     if (!editingGateway) return;
     if (!editForm.name.trim()) { setFormError("Name is required."); return; }
-    let parsedConfig = null;
+    let parsedConfig: Record<string, unknown> = {};
     if (editForm.configJson.trim()) {
       try { parsedConfig = JSON.parse(editForm.configJson.trim()); }
       catch { setFormError("Config JSON is not valid JSON."); return; }
     }
+    if (editForm.qrPreview) parsedConfig.qrCode = editForm.qrPreview;
+    const finalConfig = Object.keys(parsedConfig).length > 0 ? parsedConfig : null;
     setSaving(true); setFormError("");
     try {
       const res = await fetch(`/api/admin/payment-gateways?id=${editingGateway.id}`, {
         method: "PUT", credentials: "include", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: editForm.name.trim(), description: editForm.description.trim() || null, configJson: parsedConfig }),
+        body: JSON.stringify({ name: editForm.name.trim(), description: editForm.description.trim() || null, configJson: finalConfig }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Save failed");
@@ -220,6 +239,31 @@ export default function AdminPaymentMethodsPage() {
                 <label className="pg-label">Description</label>
                 <input className="pg-input" value={editForm.description} onChange={(e) => setEditForm((p) => ({ ...p, description: e.target.value }))} placeholder="Optional description" />
               </div>
+              {(editingGateway.category === "MOBILE" || editingGateway.key === "JAZZCASH" || editingGateway.key === "EASYPAISA") && (
+                <div className="pg-field">
+                  <label className="pg-label">QR Code Image <span className="pg-label-note">(customers will scan this to pay)</span></label>
+                  {editForm.qrPreview ? (
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+                      <img src={editForm.qrPreview} alt="QR Code" style={{ width:180, height:180, borderRadius:14, border:"1.5px solid var(--border)", objectFit:"contain", background:"#fff", padding:8 }} />
+                      <div style={{ display:"flex", gap:8 }}>
+                        <label style={{ padding:"7px 14px", borderRadius:10, border:"1px solid var(--border)", background:"transparent", color:"var(--text-soft)", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+                          Replace
+                          <input type="file" accept="image/*" onChange={handleQrUpload} style={{ display:"none" }} />
+                        </label>
+                        <button type="button" onClick={() => setEditForm(p => ({ ...p, qrPreview: "" }))} style={{ padding:"7px 14px", borderRadius:10, border:"1px solid rgba(244,63,94,.3)", background:"transparent", color:"#f87171", fontSize:12, fontWeight:700, cursor:"pointer" }}>Remove</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:10, padding:"28px 20px", borderRadius:14, border:"2px dashed var(--border)", background:"var(--bg-soft,rgba(255,255,255,.02))", cursor:"pointer", textAlign:"center" }}>
+                      <div style={{ fontSize:28 }}>📱</div>
+                      <div style={{ fontSize:13, fontWeight:700, color:"var(--text-soft)" }}>Upload QR Code</div>
+                      <div style={{ fontSize:11, color:"var(--text-muted)" }}>Screenshot from your {editingGateway.name} app · PNG or JPG</div>
+                      <input type="file" accept="image/*" onChange={handleQrUpload} style={{ display:"none" }} />
+                    </label>
+                  )}
+                </div>
+              )}
+
               <div className="pg-field">
                 <label className="pg-label">Config JSON <span className="pg-label-note">(API keys, webhook URLs, etc.)</span></label>
                 <textarea

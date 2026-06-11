@@ -238,6 +238,8 @@ export default function PaymentPage() {
   const [pkPending,   setPkPending]   = useState(false);
   const [jazzNumber,  setJazzNumber]  = useState<string>("");
   const [epNumber,    setEpNumber]    = useState<string>("");
+  const [jazzQr,      setJazzQr]      = useState<string>("");
+  const [epQr,        setEpQr]        = useState<string>("");
 
   /* Coupon */
   const [couponInput,    setCouponInput]    = useState("");
@@ -349,8 +351,8 @@ export default function PaymentPage() {
         if (Array.isArray(data?.gateways)) {
           const jzGw = data.gateways.find((g: any) => g.key === "JAZZCASH");
           const epGw = data.gateways.find((g: any) => g.key === "EASYPAISA");
-          try { if (jzGw?.configJson) { const cfg = JSON.parse(jzGw.configJson); setJazzNumber(cfg.accountNumber || ""); } } catch {}
-          try { if (epGw?.configJson) { const cfg = JSON.parse(epGw.configJson); setEpNumber(cfg.accountNumber || ""); } } catch {}
+          try { if (jzGw?.configJson) { const cfg = JSON.parse(jzGw.configJson); setJazzNumber(cfg.accountNumber || ""); setJazzQr(cfg.qrCode || ""); } } catch {}
+          try { if (epGw?.configJson) { const cfg = JSON.parse(epGw.configJson); setEpNumber(cfg.accountNumber || ""); setEpQr(cfg.qrCode || ""); } } catch {}
         }
       } catch {}
     })();
@@ -407,6 +409,7 @@ export default function PaymentPage() {
   const pkrRate = rates?.PKR || 280;
   const pkrAmount = Math.round(finalPrice * pkrRate);
   const pkAccountNumber = method === "jazzcash" ? jazzNumber : epNumber;
+  const pkQrCode = method === "jazzcash" ? jazzQr : epQr;
 
   async function submitPkPayment(userId: string, companyId: string) {
     try {
@@ -894,30 +897,56 @@ export default function PaymentPage() {
                   {/* JAZZCASH / EASYPAISA */}
                   {(method === "jazzcash" || method === "easypaisa") && (
                     <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                      {/* Step instructions */}
-                      <div style={{ padding:"14px 16px", borderRadius:12, background:"rgba(56,189,248,.06)", border:"1px solid rgba(56,189,248,.2)" }}>
-                        <div style={{ fontSize:11, fontWeight:800, color:"#38bdf8", letterSpacing:".06em", textTransform:"uppercase", marginBottom:10 }}>
-                          How to Pay
-                        </div>
-                        {[
-                          { n:"1", text: pkAccountNumber
-                              ? `Send PKR ${pkrAmount.toLocaleString()} to ${method==="jazzcash"?"JazzCash":"Easypaisa"} number: ${pkAccountNumber}`
-                              : `Send PKR ${pkrAmount.toLocaleString()} to our ${method==="jazzcash"?"JazzCash":"Easypaisa"} account (contact support for number)` },
-                          { n:"2", text:"Enter your mobile number and the transaction ID from your payment receipt below" },
-                          { n:"3", text:"Submit — our team will verify and activate your plan within a few hours" },
-                        ].map(s=>(
-                          <div key={s.n} style={{ display:"flex", gap:10, marginBottom:s.n==="3"?0:8, alignItems:"flex-start" }}>
-                            <div style={{ width:20, height:20, borderRadius:"50%", background:"rgba(56,189,248,.2)", border:"1px solid rgba(56,189,248,.35)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, color:"#38bdf8", flexShrink:0, marginTop:1 }}>{s.n}</div>
-                            <div style={{ fontSize:12, color:"rgba(255,255,255,.65)", lineHeight:1.55 }}>{s.text}</div>
-                          </div>
-                        ))}
+
+                      {/* Amount pill */}
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, padding:"12px 16px", borderRadius:12, background:"rgba(56,189,248,.08)", border:"1px solid rgba(56,189,248,.2)" }}>
+                        <span style={{ fontSize:11, color:"rgba(255,255,255,.5)" }}>Send exactly</span>
+                        <span style={{ fontSize:18, fontWeight:900, color:"#38bdf8" }}>PKR {pkrAmount.toLocaleString()}</span>
+                        <span style={{ fontSize:11, color:"rgba(255,255,255,.5)" }}>via {method==="jazzcash"?"JazzCash":"Easypaisa"}</span>
                       </div>
+
+                      {/* QR Code block */}
+                      {pkQrCode ? (
+                        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+                          <div style={{ padding:"14px 16px", borderRadius:14, background:"rgba(56,189,248,.06)", border:"1px solid rgba(56,189,248,.2)", width:"100%", textAlign:"center" }}>
+                            <div style={{ fontSize:11, fontWeight:800, color:"#38bdf8", letterSpacing:".06em", textTransform:"uppercase", marginBottom:12 }}>
+                              Scan QR to Pay
+                            </div>
+                            <img
+                              src={pkQrCode}
+                              alt={`${method==="jazzcash"?"JazzCash":"Easypaisa"} QR Code`}
+                              style={{ width:190, height:190, borderRadius:12, objectFit:"contain", background:"#fff", padding:10, margin:"0 auto", display:"block" }}
+                            />
+                            <div style={{ marginTop:12, fontSize:11, color:"rgba(255,255,255,.45)", lineHeight:1.65 }}>
+                              <strong style={{ color:"rgba(255,255,255,.7)" }}>On mobile?</strong> Screenshot this QR, open {method==="jazzcash"?"JazzCash":"Easypaisa"} app → Pay → Scan QR → <em>Choose from Gallery</em>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ padding:"14px 16px", borderRadius:12, background:"rgba(56,189,248,.06)", border:"1px solid rgba(56,189,248,.2)" }}>
+                          <div style={{ fontSize:11, fontWeight:800, color:"#38bdf8", letterSpacing:".06em", textTransform:"uppercase", marginBottom:10 }}>
+                            How to Pay
+                          </div>
+                          {[
+                            { n:"1", text: pkAccountNumber
+                                ? `Send PKR ${pkrAmount.toLocaleString()} to ${method==="jazzcash"?"JazzCash":"Easypaisa"} number: ${pkAccountNumber}`
+                                : `Contact support for our ${method==="jazzcash"?"JazzCash":"Easypaisa"} account number` },
+                            { n:"2", text:"Enter your mobile number and the transaction ID from your payment receipt below" },
+                            { n:"3", text:"Submit — our team will verify and activate your plan within a few hours" },
+                          ].map(s=>(
+                            <div key={s.n} style={{ display:"flex", gap:10, marginBottom:s.n==="3"?0:8, alignItems:"flex-start" }}>
+                              <div style={{ width:20, height:20, borderRadius:"50%", background:"rgba(56,189,248,.2)", border:"1px solid rgba(56,189,248,.35)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, color:"#38bdf8", flexShrink:0, marginTop:1 }}>{s.n}</div>
+                              <div style={{ fontSize:12, color:"rgba(255,255,255,.65)", lineHeight:1.55 }}>{s.text}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
                       <div><label style={lbl}>Your Mobile Number</label><input value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,"").slice(0,11))} placeholder="03XX-XXXXXXX" style={{...inp,fontFamily:"monospace",letterSpacing:1}}/></div>
                       <div>
                         <label style={lbl}>Transaction ID <span style={{ color:"#f87171" }}>*</span></label>
-                        <input value={txId} onChange={e=>setTxId(e.target.value.trim())} placeholder="Paste TX ID from receipt" style={{...inp,fontFamily:"monospace"}}/>
-                        <div style={{ fontSize:10, color:"rgba(255,255,255,.25)", marginTop:4 }}>Found in your {method==="jazzcash"?"JazzCash":"Easypaisa"} app under transaction history</div>
+                        <input value={txId} onChange={e=>setTxId(e.target.value.trim())} placeholder="Paste TX ID from SMS receipt" style={{...inp,fontFamily:"monospace"}}/>
+                        <div style={{ fontSize:10, color:"rgba(255,255,255,.25)", marginTop:4 }}>Sent by {method==="jazzcash"?"JazzCash":"Easypaisa"} via SMS after payment</div>
                       </div>
                       <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
