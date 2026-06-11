@@ -585,6 +585,11 @@ export default function DashboardLayout({
           if (c.ok) {
             const cj = await c.json();
             const status = String(cj.subscriptionStatus || "").toUpperCase();
+            if (status === "INACTIVE") {
+              const plan = String(cj.plan || "starter").toLowerCase();
+              router.replace(`/onboarding/payment/${plan}`);
+              return;
+            }
             setIsPro(String(cj.plan || "").toUpperCase() === "PRO" && status === "ACTIVE");
             if (cj?.plan) setCompanyPlan(String(cj.plan));
             setSubInfo({ plan: String(cj.plan || "STARTER"), status });

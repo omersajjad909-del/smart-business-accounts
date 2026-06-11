@@ -267,10 +267,8 @@ export default function CompanyProfilePage() {
 
   const planCode = String(company.plan || "STARTER").toUpperCase();
   const plan = PLAN_META[planCode] || PLAN_META.STARTER;
-  const statusActive =
-    String(company.subscriptionStatus || "").toUpperCase() === "ACTIVE" ||
-    String(company.subscriptionStatus || "").toUpperCase() === "TRIALING";
-  const statusTrialing = String(company.subscriptionStatus || "").toUpperCase() === "TRIALING";
+  const statusActive = String(company.subscriptionStatus || "").toUpperCase() === "ACTIVE";
+  const statusTrialing = false;
   const periodEnd = company.currentPeriodEnd ? fmtDate(company.currentPeriodEnd) : null;
   const userCount = company.totalUsers ?? 0;
   const accountCount = company.totalAccounts ?? 0;
@@ -710,25 +708,9 @@ export default function CompanyProfilePage() {
                 color: statusActive ? "#34d399" : "#f87171",
               }}
             >
-              {statusTrialing ? "TRIALING" : (company.subscriptionStatus || "ACTIVE").toUpperCase()}
+              {(company.subscriptionStatus || "ACTIVE").toUpperCase()}
             </span>
           </div>
-
-          {statusTrialing && (
-            <div
-              style={{
-                padding: "9px 12px",
-                borderRadius: "8px",
-                background: "rgba(251,191,36,0.1)",
-                border: "1px solid rgba(251,191,36,0.25)",
-                fontSize: "12px",
-                color: "#fbbf24",
-                marginBottom: "12px",
-              }}
-            >
-              🔔 Trial period active. Upgrade to keep access after trial ends.
-            </div>
-          )}
 
           {!statusActive && (
             <div

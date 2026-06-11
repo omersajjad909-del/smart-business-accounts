@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
         businessType: businessType ? String(businessType) as BusinessType : "trading",
         businessSetupDone: Boolean(businessType),
         plan: normalizedPlanCode,
-        subscriptionStatus: "TRIALING",
+        subscriptionStatus: "INACTIVE",
         activeModules: customModuleIds.length > 0 ? customModuleIds.join(",") : null,
         customPrice: computedCustomPrice,
       },
