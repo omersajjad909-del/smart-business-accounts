@@ -648,6 +648,100 @@ export const emailTemplates = {
   },
 };
 
+// ─── PK Payment: admin alert (on submission) ──────────────────────────────────
+export async function sendPkPaymentReceivedEmail(opts: {
+  adminEmail: string;
+  customerEmail: string;
+  method: string;
+  mobileNumber: string;
+  txId: string;
+  amountPkr: number;
+  plan: string;
+  billingCycle: string;
+}): Promise<void> {
+  const methodLabel = opts.method === "jazzcash" ? "JazzCash" : "Easypaisa";
+  const html = emailBase({
+    companyName: "FinovaOS Admin",
+    badgeText: "New PK Payment",
+    badgeColor: "#f59e0b",
+    content: `
+      <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#0f172a;">🇵🇰 New Payment Request</p>
+      <p style="margin:0 0 20px;font-size:14px;color:#64748b;">A customer has submitted a ${methodLabel} payment and is awaiting verification.</p>
+      ${infoGrid([
+        ["Method",       methodLabel],
+        ["Amount",       `PKR ${opts.amountPkr.toLocaleString()}`],
+        ["TX ID",        opts.txId],
+        ["Mobile",       opts.mobileNumber],
+        ["Customer",     opts.customerEmail],
+        ["Plan",         `${opts.plan} · ${opts.billingCycle}`],
+      ])}
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://app.finovaos.app"}/admin/pk-payments"
+           style="display:inline-block;background:#f59e0b;color:#ffffff;text-decoration:none;padding:13px 32px;border-radius:10px;font-size:14px;font-weight:700;">
+          Review in Admin Panel →
+        </a>
+      </div>
+    `,
+  });
+  try {
+    await sendEmail({ to: opts.adminEmail, subject: `🇵🇰 New ${methodLabel} Payment — PKR ${opts.amountPkr.toLocaleString()} — ${opts.customerEmail}`, html });
+  } catch {}
+}
+
+// ─── PK Payment: customer approval/rejection ──────────────────────────────────
+export async function sendPkPaymentStatusEmail(opts: {
+  customerEmail: string;
+  status: "APPROVED" | "REJECTED";
+  plan: string;
+  billingCycle: string;
+  method: string;
+  adminNote?: string | null;
+}): Promise<void> {
+  const methodLabel = opts.method === "jazzcash" ? "JazzCash" : "Easypaisa";
+  const isApproved = opts.status === "APPROVED";
+  const html = emailBase({
+    companyName: "FinovaOS",
+    badgeText: isApproved ? "Payment Verified" : "Payment Not Verified",
+    badgeColor: isApproved ? "#10b981" : "#ef4444",
+    content: isApproved ? `
+      <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#0f172a;">✅ Your Plan is Now Active!</p>
+      <p style="margin:0 0 20px;font-size:14px;color:#64748b;">We have verified your ${methodLabel} payment. Your subscription is now active.</p>
+      ${infoGrid([
+        ["Plan",          `${opts.plan} · ${opts.billingCycle}`],
+        ["Payment",       methodLabel],
+        ["Status",        "Active"],
+        ["Activated",     new Date().toLocaleString("en-PK", { dateStyle: "medium", timeStyle: "short" })],
+      ])}
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://app.finovaos.app"}/dashboard"
+           style="display:inline-block;background:#10b981;color:#ffffff;text-decoration:none;padding:13px 32px;border-radius:10px;font-size:14px;font-weight:700;">
+          Go to Dashboard →
+        </a>
+      </div>
+    ` : `
+      <p style="margin:0 0 4px;font-size:22px;font-weight:800;color:#0f172a;">❌ Payment Could Not Be Verified</p>
+      <p style="margin:0 0 20px;font-size:14px;color:#64748b;">Unfortunately, we could not verify your ${methodLabel} payment. Please contact our support team.</p>
+      ${opts.adminNote ? `<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:14px 16px;margin:16px 0;font-size:13px;color:#991b1b;"><strong>Note:</strong> ${opts.adminNote}</div>` : ""}
+      ${infoGrid([
+        ["Plan",    `${opts.plan} · ${opts.billingCycle}`],
+        ["Payment", methodLabel],
+      ])}
+      <p style="margin:20px 0 0;font-size:13px;color:#64748b;text-align:center;">
+        Contact us at <a href="mailto:support@finovaforge.com" style="color:#6366f1;font-weight:600;">support@finovaforge.com</a> with your Transaction ID for assistance.
+      </p>
+    `,
+  });
+  try {
+    await sendEmail({
+      to: opts.customerEmail,
+      subject: isApproved
+        ? `✅ Payment Verified — Your ${opts.plan} Plan is Active!`
+        : `❌ Payment Not Verified — ${opts.plan} Plan`,
+      html,
+    });
+  } catch {}
+}
+
 // ─── Login alert email ────────────────────────────────────────────────────────
 export async function sendLoginAlertEmail(opts: {
   to: string;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendPkPaymentStatusEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -46,6 +47,15 @@ export async function PATCH(req: NextRequest) {
         },
       });
     }
+
+    sendPkPaymentStatusEmail({
+      customerEmail: updated.email,
+      status,
+      plan: updated.plan,
+      billingCycle: updated.billingCycle,
+      method: updated.method,
+      adminNote: adminNote || null,
+    }).catch(() => {});
 
     return NextResponse.json({ success: true, updated });
   } catch (err) {

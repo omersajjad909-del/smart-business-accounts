@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendPkPaymentReceivedEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,20 @@ export async function POST(req: NextRequest) {
         status: "PENDING",
       },
     });
+
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.SMTP_USER || "";
+    if (adminEmail) {
+      sendPkPaymentReceivedEmail({
+        adminEmail,
+        customerEmail: request.email,
+        method: request.method,
+        mobileNumber: request.mobileNumber,
+        txId: request.txId,
+        amountPkr: request.amountPkr,
+        plan: request.plan,
+        billingCycle: request.billingCycle,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true, id: request.id });
   } catch (err) {
