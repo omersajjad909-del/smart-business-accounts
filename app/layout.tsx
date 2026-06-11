@@ -40,9 +40,6 @@ export const metadata: Metadata = {
   authors: [{ name: "FinovaOS", url: BASE_URL }],
   creator: "FinovaOS",
   publisher: "FinovaOS",
-  alternates: {
-    canonical: BASE_URL,
-  },
   robots: {
     index: true,
     follow: true,

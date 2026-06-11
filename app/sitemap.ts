@@ -28,13 +28,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/trust`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${BASE}/help`,              lastModified: now, changeFrequency: "weekly" as const,  priority: 0.7 },
     { url: `${BASE}/security`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
-    { url: `${BASE}/status`,            lastModified: now, changeFrequency: "daily" as const,   priority: 0.5 },
+    { url: `${BASE}/testimonials`,      lastModified: now, changeFrequency: "weekly" as const,  priority: 0.7 },
+    { url: `${BASE}/industries`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
     // Legal
     { url: `${BASE}/legal/privacy`,     lastModified: now, changeFrequency: "yearly" as const,  priority: 0.4 },
     { url: `${BASE}/legal/terms`,       lastModified: now, changeFrequency: "yearly" as const,  priority: 0.4 },
-    // Auth
-    { url: `${BASE}/login`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.5 },
-    { url: `${BASE}/signup`,            lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
   ];
 
   // Additional high-priority pages
@@ -43,6 +41,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/updates`,            lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6  },
     { url: `${BASE}/support`,            lastModified: now, changeFrequency: "monthly" as const, priority: 0.55 },
     { url: `${BASE}/developers/api`,     lastModified: now, changeFrequency: "monthly" as const, priority: 0.6  },
+    { url: `${BASE}/roles`,              lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6  },
+    { url: `${BASE}/culture`,            lastModified: now, changeFrequency: "monthly" as const, priority: 0.55 },
   ];
 
   // Blog articles — only add real published slugs here
