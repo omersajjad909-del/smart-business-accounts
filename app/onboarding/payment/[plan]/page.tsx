@@ -234,6 +234,10 @@ export default function PaymentPage() {
   const [activating,  setActivating]  = useState(false);
   const [otpError,    setOtpError]    = useState("");
   const [enabledMethods, setEnabledMethods] = useState<PayMethod[]>(FALLBACK_ENABLED_METHODS);
+  const [txId,        setTxId]        = useState("");
+  const [pkPending,   setPkPending]   = useState(false);
+  const [jazzNumber,  setJazzNumber]  = useState<string>("");
+  const [epNumber,    setEpNumber]    = useState<string>("");
 
   /* Coupon */
   const [couponInput,    setCouponInput]    = useState("");
@@ -342,6 +346,12 @@ export default function PaymentPage() {
         if (Array.isArray(data?.enabledMethodIds) && data.enabledMethodIds.length > 0) {
           setEnabledMethods(data.enabledMethodIds as PayMethod[]);
         }
+        if (Array.isArray(data?.gateways)) {
+          const jzGw = data.gateways.find((g: any) => g.key === "JAZZCASH");
+          const epGw = data.gateways.find((g: any) => g.key === "EASYPAISA");
+          try { if (jzGw?.configJson) { const cfg = JSON.parse(jzGw.configJson); setJazzNumber(cfg.accountNumber || ""); } } catch {}
+          try { if (epGw?.configJson) { const cfg = JSON.parse(epGw.configJson); setEpNumber(cfg.accountNumber || ""); } } catch {}
+        }
       } catch {}
     })();
   }, []);
@@ -393,10 +403,52 @@ export default function PaymentPage() {
   const verificationEmail = (lockedVerificationEmail || email).trim().toLowerCase();
   const isVerificationEmailLocked = !!lockedVerificationEmail;
 
+  const isPkMethod = method === "jazzcash" || method === "easypaisa";
+  const pkrRate = rates?.PKR || 280;
+  const pkrAmount = Math.round(finalPrice * pkrRate);
+  const pkAccountNumber = method === "jazzcash" ? jazzNumber : epNumber;
+
+  async function submitPkPayment(userId: string, companyId: string) {
+    try {
+      const res = await fetch("/api/billing/pk-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          companyId,
+          email: verificationEmail,
+          plan,
+          billingCycle,
+          method,
+          mobileNumber: phone,
+          txId,
+          amountPkr: pkrAmount,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPkPending(true);
+        setStep(3);
+      } else {
+        setOtpError(data?.error || "Failed to submit. Please try again.");
+        setActivating(false);
+      }
+    } catch {
+      setOtpError("Network error. Please try again.");
+      setActivating(false);
+    }
+  }
+
   async function activatePlanDirect() {
     const user = getCurrentUser();
     if (!user) { setOtpError("Please sign in again before activating your plan."); return; }
     setActivating(true);
+    if (isPkMethod) {
+      if (!phone)  { setOtpError("Please enter your mobile number"); setActivating(false); return; }
+      if (!txId)   { setOtpError("Please enter the transaction ID"); setActivating(false); return; }
+      await submitPkPayment(user.id || "", user.companyId || "");
+      return;
+    }
     // Save selected payment method for future auto-fill
     try {
       const allMethods = allAvailableMethods;
@@ -440,6 +492,8 @@ export default function PaymentPage() {
 
   async function handlePaymentSubmit() {
     if (!verificationEmail) { setOtpError("Please enter your email address"); return; }
+    if (isPkMethod && !phone) { setOtpError("Please enter your mobile number"); return; }
+    if (isPkMethod && !txId)  { setOtpError("Please enter the transaction ID"); return; }
     setOtpError("");
     const currentUser = getCurrentUser();
     if (currentUser?.id && currentUser?.companyId) { await activatePlanDirect(); return; }
@@ -492,6 +546,10 @@ export default function PaymentPage() {
       }
       const user = verifyData?.user || getCurrentUser();
       if (!user) { setOtpError("Please sign in again."); setActivating(false); return; }
+      if (isPkMethod) {
+        await submitPkPayment(user.id || "", user.companyId || "");
+        return;
+      }
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: {
@@ -823,16 +881,32 @@ export default function PaymentPage() {
 
                   {/* JAZZCASH / EASYPAISA */}
                   {(method === "jazzcash" || method === "easypaisa") && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-                      <div style={{ textAlign:"center", padding:"16px 0 8px" }}>
-                        <div style={{ width:60, height:60, borderRadius:16, background:"rgba(56,189,248,.1)", border:"1px solid rgba(56,189,248,.25)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px", color:"#38bdf8" }}>
-                          <IconJazz />
+                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                      {/* Step instructions */}
+                      <div style={{ padding:"14px 16px", borderRadius:12, background:"rgba(56,189,248,.06)", border:"1px solid rgba(56,189,248,.2)" }}>
+                        <div style={{ fontSize:11, fontWeight:800, color:"#38bdf8", letterSpacing:".06em", textTransform:"uppercase", marginBottom:10 }}>
+                          How to Pay
                         </div>
-                        <div style={{ fontSize:15, fontWeight:700, marginBottom:4 }}>{method==="jazzcash"?"JazzCash":"Easypaisa"} Payment</div>
-                        <div style={{ fontSize:12, color:"rgba(255,255,255,.4)" }}>Enter your registered mobile number</div>
+                        {[
+                          { n:"1", text: pkAccountNumber
+                              ? `Send PKR ${pkrAmount.toLocaleString()} to ${method==="jazzcash"?"JazzCash":"Easypaisa"} number: ${pkAccountNumber}`
+                              : `Send PKR ${pkrAmount.toLocaleString()} to our ${method==="jazzcash"?"JazzCash":"Easypaisa"} account (contact support for number)` },
+                          { n:"2", text:"Enter your mobile number and the transaction ID from your payment receipt below" },
+                          { n:"3", text:"Submit — our team will verify and activate your plan within a few hours" },
+                        ].map(s=>(
+                          <div key={s.n} style={{ display:"flex", gap:10, marginBottom:s.n==="3"?0:8, alignItems:"flex-start" }}>
+                            <div style={{ width:20, height:20, borderRadius:"50%", background:"rgba(56,189,248,.2)", border:"1px solid rgba(56,189,248,.35)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, color:"#38bdf8", flexShrink:0, marginTop:1 }}>{s.n}</div>
+                            <div style={{ fontSize:12, color:"rgba(255,255,255,.65)", lineHeight:1.55 }}>{s.text}</div>
+                          </div>
+                        ))}
                       </div>
-                      <div><label style={lbl}>Mobile Number</label><input value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,"").slice(0,11))} placeholder="03XX-XXXXXXX" style={{...inp,fontFamily:"monospace",letterSpacing:1}}/></div>
-                      <div><label style={lbl}>Account ID (optional)</label><input value={walletId} onChange={e=>setWalletId(e.target.value)} placeholder="Registered wallet ID" style={inp}/></div>
+
+                      <div><label style={lbl}>Your Mobile Number</label><input value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,"").slice(0,11))} placeholder="03XX-XXXXXXX" style={{...inp,fontFamily:"monospace",letterSpacing:1}}/></div>
+                      <div>
+                        <label style={lbl}>Transaction ID <span style={{ color:"#f87171" }}>*</span></label>
+                        <input value={txId} onChange={e=>setTxId(e.target.value.trim())} placeholder="Paste TX ID from receipt" style={{...inp,fontFamily:"monospace"}}/>
+                        <div style={{ fontSize:10, color:"rgba(255,255,255,.25)", marginTop:4 }}>Found in your {method==="jazzcash"?"JazzCash":"Easypaisa"} app under transaction history</div>
+                      </div>
                       <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
@@ -1065,8 +1139,52 @@ export default function PaymentPage() {
           </div>
         )}
 
-        {/* ═══ STEP 3: Success ═══ */}
-        {step === 3 && (() => {
+        {/* ═══ STEP 3: Success / PK Pending ═══ */}
+        {step === 3 && pkPending && (
+          <div style={{ maxWidth:480, margin:"0 auto", textAlign:"center" }}>
+            <div style={{ width:90, height:90, borderRadius:28, background:"rgba(251,191,36,.1)", border:"1.5px solid rgba(251,191,36,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:42, margin:"0 auto 24px" }}>⏳</div>
+            <h2 style={{ margin:"0 0 8px", fontSize:26, fontWeight:900, letterSpacing:"-0.5px", color:"white" }}>Payment Submitted!</h2>
+            <p style={{ fontSize:13, color:"rgba(255,255,255,.45)", lineHeight:1.75, margin:"0 0 28px" }}>
+              We&apos;ve received your transaction details. Our team will verify your payment within <strong style={{ color:"#fbbf24" }}>a few hours</strong> and activate your plan.
+            </p>
+
+            <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:"20px 22px", marginBottom:20, textAlign:"left" }}>
+              <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:14 }}>Submission Summary</div>
+              <div style={{ display:"grid", gap:10 }}>
+                {[
+                  ["Payment Method", method === "jazzcash" ? "📱 JazzCash" : "💳 Easypaisa"],
+                  ["Transaction ID", txId || "—"],
+                  ["Amount", `PKR ${pkrAmount.toLocaleString()}`],
+                  ["Plan", `${plan.charAt(0).toUpperCase()+plan.slice(1)} · ${billing}`],
+                ].map(([label, value]) => (
+                  <div key={label} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:12 }}>
+                    <span style={{ color:"rgba(255,255,255,.35)" }}>{label}</span>
+                    <span style={{ color:"rgba(255,255,255,.8)", fontWeight:600 }}>{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ background:"rgba(251,191,36,.06)", border:"1px solid rgba(251,191,36,.2)", borderRadius:14, padding:"16px 18px", marginBottom:24, textAlign:"left" }}>
+              <div style={{ fontSize:12, fontWeight:700, color:"#fbbf24", marginBottom:6 }}>What happens next?</div>
+              <div style={{ display:"grid", gap:6 }}>
+                {["Our team verifies your TX ID on the payment app","You receive a confirmation email once approved","Your plan activates automatically — no action needed"].map((txt, i) => (
+                  <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start", fontSize:11, color:"rgba(255,255,255,.5)", lineHeight:1.6 }}>
+                    <span style={{ color:"#fbbf24", fontWeight:800, flexShrink:0, marginTop:1 }}>{i+1}.</span>
+                    <span>{txt}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ padding:"12px 18px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", fontSize:11, color:"rgba(255,255,255,.35)", lineHeight:1.7 }}>
+              Questions? Contact us at{" "}
+              <a href="mailto:support@finovaforge.com" style={{ color:"#a5b4fc", textDecoration:"none", fontWeight:600 }}>support@finovaforge.com</a>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && !pkPending && (() => {
           const pm = PLAN_META[plan] || PLAN_META.starter;
           const perks: Record<string,string[]> = {
             starter:      ["Sales & Purchase Invoicing","Inventory Management","Ledger & Trial Balance","Basic Financial Reports","Up to 5 users"],

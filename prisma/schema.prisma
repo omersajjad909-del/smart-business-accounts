@@ -2078,6 +2078,28 @@ model AdminPaymentGateway {
   updatedAt   DateTime @updatedAt
 }
 
+// ================= PK PAYMENT REQUESTS =================
+
+model PkPaymentRequest {
+  id           String   @id @default(cuid())
+  companyId    String?
+  userId       String?
+  email        String
+  plan         String
+  billingCycle String   @default("monthly")
+  method       String
+  mobileNumber String
+  txId         String
+  amountPkr    Float
+  status       String   @default("PENDING")
+  adminNote    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status])
+  @@index([email])
+}
+
 // ================= STATUS SUBSCRIBERS =================
 
 model StatusSubscriber {

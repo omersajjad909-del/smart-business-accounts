@@ -8,6 +8,7 @@ const sections = [
   { name: 'Companies', icon: '🏢', href: '/admin/companies' },
   { name: 'Users', icon: '👤', href: '/admin/users' },
   { name: 'Subscriptions', icon: '💳', href: '/admin/subscriptions' },
+  { name: 'PK Payments 🇵🇰', icon: '📱', href: '/admin/pk-payments' },
   { name: 'Revenue Analytics', icon: '💰', href: '/admin/revenue' },
   { name: 'Geo Analytics', icon: '🌍', href: '/admin/geo' },
   { name: 'Usage Insights', icon: '📈', href: '/admin/usage' },
