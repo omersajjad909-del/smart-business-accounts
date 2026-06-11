@@ -14,6 +14,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "companies",        label: "Companies",         href: "/admin/companies",           group: "Main",      short: "CO", icon: "building" },
   { id: "users",            label: "Users",             href: "/admin/users",               group: "Main",      short: "US", icon: "users" },
   { id: "subscriptions",    label: "Subscriptions",     href: "/admin/subscriptions",       group: "Main",      short: "SB", icon: "credit-card" },
+  { id: "pk-payments",      label: "PK Payments 🇵🇰",   href: "/admin/pk-payments",         group: "Main",      short: "PK", icon: "credit-card", badge: "PK" },
   { id: "plans",            label: "Plans",             href: "/admin/plans",               group: "Main",      short: "PL", icon: "layers" },
   { id: "business-modules", label: "Modules",           href: "/admin/business-modules",    group: "Main",      short: "BM", icon: "box" },
 

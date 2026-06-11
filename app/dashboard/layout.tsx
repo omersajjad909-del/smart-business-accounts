@@ -585,7 +585,7 @@ export default function DashboardLayout({
           if (c.ok) {
             const cj = await c.json();
             const status = String(cj.subscriptionStatus || "").toUpperCase();
-            if (status === "INACTIVE") {
+            if (status === "INACTIVE" || status === "TRIALING") {
               const plan = String(cj.plan || "starter").toLowerCase();
               router.replace(`/onboarding/payment/${plan}`);
               return;
