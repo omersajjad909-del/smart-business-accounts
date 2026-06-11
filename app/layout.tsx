@@ -6,7 +6,7 @@ import CookieBanner from "./(marketing)/landing/components/CookieBanner";
 import { ThemeProvider } from "@/components/theme-provider";
 import VisitorTracker from "@/components/VisitorTracker";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
 const BRAND_ICON_PATH = "/icon1.png";

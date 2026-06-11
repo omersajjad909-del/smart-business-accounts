@@ -60,6 +60,12 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/:path*",
+        has: [{ type: "host", value: "finovaos.app" }],
+        destination: "https://www.finovaos.app/:path*",
+        permanent: true,
+      },
+      {
         source: "/forge",
         destination: "/forge/home",
         permanent: false,

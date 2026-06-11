@@ -1,7 +1,7 @@
 // FILE: app/robots.ts
 import { MetadataRoute } from "next";
 
-const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://finovaos.app";
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
 export default function robots(): MetadataRoute.Robots {
   return {
