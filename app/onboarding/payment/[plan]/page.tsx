@@ -865,17 +865,29 @@ export default function PaymentPage() {
 
                   {/* BANK / WISE */}
                   {(method === "bank" || method === "ach" || method === "sepa") && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-                      <div style={{ padding:"14px 16px", borderRadius:12, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.2)", display:"flex", alignItems:"flex-start", gap:12 }}>
-                        <div style={{ width:32, height:32, borderRadius:9, background:"rgba(52,211,153,.15)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:"#34d399" }}><IconBank /></div>
-                        <div>
-                          <div style={{ fontSize:13, fontWeight:700, color:"#6ee7b7", marginBottom:3 }}>{method === "bank" ? "Bank Transfer via Wise" : method === "ach" ? "ACH Bank Transfer" : "SEPA Bank Transfer"}</div>
-                          <div style={{ fontSize:11, color:"rgba(255,255,255,.45)", lineHeight:1.65 }}>Transfer to our Wise account with local bank rates. Confirmation within 1–2 business days.</div>
-                        </div>
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
+                      <div style={{ width:64, height:64, borderRadius:18, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399" }}>
+                        {method === "sepa" ? <IconSepa /> : method === "ach" ? <IconAch /> : <IconBank />}
                       </div>
-                      <div><label style={lbl}>Your Bank Name</label><input value={bankName} onChange={e=>setBankName(e.target.value)} placeholder="e.g. HBL, MCB, Standard Chartered" style={inp}/></div>
-                      <div><label style={lbl}>Account Number / IBAN</label><input value={accountNo} onChange={e=>setAccountNo(e.target.value)} placeholder="PK36SCBL0000001123456702" style={{...inp,fontFamily:"monospace"}}/></div>
-                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
+                      <div style={{ fontSize:15, fontWeight:700 }}>
+                        {method === "bank" ? "Bank Transfer via Wise" : method === "ach" ? "ACH Bank Transfer" : "SEPA Bank Transfer"}
+                      </div>
+                      <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, width:"100%", marginTop:4 }}>
+                        {(method === "bank"
+                          ? ["Local bank rates","Fast settlement","No hidden fees","Secure transfer"]
+                          : method === "ach"
+                          ? ["US bank debit","Low processing fee","2–3 business days","No card needed"]
+                          : ["EU bank transfer","Single Euro Payments","1–2 business days","No card needed"]
+                        ).map(t => (
+                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.6)", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"9px 12px" }}>
+                            <span style={{ color:"#34d399", fontSize:12 }}>✓</span>{t}
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ width:"100%", padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center", lineHeight:1.65 }}>
+                        Bank transfer details will be shown at checkout · Powered by LemonSqueezy
+                      </div>
+                      <div style={{ width:"100%" }}><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
@@ -913,23 +925,24 @@ export default function PaymentPage() {
 
                   {/* CRYPTO */}
                   {method === "crypto" && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-                      <div><label style={lbl}>Select Cryptocurrency</label>
-                        <select value={coin} onChange={e=>setCoin(e.target.value)} style={{...inp,cursor:"pointer"}}>
-                          <option value="BTC">Bitcoin (BTC)</option>
-                          <option value="ETH">Ethereum (ETH)</option>
-                          <option value="USDT">Tether (USDT)</option>
-                          <option value="BNB">BNB Smart Chain</option>
-                          <option value="SOL">Solana (SOL)</option>
-                          <option value="MATIC">Polygon (MATIC)</option>
-                        </select>
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"32px 20px", textAlign:"center" }}>
+                      <div style={{ width:64, height:64, borderRadius:18, background:"rgba(167,139,250,.1)", border:"1px solid rgba(167,139,250,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#a78bfa" }}>
+                        <IconCrypto />
                       </div>
-                      <div style={{ padding:"16px", borderRadius:12, background:"rgba(251,191,36,.05)", border:"1px solid rgba(251,191,36,.2)", textAlign:"center" }}>
-                        <div style={{ fontSize:10, color:"rgba(255,255,255,.4)", marginBottom:6, letterSpacing:".06em", textTransform:"uppercase" }}>Send to this wallet</div>
-                        <div style={{ fontFamily:"monospace", fontSize:11, color:"#fbbf24", wordBreak:"break-all", lineHeight:1.6 }}>0x742d35Cc6634C0532925a3b8D4C9E5d4f4a2b1c8</div>
+                      <div>
+                        <div style={{ fontSize:15, fontWeight:700, marginBottom:6 }}>Cryptocurrency</div>
+                        <div style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"3px 12px", borderRadius:20, background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.25)", fontSize:10, fontWeight:700, color:"#fbbf24", letterSpacing:".06em", textTransform:"uppercase" }}>
+                          🚀 Coming Soon
+                        </div>
                       </div>
-                      <div><label style={lbl}>Your TX Hash (after sending)</label><input value={cryptoAddr} onChange={e=>setCryptoAddr(e.target.value)} placeholder="Paste transaction hash here" style={{...inp,fontFamily:"monospace",fontSize:11}}/></div>
-                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
+                      <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", lineHeight:1.75, maxWidth:300 }}>
+                        We&apos;re integrating crypto payment support (BTC, ETH, USDT and more). Please choose another payment method for now.
+                      </div>
+                      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8, width:"100%", marginTop:4 }}>
+                        {["BTC","ETH","USDT","BNB","SOL","MATIC"].map(c => (
+                          <div key={c} style={{ padding:"7px 10px", borderRadius:9, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.3)", textAlign:"center" }}>{c}</div>
+                        ))}
+                      </div>
                     </div>
                   )}
 
@@ -1155,7 +1168,7 @@ export default function PaymentPage() {
                   ["Payment Method", method === "jazzcash" ? "📱 JazzCash" : "💳 Easypaisa"],
                   ["Transaction ID", txId || "—"],
                   ["Amount", `PKR ${pkrAmount.toLocaleString()}`],
-                  ["Plan", `${plan.charAt(0).toUpperCase()+plan.slice(1)} · ${billing}`],
+                  ["Plan", `${plan.charAt(0).toUpperCase()+plan.slice(1)} · ${billingCycle}`],
                 ].map(([label, value]) => (
                   <div key={label} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:12 }}>
                     <span style={{ color:"rgba(255,255,255,.35)" }}>{label}</span>
