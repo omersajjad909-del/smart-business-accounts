@@ -175,7 +175,9 @@
       "Bash(crv)",
       "Bash(cpv\")",
       "Bash(find d:/projects -name \"*.tsx\" | xargs grep -l \"pricing\\\\|Pricing\" 2>/dev/null | head -20)",
-      "Read(//d/projects/**)"
+      "Read(//d/projects/**)",
+      "Bash(for page *)",
+      "Read(//d/projects/smart-business-accounts/app/dashboard/trade$page/**)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",
