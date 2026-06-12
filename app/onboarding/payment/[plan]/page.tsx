@@ -406,7 +406,7 @@ export default function PaymentPage() {
   const isVerificationEmailLocked = !!lockedVerificationEmail;
 
   const isPkMethod = method === "jazzcash" || method === "easypaisa";
-  const pkrRate = rates?.PKR || 280;
+  const pkrRate = rates?.PKR || FX_USD["PKR"] || 280;
   const pkrAmount = Math.round(finalPrice * pkrRate);
   const pkAccountNumber = method === "jazzcash" ? jazzNumber : epNumber;
   const pkQrCode = method === "jazzcash" ? jazzQr : epQr;
