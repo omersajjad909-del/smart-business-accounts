@@ -328,12 +328,22 @@ export default function PricingPage() {
   useEffect(() => {
     (async () => {
       const stored = getStoredCurrencyPreference();
-      if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
-      if (stored.country) setCountry(stored.country);
       try {
         const geo = await fetch("/api/public/geo", { cache: "no-store" });
-        if (geo.ok) { const d = await geo.json(); if (d?.currency && FX_USD[d.currency]) { setCurrency(d.currency); setCountry(d.country || stored.country || "US"); } }
-      } catch {}
+        if (geo.ok) {
+          const d = await geo.json();
+          if (d?.currency && FX_USD[d.currency]) setCurrency(d.currency);
+          else if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
+          if (d?.country) setCountry(d.country);
+          else if (stored.country) setCountry(stored.country);
+        } else {
+          if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
+          if (stored.country) setCountry(stored.country);
+        }
+      } catch {
+        if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
+        if (stored.country) setCountry(stored.country);
+      }
       try {
         const fx = await fetch("/api/public/fx", { cache: "no-store" });
         if (fx.ok) { const d = await fx.json(); if (d?.rates) setRates(d.rates); }

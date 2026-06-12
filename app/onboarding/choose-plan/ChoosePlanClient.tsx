@@ -184,22 +184,23 @@ export default function ChoosePlanPage() {
   useEffect(() => {
     (async () => {
       const stored = getStoredCurrencyPreference();
-      if (!searchParams.get("currency") && stored.currency && FX_USD[stored.currency]) {
-        setCurrency(stored.currency);
-      }
-      if (!searchParams.get("country") && stored.country) {
-        setCountry(stored.country);
-      }
-
-      if ((!searchParams.get("currency") || !searchParams.get("country")) && (!stored.currency || !stored.country)) {
+      if (!searchParams.get("currency") || !searchParams.get("country")) {
         try {
           const geo = await fetch("/api/public/geo", { cache: "no-store" });
           if (geo.ok) {
             const data = await geo.json();
-            if (data?.currency && FX_USD[data.currency]) setCurrency(data.currency);
-            if (data?.country) setCountry(data.country);
+            if (!searchParams.get("currency") && data?.currency && FX_USD[data.currency]) setCurrency(data.currency);
+            else if (!searchParams.get("currency") && stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
+            if (!searchParams.get("country") && data?.country) setCountry(data.country);
+            else if (!searchParams.get("country") && stored.country) setCountry(stored.country);
+          } else {
+            if (!searchParams.get("currency") && stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
+            if (!searchParams.get("country") && stored.country) setCountry(stored.country);
           }
-        } catch {}
+        } catch {
+          if (!searchParams.get("currency") && stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
+          if (!searchParams.get("country") && stored.country) setCountry(stored.country);
+        }
       }
 
       try {

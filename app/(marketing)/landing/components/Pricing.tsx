@@ -332,11 +332,7 @@ export default function PricingSection() {
   // Auto-detect currency from location
   useEffect(() => {
     const stored = getStoredCurrencyPreference();
-    if (stored.currency && FX_USD[stored.currency]) {
-      setCurrency(stored.currency);
-      if (stored.country) setCountry(stored.country);
-    }
-    // Always fetch geo to auto-detect location
+    // Geo first, stored as fallback
     fetch("/api/public/geo", { cache: "no-store" })
       .then(r => r.ok ? r.json() : null)
       .then(d => {
@@ -344,9 +340,15 @@ export default function PricingSection() {
           setCurrency(d.currency);
           setStoredCurrencyPreference(d.currency, d.country || null);
           if (d.country) setCountry(d.country);
+        } else {
+          if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
+          if (stored.country) setCountry(stored.country);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
+        if (stored.country) setCountry(stored.country);
+      });
     const onCurrencyChanged = (event: Event) => {
       const detail = (event as CustomEvent<{ currency?: string; country?: string | null }>).detail;
       if (detail?.currency && FX_USD[detail.currency]) setCurrency(detail.currency);
