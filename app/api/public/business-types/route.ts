@@ -15,21 +15,26 @@ export async function GET() {
     if (log?.details) overrides = JSON.parse(log.details);
   } catch {}
 
-  const types = Object.entries(BUSINESS_PHASE_CONFIG).map(([id, cfg]) => {
-    const overrideStatus = overrides[id];
-    const effectiveStatus = overrideStatus || cfg.status;
-    const isLive = effectiveStatus === "live";
+  // export_company is an alias of import_company (both = "Import / Export") — hide from selection
+  const HIDDEN_IDS = new Set(["export_company"]);
 
-    return {
-      id,
-      label: cfg.label,
-      icon: cfg.emoji,
-      phase: cfg.phase,
-      category: cfg.category,
-      description: cfg.description,
-      isLive,
-    };
-  });
+  const types = Object.entries(BUSINESS_PHASE_CONFIG)
+    .filter(([id]) => !HIDDEN_IDS.has(id))
+    .map(([id, cfg]) => {
+      const overrideStatus = overrides[id];
+      const effectiveStatus = overrideStatus || cfg.status;
+      const isLive = effectiveStatus === "live";
+
+      return {
+        id,
+        label: cfg.label,
+        icon: cfg.emoji,
+        phase: cfg.phase,
+        category: cfg.category,
+        description: cfg.description,
+        isLive,
+      };
+    });
 
   const liveIds = types.filter(t => t.isLive).map(t => t.id);
 
