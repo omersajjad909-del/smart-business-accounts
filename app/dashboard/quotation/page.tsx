@@ -55,7 +55,7 @@ type PrintPreferences = {
 };
 
 export default function QuotationPage() {
-  const _router = useRouter();
+  const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const user = getCurrentUser();
 
@@ -92,6 +92,7 @@ export default function QuotationPage() {
   const [searchTerm, _setSearchTerm] = useState("");
 
   const [saving, setSaving] = useState(false);
+  const [converting, setConverting] = useState<string | null>(null);
   const [preview, setPreview] = useState(false);
   const [printMode, setPrintMode] = useState<"none" | "a4" | "55mm">("none");
   const [savedQuotation, setSavedQuotation] = useState<any>(null);
@@ -368,6 +369,65 @@ export default function QuotationPage() {
     }
   }
 
+  async function convertToInvoice(q: Quotation) {
+    if (!await confirmToast(`Convert ${q.quotationNo} to Sales Invoice?`)) return;
+    setConverting(q.id);
+    try {
+      const siRes = await fetch("/api/sales-invoice", {
+        headers: { "x-user-role": user?.role || "", "x-user-id": user?.id || "" },
+      });
+      const siData = await siRes.json();
+      const nextNo = siData.nextNo || "SI-1";
+
+      const invoiceRes = await fetch("/api/sales-invoice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-role": user?.role || "", "x-user-id": user?.id || "" },
+        body: JSON.stringify({
+          invoiceNo: nextNo,
+          customerId: q.customerId,
+          date: today,
+          items: q.items.map((it: any) => ({
+            itemId: it.itemId,
+            qty: it.qty,
+            rate: it.rate,
+          })),
+        }),
+      });
+
+      if (!invoiceRes.ok) {
+        const err = await invoiceRes.json();
+        throw new Error(err.error || "Failed to create invoice");
+      }
+
+      const invoiceData = await invoiceRes.json();
+
+      await fetch("/api/quotation", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-user-role": user?.role || "", "x-user-id": user?.id || "" },
+        body: JSON.stringify({
+          id: q.id,
+          date: new Date(q.date).toISOString().slice(0, 10),
+          customerId: q.customerId,
+          status: "ACCEPTED",
+          items: q.items.map((it: any) => ({
+            itemId: it.itemId,
+            qty: it.qty,
+            rate: it.rate,
+            amount: it.qty * it.rate,
+          })),
+        }),
+      });
+
+      await loadQuotations();
+      toast.success(`Invoice ${invoiceData.invoiceNo} created successfully!`);
+      router.push(`/dashboard/sales-invoice`);
+    } catch (e: any) {
+      toast.error("Conversion failed: " + (e.message || "Unknown error"));
+    } finally {
+      setConverting(null);
+    }
+  }
+
   function resetForm() {
     setEditing(null);
     setCustomerId("");
@@ -495,6 +555,14 @@ export default function QuotationPage() {
                         className="text-blue-600 hover:text-blue-800 font-medium text-sm"
                       >
                         Edit
+                      </button>
+                      <button
+                        onClick={() => convertToInvoice(q)}
+                        disabled={converting === q.id || q.status === "ACCEPTED"}
+                        className="text-green-600 hover:text-green-800 font-medium text-sm disabled:opacity-40"
+                        title={q.status === "ACCEPTED" ? "Already converted" : "Convert to Sales Invoice"}
+                      >
+                        {converting === q.id ? "..." : "→ Invoice"}
                       </button>
                       <button
                         onClick={() => deleteQuotation(q.id)}

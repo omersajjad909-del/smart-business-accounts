@@ -425,6 +425,23 @@ export async function PUT(req: NextRequest) {
     const total = subtotal - discountAmt + taxAmount + Number(freight);
 
     const result = await prisma.$transaction(async (tx: TxClient) => {
+      // Reverse old inventory txns (SALE stored negative qty; reversal restores stock)
+      for (const oldItem of existing.items) {
+        if (!oldItem.itemId) continue;
+        await tx.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "SALE_RETURN",
+            date: new Date(date),
+            itemId: oldItem.itemId,
+            qty: Number(oldItem.qty),
+            rate: Number(oldItem.rate),
+            amount: Number(oldItem.qty) * Number(oldItem.rate),
+            location: existing.location || "MAIN",
+          },
+        });
+      }
+
       await tx.salesInvoiceItem.deleteMany({ where: { invoiceId: id } });
 
       const invoice = await tx.salesInvoice.update({
@@ -467,6 +484,47 @@ export async function PUT(req: NextRequest) {
           taxConfig: true
         },
       });
+
+      // Create new inventory transactions for updated items
+      for (const i of items) {
+        if (!i.itemId) continue;
+        await tx.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "SALE",
+            date: new Date(date),
+            itemId: i.itemId,
+            qty: -Number(i.qty),
+            rate: Number(i.rate),
+            amount: Number(i.qty) * Number(i.rate),
+            location: _location || "MAIN",
+          },
+        });
+      }
+
+      // Update GL voucher to reflect new totals
+      const voucher = await tx.voucher.findFirst({
+        where: { voucherNo: existing.invoiceNo, type: "SI", companyId },
+      });
+      if (voucher) {
+        await tx.voucherEntry.deleteMany({ where: { voucherId: voucher.id } });
+        const salesAcc = await tx.account.findFirst({
+          where: { name: { equals: "Sales", mode: "insensitive" }, companyId },
+        });
+        if (salesAcc) {
+          const customerId = _customerId || existing.customerId;
+          await tx.voucherEntry.createMany({
+            data: [
+              { voucherId: voucher.id, companyId, accountId: customerId, amount: total + Number(freight) + taxAmount },
+              { voucherId: voucher.id, companyId, accountId: salesAcc.id, amount: -(total + Number(freight) + taxAmount) },
+            ],
+          });
+        }
+        await tx.voucher.update({
+          where: { id: voucher.id },
+          data: { date: new Date(date) },
+        });
+      }
 
       await tx.currencyTransaction.deleteMany({
         where: { transactionType: "INVOICE", transactionId: id },
@@ -523,7 +581,10 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
     }
 
-    const existing = await prisma.salesInvoice.findFirst({ where: { id, companyId } });
+    const existing = await prisma.salesInvoice.findFirst({
+      where: { id, companyId },
+      include: { items: true },
+    });
     if (!existing) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
@@ -536,6 +597,23 @@ export async function DELETE(req: NextRequest) {
       if (voucher) {
         await tx.voucherEntry.deleteMany({ where: { voucherId: voucher.id } });
         await tx.voucher.delete({ where: { id: voucher.id } });
+      }
+
+      // Reverse inventory transactions on delete
+      for (const oldItem of existing.items) {
+        if (!oldItem.itemId) continue;
+        await tx.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "SALE_RETURN",
+            date: new Date(),
+            itemId: oldItem.itemId,
+            qty: Number(oldItem.qty),
+            rate: Number(oldItem.rate),
+            amount: Number(oldItem.qty) * Number(oldItem.rate),
+            location: existing.location || "MAIN",
+          },
+        });
       }
 
       await tx.salesInvoiceItem.deleteMany({ where: { invoiceId: id } });

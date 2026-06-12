@@ -177,7 +177,8 @@
       "Bash(find d:/projects -name \"*.tsx\" | xargs grep -l \"pricing\\\\|Pricing\" 2>/dev/null | head -20)",
       "Read(//d/projects/**)",
       "Bash(for page *)",
-      "Read(//d/projects/smart-business-accounts/app/dashboard/trade$page/**)"
+      "Read(//d/projects/smart-business-accounts/app/dashboard/trade$page/**)",
+      "Bash(node --max-old-space-size=4096 ./node_modules/.bin/tsc --noEmit)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",

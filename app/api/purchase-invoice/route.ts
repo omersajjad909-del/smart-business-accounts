@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient ,Prisma as _Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId, resolveBranchIdOrDefault } from "@/lib/tenant";
 import { ensureOpenPeriod } from "@/lib/financialLock";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -356,12 +356,9 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    // Note: Updating purchase invoices is complex due to inventory transactions
-    // For now, we'll just update the invoice data
     const validItems = items.filter((i: any) => Number(i.qty) > 0 && i.itemId);
     const totalItemsAmount = validItems.reduce((s: number, i: any) => s + (Number(i.qty) * Number(i.rate)), 0);
-    
-    // Calculate tax if applied
+
     let taxAmount = 0;
     if (applyTax && taxConfigId) {
       const tax = await prisma.taxConfiguration.findFirst({
@@ -371,58 +368,116 @@ export async function PUT(req: NextRequest) {
         taxAmount = (totalItemsAmount * tax.taxRate) / 100;
       }
     }
-    
+
     const netTotal = totalItemsAmount + Number(freight) + taxAmount;
 
-    // const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const tx = prisma;
 
-      await tx.purchaseInvoiceItem.deleteMany({ where: { invoiceId: id } });
-
-      const invoice = await tx.purchaseInvoice.update({
-        where: { id },
+    // Reverse old inventory txns (PURCHASE stored positive qty; reversal removes stock)
+    for (const oldItem of existing.items) {
+      if (!oldItem.itemId) continue;
+      await tx.inventoryTxn.create({
         data: {
+          companyId,
+          type: "PURCHASE_RETURN",
           date: new Date(date),
-          total: netTotal,
-          approvalStatus,
-          taxConfigId: applyTax ? taxConfigId : null,
-          items: {
-            create: validItems.map((i: any) => ({
-              itemId: i.itemId,
-              qty: Number(i.qty),
-              rate: Number(i.rate),
-              amount: Number(i.qty) * Number(i.rate),
-            })),
-          },
-        },
-        include: {
-          supplier: true,
-          items: {
-            include: { item: true },
-          },
-          taxConfig: true
+          itemId: oldItem.itemId,
+          qty: -Number(oldItem.qty),
+          rate: Number(oldItem.rate),
+          amount: Number(oldItem.qty) * Number(oldItem.rate),
+          location: _location || "MAIN",
         },
       });
+    }
 
-      await tx.currencyTransaction.deleteMany({
-        where: { transactionType: "INVOICE", transactionId: id },
+    await tx.purchaseInvoiceItem.deleteMany({ where: { invoiceId: id } });
+
+    const invoice = await tx.purchaseInvoice.update({
+      where: { id },
+      data: {
+        date: new Date(date),
+        total: netTotal,
+        approvalStatus,
+        taxConfigId: applyTax ? taxConfigId : null,
+        items: {
+          create: validItems.map((i: any) => ({
+            itemId: i.itemId,
+            qty: Number(i.qty),
+            rate: Number(i.rate),
+            amount: Number(i.qty) * Number(i.rate),
+          })),
+        },
+      },
+      include: {
+        supplier: true,
+        items: { include: { item: true } },
+        taxConfig: true
+      },
+    });
+
+    // Create new inventory transactions for updated items
+    for (const i of validItems) {
+      await tx.inventoryTxn.create({
+        data: {
+          type: "PURCHASE",
+          date: new Date(date),
+          itemId: i.itemId,
+          qty: Math.abs(Number(i.qty)),
+          rate: Number(i.rate),
+          amount: Number(i.qty) * Number(i.rate),
+          location: _location || "MAIN",
+          partyId: existing.supplierId,
+          companyId,
+        },
       });
-      if (currencyId) {
-        await tx.currencyTransaction.create({
-          data: {
-            transactionType: "INVOICE",
-            transactionId: id,
-            currencyId,
-            amountInLocal: netTotal,
-            amountInBase: netTotal * Number(exchangeRate || 1),
-            exchangeRate: Number(exchangeRate || 1),
-            conversionDate: new Date(date),
-          },
+    }
+
+    // Update GL voucher to reflect new totals
+    const voucher = await tx.voucher.findFirst({
+      where: { voucherNo: existing.invoiceNo, type: "PI", companyId },
+    });
+    if (voucher) {
+      await tx.voucherEntry.deleteMany({ where: { voucherId: voucher.id } });
+      let inventoryAcc = await tx.account.findFirst({
+        where: {
+          OR: [
+            { name: { equals: "Stock/Inventory", mode: "insensitive" } },
+            { code: { equals: "INV001", mode: "insensitive" } },
+          ],
+          companyId,
+        },
+      });
+      if (inventoryAcc) {
+        await tx.voucherEntry.createMany({
+          data: [
+            { voucherId: voucher.id, companyId, accountId: inventoryAcc.id, amount: netTotal },
+            { voucherId: voucher.id, companyId, accountId: existing.supplierId, amount: -netTotal },
+          ],
         });
       }
+      await tx.voucher.update({
+        where: { id: voucher.id },
+        data: { date: new Date(date) },
+      });
+    }
 
-      // return invoice;
-    // });
+    await tx.currencyTransaction.deleteMany({
+      where: { transactionType: "INVOICE", transactionId: id },
+    });
+    if (currencyId) {
+      await tx.currencyTransaction.create({
+        data: {
+          transactionType: "INVOICE",
+          transactionId: id,
+          currencyId,
+          amountInLocal: netTotal,
+          amountInBase: netTotal * Number(exchangeRate || 1),
+          exchangeRate: Number(exchangeRate || 1),
+          conversionDate: new Date(date),
+        },
+      });
+    }
+
     const result = invoice;
 
     return NextResponse.json({ success: true, invoice: result });
@@ -454,21 +509,46 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Invoice ID required" }, { status: 400 });
     }
 
-    // await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const tx = prisma;
 
-      const existing = await tx.purchaseInvoice.findFirst({
-        where: { id, companyId },
-        select: { id: true },
+    const existingPI = await tx.purchaseInvoice.findFirst({
+      where: { id, companyId },
+      include: { items: true },
+    });
+
+    if (!existingPI) {
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    }
+
+    // Reverse inventory transactions on delete
+    for (const oldItem of existingPI.items) {
+      if (!oldItem.itemId) continue;
+      await tx.inventoryTxn.create({
+        data: {
+          companyId,
+          type: "PURCHASE_RETURN",
+          date: new Date(),
+          itemId: oldItem.itemId,
+          qty: -Number(oldItem.qty),
+          rate: Number(oldItem.rate),
+          amount: Number(oldItem.qty) * Number(oldItem.rate),
+          location: "MAIN",
+        },
       });
+    }
 
-      if (!existing) {
-        return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
-      }
+    // Reverse GL voucher on delete
+    const piVoucher = await tx.voucher.findFirst({
+      where: { voucherNo: existingPI.invoiceNo, type: "PI", companyId },
+      select: { id: true },
+    });
+    if (piVoucher) {
+      await tx.voucherEntry.deleteMany({ where: { voucherId: piVoucher.id } });
+      await tx.voucher.delete({ where: { id: piVoucher.id } });
+    }
 
-      await tx.purchaseInvoiceItem.deleteMany({ where: { invoiceId: id } });
-      await tx.purchaseInvoice.delete({ where: { id } });
-    // });
+    await tx.purchaseInvoiceItem.deleteMany({ where: { invoiceId: id } });
+    await tx.purchaseInvoice.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (e: any) {

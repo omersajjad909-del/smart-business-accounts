@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import {
   fetchJson,
   formatDate,
@@ -15,11 +16,18 @@ import {
   type TradingControlCenter,
 } from "../_shared";
 
+const REASONS = ["Physical Count", "Damaged / Broken", "Theft / Loss", "Found (surplus)", "Expired / Disposal", "Data Correction", "Other"];
+
 export default function TradingStockControlPage() {
   const [stock, setStock] = useState<StockRow[]>([]);
   const [outward, setOutward] = useState<OutwardLite[]>([]);
+  const [adjModal, setAdjModal] = useState(false);
+  const [adjItem, setAdjItem] = useState<StockRow | null>(null);
+  const [adjQty, setAdjQty] = useState("");
+  const [adjReason, setAdjReason] = useState(REASONS[0]);
+  const [adjSaving, setAdjSaving] = useState(false);
 
-  useEffect(() => {
+  function loadData() {
     fetchJson<TradingControlCenter>("/api/trading/control-center", {
       summary: {},
       quotations: [],
@@ -37,7 +45,36 @@ export default function TradingStockControlPage() {
       setStock(result.stock || []);
       setOutward(result.outwards || []);
     });
-  }, []);
+  }
+
+  useEffect(() => { loadData(); }, []);
+
+  async function handleAdjust() {
+    if (!adjItem || adjQty === "") return;
+    setAdjSaving(true);
+    try {
+      const res = await fetch("/api/stock-adjustment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-role": "ADMIN" },
+        body: JSON.stringify({ itemId: adjItem.itemId, physicalQty: Number(adjQty), reason: adjReason }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Adjustment failed");
+      if (data.diff === 0) {
+        toast("No change — physical count matches system.");
+      } else {
+        toast.success(`Stock adjusted by ${data.diff > 0 ? "+" : ""}${data.diff} units.`);
+      }
+      setAdjModal(false);
+      setAdjItem(null);
+      setAdjQty("");
+      loadData();
+    } catch (e: any) {
+      toast.error(e.message || "Adjustment failed");
+    } finally {
+      setAdjSaving(false);
+    }
+  }
 
   const stockValue = useMemo(
     () => stock.reduce((sum, row) => sum + Number(row.stockValue || 0), 0),
@@ -69,6 +106,9 @@ export default function TradingStockControlPage() {
           <Link prefetch={false} href="/dashboard/inventory" style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(245,158,11,.14)", border: "1px solid rgba(245,158,11,.24)", color: "#f59e0b", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
             Inventory Master
           </Link>
+          <button onClick={() => { setAdjItem(null); setAdjQty(""); setAdjReason(REASONS[0]); setAdjModal(true); }} style={{ padding: "10px 16px", borderRadius: 10, background: "rgba(167,139,250,.14)", border: "1px solid rgba(167,139,250,.24)", color: "#a78bfa", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+            Adjust Stock
+          </button>
           <Link prefetch={false} href="/dashboard/outward" style={{ padding: "10px 16px", borderRadius: 10, background: "#f59e0b", color: "#1a1305", textDecoration: "none", fontSize: 13, fontWeight: 800 }}>
             New Outward
           </Link>
@@ -95,7 +135,7 @@ export default function TradingStockControlPage() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr>
-                {["Item", "Unit", "Qty", "Value"].map((header) => (
+                {["Item", "Unit", "Qty", "Value", ""].map((header) => (
                   <th key={header} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: tradingMuted, borderBottom: `1px solid ${tradingBorder}` }}>{header}</th>
                 ))}
               </tr>
@@ -107,11 +147,14 @@ export default function TradingStockControlPage() {
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>{row.unit || "-"}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: Number(row.stockQty || 0) <= 5 ? "#f59e0b" : "#38bdf8", fontWeight: 700 }}>{row.stockQty}</td>
                   <td style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,.04)", color: "#34d399", fontWeight: 700 }}>{formatMoney(row.stockValue)}</td>
+                  <td style={{ padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                    <button onClick={() => { setAdjItem(row); setAdjQty(String(row.stockQty)); setAdjModal(true); }} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, background: "rgba(167,139,250,.14)", border: "1px solid rgba(167,139,250,.24)", color: "#a78bfa", cursor: "pointer", fontWeight: 700 }}>Adjust</button>
+                  </td>
                 </tr>
               ))}
               {stock.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: 28, textAlign: "center", color: "var(--text-muted)" }}>No stock report data available.</td>
+                  <td colSpan={5} style={{ padding: 28, textAlign: "center", color: "var(--text-muted)" }}>No stock report data available.</td>
                 </tr>
               )}
             </tbody>
@@ -154,6 +197,52 @@ export default function TradingStockControlPage() {
           </div>
         </div>
       </div>
+
+      {/* Stock Adjustment Modal */}
+      {adjModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+          <div style={{ background: "var(--bg-card)", border: `1px solid ${tradingBorder}`, borderRadius: 18, padding: 28, width: 380, maxWidth: "95vw", fontFamily: tradingFont }}>
+            <h3 style={{ margin: "0 0 20px", fontSize: 17, fontWeight: 800 }}>Stock Adjustment</h3>
+            {!adjItem ? (
+              <div>
+                <p style={{ fontSize: 13, color: tradingMuted, marginBottom: 14 }}>Select an item to adjust:</p>
+                <div style={{ maxHeight: 260, overflowY: "auto", display: "grid", gap: 8 }}>
+                  {stock.map((row) => (
+                    <button key={row.itemId} onClick={() => { setAdjItem(row); setAdjQty(String(row.stockQty)); }} style={{ textAlign: "left", padding: "12px 14px", borderRadius: 10, background: tradingBg, border: `1px solid ${tradingBorder}`, cursor: "pointer", display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ fontWeight: 700, color: "var(--text-primary)" }}>{row.itemName}</span>
+                      <span style={{ color: "#38bdf8", fontWeight: 700 }}>Qty: {row.stockQty}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gap: 16 }}>
+                <div style={{ padding: "12px 14px", borderRadius: 10, background: tradingBg, border: `1px solid ${tradingBorder}` }}>
+                  <div style={{ fontWeight: 800 }}>{adjItem.itemName}</div>
+                  <div style={{ fontSize: 12, color: tradingMuted, marginTop: 4 }}>System qty: <strong style={{ color: "#38bdf8" }}>{adjItem.stockQty}</strong></div>
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, color: tradingMuted, display: "block", marginBottom: 6 }}>Physical Count (actual qty)</label>
+                  <input type="number" value={adjQty} onChange={e => setAdjQty(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${tradingBorder}`, background: tradingBg, color: "var(--text-primary)", fontSize: 16, fontWeight: 700 }} />
+                  {adjQty !== "" && <div style={{ fontSize: 12, marginTop: 6, color: Number(adjQty) - adjItem.stockQty >= 0 ? "#34d399" : "#f87171" }}>
+                    Adjustment: {Number(adjQty) - adjItem.stockQty >= 0 ? "+" : ""}{Number(adjQty) - adjItem.stockQty} units
+                  </div>}
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, color: tradingMuted, display: "block", marginBottom: 6 }}>Reason</label>
+                  <select value={adjReason} onChange={e => setAdjReason(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${tradingBorder}`, background: tradingBg, color: "var(--text-primary)" }}>
+                    {REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
+              <button onClick={() => { setAdjModal(false); setAdjItem(null); }} style={{ padding: "10px 20px", borderRadius: 8, border: `1px solid ${tradingBorder}`, background: "transparent", color: tradingMuted, cursor: "pointer" }}>Cancel</button>
+              {adjItem && <button onClick={handleAdjust} disabled={adjSaving || adjQty === ""} style={{ padding: "10px 20px", borderRadius: 8, background: "#a78bfa", color: "#160d2a", fontWeight: 800, border: "none", cursor: "pointer", opacity: adjSaving ? 0.6 : 1 }}>{adjSaving ? "Saving..." : "Apply Adjustment"}</button>}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

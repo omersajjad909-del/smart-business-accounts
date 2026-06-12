@@ -55,6 +55,22 @@ export async function POST(req: NextRequest) {
       include: { items: true },
     });
 
+    // Deduct stock for each outward item
+    for (const i of items) {
+      await prisma.inventoryTxn.create({
+        data: {
+          companyId,
+          type: "OUTWARD",
+          date: new Date(date),
+          itemId: i.itemId,
+          qty: -Number(i.qty),
+          rate: 0,
+          amount: 0,
+          location: "MAIN",
+        },
+      });
+    }
+
     return NextResponse.json(entry);
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -123,10 +139,26 @@ export async function PUT(req: NextRequest) {
     const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const existing = await tx.outward.findFirst({
         where: { id, companyId },
-        select: { id: true },
+        include: { items: true },
       });
       if (!existing) {
         throw new Error("Outward not found");
+      }
+
+      // Reverse old inventory transactions
+      for (const oldItem of existing.items) {
+        await tx.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "OUTWARD_RETURN",
+            date: new Date(date),
+            itemId: oldItem.itemId,
+            qty: Number(oldItem.qty),
+            rate: 0,
+            amount: 0,
+            location: "MAIN",
+          },
+        });
       }
 
       await tx.outwardItem.deleteMany({ where: { outwardId: id } });
@@ -154,6 +186,22 @@ export async function PUT(req: NextRequest) {
           items: { include: { item: true } },
         },
       });
+
+      // Create new inventory transactions
+      for (const i of items) {
+        await tx.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "OUTWARD",
+            date: new Date(date),
+            itemId: i.itemId,
+            qty: -Number(i.qty),
+            rate: 0,
+            amount: 0,
+            location: "MAIN",
+          },
+        });
+      }
 
       return outward;
     });
@@ -188,11 +236,28 @@ export async function DELETE(req: NextRequest) {
     await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const existing = await tx.outward.findFirst({
         where: { id, companyId },
-        select: { id: true },
+        include: { items: true },
       });
       if (!existing) {
         throw new Error("Outward not found");
       }
+
+      // Reverse inventory transactions on delete
+      for (const oldItem of existing.items) {
+        await tx.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "OUTWARD_RETURN",
+            date: new Date(),
+            itemId: oldItem.itemId,
+            qty: Number(oldItem.qty),
+            rate: 0,
+            amount: 0,
+            location: "MAIN",
+          },
+        });
+      }
+
       await tx.outwardItem.deleteMany({ where: { outwardId: id } });
       await tx.outward.delete({ where: { id } });
     });

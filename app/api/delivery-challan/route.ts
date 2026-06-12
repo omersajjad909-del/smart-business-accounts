@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
           create: data.items.map((item) => ({
             itemId: item.itemId,
             qty: item.qty,
-            rate: item.rate || 0, // Store 0 if not provided
+            rate: item.rate || 0,
           })),
         },
       },
@@ -102,6 +102,24 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // Deduct stock when challan is created as DELIVERED (immediate dispatch)
+    if ((data.status || "PENDING") === "DELIVERED") {
+      for (const item of data.items) {
+        await prisma.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "CHALLAN_OUT",
+            date: new Date(data.date),
+            itemId: item.itemId,
+            qty: -item.qty,
+            rate: item.rate || 0,
+            amount: item.qty * (item.rate || 0),
+            location: "MAIN",
+          },
+        });
+      }
+    }
 
     return NextResponse.json(challan);
   } catch (error: any) {
@@ -128,14 +146,17 @@ export async function PUT(req: NextRequest) {
 
     if (!data.id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
+    const existingChallan = await prisma.deliveryChallan.findFirst({
+      where: { id: data.id, companyId },
+      select: { status: true },
+    });
+
     // Transaction to update: delete old items, create new ones
     const updated = await prisma.$transaction(async (tx) => {
-      // 1. Delete existing items
       await tx.deliveryChallanItem.deleteMany({
         where: { challanId: data.id, challan: { companyId } },
       });
 
-      // 2. Update Challan
       return await tx.deliveryChallan.update({
         where: { id: data.id, companyId, ...(branchId ? { branchId } : {}) },
         data: {
@@ -155,12 +176,30 @@ export async function PUT(req: NextRequest) {
         },
         include: {
           customer: true,
-          items: {
-            include: { item: true },
-          },
+          items: { include: { item: true } },
         },
       });
     });
+
+    // Deduct stock when status transitions to DELIVERED
+    const wasNotDelivered = existingChallan?.status !== "DELIVERED";
+    const nowDelivered = data.status === "DELIVERED";
+    if (wasNotDelivered && nowDelivered) {
+      for (const item of data.items) {
+        await prisma.inventoryTxn.create({
+          data: {
+            companyId,
+            type: "CHALLAN_OUT",
+            date: new Date(data.date),
+            itemId: item.itemId,
+            qty: -item.qty,
+            rate: item.rate || 0,
+            amount: item.qty * (item.rate || 0),
+            location: "MAIN",
+          },
+        });
+      }
+    }
 
     return NextResponse.json(updated);
   } catch (error: any) {
