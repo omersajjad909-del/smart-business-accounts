@@ -1765,6 +1765,7 @@ export default function DashboardLayout({
               {hasDashboardFeature("TRADE_REBATE") && <NavLink href="/dashboard/trade/rebate" pathname={pathname}>Rebate / Drawback</NavLink>}
               {hasDashboardFeature("TRADE_EXPORT_PERFORMANCE") && <NavLink href="/dashboard/reports/export-performance" pathname={pathname}>Export Performance</NavLink>}
               {hasDashboardFeature("TRADE_ANALYTICS") && <NavLink href="/dashboard/trade/analytics" pathname={pathname}>Analytics</NavLink>}
+              {hasDashboardFeature("CNF_JOBS") && <NavLink href="/dashboard/cnf" pathname={pathname}>C&F Jobs</NavLink>}
             </NavGroup>
           )}
 

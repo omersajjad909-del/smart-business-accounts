@@ -1250,6 +1250,15 @@ export const DASHBOARD_FEATURE_DEFS: DashboardFeatureDefinition[] = [
     businessTypes: ["import_company", "export_company", "clearing_forwarding"],
   },
   {
+    id: "CNF_JOBS",
+    label: "C&F Job Files",
+    route: "/dashboard/cnf",
+    business: "trade",
+    businessLabel: "Clearing & Forwarding",
+    section: "C&F Operations",
+    businessTypes: ["clearing_forwarding"],
+  },
+  {
     id: "TRADE_CONTAINERS",
     label: "Containers",
     route: "/dashboard/trade/containers",
