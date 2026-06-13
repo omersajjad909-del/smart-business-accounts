@@ -21,6 +21,7 @@ const COMPANY_LINKS = [
   { label: "Affiliate Program",  href: "/affiliate" },
   { label: "Privacy Policy",     href: "/legal/privacy" },
   { label: "Terms of Service",   href: "/legal/terms" },
+  { label: "Refund Policy",      href: "/legal/refund" },
 ];
 
 const SOCIALS_DEFAULT = [
@@ -33,6 +34,7 @@ const SOCIALS_DEFAULT = [
 const BOTTOM_LINKS = [
   { label: "Privacy",  href: "/legal/privacy" },
   { label: "Terms",    href: "/legal/terms" },
+  { label: "Refund",   href: "/legal/refund" },
   { label: "Security", href: "/security" },
   { label: "Sitemap",  href: "/all-pages" },
   { label: "Status",   href: "/status" },
