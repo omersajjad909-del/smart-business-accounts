@@ -1,8 +1,11 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { getCurrentUser } from "@/lib/auth";
+import toast from "react-hot-toast";
 
-const BLANK = { item: "", batch: "", mfgDate: "", expDate: "", qty: "", unit: "Units", supplier: "" };
+const BLANK = { itemId: "", item: "", batch: "", mfgDate: "", expDate: "", qty: "", unit: "Units", supplier: "" };
+type InventoryItem = { id: string; name: string; code?: string };
 
 function daysUntil(expDate: string) {
   if (!expDate) return 999;
@@ -22,12 +25,50 @@ export default function BatchExpiryPage() {
   const [form, setForm] = useState(BLANK);
   const [filter, setFilter] = useState("all");
   const [saving, setSaving] = useState(false);
+  const [writingOff, setWritingOff] = useState<string | null>(null);
+  const [allItems, setAllItems] = useState<InventoryItem[]>([]);
+  const [itemSearch, setItemSearch] = useState("");
+  const [showItemDrop, setShowItemDrop] = useState(false);
+
+  useEffect(() => {
+    const u = getCurrentUser();
+    const h: Record<string, string> = u ? { "x-user-id": u.id, "x-user-role": u.role ?? "", "x-company-id": u.companyId || "" } : {};
+    fetch("/api/items-new", { headers: h })
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setAllItems(Array.isArray(d) ? d.map((i: any) => ({ id: i.id, name: i.name, code: i.code })) : []))
+      .catch(() => {});
+  }, []);
+
+  const itemResults = itemSearch.length >= 1
+    ? allItems.filter(i => i.name.toLowerCase().includes(itemSearch.toLowerCase()) || (i.code || "").toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 8)
+    : [];
+
+  async function handleWriteOff(b: { id: string; itemId?: string; qty: number; item: string }) {
+    if (writingOff) return;
+    setWritingOff(b.id);
+    try {
+      if (b.itemId && b.qty > 0) {
+        const u = getCurrentUser();
+        const h = { "Content-Type": "application/json", ...(u ? { "x-user-id": u.id, "x-user-role": u.role ?? "ADMIN", "x-company-id": u.companyId || "" } : {}) };
+        const res = await fetch("/api/inventory-txn", {
+          method: "POST",
+          headers: h,
+          body: JSON.stringify({ type: "ADJUSTMENT", itemId: b.itemId, qty: -b.qty, location: "MAIN", date: new Date().toISOString(), rate: 0, amount: 0 }),
+        });
+        if (!res.ok) { toast.error("Inventory write-off failed"); return; }
+        toast.success(`${b.qty} units of "${b.item}" written off from inventory`);
+      }
+      await remove(b.id);
+    } catch { toast.error("Write-off failed"); }
+    finally { setWritingOff(null); }
+  }
 
   const batches = useMemo(() =>
     records.map(r => {
       const days = daysUntil(String(r.data.expDate || r.date || ""));
       return {
         id: r.id,
+        itemId: String(r.data.itemId || ""),
         item: r.title,
         batch: String(r.data.batch || ""),
         mfgDate: String(r.data.mfgDate || ""),
@@ -58,10 +99,11 @@ export default function BatchExpiryPage() {
         title: form.item,
         status: statusKey,
         date: form.expDate,
-        data: { batch: form.batch, mfgDate: form.mfgDate, expDate: form.expDate, qty: Number(form.qty) || 0, unit: form.unit, supplier: form.supplier },
+        data: { itemId: form.itemId, batch: form.batch, mfgDate: form.mfgDate, expDate: form.expDate, qty: Number(form.qty) || 0, unit: form.unit, supplier: form.supplier },
       });
       setShowModal(false);
       setForm(BLANK);
+      setItemSearch("");
     } finally {
       setSaving(false);
     }
@@ -131,8 +173,14 @@ export default function BatchExpiryPage() {
                   <td style={{ padding: "11px 14px" }}>
                     <span style={{ background: b.bg, color: b.color, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{b.label}</span>
                   </td>
-                  <td style={{ padding: "11px 14px" }}>
-                    <button onClick={() => remove(b.id)} style={{ background: "rgba(239,68,68,.08)", color: "#ef4444", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Remove</button>
+                  <td style={{ padding: "11px 14px", display: "flex", gap: 6 }}>
+                    {b.daysLeft <= 0 && b.qty > 0 ? (
+                      <button onClick={() => handleWriteOff(b)} disabled={writingOff === b.id} style={{ background: "rgba(239,68,68,.12)", color: "#ef4444", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer", fontWeight: 700, opacity: writingOff === b.id ? 0.6 : 1 }}>
+                        {writingOff === b.id ? "…" : "Write-off"}
+                      </button>
+                    ) : (
+                      <button onClick={() => remove(b.id)} style={{ background: "rgba(239,68,68,.08)", color: "#ef4444", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Remove</button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -150,9 +198,18 @@ export default function BatchExpiryPage() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Item Name *</label>
-                  <input value={form.item} onChange={e => setForm(p => ({ ...p, item: e.target.value }))} placeholder="e.g. Panadol 500mg" style={{ ...inp, marginTop: 6 }} />
+                <div style={{ position: "relative" }}>
+                  <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Item *</label>
+                  <input value={itemSearch} onChange={e => { setItemSearch(e.target.value); setShowItemDrop(true); setForm(p => ({ ...p, itemId: "", item: e.target.value })); }} onFocus={() => setShowItemDrop(true)} placeholder="Search or type item name" style={{ ...inp, marginTop: 6 }} />
+                  {showItemDrop && itemResults.length > 0 && (
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, zIndex: 50, maxHeight: 160, overflowY: "auto", marginTop: 2 }}>
+                      {itemResults.map(item => (
+                        <button key={item.id} onMouseDown={() => { setForm(p => ({ ...p, itemId: item.id, item: item.name })); setItemSearch(item.name); setShowItemDrop(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "8px 12px", background: "none", border: "none", color: "var(--text-primary)", cursor: "pointer", fontSize: 12 }}>
+                          {item.name} {item.code && <span style={{ color: "var(--text-muted)" }}>({item.code})</span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Batch No. *</label>

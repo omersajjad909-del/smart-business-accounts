@@ -169,7 +169,9 @@ export default function StockAdjustmentPage() {
                   </td>
                   <td style={{ padding: "11px 14px" }}>
                     {row.status === "PENDING" && (
-                      <button onClick={() => setStatus(row.id, "APPROVED")} style={{ background: "rgba(16,185,129,.1)", color: "#10b981", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Approve</button>
+                      <button onClick={() => handleApprove(row)} disabled={approving === row.id} style={{ background: "rgba(16,185,129,.1)", color: "#10b981", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer", opacity: approving === row.id ? 0.6 : 1 }}>
+                        {approving === row.id ? "…" : "Approve"}
+                      </button>
                     )}
                   </td>
                 </tr>
@@ -187,15 +189,20 @@ export default function StockAdjustmentPage() {
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 22, cursor: "pointer" }}>✕</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Item Name *</label>
-                  <input value={form.itemName} onChange={e => setForm(p => ({ ...p, itemName: e.target.value }))} placeholder="e.g. Basmati Rice" style={{ ...inp, marginTop: 6 }} />
-                </div>
-                <div>
-                  <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Item Code</label>
-                  <input value={form.itemCode} onChange={e => setForm(p => ({ ...p, itemCode: e.target.value }))} placeholder="ITM-001" style={{ ...inp, marginTop: 6 }} />
-                </div>
+              <div style={{ position: "relative" }}>
+                <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Search Item *</label>
+                <input value={itemSearch} onChange={e => { setItemSearch(e.target.value); setShowItemDrop(true); setForm(p => ({ ...p, itemId: "", itemName: e.target.value })); }} onFocus={() => setShowItemDrop(true)} placeholder="Type item name or code…" style={{ ...inp, marginTop: 6 }} />
+                {showItemDrop && itemResults.length > 0 && (
+                  <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, zIndex: 50, maxHeight: 200, overflowY: "auto", marginTop: 2 }}>
+                    {itemResults.map(item => (
+                      <button key={item.id} onMouseDown={() => selectItem(item)} style={{ display: "block", width: "100%", textAlign: "left", padding: "9px 12px", background: "none", border: "none", color: "var(--text-primary)", cursor: "pointer", fontSize: 13 }}>
+                        <span style={{ fontWeight: 600 }}>{item.name}</span>
+                        {item.code && <span style={{ color: "var(--text-muted)", marginLeft: 8, fontSize: 11 }}>{item.code}</span>}
+                        <span style={{ float: "right", color: "#10b981", fontSize: 11 }}>Qty: {item.qty ?? "?"}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>

@@ -2,28 +2,37 @@
 import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
+import toast from "react-hot-toast";
 
 const STATUS_COLOR: Record<string, string> = { COMPLETED: "#10b981", IN_TRANSIT: "#f59e0b", PENDING: "#6366f1" };
-const BLANK = { fromBranch: "", toBranch: "", items: "", notes: "" };
 
 type Branch = { id: string; name: string; code: string; isActive: boolean };
+type InventoryItem = { id: string; name: string; code?: string; qty?: number };
+type TransferRow = { itemId: string; itemName: string; qty: string; search: string; showDrop: boolean };
+
+const emptyRow = (): TransferRow => ({ itemId: "", itemName: "", qty: "", search: "", showDrop: false });
 
 export default function StockTransferPage() {
   const { records, loading, create, setStatus } = useBusinessRecords("stock_transfer");
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState(BLANK);
-  const [saving, setSaving] = useState(false);
-  const [branches, setBranches] = useState<Branch[]>([]);
+  const [fromBranch, setFromBranch] = useState("");
+  const [toBranch, setToBranch]   = useState("");
+  const [notes, setNotes]         = useState("");
+  const [rows, setRows]           = useState<TransferRow[]>([emptyRow()]);
+  const [saving, setSaving]       = useState(false);
+  const [completing, setCompleting] = useState<string | null>(null);
+  const [branches, setBranches]   = useState<Branch[]>([]);
+  const [allItems, setAllItems]   = useState<InventoryItem[]>([]);
 
   useEffect(() => {
     const u = getCurrentUser();
-    const headers: Record<string, string> = {};
-    if (u?.role)      headers["x-user-role"]  = u.role;
-    if (u?.id)        headers["x-user-id"]    = u.id;
-    if (u?.companyId) headers["x-company-id"] = u.companyId;
-    fetch("/api/branches", { headers })
+    const h: Record<string, string> = u ? { "x-user-id": u.id, "x-user-role": u.role ?? "", "x-company-id": u.companyId || "" } : {};
+    fetch("/api/branches", { headers: h })
       .then(r => r.ok ? r.json() : [])
       .then(d => setBranches(Array.isArray(d) ? d.filter((b: Branch) => b.isActive) : []));
+    fetch("/api/inventory", { headers: h })
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setAllItems(Array.isArray(d) ? d.map((i: any) => ({ id: i.itemId, name: i.name, code: i.code, qty: i.qty })) : []));
   }, []);
 
   const transfers = useMemo(() =>
@@ -34,28 +43,74 @@ export default function StockTransferPage() {
       fromBranch: String(r.data.fromBranch || ""),
       toBranch: String(r.data.toBranch || ""),
       itemCount: Number(r.data.itemCount || 0),
+      structuredItems: Array.isArray(r.data.structuredItems) ? r.data.structuredItems as { itemId: string; itemName: string; qty: number }[] : [],
       notes: String(r.data.notes || ""),
       status: r.status,
     })),
   [records]);
 
+  function updateRow(idx: number, field: keyof TransferRow, val: string | boolean) {
+    setRows(prev => prev.map((r, i) => i === idx ? { ...r, [field]: val } : r));
+  }
+  function selectItem(idx: number, item: InventoryItem) {
+    setRows(prev => prev.map((r, i) => i === idx ? { ...r, itemId: item.id, itemName: item.name, search: item.name, showDrop: false } : r));
+  }
+  function addRow() { setRows(prev => [...prev, emptyRow()]); }
+  function removeRow(idx: number) { if (rows.length > 1) setRows(prev => prev.filter((_, i) => i !== idx)); }
+
   async function handleSave() {
-    if (!form.fromBranch || !form.toBranch || !form.items) return;
+    if (!fromBranch || !toBranch) return;
+    const validRows = rows.filter(r => r.itemId && r.qty && Number(r.qty) > 0);
+    if (validRows.length === 0) return;
     setSaving(true);
     try {
       const tId = `TRF-${String(Date.now()).slice(-5)}`;
-      const lines = form.items.split("\n").filter(Boolean);
       await create({
         title: tId,
         status: "PENDING",
         date: new Date().toISOString().slice(0, 10),
-        data: { fromBranch: form.fromBranch, toBranch: form.toBranch, itemCount: lines.length, items: lines, notes: form.notes },
+        data: {
+          fromBranch, toBranch,
+          itemCount: validRows.length,
+          structuredItems: validRows.map(r => ({ itemId: r.itemId, itemName: r.itemName, qty: Number(r.qty) })),
+          notes,
+        },
       });
       setShowModal(false);
-      setForm(BLANK);
+      setFromBranch(""); setToBranch(""); setNotes(""); setRows([emptyRow()]);
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleComplete(transfer: typeof transfers[0]) {
+    if (completing) return;
+    setCompleting(transfer.id);
+    try {
+      const u = getCurrentUser();
+      const h = { "Content-Type": "application/json", ...(u ? { "x-user-id": u.id, "x-user-role": u.role ?? "ADMIN", "x-company-id": u.companyId || "" } : {}) };
+      // Create InventoryTxn pairs for each transferred item
+      if (transfer.structuredItems.length > 0) {
+        for (const item of transfer.structuredItems) {
+          if (!item.itemId || !item.qty) continue;
+          // OUT from source branch
+          await fetch("/api/inventory-txn", {
+            method: "POST",
+            headers: h,
+            body: JSON.stringify({ type: "TRANSFER_OUT", itemId: item.itemId, qty: -item.qty, location: transfer.fromBranch, date: new Date().toISOString(), rate: 0, amount: 0 }),
+          }).catch(() => {});
+          // IN to destination branch
+          await fetch("/api/inventory-txn", {
+            method: "POST",
+            headers: h,
+            body: JSON.stringify({ type: "TRANSFER_IN", itemId: item.itemId, qty: item.qty, location: transfer.toBranch, date: new Date().toISOString(), rate: 0, amount: 0 }),
+          }).catch(() => {});
+        }
+      }
+      await setStatus(transfer.id, "COMPLETED");
+      toast.success(`Transfer ${transfer.transferId} completed`);
+    } catch { toast.error("Completion failed"); }
+    finally { setCompleting(null); }
   }
 
   const inp = { padding: "9px 12px", background: "var(--app-bg)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text-primary)", fontSize: 13, width: "100%", boxSizing: "border-box" as const };
@@ -93,7 +148,7 @@ export default function StockTransferPage() {
         {loading ? (
           <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>Loading transfers…</div>
         ) : transfers.length === 0 ? (
-          <div style={{ padding: 48, textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>No stock transfers yet. Create your first transfer.</div>
+          <div style={{ padding: 48, textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>No stock transfers yet.</div>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
@@ -110,7 +165,7 @@ export default function StockTransferPage() {
                   <td style={{ padding: "11px 14px", color: "var(--text-muted)" }}>{row.date}</td>
                   <td style={{ padding: "11px 14px" }}>{row.fromBranch}</td>
                   <td style={{ padding: "11px 14px" }}>{row.toBranch}</td>
-                  <td style={{ padding: "11px 14px" }}>{row.itemCount} line(s)</td>
+                  <td style={{ padding: "11px 14px" }}>{row.itemCount} item(s)</td>
                   <td style={{ padding: "11px 14px" }}>
                     <span style={{ background: (STATUS_COLOR[row.status] || "#94a3b8") + "20", color: STATUS_COLOR[row.status] || "#94a3b8", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{row.status.replace("_", " ")}</span>
                   </td>
@@ -119,7 +174,9 @@ export default function StockTransferPage() {
                       <button onClick={() => setStatus(row.id, "IN_TRANSIT")} style={{ background: "rgba(245,158,11,.1)", color: "#f59e0b", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Dispatch</button>
                     )}
                     {row.status === "IN_TRANSIT" && (
-                      <button onClick={() => setStatus(row.id, "COMPLETED")} style={{ background: "rgba(16,185,129,.1)", color: "#10b981", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer" }}>Receive</button>
+                      <button onClick={() => handleComplete(row)} disabled={completing === row.id} style={{ background: "rgba(16,185,129,.1)", color: "#10b981", border: "none", borderRadius: 6, padding: "4px 10px", fontSize: 11, cursor: "pointer", opacity: completing === row.id ? 0.6 : 1 }}>
+                        {completing === row.id ? "…" : "Receive"}
+                      </button>
                     )}
                   </td>
                 </tr>
@@ -131,7 +188,7 @@ export default function StockTransferPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, padding: 20 }}>
-          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, padding: 28, width: "100%", maxWidth: 480 }}>
+          <div style={{ background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 18, padding: 28, width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>New Stock Transfer</h2>
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 22, cursor: "pointer" }}>✕</button>
@@ -140,35 +197,64 @@ export default function StockTransferPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>From Branch *</label>
-                  <select value={form.fromBranch} onChange={e => setForm(p => ({ ...p, fromBranch: e.target.value }))} style={{ ...inp, marginTop: 6 }}>
-                    <option value="">— Select branch —</option>
-                    {branches.filter(b => b.name !== form.toBranch).map(b => (
-                      <option key={b.id} value={b.name}>{b.name} ({b.code})</option>
-                    ))}
+                  <select value={fromBranch} onChange={e => setFromBranch(e.target.value)} style={{ ...inp, marginTop: 6 }}>
+                    <option value="">— Select —</option>
+                    {branches.filter(b => b.name !== toBranch).map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>To Branch *</label>
-                  <select value={form.toBranch} onChange={e => setForm(p => ({ ...p, toBranch: e.target.value }))} style={{ ...inp, marginTop: 6 }}>
-                    <option value="">— Select branch —</option>
-                    {branches.filter(b => b.name !== form.fromBranch).map(b => (
-                      <option key={b.id} value={b.name}>{b.name} ({b.code})</option>
-                    ))}
+                  <select value={toBranch} onChange={e => setToBranch(e.target.value)} style={{ ...inp, marginTop: 6 }}>
+                    <option value="">— Select —</option>
+                    {branches.filter(b => b.name !== fromBranch).map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
                   </select>
                 </div>
               </div>
+
+              {/* Item rows */}
               <div>
-                <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Items (one per line) *</label>
-                <textarea value={form.items} onChange={e => setForm(p => ({ ...p, items: e.target.value }))} placeholder={"Basmati Rice 5kg x20\nCooking Oil 1L x10"} rows={4} style={{ ...inp, marginTop: 6, resize: "vertical" }} />
+                <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600, marginBottom: 8 }}>Items to Transfer *</div>
+                {rows.map((row, idx) => {
+                  const results = row.search.length >= 1
+                    ? allItems.filter(i => i.name.toLowerCase().includes(row.search.toLowerCase()) || (i.code || "").toLowerCase().includes(row.search.toLowerCase())).slice(0, 6)
+                    : [];
+                  return (
+                    <div key={idx} style={{ position: "relative", display: "grid", gridTemplateColumns: "1fr 80px 32px", gap: 8, marginBottom: 8 }}>
+                      <div style={{ position: "relative" }}>
+                        <input
+                          value={row.search}
+                          onChange={e => { updateRow(idx, "search", e.target.value); updateRow(idx, "showDrop", true); updateRow(idx, "itemId", ""); }}
+                          onFocus={() => updateRow(idx, "showDrop", true)}
+                          placeholder="Search item…"
+                          style={inp}
+                        />
+                        {row.showDrop && results.length > 0 && (
+                          <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 8, zIndex: 50, maxHeight: 160, overflowY: "auto", marginTop: 2 }}>
+                            {results.map(item => (
+                              <button key={item.id} onMouseDown={() => selectItem(idx, item)} style={{ display: "block", width: "100%", textAlign: "left", padding: "8px 12px", background: "none", border: "none", color: "var(--text-primary)", cursor: "pointer", fontSize: 12 }}>
+                                {item.name} {item.code && <span style={{ color: "var(--text-muted)" }}>({item.code})</span>}
+                                <span style={{ float: "right", color: "#10b981" }}>Qty: {item.qty ?? "?"}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <input type="number" value={row.qty} onChange={e => updateRow(idx, "qty", e.target.value)} placeholder="Qty" style={{ ...inp, textAlign: "right" }} />
+                      <button onClick={() => removeRow(idx)} style={{ background: "rgba(239,68,68,.1)", color: "#ef4444", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 16, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button>
+                    </div>
+                  );
+                })}
+                <button onClick={addRow} style={{ fontSize: 12, color: "#6366f1", background: "none", border: "1px dashed var(--border)", borderRadius: 8, padding: "6px 14px", cursor: "pointer", width: "100%" }}>+ Add Item</button>
               </div>
+
               <div>
                 <label style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600 }}>Notes</label>
-                <input value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} placeholder="Optional notes" style={{ ...inp, marginTop: 6 }} />
+                <input value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes" style={{ ...inp, marginTop: 6 }} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 20 }}>
               <button onClick={() => setShowModal(false)} style={{ background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", borderRadius: 10, padding: "10px 20px", fontSize: 13, cursor: "pointer" }}>Cancel</button>
-              <button onClick={handleSave} disabled={saving || !form.fromBranch || !form.toBranch || !form.items} style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: (!form.fromBranch || !form.toBranch || !form.items) ? 0.5 : 1 }}>
+              <button onClick={handleSave} disabled={saving || !fromBranch || !toBranch || rows.every(r => !r.itemId)} style={{ background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: (!fromBranch || !toBranch) ? 0.5 : 1 }}>
                 {saving ? "Creating…" : "Create Transfer"}
               </button>
             </div>
