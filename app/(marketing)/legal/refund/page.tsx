@@ -61,7 +61,7 @@ const SECTIONS = [
       },
       {
         sub: "Technical Failures",
-        body: "If FinovaOS experiences a significant technical failure that prevents you from accessing the platform for an extended period (more than 72 consecutive hours), and we are unable to resolve the issue within a reasonable time, you may be eligible for a prorated credit or partial refund at our discretion, regardless of your plan type.",
+        body: "If FinovaOS experiences a significant technical failure that prevents you from accessing the platform for an extended and unresolved period, you may be eligible for a prorated credit or partial refund at our sole discretion, regardless of your plan type. Eligibility is assessed case-by-case based on the nature, duration, and impact of the disruption.",
       },
       {
         sub: "Duplicate Charges",
@@ -161,11 +161,61 @@ const SECTIONS = [
       },
       {
         sub: "Chargebacks",
-        body: "Filing a chargeback without first contacting us may result in immediate suspension of your FinovaOS account and a permanent ban from the platform. We take all chargeback attempts seriously and will provide full documentation to your bank or payment provider to contest any unauthorized chargeback claims.",
+        body: "Filing a chargeback without first contacting us may result in immediate suspension or termination of your FinovaOS account. We take all chargeback attempts seriously and will provide full documentation to your bank or payment provider to contest any unauthorized chargeback claims.",
       },
       {
         sub: "Fraudulent Chargebacks",
-        body: "Any chargeback filed fraudulently or in bad faith — where the charge was legitimate and within our policy — may be reported to the relevant authorities and payment networks. We reserve the right to pursue recovery of the disputed amount through available legal channels.",
+        body: "Any chargeback filed fraudulently or in bad faith — where the charge was legitimate and within our policy — will be contested in full. We reserve the right to pursue recovery of the disputed amount through available legal channels.",
+      },
+    ],
+  },
+  {
+    id: "free-trial",
+    icon: "🎁",
+    color: "#34d399",
+    dim: "rgba(52,211,153,.08)",
+    border: "rgba(52,211,153,.25)",
+    title: "Free Trials",
+    content: [
+      {
+        sub: "Trial Periods",
+        body: "If FinovaOS offers a free trial period, no refund applies to the trial itself as no charge is made during this period. Subscription charges begin only after the trial period ends and you choose to continue with a paid plan. If you do not cancel before the trial expires, you will be charged for the selected plan and the standard refund policy will apply from that point.",
+      },
+    ],
+  },
+  {
+    id: "taxes",
+    icon: "🧾",
+    color: "#f59e0b",
+    dim: "rgba(245,158,11,.08)",
+    border: "rgba(245,158,11,.25)",
+    title: "Taxes & Regulatory Fees",
+    content: [
+      {
+        sub: "Tax on Payments",
+        body: "Applicable taxes, VAT, GST, duties, or other regulatory fees charged at the time of purchase may not be refundable where required by applicable law. Refunds, where approved, will be issued for the subscription amount only — excluding any non-recoverable taxes or fees collected on behalf of the relevant tax authority.",
+      },
+      {
+        sub: "Payment Processor",
+        body: "All refunds are processed through LemonSqueezy, our third-party payment provider, and are subject to their processing timelines and policies. FinovaOS initiates refunds promptly upon approval but cannot control the exact timeline of funds clearing your bank, which may vary by card issuer or financial institution.",
+      },
+    ],
+  },
+  {
+    id: "denial",
+    icon: "⛔",
+    color: "#f87171",
+    dim: "rgba(248,113,113,.08)",
+    border: "rgba(248,113,113,.25)",
+    title: "Refund Denial",
+    content: [
+      {
+        sub: "Right to Deny",
+        body: "We reserve the right to deny any refund request that does not meet the eligibility requirements described in this policy. All refund decisions are made at our sole discretion. If your request is denied, we will communicate the reason clearly and promptly.",
+      },
+      {
+        sub: "No Obligation Beyond This Policy",
+        body: "This Refund Policy represents the full extent of our refund obligations. We are not bound by any verbal representations, informal agreements, or promises made outside of this written policy unless confirmed in a separate signed agreement with Finova Forge.",
       },
     ],
   },
