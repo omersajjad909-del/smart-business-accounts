@@ -63,3 +63,5 @@ export const DateInput = forwardRef<HTMLInputElement, Props>(
 );
 
 DateInput.displayName = "DateInput";
+
+export default DateInput;

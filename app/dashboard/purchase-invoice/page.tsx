@@ -76,6 +76,8 @@ type TaxConfig = {
   description?: string;
 };
 
+type InventoryItem = { id: string; name: string; barcode?: string; purchaseRate?: number; unit?: string; code?: string; description?: string };
+
 type Currency = {
   id: string;
   code: string;
@@ -188,6 +190,9 @@ const [searchTerm, setSearchTerm] = useState("");
   const [showPreview, setShowPreview] = useState(false);
   const [printMode, setPrintMode] = useState<"none" | "a4" | "55mm">("none");
   const [origin, setOrigin] = useState("");
+  const [allInventoryItems, setAllInventoryItems] = useState<InventoryItem[]>([]);
+  const [scanCode, setScanCode] = useState("");
+  const [scanActive, setScanActive] = useState(false);
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -221,6 +226,29 @@ const [searchTerm, setSearchTerm] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
   const emptyRow = (): Row => ({ itemId: "", name: "", description: "", qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "" });
+
+  function handlePIScan(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    if (!scanCode.trim()) return;
+    const found = allInventoryItems.find(i => i.barcode === scanCode || i.id === scanCode || i.code === scanCode);
+    if (!found) { toast.error(`Item not found: ${scanCode}`); setScanCode(""); return; }
+    const existingIdx = rows.findIndex(r => r.itemId === found.id);
+    if (existingIdx >= 0) {
+      const updated = [...rows];
+      updated[existingIdx] = { ...updated[existingIdx], qty: Number(updated[existingIdx].qty || 0) + 1 };
+      setRows(updated);
+    } else {
+      const newRow: Row = { itemId: found.id, name: found.name, description: found.description || "", qty: 1, rate: found.purchaseRate || "", discountPercent: "", taxPercent: "", unit: found.unit || "", sku: found.code || "" };
+      const last = rows[rows.length - 1];
+      if (!last.itemId && last.qty === "" && last.rate === "") {
+        setRows([...rows.slice(0, -1), newRow, emptyRow()]);
+      } else {
+        setRows([...rows, newRow, emptyRow()]);
+      }
+    }
+    setScanCode("");
+  }
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -305,6 +333,13 @@ const [searchTerm, setSearchTerm] = useState("");
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) setAllGrns(data);
+      })
+      .catch(() => {});
+
+    fetch("/api/items-new", { headers: requestHeaders })
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) setAllInventoryItems(data.map((i: any) => ({ id: i.id, name: i.name, barcode: i.barcode || "", purchaseRate: i.purchaseRate ?? 0, unit: i.unit || "", code: i.code || "", description: i.description || "" })));
       })
       .catch(() => {});
   }, []);
@@ -870,6 +905,19 @@ const [searchTerm, setSearchTerm] = useState("");
                           {filteredPOs.map(p => <option key={p.id} value={p.id}>{p.poNo}</option>)}
                         </select>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Barcode Scanner */}
+                  <div onClick={() => setScanActive(true)} style={{ background: scanActive ? "rgba(99,102,241,0.06)" : PANEL, border: `1px ${scanActive ? "solid" : "dashed"} ${scanActive ? ACCENT : BORDER}`, borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer" }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="14"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="10" x2="14" y2="14"/><line x1="18" y1="9" x2="18" y2="15"/></svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: ACCENT, letterSpacing: "0.06em", textTransform: "uppercase" as const, marginBottom: 4 }}>Scan Barcode / SKU</div>
+                      <input value={scanCode} onChange={e => setScanCode(e.target.value)} onKeyDown={handlePIScan} onFocus={() => setScanActive(true)} onBlur={() => setScanActive(false)}
+                        placeholder="Click here and scan barcode or type SKU…"
+                        style={{ width: "100%", padding: "7px 12px", borderRadius: 8, background: "var(--input-bg)", border: `1px solid ${BORDER}`, color: TEXT, fontSize: 13, fontFamily: "monospace", outline: "none" }} />
                     </div>
                   </div>
 

@@ -178,7 +178,9 @@
       "Read(//d/projects/**)",
       "Bash(for page *)",
       "Read(//d/projects/smart-business-accounts/app/dashboard/trade$page/**)",
-      "Bash(node --max-old-space-size=4096 ./node_modules/.bin/tsc --noEmit)"
+      "Bash(node --max-old-space-size=4096 ./node_modules/.bin/tsc --noEmit)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "Bash(grep -v '^$')"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",

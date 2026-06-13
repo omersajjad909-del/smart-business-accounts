@@ -123,17 +123,19 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    
+
+    const existing = await prisma.payroll.findFirst({ where: { id, companyId } });
+    if (!existing) return NextResponse.json({ error: "Payroll not found" }, { status: 404 });
+
     // Recalculate netSalary if needed
     if (body.baseSalary || body.allowances || body.deductions || body.additionalCash !== undefined) {
-      const existing = await prisma.payroll.findUnique({ where: { id } });
-      if (existing) {
-        // Net Salary = Earnings - Deductions (Excluding Additional Cash)
-        body.netSalary = (body.baseSalary || existing.baseSalary) + 
-                         (body.allowances || existing.allowances) - 
-                         (body.deductions || existing.deductions);
-      }
+      body.netSalary = (body.baseSalary ?? existing.baseSalary) +
+                       (body.allowances ?? existing.allowances) -
+                       (body.deductions ?? existing.deductions);
     }
+
+    const wasUnpaid = existing.paymentStatus !== "PAID";
+    const nowPaid = body.paymentStatus === "PAID";
 
     const updated = await prisma.payroll.updateMany({
       where: { id, companyId },
@@ -143,6 +145,37 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Payroll not found" }, { status: 404 });
     }
     const payroll = await prisma.payroll.findUnique({ where: { id } });
+
+    // Create GL journal entry when payroll is marked as PAID
+    if (wasUnpaid && nowPaid && payroll) {
+      try {
+        const netAmt = Number(payroll.netSalary);
+        const [salaryAcc, cashAcc] = await Promise.all([
+          prisma.account.findFirst({ where: { companyId, name: { contains: "Salary", mode: "insensitive" } } }),
+          prisma.account.findFirst({ where: { companyId, name: { contains: "Cash", mode: "insensitive" } } }),
+        ]);
+        if (salaryAcc && cashAcc) {
+          const count = await prisma.voucher.count({ where: { type: "JV", companyId } });
+          await prisma.voucher.create({
+            data: {
+              companyId,
+              voucherNo: `JV-${count + 1}`,
+              type: "JV",
+              date: new Date(),
+              narration: `Payroll payment — ${payroll.monthYear}`,
+              entries: {
+                create: [
+                  { companyId, accountId: salaryAcc.id, amount: netAmt },
+                  { companyId, accountId: cashAcc.id, amount: -netAmt },
+                ],
+              },
+            },
+          });
+        }
+      } catch (glErr) {
+        console.error("Payroll GL voucher error (non-fatal):", glErr);
+      }
+    }
 
     return NextResponse.json(payroll);
   } catch (error) {

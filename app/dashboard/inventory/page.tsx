@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -31,12 +32,86 @@ const STATUS_STYLE: Record<StockStatus, { bg: string; color: string; label: stri
 };
 
 export default function InventoryPage() {
-  const [stock, setStock]     = useState<StockRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch]   = useState("");
-  const [filter, setFilter]   = useState<"ALL" | StockStatus>("ALL");
-  const [sortBy, setSortBy]   = useState<"name" | "qty" | "value">("name");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [stock, setStock]         = useState<StockRow[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [search, setSearch]       = useState("");
+  const [filter, setFilter]       = useState<"ALL" | StockStatus>("ALL");
+  const [sortBy, setSortBy]       = useState<"name" | "qty" | "value">("name");
+  const [sortDir, setSortDir]     = useState<"asc" | "desc">("asc");
+  const [csvImporting, setCsvImporting] = useState(false);
+  const csvInputRef = useRef<HTMLInputElement>(null);
+
+  function parseSimpleCsv(text: string): string[][] {
+    return text.trim().split("\n").map(line => {
+      const cols: string[] = [];
+      let cur = "", inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === "," && !inQ) { cols.push(cur.trim()); cur = ""; }
+        else { cur += ch; }
+      }
+      cols.push(cur.trim());
+      return cols;
+    });
+  }
+
+  async function handleCsvImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    setCsvImporting(true);
+    const text = await file.text();
+    const rows = parseSimpleCsv(text);
+    if (rows.length < 2) { toast.error("CSV has no data rows"); setCsvImporting(false); return; }
+    const header = rows[0].map(h => h.toLowerCase().replace(/[^a-z]/g, ""));
+    const idx = (name: string) => header.indexOf(name);
+    const user = getCurrentUser();
+    const headers = { "Content-Type": "application/json", ...(user ? { "x-user-id": user.id, "x-user-role": user.role ?? "", "x-company-id": user.companyId || "" } : {}) };
+    let ok = 0, fail = 0;
+    for (const row of rows.slice(1)) {
+      if (!row[idx("name")] && !row[1]) continue;
+      const name = row[idx("name")] || row[1] || "";
+      if (!name) continue;
+      try {
+        const res = await fetch("/api/items-new", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            name,
+            code:         row[idx("code")]         || row[0] || "",
+            category:     row[idx("category")]     || row[2] || "",
+            unit:         row[idx("unit")]          || row[3] || "PCS",
+            rate:         Number(row[idx("rate")]          || row[4])  || 0,
+            purchaseRate: Number(row[idx("purchaserate")]  || row[5])  || 0,
+            taxRate:      Number(row[idx("taxrate")]       || row[6])  || 0,
+            minStock:     Number(row[idx("minstock")]      || row[7])  || 0,
+            barcode:      row[idx("barcode")]      || row[8] || "",
+            description:  row[idx("description")]  || row[9] || "",
+          }),
+        });
+        if (res.ok) ok++; else fail++;
+      } catch { fail++; }
+    }
+    setCsvImporting(false);
+    if (ok > 0) {
+      toast.success(`Imported ${ok} item${ok > 1 ? "s" : ""}${fail > 0 ? ` (${fail} failed)` : ""}`);
+      // Reload inventory
+      setLoading(true);
+      const h: Record<string, string> = user ? { "x-user-id": user.id, "x-user-role": user.role ?? "", "x-company-id": user.companyId || "" } : {};
+      fetch("/api/inventory", { headers: h }).then(r => r.ok ? r.json() : []).then(data => setStock(Array.isArray(data) ? data : [])).catch(() => {}).finally(() => setLoading(false));
+    } else {
+      toast.error(`Import failed — ${fail} row${fail > 1 ? "s" : ""} rejected`);
+    }
+  }
+
+  function downloadTemplate() {
+    const csv = ["code,name,category,unit,rate,purchaseRate,taxRate,minStock,barcode,description", '"ITM-001","Sample Item","TRADING","PCS",100,80,0,10,"1234567890","Optional description"'].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "inventory-import-template.csv"; a.click();
+    URL.revokeObjectURL(url);
+  }
 
   useEffect(() => {
     const user = getCurrentUser();
@@ -118,6 +193,13 @@ export default function InventoryPage() {
           <Link prefetch={false} href="/dashboard/grn" style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "var(--text-muted)", textDecoration: "none", fontFamily: FONT }}>
             📥 GRN
           </Link>
+          <button onClick={downloadTemplate} style={{ background: "transparent", border: "1px solid var(--border)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "var(--text-muted)", cursor: "pointer", fontFamily: FONT }}>
+            ⬇ Template
+          </button>
+          <button onClick={() => csvInputRef.current?.click()} disabled={csvImporting} style={{ background: "transparent", border: "1px solid rgba(99,102,241,0.5)", borderRadius: 9, padding: "8px 16px", fontSize: 13, color: "#6366f1", cursor: "pointer", fontFamily: FONT, fontWeight: 600, opacity: csvImporting ? 0.6 : 1 }}>
+            {csvImporting ? "Importing…" : "⬆ Import CSV"}
+          </button>
+          <input ref={csvInputRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleCsvImport} />
           <Link prefetch={false} href="/dashboard/barcode" style={{ background: "#6366f1", color: "#fff", border: "none", borderRadius: 9, padding: "8px 16px", fontSize: 13, fontWeight: 600, textDecoration: "none", fontFamily: FONT }}>
             📦 Barcodes
           </Link>
