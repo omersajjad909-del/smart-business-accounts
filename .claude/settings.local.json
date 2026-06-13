@@ -180,7 +180,8 @@
       "Read(//d/projects/smart-business-accounts/app/dashboard/trade$page/**)",
       "Bash(node --max-old-space-size=4096 ./node_modules/.bin/tsc --noEmit)",
       "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
-      "Bash(grep -v '^$')"
+      "Bash(grep -v '^$')",
+      "Bash(Get-Content \"C:\\\\Users\\\\STANDA~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--projects-smart-business-accounts\\\\a4c81670-0c0e-4ac7-ab49-57cd892ff5fe\\\\tasks\\\\bdbi3wc4o.output\" -Tail 60)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",

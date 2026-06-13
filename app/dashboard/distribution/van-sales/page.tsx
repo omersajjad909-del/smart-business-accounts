@@ -120,6 +120,14 @@ export default function VanSalesPage() {
       await saleRecords.update(editingId, payload);
     } else {
       await saleRecords.create(payload);
+      // Non-fatal GL: Debit AR, Credit Sales Revenue
+      if (form.saleAmount > 0) {
+        fetch("/api/distribution/van-sale-gl", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: form.saleAmount, date: form.date, salesman: form.salesman }),
+        }).catch(() => {});
+      }
     }
 
     closeModal();

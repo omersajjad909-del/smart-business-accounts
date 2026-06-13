@@ -50,6 +50,7 @@ export default function StockOnVanPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<StockForm>(emptyForm);
   const [formError, setFormError] = useState("");
+  const [prevFormState, setPrevFormState] = useState<{ loadQty: number; returnedQty: number } | null>(null);
 
   const routes = useMemo(() => mapDistributionRoutes(routeRecords.records).filter((route) => route.status === "active"), [routeRecords.records]);
 
@@ -93,6 +94,7 @@ export default function StockOnVanPage() {
     setEditingId(null);
     setForm(emptyForm);
     setFormError("");
+    setPrevFormState(null);
   }
 
   function syncRoute(routeId: string) {
@@ -106,6 +108,7 @@ export default function StockOnVanPage() {
   }
 
   function editLoad(load: (typeof loads)[number]) {
+    setPrevFormState({ loadQty: load.loadQty, returnedQty: load.returnedQty });
     setEditingId(load.id);
     setForm({
       routeId: load.routeId,
@@ -168,8 +171,35 @@ export default function StockOnVanPage() {
 
     if (editingId) {
       await stockRecords.update(editingId, payload);
+      // Non-fatal: create VAN_RETURN txn if returnedQty increased
+      if (prevFormState && form.returnedQty > prevFormState.returnedQty) {
+        fetch("/api/inventory-txn", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "VAN_RETURN",
+            itemId: form.itemId,
+            qty: form.returnedQty - prevFormState.returnedQty,
+            date: form.date,
+          }),
+        }).catch(() => {});
+      }
     } else {
       await stockRecords.create(payload);
+      // Non-fatal: stock OUT from warehouse onto van
+      if (form.loadQty > 0) {
+        fetch("/api/inventory-txn", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "VAN_LOAD",
+            itemId: form.itemId,
+            qty: -form.loadQty,
+            rate: form.loadQty > 0 ? form.amount / form.loadQty : 0,
+            date: form.date,
+          }),
+        }).catch(() => {});
+      }
     }
     closeModal();
   }

@@ -1,7 +1,7 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords, BusinessRecord } from "@/lib/useBusinessRecords";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -20,13 +20,20 @@ interface WarehouseForm {
 interface TransferForm {
   fromId: string;
   toId: string;
+  itemId: string;
   item: string;
   qty: string;
   notes: string;
 }
 
+interface ItemOption {
+  id: string;
+  name: string;
+  code: string;
+}
+
 const EMPTY_WH_FORM: WarehouseForm = { name: "", location: "", address: "", capacity: "", manager: "", phone: "", isDefault: false, notes: "" };
-const EMPTY_TX_FORM: TransferForm = { fromId: "", toId: "", item: "", qty: "", notes: "" };
+const EMPTY_TX_FORM: TransferForm = { fromId: "", toId: "", itemId: "", item: "", qty: "", notes: "" };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -129,6 +136,14 @@ export default function WarehousesPage() {
   const [txSaving, setTxSaving] = useState(false);
   const [err, setErr] = useState("");
   const [txErr, setTxErr] = useState("");
+  const [inventoryItems, setInventoryItems] = useState<ItemOption[]>([]);
+
+  useEffect(() => {
+    fetch("/api/items-new")
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setInventoryItems(Array.isArray(d) ? d : []))
+      .catch(() => {});
+  }, []);
 
   const warehouses = useMemo(() => whRecords.map(mapWarehouse), [whRecords]);
   const transfers = useMemo(() => txRecords.map(mapTransfer).slice(0, 5), [txRecords]);
@@ -176,7 +191,7 @@ export default function WarehousesPage() {
     if (!txForm.fromId) { setTxErr("Select source warehouse."); return; }
     if (!txForm.toId) { setTxErr("Select destination warehouse."); return; }
     if (txForm.fromId === txForm.toId) { setTxErr("Source and destination must differ."); return; }
-    if (!txForm.item.trim()) { setTxErr("Item name is required."); return; }
+    if (!txForm.itemId) { setTxErr("Item selection is required."); return; }
     if (!txForm.qty || Number(txForm.qty) <= 0) { setTxErr("Quantity must be greater than 0."); return; }
 
     const fromName = warehouses.find(w => w.id === txForm.fromId)?.name || txForm.fromId;
@@ -192,12 +207,29 @@ export default function WarehousesPage() {
           to: toName,
           fromId: txForm.fromId,
           toId: txForm.toId,
+          itemId: txForm.itemId,
           item: txForm.item.trim(),
           qty: Number(txForm.qty),
           notes: txForm.notes.trim(),
         },
         date: new Date().toISOString(),
       });
+
+      // Non-fatal: create InventoryTxns for the transfer
+      if (txForm.itemId && Number(txForm.qty) > 0) {
+        const txnBase = { itemId: txForm.itemId, qty: Number(txForm.qty), date: new Date().toISOString() };
+        fetch("/api/inventory-txn", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...txnBase, type: "TRANSFER_OUT", qty: -Number(txForm.qty), location: fromName }),
+        }).catch(() => {});
+        fetch("/api/inventory-txn", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...txnBase, type: "TRANSFER_IN", location: toName }),
+        }).catch(() => {});
+      }
+
       setTxForm(EMPTY_TX_FORM);
       setShowTransferModal(false);
     } catch (e) {
@@ -745,13 +777,20 @@ export default function WarehousesPage() {
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div style={fieldStyle}>
-                  <label style={labelStyle}>Item Name *</label>
-                  <input
-                    style={inputStyle}
-                    placeholder="e.g. Steel Pipes"
-                    value={txForm.item}
-                    onChange={e => setTxForm(f => ({ ...f, item: e.target.value }))}
-                  />
+                  <label style={labelStyle}>Item *</label>
+                  <select
+                    style={{ ...inputStyle, appearance: "none" }}
+                    value={txForm.itemId}
+                    onChange={e => {
+                      const found = inventoryItems.find(i => i.id === e.target.value);
+                      setTxForm(f => ({ ...f, itemId: e.target.value, item: found?.name || "" }));
+                    }}
+                  >
+                    <option value="">Select item…</option>
+                    {inventoryItems.map(i => (
+                      <option key={i.id} value={i.id}>{i.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div style={fieldStyle}>
                   <label style={labelStyle}>Quantity *</label>

@@ -8,12 +8,13 @@ const ACCENT = "#f59e0b";
 const FONT = "'Outfit','Inter',sans-serif";
 
 interface FormState {
+  customerId: string;
   customerName: string;
   limit: string;
   used: string;
 }
 
-const EMPTY_FORM: FormState = { customerName: "", limit: "", used: "" };
+const EMPTY_FORM: FormState = { customerId: "", customerName: "", limit: "", used: "" };
 
 function deriveStatus(usedPct: number): "OK" | "WARNING" | "EXCEEDED" {
   if (usedPct > 100) return "EXCEEDED";
@@ -71,6 +72,7 @@ export default function CreditLimitsPage() {
   const [saving, setSaving]         = useState(false);
   const [error, setError]           = useState("");
   const [customers, setCustomers]   = useState<Customer[]>([]);
+  const [syncingId, setSyncingId]   = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -93,6 +95,7 @@ export default function CreditLimitsPage() {
       const pct    = limit > 0 ? (used / limit) * 100 : 0;
       return {
         id:           r.id,
+        customerId:   String(r.data.customerId || ""),
         customerName: r.title,
         limit,
         used,
@@ -121,8 +124,23 @@ export default function CreditLimitsPage() {
 
   function openEdit(row: typeof rows[number]) {
     setEditId(row.id);
-    setForm({ customerName: row.customerName, limit: String(row.limit), used: String(row.used) });
+    setForm({ customerId: row.customerId, customerName: row.customerName, limit: String(row.limit), used: String(row.used) });
     setShowModal(true);
+  }
+
+  async function syncUsed(row: typeof rows[number]) {
+    if (!row.customerId) return;
+    setSyncingId(row.id);
+    try {
+      const r = await fetch(`/api/credit-limits/sync?customerId=${row.customerId}`, {
+        headers: { "x-user-role": user?.role || "ADMIN", "x-company-id": user?.companyId || "" },
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      const newUsed = Number(d.used ?? d.receivable ?? 0);
+      await update(row.id, { data: { ...records.find(rec => rec.id === row.id)?.data, used: newUsed } });
+    } catch {}
+    finally { setSyncingId(null); }
   }
 
   function closeModal() {
@@ -141,14 +159,14 @@ export default function CreditLimitsPage() {
       if (editId) {
         await update(editId, {
           title: form.customerName.trim(),
-          data: { limit: Number(form.limit), used: Number(form.used) || 0 },
+          data: { customerId: form.customerId, limit: Number(form.limit), used: Number(form.used) || 0 },
         });
       } else {
         await create({
           title:  form.customerName.trim(),
           status: "ACTIVE",
           amount: Number(form.limit),
-          data:   { limit: Number(form.limit), used: Number(form.used) || 0 },
+          data:   { customerId: form.customerId, limit: Number(form.limit), used: Number(form.used) || 0 },
         });
       }
       closeModal();
@@ -271,6 +289,20 @@ export default function CreditLimitsPage() {
                     >
                       Edit
                     </button>
+                    {r.customerId && (
+                      <button
+                        onClick={() => void syncUsed(r)}
+                        disabled={syncingId === r.id}
+                        style={{
+                          padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 600,
+                          border: "1px solid rgba(56,189,248,.4)", background: "transparent",
+                          color: "#38bdf8", cursor: syncingId === r.id ? "not-allowed" : "pointer",
+                          opacity: syncingId === r.id ? 0.6 : 1,
+                        }}
+                      >
+                        {syncingId === r.id ? "…" : "Sync"}
+                      </button>
+                    )}
                     <button
                       onClick={() => handleDelete(r.id)}
                       style={{
@@ -315,12 +347,15 @@ export default function CreditLimitsPage() {
                 <label style={labelStyle}>Customer Name *</label>
                 <select
                   style={inputStyle}
-                  value={form.customerName}
-                  onChange={(e) => setField("customerName", e.target.value)}
+                  value={form.customerId}
+                  onChange={(e) => {
+                    const c = customers.find(x => x.id === e.target.value);
+                    setForm(f => ({ ...f, customerId: e.target.value, customerName: c?.name || "" }));
+                  }}
                 >
                   <option value="">— Select Customer —</option>
                   {customers.map(c => (
-                    <option key={c.id} value={c.name}>{c.name}</option>
+                    <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
               </div>
