@@ -849,6 +849,12 @@ export default function POSPage() {
                 <span>Subtotal</span><span>Rs. {subtotal.toLocaleString()}</span>
               </div>
               {/* Discount row */}
+              {/* Discount Code */}
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
+                <input value={discountCode} onChange={e => setDiscountCode(e.target.value)} onKeyDown={e => e.key === "Enter" && applyDiscountCode()} placeholder="Discount code" style={{ flex: 1, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 5, padding: "4px 7px", color: "#fff", fontSize: 11, fontFamily: ff, outline: "none" }} />
+                <button onClick={applyDiscountCode} style={{ background: "rgba(99,102,241,.2)", border: "1px solid rgba(99,102,241,.35)", borderRadius: 5, padding: "4px 8px", color: "#a5b4fc", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Apply</button>
+              </div>
+              {discountCodeMsg && <div style={{ fontSize: 11, marginBottom: 5, color: discountCodeMsg.ok ? "#34d399" : "#f87171" }}>{discountCodeMsg.text}</div>}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
                 <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Discount</span>
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
