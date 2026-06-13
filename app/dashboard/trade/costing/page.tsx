@@ -166,8 +166,23 @@ export default function ImportCostingPage() {
     setSaving(true);
     setError("");
     try {
-      if (editingId) await update(editingId, payload);
-      else await create(payload);
+      if (editingId) {
+        await update(editingId, payload);
+      } else {
+        await create(payload);
+        if (form.status === "posted" && landedCost > 0) {
+          fetch("/api/trade/gl-post", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              category: "landed_cost",
+              amount: landedCost,
+              date: form.date,
+              narration: `Landed cost — ${form.shipmentRef}`,
+            }),
+          }).catch(() => {});
+        }
+      }
       setShowModal(false);
       resetForm();
     } catch (err) {

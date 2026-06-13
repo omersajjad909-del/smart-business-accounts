@@ -222,7 +222,24 @@ export default function FreightManagementPage() {
     finally { setSaving(false); }
   };
 
-  const changeStatus = (id: string, status: string) => update(id, { status });
+  const changeStatus = async (id: string, status: string) => {
+    await update(id, { status });
+    if (status === "DELIVERED") {
+      const freight = freights.find((f) => f.id === id);
+      if (freight && freight.totalCost > 0) {
+        fetch("/api/trade/gl-post", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            category: "freight_expense",
+            amount: freight.totalCost,
+            date: freight.etd || new Date().toISOString().slice(0, 10),
+            narration: `Freight — ${freight.carrier} ${freight.originPort} → ${freight.destinationPort}`,
+          }),
+        }).catch(() => {});
+      }
+    }
+  };
   const doDelete = async (id: string) => { await remove(id); setConfirmDel(null); };
 
   return (

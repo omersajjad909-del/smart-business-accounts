@@ -163,8 +163,24 @@ export default function TradeRebatePage() {
     setSaving(true);
     setError("");
     try {
+      const wasReceived = editingId ? rebates.find((r) => r.id === editingId)?.status === "received" : false;
       if (editingId) await update(editingId, payload);
       else await create(payload);
+
+      // Non-fatal GL: when a rebate is first marked as received
+      if (form.status === "received" && !wasReceived && amount > 0) {
+        fetch("/api/trade/gl-post", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            category: "rebate_income",
+            amount,
+            date: form.date,
+            narration: `Export rebate received — ${form.claimNo} (${form.scheme})`,
+          }),
+        }).catch(() => {});
+      }
+
       setShowModal(false);
       resetForm();
     } catch (err) {

@@ -374,6 +374,21 @@ export default function CustomsClearancePage() {
 
   const changeStatus = async (id: string, status: string) => {
     await update(id, { status });
+    if (status === "DUTY_PAID") {
+      const decl = declarations.find((d) => d.id === id);
+      if (decl && decl.totalPayable > 0) {
+        fetch("/api/trade/gl-post", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            category: "customs_duty",
+            amount: decl.totalPayable,
+            date: decl.filingDate || new Date().toISOString().slice(0, 10),
+            narration: `Customs duty — ${decl.declarationNo}`,
+          }),
+        }).catch(() => {});
+      }
+    }
   };
 
   // ── Delete ────────────────────────────────────────────────────────────────
