@@ -1,21 +1,72 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
+import { getCurrentUser } from "@/lib/auth";
+import toast from "react-hot-toast";
 
 const REASONS = ["Damaged / Broken", "Theft / Loss", "Found (surplus)", "Expired / Disposal", "Data Correction", "Physical Count", "Other"];
-const BLANK = { itemName: "", itemCode: "", systemQty: "", physicalQty: "", reason: REASONS[0], notes: "" };
+const BLANK = { itemId: "", itemName: "", itemCode: "", systemQty: "", physicalQty: "", reason: REASONS[0], notes: "" };
+
+type InventoryItem = { id: string; name: string; code?: string; qty?: number };
 
 export default function StockAdjustmentPage() {
   const { records, loading, create, setStatus } = useBusinessRecords("stock_adjustment");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(BLANK);
   const [saving, setSaving] = useState(false);
+  const [allItems, setAllItems] = useState<InventoryItem[]>([]);
+  const [itemSearch, setItemSearch] = useState("");
+  const [showItemDrop, setShowItemDrop] = useState(false);
+  const [approving, setApproving] = useState<string | null>(null);
+
+  useEffect(() => {
+    const u = getCurrentUser();
+    const h: Record<string, string> = u ? { "x-user-id": u.id, "x-user-role": u.role ?? "", "x-company-id": u.companyId || "" } : {};
+    // Load inventory with current qtys
+    fetch("/api/inventory", { headers: h })
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setAllItems(Array.isArray(d) ? d.map((i: any) => ({ id: i.itemId, name: i.name, code: i.code, qty: i.qty })) : []))
+      .catch(() => {});
+  }, []);
+
+  const itemResults = itemSearch.length >= 1
+    ? allItems.filter(i => i.name.toLowerCase().includes(itemSearch.toLowerCase()) || (i.code || "").toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 8)
+    : [];
+
+  function selectItem(item: InventoryItem) {
+    setForm(p => ({ ...p, itemId: item.id, itemName: item.name, itemCode: item.code || "", systemQty: String(item.qty ?? "") }));
+    setItemSearch(item.name);
+    setShowItemDrop(false);
+  }
+
+  async function handleApprove(row: { id: string; itemId?: string; physicalQty: number; reason: string }) {
+    if (approving) return;
+    setApproving(row.id);
+    try {
+      if (row.itemId) {
+        const u = getCurrentUser();
+        const h: Record<string, string> = { "Content-Type": "application/json", ...(u ? { "x-user-id": u.id, "x-user-role": u.role ?? "ADMIN", "x-company-id": u.companyId || "" } : {}) };
+        const res = await fetch("/api/stock-adjustment", {
+          method: "POST",
+          headers: h,
+          body: JSON.stringify({ itemId: row.itemId, physicalQty: row.physicalQty, reason: row.reason }),
+        });
+        const data = await res.json();
+        if (!res.ok) { toast.error(data.error || "Stock adjustment failed"); return; }
+        if (data.diff === 0) toast("No change — physical count matches system.");
+        else toast.success(`Stock adjusted by ${data.diff > 0 ? "+" : ""}${data.diff} units.`);
+      }
+      await setStatus(row.id, "APPROVED");
+    } catch { toast.error("Approval failed"); }
+    finally { setApproving(null); }
+  }
 
   const adjustments = useMemo(() =>
     records.map(r => ({
       id: r.id,
       adjId: r.title,
       date: r.date || r.createdAt.slice(0, 10),
+      itemId: String(r.data.itemId || ""),
       itemName: String(r.data.itemName || ""),
       itemCode: String(r.data.itemCode || ""),
       systemQty: Number(r.data.systemQty || 0),
@@ -41,10 +92,11 @@ export default function StockAdjustmentPage() {
         title: adjId,
         status: "PENDING",
         date: new Date().toISOString().slice(0, 10),
-        data: { itemName: form.itemName, itemCode: form.itemCode, systemQty: sysNum, physicalQty: physNum, diff: diffVal, reason: form.reason, notes: form.notes },
+        data: { itemId: form.itemId, itemName: form.itemName, itemCode: form.itemCode, systemQty: sysNum, physicalQty: physNum, diff: diffVal, reason: form.reason, notes: form.notes },
       });
       setShowModal(false);
       setForm(BLANK);
+      setItemSearch("");
     } finally {
       setSaving(false);
     }

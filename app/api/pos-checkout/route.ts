@@ -2,18 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 
-// POST /api/pos-checkout
-// 1. Validate stock for each item (using InventoryTxn sum)
-// 2. Create InventoryTxn SALE entries to deduct stock
 export async function POST(req: NextRequest) {
   try {
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
     const body = await req.json();
-    const { items, date } = body as {
+    const { items, date, total, taxAmt, discount, payMethod } = body as {
       items: { itemNewId: string; name: string; qty: number; rate: number }[];
       date?: string;
+      total?: number;
+      taxAmt?: number;
+      discount?: number;
+      payMethod?: string;
     };
 
     if (!Array.isArray(items) || items.length === 0) {
@@ -55,6 +56,43 @@ export async function POST(req: NextRequest) {
         },
       });
       created.push(txn.id);
+    }
+
+    // ── Step 3: GL Voucher ───────────────────────────────────────────────────
+    const saleTotal = total ?? items.reduce((s, i) => s + i.qty * i.rate, 0);
+    try {
+      const salesAcc = await prisma.account.findFirst({
+        where: { companyId, name: { contains: "Sales", mode: "insensitive" } },
+      });
+      const method = (payMethod || "cash").toLowerCase();
+      let debitAcc = await prisma.account.findFirst({
+        where: { companyId, name: { contains: method === "card" ? "Card" : "Cash", mode: "insensitive" } },
+      });
+      if (!debitAcc) {
+        debitAcc = await prisma.account.findFirst({
+          where: { companyId, name: { contains: "Cash", mode: "insensitive" } },
+        });
+      }
+      if (salesAcc && debitAcc) {
+        const count = await prisma.voucher.count({ where: { type: "SI", companyId } });
+        await prisma.voucher.create({
+          data: {
+            companyId,
+            voucherNo: `POS-${count + 1}`,
+            type: "SI",
+            date: txnDate,
+            narration: `POS Sale`,
+            entries: {
+              create: [
+                { companyId, accountId: debitAcc.id, amount: saleTotal },
+                { companyId, accountId: salesAcc.id, amount: -saleTotal },
+              ],
+            },
+          },
+        });
+      }
+    } catch (glErr) {
+      console.error("POS GL Voucher error (non-fatal):", glErr);
     }
 
     return NextResponse.json({ success: true, txns: created.length });

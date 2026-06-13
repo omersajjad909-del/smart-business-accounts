@@ -291,7 +291,7 @@ export default function POSPage() {
         const stockRes = await fetch("/api/pos-checkout", {
           method: "POST",
           headers: { ...authHeaders(), "Content-Type": "application/json" },
-          body: JSON.stringify({ date: nowDate.toISOString(), items: syncedItems.map(i => ({ itemNewId: i.itemNewId, name: i.name, qty: i.qty, rate: i.price })) }),
+          body: JSON.stringify({ date: nowDate.toISOString(), items: syncedItems.map(i => ({ itemNewId: i.itemNewId, name: i.name, qty: i.qty, rate: i.price })), total: finalTotal, taxAmt, discount: discAmt + loyaltyDiscount, payMethod }),
         });
         if (!stockRes.ok) { const err = await stockRes.json(); setCheckoutError(err.error || "Stock deduction failed"); setProcessingCheckout(false); return; }
         loadStock();
