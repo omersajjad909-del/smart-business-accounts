@@ -158,6 +158,29 @@ const MODULE_LABELS: Record<string, string> = {
   franchise_outlets: "Franchise Outlets",
   royalty_tracking: "Royalty Tracking",
   brand_compliance: "Brand Compliance",
+  // Phase 1 — Distribution
+  stock_on_van: "Stock On Van",
+  collections: "Collections",
+  trip_sheet: "Trip Sheet",
+  distribution_analytics: "Distribution Analytics",
+  // Phase 1 — Trading
+  order_desk: "Order Desk",
+  trading_analytics: "Trading Analytics",
+  delivery_order: "Delivery Orders",
+  // Phase 1 — Import / Export
+  import_costing: "Import Costing",
+  export_rebate: "Export Rebate / Drawback",
+  freight: "Freight",
+  containers: "Containers",
+  hs_codes: "HS Code Master",
+  commercial_invoice: "Commercial Invoice",
+  packing_list: "Packing List",
+  cert_of_origin: "Certificate of Origin",
+  export_docs: "Export Documents",
+  trade_analytics: "Trade Analytics",
+  export_performance: "Export Performance",
+  // Phase 1 — Clearing & Forwarding
+  cnf_jobs: "C&F Job Files",
 };
 
 // Core modules always ON for all plans

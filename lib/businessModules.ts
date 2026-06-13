@@ -76,7 +76,17 @@ export type ModuleKey =
   | "event_bookings" | "vendor_management" | "event_budget"
   | "travel_bookings" | "visa_processing" | "travel_settlements"
   | "rental_items" | "rental_agreements" | "maintenance_schedule"
-  | "franchise_outlets" | "royalty_tracking" | "brand_compliance";
+  | "franchise_outlets" | "royalty_tracking" | "brand_compliance"
+  // Phase 1 — Distribution specific
+  | "stock_on_van" | "collections" | "trip_sheet" | "distribution_analytics"
+  // Phase 1 — Trading specific
+  | "order_desk" | "trading_analytics" | "delivery_order"
+  // Phase 1 — Import / Export specific
+  | "import_costing" | "export_rebate" | "freight" | "containers"
+  | "hs_codes" | "commercial_invoice" | "packing_list"
+  | "cert_of_origin" | "export_docs" | "trade_analytics" | "export_performance"
+  // Phase 1 — Clearing & Forwarding specific
+  | "cnf_jobs";
 
 export interface DefaultAccount {
   code: string;
@@ -155,7 +165,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Buy & sell goods — general merchandise, hardware, electronics, wholesale",
     tagline: "Purchase → Sell → Profit",
     color: "#38bdf8", gradient: "linear-gradient(135deg,#0ea5e9,#38bdf8)", category: "Commerce",
-    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","sale_return","outward","inventory_items","stock_rates","barcode","reports_inventory","crm","hr_payroll"],
+    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","delivery_order","sale_return","outward","inventory_items","stock_rates","barcode","reports_inventory","crm","hr_payroll","order_desk","trading_analytics"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Accounts Receivable", type: "Asset" },
@@ -223,7 +233,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Distribute products to retailers — FMCG, pharma, electronics distribution",
     tagline: "Warehouse → Routes → Delivery",
     color: "#8b5cf6", gradient: "linear-gradient(135deg,#7c3aed,#8b5cf6)", category: "Commerce",
-    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","sale_return","outward","inventory_items","stock_rates","barcode","reports_inventory","crm","hr_payroll","routes","delivery_tracking","van_sales"],
+    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","delivery_order","sale_return","outward","inventory_items","stock_rates","barcode","reports_inventory","crm","hr_payroll","routes","delivery_tracking","van_sales","stock_on_van","collections","trip_sheet","distribution_analytics"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Accounts Receivable", type: "Asset" },
@@ -255,7 +265,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Bulk buying and selling — dealers, distributors, warehouse-level operations",
     tagline: "Buy Bulk → Warehouse → Sell → Collect",
     color: "#f59e0b", gradient: "linear-gradient(135deg,#d97706,#f59e0b)", category: "Commerce",
-    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","sale_return","outward","inventory_items","stock_rates","barcode","reports_inventory","crm","hr_payroll"],
+    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","quotation","delivery_challan","delivery_order","sale_return","outward","inventory_items","stock_rates","barcode","reports_inventory","crm","hr_payroll"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Accounts Receivable", type: "Asset" },
@@ -1423,7 +1433,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Import & export business — sourcing, customs, LC/TT, shipping, foreign buyers & local sales",
     tagline: "Source → LC/TT → Ship → Clear → Invoice → Receive",
     color: "#0891b2", gradient: "linear-gradient(135deg,#0e7490,#0891b2)", category: "Commerce",
-    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","inventory_items","stock_rates","crm","shipments","customs_clearance","lc_management","hr_payroll"],
+    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","inventory_items","stock_rates","crm","hr_payroll","shipments","containers","freight","customs_clearance","lc_management","hs_codes","import_costing","export_rebate","commercial_invoice","packing_list","cert_of_origin","export_docs","trade_analytics","export_performance"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Goods in Transit", type: "Asset" },
@@ -1460,7 +1470,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Import & export business — sourcing, customs, LC/TT, shipping, foreign buyers & local sales",
     tagline: "Source → LC/TT → Ship → Clear → Invoice → Receive",
     color: "#0891b2", gradient: "linear-gradient(135deg,#0e7490,#0891b2)", category: "Commerce",
-    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","inventory_items","stock_rates","crm","shipments","customs_clearance","lc_management","hr_payroll"],
+    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","inventory_items","stock_rates","crm","hr_payroll","shipments","containers","freight","customs_clearance","lc_management","hs_codes","import_costing","export_rebate","commercial_invoice","packing_list","cert_of_origin","export_docs","trade_analytics","export_performance"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Goods in Transit", type: "Asset" },
@@ -1498,7 +1508,7 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     description: "Customs clearance — import/export clearing, freight forwarding, documentation",
     tagline: "Receive Docs → Clear Customs → Deliver → Invoice",
     color: "#78350f", gradient: "linear-gradient(135deg,#92400e,#78350f)", category: "Commerce",
-    modules: [...CORE, "sales_invoice","purchase_invoice","quotation","hr_payroll","crm","customs_clearance","shipments"],
+    modules: [...CORE, "sales_invoice","purchase_invoice","quotation","hr_payroll","crm","cnf_jobs","shipments","containers","freight","customs_clearance","lc_management","trade_analytics"],
     defaultAccounts: [
       ...COMMON_ACCOUNTS,
       { code: "1100", name: "Client Receivables", type: "Asset" },

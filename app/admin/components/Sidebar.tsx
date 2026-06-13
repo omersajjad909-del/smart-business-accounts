@@ -14,7 +14,7 @@ const sections = [
   { name: 'Usage Insights', icon: '📈', href: '/admin/usage' },
   { name: 'Plans & Billing', icon: '🧾', href: '/admin/plans' },
   { name: 'Business Modules', icon: '🧩', href: '/admin/business-modules' },
-  { name: 'Feature Flags', icon: '🚩', href: '/admin/feature-flags' },
+{ name: 'Feature Flags', icon: '🚩', href: '/admin/feature-flags' },
   { name: 'Broadcasts', icon: '📢', href: '/admin/broadcasts' },
   { name: 'Marketing Automation', icon: '⚡', href: '/admin/automation' },
   { name: 'Marketing Autopilot', icon: '🤖', href: '/admin/marketing-autopilot' },
