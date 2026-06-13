@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
@@ -34,8 +34,20 @@ export default function ProductCatalogPage() {
 
   // Receive stock modal
   const [receiveProduct, setReceiveProduct] = useState<{ id: string; name: string; itemNewId: string; costPrice: number; stock: number } | null>(null);
-  const [receiveForm, setReceiveForm] = useState({ qty: 1, costPrice: 0, supplier: "", notes: "" });
+  const [receiveForm, setReceiveForm] = useState({ qty: 1, costPrice: 0, supplierId: "", supplierName: "", notes: "" });
   const [receiveSaving, setReceiveSaving] = useState(false);
+  const [suppliers, setSuppliers] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/accounts", { headers: authHeaders })
+      .then(r => r.json())
+      .then(d => {
+        const list = Array.isArray(d) ? d : d.accounts ?? [];
+        setSuppliers(list.filter((a: any) => a.partyType === "SUPPLIER").map((a: any) => ({ id: a.id, name: a.name })));
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const allProducts = records.map(r => ({
     id: r.id,
@@ -191,7 +203,7 @@ export default function ProductCatalogPage() {
 
   function openReceive(p: typeof allProducts[0]) {
     setReceiveProduct({ id: p.id, name: p.name, itemNewId: (records.find(r => r.id === p.id)?.data?.itemNewId as string) || "", costPrice: p.costPrice, stock: p.stock });
-    setReceiveForm({ qty: 1, costPrice: p.costPrice, supplier: "", notes: "" });
+    setReceiveForm({ qty: 1, costPrice: p.costPrice, supplierId: suppliers[0]?.id || "", supplierName: suppliers[0]?.name || "", notes: "" });
   }
 
   async function handleReceive() {
@@ -211,11 +223,31 @@ export default function ProductCatalogPage() {
         if (!res.ok) throw new Error("InventoryTxn failed");
       }
 
-      // 2. Save stock_receipt business_record
-      const { create: createReceipt } = { create: async (d: object) => { await fetch("/api/business-records", { method: "POST", headers: authHeaders, body: JSON.stringify({ type: "stock_receipt", title: receiveProduct.name, amount: receiveForm.qty * receiveForm.costPrice, data: d }) }); } };
-      await createReceipt({ productName: receiveProduct.name, itemNewId: receiveProduct.itemNewId, qtyReceived: receiveForm.qty, costPrice: receiveForm.costPrice, supplierName: receiveForm.supplier || "—", notes: receiveForm.notes, stockBefore, stockAfter });
+      // 2. Create proper PurchaseInvoice if supplier is selected
+      if (receiveForm.supplierId && receiveProduct.itemNewId) {
+        const piCount = await fetch("/api/purchase-invoice", { headers: authHeaders }).then(r => r.json()).then(d => Array.isArray(d) ? d.length : 0).catch(() => 0);
+        await fetch("/api/purchase-invoice", {
+          method: "POST",
+          headers: authHeaders,
+          body: JSON.stringify({
+            supplierId: receiveForm.supplierId,
+            date: new Date().toISOString().slice(0, 10),
+            items: [{ itemId: receiveProduct.itemNewId, name: receiveProduct.name, qty: receiveForm.qty, rate: receiveForm.costPrice, discountPercent: 0, taxPercent: 0, unit: "", sku: "", description: "" }],
+            total: receiveForm.qty * receiveForm.costPrice,
+            freight: 0,
+            approvalStatus: "APPROVED",
+            location: "MAIN",
+            notes: receiveForm.notes,
+            reference: `SR-${String(piCount + 1).padStart(4, "0")}`,
+          }),
+        }).catch(() => {});
+      }
 
-      // 3. Update catalog_product data.stock
+      // 3. Save stock_receipt business_record
+      const { create: createReceipt } = { create: async (d: object) => { await fetch("/api/business-records", { method: "POST", headers: authHeaders, body: JSON.stringify({ type: "stock_receipt", title: receiveProduct.name, amount: receiveForm.qty * receiveForm.costPrice, data: d }) }); } };
+      await createReceipt({ productName: receiveProduct.name, itemNewId: receiveProduct.itemNewId, qtyReceived: receiveForm.qty, costPrice: receiveForm.costPrice, supplierId: receiveForm.supplierId, supplierName: receiveForm.supplierName || "—", notes: receiveForm.notes, stockBefore, stockAfter });
+
+      // 4. Update catalog_product data.stock
       const existing = records.find(r => r.id === receiveProduct.id);
       await update(receiveProduct.id, { data: { ...existing?.data, stock: stockAfter } });
 
@@ -500,19 +532,28 @@ export default function ProductCatalogPage() {
               {[
                 { label: "Qty Received *", key: "qty", type: "number" },
                 { label: "Cost Price (Rs.)", key: "costPrice", type: "number" },
-                { label: "Supplier", key: "supplier", type: "text" },
-                { label: "Notes", key: "notes", type: "text" },
               ].map(f => (
                 <div key={f.key}>
                   <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>{f.label}</label>
                   <input
                     type={f.type}
                     value={(receiveForm as Record<string, number | string>)[f.key]}
-                    onChange={e => setReceiveForm(p => ({ ...p, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value }))}
+                    onChange={e => setReceiveForm(p => ({ ...p, [f.key]: Number(e.target.value) }))}
                     style={inp}
                   />
                 </div>
               ))}
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Supplier</label>
+                <select value={receiveForm.supplierId} onChange={e => { const s = suppliers.find(x => x.id === e.target.value); setReceiveForm(p => ({ ...p, supplierId: e.target.value, supplierName: s?.name || "" })); }} style={inp}>
+                  <option value="">— Walk-in / No Supplier —</option>
+                  {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Notes</label>
+                <input value={receiveForm.notes} onChange={e => setReceiveForm(p => ({ ...p, notes: e.target.value }))} placeholder="Optional notes" style={inp} />
+              </div>
             </div>
             {receiveForm.qty > 0 && (
               <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(99,102,241,.08)", borderRadius: 8, fontSize: 12, color: "rgba(255,255,255,.6)" }}>

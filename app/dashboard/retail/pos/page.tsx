@@ -22,6 +22,7 @@ export default function POSPage() {
   const { records: saleRecords, create: createSale } = useBusinessRecords("pos_sale");
   const { records: sessionRecords, update: updateSession } = useBusinessRecords("pos_session");
   const { records: loyaltyRecords, create: createLoyaltyRec, update: updateLoyaltyRec } = useBusinessRecords("loyalty_customer");
+  const { records: discountRecords } = useBusinessRecords("retail_discount");
   const activeSession = sessionRecords.find(s => s.status?.toLowerCase() === "open") || null;
 
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -63,6 +64,35 @@ export default function POSPage() {
   const [showLoyaltySearch, setShowLoyaltySearch] = useState(false);
   const [redeemPts, setRedeemPts] = useState(0);
   const [loyaltyConfig, setLoyaltyConfig] = useState({ enabled: true, pointsPerHundred: 1, redeemValue: 1, minRedeemPoints: 50, cardPrefix: "LC" });
+
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountCodeMsg, setDiscountCodeMsg] = useState<{ text: string; ok: boolean } | null>(null);
+
+  function applyDiscountCode() {
+    const code = discountCode.trim();
+    if (!code) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const match = discountRecords.find(r => {
+      const rCode = (r.data?.code as string || r.title || "").toLowerCase();
+      if (rCode !== code.toLowerCase()) return false;
+      if (r.status === "inactive") return false;
+      const from = r.data?.validFrom as string | undefined;
+      const to   = r.data?.validTo   as string | undefined;
+      if (from && today < from) return false;
+      if (to   && today > to)   return false;
+      return true;
+    });
+    if (!match) {
+      setDiscountCodeMsg({ text: `Code "${code}" not found or expired`, ok: false });
+      setTimeout(() => setDiscountCodeMsg(null), 3000);
+      return;
+    }
+    const amt = match.amount || Number(match.data?.amount || 0);
+    setDiscount(String(amt));
+    setDiscountCode("");
+    setDiscountCodeMsg({ text: `✓ Code applied — Rs. ${amt} off`, ok: true });
+    setTimeout(() => setDiscountCodeMsg(null), 3000);
+  }
 
   const searchRef    = useRef<HTMLInputElement>(null);
   const discountRef  = useRef<HTMLInputElement>(null);
@@ -326,6 +356,28 @@ export default function POSPage() {
           },
         });
       }
+      // Create proper SalesInvoice document (inventory + GL already done by pos-checkout)
+      fetch("/api/pos-invoice", {
+        method: "POST",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({
+          receiptNo: saved.title || nextReceiptNo,
+          date: nowDate.toISOString().slice(0, 10),
+          customerId: loyaltyCustomer?.id || null,
+          items: snapshot.filter(i => i.itemNewId).map(i => ({
+            itemId: i.itemNewId,
+            qty: i.qty,
+            rate: i.price,
+            discountPercent: i.itemDiscount ? Math.round((i.itemDiscount / i.price) * 100) : 0,
+            taxPercent: taxPct,
+          })),
+          total: finalTotal,
+          discount: discAmt + loyaltyDiscount,
+          taxAmt,
+          payMethod,
+        }),
+      }).catch(() => {});
+
       setReceipt({
         receiptNo: saved.title || nextReceiptNo,
         fbrInvoice: generateFBRInvoice(saved.title || nextReceiptNo, nowDate),
