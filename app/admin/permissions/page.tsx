@@ -158,6 +158,19 @@ const MODULE_LABELS: Record<string, string> = {
   franchise_outlets: "Franchise Outlets",
   royalty_tracking: "Royalty Tracking",
   brand_compliance: "Brand Compliance",
+  // Granular financial report keys
+  ledger: "Ledger / Accounts",
+  trial_balance: "Trial Balance",
+  profit_loss: "Profit & Loss",
+  balance_sheet: "Balance Sheet",
+  ageing_report: "Ageing Report",
+  cash_flow: "Cash Flow Statement",
+  stock_ledger: "Stock Ledger",
+  // Granular HR keys
+  employees: "Employees",
+  payroll: "Payroll",
+  attendance: "Attendance",
+  advance_salary: "Advance Salary",
   // Commerce — granular page keys
   purchase_return: "Purchase Return",
   bulk_payments: "Bulk Payments",
@@ -231,6 +244,25 @@ function getDefaultPlanModules(allModules: string[]): Record<Plan, string[]> {
 
 type ConfigMap = Record<string, Record<Plan, string[]>>;
 
+const MODULE_GROUPS: Array<{ id: string; label: string; icon: string; keys: string[] }> = [
+  { id: "core",      label: "Core",               icon: "⚙️",  keys: ["dashboard","ai_assistant","admin_settings","chart_of_accounts","opening_balances"] },
+  { id: "vouchers",  label: "Vouchers & Finance",  icon: "📑",  keys: ["cpv","crv","jv","contra","advance_payment","petty_cash","credit_note","debit_note","expense_vouchers","loans","recurring","tax_configuration"] },
+  { id: "banking",   label: "Banking & Payments",  icon: "🏦",  keys: ["bank_reconciliation","payment_receipts","bulk_payments","payment_followup","customer_statement","supplier_statement"] },
+  { id: "reports",   label: "Financial Reports",   icon: "📊",  keys: ["reports_financial","ledger","trial_balance","profit_loss","balance_sheet","ageing_report","cash_flow"] },
+  { id: "sales",     label: "Sales",               icon: "🧾",  keys: ["sales_invoice","sales_order","quotation","delivery_challan","delivery_order","sale_return","outward"] },
+  { id: "purchases", label: "Purchases",           icon: "🛒",  keys: ["purchase_invoice","purchase_order","purchase_return","purchase_requisition","landed_cost"] },
+  { id: "inventory", label: "Inventory",           icon: "📦",  keys: ["inventory_items","stock_rates","barcode","stock_movements","price_lists","credit_limits","warehouses","warehouse_transfers","reports_inventory","stock_ledger"] },
+  { id: "hr",        label: "HR & Payroll",        icon: "👥",  keys: ["hr_payroll","employees","payroll","attendance","advance_salary"] },
+  { id: "crm",       label: "CRM",                 icon: "🤝",  keys: ["crm"] },
+  { id: "assets",    label: "Assets & Control",    icon: "🏗️", keys: ["fixed_assets","audit_trail","budget","cost_centers"] },
+  { id: "trading",   label: "Trading",             icon: "📈",  keys: ["order_desk","delivery_order","trading_analytics"] },
+  { id: "dist",      label: "Distribution",        icon: "🚚",  keys: ["routes","delivery_tracking","van_sales","stock_on_van","collections","trip_sheet","distribution_analytics"] },
+  { id: "retail",    label: "Retail / POS",        icon: "🏪",  keys: ["pos","loyalty_points","product_catalog","stock_transfer","branch_reports","online_store_sync","supplier_portal"] },
+  { id: "trade_ops", label: "Trade Operations",    icon: "🚢",  keys: ["shipments","containers","freight","customs_clearance","lc_management"] },
+  { id: "trade_doc", label: "Trade Documents",     icon: "📋",  keys: ["hs_codes","import_costing","export_rebate","commercial_invoice","packing_list","cert_of_origin","export_docs","trade_analytics","export_performance"] },
+  { id: "cnf",       label: "C&F Operations",      icon: "🛃",  keys: ["cnf_jobs"] },
+];
+
 export default function AdminPermissionsPage() {
   const [user]       = useState(() => getCurrentUser());
   const [search,     setSearch]     = useState("");
@@ -238,7 +270,8 @@ export default function AdminPermissionsPage() {
   const [config,     setConfig]     = useState<ConfigMap>({});
   const [saving,     setSaving]     = useState(false);
   const [saved,      setSaved]      = useState(false);
-  const [enabledIds, setEnabledIds] = useState<Set<string> | null>(null);
+  const [enabledIds,      setEnabledIds]      = useState<Set<string> | null>(null);
+  const [expandedGroups,  setExpandedGroups]  = useState<Set<string>>(new Set(["core","vouchers","banking","reports","sales","purchases","inventory","hr"]));
 
   const getHeaders = () => {
     const h: Record<string, string> = { "Content-Type": "application/json" };
@@ -469,96 +502,113 @@ export default function AdminPermissionsPage() {
               </div>
             </div>
 
-            {/* 3-column plan grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
-              {PLANS.map(plan => {
-                const meta = PLAN_META[plan];
-                const enabled = new Set(planModules[plan]);
-                const allMods = selected.modules as string[];
-                return (
-                  <div
-                    key={plan}
-                    style={{
-                      background: meta.bg, border: `1px solid ${meta.border}`,
-                      borderRadius: 14, overflow: "hidden",
-                    }}
-                  >
-                    {/* Plan header */}
-                    <div style={{ padding: "14px 16px", borderBottom: `1px solid ${meta.border}` }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: meta.color }}>{meta.label}</div>
-                        <span style={{
-                          fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
-                          background: meta.bg, border: `1px solid ${meta.border}`, color: meta.color,
-                        }}>
-                          {enabled.size}/{allMods.length}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 3 }}>{meta.desc}</div>
-                      {/* Quick actions */}
-                      <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-                        <button
-                          onClick={() => setConfig(prev => ({ ...prev, [selected.id]: { ...planModules, [plan]: allMods } }))}
-                          style={{ flex: 1, padding: "5px 0", borderRadius: 6, border: `1px solid ${meta.border}`, background: "transparent", color: meta.color, fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}
-                        >
-                          All ON
-                        </button>
-                        <button
-                          onClick={() => setConfig(prev => ({ ...prev, [selected.id]: { ...planModules, [plan]: allMods.filter(m => ALWAYS_ON.has(m)) } }))}
-                          style={{ flex: 1, padding: "5px 0", borderRadius: 6, border: `1px solid ${meta.border}`, background: "transparent", color: meta.color, fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}
-                        >
-                          Core Only
-                        </button>
-                      </div>
+            {/* Plan header bar */}
+            {(() => {
+              const allMods = selected.modules as string[];
+              return (
+                <>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden", marginBottom: 10 }}>
+                    <div style={{ padding: "12px 18px", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center" }}>
+                      <span style={{ fontSize: 12, color: "rgba(255,255,255,.3)", fontWeight: 600 }}>{allMods.length} modules total</span>
                     </div>
-
-                    {/* Module list */}
-                    <div style={{ padding: "8px 0" }}>
-                      {allMods.map(mod => {
-                        const isOn = enabled.has(mod);
-                        const locked = ALWAYS_ON.has(mod);
-                        return (
-                          <div
-                            key={mod}
-                            onClick={() => toggleModule(plan, mod)}
-                            style={{
-                              display: "flex", alignItems: "center", gap: 10,
-                              padding: "8px 16px", cursor: locked ? "default" : "pointer",
-                              transition: "background .1s",
-                              background: isOn ? "rgba(255,255,255,0.04)" : "transparent",
-                            }}
-                          >
-                            {/* Toggle */}
-                            <div style={{
-                              width: 32, height: 18, borderRadius: 9, flexShrink: 0,
-                              background: isOn ? meta.color : "rgba(255,255,255,0.1)",
-                              position: "relative", transition: "background .2s",
-                            }}>
-                              <div style={{
-                                position: "absolute", top: 2,
-                                left: isOn ? 16 : 2, width: 14, height: 14,
-                                borderRadius: "50%", background: "white",
-                                transition: "left .2s",
-                                boxShadow: "0 1px 3px rgba(0,0,0,.3)",
-                              }}/>
-                            </div>
-                            <span style={{
-                              fontSize: 12, color: isOn ? "white" : "rgba(255,255,255,0.35)",
-                              fontWeight: isOn ? 500 : 400, flex: 1,
-                            }}>
-                              {MODULE_LABELS[mod] || mod}
-                            </span>
-                            {locked && (
-                              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontWeight: 700, textTransform: "uppercase" }}>Core</span>
-                            )}
+                    {PLANS.map(plan => {
+                      const meta = PLAN_META[plan];
+                      const count = allMods.filter(m => planModules[plan].includes(m)).length;
+                      return (
+                        <div key={plan} style={{ padding: "10px 14px", borderRight: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: meta.color }}>{meta.label}</div>
+                          <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 7 }}>{count}/{allMods.length} enabled</div>
+                          <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
+                            <button onClick={() => setConfig(prev => ({ ...prev, [selected.id]: { ...planModules, [plan]: allMods } }))}
+                              style={{ padding: "3px 8px", borderRadius: 5, border: `1px solid ${meta.border}`, background: "transparent", color: meta.color, fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>All ON</button>
+                            <button onClick={() => setConfig(prev => ({ ...prev, [selected.id]: { ...planModules, [plan]: allMods.filter(m => ALWAYS_ON.has(m)) } }))}
+                              style={{ padding: "3px 8px", borderRadius: 5, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.4)", fontSize: 9, fontWeight: 700, cursor: "pointer", fontFamily: FONT }}>Core</button>
                           </div>
-                        );
-                      })}
-                    </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Grouped module table */}
+                  <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
+                    {MODULE_GROUPS.map((group, gi) => {
+                      const groupMods = group.keys.filter(k => allMods.includes(k));
+                      if (groupMods.length === 0) return null;
+                      const isExpanded = expandedGroups.has(group.id);
+                      const isLast = gi === MODULE_GROUPS.length - 1;
+
+                      return (
+                        <div key={group.id} style={{ borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.05)" }}>
+                          {/* Group header */}
+                          <div
+                            onClick={() => setExpandedGroups(prev => { const n = new Set(prev); n.has(group.id) ? n.delete(group.id) : n.add(group.id); return n; })}
+                            style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "9px 16px", background: "rgba(255,255,255,0.035)", cursor: "pointer", userSelect: "none" }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                              <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)", width: 10, flexShrink: 0 }}>{isExpanded ? "▼" : "▶"}</span>
+                              <span style={{ fontSize: 13 }}>{group.icon}</span>
+                              <span style={{ fontSize: 12, fontWeight: 700, color: "white" }}>{group.label}</span>
+                              <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)" }}>({groupMods.length})</span>
+                            </div>
+                            {PLANS.map(plan => {
+                              const meta = PLAN_META[plan];
+                              const onCount = groupMods.filter(m => planModules[plan].includes(m)).length;
+                              const allOn = onCount === groupMods.length;
+                              const nonLocked = groupMods.filter(m => !ALWAYS_ON.has(m));
+                              return (
+                                <div key={plan} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }} onClick={e => e.stopPropagation()}>
+                                  <span style={{ fontSize: 10, fontWeight: 700, color: allOn ? meta.color : "rgba(255,255,255,.3)", minWidth: 28, textAlign: "right" }}>
+                                    {onCount}/{groupMods.length}
+                                  </span>
+                                  {nonLocked.length > 0 && (
+                                    <button
+                                      onClick={() => setConfig(prev => {
+                                        const cur = new Set(planModules[plan]);
+                                        if (allOn) nonLocked.forEach(m => cur.delete(m));
+                                        else nonLocked.forEach(m => cur.add(m));
+                                        return { ...prev, [selected.id]: { ...planModules, [plan]: Array.from(cur) } };
+                                      })}
+                                      style={{ padding: "2px 7px", borderRadius: 4, fontSize: 9, fontWeight: 700, cursor: "pointer", border: `1px solid ${allOn ? "rgba(248,113,113,.4)" : meta.border}`, background: "transparent", color: allOn ? "#f87171" : meta.color, fontFamily: FONT }}
+                                    >
+                                      {allOn ? "All OFF" : "All ON"}
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Module rows */}
+                          {isExpanded && groupMods.map((mod, mi) => {
+                            const locked = ALWAYS_ON.has(mod);
+                            return (
+                              <div key={mod} style={{ display: "grid", gridTemplateColumns: "1fr 170px 170px 170px", padding: "7px 16px 7px 40px", borderTop: "1px solid rgba(255,255,255,0.03)", background: mi % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.65)" }}>{MODULE_LABELS[mod] || mod}</span>
+                                  {locked && <span style={{ fontSize: 9, color: "rgba(255,255,255,.2)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em" }}>core</span>}
+                                </div>
+                                {PLANS.map(plan => {
+                                  const meta = PLAN_META[plan];
+                                  const isOn = planModules[plan].includes(mod);
+                                  return (
+                                    <div key={plan} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                      <div onClick={() => !locked && toggleModule(plan, mod)}
+                                        style={{ width: 34, height: 19, borderRadius: 10, position: "relative", transition: "background .2s", background: isOn ? meta.color : "rgba(255,255,255,0.1)", cursor: locked ? "default" : "pointer", opacity: locked ? 0.7 : 1, flexShrink: 0 }}>
+                                        <div style={{ position: "absolute", top: 2.5, left: isOn ? 17 : 2.5, width: 14, height: 14, borderRadius: "50%", background: "white", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.3)" }}/>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
 
             {/* Save */}
             <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end", gap: 10 }}>
