@@ -11,7 +11,7 @@ import {
 } from "recharts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
-type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor" | "reconciliation" | "scan" | "invoice-gen";
+type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor" | "reconciliation" | "scan" | "invoice-gen" | "inv-forecast" | "cashflow-opt" | "churn" | "supplier-intel" | "gl-suggest";
 
 // ── Scan Receipt types
 interface ScannedItem { description: string; qty: number | null; unitPrice: number | null; amount: number }
@@ -31,6 +31,25 @@ interface InvoiceDraft {
   subtotal: number; taxTotal: number; total: number;
   notes: string | null; confidence: number;
 }
+
+// ── Inventory Forecast types
+interface InvForecastItem { itemId: string; name: string; currentStock: number; minStock: number; avgMonthlySales: number; nextMonthForecast: number; suggestedReorder: number; daysOfStock: number; urgency: "critical" | "warning" | "ok"; trend: "growing" | "stable" | "declining"; totalRevenue: number; }
+interface InvForecastResult { forecasts: InvForecastItem[]; summary: { criticalCount: number; warningCount: number; totalItems: number; estimatedReorderValue: number; currency: string; reorderValueFormatted: string }; narrative: string; }
+
+// ── Cashflow Optimize types
+interface CashflowEntry { label: string; amount: number; dueDate: string; daysUntilDue: number; type: "inflow" | "outflow"; action: string; priority: "urgent" | "high" | "medium"; earlyPayDiscount?: string | null; }
+interface CashflowOptResult { inflows: CashflowEntry[]; outflows: CashflowEntry[]; projection: { net30: number; net60: number; inflow30: number; inflow60: number; outflow30: number; outflow60: number; currency: string }; tips: Array<{ title: string; impact: string; action: string; potentialSaving: string }>; narrative: string; }
+
+// ── Churn Prediction types
+interface ChurnCustomer { customerId: string; name: string; totalRevenue: number; invoiceCount: number; daysSinceLastOrder: number; avgOrderFrequencyDays: number; revenueTrend: "growing" | "stable" | "declining" | "gone_silent"; churnRisk: "critical" | "high" | "medium" | "low"; churnScore: number; reason: string; suggestedAction: string; }
+interface ChurnResult { customers: ChurnCustomer[]; summary: { criticalCount: number; highCount: number; totalCustomers: number; atRiskRevenue: number; currency: string }; narrative: string; }
+
+// ── Supplier Intel types
+interface SupplierIntelItem { supplierId: string; name: string; totalSpend: number; invoiceCount: number; spendTrend: "increasing" | "stable" | "decreasing"; spendTrendPct: number; negotiationOpportunity: "high" | "medium" | "low"; negotiationReason: string; suggestedDiscount: string; topItems: Array<{ description: string; avgRate: number; totalQty: number; priceVariance: number }>; lastOrderDaysAgo: number; concentrationRisk: boolean; }
+interface SupplierIntelResult { suppliers: SupplierIntelItem[]; summary: { highOpportunityCount: number; totalSuppliers: number; totalPotentialSaving: number; currency: string }; narrative: string; }
+
+// ── GL Suggest types
+interface GLSuggestResult { suggestions: Array<{ rank: number; category: string; confidence: number; matchedKeyword: string; matchedAccounts: Array<{ id: string; name: string; code: string | null; type: string | null }> }>; fallbackAccounts: Array<{ id: string; name: string; code: string | null; type: string | null }>; topSuggestion: { category: string; confidence: number } | null; }
 
 interface AnomalyAlert {
   severity: "critical" | "warning" | "info";
@@ -563,6 +582,28 @@ export default function AICommandCenter() {
   const [invoiceGenLoading, setInvoiceGenLoading] = useState(false);
   const [invoiceGenError, setInvoiceGenError] = useState<string | null>(null);
 
+  // Inventory Forecast state
+  const [invForecast, setInvForecast] = useState<InvForecastResult | null>(null);
+  const [invForecastLoading, setInvForecastLoading] = useState(false);
+
+  // Cashflow Optimizer state
+  const [cashflowOpt, setCashflowOpt] = useState<CashflowOptResult | null>(null);
+  const [cashflowOptLoading, setCashflowOptLoading] = useState(false);
+
+  // Churn Prediction state
+  const [churnResult, setChurnResult] = useState<ChurnResult | null>(null);
+  const [churnLoading, setChurnLoading] = useState(false);
+
+  // Supplier Intel state
+  const [supplierIntel, setSupplierIntel] = useState<SupplierIntelResult | null>(null);
+  const [supplierIntelLoading, setSupplierIntelLoading] = useState(false);
+
+  // GL Suggest state
+  const [glDesc, setGlDesc] = useState("");
+  const [glVendor, setGlVendor] = useState("");
+  const [glResult, setGlResult] = useState<GLSuggestResult | null>(null);
+  const [glLoading, setGlLoading] = useState(false);
+
   // Chat state
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
@@ -576,7 +617,7 @@ export default function AICommandCenter() {
     const allowedTabs = new Set<Tab>([
       "overview", "chat", "insights", "alerts", "forecast",
       "recommendations", "reminders", "tax", "report", "market", "advisor", "reconciliation",
-      "scan", "invoice-gen",
+      "scan", "invoice-gen", "inv-forecast", "cashflow-opt", "churn", "supplier-intel", "gl-suggest",
     ]);
     if (nextTab && allowedTabs.has(nextTab as Tab)) {
       setTab(nextTab as Tab);
@@ -836,6 +877,62 @@ export default function AICommandCenter() {
     if (t === "report") { /* period-aware, loadReport handles it */ }
     if (t === "scan") { setScanResult(null); setScanError(null); setScanFile(null); setScanPreview(null); }
     if (t === "invoice-gen") { setInvoiceDraft(null); setInvoiceGenError(null); setInvoiceGenPrompt(""); }
+    if (t === "inv-forecast" && !invForecast) loadInvForecast();
+    if (t === "cashflow-opt" && !cashflowOpt) loadCashflowOpt();
+    if (t === "churn" && !churnResult) loadChurn();
+    if (t === "supplier-intel" && !supplierIntel) loadSupplierIntel();
+    if (t === "gl-suggest") { setGlResult(null); setGlDesc(""); setGlVendor(""); }
+  }
+
+  async function loadInvForecast() {
+    if (invForecastLoading) return;
+    setInvForecastLoading(true);
+    try {
+      const res = await fetch("/api/ai/inventory-forecast", { headers: getHeaders() });
+      const data = await res.json() as InvForecastResult;
+      setInvForecast(data);
+    } catch { /* silent */ } finally { setInvForecastLoading(false); }
+  }
+
+  async function loadCashflowOpt() {
+    if (cashflowOptLoading) return;
+    setCashflowOptLoading(true);
+    try {
+      const res = await fetch("/api/ai/cashflow-optimize", { headers: getHeaders() });
+      const data = await res.json() as CashflowOptResult;
+      setCashflowOpt(data);
+    } catch { /* silent */ } finally { setCashflowOptLoading(false); }
+  }
+
+  async function loadChurn() {
+    if (churnLoading) return;
+    setChurnLoading(true);
+    try {
+      const res = await fetch("/api/ai/churn-prediction", { headers: getHeaders() });
+      const data = await res.json() as ChurnResult;
+      setChurnResult(data);
+    } catch { /* silent */ } finally { setChurnLoading(false); }
+  }
+
+  async function loadSupplierIntel() {
+    if (supplierIntelLoading) return;
+    setSupplierIntelLoading(true);
+    try {
+      const res = await fetch("/api/ai/supplier-intel", { headers: getHeaders() });
+      const data = await res.json() as SupplierIntelResult;
+      setSupplierIntel(data);
+    } catch { /* silent */ } finally { setSupplierIntelLoading(false); }
+  }
+
+  async function handleGLSuggest() {
+    if (!glDesc.trim()) return;
+    setGlLoading(true);
+    setGlResult(null);
+    try {
+      const res = await fetch("/api/ai/gl-suggest", { method: "POST", headers: getHeaders(), body: JSON.stringify({ description: glDesc, vendor: glVendor }) });
+      const data = await res.json() as GLSuggestResult;
+      setGlResult(data);
+    } catch { /* silent */ } finally { setGlLoading(false); }
   }
 
   async function handleScanReceipt() {
@@ -993,6 +1090,11 @@ export default function AICommandCenter() {
     { id: "reconciliation",   label: "Reconciliation",                                        icon: "🔗" },
     { id: "scan",             label: "Scan Receipt",                                          icon: "📷" },
     { id: "invoice-gen",      label: "Quick Invoice",                                         icon: "✍️" },
+    { id: "inv-forecast",     label: "Stock Forecast",                                        icon: "📦" },
+    { id: "cashflow-opt",     label: "Cash Optimizer",                                        icon: "💵" },
+    { id: "churn",            label: "Churn Prediction",                                      icon: "👥" },
+    { id: "supplier-intel",   label: "Supplier Intel",                                        icon: "🤝" },
+    { id: "gl-suggest",       label: "GL Auto-Code",                                          icon: "🏷️" },
   ];
 
   return (
@@ -3021,6 +3123,348 @@ export default function AICommandCenter() {
                 >
                   🧾 Open in Sales Invoice →
                 </a>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── INVENTORY FORECAST TAB ───────────────────────────────────── */}
+        {tab === "inv-forecast" && (
+          <div style={{ maxWidth: 900, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#f59e0b,#d97706)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📦</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>Inventory Demand Forecast</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI predicts next-month demand per product using 6-month sales history and trend analysis</div>
+              </div>
+              <button onClick={loadInvForecast} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(245,158,11,.12)", border: "1px solid rgba(245,158,11,.3)", color: "#fbbf24", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
+            </div>
+            {invForecastLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing sales patterns...</div>}
+            {invForecast && !invForecastLoading && (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+                  {[
+                    { label: "Critical", value: invForecast.summary.criticalCount, color: "#ef4444", bg: "rgba(239,68,68,.08)", desc: "< 15 days stock" },
+                    { label: "Warning", value: invForecast.summary.warningCount, color: "#f59e0b", bg: "rgba(245,158,11,.08)", desc: "< 30 days stock" },
+                    { label: "Total Tracked", value: invForecast.summary.totalItems, color: "#818cf8", bg: "rgba(99,102,241,.08)", desc: "products analyzed" },
+                    { label: "Reorder Value", value: invForecast.summary.reorderValueFormatted, color: "#10b981", bg: "rgba(16,185,129,.08)", desc: "estimated cost" },
+                  ].map(card => (
+                    <div key={card.label} style={{ padding: "16px 18px", borderRadius: 14, background: card.bg, border: `1px solid ${card.color}22` }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: card.color }}>{card.value}</div>
+                      <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 3 }}>{card.desc}</div>
+                    </div>
+                  ))}
+                </div>
+                {invForecast.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{invForecast.narrative}</div>}
+                <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 90px 90px 90px 90px", padding: "10px 16px", background: "rgba(255,255,255,.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", gap: 8 }}>
+                    <span>Product</span><span style={{ textAlign: "center" }}>Stock</span><span style={{ textAlign: "center" }}>Avg/Mo</span><span style={{ textAlign: "center" }}>Forecast</span><span style={{ textAlign: "center" }}>Days Left</span><span style={{ textAlign: "center" }}>Reorder</span>
+                  </div>
+                  {invForecast.forecasts.map((item, i) => {
+                    const urgencyColor = item.urgency === "critical" ? "#ef4444" : item.urgency === "warning" ? "#f59e0b" : "#10b981";
+                    const trendIcon = item.trend === "growing" ? "↑" : item.trend === "declining" ? "↓" : "→";
+                    return (
+                      <div key={item.itemId} style={{ display: "grid", gridTemplateColumns: "1fr 80px 90px 90px 90px 90px", padding: "12px 16px", borderTop: "1px solid rgba(255,255,255,.04)", gap: 8, alignItems: "center" }}>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.85)" }}>{item.name}</div>
+                          <div style={{ fontSize: 10.5, color: item.trend === "growing" ? "#10b981" : item.trend === "declining" ? "#ef4444" : "rgba(255,255,255,.35)", marginTop: 2 }}>{trendIcon} {item.trend}</div>
+                        </div>
+                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)" }}>{item.currentStock}</span>
+                        <span style={{ textAlign: "center", fontSize: 13, color: "rgba(255,255,255,.5)" }}>{item.avgMonthlySales}</span>
+                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "#818cf8" }}>{item.nextMonthForecast}</span>
+                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 800, color: urgencyColor }}>{item.daysOfStock === 999 ? "∞" : `${item.daysOfStock}d`}</span>
+                        <span style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: item.suggestedReorder > 0 ? "#f59e0b" : "rgba(255,255,255,.25)" }}>{item.suggestedReorder > 0 ? item.suggestedReorder : "—"}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+            {!invForecast && !invForecastLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.3)" }}>No inventory sales data yet.</div>}
+          </div>
+        )}
+
+        {/* ── CASHFLOW OPTIMIZER TAB ──────────────────────────────────────── */}
+        {tab === "cashflow-opt" && (
+          <div style={{ maxWidth: 900, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>💵</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>Cash Flow Optimizer</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI schedules optimal payment timing — collect faster, pay smarter, maximize liquidity</div>
+              </div>
+              <button onClick={loadCashflowOpt} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(16,185,129,.12)", border: "1px solid rgba(16,185,129,.3)", color: "#6ee7b7", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
+            </div>
+            {cashflowOptLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing cash position...</div>}
+            {cashflowOpt && !cashflowOptLoading && (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+                  {[
+                    { label: "Net Cash (30 days)", value: cashflowOpt.projection.net30, currency: cashflowOpt.projection.currency },
+                    { label: "Net Cash (60 days)", value: cashflowOpt.projection.net60, currency: cashflowOpt.projection.currency },
+                  ].map(card => {
+                    const positive = card.value >= 0;
+                    return (
+                      <div key={card.label} style={{ padding: "20px 22px", borderRadius: 14, background: positive ? "rgba(16,185,129,.07)" : "rgba(239,68,68,.07)", border: `1px solid ${positive ? "rgba(16,185,129,.25)" : "rgba(239,68,68,.25)"}` }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>{card.label}</div>
+                        <div style={{ fontSize: 24, fontWeight: 900, color: positive ? "#10b981" : "#ef4444" }}>{positive ? "+" : ""}{card.currency} {Math.abs(card.value).toLocaleString()}</div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginTop: 4 }}>{positive ? "Positive cash position" : "Cash gap — action needed"}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {cashflowOpt.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{cashflowOpt.narrative}</div>}
+                {cashflowOpt.tips.length > 0 && (
+                  <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 20px", marginBottom: 20 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>💡 Optimization Actions</div>
+                    {cashflowOpt.tips.map((tip, i) => {
+                      const impactColor = tip.impact === "critical" ? "#ef4444" : tip.impact === "high" ? "#f59e0b" : "#818cf8";
+                      return (
+                        <div key={i} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", marginBottom: 8, display: "flex", gap: 14, alignItems: "flex-start" }}>
+                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: impactColor, flexShrink: 0, marginTop: 4 }} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)", marginBottom: 3 }}>{tip.title}</div>
+                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 4 }}>{tip.action}</div>
+                            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#10b981" }}>{tip.potentialSaving}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  {[{ title: "💰 Expected Inflows", items: cashflowOpt.inflows, color: "#10b981" }, { title: "💸 Expected Outflows", items: cashflowOpt.outflows, color: "#f87171" }].map(section => (
+                    <div key={section.title} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
+                      <div style={{ padding: "12px 16px", background: "rgba(255,255,255,.03)", fontSize: 12, fontWeight: 700, color: section.color, borderBottom: "1px solid rgba(255,255,255,.05)" }}>{section.title}</div>
+                      {(section.items as CashflowEntry[]).slice(0, 6).map((item, i) => {
+                        const prColor = item.priority === "urgent" ? "#ef4444" : item.priority === "high" ? "#f59e0b" : "#818cf8";
+                        return (
+                          <div key={i} style={{ padding: "10px 16px", borderTop: i > 0 ? "1px solid rgba(255,255,255,.04)" : "none" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                              <span style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,.8)", flex: 1, marginRight: 8 }}>{item.label}</span>
+                              <span style={{ fontSize: 13, fontWeight: 800, color: section.color, whiteSpace: "nowrap" }}>{cashflowOpt.projection.currency} {item.amount.toLocaleString()}</span>
+                            </div>
+                            <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>{item.dueDate} · <span style={{ color: prColor }}>{item.priority}</span></div>
+                            {"earlyPayDiscount" in item && item.earlyPayDiscount && <div style={{ fontSize: 10.5, color: "#fbbf24", marginTop: 3 }}>💡 {item.earlyPayDiscount}</div>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {!cashflowOpt && !cashflowOptLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.3)" }}>No outstanding invoices to analyze.</div>}
+          </div>
+        )}
+
+        {/* ── CHURN PREDICTION TAB ────────────────────────────────────────── */}
+        {tab === "churn" && (
+          <div style={{ maxWidth: 900, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#8b5cf6,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>👥</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>Customer Churn Prediction</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI identifies which customers are likely to leave based on purchase frequency and revenue trends</div>
+              </div>
+              <button onClick={loadChurn} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(139,92,246,.12)", border: "1px solid rgba(139,92,246,.3)", color: "#c4b5fd", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
+            </div>
+            {churnLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing customer behavior...</div>}
+            {churnResult && !churnLoading && (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+                  {[
+                    { label: "Critical Risk", value: churnResult.summary.criticalCount, color: "#ef4444", bg: "rgba(239,68,68,.08)" },
+                    { label: "High Risk", value: churnResult.summary.highCount, color: "#f59e0b", bg: "rgba(245,158,11,.08)" },
+                    { label: "Total Customers", value: churnResult.summary.totalCustomers, color: "#818cf8", bg: "rgba(99,102,241,.08)" },
+                    { label: "Revenue at Risk", value: `${churnResult.summary.currency} ${Math.round(churnResult.summary.atRiskRevenue / 1000)}K`, color: "#ef4444", bg: "rgba(239,68,68,.08)" },
+                  ].map(card => (
+                    <div key={card.label} style={{ padding: "16px 18px", borderRadius: 14, background: card.bg, border: `1px solid ${card.color}22` }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: card.color }}>{card.value}</div>
+                    </div>
+                  ))}
+                </div>
+                {churnResult.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(139,92,246,.06)", border: "1px solid rgba(139,92,246,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{churnResult.narrative}</div>}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {churnResult.customers.map(customer => {
+                    const riskColor = customer.churnRisk === "critical" ? "#ef4444" : customer.churnRisk === "high" ? "#f59e0b" : customer.churnRisk === "medium" ? "#818cf8" : "#10b981";
+                    const trendIcon = customer.revenueTrend === "growing" ? "↑" : customer.revenueTrend === "gone_silent" ? "⚠" : customer.revenueTrend === "declining" ? "↓" : "→";
+                    return (
+                      <div key={customer.customerId} style={{ padding: "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${customer.churnRisk === "critical" ? "rgba(239,68,68,.25)" : "rgba(255,255,255,.07)"}`, display: "flex", gap: 16, alignItems: "flex-start" }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 12, background: `${riskColor}15`, border: `2px solid ${riskColor}40`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <div style={{ fontSize: 16, fontWeight: 900, color: riskColor }}>{customer.churnScore}</div>
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                            <span style={{ fontSize: 14, fontWeight: 800, color: "rgba(255,255,255,.9)" }}>{customer.name}</span>
+                            <span style={{ fontSize: 10.5, fontWeight: 800, color: riskColor, background: `${riskColor}15`, padding: "2px 8px", borderRadius: 999, border: `1px solid ${riskColor}30` }}>{customer.churnRisk.toUpperCase()}</span>
+                            <span style={{ fontSize: 11, color: customer.revenueTrend === "growing" ? "#10b981" : customer.revenueTrend === "declining" || customer.revenueTrend === "gone_silent" ? "#ef4444" : "rgba(255,255,255,.35)" }}>{trendIcon} {customer.revenueTrend}</span>
+                          </div>
+                          <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{customer.reason}</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "#c4b5fd" }}>→ {customer.suggestedAction}</div>
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,.7)" }}>{churnResult.summary.currency} {Math.round(customer.totalRevenue / 1000)}K</div>
+                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{customer.invoiceCount} orders</div>
+                          <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)" }}>Last: {customer.daysSinceLastOrder}d ago</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+            {!churnResult && !churnLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.3)" }}>No customer sales history yet.</div>}
+          </div>
+        )}
+
+        {/* ── SUPPLIER INTEL TAB ──────────────────────────────────────────── */}
+        {tab === "supplier-intel" && (
+          <div style={{ maxWidth: 900, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#0ea5e9,#0284c7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🤝</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>Supplier Negotiation Intelligence</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI identifies which suppliers to negotiate with and estimates savings from volume/loyalty discounts</div>
+              </div>
+              <button onClick={loadSupplierIntel} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(14,165,233,.12)", border: "1px solid rgba(14,165,233,.3)", color: "#7dd3fc", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
+            </div>
+            {supplierIntelLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing purchase history...</div>}
+            {supplierIntel && !supplierIntelLoading && (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
+                  {[
+                    { label: "High Opportunity", value: supplierIntel.summary.highOpportunityCount, color: "#10b981", desc: "suppliers to negotiate now" },
+                    { label: "Total Suppliers", value: supplierIntel.summary.totalSuppliers, color: "#818cf8", desc: "with 2+ orders" },
+                    { label: "Potential Savings", value: `${supplierIntel.summary.currency} ${Math.round(supplierIntel.summary.totalPotentialSaving / 1000)}K/yr`, color: "#f59e0b", desc: "if discounts secured" },
+                  ].map(card => (
+                    <div key={card.label} style={{ padding: "18px 20px", borderRadius: 14, background: `${card.color}0d`, border: `1px solid ${card.color}22` }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{card.label}</div>
+                      <div style={{ fontSize: 24, fontWeight: 900, color: card.color }}>{card.value}</div>
+                      <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 3 }}>{card.desc}</div>
+                    </div>
+                  ))}
+                </div>
+                {supplierIntel.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(14,165,233,.05)", border: "1px solid rgba(14,165,233,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{supplierIntel.narrative}</div>}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {supplierIntel.suppliers.map(supplier => {
+                    const opColor = supplier.negotiationOpportunity === "high" ? "#10b981" : supplier.negotiationOpportunity === "medium" ? "#f59e0b" : "#818cf8";
+                    const trendIcon = supplier.spendTrend === "increasing" ? "↑" : supplier.spendTrend === "decreasing" ? "↓" : "→";
+                    const trendColor = supplier.spendTrend === "increasing" ? "#ef4444" : supplier.spendTrend === "decreasing" ? "#10b981" : "rgba(255,255,255,.4)";
+                    return (
+                      <div key={supplier.supplierId} style={{ padding: "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${supplier.negotiationOpportunity === "high" ? "rgba(16,185,129,.25)" : "rgba(255,255,255,.07)"}` }}>
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
+                              <span style={{ fontSize: 14, fontWeight: 800, color: "rgba(255,255,255,.9)" }}>{supplier.name}</span>
+                              <span style={{ fontSize: 10.5, fontWeight: 800, color: opColor, background: `${opColor}15`, padding: "2px 8px", borderRadius: 999 }}>{supplier.negotiationOpportunity.toUpperCase()} OPPORTUNITY</span>
+                              {supplier.concentrationRisk && <span style={{ fontSize: 10.5, color: "#f59e0b", background: "rgba(245,158,11,.1)", padding: "2px 8px", borderRadius: 999 }}>⚠ Concentration Risk</span>}
+                            </div>
+                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 6 }}>{supplier.negotiationReason}</div>
+                            <div style={{ fontSize: 12.5, fontWeight: 700, color: "#7dd3fc" }}>💡 {supplier.suggestedDiscount}</div>
+                            {supplier.topItems.length > 0 && (
+                              <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                {supplier.topItems.slice(0, 3).map((item, i) => (
+                                  <div key={i} style={{ padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 11, color: "rgba(255,255,255,.55)" }}>
+                                    {item.description} · avg {supplierIntel.summary.currency} {item.avgRate.toLocaleString()}{item.priceVariance > 5 ? ` · ${item.priceVariance}% price variance` : ""}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div style={{ textAlign: "right", flexShrink: 0 }}>
+                            <div style={{ fontSize: 15, fontWeight: 900, color: "rgba(255,255,255,.85)" }}>{supplierIntel.summary.currency} {Math.round(supplier.totalSpend / 1000)}K/yr</div>
+                            <div style={{ fontSize: 11, color: trendColor, marginTop: 3 }}>{trendIcon} {Math.abs(supplier.spendTrendPct)}% spend {supplier.spendTrend}</div>
+                            <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{supplier.invoiceCount} orders · last {supplier.lastOrderDaysAgo}d ago</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+            {!supplierIntel && !supplierIntelLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.3)" }}>No purchase history with multiple orders yet.</div>}
+          </div>
+        )}
+
+        {/* ── GL AUTO-CODE TAB ────────────────────────────────────────────── */}
+        {tab === "gl-suggest" && (
+          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🏷️</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>GL Auto-Code</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Type a description and AI instantly suggests the correct GL account — no manual lookup needed</div>
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
+                <div style={{ flex: 2 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>Description / Narration</label>
+                  <input value={glDesc} onChange={e => setGlDesc(e.target.value)} onKeyDown={e => e.key === "Enter" && handleGLSuggest()}
+                    placeholder='e.g. "electricity bill", "office rent", "petrol for delivery van"'
+                    style={{ width: "100%", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 10, padding: "12px 14px", color: "white", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>Vendor (optional)</label>
+                  <input value={glVendor} onChange={e => setGlVendor(e.target.value)} onKeyDown={e => e.key === "Enter" && handleGLSuggest()}
+                    placeholder='e.g. "K-Electric", "PTCL"'
+                    style={{ width: "100%", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 10, padding: "12px 14px", color: "white", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} />
+                </div>
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 14 }}>
+                {["electricity bill", "office rent", "salary payment", "petrol for van", "lawyer fees", "Google Ads payment", "printer cartridge", "bank charges", "airline ticket"].map(ex => (
+                  <button key={ex} onClick={() => { setGlDesc(ex); setTimeout(handleGLSuggest, 0); }} style={{ padding: "6px 12px", borderRadius: 999, fontSize: 11.5, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", color: "rgba(255,255,255,.6)", cursor: "pointer", fontFamily: "inherit" }}>{ex}</button>
+                ))}
+              </div>
+              <button onClick={handleGLSuggest} disabled={!glDesc.trim() || glLoading}
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: glDesc.trim() && !glLoading ? "pointer" : "not-allowed", background: glDesc.trim() && !glLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.07)", color: glDesc.trim() && !glLoading ? "white" : "rgba(255,255,255,.3)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                {glLoading ? "🔍 Matching..." : "🏷️ Suggest GL Account"}
+              </button>
+            </div>
+            {glResult && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {glResult.suggestions.length === 0 && glResult.fallbackAccounts.length === 0 && (
+                  <div style={{ padding: 24, textAlign: "center", color: "rgba(255,255,255,.4)", fontSize: 13 }}>No matching GL accounts found. Try a different description.</div>
+                )}
+                {glResult.suggestions.map((s, i) => (
+                  <div key={i} style={{ padding: "16px 18px", borderRadius: 12, background: i === 0 ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.03)", border: `1px solid ${i === 0 ? "rgba(99,102,241,.3)" : "rgba(255,255,255,.07)"}` }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                      {i === 0 && <span style={{ fontSize: 11, fontWeight: 800, color: "#818cf8", background: "rgba(99,102,241,.15)", padding: "3px 10px", borderRadius: 999 }}>BEST MATCH</span>}
+                      <span style={{ fontSize: 15, fontWeight: 800, color: "rgba(255,255,255,.9)" }}>{s.category}</span>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginLeft: "auto" }}>matched "{s.matchedKeyword}"</span>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: s.confidence >= 90 ? "#10b981" : "#f59e0b" }}>{s.confidence}%</span>
+                    </div>
+                    {s.matchedAccounts.length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                        {s.matchedAccounts.map(acc => (
+                          <div key={acc.id} style={{ padding: "8px 14px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", display: "flex", gap: 8, alignItems: "center" }}>
+                            {acc.code && <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", fontFamily: "monospace" }}>{acc.code}</span>}
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{acc.name}</span>
+                            {acc.type && <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)", background: "rgba(255,255,255,.05)", padding: "1px 6px", borderRadius: 4 }}>{acc.type}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {s.matchedAccounts.length === 0 && <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", fontStyle: "italic" }}>Category identified but no matching accounts in your chart of accounts yet.</div>}
+                  </div>
+                ))}
+                {glResult.fallbackAccounts.length > 0 && glResult.suggestions.length === 0 && (
+                  <div style={{ padding: "16px 18px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", marginBottom: 10 }}>Possible Matches (by name search)</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {glResult.fallbackAccounts.map(acc => (
+                        <div key={acc.id} style={{ padding: "8px 14px", borderRadius: 9, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)" }}>
+                          {acc.code && <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", fontFamily: "monospace", marginRight: 6 }}>{acc.code}</span>}
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.8)" }}>{acc.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
