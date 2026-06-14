@@ -11,7 +11,26 @@ import {
 } from "recharts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
-type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor" | "reconciliation";
+type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor" | "reconciliation" | "scan" | "invoice-gen";
+
+// ── Scan Receipt types
+interface ScannedItem { description: string; qty: number | null; unitPrice: number | null; amount: number }
+interface ScanResult {
+  vendor: string | null; date: string | null; invoiceNo: string | null;
+  subtotal: number | null; taxAmount: number | null; taxRate: number | null;
+  total: number; currency: string; items: ScannedItem[];
+  category: string; confidence: number; notes: string | null;
+}
+
+// ── Invoice Gen types
+interface InvoiceGenItem { description: string; qty: number; unitPrice: number; taxRate: number; amount: number }
+interface InvoiceDraft {
+  customerName: string; customerId: string | null; invoiceNo: string;
+  date: string; dueDate: string;
+  items: InvoiceGenItem[];
+  subtotal: number; taxTotal: number; total: number;
+  notes: string | null; confidence: number;
+}
 
 interface AnomalyAlert {
   severity: "critical" | "warning" | "info";
@@ -530,6 +549,20 @@ export default function AICommandCenter() {
   const [reconciliationFilter, setReconciliationFilter] = useState<"all" | "pending" | "auto_matched" | "unmatched">("pending");
   const [reportPeriod, setReportPeriod] = useState<"weekly" | "monthly" | "quarterly">("monthly");
 
+  // Scan Receipt state
+  const [scanFile, setScanFile] = useState<File | null>(null);
+  const [scanPreview, setScanPreview] = useState<string | null>(null);
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const [scanLoading, setScanLoading] = useState(false);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const scanFileRef = useRef<HTMLInputElement>(null);
+
+  // Invoice Gen state
+  const [invoiceGenPrompt, setInvoiceGenPrompt] = useState("");
+  const [invoiceDraft, setInvoiceDraft] = useState<InvoiceDraft | null>(null);
+  const [invoiceGenLoading, setInvoiceGenLoading] = useState(false);
+  const [invoiceGenError, setInvoiceGenError] = useState<string | null>(null);
+
   // Chat state
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
@@ -543,6 +576,7 @@ export default function AICommandCenter() {
     const allowedTabs = new Set<Tab>([
       "overview", "chat", "insights", "alerts", "forecast",
       "recommendations", "reminders", "tax", "report", "market", "advisor", "reconciliation",
+      "scan", "invoice-gen",
     ]);
     if (nextTab && allowedTabs.has(nextTab as Tab)) {
       setTab(nextTab as Tab);
@@ -800,6 +834,53 @@ export default function AICommandCenter() {
     if (t === "advisor") loadBusinessAdvisor();
     if (t === "reconciliation") loadReconciliation();
     if (t === "report") { /* period-aware, loadReport handles it */ }
+    if (t === "scan") { setScanResult(null); setScanError(null); setScanFile(null); setScanPreview(null); }
+    if (t === "invoice-gen") { setInvoiceDraft(null); setInvoiceGenError(null); setInvoiceGenPrompt(""); }
+  }
+
+  async function handleScanReceipt() {
+    if (!scanFile) return;
+    setScanLoading(true);
+    setScanError(null);
+    setScanResult(null);
+    try {
+      const user = getCurrentUser();
+      const authHeaders: Record<string, string> = {};
+      if (user?.companyId) authHeaders["x-company-id"] = user.companyId;
+      if (user?.id)        authHeaders["x-user-id"]    = user.id;
+      if (user?.role)      authHeaders["x-user-role"]  = user.role;
+      const fd = new FormData();
+      fd.append("image", scanFile);
+      const res = await fetch("/api/ai/scan-receipt", { method: "POST", headers: authHeaders, body: fd });
+      const data = await res.json() as { extracted?: ScanResult; error?: string };
+      if (!res.ok || data.error) throw new Error(data.error || "Scan failed");
+      setScanResult(data.extracted || null);
+    } catch (e: unknown) {
+      setScanError(e instanceof Error ? e.message : "Scan failed");
+    } finally {
+      setScanLoading(false);
+    }
+  }
+
+  async function handleInvoiceGen() {
+    if (!invoiceGenPrompt.trim()) return;
+    setInvoiceGenLoading(true);
+    setInvoiceGenError(null);
+    setInvoiceDraft(null);
+    try {
+      const res = await fetch("/api/ai/invoice-gen", {
+        method: "POST",
+        headers: { ...getHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: invoiceGenPrompt }),
+      });
+      const data = await res.json() as { draft?: InvoiceDraft; error?: string };
+      if (!res.ok || data.error) throw new Error(data.error || "Generation failed");
+      setInvoiceDraft(data.draft || null);
+    } catch (e: unknown) {
+      setInvoiceGenError(e instanceof Error ? e.message : "Generation failed");
+    } finally {
+      setInvoiceGenLoading(false);
+    }
   }
 
   // ── Chat send with streaming ───────────────────────────────────────────────
@@ -910,6 +991,8 @@ export default function AICommandCenter() {
     { id: "market",           label: "Market Intel",                                          icon: "🌐" },
     { id: "advisor",          label: "Advisor",                                               icon: "🧭" },
     { id: "reconciliation",   label: "Reconciliation",                                        icon: "🔗" },
+    { id: "scan",             label: "Scan Receipt",                                          icon: "📷" },
+    { id: "invoice-gen",      label: "Quick Invoice",                                         icon: "✍️" },
   ];
 
   return (
@@ -2615,6 +2698,329 @@ export default function AICommandCenter() {
                       );
                     })}
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+
+          {/* ── SCAN RECEIPT TAB ─────────────────────────────────────────── */}
+        {tab === "scan" && (
+          <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📷</div>
+                <div>
+                  <div style={{ fontSize: 17, fontWeight: 800 }}>Receipt / Invoice Scanner</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>Upload any receipt or invoice — AI extracts vendor, amount, tax, and category automatically</div>
+                </div>
+              </div>
+
+              {/* Drop zone */}
+              <div
+                onClick={() => scanFileRef.current?.click()}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => {
+                  e.preventDefault();
+                  const f = e.dataTransfer.files[0];
+                  if (f && f.type.startsWith("image/")) {
+                    setScanFile(f);
+                    setScanResult(null);
+                    setScanError(null);
+                    const reader = new FileReader();
+                    reader.onload = ev => setScanPreview(ev.target?.result as string);
+                    reader.readAsDataURL(f);
+                  }
+                }}
+                style={{
+                  border: `2px dashed ${scanFile ? "rgba(99,102,241,.5)" : "rgba(255,255,255,.12)"}`,
+                  borderRadius: 14, padding: "32px 20px", textAlign: "center", cursor: "pointer",
+                  background: scanFile ? "rgba(99,102,241,.06)" : "rgba(255,255,255,.02)",
+                  transition: "all .2s", marginBottom: 16,
+                }}
+              >
+                {scanPreview ? (
+                  <img src={scanPreview} alt="preview" style={{ maxHeight: 220, maxWidth: "100%", borderRadius: 10, objectFit: "contain" }} />
+                ) : (
+                  <>
+                    <div style={{ fontSize: 36, marginBottom: 10 }}>📄</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.7)" }}>Click or drag &amp; drop</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>JPG, PNG, WEBP — receipts, invoices, bills</div>
+                  </>
+                )}
+              </div>
+              <input ref={scanFileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
+                const f = e.target.files?.[0];
+                if (f) {
+                  setScanFile(f);
+                  setScanResult(null);
+                  setScanError(null);
+                  const reader = new FileReader();
+                  reader.onload = ev => setScanPreview(ev.target?.result as string);
+                  reader.readAsDataURL(f);
+                }
+              }} />
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={handleScanReceipt}
+                  disabled={!scanFile || scanLoading}
+                  style={{
+                    flex: 1, padding: "12px 0", borderRadius: 11, border: "none", cursor: scanFile && !scanLoading ? "pointer" : "not-allowed",
+                    background: scanFile && !scanLoading ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.07)",
+                    color: scanFile && !scanLoading ? "white" : "rgba(255,255,255,.3)",
+                    fontSize: 14, fontWeight: 700, fontFamily: "inherit",
+                    boxShadow: scanFile && !scanLoading ? "0 4px 16px rgba(99,102,241,.35)" : "none",
+                    transition: "all .2s",
+                  }}
+                >
+                  {scanLoading ? "🔍 Scanning..." : "🔍 Scan with AI"}
+                </button>
+                {scanFile && (
+                  <button onClick={() => { setScanFile(null); setScanPreview(null); setScanResult(null); setScanError(null); if (scanFileRef.current) scanFileRef.current.value = ""; }}
+                    style={{ padding: "12px 18px", borderRadius: 11, border: "1px solid rgba(255,255,255,.12)", background: "none", color: "rgba(255,255,255,.5)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              {scanError && (
+                <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 10, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", fontSize: 13 }}>
+                  ⚠️ {scanError}
+                </div>
+              )}
+            </div>
+
+            {/* Results */}
+            {scanResult && (
+              <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 18, padding: "22px 24px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+                  <div style={{ fontSize: 15, fontWeight: 800 }}>Extracted Data</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 999, background: scanResult.confidence >= 80 ? "rgba(16,185,129,.1)" : "rgba(245,158,11,.1)", border: `1px solid ${scanResult.confidence >= 80 ? "rgba(16,185,129,.3)" : "rgba(245,158,11,.3)"}` }}>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: scanResult.confidence >= 80 ? "#10b981" : "#f59e0b" }}>{scanResult.confidence}% confidence</span>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                  {[
+                    { label: "Vendor", value: scanResult.vendor },
+                    { label: "Date", value: scanResult.date },
+                    { label: "Invoice No", value: scanResult.invoiceNo },
+                    { label: "Category", value: scanResult.category },
+                    { label: "Currency", value: scanResult.currency },
+                    { label: "Tax Rate", value: scanResult.taxRate != null ? `${scanResult.taxRate}%` : null },
+                  ].map(({ label, value }) => (
+                    <div key={label} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>{label}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: value ? "rgba(255,255,255,.85)" : "rgba(255,255,255,.25)" }}>{value || "—"}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Totals */}
+                <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: "1px solid rgba(99,102,241,.18)", marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                    <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Subtotal</span>
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>{scanResult.currency} {scanResult.subtotal?.toLocaleString() ?? "—"}</span>
+                  </div>
+                  {scanResult.taxAmount != null && (
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                      <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Tax {scanResult.taxRate ? `(${scanResult.taxRate}%)` : ""}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700 }}>{scanResult.currency} {scanResult.taxAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid rgba(255,255,255,.08)" }}>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "#c7d2fe" }}>Total</span>
+                    <span style={{ fontSize: 17, fontWeight: 900, color: "#818cf8" }}>{scanResult.currency} {scanResult.total.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Line items */}
+                {scanResult.items.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Line Items</div>
+                    {scanResult.items.map((item, i) => (
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,.05)", gap: 12 }}>
+                        <span style={{ fontSize: 13, color: "rgba(255,255,255,.75)", flex: 1 }}>{item.description}</span>
+                        {item.qty && <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>×{item.qty}</span>}
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)", whiteSpace: "nowrap" }}>{scanResult.currency} {item.amount.toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {scanResult.notes && (
+                  <div style={{ marginTop: 14, fontSize: 12.5, color: "rgba(255,255,255,.4)", fontStyle: "italic" }}>📝 {scanResult.notes}</div>
+                )}
+
+                <a
+                  href={`/dashboard/expense-vouchers/new?vendor=${encodeURIComponent(scanResult.vendor || "")}&amount=${scanResult.total}&category=${encodeURIComponent(scanResult.category || "")}`}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    marginTop: 18, padding: "12px 0", borderRadius: 11,
+                    background: "linear-gradient(135deg,#6366f1,#4f46e5)",
+                    color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none",
+                    boxShadow: "0 4px 16px rgba(99,102,241,.3)",
+                  }}
+                >
+                  💸 Create Expense Voucher with this data
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── QUICK INVOICE GEN TAB ─────────────────────────────────────── */}
+        {tab === "invoice-gen" && (
+          <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>✍️</div>
+                <div>
+                  <div style={{ fontSize: 17, fontWeight: 800 }}>Quick Invoice Generator</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>Type naturally — AI generates a complete invoice draft instantly</div>
+                </div>
+              </div>
+
+              {/* Example pills */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 14 }}>
+                {[
+                  "Invoice to ABC Trading for Rs. 50,000 consulting fee + GST",
+                  "Invoice XYZ for 10 units of product at 2000 each",
+                  "Bill to Ali Khan Rs. 75,000 for web design, net 30",
+                  "Invoice for freight charges 15,000 + 17% tax",
+                ].map(ex => (
+                  <button key={ex} onClick={() => setInvoiceGenPrompt(ex)} style={{
+                    padding: "7px 13px", borderRadius: 999, fontSize: 11.5, fontWeight: 600,
+                    background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)",
+                    color: "rgba(255,255,255,.65)", cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+                  }}>
+                    {ex}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ position: "relative" }}>
+                <textarea
+                  value={invoiceGenPrompt}
+                  onChange={e => setInvoiceGenPrompt(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleInvoiceGen(); }}
+                  placeholder='e.g. "Invoice to Sunrise Trading for Rs. 1,20,000 + GST — consulting services"'
+                  rows={3}
+                  style={{
+                    width: "100%", background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.12)",
+                    borderRadius: 12, padding: "14px 16px", color: "white", fontSize: 14,
+                    fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box",
+                  }}
+                />
+                <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.25)", marginTop: 5 }}>Ctrl+Enter to generate</div>
+              </div>
+
+              <button
+                onClick={handleInvoiceGen}
+                disabled={!invoiceGenPrompt.trim() || invoiceGenLoading}
+                style={{
+                  width: "100%", marginTop: 12, padding: "13px 0", borderRadius: 11, border: "none",
+                  cursor: invoiceGenPrompt.trim() && !invoiceGenLoading ? "pointer" : "not-allowed",
+                  background: invoiceGenPrompt.trim() && !invoiceGenLoading ? "linear-gradient(135deg,#10b981,#059669)" : "rgba(255,255,255,.07)",
+                  color: invoiceGenPrompt.trim() && !invoiceGenLoading ? "white" : "rgba(255,255,255,.3)",
+                  fontSize: 14, fontWeight: 700, fontFamily: "inherit",
+                  boxShadow: invoiceGenPrompt.trim() && !invoiceGenLoading ? "0 4px 16px rgba(16,185,129,.3)" : "none",
+                  transition: "all .2s",
+                }}
+              >
+                {invoiceGenLoading ? "✨ Generating..." : "✨ Generate Invoice Draft"}
+              </button>
+
+              {invoiceGenError && (
+                <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 10, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.25)", color: "#f87171", fontSize: 13 }}>
+                  ⚠️ {invoiceGenError}
+                </div>
+              )}
+            </div>
+
+            {/* Draft preview */}
+            {invoiceDraft && (
+              <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(16,185,129,.25)", borderRadius: 18, padding: "22px 24px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+                  <div style={{ fontSize: 15, fontWeight: 800 }}>Invoice Draft</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 999, background: invoiceDraft.confidence >= 80 ? "rgba(16,185,129,.1)" : "rgba(245,158,11,.1)", border: `1px solid ${invoiceDraft.confidence >= 80 ? "rgba(16,185,129,.3)" : "rgba(245,158,11,.3)"}` }}>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: invoiceDraft.confidence >= 80 ? "#10b981" : "#f59e0b" }}>{invoiceDraft.confidence}% confidence</span>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                  {[
+                    { label: "Customer", value: invoiceDraft.customerName },
+                    { label: "Invoice No", value: invoiceDraft.invoiceNo },
+                    { label: "Date", value: invoiceDraft.date },
+                    { label: "Due Date", value: invoiceDraft.dueDate },
+                  ].map(({ label, value }) => (
+                    <div key={label} style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>{label}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{value}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Line items */}
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Line Items</div>
+                  <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,.07)" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 60px 90px 80px 90px", gap: 0, padding: "8px 14px", background: "rgba(255,255,255,.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase" }}>
+                      <span>Description</span><span style={{ textAlign: "center" }}>Qty</span><span style={{ textAlign: "right" }}>Unit Price</span><span style={{ textAlign: "center" }}>Tax</span><span style={{ textAlign: "right" }}>Amount</span>
+                    </div>
+                    {invoiceDraft.items.map((item, i) => (
+                      <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 60px 90px 80px 90px", gap: 0, padding: "11px 14px", borderTop: "1px solid rgba(255,255,255,.05)", fontSize: 13 }}>
+                        <span style={{ color: "rgba(255,255,255,.8)" }}>{item.description}</span>
+                        <span style={{ textAlign: "center", color: "rgba(255,255,255,.5)" }}>{item.qty}</span>
+                        <span style={{ textAlign: "right", color: "rgba(255,255,255,.6)" }}>{item.unitPrice.toLocaleString()}</span>
+                        <span style={{ textAlign: "center", color: "rgba(255,255,255,.4)" }}>{item.taxRate > 0 ? `${item.taxRate}%` : "—"}</span>
+                        <span style={{ textAlign: "right", fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{item.amount.toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Totals */}
+                <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.18)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                    <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Subtotal</span>
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>PKR {invoiceDraft.subtotal.toLocaleString()}</span>
+                  </div>
+                  {invoiceDraft.taxTotal > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                      <span style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Tax / GST</span>
+                      <span style={{ fontSize: 13, fontWeight: 700 }}>PKR {invoiceDraft.taxTotal.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, borderTop: "1px solid rgba(255,255,255,.08)" }}>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "#6ee7b7" }}>Total</span>
+                    <span style={{ fontSize: 17, fontWeight: 900, color: "#10b981" }}>PKR {invoiceDraft.total.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {invoiceDraft.notes && (
+                  <div style={{ marginTop: 12, fontSize: 12.5, color: "rgba(255,255,255,.4)", fontStyle: "italic" }}>📝 {invoiceDraft.notes}</div>
+                )}
+
+                {!invoiceDraft.customerId && (
+                  <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,.07)", border: "1px solid rgba(245,158,11,.22)", fontSize: 12.5, color: "#fbbf24" }}>
+                    ⚠️ Customer "{invoiceDraft.customerName}" not found in your records — you'll need to select or create them when saving the invoice.
+                  </div>
+                )}
+
+                <a
+                  href={`/dashboard/sales-invoice/new?customer=${encodeURIComponent(invoiceDraft.customerName)}&customerId=${invoiceDraft.customerId || ""}&total=${invoiceDraft.total}&invoiceNo=${encodeURIComponent(invoiceDraft.invoiceNo)}`}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    marginTop: 18, padding: "12px 0", borderRadius: 11,
+                    background: "linear-gradient(135deg,#10b981,#059669)",
+                    color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none",
+                    boxShadow: "0 4px 16px rgba(16,185,129,.3)",
+                  }}
+                >
+                  🧾 Open in Sales Invoice →
+                </a>
               </div>
             )}
           </div>
