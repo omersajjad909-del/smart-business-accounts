@@ -29,7 +29,7 @@ export type BusinessType =
   // Wholesale
   | "wholesale"
   // Import / Export
-  | "import_company" | "export_company" | "clearing_forwarding"
+  | "import_company" | "export_company" | "clearing_forwarding" // export_company kept for backward compat
   // Event Management
   | "event_planner" | "wedding_planner" | "decorator" | "sound_services"
   // Rental Business
@@ -1465,43 +1465,6 @@ export const BUSINESS_TYPES: BusinessTypeMeta[] = [
     ],
   },
 
-  {
-    id: "export_company", label: "Import / Export", icon: "🚢", emoji: "🚢",
-    description: "Import & export business — sourcing, customs, LC/TT, shipping, foreign buyers & local sales",
-    tagline: "Source → LC/TT → Ship → Clear → Invoice → Receive",
-    color: "#0891b2", gradient: "linear-gradient(135deg,#0e7490,#0891b2)", category: "Commerce",
-    modules: [...CORE, "sales_invoice","purchase_invoice","purchase_order","inventory_items","stock_rates","crm","hr_payroll","shipments","containers","freight","customs_clearance","lc_management","hs_codes","import_costing","export_rebate","commercial_invoice","packing_list","cert_of_origin","export_docs","trade_analytics","export_performance"],
-    defaultAccounts: [
-      ...COMMON_ACCOUNTS,
-      { code: "1100", name: "Goods in Transit", type: "Asset" },
-      { code: "1101", name: "Export Receivables (Foreign)", type: "Asset" },
-      { code: "1200", name: "Import / Export Goods Inventory", type: "Asset" },
-      { code: "2100", name: "Letter of Credit Payable", type: "Liability" },
-      { code: "4001", name: "Local Sales Revenue", type: "Revenue" },
-      { code: "4002", name: "Export Sales Revenue", type: "Revenue" },
-      { code: "4003", name: "Export Rebate / Drawback", type: "Revenue" },
-      { code: "5100", name: "Cost of Imported Goods", type: "Expense" },
-      { code: "5101", name: "Customs Duty & Taxes", type: "Expense" },
-      { code: "5102", name: "Freight & Insurance", type: "Expense" },
-      { code: "5103", name: "Clearing Agent Charges", type: "Expense" },
-      { code: "5104", name: "Port Charges", type: "Expense" },
-      { code: "5105", name: "Packing & Labelling", type: "Expense" },
-      { code: "5106", name: "Export Documentation", type: "Expense" },
-    ],
-    kpis: [
-      { key: "shipments_in_transit", label: "Shipments in Transit", icon: "🚢", color: "#0891b2" },
-      { key: "export_revenue", label: "Export Revenue", icon: "💰", color: "#34d399" },
-      { key: "stock_value", label: "Stock Value", icon: "📦", color: "#fbbf24" },
-      { key: "foreign_receivables", label: "Foreign Receivables", icon: "🌍", color: "#818cf8" },
-    ],
-    quickActions: [
-      { label: "Purchase Order", href: "/dashboard/purchase-order", icon: "🛒", color: "#0891b2" },
-      { label: "Export Invoice", href: "/dashboard/sales-invoice", icon: "🧾", color: "#34d399" },
-      { label: "Inventory", href: "/dashboard/inventory", icon: "📦", color: "#818cf8" },
-      { label: "Stock Report", href: "/dashboard/reports/stock", icon: "📊", color: "#fbbf24" },
-    ],
-  },
-
   // ── CLEARING & FORWARDING ─────────────────────────────────
   {
     id: "clearing_forwarding", label: "Clearing & Forwarding Agent", icon: "🛃", emoji: "🛃",
@@ -1722,7 +1685,6 @@ export const BUSINESS_PHASE_CONFIG: Record<string, { phase: 1|2|3|4; status: Pha
   retail:               { phase:1, status:"live",        category:"Commerce",          label:"Retail & Multi-Store",    emoji:"🏪", description:"POS, loyalty, multi-branch retail management" },
   wholesale:            { phase:1, status:"live",        category:"Commerce",          label:"Wholesale",               emoji:"📦", description:"Bulk pricing, dealer management, warehouse operations" },
   import_company:       { phase:1, status:"live",        category:"Commerce",          label:"Import / Export",         emoji:"🚢", description:"Import & export — customs, LC/TT, shipping, foreign buyers & local sales" },
-  export_company:       { phase:1, status:"live",        category:"Commerce",          label:"Import / Export",         emoji:"🚢", description:"Import & export — customs, LC/TT, shipping, foreign buyers & local sales" },
   clearing_forwarding:  { phase:1, status:"live",        category:"Commerce",          label:"Clearing & Forwarding",   emoji:"🛃", description:"Freight forwarding, customs documentation" },
 
   // ── Phase 2 — COMING SOON (Production + Retail + Food) ──────

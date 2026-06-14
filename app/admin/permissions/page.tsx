@@ -211,17 +211,16 @@ function getDefaultPlanModules(allModules: string[]): Record<Plan, string[]> {
   return { STARTER: starter, PRO: pro, ENTERPRISE: enterprise };
 }
 
-const ALL_BUSINESSES = BUSINESS_TYPES;
-
 type ConfigMap = Record<string, Record<Plan, string[]>>;
 
 export default function AdminPermissionsPage() {
-  const [user]    = useState(() => getCurrentUser());
-  const [search,  setSearch]  = useState("");
-  const [selected, setSelected] = useState<typeof BUSINESS_TYPES[0] | null>(null);
-  const [config,  setConfig]  = useState<ConfigMap>({});
-  const [saving,  setSaving]  = useState(false);
-  const [saved,   setSaved]   = useState(false);
+  const [user]       = useState(() => getCurrentUser());
+  const [search,     setSearch]     = useState("");
+  const [selected,   setSelected]   = useState<typeof BUSINESS_TYPES[0] | null>(null);
+  const [config,     setConfig]     = useState<ConfigMap>({});
+  const [saving,     setSaving]     = useState(false);
+  const [saved,      setSaved]      = useState(false);
+  const [enabledIds, setEnabledIds] = useState<Set<string> | null>(null);
 
   const getHeaders = () => {
     const h: Record<string, string> = { "Content-Type": "application/json" };
@@ -229,12 +228,22 @@ export default function AdminPermissionsPage() {
     return h;
   };
 
-  // Load saved config
+  // Load saved config + enabled business types
   useEffect(() => {
     fetch("/api/admin/business-plan-modules", { headers: getHeaders() })
       .then(r => r.ok ? r.json() : { config: {} })
       .then(d => setConfig(d.config || {}))
       .catch(() => {});
+
+    fetch("/api/admin/business-modules", { headers: getHeaders() })
+      .then(r => r.ok ? r.json() : { modules: [] })
+      .then(d => {
+        const ids = new Set<string>(
+          (d.modules || []).filter((m: any) => m.enabled).map((m: any) => m.id as string)
+        );
+        setEnabledIds(ids);
+      })
+      .catch(() => setEnabledIds(new Set()));
   }, []);
 
   // Get plan modules for selected business (saved config or defaults)
@@ -283,12 +292,16 @@ export default function AdminPermissionsPage() {
     } finally { setSaving(false); }
   }
 
+  // Only show business types that are currently enabled in Business Modules admin
   const filtered = useMemo(() => {
+    const businesses = enabledIds
+      ? BUSINESS_TYPES.filter(b => enabledIds.has(b.id))
+      : BUSINESS_TYPES;
     const q = search.toLowerCase();
-    return ALL_BUSINESSES.filter(b =>
+    return businesses.filter(b =>
       !q || b.label.toLowerCase().includes(q) || b.id.toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [search, enabledIds]);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--app-bg, #0f1117)", padding: "32px 28px", fontFamily: FONT, color: "white" }}>
@@ -328,7 +341,7 @@ export default function AdminPermissionsPage() {
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
           <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>
-              {ALL_BUSINESSES.length} Business Types
+              {enabledIds ? `${enabledIds.size} Enabled` : "Loading…"} Business Types
             </div>
             <input
               value={search}
@@ -343,7 +356,13 @@ export default function AdminPermissionsPage() {
           </div>
 
           <div style={{ maxHeight: selected ? "calc(100vh - 200px)" : "auto", overflowY: "auto" }}>
-            {!selected && (
+            {enabledIds === null && (
+              <div style={{ padding: 24, textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>Loading…</div>
+            )}
+            {enabledIds !== null && filtered.length === 0 && (
+              <div style={{ padding: 24, textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>No enabled business types found.</div>
+            )}
+            {enabledIds !== null && !selected && (
               // Grid view when nothing selected
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10, padding: 14 }}>
                 {filtered.map(b => {
@@ -373,7 +392,7 @@ export default function AdminPermissionsPage() {
               </div>
             )}
 
-            {selected && (
+            {enabledIds !== null && selected && (
               // List view when something is selected
               filtered.map(b => {
                 const isActive = selected.id === b.id;
