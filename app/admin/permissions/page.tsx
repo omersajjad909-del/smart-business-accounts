@@ -173,7 +173,6 @@ const MODULE_LABELS: Record<string, string> = {
   advance_salary: "Advance Salary",
   // Commerce — granular page keys
   purchase_return: "Purchase Return",
-  bulk_payments: "Bulk Payments",
   payment_followup: "Payment Follow-up",
   customer_statement: "Customer Statement",
   supplier_statement: "Supplier Statement",

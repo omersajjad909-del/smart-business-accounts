@@ -1150,6 +1150,213 @@ const BUSINESS_PROFILES: Record<string, BusinessTypeProfile> = {
     ],
   },
 
+  distribution: {
+    label: "Distribution / Van Sales",
+    coreProducts: ["FMCG", "beverages", "snacks", "personal care", "household items", "dairy", "confectionery", "tobacco"],
+    suggestedAdditions: [
+      { name: "Route Optimization Service for Brand Principals", reason: "Sell territory coverage data to your brand partners — they pay premium for retail outlet penetration reports", potentialRevenue: "high" },
+      { name: "Cold Chain Distribution", reason: "Dairy, pharma, and frozen food demand is growing 40% annually — cold chain capacity commands 25% higher margins", potentialRevenue: "high" },
+      { name: "Secondary Distribution Contracts", reason: "Sub-distribute for large distributors who can't cover your territory — guaranteed volume, no marketing cost", potentialRevenue: "high" },
+      { name: "Van Sales App with Digital Invoicing", reason: "Replace manual order books — reduces errors, speeds up billing, and impresses modern retailers", potentialRevenue: "medium" },
+      { name: "Retail Merchandising Service", reason: "Offer shelf stocking and planogram service to brands — separate revenue stream from your existing routes", potentialRevenue: "medium" },
+      { name: "Retailer Credit Facility via Finance Partner", reason: "Retailers who get credit buy 40% more — partner with a fintech to offer buy-now-pay-later to your outlets", potentialRevenue: "medium" },
+    ],
+    marketTrends: [
+      "Van sales technology adoption is accelerating — distributors without apps are losing brand contracts to digitized competitors",
+      "Modern trade (supermarkets, chains) now requires EDI/digital ordering — manual distributors are being delisted",
+      "Brand principals are consolidating distributor networks — only high-coverage, data-reporting distributors survive",
+      "Same-day stock replenishment is becoming the norm in urban areas — route frequency is a key differentiator",
+    ],
+    seasonalOpportunities: {
+      Jan: ["New year restocking — retailers building inventory after holiday depletion", "Annual contracts with brand principals — lock in territory rights early"],
+      Feb: ["Valentine promotions for confectionery and gifting categories", "Pre-Ramadan planning season — place your Ramadan stock orders now"],
+      Mar: ["Ramadan loading — FMCG demand surges 3-5x, especially juices, beverages, dates", "Increase route frequency to handle surge volume"],
+      Apr: ["Eid ul Fitr pre-loading peak — max vehicle utilization", "Post-Eid retailer returns and credit settlement cycle"],
+      May: ["Summer beverage season begins — cold drinks, juices, ice cream demand spikes", "Expand cold storage capacity for summer season"],
+      Jun: ["Peak summer — beverage volume at annual high", "Mid-year stock count and route performance review"],
+      Jul: ["Monsoon slowdown in some categories — shift focus to rainwear, household items", "Q3 brand review — negotiate better margins for strong performers"],
+      Aug: ["Independence Day promotions — national brands run heavy promotions", "Pre-school season stocking"],
+      Sep: ["Q4 ramp-up — brands push year-end volume targets", "Winter product introduction: quilts, warm beverages, heaters"],
+      Oct: ["Brand principal Q4 push — achieve target volume for annual rebates", "Festival season stock loading"],
+      Nov: ["Year-end volume sprint to hit annual targets and unlock rebates", "New year product launches begin — secure first allocation"],
+      Dec: ["Holiday gifting volume — confectionery and premium FMCG", "Year-end reconciliation with brand principals — rebate collection"],
+    },
+    revenueDiversification: [
+      "Add a returns and damaged goods management service for brand principals",
+      "Offer territory coverage reporting as a paid data service to brand principals",
+      "Launch a retailer loyalty program funded by brand marketing budgets",
+      "Build cold storage capacity and rent it to brands needing temperature-controlled stocking",
+      "Expand into adjacent categories to increase basket size per retailer visit",
+    ],
+    competitorEdge: [
+      "Daily route coverage data with digital proof-of-delivery — brands pay extra for distributors who can prove outlet reach",
+      "Van sales reps with handheld devices and instant invoicing — reduces disputes and accelerates payment",
+      "Refrigerated vehicle fleet — opens cold-chain categories that non-refrigerated competitors cannot serve",
+      "Route-level stock analytics — know which SKUs move fastest per route and never be out of stock",
+    ],
+    crossSellPairs: [
+      { trigger: "Retailer orders beverages", suggest: "Snacks, confectionery, and impulse-buy items at the same drop", reason: "Increases drop size with zero extra route cost — same visit, bigger invoice" },
+      { trigger: "Retailer runs out of stock", suggest: "Suggest adding a buffer quantity to standing order", reason: "Stockouts hurt the retailer — protect them and increase your volumes simultaneously" },
+    ],
+    riskWarnings: [
+      "Brand concentration risk — if one major brand leaves, you may lose 30-50% of your volume overnight",
+      "Vehicle downtime is lost revenue — maintenance planning and backup vehicles are critical",
+      "Retailer credit defaults are endemic — enforce strict credit limits and monitor aging weekly",
+      "Fuel cost volatility directly impacts your per-drop margins — monitor route profitability monthly",
+    ],
+    marketGaps: [
+      "Digital van sales (app-based ordering at retail point) is adopted by less than 20% of Pakistani distributors — early movers get brand contracts",
+      "Proof-of-delivery with geo-tagged photos is demanded by modern brands but almost no distributor provides it",
+      "Retailer segment reporting (which outlet types buy what) is a premium service no distributor currently offers",
+      "After-hours ordering for next-day delivery is an unmet need for retailers in busy commercial areas",
+    ],
+    growthStrategies: [
+      {
+        title: "Digitize Your Van Sales Operation",
+        steps: ["Deploy FinovaOS on tablets for all van sales reps", "Replace manual order books with digital invoices and stock tallies", "Generate daily route coverage and drop reports", "Share weekly outlet data with brand principals to justify your territory value"],
+        impact: "Distributors who digitize win an average of 2 new brand contracts within 6 months — brands actively seek data-reporting partners",
+      },
+    ],
+  },
+
+  "import-company": {
+    label: "Import / Export Trading",
+    coreProducts: ["imported machinery", "raw materials", "finished goods", "consumer electronics", "textiles", "chemicals", "food commodities", "industrial equipment"],
+    suggestedAdditions: [
+      { name: "After-Sale Service & Spare Parts", reason: "After-sales service on imported machinery earns 3-5x the margin of the original sale over the product lifecycle", potentialRevenue: "high" },
+      { name: "Exclusive Agency / Distribution Rights", reason: "Represent a foreign brand exclusively in your market — lock out competition and earn importer margin on every sale", potentialRevenue: "high" },
+      { name: "Bonded Warehouse Service", reason: "Store goods under customs bond and offer logistics to other importers — turn your clearance infrastructure into a service revenue line", potentialRevenue: "high" },
+      { name: "Letter of Credit Consulting for Buyers", reason: "Help your buyers structure their LC — add a consulting fee and deepen the relationship beyond supplier", potentialRevenue: "medium" },
+      { name: "Pre-shipment Inspection Service", reason: "Partner with an inspection agency — offer quality verification to buyers who import from unknown suppliers", potentialRevenue: "medium" },
+      { name: "Currency Hedging Advisory", reason: "Currency risk is your buyers' biggest fear — offer forward contracts or hedging guidance as a value-add", potentialRevenue: "medium" },
+    ],
+    marketTrends: [
+      "Pakistan's import policy shifts frequently — importers who track regulatory changes in real time maintain a competitive edge",
+      "USD/PKR volatility is making long-term import contracts risky — spot buying and hedging are becoming essential skills",
+      "Chinese suppliers are offering direct-to-importer pricing but require digital documentation and compliance — importers who adapt win",
+      "E-commerce import demand is growing — importers who can split large shipments for B2C fulfillment are capturing new revenue",
+    ],
+    seasonalOpportunities: {
+      Jan: ["Q1 import planning season — lock in annual purchase agreements with suppliers before price increases", "Raw material restocking for manufacturers after year-end"],
+      Feb: ["Pre-Ramadan imports must arrive before Mar — place orders now or pay premium for air freight", "Chinese New Year supply disruption window — stock critical items before factory shutdowns"],
+      Mar: ["Ramadan consumer goods — peak demand for food imports, packaging, consumer products", "Post-CNY supplier resumption — negotiate Q2 volume deals"],
+      Apr: ["Eid consumer goods final push — last chance for fast-sea or air freight arrivals", "Post-Eid: review LC utilization and bank limit usage"],
+      May: ["Summer imports: cooling equipment, beverages, seasonal consumer goods", "Supplier visit season — schedule factory audits and relationship-building trips"],
+      Jun: ["Mid-year inventory review — sell slow-moving imports at discount before year-end financing costs mount", "Plan Q3 imports based on H1 sales performance"],
+      Jul: ["Negotiate H2 supply contracts with overseas suppliers", "Review import duty structures for any regulatory changes effective new fiscal year"],
+      Aug: ["Independence Day promotions — imported consumer goods see spike", "Plan advance orders for year-end festive season shipments"],
+      Sep: ["Year-end stocking season — manufacturers and retailers place large Q4 import orders", "Ship now for Oct-Nov arrival to capture Christmas/year-end market"],
+      Oct: ["Festival season demand — premium imports see highest margins of the year", "Review insurance coverage on in-transit goods as peak shipping season begins"],
+      Nov: ["Year-end budget spend by corporate buyers — sell capital equipment and machinery now", "Negotiate preferential supplier terms for coming year before their order books fill"],
+      Dec: ["Year-end clearance on aged inventory — offer deep discounts to clear financing costs", "Place Q1 next-year orders for price and allocation advantage"],
+    },
+    revenueDiversification: [
+      "Add a value-added logistics service: customs clearance, warehousing, and last-mile delivery for other importers",
+      "Launch a B2B digital catalog of your imported products for manufacturer buyers",
+      "Offer trade finance introduction services — connect buyers with banks for LC facilities and earn a referral fee",
+      "Export surplus or overstock internationally — your import contacts may buy from you in reverse",
+      "Add import consultancy for new importers — regulatory navigation, supplier vetting, and LC structuring",
+    ],
+    competitorEdge: [
+      "Strong banking relationships for faster LC opening and better forex rates — critical advantage when PKR moves",
+      "Pre-qualified supplier network with audit history — buyers pay more for verified, reliable supply chains",
+      "Bonded warehouse capability reduces customs holding time from weeks to days — speed is a premium service",
+      "Regulatory compliance expertise — importers who avoid SRO and duty traps save clients 5-15% on landed costs",
+    ],
+    crossSellPairs: [
+      { trigger: "Client imports machinery", suggest: "Annual maintenance contract and spare parts supply agreement", reason: "Parts and service earn 3-5x the margin of the original machinery sale over its lifecycle" },
+      { trigger: "Client needs LC for new supplier", suggest: "Pre-shipment inspection service and supplier audit", reason: "New supplier risk is the client's biggest fear — mitigate it and become indispensable" },
+    ],
+    riskWarnings: [
+      "PKR depreciation risk — open foreign currency payables are your biggest balance sheet vulnerability",
+      "Import policy changes (SROs, duty increases, bans) can make an entire shipment unprofitable overnight",
+      "LC discrepancy risk — even minor document errors can delay payment by 30-60 days and trigger disputes",
+      "Single supplier dependency — if your key overseas supplier stops shipping, you have no product to sell",
+    ],
+    marketGaps: [
+      "Digital import documentation management is almost absent in Pakistan — importers using FinovaOS gain audit and compliance advantage",
+      "Transparent landed cost tracking (including all duties, clearing, freight) is rarely provided to end buyers — those who provide it build trust",
+      "Post-clearance tracking for buyers is an unmet need — most importers lose visibility once goods leave the port",
+      "Consolidation services for smaller importers who can't fill a full container are severely underserved",
+    ],
+    growthStrategies: [
+      {
+        title: "Build an Exclusive Agency Portfolio",
+        steps: ["Identify 3 overseas brands in your category that lack a Pakistani distributor", "Contact them with your import volume and track record", "Negotiate exclusive import rights with 1-2 year contracts", "Use FinovaOS to provide brands with quarterly sales and market penetration reports"],
+        impact: "Exclusive agencies block competition and improve margins by 15-25% compared to open-market importing",
+      },
+    ],
+  },
+
+  "clearing-forwarding": {
+    label: "Clearing & Forwarding / Freight",
+    coreProducts: ["customs clearance", "freight forwarding", "documentation services", "warehousing", "shipping agency", "cargo handling", "container tracking"],
+    suggestedAdditions: [
+      { name: "Integrated Logistics (Door-to-Door)", reason: "Extend from port clearance to final delivery — capture 3x more revenue per shipment and become a single-point partner", potentialRevenue: "high" },
+      { name: "Bonded Warehouse License", reason: "Offer duty-deferred storage — clients pay premium for flexibility to clear goods in tranches when cash flow allows", potentialRevenue: "high" },
+      { name: "Digital Shipment Tracking Portal", reason: "Give clients 24/7 visibility on their cargo status — retention goes up 40% when clients have real-time tracking", potentialRevenue: "high" },
+      { name: "Trade Finance Introduction Service", reason: "Connect importers with banks for LC and financing — earn a referral fee without capital risk", potentialRevenue: "medium" },
+      { name: "Compliance Consulting Retainer", reason: "Regulatory expertise is scarce — offer a monthly retainer for HS code classification, duty optimization, and SRO monitoring", potentialRevenue: "medium" },
+      { name: "Air Freight Brokerage", reason: "When sea freight is too slow, clients need air freight — offer as a premium service to capture urgent cargo revenue", potentialRevenue: "medium" },
+    ],
+    marketTrends: [
+      "Pakistan Customs WeBOC digitization is accelerating — C&F agents who master digital filing win contracts from those who still use manual processes",
+      "One-Customs and PACCS integration requires electronic documentation — early adopters are already winning government tender contracts",
+      "Global shipping disruption (container shortages, port congestion) has made expert freight sourcing a premium service",
+      "Clients increasingly demand end-to-end visibility — C&F agents who provide tracking portals retain clients 40% longer",
+    ],
+    seasonalOpportunities: {
+      Jan: ["January is peak clearance season — year-end shipments clearing through port require extra staff and banking support", "Annual contract renewals with importer clients — lock in volume commitments early"],
+      Feb: ["Chinese New Year — pre-CNY shipments arrive, clearing backlog peaks at ports", "Post-CNY: plan for March surge when Chinese factories resume"],
+      Mar: ["Pre-Ramadan shipment surge — consumer goods importers rush to clear before Ramadan slowdown", "Budget planning for fiscal year — offer annual package pricing to clients"],
+      Apr: ["Post-Eid: shipping activity normalizes, good time for capacity building and staff training", "Mid-year tariff review — monitor any new SROs affecting your clients' HS codes"],
+      May: ["Summer peak: electronics, cooling equipment, and beverage-related imports surge", "Negotiate space allocations with shipping lines before summer peak rates kick in"],
+      Jun: ["Fiscal year end — importers rush to clear goods before June 30 for balance sheet purposes", "New fiscal year begins — update clients on any duty structure or SRO changes"],
+      Jul: ["New fiscal year tariff effects — clients need guidance on new duty rates and HS code changes", "Shipping line contract negotiations for H2 volume allocations"],
+      Aug: ["Pre-festival imports begin moving — consumer goods peak for Oct-Nov market", "Audit your clearance turnaround times and address bottlenecks before peak season"],
+      Sep: ["Q4 shipment surge begins — manufacturers and retailers stocking for year-end", "Negotiate priority clearance agreements with Customs for your bulk clients"],
+      Oct: ["Festival season — high value imports (electronics, luxury goods) need extra insurance and care", "Establish emergency clearance protocols for time-sensitive client shipments"],
+      Nov: ["Year-end rush — importers clearing goods before December fiscal cuts", "Review annual client volumes to renegotiate rates and lock in next-year contracts"],
+      Dec: ["December port congestion is predictable — warn clients, plan in advance, and charge premium for guaranteed slots", "Year-end financials — reconcile all job files, collect outstanding fees, close books"],
+    },
+    revenueDiversification: [
+      "Add a compliance subscription — monthly fee for HS code guidance, SRO alerts, and duty optimization",
+      "Offer bonded warehousing — clients pay for storage flexibility without upfront duty payment",
+      "Launch a digital client portal with real-time shipment tracking and document downloads",
+      "Partner with freight insurance providers and earn commission on marine cargo policies",
+      "Expand into project cargo and heavy lift for infrastructure and energy sector clients",
+    ],
+    competitorEdge: [
+      "WeBOC and One-Customs expertise with faster-than-average clearance times — publish your average days-to-clear as a marketing tool",
+      "Proactive SRO and duty change notifications to clients before shipments arrive — prevent costly surprises",
+      "24/7 port agent contacts for urgent clearances — most C&F agents work office hours only",
+      "Consolidated job reporting per client with landed cost breakdown — clients make better import decisions with better data",
+    ],
+    crossSellPairs: [
+      { trigger: "Client ships full container load (FCL)", suggest: "Warehousing and last-mile delivery service", reason: "They still need to get goods from port to warehouse to customer — own the full chain" },
+      { trigger: "Client has high-duty shipment", suggest: "Duty optimization review and HS code reclassification advisory", reason: "Saving a client 3-5% on duties earns more loyalty than discounting your clearing fee" },
+    ],
+    riskWarnings: [
+      "Regulatory violation liability — incorrectly classified HS codes or valuation disputes can result in penalties imposed on your agency",
+      "Client credit risk — C&F agents often pay duties and freight on behalf of clients; outstanding recovery is a major cash flow risk",
+      "Single port dependency — if your primary port has disruptions (strikes, floods, system outages), all revenue stops",
+      "Staff poaching — experienced customs officers and classifiers are scarce and frequently targeted by competitors",
+    ],
+    marketGaps: [
+      "Real-time digital job status updates for importer clients is almost nonexistent in Pakistan's C&F industry",
+      "HS code and duty optimization as a standalone advisory service is an untapped revenue stream",
+      "Transparent fee structures (no hidden charges) is a major pain point importers cite — first mover wins client trust",
+      "SME importer support (first-time importers navigating LC, customs, and freight) is severely underserved and commands premium fees",
+    ],
+    growthStrategies: [
+      {
+        title: "Build a Client Tracking Portal",
+        steps: ["Use FinovaOS to track all active jobs with status, documents, and estimated clearance date", "Give each client a login to view their own shipments", "Send automated status notifications via WhatsApp at key milestones", "Use job completion data to prove your average clearance time is better than competitors"],
+        impact: "C&F agents with tracking portals retain clients 40% longer and win referrals — most clients cite 'no updates' as their #1 frustration",
+      },
+    ],
+  },
+
 };
 
 // Default profile for unknown business types
@@ -1251,20 +1458,26 @@ const EID_CALENDAR: Record<number, { fitr: string; azha: string }> = {
 
 // Business-type specific Eid opportunity text (injected dynamically based on actual year)
 const EID_FITR_OPPS: Record<string, string> = {
-  retail:      "Eid ul Fitr — biggest shopping event of the year in Muslim markets",
-  trading:     "Eid ul Fitr gifting and packaging demand peaks",
-  restaurant:  "Eid ul Fitr feasting — family packages, catering for home parties",
-  wholesale:   "Eid ul Fitr — massive gifting and fashion spending",
-  salon:       "Eid ul Fitr — walk-in surge, extend hours",
-  default:     "Eid ul Fitr — elevated consumer spending across all categories",
+  retail:                "Eid ul Fitr — biggest shopping event of the year in Muslim markets",
+  trading:               "Eid ul Fitr gifting and packaging demand peaks",
+  restaurant:            "Eid ul Fitr feasting — family packages, catering for home parties",
+  wholesale:             "Eid ul Fitr — massive gifting and fashion spending",
+  salon:                 "Eid ul Fitr — walk-in surge, extend hours",
+  distribution:          "Eid ul Fitr — max route frequency, FMCG demand surges 4-5x",
+  "import-company":      "Eid ul Fitr — ensure pre-Eid shipments cleared; post-Eid import planning begins",
+  "clearing-forwarding": "Eid ul Fitr — clear pre-Eid backlog before holiday; staff holiday coverage essential",
+  default:               "Eid ul Fitr — elevated consumer spending across all categories",
 };
 const EID_AZHA_OPPS: Record<string, string> = {
-  retail:      "Eid ul Azha — major shopping event: clothing, accessories, gifts",
-  trading:     "Eid ul Azha — livestock supplies, packaging, and gifting demand",
-  restaurant:  "Eid ul Azha — catering demand for family gatherings and meat-based dishes",
-  wholesale:   "Eid ul Azha — bulk orders for gifting and food distribution",
-  salon:       "Eid ul Azha — pre-Eid salon bookings surge",
-  default:     "Eid ul Azha — significant consumer activity across categories",
+  retail:                "Eid ul Azha — major shopping event: clothing, accessories, gifts",
+  trading:               "Eid ul Azha — livestock supplies, packaging, and gifting demand",
+  restaurant:            "Eid ul Azha — catering demand for family gatherings and meat-based dishes",
+  wholesale:             "Eid ul Azha — bulk orders for gifting and food distribution",
+  salon:                 "Eid ul Azha — pre-Eid salon bookings surge",
+  distribution:          "Eid ul Azha — livestock feed and packaging surge; gifting FMCG demand rises",
+  "import-company":      "Eid ul Azha — animal feed, packaging, and consumer goods imports peak",
+  "clearing-forwarding": "Eid ul Azha — heavy shipment volumes pre-Eid; anticipate port congestion",
+  default:               "Eid ul Azha — significant consumer activity across categories",
 };
 
 function injectEidOpportunities(
