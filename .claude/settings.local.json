@@ -190,7 +190,10 @@
       "Bash(findstr /i \"openai anthropic ai\")",
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Recurse -Include \"*affiliate*\")",
       "Bash(Select-Object -Property FullName)",
-      "PowerShell(Set-Location \"d:\\\\projects\\\\smart-business-accounts\"; npx tsc --noEmit --skipLibCheck 2>&1 | Where-Object { $_ -match \"error\" } | Select-Object -First 15)"
+      "PowerShell(Set-Location \"d:\\\\projects\\\\smart-business-accounts\"; npx tsc --noEmit --skipLibCheck 2>&1 | Where-Object { $_ -match \"error\" } | Select-Object -First 15)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\" -Recurse -Directory | Select-Object FullName | ForEach-Object { $_.FullName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\) })",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\lib\" -Recurse -Directory | Select-Object FullName | ForEach-Object { $_.FullName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\) })",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\public\" -Recurse | Where-Object { -not $_.PSIsContainer } | Select-Object @{Name=\"Path\"; Expression={$_.FullName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\)}} | Head -50)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",

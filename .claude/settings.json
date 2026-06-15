@@ -34,7 +34,12 @@
       "Bash(grep -l \"TODO\\\\|FIXME\\\\|XXX\\\\|BROKEN\\\\|WIP\" /d/projects/smart-business-accounts/app/dashboard/*/*page.tsx)",
       "Bash(ls -1d /d/projects/smart-business-accounts/app/dashboard/*/)",
       "Bash(ls -d /d/projects/smart-business-accounts/app/dashboard/*/)",
-      "Bash(grep -l \"branchId\" /d/projects/smart-business-accounts/app/api/reports/**/*.ts)"
+      "Bash(grep -l \"branchId\" /d/projects/smart-business-accounts/app/api/reports/**/*.ts)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\public\" -Recurse | Where-Object { -not $_.PSIsContainer } | Select-Object @{Name=\"Path\"; Expression={$_.FullName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\)}} | Select-Object -First 50)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\dashboard\" -Recurse -Directory | Where-Object { -not \\($_.GetFiles\\(\\) | Where-Object { $_.Name -match \"^page\\\\.\" }\\) } | Select-Object -ExpandProperty FullName | ForEach-Object { $_.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\) })",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\\\(marketing\\)\" -Recurse -File -Filter \"page.tsx\" | Select-Object @{Name=\"Path\"; Expression={$_.DirectoryName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\)}} | Sort-Object -Unique Path)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\\\(forge\\)\" -Recurse -File -Filter \"page.tsx\" | Select-Object @{Name=\"Path\"; Expression={$_.DirectoryName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\)}} | Sort-Object -Unique Path)",
+      "PowerShell($pages = Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\" -Recurse -File -Filter \"page.tsx\" | Measure-Object; $layouts = Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\" -Recurse -File -Filter \"layout.tsx\" | Measure-Object; Write-Host \"Total Pages \\(page.tsx\\): $\\($pages.Count\\)\"; Write-Host \"Total Layouts \\(layout.tsx\\): $\\($layouts.Count\\)\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
