@@ -10,7 +10,8 @@ import TestimonialsSection from "./components/Testimonials";
 import FAQSection from "./components/FAQSection";
 import CTASection from "./components/CTASection";
 import NewsletterSection from "./components/NewsletterSection";
-import CookieBanner from "./components/CookieBanner";
+import TrustedBy from "./components/TrustedBy";
+import VideoDemo from "./components/VideoDemo";
 
 async function getRequestHost() {
   const headerStore = await headers();
@@ -47,7 +48,9 @@ export default async function LandingPage() {
   return (
     <>
       <Hero />
+      <TrustedBy />
       <SolutionSection />
+      <VideoDemo />
       <FeaturesSection />
       <ModulesSection />
       <IndustrySelector />
@@ -56,7 +59,6 @@ export default async function LandingPage() {
       <FAQSection />
       <NewsletterSection />
       <CTASection />
-      <CookieBanner />
     </>
   );
 }

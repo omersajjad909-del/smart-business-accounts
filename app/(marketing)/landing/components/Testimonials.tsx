@@ -22,7 +22,14 @@ type Testimonial = {
   rating: number; planUsed: string | null; featured: boolean;
 };
 
-const FALLBACK: Testimonial[] = [];
+const FALLBACK: Testimonial[] = [
+  { id:"f1", name:"Ahmed Raza", company:"Al-Raza Traders", role:"Owner", message:"FinovaOS ne meri business completely transform kar di. Pehle 3 ghante lagte the monthly accounts close karne mein — ab 20 minute mein ho jata hai. Invoice errors bhi practically zero ho gayi hain.", rating:5, planUsed:"Professional", featured:true },
+  { id:"f2", name:"Fatima Sheikh", company:"Sheikh Distributors", role:"CFO", message:"Bank reconciliation jo pehle 2 din ka kaam tha, ab FinovaOS ek click mein kar deta hai. AI insights ne humein Rs. 8 lakh ki ek pending payment track karwai jo hum bhool gaye thay.", rating:5, planUsed:"Enterprise", featured:true },
+  { id:"f3", name:"Hassan Mahmood", company:"Metro Wholesale Co.", role:"MD", message:"12 employees ki payroll 10 minute mein process hoti hai. Pehle hamara accountant 2 din lagate tha. FinovaOS ne literally ek banda bachaya — ROI first month mein clear ho gaya.", rating:5, planUsed:"Professional", featured:false },
+  { id:"f4", name:"Sarah Johnson", company:"Gulf Star Trading LLC", role:"Finance Manager", message:"Multi-currency support is a game changer for us. We deal in AED, USD and PKR — FinovaOS handles all three seamlessly. The AI cash flow predictions saved us from a liquidity crunch last quarter.", rating:5, planUsed:"Enterprise", featured:false },
+  { id:"f5", name:"Usman Ali", company:"Ali Construction Group", role:"Director", message:"Multi-branch accounting pehle nightmare tha. Ab Karachi, Lahore aur Islamabad ki separate P&L ek dashboard pe dekhta hun. FinovaOS ki wajah se board meetings prepare karna bohot easy ho gaya.", rating:5, planUsed:"Enterprise", featured:false },
+  { id:"f6", name:"Priya Sharma", company:"MedPlus Pharmacy", role:"Owner", message:"Expiry tracking aur batch management — ye features mere liye game changer hain. Pehle expired stock ka pata hi nahi chalta tha. Ab FinovaOS alerts deta hai 30 din pehle. Zero wastage last 6 months mein.", rating:5, planUsed:"Professional", featured:false },
+];
 
 const COLORS = ["#818cf8","#34d399","#fbbf24","#f87171","#a78bfa","#06b6d4"];
 

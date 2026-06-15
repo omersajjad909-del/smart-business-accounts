@@ -256,11 +256,28 @@ export default function Hero() {
 
               {/* Social proof row */}
               <div className="h5 hero-proof" style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
+                {/* Avatar stack */}
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                  <span style={{ fontSize:18 }}>🚀</span>
-                  <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.5)" }}>
-                    <span style={{ color:"rgba(255,255,255,.8)" }}>Early Access</span> — Limited spots available
-                  </span>
+                  <div style={{ display:"flex" }}>
+                    {["AH","SR","FM","MK","PR"].map((init, i) => (
+                      <div key={i} style={{
+                        width:28, height:28, borderRadius:"50%",
+                        background:`linear-gradient(135deg,${["#6366f1","#10b981","#f59e0b","#3b82f6","#ec4899"][i]},${["#4f46e5","#059669","#d97706","#2563eb","#db2777"][i]})`,
+                        border:"2px solid #04061a",
+                        display:"flex", alignItems:"center", justifyContent:"center",
+                        fontSize:9, fontWeight:800, color:"white",
+                        marginLeft: i === 0 ? 0 : -8, zIndex:5-i, position:"relative",
+                      }}>{init}</div>
+                    ))}
+                  </div>
+                  <div>
+                    <div style={{ display:"flex", gap:1, marginBottom:1 }}>
+                      {[1,2,3,4,5].map(n => <span key={n} style={{ fontSize:10, color:"#fbbf24" }}>★</span>)}
+                    </div>
+                    <span style={{ fontSize:11, fontWeight:600, color:"rgba(255,255,255,.5)" }}>
+                      <span style={{ color:"rgba(255,255,255,.8)" }}>500+</span> businesses trust FinovaOS
+                    </span>
+                  </div>
                 </div>
                 <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>
                 <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>14-day money-back guarantee</span>

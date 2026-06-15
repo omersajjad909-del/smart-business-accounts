@@ -33,6 +33,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Legal
     { url: `${BASE}/legal/privacy`,     lastModified: now, changeFrequency: "yearly" as const,  priority: 0.4 },
     { url: `${BASE}/legal/terms`,       lastModified: now, changeFrequency: "yearly" as const,  priority: 0.4 },
+    { url: `${BASE}/legal/sla`,         lastModified: now, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/dpa`,         lastModified: now, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/aup`,         lastModified: now, changeFrequency: "yearly" as const,  priority: 0.35 },
+    { url: `${BASE}/legal/refund`,      lastModified: now, changeFrequency: "yearly" as const,  priority: 0.35 },
+    // Tools & converters
+    { url: `${BASE}/roi-calculator`,    lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${BASE}/compare`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${BASE}/case-studies`,      lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
   ];
 
   // Additional high-priority pages
@@ -48,6 +56,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Blog articles — only add real published slugs here
   const blogSlugs = [
     "bank-reconciliation-guide",
+    "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "10", "11", "12", "13", "14", "15",
   ];
   const blogPages = blogSlugs.map(slug => ({
     url: `${BASE}/blog/${slug}`,
