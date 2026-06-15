@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 const PRODUCT_LINKS = [
   { label: "Core Features",      href: "/features" },
   { label: "Pricing Plans",      href: "/pricing" },
+  { label: "ROI Calculator",     href: "/roi-calculator" },
+  { label: "Compare vs Xero",    href: "/compare" },
   { label: "All Industries",     href: "/industries" },
   { label: "Industry Solutions", href: "/solutions" },
   { label: "Data Security",      href: "/security" },
@@ -16,6 +18,7 @@ const PRODUCT_LINKS = [
 const COMPANY_LINKS = [
   { label: "About Us",           href: "/about" },
   { label: "Blog",               href: "/blog" },
+  { label: "Case Studies",       href: "/case-studies" },
   { label: "Careers",            href: "/careers" },
   { label: "Support Center",     href: "/support" },
   { label: "Affiliate Program",  href: "/affiliate" },
