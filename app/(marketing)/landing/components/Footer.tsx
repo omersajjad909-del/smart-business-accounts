@@ -25,6 +25,9 @@ const COMPANY_LINKS = [
   { label: "Privacy Policy",     href: "/legal/privacy" },
   { label: "Terms of Service",   href: "/legal/terms" },
   { label: "Refund Policy",      href: "/legal/refund" },
+  { label: "SLA",                href: "/legal/sla" },
+  { label: "DPA",                href: "/legal/dpa" },
+  { label: "Acceptable Use",     href: "/legal/aup" },
 ];
 
 const SOCIALS_DEFAULT = [
@@ -39,6 +42,8 @@ const BOTTOM_LINKS = [
   { label: "Terms",    href: "/legal/terms" },
   { label: "Refund",   href: "/legal/refund" },
   { label: "Security", href: "/security" },
+  { label: "SLA",      href: "/legal/sla" },
+  { label: "AUP",      href: "/legal/aup" },
   { label: "Sitemap",  href: "/all-pages" },
   { label: "Status",   href: "/status" },
 ];
