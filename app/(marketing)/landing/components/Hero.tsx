@@ -202,6 +202,25 @@ export default function Hero() {
                 From accounting and inventory to payroll and CRM — FinovaOS manages your entire business while AI monitors your numbers and tells you exactly what to do next.
               </p>
 
+              {/* Outcome benefits */}
+              <div className="h3 hero-tags" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:28, maxWidth:440 }}>
+                {[
+                  { icon:"⏱️", text:"Save 10 hrs/week on accounting" },
+                  { icon:"📬", text:"Collect payments 30% faster" },
+                  { icon:"❌", text:"Reduce invoice errors by 95%" },
+                  { icon:"🔔", text:"Never miss a deadline again" },
+                ].map(b => (
+                  <div key={b.text} style={{
+                    display:"flex", alignItems:"center", gap:8,
+                    padding:"9px 12px", borderRadius:10,
+                    background:"rgba(99,102,241,.07)", border:"1px solid rgba(99,102,241,.15)",
+                  }}>
+                    <span style={{ fontSize:16, flexShrink:0 }}>{b.icon}</span>
+                    <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.7)", lineHeight:1.35 }}>{b.text}</span>
+                  </div>
+                ))}
+              </div>
+
               {/* Feature tags */}
               <div className="h3 hero-tags" style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:36 }}>
                 {[

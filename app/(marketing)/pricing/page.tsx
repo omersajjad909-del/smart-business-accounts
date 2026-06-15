@@ -292,6 +292,66 @@ function Val({ v, color }: { v: Val; color: string }) {
   return <span style={{ fontSize: 11, fontWeight: 700, color, textAlign: "center", display: "block" }}>{v}</span>;
 }
 
+const USE_CASES = [
+  {
+    icon: "👤", label: "Solo / Freelancer",
+    desc: "1-2 people, simple invoicing & expenses",
+    recommended: "Starter", plan: "starter", color: "#818cf8",
+    highlights: ["Unlimited invoices", "Ledger & P&L", "Basic reports", "Email support"],
+  },
+  {
+    icon: "🏢", label: "Small Team",
+    desc: "3-20 employees, need payroll & CRM",
+    recommended: "Professional", plan: "professional", color: "#a5b4fc",
+    highlights: ["Everything in Starter", "HR & Payroll", "Inventory", "CRM + Pipeline"],
+    popular: true,
+  },
+  {
+    icon: "🌐", label: "Multi-Branch / Enterprise",
+    desc: "Multiple locations, advanced reports & API",
+    recommended: "Enterprise", plan: "enterprise", color: "#34d399",
+    highlights: ["Everything in Pro", "Multi-branch", "API access", "Priority support"],
+  },
+];
+
+function UseCaseWizard() {
+  const [selected, setSelected] = useState<string | null>(null);
+  const chosen = USE_CASES.find(u => u.plan === selected);
+  return (
+    <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 20, padding: "28px 28px 24px", marginBottom: 48 }}>
+      <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>NOT SURE WHICH PLAN? TELL US ABOUT YOUR BUSINESS</div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: chosen ? 20 : 0 }}>
+        {USE_CASES.map(u => (
+          <button key={u.plan} onClick={() => setSelected(selected === u.plan ? null : u.plan)}
+            style={{ padding: "16px 14px", borderRadius: 14, border: `1.5px solid ${selected === u.plan ? u.color + "66" : "rgba(255,255,255,.08)"}`, background: selected === u.plan ? `${u.color}10` : "rgba(255,255,255,.02)", cursor: "pointer", textAlign: "left", transition: "all .2s", position: "relative" }}>
+            {u.popular && <div style={{ position: "absolute", top: -10, right: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 20 }}>MOST POPULAR</div>}
+            <div style={{ fontSize: 24, marginBottom: 8 }}>{u.icon}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: selected === u.plan ? u.color : "#e2e8f0", marginBottom: 4 }}>{u.label}</div>
+            <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.4 }}>{u.desc}</div>
+          </button>
+        ))}
+      </div>
+      {chosen && (
+        <div style={{ background: `${chosen.color}0d`, border: `1px solid ${chosen.color}33`, borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 13, color: chosen.color, fontWeight: 700, marginBottom: 6 }}>✓ We recommend: {chosen.recommended} Plan</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {chosen.highlights.map(h => (
+                <span key={h} style={{ fontSize: 12, color: "#94a3b8", background: "rgba(255,255,255,.05)", padding: "3px 10px", borderRadius: 20 }}>{h}</span>
+              ))}
+            </div>
+          </div>
+          <a href={`/onboarding/signup/${chosen.plan}`} style={{ background: `linear-gradient(135deg,${chosen.color},${chosen.color}bb)`, color: "#fff", padding: "10px 22px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", flexShrink: 0 }}>
+            Start with {chosen.recommended} →
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PricingPage() {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app";
   const [billing, setBilling] = useState<BillingCycle>("monthly");
@@ -484,9 +544,12 @@ export default function PricingPage() {
             {SUPPORTED_CURRENCIES.map(code => <option key={code} value={code}>{code} - {CURRENCY_LABEL[code]}</option>)}
           </select>
         </div>
-        <div style={{ textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 12, marginBottom: 56 }}>
+        <div style={{ textAlign: "center", color: "rgba(255,255,255,.3)", fontSize: 12, marginBottom: 40 }}>
           Showing prices in {currency} · Final billing currency confirmed at checkout
         </div>
+
+        {/* ── USE-CASE WIZARD ───────────────────────────────── */}
+        <UseCaseWizard />
 
         {/* ── PLAN CARDS ──────────────────────────────────────── */}
         <div className="pg" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20, marginBottom: 80 }}>
