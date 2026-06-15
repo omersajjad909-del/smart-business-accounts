@@ -40,3 +40,6 @@ prisma/.env
 # backups
 /backups/*
 !backups/.gitkeep
+
+# Sentry Config File
+.env.sentry-build-plugin
