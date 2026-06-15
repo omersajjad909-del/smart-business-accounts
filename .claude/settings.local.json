@@ -187,7 +187,10 @@
       "Bash(findstr -i \"market\\\\|intell\\\\|business\\\\|advisor\")",
       "Bash(grep -E \"app/.*\\\\.\\(tsx|ts\\)$\")",
       "Bash(dir \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\\\\ai\\\\\" /b)",
-      "Bash(findstr /i \"openai anthropic ai\")"
+      "Bash(findstr /i \"openai anthropic ai\")",
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Recurse -Include \"*affiliate*\")",
+      "Bash(Select-Object -Property FullName)",
+      "PowerShell(Set-Location \"d:\\\\projects\\\\smart-business-accounts\"; npx tsc --noEmit --skipLibCheck 2>&1 | Where-Object { $_ -match \"error\" } | Select-Object -First 15)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\lib",

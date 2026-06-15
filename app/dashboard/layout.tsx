@@ -2115,6 +2115,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
               {(!isCustomPlan || hasCustomActiveModule("api_access")) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
+              <NavLink href="/dashboard/affiliate" pathname={pathname}>🤝 Affiliate Program</NavLink>
             </NavGroup>
           )}
 

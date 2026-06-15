@@ -1754,6 +1754,72 @@ model Referral {
   convertedAt  DateTime?
 }
 
+// ─── Affiliate Program ────────────────────────────────────────────────────────
+
+model Affiliate {
+  id              String    @id @default(uuid())
+  userId          String?
+  name            String
+  email           String    @unique
+  website         String?
+  audience        String?
+  status          String    @default("PENDING") // PENDING | APPROVED | REJECTED | SUSPENDED
+  tier            String    @default("STARTER") // STARTER | GROWTH | PRO | ELITE
+  trackingCode    String    @unique
+  commissionRate  Float     @default(0.20)
+  payoutMethod    String?   // bank | paypal | crypto | jazzcash | easypaisa
+  payoutDetails   String?
+  totalEarned     Float     @default(0)
+  totalPaid       Float     @default(0)
+  pendingBalance  Float     @default(0)
+  totalReferrals  Int       @default(0)
+  activeReferrals Int       @default(0)
+  approvedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  conversions     AffiliateConversion[]
+  payouts         AffiliatePayout[]
+
+  @@index([email])
+  @@index([trackingCode])
+  @@index([status])
+}
+
+model AffiliateConversion {
+  id            String    @id @default(uuid())
+  affiliateId   String
+  affiliate     Affiliate @relation(fields: [affiliateId], references: [id])
+  companyId     String?
+  customerEmail String
+  customerName  String?
+  plan          String?
+  planAmount    Float?
+  commissionAmt Float
+  status        String    @default("PENDING") // PENDING | CONFIRMED | PAID
+  convertedAt   DateTime  @default(now())
+  paidAt        DateTime?
+
+  @@index([affiliateId])
+  @@index([status])
+}
+
+model AffiliatePayout {
+  id          String    @id @default(uuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+  amount      Float
+  method      String
+  status      String    @default("PENDING") // PENDING | PROCESSING | PAID
+  reference   String?
+  month       String
+  createdAt   DateTime  @default(now())
+  paidAt      DateTime?
+
+  @@index([affiliateId])
+  @@index([month])
+}
+
 // ─── Testimonials ─────────────────────────────────────────────────────────────
 
 model Testimonial {
