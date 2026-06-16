@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
 
 const COMPANIES = [
   { name: "Al-Raza Traders",       initials: "AR", color: "#6366f1", city: "Karachi" },
@@ -17,15 +16,6 @@ const COMPANIES = [
 ];
 
 export default function TrustedBy() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [vis, setVis] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect(); } }, { threshold: 0.1 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-
   return (
     <section style={{
       background: "linear-gradient(180deg,#070a1e 0%,#080c22 100%)",
@@ -47,14 +37,10 @@ export default function TrustedBy() {
         @media(max-width:640px){.trust-stats{grid-template-columns:repeat(2,1fr) !important;}}
       `}</style>
 
-      <div ref={ref} style={{ maxWidth: 1160, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto" }}>
 
         {/* Header */}
-        <div style={{
-          textAlign: "center", marginBottom: 40,
-          opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(16px)",
-          transition: "all .5s ease",
-        }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 16 }}>
             TRUSTED BY 500+ BUSINESSES IN 20+ COUNTRIES
           </p>
@@ -62,9 +48,9 @@ export default function TrustedBy() {
           {/* Stats row */}
           <div className="trust-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, maxWidth: 720, margin: "0 auto 40px" }}>
             {[
-              { n: "500+",   l: "Businesses",      color: "#818cf8" },
-              { n: "20+",    l: "Countries",        color: "#34d399" },
-              { n: "4.9★",   l: "Average Rating",  color: "#fbbf24" },
+              { n: "500+",     l: "Businesses",              color: "#818cf8" },
+              { n: "20+",      l: "Countries",               color: "#34d399" },
+              { n: "4.9★",     l: "Average Rating",          color: "#fbbf24" },
               { n: "Rs. 2Cr+", l: "Monthly Revenue Tracked", color: "#38bdf8" },
             ].map((s, i) => (
               <div key={i} style={{
@@ -106,13 +92,10 @@ export default function TrustedBy() {
         </div>
 
         {/* Bottom ratings */}
-        <div style={{
-          display: "flex", justifyContent: "center", gap: 32, marginTop: 40, flexWrap: "wrap",
-          opacity: vis ? 1 : 0, transition: "opacity .6s ease .3s",
-        }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 32, marginTop: 40, flexWrap: "wrap" }}>
           {[
-            { platform: "G2", rating: "4.9/5", reviews: "128 reviews", color: "#f97316" },
-            { platform: "Capterra", rating: "4.8/5", reviews: "94 reviews", color: "#3b82f6" },
+            { platform: "G2",         rating: "4.9/5", reviews: "128 reviews", color: "#f97316" },
+            { platform: "Capterra",   rating: "4.8/5", reviews: "94 reviews",  color: "#3b82f6" },
             { platform: "Trustpilot", rating: "4.9/5", reviews: "211 reviews", color: "#34d399" },
           ].map(r => (
             <div key={r.platform} style={{ textAlign: "center" }}>

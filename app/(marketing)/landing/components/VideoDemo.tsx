@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 const TABS = [
   { id: "invoice",   label: "Sales Invoice",    icon: "📄", color: "#818cf8", desc: "Create & send professional invoices in 30 seconds" },
@@ -46,7 +46,7 @@ export default function VideoDemo() {
         <div style={{ position:"absolute", bottom:0, left:"10%", right:"10%", height:1, background:"linear-gradient(90deg,transparent,rgba(99,102,241,.12),transparent)" }}/>
       </div>
 
-      <div ref={ref} style={{ maxWidth:1160, margin:"0 auto", position:"relative" }}>
+      <div style={{ maxWidth:1160, margin:"0 auto", position:"relative" }}>
 
         {/* Header */}
         <div style={{
