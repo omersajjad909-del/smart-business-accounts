@@ -70,8 +70,6 @@ export default function VideoDemo() {
         {/* Main layout */}
         <div className="demo-layout" style={{
           display:"flex", gap:28, alignItems:"flex-start",
-          opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(32px)",
-          transition:"all .7s cubic-bezier(.22,1,.36,1) .15s",
         }}>
 
           {/* Tab sidebar */}
