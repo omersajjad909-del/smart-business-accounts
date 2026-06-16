@@ -48,9 +48,9 @@ export default async function LandingPage() {
   return (
     <>
       <Hero />
+      <VideoDemo />
       <TrustedBy />
       <SolutionSection />
-      <VideoDemo />
       <FeaturesSection />
       <ModulesSection />
       <IndustrySelector />
