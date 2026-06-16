@@ -17,18 +17,8 @@ const FEATURES_BY_TAB: Record<string, string[]> = {
 
 export default function VideoDemo() {
   const ref = useRef<HTMLDivElement>(null);
-  const [vis, setVis] = useState(false);
   const [activeTab, setActiveTab] = useState("invoice");
   const [playing, setPlaying] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect(); } },
-      { threshold: 0.08 }
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
 
   const active = TABS.find(t => t.id === activeTab)!;
 
