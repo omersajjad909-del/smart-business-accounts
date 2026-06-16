@@ -11,7 +11,7 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "seed": "node prisma/seed.js",
-    "vercel-build": "prisma generate && cross-env NODE_OPTIONS=--max-old-space-size=8192 next build --webpack",
+    "vercel-build": "prisma generate && NODE_OPTIONS=--max-old-space-size=8192 next build --webpack",
     "setup:prod": "bash scripts/setup-production.sh",
     "verify:env": "node scripts/verify-env.js",
     "user:create": "node scripts/create-user.js",
