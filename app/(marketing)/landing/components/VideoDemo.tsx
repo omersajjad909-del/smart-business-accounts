@@ -51,8 +51,6 @@ export default function VideoDemo() {
         {/* Header */}
         <div style={{
           textAlign:"center", marginBottom:56,
-          opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(24px)",
-          transition:"all .6s cubic-bezier(.22,1,.36,1)",
         }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"6px 16px", borderRadius:100, marginBottom:20, background:"rgba(129,140,248,.1)", border:"1.5px solid rgba(129,140,248,.22)" }}>
             <span style={{ fontSize:14 }}>▶</span>
