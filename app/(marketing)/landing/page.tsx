@@ -41,10 +41,6 @@ export default async function LandingPage() {
     redirect("/dashboard/ai");
   }
 
-  if (host === "finovaos.app" || host === "www.finovaos.app") {
-    redirect("/");
-  }
-
   return (
     <>
       <Hero />
