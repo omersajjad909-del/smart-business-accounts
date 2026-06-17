@@ -289,10 +289,14 @@ export default function HrPayrollDashboard() {
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes spin{to{transform:rotate(360deg)}}
-        .hr-table tr:hover td{background:#f8fafc!important;}
+        .hr-table tr:hover td{background:var(--surface)!important;}
         .hr-table tr td{transition:background .15s;}
         .quick-link:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1)!important;}
         .quick-link{transition:all .2s!important;}
+        @media(max-width:768px){
+          .hr-grid-charts{grid-template-columns:1fr!important;}
+          .hr-grid-bottom{grid-template-columns:1fr!important;}
+        }
       `}</style>
 
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "28px 24px" }}>
