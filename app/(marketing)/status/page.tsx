@@ -142,7 +142,7 @@ function LiveClock() {
 }
 
 /* ─── Service row ─── */
-function ServiceRow({ svc, index }: { svc: typeof SERVICES[0]; index: number }) {
+function ServiceRow({ svc, index }: { svc: ServiceData; index: number }) {
   const m = STATUS_META[svc.status];
   const [hov, setHov] = useState(false);
 

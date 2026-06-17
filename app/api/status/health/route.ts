@@ -47,6 +47,34 @@ async function checkEmail(): Promise<{ ok: boolean }> {
   return { ok: hasKey };
 }
 
+async function getUptimeRobotData(): Promise<Record<string, string>> {
+  const key = process.env.UPTIMEROBOT_API_KEY;
+  if (!key) return {};
+  try {
+    const res = await fetch("https://api.uptimerobot.com/v2/getMonitors", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        api_key: key,
+        format: "json",
+        custom_uptime_ratios: "30",
+        response_times: "0",
+      }),
+      signal: AbortSignal.timeout(6000),
+    });
+    const data = await res.json();
+    if (data.stat !== "ok") return {};
+    const result: Record<string, string> = {};
+    for (const m of data.monitors || []) {
+      const ratio = m.custom_uptime_ratio ? parseFloat(m.custom_uptime_ratio).toFixed(2) : null;
+      if (ratio) result[m.friendly_name?.toLowerCase() || m.id] = `${ratio}%`;
+    }
+    return result;
+  } catch {
+    return {};
+  }
+}
+
 async function checkBackups(): Promise<{ ok: boolean; lastRun: string | null }> {
   try {
     const latest = await prisma.backupSchedule.findFirst({
@@ -69,12 +97,23 @@ function formatLatency(ms: number): string {
 }
 
 export async function GET() {
-  const [db, api, email, backups] = await Promise.all([
+  const [db, api, cdn, email, backups, urData] = await Promise.all([
     checkDatabase(),
     checkApi(),
+    checkCdn(),
     checkEmail(),
     checkBackups(),
+    getUptimeRobotData(),
   ]);
+
+  // Try to match a monitor by candidate names, return "—" if no key or no match
+  function uptime(...candidates: string[]): string {
+    for (const name of candidates) {
+      const val = urData[name.toLowerCase()];
+      if (val) return val;
+    }
+    return Object.keys(urData).length > 0 ? "—" : "—";
+  }
 
   const services = [
     {
@@ -82,9 +121,9 @@ export async function GET() {
       icon: "🌐",
       name: "Web Application",
       desc: "Main dashboard & UI",
-      status: "operational",
+      status: api.ok ? "operational" : "degraded",
       latency: formatLatency(api.latencyMs),
-      uptime: "99.98%",
+      uptime: uptime("web", "web application", "finovaos", "www"),
     },
     {
       id: "api",
@@ -93,7 +132,7 @@ export async function GET() {
       desc: "REST API & authentication",
       status: api.ok ? "operational" : "degraded",
       latency: formatLatency(api.latencyMs),
-      uptime: "99.95%",
+      uptime: uptime("api", "api gateway", "api gateway"),
     },
     {
       id: "db",
@@ -102,7 +141,7 @@ export async function GET() {
       desc: "Primary data storage",
       status: db.ok ? "operational" : "outage",
       latency: formatLatency(db.latencyMs),
-      uptime: "99.99%",
+      uptime: uptime("db", "database", "database cluster"),
     },
     {
       id: "reports",
@@ -110,8 +149,8 @@ export async function GET() {
       name: "Report Engine",
       desc: "PDF & Excel generation",
       status: db.ok ? "operational" : "degraded",
-      latency: db.ok ? "280ms" : "—",
-      uptime: "99.91%",
+      latency: db.ok ? formatLatency(db.latencyMs + 220) : "—",
+      uptime: uptime("reports", "report engine"),
     },
     {
       id: "email",
@@ -120,7 +159,7 @@ export async function GET() {
       desc: "Invoice delivery & alerts",
       status: email.ok ? "operational" : "degraded",
       latency: "—",
-      uptime: "99.87%",
+      uptime: uptime("email", "email & notifications", "notifications"),
     },
     {
       id: "backups",
@@ -129,7 +168,7 @@ export async function GET() {
       desc: "Automated daily backups",
       status: backups.ok ? "operational" : "degraded",
       latency: "—",
-      uptime: "100%",
+      uptime: uptime("backups", "backup service", "backup"),
       lastRun: backups.lastRun,
     },
     {
@@ -137,9 +176,9 @@ export async function GET() {
       icon: "🚀",
       name: "CDN & Assets",
       desc: "Static files & media",
-      status: "operational",
-      latency: "28ms",
-      uptime: "99.99%",
+      status: cdn.ok ? "operational" : "degraded",
+      latency: formatLatency(cdn.latencyMs),
+      uptime: uptime("cdn", "cdn & assets", "assets"),
     },
     {
       id: "search",
@@ -148,7 +187,7 @@ export async function GET() {
       desc: "Full-text record search",
       status: db.ok ? "operational" : "degraded",
       latency: db.ok ? formatLatency(db.latencyMs + 40) : "—",
-      uptime: "99.82%",
+      uptime: uptime("search", "search & indexing"),
     },
   ];
 
@@ -166,5 +205,6 @@ export async function GET() {
     checkedAt: new Date().toISOString(),
     services,
     uptimeMonths,
+    uptimeSource: Object.keys(urData).length > 0 ? "uptimerobot" : "none",
   });
 }
