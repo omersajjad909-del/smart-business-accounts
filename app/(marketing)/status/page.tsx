@@ -98,118 +98,17 @@ function SubscribeBanner() {
   );
 }
 
-/* ─── Static data ─── */
-const SERVICES = [
-  {
-    id: "web",
-    icon: "🌐",
-    name: "Web Application",
-    desc: "Main dashboard & UI",
-    status: "operational" as Status,
-    uptime: "99.98%",
-    latency: "142ms",
-  },
-  {
-    id: "api",
-    icon: "⚡",
-    name: "API Gateway",
-    desc: "REST API & authentication",
-    status: "operational" as Status,
-    uptime: "99.95%",
-    latency: "89ms",
-  },
-  {
-    id: "db",
-    icon: "🗄️",
-    name: "Database Cluster",
-    desc: "Primary data storage",
-    status: "operational" as Status,
-    uptime: "99.99%",
-    latency: "12ms",
-  },
-  {
-    id: "reports",
-    icon: "📊",
-    name: "Report Engine",
-    desc: "PDF & Excel generation",
-    status: "operational" as Status,
-    uptime: "99.91%",
-    latency: "320ms",
-  },
-  {
-    id: "email",
-    icon: "📧",
-    name: "Email & Notifications",
-    desc: "Invoice delivery & alerts",
-    status: "operational" as Status,
-    uptime: "99.87%",
-    latency: "—",
-  },
-  {
-    id: "backups",
-    icon: "💾",
-    name: "Backup Service",
-    desc: "Automated daily backups",
-    status: "operational" as Status,
-    uptime: "100%",
-    latency: "—",
-  },
-  {
-    id: "cdn",
-    icon: "🚀",
-    name: "CDN & Assets",
-    desc: "Static files & media",
-    status: "operational" as Status,
-    uptime: "99.99%",
-    latency: "28ms",
-  },
-  {
-    id: "search",
-    icon: "🔍",
-    name: "Search & Indexing",
-    desc: "Full-text record search",
-    status: "operational" as Status,
-    uptime: "99.82%",
-    latency: "55ms",
-  },
-];
+type ServiceData = {
+  id: string; icon: string; name: string; desc: string;
+  status: Status; latency: string; uptime: string; lastRun?: string | null;
+};
 
 const INCIDENTS: {
   date: string;
   title: string;
   severity: "minor" | "major" | "resolved";
   updates: { time: string; text: string }[];
-}[] = [
-  {
-    date: "Feb 18, 2025",
-    title: "Elevated report generation latency",
-    severity: "resolved",
-    updates: [
-      { time: "14:32 PKT", text: "Issue identified. Report engine experiencing high queue depth due to batch job conflict." },
-      { time: "15:10 PKT", text: "Batch jobs paused. Queue draining. Latency returning to normal." },
-      { time: "15:45 PKT", text: "Fully resolved. Root cause: scheduled job conflicting with peak usage hours. Fixed scheduling." },
-    ],
-  },
-  {
-    date: "Jan 29, 2025",
-    title: "Email delivery delays — invoices & reminders",
-    severity: "resolved",
-    updates: [
-      { time: "09:14 PKT", text: "Upstream SMTP provider reporting elevated bounce rates. Investigation started." },
-      { time: "10:02 PKT", text: "Switched to secondary mail relay. Queued emails processing." },
-      { time: "11:30 PKT", text: "All queued emails delivered. System normal. Monitoring primary provider." },
-    ],
-  },
-];
-
-const UPTIME_MONTHS = [
-  { month:"Sep", pct:100 },
-  { month:"Oct", pct:99.95 },
-  { month:"Nov", pct:100 },
-  { month:"Dec", pct:99.91 },
-  { month:"Jan", pct:99.98 },
-  { month:"Feb", pct:99.97 },
-];
+}[] = [];
 
 /* ─── Helpers ─── */
 const STATUS_META: Record<Status, { label: string; color: string; bg: string; border: string; dot: string }> = {
@@ -309,12 +208,36 @@ export default function StatusPage() {
   const [histRef, histVisible] = useVisible(0.08);
   const [uptimeRef, uptimeVisible] = useVisible(0.1);
   const [expandedInc, setExpandedInc] = useState<number | null>(null);
+  const [services, setServices] = useState<ServiceData[]>([]);
+  const [uptimeMonths, setUptimeMonths] = useState<{ month: string; pct: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [checkedAt, setCheckedAt] = useState<string | null>(null);
+
   const searchParams = typeof window !== "undefined"
     ? new URLSearchParams(window.location.search)
     : null;
   const confirmed = searchParams?.get("confirmed");
 
-  const allOperational = SERVICES.every(s => s.status === "operational");
+  async function fetchHealth() {
+    try {
+      const res = await fetch("/api/status/health", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      setServices(data.services || []);
+      setUptimeMonths(data.uptimeMonths || []);
+      setCheckedAt(data.checkedAt || null);
+    } catch { /* ignore */ } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchHealth();
+    const interval = setInterval(fetchHealth, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const allOperational = services.length > 0 && services.every(s => s.status === "operational");
 
   return (
     <>
@@ -429,7 +352,7 @@ export default function StatusPage() {
               )}
 
               <p style={{ fontSize:14, color:"rgba(255,255,255,.38)", lineHeight:1.7, marginBottom:6 }}>
-                Last checked: <LiveClock/> · Updated every 60 seconds
+                Last checked: <LiveClock/> · Auto-refreshes every 60 seconds
               </p>
             </div>
           </div>
@@ -460,7 +383,13 @@ export default function StatusPage() {
             </div>
 
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-              {SERVICES.map((svc, i) => <ServiceRow key={svc.id} svc={svc} index={i}/>)}
+              {loading ? (
+                [1,2,3,4,5,6,7,8].map(i => (
+                  <div key={i} style={{ height:74, borderRadius:14, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", animation:"pulse 1.5s ease infinite" }}/>
+                ))
+              ) : (
+                services.map((svc, i) => <ServiceRow key={svc.id} svc={svc} index={i}/>)
+              )}
             </div>
           </div>
 
@@ -488,7 +417,7 @@ export default function StatusPage() {
               </p>
 
               <div style={{ display:"flex", gap:10, alignItems:"flex-end" }}>
-                {UPTIME_MONTHS.map(({ month, pct }) => {
+                {uptimeMonths.map(({ month, pct }) => {
                   const h = Math.round(((pct - 99.8) / 0.2) * 60 + 20);
                   const color = pct === 100 ? "#34d399" : pct > 99.9 ? "#818cf8" : "#fbbf24";
                   return (
