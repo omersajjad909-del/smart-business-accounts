@@ -43,7 +43,8 @@
       "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\components\" -Recurse -Directory | Select-Object -ExpandProperty FullName | ForEach-Object { $_.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\) } | Sort-Object)",
       "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\lib\" -Recurse -Directory | Select-Object -ExpandProperty FullName | ForEach-Object { $_.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\) } | Sort-Object)",
       "PowerShell(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\.github\" -Recurse -File | Select-Object @{Name=\"Path\"; Expression={$_.FullName.Replace\\('d:\\\\projects\\\\smart-business-accounts\\\\', ''\\)}} | Sort-Object Path)",
-      "PowerShell($apiRoutes = Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\" -Recurse -File -Filter \"route.ts\" | Group-Object { Split-Path -Parent $_.FullName } | ForEach-Object { $_.Count } | Measure-Object -Sum; Write-Host \"Total API route files: $\\($apiRoutes.Sum\\)\")"
+      "PowerShell($apiRoutes = Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\" -Recurse -File -Filter \"route.ts\" | Group-Object { Split-Path -Parent $_.FullName } | ForEach-Object { $_.Count } | Measure-Object -Sum; Write-Host \"Total API route files: $\\($apiRoutes.Sum\\)\")",
+      "Bash(npm audit *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
