@@ -28,6 +28,20 @@ async function checkApi(): Promise<{ ok: boolean; latencyMs: number }> {
   }
 }
 
+async function checkCdn(): Promise<{ ok: boolean; latencyMs: number }> {
+  const start = Date.now();
+  try {
+    const base = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+    const res = await fetch(`${base}/favicon-32x32.png`, {
+      signal: AbortSignal.timeout(5000),
+      cache: "no-store",
+    });
+    return { ok: res.ok, latencyMs: Date.now() - start };
+  } catch {
+    return { ok: false, latencyMs: Date.now() - start };
+  }
+}
+
 async function checkEmail(): Promise<{ ok: boolean }> {
   const hasKey = !!(process.env.RESEND_API_KEY || process.env.SMTP_HOST);
   return { ok: hasKey };
