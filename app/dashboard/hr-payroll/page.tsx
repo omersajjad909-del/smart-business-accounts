@@ -334,17 +334,17 @@ export default function HrPayrollDashboard() {
         </div>
 
         {/* ── Quick Links ───────────────────────────────────────────────────── */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))", gap: 10, marginBottom: 24 }}>
           {links.map(l => (
             <Link key={l.href} href={l.href} className="quick-link" style={{
               display: "flex", alignItems: "center", gap: 8,
-              padding: "9px 18px", borderRadius: 10,
+              padding: "9px 14px", borderRadius: 10,
               background: "var(--card-bg)", border: `1px solid ${C.border}`,
               textDecoration: "none", fontSize: 13, fontWeight: 600, color: C.text,
               boxShadow: "0 1px 4px rgba(0,0,0,.05)",
             }}>
               <span style={{
-                width: 30, height: 30, borderRadius: 7,
+                width: 30, height: 30, borderRadius: 7, flexShrink: 0,
                 background: `${l.color}15`, display: "flex", alignItems: "center",
                 justifyContent: "center", fontSize: 16,
               }}>{l.icon}</span>
@@ -354,7 +354,7 @@ export default function HrPayrollDashboard() {
         </div>
 
         {/* ── Stats Row ─────────────────────────────────────────────────────── */}
-        <div style={{ display: "flex", gap: 14, marginBottom: 24, flexWrap: "wrap" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: 14, marginBottom: 24 }}>
           <StatCard
             label="Total Employees"  value={activeEmps}
             icon="👥" color="#6366f1"
@@ -385,7 +385,8 @@ export default function HrPayrollDashboard() {
         </div>
 
         {/* ── Charts Row ────────────────────────────────────────────────────── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 16, marginBottom: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,340px)", gap: 16, marginBottom: 24 }}
+          className="hr-grid-charts">
 
           {/* Line Chart */}
           <div style={{
@@ -481,7 +482,8 @@ export default function HrPayrollDashboard() {
         </div>
 
         {/* ── Bottom Row ────────────────────────────────────────────────────── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,320px)", gap: 16 }}
+          className="hr-grid-bottom">
 
           {/* Payroll Table */}
           <div style={{
