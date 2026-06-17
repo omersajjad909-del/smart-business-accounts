@@ -74,27 +74,26 @@ function StatCard({
   color: string; sub?: string; subColor?: string;
 }) {
   return (
-    <div style={{
-      background: C.card, borderRadius: 12, padding: "20px 22px",
+    <div className="hr-stat-card" style={{
+      background: C.card, borderRadius: 12,
       border: `1px solid ${C.border}`,
       boxShadow: "0 1px 6px rgba(0,0,0,.06)",
-      display: "flex", alignItems: "center", gap: 16, flex: 1, minWidth: 0,
+      display: "flex", alignItems: "center", gap: 12,
     }}>
-      <div style={{
-        width: 52, height: 52, borderRadius: 12, flexShrink: 0,
+      <div className="hr-stat-icon" style={{
+        borderRadius: 10, flexShrink: 0,
         background: `${color}18`,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 24,
       }}>
         {icon}
       </div>
-      <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 12, color: C.sub, fontWeight: 500, marginBottom: 4 }}>{label}</div>
-        <div style={{ fontSize: 26, fontWeight: 800, color: C.text, letterSpacing: "-0.5px", lineHeight: 1 }}>
+      <div style={{ minWidth: 0, overflow: "hidden" }}>
+        <div className="hr-stat-label" style={{ color: C.sub, fontWeight: 500, marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</div>
+        <div className="hr-stat-value" style={{ fontWeight: 800, color: C.text, letterSpacing: "-0.5px", lineHeight: 1 }}>
           {value}
         </div>
         {sub && (
-          <div style={{ fontSize: 11.5, color: subColor || C.sub, fontWeight: 600, marginTop: 5 }}>
+          <div className="hr-stat-sub" style={{ color: subColor || C.sub, fontWeight: 600, marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {sub}
           </div>
         )}
@@ -284,22 +283,42 @@ export default function HrPayrollDashboard() {
   ];
 
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: ff, color: C.text }}>
+    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: ff, color: C.text, minWidth: 0, overflowX: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
         *,*::before,*::after{box-sizing:border-box;}
         @keyframes spin{to{transform:rotate(360deg)}}
+
+        /* ── Stat cards ── */
+        .hr-stat-card{padding:16px 18px;}
+        .hr-stat-icon{width:44px;height:44px;font-size:20px;}
+        .hr-stat-label{font-size:11px;}
+        .hr-stat-value{font-size:22px;}
+        .hr-stat-sub{font-size:10.5px;}
+
+        /* ── Table ── */
         .hr-table tr:hover td{background:var(--surface)!important;}
         .hr-table tr td{transition:background .15s;}
+
+        /* ── Quick links ── */
         .quick-link:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1)!important;}
         .quick-link{transition:all .2s!important;}
-        @media(max-width:768px){
+
+        /* ── Responsive ── */
+        @media(max-width:900px){
           .hr-grid-charts{grid-template-columns:1fr!important;}
           .hr-grid-bottom{grid-template-columns:1fr!important;}
         }
+        @media(max-width:600px){
+          .hr-stat-card{padding:12px 14px;gap:10px!important;}
+          .hr-stat-icon{width:36px!important;height:36px!important;font-size:16px!important;border-radius:8px!important;}
+          .hr-stat-value{font-size:18px!important;}
+          .hr-stat-label{font-size:10px!important;}
+          .hr-stat-sub{display:none;}
+        }
       `}</style>
 
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "28px 24px" }}>
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "20px 16px" }}>
 
         {/* ── Header ────────────────────────────────────────────────────────── */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 16 }}>
@@ -358,7 +377,7 @@ export default function HrPayrollDashboard() {
         </div>
 
         {/* ── Stats Row ─────────────────────────────────────────────────────── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: 14, marginBottom: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr))", gap: 10, marginBottom: 20 }}>
           <StatCard
             label="Total Employees"  value={activeEmps}
             icon="👥" color="#6366f1"
