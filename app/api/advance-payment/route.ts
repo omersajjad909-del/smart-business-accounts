@@ -93,8 +93,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(request);
+    if (!companyId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { id, invoiceNo, adjustedAmount, date, remarks } = body;
 
@@ -114,6 +119,10 @@ export async function PUT(request: Request) {
         { error: "Advance payment not found" },
         { status: 404 }
       );
+    }
+
+    if (advance.companyId !== companyId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     if (adjustedAmount > advance.balance) {
@@ -163,8 +172,13 @@ export async function PUT(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
+    const companyId = await resolveCompanyId(request);
+    if (!companyId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -173,6 +187,11 @@ export async function DELETE(request: Request) {
         { error: "Missing id" },
         { status: 400 }
       );
+    }
+
+    const advance = await prisma.advancePayment.findUnique({ where: { id }, select: { companyId: true } });
+    if (!advance || advance.companyId !== companyId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     await prisma.advancePayment.delete({

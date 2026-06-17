@@ -104,11 +104,21 @@ export async function DELETE(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
+    if (!companyId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    const record = await prisma.advanceSalary.findUnique({ where: { id }, select: { companyId: true } });
+    if (!record || record.companyId !== companyId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     await prisma.advanceSalary.delete({

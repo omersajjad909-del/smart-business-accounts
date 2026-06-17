@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireRole } from "@/lib/requireRole";
 
 export const runtime = "nodejs";
 
-// GET /api/chat/conversations — list all (for admin dashboard)
+// GET /api/chat/conversations — list all (admin dashboard only)
 export async function GET(req: NextRequest) {
+  const guard = requireRole(req, ["ADMIN", "ACCOUNTANT", "SUPPORT"]);
+  if (guard) return guard;
+
   try {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status"); // optional filter

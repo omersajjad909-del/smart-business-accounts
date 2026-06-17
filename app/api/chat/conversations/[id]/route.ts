@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireRole } from "@/lib/requireRole";
 
 export const runtime = "nodejs";
 
-// PATCH /api/chat/conversations/[id] — update status, assigned_agent
+// PATCH /api/chat/conversations/[id] — update status, assigned_agent (admin only)
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const guard = requireRole(req, ["ADMIN", "ACCOUNTANT", "SUPPORT"]);
+  if (guard) return guard;
+
   try {
     const { id } = await params;
     const body = await req.json();

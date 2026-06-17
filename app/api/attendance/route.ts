@@ -152,10 +152,16 @@ export async function PUT(req: NextRequest) {
     // However, the frontend sends "HH:mm".
     // We need the Date of the record to set the correct Day/Month/Year for the Time.
     
+    const companyId = await resolveCompanyId(req);
+
     // Let's fetch the existing record first to get the base date.
     const existingRecord = await prisma.attendance.findUnique({ where: { id } });
     if (!existingRecord) {
         return NextResponse.json({ error: "Record not found" }, { status: 404 });
+    }
+
+    if (companyId && existingRecord.companyId !== companyId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const baseDate = new Date(existingRecord.date);
@@ -222,11 +228,20 @@ export async function DELETE(req: NextRequest) {
   if (guard) return guard;
 
   try {
+    const companyId = await resolveCompanyId(req);
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    const record = await prisma.attendance.findUnique({ where: { id }, select: { companyId: true } });
+    if (!record) {
+      return NextResponse.json({ error: "Attendance record not found" }, { status: 404 });
+    }
+    if (companyId && record.companyId !== companyId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     await prisma.attendance.delete({

@@ -2,8 +2,15 @@
 // Returns invite details (email, role) for a given token — used on accept-invite page
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const { allowed } = rateLimit(`invite-preview:${ip}`, 10, 60_000);
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   try {
     const token = req.nextUrl.searchParams.get("token") || "";
     if (!token) return NextResponse.json({ error: "Token required" }, { status: 400 });
