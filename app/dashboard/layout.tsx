@@ -764,6 +764,7 @@ export default function DashboardLayout({
       { prefix: "/dashboard/roles-permissions",   permission: PERMISSIONS.MANAGE_ROLES },
       { prefix: "/dashboard/team",                permission: PERMISSIONS.MANAGE_USERS },
       { prefix: "/dashboard/admin-control",       permission: PERMISSIONS.MANAGE_USERS },
+      { prefix: "/dashboard/hr-payroll",           permission: PERMISSIONS.VIEW_HR_PAYROLL },
       { prefix: "/dashboard/payroll",             permission: PERMISSIONS.VIEW_HR_PAYROLL },
       { prefix: "/dashboard/employees",           permission: PERMISSIONS.VIEW_HR_PAYROLL },
       { prefix: "/dashboard/attendance",          permission: PERMISSIONS.VIEW_HR_PAYROLL },
@@ -1167,6 +1168,7 @@ export default function DashboardLayout({
               open={openSection === "hr"}
               onToggle={() => toggle("hr")}
             >
+              <NavLink href="/dashboard/hr-payroll" pathname={pathname}>Overview</NavLink>
               <NavLink href="/dashboard/employees" pathname={pathname}>Employees</NavLink>
               <NavLink href="/dashboard/attendance" pathname={pathname}>Attendance</NavLink>
               <NavLink href="/dashboard/payroll" pathname={pathname}>Payroll</NavLink>

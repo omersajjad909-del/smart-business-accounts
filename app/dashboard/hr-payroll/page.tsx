@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  Legend, ResponsiveContainer, PieChart, Pie, Cell,
+  ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -24,19 +24,20 @@ type Emp = {
   department: string; designation: string; salary: number; isActive: boolean;
 };
 
-// ─── Palette ──────────────────────────────────────────────────────────────────
+// ─── Semantic colours (theme-aware via CSS vars) ───────────────────────────────
 const C = {
   present:  "#22c55e",
   absent:   "#ef4444",
   late:     "#8b5cf6",
   leave:    "#3b82f6",
   halfDay:  "#f97316",
-  navy:     "#1e3a5f",
-  bg:       "#f5f7fa",
-  card:     "#ffffff",
-  border:   "#e8edf2",
-  text:     "#1a2744",
-  sub:      "#6b7280",
+  // these automatically flip in dark mode
+  bg:       "var(--app-bg)",
+  card:     "var(--card-bg)",
+  border:   "var(--border)",
+  text:     "var(--text-primary)",
+  sub:      "var(--text-muted)",
+  surface:  "var(--surface)",
 };
 
 const ff = "'Outfit','Inter',sans-serif";
@@ -130,8 +131,8 @@ function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
-      background: "white", border: `1px solid ${C.border}`, borderRadius: 8,
-      padding: "8px 14px", boxShadow: "0 4px 16px rgba(0,0,0,.1)", fontFamily: ff,
+      background: "var(--card-bg)", border: `1px solid var(--border)`, borderRadius: 8,
+      padding: "8px 14px", boxShadow: "0 4px 16px rgba(0,0,0,.15)", fontFamily: ff,
     }}>
       <div style={{ fontWeight: 700, color: C.text, marginBottom: 6, fontSize: 12 }}>{label}</div>
       {payload.map((p: any) => (
@@ -313,7 +314,7 @@ export default function HrPayrollDashboard() {
               onChange={e => setMonth(e.target.value)}
               style={{
                 padding: "8px 14px", borderRadius: 8, border: `1px solid ${C.border}`,
-                fontFamily: ff, fontSize: 13, color: C.text, background: "white",
+                fontFamily: ff, fontSize: 13, color: C.text, background: "var(--card-bg)",
                 cursor: "pointer",
               }}
             />
@@ -321,7 +322,7 @@ export default function HrPayrollDashboard() {
               onClick={load}
               style={{
                 width: 38, height: 38, borderRadius: 8, border: `1px solid ${C.border}`,
-                background: "white", cursor: "pointer", fontSize: 16,
+                background: "var(--card-bg)", cursor: "pointer", fontSize: 16,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 boxShadow: "0 1px 4px rgba(0,0,0,.06)",
               }}
@@ -338,7 +339,7 @@ export default function HrPayrollDashboard() {
             <Link key={l.href} href={l.href} className="quick-link" style={{
               display: "flex", alignItems: "center", gap: 8,
               padding: "9px 18px", borderRadius: 10,
-              background: "white", border: `1px solid ${C.border}`,
+              background: "var(--card-bg)", border: `1px solid ${C.border}`,
               textDecoration: "none", fontSize: 13, fontWeight: 600, color: C.text,
               boxShadow: "0 1px 4px rgba(0,0,0,.05)",
             }}>
@@ -418,7 +419,7 @@ export default function HrPayrollDashboard() {
             ) : (
               <ResponsiveContainer width="100%" height={220}>
                 <LineChart data={lineData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f4f8" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis dataKey="day" tick={{ fontSize: 11, fill: C.sub }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: C.sub }} tickLine={false} axisLine={false} />
                   <Tooltip content={<ChartTooltip />} />
@@ -504,7 +505,7 @@ export default function HrPayrollDashboard() {
             {loading ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[1,2,3,4,5].map(i => (
-                  <div key={i} style={{ height: 44, background: "#f8fafc", borderRadius: 8, animation: "pulse 1.5s ease infinite" }} />
+                  <div key={i} style={{ height: 44, background: "var(--surface)", borderRadius: 8, animation: "pulse 1.5s ease infinite" }} />
                 ))}
               </div>
             ) : recentPay.length === 0 ? (
@@ -515,7 +516,7 @@ export default function HrPayrollDashboard() {
               <div style={{ overflowX: "auto" }}>
                 <table className="hr-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
-                    <tr style={{ background: "#f8fafc" }}>
+                    <tr style={{ background: "var(--surface)" }}>
                       {["Emp ID", "Employee", "Department", "Basic", "Net Salary", "Status"].map(h => (
                         <th key={h} style={{
                           padding: "10px 14px", textAlign: "left", fontSize: 11,
