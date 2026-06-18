@@ -56,7 +56,8 @@
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Recurse -Include \"*admin*\")",
       "Bash(Sort-Object FullName)",
       "Bash(Select-String \"companies\\\\[id\\\\]\")",
-      "Read(//d/projects/smart-business-accounts/app/admin/companies/**)"
+      "Read(//d/projects/smart-business-accounts/app/admin/companies/**)",
+      "Bash(git worktree *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
