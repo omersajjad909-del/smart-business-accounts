@@ -81,8 +81,8 @@ export default function WebSettingsPage() {
           <h1 className="ws-title">Web Settings</h1>
           <p className="ws-subtitle">Configure your public website, domain, analytics integrations, and visibility controls.</p>
         </div>
-        <button type="button" className="ws-save-btn" onClick={handleSave} disabled={saving}>
-          {saving ? "Saving…" : "Save Changes"}
+        <button type="button" className="ws-save-btn" onClick={handleSave} disabled={saving || loadingSettings}>
+          {loadingSettings ? "Loading…" : saving ? "Saving…" : "Save Changes"}
         </button>
       </div>
 
