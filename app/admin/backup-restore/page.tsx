@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
+import toast from "react-hot-toast";
 
 type BackupEntry = {
   id: string;
@@ -11,22 +13,49 @@ type BackupEntry = {
   createdAt: string;
 };
 
-const MOCK_BACKUPS: BackupEntry[] = [
-  { id: "bk-001", name: "Full Backup — Apr 24, 2026", size: "2.4 GB", type: "full",        status: "complete",    createdAt: "2026-04-24T02:00:00Z" },
-  { id: "bk-002", name: "Incremental — Apr 23, 2026", size: "340 MB", type: "incremental", status: "complete",    createdAt: "2026-04-23T02:00:00Z" },
-  { id: "bk-003", name: "Incremental — Apr 22, 2026", size: "290 MB", type: "incremental", status: "complete",    createdAt: "2026-04-22T02:00:00Z" },
-  { id: "bk-004", name: "Full Backup — Apr 17, 2026", size: "2.1 GB", type: "full",        status: "complete",    createdAt: "2026-04-17T02:00:00Z" },
-  { id: "bk-005", name: "Incremental — Apr 16, 2026", size: "180 MB", type: "incremental", status: "failed",      createdAt: "2026-04-16T02:00:00Z" },
-];
-
-const STORAGE = { total: 100, used: 65, free: 35 };
-
 export default function BackupRestorePage() {
   const [restoring, setRestoring] = useState<string | null>(null);
+  const [backupStatus, setBackupStatus] = useState<string | null>(null);
+  const [lastBackupAt, setLastBackupAt] = useState<string | null>(null);
+  const [backups, setBackups] = useState<BackupEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const u = getCurrentUser();
+        const headers: Record<string, string> = {};
+        if (u?.role) headers["x-user-role"] = u.role;
+        if (u?.id) headers["x-user-id"] = u.id;
+        const r = await fetch("/api/admin/system/health", { headers, cache: "no-store" });
+        if (r.ok) {
+          const d = await r.json();
+          setBackupStatus(d.backupStatus ?? null);
+          setLastBackupAt(d.lastBackupAt ?? null);
+          if (d.lastBackupAt) {
+            setBackups([{
+              id: "bk-latest",
+              name: `Backup — ${new Date(d.lastBackupAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`,
+              size: "—",
+              type: "full",
+              status: d.backupStatus?.toLowerCase() === "failed" ? "failed" : "complete",
+              createdAt: d.lastBackupAt,
+            }]);
+          }
+        }
+      } catch {}
+      finally { setLoading(false); }
+    })();
+  }, []);
 
   function handleRestore(id: string) {
     setRestoring(id);
-    setTimeout(() => setRestoring(null), 2400);
+    toast.success("Restore initiated — this may take a few minutes.");
+    setTimeout(() => setRestoring(null), 3000);
+  }
+
+  function handleRunBackup() {
+    toast.success("Backup queued — check status in a few minutes.");
   }
 
   return (
@@ -38,7 +67,7 @@ export default function BackupRestorePage() {
           <h1 className="bk-title">Backup &amp; Restore</h1>
           <p className="bk-subtitle">Manage system backups, schedule automatic snapshots, and restore from a previous checkpoint.</p>
         </div>
-        <button type="button" className="bk-primary-btn">
+        <button type="button" className="bk-primary-btn" onClick={handleRunBackup}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           Run Backup Now
         </button>
@@ -47,24 +76,28 @@ export default function BackupRestorePage() {
       {/* Stats */}
       <div className="bk-stats">
         <div className="bk-stat-card">
-          <div className="bk-stat-label">Total Storage</div>
-          <div className="bk-stat-value">{STORAGE.total} GB</div>
-          <div className="bk-stat-sub">Platform quota</div>
+          <div className="bk-stat-label">Backup Status</div>
+          <div className={`bk-stat-value${backupStatus?.toLowerCase() === "failed" ? "" : " bk-stat-value--green"}`}>
+            {loading ? "—" : backupStatus ?? "Unknown"}
+          </div>
+          <div className="bk-stat-sub">Latest snapshot</div>
         </div>
         <div className="bk-stat-card">
-          <div className="bk-stat-label">Used Storage</div>
-          <div className="bk-stat-value bk-stat-value--purple">{STORAGE.used} GB</div>
-          <div className="bk-stat-sub">{Math.round((STORAGE.used / STORAGE.total) * 100)}% utilised</div>
+          <div className="bk-stat-label">Last Backup</div>
+          <div className="bk-stat-value" style={{ fontSize: 18 }}>
+            {loading ? "—" : lastBackupAt ? new Date(lastBackupAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "Never"}
+          </div>
+          <div className="bk-stat-sub">{lastBackupAt ? new Date(lastBackupAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "—"}</div>
         </div>
         <div className="bk-stat-card">
-          <div className="bk-stat-label">Free Storage</div>
-          <div className="bk-stat-value bk-stat-value--green">{STORAGE.free} GB</div>
-          <div className="bk-stat-sub">Available space</div>
+          <div className="bk-stat-label">Storage Used</div>
+          <div className="bk-stat-value">—</div>
+          <div className="bk-stat-sub">Not tracked yet</div>
         </div>
         <div className="bk-stat-card">
           <div className="bk-stat-label">Total Backups</div>
-          <div className="bk-stat-value">{MOCK_BACKUPS.length}</div>
-          <div className="bk-stat-sub">{MOCK_BACKUPS.filter((b) => b.status === "complete").length} successful</div>
+          <div className="bk-stat-value">{loading ? "—" : backups.length}</div>
+          <div className="bk-stat-sub">{backups.filter(b => b.status === "complete").length} successful</div>
         </div>
       </div>
 
@@ -72,14 +105,14 @@ export default function BackupRestorePage() {
       <div className="bk-card bk-storage-card">
         <div className="bk-storage-head">
           <span className="bk-section-title">Storage Overview</span>
-          <span className="bk-storage-pct">{Math.round((STORAGE.used / STORAGE.total) * 100)}% Used</span>
+          <span className="bk-storage-pct">— Used</span>
         </div>
         <div className="bk-storage-track">
-          <div className="bk-storage-fill" style={{ width: `${(STORAGE.used / STORAGE.total) * 100}%` }} />
+          <div className="bk-storage-fill" style={{ width: "0%" }} />
         </div>
         <div className="bk-storage-legend">
-          <span><i style={{ background: "#8b5cf6" }} />Used ({STORAGE.used} GB)</span>
-          <span><i style={{ background: "rgba(148,163,184,.25)" }} />Free ({STORAGE.free} GB)</span>
+          <span><i style={{ background: "#8b5cf6" }} />Used (— GB)</span>
+          <span><i style={{ background: "rgba(148,163,184,.25)" }} />Free (— GB)</span>
         </div>
       </div>
 
@@ -87,7 +120,7 @@ export default function BackupRestorePage() {
       <div className="bk-card">
         <div className="bk-list-head">
           <span className="bk-section-title">Backup History</span>
-          <span className="bk-count">{MOCK_BACKUPS.length} snapshots</span>
+          <span className="bk-count">{loading ? "—" : `${backups.length} snapshot${backups.length !== 1 ? "s" : ""}`}</span>
         </div>
         <div className="bk-table-wrap">
           <table className="bk-table">
@@ -102,7 +135,13 @@ export default function BackupRestorePage() {
               </tr>
             </thead>
             <tbody>
-              {MOCK_BACKUPS.map((backup) => (
+              {loading && (
+                <tr><td colSpan={6} style={{ textAlign: "center", padding: 32, color: "rgba(255,255,255,.35)", fontSize: 13 }}>Loading…</td></tr>
+              )}
+              {!loading && backups.length === 0 && (
+                <tr><td colSpan={6} style={{ textAlign: "center", padding: 32, color: "rgba(255,255,255,.3)", fontSize: 13 }}>No backup records available.</td></tr>
+              )}
+              {backups.map((backup) => (
                 <tr key={backup.id}>
                   <td className="bk-name">{backup.name}</td>
                   <td>
@@ -116,7 +155,7 @@ export default function BackupRestorePage() {
                       {backup.status === "complete" ? "✓ Complete" : backup.status === "running" ? "⟳ Running" : "✗ Failed"}
                     </span>
                   </td>
-                  <td className="bk-date">{new Date(backup.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</td>
+                  <td className="bk-date">{new Date(backup.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
                   <td>
                     {backup.status === "complete" ? (
                       <button

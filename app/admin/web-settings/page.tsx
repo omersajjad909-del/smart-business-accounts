@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
+import toast from "react-hot-toast";
 
 type SettingRow = {
   id: string;
@@ -20,19 +22,54 @@ const DEFAULT_SETTINGS: SettingRow[] = [
   { id: "heatmaps",         label: "Heatmaps & Recordings",  description: "Record anonymous user sessions and generate heatmaps for UX insights.", value: false },
 ];
 
+function adminHdrs(json = false): Record<string, string> {
+  const u = getCurrentUser();
+  const h: Record<string, string> = {};
+  if (json) h["Content-Type"] = "application/json";
+  if (u?.role) h["x-user-role"] = u.role;
+  if (u?.id) h["x-user-id"] = u.id;
+  return h;
+}
+
 export default function WebSettingsPage() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
-  const [domain, setDomain] = useState("https://finovaos.com");
-  const [gtm, setGtm] = useState("GTM-XXXXXXX");
+  const [domain, setDomain] = useState("https://www.finovaos.app");
+  const [gtm, setGtm] = useState("");
   const [saving, setSaving] = useState(false);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch("/api/admin/settings", { headers: adminHdrs(), cache: "no-store" });
+        if (r.ok) {
+          const d = await r.json();
+          if (d.settings?.appName) setDomain(d.settings.appName);
+          if (d.settings?.maintenanceMode !== undefined) {
+            setSettings(prev => prev.map(s => s.id === "maintenance" ? { ...s, value: !!d.settings.maintenanceMode } : s));
+          }
+        }
+      } catch {}
+      finally { setLoadingSettings(false); }
+    })();
+  }, []);
 
   function toggle(id: string) {
     setSettings((prev) => prev.map((s) => s.id === id ? { ...s, value: !s.value } : s));
   }
 
-  function handleSave() {
+  async function handleSave() {
     setSaving(true);
-    setTimeout(() => setSaving(false), 1400);
+    try {
+      const maintenanceSetting = settings.find(s => s.id === "maintenance");
+      await Promise.all([
+        fetch("/api/admin/settings", { method: "POST", headers: adminHdrs(true), body: JSON.stringify({ key: "appName", value: domain }) }),
+        fetch("/api/admin/settings", { method: "POST", headers: adminHdrs(true), body: JSON.stringify({ key: "maintenanceMode", value: maintenanceSetting?.value ?? false }) }),
+        gtm ? fetch("/api/admin/settings", { method: "POST", headers: adminHdrs(true), body: JSON.stringify({ key: "gtmId", value: gtm }) }) : Promise.resolve(),
+      ]);
+      toast.success("Settings saved");
+    } catch { toast.error("Failed to save settings"); }
+    finally { setSaving(false); }
   }
 
   return (

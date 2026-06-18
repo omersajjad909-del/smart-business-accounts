@@ -52,7 +52,10 @@
       "Bash(Select-Object FullName, PSIsContainer)",
       "Bash(Format-Table -AutoSize)",
       "Bash(find d:\\\\\\\\projects\\\\\\\\smart-business-accounts\\\\\\\\app\\\\\\\\api -type d -name \"*payroll*\" -o -type d -name \"*employee*\" -o -type d -name \"*attendance*\" -o -type d -name \"*leave*\")",
-      "PowerShell(Test-Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\"; if \\(\\(Test-Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\"\\)\\) { Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\" -Directory -Force | Select-Object Name })"
+      "PowerShell(Test-Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\"; if \\(\\(Test-Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\"\\)\\) { Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\" -Directory -Force | Select-Object Name })",
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Recurse -Include \"*admin*\")",
+      "Bash(Sort-Object FullName)",
+      "Bash(Select-String \"companies\\\\[id\\\\]\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
