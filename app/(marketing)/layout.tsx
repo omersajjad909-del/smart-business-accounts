@@ -13,15 +13,23 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: {
-    default: "FinovaOS — Cloud Accounting & Business Management for SMEs",
+    default: "FinovaOS — Cloud Accounting Software for Pakistan & Gulf SMEs",
     template: "%s | FinovaOS",
   },
   description:
-    "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. Purpose-built for trading, wholesale, and distribution businesses.",
+    "Best cloud accounting software for Pakistan & UAE businesses. FBR-ready invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. Trusted by 500+ SMEs in Karachi, Lahore, Dubai.",
   keywords: [
-    "accounting software", "cloud accounting", "invoicing software", "inventory management",
-    "HR payroll", "bank reconciliation", "CRM software", "SME accounting", "financial management",
-    "business software", "online accounting", "FinovaOS",
+    // Pakistan-specific
+    "accounting software Pakistan", "cloud accounting Pakistan", "FBR accounting software",
+    "business software Pakistan", "invoicing software Pakistan", "SME accounting Pakistan",
+    "Karachi accounting software", "Lahore business software", "online accounting Pakistan",
+    // UAE/Gulf
+    "accounting software UAE", "cloud accounting Dubai", "SME software Dubai",
+    // Features
+    "invoicing software", "inventory management", "HR payroll software", "bank reconciliation",
+    "CRM software", "financial management", "GST invoicing", "FBR compliant",
+    // Brand
+    "FinovaOS", "FinovaOS accounting",
   ],
   authors: [{ name: "FinovaOS", url: BASE }],
   creator: "FinovaOS",

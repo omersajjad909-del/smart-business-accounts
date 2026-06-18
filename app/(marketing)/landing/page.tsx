@@ -13,6 +13,158 @@ import NewsletterSection from "./components/NewsletterSection";
 import TrustedBy from "./components/TrustedBy";
 import VideoDemo from "./components/VideoDemo";
 
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${BASE}/#software`,
+      "name": "FinovaOS",
+      "description": "Cloud accounting software for Pakistan & UAE SMEs. FBR-ready invoicing, inventory management, HR & payroll, bank reconciliation, and CRM — all in one platform. Trusted by 500+ businesses in Karachi, Lahore, and Dubai.",
+      "url": BASE,
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "AccountingApplication",
+      "operatingSystem": "Web Browser",
+      "inLanguage": ["en", "ur"],
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Starter Plan",
+          "price": "0",
+          "priceCurrency": "PKR",
+          "availability": "https://schema.org/InStock",
+          "description": "Free plan for small businesses",
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro Plan",
+          "price": "2999",
+          "priceCurrency": "PKR",
+          "availability": "https://schema.org/InStock",
+          "billingIncrement": "P1M",
+        },
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "500",
+        "bestRating": "5",
+        "worstRating": "1",
+      },
+      "featureList": [
+        "FBR-compliant invoicing",
+        "Double-entry accounting",
+        "Inventory management",
+        "HR & Payroll with attendance tracking",
+        "Bank reconciliation",
+        "CRM and customer management",
+        "Multi-branch support",
+        "Financial reporting (P&L, Balance Sheet, Trial Balance)",
+        "GST / Sales Tax invoicing",
+        "Role-based access control",
+      ],
+      "screenshot": `${BASE}/icon.png`,
+      "creator": { "@id": `${BASE}/#org` },
+      "publisher": { "@id": `${BASE}/#org` },
+      "countriesSupported": "PK AE SA GB",
+    },
+    {
+      "@type": "Organization",
+      "@id": `${BASE}/#org`,
+      "name": "FinovaOS",
+      "url": BASE,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${BASE}/icon.png`,
+        "width": 512,
+        "height": 512,
+      },
+      "sameAs": ["https://twitter.com/finova_io"],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "availableLanguage": ["English", "Urdu"],
+        "areaServed": ["PK", "AE", "SA"],
+      },
+      "areaServed": [
+        { "@type": "Country", "name": "Pakistan" },
+        { "@type": "Country", "name": "United Arab Emirates" },
+        { "@type": "Country", "name": "Saudi Arabia" },
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${BASE}/#website`,
+      "url": BASE,
+      "name": "FinovaOS",
+      "publisher": { "@id": `${BASE}/#org` },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": `${BASE}/blog?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is FinovaOS FBR compliant?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. FinovaOS generates FBR-compliant invoices with all required fields including NTN, STRN, and tax breakdowns. You can export reports formatted for FBR filing.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Can I manage payroll and attendance in FinovaOS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. FinovaOS includes a full HR & Payroll module with attendance tracking, leave management, salary slip generation, and deduction handling — all integrated with your accounting ledger.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Does FinovaOS work for businesses in Pakistan and UAE?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. FinovaOS is built for SMEs across Pakistan (FBR-ready) and the Gulf (UAE VAT-compatible). It supports PKR, AED, SAR, and other currencies with localized tax settings.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Is FinovaOS a cloud-based accounting software?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. FinovaOS is 100% cloud-based. You can access your accounts, invoices, inventory, and reports from any browser — no installation needed. Your data is backed up automatically.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Can FinovaOS handle inventory management?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. FinovaOS includes real-time inventory tracking with stock-in/stock-out, low-stock alerts, product variants, multi-warehouse support, and automatic COGS calculation linked to your accounting.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a free plan available?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. FinovaOS offers a free Starter plan for small businesses. You can upgrade to Pro or Enterprise as your business grows — no credit card required to get started.",
+          },
+        },
+      ],
+    },
+  ],
+};
+
 async function getRequestHost() {
   const headerStore = await headers();
   return (
@@ -43,6 +195,10 @@ export default async function LandingPage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+      />
       <Hero />
       <VideoDemo />
       <TrustedBy />
