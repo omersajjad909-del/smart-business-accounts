@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { generateMarketingText, getErrorMessage } from "@/lib/marketingAutopilotAI";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+type MarketingPost = {
+  platform: string;
+  type: string;
+  text: string;
+  hashtags: string;
+  bestTime?: string;
+};
 
 const NICHE_CONTEXT: Record<string, string> = {
   trading:        "trading businesses — buying and selling goods, managing stock, tracking purchases and sales",
@@ -76,23 +82,17 @@ Rules:
 - Keep posts under 250 characters for Instagram, LinkedIn can be longer
 - Return ONLY the JSON array, no other text`;
 
-    const response = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 4000,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const raw = (response.content[0] as any).text.trim();
+    const raw = await generateMarketingText(prompt, 4000);
     const jsonMatch = raw.match(/\[[\s\S]*\]/);
     if (!jsonMatch) return NextResponse.json({ error: "AI returned invalid format" }, { status: 500 });
 
-    const posts = JSON.parse(jsonMatch[0]).map((p: any) => ({
+    const posts = (JSON.parse(jsonMatch[0]) as MarketingPost[]).map((p) => ({
       ...p,
       bestTime: p.bestTime || BEST_TIMES[platform] || BEST_TIMES.all,
     }));
 
     return NextResponse.json({ posts });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: getErrorMessage(e, "Content generation failed") }, { status: 500 });
   }
 }

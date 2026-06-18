@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+import { generateMarketingText, getErrorMessage } from "@/lib/marketingAutopilotAI";
 
 const NICHE_MAP: Record<string, string> = {
   trading:        "traders and trading businesses who manage stock and buy/sell goods",
@@ -70,19 +68,13 @@ Respond with a JSON array of exactly 3 objects:
 
 Return ONLY the JSON array, no other text.`;
 
-    const response = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 3000,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const raw = (response.content[0] as any).text.trim();
+    const raw = await generateMarketingText(prompt, 3000);
     const jsonMatch = raw.match(/\[[\s\S]*\]/);
     if (!jsonMatch) return NextResponse.json({ error: "AI returned invalid format" }, { status: 500 });
 
     const ads = JSON.parse(jsonMatch[0]);
     return NextResponse.json({ ads });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: getErrorMessage(e, "Ad generation failed") }, { status: 500 });
   }
 }

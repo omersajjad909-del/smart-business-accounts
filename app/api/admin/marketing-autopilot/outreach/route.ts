@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { generateMarketingText, getErrorMessage } from "@/lib/marketingAutopilotAI";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+type OutreachScript = {
+  channel: string;
+  subject?: string;
+  body: string;
+  followUp: string;
+  bestTime: string;
+  tipPK: string;
+};
 
 const NICHE_PAIN: Record<string, string> = {
   trading:       "Traders often struggle with: tracking multiple purchases and sales, managing stock manually in Excel, losing track of payments from customers, calculating profit per item, reconciling accounts at month end.",
@@ -35,7 +42,7 @@ export async function POST(req: NextRequest) {
       direct:       "bold and to the point — no fluff, just value and call to action",
     };
 
-    const scripts: any[] = [];
+    const scripts: OutreachScript[] = [];
 
     for (const ch of channels) {
       const isWhatsApp = ch === "whatsapp";
@@ -74,21 +81,15 @@ Respond as a JSON object:
 
 Return ONLY the JSON object, no other text.`;
 
-      const response = await client.messages.create({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 2000,
-        messages: [{ role: "user", content: prompt }],
-      });
-
-      const raw = (response.content[0] as any).text.trim();
+      const raw = await generateMarketingText(prompt, 2000);
       const jsonMatch = raw.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        try { scripts.push(JSON.parse(jsonMatch[0])); } catch { /* skip malformed */ }
+        try { scripts.push(JSON.parse(jsonMatch[0]) as OutreachScript); } catch { /* skip malformed */ }
       }
     }
 
     return NextResponse.json({ scripts });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    return NextResponse.json({ error: getErrorMessage(e, "Outreach generation failed") }, { status: 500 });
   }
 }

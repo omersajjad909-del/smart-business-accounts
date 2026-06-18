@@ -55,12 +55,14 @@
       "PowerShell(Test-Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\"; if \\(\\(Test-Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\"\\)\\) { Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\\\\app\\\\api\" -Directory -Force | Select-Object Name })",
       "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Recurse -Include \"*admin*\")",
       "Bash(Sort-Object FullName)",
-      "Bash(Select-String \"companies\\\\[id\\\\]\")"
+      "Bash(Select-String \"companies\\\\[id\\\\]\")",
+      "Read(//d/projects/smart-business-accounts/app/admin/companies/**)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
       "d:\\projects\\smart-business-accounts\\app\\api\\bulk-payments",
-      "d:\\projects\\smart-business-accounts\\app\\api\\payment-followup"
+      "d:\\projects\\smart-business-accounts\\app\\api\\payment-followup",
+      "d:\\projects\\smart-business-accounts\\app\\admin\\companies\\[id]"
     ]
   }
 }

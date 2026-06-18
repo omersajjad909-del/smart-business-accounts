@@ -488,6 +488,10 @@ export default function AdminCompaniesPage() {
                     </td>
                     <td style={{ padding: "14px 16px", textAlign: "right" }}>
                       <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                        <a href={`/admin/companies/${c.id}`}
+                          style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(56,189,248,.1)", border: "1px solid rgba(56,189,248,.2)", color: "#38bdf8", fontSize: 11, fontWeight: 700, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                          Details
+                        </a>
                         <button onClick={() => setChanging(c)} disabled={busy === c.id}
                           style={{ padding: "5px 12px", borderRadius: 8, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.25)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
                           ✦ Plan

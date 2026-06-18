@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
+import { generateMarketingText, getErrorMessage, hasUsableAIKey } from "@/lib/marketingAutopilotAI";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const openai    = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const MODEL  = (process.env.DALLE_MODEL   || "dall-e-3") as "dall-e-3" | "dall-e-2";
 const SIZE   = (process.env.DALLE_SIZE    || "1024x1024") as "1024x1024" | "1024x1792" | "1792x1024";
@@ -18,14 +16,12 @@ export async function POST(req: NextRequest) {
 
     const { postText, niche, platform, style } = await req.json();
     if (!postText) return NextResponse.json({ error: "postText required" }, { status: 400 });
+    if (!hasUsableAIKey(process.env.OPENAI_API_KEY)) {
+      return NextResponse.json({ error: "OpenAI API key not configured for image generation" }, { status: 500 });
+    }
 
-    // Step 1 — use Claude to write a precise DALL-E prompt
-    const promptResp = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 400,
-      messages: [{
-        role: "user",
-        content: `You are an expert at writing DALL-E 3 image generation prompts for social media marketing graphics.
+    // Step 1 — use the configured text model to write a precise DALL-E prompt
+    const imagePrompt = await generateMarketingText(`You are an expert at writing DALL-E 3 image generation prompts for social media marketing graphics.
 
 Create a DALL-E 3 image prompt for this social media post for FinovaOS (a business accounting software):
 
@@ -44,13 +40,10 @@ Requirements:
 - Could include: graphs, dashboards, business people, office settings, product displays, money/finance symbols, global/tech imagery
 - Photorealistic or high-quality digital art
 
-Write ONLY the image prompt, nothing else. Keep it under 150 words.`,
-      }],
-    });
-
-    const imagePrompt = (promptResp.content[0] as any).text.trim();
+Write ONLY the image prompt, nothing else. Keep it under 150 words.`, 400);
 
     // Step 2 — generate image with DALL-E 3
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const response = await openai.images.generate({
       model:   MODEL,
       prompt:  `${imagePrompt}. Professional business marketing graphic, no text or typography, clean composition.`,
@@ -70,11 +63,11 @@ Write ONLY the image prompt, nothing else. Keep it under 150 words.`,
       size:         SIZE,
     });
 
-  } catch (e: any) {
+  } catch (e: unknown) {
     // OpenAI content policy errors
-    if (e?.status === 400) {
+    if (typeof e === "object" && e && "status" in e && e.status === 400) {
       return NextResponse.json({ error: "Image prompt was rejected by content policy. Try different post text." }, { status: 400 });
     }
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(e, "Image generation failed") }, { status: 500 });
   }
 }
