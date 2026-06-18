@@ -93,6 +93,12 @@ export default function BarcodePage() {
   const [assignInput, setAssignInput] = useState<Record<string, string>>({});
   const scanRef = useRef<HTMLInputElement>(null);
 
+  // ── Batch print state ─────────────────────────────────────────────────────
+  const [selectedIds, setSelectedIds]     = useState<Set<string>>(new Set());
+  const [showBatchModal, setShowBatchModal] = useState(false);
+  const [batchPrintQty, setBatchPrintQty] = useState(1);
+  const [batchActive, setBatchActive]     = useState(false);
+
   // ── Price Update tab ───────────────────────────────────────────────────────
   const [puScan, setPuScan]       = useState("");
   const [puItem, setPuItem]       = useState<Item | null>(null);
@@ -185,6 +191,23 @@ export default function BarcodePage() {
 
   function openPrint(item: Item) { setPrintItem(item); setPrintQty(1); setShowPrintModal(true); }
   function executePrint() { setShowPrintModal(false); setTimeout(() => window.print(), 200); }
+
+  function toggleSelect(id: string) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+  function selectAllWithBarcode() {
+    const ids = filtered.filter(i => i.barcode).map(i => i.id);
+    setSelectedIds(prev => prev.size === ids.length && ids.every(id => prev.has(id)) ? new Set() : new Set(ids));
+  }
+  function executeBatchPrint() {
+    setShowBatchModal(false);
+    setBatchActive(true);
+    setTimeout(() => { window.print(); setBatchActive(false); }, 200);
+  }
 
   // ── Price Update tab handlers ──────────────────────────────────────────────
   function handlePuScan(e: React.FormEvent) {
@@ -312,6 +335,10 @@ export default function BarcodePage() {
   }
 
   const printLabels = printItem ? Array.from({ length: Math.max(1, Math.min(printQty, 100)) }) : [];
+  const batchSelectedItems = filtered.filter(i => i.barcode && selectedIds.has(i.id));
+  const batchPrintLabels: Item[] = batchActive
+    ? batchSelectedItems.flatMap(item => Array.from({ length: Math.max(1, Math.min(batchPrintQty, 50)) }, () => item))
+    : [];
 
   // ── UI ─────────────────────────────────────────────────────────────────────
   const TAB_STYLE = (active: boolean): React.CSSProperties => ({
@@ -342,8 +369,8 @@ export default function BarcodePage() {
         .print-area { display: none; }
       `}</style>
 
-      {/* Print area */}
-      {printItem && (
+      {/* Single-item print area */}
+      {printItem && !batchActive && (
         <div className="print-area">
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 4 }}>
             {printLabels.map((_, idx) => (
@@ -352,6 +379,23 @@ export default function BarcodePage() {
                 <Barcode128 value={printItem.barcode!} moduleWidth={1.5} height={48} bg="white" fg="black" />
                 {(printItem.rate ?? printItem.salePrice) != null && (
                   <div style={{ fontSize: 12, fontWeight: 800, color: "#000" }}>{currency}{printItem.rate ?? printItem.salePrice}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Batch print area */}
+      {batchActive && (
+        <div className="print-area">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 4 }}>
+            {batchPrintLabels.map((item, idx) => (
+              <div key={idx} style={{ border: "1px dashed #ccc", borderRadius: 6, padding: "10px 14px", textAlign: "center", display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 4, pageBreakInside: "avoid" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#000", maxWidth: 180, textAlign: "center", lineHeight: 1.3 }}>{item.name}</div>
+                <Barcode128 value={item.barcode!} moduleWidth={1.5} height={48} bg="white" fg="black" />
+                {(item.rate ?? item.salePrice) != null && (
+                  <div style={{ fontSize: 12, fontWeight: 800, color: "#000" }}>{currency}{item.rate ?? item.salePrice}</div>
                 )}
               </div>
             ))}
@@ -424,23 +468,47 @@ export default function BarcodePage() {
 
             {/* Items Table */}
             <div style={{ borderRadius: 14, background: "rgba(255,255,255,.03)", border: "1px solid var(--border)", overflow: "hidden" }}>
-              <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>All Items</span>
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginRight: "auto" }}>All Items</span>
+
+                {/* Batch print bar */}
+                {selectedIds.size > 0 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 10, background: "rgba(99,102,241,.12)", border: "1px solid rgba(99,102,241,.3)" }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#818cf8" }}>{selectedIds.size} selected</span>
+                    <button onClick={() => setShowBatchModal(true)} style={{ padding: "5px 12px", borderRadius: 7, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                      🖨 Print Selected
+                    </button>
+                    <button onClick={() => setSelectedIds(new Set())} style={{ padding: "5px 8px", borderRadius: 7, background: "transparent", border: "1px solid rgba(255,255,255,.15)", color: "var(--text-muted)", fontSize: 11, cursor: "pointer" }}>✕</button>
+                  </div>
+                )}
+
+                <button onClick={selectAllWithBarcode}
+                  style={{ padding: "6px 12px", borderRadius: 8, background: "transparent", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 11.5, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>
+                  {selectedIds.size > 0 && batchSelectedItems.length === selectedIds.size ? "✓ Deselect All" : "Select All with Barcode"}
+                </button>
+
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, code, barcode…"
-                  style={{ width: 280, padding: "7px 12px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 12.5, fontFamily: "inherit", outline: "none" }} />
+                  style={{ width: 220, padding: "7px 12px", borderRadius: 9, background: "var(--app-bg)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 12.5, fontFamily: "inherit", outline: "none" }} />
               </div>
               {loading ? <div style={{ padding: 32, textAlign: "center", color: "var(--text-muted)" }}>Loading…</div> : (
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
                   <thead>
                     <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                      {["Item","Code","Barcode Preview","Unit","Price","Action"].map(h => (
+                      <th style={{ padding: "10px 10px 10px 16px", width: 32 }} />
+                    {["Item","Code","Barcode Preview","Unit","Price","Action"].map(h => (
                         <th key={h} style={{ padding: "10px 16px", textAlign: "left", color: "var(--text-muted)", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: ".05em" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.slice(0, 100).map(item => (
-                      <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                      <tr key={item.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)", background: selectedIds.has(item.id) ? "rgba(99,102,241,.05)" : "transparent" }}>
+                        <td style={{ padding: "11px 10px 11px 16px" }}>
+                          {item.barcode && (
+                            <input type="checkbox" checked={selectedIds.has(item.id)} onChange={() => toggleSelect(item.id)}
+                              style={{ width: 14, height: 14, cursor: "pointer", accentColor: "#6366f1" }} />
+                          )}
+                        </td>
                         <td style={{ padding: "11px 16px", color: "var(--text-primary)", fontWeight: 600 }}>{item.name}</td>
                         <td style={{ padding: "11px 16px", color: "var(--text-muted)", fontFamily: "monospace" }}>
                           {item._source === "catalog" && item.code
@@ -802,6 +870,63 @@ export default function BarcodePage() {
               <button onClick={() => setShowPrintModal(false)} style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
               <button onClick={executePrint} style={{ padding: "10px 24px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                 🖨 Print {printQty} Label{printQty > 1 ? "s" : ""}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Batch Print Modal */}
+      {showBatchModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(8px)", zIndex: 99, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "var(--panel-bg, #1a1d2e)", border: "1px solid var(--border)", borderRadius: 18, padding: 28, width: 500, fontFamily: "'Outfit',sans-serif" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>🖨 Batch Print Barcodes</h2>
+              <button onClick={() => setShowBatchModal(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 22, cursor: "pointer" }}>✕</button>
+            </div>
+
+            {/* Selected items preview */}
+            <div style={{ borderRadius: 10, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", padding: "12px 16px", marginBottom: 20, maxHeight: 180, overflowY: "auto" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>
+                {batchSelectedItems.length} items selected
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {batchSelectedItems.map(item => (
+                  <div key={item.id} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 20, background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.25)", fontSize: 11.5, color: "var(--text-primary)", fontWeight: 600 }}>
+                    {item.name}
+                    <button onClick={() => toggleSelect(item.id)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.4)", fontSize: 12, cursor: "pointer", padding: 0, lineHeight: 1 }}>✕</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Qty per item */}
+            <div style={{ marginBottom: 22 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 10 }}>Copies per item (max 50)</label>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <button onClick={() => setBatchPrintQty(q => Math.max(1, q - 1))} style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 18, cursor: "pointer" }}>−</button>
+                <input type="number" min={1} max={50} value={batchPrintQty} onChange={e => setBatchPrintQty(Math.max(1, Math.min(50, Number(e.target.value))))}
+                  style={{ width: 70, padding: "8px 0", borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 16, fontWeight: 700, textAlign: "center", outline: "none" }} />
+                <button onClick={() => setBatchPrintQty(q => Math.min(50, q + 1))} style={{ width: 36, height: 36, borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 18, cursor: "pointer" }}>+</button>
+                <div style={{ display: "flex", gap: 5, marginLeft: 6 }}>
+                  {[1, 2, 4, 8, 12].map(n => (
+                    <button key={n} onClick={() => setBatchPrintQty(n)}
+                      style={{ padding: "6px 9px", borderRadius: 7, border: `1px solid ${batchPrintQty === n ? "rgba(99,102,241,.5)" : "var(--border)"}`, background: batchPrintQty === n ? "rgba(99,102,241,.15)" : "transparent", color: batchPrintQty === n ? "#818cf8" : "var(--text-muted)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ marginTop: 8, fontSize: 12, color: "var(--text-muted)" }}>
+                Total labels: <strong style={{ color: "#818cf8" }}>{batchSelectedItems.length * batchPrintQty}</strong>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button onClick={() => setShowBatchModal(false)} style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              <button onClick={executeBatchPrint} disabled={batchSelectedItems.length === 0}
+                style={{ padding: "10px 24px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: batchSelectedItems.length === 0 ? .5 : 1 }}>
+                🖨 Print {batchSelectedItems.length * batchPrintQty} Labels
               </button>
             </div>
           </div>

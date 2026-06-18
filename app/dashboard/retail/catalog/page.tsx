@@ -4,6 +4,56 @@ import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
 
+// ── Pure Code128B barcode generator (no external library) ──────────────────
+const C128B: string[] = [
+  "11011001100","11001101100","11001100110","10010011000","10010001100",
+  "10001001100","10011001000","10011000100","10001100100","11001001000",
+  "11001000100","11000100100","10110011100","10011011100","10011001110",
+  "10111001100","10011101100","10011100110","11001110010","11001011100",
+  "11001001110","11011100100","11001110100","11101101110","11101001100",
+  "11100101100","11100100110","11101100100","11100110100","11100110010",
+  "11011011000","11011000110","11000110110","10100011000","10001011000",
+  "10001000110","10110001000","10001101000","10001100010","11010001000",
+  "11000101000","11000100010","10110111000","10110001110","10001101110",
+  "10111011000","10111000110","10001110110","11101110110","11010001110",
+  "11000101110","11011101000","11011100010","11011101110","11101011000",
+  "11101000110","11100010110","11101101000","11101100010","11100011010",
+  "11101111010","11001000010","11110001010","10100110000","10100001100",
+  "10010110000","10010000110","10000101100","10000100110","10110010000",
+  "10110000100","10011010000","10011000010","10000110100","10000110010",
+  "11000010010","11001010000","11110111010","11000010100","10001111010",
+  "10100111100","10010111100","10010011110","10111100100","10011110100",
+  "10011110010","11110100100","11110010100","11110010010","11011011110",
+  "11011110110","11110110110","10101111000","10100011110","10001011110",
+  "10111101000","10111100010","11110101000","11110100010","10111011110",
+  "10111101110","11101011110","11110101110",
+  "11010000100","11010010000","11010011100",
+];
+const C128B_STOP = "1100011101011";
+function encodeC128B(text: string): string {
+  if (!text) return "";
+  const vals: number[] = [];
+  for (const ch of text) { const c = ch.charCodeAt(0); if (c >= 32 && c <= 126) vals.push(c - 32); }
+  if (!vals.length) return "";
+  const checksum = (104 + vals.reduce((s, v, i) => s + v * (i + 1), 0)) % 103;
+  const q = "0".repeat(11);
+  return q + C128B[104] + vals.map(v => C128B[v]).join("") + C128B[checksum] + C128B_STOP + q;
+}
+function CatalogBarcode({ value, height = 48, moduleWidth = 1.5 }: { value: string; height?: number; moduleWidth?: number }) {
+  const bits = encodeC128B(value);
+  if (!bits) return null;
+  const w = bits.length * moduleWidth;
+  const h = height + 18;
+  return (
+    <svg width={w} height={h} xmlns="http://www.w3.org/2000/svg">
+      <rect width={w} height={h} fill="white" />
+      {bits.split("").map((b, i) => b === "1" ? <rect key={i} x={i * moduleWidth} y={2} width={moduleWidth} height={height} fill="black" /> : null)}
+      <text x={w / 2} y={height + 14} textAnchor="middle" fontSize={10} fontFamily="'Courier New',monospace" fill="black" letterSpacing="1">{value}</text>
+    </svg>
+  );
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
 const ff = "'Outfit','Inter',sans-serif";
 const bg = "rgba(255,255,255,0.03)";
 const border = "rgba(255,255,255,0.07)";
@@ -31,6 +81,14 @@ export default function ProductCatalogPage() {
   const [formError, setFormError] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Barcode print
+  const [catPrintItem, setCatPrintItem] = useState<{ name: string; sku: string; price: number } | null>(null);
+  const [catPrintQty, setCatPrintQty]   = useState(1);
+  const [showCatPrint, setShowCatPrint] = useState(false);
+  const catPrintLabels = catPrintItem ? Array.from({ length: Math.max(1, Math.min(100, catPrintQty)) }) : [];
+  function openCatPrint(p: { name: string; sku: string; price: number }) { setCatPrintItem({ name: p.name, sku: p.sku, price: p.price }); setCatPrintQty(1); setShowCatPrint(true); }
+  function executeCatPrint() { setShowCatPrint(false); setTimeout(() => window.print(), 200); }
 
   // Receive stock modal
   const [receiveProduct, setReceiveProduct] = useState<{ id: string; name: string; itemNewId: string; costPrice: number; stock: number } | null>(null);
@@ -265,6 +323,36 @@ export default function ProductCatalogPage() {
 
   return (
     <div style={{ padding: "28px 32px", fontFamily: ff, color: "#fff", minHeight: "100vh" }}>
+      <style>{`
+        @media print {
+          body * { visibility: hidden !important; }
+          .cat-print-area, .cat-print-area * { visibility: visible !important; }
+          .cat-print-area {
+            display: block !important; position: fixed !important;
+            top: 0 !important; left: 0 !important; width: 100% !important;
+            background: white !important; z-index: 99999 !important;
+          }
+          body { background: white !important; }
+          @page { margin: 8mm; size: auto; }
+        }
+        .cat-print-area { display: none; }
+      `}</style>
+
+      {/* Barcode print area */}
+      {catPrintItem && (
+        <div className="cat-print-area">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: 4 }}>
+            {catPrintLabels.map((_, idx) => (
+              <div key={idx} style={{ border: "1px dashed #ccc", borderRadius: 6, padding: "10px 14px", textAlign: "center", display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 4, pageBreakInside: "avoid" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#000", maxWidth: 180, textAlign: "center", lineHeight: 1.3 }}>{catPrintItem.name}</div>
+                <CatalogBarcode value={catPrintItem.sku} height={48} moduleWidth={1.5} />
+                {catPrintItem.price > 0 && <div style={{ fontSize: 12, fontWeight: 800, color: "#000" }}>Rs. {catPrintItem.price.toLocaleString()}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
@@ -364,6 +452,14 @@ export default function ProductCatalogPage() {
                     >
                       📦 Receive
                     </button>
+                    {p.sku && (
+                      <button
+                        onClick={() => openCatPrint(p)}
+                        style={{ padding: "5px 10px", background: "rgba(129,140,248,.1)", border: "1px solid rgba(129,140,248,.25)", color: "#a5b4fc", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
+                      >
+                        🖨 Barcode
+                      </button>
+                    )}
                     <button
                       onClick={() => openEdit(p)}
                       style={{ padding: "5px 10px", background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.3)", color: "#818cf8", borderRadius: 6, fontSize: 11, cursor: "pointer", fontWeight: 600 }}
@@ -574,6 +670,46 @@ export default function ProductCatalogPage() {
                 style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${border}`, borderRadius: 8, color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer" }}
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Barcode Print Modal */}
+      {showCatPrint && catPrintItem && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", backdropFilter: "blur(8px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#161b27", border: `1px solid ${border}`, borderRadius: 18, padding: 28, width: 460, fontFamily: ff }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ fontSize: 17, fontWeight: 800, margin: 0 }}>🖨 Print Barcode Labels</h2>
+              <button onClick={() => setShowCatPrint(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 22, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ background: "white", borderRadius: 10, padding: "16px 20px", textAlign: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#000", marginBottom: 8 }}>{catPrintItem.name}</div>
+              <CatalogBarcode value={catPrintItem.sku} height={56} moduleWidth={2} />
+              {catPrintItem.price > 0 && <div style={{ fontSize: 13, fontWeight: 800, color: "#000", marginTop: 6 }}>Rs. {catPrintItem.price.toLocaleString()}</div>}
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>How many labels? (max 100)</label>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <button onClick={() => setCatPrintQty(q => Math.max(1, q - 1))} style={{ width: 36, height: 36, borderRadius: 8, border: `1px solid ${border}`, background: "rgba(255,255,255,.05)", color: "#fff", fontSize: 18, cursor: "pointer" }}>−</button>
+                <input type="number" min={1} max={100} value={catPrintQty} onChange={e => setCatPrintQty(Math.max(1, Math.min(100, Number(e.target.value))))}
+                  style={{ width: 70, padding: "8px 0", borderRadius: 8, border: `1px solid ${border}`, background: "rgba(255,255,255,.05)", color: "#fff", fontSize: 16, fontWeight: 700, textAlign: "center", outline: "none" }} />
+                <button onClick={() => setCatPrintQty(q => Math.min(100, q + 1))} style={{ width: 36, height: 36, borderRadius: 8, border: `1px solid ${border}`, background: "rgba(255,255,255,.05)", color: "#fff", fontSize: 18, cursor: "pointer" }}>+</button>
+                <div style={{ display: "flex", gap: 5, marginLeft: 6 }}>
+                  {[1, 4, 8, 12, 24, 48].map(n => (
+                    <button key={n} onClick={() => setCatPrintQty(n)}
+                      style={{ padding: "6px 9px", borderRadius: 7, border: `1px solid ${catPrintQty === n ? "rgba(99,102,241,.5)" : border}`, background: catPrintQty === n ? "rgba(99,102,241,.15)" : "transparent", color: catPrintQty === n ? "#818cf8" : "rgba(255,255,255,.4)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button onClick={() => setShowCatPrint(false)} style={{ padding: "10px 20px", borderRadius: 10, border: `1px solid ${border}`, background: "transparent", color: "rgba(255,255,255,.5)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              <button onClick={executeCatPrint} style={{ padding: "10px 24px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                🖨 Print {catPrintQty} Label{catPrintQty > 1 ? "s" : ""}
               </button>
             </div>
           </div>
