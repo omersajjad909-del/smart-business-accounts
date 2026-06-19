@@ -18,22 +18,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Company required" }, { status: 400 });
   }
 
-  const [
-    quotations,
-    salesInvoices,
-    purchaseOrders,
-    purchaseInvoices,
-    challans,
-    saleReturns,
-    outwards,
-    grns,
-    receipts,
-    accounts,
-    items,
-  ] = await Promise.all([
+  // Run in sequential batches of 3 to avoid exhausting connection_limit=1.
+  // 11 parallel queries all compete for the single pool connection and time out at 20s.
+  const [quotations, salesInvoices, purchaseOrders] = await Promise.all([
     prisma.quotation.findMany({
       where: { companyId },
       orderBy: { date: "desc" },
+      take: 200,
       select: {
         id: true,
         quotationNo: true,
@@ -47,6 +38,7 @@ export async function GET(req: NextRequest) {
     prisma.salesInvoice.findMany({
       where: { companyId, deletedAt: null },
       orderBy: { date: "desc" },
+      take: 200,
       select: {
         id: true,
         invoiceNo: true,
@@ -60,6 +52,7 @@ export async function GET(req: NextRequest) {
     prisma.purchaseOrder.findMany({
       where: { companyId },
       orderBy: { date: "desc" },
+      take: 200,
       select: {
         id: true,
         poNo: true,
@@ -70,9 +63,13 @@ export async function GET(req: NextRequest) {
         items: { select: { qty: true, rate: true } },
       },
     }),
+  ]);
+
+  const [purchaseInvoices, challans, saleReturns] = await Promise.all([
     prisma.purchaseInvoice.findMany({
       where: { companyId, deletedAt: null },
       orderBy: { date: "desc" },
+      take: 200,
       select: {
         id: true,
         invoiceNo: true,
@@ -84,6 +81,7 @@ export async function GET(req: NextRequest) {
     prisma.deliveryChallan.findMany({
       where: { companyId },
       orderBy: { date: "desc" },
+      take: 200,
       select: {
         id: true,
         challanNo: true,
@@ -97,6 +95,7 @@ export async function GET(req: NextRequest) {
     prisma.saleReturn.findMany({
       where: { companyId },
       orderBy: { date: "desc" },
+      take: 200,
       select: {
         id: true,
         returnNo: true,
@@ -106,9 +105,13 @@ export async function GET(req: NextRequest) {
         invoice: { select: { invoiceNo: true } },
       },
     }),
+  ]);
+
+  const [outwards, grns, receipts] = await Promise.all([
     prisma.outward.findMany({
       where: { companyId },
       orderBy: { date: "desc" },
+      take: 200,
       select: {
         id: true,
         outwardNo: true,
@@ -122,6 +125,7 @@ export async function GET(req: NextRequest) {
     prisma.goodsReceiptNote.findMany({
       where: { companyId },
       orderBy: { date: "desc" },
+      take: 200,
       select: {
         id: true,
         grnNo: true,
@@ -134,6 +138,7 @@ export async function GET(req: NextRequest) {
     prisma.paymentReceipt.findMany({
       where: { companyId, deletedAt: null },
       orderBy: { date: "desc" },
+      take: 200,
       select: {
         id: true,
         receiptNo: true,
@@ -144,6 +149,9 @@ export async function GET(req: NextRequest) {
         party: { select: { name: true } },
       },
     }),
+  ]);
+
+  const [accounts, items] = await Promise.all([
     prisma.account.findMany({
       where: { companyId, deletedAt: null },
       orderBy: { name: "asc" },
