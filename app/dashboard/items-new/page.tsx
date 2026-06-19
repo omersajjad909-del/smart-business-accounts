@@ -221,7 +221,7 @@ export default function ItemsNewPage() {
             <input style={{...INPUT, borderColor:"rgba(52,211,153,0.2)"}} type="number" placeholder="0" value={purchaseRate} onChange={e=>setPurchaseRate(e.target.value)} />
           </div>
           <div>
-            <div style={{ fontSize:11, color:"#f59e0b", marginBottom:5 }}>Tax / GST % <span style={{fontSize:10,opacity:.6}}>e.g. 17</span></div>
+            <div style={{ fontSize:11, color:"#f59e0b", marginBottom:5 }}>Tax / GST % <span style={{fontSize:10,opacity:.6}}></span></div>
             <input style={{...INPUT, borderColor:"rgba(245,158,11,0.2)"}} type="number" placeholder="0" value={taxRate} onChange={e=>setTaxRate(e.target.value)} />
           </div>
           <div>
