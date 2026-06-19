@@ -667,11 +667,16 @@ export default function POSPage() {
                 return (
                   <div key={p.id} className="prod-card" onClick={() => !outOfStock && addToCart(p)}
                     style={{ background: "#111c30", border: `1.5px solid ${outOfStock ? "rgba(239,68,68,.18)" : "rgba(255,255,255,.08)"}`, borderRadius: 12, padding: "14px 13px 12px", userSelect: "none", opacity: outOfStock ? 0.5 : 1, cursor: outOfStock ? "not-allowed" : "pointer", position: "relative", boxSizing: "border-box" }}>
-                    {outOfStock && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,.18)", color: "#f87171", fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 4 }}>OUT</div>}
-                    {lowStock   && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(245,158,11,.15)", color: "#f59e0b", fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 4 }}>LOW</div>}
-                    <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>{p.category}</div>
+                    {outOfStock && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,.18)", color: "#f87171", fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 4, zIndex: 1 }}>OUT</div>}
+                    {lowStock   && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(245,158,11,.15)", color: "#f59e0b", fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 4, zIndex: 1 }}>LOW</div>}
+                    {p.imageUrl ? (
+                      <img src={p.imageUrl} alt={p.name} style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8, marginBottom: 8, display: "block" }} />
+                    ) : (
+                      <div style={{ width: "100%", height: 60, borderRadius: 8, background: "rgba(99,102,241,.08)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 22 }}>📦</div>
+                    )}
+                    <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 4 }}>{p.category}</div>
                     <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.35, marginBottom: 4, color: "#e2e8f0", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const }}>{p.name}</div>
-                    {p.sku && <div style={{ fontSize: 9, color: "rgba(255,255,255,.22)", marginBottom: 8 }}>SKU: {p.sku}</div>}
+                    {p.sku && <div style={{ fontSize: 9, color: "rgba(255,255,255,.22)", marginBottom: 6 }}>SKU: {p.sku}</div>}
                     <div style={{ fontSize: 17, fontWeight: 800, color: "#818cf8", marginBottom: 4 }}>Rs. {p.price.toLocaleString()}</div>
                     {stockQty !== null && (
                       <div style={{ fontSize: 10, fontWeight: 600, color: outOfStock ? "#f87171" : lowStock ? "#f59e0b" : "#34d399" }}>
