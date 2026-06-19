@@ -89,6 +89,33 @@ export function mapGuestHistoryRecords(records: BusinessRecord[]) {
   }));
 }
 
+export function mapLaundryRecords(records: BusinessRecord[]) {
+  return records.map((record) => ({
+    id: record.id,
+    guest: record.title,
+    room: String(record.data?.room || ""),
+    items: String(record.data?.items || ""),
+    notes: String(record.data?.notes || ""),
+    amount: Number(record.amount || 0),
+    status: String(record.status || "pickup_pending"),
+    date: String(record.date || "").slice(0, 10),
+  }));
+}
+
+export function mapComplaintRecords(records: BusinessRecord[]) {
+  return records.map((record) => ({
+    id: record.id,
+    title: record.title,
+    guestName: String(record.data?.guestName || ""),
+    room: String(record.data?.room || ""),
+    category: String(record.data?.category || "general"),
+    priority: String(record.data?.priority || "medium"),
+    notes: String(record.data?.notes || ""),
+    status: String(record.status || "open"),
+    date: String(record.date || "").slice(0, 10),
+  }));
+}
+
 export type HotelControlCenter = {
   summary: {
     rooms: number;
@@ -99,11 +126,22 @@ export type HotelControlCenter = {
     serviceRevenue: number;
     pendingHousekeeping: number;
     maintenanceRooms: number;
+    todayCheckIns: number;
+    todayCheckOuts: number;
+    expectedArrivals: number;
+    openComplaints: number;
+    laundryPending: number;
+    laundryInProgress: number;
+    laundryReady: number;
+    revenueToday: number;
+    pendingReservations: number;
   };
   rooms: ReturnType<typeof mapRoomRecords>;
   reservations: ReturnType<typeof mapReservationRecords>;
   housekeeping: ReturnType<typeof mapHousekeepingRecords>;
   serviceOrders: ReturnType<typeof mapRoomServiceRecords>;
+  laundry: ReturnType<typeof mapLaundryRecords>;
+  complaints: ReturnType<typeof mapComplaintRecords>;
 };
 
 export async function fetchJson<T>(url: string, fallback: T): Promise<T> {
