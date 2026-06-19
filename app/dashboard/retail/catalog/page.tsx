@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useBusinessRecords } from "@/lib/useBusinessRecords";
 import { getCurrentUser } from "@/lib/auth";
 import Link from "next/link";
+import ImageUpload from "@/components/ImageUpload";
 
 // ── Pure Code128B barcode generator (no external library) ──────────────────
 const C128B: string[] = [
