@@ -91,6 +91,7 @@ export async function POST(req: NextRequest) {
         minStock: Number(body.minStock) || 0,
         barcode: body.barcode ? String(body.barcode).trim() : null,
         description: body.description || "",
+        imageUrl: body.imageUrl || null,
       },
     });
 
@@ -124,7 +125,7 @@ export async function PUT(req: NextRequest) {
     }
     const userId = req.headers.get("x-user-id");
     const body = await req.json();
-    const { id, name, category, unit, rate, purchaseRate, taxRate, minStock, barcode, description } = body;
+    const { id, name, category, unit, rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl } = body;
 
     if (!id || !name || !unit) {
       return NextResponse.json({ error: "ID, Name & Unit required" }, { status: 400 });
@@ -142,6 +143,7 @@ export async function PUT(req: NextRequest) {
         minStock: Number(minStock) || 0,
         barcode: barcode ? String(barcode).trim() : null,
         description: description || "",
+        imageUrl: imageUrl !== undefined ? (imageUrl || null) : undefined,
       },
     });
 

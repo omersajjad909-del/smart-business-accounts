@@ -3,6 +3,7 @@ import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import ImageUpload from "@/components/ImageUpload";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const FONT   = "'Outfit','Inter',sans-serif";
@@ -38,6 +39,7 @@ type Item = {
   id: string; code: string; name: string; category: string;
   unit: string; rate: number; purchaseRate: number; taxRate: number;
   minStock: number; barcode?: string | null; description?: string | null;
+  imageUrl?: string | null;
 };
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -54,6 +56,7 @@ export default function ItemsNewPage() {
   const [minStock,    setMinStock]    = useState("");
   const [barcode,     setBarcode]     = useState("");
   const [description, setDescription] = useState("");
+  const [imageUrl,    setImageUrl]    = useState<string | null>(null);
   const [saving,      setSaving]      = useState(false);
   const [editingId,   setEditingId]   = useState<string | null>(null);
   const [search,      setSearch]      = useState("");
@@ -77,7 +80,7 @@ export default function ItemsNewPage() {
   function resetForm() {
     setEditingId(null); setName(""); setCategory("TRADING"); setUnit("");
     setRate(""); setPurchaseRate(""); setTaxRate(""); setMinStock("");
-    setBarcode(""); setDescription("");
+    setBarcode(""); setDescription(""); setImageUrl(null);
   }
 
   async function saveItem() {
@@ -88,7 +91,7 @@ export default function ItemsNewPage() {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type":"application/json", ...headers },
         body: JSON.stringify({ id:editingId, name:name.trim(), category, unit,
-          rate, purchaseRate, taxRate, minStock, barcode, description }),
+          rate, purchaseRate, taxRate, minStock, barcode, description, imageUrl }),
       });
       if (!res.ok) { const e = await res.json(); throw new Error(e.error || "Save failed"); }
       resetForm();
@@ -104,6 +107,7 @@ export default function ItemsNewPage() {
     setUnit(item.unit); setRate(String(item.rate || "")); setPurchaseRate(String(item.purchaseRate || ""));
     setTaxRate(String(item.taxRate || "")); setMinStock(String(item.minStock || ""));
     setBarcode(item.barcode || ""); setDescription(item.description || "");
+    setImageUrl(item.imageUrl || null);
     window.scrollTo({ top:0, behavior:"smooth" });
   }
 
@@ -227,7 +231,7 @@ export default function ItemsNewPage() {
         </div>
 
         {/* Row 3: Barcode + Description */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 2fr", gap:12, marginBottom:16 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 2fr", gap:12, marginBottom:12 }}>
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Barcode / SKU</div>
             <input style={INPUT} placeholder="Scan or type barcode" value={barcode} onChange={e=>setBarcode(e.target.value)} />
@@ -236,6 +240,11 @@ export default function ItemsNewPage() {
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Description / Notes</div>
             <input style={INPUT} placeholder="Optional notes about this item" value={description} onChange={e=>setDescription(e.target.value)} />
           </div>
+        </div>
+
+        {/* Row 4: Product Image */}
+        <div style={{ marginBottom:16 }}>
+          <ImageUpload value={imageUrl} onChange={setImageUrl} label="Product Image (optional)" />
         </div>
 
         {/* Buttons */}
@@ -287,7 +296,7 @@ export default function ItemsNewPage() {
         <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
           <thead>
             <tr style={{ borderBottom:`1px solid ${BORDER}` }}>
-              {["Code","Name","Category","Unit","Sale Rate","Purchase Rate","Margin","Tax %","Min Stock","Barcode","Actions"].map(h => (
+              {["","Code","Name","Category","Unit","Sale Rate","Purchase Rate","Margin","Tax %","Min Stock","Barcode","Actions"].map(h => (
                 <th key={h} style={{ padding:"11px 14px", textAlign:"left", fontSize:11,
                   fontWeight:700, color:MUTED, textTransform:"uppercase", letterSpacing:".06em",
                   whiteSpace:"nowrap" }}>{h}</th>
@@ -296,7 +305,7 @@ export default function ItemsNewPage() {
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={11} style={{ padding:"40px", textAlign:"center", color:MUTED }}>
+              <tr><td colSpan={12} style={{ padding:"40px", textAlign:"center", color:MUTED }}>
                 No items found. Add your first item above.
               </td></tr>
             ) : filtered.map((item, idx) => {
@@ -307,6 +316,12 @@ export default function ItemsNewPage() {
                     background: idx % 2 === 0 ? "transparent" : "rgba(255,255,255,.01)" }}
                   onMouseEnter={e=>(e.currentTarget.style.background="rgba(99,102,241,0.04)")}
                   onMouseLeave={e=>(e.currentTarget.style.background=idx%2===0?"transparent":"rgba(255,255,255,.01)")}>
+                  <td style={{ padding:"6px 8px 6px 14px", width:44 }}>
+                    {item.imageUrl
+                      ? <img src={item.imageUrl} alt="" style={{ width:36, height:36, objectFit:"cover", borderRadius:6, border:`1px solid ${BORDER}`, display:"block" }} />
+                      : <div style={{ width:36, height:36, borderRadius:6, border:`1px dashed ${BORDER}`, background:"rgba(255,255,255,.02)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, opacity:.4 }}>🖼</div>
+                    }
+                  </td>
                   <td style={{ padding:"10px 14px", fontFamily:"monospace", fontSize:12, color:ACCENT, fontWeight:700 }}>{item.code}</td>
                   <td style={{ padding:"10px 14px", fontWeight:700 }}>{item.name}</td>
                   <td style={{ padding:"10px 14px" }}><CatPill value={item.category || "TRADING"} /></td>
