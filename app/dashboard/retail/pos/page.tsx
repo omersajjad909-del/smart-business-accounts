@@ -158,6 +158,7 @@ export default function POSPage() {
     sku: (r.data?.sku as string) || "",
     itemNewId: (r.data?.itemNewId as string) || "",
     catalogStock: typeof r.data?.stock === "number" ? r.data.stock as number : null,
+    imageUrl: (r.data?.imageUrl as string) || "",
   }));
 
   const categories = ["All", ...Array.from(new Set(products.map(p => p.category)))];
