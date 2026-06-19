@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin, PRODUCT_IMAGES_BUCKET } from "@/lib/supabase";
+import { isSupabaseStorageConfigured, supabaseAdmin, PRODUCT_IMAGES_BUCKET } from "@/lib/supabase";
 import { resolveCompanyId } from "@/lib/tenant";
 import { randomUUID } from "crypto";
 
@@ -8,15 +8,6 @@ const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
 
 export async function POST(req: NextRequest) {
   try {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      console.error("UPLOAD: NEXT_PUBLIC_SUPABASE_URL is not set");
-      return NextResponse.json({ error: "Storage not configured (missing SUPABASE_URL)" }, { status: 500 });
-    }
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.error("UPLOAD: SUPABASE_SERVICE_ROLE_KEY is not set");
-      return NextResponse.json({ error: "Storage not configured (missing SERVICE_ROLE_KEY)" }, { status: 500 });
-    }
-
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
@@ -33,20 +24,30 @@ export async function POST(req: NextRequest) {
     const path = `${companyId}/${randomUUID()}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const { error } = await supabaseAdmin.storage
-      .from(PRODUCT_IMAGES_BUCKET)
-      .upload(path, buffer, { contentType: file.type, upsert: false });
+    if (isSupabaseStorageConfigured() && supabaseAdmin) {
+      try {
+        const { error } = await supabaseAdmin.storage
+          .from(PRODUCT_IMAGES_BUCKET)
+          .upload(path, buffer, { contentType: file.type, upsert: false });
 
-    if (error) {
-      console.error("Supabase upload error:", error.message, error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+        if (!error) {
+          const { data: { publicUrl } } = supabaseAdmin.storage
+            .from(PRODUCT_IMAGES_BUCKET)
+            .getPublicUrl(path);
+
+          return NextResponse.json({ url: publicUrl });
+        }
+
+        console.error("Supabase upload error:", error.message, error);
+      } catch (error) {
+        console.error("Supabase upload exception:", error);
+      }
+    } else {
+      console.error("UPLOAD: Supabase storage is not configured; using inline image fallback");
     }
 
-    const { data: { publicUrl } } = supabaseAdmin.storage
-      .from(PRODUCT_IMAGES_BUCKET)
-      .getPublicUrl(path);
-
-    return NextResponse.json({ url: publicUrl });
+    const dataUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+    return NextResponse.json({ url: dataUrl, storage: "inline" });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Upload failed";
     console.error("UPLOAD exception:", msg, e);
@@ -61,6 +62,7 @@ export async function DELETE(req: NextRequest) {
 
     const { url: imageUrl } = await req.json();
     if (!imageUrl) return NextResponse.json({ error: "URL required" }, { status: 400 });
+    if (String(imageUrl).startsWith("data:")) return NextResponse.json({ ok: true });
 
     // Extract path from public URL: .../product-images/companyId/uuid.ext
     const bucketPrefix = `${PRODUCT_IMAGES_BUCKET}/`;
@@ -73,7 +75,9 @@ export async function DELETE(req: NextRequest) {
     if (!path.startsWith(`${companyId}/`))
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    await supabaseAdmin.storage.from(PRODUCT_IMAGES_BUCKET).remove([path]);
+    if (supabaseAdmin) {
+      await supabaseAdmin.storage.from(PRODUCT_IMAGES_BUCKET).remove([path]);
+    }
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Delete failed";

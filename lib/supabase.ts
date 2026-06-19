@@ -1,10 +1,17 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+const configured = Boolean(url && serviceKey);
 
-export const supabaseAdmin = createClient(url, serviceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+export const supabaseAdmin = configured
+  ? createClient(url, serviceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
+  : null;
 
 export const PRODUCT_IMAGES_BUCKET = "product-images";
+
+export function isSupabaseStorageConfigured() {
+  return configured;
+}
