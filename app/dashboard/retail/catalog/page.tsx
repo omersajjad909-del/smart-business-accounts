@@ -61,7 +61,7 @@ const border = "rgba(255,255,255,0.07)";
 
 const UNITS = ["Pcs", "Kg", "Gram", "Ltr", "ML", "Meter", "Foot", "Box", "Pack", "Dozen", "Pair", "Set", "Bag", "Bottle", "Can", "Carton"];
 
-const emptyForm = { name: "", category: "", sku: "", unit: "Pcs", price: 0, costPrice: 0, stock: 0, description: "" };
+const emptyForm = { name: "", category: "", sku: "", unit: "Pcs", price: 0, costPrice: 0, stock: 0, description: "", imageUrl: "" };
 
 export default function ProductCatalogPage() {
   const user = getCurrentUser();
@@ -118,6 +118,7 @@ export default function ProductCatalogPage() {
     costPrice: Number(r.data?.costPrice) || 0,
     stock: Number(r.data?.stock) || 0,
     description: (r.data?.description as string) || "",
+    imageUrl: (r.data?.imageUrl as string) || "",
     status: r.status || "active",
     margin: r.amount ? Math.round((r.amount - Number(r.data?.costPrice || 0)) / r.amount * 100) : 0,
   }));
