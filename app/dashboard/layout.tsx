@@ -1445,6 +1445,8 @@ export default function DashboardLayout({
               {hasDashboardFeature("HOTEL_ROOM_SERVICE") && <NavLink href="/dashboard/hotel/room-service" pathname={pathname}>Room Service</NavLink>}
               {hasDashboardFeature("HOTEL_FOLIOS") && <NavLink href="/dashboard/hotel/folios" pathname={pathname}>Billing Folios</NavLink>}
               {hasDashboardFeature("HOTEL_GUEST_HISTORY") && <NavLink href="/dashboard/hotel/guest-history" pathname={pathname}>Guest History</NavLink>}
+              <NavLink href="/dashboard/hotel/laundry" pathname={pathname}>Laundry</NavLink>
+              <NavLink href="/dashboard/hotel/complaints" pathname={pathname}>Complaints</NavLink>
               {hasDashboardFeature("HOTEL_ANALYTICS") && <NavLink href="/dashboard/hotel/analytics" pathname={pathname}>Analytics</NavLink>}
             </NavGroup>
           )}
