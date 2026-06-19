@@ -42,7 +42,6 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
-  reactCompiler: true,
   compress: true,
   poweredByHeader: false,
   transpilePackages: ["bcryptjs"],
