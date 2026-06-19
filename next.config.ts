@@ -1,4 +1,3 @@
-import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 // unsafe-eval removed in production — only kept in dev for Next.js HMR/fast-refresh
@@ -85,10 +84,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
-  org: "finovaos",
-  project: "javascript-nextjs",
-  silent: true,
-  widenClientFileUpload: false,
-  disableLogger: true,
-});
+export default nextConfig;
