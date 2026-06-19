@@ -157,7 +157,7 @@ export default function ItemsNewPage() {
         <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr", gap:12, marginBottom:12 }}>
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Item Name *</div>
-            <input style={INPUT} placeholder="e.g. PVC Non-Stick Roll" value={name} onChange={e=>setName(e.target.value)} />
+            <input style={INPUT} placeholder="e.g. Any item" value={name} onChange={e=>setName(e.target.value)} />
           </div>
           <div>
             <div style={{ fontSize:11, color:MUTED, marginBottom:5 }}>Category *</div>
