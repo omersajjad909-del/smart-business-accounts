@@ -142,7 +142,7 @@ export default function ProductCatalogPage() {
 
   function openEdit(p: typeof allProducts[0]) {
     setEditId(p.id);
-    setForm({ name: p.name, category: p.category, sku: p.sku, unit: p.unit, price: p.price, costPrice: p.costPrice, stock: p.stock, description: p.description });
+    setForm({ name: p.name, category: p.category, sku: p.sku, unit: p.unit, price: p.price, costPrice: p.costPrice, stock: p.stock, description: p.description, imageUrl: p.imageUrl || "" });
     setFormError("");
     setShowModal(true);
   }
@@ -170,7 +170,7 @@ export default function ProductCatalogPage() {
       await update(editId, {
         title: name,
         amount: form.price,
-        data: { category, sku, unit: form.unit, costPrice: form.costPrice, stock: existingStock, description, ...(itemNewId ? { itemNewId } : {}) },
+        data: { category, sku, unit: form.unit, costPrice: form.costPrice, stock: existingStock, description, imageUrl: form.imageUrl || null, ...(itemNewId ? { itemNewId } : {}) },
       });
       // Sync to Item Master
       if (itemNewId) {
@@ -195,7 +195,7 @@ export default function ProductCatalogPage() {
         title: name,
         status: "active",
         amount: form.price,
-        data: { category, sku, unit: form.unit, costPrice: form.costPrice, stock: form.stock, description },
+        data: { category, sku, unit: form.unit, costPrice: form.costPrice, stock: form.stock, description, imageUrl: form.imageUrl || null },
       });
       // Sync to Item Master
       const res = await fetch("/api/items-new", {
@@ -417,7 +417,7 @@ export default function ProductCatalogPage() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              {["Product", "Category", "SKU", "Unit", "Cost", "Sale Price", "Margin", "Stock", "Status", "Actions"].map(h => (
+              {["", "Product", "Category", "SKU", "Unit", "Cost", "Sale Price", "Margin", "Stock", "Status", "Actions"].map(h => (
                 <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, color: "rgba(255,255,255,.5)", borderBottom: `1px solid ${border}`, fontWeight: 600 }}>{h}</th>
               ))}
             </tr>
@@ -425,6 +425,12 @@ export default function ProductCatalogPage() {
           <tbody>
             {products.map(p => (
               <tr key={p.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                <td style={{ padding: "10px 12px 10px 16px", width: 44 }}>
+                  {p.imageUrl
+                    ? <img src={p.imageUrl} alt="" style={{ width: 36, height: 36, borderRadius: 6, objectFit: "cover", display: "block" }} />
+                    : <div style={{ width: 36, height: 36, borderRadius: 6, background: "rgba(255,255,255,.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🖼</div>
+                  }
+                </td>
                 <td style={{ padding: "13px 16px", fontWeight: 600 }}>{p.name}</td>
                 <td style={{ padding: "13px 16px", fontSize: 13 }}>{p.category || <span style={{ color: "rgba(255,255,255,.2)" }}>—</span>}</td>
                 <td style={{ padding: "13px 16px", fontSize: 11, color: "rgba(255,255,255,.4)" }}>{p.sku}</td>
@@ -485,7 +491,7 @@ export default function ProductCatalogPage() {
               </tr>
             ))}
             {!loading && products.length === 0 && (
-              <tr><td colSpan={9} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>
+              <tr><td colSpan={11} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.25)" }}>
                 {filterCategory ? `No products in "${filterCategory}"` : "No products yet."}
               </td></tr>
 
@@ -550,6 +556,14 @@ export default function ProductCatalogPage() {
               <div style={{ gridColumn: "span 2" }}>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Description</label>
                 <input type="text" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Optional product description" style={inp} />
+              </div>
+
+              <div style={{ gridColumn: "span 2" }}>
+                <ImageUpload
+                  value={form.imageUrl || null}
+                  onChange={url => setForm(f => ({ ...f, imageUrl: url || "" }))}
+                  label="Product Image (optional)"
+                />
               </div>
 
               <div>
