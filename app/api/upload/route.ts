@@ -8,6 +8,15 @@ const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
 
 export async function POST(req: NextRequest) {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      console.error("UPLOAD: NEXT_PUBLIC_SUPABASE_URL is not set");
+      return NextResponse.json({ error: "Storage not configured (missing SUPABASE_URL)" }, { status: 500 });
+    }
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error("UPLOAD: SUPABASE_SERVICE_ROLE_KEY is not set");
+      return NextResponse.json({ error: "Storage not configured (missing SERVICE_ROLE_KEY)" }, { status: 500 });
+    }
+
     const companyId = await resolveCompanyId(req);
     if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
 
@@ -29,7 +38,7 @@ export async function POST(req: NextRequest) {
       .upload(path, buffer, { contentType: file.type, upsert: false });
 
     if (error) {
-      console.error("Supabase upload error:", error);
+      console.error("Supabase upload error:", error.message, error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -40,6 +49,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: publicUrl });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Upload failed";
+    console.error("UPLOAD exception:", msg, e);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
