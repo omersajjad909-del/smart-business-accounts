@@ -185,6 +185,49 @@ export default function POSPage() {
   const paginated = filtered.slice(safeP * PAGE_SIZE, (safeP + 1) * PAGE_SIZE);
   useEffect(() => { setPage(0); }, [cat, search]);
 
+  // Attach camera stream to video element after modal renders
+  useEffect(() => {
+    if (!showScanner || !scannerStreamRef.current) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.srcObject = scannerStreamRef.current;
+    video.play().catch(() => {});
+
+    // @ts-ignore
+    const detector = new (window as any).BarcodeDetector({
+      formats: ["code_128", "code_39", "ean_13", "ean_8", "upc_a", "upc_e", "qr_code", "itf"],
+    });
+
+    setScannerStatus("scanning");
+    let lastCode = ""; let lastTs = 0;
+    let stopped = false;
+
+    async function scan() {
+      if (stopped) return;
+      if (!video || video.readyState < 2) {
+        scannerRafRef.current = requestAnimationFrame(scan); return;
+      }
+      try {
+        const codes = await detector.detect(video);
+        if (codes.length > 0) {
+          const code: string = codes[0].rawValue;
+          const now = Date.now();
+          if (code !== lastCode || now - lastTs > 2000) {
+            lastCode = code; lastTs = now;
+            handleScannedCode(code);
+            return;
+          }
+        }
+      } catch {}
+      if (!stopped) scannerRafRef.current = requestAnimationFrame(scan);
+    }
+    scan();
+
+    return () => { stopped = true; cancelAnimationFrame(scannerRafRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showScanner]);
+
   const todaySales = saleRecords.filter(r => r.createdAt?.split("T")[0] === new Date().toISOString().split("T")[0]);
   const todayTotal = todaySales.reduce((a, r) => a + (r.amount || 0), 0);
   const cashTotal  = todaySales.filter(r => r.data?.payMethod === "cash").reduce((a, r) => a + (r.amount || 0), 0);
@@ -345,12 +388,12 @@ export default function POSPage() {
   async function startScanner() {
     setScannerError("");
     setLastScanned("");
-    setShowScanner(true);
     setScannerStatus("starting");
 
-    const hasBD = "BarcodeDetector" in window;
-    if (!hasBD) {
+    if (!("BarcodeDetector" in window)) {
+      setScannerError("Chrome 83+ ya Android browser use karo ya image upload karo.");
       setScannerStatus("unsupported");
+      setShowScanner(true);
       return;
     }
 
@@ -359,45 +402,14 @@ export default function POSPage() {
         video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
       });
       scannerStreamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-
-      // @ts-ignore — BarcodeDetector is not in TS lib yet
-      const detector = new (window as any).BarcodeDetector({
-        formats: ["code_128", "code_39", "ean_13", "ean_8", "upc_a", "upc_e", "qr_code", "itf"],
-      });
-
-      setScannerStatus("scanning");
-      let lastCode = ""; let lastTs = 0;
-
-      async function scan() {
-        if (!videoRef.current || videoRef.current.readyState < 2) {
-          scannerRafRef.current = requestAnimationFrame(scan); return;
-        }
-        try {
-          const codes = await detector.detect(videoRef.current);
-          if (codes.length > 0) {
-            const code: string = codes[0].rawValue;
-            const now = Date.now();
-            if (code !== lastCode || now - lastTs > 2000) {
-              lastCode = code; lastTs = now;
-              handleScannedCode(code);
-              return; // stop scanning after hit
-            }
-          }
-        } catch {}
-        scannerRafRef.current = requestAnimationFrame(scan);
-      }
-      scan();
+      setShowScanner(true); // useEffect will attach stream after modal renders
     } catch (e: any) {
-      setScannerStatus("idle");
       setScannerError(
         e?.name === "NotAllowedError"
-          ? "Camera access denied. Browser settings mein allow karo."
-          : e?.message || "Camera start nahi ho saka."
+          ? "Camera permission deny ki. Browser settings mein camera allow karo."
+          : "Camera start nahi ho saka."
       );
+      setScannerStatus("idle");
     }
   }
 
