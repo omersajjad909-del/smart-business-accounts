@@ -1,970 +1,387 @@
-// lib/emailTemplates.ts
+import { NextRequest } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { apiError, apiOk } from "@/lib/apiError";
+import { createHmac, timingSafeEqual } from "crypto";
+import { sendEmail } from "@/lib/email";
+import { emailTemplates } from "@/lib/emailTemplates";
+import { mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
 
-export const emailTemplates = {
-  /**
-   * Welcome email for new subscription
-   * Professional, branded, company-specific
-   */
-  welcomeSubscription: (
-    userName: string,
-    planCode: string,
-    features: string[],
-    dashboardUrl: string,
-    country: string = "GLOBAL"
-  ): string => {
-    const planInfo = getPlanInfo(planCode, country);
-    const brandColor = "#2563EB";
-    const accentColor = "#1E40AF";
-    const lightBg = "#F8FAFC";
-    const borderColor = "#E2E8F0";
+function safeDate(value: unknown) {
+  if (!value) return null;
+  const date = new Date(String(value));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
 
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to FinovaOS</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #1E293B;
-            background-color: #F1F5F9;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        }
-        
-        .header {
-            background: linear-gradient(135deg, ${brandColor} 0%, ${accentColor} 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-        }
-        
-        .header-logo {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-        }
-        
-        .header-subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .content {
-            padding: 40px;
-        }
-        
-        .greeting {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #0F172A;
-        }
-        
-        .intro-text {
-            font-size: 15px;
-            color: #475569;
-            margin-bottom: 30px;
-            line-height: 1.8;
-        }
-        
-        .plan-card {
-            background: ${lightBg};
-            border: 2px solid ${borderColor};
-            border-radius: 8px;
-            padding: 24px;
-            margin: 30px 0;
-        }
-        
-        .plan-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: ${accentColor};
-            margin-bottom: 8px;
-        }
-        
-        .plan-price {
-            font-size: 32px;
-            font-weight: 800;
-            color: ${brandColor};
-            margin-bottom: 4px;
-        }
-        
-        .plan-billing {
-            font-size: 13px;
-            color: #64748B;
-            margin-bottom: 20px;
-        }
-        
-        .features-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #0F172A;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .features-list {
-            list-style: none;
-        }
-        
-        .features-list li {
-            font-size: 14px;
-            color: #475569;
-            margin-bottom: 10px;
-            padding-left: 24px;
-            position: relative;
-        }
-        
-        .features-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: ${brandColor};
-            font-weight: 800;
-        }
-        
-        .cta-section {
-            text-align: center;
-            margin: 40px 0;
-        }
-        
-        .cta-button {
-            display: inline-block;
-            background: ${brandColor};
-            color: white;
-            padding: 14px 48px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 15px;
-            transition: background 0.3s ease;
-        }
-        
-        .cta-button:hover {
-            background: ${accentColor};
-        }
-        
-        .next-steps {
-            background: ${lightBg};
-            border-left: 4px solid ${brandColor};
-            border-radius: 6px;
-            padding: 20px;
-            margin: 30px 0;
-        }
-        
-        .next-steps-title {
-            font-weight: 700;
-            color: #0F172A;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
-        
-        .next-steps-list {
-            list-style: none;
-            counter-reset: item;
-        }
-        
-        .next-steps-list li {
-            font-size: 14px;
-            color: #475569;
-            margin-bottom: 8px;
-            counter-increment: item;
-            padding-left: 28px;
-            position: relative;
-        }
-        
-        .next-steps-list li:before {
-            content: counter(item);
-            position: absolute;
-            left: 0;
-            top: -2px;
-            background: ${brandColor};
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-        }
-        
-        .support-section {
-            background: white;
-            border: 1px solid ${borderColor};
-            border-radius: 8px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: center;
-        }
-        
-        .support-title {
-            font-weight: 700;
-            color: #0F172A;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .support-text {
-            font-size: 14px;
-            color: #64748B;
-            margin-bottom: 12px;
-        }
-        
-        .support-link {
-            color: ${brandColor};
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .divider {
-            height: 1px;
-            background: ${borderColor};
-            margin: 30px 0;
-        }
-        
-        .footer {
-            background: #F8FAFC;
-            padding: 30px 40px;
-            text-align: center;
-            border-top: 1px solid ${borderColor};
-        }
-        
-        .footer-text {
-            font-size: 12px;
-            color: #64748B;
-            margin-bottom: 16px;
-        }
-        
-        .footer-links {
-            font-size: 12px;
-            margin-bottom: 16px;
-        }
-        
-        .footer-links a {
-            color: ${brandColor};
-            text-decoration: none;
-            margin: 0 8px;
-        }
-        
-        .social-links {
-            margin-top: 16px;
-        }
-        
-        .social-links a {
-            display: inline-block;
-            width: 32px;
-            height: 32px;
-            margin: 0 6px;
-            background: ${lightBg};
-            border-radius: 50%;
-            text-decoration: none;
-            color: ${brandColor};
-            font-weight: 700;
-            line-height: 32px;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        .company-badge {
-            display: inline-block;
-            background: ${brandColor};
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                border-radius: 0;
-            }
-            
-            .content {
-                padding: 24px;
-            }
-            
-            .greeting {
-                font-size: 18px;
-            }
-            
-            .plan-price {
-                font-size: 24px;
-            }
-            
-            .header {
-                padding: 30px 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-logo">✦ FinovaOS</div>
-            <div class="header-subtitle">AI-Powered Accounting Platform</div>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="content">
-            <!-- Greeting -->
-            <div class="greeting">
-                Welcome to FinovaOS, ${userName}! 🎉
-            </div>
-            
-            <!-- Intro -->
-            <div class="intro-text">
-                Your ${planInfo.displayName} plan is now active. You're all set to start managing your 
-                business finances with intelligence and ease.
-            </div>
-            
-            <!-- Plan Details Card -->
-            <div class="plan-card">
-                <div class="plan-name">${planInfo.displayName} Plan</div>
-                <div class="plan-price">${planInfo.priceDisplay}</div>
-                <div class="plan-billing">${planInfo.billingText}</div>
-                
-                <div class="features-title">What's Included:</div>
-                <ul class="features-list">
-                    ${features.map(f => `<li>${f}</li>`).join("")}
-                </ul>
-            </div>
-            
-            <!-- CTA Button -->
-            <div class="cta-section">
-                <a href="${dashboardUrl}" class="cta-button">
-                    Go to Dashboard →
-                </a>
-            </div>
-            
-            <!-- Next Steps -->
-            <div class="next-steps">
-                <div class="next-steps-title">Next Steps:</div>
-                <ol class="next-steps-list">
-                    <li>Log in to your FinovaOS dashboard</li>
-                    <li>Connect your bank accounts (optional)</li>
-                    <li>Import your first invoice or transaction</li>
-                    <li>Explore AI features for business insights</li>
-                </ol>
-            </div>
-            
-            <!-- Key Features Highlight -->
-            <div class="support-section">
-                <div class="support-title">🚀 Pro Tips:</div>
-                <div class="support-text">
-                    • Use our AI Chat for instant accounting help<br>
-                    • Set up bank sync for automated reconciliation<br>
-                    • Create custom reports for your business needs
-                </div>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <!-- Support Section -->
-            <div class="support-section">
-                <div class="support-title">Need Help?</div>
-                <div class="support-text">
-                    Our support team is here to help you get the most out of FinovaOS.
-                </div>
-                <a href="https://finovoas.app/support" class="support-link">
-                    Visit Help Center →
-                </a>
-            </div>
-        </div>
-        
-        <!-- Footer -->
-        <div class="footer">
-            <div class="footer-text">
-                You're receiving this because you just subscribed to FinovaOS.
-            </div>
-            
-            <div class="footer-links">
-                <a href="https://finovoas.app/privacy">Privacy Policy</a>
-                <a href="https://finovoas.app/terms">Terms of Service</a>
-                <a href="https://finovoas.app/contact">Contact Us</a>
-            </div>
-            
-            <div class="social-links">
-                <a href="https://linkedin.com/company/finova-forge">in</a>
-                <a href="https://twitter.com/finovoas">𝕏</a>
-                <a href="https://facebook.com/finovoas">f</a>
-            </div>
-            
-            <div class="footer-text" style="margin-top: 16px;">
-                © 2026 Finova Forge. All rights reserved.<br>
-                Faisalabad, Pakistan | <a href="https://finovoas.app" style="color: ${brandColor};">finovoas.app</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-  },
+async function applySuccessfulPlanUpdate(params: {
+  companyId: string;
+  planCode: string;
+  status: string;
+  providerCustomerId?: string | null;
+  providerSubscriptionId?: string | null;
+  currentPeriodEnd?: Date | null;
+  billingCycle?: string | null;
+  displayCurrency?: string | null;
+  displayCountry?: string | null;
+  invoiceAmount?: number | null;
+}) {
+  const normalizedPlan  = String(params.planCode || "STARTER").toUpperCase();
+  const normalizedCycle = String(params.billingCycle || "MONTHLY").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
 
-  /**
-   * Payment confirmation email
-   */
-  paymentConfirmation: (
-    userName: string,
-    planCode: string,
-    amount: number,
-    currency: string,
-    nextBillingDate: string,
-    invoiceUrl: string,
-    dashboardUrl: string
-  ): string => {
-    const planInfo = getPlanInfo(planCode);
-    const brandColor = "#2563EB";
-    const accentColor = "#1E40AF";
-    const successColor = "#10B981";
-    const lightBg = "#F8FAFC";
-    const borderColor = "#E2E8F0";
+  if (normalizedPlan.startsWith("ADDON-")) {
+    if (normalizedPlan === "ADDON-AUTOMATION") {
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "AutomationAddon" (
+          "id" TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+          "companyId" TEXT NOT NULL UNIQUE,
+          "enabled" BOOLEAN NOT NULL DEFAULT true,
+          "plan" TEXT NOT NULL DEFAULT 'MONTHLY',
+          "pricePerMonth" DOUBLE PRECISION NOT NULL DEFAULT 79,
+          "expiresAt" TIMESTAMP(3),
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `).catch(() => {});
+      await prisma.$executeRaw`
+        INSERT INTO "AutomationAddon" ("companyId", "enabled", "plan", "pricePerMonth")
+        VALUES (${params.companyId}, true, ${normalizedCycle}, 79)
+        ON CONFLICT ("companyId") DO UPDATE SET "enabled" = true, "updatedAt" = NOW()
+      `.catch(() => {});
+    }
+    return;
+  }
 
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Received - FinovaOS</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #1E293B;
-            background-color: #F1F5F9;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        }
-        .header {
-            background: linear-gradient(135deg, ${successColor} 0%, #059669 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-        }
-        .header-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-        .header-title {
-            font-size: 24px;
-            font-weight: 700;
-        }
-        .content { padding: 40px; }
-        .greeting { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #0F172A; }
-        .invoice-box {
-            background: ${lightBg};
-            border: 2px solid ${borderColor};
-            border-radius: 8px;
-            padding: 24px;
-            margin: 30px 0;
-        }
-        .invoice-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid ${borderColor};
-        }
-        .invoice-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .invoice-label { font-size: 14px; color: #64748B; }
-        .invoice-value { font-weight: 600; color: #0F172A; }
-        .invoice-total {
-            background: white;
-            padding: 16px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            margin-top: 12px;
-        }
-        .total-label { font-size: 16px; font-weight: 700; color: #0F172A; }
-        .total-amount { font-size: 24px; font-weight: 800; color: ${successColor}; }
-        .status-badge {
-            display: inline-block;
-            background: ${successColor};
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin: 20px 0;
-        }
-        .button-group {
-            text-align: center;
-            margin: 30px 0;
-        }
-        .button {
-            display: inline-block;
-            padding: 12px 32px;
-            margin: 0 8px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .button-primary {
-            background: ${brandColor};
-            color: white;
-        }
-        .button-primary:hover { background: ${accentColor}; }
-        .button-secondary {
-            background: ${lightBg};
-            color: ${brandColor};
-            border: 2px solid ${borderColor};
-        }
-        .footer { background: ${lightBg}; padding: 30px 40px; text-align: center; border-top: 1px solid ${borderColor}; }
-        .footer-text { font-size: 12px; color: #64748B; }
-        @media (max-width: 600px) {
-            .content { padding: 24px; }
-            .button { display: block; margin: 8px 0; width: 100%; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="header-icon">✓</div>
-            <div class="header-title">Payment Received</div>
-        </div>
-        
-        <div class="content">
-            <div class="greeting">Thank you, ${userName}!</div>
-            
-            <p style="font-size: 15px; color: #475569; margin-bottom: 20px;">
-                Your payment has been successfully processed. Your ${planInfo.displayName} plan is active and ready to use.
-            </p>
-            
-            <div class="status-badge">✓ Payment Confirmed</div>
-            
-            <div class="invoice-box">
-                <div class="invoice-row">
-                    <span class="invoice-label">Plan</span>
-                    <span class="invoice-value">${planInfo.displayName}</span>
-                </div>
-                <div class="invoice-row">
-                    <span class="invoice-label">Amount</span>
-                    <span class="invoice-value">${currency} ${amount.toFixed(2)}</span>
-                </div>
-                <div class="invoice-row">
-                    <span class="invoice-label">Payment Date</span>
-                    <span class="invoice-value">${new Date().toLocaleDateString()}</span>
-                </div>
-                <div class="invoice-row">
-                    <span class="invoice-label">Next Billing</span>
-                    <span class="invoice-value">${nextBillingDate}</span>
-                </div>
-                
-                <div class="invoice-total">
-                    <span class="total-label">Total Due</span>
-                    <span class="total-amount">${currency} ${amount.toFixed(2)}</span>
-                </div>
-            </div>
-            
-            <div class="button-group">
-                <a href="${dashboardUrl}" class="button button-primary">Go to Dashboard</a>
-                <a href="${invoiceUrl}" class="button button-secondary">Download Invoice</a>
-            </div>
-            
-            <p style="font-size: 14px; color: #64748B; margin-top: 20px;">
-                Your subscription will automatically renew on <strong>${nextBillingDate}</strong>. 
-                You can manage your subscription settings anytime from your account dashboard.
-            </p>
-        </div>
-        
-        <div class="footer">
-            <div class="footer-text">
-                If you have any questions, <a href="https://finovoas.app/support" style="color: ${brandColor};">contact our support team</a>.
-            </div>
-            <div class="footer-text" style="margin-top: 12px;">
-                © 2026 Finova Forge | <a href="https://finovoas.app" style="color: ${brandColor};">finovoas.app</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-  },
+  await prisma.company.update({
+    where: { id: params.companyId },
+    data: {
+      plan: normalizedPlan,
+      subscriptionStatus: params.status,
+      currentPeriodEnd: params.currentPeriodEnd || undefined,
+      ...(params.providerCustomerId ? { stripeCustomerId: params.providerCustomerId } : {}),
+      ...(params.displayCurrency    ? { baseCurrency: params.displayCurrency }         : {}),
+      ...(params.displayCountry     ? { country: params.displayCountry }               : {}),
+    },
+  });
 
-  /**
-   * Failed payment email
-   */
-  paymentFailed: (
-    userName: string,
-    planCode: string,
-    amount: number,
-    currency: string,
-    retryDate: string,
-    updatePaymentUrl: string
-  ): string => {
-    const planInfo = getPlanInfo(planCode);
-    const warningColor = "#DC2626";
-    const lightBg = "#F8FAFC";
-    const borderColor = "#E2E8F0";
+  await prisma.subscription.upsert({
+    where: { companyId: params.companyId },
+    update: {
+      plan: normalizedPlan,
+      status: params.status,
+      billingCycle: normalizedCycle,
+      currentPeriodEnd: params.currentPeriodEnd || undefined,
+      ...(params.providerCustomerId     ? { stripeCustomerId: params.providerCustomerId }         : {}),
+      ...(params.providerSubscriptionId ? { stripeSubscriptionId: params.providerSubscriptionId } : {}),
+      ...(typeof params.invoiceAmount === "number" ? { pricePerMonth: params.invoiceAmount } : {}),
+    },
+    create: {
+      companyId: params.companyId,
+      plan: normalizedPlan,
+      status: params.status,
+      billingCycle: normalizedCycle,
+      currentPeriodEnd: params.currentPeriodEnd || undefined,
+      stripeCustomerId: params.providerCustomerId || undefined,
+      stripeSubscriptionId: params.providerSubscriptionId || undefined,
+      pricePerMonth: typeof params.invoiceAmount === "number" ? params.invoiceAmount : 0,
+    },
+  });
+}
 
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Failed - Action Required</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #1E293B;
-            background-color: #F1F5F9;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        }
-        .header {
-            background: linear-gradient(135deg, ${warningColor} 0%, #991B1B 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-        }
-        .header-icon { font-size: 48px; margin-bottom: 12px; }
-        .header-title { font-size: 24px; font-weight: 700; }
-        .content { padding: 40px; }
-        .greeting { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #0F172A; }
-        .alert-box {
-            background: #FEE2E2;
-            border-left: 4px solid ${warningColor};
-            border-radius: 6px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .alert-title { font-weight: 700; color: ${warningColor}; margin-bottom: 8px; }
-        .alert-text { font-size: 14px; color: #7F1D1D; }
-        .info-box {
-            background: ${lightBg};
-            border: 1px solid ${borderColor};
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
-        .info-label { color: #64748B; font-size: 14px; }
-        .info-value { font-weight: 600; color: #0F172A; }
-        .cta-button {
-            display: block;
-            background: ${warningColor};
-            color: white;
-            padding: 14px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            text-align: center;
-            margin: 30px 0;
-        }
-        .cta-button:hover { background: #991B1B; }
-        .footer { background: ${lightBg}; padding: 30px 40px; text-align: center; border-top: 1px solid ${borderColor}; }
-        .footer-text { font-size: 12px; color: #64748B; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="header-icon">⚠</div>
-            <div class="header-title">Payment Failed</div>
-        </div>
-        
-        <div class="content">
-            <div class="greeting">Hi ${userName},</div>
-            
-            <div class="alert-box">
-                <div class="alert-title">Action Required</div>
-                <div class="alert-text">
-                    We couldn't process your payment. Please update your billing information to avoid service interruption.
-                </div>
-            </div>
-            
-            <div class="info-box">
-                <div class="info-row">
-                    <span class="info-label">Plan</span>
-                    <span class="info-value">${planInfo.displayName}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Amount</span>
-                    <span class="info-value">${currency} ${amount.toFixed(2)}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Retry Date</span>
-                    <span class="info-value">${retryDate}</span>
-                </div>
-            </div>
-            
-            <a href="${updatePaymentUrl}" class="cta-button">
-                Update Payment Method →
-            </a>
-            
-            <p style="font-size: 14px; color: #64748B;">
-                <strong>What happens next?</strong><br>
-                We'll automatically retry your payment on ${retryDate}. If you update your payment method before then, we'll charge you immediately.
-            </p>
-            
-            <p style="font-size: 14px; color: #64748B; margin-top: 16px;">
-                If this issue persists, please <a href="https://finovoas.app/support" style="color: #DC2626; font-weight: 600;">contact our support team</a>.
-            </p>
-        </div>
-        
-        <div class="footer">
-            <div class="footer-text">
-                © 2026 Finova Forge | <a href="https://finovoas.app" style="color: #DC2626;">finovoas.app</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-  },
+// ─── Shared helpers ───────────────────────────────────────────────────────────
 
-  /**
-   * Plan upgraded email
-   */
-  planUpgraded: (
-    userName: string,
-    oldPlan: string,
-    newPlan: string,
-    newFeatures: string[],
-    dashboardUrl: string
-  ): string => {
-    const oldPlanInfo = getPlanInfo(oldPlan);
-    const newPlanInfo = getPlanInfo(newPlan);
-    const brandColor = "#2563EB";
-    const successColor = "#10B981";
-    const lightBg = "#F8FAFC";
-    const borderColor = "#E2E8F0";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://usefinova.app";
 
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plan Upgraded - FinovaOS</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #1E293B;
-            background-color: #F1F5F9;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        }
-        .header {
-            background: linear-gradient(135deg, ${successColor} 0%, #059669 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-        }
-        .header-icon { font-size: 48px; margin-bottom: 12px; }
-        .header-title { font-size: 24px; font-weight: 700; }
-        .content { padding: 40px; }
-        .greeting { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #0F172A; }
-        .upgrade-badge {
-            display: inline-block;
-            background: ${successColor};
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin: 20px 0;
-        }
-        .plan-comparison {
-            background: ${lightBg};
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .comparison-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid ${borderColor};
-        }
-        .comparison-row:last-child { border-bottom: none; }
-        .plan-label { color: #64748B; font-size: 14px; }
-        .old-plan { color: #94A3B8; text-decoration: line-through; }
-        .new-plan { color: ${successColor}; font-weight: 700; }
-        .new-features {
-            background: ${lightBg};
-            border-left: 4px solid ${successColor};
-            border-radius: 6px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .features-title { font-weight: 700; color: #0F172A; margin-bottom: 12px; }
-        .features-list { list-style: none; }
-        .features-list li {
-            font-size: 14px;
-            color: #475569;
-            margin-bottom: 8px;
-            padding-left: 20px;
-            position: relative;
-        }
-        .features-list li:before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: ${successColor};
-            font-weight: 700;
-        }
-        .cta-button {
-            display: block;
-            background: ${brandColor};
-            color: white;
-            padding: 14px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            text-align: center;
-            margin: 30px 0;
-        }
-        .footer { background: ${lightBg}; padding: 30px 40px; text-align: center; border-top: 1px solid ${borderColor}; }
-        .footer-text { font-size: 12px; color: #64748B; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="header-icon">🎉</div>
-            <div class="header-title">Plan Upgraded!</div>
-        </div>
-        
-        <div class="content">
-            <div class="greeting">Welcome to ${newPlanInfo.displayName}, ${userName}!</div>
-            
-            <div class="upgrade-badge">✓ Upgrade Successful</div>
-            
-            <div class="plan-comparison">
-                <div class="comparison-row">
-                    <span class="plan-label">Previous Plan</span>
-                    <span class="old-plan">${oldPlanInfo.displayName}</span>
-                </div>
-                <div class="comparison-row">
-                    <span class="plan-label">New Plan</span>
-                    <span class="new-plan">${newPlanInfo.displayName}</span>
-                </div>
-            </div>
-            
-            <div class="new-features">
-                <div class="features-title">New Capabilities Unlocked:</div>
-                <ul class="features-list">
-                    ${newFeatures.map(f => `<li>${f}</li>`).join("")}
-                </ul>
-            </div>
-            
-            <a href="${dashboardUrl}" class="cta-button">
-                Explore New Features →
-            </a>
-            
-            <p style="font-size: 14px; color: #64748B;">
-                Your upgrade is effective immediately. You'll have access to all new features right away. 
-                Enjoy the enhanced capabilities!
-            </p>
-        </div>
-        
-        <div class="footer">
-            <div class="footer-text">
-                © 2026 Finova Forge | <a href="https://finovoas.app" style="color: ${brandColor};">finovoas.app</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-  },
+const PLAN_FEATURES: Record<string, string[]> = {
+  starter:      ["Up to 5 users", "Sales & purchase invoices", "Chart of accounts", "Ledger & trial balance", "Basic reports", "Email support"],
+  pro:          ["Up to 20 users", "Everything in Starter", "Inventory management", "Bank reconciliation", "Multi-branch support", "HR & payroll", "CRM & advanced reports", "Priority support"],
+  professional: ["Up to 20 users", "Everything in Starter", "Inventory management", "Bank reconciliation", "Multi-branch support", "HR & payroll", "CRM & advanced reports", "Priority support"],
+  enterprise:   ["Unlimited users", "Everything in Professional", "API access", "Custom integrations", "Multi-currency", "Guided onboarding", "Advanced audit trails", "Dedicated support"],
+  custom:       ["Your selected modules", "Flexible billing", "Dedicated account manager", "Priority support", "Custom onboarding"],
 };
 
-/**
- * Helper function to get plan information
- */
-function getPlanInfo(planCode: string, country: string = "GLOBAL"): {
-  displayName: string;
-  priceDisplay: string;
-  billingText: string;
-} {
-  const plan = String(planCode || "STARTER").toUpperCase();
-  
-  const planMap: Record<string, { name: string; price: string; billing: string }> = {
-    STARTER: {
-      name: "Starter",
-      price: "$49",
-      billing: "/month (billed monthly)",
-    },
-    PROFESSIONAL: {
-      name: "Professional",
-      price: "$99",
-      billing: "/month (billed monthly)",
-    },
-    PRO: {
-      name: "Professional",
-      price: "$99",
-      billing: "/month (billed monthly)",
-    },
-    ENTERPRISE: {
-      name: "Enterprise",
-      price: "Custom",
-      billing: "Contact sales",
-    },
-    CUSTOM: {
-      name: "Custom Plan",
-      price: "Custom",
-      billing: "Based on requirements",
-    },
-  };
+function planLabel(planCode: string) {
+  const key = String(planCode || "starter").toLowerCase();
+  if (["pro", "professional"].includes(key)) return "Professional";
+  return key.charAt(0).toUpperCase() + key.slice(1);
+}
 
-  const info = planMap[plan] || planMap.STARTER;
+async function getCompanyOwner(companyId: string) {
+  return prisma.userCompany.findFirst({
+    where:   { companyId, user: { role: { in: ["ADMIN", "OWNER"] } } },
+    include: { user: { select: { name: true, email: true } }, company: { select: { country: true } } },
+  });
+}
 
-  return {
-    displayName: info.name,
-    priceDisplay: info.price,
-    billingText: info.billing,
-  };
+// ─── Email senders ────────────────────────────────────────────────────────────
+
+async function sendWelcomeSubscriptionEmail(companyId: string, planCode: string, country?: string | null) {
+  try {
+    const uc = await getCompanyOwner(companyId);
+    if (!uc?.user?.email) return;
+
+    const planKey         = String(planCode || "starter").toLowerCase();
+    const features        = PLAN_FEATURES[planKey] || PLAN_FEATURES.starter;
+    const resolvedCountry = country || uc.company?.country || "GLOBAL";
+
+    await sendEmail({
+      to:      uc.user.email,
+      subject: `Welcome to FinovaOS — Your ${planLabel(planCode)} plan is active`,
+      html:    emailTemplates.welcomeSubscription(
+        uc.user.name || "there",
+        planKey,
+        features,
+        `${APP_URL}/dashboard`,
+        resolvedCountry,
+      ),
+    });
+  } catch {}
+}
+
+async function sendPaymentConfirmationEmail(
+  companyId: string,
+  planCode: string,
+  amount: number,
+  currency: string,
+  nextBillingDate: string,
+) {
+  try {
+    const uc = await getCompanyOwner(companyId);
+    if (!uc?.user?.email) return;
+
+    await sendEmail({
+      to:      uc.user.email,
+      subject: `Payment confirmed — ${planLabel(planCode)} plan receipt`,
+      html:    emailTemplates.paymentConfirmation(
+        uc.user.name || "there",
+        planCode,
+        amount,
+        currency,
+        nextBillingDate,
+        `${APP_URL}/dashboard/settings/subscription`,
+        `${APP_URL}/dashboard`,
+      ),
+    });
+  } catch {}
+}
+
+async function sendPaymentFailedEmail(
+  companyId: string,
+  planCode: string,
+  amount: number,
+  currency: string,
+  retryDate: string,
+) {
+  try {
+    const uc = await getCompanyOwner(companyId);
+    if (!uc?.user?.email) return;
+
+    await sendEmail({
+      to:      uc.user.email,
+      subject: `Action required — payment failed for your FinovaOS subscription`,
+      html:    emailTemplates.paymentFailed(
+        uc.user.name || "there",
+        planCode,
+        amount,
+        currency,
+        retryDate,
+        `${APP_URL}/dashboard/settings/subscription`,
+      ),
+    });
+  } catch {}
+}
+
+// ─── Lemon Squeezy ───────────────────────────────────────────────────────────
+
+async function handleLemonWebhook(req: NextRequest, raw: string) {
+  const signature = req.headers.get("x-signature");
+  if (!verifyLemonSignature(raw, signature)) {
+    return apiError("Invalid Lemon Squeezy signature", 400);
+  }
+
+  const payload   = JSON.parse(raw);
+  const meta      = payload?.meta || {};
+  const eventName = String(meta?.event_name || "");
+  const attrs     = payload?.data?.attributes || {};
+  const custom    = meta?.custom_data || attrs?.custom_data || attrs?.first_subscription_item?.custom_data || {};
+
+  const companyId      = String(custom?.company_id || meta?.custom_data?.company_id || "").trim();
+  const planCode       = String(custom?.plan_code || attrs?.product_name || "STARTER").toUpperCase();
+  const billingCycle   = String(custom?.billing_cycle || attrs?.billing_anchor || "MONTHLY").toUpperCase();
+  const displayCurrency = custom?.display_currency ? String(custom.display_currency).toUpperCase() : null;
+  const displayCountry  = custom?.display_country  ? String(custom.display_country).toUpperCase()  : null;
+
+  if (eventName.startsWith("subscription_") && companyId) {
+    const status           = mapLemonSubscriptionStatus(String(attrs?.status || ""));
+    const currentPeriodEnd = safeDate(attrs?.renews_at || attrs?.ends_at || attrs?.trial_ends_at);
+    const customerId       = attrs?.customer_id ? String(attrs.customer_id) : null;
+    const subscriptionId   = payload?.data?.id  ? String(payload.data.id)  : null;
+    const invoiceAmount    = typeof attrs?.subtotal === "number" ? Number(attrs.subtotal) / 100 : null;
+
+    await applySuccessfulPlanUpdate({
+      companyId, planCode, status,
+      providerCustomerId: customerId,
+      providerSubscriptionId: subscriptionId,
+      currentPeriodEnd, billingCycle, displayCurrency, displayCountry,
+      invoiceAmount,
+    });
+
+    await prisma.activityLog.create({
+      data: {
+        companyId, userId: null,
+        action: "LEMON_SUBSCRIPTION_EVENT",
+        details: JSON.stringify({ eventName, planCode, status, subscriptionId, customerId, currentPeriodEnd: currentPeriodEnd?.toISOString() || null }),
+      },
+    }).catch(() => {});
+
+    if (eventName === "subscription_created" && (status === "ACTIVE" || status === "TRIALING")) {
+      await sendWelcomeSubscriptionEmail(companyId, planCode, displayCountry);
+    }
+
+    if (eventName === "subscription_payment_success" && invoiceAmount) {
+      const nextBilling = currentPeriodEnd
+        ? currentPeriodEnd.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
+        : "your next billing date";
+      await sendPaymentConfirmationEmail(companyId, planCode, invoiceAmount, attrs?.currency || "USD", nextBilling);
+    }
+
+    if (eventName === "subscription_payment_failed") {
+      const retryAt = safeDate(attrs?.trial_ends_at || attrs?.ends_at);
+      const retryDate = retryAt
+        ? retryAt.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
+        : "soon";
+      const failedAmount = typeof attrs?.subtotal === "number" ? Number(attrs.subtotal) / 100 : 0;
+      await sendPaymentFailedEmail(companyId, planCode, failedAmount, attrs?.currency || "USD", retryDate);
+    }
+  }
+
+  if ((eventName === "order_created" || eventName === "subscription_payment_success") && companyId) {
+    await prisma.activityLog.create({
+      data: {
+        companyId, userId: null,
+        action: "PAYMENT_EVENT",
+        details: JSON.stringify({
+          provider: "LEMON_SQUEEZY", eventName,
+          amount: attrs?.subtotal ?? attrs?.total ?? null,
+          currency: attrs?.currency || "USD",
+          orderId: payload?.data?.id || null,
+        }),
+      },
+    }).catch(() => {});
+  }
+
+  return apiOk({ received: true, provider: "lemonsqueezy" });
+}
+
+// ─── Stripe ───────────────────────────────────────────────────────────────────
+
+async function handleStripeWebhook(req: NextRequest, raw: string) {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) return apiError("Stripe webhook not configured", 500);
+
+  const sig = req.headers.get("stripe-signature");
+  if (!sig) return apiError("Missing Stripe-Signature", 400);
+
+  const parts  = sig.split(",").map((p) => p.trim());
+  const tPart  = parts.find((p) => p.startsWith("t="))  || "";
+  const v1Part = parts.find((p) => p.startsWith("v1=")) || "";
+  const ts     = Number(tPart.replace("t=", ""));
+  const v1     = v1Part.replace("v1=", "");
+  if (!ts || !v1) return apiError("Invalid Stripe-Signature", 400);
+
+  const signedPayload = `${ts}.${raw}`;
+  const expected      = createHmac("sha256", webhookSecret).update(signedPayload).digest("hex");
+  const isValid       = timingSafeEqual(Buffer.from(expected), Buffer.from(v1));
+  if (!isValid || Math.abs(Date.now() - ts * 1000) > 5 * 60 * 1000) {
+    return apiError("Signature verification failed", 400);
+  }
+
+  const payload = JSON.parse(raw);
+  const type    = payload.type;
+  const data    = payload.data?.object || {};
+
+  if (type === "customer.subscription.created" || type === "customer.subscription.updated") {
+    const companyId          = data.metadata?.companyId || null;
+    const planCode           = data.metadata?.planCode  || null;
+    const stripeCustomerId   = data.customer || null;
+    const stripeSubscriptionId = data.id || null;
+    const currentPeriodEnd   = data.current_period_end ? new Date(data.current_period_end * 1000) : null;
+
+    if (companyId) {
+      const dbStatus =
+        String(data.status || "").toUpperCase() === "ACTIVE"   ? "ACTIVE"   :
+        String(data.status || "").toUpperCase() === "TRIALING" ? "TRIALING" :
+        String(data.status || "").toUpperCase() === "PAST_DUE" ? "PAST_DUE" :
+        String(data.status || "").toUpperCase() === "CANCELED"  ? "CANCELED"  :
+        "INACTIVE";
+
+      await applySuccessfulPlanUpdate({
+        companyId,
+        planCode: String(planCode || "STARTER"),
+        status: dbStatus,
+        providerCustomerId: stripeCustomerId,
+        providerSubscriptionId: stripeSubscriptionId,
+        currentPeriodEnd,
+      });
+
+      if (type === "customer.subscription.created" && (dbStatus === "ACTIVE" || dbStatus === "TRIALING")) {
+        const countryMeta = data.metadata?.country || null;
+        await sendWelcomeSubscriptionEmail(companyId, String(planCode || "starter"), countryMeta);
+      }
+    }
+  }
+
+  if (type === "invoice.payment_succeeded") {
+    const companyId    = data.subscription_details?.metadata?.companyId || data.metadata?.companyId || null;
+    const planCode     = data.subscription_details?.metadata?.planCode  || data.metadata?.planCode  || "STARTER";
+    const amountPaid   = typeof data.amount_paid === "number" ? data.amount_paid / 100 : 0;
+    const currency     = String(data.currency || "USD").toUpperCase();
+    const periodEnd    = data.lines?.data?.[0]?.period?.end
+      ? new Date(data.lines.data[0].period.end * 1000)
+      : null;
+    const nextBilling  = periodEnd
+      ? periodEnd.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
+      : "your next billing date";
+
+    if (companyId && amountPaid > 0) {
+      await sendPaymentConfirmationEmail(companyId, planCode, amountPaid, currency, nextBilling);
+    }
+  }
+
+  if (type === "invoice.payment_failed") {
+    const companyId  = data.subscription_details?.metadata?.companyId || data.metadata?.companyId || null;
+    const planCode   = data.subscription_details?.metadata?.planCode  || data.metadata?.planCode  || "STARTER";
+    const amount     = typeof data.amount_due === "number" ? data.amount_due / 100 : 0;
+    const currency   = String(data.currency || "USD").toUpperCase();
+    const nextRetry  = data.next_payment_attempt
+      ? new Date(data.next_payment_attempt * 1000).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
+      : "soon";
+
+    if (companyId) {
+      await sendPaymentFailedEmail(companyId, planCode, amount, currency, nextRetry);
+    }
+  }
+
+  if (type === "customer.subscription.deleted") {
+    const companyId = data.metadata?.companyId || null;
+    if (companyId) {
+      await prisma.company.update({
+        where: { id: companyId },
+        data:  { subscriptionStatus: "INACTIVE" },
+      });
+    }
+  }
+
+  return apiOk({ received: true, provider: "stripe" });
+}
+
+// ─── Entry point ──────────────────────────────────────────────────────────────
+
+export async function POST(req: NextRequest) {
+  try {
+    const raw = await req.text();
+    if (req.headers.get("x-signature"))     return await handleLemonWebhook(req, raw);
+    if (req.headers.get("stripe-signature")) return await handleStripeWebhook(req, raw);
+    return apiError("Unsupported webhook signature", 400);
+  } catch (e: any) {
+    return apiError(e.message, 500);
+  }
 }
