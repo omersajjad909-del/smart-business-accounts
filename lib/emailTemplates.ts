@@ -342,11 +342,11 @@ export const emailTemplates = {
   welcomeSubscription: (name: string, plan: string, features: string[], dashboardUrl: string, country?: string) => {
 
     /* ── Plan styling ── */
-    const planColors: Record<string, { bg: string; accent: string; badge: string; badgeBg: string }> = {
-      starter:    { bg: "linear-gradient(135deg,#4338ca,#6366f1)", accent: "#818cf8", badge: "🚀 Starter Plan",      badgeBg: "rgba(99,102,241,.18)" },
-      pro:        { bg: "linear-gradient(135deg,#6d28d9,#a78bfa)", accent: "#c4b5fd", badge: "⭐ Professional Plan", badgeBg: "rgba(167,139,250,.18)" },
-      enterprise: { bg: "linear-gradient(135deg,#1e1b4b,#4f46e5)", accent: "#e0e7ff", badge: "💎 Enterprise Plan",   badgeBg: "rgba(199,210,254,.12)" },
-      custom:     { bg: "linear-gradient(135deg,#064e3b,#059669)", accent: "#6ee7b7", badge: "✦ Custom Plan",        badgeBg: "rgba(52,211,153,.12)" },
+    const planColors: Record<string, { accentColor: string; badgeText: string; badgeDot: string }> = {
+      starter:    { accentColor: "#4f46e5", badgeText: "Starter Plan",      badgeDot: "#818cf8" },
+      pro:        { accentColor: "#7c3aed", badgeText: "Professional Plan", badgeDot: "#a78bfa" },
+      enterprise: { accentColor: "#0f172a", badgeText: "Enterprise Plan",   badgeDot: "#6366f1" },
+      custom:     { accentColor: "#059669", badgeText: "Custom Plan",       badgeDot: "#34d399" },
     };
     const planKey = plan.toLowerCase().replace("professional","pro");
     const c = planColors[planKey] || planColors.starter;
@@ -478,83 +478,125 @@ export const emailTemplates = {
     /* ── Feature checklist ── */
     const featureRows = features.map(f => `
       <tr>
-        <td style="padding:10px 0;border-bottom:1px solid #f1f5f9;">
-          <span style="display:inline-flex;align-items:center;gap:10px;">
-            <span style="width:22px;height:22px;border-radius:50%;background:#ede9fe;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="#4f46e5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <span style="font-size:14px;color:#334155;font-weight:500;">${f}</span>
-          </span>
+        <td style="padding:11px 0;border-bottom:1px solid #f1f5f9;">
+          <table style="border-collapse:collapse;">
+            <tr>
+              <td style="width:24px;vertical-align:middle;padding-right:12px;">
+                <div style="width:20px;height:20px;border-radius:50%;background:${c.accentColor};display:inline-flex;align-items:center;justify-content:center;">
+                  <svg width="9" height="7" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </td>
+              <td style="font-size:14px;color:#1e293b;font-weight:500;">${f}</td>
+            </tr>
+          </table>
         </td>
       </tr>
     `).join("");
 
     /* ── Tips list helper ── */
     const tipsList = (tips: string[]) => tips.map(t => `
-      <li style="padding:6px 0;font-size:13px;color:#475569;line-height:1.7;">${t}</li>
+      <li style="padding:5px 0;font-size:13px;color:#475569;line-height:1.7;">${t}</li>
+    `).join("");
+
+    /* ── Numbered step rows ── */
+    const allSteps = [
+      { title: "Complete your company profile", desc: `Go to <strong>Settings → Company</strong> — add your logo, address, and set currency to <strong>${cp.currency}</strong>.` },
+      ...cp.localTips.map((t, i) => ({ title: `Step ${i + 2}`, desc: t })),
+    ];
+    const stepRows = allSteps.slice(0, 5).map((s, i) => `
+      <tr>
+        <td style="padding:14px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
+          <table style="border-collapse:collapse;width:100%;">
+            <tr>
+              <td style="width:34px;vertical-align:top;padding-top:1px;">
+                <div style="width:28px;height:28px;border-radius:8px;background:#f1f5f9;border:1px solid #e2e8f0;text-align:center;line-height:28px;font-size:11px;font-weight:900;color:${c.accentColor};font-family:monospace;">0${i+1}</div>
+              </td>
+              <td style="padding-left:12px;">
+                <div style="font-size:13px;color:#64748b;line-height:1.65;">${s.desc}</div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
     `).join("");
 
     return baseTemplate(`
       <!-- Hero banner -->
-      <div style="background:${c.bg};padding:40px 40px 36px;text-align:center;margin:-40px -40px 36px;position:relative;">
-        <div style="display:inline-block;padding:5px 16px;border-radius:20px;background:${c.badgeBg};border:1px solid rgba(255,255,255,.2);font-size:12px;font-weight:800;color:rgba(255,255,255,.9);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;">${c.badge}</div>
-        <h1 style="font-size:30px;font-weight:900;color:#ffffff;margin:0 0 10px;line-height:1.2;letter-spacing:-.5px;">
-          ${cp.flag} ${cp.greeting}!
+      <div style="background:linear-gradient(160deg,#060818 0%,#0d1030 55%,#1a1060 100%);padding:48px 40px 44px;text-align:center;margin:-40px -40px 36px;">
+        <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.12em;text-transform:uppercase;margin-bottom:22px;">
+          <span style="width:6px;height:6px;border-radius:50%;background:${c.badgeDot};display:inline-block;"></span>
+          ${c.badgeText}
+        </div>
+        <h1 style="font-size:34px;font-weight:900;color:#ffffff;margin:0 0 12px;line-height:1.15;letter-spacing:-.8px;">
+          Welcome to FinovaOS
         </h1>
-        <p style="font-size:15px;color:rgba(255,255,255,.75);margin:0 0 20px;">Your <strong style="color:#fff;">${planLabel} Plan</strong> is active and ready to use.</p>
-        <a href="${dashboardUrl}" style="display:inline-block;padding:13px 32px;border-radius:10px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.4);color:#ffffff!important;font-weight:800;font-size:14px;text-decoration:none;letter-spacing:.01em;">
-          Open My Dashboard →
+        <p style="font-size:14px;color:rgba(255,255,255,.55);margin:0 0 30px;line-height:1.6;max-width:380px;margin-left:auto;margin-right:auto;">
+          Hi <strong style="color:rgba(255,255,255,.85);">${name}</strong> — your account is active and your workspace is ready.
+        </p>
+        <a href="${dashboardUrl}" style="display:inline-block;padding:14px 36px;border-radius:10px;background:#ffffff;color:${c.accentColor}!important;font-weight:800;font-size:14px;text-decoration:none;letter-spacing:.01em;">
+          Open Dashboard →
         </a>
       </div>
 
-      <!-- Greeting -->
-      <p style="font-size:16px;color:#1e293b;">Hi <strong>${name}</strong>,</p>
-      <p>Thank you for choosing <strong>FinovaOS</strong> — the accounting and business management platform built for growing companies worldwide. Your <span style="color:#4f46e5;font-weight:700;">${planLabel} Plan</span> is now active.</p>
+      <!-- Plan badge -->
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 22px;margin:0 0 28px;display:flex;align-items:center;justify-content:space-between;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="font-size:13px;color:#64748b;">Active Plan</td>
+            <td style="text-align:right;">
+              <span style="display:inline-block;padding:3px 12px;border-radius:20px;background:${c.accentColor};color:#fff;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;">${planLabel}</span>
+            </td>
+          </tr>
+        </table>
+      </div>
 
       <!-- Plan features -->
-      <div style="background:#f8fafc;border-radius:14px;padding:22px 26px;margin:28px 0;border:1px solid #e2e8f0;">
-        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">✦ What's Included in Your Plan</div>
+      <div style="margin:0 0 28px;">
+        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;">What's included</div>
         <table style="width:100%;border-collapse:collapse;">${featureRows}</table>
       </div>
 
-      <!-- Country-specific tax setup -->
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:20px 24px;margin:24px 0;">
-        <div style="font-size:13px;font-weight:800;color:#166534;margin-bottom:12px;">🏛️ ${cp.taxLabel} — Setup for ${cp.flag}</div>
-        <ul style="margin:0;padding-left:18px;">
+      <!-- Divider -->
+      <div style="height:1px;background:#f1f5f9;margin:32px 0;"></div>
+
+      <!-- Getting started -->
+      <div style="margin:0 0 28px;">
+        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;">Getting Started</div>
+        <p style="font-size:13px;color:#94a3b8;margin:0 0 16px;">Set up your workspace in a few simple steps.</p>
+        <table style="width:100%;border-collapse:collapse;">${stepRows}</table>
+      </div>
+
+      <!-- Tax compliance -->
+      <div style="border-left:3px solid ${c.accentColor};padding:16px 20px;background:#f8fafc;border-radius:0 10px 10px 0;margin:0 0 28px;">
+        <div style="font-size:12px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">${cp.taxLabel} ${cp.flag}</div>
+        <ul style="margin:0;padding-left:16px;">
           ${tipsList(cp.taxTips)}
         </ul>
       </div>
 
-      <!-- Getting started tips -->
-      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:20px 24px;margin:24px 0;">
-        <div style="font-size:13px;font-weight:800;color:#92400e;margin-bottom:12px;">🚀 5 Steps to Get Started</div>
-        <ol style="margin:0;padding-left:20px;">
-          <li style="padding:5px 0;font-size:13px;color:#78350f;line-height:1.7;">Go to <strong>Settings → Company</strong> — add your logo, address, and set currency to <strong>${cp.currency}</strong></li>
-          ${tipsList(cp.localTips)}
-        </ol>
+      <!-- Support -->
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 22px;margin:0 0 28px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="vertical-align:middle;">
+              <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:3px;">Questions? We're here.</div>
+              <div style="font-size:12px;color:#64748b;">${cp.supportNote}</div>
+            </td>
+            <td style="text-align:right;vertical-align:middle;white-space:nowrap;padding-left:12px;">
+              <a href="${BASE_URL}/help" style="font-size:12px;font-weight:700;color:${c.accentColor};text-decoration:none;margin-right:14px;">Help Centre →</a>
+              <a href="mailto:support@finovaos.app" style="font-size:12px;font-weight:700;color:${c.accentColor};text-decoration:none;">Email Us →</a>
+            </td>
+          </tr>
+        </table>
       </div>
 
-      <!-- Support info -->
-      <div style="background:#f8fafc;border-radius:12px;padding:18px 22px;margin:24px 0;border:1px solid #e2e8f0;display:flex;align-items:center;gap:14px;">
-        <div style="font-size:28px;">💬</div>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:4px;">Need help getting started?</div>
-          <div style="font-size:12px;color:#64748b;">${cp.supportNote}</div>
-          <div style="margin-top:8px;">
-            <a href="${BASE_URL}/support" style="font-size:12px;color:#4f46e5;font-weight:700;text-decoration:none;">Visit Help Centre →</a>
-            &nbsp;&nbsp;
-            <a href="mailto:support@finovaos.app" style="font-size:12px;color:#4f46e5;font-weight:700;text-decoration:none;">Email Support →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer note -->
-      <div class="divider"></div>
-      <p style="font-size:13px;color:#94a3b8;text-align:center;">
-        You subscribed to FinovaOS ${planLabel} Plan.<br>
-        Manage your subscription anytime from <a href="${dashboardUrl}/subscriptions" style="color:#6366f1;">Dashboard → Subscription</a>.
+      <!-- Sign-off -->
+      <div style="height:1px;background:#f1f5f9;margin:8px 0 24px;"></div>
+      <p style="font-size:14px;color:#475569;line-height:1.7;">We're glad you're here. If you ever have questions, ideas, or just want to share how FinovaOS is working for your business — reply to this email directly. We read every message.</p>
+      <p style="font-size:14px;color:#1e293b;font-weight:600;margin-top:20px;">
+        The FinovaOS Team<br>
+        <span style="font-size:12px;font-weight:400;color:#94a3b8;">Manage your subscription: <a href="${dashboardUrl}/settings/subscription" style="color:${c.accentColor};text-decoration:none;">Dashboard → Settings → Subscription</a></span>
       </p>
-      <p style="font-size:14px;color:#475569;text-align:center;margin-top:8px;">— The FinovaOS Team ✨</p>
-    `, `Welcome to FinovaOS ${planLabel} — Your account is active!`);
+    `, `Welcome to FinovaOS — Your ${planLabel} account is active`);
   },
 };
