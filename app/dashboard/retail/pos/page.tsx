@@ -104,10 +104,11 @@ export default function POSPage() {
   const discountRef  = useRef<HTMLInputElement>(null);
   const tenderedRef  = useRef<HTMLInputElement>(null);
   const noteRef      = useRef<HTMLInputElement>(null);
-  const videoRef          = useRef<HTMLVideoElement>(null);
-  const scannerStreamRef  = useRef<MediaStream | null>(null);
-  const scannerRafRef     = useRef<number>(0);
-  const fileInputRef      = useRef<HTMLInputElement>(null);
+  const videoRef              = useRef<HTMLVideoElement>(null);
+  const scannerStreamRef      = useRef<MediaStream | null>(null);
+  const scannerRafRef         = useRef<number>(0);
+  const fileInputRef          = useRef<HTMLInputElement>(null);
+  const handleScannedCodeRef  = useRef<(code: string) => void>(() => {});
   const checkoutFnRef = useRef<() => Promise<void>>(async () => {});
   const fKeyTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -191,62 +192,40 @@ export default function POSPage() {
     const video = videoRef.current;
     if (!video) return;
 
-    let stopped = false;
-    let stream: MediaStream | null = null;
+    let mounted = true;
+    let stopControls: (() => void) | null = null;
 
     (async () => {
       try {
         const { BrowserMultiFormatReader } = await import("@zxing/browser");
+        if (!mounted) return;
         const reader = new BrowserMultiFormatReader();
 
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
-        });
-        if (stopped) { stream.getTracks().forEach(t => t.stop()); return; }
-
-        scannerStreamRef.current = stream;
-        video.srcObject = stream;
-        await video.play();
-        setScannerStatus("scanning");
-
-        let lastCode = ""; let lastTs = 0;
-
-        const loop = async () => {
-          if (stopped) return;
-          try {
-            const result = await reader.decodeOnceFromVideoElement(video);
-            if (!stopped) {
-              const code = result.getText();
-              const now = Date.now();
-              if (code !== lastCode || now - lastTs > 2000) {
-                lastCode = code; lastTs = now;
-                handleScannedCode(code);
-                return;
-              }
-              scannerRafRef.current = requestAnimationFrame(loop as any);
-            }
-          } catch {
-            if (!stopped) scannerRafRef.current = requestAnimationFrame(loop as any);
+        const controls = await reader.decodeFromConstraints(
+          { video: { facingMode: "environment" } },
+          video,
+          (result, err) => {
+            if (!mounted || !result) return;
+            handleScannedCodeRef.current(result.getText());
           }
-        };
-        loop();
+        );
+
+        stopControls = () => controls.stop();
+        if (mounted) setScannerStatus("scanning");
       } catch (e: any) {
-        if (!stopped) {
-          setScannerError(
-            e?.name === "NotAllowedError"
-              ? "Camera permission deny ki. Browser settings mein camera allow karo."
-              : "Camera start nahi ho saka. Dobara try karo."
-          );
-          setScannerStatus("idle");
-        }
+        if (!mounted) return;
+        setScannerError(
+          e?.name === "NotAllowedError"
+            ? "Camera permission deny ki. Browser settings mein allow karo."
+            : "Camera open nahi ho saka. Dobara try karo."
+        );
+        setScannerStatus("idle");
       }
     })();
 
     return () => {
-      stopped = true;
-      cancelAnimationFrame(scannerRafRef.current);
-      stream?.getTracks().forEach(t => t.stop());
-      scannerStreamRef.current = null;
+      mounted = false;
+      stopControls?.();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showScanner]);
@@ -390,6 +369,7 @@ export default function POSPage() {
     if (match) {
       addToCart(match);
       setLastScanned(`✓ ${match.name}`);
+      stopScanner();
       setTimeout(() => setLastScanned(""), 2500);
     } else {
       setLastScanned(`"${code}" — item not found`);
@@ -397,6 +377,7 @@ export default function POSPage() {
       stopScanner();
     }
   }
+  handleScannedCodeRef.current = handleScannedCode;
 
   function stopScanner() {
     setShowScanner(false); // triggers useEffect cleanup which stops stream
