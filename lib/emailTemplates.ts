@@ -77,23 +77,125 @@ export const emailTemplates = {
     `, `Your FinovaOS verification code is ${code}`),
 
   /* ── 2. Welcome Email ── */
-  welcome: (user: { name: string; email: string }, plan: string, companyName: string) =>
-    baseTemplate(`
-      <h1>Welcome to FinovaOS, ${user.name.split(" ")[0]}! 🎉</h1>
-      <p>Your <strong>${companyName}</strong> workspace is ready. You're on the <span class="tag">${plan.toUpperCase()}</span> plan.</p>
-      <p>Here's what you can do right now:</p>
-      <div style="margin:20px 0;">
-        <div class="feature-row"><span class="feature-icon">📊</span><div><strong>Set up your Chart of Accounts</strong><br><span style="font-size:13px;color:#64748b;">Go to Accounting → Chart of Accounts to configure your ledger.</span></div></div>
-        <div class="feature-row"><span class="feature-icon">🧾</span><div><strong>Create your first invoice</strong><br><span style="font-size:13px;color:#64748b;">Go to Sales → New Invoice and send a professional invoice in minutes.</span></div></div>
-        <div class="feature-row"><span class="feature-icon">👥</span><div><strong>Invite your team</strong><br><span style="font-size:13px;color:#64748b;">Go to Settings → Team Members to add your accountant or colleagues.</span></div></div>
-        <div class="feature-row"><span class="feature-icon">🏦</span><div><strong>Connect your bank</strong><br><span style="font-size:13px;color:#64748b;">Go to Banking → Add Bank Account for auto-reconciliation.</span></div></div>
+  welcome: (user: { name: string; email: string }, plan: string, companyName: string) => {
+    const firstName = user.name.split(" ")[0];
+    const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1).toLowerCase();
+    const steps = [
+      {
+        num: "01",
+        title: "Complete your company profile",
+        desc: "Add your logo, address, and tax number in <strong>Settings → Company</strong>. This appears on every invoice you send.",
+      },
+      {
+        num: "02",
+        title: "Create your first invoice",
+        desc: "Go to <strong>Sales → New Invoice</strong>. Add a client, line items, and hit Send — your client gets a professional PDF in seconds.",
+      },
+      {
+        num: "03",
+        title: "Connect your bank account",
+        desc: "Navigate to <strong>Banking → Add Account</strong>. Transactions sync automatically so your books stay up to date.",
+      },
+      {
+        num: "04",
+        title: "Invite your team",
+        desc: "Go to <strong>Settings → Team Members</strong> to add your accountant or business partners with role-based permissions.",
+      },
+    ];
+    const stepsHtml = steps.map(s => `
+      <tr>
+        <td style="padding:16px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
+          <table style="width:100%;border-collapse:collapse;">
+            <tr>
+              <td style="width:40px;vertical-align:top;padding-top:2px;">
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;font-family:monospace;">${s.num}</div>
+              </td>
+              <td style="padding-left:14px;">
+                <div style="font-size:14px;font-weight:700;color:#0f172a;margin-bottom:4px;">${s.title}</div>
+                <div style="font-size:13px;color:#64748b;line-height:1.65;">${s.desc}</div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    `).join("");
+
+    return baseTemplate(`
+      <!-- Hero -->
+      <div style="background:linear-gradient(135deg,#0c0f2e 0%,#1e1b4b 50%,#312e81 100%);padding:44px 40px 40px;text-align:center;margin:-40px -40px 36px;border-radius:0;">
+        <div style="display:inline-block;padding:4px 14px;border-radius:20px;background:rgba(99,102,241,.25);border:1px solid rgba(129,140,248,.4);font-size:11px;font-weight:800;color:#a5b4fc;letter-spacing:.1em;text-transform:uppercase;margin-bottom:18px;">Account Activated</div>
+        <h1 style="font-size:32px;font-weight:900;color:#ffffff;margin:0 0 10px;line-height:1.15;letter-spacing:-.5px;">
+          Welcome aboard, ${firstName}.
+        </h1>
+        <p style="font-size:15px;color:rgba(255,255,255,.65);margin:0 0 28px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6;">
+          Your <strong style="color:#c7d2fe;">${companyName}</strong> workspace is live on the <strong style="color:#c7d2fe;">${planLabel} Plan</strong>.
+        </p>
+        <a href="${APP_URL}/dashboard" style="display:inline-block;padding:14px 36px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#ffffff!important;font-weight:800;font-size:15px;text-decoration:none;letter-spacing:.01em;box-shadow:0 4px 24px rgba(79,70,229,.45);">
+          Open My Dashboard →
+        </a>
       </div>
+
+      <!-- Greeting -->
+      <p style="font-size:16px;color:#1e293b;line-height:1.7;">Hi <strong>${firstName}</strong>,</p>
+      <p style="font-size:15px;color:#475569;line-height:1.75;">
+        We're thrilled to have you. FinovaOS is your complete financial command centre — invoicing, expenses, payroll, and reporting, all in one place. Here's everything you need to hit the ground running.
+      </p>
+
+      <!-- Account summary card -->
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin:28px 0;">
+        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">Your Account Summary</div>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#64748b;">Workspace</td>
+            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700;color:#0f172a;text-align:right;">${companyName}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#64748b;">Plan</td>
+            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;text-align:right;"><span style="display:inline-block;padding:2px 10px;border-radius:20px;background:#ede9fe;color:#4f46e5;font-size:12px;font-weight:800;">${planLabel.toUpperCase()}</span></td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;font-size:13px;color:#64748b;">Account Email</td>
+            <td style="padding:8px 0;font-size:13px;font-weight:600;color:#0f172a;text-align:right;">${user.email}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Getting started steps -->
+      <div style="margin:32px 0 8px;">
+        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Getting Started</div>
+        <p style="font-size:13px;color:#64748b;margin:0 0 16px;">Four steps to set up your workspace in under 10 minutes.</p>
+        <table style="width:100%;border-collapse:collapse;">${stepsHtml}</table>
+      </div>
+
+      <!-- Support -->
+      <div style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:14px;padding:20px 24px;margin:32px 0;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="vertical-align:middle;font-size:26px;width:40px;">💬</td>
+            <td style="padding-left:14px;">
+              <div style="font-size:14px;font-weight:700;color:#0c4a6e;margin-bottom:3px;">We're here if you need us</div>
+              <div style="font-size:13px;color:#0369a1;line-height:1.6;">Reply to this email anytime, or explore our documentation to get the most out of FinovaOS.</div>
+              <div style="margin-top:10px;">
+                <a href="${BASE_URL}/help" style="font-size:12px;font-weight:700;color:#0284c7;text-decoration:none;margin-right:16px;">Help Centre →</a>
+                <a href="mailto:support@finovaos.app" style="font-size:12px;font-weight:700;color:#0284c7;text-decoration:none;">Email Support →</a>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
       <div class="divider"></div>
-      <div style="text-align:center;margin:28px 0;">
-        <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard →</a>
-      </div>
-      <p style="font-size:13px;color:#94a3b8;text-align:center;">Need help? Reply to this email or visit our <a href="${BASE_URL}/help" style="color:#6366f1;">Help Centre</a>.</p>
-    `, `Your FinovaOS workspace is ready — let's get started`),
+
+      <!-- Sign-off -->
+      <p style="font-size:14px;color:#475569;line-height:1.7;">
+        We built FinovaOS to give every business — from a solo founder to a growing team — the same financial tools that large enterprises rely on. We're excited to be part of your journey.
+      </p>
+      <p style="font-size:14px;color:#1e293b;font-weight:600;margin-top:20px;">
+        Warm regards,<br>
+        <span style="font-size:13px;font-weight:400;color:#64748b;">The FinovaOS Team</span>
+      </p>
+    `, `Welcome to FinovaOS — Your ${companyName} workspace is ready`);
+  },
 
   /* ── 3. Password Reset ── */
   passwordReset: (user: { name: string }, resetUrl: string) =>
