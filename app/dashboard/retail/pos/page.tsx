@@ -415,16 +415,20 @@ export default function POSPage() {
   async function handleFileCapture(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if ("BarcodeDetector" in window) {
+    try {
+      const { BrowserMultiFormatReader } = await import("@zxing/browser");
+      const reader = new BrowserMultiFormatReader();
+      const url = URL.createObjectURL(file);
       try {
-        const bitmap = await createImageBitmap(file);
-        // @ts-ignore
-        const detector = new (window as any).BarcodeDetector({ formats: ["code_128","ean_13","ean_8","upc_a","qr_code"] });
-        const codes = await detector.detect(bitmap);
-        if (codes.length > 0) { handleScannedCode(codes[0].rawValue); return; }
-      } catch {}
+        const result = await reader.decodeFromImageUrl(url);
+        handleScannedCode(result.getText());
+        return;
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    } catch {
+      setScannerError("Barcode detect nahi hua. Clear photo lo — barcode seedha aur visible hona chahiye.");
     }
-    setScannerError("Barcode detect nahi hua. Dobara try karo — barcode seedha camera ke saamne rakho.");
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
