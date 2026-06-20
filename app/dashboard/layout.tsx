@@ -273,9 +273,15 @@ export default function DashboardLayout({
   }
 
   useEffect(() => {
+    if (!currentUser?.companyId) return;
+    const hdrs: Record<string, string> = {
+      "x-company-id": currentUser.companyId,
+      ...(currentUser.id   ? { "x-user-id":   currentUser.id }   : {}),
+      ...(currentUser.role ? { "x-user-role": currentUser.role } : {}),
+    };
     async function fetchCompany() {
       try {
-        const res = await fetch("/api/me/company");
+        const res = await fetch("/api/me/company", { headers: hdrs });
         if (res.ok) {
           const data = await res.json();
           if (data?.name) setCompanyName(data.name);
@@ -300,8 +306,8 @@ export default function DashboardLayout({
     }
     fetchCompany();
     // Load company shortcuts
-    fetch("/api/company/shortcuts").then(r => r.json()).then(d => { if (d.shortcuts) setShortcuts(d.shortcuts); }).catch(() => {});
-  }, []);
+    fetch("/api/company/shortcuts", { headers: hdrs }).then(r => r.json()).then(d => { if (d.shortcuts) setShortcuts(d.shortcuts); }).catch(() => {});
+  }, [currentUser?.companyId]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -614,9 +620,15 @@ export default function DashboardLayout({
 
   // Load plan-permission allowlist for menu gating
   useEffect(() => {
+    if (!currentUser?.companyId) return;
+    const planHdrs: Record<string, string> = {
+      "x-company-id": currentUser.companyId,
+      ...(currentUser.id   ? { "x-user-id":   currentUser.id }   : {}),
+      ...(currentUser.role ? { "x-user-role": currentUser.role } : {}),
+    };
     (async () => {
       try {
-        const c = await fetch("/api/me/company", { cache: "no-store" });
+        const c = await fetch("/api/me/company", { cache: "no-store", headers: planHdrs });
         const cfg = await fetch("/api/public/plan-config", { cache: "no-store" });
         if (c.ok && cfg.ok) {
           const cj = await c.json();
@@ -651,7 +663,7 @@ export default function DashboardLayout({
         setAllowedDashboardFeatures(null);
       }
     })();
-  }, []);
+  }, [currentUser?.companyId]);
 
   const hasPermission = (user: any, perm: string) => {
     if (!allowedPlanPerms) return baseHasPermission(user, perm);
