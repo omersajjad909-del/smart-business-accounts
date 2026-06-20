@@ -1,602 +1,589 @@
 // FILE: lib/emailTemplates.ts
-// All FinovaOS email templates — HTML branded emails
+// Billing & subscription email templates for FinovaOS
 // Usage: import { emailTemplates } from "@/lib/emailTemplates"
 
-import { getAppUrl, getMarketingUrl } from "@/lib/domains";
+export const emailTemplates = {
+  /**
+   * Welcome email for new subscription
+   */
+  welcomeSubscription: (
+    userName: string,
+    planCode: string,
+    features: string[],
+    dashboardUrl: string,
+    country: string = "GLOBAL"
+  ): string => {
+    const planInfo = getPlanInfo(planCode, country);
+    const brandColor = "#2563EB";
+    const accentColor = "#1E40AF";
+    const lightBg = "#F8FAFC";
+    const borderColor = "#E2E8F0";
 
-const BASE_URL = getMarketingUrl();
-const APP_URL = getAppUrl();
-
-const STYLES = `
-  body { margin:0; padding:0; background:#f1f5f9; font-family:'Segoe UI',Arial,sans-serif; }
-  .wrapper { max-width:600px; margin:0 auto; background:#ffffff; }
-  .header { background:linear-gradient(135deg,#080c1e,#0c0f2e); padding:32px 40px; text-align:center; }
-  .logo { font-size:24px; font-weight:800; color:#ffffff; letter-spacing:-0.5px; }
-  .logo span { color:#818cf8; }
-  .body { padding:40px; color:#1e293b; }
-  .footer { background:#f8fafc; padding:24px 40px; text-align:center; border-top:1px solid #e2e8f0; }
-  .btn { display:inline-block; padding:14px 32px; border-radius:10px; background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#ffffff!important; font-weight:700; font-size:15px; text-decoration:none; }
-  .otp-box { background:#f1f5f9; border:2px dashed #6366f1; border-radius:12px; padding:20px; text-align:center; margin:24px 0; }
-  .otp-code { font-size:40px; font-weight:900; letter-spacing:12px; color:#4f46e5; font-family:monospace; }
-  h1 { font-size:24px; font-weight:800; color:#0f172a; margin:0 0 12px; }
-  p { font-size:15px; line-height:1.7; color:#475569; margin:0 0 16px; }
-  .highlight { color:#4f46e5; font-weight:700; }
-  .divider { height:1px; background:#e2e8f0; margin:24px 0; }
-  .feature-row { display:flex; gap:12px; margin-bottom:12px; align-items:flex-start; }
-  .feature-icon { font-size:18px; margin-top:2px; }
-  .tag { display:inline-block; padding:3px 10px; border-radius:20px; background:#ede9fe; color:#4f46e5; font-size:12px; font-weight:700; }
-`;
-
-function baseTemplate(content: string, preheader = "") {
-  return `<!DOCTYPE html>
-<html>
+    return `
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>FinovaOS</title>
-  <style>${STYLES}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to FinovaOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1E293B;
+            background-color: #F1F5F9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        .header {
+            background: linear-gradient(135deg, ${brandColor} 0%, ${accentColor} 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+        }
+        .header-logo { font-size: 28px; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+        .header-subtitle { font-size: 14px; opacity: 0.9; }
+        .content { padding: 40px; }
+        .greeting { font-size: 22px; font-weight: 700; margin-bottom: 20px; color: #0F172A; }
+        .intro-text { font-size: 15px; color: #475569; margin-bottom: 30px; line-height: 1.8; }
+        .plan-card {
+            background: ${lightBg};
+            border: 2px solid ${borderColor};
+            border-radius: 8px;
+            padding: 24px;
+            margin: 30px 0;
+        }
+        .plan-name { font-size: 18px; font-weight: 700; color: ${accentColor}; margin-bottom: 8px; }
+        .plan-price { font-size: 32px; font-weight: 800; color: ${brandColor}; margin-bottom: 4px; }
+        .plan-billing { font-size: 13px; color: #64748B; margin-bottom: 20px; }
+        .features-title {
+            font-size: 14px; font-weight: 700; color: #0F172A;
+            margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .features-list { list-style: none; }
+        .features-list li {
+            font-size: 14px; color: #475569; margin-bottom: 10px;
+            padding-left: 24px; position: relative;
+        }
+        .features-list li:before {
+            content: "✓"; position: absolute; left: 0;
+            color: ${brandColor}; font-weight: 800;
+        }
+        .cta-section { text-align: center; margin: 40px 0; }
+        .cta-button {
+            display: inline-block; background: ${brandColor}; color: white;
+            padding: 14px 48px; border-radius: 8px; text-decoration: none;
+            font-weight: 600; font-size: 15px;
+        }
+        .next-steps {
+            background: ${lightBg}; border-left: 4px solid ${brandColor};
+            border-radius: 6px; padding: 20px; margin: 30px 0;
+        }
+        .next-steps-title { font-weight: 700; color: #0F172A; margin-bottom: 12px; font-size: 14px; }
+        .next-steps-list { list-style: none; counter-reset: item; }
+        .next-steps-list li {
+            font-size: 14px; color: #475569; margin-bottom: 8px;
+            counter-increment: item; padding-left: 28px; position: relative;
+        }
+        .next-steps-list li:before {
+            content: counter(item); position: absolute; left: 0; top: -2px;
+            background: ${brandColor}; color: white; width: 20px; height: 20px;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 12px; font-weight: 700;
+        }
+        .support-section {
+            background: white; border: 1px solid ${borderColor};
+            border-radius: 8px; padding: 20px; margin: 30px 0; text-align: center;
+        }
+        .support-title { font-weight: 700; color: #0F172A; margin-bottom: 8px; font-size: 14px; }
+        .support-text { font-size: 14px; color: #64748B; margin-bottom: 12px; }
+        .support-link { color: ${brandColor}; text-decoration: none; font-weight: 600; }
+        .divider { height: 1px; background: ${borderColor}; margin: 30px 0; }
+        .footer {
+            background: #F8FAFC; padding: 30px 40px; text-align: center;
+            border-top: 1px solid ${borderColor};
+        }
+        .footer-text { font-size: 12px; color: #64748B; margin-bottom: 16px; }
+        .footer-links { font-size: 12px; margin-bottom: 16px; }
+        .footer-links a { color: ${brandColor}; text-decoration: none; margin: 0 8px; }
+        .social-links { margin-top: 16px; }
+        .social-links a {
+            display: inline-block; width: 32px; height: 32px; margin: 0 6px;
+            background: ${lightBg}; border-radius: 50%; text-decoration: none;
+            color: ${brandColor}; font-weight: 700; line-height: 32px;
+            text-align: center; font-size: 14px;
+        }
+        @media (max-width: 600px) {
+            .container { border-radius: 0; }
+            .content { padding: 24px; }
+            .greeting { font-size: 18px; }
+            .plan-price { font-size: 24px; }
+            .header { padding: 30px 20px; }
+        }
+    </style>
 </head>
 <body>
-  ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;color:#f1f5f9;">${preheader}</div>` : ""}
-  <div class="wrapper">
-    <div class="header">
-      <div class="logo">Fin<span>ova</span></div>
-      <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:4px;letter-spacing:.06em;">GLOBAL ACCOUNTING PLATFORM</div>
+    <div class="container">
+        <div class="header">
+            <div class="header-logo">✦ FinovaOS</div>
+            <div class="header-subtitle">AI-Powered Accounting Platform</div>
+        </div>
+        <div class="content">
+            <div class="greeting">Welcome to FinovaOS, ${userName}! 🎉</div>
+            <div class="intro-text">
+                Your ${planInfo.displayName} plan is now active. You're all set to start managing your
+                business finances with intelligence and ease.
+            </div>
+            <div class="plan-card">
+                <div class="plan-name">${planInfo.displayName} Plan</div>
+                <div class="plan-price">${planInfo.priceDisplay}</div>
+                <div class="plan-billing">${planInfo.billingText}</div>
+                <div class="features-title">What's Included:</div>
+                <ul class="features-list">
+                    ${features.map(f => `<li>${f}</li>`).join("")}
+                </ul>
+            </div>
+            <div class="cta-section">
+                <a href="${dashboardUrl}" class="cta-button">Go to Dashboard →</a>
+            </div>
+            <div class="next-steps">
+                <div class="next-steps-title">Next Steps:</div>
+                <ol class="next-steps-list">
+                    <li>Log in to your FinovaOS dashboard</li>
+                    <li>Connect your bank accounts (optional)</li>
+                    <li>Import your first invoice or transaction</li>
+                    <li>Explore AI features for business insights</li>
+                </ol>
+            </div>
+            <div class="support-section">
+                <div class="support-title">🚀 Pro Tips:</div>
+                <div class="support-text">
+                    • Use our AI Chat for instant accounting help<br>
+                    • Set up bank sync for automated reconciliation<br>
+                    • Create custom reports for your business needs
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="support-section">
+                <div class="support-title">Need Help?</div>
+                <div class="support-text">Our support team is here to help you get the most out of FinovaOS.</div>
+                <a href="https://finovaos.app/support" class="support-link">Visit Help Center →</a>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-text">You're receiving this because you just subscribed to FinovaOS.</div>
+            <div class="footer-links">
+                <a href="https://finovaos.app/privacy">Privacy Policy</a>
+                <a href="https://finovaos.app/terms">Terms of Service</a>
+                <a href="https://finovaos.app/contact">Contact Us</a>
+            </div>
+            <div class="social-links">
+                <a href="https://linkedin.com/company/finova-forge">in</a>
+                <a href="https://twitter.com/finovoas">𝕏</a>
+                <a href="https://facebook.com/finovoas">f</a>
+            </div>
+            <div class="footer-text" style="margin-top:16px;">
+                © ${new Date().getFullYear()} Finova Forge. All rights reserved.<br>
+                Faisalabad, Pakistan | <a href="https://finovaos.app" style="color:${brandColor};">finovaos.app</a>
+            </div>
+        </div>
     </div>
-    <div class="body">${content}</div>
-    <div class="footer">
-      <p style="font-size:12px;color:#94a3b8;margin:0 0 8px;">
-        © ${new Date().getFullYear()} FinovaOS · <a href="${BASE_URL}/legal/privacy" style="color:#6366f1;">Privacy Policy</a> · <a href="${BASE_URL}/legal/terms" style="color:#6366f1;">Terms</a>
-      </p>
-      <p style="font-size:11px;color:#cbd5e1;margin:0;">
-        You're receiving this email because you signed up for FinovaOS.<br>
-        <a href="${BASE_URL}/unsubscribe" style="color:#94a3b8;">Unsubscribe</a>
-      </p>
-    </div>
-  </div>
 </body>
 </html>`;
-}
-
-export const emailTemplates = {
-
-  /* ── 1. OTP Verification ── */
-  otp: (user: { name: string; email: string }, code: string) =>
-    baseTemplate(`
-      <h1>Verify your email address</h1>
-      <p>Hi <strong>${user.name}</strong>,</p>
-      <p>Welcome to FinovaOS! Enter this code to verify your email and activate your account.</p>
-      <div class="otp-box">
-        <div style="font-size:12px;font-weight:700;color:#64748b;letter-spacing:.1em;margin-bottom:8px;">YOUR VERIFICATION CODE</div>
-        <div class="otp-code">${code}</div>
-        <div style="font-size:12px;color:#94a3b8;margin-top:8px;">Valid for 15 minutes</div>
-      </div>
-      <p>If you didn't create a FinovaOS account, you can safely ignore this email.</p>
-      <div class="divider"></div>
-      <p style="font-size:13px;color:#94a3b8;">For security, never share this code with anyone — FinovaOS will never ask for it.</p>
-    `, `Your FinovaOS verification code is ${code}`),
-
-  /* ── 2. Welcome Email ── */
-  welcome: (user: { name: string; email: string }, plan: string, companyName: string) => {
-    const firstName = user.name.split(" ")[0];
-    const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1).toLowerCase();
-    const steps = [
-      {
-        num: "01",
-        title: "Complete your company profile",
-        desc: "Add your logo, address, and tax number in <strong>Settings → Company</strong>. This appears on every invoice you send.",
-      },
-      {
-        num: "02",
-        title: "Create your first invoice",
-        desc: "Go to <strong>Sales → New Invoice</strong>. Add a client, line items, and hit Send — your client gets a professional PDF in seconds.",
-      },
-      {
-        num: "03",
-        title: "Connect your bank account",
-        desc: "Navigate to <strong>Banking → Add Account</strong>. Transactions sync automatically so your books stay up to date.",
-      },
-      {
-        num: "04",
-        title: "Invite your team",
-        desc: "Go to <strong>Settings → Team Members</strong> to add your accountant or business partners with role-based permissions.",
-      },
-    ];
-    const stepsHtml = steps.map(s => `
-      <tr>
-        <td style="padding:16px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
-          <table style="width:100%;border-collapse:collapse;">
-            <tr>
-              <td style="width:40px;vertical-align:top;padding-top:2px;">
-                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;font-family:monospace;">${s.num}</div>
-              </td>
-              <td style="padding-left:14px;">
-                <div style="font-size:14px;font-weight:700;color:#0f172a;margin-bottom:4px;">${s.title}</div>
-                <div style="font-size:13px;color:#64748b;line-height:1.65;">${s.desc}</div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    `).join("");
-
-    return baseTemplate(`
-      <!-- Hero -->
-      <div style="background:linear-gradient(135deg,#0c0f2e 0%,#1e1b4b 50%,#312e81 100%);padding:44px 40px 40px;text-align:center;margin:-40px -40px 36px;border-radius:0;">
-        <div style="display:inline-block;padding:4px 14px;border-radius:20px;background:rgba(99,102,241,.25);border:1px solid rgba(129,140,248,.4);font-size:11px;font-weight:800;color:#a5b4fc;letter-spacing:.1em;text-transform:uppercase;margin-bottom:18px;">Account Activated</div>
-        <h1 style="font-size:32px;font-weight:900;color:#ffffff;margin:0 0 10px;line-height:1.15;letter-spacing:-.5px;">
-          Welcome aboard, ${firstName}.
-        </h1>
-        <p style="font-size:15px;color:rgba(255,255,255,.65);margin:0 0 28px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6;">
-          Your <strong style="color:#c7d2fe;">${companyName}</strong> workspace is live on the <strong style="color:#c7d2fe;">${planLabel} Plan</strong>.
-        </p>
-        <a href="${APP_URL}/dashboard" style="display:inline-block;padding:14px 36px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#ffffff!important;font-weight:800;font-size:15px;text-decoration:none;letter-spacing:.01em;box-shadow:0 4px 24px rgba(79,70,229,.45);">
-          Open My Dashboard →
-        </a>
-      </div>
-
-      <!-- Greeting -->
-      <p style="font-size:16px;color:#1e293b;line-height:1.7;">Hi <strong>${firstName}</strong>,</p>
-      <p style="font-size:15px;color:#475569;line-height:1.75;">
-        We're thrilled to have you. FinovaOS is your complete financial command centre — invoicing, expenses, payroll, and reporting, all in one place. Here's everything you need to hit the ground running.
-      </p>
-
-      <!-- Account summary card -->
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin:28px 0;">
-        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">Your Account Summary</div>
-        <table style="width:100%;border-collapse:collapse;">
-          <tr>
-            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#64748b;">Workspace</td>
-            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700;color:#0f172a;text-align:right;">${companyName}</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#64748b;">Plan</td>
-            <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;text-align:right;"><span style="display:inline-block;padding:2px 10px;border-radius:20px;background:#ede9fe;color:#4f46e5;font-size:12px;font-weight:800;">${planLabel.toUpperCase()}</span></td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;font-size:13px;color:#64748b;">Account Email</td>
-            <td style="padding:8px 0;font-size:13px;font-weight:600;color:#0f172a;text-align:right;">${user.email}</td>
-          </tr>
-        </table>
-      </div>
-
-      <!-- Getting started steps -->
-      <div style="margin:32px 0 8px;">
-        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Getting Started</div>
-        <p style="font-size:13px;color:#64748b;margin:0 0 16px;">Four steps to set up your workspace in under 10 minutes.</p>
-        <table style="width:100%;border-collapse:collapse;">${stepsHtml}</table>
-      </div>
-
-      <!-- Support -->
-      <div style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:14px;padding:20px 24px;margin:32px 0;">
-        <table style="width:100%;border-collapse:collapse;">
-          <tr>
-            <td style="vertical-align:middle;font-size:26px;width:40px;">💬</td>
-            <td style="padding-left:14px;">
-              <div style="font-size:14px;font-weight:700;color:#0c4a6e;margin-bottom:3px;">We're here if you need us</div>
-              <div style="font-size:13px;color:#0369a1;line-height:1.6;">Reply to this email anytime, or explore our documentation to get the most out of FinovaOS.</div>
-              <div style="margin-top:10px;">
-                <a href="${BASE_URL}/help" style="font-size:12px;font-weight:700;color:#0284c7;text-decoration:none;margin-right:16px;">Help Centre →</a>
-                <a href="mailto:support@finovaos.app" style="font-size:12px;font-weight:700;color:#0284c7;text-decoration:none;">Email Support →</a>
-              </div>
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Sign-off -->
-      <p style="font-size:14px;color:#475569;line-height:1.7;">
-        We built FinovaOS to give every business — from a solo founder to a growing team — the same financial tools that large enterprises rely on. We're excited to be part of your journey.
-      </p>
-      <p style="font-size:14px;color:#1e293b;font-weight:600;margin-top:20px;">
-        Warm regards,<br>
-        <span style="font-size:13px;font-weight:400;color:#64748b;">The FinovaOS Team</span>
-      </p>
-    `, `Welcome to FinovaOS — Your ${companyName} workspace is ready`);
   },
 
-  /* ── 3. Password Reset ── */
-  passwordReset: (user: { name: string }, resetUrl: string) =>
-    baseTemplate(`
-      <h1>Reset your password</h1>
-      <p>Hi <strong>${user.name}</strong>,</p>
-      <p>We received a request to reset your FinovaOS password. Click the button below to set a new password.</p>
-      <div style="text-align:center;margin:32px 0;">
-        <a href="${resetUrl}" class="btn">Reset Password →</a>
-      </div>
-      <p style="font-size:13px;color:#94a3b8;">This link expires in <strong>1 hour</strong>. If you didn't request a password reset, you can safely ignore this email — your password won't change.</p>
-      <div class="divider"></div>
-      <p style="font-size:12px;color:#94a3b8;">If the button doesn't work, copy and paste this link:<br>
-        <a href="${resetUrl}" style="color:#6366f1;word-break:break-all;">${resetUrl}</a>
-      </p>
-    `, "Reset your FinovaOS password"),
+  /**
+   * Payment confirmation email — sent on successful charge
+   */
+  paymentConfirmation: (
+    userName: string,
+    planCode: string,
+    amount: number,
+    currency: string,
+    nextBillingDate: string,
+    invoiceUrl: string,
+    dashboardUrl: string
+  ): string => {
+    const planInfo = getPlanInfo(planCode);
+    const brandColor = "#2563EB";
+    const accentColor = "#1E40AF";
+    const successColor = "#10B981";
+    const lightBg = "#F8FAFC";
+    const borderColor = "#E2E8F0";
 
-  /* ── 4. Team Invite ── */
-  teamInvite: (inviter: string, companyName: string, role: string, inviteUrl: string) =>
-    baseTemplate(`
-      <h1>You've been invited to join ${companyName}</h1>
-      <p><strong>${inviter}</strong> has invited you to collaborate on <strong>${companyName}</strong>'s FinovaOS workspace as a <span class="tag">${role}</span>.</p>
-      <p>FinovaOS is a cloud accounting platform that helps businesses manage invoices, inventory, payroll, and more.</p>
-      <div style="background:#f8fafc;border-radius:12px;padding:20px;margin:24px 0;border:1px solid #e2e8f0;">
-        <div style="font-size:13px;color:#64748b;margin-bottom:8px;">YOU'VE BEEN INVITED TO</div>
-        <div style="font-size:18px;font-weight:800;color:#0f172a;">${companyName}</div>
-        <div style="font-size:13px;color:#4f46e5;font-weight:600;margin-top:4px;">Role: ${role}</div>
-      </div>
-      <div style="text-align:center;margin:28px 0;">
-        <a href="${inviteUrl}" class="btn">Accept Invitation →</a>
-      </div>
-      <p style="font-size:13px;color:#94a3b8;">This invitation expires in 7 days. If you don't know ${inviter}, you can ignore this email.</p>
-    `, `${inviter} invited you to join ${companyName} on FinovaOS`),
-
-  /* ── 5. Invoice Sent (to customer) ── */
-  invoiceSent: (customerName: string, invoiceNo: string, amount: string, dueDate: string, companyName: string, viewUrl: string) =>
-    baseTemplate(`
-      <h1>Invoice from ${companyName}</h1>
-      <p>Dear <strong>${customerName}</strong>,</p>
-      <p>Please find your invoice below. You can view and download it using the button below.</p>
-      <div style="background:#f8fafc;border-radius:12px;padding:24px;margin:24px 0;border:1px solid #e2e8f0;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-          <span style="font-size:13px;color:#64748b;">Invoice Number</span>
-          <span style="font-size:13px;font-weight:700;color:#0f172a;">${invoiceNo}</span>
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Received - FinovaOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6; color: #1E293B; background-color: #F1F5F9;
+        }
+        .container {
+            max-width: 600px; margin: 0 auto; background: white;
+            border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        .header {
+            background: linear-gradient(135deg, ${successColor} 0%, #059669 100%);
+            padding: 40px 20px; text-align: center; color: white;
+        }
+        .header-icon { font-size: 48px; margin-bottom: 12px; }
+        .header-title { font-size: 24px; font-weight: 700; }
+        .content { padding: 40px; }
+        .greeting { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #0F172A; }
+        .invoice-box {
+            background: ${lightBg}; border: 2px solid ${borderColor};
+            border-radius: 8px; padding: 24px; margin: 30px 0;
+        }
+        .invoice-row {
+            display: flex; justify-content: space-between;
+            margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid ${borderColor};
+        }
+        .invoice-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .invoice-label { font-size: 14px; color: #64748B; }
+        .invoice-value { font-weight: 600; color: #0F172A; }
+        .invoice-total {
+            background: white; padding: 16px; border-radius: 6px;
+            display: flex; justify-content: space-between; margin-top: 12px;
+        }
+        .total-label { font-size: 16px; font-weight: 700; color: #0F172A; }
+        .total-amount { font-size: 24px; font-weight: 800; color: ${successColor}; }
+        .status-badge {
+            display: inline-block; background: ${successColor}; color: white;
+            padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; margin: 20px 0;
+        }
+        .button-group { text-align: center; margin: 30px 0; }
+        .button {
+            display: inline-block; padding: 12px 32px; margin: 0 8px;
+            border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;
+        }
+        .button-primary { background: ${brandColor}; color: white; }
+        .button-secondary { background: ${lightBg}; color: ${brandColor}; border: 2px solid ${borderColor}; }
+        .footer {
+            background: ${lightBg}; padding: 30px 40px; text-align: center;
+            border-top: 1px solid ${borderColor};
+        }
+        .footer-text { font-size: 12px; color: #64748B; }
+        @media (max-width: 600px) {
+            .content { padding: 24px; }
+            .button { display: block; margin: 8px 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">✓</div>
+            <div class="header-title">Payment Received</div>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-          <span style="font-size:13px;color:#64748b;">Amount Due</span>
-          <span style="font-size:20px;font-weight:800;color:#4f46e5;">${amount}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;">
-          <span style="font-size:13px;color:#64748b;">Due Date</span>
-          <span style="font-size:13px;font-weight:700;color:#ef4444;">${dueDate}</span>
-        </div>
-      </div>
-      <div style="text-align:center;margin:28px 0;">
-        <a href="${viewUrl}" class="btn">View Invoice →</a>
-      </div>
-      <p style="font-size:13px;color:#94a3b8;">For questions about this invoice, please contact <strong>${companyName}</strong> directly.</p>
-    `, `Invoice ${invoiceNo} from ${companyName} — ${amount} due ${dueDate}`),
-
-  /* ── 6. Payment Reminder ── */
-  paymentReminder: (customerName: string, invoiceNo: string, amount: string, dueDate: string, daysOverdue: number, companyName: string, viewUrl: string) =>
-    baseTemplate(`
-      <h1>Payment reminder${daysOverdue > 0 ? " — overdue" : ""}</h1>
-      <p>Dear <strong>${customerName}</strong>,</p>
-      <p>${daysOverdue > 0
-        ? `This is a reminder that invoice <strong>${invoiceNo}</strong> from <strong>${companyName}</strong> is <strong style="color:#ef4444;">${daysOverdue} days overdue</strong>.`
-        : `This is a friendly reminder that invoice <strong>${invoiceNo}</strong> from <strong>${companyName}</strong> is due on <strong>${dueDate}</strong>.`
-      }</p>
-      <div style="background:${daysOverdue > 0 ? "#fef2f2" : "#f8fafc"};border-radius:12px;padding:20px;margin:24px 0;border:1px solid ${daysOverdue > 0 ? "#fecaca" : "#e2e8f0"};">
-        <div style="font-size:13px;color:#64748b;margin-bottom:6px;">AMOUNT DUE</div>
-        <div style="font-size:28px;font-weight:900;color:${daysOverdue > 0 ? "#ef4444" : "#4f46e5"};">${amount}</div>
-        <div style="font-size:13px;color:#64748b;margin-top:4px;">Invoice ${invoiceNo} · Due ${dueDate}</div>
-      </div>
-      <div style="text-align:center;margin:28px 0;">
-        <a href="${viewUrl}" class="btn">View & Pay Invoice →</a>
-      </div>
-    `, `Payment reminder — Invoice ${invoiceNo} — ${amount}`),
-
-  /* ── 7. Subscription Activated ── */
-  subscriptionActivated: (user: { name: string }, plan: string, amount: string, nextBilling: string) =>
-    baseTemplate(`
-      <h1>Your ${plan} plan is active ✅</h1>
-      <p>Hi <strong>${user.name}</strong>,</p>
-      <p>Your payment was successful and your <strong>${plan}</strong> plan is now active. Here's your billing summary:</p>
-      <div style="background:#f0fdf4;border-radius:12px;padding:20px;margin:24px 0;border:1px solid #bbf7d0;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-          <span style="font-size:13px;color:#64748b;">Plan</span>
-          <span style="font-size:13px;font-weight:700;color:#0f172a;">${plan}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-          <span style="font-size:13px;color:#64748b;">Amount Paid</span>
-          <span style="font-size:13px;font-weight:700;color:#16a34a;">${amount}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;">
-          <span style="font-size:13px;color:#64748b;">Next Billing</span>
-          <span style="font-size:13px;font-weight:700;color:#0f172a;">${nextBilling}</span>
-        </div>
-      </div>
-      <div style="text-align:center;margin:28px 0;">
-        <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard →</a>
-      </div>
-    `, `Your FinovaOS ${plan} plan is now active`),
-
-  /* ── 8. Email Broadcast (admin sends to users) ── */
-  broadcast: (subject: string, body: string, _companyName = "FinovaOS") =>
-    baseTemplate(`
-      <h1>${subject}</h1>
-      <div style="white-space:pre-wrap;font-size:15px;line-height:1.75;color:#475569;">${body}</div>
-      <div class="divider"></div>
-      <div style="text-align:center;margin:24px 0;">
-        <a href="${APP_URL}/dashboard" class="btn">Go to Dashboard →</a>
-      </div>
-    `, subject),
-
-  /* ── 9. Contact Form Confirmation ── */
-  contactConfirmation: (name: string, subject: string) =>
-    baseTemplate(`
-      <h1>We got your message ✅</h1>
-      <p>Hi <strong>${name}</strong>,</p>
-      <p>Thanks for reaching out! We've received your message about <strong>"${subject}"</strong> and will get back to you within 24 hours.</p>
-      <p>In the meantime, you might find answers in our <a href="${BASE_URL}/help" style="color:#6366f1;">Help Centre</a>.</p>
-      <div class="divider"></div>
-      <p style="font-size:13px;color:#94a3b8;">— The FinovaOS Team</p>
-    `, "We received your message — FinovaOS"),
-
-  /* ── 10. Payslip Notification ── */
-  payslip: (employeeName: string, month: string, netSalary: string, viewUrl: string) =>
-    baseTemplate(`
-      <h1>Your payslip for ${month} is ready</h1>
-      <p>Hi <strong>${employeeName}</strong>,</p>
-      <p>Your salary for <strong>${month}</strong> has been processed. Here's a summary:</p>
-      <div style="background:#f8fafc;border-radius:12px;padding:20px;margin:24px 0;border:1px solid #e2e8f0;">
-        <div style="font-size:13px;color:#64748b;margin-bottom:6px;">NET SALARY</div>
-        <div style="font-size:32px;font-weight:900;color:#4f46e5;">${netSalary}</div>
-        <div style="font-size:13px;color:#64748b;margin-top:4px;">${month}</div>
-      </div>
-      <div style="text-align:center;margin:28px 0;">
-        <a href="${viewUrl}" class="btn">View & Download Payslip →</a>
-      </div>
-    `, `Your payslip for ${month} is ready`),
-
-  /* ── 11. Welcome — Subscription (Country-Aware) ── */
-  welcomeSubscription: (name: string, plan: string, features: string[], dashboardUrl: string, country?: string) => {
-
-    /* ── Plan styling ── */
-    const planColors: Record<string, { accentColor: string; badgeText: string; badgeDot: string }> = {
-      starter:    { accentColor: "#4f46e5", badgeText: "Starter Plan",      badgeDot: "#818cf8" },
-      pro:        { accentColor: "#7c3aed", badgeText: "Professional Plan", badgeDot: "#a78bfa" },
-      enterprise: { accentColor: "#0f172a", badgeText: "Enterprise Plan",   badgeDot: "#6366f1" },
-      custom:     { accentColor: "#059669", badgeText: "Custom Plan",       badgeDot: "#34d399" },
-    };
-    const planKey = plan.toLowerCase().replace("professional","pro");
-    const c = planColors[planKey] || planColors.starter;
-    const planLabel = planKey === "pro" ? "Professional" : planKey.charAt(0).toUpperCase() + planKey.slice(1);
-
-    /* ── Country config ── */
-    const cc = (country || "").toUpperCase();
-    type CountryProfile = {
-      flag: string; greeting: string; currency: string; taxLabel: string;
-      taxTips: string[]; supportNote: string; localTips: string[];
-    };
-    const GULF = ["AE","SA","QA","KW","BH","OM"];
-    const countryProfile = (): CountryProfile => {
-      if (cc === "PK") return {
-        flag: "🇵🇰",
-        greeting: "Welcome!",
-        currency: "PKR",
-        taxLabel: "FBR / Tax Compliance",
-        taxTips: [
-          "Set your base currency to <strong>PKR</strong> in Settings → Company",
-          "Enable <strong>SRB / FBR tax</strong> in tax settings for compliant invoices",
-          "Add your <strong>NTN number</strong> to your company profile",
-        ],
-        supportNote: "Support available via WhatsApp & email · Pakistan Standard Time (UTC+5)",
-        localTips: [
-          "Use <strong>Sales Invoice</strong> to bill customers in PKR",
-          "Add your bank accounts (HBL, MCB, UBL, etc.) for reconciliation",
-          "Set up <strong>multi-branch</strong> if you have multiple outlets",
-          "Use <strong>Expense Tracking</strong> to monitor daily business costs",
-        ],
-      };
-      if (GULF.includes(cc)) return {
-        flag: cc === "AE" ? "🇦🇪" : cc === "SA" ? "🇸🇦" : cc === "QA" ? "🇶🇦" : "🌍",
-        greeting: "Welcome!",
-        currency: cc === "AE" ? "AED" : cc === "SA" ? "SAR" : cc === "QA" ? "QAR" : "USD",
-        taxLabel: "VAT Compliance (5%)",
-        taxTips: [
-          `Set your currency to <strong>${cc === "AE" ? "AED" : cc === "SA" ? "SAR" : "local currency"}</strong> in Settings → Company`,
-          "Enable <strong>VAT (5%)</strong> in tax settings — required for GCC businesses",
-          "Add your <strong>TRN (Tax Registration Number)</strong> to company profile",
-        ],
-        supportNote: "Support available via email & live chat · Gulf Standard Time (UTC+4)",
-        localTips: [
-          "Configure <strong>VAT 5%</strong> on all taxable items",
-          "Use <strong>multi-currency</strong> for USD / EUR international transactions",
-          "Add all bank accounts including local UAE/KSA banks",
-          "Enable <strong>Arabic language</strong> on invoices in Settings",
-        ],
-      };
-      if (cc === "IN") return {
-        flag: "🇮🇳",
-        greeting: "स्वागत है! Welcome",
-        currency: "INR",
-        taxLabel: "GST Compliance",
-        taxTips: [
-          "Set your base currency to <strong>INR</strong> in Settings → Company",
-          "Configure <strong>GST (CGST / SGST / IGST)</strong> in tax settings",
-          "Add your <strong>GSTIN</strong> to company profile for compliant invoices",
-        ],
-        supportNote: "Support available via email · India Standard Time (UTC+5:30)",
-        localTips: [
-          "Set up <strong>HSN/SAC codes</strong> on your products and services",
-          "Use <strong>Sales Invoice</strong> with GST calculations built in",
-          "Connect your bank account for automated reconciliation",
-          "Generate <strong>GSTR reports</strong> from the Reports section",
-        ],
-      };
-      if (cc === "GB") return {
-        flag: "🇬🇧",
-        greeting: "Welcome",
-        currency: "GBP",
-        taxLabel: "UK VAT & Making Tax Digital",
-        taxTips: [
-          "Set your base currency to <strong>GBP</strong> in Settings → Company",
-          "Enable <strong>VAT (20%)</strong> in tax settings for MTD compliance",
-          "Add your <strong>VAT Registration Number</strong> to company profile",
-        ],
-        supportNote: "Support available via email · GMT / BST timezone",
-        localTips: [
-          "Set up <strong>UK VAT rates</strong> (Standard 20%, Reduced 5%, Zero-rated)",
-          "Use <strong>Making Tax Digital</strong> compatible reports",
-          "Connect your UK bank account for automated reconciliation",
-          "Add team members and set roles under <strong>Users & Roles</strong>",
-        ],
-      };
-      if (cc === "US" || cc === "CA") return {
-        flag: cc === "CA" ? "🇨🇦" : "🇺🇸",
-        greeting: "Welcome",
-        currency: cc === "CA" ? "CAD" : "USD",
-        taxLabel: cc === "CA" ? "CRA / HST / GST" : "US Sales Tax & IRS",
-        taxTips: [
-          `Set your base currency to <strong>${cc === "CA" ? "CAD" : "USD"}</strong> in Settings → Company`,
-          cc === "CA"
-            ? "Configure <strong>HST / GST / PST</strong> rates per province in tax settings"
-            : "Set up <strong>state sales tax rates</strong> in tax settings",
-          "Add your <strong>EIN / Business Number</strong> to company profile",
-        ],
-        supportNote: "Support available via email & live chat · US/CA timezones",
-        localTips: [
-          "Use the <strong>Chart of Accounts</strong> aligned with GAAP standards",
-          "Connect your bank account for automated reconciliation",
-          `Generate <strong>${cc === "CA" ? "CRA-ready" : "IRS-ready"}</strong> financial reports`,
-          "Add your team with role-based permissions under <strong>Users & Roles</strong>",
-        ],
-      };
-      /* Default / Global */
-      return {
-        flag: "🌍",
-        greeting: "Welcome",
-        currency: "USD",
-        taxLabel: "Tax & Compliance",
-        taxTips: [
-          "Set your base <strong>currency</strong> in Settings → Company",
-          "Configure applicable <strong>tax rates</strong> in tax settings",
-          "Add your <strong>tax registration number</strong> to company profile",
-        ],
-        supportNote: "Support available via email & live chat",
-        localTips: [
-          "Set up your <strong>company profile</strong> in Settings",
-          "Add your team under <strong>Users & Roles</strong>",
-          "Create your first <strong>Sales Invoice</strong>",
-          "Connect your <strong>bank account</strong> for reconciliation",
-        ],
-      };
-    };
-
-    const cp = countryProfile();
-
-    /* ── Feature checklist ── */
-    const featureRows = features.map(f => `
-      <tr>
-        <td style="padding:11px 0;border-bottom:1px solid #f1f5f9;">
-          <table style="border-collapse:collapse;">
-            <tr>
-              <td style="width:24px;vertical-align:middle;padding-right:12px;">
-                <div style="width:20px;height:20px;border-radius:50%;background:${c.accentColor};display:inline-flex;align-items:center;justify-content:center;">
-                  <svg width="9" height="7" viewBox="0 0 12 10" fill="none"><path d="M1 5.5L4.5 9 11 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="content">
+            <div class="greeting">Thank you, ${userName}!</div>
+            <p style="font-size:15px;color:#475569;margin-bottom:20px;">
+                Your payment has been successfully processed. Your ${planInfo.displayName} plan is active and ready to use.
+            </p>
+            <div class="status-badge">✓ Payment Confirmed</div>
+            <div class="invoice-box">
+                <div class="invoice-row">
+                    <span class="invoice-label">Plan</span>
+                    <span class="invoice-value">${planInfo.displayName}</span>
                 </div>
-              </td>
-              <td style="font-size:14px;color:#1e293b;font-weight:500;">${f}</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    `).join("");
-
-    /* ── Tips list helper ── */
-    const tipsList = (tips: string[]) => tips.map(t => `
-      <li style="padding:5px 0;font-size:13px;color:#475569;line-height:1.7;">${t}</li>
-    `).join("");
-
-    /* ── Numbered step rows ── */
-    const allSteps = [
-      { title: "Complete your company profile", desc: `Go to <strong>Settings → Company</strong> — add your logo, address, and set currency to <strong>${cp.currency}</strong>.` },
-      ...cp.localTips.map((t, i) => ({ title: `Step ${i + 2}`, desc: t })),
-    ];
-    const stepRows = allSteps.slice(0, 5).map((s, i) => `
-      <tr>
-        <td style="padding:14px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
-          <table style="border-collapse:collapse;width:100%;">
-            <tr>
-              <td style="width:34px;vertical-align:top;padding-top:1px;">
-                <div style="width:28px;height:28px;border-radius:8px;background:#f1f5f9;border:1px solid #e2e8f0;text-align:center;line-height:28px;font-size:11px;font-weight:900;color:${c.accentColor};font-family:monospace;">0${i+1}</div>
-              </td>
-              <td style="padding-left:12px;">
-                <div style="font-size:13px;color:#64748b;line-height:1.65;">${s.desc}</div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    `).join("");
-
-    return baseTemplate(`
-      <!-- Hero banner -->
-      <div style="background:linear-gradient(160deg,#060818 0%,#0d1030 55%,#1a1060 100%);padding:48px 40px 44px;text-align:center;margin:-40px -40px 36px;">
-        <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.12em;text-transform:uppercase;margin-bottom:22px;">
-          <span style="width:6px;height:6px;border-radius:50%;background:${c.badgeDot};display:inline-block;"></span>
-          ${c.badgeText}
+                <div class="invoice-row">
+                    <span class="invoice-label">Amount</span>
+                    <span class="invoice-value">${currency} ${amount.toFixed(2)}</span>
+                </div>
+                <div class="invoice-row">
+                    <span class="invoice-label">Payment Date</span>
+                    <span class="invoice-value">${new Date().toLocaleDateString("en-GB")}</span>
+                </div>
+                <div class="invoice-row">
+                    <span class="invoice-label">Next Billing</span>
+                    <span class="invoice-value">${nextBillingDate}</span>
+                </div>
+                <div class="invoice-total">
+                    <span class="total-label">Total Paid</span>
+                    <span class="total-amount">${currency} ${amount.toFixed(2)}</span>
+                </div>
+            </div>
+            <div class="button-group">
+                <a href="${dashboardUrl}" class="button button-primary">Go to Dashboard</a>
+                <a href="${invoiceUrl}" class="button button-secondary">Download Invoice</a>
+            </div>
+            <p style="font-size:14px;color:#64748B;margin-top:20px;">
+                Your subscription will automatically renew on <strong>${nextBillingDate}</strong>.
+                You can manage your subscription anytime from your account dashboard.
+            </p>
         </div>
-        <h1 style="font-size:34px;font-weight:900;color:#ffffff;margin:0 0 12px;line-height:1.15;letter-spacing:-.8px;">
-          Welcome to FinovaOS
-        </h1>
-        <p style="font-size:14px;color:rgba(255,255,255,.55);margin:0 0 30px;line-height:1.6;max-width:380px;margin-left:auto;margin-right:auto;">
-          Hi <strong style="color:rgba(255,255,255,.85);">${name}</strong> — your account is active and your workspace is ready.
-        </p>
-        <a href="${dashboardUrl}" style="display:inline-block;padding:14px 36px;border-radius:10px;background:#ffffff;color:${c.accentColor}!important;font-weight:800;font-size:14px;text-decoration:none;letter-spacing:.01em;">
-          Open Dashboard →
-        </a>
-      </div>
+        <div class="footer">
+            <div class="footer-text">
+                Questions? <a href="https://finovaos.app/support" style="color:${brandColor};">Contact our support team</a>.
+            </div>
+            <div class="footer-text" style="margin-top:12px;">
+                © ${new Date().getFullYear()} Finova Forge | <a href="https://finovaos.app" style="color:${brandColor};">finovaos.app</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+  },
 
-      <!-- Plan badge -->
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 22px;margin:0 0 28px;display:flex;align-items:center;justify-content:space-between;">
-        <table style="width:100%;border-collapse:collapse;">
-          <tr>
-            <td style="font-size:13px;color:#64748b;">Active Plan</td>
-            <td style="text-align:right;">
-              <span style="display:inline-block;padding:3px 12px;border-radius:20px;background:${c.accentColor};color:#fff;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;">${planLabel}</span>
-            </td>
-          </tr>
-        </table>
-      </div>
+  /**
+   * Payment failed email — sent when charge fails
+   */
+  paymentFailed: (
+    userName: string,
+    planCode: string,
+    amount: number,
+    currency: string,
+    retryDate: string,
+    updatePaymentUrl: string
+  ): string => {
+    const planInfo = getPlanInfo(planCode);
+    const warningColor = "#DC2626";
+    const lightBg = "#F8FAFC";
+    const borderColor = "#E2E8F0";
 
-      <!-- Plan features -->
-      <div style="margin:0 0 28px;">
-        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;">What's included</div>
-        <table style="width:100%;border-collapse:collapse;">${featureRows}</table>
-      </div>
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed - Action Required</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6; color: #1E293B; background-color: #F1F5F9;
+        }
+        .container {
+            max-width: 600px; margin: 0 auto; background: white;
+            border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        .header {
+            background: linear-gradient(135deg, ${warningColor} 0%, #991B1B 100%);
+            padding: 40px 20px; text-align: center; color: white;
+        }
+        .header-icon { font-size: 48px; margin-bottom: 12px; }
+        .header-title { font-size: 24px; font-weight: 700; }
+        .content { padding: 40px; }
+        .greeting { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #0F172A; }
+        .alert-box {
+            background: #FEE2E2; border-left: 4px solid ${warningColor};
+            border-radius: 6px; padding: 20px; margin: 20px 0;
+        }
+        .alert-title { font-weight: 700; color: ${warningColor}; margin-bottom: 8px; }
+        .alert-text { font-size: 14px; color: #7F1D1D; }
+        .info-box {
+            background: ${lightBg}; border: 1px solid ${borderColor};
+            border-radius: 8px; padding: 20px; margin: 20px 0;
+        }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+        .info-row:last-child { margin-bottom: 0; }
+        .info-label { color: #64748B; font-size: 14px; }
+        .info-value { font-weight: 600; color: #0F172A; }
+        .cta-button {
+            display: block; background: ${warningColor}; color: white;
+            padding: 14px 32px; border-radius: 8px; text-decoration: none;
+            font-weight: 600; text-align: center; margin: 30px 0;
+        }
+        .footer {
+            background: ${lightBg}; padding: 30px 40px; text-align: center;
+            border-top: 1px solid ${borderColor};
+        }
+        .footer-text { font-size: 12px; color: #64748B; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">⚠</div>
+            <div class="header-title">Payment Failed</div>
+        </div>
+        <div class="content">
+            <div class="greeting">Hi ${userName},</div>
+            <div class="alert-box">
+                <div class="alert-title">Action Required</div>
+                <div class="alert-text">
+                    We couldn't process your payment. Please update your billing information to avoid service interruption.
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="info-label">Plan</span>
+                    <span class="info-value">${planInfo.displayName}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Amount</span>
+                    <span class="info-value">${currency} ${amount.toFixed(2)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Retry Date</span>
+                    <span class="info-value">${retryDate}</span>
+                </div>
+            </div>
+            <a href="${updatePaymentUrl}" class="cta-button">Update Payment Method →</a>
+            <p style="font-size:14px;color:#64748B;">
+                <strong>What happens next?</strong><br>
+                We'll automatically retry your payment on ${retryDate}. If you update your payment method before then, we'll charge you immediately.
+            </p>
+            <p style="font-size:14px;color:#64748B;margin-top:16px;">
+                If this issue persists, please <a href="https://finovaos.app/support" style="color:${warningColor};font-weight:600;">contact our support team</a>.
+            </p>
+        </div>
+        <div class="footer">
+            <div class="footer-text">
+                © ${new Date().getFullYear()} Finova Forge | <a href="https://finovaos.app" style="color:${warningColor};">finovaos.app</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+  },
 
-      <!-- Divider -->
-      <div style="height:1px;background:#f1f5f9;margin:32px 0;"></div>
+  /**
+   * Plan upgraded email
+   */
+  planUpgraded: (
+    userName: string,
+    oldPlan: string,
+    newPlan: string,
+    newFeatures: string[],
+    dashboardUrl: string
+  ): string => {
+    const oldPlanInfo = getPlanInfo(oldPlan);
+    const newPlanInfo = getPlanInfo(newPlan);
+    const brandColor = "#2563EB";
+    const successColor = "#10B981";
+    const lightBg = "#F8FAFC";
+    const borderColor = "#E2E8F0";
 
-      <!-- Getting started -->
-      <div style="margin:0 0 28px;">
-        <div style="font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;">Getting Started</div>
-        <p style="font-size:13px;color:#94a3b8;margin:0 0 16px;">Set up your workspace in a few simple steps.</p>
-        <table style="width:100%;border-collapse:collapse;">${stepRows}</table>
-      </div>
-
-      <!-- Tax compliance -->
-      <div style="border-left:3px solid ${c.accentColor};padding:16px 20px;background:#f8fafc;border-radius:0 10px 10px 0;margin:0 0 28px;">
-        <div style="font-size:12px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">${cp.taxLabel} ${cp.flag}</div>
-        <ul style="margin:0;padding-left:16px;">
-          ${tipsList(cp.taxTips)}
-        </ul>
-      </div>
-
-      <!-- Support -->
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 22px;margin:0 0 28px;">
-        <table style="width:100%;border-collapse:collapse;">
-          <tr>
-            <td style="vertical-align:middle;">
-              <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:3px;">Questions? We're here.</div>
-              <div style="font-size:12px;color:#64748b;">${cp.supportNote}</div>
-            </td>
-            <td style="text-align:right;vertical-align:middle;white-space:nowrap;padding-left:12px;">
-              <a href="${BASE_URL}/help" style="font-size:12px;font-weight:700;color:${c.accentColor};text-decoration:none;margin-right:14px;">Help Centre →</a>
-              <a href="mailto:support@finovaos.app" style="font-size:12px;font-weight:700;color:${c.accentColor};text-decoration:none;">Email Us →</a>
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <!-- Sign-off -->
-      <div style="height:1px;background:#f1f5f9;margin:8px 0 24px;"></div>
-      <p style="font-size:14px;color:#475569;line-height:1.7;">We're glad you're here. If you ever have questions, ideas, or just want to share how FinovaOS is working for your business — reply to this email directly. We read every message.</p>
-      <p style="font-size:14px;color:#1e293b;font-weight:600;margin-top:20px;">
-        The FinovaOS Team<br>
-        <span style="font-size:12px;font-weight:400;color:#94a3b8;">Manage your subscription: <a href="${dashboardUrl}/settings/subscription" style="color:${c.accentColor};text-decoration:none;">Dashboard → Settings → Subscription</a></span>
-      </p>
-    `, `Welcome to FinovaOS — Your ${planLabel} account is active`);
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Upgraded - FinovaOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6; color: #1E293B; background-color: #F1F5F9;
+        }
+        .container {
+            max-width: 600px; margin: 0 auto; background: white;
+            border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        .header {
+            background: linear-gradient(135deg, ${successColor} 0%, #059669 100%);
+            padding: 40px 20px; text-align: center; color: white;
+        }
+        .header-icon { font-size: 48px; margin-bottom: 12px; }
+        .header-title { font-size: 24px; font-weight: 700; }
+        .content { padding: 40px; }
+        .greeting { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #0F172A; }
+        .upgrade-badge {
+            display: inline-block; background: ${successColor}; color: white;
+            padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; margin: 20px 0;
+        }
+        .plan-comparison { background: ${lightBg}; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .comparison-row {
+            display: flex; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid ${borderColor};
+        }
+        .comparison-row:last-child { border-bottom: none; }
+        .plan-label { color: #64748B; font-size: 14px; }
+        .old-plan { color: #94A3B8; text-decoration: line-through; }
+        .new-plan { color: ${successColor}; font-weight: 700; }
+        .new-features {
+            background: ${lightBg}; border-left: 4px solid ${successColor};
+            border-radius: 6px; padding: 20px; margin: 20px 0;
+        }
+        .features-title { font-weight: 700; color: #0F172A; margin-bottom: 12px; }
+        .features-list { list-style: none; }
+        .features-list li {
+            font-size: 14px; color: #475569; margin-bottom: 8px;
+            padding-left: 20px; position: relative;
+        }
+        .features-list li:before { content: "→"; position: absolute; left: 0; color: ${successColor}; font-weight: 700; }
+        .cta-button {
+            display: block; background: ${brandColor}; color: white;
+            padding: 14px 32px; border-radius: 8px; text-decoration: none;
+            font-weight: 600; text-align: center; margin: 30px 0;
+        }
+        .footer {
+            background: ${lightBg}; padding: 30px 40px; text-align: center;
+            border-top: 1px solid ${borderColor};
+        }
+        .footer-text { font-size: 12px; color: #64748B; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">🎉</div>
+            <div class="header-title">Plan Upgraded!</div>
+        </div>
+        <div class="content">
+            <div class="greeting">Welcome to ${newPlanInfo.displayName}, ${userName}!</div>
+            <div class="upgrade-badge">✓ Upgrade Successful</div>
+            <div class="plan-comparison">
+                <div class="comparison-row">
+                    <span class="plan-label">Previous Plan</span>
+                    <span class="old-plan">${oldPlanInfo.displayName}</span>
+                </div>
+                <div class="comparison-row">
+                    <span class="plan-label">New Plan</span>
+                    <span class="new-plan">${newPlanInfo.displayName}</span>
+                </div>
+            </div>
+            <div class="new-features">
+                <div class="features-title">New Capabilities Unlocked:</div>
+                <ul class="features-list">
+                    ${newFeatures.map(f => `<li>${f}</li>`).join("")}
+                </ul>
+            </div>
+            <a href="${dashboardUrl}" class="cta-button">Explore New Features →</a>
+            <p style="font-size:14px;color:#64748B;">
+                Your upgrade is effective immediately. Enjoy the enhanced capabilities!
+            </p>
+        </div>
+        <div class="footer">
+            <div class="footer-text">
+                © ${new Date().getFullYear()} Finova Forge | <a href="https://finovaos.app" style="color:${brandColor};">finovaos.app</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
   },
 };
+
+function getPlanInfo(planCode: string, _country: string = "GLOBAL"): {
+  displayName: string;
+  priceDisplay: string;
+  billingText: string;
+} {
+  const plan = String(planCode || "STARTER").toUpperCase();
+  const planMap: Record<string, { name: string; price: string; billing: string }> = {
+    STARTER:      { name: "Starter",      price: "$49",   billing: "/month (billed monthly)" },
+    PROFESSIONAL: { name: "Professional", price: "$99",   billing: "/month (billed monthly)" },
+    PRO:          { name: "Professional", price: "$99",   billing: "/month (billed monthly)" },
+    ENTERPRISE:   { name: "Enterprise",   price: "Custom", billing: "Contact sales" },
+    CUSTOM:       { name: "Custom Plan",  price: "Custom", billing: "Based on requirements" },
+  };
+  const info = planMap[plan] || planMap.STARTER;
+  return { displayName: info.name, priceDisplay: info.price, billingText: info.billing };
+}

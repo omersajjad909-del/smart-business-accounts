@@ -1,8 +1,7 @@
 import { createHmac, randomInt } from "crypto";
 
 import { prisma } from "@/lib/prisma";
-import { sendEmail } from "@/lib/email";
-import { emailTemplates } from "@/lib/emailTemplates";
+import { sendEmail, emailTemplates } from "@/lib/email";
 import { sendVerificationSms } from "@/lib/sms";
 
 export type VerificationChannel = "email" | "sms";

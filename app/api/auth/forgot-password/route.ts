@@ -3,8 +3,7 @@ import { createHash, randomBytes } from "crypto";
 
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rateLimit";
-import { sendEmail } from "@/lib/email";
-import { emailTemplates } from "@/lib/emailTemplates";
+import { sendEmail, emailTemplates } from "@/lib/email";
 import { getRuntimeAppUrl } from "@/lib/domains";
 
 const RESET_TTL_MS = 60 * 60 * 1000;
