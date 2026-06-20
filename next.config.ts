@@ -31,7 +31,7 @@ const SECURITY_HEADERS = [
   // Referrer policy — only send origin on same-origin
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Permissions policy — disable unused browser APIs
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" },
+  { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" },
   // Content Security Policy
   { key: "Content-Security-Policy", value: CSP },
   // Prevent cross-origin info leakage

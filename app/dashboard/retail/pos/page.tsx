@@ -197,12 +197,23 @@ export default function POSPage() {
 
     (async () => {
       try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error("CameraUnsupported");
+        }
+
         const { BrowserMultiFormatReader } = await import("@zxing/browser");
         if (!mounted) return;
+
+        const devices = await navigator.mediaDevices.enumerateDevices().catch(() => []);
+        const cameras = devices.filter(device => device.kind === "videoinput");
+        const backCamera = cameras.find(device => /back|rear|environment/i.test(device.label));
+        const videoConstraints: MediaTrackConstraints = backCamera
+          ? { deviceId: { exact: backCamera.deviceId } }
+          : { facingMode: { ideal: "environment" } };
         const reader = new BrowserMultiFormatReader();
 
         const controls = await reader.decodeFromConstraints(
-          { video: { facingMode: "environment" } },
+          { video: videoConstraints },
           video,
           (result, err) => {
             if (!mounted || !result) return;
@@ -217,6 +228,8 @@ export default function POSPage() {
         setScannerError(
           e?.name === "NotAllowedError"
             ? "Camera permission deny ki. Browser settings mein allow karo."
+            : e?.message === "CameraUnsupported"
+              ? "Is browser/device mein camera scanning support nahi hai. Photo upload try karo."
             : "Camera open nahi ho saka. Dobara try karo."
         );
         setScannerStatus("idle");
@@ -396,18 +409,24 @@ export default function POSPage() {
   async function handleFileCapture(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setScannerError("");
+    setLastScanned("Photo read ho rahi hai…");
     try {
       const { BrowserMultiFormatReader } = await import("@zxing/browser");
       const reader = new BrowserMultiFormatReader();
       const url = URL.createObjectURL(file);
       try {
-        const result = await reader.decodeFromImageUrl(url);
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        const result = await reader.decodeFromImageElement(image);
         handleScannedCode(result.getText());
         return;
       } finally {
         URL.revokeObjectURL(url);
       }
     } catch {
+      setLastScanned("");
       setScannerError("Barcode detect nahi hua. Clear photo lo — barcode seedha aur visible hona chahiye.");
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -1324,7 +1343,7 @@ export default function POSPage() {
               <div style={{ fontSize: 13, color: "#f87171", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.25)", borderRadius: 8, padding: "8px 18px", maxWidth: 340 }}>
                 {scannerError}
                 <div style={{ marginTop: 10 }}>
-                  <button onClick={() => fileInputRef.current?.click()}
+                  <button onClick={() => { if (fileInputRef.current) fileInputRef.current.value = ""; fileInputRef.current?.click(); }}
                     style={{ padding: "7px 18px", borderRadius: 8, background: "#6366f1", border: "none", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                     📷 Upload Photo Instead
                   </button>
