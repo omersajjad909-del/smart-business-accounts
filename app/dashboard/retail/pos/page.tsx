@@ -10,7 +10,16 @@ const PAGE_SIZE = 12;
 
 type CartItem = {
   id: string; name: string; price: number; qty: number;
-  category: string; sku: string; itemNewId?: string; itemDiscount: number;
+  category: string; sku: string; barcode?: string; itemNewId?: string; itemDiscount: number;
+};
+
+type BarcodeItem = {
+  id: string;
+  name: string;
+  code?: string | null;
+  barcode?: string | null;
+  rate?: number | null;
+  salePrice?: number | null;
 };
 
 export default function POSPage() {
@@ -39,6 +48,7 @@ export default function POSPage() {
   const [checkoutError, setCheckoutError] = useState("");
   const [processingCheckout, setProcessingCheckout] = useState(false);
   const [stockMap, setStockMap] = useState<Record<string, number>>({});
+  const [barcodeItems, setBarcodeItems] = useState<BarcodeItem[]>([]);
   const [showStats, setShowStats] = useState(false);
   const [page, setPage] = useState(0);
   const [customerName, setCustomerName] = useState("");
@@ -121,7 +131,12 @@ export default function POSPage() {
 
   // Refetch products when user switches back to this tab (catches price updates from other pages)
   useEffect(() => {
-    const onVisible = () => { if (document.visibilityState === "visible") refetchProducts(); };
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        refetchProducts();
+        loadBarcodeItems();
+      }
+    };
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [refetchProducts]);
@@ -148,6 +163,13 @@ export default function POSPage() {
       }).catch(() => {});
   }
 
+  function loadBarcodeItems() {
+    fetch("/api/barcode", { credentials: "include", headers: authHeaders() })
+      .then(r => r.ok ? r.json() : { items: [] })
+      .then((data: { items?: BarcodeItem[] }) => setBarcodeItems(Array.isArray(data.items) ? data.items : []))
+      .catch(() => {});
+  }
+
   useEffect(() => {
     const h = user as { id?: string; role?: string; companyId?: string } | null;
     const headers: HeadersInit = { "x-user-id": h?.id || "", "x-user-role": h?.role || "ADMIN", "x-company-id": h?.companyId || "" };
@@ -167,24 +189,44 @@ export default function POSPage() {
       })
       .catch(() => {});
     loadStock();
+    loadBarcodeItems();
   }, []);
 
-  const products = productRecords.filter(r => r.status !== "inactive").map(r => ({
-    id: r.id, name: r.title,
-    category: (r.data?.category as string) || "General",
-    price: r.amount || 0,
-    sku: (r.data?.sku as string) || "",
-    itemNewId: (r.data?.itemNewId as string) || "",
-    catalogStock: typeof r.data?.stock === "number" ? r.data.stock as number : null,
-    imageUrl: (r.data?.imageUrl as string) || "",
-  }));
+  const barcodeItemById = new Map(barcodeItems.map(item => [item.id, item]));
+  const barcodeItemByCode = new Map<string, BarcodeItem>();
+  barcodeItems.forEach(item => {
+    [item.code, item.barcode, item.name].forEach(value => {
+      const key = String(value || "").trim().toLowerCase();
+      if (key && !barcodeItemByCode.has(key)) barcodeItemByCode.set(key, item);
+    });
+  });
+
+  const products = productRecords.filter(r => r.status !== "inactive").map(r => {
+    const sku = (r.data?.sku as string) || "";
+    const itemNewId = (r.data?.itemNewId as string) || "";
+    const inventoryItem =
+      (itemNewId && barcodeItemById.get(itemNewId)) ||
+      barcodeItemByCode.get(sku.trim().toLowerCase()) ||
+      barcodeItemByCode.get(r.title.trim().toLowerCase());
+    const inventoryRate = Number(inventoryItem?.rate ?? inventoryItem?.salePrice ?? NaN);
+    return {
+      id: r.id, name: r.title,
+      category: (r.data?.category as string) || "General",
+      price: Number.isFinite(inventoryRate) ? inventoryRate : r.amount || 0,
+      sku,
+      barcode: (inventoryItem?.barcode as string) || (r.data?.barcode as string) || sku,
+      itemNewId,
+      catalogStock: typeof r.data?.stock === "number" ? r.data.stock as number : null,
+      imageUrl: (r.data?.imageUrl as string) || "",
+    };
+  });
 
   const categories = ["All", ...Array.from(new Set(products.map(p => p.category)))];
 
   const filtered = products.filter(p => {
     const matchCat = cat === "All" || p.category === cat;
     const q = search.toLowerCase();
-    const matchSearch = !q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q);
+    const matchSearch = !q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) || (p.barcode || "").toLowerCase().includes(q);
     return matchCat && matchSearch;
   });
 
@@ -367,7 +409,11 @@ export default function POSPage() {
   function handleSearchKey(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
     const q = search.trim(); if (!q) return;
-    const match = products.find(p => p.sku && p.sku.toLowerCase() === q.toLowerCase())
+    const normalizedQ = q.toLowerCase();
+    const match = products.find(p =>
+      (p.sku && p.sku.toLowerCase() === normalizedQ) ||
+      (p.barcode && p.barcode.toLowerCase() === normalizedQ)
+    )
       || (filtered.length === 1 ? filtered[0] : null);
     if (match) {
       addToCart(match); setSearch("");
@@ -382,9 +428,11 @@ export default function POSPage() {
   function handleScannedCode(raw: string) {
     const code = raw.trim();
     if (!code) return;
+    const normalizedCode = code.toLowerCase();
     const match = products.find(p =>
-      (p.sku  && p.sku.toLowerCase()  === code.toLowerCase()) ||
-      (p.name && p.name.toLowerCase() === code.toLowerCase())
+      (p.sku     && p.sku.toLowerCase()     === normalizedCode) ||
+      (p.barcode && p.barcode.toLowerCase() === normalizedCode) ||
+      (p.name    && p.name.toLowerCase()    === normalizedCode)
     );
     if (match) {
       addToCart(match);
@@ -735,7 +783,7 @@ export default function POSPage() {
               <input ref={fileInputRef} type="file" accept="image/*" capture="environment"
                 onChange={handleFileCapture}
                 style={{ display: "none" }} />
-              <button onClick={() => { const q = search.trim(); if (!q) return; const match = products.find(p => p.sku?.toLowerCase() === q.toLowerCase()) || (filtered.length === 1 ? filtered[0] : null); if (match) { addToCart(match); setSearch(""); setSearchMsg({ text: `✓ ${match.name} added`, ok: true }); setTimeout(() => setSearchMsg(null), 2000); } }}
+              <button onClick={() => { const q = search.trim(); if (!q) return; const normalizedQ = q.toLowerCase(); const match = products.find(p => p.sku?.toLowerCase() === normalizedQ || p.barcode?.toLowerCase() === normalizedQ) || (filtered.length === 1 ? filtered[0] : null); if (match) { addToCart(match); setSearch(""); setSearchMsg({ text: `✓ ${match.name} added`, ok: true }); setTimeout(() => setSearchMsg(null), 2000); } }}
                 style={{ padding: "0 20px", borderRadius: 10, background: "#6366f1", border: "none", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, flexShrink: 0 }}>Search</button>
             </div>
 
@@ -1238,8 +1286,8 @@ export default function POSPage() {
                   <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
                 <input ref={priceCheckRef} value={priceCheckQ} onChange={e => setPriceCheckQ(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Escape") setShowPriceCheck(false); if (e.key === "Enter") { const res = products.filter(p => p.name.toLowerCase().includes(priceCheckQ.toLowerCase()) || p.sku.toLowerCase().includes(priceCheckQ.toLowerCase())); if (res.length === 1) { addToCart(res[0]); setShowPriceCheck(false); showFKeyMsg("F4", `✓ ${res[0].name} added to cart`, "green"); } } }}
-                  placeholder="Type product name or SKU..."
+                  onKeyDown={e => { if (e.key === "Escape") setShowPriceCheck(false); if (e.key === "Enter") { const q = priceCheckQ.toLowerCase(); const res = products.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) || (p.barcode || "").toLowerCase().includes(q)); if (res.length === 1) { addToCart(res[0]); setShowPriceCheck(false); showFKeyMsg("F4", `✓ ${res[0].name} added to cart`, "green"); } } }}
+                  placeholder="Type product name, SKU, or barcode..."
                   style={{ width: "100%", boxSizing: "border-box" as const, paddingLeft: 38, paddingRight: 12, paddingTop: 11, paddingBottom: 11, background: "rgba(255,255,255,.05)", border: "1.5px solid rgba(99,102,241,.3)", borderRadius: 10, color: "#fff", fontSize: 14, fontFamily: ff, outline: "none" }} />
               </div>
               <div style={{ maxHeight: 360, overflowY: "auto" }}>
@@ -1248,7 +1296,8 @@ export default function POSPage() {
                 ) : (() => {
                   const res = products.filter(p =>
                     p.name.toLowerCase().includes(priceCheckQ.toLowerCase()) ||
-                    p.sku.toLowerCase().includes(priceCheckQ.toLowerCase())
+                    p.sku.toLowerCase().includes(priceCheckQ.toLowerCase()) ||
+                    (p.barcode || "").toLowerCase().includes(priceCheckQ.toLowerCase())
                   );
                   if (res.length === 0) return <div style={{ textAlign: "center", padding: "24px 0", color: "#f87171", fontSize: 13 }}>No product found for "{priceCheckQ}"</div>;
                   return res.map(p => {
