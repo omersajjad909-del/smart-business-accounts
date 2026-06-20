@@ -18,7 +18,7 @@ export default function POSPage() {
   const user = userRef.current;
   const cashierName = (user as { name?: string } | null)?.name || "Cashier";
 
-  const { records: productRecords, loading: loadingProducts } = useBusinessRecords("catalog_product");
+  const { records: productRecords, loading: loadingProducts, refetch: refetchProducts } = useBusinessRecords("catalog_product");
   const { records: saleRecords, create: createSale } = useBusinessRecords("pos_sale");
   const { records: sessionRecords, update: updateSession } = useBusinessRecords("pos_session");
   const { records: loyaltyRecords, create: createLoyaltyRec, update: updateLoyaltyRec } = useBusinessRecords("loyalty_customer");
@@ -118,6 +118,13 @@ export default function POSPage() {
     const id = setInterval(tick, 30000);
     return () => clearInterval(id);
   }, []);
+
+  // Refetch products when user switches back to this tab (catches price updates from other pages)
+  useEffect(() => {
+    const onVisible = () => { if (document.visibilityState === "visible") refetchProducts(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [refetchProducts]);
 
   function showFKeyMsg(key: string, msg: string, color: "amber" | "green") {
     if (fKeyTimerRef.current) clearTimeout(fKeyTimerRef.current);
