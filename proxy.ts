@@ -86,6 +86,7 @@ export function proxy(req: NextRequest) {
     "/api/invitations/accept",
     "/api/invitations/preview",
     "/api/public/",
+    "/api/dev/",
   ];
   const isApi = pathname.startsWith("/api/");
   const isPublic = publicApi.some((p) => pathname.startsWith(p));
