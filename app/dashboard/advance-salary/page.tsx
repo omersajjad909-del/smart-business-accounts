@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -18,6 +18,12 @@ type Advance = {
 const STATUS_COLOR: Record<string, string> = {
   ACTIVE: "#fbbf24", CLEARED: "#34d399", PENDING: "#818cf8",
 };
+
+function employeeLabel(employee: Employee) {
+  const name = String(employee.name || "").trim();
+  const designation = String(employee.designation || "").trim();
+  return `${name || "Unnamed Employee"}${designation ? ` (${designation})` : ""}`;
+}
 
 function getHeaders(): Record<string, string> {
   const user = getCurrentUser();
@@ -56,6 +62,7 @@ export default function AdvanceSalaryPage() {
   const totalCleared = advances.filter(a => a.status === "CLEARED").length;
 
   const selectedEmployee = employees.find(e => e.id === form.employeeId);
+  const optionStyle: React.CSSProperties = { background: "#0f172a", color: "#f8fafc" };
 
   async function handleSave() {
     if (!form.employeeId || !form.amount) { setMsg("Please select an employee and enter amount"); return; }
@@ -115,7 +122,8 @@ export default function AdvanceSalaryPage() {
     modal:  { position: "fixed" as const, inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 },
     mbox:   { background: "var(--panel-bg)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, width: 420, maxWidth: "90vw" },
     label:  { fontSize: 12, color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: 6 },
-    input:  { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--panel-bg)", color: "var(--text-primary)", fontSize: 13, outline: "none", boxSizing: "border-box" as const },
+    input:  { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--app-bg)", color: "var(--text-primary)", fontSize: 13, outline: "none", boxSizing: "border-box" as const },
+    select: { width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "#0f172a", color: "#f8fafc", fontSize: 13, outline: "none", boxSizing: "border-box" as const, colorScheme: "dark" as const, cursor: "pointer" },
   };
 
   return (
@@ -154,7 +162,7 @@ export default function AdvanceSalaryPage() {
           Advance Records
         </div>
         {loading ? (
-          <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading…</div>
+          <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loadingâ€¦</div>
         ) : (
           <table style={s.table}>
             <thead>
@@ -215,10 +223,10 @@ export default function AdvanceSalaryPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
                 <label style={s.label}>Employee</label>
-                <select style={s.input} value={form.employeeId} onChange={e => setForm(p => ({ ...p, employeeId: e.target.value }))}>
-                  <option value="">— Select Employee —</option>
+                <select style={s.select} value={form.employeeId} onChange={e => setForm(p => ({ ...p, employeeId: e.target.value }))}>
+                  <option value="" style={optionStyle}>— Select Employee —</option>
                   {employees.map(e => (
-                    <option key={e.id} value={e.id}>{e.name}{e.designation ? ` (${e.designation})` : ""}</option>
+                    <option key={e.id} value={e.id} style={optionStyle}>{employeeLabel(e)}</option>
                   ))}
                 </select>
                 {employees.length === 0 && (
@@ -231,17 +239,17 @@ export default function AdvanceSalaryPage() {
               </div>
               <div>
                 <label style={s.label}>Reason</label>
-                <input style={s.input} placeholder="Medical, rent, personal…" value={form.reason} onChange={e => setForm(p => ({ ...p, reason: e.target.value }))} />
+                <input style={s.input} placeholder="Medical, rent, personalâ€¦" value={form.reason} onChange={e => setForm(p => ({ ...p, reason: e.target.value }))} />
               </div>
               <div>
                 <label style={s.label}>Deduct Over (months)</label>
-                <select style={s.input} value={form.deductMonths} onChange={e => setForm(p => ({ ...p, deductMonths: e.target.value }))}>
-                  {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} month{n > 1 ? "s" : ""}</option>)}
+                <select style={s.select} value={form.deductMonths} onChange={e => setForm(p => ({ ...p, deductMonths: e.target.value }))}>
+                  {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n} style={optionStyle}>{n} month{n > 1 ? "s" : ""}</option>)}
                 </select>
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button style={{ ...s.btn, flex: 1 }} onClick={handleSave} disabled={saving}>
-                  {saving ? "Saving…" : "Save Advance"}
+                  {saving ? "Savingâ€¦" : "Save Advance"}
                 </button>
                 <button style={{ ...s.btn, background: "var(--border)", color: "var(--text-muted)", flex: 1 }} onClick={() => { setShowForm(false); setMsg(""); }}>
                   Cancel
