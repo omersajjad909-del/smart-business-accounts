@@ -130,9 +130,10 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
   const meta = payload?.meta || {};
   const eventName = String(meta?.event_name || "");
   const attrs = payload?.data?.attributes || {};
-  const custom = attrs?.custom_data || attrs?.first_subscription_item?.custom_data || {};
+  // LemonSqueezy puts custom_data inside meta, not data.attributes
+  const custom = meta?.custom_data || attrs?.custom_data || attrs?.first_subscription_item?.custom_data || {};
 
-  const companyId = String(custom?.company_id || attrs?.custom_data?.company_id || "").trim();
+  const companyId = String(custom?.company_id || meta?.custom_data?.company_id || "").trim();
   const planCode = String(custom?.plan_code || attrs?.product_name || "STARTER").toUpperCase();
   const billingCycle = String(custom?.billing_cycle || attrs?.billing_anchor || "MONTHLY").toUpperCase();
   const displayCurrency = custom?.display_currency ? String(custom.display_currency).toUpperCase() : null;
