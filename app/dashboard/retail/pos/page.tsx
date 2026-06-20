@@ -1355,6 +1355,14 @@ export default function POSPage() {
                 {scannerStatus === "scanning" && "🟢 Scanning — hold barcode steady"}
               </div>
             )}
+            {!scannerError && (
+              <div style={{ marginTop: 10 }}>
+                <button onClick={() => { if (fileInputRef.current) fileInputRef.current.value = ""; fileInputRef.current?.click(); }}
+                  style={{ padding: "7px 18px", borderRadius: 8, background: "#6366f1", border: "none", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  📷 Upload Photo Instead
+                </button>
+              </div>
+            )}
             {lastScanned && (
               <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,.35)" }}>Last: {lastScanned}</div>
             )}
