@@ -36,23 +36,10 @@ export function getCurrentUser() {
 
   try {
     const sessionRaw = window.sessionStorage.getItem(BROWSER_USER_KEY);
-    const localRaw = window.localStorage.getItem(BROWSER_USER_KEY);
-    const raw = sessionRaw || localRaw;
+    if (!sessionRaw) return null;
 
-    if (!raw) {
-      return null;
-    }
-
-    const currentUser = normalizeBrowserUser(raw);
-    if (!currentUser) {
-      return null;
-    }
-
-    if (!sessionRaw && localRaw) {
-      window.sessionStorage.setItem(BROWSER_USER_KEY, localRaw);
-    }
-
-    return currentUser;
+    const currentUser = normalizeBrowserUser(sessionRaw);
+    return currentUser ?? null;
   } catch {
     return null;
   }
@@ -62,25 +49,23 @@ export function setCurrentUser(user: unknown) {
   if (typeof window === "undefined") return;
   const serialized = JSON.stringify(user);
   window.sessionStorage.setItem(BROWSER_USER_KEY, serialized);
-  window.localStorage.setItem(BROWSER_USER_KEY, serialized);
+  // Remove stale localStorage entry if it exists (legacy cleanup)
+  try { window.localStorage.removeItem(BROWSER_USER_KEY); } catch {}
 }
 
 export function clearCurrentUser() {
   if (typeof window === "undefined") return;
   window.sessionStorage.removeItem(BROWSER_USER_KEY);
-  window.localStorage.removeItem(BROWSER_USER_KEY);
+  try { window.localStorage.removeItem(BROWSER_USER_KEY); } catch {}
 }
 
 export function updateStoredUser(mutator: (current: any) => any) {
   if (typeof window === "undefined") return null;
   try {
     const sessionRaw = window.sessionStorage.getItem(BROWSER_USER_KEY);
-    const localRaw = window.localStorage.getItem(BROWSER_USER_KEY);
-    const parsed = JSON.parse(sessionRaw || localRaw || "{}");
+    const parsed = JSON.parse(sessionRaw || "{}");
     const next = mutator(parsed);
-    const serialized = JSON.stringify(next);
-    window.sessionStorage.setItem(BROWSER_USER_KEY, serialized);
-    window.localStorage.setItem(BROWSER_USER_KEY, serialized);
+    window.sessionStorage.setItem(BROWSER_USER_KEY, JSON.stringify(next));
     return next;
   } catch {
     return null;
