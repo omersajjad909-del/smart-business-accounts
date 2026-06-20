@@ -163,10 +163,9 @@ async function getOrCreateDemoUser(businessType?: string | null) {
   });
 
   if (user) {
-    // Ensure sample data exists
+    // Ensure sample data exists — but NEVER overwrite businessType of existing company
     const companyId = user.defaultCompanyId;
     if (companyId) {
-      await applyDemoBusinessType(companyId, businessType);
       await seedBusinessRecords(companyId);
       if (businessType === "travel") {
         await seedTravelBusinessRecords(companyId);
