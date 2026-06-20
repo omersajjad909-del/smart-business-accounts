@@ -726,21 +726,7 @@ export default function POSPage() {
                 </svg>
               </button>
               <input ref={fileInputRef} type="file" accept="image/*" capture="environment"
-                onChange={async e => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  const img = new Image();
-                  img.src = URL.createObjectURL(file);
-                  img.onload = async () => {
-                    try {
-                      const det = new (window as any).BarcodeDetector({ formats: ["code_128","ean_13","ean_8","upc_a","qr_code"] });
-                      const codes = await det.detect(img);
-                      if (codes.length > 0) handleScannedCode(codes[0].rawValue);
-                    } catch {}
-                    URL.revokeObjectURL(img.src);
-                  };
-                  e.target.value = "";
-                }}
+                onChange={handleFileCapture}
                 style={{ display: "none" }} />
               <button onClick={() => { const q = search.trim(); if (!q) return; const match = products.find(p => p.sku?.toLowerCase() === q.toLowerCase()) || (filtered.length === 1 ? filtered[0] : null); if (match) { addToCart(match); setSearch(""); setSearchMsg({ text: `✓ ${match.name} added`, ok: true }); setTimeout(() => setSearchMsg(null), 2000); } }}
                 style={{ padding: "0 20px", borderRadius: 10, background: "#6366f1", border: "none", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, flexShrink: 0 }}>Search</button>
