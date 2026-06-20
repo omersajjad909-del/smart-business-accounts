@@ -47,6 +47,12 @@ export default function POSPage() {
   const [flashKey, setFlashKey] = useState<string | null>(null);
   const [fKeyMsg, setFKeyMsg] = useState<string | null>(null);
 
+  // Camera Scanner
+  const [showScanner, setShowScanner]     = useState(false);
+  const [scannerError, setScannerError]   = useState("");
+  const [scannerStatus, setScannerStatus] = useState<"idle" | "starting" | "scanning" | "unsupported">("idle");
+  const [lastScanned, setLastScanned]     = useState("");
+
   // Hold Sales
   type HeldSale = { id: string; cart: CartItem[]; discount: string; taxRate: string; itemNote: string; customer: string; savedAt: string; total: number; };
   const [heldSales, setHeldSales] = useState<HeldSale[]>([]);
@@ -98,6 +104,10 @@ export default function POSPage() {
   const discountRef  = useRef<HTMLInputElement>(null);
   const tenderedRef  = useRef<HTMLInputElement>(null);
   const noteRef      = useRef<HTMLInputElement>(null);
+  const videoRef          = useRef<HTMLVideoElement>(null);
+  const scannerStreamRef  = useRef<MediaStream | null>(null);
+  const scannerRafRef     = useRef<number>(0);
+  const fileInputRef      = useRef<HTMLInputElement>(null);
   const checkoutFnRef = useRef<() => Promise<void>>(async () => {});
   const fKeyTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -301,6 +311,110 @@ export default function POSPage() {
       setSearchMsg({ text: filtered.length === 0 ? `No match for "${q}"` : `${filtered.length} results found`, ok: filtered.length > 0 });
     }
     setTimeout(() => setSearchMsg(null), 2500);
+  }
+
+  // ── Camera Scanner ────────────────────────────────────────────────────────
+  function handleScannedCode(raw: string) {
+    const code = raw.trim();
+    if (!code) return;
+    const match = products.find(p =>
+      (p.sku  && p.sku.toLowerCase()  === code.toLowerCase()) ||
+      (p.name && p.name.toLowerCase() === code.toLowerCase())
+    );
+    if (match) {
+      addToCart(match);
+      setLastScanned(`✓ ${match.name}`);
+      setTimeout(() => setLastScanned(""), 2500);
+    } else {
+      setLastScanned(`"${code}" — item not found`);
+      setSearch(code);
+      stopScanner();
+    }
+  }
+
+  function stopScanner() {
+    cancelAnimationFrame(scannerRafRef.current);
+    scannerStreamRef.current?.getTracks().forEach(t => t.stop());
+    scannerStreamRef.current = null;
+    setShowScanner(false);
+    setScannerError("");
+    setScannerStatus("idle");
+    setLastScanned("");
+  }
+
+  async function startScanner() {
+    setScannerError("");
+    setLastScanned("");
+    setShowScanner(true);
+    setScannerStatus("starting");
+
+    const hasBD = "BarcodeDetector" in window;
+    if (!hasBD) {
+      setScannerStatus("unsupported");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+      scannerStreamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+
+      // @ts-ignore — BarcodeDetector is not in TS lib yet
+      const detector = new (window as any).BarcodeDetector({
+        formats: ["code_128", "code_39", "ean_13", "ean_8", "upc_a", "upc_e", "qr_code", "itf"],
+      });
+
+      setScannerStatus("scanning");
+      let lastCode = ""; let lastTs = 0;
+
+      async function scan() {
+        if (!videoRef.current || videoRef.current.readyState < 2) {
+          scannerRafRef.current = requestAnimationFrame(scan); return;
+        }
+        try {
+          const codes = await detector.detect(videoRef.current);
+          if (codes.length > 0) {
+            const code: string = codes[0].rawValue;
+            const now = Date.now();
+            if (code !== lastCode || now - lastTs > 2000) {
+              lastCode = code; lastTs = now;
+              handleScannedCode(code);
+              return; // stop scanning after hit
+            }
+          }
+        } catch {}
+        scannerRafRef.current = requestAnimationFrame(scan);
+      }
+      scan();
+    } catch (e: any) {
+      setScannerStatus("idle");
+      setScannerError(
+        e?.name === "NotAllowedError"
+          ? "Camera access denied. Browser settings mein allow karo."
+          : e?.message || "Camera start nahi ho saka."
+      );
+    }
+  }
+
+  async function handleFileCapture(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if ("BarcodeDetector" in window) {
+      try {
+        const bitmap = await createImageBitmap(file);
+        // @ts-ignore
+        const detector = new (window as any).BarcodeDetector({ formats: ["code_128","ean_13","ean_8","upc_a","qr_code"] });
+        const codes = await detector.detect(bitmap);
+        if (codes.length > 0) { handleScannedCode(codes[0].rawValue); return; }
+      } catch {}
+    }
+    setScannerError("Barcode detect nahi hua. Dobara try karo — barcode seedha camera ke saamne rakho.");
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   async function checkout() {
@@ -585,10 +699,34 @@ export default function POSPage() {
                   </span>
                 )}
               </div>
-              {/* Keyboard icon */}
-              <button style={{ width: 44, height: 44, borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M8 16h8"/></svg>
+              {/* Camera scan button */}
+              <button onClick={startScanner} title="Scan barcode with camera"
+                style={{ width: 44, height: 44, borderRadius: 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .15s",
+                  background: scannerStatus === "scanning" ? "rgba(52,211,153,.15)" : "rgba(255,255,255,.05)",
+                  border: `1px solid ${scannerStatus === "scanning" ? "rgba(52,211,153,.35)" : "rgba(255,255,255,.1)"}`,
+                  color: scannerStatus === "scanning" ? "#34d399" : "rgba(255,255,255,.45)" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M2 8V6a2 2 0 0 1 2-2h2M2 16v2a2 2 0 0 0 2 2h2M22 8V6a2 2 0 0 0-2-2h-2M22 16v2a2 2 0 0 1-2 2h-2"/>
+                  <rect x="7" y="9" width="10" height="6" rx="1"/>
+                </svg>
               </button>
+              <input ref={fileInputRef} type="file" accept="image/*" capture="environment"
+                onChange={async e => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const img = new Image();
+                  img.src = URL.createObjectURL(file);
+                  img.onload = async () => {
+                    try {
+                      const det = new (window as any).BarcodeDetector({ formats: ["code_128","ean_13","ean_8","upc_a","qr_code"] });
+                      const codes = await det.detect(img);
+                      if (codes.length > 0) handleScannedCode(codes[0].rawValue);
+                    } catch {}
+                    URL.revokeObjectURL(img.src);
+                  };
+                  e.target.value = "";
+                }}
+                style={{ display: "none" }} />
               <button onClick={() => { const q = search.trim(); if (!q) return; const match = products.find(p => p.sku?.toLowerCase() === q.toLowerCase()) || (filtered.length === 1 ? filtered[0] : null); if (match) { addToCart(match); setSearch(""); setSearchMsg({ text: `✓ ${match.name} added`, ok: true }); setTimeout(() => setSearchMsg(null), 2000); } }}
                 style={{ padding: "0 20px", borderRadius: 10, background: "#6366f1", border: "none", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, flexShrink: 0 }}>Search</button>
             </div>
@@ -1164,6 +1302,61 @@ export default function POSPage() {
         <div id="pos-receipt">
           <div id="pos-receipt-paper" style={{ margin: "0 auto", width: "fit-content" }}>
             <ThermalReceipt receipt={receipt} company={company} />
+          </div>
+        </div>
+      )}
+
+      {/* ── Camera Scanner Modal ── */}
+      {showScanner && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.92)", zIndex: 200, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          {/* Header */}
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px" }}>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Camera Scanner</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>Point at barcode to add product instantly</div>
+            </div>
+            <button onClick={stopScanner}
+              style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.15)", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              ✕
+            </button>
+          </div>
+
+          {/* Video */}
+          <div style={{ position: "relative", width: "min(94vw,480px)", borderRadius: 16, overflow: "hidden", border: "2px solid rgba(99,102,241,.4)", boxShadow: "0 0 40px rgba(99,102,241,.2)" }}>
+            <video ref={videoRef} autoPlay playsInline muted
+              style={{ width: "100%", display: "block", background: "#000", aspectRatio: "4/3", objectFit: "cover" }} />
+            {/* Scan overlay */}
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+              <div style={{ width: 220, height: 100, border: "2px solid rgba(99,102,241,.8)", borderRadius: 8, boxShadow: "0 0 0 9999px rgba(0,0,0,.35)" }}>
+                <div style={{ position: "absolute", top: 0, left: 0, width: 20, height: 20, borderTop: "3px solid #6366f1", borderLeft: "3px solid #6366f1", borderRadius: "4px 0 0 0" }} />
+                <div style={{ position: "absolute", top: 0, right: 0, width: 20, height: 20, borderTop: "3px solid #6366f1", borderRight: "3px solid #6366f1", borderRadius: "0 4px 0 0" }} />
+                <div style={{ position: "absolute", bottom: 0, left: 0, width: 20, height: 20, borderBottom: "3px solid #6366f1", borderLeft: "3px solid #6366f1", borderRadius: "0 0 0 4px" }} />
+                <div style={{ position: "absolute", bottom: 0, right: 0, width: 20, height: 20, borderBottom: "3px solid #6366f1", borderRight: "3px solid #6366f1", borderRadius: "0 0 4px 0" }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Status / Error */}
+          <div style={{ marginTop: 20, textAlign: "center" }}>
+            {scannerError ? (
+              <div style={{ fontSize: 13, color: "#f87171", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.25)", borderRadius: 8, padding: "8px 18px", maxWidth: 340 }}>
+                {scannerError}
+                <div style={{ marginTop: 10 }}>
+                  <button onClick={() => fileInputRef.current?.click()}
+                    style={{ padding: "7px 18px", borderRadius: 8, background: "#6366f1", border: "none", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                    📷 Upload Photo Instead
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ fontSize: 13, color: scannerStatus === "scanning" ? "#34d399" : "rgba(255,255,255,.45)" }}>
+                {scannerStatus === "starting" && "Starting camera…"}
+                {scannerStatus === "scanning" && "🟢 Scanning — hold barcode steady"}
+              </div>
+            )}
+            {lastScanned && (
+              <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,.35)" }}>Last: {lastScanned}</div>
+            )}
           </div>
         </div>
       )}
