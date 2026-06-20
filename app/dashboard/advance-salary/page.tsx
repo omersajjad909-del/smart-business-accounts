@@ -2,7 +2,15 @@
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
-type Employee = { id: string; name: string; designation?: string; salary?: number };
+type Employee = {
+  id: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  designation?: string;
+  designations?: string;
+  salary?: number;
+};
 type Advance = {
   id: string;
   employeeId: string;
@@ -20,8 +28,8 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 function employeeLabel(employee: Employee) {
-  const name = String(employee.name || "").trim();
-  const designation = String(employee.designation || "").trim();
+  const name = String(employee.name || [employee.firstName, employee.lastName].filter(Boolean).join(" ")).trim();
+  const designation = String(employee.designation || employee.designations || "").trim();
   return `${name || "Unnamed Employee"}${designation ? ` (${designation})` : ""}`;
 }
 
@@ -73,7 +81,7 @@ export default function AdvanceSalaryPage() {
         headers: { "Content-Type": "application/json", ...getHeaders() },
         body: JSON.stringify({
           employeeId: form.employeeId,
-          employeeName: selectedEmployee?.name ?? "",
+          employeeName: selectedEmployee ? employeeLabel(selectedEmployee) : "",
           amount: parseFloat(form.amount),
           reason: form.reason,
           deductMonths: parseInt(form.deductMonths),
@@ -84,7 +92,7 @@ export default function AdvanceSalaryPage() {
         setAdvances(prev => [d.advance || {
           id: Date.now().toString(),
           employeeId: form.employeeId,
-          employeeName: selectedEmployee?.name ?? "",
+          employeeName: selectedEmployee ? employeeLabel(selectedEmployee) : "",
           amount: parseFloat(form.amount),
           reason: form.reason,
           deductMonths: parseInt(form.deductMonths),

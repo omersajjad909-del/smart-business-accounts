@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     });
 
     const result = items
-      .filter(item => !unitFilter || item.unit === unitFilter)
+      .filter(item => !unitFilter || (item.unit || "").toUpperCase() === unitFilter.toUpperCase())
       .map(item => {
         let purchasedQty  = 0;
         let soldQty       = 0;

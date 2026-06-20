@@ -67,7 +67,7 @@ export default function StockReportPage() {
     fetch("/api/reports/stock", { credentials: "include", headers: h() })
       .then(r => r.ok ? r.json() : [])
       .then((d: Row[]) => {
-        const u = Array.from(new Set(d.map(r => r.unit).filter(Boolean))).sort() as string[];
+        const u = Array.from(new Set(d.map(r => (r.unit || "").toUpperCase()).filter(Boolean))).sort() as string[];
         setUnits(u);
       })
       .catch(() => {});
