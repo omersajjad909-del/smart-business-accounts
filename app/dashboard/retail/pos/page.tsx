@@ -185,46 +185,69 @@ export default function POSPage() {
   const paginated = filtered.slice(safeP * PAGE_SIZE, (safeP + 1) * PAGE_SIZE);
   useEffect(() => { setPage(0); }, [cat, search]);
 
-  // Attach camera stream to video element after modal renders
+  // Start ZXing camera scanner after modal renders
   useEffect(() => {
-    if (!showScanner || !scannerStreamRef.current) return;
+    if (!showScanner) return;
     const video = videoRef.current;
     if (!video) return;
 
-    video.srcObject = scannerStreamRef.current;
-    video.play().catch(() => {});
-
-    // @ts-ignore
-    const detector = new (window as any).BarcodeDetector({
-      formats: ["code_128", "code_39", "ean_13", "ean_8", "upc_a", "upc_e", "qr_code", "itf"],
-    });
-
-    setScannerStatus("scanning");
-    let lastCode = ""; let lastTs = 0;
     let stopped = false;
+    let stream: MediaStream | null = null;
 
-    async function scan() {
-      if (stopped) return;
-      if (!video || video.readyState < 2) {
-        scannerRafRef.current = requestAnimationFrame(scan); return;
-      }
+    (async () => {
       try {
-        const codes = await detector.detect(video);
-        if (codes.length > 0) {
-          const code: string = codes[0].rawValue;
-          const now = Date.now();
-          if (code !== lastCode || now - lastTs > 2000) {
-            lastCode = code; lastTs = now;
-            handleScannedCode(code);
-            return;
-          }
-        }
-      } catch {}
-      if (!stopped) scannerRafRef.current = requestAnimationFrame(scan);
-    }
-    scan();
+        const { BrowserMultiFormatReader } = await import("@zxing/browser");
+        const reader = new BrowserMultiFormatReader();
 
-    return () => { stopped = true; cancelAnimationFrame(scannerRafRef.current); };
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+        });
+        if (stopped) { stream.getTracks().forEach(t => t.stop()); return; }
+
+        scannerStreamRef.current = stream;
+        video.srcObject = stream;
+        await video.play();
+        setScannerStatus("scanning");
+
+        let lastCode = ""; let lastTs = 0;
+
+        const loop = async () => {
+          if (stopped) return;
+          try {
+            const result = await reader.decodeOnceFromVideoElement(video);
+            if (!stopped) {
+              const code = result.getText();
+              const now = Date.now();
+              if (code !== lastCode || now - lastTs > 2000) {
+                lastCode = code; lastTs = now;
+                handleScannedCode(code);
+                return;
+              }
+              scannerRafRef.current = requestAnimationFrame(loop as any);
+            }
+          } catch {
+            if (!stopped) scannerRafRef.current = requestAnimationFrame(loop as any);
+          }
+        };
+        loop();
+      } catch (e: any) {
+        if (!stopped) {
+          setScannerError(
+            e?.name === "NotAllowedError"
+              ? "Camera permission deny ki. Browser settings mein camera allow karo."
+              : "Camera start nahi ho saka. Dobara try karo."
+          );
+          setScannerStatus("idle");
+        }
+      }
+    })();
+
+    return () => {
+      stopped = true;
+      cancelAnimationFrame(scannerRafRef.current);
+      stream?.getTracks().forEach(t => t.stop());
+      scannerStreamRef.current = null;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showScanner]);
 
@@ -376,41 +399,17 @@ export default function POSPage() {
   }
 
   function stopScanner() {
-    cancelAnimationFrame(scannerRafRef.current);
-    scannerStreamRef.current?.getTracks().forEach(t => t.stop());
-    scannerStreamRef.current = null;
-    setShowScanner(false);
+    setShowScanner(false); // triggers useEffect cleanup which stops stream
     setScannerError("");
     setScannerStatus("idle");
     setLastScanned("");
   }
 
-  async function startScanner() {
+  function startScanner() {
     setScannerError("");
     setLastScanned("");
     setScannerStatus("starting");
-
-    if (!("BarcodeDetector" in window)) {
-      setScannerError("Chrome 83+ ya Android browser use karo ya image upload karo.");
-      setScannerStatus("unsupported");
-      setShowScanner(true);
-      return;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
-      });
-      scannerStreamRef.current = stream;
-      setShowScanner(true); // useEffect will attach stream after modal renders
-    } catch (e: any) {
-      setScannerError(
-        e?.name === "NotAllowedError"
-          ? "Camera permission deny ki. Browser settings mein camera allow karo."
-          : "Camera start nahi ho saka."
-      );
-      setScannerStatus("idle");
-    }
+    setShowScanner(true); // useEffect handles everything after render
   }
 
   async function handleFileCapture(e: React.ChangeEvent<HTMLInputElement>) {
