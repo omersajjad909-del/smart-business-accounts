@@ -377,9 +377,6 @@ export default function BarcodePage() {
               <div key={idx} style={{ border: "1px dashed #ccc", borderRadius: 6, padding: "10px 14px", textAlign: "center", display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 4, pageBreakInside: "avoid" }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#000", maxWidth: 180, textAlign: "center", lineHeight: 1.3 }}>{printItem.name}</div>
                 <Barcode128 value={printItem.barcode!} moduleWidth={1.5} height={48} bg="white" fg="black" />
-                {(printItem.rate ?? printItem.salePrice) != null && (
-                  <div style={{ fontSize: 12, fontWeight: 800, color: "#000" }}>{currency}{printItem.rate ?? printItem.salePrice}</div>
-                )}
               </div>
             ))}
           </div>
@@ -394,9 +391,6 @@ export default function BarcodePage() {
               <div key={idx} style={{ border: "1px dashed #ccc", borderRadius: 6, padding: "10px 14px", textAlign: "center", display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 4, pageBreakInside: "avoid" }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#000", maxWidth: 180, textAlign: "center", lineHeight: 1.3 }}>{item.name}</div>
                 <Barcode128 value={item.barcode!} moduleWidth={1.5} height={48} bg="white" fg="black" />
-                {(item.rate ?? item.salePrice) != null && (
-                  <div style={{ fontSize: 12, fontWeight: 800, color: "#000" }}>{currency}{item.rate ?? item.salePrice}</div>
-                )}
               </div>
             ))}
           </div>
@@ -845,9 +839,6 @@ export default function BarcodePage() {
             <div style={{ background: "white", borderRadius: 10, padding: 16, textAlign: "center", marginBottom: 20 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#000", marginBottom: 8 }}>{printItem.name}</div>
               <Barcode128 value={printItem.barcode!} moduleWidth={2} height={56} bg="white" fg="black" />
-              {(printItem.rate ?? printItem.salePrice) != null && (
-                <div style={{ fontSize: 13, fontWeight: 800, color: "#000", marginTop: 6 }}>{currency}{printItem.rate ?? printItem.salePrice}</div>
-              )}
             </div>
             <div style={{ marginBottom: 20 }}>
               <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>How many labels? (max 100)</label>
