@@ -11,6 +11,20 @@ type StockRow = {
   stockQty: number;
 };
 
+function stockQtyClass(qty: number) {
+  if (qty < 0) return "text-red-700 bg-red-100";
+  if (qty === 0) return "text-gray-700 bg-gray-100";
+  if (qty < 5) return "text-amber-700 bg-amber-50";
+  return "text-blue-700 bg-blue-50";
+}
+
+function stockStatusLabel(qty: number) {
+  if (qty < 0) return "Oversold";
+  if (qty === 0) return "Out of stock";
+  if (qty < 5) return "Low stock";
+  return "In stock";
+}
+
 export default function StockSummaryPage() {
   const today = new Date().toISOString().slice(0, 10);
   const [asOnDate, setAsOnDate] = useState(today);
@@ -22,7 +36,11 @@ export default function StockSummaryPage() {
     const user = getCurrentUser();
     try {
       const res = await fetch(`/api/reports/inventory/stock-summary?date=${asOnDate}`, {
-        headers: { "x-user-role": user?.role || "" }
+        headers: {
+          "x-user-id": user?.id || "",
+          "x-user-role": user?.role || "",
+          "x-company-id": user?.companyId || "",
+        },
       });
       const json = await res.json();
       setRows(Array.isArray(json) ? json : []);
@@ -63,17 +81,18 @@ export default function StockSummaryPage() {
             ) : rows.length === 0 ? (
               <tr><td colSpan={3} className="p-10 text-center text-gray-400 italic">No Stock Found.</td></tr>
             ) : (
-              rows.map((r, i) => (
-                <tr key={i} className="border-b-2 border-black hover:bg-yellow-50 transition-colors">
+              rows.map((r) => (
+                <tr key={r.itemId} className="border-b-2 border-black hover:bg-yellow-50 transition-colors">
                   <td className="p-4 border-r-2 border-black">
-                    <div>{r.itemName}</div>
+                    <div>{r.itemName || "Unnamed Item"}</div>
                     <div className="text-[10px] text-gray-500 normal-case">
                       {r.description || ""}
                     </div>
                   </td>
-                  <td className="p-4 text-center border-r-2 border-black text-gray-600">{r.unit}</td>
-                  <td className={`p-4 text-right text-lg ${r.stockQty < 5 ? 'text-red-600 bg-red-50' : 'text-blue-700'}`}>
-                    {r.stockQty.toLocaleString()}
+                  <td className="p-4 text-center border-r-2 border-black text-gray-600">{r.unit || "—"}</td>
+                  <td className={`p-4 text-right text-lg ${stockQtyClass(r.stockQty)}`}>
+                    <div>{r.stockQty.toLocaleString()}</div>
+                    <div className="text-[10px] font-black uppercase tracking-wide opacity-70">{stockStatusLabel(r.stockQty)}</div>
                   </td>
                 </tr>
               ))

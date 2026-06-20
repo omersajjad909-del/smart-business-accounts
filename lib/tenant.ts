@@ -18,6 +18,16 @@ export async function resolveCompanyId(req: NextRequest): Promise<string | null>
           ? payload.defaultCompanyId
           : null;
     if (tokenCompanyId) return tokenCompanyId;
+
+    // Fallback: JWT has userId but no companyId — look up from DB
+    const jwtUserId = typeof payload?.userId === "string" ? payload.userId : null;
+    if (jwtUserId) {
+      const jwtUser = await prisma.user.findUnique({
+        where: { id: jwtUserId },
+        select: { defaultCompanyId: true },
+      });
+      if (jwtUser?.defaultCompanyId) return jwtUser.defaultCompanyId;
+    }
     return null;
   }
 
