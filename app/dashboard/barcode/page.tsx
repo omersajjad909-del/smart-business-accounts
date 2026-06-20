@@ -107,8 +107,15 @@ export default function BarcodePage() {
   const [puCostPrice, setPuCostPrice]   = useState("");
   const [puSaving, setPuSaving]         = useState(false);
   const [puLog, setPuLog]               = useState<UpdateLog[]>([]);
+  const [showPuCamera, setShowPuCamera] = useState(false);
+  const [puCameraStatus, setPuCameraStatus] = useState<"idle" | "starting" | "scanning">("idle");
+  const [puCameraErr, setPuCameraErr] = useState("");
+  const [puCameraMsg, setPuCameraMsg] = useState("");
   const puScanRef = useRef<HTMLInputElement>(null);
   const puPriceRef = useRef<HTMLInputElement>(null);
+  const puVideoRef = useRef<HTMLVideoElement>(null);
+  const puFileRef = useRef<HTMLInputElement>(null);
+  const handlePuCodeRef = useRef<(code: string) => void>(() => {});
 
   // ── Bulk price change tab ──────────────────────────────────────────────────
   const [bulkCategory, setBulkCategory] = useState("ALL");
@@ -210,9 +217,8 @@ export default function BarcodePage() {
   }
 
   // ── Price Update tab handlers ──────────────────────────────────────────────
-  function handlePuScan(e: React.FormEvent) {
-    e.preventDefault();
-    const val = puScan.trim();
+  function selectPuScannedCode(raw: string) {
+    const val = raw.trim();
     if (!val) return;
     const found = findItemByBarcode(val);
     if (found) {
@@ -220,13 +226,117 @@ export default function BarcodePage() {
       setPuSalePrice(String(found.rate ?? found.salePrice ?? ""));
       setPuCostPrice(String(found.purchaseRate ?? ""));
       setPuErr("");
+      setPuCameraMsg(`✓ ${found.name}`);
+      setShowPuCamera(false);
       setTimeout(() => puPriceRef.current?.focus(), 80);
     } else {
       setPuItem(null);
+      setPuCameraMsg(`"${val}" — item not found`);
       setPuErr(`"${val}" — item not found`);
     }
     setPuScan("");
     if (!found) puScanRef.current?.focus();
+  }
+  handlePuCodeRef.current = selectPuScannedCode;
+
+  function handlePuScan(e: React.FormEvent) {
+    e.preventDefault();
+    selectPuScannedCode(puScan);
+  }
+
+  function startPuCamera() {
+    setPuCameraErr("");
+    setPuCameraMsg("");
+    setPuCameraStatus("starting");
+    setShowPuCamera(true);
+  }
+
+  function stopPuCamera() {
+    setShowPuCamera(false);
+    setPuCameraStatus("idle");
+    setPuCameraErr("");
+    setPuCameraMsg("");
+  }
+
+  useEffect(() => {
+    if (!showPuCamera) return;
+    const video = puVideoRef.current;
+    if (!video) return;
+
+    let mounted = true;
+    let stopControls: (() => void) | null = null;
+
+    (async () => {
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error("CameraUnsupported");
+        }
+
+        const { BrowserMultiFormatReader } = await import("@zxing/browser");
+        if (!mounted) return;
+
+        const devices = await navigator.mediaDevices.enumerateDevices().catch(() => []);
+        const cameras = devices.filter(device => device.kind === "videoinput");
+        const backCamera = cameras.find(device => /back|rear|environment/i.test(device.label));
+        const videoConstraints: MediaTrackConstraints = backCamera
+          ? { deviceId: { exact: backCamera.deviceId } }
+          : { facingMode: { ideal: "environment" } };
+        const reader = new BrowserMultiFormatReader();
+
+        const controls = await reader.decodeFromConstraints(
+          { video: videoConstraints },
+          video,
+          result => {
+            if (!mounted || !result) return;
+            handlePuCodeRef.current(result.getText());
+          }
+        );
+
+        stopControls = () => controls.stop();
+        if (mounted) setPuCameraStatus("scanning");
+      } catch (e: any) {
+        if (!mounted) return;
+        setPuCameraErr(
+          e?.name === "NotAllowedError"
+            ? "Camera permission deny ki. Browser settings mein allow karo."
+            : e?.message === "CameraUnsupported"
+              ? "Is browser/device mein camera scanning support nahi hai. Photo upload try karo."
+              : "Camera open nahi ho saka. Dobara try karo."
+        );
+        setPuCameraStatus("idle");
+      }
+    })();
+
+    return () => {
+      mounted = false;
+      stopControls?.();
+    };
+  }, [showPuCamera]);
+
+  async function handlePuFileCapture(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPuCameraErr("");
+    setPuCameraMsg("Photo read ho rahi hai…");
+    try {
+      const { BrowserMultiFormatReader } = await import("@zxing/browser");
+      const reader = new BrowserMultiFormatReader();
+      const url = URL.createObjectURL(file);
+      try {
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        const result = await reader.decodeFromImageElement(image);
+        selectPuScannedCode(result.getText());
+        return;
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    } catch {
+      setPuCameraMsg("");
+      setPuCameraErr("Barcode detect nahi hua. Clear photo lo — barcode seedha aur visible hona chahiye.");
+    }
+    if (puFileRef.current) puFileRef.current.value = "";
   }
 
   async function savePuPrice(e: React.FormEvent) {
@@ -570,7 +680,12 @@ export default function BarcodePage() {
                         autoFocus
                         style={{ flex: 1, padding: "12px 16px", borderRadius: 10, background: "var(--app-bg)", border: "1.5px solid rgba(245,158,11,.4)", color: "var(--text-primary)", fontSize: 14, fontFamily: "inherit", outline: "none" }}
                       />
+                      <button type="button" onClick={startPuCamera} title="Scan with camera"
+                        style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(99,102,241,.14)", border: "1px solid rgba(99,102,241,.35)", color: "#a5b4fc", fontSize: 16, fontWeight: 800, cursor: "pointer" }}>
+                        📷
+                      </button>
                       <button type="submit" style={{ padding: "12px 18px", borderRadius: 10, background: "linear-gradient(135deg,#f59e0b,#d97706)", border: "none", color: "#000", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>Scan</button>
+                      <input ref={puFileRef} type="file" accept="image/*" capture="environment" onChange={handlePuFileCapture} style={{ display: "none" }} />
                     </form>
                     {puErr && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 12.5 }}>{puErr}</div>}
                   </>
@@ -920,6 +1035,51 @@ export default function BarcodePage() {
                 🖨 Print {batchSelectedItems.length * batchPrintQty} Labels
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showPuCamera && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.92)", zIndex: 120, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px" }}>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Price Scanner Camera</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginTop: 2 }}>Barcode ko frame ke andar seedha rakho</div>
+            </div>
+            <button onClick={stopPuCamera}
+              style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.15)", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              ×
+            </button>
+          </div>
+
+          <div style={{ position: "relative", width: "min(94vw,520px)", borderRadius: 16, overflow: "hidden", border: "2px solid rgba(245,158,11,.45)", boxShadow: "0 0 40px rgba(245,158,11,.18)" }}>
+            <video ref={puVideoRef} autoPlay playsInline muted
+              style={{ width: "100%", display: "block", background: "#000", aspectRatio: "4/3", objectFit: "cover" }} />
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+              <div style={{ width: 240, height: 105, border: "2px solid rgba(245,158,11,.9)", borderRadius: 8, boxShadow: "0 0 0 9999px rgba(0,0,0,.35)" }} />
+            </div>
+          </div>
+
+          <div style={{ marginTop: 20, textAlign: "center" }}>
+            {puCameraErr ? (
+              <div style={{ fontSize: 13, color: "#f87171", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.25)", borderRadius: 8, padding: "8px 18px", maxWidth: 360 }}>
+                {puCameraErr}
+              </div>
+            ) : (
+              <div style={{ fontSize: 13, color: puCameraStatus === "scanning" ? "#34d399" : "rgba(255,255,255,.55)" }}>
+                {puCameraStatus === "starting" && "Starting camera…"}
+                {puCameraStatus === "scanning" && "🟢 Scanning — hold barcode steady"}
+              </div>
+            )}
+            <div style={{ marginTop: 10 }}>
+              <button onClick={() => { if (puFileRef.current) puFileRef.current.value = ""; puFileRef.current?.click(); }}
+                style={{ padding: "8px 18px", borderRadius: 9, background: "#6366f1", border: "none", color: "#fff", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>
+                📷 Upload Photo Instead
+              </button>
+            </div>
+            {puCameraMsg && (
+              <div style={{ marginTop: 8, fontSize: 12, color: "rgba(255,255,255,.45)" }}>{puCameraMsg}</div>
+            )}
           </div>
         </div>
       )}
