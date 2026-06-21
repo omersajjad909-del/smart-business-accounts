@@ -93,7 +93,7 @@ export default function ProductCatalogPage() {
 
   // Receive stock modal
   const [receiveProduct, setReceiveProduct] = useState<{ id: string; name: string; itemNewId: string; costPrice: number; stock: number } | null>(null);
-  const [receiveForm, setReceiveForm] = useState({ qty: 1, costPrice: 0, supplierId: "", supplierName: "", notes: "" });
+  const [receiveForm, setReceiveForm] = useState({ qty: 1, costPrice: 0, supplierId: "", supplierName: "", notes: "", batchNo: "", expiryDate: "" });
   const [receiveSaving, setReceiveSaving] = useState(false);
   const [suppliers, setSuppliers] = useState<{ id: string; name: string }[]>([]);
 
@@ -255,7 +255,7 @@ export default function ProductCatalogPage() {
 
   function openReceive(p: typeof allProducts[0]) {
     setReceiveProduct({ id: p.id, name: p.name, itemNewId: (records.find(r => r.id === p.id)?.data?.itemNewId as string) || "", costPrice: p.costPrice, stock: p.stock });
-    setReceiveForm({ qty: 1, costPrice: p.costPrice, supplierId: suppliers[0]?.id || "", supplierName: suppliers[0]?.name || "", notes: "" });
+    setReceiveForm({ qty: 1, costPrice: p.costPrice, supplierId: suppliers[0]?.id || "", supplierName: suppliers[0]?.name || "", notes: "", batchNo: "", expiryDate: "" });
   }
 
   async function handleReceive() {
@@ -296,8 +296,15 @@ export default function ProductCatalogPage() {
       }
 
       // 3. Save stock_receipt business_record
-      const { create: createReceipt } = { create: async (d: object) => { await fetch("/api/business-records", { method: "POST", headers: authHeaders, body: JSON.stringify({ type: "stock_receipt", title: receiveProduct.name, amount: receiveForm.qty * receiveForm.costPrice, data: d }) }); } };
-      await createReceipt({ productName: receiveProduct.name, itemNewId: receiveProduct.itemNewId, qtyReceived: receiveForm.qty, costPrice: receiveForm.costPrice, supplierId: receiveForm.supplierId, supplierName: receiveForm.supplierName || "—", notes: receiveForm.notes, stockBefore, stockAfter });
+      const receiptData = {
+        productName: receiveProduct.name, itemNewId: receiveProduct.itemNewId,
+        qtyReceived: receiveForm.qty, costPrice: receiveForm.costPrice,
+        supplierId: receiveForm.supplierId, supplierName: receiveForm.supplierName || "—",
+        notes: receiveForm.notes, stockBefore, stockAfter,
+        batchNo: receiveForm.batchNo || null,
+        expiryDate: receiveForm.expiryDate || null,
+      };
+      await fetch("/api/business-records", { method: "POST", headers: authHeaders, body: JSON.stringify({ category: "stock_receipt", title: receiveProduct.name, amount: receiveForm.qty * receiveForm.costPrice, data: receiptData }) });
 
       // 4. Update catalog_product data.stock
       const existing = records.find(r => r.id === receiveProduct.id);
@@ -654,6 +661,16 @@ export default function ProductCatalogPage() {
               <div>
                 <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Notes</label>
                 <input value={receiveForm.notes} onChange={e => setReceiveForm(p => ({ ...p, notes: e.target.value }))} placeholder="Optional notes" style={inp} />
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Batch # (optional)</label>
+                  <input value={receiveForm.batchNo} onChange={e => setReceiveForm(p => ({ ...p, batchNo: e.target.value }))} placeholder="e.g. B2024-01" style={inp} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Expiry Date (optional)</label>
+                  <input type="date" value={receiveForm.expiryDate} onChange={e => setReceiveForm(p => ({ ...p, expiryDate: e.target.value }))} style={{ ...inp, colorScheme: "dark" }} />
+                </div>
               </div>
             </div>
             {receiveForm.qty > 0 && (
