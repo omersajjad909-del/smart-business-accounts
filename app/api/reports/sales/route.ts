@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
       inv.items
         .filter(it => {
           if (itemSearch && !it.item?.name?.toLowerCase().includes(itemSearch.toLowerCase())) return false;
-          if (unitFilter && it.item?.unit !== unitFilter) return false;
+          if (unitFilter && it.item?.unit?.toUpperCase() !== unitFilter.toUpperCase()) return false;
           return true;
         })
         .map(it => ({

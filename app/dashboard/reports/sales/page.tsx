@@ -72,7 +72,7 @@ export default function SalesReportPage() {
     fetch("/api/reports/stock", { credentials: "include", headers: h() })
       .then(r => r.ok ? r.json() : [])
       .then((d: any[]) => {
-        const u = Array.from(new Set(d.map((r: any) => r.unit).filter(Boolean))).sort() as string[];
+        const u = Array.from(new Set(d.map((r: any) => (r.unit || "").trim().toUpperCase()).filter(Boolean))).sort() as string[];
         setUnits(u);
       })
       .catch(() => {});
