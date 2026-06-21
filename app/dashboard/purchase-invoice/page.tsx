@@ -224,6 +224,8 @@ const [searchTerm, setSearchTerm] = useState("");
   const [notes, setNotes] = useState("");
   const [reference, setReference] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [batchNo, setBatchNo]       = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
   const emptyRow = (): Row => ({ itemId: "", name: "", description: "", qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "" });
 
@@ -543,6 +545,36 @@ const [searchTerm, setSearchTerm] = useState("");
         const newDbId = (typeof data === "object" && data.id) ? data.id : (editing?.id || null);
         setInvoiceId(newInvoiceNo);
         setSavedInvoiceId(newDbId);
+
+        // Save stock_receipt BusinessRecords with batch/expiry for each item (enables Expiry Report)
+        if (expiryDate || batchNo) {
+          const clean = rows.filter(r => r.itemId && r.qty !== "" && Number(r.qty) > 0);
+          await Promise.allSettled(clean.map(r =>
+            fetch("/api/business-records", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", ...requestHeaders },
+              body: JSON.stringify({
+                category: "stock_receipt",
+                title: r.name,
+                amount: Number(r.qty) * Number(r.rate),
+                data: {
+                  productName:  r.name,
+                  itemNewId:    r.itemId,
+                  qtyReceived:  Number(r.qty),
+                  costPrice:    Number(r.rate),
+                  invoiceNo:    newInvoiceNo,
+                  supplierId,
+                  supplierName,
+                  batchNo:      batchNo   || null,
+                  expiryDate:   expiryDate || null,
+                  stockBefore:  0,
+                  stockAfter:   Number(r.qty),
+                },
+              }),
+            })
+          ));
+        }
+
         await loadInvoices();
         // Re-fetch saved invoice so rows are correct even if useEffect reset them
         if (newDbId) {
@@ -651,6 +683,8 @@ const [searchTerm, setSearchTerm] = useState("");
     setReference("");
     setPaymentMethod("");
     setPaymentTerms("");
+    setBatchNo("");
+    setExpiryDate("");
     setApprovalStatus("PENDING");
     setRows([emptyRow()]);
     setApplyTax(false);
@@ -1028,6 +1062,17 @@ const [searchTerm, setSearchTerm] = useState("");
                         <div>
                           <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Notes</div>
                           <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any notes…" style={{ ...inp({ minHeight: 60, resize: "vertical" as const }) }} />
+                        </div>
+                        {/* Batch & Expiry tracking */}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                          <div>
+                            <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Batch # (optional)</div>
+                            <input value={batchNo} onChange={e => setBatchNo(e.target.value)} placeholder="e.g. B2024-01" style={inp()} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Expiry Date (optional)</div>
+                            <DateInput value={expiryDate} onChange={setExpiryDate} style={inp()} />
+                          </div>
                         </div>
                         <div>
                           <button type="button" onClick={() => { setApplyTax(!applyTax); if (!applyTax) setSelectedTaxId(""); }} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "none", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", background: applyTax ? "linear-gradient(135deg,#2563eb,#3b82f6)" : `rgba(37,99,235,0.08)`, color: applyTax ? "#fff" : ACCENT }}>
