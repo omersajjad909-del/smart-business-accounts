@@ -417,10 +417,10 @@ export default function ProductCatalogPage() {
           <tbody>
             {products.map(p => (
               <tr key={p.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
-                <td style={{ padding: "10px 12px 10px 16px", width: 44 }}>
+                <td style={{ padding: "8px 12px 8px 16px", width: 56 }}>
                   {p.imageUrl
-                    ? <img src={p.imageUrl} alt="" style={{ width: 36, height: 36, borderRadius: 6, objectFit: "cover", display: "block" }} />
-                    : <div style={{ width: 36, height: 36, borderRadius: 6, background: "rgba(255,255,255,.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🖼</div>
+                    ? <img src={p.imageUrl} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover", display: "block" }} />
+                    : <div style={{ width: 48, height: 48, borderRadius: 8, background: "rgba(255,255,255,.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🖼</div>
                   }
                 </td>
                 <td style={{ padding: "13px 16px", fontWeight: 600 }}>{p.name}</td>
