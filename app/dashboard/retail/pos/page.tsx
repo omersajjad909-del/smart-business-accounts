@@ -639,7 +639,7 @@ export default function POSPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0f1a", color: "#fff", fontFamily: ff, display: "flex", flexDirection: "column" }}>
+    <div style={{ height: "100vh", background: "#070c18", color: "#fff", fontFamily: ff, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <style>{`
         @media print {
           body * { visibility: hidden !important; }
@@ -650,238 +650,298 @@ export default function POSPage() {
         #pos-receipt { display: none; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
-        .prod-card { transition: transform .12s, box-shadow .12s, border-color .12s; }
-        .prod-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,.2) !important; border-color: rgba(99,102,241,.5) !important; }
-        .prod-card:active { transform: scale(.96); }
-        .pos-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .prod-card { transition: transform .1s, box-shadow .1s, border-color .1s; }
+        .prod-card:hover { transform: translateY(-3px) !important; box-shadow: 0 10px 28px rgba(99,102,241,.28) !important; border-color: rgba(99,102,241,.6) !important; }
+        .prod-card:active { transform: scale(.95) !important; }
+        .pos-scroll::-webkit-scrollbar { width: 3px; height: 3px; }
         .pos-scroll::-webkit-scrollbar-track { background: transparent; }
-        .pos-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
-        .qfkey:hover { background: rgba(99,102,241,.14) !important; border-color: rgba(99,102,241,.3) !important; }
-        .qfkey:hover span { color: #a5b4fc !important; }
-        .cat-pill:hover { background: rgba(99,102,241,.18) !important; color: #a5b4fc !important; }
-        .qty-btn:hover { opacity: .8; }
-        .pay-opt:hover { opacity: .85; }
-        .quick-amt:hover { background: rgba(16,185,129,.12) !important; border-color: rgba(16,185,129,.3) !important; color: #34d399 !important; }
+        .pos-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 3px; }
+        .qfkey:hover { background: rgba(99,102,241,.18) !important; border-color: rgba(99,102,241,.4) !important; }
+        .cat-pill:hover { background: rgba(99,102,241,.2) !important; color: #c7d2fe !important; }
+        .qty-btn:hover { opacity: .75; }
+        .pay-opt:hover { transform: translateY(-1px); opacity: .9; }
+        .pay-opt { transition: all .1s; }
+        .quick-amt:hover { background: rgba(16,185,129,.14) !important; border-color: rgba(16,185,129,.4) !important; color: #34d399 !important; }
+        .cart-row:hover { background: rgba(255,255,255,.024) !important; }
+        .checkout-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+        .checkout-btn { transition: all .12s; }
+        @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
       `}</style>
 
-      {/* ── Session Banner ── */}
-      {!activeSession ? (
-        <div style={{ background: "rgba(245,158,11,.08)", borderBottom: "1px solid rgba(245,158,11,.18)", padding: "6px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-          <span style={{ fontSize: 12, color: "#fbbf24", fontWeight: 600 }}>⚠️ No active session — sales will not be linked to a cashier shift.</span>
-          <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => setShowStats(v => !v)} style={{ padding: "3px 10px", borderRadius: 6, border: `1px solid ${showStats ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.1)"}`, background: showStats ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.04)", color: showStats ? "#818cf8" : "rgba(255,255,255,.35)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>{showStats ? "Hide Stats" : "Stats"}</button>
-            <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 12, color: "#fbbf24", fontWeight: 700, textDecoration: "underline" }}>Open Session →</a>
+      {/* ════════════════════════════════════════════
+          TOP HEADER BAR — compact single row ~52px
+      ════════════════════════════════════════════ */}
+      <div style={{ height: 52, background: "#0f1729", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", padding: "0 16px", gap: 12, flexShrink: 0, zIndex: 10 }}>
+        {/* Left: logo + company */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 10px rgba(99,102,241,.35)" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", lineHeight: 1.15, letterSpacing: "-.01em" }}>{company.name}</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,.35)", letterSpacing: ".08em", textTransform: "uppercase" }}>POS Terminal</div>
           </div>
         </div>
-      ) : (
-        <div style={{ background: "rgba(16,185,129,.06)", borderBottom: "1px solid rgba(16,185,129,.12)", padding: "5px 18px", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
-          <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 6px #10b981", flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: "#34d399", fontWeight: 700 }}>{activeSession.title}</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Cashier: {String(activeSession.data?.cashier || "—")}</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Branch: {String(activeSession.data?.branch || "—")}</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Txns: {Number(activeSession.data?.transactions || 0)}</span>
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 12, color: "#34d399", fontWeight: 700 }}>Session: Rs. {(activeSession.amount || 0).toLocaleString()}</span>
-            <button onClick={() => setShowStats(v => !v)} style={{ padding: "3px 10px", borderRadius: 6, border: `1px solid ${showStats ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.1)"}`, background: showStats ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.04)", color: showStats ? "#818cf8" : "rgba(255,255,255,.35)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>{showStats ? "Hide Stats" : "Stats"}</button>
-            <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 11, color: "rgba(255,255,255,.3)", textDecoration: "none", border: "1px solid rgba(255,255,255,.1)", borderRadius: 5, padding: "2px 8px" }}>Close</a>
-          </div>
-        </div>
-      )}
 
-      {/* ── Stats Bar ── */}
+        {/* Divider */}
+        <div style={{ width: 1, height: 28, background: "rgba(255,255,255,.07)", flexShrink: 0 }} />
+
+        {/* Center: invoice badge + date + clock */}
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 7, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.22)", borderRadius: 8, padding: "4px 11px" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,.4)", fontWeight: 600 }}>Invoice</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#818cf8", fontFamily: "'Courier New',monospace" }}>{nextReceiptNo}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "#c7d0e8" }}>{dateStr}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 7, padding: "3px 10px" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#e2e8f0", letterSpacing: ".02em" }}>{clockStr}</span>
+          </div>
+        </div>
+
+        {/* Right: cashier chip + session dot + stats + session link */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          {/* Cashier chip */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.2)", borderRadius: 20, padding: "4px 10px 4px 6px" }}>
+            <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(52,211,153,.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#34d399", fontWeight: 800, flexShrink: 0 }}>
+              {cashierName.charAt(0).toUpperCase()}
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>{cashierName}</span>
+          </div>
+          {/* Active session dot */}
+          {activeSession && (
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 7px #10b981" }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#34d399" }}>LIVE</span>
+            </div>
+          )}
+          {/* Stats toggle */}
+          <button className="pos-top-btn" onClick={() => setShowStats(v => !v)}
+            style={{ padding: "5px 11px", borderRadius: 7, border: `1px solid ${showStats ? "rgba(99,102,241,.4)" : "rgba(255,255,255,.1)"}`, background: showStats ? "rgba(99,102,241,.15)" : "rgba(255,255,255,.04)", color: showStats ? "#a5b4fc" : "rgba(255,255,255,.4)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: 4, verticalAlign: "middle" }}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            {showStats ? "Hide Stats" : "Stats"}
+          </button>
+          {/* Session link */}
+          <a href="/dashboard/retail/pos-sessions"
+            style={{ padding: "5px 11px", borderRadius: 7, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", color: "rgba(255,255,255,.4)", fontSize: 11, fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", gap: 4, transition: "all .12s" }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            Session
+          </a>
+        </div>
+      </div>
+
+      {/* ════════════════════════════════════════════
+          STATS BAR — collapsible
+      ════════════════════════════════════════════ */}
       {showStats && (
-        <div style={{ display: "flex", background: "#0c1322", borderBottom: "1px solid rgba(255,255,255,.05)", flexShrink: 0 }}>
+        <div style={{ display: "flex", background: "#0c1829", borderBottom: "1px solid rgba(255,255,255,.05)", flexShrink: 0 }}>
           {[
-            { label: "TODAY SALES",    value: `Rs. ${todayTotal.toLocaleString()}`, color: "#34d399", href: null },
-            { label: "TRANSACTIONS",   value: String(todaySales.length),             color: "#fff",    href: "/dashboard/retail/sales-history" },
-            { label: "CASH",           value: `Rs. ${cashTotal.toLocaleString()}`,   color: "#10b981", href: null },
-            { label: "CARD / DIGITAL", value: `Rs. ${cardTotal.toLocaleString()}`,   color: "#818cf8", href: null },
-            { label: "NEXT RECEIPT",   value: nextReceiptNo,                          color: "#f59e0b", href: null },
-          ].map(s => (
-            <div key={s.label} onClick={() => s.href && (window.location.href = s.href)}
-              style={{ flex: 1, padding: "8px 16px", borderRight: "1px solid rgba(255,255,255,.04)", cursor: s.href ? "pointer" : "default" }}>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)", letterSpacing: ".08em", marginBottom: 2, textTransform: "uppercase" }}>{s.label}</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: s.color }}>{s.value}</div>
+            { label: "TODAY SALES",    value: `Rs. ${todayTotal.toLocaleString()}`,  color: "#34d399", icon: "📈", href: null },
+            { label: "TRANSACTIONS",   value: String(todaySales.length),              color: "#e2e8f0", icon: "🧾", href: "/dashboard/retail/sales-history" },
+            { label: "CASH",           value: `Rs. ${cashTotal.toLocaleString()}`,    color: "#10b981", icon: "💵", href: null },
+            { label: "CARD / DIGITAL", value: `Rs. ${cardTotal.toLocaleString()}`,    color: "#818cf8", icon: "💳", href: null },
+            { label: "NEXT RECEIPT",   value: nextReceiptNo,                           color: "#f59e0b", icon: "#",  href: null },
+          ].map((s, si) => (
+            <div key={s.label} className="pos-stat-tile"
+              onClick={() => s.href && (window.location.href = s.href)}
+              style={{ flex: 1, padding: "9px 16px", borderRight: si < 4 ? "1px solid rgba(255,255,255,.04)" : "none", cursor: s.href ? "pointer" : "default", transition: "background .12s" }}>
+              <div style={{ fontSize: 8, color: "rgba(255,255,255,.28)", letterSpacing: ".09em", marginBottom: 3, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4 }}>
+                <span>{s.icon}</span>{s.label}
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: s.color, letterSpacing: "-.01em" }}>{s.value}</div>
             </div>
           ))}
         </div>
       )}
 
-      {/* ── Header Info Bar ── */}
-      <div style={{ background: "#0d1425", borderBottom: "1px solid rgba(255,255,255,.07)", padding: "10px 20px", display: "flex", alignItems: "center", gap: 0, flexShrink: 0 }}>
-        <div style={{ marginRight: 8 }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: "-.01em" }}>New POS Invoice</div>
-        </div>
-        <div style={{ flex: 1 }} />
-        {/* Invoice No */}
-        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 10, padding: "7px 14px", marginRight: 10, minWidth: 140 }}>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 2 }}>Invoice No.</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 15, fontWeight: 800, color: "#818cf8" }}>{nextReceiptNo}</span>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.25)" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      {/* ════════════════════════════════════════════
+          SESSION WARNING BANNER
+      ════════════════════════════════════════════ */}
+      {!activeSession && (
+        <div style={{ background: "rgba(245,158,11,.07)", borderBottom: "1px solid rgba(245,158,11,.18)", padding: "7px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(245,158,11,.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>⚠</div>
+            <span style={{ fontSize: 12, color: "#fbbf24", fontWeight: 600 }}>No active cashier session — sales won't be linked to a shift.</span>
           </div>
+          <a href="/dashboard/retail/pos-sessions" style={{ fontSize: 12, color: "#f59e0b", fontWeight: 700, textDecoration: "none", background: "rgba(245,158,11,.12)", border: "1px solid rgba(245,158,11,.3)", borderRadius: 7, padding: "4px 12px" }}>Open Session →</a>
         </div>
-        {/* Date/Time */}
-        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 10, padding: "7px 14px", marginRight: 10, minWidth: 170 }}>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 2 }}>Date &amp; Time</div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "#dde1f0" }}>📅 {dateStr}  {clockStr}</div>
-        </div>
-        {/* Cashier */}
-        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 10, padding: "7px 14px", marginRight: 10, minWidth: 120 }}>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 2 }}>Cashier</div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#34d399" }}>👤 {cashierName}</div>
-        </div>
-        {/* Customer */}
-        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 10, padding: "7px 14px", minWidth: 200, display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", textTransform: "uppercase", marginBottom: 3 }}>Customer (Optional)</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <input value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="Walk-in Customer"
-              style={{ flex: 1, background: "transparent", border: "none", color: "#fff", fontSize: 12, fontFamily: ff, outline: "none" }} />
-            <button onClick={() => {}} style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(99,102,241,.2)", border: "1px solid rgba(99,102,241,.35)", color: "#818cf8", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>+</button>
-          </div>
-        </div>
-      </div>
+      )}
 
-      {/* ── Main Body ── */}
-      <div style={{ display: "flex", flex: 1, overflow: "hidden", minHeight: 0 }}>
+      {/* ════════════════════════════════════════════
+          MAIN BODY
+      ════════════════════════════════════════════ */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden", minHeight: 0, flexDirection: "row" }}>
 
-        {/* ════ LEFT: Products Panel ════ */}
+        {/* ════ LEFT PANEL: Products ════ */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", borderRight: "1px solid rgba(255,255,255,.06)" }}>
 
-          {/* Search + Quick Access + Categories */}
-          <div style={{ padding: "12px 16px 10px", background: "#0c1322", borderBottom: "1px solid rgba(255,255,255,.06)", flexShrink: 0 }}>
+          {/* ── Search + Controls Bar ── */}
+          <div style={{ padding: "12px 16px 10px", background: "#0f1729", borderBottom: "1px solid rgba(255,255,255,.06)", flexShrink: 0 }}>
 
-            {/* Search Bar */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+            {/* Row 1: Search input + camera + search button */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 9 }}>
               <div style={{ position: "relative", flex: 1 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="2.5"
-                  style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2.5"
+                  style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
                   <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
+                <span style={{ position: "absolute", left: 35, top: "50%", transform: "translateY(-50%)", fontSize: 9, fontWeight: 800, color: "#6366f1", background: "rgba(99,102,241,.15)", padding: "1px 5px", borderRadius: 3, pointerEvents: "none" }}>F2</span>
                 <input ref={searchRef} value={search} onChange={e => setSearch(e.target.value)} onKeyDown={handleSearchKey} autoFocus
-                  placeholder="Scan barcode / Enter barcode / Search product..."
-                  style={{ width: "100%", boxSizing: "border-box" as const, paddingLeft: 40, paddingRight: 12, paddingTop: 11, paddingBottom: 11,
+                  placeholder="Search products, SKU, barcode…"
+                  style={{ width: "100%", boxSizing: "border-box" as const, paddingLeft: 68, paddingRight: searchMsg ? 140 : 14, paddingTop: 10, paddingBottom: 10,
                     background: "rgba(255,255,255,.04)", borderRadius: 10, color: "#fff", fontSize: 13, fontFamily: ff, outline: "none",
-                    border: `1.5px solid ${searchMsg ? (searchMsg.ok ? "rgba(52,211,153,.45)" : "rgba(248,113,113,.45)") : "rgba(99,102,241,.25)"}` }} />
+                    border: `1.5px solid ${searchMsg ? (searchMsg.ok ? "rgba(52,211,153,.5)" : "rgba(248,113,113,.5)") : "rgba(99,102,241,.2)"}`,
+                    transition: "border-color .15s" }} />
                 {searchMsg && (
-                  <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 11, fontWeight: 700, color: searchMsg.ok ? "#34d399" : "#f87171", whiteSpace: "nowrap" }}>
+                  <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 11, fontWeight: 700, color: searchMsg.ok ? "#34d399" : "#f87171", whiteSpace: "nowrap", background: searchMsg.ok ? "rgba(52,211,153,.1)" : "rgba(248,113,113,.1)", padding: "2px 8px", borderRadius: 5 }}>
                     {searchMsg.text}
                   </span>
                 )}
               </div>
               {/* Camera scan button */}
               <button onClick={startScanner} title="Scan barcode with camera"
-                style={{ width: 44, height: 44, borderRadius: 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .15s",
+                style={{ width: 42, height: 42, borderRadius: 9, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .15s",
                   background: scannerStatus === "scanning" ? "rgba(52,211,153,.15)" : "rgba(255,255,255,.05)",
-                  border: `1px solid ${scannerStatus === "scanning" ? "rgba(52,211,153,.35)" : "rgba(255,255,255,.1)"}`,
-                  color: scannerStatus === "scanning" ? "#34d399" : "rgba(255,255,255,.45)" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  border: `1px solid ${scannerStatus === "scanning" ? "rgba(52,211,153,.4)" : "rgba(255,255,255,.1)"}`,
+                  color: scannerStatus === "scanning" ? "#34d399" : "rgba(255,255,255,.4)" }}>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
                   <path d="M2 8V6a2 2 0 0 1 2-2h2M2 16v2a2 2 0 0 0 2 2h2M22 8V6a2 2 0 0 0-2-2h-2M22 16v2a2 2 0 0 1-2 2h-2"/>
                   <rect x="7" y="9" width="10" height="6" rx="1"/>
                 </svg>
               </button>
-              <input ref={fileInputRef} type="file" accept="image/*" capture="environment"
-                onChange={handleFileCapture}
-                style={{ display: "none" }} />
-              <button onClick={() => { const q = search.trim(); if (!q) return; const normalizedQ = q.toLowerCase(); const match = products.find(p => p.sku?.toLowerCase() === normalizedQ || p.barcode?.toLowerCase() === normalizedQ) || (filtered.length === 1 ? filtered[0] : null); if (match) { addToCart(match); setSearch(""); setSearchMsg({ text: `✓ ${match.name} added`, ok: true }); setTimeout(() => setSearchMsg(null), 2000); } }}
-                style={{ padding: "0 20px", borderRadius: 10, background: "#6366f1", border: "none", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, flexShrink: 0 }}>Search</button>
+              <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileCapture} style={{ display: "none" }} />
+              <button onClick={() => { const q = search.trim(); if (!q) return; const nq = q.toLowerCase(); const match = products.find(p => p.sku?.toLowerCase() === nq || p.barcode?.toLowerCase() === nq) || (filtered.length === 1 ? filtered[0] : null); if (match) { addToCart(match); setSearch(""); setSearchMsg({ text: `✓ ${match.name} added`, ok: true }); setTimeout(() => setSearchMsg(null), 2000); } }}
+                style={{ padding: "0 18px", height: 42, borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, flexShrink: 0, boxShadow: "0 2px 10px rgba(99,102,241,.25)" }}>
+                Search
+              </button>
             </div>
 
-            {/* Quick Access */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 10, color: "rgba(255,255,255,.3)", fontWeight: 600, marginRight: 2 }}>Quick Access</span>
+            {/* Row 2: Quick F-keys + flash message */}
+            <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 9, flexWrap: "nowrap", overflowX: "auto" }}>
+              <span style={{ fontSize: 9, color: "rgba(255,255,255,.25)", fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", flexShrink: 0, marginRight: 2 }}>Quick</span>
+              {([
+                ["F2", "Search",      () => { searchRef.current?.focus(); showFKeyMsg("F2", "✓ Search focused", "green"); }],
+                ["F3", "Hold Sale",   () => holdCart()],
+                ["F4", "Price Check", () => { setShowPriceCheck(true); setPriceCheckQ(""); setTimeout(() => priceCheckRef.current?.focus(), 80); showFKeyMsg("F4", "✓ Price Check open", "green"); }],
+                ["F5", "Discount",    () => { discountRef.current?.focus(); discountRef.current?.select(); showFKeyMsg("F5", "✓ Discount field active", "green"); }],
+                ["F6", "Note",        () => { noteRef.current?.focus(); showFKeyMsg("F6", "✓ Note field active", "green"); }],
+              ] as [string, string, () => void][]).map(([key, label, action]) => {
+                const isActive = flashKey === key;
+                const isGreen  = isActive && fKeyMsg?.endsWith("green");
+                const isAmber  = isActive && !fKeyMsg?.endsWith("green");
+                return (
+                  <button key={key} className="qfkey" onClick={action}
+                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 9px", borderRadius: 6, cursor: "pointer", fontFamily: ff, transition: "all .12s", flexShrink: 0,
+                      background: isGreen ? "rgba(52,211,153,.1)" : isAmber ? "rgba(245,158,11,.1)" : "rgba(255,255,255,.04)",
+                      border: `1px solid ${isGreen ? "rgba(52,211,153,.3)" : isAmber ? "rgba(245,158,11,.3)" : "rgba(255,255,255,.09)"}` }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 4px", borderRadius: 3,
+                      color: isGreen ? "#34d399" : isAmber ? "#fbbf24" : "#818cf8",
+                      background: isGreen ? "rgba(52,211,153,.15)" : isAmber ? "rgba(245,158,11,.15)" : "rgba(99,102,241,.15)" }}>{key}</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: isGreen ? "#34d399" : isAmber ? "#fbbf24" : "rgba(255,255,255,.45)" }}>{label}</span>
+                  </button>
+                );
+              })}
+              {/* Flash message */}
               {fKeyMsg && (() => {
                 const isGreen = fKeyMsg.endsWith("__green");
                 const text = fKeyMsg.replace(/__amber$|__green$/, "");
                 return (
-                  <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 10px", borderRadius: 5,
+                  <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 10px", borderRadius: 5, flexShrink: 0, marginLeft: 4,
                     color: isGreen ? "#34d399" : "#fbbf24",
-                    background: isGreen ? "rgba(52,211,153,.1)" : "rgba(245,158,11,.1)",
-                    border: `1px solid ${isGreen ? "rgba(52,211,153,.25)" : "rgba(245,158,11,.22)"}` }}>
+                    background: isGreen ? "rgba(52,211,153,.09)" : "rgba(245,158,11,.09)",
+                    border: `1px solid ${isGreen ? "rgba(52,211,153,.22)" : "rgba(245,158,11,.22)"}` }}>
                     {text}
                   </span>
                 );
               })()}
-              {([
-                ["F2", "Recent Items", () => { searchRef.current?.focus(); showFKeyMsg("F2", "✓ Search focused", "green"); }],
-                ["F3", "Hold Sale",    () => holdCart()],
-                ["F4", "Price Check",  () => { setShowPriceCheck(true); setPriceCheckQ(""); setTimeout(() => priceCheckRef.current?.focus(), 80); showFKeyMsg("F4", "✓ Price Check open", "green"); }],
-                ["F5", "Discount",     () => { discountRef.current?.focus(); discountRef.current?.select(); showFKeyMsg("F5", "✓ Discount field — type amount", "green"); }],
-                ["F6", "Note",         () => { noteRef.current?.focus(); showFKeyMsg("F6", "✓ Note field active", "green"); }],
-              ] as [string, string, () => void][]).map(([key, label, action]) => {
-                const isActive = flashKey === key;
-                const msgColor = fKeyMsg?.endsWith("green") ? "green" : "amber";
-                const isGreen  = isActive && msgColor === "green";
-                const isAmber  = isActive && msgColor === "amber";
-                return (
-                  <button key={key} className="qfkey" onClick={action}
-                    style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 6, cursor: "pointer", fontFamily: ff, transition: "all .12s",
-                      background: isGreen ? "rgba(52,211,153,.1)" : isAmber ? "rgba(245,158,11,.1)" : "rgba(255,255,255,.05)",
-                      border: `1px solid ${isGreen ? "rgba(52,211,153,.3)" : isAmber ? "rgba(245,158,11,.3)" : "rgba(255,255,255,.1)"}` }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 5px", borderRadius: 3,
-                      color: isGreen ? "#34d399" : isAmber ? "#fbbf24" : "#6366f1",
-                      background: isGreen ? "rgba(52,211,153,.15)" : isAmber ? "rgba(245,158,11,.15)" : "rgba(99,102,241,.15)" }}>{key}</span>
-                    <span style={{ fontSize: 11, fontWeight: 600,
-                      color: isGreen ? "#34d399" : isAmber ? "#fbbf24" : "rgba(255,255,255,.5)" }}>{label}</span>
-                  </button>
-                );
-              })}
             </div>
 
-            {/* Category Pills */}
+            {/* Row 3: Category pills */}
             <div className="pos-scroll" style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 2 }}>
               {categories.map(c => (
                 <button key={c} className={cat !== c ? "cat-pill" : ""} onClick={() => setCat(c)}
-                  style={{ padding: "6px 16px", borderRadius: 20, whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: ff, transition: "all .12s",
-                    background: cat === c ? "#6366f1" : "rgba(255,255,255,.06)",
-                    border: cat === c ? "1.5px solid #6366f1" : "1.5px solid rgba(255,255,255,.1)",
-                    color: cat === c ? "#fff" : "rgba(255,255,255,.5)" }}>
+                  style={{ padding: "5px 14px", borderRadius: 20, whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer", fontSize: 11, fontWeight: 600, fontFamily: ff, transition: "all .12s",
+                    background: cat === c ? "#6366f1" : "rgba(255,255,255,.05)",
+                    border: cat === c ? "1.5px solid #6366f1" : "1.5px solid rgba(255,255,255,.09)",
+                    color: cat === c ? "#fff" : "rgba(255,255,255,.45)",
+                    boxShadow: cat === c ? "0 2px 10px rgba(99,102,241,.25)" : "none" }}>
                   {c}
-                  {cat === c && filtered.length > 0 && <span style={{ marginLeft: 6, background: "rgba(255,255,255,.2)", borderRadius: 10, padding: "1px 6px", fontSize: 9 }}>{filtered.length}</span>}
+                  {cat === c && filtered.length > 0 && <span style={{ marginLeft: 5, background: "rgba(255,255,255,.2)", borderRadius: 10, padding: "1px 5px", fontSize: 9 }}>{filtered.length}</span>}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Product Grid */}
-          <div className="pos-scroll" style={{ flex: 1, overflowY: "auto", padding: "12px 14px" }}>
-            {loadingProducts && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.25)", fontSize: 13 }}>Loading products...</div>}
-            {!loadingProducts && products.length === 0 && (
-              <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.25)" }}>
-                <div style={{ fontSize: 34, marginBottom: 8 }}>📦</div>
-                <div style={{ fontSize: 13, marginBottom: 6 }}>No products yet</div>
-                <a href="/dashboard/retail/catalog" style={{ fontSize: 12, color: "#6366f1", fontWeight: 600 }}>Add products →</a>
+          {/* ── Product Grid ── */}
+          <div className="pos-scroll" style={{ flex: 1, overflowY: "auto", padding: "14px" }}>
+            {loadingProducts && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 200, gap: 12, color: "rgba(255,255,255,.25)" }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", border: "3px solid rgba(99,102,241,.2)", borderTopColor: "#6366f1", animation: "spin 0.8s linear infinite" }} />
+                <span style={{ fontSize: 13 }}>Loading products…</span>
               </div>
             )}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
+            {!loadingProducts && products.length === 0 && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 200, gap: 8, color: "rgba(255,255,255,.25)" }}>
+                <div style={{ fontSize: 40, opacity: 0.4 }}>📦</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>No products yet</div>
+                <a href="/dashboard/retail/catalog" style={{ fontSize: 12, color: "#6366f1", fontWeight: 700, textDecoration: "none" }}>Add products →</a>
+              </div>
+            )}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))", gap: 10 }}>
               {paginated.map(p => {
-                const stockQty  = p.itemNewId ? (stockMap[p.itemNewId] ?? 0) : (p.catalogStock !== null ? p.catalogStock : null);
+                const stockQty   = p.itemNewId ? (stockMap[p.itemNewId] ?? 0) : (p.catalogStock !== null ? p.catalogStock : null);
                 const outOfStock = stockQty !== null && stockQty <= 0;
                 const lowStock   = stockQty !== null && stockQty > 0 && stockQty <= 5;
                 return (
                   <div key={p.id} className="prod-card" onClick={() => !outOfStock && addToCart(p)}
-                    style={{ background: "#111c30", border: `1.5px solid ${outOfStock ? "rgba(239,68,68,.18)" : "rgba(255,255,255,.08)"}`, borderRadius: 12, padding: "14px 13px 12px", userSelect: "none", opacity: outOfStock ? 0.5 : 1, cursor: outOfStock ? "not-allowed" : "pointer", position: "relative", boxSizing: "border-box" }}>
-                    {outOfStock && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,.18)", color: "#f87171", fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 4, zIndex: 1 }}>OUT</div>}
-                    {lowStock   && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(245,158,11,.15)", color: "#f59e0b", fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 4, zIndex: 1 }}>LOW</div>}
+                    style={{ background: "#111c30", border: `1.5px solid ${outOfStock ? "rgba(239,68,68,.15)" : "rgba(255,255,255,.07)"}`, borderRadius: 12, padding: "12px 12px 10px", userSelect: "none", opacity: outOfStock ? 0.48 : 1, cursor: outOfStock ? "not-allowed" : "pointer", position: "relative", boxSizing: "border-box" as const }}>
+                    {/* Stock badge */}
+                    {outOfStock && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,.2)", color: "#f87171", fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 4, zIndex: 1, letterSpacing: ".04em" }}>OUT</div>}
+                    {lowStock   && <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(245,158,11,.15)", color: "#f59e0b", fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 4, zIndex: 1, letterSpacing: ".04em" }}>LOW</div>}
+                    {/* Image or placeholder */}
                     {p.imageUrl ? (
-                      <img src={p.imageUrl} alt={p.name} style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 8, marginBottom: 8, display: "block" }} />
+                      <img src={p.imageUrl} alt={p.name} style={{ width: "100%", height: 72, objectFit: "cover", borderRadius: 8, marginBottom: 8, display: "block" }} />
                     ) : (
-                      <div style={{ width: "100%", height: 60, borderRadius: 8, background: "rgba(99,102,241,.08)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 22 }}>📦</div>
+                      <div style={{ width: "100%", height: 60, borderRadius: 8, background: "rgba(99,102,241,.07)", border: "1px solid rgba(99,102,241,.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 20, color: "rgba(99,102,241,.4)" }}>
+                        📦
+                      </div>
                     )}
-                    <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 4 }}>{p.category}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.35, marginBottom: 4, color: "#e2e8f0", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const }}>{p.name}</div>
-                    {p.sku && <div style={{ fontSize: 9, color: "rgba(255,255,255,.22)", marginBottom: 6 }}>SKU: {p.sku}</div>}
-                    <div style={{ fontSize: 17, fontWeight: 800, color: "#818cf8", marginBottom: 4 }}>Rs. {p.price.toLocaleString()}</div>
+                    {/* Category */}
+                    <div style={{ fontSize: 8, color: "rgba(255,255,255,.28)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4, fontWeight: 600 }}>{p.category}</div>
+                    {/* Name */}
+                    <div style={{ fontSize: 12, fontWeight: 700, lineHeight: 1.35, marginBottom: 3, color: "#dde6f5", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const }}>{p.name}</div>
+                    {/* SKU */}
+                    {p.sku && <div style={{ fontSize: 9, color: "rgba(255,255,255,.2)", marginBottom: 6, fontFamily: "'Courier New',monospace" }}>{p.sku}</div>}
+                    {/* Price + add button row */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
+                      <span style={{ fontSize: 17, fontWeight: 800, color: "#818cf8", letterSpacing: "-.01em" }}>Rs. {p.price.toLocaleString()}</span>
+                      {!outOfStock && (
+                        <button className="add-btn" onClick={e => { e.stopPropagation(); addToCart(p); }}
+                          style={{ width: 26, height: 26, borderRadius: 7, background: "#6366f1", border: "none", color: "#fff", fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, flexShrink: 0, transition: "background .12s" }}>+</button>
+                      )}
+                    </div>
+                    {/* Stock count */}
                     {stockQty !== null && (
-                      <div style={{ fontSize: 10, fontWeight: 600, color: outOfStock ? "#f87171" : lowStock ? "#f59e0b" : "#34d399" }}>
-                        Stock: {outOfStock ? "Out" : stockQty}
+                      <div style={{ fontSize: 10, fontWeight: 600, marginTop: 4, color: outOfStock ? "#f87171" : lowStock ? "#f59e0b" : "#34d399" }}>
+                        {outOfStock ? "Out of stock" : `Stock: ${stockQty}`}
                       </div>
                     )}
                   </div>
                 );
               })}
               {!loadingProducts && filtered.length === 0 && products.length > 0 && (
-                <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: 40, color: "rgba(255,255,255,.22)", fontSize: 12 }}>No products match "{search || cat}"</div>
+                <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: 40, color: "rgba(255,255,255,.22)", fontSize: 12 }}>
+                  No products match &quot;{search || cat}&quot;
+                </div>
               )}
             </div>
           </div>
@@ -889,91 +949,90 @@ export default function POSPage() {
           <PaginationBar />
         </div>
 
-        {/* ════ RIGHT: Cart Panel ════ */}
-        <div style={{ width: 460, background: "#0c1322", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        {/* ════ RIGHT PANEL: Cart ════ */}
+        <div style={{ width: 440, background: "#0c1322", display: "flex", flexDirection: "column", overflow: "hidden", borderLeft: "1px solid rgba(255,255,255,.06)" }}>
 
-          {/* Cart Header */}
-          <div style={{ padding: "10px 14px 8px", borderBottom: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
-            {/* Top row: Cart title + buttons */}
+          {/* ── Cart Header ── */}
+          <div style={{ padding: "10px 14px 9px", borderBottom: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
+            {/* Row 1: title + actions */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <div style={{ fontSize: 14, fontWeight: 700 }}>
-                Cart
-                <span style={{ marginLeft: 6, fontSize: 12, color: "rgba(255,255,255,.45)", fontWeight: 500 }}>({cart.length} Items)</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Cart</span>
+                <span style={{ background: cart.length > 0 ? "rgba(99,102,241,.2)" : "rgba(255,255,255,.07)", border: `1px solid ${cart.length > 0 ? "rgba(99,102,241,.35)" : "rgba(255,255,255,.1)"}`, color: cart.length > 0 ? "#a5b4fc" : "rgba(255,255,255,.3)", fontSize: 10, fontWeight: 800, borderRadius: 20, padding: "1px 8px", minWidth: 20, textAlign: "center" }}>{cart.length}</span>
               </div>
-              <div style={{ display: "flex", gap: 7 }}>
+              <div style={{ display: "flex", gap: 6 }}>
                 {receipt && (
-                  <button onClick={printReceipt} style={{ padding: "5px 10px", borderRadius: 6, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>🖨 Receipt</button>
+                  <button onClick={printReceipt} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.1)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, display: "flex", alignItems: "center", gap: 4 }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    Receipt
+                  </button>
                 )}
-                <button onClick={clearCart} style={{ padding: "5px 12px", borderRadius: 6, border: "1px solid rgba(239,68,68,.25)", background: "rgba(239,68,68,.08)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Clear</button>
-                <button onClick={() => setShowHeld(v => !v)} style={{ position: "relative", padding: "5px 12px", borderRadius: 6, border: "1px solid rgba(99,102,241,.3)", background: showHeld ? "rgba(99,102,241,.2)" : "rgba(99,102,241,.1)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
+                <button onClick={clearCart} style={{ padding: "5px 11px", borderRadius: 7, border: "1px solid rgba(239,68,68,.22)", background: "rgba(239,68,68,.07)", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Clear</button>
+                <button onClick={() => setShowHeld(v => !v)} style={{ position: "relative", padding: "5px 11px", borderRadius: 7, border: `1px solid ${showHeld ? "rgba(99,102,241,.45)" : "rgba(99,102,241,.25)"}`, background: showHeld ? "rgba(99,102,241,.2)" : "rgba(99,102,241,.08)", color: "#818cf8", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
                   Hold
                   {heldSales.length > 0 && <span style={{ position: "absolute", top: -6, right: -6, background: "#f59e0b", color: "#000", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{heldSales.length}</span>}
                 </button>
               </div>
             </div>
 
-            {/* ── Loyalty Customer Row ── always visible ── */}
+            {/* Row 2: Loyalty customer search / display */}
             <div style={{ position: "relative" }}>
               {loyaltyCustomer ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "rgba(245,158,11,.1)", border: "1px solid rgba(245,158,11,.28)", borderRadius: 9 }}>
-                  <span style={{ fontSize: 16, flexShrink: 0 }}>🎁</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.25)", borderRadius: 9 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(245,158,11,.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>🎁</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#fbbf24", lineHeight: 1.2 }}>{loyaltyCustomer.name}</div>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", marginTop: 1 }}>
-                      {loyaltyCustomer.cardNo} · <span style={{ color: "#f59e0b", fontWeight: 700 }}>{loyaltyCustomer.points} pts</span>
-                      {pointsToEarn > 0 && <span style={{ color: "#34d399", marginLeft: 4 }}>+{pointsToEarn} pts this sale</span>}
+                    <div style={{ fontSize: 10, color: "rgba(255,255,255,.38)", marginTop: 1 }}>
+                      <span style={{ fontFamily: "'Courier New',monospace" }}>{loyaltyCustomer.cardNo}</span>
+                      {" · "}<span style={{ color: "#f59e0b", fontWeight: 700 }}>{loyaltyCustomer.points} pts</span>
+                      {pointsToEarn > 0 && <span style={{ color: "#34d399", marginLeft: 5 }}>+{pointsToEarn} pts</span>}
                     </div>
                   </div>
                   {loyaltyCustomer.points >= loyaltyConfig.minRedeemPoints && (
                     <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>Redeem:</span>
-                      <input type="number" min={0} max={loyaltyCustomer.points}
-                        value={redeemPts || ""}
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)" }}>Redeem:</span>
+                      <input type="number" min={0} max={loyaltyCustomer.points} value={redeemPts || ""}
                         onChange={e => { const v = Math.max(0, Math.min(loyaltyCustomer.points, parseInt(e.target.value) || 0)); setRedeemPts(v); }}
                         placeholder="0"
-                        style={{ width: 50, textAlign: "center", background: "rgba(255,255,255,.07)", border: "1px solid rgba(245,158,11,.35)", borderRadius: 5, padding: "2px 6px", color: "#fff", fontSize: 11, fontFamily: ff, outline: "none" }} />
-                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.25)" }}>pts</span>
-                      {safeRedeemPts > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>= −Rs.{loyaltyDiscount}</span>}
+                        style={{ width: 48, textAlign: "center", background: "rgba(255,255,255,.07)", border: "1px solid rgba(245,158,11,.35)", borderRadius: 5, padding: "2px 5px", color: "#fff", fontSize: 11, fontFamily: ff, outline: "none" }} />
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.22)" }}>pts</span>
+                      {safeRedeemPts > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399" }}>−Rs.{loyaltyDiscount}</span>}
                     </div>
                   )}
                   <button onClick={() => { setLoyaltyCustomer(null); setLoyaltyQ(""); setRedeemPts(0); }}
-                    style={{ background: "none", border: "none", color: "rgba(255,255,255,.3)", fontSize: 15, cursor: "pointer", padding: 0, flexShrink: 0, lineHeight: 1 }}>✕</button>
+                    style={{ background: "none", border: "none", color: "rgba(255,255,255,.28)", fontSize: 15, cursor: "pointer", padding: 0, flexShrink: 0, lineHeight: 1 }}>✕</button>
                 </div>
               ) : (
                 <div>
-                  <input
-                    value={loyaltyQ}
+                  <input value={loyaltyQ}
                     onChange={e => { setLoyaltyQ(e.target.value); setShowLoyaltySearch(true); }}
                     onFocus={() => setShowLoyaltySearch(true)}
                     onBlur={() => setTimeout(() => setShowLoyaltySearch(false), 200)}
-                    placeholder="🎁 Loyalty customer — name, phone, or last 4+ card digits..."
-                    style={{ width: "100%", boxSizing: "border-box" as const, background: "rgba(245,158,11,.05)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,255,255,.65)", fontSize: 11, fontFamily: ff, outline: "none" }} />
+                    placeholder="🎁 Loyalty customer — name, phone, or card no…"
+                    style={{ width: "100%", boxSizing: "border-box" as const, background: "rgba(245,158,11,.04)", border: "1px solid rgba(245,158,11,.18)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,255,255,.6)", fontSize: 11, fontFamily: ff, outline: "none" }} />
                   {showLoyaltySearch && lcResults.length > 0 && (
-                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#141e33", border: "1px solid rgba(245,158,11,.3)", borderRadius: 9, zIndex: 60, marginTop: 4, overflow: "hidden", boxShadow: "0 12px 32px rgba(0,0,0,.65)" }}>
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#141e33", border: "1px solid rgba(245,158,11,.28)", borderRadius: 9, zIndex: 60, marginTop: 4, overflow: "hidden", boxShadow: "0 14px 36px rgba(0,0,0,.7)" }}>
                       {lcResults.map(r => (
-                        <div key={r.id}
-                          onMouseDown={() => {
-                            setLoyaltyCustomer({ id: r.id, name: r.title, cardNo: String(r.data?.cardNo || ""), phone: String(r.data?.phone || ""), points: r.amount || 0, totalSpent: Number(r.data?.totalSpent) || 0 });
-                            setLoyaltyQ(""); setShowLoyaltySearch(false); setRedeemPts(0);
-                          }}
-                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 13px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
-                          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(245,158,11,.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#f59e0b", fontWeight: 800, flexShrink: 0 }}>{r.title.charAt(0).toUpperCase()}</div>
+                        <div key={r.id} onMouseDown={() => { setLoyaltyCustomer({ id: r.id, name: r.title, cardNo: String(r.data?.cardNo || ""), phone: String(r.data?.phone || ""), points: r.amount || 0, totalSpent: Number(r.data?.totalSpent) || 0 }); setLoyaltyQ(""); setShowLoyaltySearch(false); setRedeemPts(0); }}
+                          style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 13px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                          <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(245,158,11,.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#f59e0b", fontWeight: 800, flexShrink: 0 }}>{r.title.charAt(0).toUpperCase()}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 12, fontWeight: 700, color: "#e2e8f0" }}>{r.title}</div>
-                            <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)" }}>{String(r.data?.cardNo || "")} · {String(r.data?.phone || "")}</div>
+                            <div style={{ fontSize: 10, color: "rgba(255,255,255,.38)" }}>{String(r.data?.cardNo || "")} · {String(r.data?.phone || "")}</div>
                           </div>
                           <div style={{ textAlign: "right", flexShrink: 0 }}>
-                            <div style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b" }}>{r.amount || 0}</div>
-                            <div style={{ fontSize: 9, color: "rgba(255,255,255,.3)" }}>pts</div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: "#f59e0b" }}>{r.amount || 0}</div>
+                            <div style={{ fontSize: 9, color: "rgba(255,255,255,.28)" }}>pts</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
                   {showLoyaltySearch && loyaltyQ.length >= 2 && lcResults.length === 0 && (
-                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#141e33", border: "1px solid rgba(255,255,255,.1)", borderRadius: 9, zIndex: 60, marginTop: 4, padding: "12px 14px", textAlign: "center", color: "rgba(255,255,255,.35)", fontSize: 12 }}>
-                      No loyalty customers found ·{" "}
-                      <a href="/dashboard/retail/loyalty" style={{ color: "#f59e0b", textDecoration: "none", fontWeight: 700 }}>Register one →</a>
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#141e33", border: "1px solid rgba(255,255,255,.09)", borderRadius: 9, zIndex: 60, marginTop: 4, padding: "12px 14px", textAlign: "center", color: "rgba(255,255,255,.32)", fontSize: 12 }}>
+                      No customers found ·{" "}
+                      <a href="/dashboard/retail/loyalty" style={{ color: "#f59e0b", textDecoration: "none", fontWeight: 700 }}>Register →</a>
                     </div>
                   )}
                 </div>
@@ -981,238 +1040,285 @@ export default function POSPage() {
             </div>
           </div>
 
-          {/* Column Headers */}
+          {/* ── Column Headers ── */}
           {cart.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: "24px 1fr 72px 90px 60px 70px 20px", gap: 4, padding: "5px 14px", borderBottom: "1px solid rgba(255,255,255,.05)", background: "rgba(255,255,255,.02)", flexShrink: 0 }}>
-              {(["#", "Item", "Price", "Qty", "Discount", "Total", ""] as string[]).map((h, i) => (
-                <div key={i} style={{ fontSize: 9, color: "rgba(255,255,255,.3)", letterSpacing: ".06em", textTransform: "uppercase", textAlign: i >= 2 && i <= 5 ? "right" : "left" }}>{h}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, padding: "5px 14px", borderBottom: "1px solid rgba(255,255,255,.05)", background: "rgba(255,255,255,.018)", flexShrink: 0 }}>
+              {(["#", "Item", "Price", "Qty", "Disc", "Total", ""] as string[]).map((h, i) => (
+                <div key={i} style={{ fontSize: 8, color: "rgba(255,255,255,.28)", letterSpacing: ".07em", textTransform: "uppercase", fontWeight: 700, textAlign: i >= 2 && i <= 5 ? "right" : "left" }}>{h}</div>
               ))}
             </div>
           )}
 
-          {/* Cart Items */}
+          {/* ── Cart Items ── */}
           <div className="pos-scroll" style={{ flex: 1, overflowY: "auto", padding: cart.length === 0 ? 0 : "4px 10px" }}>
             {cart.length === 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", color: "rgba(255,255,255,.18)", gap: 10 }}>
-                <div style={{ fontSize: 44 }}>🛒</div>
-                <div style={{ fontSize: 13, fontWeight: 600 }}>Cart is empty</div>
-                <div style={{ fontSize: 11 }}>Tap a product · press F2 to search</div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", color: "rgba(255,255,255,.16)", gap: 10 }}>
+                <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>🛒</div>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>Cart is empty</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.2)" }}>Tap a product or press F2 to search</div>
               </div>
             ) : cart.map((item, idx) => {
               const lineTotal = item.price * item.qty - (item.itemDiscount || 0) * item.qty;
               return (
-                <div key={item.id} style={{ display: "grid", gridTemplateColumns: "24px 1fr 72px 90px 60px 70px 20px", gap: 4, alignItems: "center", padding: "8px 4px", marginBottom: 3, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", textAlign: "center" }}>{idx + 1}</div>
+                <div key={item.id} style={{ display: "grid", gridTemplateColumns: "22px 1fr 68px 88px 58px 68px 18px", gap: 4, alignItems: "center", padding: "7px 4px", marginBottom: 2, borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.22)", textAlign: "center" }}>{idx + 1}</div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#e2e8f0" }}>{item.name}</div>
-                    {item.sku && <div style={{ fontSize: 9, color: "rgba(255,255,255,.28)", marginTop: 1 }}>SKU: {item.sku}</div>}
+                    <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#dde6f5" }}>{item.name}</div>
+                    {item.sku && <div style={{ fontSize: 9, color: "rgba(255,255,255,.24)", marginTop: 1, fontFamily: "'Courier New',monospace" }}>{item.sku}</div>}
                   </div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)", textAlign: "right" }}>Rs. {item.price.toLocaleString()}</div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 3, justifyContent: "flex-end" }}>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.45)", textAlign: "right" }}>Rs.{item.price.toLocaleString()}</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 2, justifyContent: "flex-end" }}>
                     <button className="qty-btn" onClick={() => changeQty(item.id, -1)}
-                      style={{ width: 22, height: 22, background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.12)", color: "rgba(255,255,255,.6)", fontSize: 14, cursor: "pointer", borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: ff }}>−</button>
+                      style={{ width: 20, height: 20, background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.12)", color: "rgba(255,255,255,.6)", fontSize: 13, cursor: "pointer", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: ff, flexShrink: 0 }}>−</button>
                     <input type="number" min={1} value={item.qty === 0 ? "" : item.qty}
                       onChange={e => setQty(item.id, e.target.value)}
                       onBlur={e => commitQty(item.id, e.target.value)}
                       onFocus={e => e.target.select()}
-                      style={{ width: 28, textAlign: "center", fontSize: 12, fontWeight: 700, color: "#fff", background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 5, padding: "1px 0", outline: "none", fontFamily: ff }} />
+                      style={{ width: 28, textAlign: "center", fontSize: 12, fontWeight: 700, color: "#fff", background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 4, padding: "1px 0", outline: "none", fontFamily: ff }} />
                     <button className="qty-btn" onClick={() => changeQty(item.id, 1)}
-                      style={{ width: 22, height: 22, background: "#6366f1", border: "none", color: "#fff", fontSize: 14, cursor: "pointer", borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: ff }}>+</button>
+                      style={{ width: 20, height: 20, background: "#6366f1", border: "none", color: "#fff", fontSize: 13, cursor: "pointer", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: ff, flexShrink: 0 }}>+</button>
                   </div>
                   <div>
                     <input type="number" min={0} value={item.itemDiscount || ""}
                       onChange={e => setItemDisc(item.id, e.target.value)}
-                      placeholder="0.00"
-                      style={{ width: "100%", textAlign: "right", fontSize: 10, color: item.itemDiscount ? "#fbbf24" : "rgba(255,255,255,.28)", background: "transparent", border: `1px solid ${item.itemDiscount ? "rgba(245,158,11,.3)" : "rgba(255,255,255,.08)"}`, borderRadius: 5, padding: "3px 5px", outline: "none", fontFamily: ff, boxSizing: "border-box" }} />
+                      placeholder="0"
+                      style={{ width: "100%", textAlign: "right", fontSize: 10, color: item.itemDiscount ? "#fbbf24" : "rgba(255,255,255,.25)", background: "transparent", border: `1px solid ${item.itemDiscount ? "rgba(245,158,11,.28)" : "rgba(255,255,255,.07)"}`, borderRadius: 4, padding: "3px 4px", outline: "none", fontFamily: ff, boxSizing: "border-box" as const }} />
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc", textAlign: "right" }}>Rs. {lineTotal.toLocaleString()}</div>
-                  <button onClick={() => removeItem(item.id)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.2)", fontSize: 13, cursor: "pointer", padding: 0, textAlign: "center" }}>✕</button>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#a5b4fc", textAlign: "right" }}>Rs.{lineTotal.toLocaleString()}</div>
+                  <button onClick={() => removeItem(item.id)} style={{ background: "none", border: "none", color: "rgba(255,255,255,.18)", fontSize: 13, cursor: "pointer", padding: 0, textAlign: "center", lineHeight: 1 }}>✕</button>
                 </div>
               );
             })}
           </div>
 
-          {/* Add item note */}
+          {/* ── Item Note ── */}
           {cart.length > 0 && (
-            <div style={{ padding: "6px 14px", borderTop: "1px solid rgba(255,255,255,.05)", flexShrink: 0 }}>
-              <input ref={noteRef} value={itemNote} onChange={e => setItemNote(e.target.value)} placeholder="✏ Add item note..."
-                style={{ width: "100%", boxSizing: "border-box" as const, background: "transparent", border: "none", borderBottom: "1px dashed rgba(255,255,255,.1)", color: "rgba(255,255,255,.4)", fontSize: 11, fontFamily: ff, outline: "none", padding: "4px 2px" }} />
+            <div style={{ padding: "6px 14px", borderBottom: "1px dashed rgba(255,255,255,.06)", flexShrink: 0 }}>
+              <input ref={noteRef} value={itemNote} onChange={e => setItemNote(e.target.value)} placeholder="✏ Add order note…"
+                style={{ width: "100%", boxSizing: "border-box" as const, background: "transparent", border: "none", borderBottom: "1px dashed rgba(255,255,255,.1)", color: "rgba(255,255,255,.38)", fontSize: 11, fontFamily: ff, outline: "none", padding: "4px 2px" }} />
             </div>
           )}
 
-          {/* Summary + Payment */}
-          <div style={{ padding: "12px 16px 14px", borderTop: "1px solid rgba(255,255,255,.08)", flexShrink: 0 }}>
+          {/* ── Summary + Payment ── */}
+          <div style={{ padding: "10px 14px 12px", borderTop: "1px solid rgba(255,255,255,.07)", flexShrink: 0 }}>
 
-            {/* Summary Lines */}
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgba(255,255,255,.5)", marginBottom: 7 }}>
-                <span>Subtotal</span><span>Rs. {subtotal.toLocaleString()}</span>
+            {/* Compact summary rows */}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "rgba(255,255,255,.38)", marginBottom: 4 }}>
+                <span>Subtotal</span>
+                <span>Rs. {subtotal.toLocaleString()}</span>
               </div>
-              {/* Discount row */}
-              {/* Discount Code */}
-              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
-                <input value={discountCode} onChange={e => setDiscountCode(e.target.value)} onKeyDown={e => e.key === "Enter" && applyDiscountCode()} placeholder="Discount code" style={{ flex: 1, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 5, padding: "4px 7px", color: "#fff", fontSize: 11, fontFamily: ff, outline: "none" }} />
-                <button onClick={applyDiscountCode} style={{ background: "rgba(99,102,241,.2)", border: "1px solid rgba(99,102,241,.35)", borderRadius: 5, padding: "4px 8px", color: "#a5b4fc", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Apply</button>
+
+              {/* Promo code + discount in one row */}
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+                <input value={discountCode} onChange={e => setDiscountCode(e.target.value)} onKeyDown={e => e.key === "Enter" && applyDiscountCode()}
+                  placeholder="Promo code…"
+                  style={{ flex: 1, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 6, padding: "4px 8px", color: "#fff", fontSize: 10, fontFamily: ff, outline: "none" }} />
+                <button onClick={applyDiscountCode}
+                  style={{ background: "rgba(99,102,241,.15)", border: "1px solid rgba(99,102,241,.25)", borderRadius: 6, padding: "4px 8px", color: "#a5b4fc", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: ff, whiteSpace: "nowrap" }}>Apply</button>
+                <input ref={discountRef} value={discount} onChange={e => setDiscount(e.target.value)} placeholder="Disc" type="number" min="0"
+                  style={{ width: 48, textAlign: "right", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 6, padding: "4px 6px", color: "#fff", fontSize: 10, fontFamily: ff, outline: "none" }} />
               </div>
-              {discountCodeMsg && <div style={{ fontSize: 11, marginBottom: 5, color: discountCodeMsg.ok ? "#34d399" : "#f87171" }}>{discountCodeMsg.text}</div>}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Discount</span>
-                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <input ref={discountRef} value={discount} onChange={e => setDiscount(e.target.value)} placeholder="0.00" type="number" min="0"
-                    style={{ width: 64, textAlign: "right", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 5, padding: "3px 7px", color: "#fff", fontSize: 12, fontFamily: ff, outline: "none" }} />
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)", background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 5, padding: "3px 7px" }}>Rs.</span>
-                  <span style={{ fontSize: 12, color: discAmt > 0 ? "#f87171" : "rgba(255,255,255,.35)", fontWeight: discAmt > 0 ? 700 : 400, minWidth: 55, textAlign: "right" }}>
-                    {discAmt > 0 ? discAmt.toLocaleString() : "0.00"}
-                  </span>
-                </div>
-              </div>
-              {/* Tax row */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 7 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>Tax</span>
-                  <input value={taxRate} onChange={e => setTaxRate(e.target.value)} placeholder="0" type="number" min="0" max="100"
-                    style={{ width: 42, textAlign: "center", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 5, padding: "3px 6px", color: "#fbbf24", fontSize: 11, fontFamily: ff, outline: "none" }} />
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>%</span>
-                </div>
-                <span style={{ fontSize: 12, color: taxAmt > 0 ? "#fbbf24" : "rgba(255,255,255,.35)", fontWeight: taxAmt > 0 ? 700 : 400 }}>
-                  {taxAmt > 0 ? `Rs. ${taxAmt.toLocaleString()}` : "Rs. 0.00"}
-                </span>
-              </div>
-              {/* Rounding */}
-              {Math.abs(rounding) > 0.001 && (
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 7 }}>
-                  <span>Rounding</span><span>Rs. {rounding.toFixed(2)}</span>
+              {discountCodeMsg && (
+                <div style={{ fontSize: 10, marginBottom: 4, color: discountCodeMsg.ok ? "#34d399" : "#f87171" }}>{discountCodeMsg.text}</div>
+              )}
+
+              {/* Disc + Tax values */}
+              {(discAmt > 0 || taxAmt > 0 || Math.abs(rounding) > 0.001) && (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    {discAmt > 0 && <span style={{ fontSize: 10, color: "#f87171", fontWeight: 600 }}>−Rs. {discAmt.toLocaleString()} disc</span>}
+                    <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                      <input value={taxRate} onChange={e => setTaxRate(e.target.value)} placeholder="0" type="number" min="0" max="100"
+                        style={{ width: 30, textAlign: "center", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 4, padding: "2px 4px", color: "#fbbf24", fontSize: 10, fontFamily: ff, outline: "none" }} />
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.28)" }}>% tax</span>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    {taxAmt > 0 && <span style={{ fontSize: 10, color: "#fbbf24", fontWeight: 600 }}>+Rs. {taxAmt.toLocaleString()}</span>}
+                    {Math.abs(rounding) > 0.001 && <span style={{ fontSize: 10, color: "rgba(255,255,255,.28)", marginLeft: 6 }}>rnd {rounding.toFixed(2)}</span>}
+                  </div>
                 </div>
               )}
-              {/* Loyalty Discount */}
+
+              {/* Loyalty discount */}
               {loyaltyDiscount > 0 && (
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#34d399", fontWeight: 700, marginBottom: 7, padding: "5px 8px", background: "rgba(52,211,153,.06)", borderRadius: 6, border: "1px solid rgba(52,211,153,.15)" }}>
-                  <span>🎁 Loyalty Redeem ({safeRedeemPts} pts)</span>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#34d399", fontWeight: 700, marginBottom: 5, padding: "4px 8px", background: "rgba(52,211,153,.06)", borderRadius: 6, border: "1px solid rgba(52,211,153,.13)" }}>
+                  <span>🎁 Loyalty ({safeRedeemPts} pts)</span>
                   <span>−Rs. {loyaltyDiscount.toLocaleString()}</span>
                 </div>
               )}
-              {/* Grand Total */}
-              <div style={{ borderTop: "1px solid rgba(255,255,255,.08)", paddingTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Grand Total</span>
-                <span style={{ fontSize: 26, fontWeight: 800, color: cart.length > 0 ? "#818cf8" : "rgba(255,255,255,.2)", letterSpacing: "-.02em" }}>
-                  Rs. {finalTotal.toLocaleString()}
-                </span>
+            </div>
+
+            {/* Grand Total — prominent box */}
+            <div style={{ background: "linear-gradient(135deg,rgba(99,102,241,.14),rgba(79,70,229,.06))", border: `1.5px solid ${cart.length > 0 ? "rgba(99,102,241,.32)" : "rgba(255,255,255,.08)"}`, borderRadius: 13, padding: "11px 14px", marginBottom: 9, transition: "border-color .15s" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 8, color: "rgba(255,255,255,.32)", letterSpacing: ".09em", textTransform: "uppercase", marginBottom: 3 }}>Grand Total</div>
+                  <div style={{ fontSize: 27, fontWeight: 900, color: cart.length > 0 ? "#818cf8" : "rgba(255,255,255,.18)", letterSpacing: "-.025em", lineHeight: 1 }}>
+                    Rs.&nbsp;{finalTotal.toLocaleString()}
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.28)", marginBottom: 2 }}>{cart.length} item{cart.length !== 1 ? "s" : ""}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,.2)" }}>{totalQty} qty</div>
+                </div>
               </div>
             </div>
 
-            {/* Payment Method */}
-            <div style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>Payment Method</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+            {/* Payment method 2×2 */}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 }}>
                 {PAY_METHODS.map(m => (
                   <button key={m.id} className="pay-opt" onClick={() => { setPayMethod(m.id as typeof payMethod); setTendered(""); setTxRef(""); }}
-                    style={{ padding: "9px 8px", borderRadius: 9, border: `1.5px solid ${payMethod === m.id ? m.color : "rgba(255,255,255,.08)"}`,
-                      background: payMethod === m.id ? `${m.color}1a` : "rgba(255,255,255,.03)",
-                      color: payMethod === m.id ? m.color : "rgba(255,255,255,.35)",
-                      fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s", textAlign: "center" }}>
+                    style={{ padding: "7px 8px", borderRadius: 8, border: `1.5px solid ${payMethod === m.id ? m.color : "rgba(255,255,255,.07)"}`,
+                      background: payMethod === m.id ? `${m.color}20` : "rgba(255,255,255,.03)",
+                      color: payMethod === m.id ? m.color : "rgba(255,255,255,.28)",
+                      fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s", textAlign: "center",
+                      boxShadow: payMethod === m.id ? `0 2px 12px ${m.color}22` : "none" }}>
                     {m.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Amount Received — prominent input, always visible */}
+            {/* Amount received */}
             <div style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.35)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 6 }}>Amount Received</div>
               <input ref={tenderedRef} value={tendered} onChange={e => setTendered(e.target.value)}
-                placeholder="Enter amount…" type="number" min="0"
-                style={{ width: "100%", textAlign: "left", background: "rgba(255,255,255,.06)", border: `2px solid ${tenderedAmt >= finalTotal && finalTotal > 0 ? "rgba(52,211,153,.5)" : "rgba(255,255,255,.12)"}`, borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 18, fontFamily: ff, outline: "none", fontWeight: 700, boxSizing: "border-box", transition: "border-color .15s" }} />
-
-              {/* Change due */}
+                placeholder="Amount received…" type="number" min="0"
+                style={{ width: "100%", textAlign: "left", background: "rgba(255,255,255,.06)", border: `2px solid ${tenderedAmt >= finalTotal && finalTotal > 0 ? "rgba(52,211,153,.55)" : "rgba(255,255,255,.1)"}`, borderRadius: 10, padding: "9px 14px", color: "#fff", fontSize: 17, fontFamily: ff, outline: "none", fontWeight: 700, boxSizing: "border-box" as const, transition: "border-color .15s" }} />
               {tenderedAmt >= finalTotal && finalTotal > 0 && (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 14, color: "#34d399", fontWeight: 700, padding: "8px 14px", background: "rgba(52,211,153,.08)", borderRadius: 9, border: "1px solid rgba(52,211,153,.2)", marginTop: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#34d399", fontWeight: 700, padding: "6px 12px", background: "rgba(52,211,153,.07)", borderRadius: 7, border: "1px solid rgba(52,211,153,.16)", marginTop: 5 }}>
                   <span>Change Due</span>
-                  <span style={{ fontSize: 16 }}>Rs. {change.toLocaleString()}</span>
+                  <span>Rs. {change.toLocaleString()}</span>
                 </div>
               )}
-
-              {/* Quick amounts — only for Cash */}
               {payMethod === "cash" && (
-                <div style={{ display: "flex", gap: 5, marginTop: 7 }}>
+                <div style={{ display: "flex", gap: 4, marginTop: 5 }}>
                   {QUICK_AMTS.map(amt => (
                     <button key={amt} className="quick-amt" onClick={() => setTendered(String(amt))}
-                      style={{ flex: 1, padding: "6px 0", borderRadius: 7, border: `1px solid ${Number(tendered) === amt ? "rgba(16,185,129,.4)" : "rgba(255,255,255,.1)"}`, background: Number(tendered) === amt ? "rgba(16,185,129,.12)" : "rgba(255,255,255,.04)", color: Number(tendered) === amt ? "#34d399" : "rgba(255,255,255,.45)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .1s" }}>
+                      style={{ flex: 1, padding: "4px 0", borderRadius: 5, border: `1px solid ${Number(tendered) === amt ? "rgba(16,185,129,.4)" : "rgba(255,255,255,.09)"}`, background: Number(tendered) === amt ? "rgba(16,185,129,.12)" : "rgba(255,255,255,.04)", color: Number(tendered) === amt ? "#34d399" : "rgba(255,255,255,.38)", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .1s" }}>
                       {amt >= 1000 ? `${amt / 1000}K` : amt}
                     </button>
                   ))}
                   <button className="quick-amt" onClick={() => setTendered(String(finalTotal))}
-                    style={{ flex: 1, padding: "6px 0", borderRadius: 7, border: "1px solid rgba(52,211,153,.25)", background: "rgba(52,211,153,.07)", color: "#34d399", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>
-                    Exact
-                  </button>
+                    style={{ flex: 1, padding: "4px 0", borderRadius: 5, border: "1px solid rgba(52,211,153,.22)", background: "rgba(52,211,153,.06)", color: "#34d399", fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: ff }}>Exact</button>
                 </div>
               )}
-
-              {/* Reference / Transaction No. — for non-cash */}
               {payMethod !== "cash" && (
                 <input value={txRef} onChange={e => setTxRef(e.target.value)}
                   placeholder={payMethod === "card" ? "Card last 4 digits or ref…" : payMethod === "cheque" ? "Cheque number…" : "Transaction / reference no…"}
-                  style={{ width: "100%", marginTop: 8, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 9, padding: "9px 12px", color: "rgba(255,255,255,.7)", fontSize: 12, fontFamily: ff, outline: "none", boxSizing: "border-box" }} />
+                  style={{ width: "100%", marginTop: 6, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,255,255,.6)", fontSize: 11, fontFamily: ff, outline: "none", boxSizing: "border-box" as const }} />
               )}
             </div>
 
+            {/* Checkout error */}
             {checkoutError && (
-              <div style={{ marginTop: 8, padding: "7px 10px", borderRadius: 7, background: "rgba(248,113,113,.09)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5", fontSize: 11 }}>
-                {checkoutError}
+              <div style={{ padding: "6px 10px", borderRadius: 7, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.18)", color: "#fca5a5", fontSize: 11, marginBottom: 8, display: "flex", alignItems: "flex-start", gap: 6 }}>
+                <span style={{ flexShrink: 0 }}>⚠</span>{checkoutError}
               </div>
             )}
+
+            {/* COMPLETE SALE button — primary checkout action */}
+            <button className="checkout-btn" onClick={checkout} disabled={cart.length === 0 || processingCheckout}
+              style={{ width: "100%", height: 50, borderRadius: 13, border: "none",
+                background: cart.length > 0
+                  ? processingCheckout
+                    ? "rgba(16,185,129,.5)"
+                    : "linear-gradient(135deg,#10b981,#059669)"
+                  : "rgba(255,255,255,.06)",
+                color: cart.length > 0 ? "#fff" : "rgba(255,255,255,.18)",
+                fontSize: 14, fontWeight: 800, cursor: cart.length > 0 ? "pointer" : "not-allowed",
+                fontFamily: ff, display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                boxShadow: cart.length > 0 && !processingCheckout ? "0 4px 22px rgba(16,185,129,.3), inset 0 1px 0 rgba(255,255,255,.12)" : "none",
+                letterSpacing: "-.01em", transition: "all .12s" }}>
+              {processingCheckout ? (
+                <>
+                  <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid rgba(255,255,255,.3)", borderTopColor: "#fff", animation: "spin 0.7s linear infinite" }} />
+                  Processing…
+                </>
+              ) : cart.length === 0 ? (
+                <span style={{ fontSize: 13 }}>Add items to checkout</span>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  Complete Sale
+                  <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.55)", background: "rgba(255,255,255,.12)", padding: "2px 6px", borderRadius: 4, letterSpacing: ".04em" }}>F10</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════ */}
-      {/* ── BOTTOM ACTION BAR ── */}
-      {/* ══════════════════════════════════════════════════════ */}
-      <div style={{ display: "flex", alignItems: "center", background: "#080e1c", borderTop: "1px solid rgba(255,255,255,.08)", flexShrink: 0, height: 58 }}>
-        {/* F7 Hold Invoice */}
+      {/* ════════════════════════════════════════════
+          BOTTOM SHORTCUT BAR
+      ════════════════════════════════════════════ */}
+      <div style={{ display: "flex", alignItems: "center", background: "#070c18", borderTop: "1px solid rgba(255,255,255,.06)", flexShrink: 0, height: 42 }}>
+        {/* Shortcut keys */}
+        {([
+          ["F2", "Search",   () => { searchRef.current?.focus(); showFKeyMsg("F2", "✓ Search focused", "green"); }],
+          ["F3", "Hold",     () => holdCart()],
+          ["F4", "Price",    () => { setShowPriceCheck(true); setPriceCheckQ(""); setTimeout(() => priceCheckRef.current?.focus(), 80); }],
+          ["F5", "Discount", () => { discountRef.current?.focus(); discountRef.current?.select(); }],
+          ["F6", "Note",     () => noteRef.current?.focus()],
+        ] as [string, string, () => void][]).map(([key, label, action]) => (
+          <button key={key} onClick={action}
+            style={{ height: "100%", padding: "0 13px", display: "flex", alignItems: "center", gap: 5, background: "transparent", border: "none", borderRight: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.32)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: ff, flexShrink: 0, transition: "color .1s" }}>
+            <span style={{ fontSize: 8, fontWeight: 800, color: "#6366f1", background: "rgba(99,102,241,.14)", padding: "1px 4px", borderRadius: 3 }}>{key}</span>
+            {label}
+          </button>
+        ))}
+
+        {/* F7 Hold with badge */}
         <button onClick={holdCart}
-          style={{ height: "100%", padding: "0 22px", display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.04)", border: "none", borderRight: "1px solid rgba(255,255,255,.07)", color: "rgba(255,255,255,.55)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s", flexShrink: 0, position: "relative" }}>
-          <span style={{ fontSize: 10, fontWeight: 800, color: "#6366f1", background: "rgba(99,102,241,.15)", padding: "2px 6px", borderRadius: 3 }}>F7</span>
-          Hold Invoice
-          {heldSales.length > 0 && <span style={{ position: "absolute", top: 8, right: 8, background: "#f59e0b", color: "#000", borderRadius: "50%", width: 16, height: 16, fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{heldSales.length}</span>}
-        </button>
-        {/* F8 Print Preview */}
-        <button onClick={() => { if (receipt) printReceipt(); else showFKeyMsg("F8", "F8 — No receipt yet, complete a sale first", "amber"); }}
-          style={{ height: "100%", padding: "0 22px", display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.04)", border: "none", borderRight: "1px solid rgba(255,255,255,.07)", color: flashKey === "F8" ? "#fbbf24" : "rgba(255,255,255,.55)", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: ff, transition: "all .12s", flexShrink: 0 }}>
-          <span style={{ fontSize: 10, fontWeight: 800, color: flashKey === "F8" ? "#fbbf24" : "#6366f1", background: flashKey === "F8" ? "rgba(245,158,11,.15)" : "rgba(99,102,241,.15)", padding: "2px 6px", borderRadius: 3 }}>F8</span>
-          Print Preview
+          style={{ height: "100%", padding: "0 13px", display: "flex", alignItems: "center", gap: 5, background: "transparent", border: "none", borderRight: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.32)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: ff, flexShrink: 0, position: "relative" }}>
+          <span style={{ fontSize: 8, fontWeight: 800, color: "#6366f1", background: "rgba(99,102,241,.14)", padding: "1px 4px", borderRadius: 3 }}>F7</span>
+          Hold
+          {heldSales.length > 0 && <span style={{ background: "#f59e0b", color: "#000", borderRadius: "50%", width: 14, height: 14, fontSize: 8, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>{heldSales.length}</span>}
         </button>
 
-        {/* Center summary */}
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 24, padding: "0 20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Items</span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{cart.length}</span>
-          </div>
-          <div style={{ width: 1, height: 18, background: "rgba(255,255,255,.1)" }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Total Qty</span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{totalQty}</span>
-          </div>
-          <div style={{ width: 1, height: 18, background: "rgba(255,255,255,.1)" }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Total</span>
-            <span style={{ fontSize: 16, fontWeight: 800, color: cart.length > 0 ? "#818cf8" : "rgba(255,255,255,.25)" }}>Rs. {finalTotal.toLocaleString()}</span>
-          </div>
+        {/* F8 last receipt */}
+        <button onClick={() => { if (receipt) printReceipt(); else showFKeyMsg("F8", "No receipt yet — complete a sale first", "amber"); }}
+          style={{ height: "100%", padding: "0 13px", display: "flex", alignItems: "center", gap: 5, background: "transparent", border: "none", borderRight: "1px solid rgba(255,255,255,.05)", color: flashKey === "F8" ? "#fbbf24" : "rgba(255,255,255,.32)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: ff, flexShrink: 0 }}>
+          <span style={{ fontSize: 8, fontWeight: 800, color: flashKey === "F8" ? "#fbbf24" : "#6366f1", background: flashKey === "F8" ? "rgba(245,158,11,.14)" : "rgba(99,102,241,.14)", padding: "1px 4px", borderRadius: 3 }}>F8</span>
+          Receipt
+        </button>
+
+        {/* Center: session indicator */}
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
+          {activeSession ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(16,185,129,.06)", border: "1px solid rgba(16,185,129,.16)", borderRadius: 20, padding: "3px 11px" }}>
+              <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#10b981", display: "inline-block", animation: "pulse-dot 2s ease-in-out infinite" }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#34d399" }}>{activeSession.title || "Session Active"}</span>
+            </div>
+          ) : (
+            <span style={{ fontSize: 10, color: "rgba(255,255,255,.18)", fontWeight: 600 }}>No active session</span>
+          )}
+          {cart.length > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,.28)" }}>{cart.length} items · {totalQty} qty</span>
+              <span style={{ width: 1, height: 12, background: "rgba(255,255,255,.1)" }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#818cf8" }}>Rs. {finalTotal.toLocaleString()}</span>
+            </div>
+          )}
         </div>
 
-        {/* Pay & Print */}
-        <button onClick={checkout} disabled={cart.length === 0 || processingCheckout}
-          style={{ height: "100%", padding: "0 24px", display: "flex", alignItems: "center", gap: 8, background: cart.length > 0 ? "linear-gradient(135deg,#059669,#10b981)" : "rgba(255,255,255,.06)", border: "none", borderLeft: "1px solid rgba(255,255,255,.07)", color: cart.length > 0 ? "#fff" : "rgba(255,255,255,.2)", fontSize: 13, fontWeight: 700, cursor: cart.length > 0 ? "pointer" : "not-allowed", fontFamily: ff, flexShrink: 0, transition: "opacity .15s" }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          {processingCheckout ? "Processing..." : "Pay & Print"}
+        {/* Right actions */}
+        <button onClick={startScanner}
+          style={{ height: "100%", padding: "0 13px", display: "flex", alignItems: "center", gap: 5, background: "transparent", border: "none", borderLeft: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.32)", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: ff, flexShrink: 0 }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 8V6a2 2 0 0 1 2-2h2M2 16v2a2 2 0 0 0 2 2h2M22 8V6a2 2 0 0 0-2-2h-2M22 16v2a2 2 0 0 1-2 2h-2"/><rect x="7" y="9" width="10" height="6" rx="1"/></svg>
+          Scan
         </button>
-
-        {/* F10 Pay */}
-        <button onClick={checkout} disabled={cart.length === 0 || processingCheckout}
-          style={{ height: "100%", padding: "0 28px", display: "flex", alignItems: "center", gap: 8, background: cart.length > 0 ? "#6366f1" : "rgba(255,255,255,.05)", border: "none", borderLeft: "1px solid rgba(255,255,255,.07)", color: cart.length > 0 ? "#fff" : "rgba(255,255,255,.2)", fontSize: 14, fontWeight: 800, cursor: cart.length > 0 ? "pointer" : "not-allowed", fontFamily: ff, flexShrink: 0, boxShadow: cart.length > 0 ? "inset 0 0 0 1px rgba(255,255,255,.1)" : "none" }}>
-          <span style={{ fontSize: 9, fontWeight: 800, color: cart.length > 0 ? "#c7d2fe" : "rgba(255,255,255,.2)", background: "rgba(255,255,255,.12)", padding: "2px 6px", borderRadius: 3 }}>F10</span>
-          Pay  →
-        </button>
+        <a href="/dashboard/retail/sales-history"
+          style={{ height: "100%", padding: "0 13px", display: "flex", alignItems: "center", gap: 5, background: "transparent", borderLeft: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.32)", fontSize: 11, fontWeight: 600, textDecoration: "none", flexShrink: 0 }}>
+          History
+        </a>
+        <a href="/dashboard/retail/pos-sessions"
+          style={{ height: "100%", padding: "0 14px", display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,.025)", borderLeft: "1px solid rgba(255,255,255,.05)", color: "rgba(255,255,255,.38)", fontSize: 11, fontWeight: 700, textDecoration: "none", flexShrink: 0 }}>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          Session
+        </a>
       </div>
 
       {/* ── Held Sales Panel ── */}
