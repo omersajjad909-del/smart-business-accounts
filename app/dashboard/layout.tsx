@@ -4,7 +4,12 @@ import { fmtDate } from "@/lib/dateUtils";
 import { useEffect, useState, useRef, Suspense, createContext, useContext } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { getCurrentUser, setCurrentUser as storeUser, updateStoredUser } from "@/lib/auth";
+import {
+  getCurrentUser,
+  getStoredDemoBusinessPreference,
+  setCurrentUser as storeUser,
+  updateStoredUser,
+} from "@/lib/auth";
 import { logout } from "@/lib/logout";
 import { hasPermission as baseHasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -156,7 +161,7 @@ export default function DashboardLayout({
   const initialUser = getCurrentUser() as CurrentUser;
   const initialDemoBusiness =
     typeof window !== "undefined" && initialUser?.email === "finovaos.app@gmail.com"
-      ? (localStorage.getItem("finova_demo_business") as BusinessType | null)
+      ? (getStoredDemoBusinessPreference() as BusinessType | null)
       : null;
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
   const isAdmin = currentUser?.role?.toUpperCase() === "ADMIN";
@@ -288,7 +293,7 @@ export default function DashboardLayout({
           if (data?.plan) setCompanyPlan(String(data.plan));
           const preferredDemoBusiness =
             initialUser?.email === "finovaos.app@gmail.com" && typeof window !== "undefined"
-              ? (localStorage.getItem("finova_demo_business") as BusinessType | null)
+              ? (getStoredDemoBusinessPreference() as BusinessType | null)
               : null;
           if (preferredDemoBusiness) {
             setBusinessType(preferredDemoBusiness);
@@ -703,7 +708,7 @@ export default function DashboardLayout({
         if (!d) return;
         const preferredDemoBusiness =
           initialUser?.email === "finovaos.app@gmail.com" && typeof window !== "undefined"
-            ? (localStorage.getItem("finova_demo_business") as BusinessType | null)
+            ? (getStoredDemoBusinessPreference() as BusinessType | null)
             : null;
         if (preferredDemoBusiness) {
           setBusinessType(preferredDemoBusiness);

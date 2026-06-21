@@ -75,11 +75,11 @@ export function updateStoredUser(mutator: (current: any) => any) {
 export function getStoredDemoBusinessPreference() {
   if (typeof window === "undefined") return null;
   try {
-    return (
-      window.sessionStorage.getItem(DEMO_BUSINESS_KEY) ||
-      window.localStorage.getItem(DEMO_BUSINESS_KEY) ||
-      null
-    );
+    const sessionValue = window.sessionStorage.getItem(DEMO_BUSINESS_KEY);
+    try {
+      window.localStorage.removeItem(DEMO_BUSINESS_KEY);
+    } catch {}
+    return sessionValue || null;
   } catch {
     return null;
   }
@@ -90,11 +90,15 @@ export function setStoredDemoBusinessPreference(businessType: string | null) {
   try {
     if (!businessType) {
       window.sessionStorage.removeItem(DEMO_BUSINESS_KEY);
-      window.localStorage.removeItem(DEMO_BUSINESS_KEY);
+      try {
+        window.localStorage.removeItem(DEMO_BUSINESS_KEY);
+      } catch {}
       return;
     }
     window.sessionStorage.setItem(DEMO_BUSINESS_KEY, businessType);
-    window.localStorage.setItem(DEMO_BUSINESS_KEY, businessType);
+    try {
+      window.localStorage.removeItem(DEMO_BUSINESS_KEY);
+    } catch {}
   } catch {}
 }
 
