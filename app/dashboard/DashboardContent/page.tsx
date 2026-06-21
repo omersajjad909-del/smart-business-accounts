@@ -572,7 +572,7 @@ export default function DashboardContent() {
             headers: h,
             cache: "no-store",
           }),
-          fetch("/api/me/company", { cache: "no-store" }),
+          fetch("/api/me/company", { cache: "no-store", headers: h }),
           fetch("/api/company/business-type", {
             headers: h,
             cache: "no-store",

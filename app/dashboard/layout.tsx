@@ -1,7 +1,7 @@
 "use client";
 import { fmtDate } from "@/lib/dateUtils";
 
-import { useEffect, useState, useRef, Suspense, createContext, useContext } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, Suspense, createContext, useContext } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -236,8 +236,12 @@ export default function DashboardLayout({
   const [showHelpPanel, setShowHelpPanel] = useState(false);
 
   async function refreshCompanySummary() {
+    const headers: Record<string, string> = {};
+    if (currentUser?.companyId) headers["x-company-id"] = currentUser.companyId;
+    if (currentUser?.id) headers["x-user-id"] = currentUser.id;
+    if (currentUser?.role) headers["x-user-role"] = currentUser.role;
     try {
-      const res = await fetch("/api/me/company", { cache: "no-store" });
+      const res = await fetch("/api/me/company", { cache: "no-store", headers });
       if (!res.ok) return;
       const data = await res.json();
       if (data?.name) setCompanyName(data.name);
@@ -804,7 +808,7 @@ export default function DashboardLayout({
     }
   }, [ready, currentUser, pathname, router]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!currentUser?.companyId) return;
     const originalFetch = window.fetch;
     window.fetch = (input, init = {}) => {

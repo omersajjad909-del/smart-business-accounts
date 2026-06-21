@@ -156,7 +156,7 @@ export default function ProductCatalogPage() {
     if (!name) { setFormError("Product name is required."); return; }
     if (!sku) { setFormError("SKU is required."); return; }
     if (form.price <= 0) { setFormError("Sale price must be greater than zero."); return; }
-    if (form.costPrice < 0 || form.stock < 0) { setFormError("Cost price and stock cannot be negative."); return; }
+    if (form.costPrice < 0) { setFormError("Cost price cannot be negative."); return; }
 
     const skuExists = allProducts.some(p => p.sku.toLowerCase() === sku.toLowerCase() && p.id !== editId);
     if (skuExists) { setFormError("SKU already exists. Use a different SKU."); return; }
@@ -195,7 +195,7 @@ export default function ProductCatalogPage() {
         title: name,
         status: "active",
         amount: form.price,
-        data: { category, sku, unit: form.unit, costPrice: form.costPrice, stock: form.stock, description, imageUrl: form.imageUrl || null },
+        data: { category, sku, unit: form.unit, costPrice: form.costPrice, stock: 0, description, imageUrl: form.imageUrl || null },
       });
       // Sync to Item Master
       const res = await fetch("/api/items-new", {
@@ -206,14 +206,6 @@ export default function ProductCatalogPage() {
       if (res.ok) {
         const created = await res.json();
         await update(saved.id, { data: { itemNewId: created.id } });
-        // Create opening InventoryTxn if initial stock > 0
-        if (form.stock > 0) {
-          await fetch("/api/retail/stock-receipt", {
-            method: "POST",
-            headers: authHeaders,
-            body: JSON.stringify({ itemNewId: created.id, qty: form.stock, costPrice: form.costPrice }),
-          });
-        }
       }
     }
 
@@ -576,10 +568,6 @@ export default function ProductCatalogPage() {
                 <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} style={inp} />
               </div>
 
-              <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>Stock Quantity</label>
-                <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: Number(e.target.value) }))} style={inp} />
-              </div>
 
             </div>
 
