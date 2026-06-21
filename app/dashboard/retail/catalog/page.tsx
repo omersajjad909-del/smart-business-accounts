@@ -501,11 +501,6 @@ export default function ProductCatalogPage() {
               <button onClick={() => { setShowModal(false); setFormError(""); }} style={{ background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 22, cursor: "pointer", lineHeight: 1 }}>✕</button>
             </div>
 
-            {formError && (
-              <div style={{ marginBottom: 14, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>
-                {formError}
-              </div>
-            )}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
 
@@ -571,7 +566,13 @@ export default function ProductCatalogPage() {
 
             </div>
 
-            <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
+            {formError && (
+              <div style={{ marginTop: 16, padding: "10px 12px", borderRadius: 8, background: "rgba(239,68,68,.14)", border: "1px solid rgba(239,68,68,.28)", color: "#fca5a5", fontSize: 12 }}>
+                {formError}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
               <button
                 onClick={save}
                 style={{ flex: 1, padding: "11px 0", background: "#f97316", border: "none", borderRadius: 8, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer" }}
