@@ -60,7 +60,9 @@
       "Bash(git worktree *)",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); deps={**d.get\\('dependencies',{}\\), **d.get\\('devDependencies',{}\\)}; print\\('\\\\n'.join\\(f'{k}: {v}' for k,v in sorted\\(deps.items\\(\\)\\)\\)\\)\")",
       "Bash(node -e ' *)",
-      "Bash(Select-String \"stock-ledger|error\")"
+      "Bash(Select-String \"stock-ledger|error\")",
+      "PowerShell(node --max-old-space-size=512 node_modules/.bin/tsc --noEmit --skipLibCheck --isolatedModules app/api/reports/profit-loss/route.ts app/dashboard/reports/profit-loss/page.tsx 2>&1)",
+      "PowerShell(node --max-old-space-size=512 ./node_modules/typescript/bin/tsc --noEmit --skipLibCheck app/api/reports/profit-loss/route.ts app/dashboard/reports/profit-loss/page.tsx 2>&1)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
