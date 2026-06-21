@@ -24,15 +24,19 @@ export async function GET(req: NextRequest) {
       orderBy: { name: "asc" },
     });
 
-    // Category map from catalog_product business records
+    // Category map + catalog stock/cost fallback from catalog_product business records
     const catalogRecs = await prisma.businessRecord.findMany({
       where: { companyId, category: "catalog_product" },
       select: { data: true },
     });
     const catMap = new Map<string, string>();
+    const catStockMap = new Map<string, { stock: number; costPrice: number }>();
     for (const r of catalogRecs) {
       const d = r.data as any;
-      if (d?.itemNewId && d?.category) catMap.set(d.itemNewId, d.category);
+      if (d?.itemNewId) {
+        if (d.category) catMap.set(d.itemNewId, d.category);
+        catStockMap.set(d.itemNewId, { stock: Number(d.stock) || 0, costPrice: Number(d.costPrice) || 0 });
+      }
     }
 
     const rows = items.map(item => {
@@ -48,12 +52,19 @@ export async function GET(req: NextRequest) {
 
       const totalPurchasedQty = purchases.reduce((s, p) => s + p.qty, 0);
       const totalPurchasedAmt = purchases.reduce((s, p) => s + p.qty * p.rate, 0);
-      const stockQty = totalPurchasedQty - totalSoldQty;
+      let stockQty = totalPurchasedQty - totalSoldQty;
+
+      // For items with no purchase txns, fall back to catalog_product data.stock
+      const catEntry = catStockMap.get(item.id);
+      if (totalPurchasedQty === 0 && catEntry && catEntry.stock > 0) {
+        stockQty = catEntry.stock;
+      }
 
       if (stockQty <= 0) return null;
 
-      // Weighted Average cost
-      const avgCost = totalPurchasedQty > 0 ? totalPurchasedAmt / totalPurchasedQty : 0;
+      // Weighted Average cost — fall back to catalog costPrice or item.purchaseRate
+      const fallbackCost = catEntry?.costPrice || Number(item.purchaseRate) || 0;
+      const avgCost = totalPurchasedQty > 0 ? totalPurchasedAmt / totalPurchasedQty : fallbackCost;
 
       // FIFO cost — consume oldest purchases first for sold qty, remaining is stock
       let remainingSold = totalSoldQty;

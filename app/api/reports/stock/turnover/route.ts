@@ -37,9 +37,13 @@ export async function GET(req: NextRequest) {
       select: { data: true },
     });
     const catMap = new Map<string, string>();
+    const catStockMap = new Map<string, { stock: number; costPrice: number }>();
     for (const r of catalogRecs) {
       const d = r.data as any;
-      if (d?.itemNewId && d?.category) catMap.set(d.itemNewId, d.category);
+      if (d?.itemNewId) {
+        if (d.category) catMap.set(d.itemNewId, d.category);
+        catStockMap.set(d.itemNewId, { stock: Number(d.stock) || 0, costPrice: Number(d.costPrice) || 0 });
+      }
     }
 
     const rows = items.map(item => {
@@ -47,6 +51,7 @@ export async function GET(req: NextRequest) {
       let closingStock = 0;   // qty at end (now)
       let cogsQty = 0;
       let cogsAmt = 0;
+      let hasTxns = false;
       // Track avg cost for COGS calculation
       let runningQty = 0;
       let runningAmt = 0;
@@ -58,11 +63,13 @@ export async function GET(req: NextRequest) {
         const inPeriod = d && d >= periodStart;
 
         if (q > 0) {
+          hasTxns = true;
           if (!inPeriod) openingStock += q;
           closingStock += q;
           runningQty += q;
           runningAmt += q * r;
         } else if (q < 0) {
+          hasTxns = true;
           if (!inPeriod) openingStock -= Math.abs(q);
           closingStock -= Math.abs(q);
           if (inPeriod) {
@@ -72,6 +79,16 @@ export async function GET(req: NextRequest) {
           }
           runningQty = Math.max(0, runningQty - Math.abs(q));
           runningAmt = runningQty > 0 ? runningAmt * (runningQty / (runningQty + Math.abs(q))) : 0;
+        }
+      }
+
+      // Fall back to catalog_product data.stock for items with no InventoryTxn records
+      if (!hasTxns) {
+        const catEntry = catStockMap.get(item.id);
+        if (catEntry && catEntry.stock > 0) {
+          closingStock = catEntry.stock;
+          // Opening stock = closing stock (no in-period txns known)
+          openingStock = catEntry.stock;
         }
       }
 

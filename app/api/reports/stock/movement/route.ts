@@ -34,16 +34,18 @@ export async function GET(req: NextRequest) {
       orderBy: { name: "asc" },
     });
 
-    // Build itemNewId → category map from catalog_product business_records
+    // Build itemNewId → { category, stock, costPrice } from catalog_product business_records
     const catalogRecords = await prisma.businessRecord.findMany({
       where: { companyId, category: "catalog_product" },
       select: { data: true },
     });
     const categoryMap = new Map<string, string>();
+    const catalogStockMap = new Map<string, number>();
     for (const rec of catalogRecords) {
       const d = rec.data as any;
-      if (d?.itemNewId && d?.category) {
-        categoryMap.set(d.itemNewId, d.category);
+      if (d?.itemNewId) {
+        if (d.category) categoryMap.set(d.itemNewId, d.category);
+        if (d.stock != null) catalogStockMap.set(d.itemNewId, Number(d.stock) || 0);
       }
     }
 
@@ -70,7 +72,9 @@ export async function GET(req: NextRequest) {
           }
         }
 
-        const stockQty = totalIn - totalOut;
+        // Fall back to catalog_product data.stock for items with no purchase txns recorded
+        const txnStock = totalIn - totalOut;
+        const stockQty = totalIn === 0 ? (catalogStockMap.get(item.id) ?? 0) : txnStock;
 
         // Turnover days: how many days to sell current stock at current rate
         // avgDailySales = qtySoldInPeriod / days
@@ -94,7 +98,7 @@ export async function GET(req: NextRequest) {
           itemName:     item.name,
           category:     categoryMap.get(item.id) || "",
           qtySold:      qtySoldInPeriod,
-          qtyPurchased: totalIn,
+          qtyPurchased: totalIn === 0 ? stockQty : totalIn,
           stockQty,
           turnoverDays,
           movementTag,

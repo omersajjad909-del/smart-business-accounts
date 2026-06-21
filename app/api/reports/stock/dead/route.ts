@@ -33,9 +33,13 @@ export async function GET(req: NextRequest) {
       select: { data: true },
     });
     const catMap = new Map<string, string>();
+    const catStockMap = new Map<string, { stock: number; costPrice: number }>();
     for (const r of catalogRecs) {
       const d = r.data as any;
-      if (d?.itemNewId && d?.category) catMap.set(d.itemNewId, d.category);
+      if (d?.itemNewId) {
+        if (d.category) catMap.set(d.itemNewId, d.category);
+        catStockMap.set(d.itemNewId, { stock: Number(d.stock) || 0, costPrice: Number(d.costPrice) || 0 });
+      }
     }
 
     const today = new Date();
@@ -61,6 +65,14 @@ export async function GET(req: NextRequest) {
             if (!lastSaleDate || iso > lastSaleDate) lastSaleDate = iso;
           }
         }
+      }
+
+      // For items with no purchase txns, fall back to catalog_product data.stock
+      const catEntry = catStockMap.get(item.id);
+      if (totalPurchasedQty === 0 && catEntry && catEntry.stock > 0) {
+        stockQty = catEntry.stock;
+        totalPurchasedQty = catEntry.stock;
+        totalPurchasedAmt = catEntry.stock * (catEntry.costPrice || Number(item.purchaseRate) || 0);
       }
 
       if (stockQty <= 0) return null;

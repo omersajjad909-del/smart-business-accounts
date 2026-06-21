@@ -28,9 +28,13 @@ export async function GET(req: NextRequest) {
       select: { data: true },
     });
     const catMap = new Map<string, string>();
+    const catStockMap = new Map<string, { stock: number; costPrice: number }>();
     for (const r of catalogRecs) {
       const d = r.data as any;
-      if (d?.itemNewId && d?.category) catMap.set(d.itemNewId, d.category);
+      if (d?.itemNewId) {
+        if (d.category) catMap.set(d.itemNewId, d.category);
+        catStockMap.set(d.itemNewId, { stock: Number(d.stock) || 0, costPrice: Number(d.costPrice) || 0 });
+      }
     }
 
     // Aggregate by location × item
@@ -40,6 +44,7 @@ export async function GET(req: NextRequest) {
 
     for (const item of items) {
       const perLocation = new Map<string, { qty: number; totalAmt: number }>();
+      let hasTxns = false;
 
       for (const t of item.inventoryTxns) {
         const loc = t.location || "MAIN";
@@ -47,8 +52,17 @@ export async function GET(req: NextRequest) {
         const r = Number(t.rate);
         if (!perLocation.has(loc)) perLocation.set(loc, { qty: 0, totalAmt: 0 });
         const entry = perLocation.get(loc)!;
-        if (q > 0) { entry.qty += q; entry.totalAmt += q * r; }
+        if (q > 0) { hasTxns = true; entry.qty += q; entry.totalAmt += q * r; }
         else { entry.qty -= Math.abs(q); }
+      }
+
+      // Fall back to catalog_product data.stock for items with no purchase txns
+      if (!hasTxns) {
+        const catEntry = catStockMap.get(item.id);
+        if (catEntry && catEntry.stock > 0) {
+          const costPrice = catEntry.costPrice || Number(item.purchaseRate) || 0;
+          perLocation.set("MAIN", { qty: catEntry.stock, totalAmt: catEntry.stock * costPrice });
+        }
       }
 
       for (const [loc, data] of perLocation.entries()) {
