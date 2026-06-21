@@ -227,6 +227,7 @@ const [searchTerm, setSearchTerm] = useState("");
   const [batchNo, setBatchNo]       = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
+  const [advancePayment, setAdvancePayment] = useState<number | "">();
   const emptyRow = (): Row => ({ itemId: "", name: "", description: "", qty: "", rate: "", discountPercent: "", taxPercent: "", unit: "", sku: "" });
 
   function handlePIScan(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -685,6 +686,7 @@ const [searchTerm, setSearchTerm] = useState("");
     setPaymentTerms("");
     setBatchNo("");
     setExpiryDate("");
+    setAdvancePayment("");
     setApprovalStatus("PENDING");
     setRows([emptyRow()]);
     setApplyTax(false);
@@ -733,11 +735,11 @@ const [searchTerm, setSearchTerm] = useState("");
       setSendingEmail(false);
     }
   }
+  const payableAmount = netTotal - (Number(advancePayment) || 0);
+
   const filteredInvoices = invoices.filter(inv => {
   if (!searchTerm.trim()) return true;
-
   const term = searchTerm.toLowerCase();
-
   return (
     inv.invoiceNo?.toLowerCase().includes(term) ||
     inv.supplier?.name?.toLowerCase().includes(term) ||
@@ -745,245 +747,338 @@ const [searchTerm, setSearchTerm] = useState("");
   );
 });
 
+  function amountInWords(n: number): string {
+    const units = ["","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+    const tens = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+    function say(x: number): string {
+      if (x === 0) return "";
+      if (x < 20) return units[x];
+      if (x < 100) return tens[Math.floor(x/10)] + (x%10 ? " " + units[x%10] : "");
+      return units[Math.floor(x/100)] + " hundred" + (x%100 ? " and " + say(x%100) : "");
+    }
+    if (n <= 0) return "Zero";
+    const whole = Math.floor(n);
+    const p: string[] = [];
+    const cr = Math.floor(whole/10000000); if (cr) p.push(say(cr) + " crore");
+    const lk = Math.floor((whole%10000000)/100000); if (lk) p.push(say(lk) + " lakh");
+    const th = Math.floor((whole%100000)/1000); if (th) p.push(say(th) + " thousand");
+    const rm = whole%1000; if (rm) p.push(say(rm));
+    const words = p.join(" ");
+    return (words.charAt(0).toUpperCase() + words.slice(1)) + " only";
+  }
+
 
   return (
-    <div style={{ padding: isMobile ? 12 : 24, maxWidth: 1380, margin: "0 auto", fontFamily: FONT, color: TEXT }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
+    <div style={{ padding: isMobile ? 8 : "0 0 40px", maxWidth: 1480, margin: "0 auto", fontFamily: FONT, color: TEXT }}>
+
+      {/* ── PAGE HEADER ── */}
+      <div style={{ padding: isMobile ? "16px 12px 12px" : "20px 28px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, borderBottom: `1px solid ${BORDER}`, marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, letterSpacing: -0.5, color: piQueryMode ? "#facc15" : undefined }}>
-            {piQueryMode ? "🔍 QUERY MODE — Purchase Invoice" : "Purchase Invoice"}
+          <div style={{ fontSize: 11, color: MUTED, marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
+            <span>Dashboard</span>
+            <span style={{ color: BORDER }}>/</span>
+            <span style={{ color: ACCENT, fontWeight: 600 }}>Purchase Invoice</span>
+          </div>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: -0.5, color: piQueryMode ? "#facc15" : TEXT, display: "flex", alignItems: "center", gap: 10 }}>
+            {piQueryMode ? "🔍 Query Mode" : (
+              <>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2.5"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/></svg>
+                Purchase Invoice
+              </>
+            )}
           </h1>
-          <p style={{ margin: "3px 0 0", fontSize: 13, color: piQueryMode ? "rgba(250,204,21,.5)" : MUTED }}>
-            {piQueryMode ? "Enter search criteria then press F8 to execute" : `${invoices.length} total purchase invoices`}
-          </p>
+          {invoiceId && <div style={{ fontSize: 11, color: MUTED, marginTop: 2, fontFamily: "monospace", fontWeight: 700 }}>{invoiceId}</div>}
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
           {piQueryIdx >= 0 && !piQueryMode && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(99,102,241,.08)", border: "1px solid rgba(99,102,241,.2)", borderRadius: 10, padding: "6px 12px" }}>
               <button onClick={() => piNavTo(piQueryIdx - 1)} disabled={piQueryIdx === 0} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: piQueryIdx===0?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: piQueryIdx===0?"default":"pointer", fontFamily: FONT }}>◀</button>
-              <span style={{ fontSize: 12, color: ACCENT, fontWeight: 700, minWidth: 100, textAlign: "center" }}>{piQueryResults[piQueryIdx]?.invoiceNo} · {piQueryIdx+1}/{piQueryResults.length}</span>
+              <span style={{ fontSize: 12, color: ACCENT, fontWeight: 700, minWidth: 110, textAlign: "center" }}>{piQueryResults[piQueryIdx]?.invoiceNo} · {piQueryIdx+1}/{piQueryResults.length}</span>
               <button onClick={() => piNavTo(piQueryIdx + 1)} disabled={piQueryIdx === piQueryResults.length-1} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: piQueryIdx===piQueryResults.length-1?"rgba(255,255,255,.2)":"rgba(255,255,255,.7)", fontSize: 13, cursor: piQueryIdx===piQueryResults.length-1?"default":"pointer", fontFamily: FONT }}>▶</button>
-              <button onClick={piExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: FONT }}>✕</button>
+              <button onClick={piExitQuery} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(248,113,113,.08)", border: "1px solid rgba(248,113,113,.2)", color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: FONT }}>✕ Exit</button>
             </div>
           )}
-          <button
-            onClick={piQueryMode ? piExitQuery : piEnterQuery}
-            style={{ padding: "9px 16px", borderRadius: 8, border: `1px solid ${piQueryMode ? "rgba(250,204,21,.3)" : BORDER}`, background: piQueryMode ? "rgba(250,204,21,.1)" : PANEL, color: piQueryMode ? "#facc15" : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
-          >
-            <span style={{ background: piQueryMode ? "#facc15" : ACCENT, color: piQueryMode ? "#000" : "#fff", borderRadius: 3, padding: "0 5px", fontSize: 10, fontWeight: 800 }}>F7</span>
+          <button onClick={piQueryMode ? piExitQuery : piEnterQuery}
+            style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${piQueryMode ? "rgba(250,204,21,.4)" : BORDER}`, background: piQueryMode ? "rgba(250,204,21,.1)" : PANEL, color: piQueryMode ? "#facc15" : TEXT, fontFamily: FONT, fontSize: 12.5, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+            <span style={{ background: piQueryMode ? "#facc15" : "rgba(99,102,241,.15)", color: piQueryMode ? "#000" : ACCENT, borderRadius: 3, padding: "1px 5px", fontSize: 10, fontWeight: 800 }}>F7</span>
             {piQueryMode ? "Cancel Query" : "Query Mode"}
           </button>
-          <button
-            onClick={() => { setShowList(!showList); setShowForm(showList); setEditing(null); }}
-            style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(99,102,241,0.12)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 13, fontWeight: 600, cursor: "pointer" }}
-          >
-            {showList ? "Hide List" : "Show List"}
+          {showPreview && (
+            <>
+              <button onClick={() => { setPrintMode("a4"); setTimeout(() => window.print(), 150); }} style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${BORDER}`, background: PANEL, color: TEXT, fontFamily: FONT, fontSize: 12.5, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Print
+              </button>
+              <button onClick={sendInvoiceEmail} disabled={sendingEmail} style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: "rgba(99,102,241,.12)", color: ACCENT, fontFamily: FONT, fontSize: 12.5, fontWeight: 700, cursor: sendingEmail?"not-allowed":"pointer", opacity: sendingEmail?0.7:1 }}>{sendingEmail?"Sending…":"Email"}</button>
+              <button onClick={() => setShowPreview(false)} style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 12.5, cursor: "pointer" }}>Back to Edit</button>
+            </>
+          )}
+          <button onClick={() => { setShowList(!showList); setShowForm(showList); setEditing(null); }}
+            style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(99,102,241,0.1)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
+            {showList ? "Hide List" : "All Invoices"}
           </button>
-          <button
-            onClick={() => { setShowForm(true); setShowList(false); resetForm(); piExitQuery(); }}
-            style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(37,99,235,0.35)" }}
-          >
-            + New Invoice
+          <button onClick={() => { setShowForm(true); setShowList(false); resetForm(); piExitQuery(); }}
+            style={{ padding: "8px 18px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", fontFamily: FONT, fontSize: 12.5, fontWeight: 700, cursor: "pointer", boxShadow: "0 3px 12px rgba(37,99,235,.3)", display: "flex", alignItems: "center", gap: 5 }}>
+            <span style={{ fontSize: 15, lineHeight: 1 }}>+</span> New Invoice
           </button>
         </div>
       </div>
 
       {/* ── QUERY MODE FORM ── */}
       {piQueryMode && (
-        <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 16, padding: 28, marginBottom: 28 }}>
-          <div style={{ marginBottom: 18 }}>
+        <div style={{ background: "rgba(250,204,21,.04)", border: "2px solid rgba(250,204,21,.3)", borderRadius: 14, padding: "22px 28px", marginBottom: 24, marginInline: 28 }}>
+          <div style={{ marginBottom: 14 }}>
             <span style={{ fontSize: 12, color: "rgba(250,204,21,.7)" }}>Enter criteria — leave blank to get all. Use <b style={{ color: "#facc15" }}>&gt;</b>, <b style={{ color: "#facc15" }}>&lt;</b>, <b style={{ color: "#facc15" }}>&gt;=</b> for date range.</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "180px 240px 1fr", gap: 16, marginBottom: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "180px 240px 1fr", gap: 16, marginBottom: 20 }}>
             <div>
-              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Invoice # (e.g. PI-5)</div>
+              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Invoice #</div>
               <input autoFocus value={piQueryInvNo} onChange={e => setPiQueryInvNo(e.target.value)} placeholder="PI-1 or blank…"
                 style={{ ...inp(), border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty); } if (e.key === "Escape") piExitQuery(); }} />
             </div>
             <div>
-              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Date (e.g. &gt;010425 or 01-05-2026)</div>
+              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Date (e.g. &gt;010425)</div>
               <input value={piQueryDate} onChange={e => setPiQueryDate(e.target.value)} placeholder=">010125 or blank…"
                 style={{ ...inp(), border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty); } if (e.key === "Escape") piExitQuery(); }} />
             </div>
             <div>
-              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Supplier (name)</div>
-              <input value={piQueryParty} onChange={e => setPiQueryParty(e.target.value)} placeholder="e.g. ABC Suppliers, or blank…"
+              <div style={{ fontSize: 10, color: "rgba(250,204,21,.6)", fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>Supplier</div>
+              <input value={piQueryParty} onChange={e => setPiQueryParty(e.target.value)} placeholder="e.g. ABC Suppliers…"
                 style={{ ...inp(), border: "1px solid rgba(250,204,21,.3)", background: "rgba(250,204,21,.05)" }}
                 onKeyDown={e => { if (e.key === "F8") { e.preventDefault(); piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty); } if (e.key === "Escape") piExitQuery(); }} />
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button onClick={() => piExecuteQuery(piQueryInvNo, piQueryDate, piQueryParty)}
-              style={{ padding: "10px 32px", borderRadius: 9, background: "linear-gradient(135deg,#facc15,#ca8a04)", border: "none", color: "#000", fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: FONT, display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 4, padding: "1px 7px", fontSize: 11 }}>F8</span>Execute Query
+              style={{ padding: "9px 28px", borderRadius: 8, background: "linear-gradient(135deg,#facc15,#ca8a04)", border: "none", color: "#000", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: FONT, display: "flex", alignItems: "center", gap: 7 }}>
+              <span style={{ background: "rgba(0,0,0,.2)", borderRadius: 3, padding: "1px 6px", fontSize: 10 }}>F8</span>Execute Query
             </button>
-            <button onClick={piExitQuery} style={{ padding: "10px 20px", borderRadius: 9, background: "transparent", border: `1px solid ${BORDER}`, color: MUTED, fontSize: 13, cursor: "pointer", fontFamily: FONT }}>Cancel (Esc)</button>
-            <span style={{ fontSize: 11, color: "rgba(250,204,21,.4)", marginLeft: 8 }}>Operators: <b style={{ color: "rgba(250,204,21,.7)" }}>&gt;010425</b> (after) &nbsp; <b style={{ color: "rgba(250,204,21,.7)" }}>&lt;010425</b> (before)</span>
+            <button onClick={piExitQuery} style={{ padding: "9px 18px", borderRadius: 8, background: "transparent", border: `1px solid ${BORDER}`, color: MUTED, fontSize: 12, cursor: "pointer", fontFamily: FONT }}>Cancel (Esc)</button>
           </div>
         </div>
       )}
 
-      {/* LIST VIEW */}
+      {/* ── LIST VIEW ── */}
       {showList && (
-        <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden", marginInline: isMobile ? 8 : 28, marginBottom: 24 }}>
+          <div style={{ padding: "14px 18px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <div style={{ fontWeight: 700, fontSize: 14 }}>All Purchase Invoices</div>
+            <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search by invoice #, supplier…" style={{ ...inp({ width: 260, padding: "7px 12px", fontSize: 12.5 }) }} />
+          </div>
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 800 }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 700 }}>
               <thead>
-                <tr style={{ background: "rgba(99,102,241,0.07)" }}>
-                  <th style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Invoice No</th>
-                  <th style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Date</th>
-                  <th style={{ padding: "12px 16px", textAlign: "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Supplier</th>
-                  <th style={{ padding: "12px 16px", textAlign: "right", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Total</th>
-                  <th style={{ padding: "12px 16px", textAlign: "center", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase", letterSpacing: 0.7 }}>Actions</th>
+                <tr style={{ background: "rgba(99,102,241,0.05)" }}>
+                  {["Invoice No","Date","Supplier","Total","Status","Actions"].map((h, hi) => (
+                    <th key={h} style={{ padding: "11px 16px", textAlign: hi >= 3 && hi < 5 ? "right" : hi === 5 ? "center" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {filteredInvoices.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No invoices found</td>
+                  <tr><td colSpan={6} style={{ padding: "40px 16px", textAlign: "center", color: MUTED }}>No invoices found</td></tr>
+                ) : filteredInvoices.map(inv => (
+                  <tr key={inv.id} style={{ borderTop: `1px solid ${BORDER}` }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,.03)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <td style={{ padding: "12px 16px", fontWeight: 700, color: ACCENT, fontFamily: "monospace", fontSize: 13 }}>{inv.invoiceNo}</td>
+                    <td style={{ padding: "12px 16px", color: MUTED, fontSize: 12 }}>{fmtDate(inv.date)}</td>
+                    <td style={{ padding: "12px 16px", fontWeight: 600 }}>{inv.supplier?.name || "—"}</td>
+                    <td style={{ padding: "12px 16px", textAlign: "right", fontWeight: 700 }}>{inv.total.toLocaleString()}</td>
+                    <td style={{ padding: "12px 16px", textAlign: "right" }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: inv.approvalStatus === "APPROVED" ? "rgba(52,211,153,.1)" : inv.approvalStatus === "REJECTED" ? "rgba(248,113,113,.1)" : "rgba(251,191,36,.1)", color: inv.approvalStatus === "APPROVED" ? "#34d399" : inv.approvalStatus === "REJECTED" ? "#f87171" : "#fbbf24" }}>{inv.approvalStatus || "PENDING"}</span>
+                    </td>
+                    <td style={{ padding: "12px 16px", textAlign: "center", whiteSpace: "nowrap" }}>
+                      <button onClick={() => startEdit(inv)} style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid rgba(99,102,241,.3)", background: "rgba(99,102,241,.07)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer", marginRight: 6 }}>Edit</button>
+                      <button onClick={() => deleteInvoice(inv.id)} style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.06)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
+                    </td>
                   </tr>
-                ) : (
-                  filteredInvoices.map(inv => (
-                    <tr key={inv.id} style={{ borderTop: `1px solid ${BORDER}` }}>
-                      <td style={{ padding: "13px 16px", fontWeight: 700, color: ACCENT, fontFamily: "monospace", fontSize: 13 }}>{inv.invoiceNo}</td>
-                      <td style={{ padding: "13px 16px", color: MUTED }}>{fmtDate(inv.date)}</td>
-                      <td style={{ padding: "13px 16px", fontWeight: 600 }}>{inv.supplier?.name || "N/A"}</td>
-                      <td style={{ padding: "13px 16px", textAlign: "right", fontWeight: 700 }}>{inv.total.toLocaleString()}</td>
-                      <td style={{ padding: "13px 16px", textAlign: "center", whiteSpace: "nowrap" }}>
-                        <button onClick={() => startEdit(inv)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(99,102,241,0.35)", background: "rgba(99,102,241,0.08)", color: ACCENT, fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer", marginRight: 8 }}>Edit</button>
-                        <button onClick={() => deleteInvoice(inv.id)} style={{ padding: "5px 13px", borderRadius: 6, border: "1px solid rgba(248,113,113,0.35)", background: "rgba(248,113,113,0.07)", color: "#f87171", fontFamily: FONT, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Delete</button>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                ))}
               </tbody>
             </table>
           </div>
-          <div style={{ padding: "11px 18px", borderTop: `1px solid ${BORDER}`, fontSize: 12, color: MUTED }}>{filteredInvoices.length} invoices in view</div>
+          <div style={{ padding: "10px 18px", borderTop: `1px solid ${BORDER}`, fontSize: 11.5, color: MUTED }}>{filteredInvoices.length} of {invoices.length} invoices</div>
         </div>
       )}
 
-      {/* FORM */}
+      {/* ── FORM ── */}
       {showForm && (
         <>
-          <div className="print:hidden" style={{ background: PANEL, border: `1.5px solid ${BORDER}`, borderRadius: 16, overflow: "hidden", marginTop: showList ? 24 : 0 }}>
-            <div style={{ padding: "14px 22px", borderBottom: `1px solid ${BORDER}`, background: "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(37,99,235,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M8 9h3"/></svg>
-                </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 15 }}>{editing ? "Edit Purchase Invoice" : "New Purchase Invoice"}</div>
-                  <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>F7 = Query Mode &nbsp;|&nbsp; F8 = Execute Query &nbsp;|&nbsp; PageDown/PageUp = Navigate</div>
-                </div>
-              </div>
-              {showPreview && (
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                  <button onClick={() => { setPrintMode("a4"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
-                    Print A4
-                  </button>
-                  <button onClick={() => { setPrintMode("55mm"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                    Print 55mm
-                  </button>
-                  <button onClick={sendInvoiceEmail} disabled={sendingEmail} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: sendingEmail ? "not-allowed" : "pointer", opacity: sendingEmail ? 0.7 : 1 }}>{sendingEmail ? "Sending..." : "Email Invoice"}</button>
-                  <button onClick={() => setShowPreview(false)} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>Back to Edit</button>
-                </div>
-              )}
-            </div>
+          <div className="print:hidden">
 
           {!showPreview && (
-            <div className="no-print" style={{ padding: "0 22px 22px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 320px", gap: 20, alignItems: "start" }}>
+            <div className="no-print" style={{ padding: isMobile ? "0 8px" : "0 28px" }}>
 
-                {/* LEFT COLUMN */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* ── 3-PANEL HEADER ROW ── */}
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 16 }}>
 
-                  {/* Supplier + Business Details */}
-                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
-                    <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Supplier Details</div>
-                      <select value={supplierId} onChange={e => handleSupplierChange(e.target.value)} style={{ ...inp(), marginBottom: 10 }}>
-                        <option value="">— Select Supplier —</option>
-                        {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                      </select>
-                      {supplierId && suppliers.find(s => s.id === supplierId) && (() => {
-                        const s = suppliers.find(x => x.id === supplierId) as any;
-                        return (
-                          <div style={{ padding: "10px 12px", background: "var(--panel-bg-2,rgba(255,255,255,0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
-                            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{s.name}</div>
-                            {(s.email || s.phone) && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3, display: "flex", gap: 12, flexWrap: "wrap" }}>{s.email && <span>{s.email}</span>}{s.phone && <span>{s.phone}</span>}</div>}
-                            {s.address && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>{s.address}{s.city ? `, ${s.city}` : ""}</div>}
-                            {(s.ntn || s.strn) && <div style={{ fontSize: 11, color: MUTED, display: "flex", gap: 12 }}>{s.ntn && <span>NTN: {s.ntn}</span>}{s.strn && <span>STRN: {s.strn}</span>}</div>}
-                          </div>
-                        );
-                      })()}
+                {/* Panel 1: Supplier */}
+                <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: "rgba(99,102,241,.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </div>
-                    <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Your Business</div>
-                      {companyInfo ? (
-                        <div style={{ padding: "10px 12px", background: "var(--panel-bg-2,rgba(255,255,255,0.03))", borderRadius: 8, border: `1px solid ${BORDER}` }}>
-                          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{companyInfo.name}</div>
-                          {companyInfo.address && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>{companyInfo.address}</div>}
-                          {companyInfo.phone && <div style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>{companyInfo.phone}</div>}
-                          {companyInfo.ntn && <div style={{ fontSize: 11, color: MUTED }}>NTN: {companyInfo.ntn}</div>}
-                        </div>
-                      ) : <div style={{ fontSize: 12, color: MUTED, fontStyle: "italic" }}>Loading company info…</div>}
-                      <div style={{ marginTop: 10 }}>
-                        <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Against PO</div>
-                        <select value={selectedPoId} onChange={e => handlePoSelection(e.target.value)} style={inp()}>
-                          <option value="">— No PO —</option>
-                          {filteredPOs.map(p => <option key={p.id} value={p.id}>{p.poNo}</option>)}
-                        </select>
+                    <div style={{ fontSize: 10.5, fontWeight: 800, color: MUTED, textTransform: "uppercase" as const, letterSpacing: 0.7 }}>Supplier Details</div>
+                  </div>
+                  <select value={supplierId} onChange={e => handleSupplierChange(e.target.value)} style={{ ...inp({ marginBottom: 8 }) }}>
+                    <option value="">— Select Supplier —</option>
+                    {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                  {supplierId && (() => {
+                    const s = suppliers.find(x => x.id === supplierId) as any;
+                    if (!s) return null;
+                    return (
+                      <div style={{ padding: "8px 10px", background: "rgba(99,102,241,.04)", borderRadius: 8, border: `1px solid rgba(99,102,241,.12)` }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 3, color: TEXT }}>{s.name}</div>
+                        {(s.email || s.phone) && <div style={{ fontSize: 11, color: MUTED, marginBottom: 2, display: "flex", gap: 10, flexWrap: "wrap" }}>{s.email && <span>{s.email}</span>}{s.phone && <span>{s.phone}</span>}</div>}
+                        {s.address && <div style={{ fontSize: 11, color: MUTED, marginBottom: 2 }}>{s.address}{s.city ? `, ${s.city}` : ""}</div>}
+                        {(s.ntn || s.strn) && <div style={{ fontSize: 10, color: MUTED, display: "flex", gap: 10 }}>{s.ntn && <span>NTN: {s.ntn}</span>}{s.strn && <span>STRN: {s.strn}</span>}</div>}
                       </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
+                </div>
 
-                  {/* Barcode Scanner */}
-                  <div onClick={() => setScanActive(true)} style={{ background: scanActive ? "rgba(99,102,241,0.06)" : PANEL, border: `1px ${scanActive ? "solid" : "dashed"} ${scanActive ? ACCENT : BORDER}`, borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer" }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="14"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="10" x2="14" y2="14"/><line x1="18" y1="9" x2="18" y2="15"/></svg>
+                {/* Panel 2: Invoice Details */}
+                <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: 7, background: "rgba(37,99,235,.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      </div>
+                      <div style={{ fontSize: 10.5, fontWeight: 800, color: MUTED, textTransform: "uppercase" as const, letterSpacing: 0.7 }}>Invoice Details</div>
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: ACCENT, letterSpacing: "0.06em", textTransform: "uppercase" as const, marginBottom: 4 }}>Scan Barcode / SKU</div>
-                      <input value={scanCode} onChange={e => setScanCode(e.target.value)} onKeyDown={handlePIScan} onFocus={() => setScanActive(true)} onBlur={() => setScanActive(false)}
-                        placeholder="Click here and scan barcode or type SKU…"
-                        style={{ width: "100%", padding: "7px 12px", borderRadius: 8, background: "var(--input-bg)", border: `1px solid ${BORDER}`, color: TEXT, fontSize: 13, fontFamily: "monospace", outline: "none" }} />
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ fontFamily: "monospace", fontWeight: 800, fontSize: 13, color: ACCENT }}>{invoiceId || "Auto #"}</div>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: approvalStatus === "APPROVED" ? "rgba(52,211,153,.12)" : approvalStatus === "REJECTED" ? "rgba(248,113,113,.12)" : "rgba(251,191,36,.12)", color: approvalStatus === "APPROVED" ? "#34d399" : approvalStatus === "REJECTED" ? "#f87171" : "#fbbf24" }}>{approvalStatus}</span>
                     </div>
                   </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+                    <div>
+                      <div style={labelStyle()}>Invoice Date</div>
+                      <DateInput value={date} onChange={setDate} style={inp({ padding: "7px 10px", fontSize: 12.5 })} />
+                    </div>
+                    <div>
+                      <div style={labelStyle()}>Due Date</div>
+                      <DateInput value={dueDate} onChange={setDueDate} style={inp({ padding: "7px 10px", fontSize: 12.5 })} />
+                    </div>
+                    <div>
+                      <div style={labelStyle()}>Approval</div>
+                      <select value={approvalStatus} onChange={e => setApprovalStatus(e.target.value)} style={inp({ padding: "7px 10px", fontSize: 12.5 })}>
+                        <option value="DRAFT">Draft</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
+                      </select>
+                    </div>
+                    <div>
+                      <div style={labelStyle()}>Reference</div>
+                      <input value={reference} onChange={e => setReference(e.target.value)} placeholder="PO / ref no." style={inp({ padding: "7px 10px", fontSize: 12.5 })} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Panel 3: Business & Location */}
+                <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: "rgba(16,185,129,.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    </div>
+                    <div style={{ fontSize: 10.5, fontWeight: 800, color: MUTED, textTransform: "uppercase" as const, letterSpacing: 0.7 }}>Business & Location</div>
+                  </div>
+                  {companyInfo ? (
+                    <div style={{ padding: "8px 10px", background: "rgba(16,185,129,.04)", borderRadius: 8, border: "1px solid rgba(16,185,129,.12)", marginBottom: 9 }}>
+                      <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 2 }}>{companyInfo.name}</div>
+                      {companyInfo.address && <div style={{ fontSize: 11, color: MUTED, marginBottom: 2 }}>{companyInfo.address}</div>}
+                      {(companyInfo.phone || companyInfo.ntn) && <div style={{ fontSize: 10, color: MUTED, display: "flex", gap: 10 }}>{companyInfo.phone && <span>{companyInfo.phone}</span>}{companyInfo.ntn && <span>NTN: {companyInfo.ntn}</span>}</div>}
+                    </div>
+                  ) : <div style={{ fontSize: 11, color: MUTED, fontStyle: "italic", marginBottom: 9 }}>Loading…</div>}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+                    <div>
+                      <div style={labelStyle()}>Location</div>
+                      <select value={location} onChange={e => setLocation(e.target.value)} style={inp({ padding: "7px 10px", fontSize: 12.5 })}>
+                        <option value="MAIN">Main</option>
+                        <option value="SHOP">Shop</option>
+                      </select>
+                    </div>
+                    <div>
+                      <div style={labelStyle()}>Against PO</div>
+                      <select value={selectedPoId} onChange={e => handlePoSelection(e.target.value)} style={inp({ padding: "7px 10px", fontSize: 12.5 })}>
+                        <option value="">— No PO —</option>
+                        {filteredPOs.map(p => <option key={p.id} value={p.id}>{p.poNo}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <div style={labelStyle()}>Currency</div>
+                      <select style={inp({ padding: "7px 10px", fontSize: 12.5 })} value={currencyId} onChange={e => { const id = e.target.value; setCurrencyId(id); const c = currencies.find(c => c.id === id); if (c) setExchangeRate(c.exchangeRate || 1); }}>
+                        <option value="">Base</option>
+                        {currencies.map(c => <option key={c.id} value={c.id}>{c.code}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <div style={labelStyle()}>Ex. Rate</div>
+                      <input type="number" style={inp({ padding: "7px 10px", textAlign: "right", fontSize: 12.5 })} value={exchangeRate} onChange={e => setExchangeRate(Number(e.target.value) || 1)} placeholder="1" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── SCAN BAR ── */}
+              <div onClick={() => setScanActive(true)} style={{ background: scanActive ? "rgba(99,102,241,.05)" : PANEL, border: `1.5px ${scanActive ? "solid" : "dashed"} ${scanActive ? ACCENT : BORDER}`, borderRadius: 12, padding: "12px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "text", marginBottom: 16, transition: "all .15s" }}>
+                <div style={{ width: 36, height: 36, borderRadius: 9, flexShrink: 0, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="14"/><line x1="10" y1="8" x2="10" y2="16"/><line x1="14" y1="10" x2="14" y2="14"/><line x1="18" y1="9" x2="18" y2="15"/></svg>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: ACCENT, letterSpacing: ".08em", textTransform: "uppercase" as const, marginBottom: 3 }}>Scan Barcode / Search Item &nbsp;<span style={{ color: MUTED, fontWeight: 600 }}>— type SKU or scan barcode, press Enter to add</span></div>
+                  <input value={scanCode} onChange={e => setScanCode(e.target.value)} onKeyDown={handlePIScan} onFocus={() => setScanActive(true)} onBlur={() => setScanActive(false)}
+                    placeholder="Scan or type item code…"
+                    style={{ width: "100%", padding: "6px 10px", borderRadius: 7, background: "transparent", border: `1px solid ${BORDER}`, color: TEXT, fontSize: 13, fontFamily: "monospace", outline: "none" }} />
+                </div>
+                <div style={{ fontSize: 10, color: MUTED, display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                  <span style={{ background: "rgba(255,255,255,.06)", border: `1px solid ${BORDER}`, borderRadius: 4, padding: "2px 7px", fontFamily: "monospace", fontWeight: 700, fontSize: 10 }}>F4</span>
+                  <span>Item Search</span>
+                </div>
+              </div>
+
+              {/* ── MAIN 2-COL LAYOUT ── */}
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap: 16, alignItems: "start" }}>
+
+                {/* LEFT: Items + Notes */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
                   {/* Items Table */}
                   <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>
-                    <div style={{ padding: "12px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>Invoice Items</div>
-                      <div style={{ fontSize: 11, color: MUTED }}>{rows.filter(r => r.itemId).length} items</div>
+                    <div style={{ padding: "11px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(99,102,241,.03)" }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 800, color: TEXT, display: "flex", alignItems: "center", gap: 7 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                        Invoice Items
+                      </div>
+                      <div style={{ fontSize: 11, color: MUTED, fontWeight: 600 }}>{rows.filter(r => r.itemId).length} line items</div>
                     </div>
                     {isMobile ? (
                       <div style={{ padding: "10px 14px" }}>
                         {rows.map((r, i) => (
                           <div key={i} style={{ border: `1px solid ${BORDER}`, borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 6, textTransform: "uppercase" as const }}>Item {i + 1}</div>
-                            <div style={{ fontWeight: 700, color: TEXT, marginBottom: 4 }}>{r.name || <span style={{ color: MUTED, fontStyle: "italic" }}>Unselected</span>}</div>
-                            {r.description && <div style={{ fontSize: 12, color: MUTED, marginBottom: 8 }}>{r.description}</div>}
+                            <div style={{ fontSize: 11, fontWeight: 700, color: MUTED, marginBottom: 5, textTransform: "uppercase" as const }}>Item {i + 1}</div>
+                            <div style={{ fontWeight: 700, color: TEXT, marginBottom: 4 }}>{r.name || <span style={{ color: MUTED, fontStyle: "italic" }}>—</span>}</div>
+                            {r.sku && <div style={{ fontSize: 10, color: ACCENT, fontFamily: "monospace", marginBottom: 6 }}>{r.sku}</div>}
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                              <div><div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" as const }}>Qty</div><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "8px 10px", textAlign: "right" })} /></div>
-                              <div><div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" as const }}>Rate</div><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={inp({ padding: "8px 10px", textAlign: "right" })} /></div>
-                              <div><div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" as const }}>Disc%</div><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} style={inp({ padding: "8px 10px", textAlign: "right" })} /></div>
-                              <div><div style={{ fontSize: 10, color: MUTED, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" as const }}>Tax%</div><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} style={inp({ padding: "8px 10px", textAlign: "right" })} /></div>
+                              <div><div style={labelStyle()}>Qty</div><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
+                              <div><div style={labelStyle()}>Unit Cost</div><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
+                              <div><div style={labelStyle()}>Disc%</div><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
+                              <div><div style={labelStyle()}>Tax%</div><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} style={inp({ padding: "7px 9px", textAlign: "right" })} /></div>
                             </div>
                           </div>
                         ))}
                       </div>
                     ) : (
                       <div style={{ overflowX: "auto" }}>
-                        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 580 }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
                           <thead>
-                            <tr style={{ background: "rgba(99,102,241,0.06)" }}>
-                              {["#", "Item / Description", "Qty", "Unit Price", "Disc%", "Tax%", "Total", "×"].map((h, hi) => (
-                                <th key={hi} style={{ padding: "10px 8px", textAlign: hi >= 2 && hi !== 1 ? "right" : "left", color: MUTED, fontWeight: 700, fontSize: 10.5, textTransform: "uppercase" as const, letterSpacing: 0.6, whiteSpace: "nowrap" }}>{h}</th>
+                            <tr style={{ background: "rgba(99,102,241,.04)" }}>
+                              {["#","SKU / Code","Product Name","Unit","Qty","Unit Cost","Disc%","Tax%","Total",""].map((h, hi) => (
+                                <th key={hi} style={{ padding: "9px 8px", textAlign: hi >= 4 && hi < 9 ? "right" : hi === 9 ? "center" : "left", color: MUTED, fontWeight: 700, fontSize: 10, textTransform: "uppercase" as const, letterSpacing: 0.5, whiteSpace: "nowrap", borderBottom: `1px solid ${BORDER}` }}>{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -992,19 +1087,45 @@ const [searchTerm, setSearchTerm] = useState("");
                               const lineBase = (Number(r.qty) || 0) * (Number(r.rate) || 0);
                               const lineDisc = lineBase * (Number(r.discountPercent) || 0) / 100;
                               const lineTax = (lineBase - lineDisc) * (Number(r.taxPercent) || 0) / 100;
+                              const lineTotal = lineBase - lineDisc + lineTax;
                               return (
-                                <tr key={i} style={{ borderTop: `1px solid ${BORDER}` }}>
-                                  <td style={{ padding: "6px 8px", color: MUTED, fontSize: 12, width: 28 }}>{i + 1}</td>
-                                  <td style={{ padding: "6px 8px", minWidth: 140 }}>
-                                    <div style={{ fontWeight: 600, fontSize: 13, color: TEXT }}>{r.name || <span style={{ color: MUTED, fontStyle: "italic", fontSize: 12 }}>—</span>}</div>
-                                    {r.description && <div style={{ fontSize: 11, color: MUTED, marginTop: 2 }}>{r.description}</div>}
+                                <tr key={i} style={{ borderBottom: `1px solid ${BORDER}` }}
+                                  onMouseEnter={e => (e.currentTarget.style.background = "rgba(99,102,241,.025)")}
+                                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                                  <td style={{ padding: "7px 8px", color: MUTED, fontSize: 11.5, width: 28 }}>{i + 1}</td>
+                                  <td style={{ padding: "7px 8px", width: 90 }}>
+                                    {r.sku ? <span style={{ fontFamily: "monospace", fontSize: 11, color: ACCENT, fontWeight: 700 }}>{r.sku}</span> : <span style={{ color: MUTED, fontSize: 11 }}>—</span>}
                                   </td>
-                                  <td style={{ padding: "6px 8px", width: 80 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                                  <td style={{ padding: "6px 8px", width: 100 }}><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                                  <td style={{ padding: "6px 8px", width: 72 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                                  <td style={{ padding: "6px 8px", width: 72 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 13 })} /></td>
-                                  <td style={{ padding: "6px 8px", textAlign: "right", fontWeight: 600, fontSize: 13, width: 90, whiteSpace: "nowrap" }}>{(lineBase - lineDisc + lineTax).toLocaleString()}</td>
-                                  <td style={{ padding: "6px 8px", width: 28 }}><button onClick={() => { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }} style={{ background: "none", border: "none", color: "var(--danger,#f87171)", cursor: "pointer", fontSize: 17, padding: 0, opacity: rows.length === 1 ? 0.3 : 1 }} disabled={rows.length === 1}>×</button></td>
+                                  <td style={{ padding: "7px 8px", minWidth: 160 }}>
+                                    <select value={r.itemId} onChange={e => {
+                                      const item = allInventoryItems.find(it => it.id === e.target.value);
+                                      if (item) {
+                                        const copy = [...rows];
+                                        copy[i] = { ...copy[i], itemId: item.id, name: item.name, description: item.description || "", sku: item.code || "", unit: item.unit || "", rate: item.purchaseRate || "" };
+                                        if (i === copy.length - 1) copy.push(emptyRow());
+                                        setRows(copy);
+                                      } else {
+                                        const copy = [...rows];
+                                        copy[i] = { ...copy[i], itemId: "", name: "", sku: "", unit: "" };
+                                        setRows(copy);
+                                      }
+                                    }} style={{ ...inp({ padding: "5px 7px", fontSize: 12.5 }), fontWeight: r.itemId ? 600 : 400 }}>
+                                      <option value="">— Select Item —</option>
+                                      {allInventoryItems.map(it => <option key={it.id} value={it.id}>{it.name}</option>)}
+                                    </select>
+                                    {r.description && <div style={{ fontSize: 10, color: MUTED, marginTop: 2, paddingLeft: 2 }}>{r.description}</div>}
+                                  </td>
+                                  <td style={{ padding: "7px 8px", width: 64 }}>
+                                    <input value={r.unit} onChange={e => updateRow(i, "unit", e.target.value)} placeholder="pcs" style={inp({ padding: "5px 6px", fontSize: 12, textAlign: "center" })} />
+                                  </td>
+                                  <td style={{ padding: "7px 8px", width: 76 }}><input type="number" value={r.qty} onChange={e => updateRow(i, "qty", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td style={{ padding: "7px 8px", width: 96 }}><input type="number" value={r.rate} onChange={e => updateRow(i, "rate", e.target.value)} placeholder="0.00" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.discountPercent} onChange={e => updateRow(i, "discountPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td style={{ padding: "7px 8px", width: 64 }}><input type="number" value={r.taxPercent} onChange={e => updateRow(i, "taxPercent", e.target.value)} placeholder="0" style={inp({ padding: "5px 7px", textAlign: "right", fontSize: 12.5 })} /></td>
+                                  <td style={{ padding: "7px 8px", textAlign: "right", fontWeight: 700, fontSize: 13, width: 96, color: lineTotal > 0 ? TEXT : MUTED, whiteSpace: "nowrap" }}>{lineTotal > 0 ? lineTotal.toLocaleString() : "—"}</td>
+                                  <td style={{ padding: "7px 8px", width: 28, textAlign: "center" }}>
+                                    <button onClick={() => { if (rows.length > 1) setRows(rows.filter((_, idx) => idx !== i)); }} style={{ background: "none", border: "none", color: "#f87171", cursor: "pointer", fontSize: 16, padding: 2, opacity: rows.length === 1 ? 0.2 : 0.6, lineHeight: 1 }} disabled={rows.length === 1}>×</button>
+                                  </td>
                                 </tr>
                               );
                             })}
@@ -1014,14 +1135,35 @@ const [searchTerm, setSearchTerm] = useState("");
                     )}
                   </div>
 
-                  {/* Payment + Notes */}
-                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
-                    <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Payment Details</div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {/* Notes + Payment + Batch row */}
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14 }}>
+                    {/* Notes & Batch */}
+                    <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16 }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 11, color: TEXT }}>Notes & Batch Info</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
                         <div>
-                          <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Payment Method</div>
-                          <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)} style={inp()}>
+                          <div style={labelStyle()}>Notes</div>
+                          <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any notes for this invoice…" rows={3} style={{ ...inp({ resize: "vertical" as const, fontSize: 12.5 }) }} />
+                        </div>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 9 }}>
+                          <div>
+                            <div style={labelStyle()}>Batch # (optional)</div>
+                            <input value={batchNo} onChange={e => setBatchNo(e.target.value)} placeholder="e.g. B2024-01" style={inp({ fontSize: 12.5 })} />
+                          </div>
+                          <div>
+                            <div style={labelStyle()}>Expiry Date (optional)</div>
+                            <DateInput value={expiryDate} onChange={setExpiryDate} style={inp({ fontSize: 12.5 })} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Payment Terms */}
+                    <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 16 }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 11, color: TEXT }}>Payment Terms</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                        <div>
+                          <div style={labelStyle()}>Payment Method</div>
+                          <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)} style={inp({ fontSize: 12.5 })}>
                             <option value="">Select Method</option>
                             <option value="Cash">Cash</option>
                             <option value="Bank Transfer">Bank Transfer</option>
@@ -1030,8 +1172,8 @@ const [searchTerm, setSearchTerm] = useState("");
                           </select>
                         </div>
                         <div>
-                          <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Payment Terms</div>
-                          <select value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)} style={inp()}>
+                          <div style={labelStyle()}>Payment Terms</div>
+                          <select value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)} style={inp({ fontSize: 12.5 })}>
                             <option value="">Select Terms</option>
                             <option value="Immediate">Immediate</option>
                             <option value="Net 15">Net 15 Days</option>
@@ -1041,48 +1183,16 @@ const [searchTerm, setSearchTerm] = useState("");
                           </select>
                         </div>
                         <div>
-                          <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Reference</div>
-                          <input value={reference} onChange={e => setReference(e.target.value)} placeholder="PO / ref no." style={inp()} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Currency</div>
-                          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 8 }}>
-                            <select style={inp()} value={currencyId} onChange={e => { const nextId = e.target.value; setCurrencyId(nextId); const c = currencies.find(c => c.id === nextId); if (c) setExchangeRate(c.exchangeRate || 1); }}>
-                              <option value="">Base Currency</option>
-                              {currencies.map(c => <option key={c.id} value={c.id}>{c.code} - {c.name}</option>)}
-                            </select>
-                            <input type="number" style={inp({ textAlign: "right" })} value={exchangeRate} onChange={e => setExchangeRate(Number(e.target.value) || 1)} placeholder="Rate" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: TEXT }}>Notes & Tax</div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                        <div>
-                          <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Notes</div>
-                          <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any notes…" style={{ ...inp({ minHeight: 60, resize: "vertical" as const }) }} />
-                        </div>
-                        {/* Batch & Expiry tracking */}
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                          <div>
-                            <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Batch # (optional)</div>
-                            <input value={batchNo} onChange={e => setBatchNo(e.target.value)} placeholder="e.g. B2024-01" style={inp()} />
-                          </div>
-                          <div>
-                            <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Expiry Date (optional)</div>
-                            <DateInput value={expiryDate} onChange={setExpiryDate} style={inp()} />
-                          </div>
-                        </div>
-                        <div>
-                          <button type="button" onClick={() => { setApplyTax(!applyTax); if (!applyTax) setSelectedTaxId(""); }} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "none", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", background: applyTax ? "linear-gradient(135deg,#2563eb,#3b82f6)" : `rgba(37,99,235,0.08)`, color: applyTax ? "#fff" : ACCENT }}>
+                          <div style={labelStyle()}>Global Tax</div>
+                          <button type="button" onClick={() => { setApplyTax(!applyTax); if (!applyTax) setSelectedTaxId(""); }}
+                            style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "none", fontFamily: FONT, fontSize: 12.5, fontWeight: 700, cursor: "pointer", background: applyTax ? "linear-gradient(135deg,#2563eb,#3b82f6)" : "rgba(37,99,235,.08)", color: applyTax ? "#fff" : ACCENT }}>
                             {applyTax ? "✓ Tax Applied" : "+ Add Global Tax"}
                           </button>
                           {applyTax && (
-                            <div style={{ marginTop: 8 }}>
-                              <select value={selectedTaxId} onChange={e => setSelectedTaxId(e.target.value)} style={inp()}>
+                            <div style={{ marginTop: 7 }}>
+                              <select value={selectedTaxId} onChange={e => setSelectedTaxId(e.target.value)} style={inp({ fontSize: 12.5 })}>
                                 <option value="">Select Tax</option>
-                                {taxes.map(tax => <option key={tax.id} value={tax.id}>{tax.taxType} ({tax.taxCode}) - {tax.taxRate}%</option>)}
+                                {taxes.map(tax => <option key={tax.id} value={tax.id}>{tax.taxType} ({tax.taxCode}) — {tax.taxRate}%</option>)}
                               </select>
                             </div>
                           )}
@@ -1092,101 +1202,117 @@ const [searchTerm, setSearchTerm] = useState("");
                   </div>
                 </div>
 
-                {/* RIGHT COLUMN */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 16, position: isMobile ? "static" : "sticky", top: 24 }}>
-
-                  {/* Invoice Header */}
-                  <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: 1, textTransform: "uppercase" as const, marginBottom: 6 }}>Purchase Invoice</div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                      <div style={{ fontSize: 17, fontWeight: 800, fontFamily: "monospace", color: TEXT }}>{invoiceId || "Auto #"}</div>
-                      <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: approvalStatus === "APPROVED" ? "rgba(52,211,153,0.12)" : approvalStatus === "REJECTED" ? "rgba(248,113,113,0.12)" : "rgba(251,191,36,0.12)", color: approvalStatus === "APPROVED" ? "#34d399" : approvalStatus === "REJECTED" ? "#f87171" : "#fbbf24", border: `1px solid ${approvalStatus === "APPROVED" ? "rgba(52,211,153,0.3)" : approvalStatus === "REJECTED" ? "rgba(248,113,113,0.3)" : "rgba(251,191,36,0.3)"}` }}>{approvalStatus}</span>
+                {/* RIGHT: Invoice Summary Panel */}
+                <div style={{ position: isMobile ? "static" : "sticky", top: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden" }}>
+                    {/* Summary header */}
+                    <div style={{ padding: "13px 16px", borderBottom: `1px solid ${BORDER}`, background: "linear-gradient(135deg,rgba(37,99,235,.08),rgba(99,102,241,.06))" }}>
+                      <div style={{ fontSize: 10, fontWeight: 800, color: MUTED, textTransform: "uppercase" as const, letterSpacing: 0.8, marginBottom: 3 }}>Invoice Summary</div>
+                      <div style={{ fontFamily: "monospace", fontWeight: 800, fontSize: 13, color: ACCENT }}>{invoiceId || "Auto #"}</div>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                        <div>
-                          <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Invoice Date</div>
-                          <DateInput value={date} onChange={setDate} style={inp()} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Due Date</div>
-                          <DateInput value={dueDate} onChange={setDueDate} style={inp()} />
-                        </div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Approval Status</div>
-                        <select value={approvalStatus} onChange={e => setApprovalStatus(e.target.value)} style={inp()}>
-                          <option value="DRAFT">Draft</option>
-                          <option value="PENDING">Pending</option>
-                          <option value="APPROVED">Approved</option>
-                          <option value="REJECTED">Rejected</option>
-                        </select>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 10.5, color: MUTED, fontWeight: 700, marginBottom: 5, textTransform: "uppercase" as const, letterSpacing: 0.6 }}>Location</div>
-                        <select value={location} onChange={e => setLocation(e.target.value)} style={inp()}>
-                          <option value="MAIN">Main</option>
-                          <option value="SHOP">Shop</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Totals */}
-                  <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: 18 }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}><span style={{ color: MUTED }}>Subtotal</span><span>{cur} {subtotal.toLocaleString()}</span></div>
-                      {perItemDiscountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger,#f87171)" }}><span>Item Discounts</span><span>— {cur} {perItemDiscountAmt.toLocaleString()}</span></div>}
+                    {/* Line items */}
+                    <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 9 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                        <span style={{ color: MUTED }}>Subtotal</span>
+                        <span style={{ fontWeight: 600 }}>{cur} {subtotal.toLocaleString()}</span>
+                      </div>
+                      {perItemDiscountAmt > 0 && (
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#f87171" }}>
+                          <span>Item Discounts</span><span>− {cur} {perItemDiscountAmt.toLocaleString()}</span>
+                        </div>
+                      )}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                        <span style={{ color: MUTED }}>Overall Discount</span>
-                        <div style={{ display: "flex", gap: 5 }}>
-                          <select value={discountType} onChange={e => setDiscountType(e.target.value)} style={{ ...inp({ width: 58, padding: "3px 6px", fontSize: 12 }) }}><option value="flat">Flat</option><option value="percent">%</option></select>
-                          <input type="number" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 80, padding: "3px 7px", fontSize: 12, textAlign: "right" }) }} />
+                        <span style={{ color: MUTED }}>Discount</span>
+                        <div style={{ display: "flex", gap: 4 }}>
+                          <select value={discountType} onChange={e => setDiscountType(e.target.value)} style={{ ...inp({ width: 52, padding: "3px 5px", fontSize: 11 }) }}><option value="flat">Flat</option><option value="percent">%</option></select>
+                          <input type="number" value={discount} onChange={e => setDiscount(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 74, padding: "3px 6px", fontSize: 12, textAlign: "right" }) }} />
                         </div>
                       </div>
-                      {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--danger,#f87171)" }}><span>Discount Amount</span><span>— {cur} {discountAmt.toLocaleString()}</span></div>}
+                      {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#f87171" }}><span>Discount Amt</span><span>− {cur} {discountAmt.toLocaleString()}</span></div>}
                       {perItemTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#60a5fa" }}><span>Item Tax</span><span>+ {cur} {perItemTaxAmt.toLocaleString()}</span></div>}
                       {selectedTax && globalTaxAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#60a5fa" }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>+ {cur} {globalTaxAmt.toLocaleString()}</span></div>}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
                         <span style={{ color: MUTED }}>Freight</span>
-                        <input type="number" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0.00" style={{ ...inp({ width: 100, padding: "3px 7px", fontSize: 12, textAlign: "right" }) }} />
+                        <input type="number" value={freight} onChange={e => setFreight(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 90, padding: "3px 6px", fontSize: 12, textAlign: "right" }) }} />
                       </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", borderTop: `2px solid ${BORDER}`, paddingTop: 12, fontSize: 18, fontWeight: 800 }}>
-                        <span>Net Payable</span>
-                        <span style={{ color: ACCENT }}>{cur} {netTotal.toLocaleString()}</span>
+
+                      {/* Grand Total */}
+                      <div style={{ margin: "4px 0", padding: "10px 12px", borderRadius: 9, background: "linear-gradient(135deg,rgba(37,99,235,.12),rgba(99,102,241,.08))", border: "1px solid rgba(99,102,241,.18)" }}>
+                        <div style={{ fontSize: 10, color: "#818cf8", fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: 0.6, marginBottom: 3 }}>Grand Total</div>
+                        <div style={{ fontSize: 22, fontWeight: 900, color: ACCENT, letterSpacing: -0.5 }}>{cur} {netTotal.toLocaleString()}</div>
+                      </div>
+
+                      {/* In Words */}
+                      <div style={{ padding: "8px 10px", borderRadius: 8, background: "rgba(255,255,255,.03)", border: `1px solid ${BORDER}`, fontSize: 11, color: MUTED, fontStyle: "italic", lineHeight: 1.4 }}>
+                        {netTotal > 0 ? amountInWords(netTotal) : "—"}
+                      </div>
+
+                      {/* Payment method display */}
+                      {paymentMethod && (
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5 }}>
+                          <span style={{ color: MUTED }}>Payment</span>
+                          <span style={{ fontWeight: 700, color: TEXT }}>{paymentMethod}</span>
+                        </div>
+                      )}
+
+                      {/* Advance Payment */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                        <span style={{ color: MUTED }}>Advance Paid</span>
+                        <input type="number" value={advancePayment} onChange={e => setAdvancePayment(e.target.value === "" ? "" : Number(e.target.value))} placeholder="0" style={{ ...inp({ width: 90, padding: "3px 6px", fontSize: 12, textAlign: "right" }) }} />
+                      </div>
+
+                      {/* Payable Amount */}
+                      <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1.5px solid ${BORDER}`, paddingTop: 10, fontSize: 14, fontWeight: 800 }}>
+                        <span>Payable Amount</span>
+                        <span style={{ color: payableAmount > 0 ? "#f87171" : "#34d399" }}>{cur} {payableAmount.toLocaleString()}</span>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Save Buttons */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <button onClick={saveInvoice} disabled={saving} style={{ padding: "12px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", fontFamily: FONT, fontSize: 15, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.7 : 1, boxShadow: "0 4px 14px rgba(37,99,235,0.35)" }}>{saving ? "Saving…" : editing ? "Update Invoice" : "Save & Preview"}</button>
-                    <button onClick={() => { setShowForm(false); resetForm(); }} style={{ padding: "10px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>Cancel</button>
+                    {/* Action buttons */}
+                    <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
+                      <button onClick={saveInvoice} disabled={saving}
+                        style={{ padding: "12px", borderRadius: 9, border: "none", background: saving ? "#374151" : "linear-gradient(135deg,#2563eb,#3b82f6)", color: "#fff", fontFamily: FONT, fontSize: 14, fontWeight: 800, cursor: saving ? "not-allowed" : "pointer", boxShadow: saving ? "none" : "0 4px 16px rgba(37,99,235,.4)", display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
+                        {saving ? (
+                          <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(255,255,255,.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />Saving…</>
+                        ) : (
+                          <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>{editing ? "Update Invoice" : "Save & Preview"}</>
+                        )}
+                      </button>
+                      <button onClick={() => { setShowForm(false); resetForm(); }}
+                        style={{ padding: "10px", borderRadius: 9, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
 
-
-          {/* ── Shortcuts Bar ── */}
-          {!showPreview && (
-            <div style={{ display: "flex", gap: 6, marginTop: 16, flexWrap: "wrap", padding: "0 22px 22px" }}>
-              {(piQueryMode ? [
-                { key: "F8", label: "Execute Query", color: "#facc15" },
-                { key: "Esc", label: "Cancel Query", color: undefined },
-              ] : piQueryIdx >= 0 ? [
-                { key: "F7", label: "New Query", color: ACCENT },
-                { key: "PageDown", label: "Next Invoice", color: undefined },
-                { key: "PageUp", label: "Prev Invoice", color: undefined },
-              ] : [
-                { key: "F7", label: "Query Mode", color: ACCENT },
-              ]).map(s => (
-                <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,.03)", border: `1px solid ${BORDER}`, borderRadius: 6, padding: "4px 10px" }}>
-                  <span style={{ background: s.color ? `${s.color}22` : "rgba(255,255,255,.06)", color: s.color || MUTED, borderRadius: 4, padding: "1px 7px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.color ? `${s.color}44` : BORDER}` }}>{s.key}</span>
-                  <span style={{ fontSize: 11, color: MUTED }}>{s.label}</span>
-                </div>
-              ))}
+              {/* ── SHORTCUTS BAR ── */}
+              <div style={{ marginTop: 16, padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,.02)", border: `1px solid ${BORDER}`, display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                <span style={{ fontSize: 10, color: MUTED, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: 0.5, marginRight: 4 }}>Shortcuts:</span>
+                {(piQueryMode ? [
+                  { key: "F8", label: "Execute Query", c: "#facc15" },
+                  { key: "Esc", label: "Cancel Query", c: undefined },
+                ] : piQueryIdx >= 0 ? [
+                  { key: "F7", label: "New Query", c: ACCENT },
+                  { key: "PgDn", label: "Next Invoice", c: undefined },
+                  { key: "PgUp", label: "Prev Invoice", c: undefined },
+                  { key: "Esc", label: "Clear Query", c: undefined },
+                ] : [
+                  { key: "F2", label: "Supplier", c: undefined },
+                  { key: "F4", label: "Item Search", c: undefined },
+                  { key: "F7", label: "Query Mode", c: ACCENT },
+                  { key: "F8", label: "Save Draft", c: "#34d399" },
+                  { key: "F9", label: "Save & Post", c: "#3b82f6" },
+                  { key: "Esc", label: "Clear", c: undefined },
+                ]).map(s => (
+                  <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 4, padding: "3px 9px 3px 5px", borderRadius: 6, border: `1px solid ${s.c ? `${s.c}33` : BORDER}`, background: s.c ? `${s.c}0d` : "transparent" }}>
+                    <span style={{ background: s.c ? `${s.c}22` : "rgba(255,255,255,.06)", color: s.c || MUTED, borderRadius: 4, padding: "1px 6px", fontSize: 10, fontWeight: 800, fontFamily: "monospace", border: `1px solid ${s.c ? `${s.c}44` : BORDER}` }}>{s.key}</span>
+                    <span style={{ fontSize: 10.5, color: s.c || MUTED, fontWeight: s.c ? 700 : 500 }}>{s.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
