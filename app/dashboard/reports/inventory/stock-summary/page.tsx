@@ -12,10 +12,10 @@ type StockRow = {
 };
 
 function stockQtyClass(qty: number) {
-  if (qty < 0) return "text-red-700 bg-red-100";
-  if (qty === 0) return "text-gray-700 bg-gray-100";
-  if (qty < 5) return "text-amber-700 bg-amber-50";
-  return "text-blue-700 bg-blue-50";
+  if (qty < 0) return "bg-red-100 text-red-800";
+  if (qty === 0) return "bg-slate-200 text-slate-900";
+  if (qty < 5) return "bg-amber-100 text-amber-900";
+  return "bg-blue-100 text-blue-800";
 }
 
 function stockStatusLabel(qty: number) {
@@ -51,48 +51,75 @@ export default function StockSummaryPage() {
     }
   }
 
-  useEffect(() => { loadStock(); }, [asOnDate]);
+  useEffect(() => {
+    loadStock();
+  }, [asOnDate]);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex justify-between items-end border-b-4 border-black pb-4">
+    <div className="mx-auto max-w-5xl space-y-6 p-6">
+      <div className="flex items-end justify-between border-b-4 border-black pb-4">
         <div>
-          <h1 className="text-3xl font-black uppercase italic">Current Stock Status</h1>
-          <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Inventory Balance Report</p>
+          <h1 className="text-3xl font-black uppercase italic text-white">Current Stock Status</h1>
+          <p className="text-sm font-bold uppercase tracking-widest text-slate-300">Inventory Balance Report</p>
         </div>
         <div className="flex gap-2">
-          <input type="date" value={asOnDate} onChange={e => setAsOnDate(e.target.value)} className="border-2 border-black px-4 py-2 font-bold outline-none" />
-          <button onClick={loadStock} className="bg-black text-white px-6 py-2 font-bold uppercase hover:bg-gray-800 transition-all">Refresh</button>
+          <input
+            type="date"
+            value={asOnDate}
+            onChange={(e) => setAsOnDate(e.target.value)}
+            className="border-2 border-slate-700 bg-slate-950 px-4 py-2 font-bold text-white outline-none"
+          />
+          <button
+            onClick={loadStock}
+            className="bg-black px-6 py-2 font-bold uppercase text-white transition-all hover:bg-gray-800"
+          >
+            Refresh
+          </button>
         </div>
       </div>
 
-      <div className="bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-        <table className="w-full text-sm border-collapse">
-          <thead className="bg-black text-white uppercase font-black">
+      <div className="overflow-hidden border-2 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <table className="w-full border-collapse text-sm">
+          <thead className="bg-black font-black uppercase text-white">
             <tr>
-              <th className="p-4 text-left border-r border-gray-700">Item Description</th>
-              <th className="p-4 text-center border-r border-gray-700 w-32">Unit</th>
-              <th className="p-4 text-right w-48">Available Qty</th>
+              <th className="border-r border-gray-700 p-4 text-left">Item Description</th>
+              <th className="w-32 border-r border-gray-700 p-4 text-center">Unit</th>
+              <th className="w-48 p-4 text-right">Available Qty</th>
             </tr>
           </thead>
-          <tbody className="font-bold uppercase">
+          <tbody className="font-bold uppercase text-slate-950">
             {loading ? (
-              <tr><td colSpan={3} className="p-10 text-center animate-pulse">Checking Warehouse...</td></tr>
+              <tr>
+                <td colSpan={3} className="p-10 text-center text-slate-700 animate-pulse">
+                  Checking Warehouse...
+                </td>
+              </tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={3} className="p-10 text-center text-gray-400 italic">No Stock Found.</td></tr>
+              <tr>
+                <td colSpan={3} className="p-10 text-center italic text-gray-400">
+                  No Stock Found.
+                </td>
+              </tr>
             ) : (
               rows.map((r) => (
-                <tr key={r.itemId} className="border-b-2 border-black hover:bg-yellow-50 transition-colors">
-                  <td className="p-4 border-r-2 border-black">
-                    <div>{r.itemName || "Unnamed Item"}</div>
-                    <div className="text-[10px] text-gray-500 normal-case">
+                <tr
+                  key={r.itemId}
+                  className="group border-b-2 border-black bg-white transition-colors hover:bg-amber-50"
+                >
+                  <td className="border-r-2 border-black p-4 text-slate-950">
+                    <div className="font-extrabold text-slate-950">{r.itemName || "Unnamed Item"}</div>
+                    <div className="text-[10px] normal-case text-slate-500 group-hover:text-slate-700">
                       {r.description || ""}
                     </div>
                   </td>
-                  <td className="p-4 text-center border-r-2 border-black text-gray-600">{r.unit || "—"}</td>
+                  <td className="border-r-2 border-black p-4 text-center font-extrabold text-slate-700 group-hover:text-slate-900">
+                    {r.unit || "-"}
+                  </td>
                   <td className={`p-4 text-right text-lg ${stockQtyClass(r.stockQty)}`}>
                     <div>{r.stockQty.toLocaleString()}</div>
-                    <div className="text-[10px] font-black uppercase tracking-wide opacity-70">{stockStatusLabel(r.stockQty)}</div>
+                    <div className="text-[10px] font-black uppercase tracking-wide opacity-80">
+                      {stockStatusLabel(r.stockQty)}
+                    </div>
                   </td>
                 </tr>
               ))
