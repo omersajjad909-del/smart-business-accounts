@@ -13,6 +13,8 @@ interface PLReport {
   grossProfit: number; netProfit: number;
 }
 
+const COGS_KEY = "Purchases / Cost of Goods";
+
 const fmt = (n: number | undefined | null) =>
   (n === undefined || n === null) ? "—" : Math.abs(n).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 });
 
@@ -128,7 +130,13 @@ export default function ProfitLossPage() {
             <div style={{ textAlign:"center", padding:"80px 0", color:"rgba(255,255,255,.25)", fontSize:14 }}>Loading report…</div>
           )}
 
-          {report && !loading && (
+          {report && !loading && (() => {
+            const cogs        = report.expense.find(e => e.name === COGS_KEY)?.amount ?? 0;
+            const opEx        = report.expense.filter(e => e.name !== COGS_KEY);
+            const totalOpEx   = opEx.reduce((s, r) => s + r.amount, 0);
+            const grossProfit = report.totalIncome - cogs;
+            const gpColor     = grossProfit >= 0 ? "#34d399" : "#f87171";
+            return (
             <>
               {/* Period label */}
               <div style={{ textAlign:"center", marginBottom:20, fontSize:13, color:"rgba(255,255,255,.4)" }}>
@@ -136,48 +144,23 @@ export default function ProfitLossPage() {
               </div>
 
               {/* KPI row */}
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12, marginBottom:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12, marginBottom:20 }}>
                 {[
-                  { label:"Total Revenue",  val:report.totalIncome,  color:"#34d399", bg:"rgba(52,211,153,.08)",  border:"rgba(52,211,153,.2)"  },
-                  { label:"Total Expenses", val:report.totalExpense, color:"#f87171", bg:"rgba(248,113,113,.08)", border:"rgba(248,113,113,.2)" },
+                  { label:"Total Revenue",      val:report.totalIncome,  color:"#34d399", bg:"rgba(52,211,153,.08)",  border:"rgba(52,211,153,.2)"  },
+                  { label:"Cost of Goods Sold", val:cogs,                color:"#fb923c", bg:"rgba(251,146,60,.08)",  border:"rgba(251,146,60,.2)"  },
+                  { label:"Gross Profit",        val:grossProfit,         color:gpColor,   bg:`${gpColor}14`,          border:`${gpColor}33`          },
                   { label:isProfitable?"Net Profit":"Net Loss", val:profit, color:isProfitable?"#34d399":"#f87171", bg:isProfitable?"rgba(52,211,153,.08)":"rgba(248,113,113,.08)", border:isProfitable?"rgba(52,211,153,.2)":"rgba(248,113,113,.2)" },
                 ].map(k => (
-                  <div key={k.label} style={{ background:k.bg, border:`1px solid ${k.border}`, borderRadius:14, padding:"18px 20px" }}>
+                  <div key={k.label} style={{ background:k.bg, border:`1px solid ${k.border}`, borderRadius:14, padding:"16px 18px" }}>
                     <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>{k.label}</div>
-                    <div style={{ fontSize:26, fontWeight:900, color:k.color }}>{!isProfitable && k.label.includes("Net") ? "−" : ""}{fmt(k.val)}</div>
+                    <div style={{ fontSize:22, fontWeight:900, color:k.color }}>{k.val < 0 ? "−" : ""}{fmt(Math.abs(k.val))}</div>
                   </div>
                 ))}
               </div>
 
               {/* Two-column income/expense */}
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-                {/* Expenses */}
-                <div style={card}>
-                  <div style={{ background:"rgba(239,68,68,.1)", padding:"12px 16px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", gap:8 }}>
-                    <span style={{ width:8, height:8, borderRadius:"50%", background:"#f87171", display:"inline-block" }}/>
-                    <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:"#f87171" }}>Expenses / Outflows</span>
-                  </div>
-                  <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                    <tbody>
-                      {report.expense.length === 0 ? (
-                        <tr><td colSpan={2} style={{ padding:"24px 16px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No expenses in this period</td></tr>
-                      ) : report.expense.map((item, i) => (
-                        <tr key={i} style={{ borderBottom:"1px solid rgba(255,255,255,.04)" }}>
-                          <td style={{ padding:"10px 16px", fontSize:13, color:"rgba(255,255,255,.7)" }}>{item.name}</td>
-                          <td style={{ padding:"10px 16px", textAlign:"right", fontWeight:600, fontSize:13, color:"#fca5a5" }}>{fmt(item.amount)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr style={{ background:"rgba(239,68,68,.07)", borderTop:"2px solid rgba(239,68,68,.2)" }}>
-                        <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"#f87171" }}>Total Expenses</td>
-                        <td style={{ padding:"12px 16px", textAlign:"right", fontWeight:800, fontSize:15, color:"#f87171" }}>{fmt(report.totalExpense)}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-
-                {/* Income */}
+                {/* Income column */}
                 <div style={card}>
                   <div style={{ background:"rgba(34,197,94,.08)", padding:"12px 16px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ width:8, height:8, borderRadius:"50%", background:"#4ade80", display:"inline-block" }}/>
@@ -196,15 +179,66 @@ export default function ProfitLossPage() {
                     </tbody>
                     <tfoot>
                       <tr style={{ background:"rgba(34,197,94,.07)", borderTop:"2px solid rgba(34,197,94,.2)" }}>
-                        <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"#4ade80" }}>Total Income</td>
+                        <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"#4ade80" }}>Total Revenue</td>
                         <td style={{ padding:"12px 16px", textAlign:"right", fontWeight:800, fontSize:15, color:"#4ade80" }}>{fmt(report.totalIncome)}</td>
                       </tr>
                     </tfoot>
                   </table>
                 </div>
+
+                {/* Expenses column */}
+                <div style={card}>
+                  <div style={{ background:"rgba(239,68,68,.1)", padding:"12px 16px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ width:8, height:8, borderRadius:"50%", background:"#f87171", display:"inline-block" }}/>
+                    <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"1px", color:"#f87171" }}>Expenses / Outflows</span>
+                  </div>
+                  <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                    <tbody>
+                      {/* COGS first */}
+                      {cogs > 0 && (
+                        <>
+                          <tr style={{ background:"rgba(251,146,60,.04)" }}>
+                            <td colSpan={2} style={{ padding:"6px 16px", fontSize:10, fontWeight:700, color:"#fb923c", textTransform:"uppercase", letterSpacing:".06em" }}>Cost of Goods Sold</td>
+                          </tr>
+                          <tr style={{ borderBottom:"1px solid rgba(255,255,255,.06)" }}>
+                            <td style={{ padding:"10px 16px 10px 24px", fontSize:13, color:"rgba(255,255,255,.7)" }}>Purchases</td>
+                            <td style={{ padding:"10px 16px", textAlign:"right", fontWeight:600, fontSize:13, color:"#fdba74" }}>{fmt(cogs)}</td>
+                          </tr>
+                        </>
+                      )}
+                      {/* Operating expenses */}
+                      {opEx.length > 0 && (
+                        <tr style={{ background:"rgba(248,113,113,.04)" }}>
+                          <td colSpan={2} style={{ padding:"6px 16px", fontSize:10, fontWeight:700, color:"#f87171", textTransform:"uppercase", letterSpacing:".06em" }}>Operating Expenses</td>
+                        </tr>
+                      )}
+                      {opEx.length === 0 && cogs === 0 ? (
+                        <tr><td colSpan={2} style={{ padding:"24px 16px", textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:13 }}>No expenses in this period</td></tr>
+                      ) : opEx.map((item, i) => (
+                        <tr key={i} style={{ borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+                          <td style={{ padding:"10px 16px 10px 24px", fontSize:13, color:"rgba(255,255,255,.7)" }}>{item.name}</td>
+                          <td style={{ padding:"10px 16px", textAlign:"right", fontWeight:600, fontSize:13, color:"#fca5a5" }}>{fmt(item.amount)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr style={{ background:"rgba(239,68,68,.07)", borderTop:"2px solid rgba(239,68,68,.2)" }}>
+                        <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"#f87171" }}>Total Expenses</td>
+                        <td style={{ padding:"12px 16px", textAlign:"right", fontWeight:800, fontSize:15, color:"#f87171" }}>{fmt(report.totalExpense)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+
+              {/* Net Profit / Loss bar */}
+              <div style={{ marginTop:16, padding:"16px 20px", borderRadius:14, background:isProfitable?"rgba(52,211,153,.08)":"rgba(248,113,113,.08)", border:`1px solid ${isProfitable?"rgba(52,211,153,.25)":"rgba(248,113,113,.25)"}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <span style={{ fontSize:14, fontWeight:700, color:"rgba(255,255,255,.6)" }}>{isProfitable ? "✅ Net Profit" : "⚠️ Net Loss"} for period {from} → {to}</span>
+                <span style={{ fontSize:22, fontWeight:900, color:isProfitable?"#34d399":"#f87171" }}>{profit < 0 ? "−" : ""}Rs {fmt(Math.abs(profit))}</span>
               </div>
             </>
-          )}
+            );
+          })()}
         </>
       )}
     </div>
