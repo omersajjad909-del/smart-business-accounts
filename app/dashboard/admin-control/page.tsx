@@ -9,7 +9,7 @@ import Link from "next/link";
 
 /* ─── types ─── */
 type Branch = { id: string; code: string; name: string; city?: string | null; isActive: boolean; address?: string; latitude?: number | null; longitude?: number | null; geoSource?: "exact" | "manual" | "country" | "unset" };
-type UserRow = { id: string; name: string; email: string; role: string; active: boolean };
+type UserRow = { id: string; name: string; email: string; role: string; active: boolean; permissions?: { permission: string }[] };
 type RoleRow = { role: string; permissions: string[] };
 type CompanyRow = { name: string; country?: string | null; baseCurrency?: string | null; plan?: string | null };
 type PrintPreferences = { paperSize: "A4" | "THERMAL_80MM" | "THERMAL_58MM"; invoiceTemplate: "classic" | "compact" | "modern"; receiptTemplate: "standard" | "mart" | "restaurant"; defaultOutput: "pdf" | "browser-print"; showLogo: boolean; showPhone: boolean; showAddress: boolean; showTaxNumber: boolean; logoUrl: string; headerNote: string; footerNote: string; thermalFontSize: "sm" | "md" | "lg" };
@@ -89,6 +89,9 @@ export default function AdminControlPage() {
   const [roles, setRoles]       = useState<RoleRow[]>([]);
   const [selectedRole, setSelectedRole] = useState("ADMIN");
   const [rolePermissions, setRolePermissions] = useState<string[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [userPermsMap, setUserPermsMap] = useState<Record<string, string[]>>({});
+  const [savingUserPerms, setSavingUserPerms] = useState(false);
   const [settings, setSettings] = useState<AdminControlSettings>({ branchAssignments: {}, printPreferences: DEFAULT_PRINT, taxProfile: DEFAULT_TAX, companyIdentity: DEFAULT_IDENTITY, invoiceContact: DEFAULT_CONTACT, bankDetails: DEFAULT_BANK, branchLocations: {} });
   const [opsLoading, setOpsLoading] = useState<null | "backup" | "download">(null);
 
@@ -117,11 +120,16 @@ export default function AdminControlPage() {
       setCompanyForm({ companyName: companyData?.name || "", country: companyData?.country || "", baseCurrency: companyData?.baseCurrency || "USD" });
       const locMap = settingsData?.branchLocations || {};
       setBranches(Array.isArray(branchData) ? branchData.map((b: Branch) => ({ ...b, address: locMap[b.id]?.address || "", latitude: typeof locMap[b.id]?.latitude === "number" ? locMap[b.id].latitude : null, longitude: typeof locMap[b.id]?.longitude === "number" ? locMap[b.id].longitude : null, geoSource: locMap[b.id]?.geoSource || "unset" })) : []);
-      setUsers(Array.isArray(userData) ? userData : []);
+      const userList: UserRow[] = Array.isArray(userData) ? userData : [];
+      setUsers(userList);
       setRoles(Array.isArray(roleData) ? roleData : []);
       setSettings({ branchAssignments: settingsData?.branchAssignments || {}, printPreferences: { ...DEFAULT_PRINT, ...(settingsData?.printPreferences || {}) }, taxProfile: { ...DEFAULT_TAX, ...(settingsData?.taxProfile || {}) }, companyIdentity: { ...DEFAULT_IDENTITY, ...(settingsData?.companyIdentity || {}) }, invoiceContact: { ...DEFAULT_CONTACT, ...(settingsData?.invoiceContact || {}) }, bankDetails: { ...DEFAULT_BANK, ...(settingsData?.bankDetails || {}) }, branchLocations: settingsData?.branchLocations || {} });
       const firstRole = Array.isArray(roleData) && roleData.length > 0 ? roleData[0] : null;
       if (firstRole?.role) { setSelectedRole(firstRole.role); setRolePermissions(firstRole.permissions || []); }
+      const permsMap: Record<string, string[]> = {};
+      for (const u of userList) { permsMap[u.id] = (u.permissions || []).map(p => p.permission); }
+      setUserPermsMap(permsMap);
+      setSelectedUserId(prev => prev ?? (userList[0]?.id || null));
     } finally { setLoading(false); }
   }
 
@@ -184,6 +192,18 @@ export default function AdminControlPage() {
       flash(`${selectedRole} permissions saved.`);
       await loadAll();
     } catch { flash("Failed to save.", false); }
+  }
+
+  async function saveUserPermissions() {
+    if (!selectedUserId) return;
+    setSavingUserPerms(true);
+    try {
+      const res = await fetch("/api/users/permissions", { method: "POST", headers: { "Content-Type": "application/json", "x-user-role": "ADMIN" }, body: JSON.stringify({ userId: selectedUserId, permissions: userPermsMap[selectedUserId] || [] }) });
+      if (!res.ok) throw new Error();
+      const selUser = users.find(u => u.id === selectedUserId);
+      flash(`Permissions saved for ${selUser?.name || "user"}.`);
+    } catch { flash("Failed to save.", false); }
+    finally { setSavingUserPerms(false); }
   }
 
   async function saveBranch(e: React.FormEvent) {
@@ -510,42 +530,72 @@ export default function AdminControlPage() {
 
           {/* ══════════════ TAB: PERMISSIONS ══════════════ */}
           {tab === "permissions" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-                <div>
-                  <div style={sectionTitle}>Role Permissions</div>
-                  <div style={{ fontSize: 12, color: MUTED }}>Set default permissions per role for the entire company.</div>
-                </div>
-                <div style={{ display: "flex", gap: 10 }}>
-                  <Btn variant="secondary" onClick={() => setRolePermissions(availablePermissions)}>Select All</Btn>
-                  <Btn variant="secondary" onClick={() => setRolePermissions([])}>Clear</Btn>
-                  <Btn onClick={saveRolePermissions}>💾 Save Role</Btn>
-                </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <div style={sectionTitle}>User Permissions</div>
+                <div style={{ fontSize: 12, color: MUTED }}>Select a user from the list to view and manage their individual permissions.</div>
               </div>
 
-              {/* Dynamic role tabs */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {(() => {
-                  const fromUsers = [...new Set(users.map(u => u.role.toUpperCase()))];
-                  const fromRoles = roles.map(r => r.role.toUpperCase());
-                  const all = [...new Set([...fromUsers, ...fromRoles])];
-                  const display = all.length > 0 ? all : ["ADMIN", "ACCOUNTANT", "VIEWER"];
-                  return display.map(r => (
-                    <button key={r} onClick={() => setSelectedRole(r)} style={{ padding: "8px 18px", borderRadius: 20, border: `1px solid ${selectedRole === r ? ACCENT : BDR}`, background: selectedRole === r ? "rgba(99,102,241,.14)" : "transparent", color: selectedRole === r ? "#fff" : MUTED, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                      {r}
-                    </button>
-                  ));
-                })()}
-              </div>
+              {users.length === 0 ? (
+                <div style={{ ...panel, textAlign: "center", padding: 48, color: MUTED, fontSize: 13 }}>
+                  No users found. Add team members in the Team &amp; Access tab.
+                </div>
+              ) : (
+                <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-                {availablePermissions.map(p => (
-                  <label key={p} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 9, border: `1px solid ${rolePermissions.includes(p) ? "rgba(99,102,241,.35)" : BDR}`, background: rolePermissions.includes(p) ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.02)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                    <input type="checkbox" checked={rolePermissions.includes(p)} onChange={() => setRolePermissions(c => c.includes(p) ? c.filter(x => x !== p) : [...c, p])} />
-                    {p}
-                  </label>
-                ))}
-              </div>
+                  {/* ── Left: User list ── */}
+                  <div style={{ width: 200, flexShrink: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                    {users.map(u => {
+                      const isSel = selectedUserId === u.id;
+                      return (
+                        <button key={u.id} onClick={() => setSelectedUserId(u.id)} style={{ width: "100%", textAlign: "left", padding: "12px 14px", borderRadius: 10, border: `1px solid ${isSel ? ACCENT : BDR}`, background: isSel ? "rgba(99,102,241,.1)" : BG, cursor: "pointer", transition: "all .15s", outline: "none" }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u.name}</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: isSel ? ACCENT : MUTED, letterSpacing: ".04em" }}>{u.role}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* ── Right: Permissions panel ── */}
+                  <div style={{ flex: 1 }}>
+                    {!selectedUserId ? (
+                      <div style={{ ...panel, textAlign: "center", padding: 48, color: MUTED, fontSize: 13 }}>
+                        ← Select a user to manage their permissions
+                      </div>
+                    ) : (() => {
+                      const selUser = users.find(u => u.id === selectedUserId);
+                      const perms = userPermsMap[selectedUserId] || [];
+                      return (
+                        <div>
+                          {/* User header + action buttons */}
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10, padding: "14px 16px", borderRadius: 12, background: "rgba(99,102,241,.06)", border: `1px solid rgba(99,102,241,.2)` }}>
+                            <div>
+                              <div style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{selUser?.name}</div>
+                              <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{selUser?.role} · {selUser?.email}</div>
+                            </div>
+                            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                              <Btn variant="secondary" onClick={() => setUserPermsMap(m => ({ ...m, [selectedUserId]: [...availablePermissions] }))}>Select All</Btn>
+                              <Btn variant="secondary" onClick={() => setUserPermsMap(m => ({ ...m, [selectedUserId]: [] }))}>Clear</Btn>
+                              <Btn onClick={saveUserPermissions} disabled={savingUserPerms}>{savingUserPerms ? "Saving…" : "💾 Save Permissions"}</Btn>
+                            </div>
+                          </div>
+
+                          {/* Permission checkboxes */}
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 7 }}>
+                            {availablePermissions.map(p => (
+                              <label key={p} style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 13px", borderRadius: 8, border: `1px solid ${perms.includes(p) ? "rgba(99,102,241,.35)" : BDR}`, background: perms.includes(p) ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.02)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                                <input type="checkbox" checked={perms.includes(p)} onChange={() => setUserPermsMap(m => ({ ...m, [selectedUserId]: perms.includes(p) ? perms.filter(x => x !== p) : [...perms, p] }))} style={{ accentColor: ACCENT }} />
+                                {p}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                </div>
+              )}
             </div>
           )}
 
