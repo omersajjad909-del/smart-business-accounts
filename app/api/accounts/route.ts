@@ -79,12 +79,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(results.map(a => safeDecryptFields(a, ACCOUNT_PII_FIELDS)));
   }
 
+  const partyTypeParam = searchParams.get("partyType");
+
   const accounts = await prisma.account.findMany({
-    where: { companyId, deletedAt: null },
+    where: {
+      companyId,
+      deletedAt: null,
+      ...(partyTypeParam ? { partyType: { equals: partyTypeParam, mode: "insensitive" } } : {}),
+    },
     orderBy: { name: "asc" },
   });
 
-  if (accounts.length === 0 && role === "ADMIN") {
+  if (accounts.length === 0 && role === "ADMIN" && !partyTypeParam) {
     await seedMinimalChart(prisma, companyId);
     const seeded = await prisma.account.findMany({
       where: { companyId, deletedAt: null },

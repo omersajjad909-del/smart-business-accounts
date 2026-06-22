@@ -27,10 +27,10 @@ export default function CustomerStatementPage() {
 
   useEffect(() => {
     const user = getCurrentUser();
-    fetch("/api/crm/contacts", {
+    fetch("/api/accounts?partyType=CUSTOMER", {
       credentials: "include",
       headers: { "x-user-id": user?.id || "", "x-user-role": user?.role || "", "x-company-id": user?.companyId || "" },
-    }).then(r => r.json()).then(d => setContacts(Array.isArray(d) ? d : Array.isArray(d?.contacts) ? d.contacts : [])).catch(() => {});
+    }).then(r => r.json()).then(d => setContacts(Array.isArray(d) ? d : [])).catch(() => {});
   }, []);
 
   const fetchStatement = useCallback((c: Contact, from: string, to: string) => {
