@@ -1127,7 +1127,8 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.CREATE_SALE_RETURN) && <NavLink href="/dashboard/sale-return" pathname={pathname}>Sale Return</NavLink>}
               {/* ── Admin ── */}
 
-              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>}
+              {bizFeatures?.customerCreditLimits && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/credit-limits" pathname={pathname}>💳 Credit Limits</NavLink>}
+              {bizFeatures?.discountEngine && hasPermission(currentUser, PERMISSIONS.CREATE_SALES_INVOICE) && <NavLink href="/dashboard/promotions" pathname={pathname}>🏷️ Promotions</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/payment-receipts" pathname={pathname}>Payment Receipts</NavLink>}
             </NavGroup>
           )}
@@ -1143,6 +1144,8 @@ export default function DashboardLayout({
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/inventory" pathname={pathname}>Inventory Overview</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_ITEMS) && <NavLink href="/dashboard/items-new" pathname={pathname}>Inventory Items</NavLink>}
               {bizFeatures?.multiWarehouse && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/warehouses" pathname={pathname}>Warehouses</NavLink>}
+              {bizFeatures?.productVariants && hasPermission(currentUser, PERMISSIONS.VIEW_CATALOG) && <NavLink href="/dashboard/product-variants" pathname={pathname}>👕 Product Variants</NavLink>}
+              {bizFeatures?.batchSerialTracking && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/batch-tracking" pathname={pathname}>🔢 Batch & Serial</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/price-lists" pathname={pathname}>Price Lists</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_STOCK_RATE) && <NavLink href="/dashboard/stock-rate" pathname={pathname}>Stock Rates</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.MANAGE_BARCODE) && <NavLink href="/dashboard/barcode" pathname={pathname}>Barcode</NavLink>}
@@ -1159,7 +1162,7 @@ export default function DashboardLayout({
             >
               {hasPermission(currentUser, PERMISSIONS.BANK_RECONCILIATION) && <NavLink href="/dashboard/bank-reconciliation" pathname={pathname}>Bank Reconciliation</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.EXPENSE_VOUCHERS) && <NavLink href="/dashboard/expense-vouchers" pathname={pathname}>Expense Vouchers</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.TAX_CONFIGURATION) && <NavLink href="/dashboard/tax-configuration" pathname={pathname}>Tax Configuration</NavLink>}
+              {bizFeatures?.taxConfiguration && hasPermission(currentUser, PERMISSIONS.TAX_CONFIGURATION) && <NavLink href="/dashboard/tax-configuration" pathname={pathname}>📑 Tax & GST</NavLink>}
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BULK_PAYMENTS) && <NavLink href="/dashboard/bulk-payments" pathname={pathname}>Bulk Payments</NavLink>}
             </NavGroup>
           )}
@@ -1259,6 +1262,8 @@ export default function DashboardLayout({
               {bizFeatures?.multiWarehouse && hasDashboardFeature("RETAIL_STOCK_TRANSFER") && <NavLink href="/dashboard/retail/stock-transfer" pathname={pathname}>Stock Transfer</NavLink>}
               {hasDashboardFeature("RETAIL_STOCK_ADJUSTMENT") && <NavLink href="/dashboard/retail/stock-adjustment" pathname={pathname}>Stock Adjustment</NavLink>}
               {hasDashboardFeature("RETAIL_BATCH_EXPIRY") && <NavLink href="/dashboard/retail/batch-expiry" pathname={pathname}>Batch & Expiry</NavLink>}
+              {bizFeatures?.batchSerialTracking && <NavLink href="/dashboard/batch-tracking" pathname={pathname}>🔢 Batch & Serial</NavLink>}
+              {bizFeatures?.productVariants && <NavLink href="/dashboard/product-variants" pathname={pathname}>👕 Product Variants</NavLink>}
               <NavLink href="/dashboard/reports/stock/low" pathname={pathname}>🚨 Reorder Alerts</NavLink>
             </NavGroup>
 
@@ -1271,7 +1276,7 @@ export default function DashboardLayout({
             >
               {hasDashboardFeature("RETAIL_CUSTOMERS") && <NavLink href="/dashboard/retail/customers" pathname={pathname}>Customer List</NavLink>}
               {hasDashboardFeature("RETAIL_LOYALTY") && <NavLink href="/dashboard/retail/loyalty" pathname={pathname}>Loyalty Points</NavLink>}
-              <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>
+              {bizFeatures?.customerCreditLimits && <NavLink href="/dashboard/credit-limits" pathname={pathname}>💳 Credit Limits</NavLink>}
             </NavGroup>
 
             {/* ── 6. Suppliers ── */}
@@ -2077,6 +2082,7 @@ export default function DashboardLayout({
             >
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
               <NavLink href="/dashboard/business-features" pathname={pathname}>⚡ Business Features</NavLink>
+              {bizFeatures?.smsNotifications && <NavLink href="/dashboard/notifications-config" pathname={pathname}>💬 Notifications</NavLink>}
               <NavLink href="/dashboard/shortcuts" pathname={pathname}>Keyboard Shortcuts</NavLink>
               {/* <NavLink href="/dashboard/users" pathname={pathname}>Users & Permissions</NavLink>
               <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink> */}
