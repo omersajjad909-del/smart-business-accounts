@@ -183,12 +183,18 @@ export default function BalanceSheetPage() {
                           <td style={{ ...td, textAlign:"right", fontFamily:"monospace", color:"#6ee7b7", fontWeight:600 }}>{fmtN(e.amount)}</td>
                         </tr>
                       ))}
-                      {data.netProfit !== undefined && (
-                        <tr style={{ borderBottom:"1px solid rgba(255,255,255,.04)", background:"rgba(52,211,153,.05)" }}>
-                          <td style={{ ...td, color:"#34d399", fontWeight:600 }}>Net Profit / Loss</td>
-                          <td style={{ ...td, textAlign:"right", fontFamily:"monospace", color:"#34d399", fontWeight:700 }}>{fmtN(data.netProfit)}</td>
-                        </tr>
-                      )}
+                      {data.netProfit !== undefined && (() => {
+                        const isProfit = data.netProfit >= 0;
+                        const c = isProfit ? "#34d399" : "#f87171";
+                        return (
+                          <tr style={{ borderBottom:"1px solid rgba(255,255,255,.04)", background: isProfit ? "rgba(52,211,153,.05)" : "rgba(248,113,113,.05)" }}>
+                            <td style={{ ...td, color:c, fontWeight:600 }}>{isProfit ? "Net Profit" : "Net Loss"}</td>
+                            <td style={{ ...td, textAlign:"right", fontFamily:"monospace", color:c, fontWeight:700 }}>
+                              {!isProfit ? "(" : ""}{fmtN(data.netProfit)}{!isProfit ? ")" : ""}
+                            </td>
+                          </tr>
+                        );
+                      })()}
                     </tbody>
                     <tfoot><tr style={{ background:"rgba(239,68,68,.1)", borderTop:"2px solid rgba(239,68,68,.25)" }}>
                       <td style={{ padding:"12px 16px", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:.5, color:"#f87171" }}>Total Liabilities & Equity</td>

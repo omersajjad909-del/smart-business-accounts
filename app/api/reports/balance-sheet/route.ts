@@ -1,98 +1,76 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { resolveCompanyId } from "@/lib/tenant";
+import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 import { PERMISSIONS } from "@/lib/permissions";
 import { apiHasPermission } from "@/lib/apiPermission";
 import { requireEntitlement } from "@/lib/subscriptionGuard";
 
-type AccountWithEntries = Prisma.AccountGetPayload<{
-  include: {
-    voucherEntries: true;
-  };
-}>;
-
-
-if (process.env.NODE_ENV === "development") {
-  (globalThis as { prisma?: PrismaClient }).prisma = prisma;
-}
-
-// api/reports/balance-sheet/route.ts
 export async function GET(req: NextRequest) {
   try {
     const dateParam = req.nextUrl.searchParams.get("date");
     const asOn = dateParam ? new Date(dateParam + "T23:59:59.999") : new Date();
 
-    const userId = req.headers.get("x-user-id");
+    const userId   = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
+
     const companyId = await resolveCompanyId(req);
-    if (!companyId) {
-      return NextResponse.json({ error: "Company required" }, { status: 400 });
-    }
+    if (!companyId) return NextResponse.json({ error: "Company required" }, { status: 400 });
+
+    const branchId = await resolveBranchId(req, companyId);
+
     const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_BALANCE_SHEET_REPORT, companyId);
-    if (!allowed) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
     const sub = await requireEntitlement(req, "advancedReports");
     if (sub) return sub;
 
-    const accounts = await prisma.account.findMany({
-      where: { companyId },
-      include: {
-        voucherEntries: {
-          where: {
-            voucher: {
-              date: { lte: asOn },
-              companyId,
-            },
-          },
-        },
-      },
-    });
+    const branchFilter = branchId ? { branchId } : {};
 
-    const assetsList: any[] = [];
-    const liabilitiesList: any[] = [];
-    const equityList: any[] = [];
+    // ── 2 queries: accounts + bulk movement groupBy ─────────────────────
+    const [accounts, movements] = await Promise.all([
+      prisma.account.findMany({ where: { companyId } }),
+      prisma.voucherEntry.groupBy({
+        by: ["accountId"],
+        where: { voucher: { date: { lte: asOn }, companyId, deletedAt: null, ...branchFilter } },
+        _sum: { amount: true },
+      }),
+    ]);
 
-    let incomeTotal = 0;
-    let expenseTotal = 0;
-    let totalAssets = 0;
-    let totalLiabilities = 0;
+    const movMap = Object.fromEntries(movements.map(m => [m.accountId, m._sum.amount ?? 0]));
+
+    const assetsList: { name: string; amount: number }[]       = [];
+    const liabilitiesList: { name: string; amount: number }[]  = [];
+    const equityList: { name: string; amount: number }[]       = [];
+
+    let incomeTotal        = 0;
+    let expenseTotal       = 0;
+    let totalAssets        = 0;
+    let totalLiabilities   = 0;
     let totalEquityAccounts = 0;
 
-    accounts.forEach((acc: AccountWithEntries) => {
+    for (const acc of accounts) {
+      const opening  = Number(acc.openDebit || 0) - Number(acc.openCredit || 0);
+      const movement = movMap[acc.id] ?? 0;
+      const closing  = opening + movement;
 
-      const opening =
-        Number(acc.openDebit || 0) - Number(acc.openCredit || 0);
-      const movement = (acc.voucherEntries || []).reduce(
-        (sum, e) => sum + Number(e.amount),
-        0
-      );
-      const closing = opening + movement;
+      if (Math.abs(closing) < 0.0001) continue;
 
-      if (Math.abs(closing) < 0.0001) {
-        return;
-      }
-
-      const type = (acc.type || "").toUpperCase();
+      const type  = (acc.type      || "").toUpperCase();
       const party = (acc.partyType || "").toUpperCase();
 
-      const isAsset =
-        type === "ASSET" ||
-        type === "BANK" ||
-        type === "CASH" ||
-        party === "CUSTOMER";
-      const isLiability =
-        type === "LIABILITY" || party === "SUPPLIER";
-      const isEquity =
-        type === "EQUITY" || type === "CAPITAL";
-      const isIncome =
-        type === "INCOME" || type === "REVENUE";
-      const isExpense =
-        type === "EXPENSE" || type === "COST";
+      const isAsset     = type === "ASSET" || type === "BANK" || type === "CASH" || party === "CUSTOMER";
+      const isLiability = type === "LIABILITY" || party === "SUPPLIER" || party === "EMPLOYEE" || party === "EMPLOYES";
+      const isEquity    = type === "EQUITY" || type === "CAPITAL";
+      const isIncome    = type === "INCOME" || type === "REVENUE";
+      const isExpense   = type === "EXPENSE" || type === "COST";
 
-      if (isAsset && closing > 0) {
-        assetsList.push({ name: acc.name, amount: closing });
+      if (isAsset) {
+        if (closing > 0) {
+          assetsList.push({ name: acc.name, amount: closing });
+        } else {
+          // Contra asset (e.g. accumulated depreciation) — deduction in assets section
+          assetsList.push({ name: `Less: ${acc.name}`, amount: closing });
+        }
         totalAssets += closing;
       }
 
@@ -108,24 +86,13 @@ export async function GET(req: NextRequest) {
         totalEquityAccounts += val;
       }
 
-      if (isIncome) {
-        if (closing < 0) {
-          incomeTotal += Math.abs(closing);
-        } else {
-          expenseTotal += closing;
-        }
-      }
+      // Income: credit balance (negative closing) = revenue earned
+      if (isIncome)  incomeTotal  += -closing;
+      // Expense: debit balance (positive closing) = costs incurred
+      if (isExpense) expenseTotal += closing;
+    }
 
-      if (isExpense) {
-        if (closing > 0) {
-          expenseTotal += closing;
-        } else {
-          incomeTotal += Math.abs(closing);
-        }
-      }
-    });
-
-    const netProfit = incomeTotal - expenseTotal;
+    const netProfit   = incomeTotal - expenseTotal;
     const totalEquity = totalEquityAccounts + netProfit;
 
     return NextResponse.json({
@@ -136,8 +103,7 @@ export async function GET(req: NextRequest) {
       totalAssets,
       totalLiabilities,
       totalEquity,
-      isBalanced:
-        Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 1,
+      isBalanced: Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 1,
     });
   } catch (e) {
     console.error("BALANCE SHEET ERROR:", e);
