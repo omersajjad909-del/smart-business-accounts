@@ -811,11 +811,17 @@ export default function AdminControlPage() {
             </div>
 
             <div className="mb-5 flex flex-wrap gap-2">
-              {["ADMIN", "ACCOUNTANT", "VIEWER"].map((roleName) => (
-                <button key={roleName} type="button" onClick={() => setSelectedRole(roleName)} className={`rounded-full border px-4 py-2 text-sm transition ${selectedRole === roleName ? "border-[var(--accent)] bg-[color:rgba(99,102,241,.14)] text-[var(--text-primary)]" : "border-[var(--border)] text-[var(--text-muted)]"}`}>
-                  {roleName}
-                </button>
-              ))}
+              {(() => {
+                const fromUsers = [...new Set(users.map(u => u.role.toUpperCase()))];
+                const fromRoles = roles.map(r => r.role.toUpperCase());
+                const allRoles  = [...new Set([...fromUsers, ...fromRoles])];
+                const display   = allRoles.length > 0 ? allRoles : ["ADMIN", "ACCOUNTANT", "VIEWER"];
+                return display.map((roleName) => (
+                  <button key={roleName} type="button" onClick={() => setSelectedRole(roleName)} className={`rounded-full border px-4 py-2 text-sm transition ${selectedRole === roleName ? "border-[var(--accent)] bg-[color:rgba(99,102,241,.14)] text-[var(--text-primary)]" : "border-[var(--border)] text-[var(--text-muted)]"}`}>
+                    {roleName}
+                  </button>
+                ));
+              })()}
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
