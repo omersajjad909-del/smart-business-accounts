@@ -53,7 +53,8 @@ export default function LedgerReportPage() {
     const user = getCurrentUser();
     if (!user) return;
     setPreviewLoading(true);
-    fetch(`/api/reports/ledger?accountId=${accountId}&from=${fromDate}&to=${toDate}&balanceOnly=1`, {
+    const todayIso = new Date().toISOString().slice(0, 10);
+    fetch(`/api/reports/ledger?accountId=${accountId}&from=2000-01-01&to=${todayIso}&balanceOnly=1`, {
       credentials: "include",
       headers: { "x-user-id": user.id, "x-user-role": user.role, "x-company-id": user.companyId || "" },
     })
@@ -61,7 +62,7 @@ export default function LedgerReportPage() {
       .then(d => setPreviewBal(typeof d.balance === "number" ? d.balance : null))
       .catch(() => setPreviewBal(null))
       .finally(() => setPreviewLoading(false));
-  }, [accountId, fromDate]);
+  }, [accountId]);
 
   async function loadLedger(overrideId?: string) {
     const id = overrideId || accountId;
@@ -241,7 +242,7 @@ export default function LedgerReportPage() {
                       borderRadius: 7, padding: "4px 10px",
                     }}>
                       <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>
-                        Opening Balance
+                        Current Balance
                       </span>
                       <span style={{ fontSize: 13, fontWeight: 800, color: previewBal >= 0 ? "#34d399" : "#f87171", fontFamily: "monospace" }}>
                         {fmt(previewBal)} {previewBal >= 0 ? "Dr" : "Cr"}
