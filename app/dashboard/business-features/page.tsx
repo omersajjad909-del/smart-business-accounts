@@ -6,15 +6,27 @@ import toast from "react-hot-toast";
 const ff = "'Outfit','Inter',sans-serif";
 
 type Features = {
-  advancedPurchasing: boolean;
-  multiWarehouse:     boolean;
-  approvalWorkflow:   boolean;
+  advancedPurchasing:    boolean;
+  multiWarehouse:        boolean;
+  approvalWorkflow:      boolean;
+  customerCreditLimits:  boolean;
+  batchSerialTracking:   boolean;
+  productVariants:       boolean;
+  discountEngine:        boolean;
+  taxConfiguration:      boolean;
+  smsNotifications:      boolean;
 };
 
 const DEFAULT: Features = {
-  advancedPurchasing: false,
-  multiWarehouse:     false,
-  approvalWorkflow:   false,
+  advancedPurchasing:    false,
+  multiWarehouse:        false,
+  approvalWorkflow:      false,
+  customerCreditLimits:  false,
+  batchSerialTracking:   false,
+  productVariants:       false,
+  discountEngine:        false,
+  taxConfiguration:      false,
+  smsNotifications:      false,
 };
 
 /* ─── Feature definitions ─── */
@@ -90,6 +102,150 @@ const FEATURE_CARDS = [
     color: "#f59e0b",
     bg: "rgba(245,158,11,.07)",
     border: "rgba(245,158,11,.2)",
+  },
+  {
+    key: "customerCreditLimits" as keyof Features,
+    icon: "💳",
+    title: "Customer Credit Limits",
+    subtitle: "Per-customer credit control",
+    who: "Wholesale / B2B",
+    whoColor: "#fb923c",
+    description:
+      "Set a maximum credit limit per customer. Block or warn when a new invoice would exceed that limit. Prevents bad debt before it happens.",
+    simple: {
+      label: "Simple Mode (OFF)",
+      flow: ["Create invoice for any customer", "→ No credit check done", "→ Invoice saved directly ✅"],
+      note: "Full trust mode. Good for small retail or cash-only businesses.",
+    },
+    advanced: {
+      label: "Advanced Mode (ON)",
+      flow: ["Set credit limit per customer", "→ New invoice checked against outstanding balance", "→ Blocked if limit exceeded", "→ Manager override available ✅"],
+      note: "Prevents over-exposure to slow-paying customers.",
+    },
+    unlocks: ["Credit limit field on customer profile", "Over-limit block at invoice creation", "Manager override on blocked sales"],
+    color: "#fb923c",
+    bg: "rgba(251,146,60,.07)",
+    border: "rgba(251,146,60,.2)",
+  },
+  {
+    key: "batchSerialTracking" as keyof Features,
+    icon: "🔢",
+    title: "Batch & Serial Number Tracking",
+    subtitle: "Lot numbers, expiry, individual units",
+    who: "Pharma / Electronics",
+    whoColor: "#38bdf8",
+    description:
+      "Track inventory by batch (with expiry date) or by serial number per unit. Enables recalls, warranty tracking, and compliance reporting.",
+    simple: {
+      label: "Simple Mode (OFF)",
+      flow: ["Stock received in bulk", "→ No batch or serial required", "→ Stock count updated ✅"],
+      note: "Standard stock tracking. Works for most general retail.",
+    },
+    advanced: {
+      label: "Advanced Mode (ON)",
+      flow: ["Purchase: enter batch no. + expiry date", "→ Sale: batch/serial auto-assigned (FEFO)", "→ Full traceability per unit", "→ Expiry alerts before stock expires ✅"],
+      note: "Mandatory for pharma, medical devices, and electronics.",
+    },
+    unlocks: ["Batch number on purchase receipt", "Serial number capture on sale", "Expiry date tracking & alerts"],
+    color: "#38bdf8",
+    bg: "rgba(56,189,248,.07)",
+    border: "rgba(56,189,248,.2)",
+  },
+  {
+    key: "productVariants" as keyof Features,
+    icon: "👕",
+    title: "Product Variants",
+    subtitle: "Size, color, weight per product",
+    who: "Clothing / Footwear / FMCG",
+    whoColor: "#e879f9",
+    description:
+      "A single product can have multiple variants (S / M / L, Red / Blue). Each variant has its own price and stock level.",
+    simple: {
+      label: "Simple Mode (OFF)",
+      flow: ["One product → one SKU", "→ One price, one stock", "→ Done ✅"],
+      note: "Clean and simple. Best for single-item businesses.",
+    },
+    advanced: {
+      label: "Advanced Mode (ON)",
+      flow: ["Create product with variant attributes", "→ Generate variants (S-Red, S-Blue, M-Red…)", "→ Per-variant price & stock", "→ Variant-wise sales report ✅"],
+      note: "Essential for clothing, shoes, beverages with sizes.",
+    },
+    unlocks: ["Variant attribute builder (Size, Color, Weight)", "Per-variant pricing & stock", "Variant-wise sales analytics"],
+    color: "#e879f9",
+    bg: "rgba(232,121,249,.07)",
+    border: "rgba(232,121,249,.2)",
+  },
+  {
+    key: "discountEngine" as keyof Features,
+    icon: "🏷️",
+    title: "Discount & Promotions Engine",
+    subtitle: "BOGO, category discounts, timed sales",
+    who: "Retail / FMCG",
+    whoColor: "#f97316",
+    description:
+      "Run structured promotions — Buy 1 Get 1, category-wide % off, bundle pricing, and time-limited sale prices. Applied automatically at POS.",
+    simple: {
+      label: "Simple Mode (OFF)",
+      flow: ["Manual discount on each invoice line", "→ No promo rules", "→ Discount at cashier's discretion ✅"],
+      note: "Ad-hoc discounts only. No automated promotions.",
+    },
+    advanced: {
+      label: "Advanced Mode (ON)",
+      flow: ["Create promo rule (type + date range + scope)", "→ Auto-applied at POS on matching items", "→ Stacking rules controlled", "→ Promo performance report ✅"],
+      note: "Structured promotions with full audit trail.",
+    },
+    unlocks: ["Promotions rule manager", "BOGO & bundle pricing engine", "Category-wise % discount rules"],
+    color: "#f97316",
+    bg: "rgba(249,115,22,.07)",
+    border: "rgba(249,115,22,.2)",
+  },
+  {
+    key: "taxConfiguration" as keyof Features,
+    icon: "📑",
+    title: "Tax & GST Configuration",
+    subtitle: "GST / Sales Tax on invoices",
+    who: "Registered Businesses",
+    whoColor: "#4ade80",
+    description:
+      "Enable tax on invoices. Assign tax classes to products, choose tax-inclusive or exclusive pricing, and generate tax summary reports.",
+    simple: {
+      label: "Simple Mode (OFF)",
+      flow: ["Price entered directly", "→ No tax calculation", "→ Invoice total = net price ✅"],
+      note: "For unregistered or informal businesses.",
+    },
+    advanced: {
+      label: "Advanced Mode (ON)",
+      flow: ["Tax class assigned per product", "→ Tax auto-calculated on invoice", "→ Tax-inclusive or exclusive toggle", "→ GST summary report for filing ✅"],
+      note: "Required for FBR/GST-registered businesses.",
+    },
+    unlocks: ["Tax class setup (Standard, Zero-rated, Exempt)", "Auto tax on sales & purchase invoices", "Tax summary report for filing"],
+    color: "#4ade80",
+    bg: "rgba(74,222,128,.07)",
+    border: "rgba(74,222,128,.2)",
+  },
+  {
+    key: "smsNotifications" as keyof Features,
+    icon: "💬",
+    title: "SMS & WhatsApp Notifications",
+    subtitle: "Automated customer & owner alerts",
+    who: "Customer-Facing Businesses",
+    whoColor: "#34d399",
+    description:
+      "Send automated messages to customers — sale receipts via WhatsApp, payment due reminders, and low-stock alerts to the owner.",
+    simple: {
+      label: "Simple Mode (OFF)",
+      flow: ["Sale complete", "→ No message sent", "→ Customer walks out with paper receipt ✅"],
+      note: "No external API needed. Fully offline-friendly.",
+    },
+    advanced: {
+      label: "Advanced Mode (ON)",
+      flow: ["Sale complete → WhatsApp receipt sent instantly", "→ Payment overdue → Reminder sent automatically", "→ Stock below threshold → Owner alerted", "→ Full delivery log ✅"],
+      note: "Requires WhatsApp Business API or SMS gateway setup.",
+    },
+    unlocks: ["WhatsApp receipt on sale completion", "Payment due reminders to customers", "Low-stock owner alerts"],
+    color: "#34d399",
+    bg: "rgba(52,211,153,.07)",
+    border: "rgba(52,211,153,.2)",
   },
 ] as const;
 
