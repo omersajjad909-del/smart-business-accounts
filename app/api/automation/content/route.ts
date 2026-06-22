@@ -9,7 +9,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAutomationCompanyId } from "@/lib/automationHelpers";
 import { prisma } from "@/lib/prisma";
-import Anthropic from "@anthropic-ai/sdk";
+// import Anthropic from "@anthropic-ai/sdk"; // switched to OpenAI
+import OpenAI from "openai";
 
 
 
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
     const { type = "social_post", topic, tone = "professional", language = "en", keywords = [], wordCount = 150, context = "" } = body;
 
     if (!topic) return NextResponse.json({ error: "topic is required" }, { status: 400 });
-    if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: "AI not configured" }, { status: 503 });
+    if (!process.env.OPENAI_API_KEY) return NextResponse.json({ error: "AI not configured" }, { status: 503 });
 
     const typePrompt = TYPE_PROMPTS[type] || TYPE_PROMPTS.social_post;
     const langLine = language === "ur" ? "Write in Urdu (Roman Urdu is acceptable)." : "Write in English.";
@@ -40,14 +41,24 @@ export async function POST(req: NextRequest) {
 
     const prompt = `${typePrompt}\n\nTopic: ${topic}\nTone: ${tone}\nTarget ~${wordCount} words.\n${langLine}\n${kwLine}\n${ctxLine}\n\nGenerate the content directly without preamble.`;
 
+    // OpenAI version
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const res = await client.chat.completions.create({
+      model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+      max_tokens: Math.min(wordCount * 6, 1500),
+      messages: [{ role: "user", content: prompt }],
+    });
+    const generated = res.choices[0]?.message?.content?.trim() || "";
+
+    /* -- Anthropic version (keep for future use) --
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const res = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: Math.min(wordCount * 6, 1500),
       messages: [{ role: "user", content: prompt }],
     });
-
     const generated = res.content.find(c => c.type === "text")?.text?.trim() || "";
+    -- end Anthropic -- */
 
     await prisma.activityLog.create({
       data: { action: "AI_CONTENT_GENERATED", companyId, details: JSON.stringify({ type, topic, words: generated.split(/\s+/).length }) },

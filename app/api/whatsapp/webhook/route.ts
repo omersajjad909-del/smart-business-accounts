@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendWhatsApp } from "@/lib/whatsapp";
-import Anthropic from "@anthropic-ai/sdk";
+// import Anthropic from "@anthropic-ai/sdk"; // switched to OpenAI
+import OpenAI from "openai";
 
 // GET — Meta webhook verification
 export async function GET(req: NextRequest) {
@@ -115,6 +116,25 @@ async function getAutoReplyConfig(companyId: string): Promise<{ enabled: boolean
 
 async function generateAIReply(systemPrompt: string, userMessage: string): Promise<string | null> {
   try {
+    // OpenAI version
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const res = await client.chat.completions.create({
+      model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+      max_tokens: 300,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage },
+      ],
+    });
+    return res.choices[0]?.message?.content?.trim() || null;
+  } catch (e) {
+    console.error("AI reply error:", e);
+    return null;
+  }
+}
+/* -- Anthropic version (keep for future use) --
+async function generateAIReplyAnthropic(systemPrompt: string, userMessage: string): Promise<string | null> {
+  try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const res = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
@@ -123,8 +143,6 @@ async function generateAIReply(systemPrompt: string, userMessage: string): Promi
       messages: [{ role: "user", content: userMessage }],
     });
     return res.content.find(c => c.type === "text")?.text?.trim() || null;
-  } catch (e) {
-    console.error("AI reply error:", e);
-    return null;
-  }
+  } catch (e) { console.error("AI reply error:", e); return null; }
 }
+-- end Anthropic -- */

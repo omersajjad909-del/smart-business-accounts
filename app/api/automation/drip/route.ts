@@ -14,7 +14,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAutomationCompanyId } from "@/lib/automationHelpers";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
-import Anthropic from "@anthropic-ai/sdk";
+// import Anthropic from "@anthropic-ai/sdk"; // switched to OpenAI
+import OpenAI from "openai";
 
 // ─── auth helper ────────────────────────────────────────────────────────────
 
@@ -206,17 +207,28 @@ async function handleTrigger(_req: NextRequest, companyId: string) {
     // AI-generated body if configured
     if (step.useAI && step.aiPrompt) {
       try {
-        const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-        const res = await client.messages.create({
-          model: "claude-haiku-4-5-20251001",
+        // OpenAI version
+        const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const res = await client.chat.completions.create({
+          model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
           max_tokens: 500,
           messages: [{
             role: "user",
             content: `Write a professional email body for: ${step.aiPrompt}\nRecipient name: ${enrollment.name || "Customer"}\nReturn only the HTML body content.`,
           }],
         });
+        const text = res.choices[0]?.message?.content?.trim() || "";
+        if (text) bodyHtml = `<p>${text.replace(/\n/g, "<br/>")}</p>`;
+        /* -- Anthropic version (keep for future use) --
+        const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+        const res = await client.messages.create({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 500,
+          messages: [{ role: "user", content: `Write a professional email body for: ${step.aiPrompt}\nRecipient name: ${enrollment.name || "Customer"}\nReturn only the HTML body content.` }],
+        });
         const text = res.content.find(c => c.type === "text")?.text || "";
         if (text) bodyHtml = `<p>${text.replace(/\n/g, "<br/>")}</p>`;
+        -- end Anthropic -- */
       } catch (e) { console.error("AI drip error:", e); }
     }
 

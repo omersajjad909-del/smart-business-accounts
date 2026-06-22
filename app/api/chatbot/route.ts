@@ -13,7 +13,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import Anthropic from "@anthropic-ai/sdk";
+// import Anthropic from "@anthropic-ai/sdk"; // switched to OpenAI
+import OpenAI from "openai";
 import crypto from "crypto";
 
 async function getCompanyId(req: NextRequest): Promise<string | null> {
@@ -170,8 +171,23 @@ export async function POST(req: NextRequest) {
       "Answer customer questions politely and concisely. If you don't know something, say so honestly. " +
       "Do not make up information. Keep responses under 150 words.";
 
-    // Call Claude
+    // Call OpenAI
     let reply = "I'm having trouble responding right now. Please try again.";
+    try {
+      const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const res = await client.chat.completions.create({
+        model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+        max_tokens: 300,
+        messages: [
+          { role: "system", content: sysPrompt },
+          ...history.map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
+        ],
+      });
+      reply = res.choices[0]?.message?.content?.trim() || reply;
+    } catch (e) {
+      console.error("Chatbot AI error:", e);
+    }
+    /* -- Anthropic version (keep for future use) --
     try {
       const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
       const res = await client.messages.create({
@@ -181,9 +197,8 @@ export async function POST(req: NextRequest) {
         messages: history.map(m => ({ role: m.role, content: m.content })),
       });
       reply = res.content.find(c => c.type === "text")?.text?.trim() || reply;
-    } catch (e) {
-      console.error("Chatbot AI error:", e);
-    }
+    } catch (e) { console.error("Chatbot AI error:", e); }
+    -- end Anthropic -- */
 
     // Save conversation
     const updatedMessages = [...history, { role: "assistant" as const, content: reply }];
