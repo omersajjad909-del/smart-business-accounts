@@ -242,6 +242,9 @@ export default function CPVPage() {
   function removeRow(id: number) { setEntries(prev => prev.length > 1 ? prev.filter(e => e.id !== id) : prev); }
 
   const total = entries.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const previewVoucherNo = queryIdx >= 0
+    ? (queryResults[queryIdx]?.voucherNo || `CPV-${vouchers.length + 1}`)
+    : `CPV-${vouchers.length + 1}`;
 
   async function save() {
     const valid = entries.filter(e => e.accountId && Number(e.amount) > 0);
@@ -467,7 +470,7 @@ export default function CPVPage() {
                   </td>
                   <td style={{ padding:"4px 8px", textAlign:"center" }}>
                     <div style={{ display:"flex", gap:4, justifyContent:"center" }}>
-                      <button type="button" title="Print Receipt" onClick={() => row.accountId && printVoucher([row], "PREVIEW", date, mode, Number(row.amount), company, row.narration)}
+                      <button type="button" title="Print Receipt" onClick={() => row.accountId && printVoucher([row], previewVoucherNo, date, mode, Number(row.amount), company, row.narration)}
                         disabled={!row.accountId || !Number(row.amount)}
                         style={{ padding:"4px 8px", borderRadius:6, background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", color:BLUE, fontSize:11, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId || !Number(row.amount)) ? 0.3 : 1 }}>🧾</button>
                       <button onClick={() => removeRow(row.id)}
@@ -490,7 +493,7 @@ export default function CPVPage() {
               <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", textTransform:"uppercase", letterSpacing:".06em" }}>Total Amount</div>
               <div style={{ fontSize:22, fontWeight:900, color:BLUE }}>{company?.baseCurrency || "PKR"} {fmt(total)}</div>
             </div>
-            <button onClick={() => printVoucher(entries, "PREVIEW", date, mode, total, company, narration)} disabled={total <= 0}
+            <button onClick={() => printVoucher(entries, previewVoucherNo, date, mode, total, company, narration)} disabled={total <= 0}
               style={{ padding:"10px 18px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.65)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:total<=0?0.4:1 }}>
               🖨 Print Voucher
             </button>

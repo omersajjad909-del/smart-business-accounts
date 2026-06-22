@@ -28,9 +28,11 @@ export default function LedgerReportPage() {
   const [rows,        setRows]        = useState<LedgerRow[]>([]);
   const [loading,     setLoading]     = useState(false);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
-  const [showModal,   setShowModal]   = useState(true);
-  const [search,      setSearch]      = useState("");
-  const [dropOpen,    setDropOpen]    = useState(false);
+  const [showModal,      setShowModal]      = useState(true);
+  const [search,         setSearch]         = useState("");
+  const [dropOpen,       setDropOpen]       = useState(false);
+  const [previewBal,     setPreviewBal]     = useState<number | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const fromRef    = useRef<HTMLInputElement>(null);
   const toRef      = useRef<HTMLInputElement>(null);
@@ -45,6 +47,21 @@ export default function LedgerReportPage() {
     fetch("/api/me/company", { headers: { "x-user-role": user?.role || "", "x-company-id": user?.companyId || "" } })
       .then(r => r.ok ? r.json() : null).then(d => d && setCompanyInfo(d)).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!accountId) { setPreviewBal(null); return; }
+    const user = getCurrentUser();
+    if (!user) return;
+    setPreviewLoading(true);
+    fetch(`/api/reports/ledger?accountId=${accountId}&from=${fromDate}&to=${toDate}&balanceOnly=1`, {
+      credentials: "include",
+      headers: { "x-user-id": user.id, "x-user-role": user.role, "x-company-id": user.companyId || "" },
+    })
+      .then(r => r.json())
+      .then(d => setPreviewBal(typeof d.balance === "number" ? d.balance : null))
+      .catch(() => setPreviewBal(null))
+      .finally(() => setPreviewLoading(false));
+  }, [accountId, fromDate]);
 
   async function loadLedger(overrideId?: string) {
     const id = overrideId || accountId;
@@ -210,7 +227,28 @@ export default function LedgerReportPage() {
                 </div>
               )}
               {accountId && (
-                <div style={{ marginTop: 5, fontSize: 11, color: "#818cf8" }}>✓ {acctCode && <span style={{ fontFamily:"monospace", marginRight:5 }}>{acctCode}</span>}{acctName}</div>
+                <div style={{ marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ fontSize: 11, color: "#818cf8" }}>
+                    ✓ {acctCode && <span style={{ fontFamily:"monospace", marginRight:5 }}>{acctCode}</span>}{acctName}
+                  </div>
+                  {previewLoading ? (
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)" }}>…</div>
+                  ) : previewBal !== null && (
+                    <div style={{
+                      display: "flex", alignItems: "center", gap: 6,
+                      background: previewBal >= 0 ? "rgba(52,211,153,.1)" : "rgba(248,113,113,.1)",
+                      border: `1px solid ${previewBal >= 0 ? "rgba(52,211,153,.25)" : "rgba(248,113,113,.25)"}`,
+                      borderRadius: 7, padding: "4px 10px",
+                    }}>
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>
+                        Opening Balance
+                      </span>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: previewBal >= 0 ? "#34d399" : "#f87171", fontFamily: "monospace" }}>
+                        {fmt(previewBal)} {previewBal >= 0 ? "Dr" : "Cr"}
+                      </span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 

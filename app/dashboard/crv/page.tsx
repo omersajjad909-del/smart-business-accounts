@@ -303,6 +303,9 @@ export default function CRVPage() {
   }
 
   const total = entries.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const previewVoucherNo = queryIdx >= 0
+    ? (queryResults[queryIdx]?.voucherNo || `CRV-${vouchers.length + 1}`)
+    : `CRV-${vouchers.length + 1}`;
 
   async function save() {
     const valid = entries.filter(e => e.accountId && Number(e.amount) > 0);
@@ -634,7 +637,7 @@ export default function CRVPage() {
                       <button
                         type="button"
                         title="Print Receipt"
-                        onClick={() => row.accountId && printReceipt(row, "NEW", date, mode, company)}
+                        onClick={() => row.accountId && printReceipt(row, previewVoucherNo, date, mode, company)}
                         disabled={!row.accountId || !Number(row.amount)}
                         style={{ padding:"4px 8px", borderRadius:6, background:"rgba(34,197,94,.1)", border:"1px solid rgba(34,197,94,.25)", color:GREEN, fontSize:11, cursor:"pointer", fontFamily:ff, opacity:(!row.accountId || !Number(row.amount)) ? 0.3 : 1 }}
                       >🧾</button>
@@ -663,7 +666,7 @@ export default function CRVPage() {
               <div style={{ fontSize:22, fontWeight:900, color:GREEN }}>{company?.baseCurrency || "PKR"} {fmt(total)}</div>
             </div>
             <button
-              onClick={() => printVoucher(entries, "PREVIEW", date, mode, total, company, narration)}
+              onClick={() => printVoucher(entries, previewVoucherNo, date, mode, total, company, narration)}
               disabled={total <= 0}
               style={{ padding:"10px 18px", borderRadius:9, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:"rgba(255,255,255,.65)", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:ff, opacity:total<=0?0.4:1 }}
             >🖨 Print Voucher</button>

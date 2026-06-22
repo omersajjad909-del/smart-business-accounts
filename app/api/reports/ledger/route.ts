@@ -18,39 +18,39 @@ export async function GET(req: NextRequest) {
     if (!allowed) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const { searchParams } = new URL(req.url);
-    const accountId = searchParams.get("accountId");
-    const from      = searchParams.get("from");
-    const to        = searchParams.get("to");
+    const accountId   = searchParams.get("accountId");
+    const from        = searchParams.get("from");
+    const to          = searchParams.get("to");
+    const balanceOnly = searchParams.get("balanceOnly") === "1";
 
-    if (!accountId) return NextResponse.json([]);
+    if (!accountId) return NextResponse.json(balanceOnly ? { balance: 0 } : []);
 
     const account = await prisma.account.findFirst({
       where: { id: accountId, companyId },
       select: { id: true, openDebit: true, openCredit: true },
     });
-    if (!account) return NextResponse.json([]);
+    if (!account) return NextResponse.json(balanceOnly ? { balance: 0 } : []);
 
     const fromDate = from ? new Date(from + "T00:00:00") : new Date("2024-01-01");
     const toDate   = to   ? new Date(to   + "T23:59:59.999") : new Date();
 
     // ── 1. Opening balance: master opening + all voucher entries before period ──
-    const prevEntries = await prisma.voucherEntry.findMany({
+    const prevAgg = await prisma.voucherEntry.aggregate({
       where: {
         accountId,
-        voucher: {
-          companyId,
-          date: { lt: fromDate },
-          ...(branchId ? { branchId } : {}),
-        },
+        voucher: { companyId, date: { lt: fromDate }, ...(branchId ? { branchId } : {}) },
       },
-      select: { amount: true },
+      _sum: { amount: true },
     });
 
     const openingFromMaster   = Number(account.openDebit || 0) - Number(account.openCredit || 0);
-    const openingFromVouchers = prevEntries.reduce((s, e) => s + Number(e.amount), 0);
+    const openingFromVouchers = Number(prevAgg._sum.amount ?? 0);
     const openingBal          = openingFromMaster + openingFromVouchers;
 
-    // ── 2. Period entries — join voucher for date/voucherNo/narration ──
+    // Lightweight path — just return the opening balance
+    if (balanceOnly) return NextResponse.json({ balance: openingBal });
+
+    // ── 2. Period entries — join voucher for date / voucherNo / narration ──
     const periodEntries = await prisma.voucherEntry.findMany({
       where: {
         accountId,
