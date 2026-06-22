@@ -207,7 +207,7 @@ export default function ProfitLossPage() {
                 🖨 Print
               </button>
               <button onClick={sendEmail} disabled={sendingEmail || !report} style={{ padding: "8px 14px", borderRadius: 9, border: "1px solid rgba(52,211,153,.3)", background: "rgba(52,211,153,.06)", color: "#34d399", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: ff, opacity: (sendingEmail || !report) ? 0.5 : 1 }}>
-                {sendingEmail ? "Sending…" : "✉ Emil"}
+                {sendingEmail ? "Sending…" : "✉ Email"}
               </button>
             </div>
           </div>
