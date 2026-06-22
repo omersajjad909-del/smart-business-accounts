@@ -13,6 +13,11 @@ type TBRow = {
   transDebit: number; transCredit: number;
   clDebit: number; clCredit: number;
 };
+type TBTotals = {
+  opDebit: number; opCredit: number;
+  transDebit: number; transCredit: number;
+  clDebit: number; clCredit: number;
+};
 
 const fmt = (n: number, cur = "") =>
   `${cur ? cur + " " : ""}${Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -27,6 +32,7 @@ export default function TrialBalancePage() {
   const [fromDate,     setFromDate]     = useState(`${new Date().getFullYear()}-01-01`);
   const [toDate,       setToDate]       = useState(today);
   const [rows,         setRows]         = useState<TBRow[]>([]);
+  const [totals,       setTotals]       = useState<TBTotals | null>(null);
   const [loading,      setLoading]      = useState(false);
   const [companyInfo,  setCompanyInfo]  = useState<any>(null);
   const [cleaning,     setCleaning]     = useState(false);
@@ -44,6 +50,7 @@ export default function TrialBalancePage() {
       const tb = await tbRes.json();
       const co = coRes.ok ? await coRes.json() : null;
       setRows(tb.rows || []);
+      setTotals(tb.totals || null);
       if (co) setCompanyInfo(co);
     } finally {
       setLoading(false);
@@ -71,11 +78,9 @@ export default function TrialBalancePage() {
 
   const categories = Array.from(new Set(rows.map(r => r.category)));
   const cur = companyInfo?.baseCurrency || "";
-  const grand = rows.reduce(
-    (a, r) => ({ opD: a.opD+(r.opDebit||0), opC: a.opC+(r.opCredit||0), trD: a.trD+(r.transDebit||0), trC: a.trC+(r.transCredit||0), clD: a.clD+(r.clDebit||0), clC: a.clC+(r.clCredit||0) }),
-    { opD:0, opC:0, trD:0, trC:0, clD:0, clC:0 }
-  );
-  const difference = grand.clD - grand.clC;
+  const t = totals ?? { opDebit:0, opCredit:0, transDebit:0, transCredit:0, clDebit:0, clCredit:0 };
+  const difference = t.clDebit - t.clCredit;
+  const isBalanced = Math.abs(difference) < 0.01;
 
   const thStyle = (right = false): React.CSSProperties => ({
     padding: "10px 14px", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)",
@@ -253,37 +258,37 @@ export default function TrialBalancePage() {
                           </td>
                           <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Op Dr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"rgba(255,255,255,.6)" }}>{fmt(grand.opD, cur)}</div>
+                            <div style={{ fontSize:13, fontWeight:800, color:"rgba(255,255,255,.6)" }}>{fmt(t.opDebit, cur)}</div>
                           </td>
                           <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Op Cr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"rgba(255,255,255,.6)" }}>{fmt(grand.opC, cur)}</div>
+                            <div style={{ fontSize:13, fontWeight:800, color:"rgba(255,255,255,.6)" }}>{fmt(t.opCredit, cur)}</div>
                           </td>
                           <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(52,211,153,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Tr Dr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"#34d399" }}>{fmt(grand.trD, cur)}</div>
+                            <div style={{ fontSize:13, fontWeight:800, color:"#34d399" }}>{fmt(t.transDebit, cur)}</div>
                           </td>
                           <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(52,211,153,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Tr Cr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"#f87171" }}>{fmt(grand.trC, cur)}</div>
+                            <div style={{ fontSize:13, fontWeight:800, color:"#f87171" }}>{fmt(t.transCredit, cur)}</div>
                           </td>
                           <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const, borderRight:"1px solid rgba(255,255,255,.04)" }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(251,191,36,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Cl Dr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"#fbbf24" }}>{fmt(grand.clD, cur)}</div>
+                            <div style={{ fontSize:13, fontWeight:800, color:"#fbbf24" }}>{fmt(t.clDebit, cur)}</div>
                           </td>
                           <td style={{ padding:"14px 14px", textAlign:"right" as const, whiteSpace:"nowrap" as const }}>
                             <div style={{ fontSize:9, fontWeight:700, color:"rgba(251,191,36,.5)", letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:3 }}>Total Cl Cr</div>
-                            <div style={{ fontSize:13, fontWeight:800, color:"#fbbf24" }}>{fmt(grand.clC, cur)}</div>
+                            <div style={{ fontSize:13, fontWeight:800, color:"#fbbf24" }}>{fmt(t.clCredit, cur)}</div>
                           </td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
                   {/* Balanced box — far right */}
-                  <div style={{ flexShrink:0, display:"flex", alignItems:"center", padding:"0 24px", borderLeft:`2px solid ${difference===0?"rgba(52,211,153,.25)":"rgba(248,113,113,.25)"}`, background:difference===0?"rgba(52,211,153,.07)":"rgba(248,113,113,.07)" }}>
+                  <div style={{ flexShrink:0, display:"flex", alignItems:"center", padding:"0 24px", borderLeft:`2px solid ${isBalanced?"rgba(52,211,153,.25)":"rgba(248,113,113,.25)"}`, background:isBalanced?"rgba(52,211,153,.07)":"rgba(248,113,113,.07)" }}>
                     <div style={{ textAlign:"center" }}>
                       <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:5 }}>Difference</div>
-                      <div style={{ fontSize:18, fontWeight:900, color:difference===0?"#34d399":"#f87171", whiteSpace:"nowrap" }}>{difference===0 ? "✓ Balanced" : fmt(Math.abs(difference), cur)}</div>
+                      <div style={{ fontSize:18, fontWeight:900, color:isBalanced?"#34d399":"#f87171", whiteSpace:"nowrap" }}>{isBalanced ? "✓ Balanced" : fmt(Math.abs(difference), cur)}</div>
                     </div>
                   </div>
                 </div>
