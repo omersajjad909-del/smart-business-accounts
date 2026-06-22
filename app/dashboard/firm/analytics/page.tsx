@@ -62,7 +62,7 @@ export default function FirmAnalyticsPage() {
         <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Client Industry Mix</div>
         <div style={{ display: "grid", gap: 12 }}>
           {industryMix.length === 0 ? (
-            <div style={{ color: firmMuted, fontSize: 13 }}>Industry mix dekhne ke liye clients add karein.</div>
+            <div style={{ color: firmMuted, fontSize: 13 }}>Add clients to view the industry mix.</div>
           ) : industryMix.map(([industry, count]) => {
             const pct = clients.length ? Math.max(12, Math.round((count / clients.length) * 100)) : 12;
             return (

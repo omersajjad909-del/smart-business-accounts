@@ -298,10 +298,10 @@ export default function BarcodePage() {
         if (!mounted) return;
         setPuCameraErr(
           e?.name === "NotAllowedError"
-            ? "Camera permission deny ki. Browser settings mein allow karo."
+            ? "Camera permission denied. Allow camera access in your browser settings."
             : e?.message === "CameraUnsupported"
-              ? "Is browser/device mein camera scanning support nahi hai. Photo upload try karo."
-              : "Camera open nahi ho saka. Dobara try karo."
+              ? "Camera scanning is not supported on this browser or device. Try uploading a photo instead."
+              : "Could not open camera. Please try again."
         );
         setPuCameraStatus("idle");
       }
@@ -334,7 +334,7 @@ export default function BarcodePage() {
       }
     } catch {
       setPuCameraMsg("");
-      setPuCameraErr("Barcode detect nahi hua. Clear photo lo — barcode seedha aur visible hona chahiye.");
+      setPuCameraErr("Barcode not detected. Take a clear photo — the barcode must be straight and fully visible.");
     }
     if (puFileRef.current) puFileRef.current.value = "";
   }

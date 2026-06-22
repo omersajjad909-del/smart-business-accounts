@@ -146,7 +146,7 @@ export default function BOMPage() {
             <div style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,.55)" }}>
               1. Define raw materials.
               <br />
-              2. BOM banao.
+              2. Create a Bill of Materials (BOM).
               <br />
               3. Issue a production order against the BOM.
               <br />

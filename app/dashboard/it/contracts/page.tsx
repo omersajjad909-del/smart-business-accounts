@@ -93,7 +93,7 @@ export default function ContractsPage() {
       return;
     }
     if (value <= 0) {
-      toast('Contract value positive honi chahiye.');
+      toast('Contract value must be a positive number.');
       return;
     }
     if (duplicateContract) {

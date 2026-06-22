@@ -58,7 +58,7 @@ export default function GymOverviewPage() {
         <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Gym / Fitness</div>
         <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Owner Fitness Desk</h1>
         <p style={{ margin: 0, fontSize: 14, color: gymMuted, maxWidth: 760 }}>
-          Membership renewals, trainer utilization, class occupancy, aur fitness revenue ko ek hi command center se manage karein.
+          Manage membership renewals, trainer utilization, class occupancy, and fitness revenue from one command center.
         </p>
       </div>
 
@@ -75,10 +75,10 @@ export default function GymOverviewPage() {
           <div style={{ fontSize: 13, color: "#bbf7d0", fontWeight: 800, marginBottom: 10, textTransform: "uppercase", letterSpacing: ".07em" }}>Business Flow</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
             {[
-              { title: "Sell Membership", body: "Plan choose karein, member onboard karein, payment status track karein." },
-              { title: "Assign Trainers", body: "Specialization aur active client load ke mutabiq staff manage karein." },
-              { title: "Run Classes", body: "Time slots, instructor schedule, aur seat occupancy monitor karein." },
-              { title: "Review Revenue", body: "Renewals, member mix, aur class demand ka operational reading dekhein." },
+              { title: "Sell Membership", body: "Choose a plan, onboard the member, and track payment status." },
+              { title: "Assign Trainers", body: "Manage staff based on specialization and active client load." },
+              { title: "Run Classes", body: "Monitor time slots, instructor schedules, and seat occupancy." },
+              { title: "Review Revenue", body: "Review renewals, member mix, and class demand for an operational snapshot." },
             ].map((step, index) => (
               <div key={step.title} style={{ background: "rgba(8,12,30,.36)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 28, height: 28, borderRadius: 999, background: "rgba(134,239,172,.16)", color: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, marginBottom: 12 }}>{index + 1}</div>

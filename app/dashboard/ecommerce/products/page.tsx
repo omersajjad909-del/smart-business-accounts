@@ -42,7 +42,7 @@ export default function EcommerceProductsPage() {
     const stock = Number(form.stock);
 
     if (!name) return setError("Product name is required.");
-    if (!category) return setError("Category select ya enter karein.");
+    if (!category) return setError("Please select or enter a category.");
     if (!sku) return setError("SKU is required.");
     if (!Number.isFinite(price) || price <= 0) return setError("Price must be greater than zero.");
     if (!Number.isFinite(stock) || stock < 0) return setError("Stock cannot be negative.");
@@ -71,7 +71,7 @@ export default function EcommerceProductsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, margin: "0 0 6px" }}>Product Listings</h1>
-          <p style={{ fontSize: 13, color: ecommerceMuted, margin: 0 }}>Catalog, pricing, SKU aur platform presence ko ek jagah se control karein.</p>
+          <p style={{ fontSize: 13, color: ecommerceMuted, margin: 0 }}>Manage your product catalog, pricing, SKU, and platform presence in one place.</p>
         </div>
         <button onClick={() => setShowModal(true)} style={{ padding: "10px 20px", borderRadius: 12, border: "none", background: "#6366f1", color: "#fff", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
           + Add Product

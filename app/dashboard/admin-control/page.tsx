@@ -596,10 +596,10 @@ export default function AdminControlPage() {
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {[
-                  ["showLogo", "Print pe logo show ho"],
-                  ["showPhone", "Phone number show ho"],
-                  ["showAddress", "Address show ho"],
-                  ["showTaxNumber", "Tax / NTN label show ho"],
+                  ["showLogo", "Show logo on print"],
+                  ["showPhone", "Show phone number"],
+                  ["showAddress", "Show address"],
+                  ["showTaxNumber", "Show Tax / NTN label"],
                 ].map(([key, label]) => (
                   <label key={key} className="flex items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-bg-2)] px-4 py-3 text-sm text-[var(--text-primary)]">
                     <input type="checkbox" checked={Boolean(settings.printPreferences[key as keyof PrintPreferences])} onChange={(e) => setSettings((s) => ({ ...s, printPreferences: { ...s.printPreferences, [key]: e.target.checked } }))} />
@@ -801,7 +801,7 @@ export default function AdminControlPage() {
             <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-[var(--text-primary)]">Role Permissions</h2>
-                <p className="text-sm text-[var(--text-muted)]">Owner/admin yahan se poori company ke default permissions set kar sakta hai.</p>
+                <p className="text-sm text-[var(--text-muted)]">The owner or admin can set default permissions for the entire company from here.</p>
               </div>
               <div className="flex gap-2">
                 <Button type="button" variant="secondary" onClick={() => setRolePermissions(availablePermissions)}>Select All</Button>

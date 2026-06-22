@@ -48,8 +48,8 @@ export default function DealsPage() {
     const vehicle = vehicles.find((item) => item.id === form.vehicleId);
     const amount = Number(form.amount);
     if (!customer) return toast.error("Customer is required.");
-    if (!vehicle) return toast.error("Vehicle select karein.");
-    if (amount <= 0) return toast("Deal amount valid honi chahiye.");
+    if (!vehicle) return toast.error("Please select a vehicle.");
+    if (amount <= 0) return toast("Deal amount must be a valid positive number.");
     if (deals.some((item) => item.customer.trim().toLowerCase() === customer.toLowerCase() && item.vehicleId === vehicle.id && item.status !== "lost")) {
       return toast.error("Is customer ka same vehicle ke liye active deal already hai.");
     }
@@ -70,7 +70,7 @@ export default function DealsPage() {
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: autoFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Deals & Finance</h1>
-        <p style={{ margin: 0, fontSize: 14, color: autoMuted }}>Negotiation pipeline, booking value, aur financer involvement yahan manage karein.</p>
+        <p style={{ margin: 0, fontSize: 14, color: autoMuted }}>Track your negotiation pipeline, booking value, and financer involvement.</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 18 }}>

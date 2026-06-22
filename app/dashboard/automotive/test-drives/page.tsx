@@ -48,9 +48,9 @@ export default function TestDrivesPage() {
     const phone = form.phone.trim();
     const vehicle = vehicles.find((item) => item.id === form.vehicleId);
     if (!customer || !phone) return toast.error("Customer and phone are required.");
-    if (!vehicle) return toast.error("Vehicle select karein.");
+    if (!vehicle) return toast.error("Please select a vehicle.");
     if (drives.some((item) => item.phone === phone && item.vehicleId === vehicle.id && item.status !== "cancelled")) {
-      return toast.error("Is customer ka same vehicle ke liye active test drive already hai.");
+      return toast.error("This customer already has an active test drive for this vehicle.");
     }
     await create({
       title: customer,
@@ -69,7 +69,7 @@ export default function TestDrivesPage() {
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: autoFont }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900 }}>Test Drives</h1>
-        <p style={{ margin: 0, fontSize: 14, color: autoMuted }}>Interested buyers ke liye vehicle-level drive scheduling aur follow-up yahan manage karein.</p>
+        <p style={{ margin: 0, fontSize: 14, color: autoMuted }}>Schedule test drives and manage follow-ups for interested buyers.</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 18 }}>

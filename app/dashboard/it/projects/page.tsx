@@ -79,7 +79,7 @@ export default function ITProjectsPage() {
       return;
     }
     if (teamSize <= 0 || budget <= 0 || techStack.length === 0) {
-      toast('Team size, budget, aur tech stack valid honi chahiye.');
+      toast('Team size, budget, and tech stack are required and must be valid.');
       return;
     }
     if (new Date(form.deadline) < new Date(form.startDate)) {

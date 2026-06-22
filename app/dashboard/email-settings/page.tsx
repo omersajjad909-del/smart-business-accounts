@@ -102,8 +102,8 @@ export default function EmailSettingsPage() {
 
       <div className="bg-yellow-50 border border-yellow-200 p-4 rounded mb-6">
         <p className="text-sm text-yellow-800">
-          <strong>Important:</strong> Company email credentials encrypted company storage me save hongi.
-          Global <code>.env</code> sirf fallback ya system-level transport ke liye rakhein.
+          <strong>Important:</strong> Company email credentials are saved in encrypted company storage.
+          The global <code>.env</code> should only be used as a fallback or for system-level transport.
         </p>
       </div>
 

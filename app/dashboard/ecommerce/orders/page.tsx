@@ -62,7 +62,7 @@ export default function EcommerceOrdersPage() {
     const amount = Number(form.amount);
 
     if (!customer) return setError("Customer name is required.");
-    if (!selectedProduct) return setError("Valid product select karein.");
+    if (!selectedProduct) return setError("Please select a valid product.");
     if (!address) return setError("Delivery address is required.");
     if (!Number.isFinite(quantity) || quantity <= 0) return setError("Quantity must be greater than zero.");
     if (!Number.isFinite(amount) || amount <= 0) return setError("Order amount must be greater than zero.");

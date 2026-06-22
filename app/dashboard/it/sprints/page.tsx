@@ -79,7 +79,7 @@ export default function SprintsPage() {
       return;
     }
     if (total <= 0) {
-      toast('Total stories/points positive hone chahiye.');
+      toast('Total stories/points must be a positive number.');
       return;
     }
     if (duplicateSprint) {

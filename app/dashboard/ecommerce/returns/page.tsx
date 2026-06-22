@@ -59,8 +59,8 @@ export default function ReturnsPage() {
     const amount = Number(form.amount);
     const orderId = form.orderId.trim();
 
-    if (!orderId) return setError("Order select karein.");
-    if (!selectedOrder) return setError("Valid order select karein.");
+    if (!orderId) return setError("Please select an order.");
+    if (!selectedOrder) return setError("Please select a valid order.");
     if (!customer) return setError("Customer name is required.");
     if (!product) return setError("Product name is required.");
     if (!Number.isFinite(qty) || qty <= 0) return setError("Quantity must be greater than zero.");
@@ -118,7 +118,7 @@ export default function ReturnsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, margin: "0 0 6px" }}>Returns & Refunds</h1>
-          <p style={{ fontSize: 13, color: ecommerceMuted, margin: 0 }}>Customer trust aur refund discipline dono ko yahan se manage karein.</p>
+          <p style={{ fontSize: 13, color: ecommerceMuted, margin: 0 }}>Manage customer returns and maintain refund discipline from one place.</p>
         </div>
         <button onClick={() => setShowAdd(true)} style={primaryButton}>+ Add Return</button>
       </div>

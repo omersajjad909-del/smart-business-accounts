@@ -59,7 +59,7 @@ const FEATURE_CARDS = [
     },
     advanced: {
       label: "Advanced Mode (ON)",
-      flow: ["Har warehouse alag track hota hai", "→ Branch A se Branch B transfer karo", "→ Per-location stock report", "→ Full movement history ✅"],
+      flow: ["Each warehouse tracked separately", "→ Transfer stock from Branch A to Branch B", "→ Per-location stock report", "→ Full movement history ✅"],
       note: "Multi-location inventory with transfer tracking.",
     },
     unlocks: ["Warehouses management", "Stock Transfer between branches", "Per-location stock reports"],
@@ -78,12 +78,12 @@ const FEATURE_CARDS = [
       "Require manager approval before a Purchase Order is sent to a supplier. Prevents unauthorized spending.",
     simple: {
       label: "Simple Mode (OFF)",
-      flow: ["Koi bhi Purchase Invoice bana sakta hai", "→ Direct save hota hai", "→ Done ✅"],
+      flow: ["Anyone can create a Purchase Invoice", "→ Saves directly without approval", "→ Done ✅"],
       note: "Fast workflow. Trust your team fully.",
     },
     advanced: {
       label: "Advanced Mode (ON)",
-      flow: ["Staff PO submit karta hai", "→ Manager review karta hai", "→ Approve → Supplier ko bheja jata hai", "→ Rejected → Wapas staff ko ✅"],
+      flow: ["Staff submits PO for approval", "→ Manager reviews the request", "→ Approved → Sent to supplier", "→ Rejected → Returned to staff ✅"],
       note: "Controlled spending with full accountability.",
     },
     unlocks: ["PO Approval queue for managers", "Reject / Approve actions", "Approval audit log"],
@@ -217,10 +217,10 @@ export default function BusinessFeaturesPage() {
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", marginBottom: 4 }}>One system. Adaptive workflow.</div>
             <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.7 }}>
-              Har feature <strong style={{ color: "rgba(255,255,255,.6)" }}>same database, same backend</strong> use karta hai — sirf screen aur workflow change hota hai.
-              Small shop ke liye simple 2-click flow. Enterprise ke liye full approval + audit trail.
+              Every feature uses the <strong style={{ color: "rgba(255,255,255,.6)" }}>same database and backend</strong> — only the screen and workflow adapts.
+              Simple 2-click flow for small shops. Full approval + audit trail for enterprise.
               <br />
-              <strong style={{ color: "rgba(255,255,255,.5)" }}>Default: sab OFF</strong> — sirf wahi enable karo jo tumhare business ko chahiye.
+              <strong style={{ color: "rgba(255,255,255,.5)" }}>Default: all OFF</strong> — enable only what your business actually needs.
             </div>
           </div>
         </div>

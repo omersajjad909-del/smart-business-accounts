@@ -57,9 +57,9 @@ export default function SubscriptionBoxCatalogPage() {
     const items = form.items.split(",").map((item) => item.trim()).filter(Boolean);
     const price = Number(form.price);
     if (!title) return toast.error("Box name is required.");
-    if (!plan) return toast.error("Active plan select karein.");
-    if (!items.length) return toast("Kam az kam aik curated item add karein.");
-    if (price <= 0) return toast("Box price valid honi chahiye.");
+    if (!plan) return toast.error("Please select an active plan.");
+    if (!items.length) return toast("Add at least one curated item.");
+    if (price <= 0) return toast("Box price must be a valid positive number.");
     if (boxes.some((item) => item.title.trim().toLowerCase() === title.toLowerCase() && item.status !== "archived")) {
       return toast.error("A box with this name already exists.");
     }

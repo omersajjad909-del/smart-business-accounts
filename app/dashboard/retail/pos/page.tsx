@@ -276,10 +276,10 @@ export default function POSPage() {
         if (!mounted) return;
         setScannerError(
           e?.name === "NotAllowedError"
-            ? "Camera permission deny ki. Browser settings mein allow karo."
+            ? "Camera permission denied. Allow camera access in your browser settings."
             : e?.message === "CameraUnsupported"
-              ? "Is browser/device mein camera scanning support nahi hai. Photo upload try karo."
-            : "Camera open nahi ho saka. Dobara try karo."
+              ? "Camera scanning is not supported on this browser or device. Try uploading a photo instead."
+            : "Could not open camera. Please try again."
         );
         setScannerStatus("idle");
       }
@@ -371,7 +371,7 @@ export default function POSPage() {
   function removeItem(id: string) { setCart(prev => prev.filter(i => i.id !== id)); }
 
   function holdCart() {
-    if (cart.length === 0) { showFKeyMsg("F3", "Cart khali hai — hold karne ke liye items add karo", "amber"); return; }
+    if (cart.length === 0) { showFKeyMsg("F3", "Cart is empty — add items before putting on hold", "amber"); return; }
     const heldTotal = cart.reduce((s, i) => s + i.price * i.qty - (i.itemDiscount || 0) * i.qty, 0);
     const held: HeldSale = {
       id: `HOLD-${Date.now()}`,
@@ -482,7 +482,7 @@ export default function POSPage() {
       }
     } catch {
       setLastScanned("");
-      setScannerError("Barcode detect nahi hua. Clear photo lo — barcode seedha aur visible hona chahiye.");
+      setScannerError("Barcode not detected. Take a clear photo — the barcode must be straight and fully visible.");
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
   }

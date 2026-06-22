@@ -77,9 +77,9 @@ export default function GymAnalyticsPage() {
     <div style={{ padding: "28px 32px", minHeight: "100vh", color: "#fff", fontFamily: gymFont }}>
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 12, color: "#86efac", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 10 }}>Gym Analytics</div>
-        <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Membership health, class demand, aur trainer utilization</h1>
+        <h1 style={{ fontSize: 30, fontWeight: 900, margin: "0 0 10px" }}>Membership Health, Class Demand & Trainer Utilization</h1>
         <p style={{ margin: 0, fontSize: 14, color: gymMuted, maxWidth: 760 }}>
-          Fitness business ko fast reading dene ke liye revenue, renewal pressure, occupancy, aur staff load ko ek jagah compare karein.
+          Compare revenue, renewal pressure, occupancy, and staff load to get a fast reading of your fitness business.
         </p>
       </div>
 
@@ -95,7 +95,7 @@ export default function GymAnalyticsPage() {
           <div style={{ fontSize: 13, color: "#34d399", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Membership Plan Mix</div>
           <div style={{ display: "grid", gap: 12 }}>
             {planMix.length === 0 ? (
-              <div style={{ color: gymMuted, fontSize: 13 }}>Plan mix show karne ke liye memberships add karein.</div>
+              <div style={{ color: gymMuted, fontSize: 13 }}>Add memberships to view the plan mix.</div>
             ) : planMix.map(([plan, count]) => {
               const pct = memberships.length ? Math.max(10, Math.round((count / memberships.length) * 100)) : 10;
               return (
@@ -117,7 +117,7 @@ export default function GymAnalyticsPage() {
           <div style={{ fontSize: 13, color: "#60a5fa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Top Class Occupancy</div>
           <div style={{ display: "grid", gap: 10 }}>
             {classLoad.length === 0 ? (
-              <div style={{ color: gymMuted, fontSize: 13 }}>Class occupancy show karne ke liye schedule build karein.</div>
+              <div style={{ color: gymMuted, fontSize: 13 }}>Build a class schedule to view occupancy.</div>
             ) : classLoad.map((gymClass) => (
               <div key={gymClass.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
                 <div>
@@ -135,7 +135,7 @@ export default function GymAnalyticsPage() {
         <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 800, marginBottom: 16, textTransform: "uppercase", letterSpacing: ".07em" }}>Trainer Load Board</div>
         <div style={{ display: "grid", gap: 10 }}>
           {trainerLoad.length === 0 ? (
-            <div style={{ color: gymMuted, fontSize: 13 }}>Trainer load show karne ke liye trainers add karein.</div>
+            <div style={{ color: gymMuted, fontSize: 13 }}>Add trainers to view the load board.</div>
           ) : trainerLoad.map((trainer) => (
             <div key={trainer.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "12px 14px" }}>
               <div>

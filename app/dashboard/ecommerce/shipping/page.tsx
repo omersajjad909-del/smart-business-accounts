@@ -69,8 +69,8 @@ export default function ShippingPage() {
     const weight = Number(form.weight);
     const charges = Number(form.charges);
 
-    if (!orderId) return setError("Order select karein.");
-    if (!selectedOrder) return setError("Valid order select karein.");
+    if (!orderId) return setError("Please select an order.");
+    if (!selectedOrder) return setError("Please select a valid order.");
     if (!customer) return setError("Customer name is required.");
     if (!city) return setError("City is required.");
     if (!expected) return setError("Expected delivery date is required.");
@@ -137,7 +137,7 @@ export default function ShippingPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900, margin: "0 0 6px" }}>Shipping Desk</h1>
-          <p style={{ fontSize: 13, color: ecommerceMuted, margin: 0 }}>Courier dispatch, transit tracking, aur delivery closure ko yahan se monitor karein.</p>
+          <p style={{ fontSize: 13, color: ecommerceMuted, margin: 0 }}>Monitor courier dispatch, track transit status, and manage delivery closure.</p>
         </div>
         <button onClick={() => setShowAdd(true)} style={primaryButton}>+ Create Shipment</button>
       </div>
