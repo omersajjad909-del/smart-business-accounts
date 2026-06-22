@@ -62,7 +62,9 @@
       "Bash(node -e ' *)",
       "Bash(Select-String \"stock-ledger|error\")",
       "PowerShell(node --max-old-space-size=512 node_modules/.bin/tsc --noEmit --skipLibCheck --isolatedModules app/api/reports/profit-loss/route.ts app/dashboard/reports/profit-loss/page.tsx 2>&1)",
-      "PowerShell(node --max-old-space-size=512 ./node_modules/typescript/bin/tsc --noEmit --skipLibCheck app/api/reports/profit-loss/route.ts app/dashboard/reports/profit-loss/page.tsx 2>&1)"
+      "PowerShell(node --max-old-space-size=512 ./node_modules/typescript/bin/tsc --noEmit --skipLibCheck app/api/reports/profit-loss/route.ts app/dashboard/reports/profit-loss/page.tsx 2>&1)",
+      "PowerShell(git rm -r --cached \".claude/worktrees/\" 2>&1)",
+      "PowerShell(git add .gitignore \".claude/settings.json\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
