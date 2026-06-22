@@ -67,7 +67,9 @@
       "PowerShell(git add .gitignore \".claude/settings.json\")",
       "PowerShell(git commit -m \"chore: ignore claude worktrees, update settings\")",
       "PowerShell(git push)",
-      "PowerShell(git push origin main)"
+      "PowerShell(git push origin main)",
+      "PowerShell(git add \".claude/settings.json\")",
+      "PowerShell(git commit -m \"chore: settings\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
