@@ -36,6 +36,8 @@ export default function BackupRestorePage() {
   const [creating, setCreating] = useState(false);
   const [restoringId, setRestoringId] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const user = getCurrentUser();
   const canAccess = userHasPerm(user, "BACKUP_RESTORE");
@@ -125,6 +127,37 @@ export default function BackupRestorePage() {
     }
   }
 
+  async function restoreFromFile() {
+    if (!uploadFile) return;
+    if (!await confirmToast(`Restore from "${uploadFile.name}"?\n\nThis will REPLACE all current data. This cannot be undone.`)) return;
+    setUploading(true);
+    try {
+      const text = await uploadFile.text();
+      let parsed: unknown;
+      try { parsed = JSON.parse(text); } catch {
+        flash("Invalid file — not a valid JSON backup.", false);
+        return;
+      }
+      const res = await fetch("/api/backup/restore-file", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-role": user?.role || "", "x-user-id": user?.id || "" },
+        body: JSON.stringify(parsed),
+      });
+      const j = await res.json();
+      if (res.ok) {
+        flash("Data restored from file! Reloading…");
+        setUploadFile(null);
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        flash(j.error || "Restore failed.", false);
+      }
+    } catch {
+      flash("Could not read the file. Please try again.", false);
+    } finally {
+      setUploading(false);
+    }
+  }
+
   function fmtSize(bytes?: number) {
     if (!bytes) return "—";
     if (bytes < 1024) return bytes + " B";
@@ -182,6 +215,54 @@ export default function BackupRestorePage() {
         <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
           <strong style={{ color: "white" }}>How it works:</strong> Backups include all your accounts, invoices, vouchers, inventory, HR records and more.
           Stored in the database — no external storage needed. Download the JSON file to keep an offline copy.
+        </div>
+      </div>
+
+      {/* ── Upload & Restore from file ── */}
+      <div style={{ ...card, marginBottom: 20, background: "rgba(251,191,36,.05)", border: "1px solid rgba(251,191,36,.2)" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 14 }}>
+          <span style={{ fontSize: 22 }}>📂</span>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#fbbf24", marginBottom: 3 }}>Restore from Downloaded File</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", lineHeight: 1.6 }}>
+              Have a <code style={{ background: "rgba(255,255,255,.08)", padding: "1px 5px", borderRadius: 4 }}>.json</code> backup file on your computer? Upload it here to restore your data directly.
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", borderRadius: 9, border: "1px dashed rgba(251,191,36,.4)", background: "rgba(251,191,36,.06)", cursor: "pointer", fontSize: 13, color: uploadFile ? "#fbbf24" : "rgba(255,255,255,.5)", fontWeight: 600 }}>
+            <span>📁</span>
+            {uploadFile ? uploadFile.name : "Choose backup .json file"}
+            <input
+              type="file"
+              accept=".json,application/json"
+              style={{ display: "none" }}
+              onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+            />
+          </label>
+
+          {uploadFile && (
+            <>
+              <button
+                onClick={restoreFromFile}
+                disabled={uploading}
+                style={{ padding: "10px 20px", borderRadius: 9, border: "none", background: uploading ? "rgba(251,191,36,.3)" : "#f59e0b", color: "#fff", fontSize: 13, fontWeight: 700, cursor: uploading ? "not-allowed" : "pointer" }}
+              >
+                {uploading ? "Restoring…" : "↺ Restore from File"}
+              </button>
+              <button
+                onClick={() => setUploadFile(null)}
+                style={{ padding: "10px 16px", borderRadius: 9, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "rgba(255,255,255,.4)", fontSize: 13, cursor: "pointer" }}
+              >
+                Clear
+              </button>
+            </>
+          )}
+        </div>
+
+        <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 8, background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.2)", fontSize: 12, color: "#f87171" }}>
+          ⚠️ <strong>Warning:</strong> Restoring will permanently replace ALL current data. Make sure to create a fresh backup first before restoring an old file.
         </div>
       </div>
 
