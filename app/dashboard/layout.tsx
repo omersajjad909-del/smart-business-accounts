@@ -1298,27 +1298,6 @@ export default function DashboardLayout({
               {hasDashboardFeature("RETAIL_BRANCH_REPORTS") && <NavLink href="/dashboard/retail/branch-reports" pathname={pathname}>Branch Reports</NavLink>}
             </NavGroup>
 
-            {/* ── 8. Reports ── */}
-            <NavGroup
-              title="📊 Reports"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>}
-              open={openSection === "retailReports"}
-              onToggle={() => toggle("retailReports")}
-            >
-              <NavLink href="/dashboard/reports/sales" pathname={pathname}>📈 Sales Report</NavLink>
-              <NavLink href="/dashboard/reports/stock" pathname={pathname}>📦 Stock Report</NavLink>
-              <NavLink href="/dashboard/reports/stock-ledger" pathname={pathname}>📒 Stock Ledger</NavLink>
-              <NavLink href="/dashboard/reports/inventory/inward" pathname={pathname}>📥 Inward Report</NavLink>
-              <NavLink href="/dashboard/reports/outward" pathname={pathname}>📤 Outward Report</NavLink>
-              <NavLink href="/dashboard/reports/stock/movement" pathname={pathname}>🔄 Stock Movement</NavLink>
-              <NavLink href="/dashboard/reports/inventory/stock-summary" pathname={pathname}>📋 Stock Summary</NavLink>
-              <NavLink href="/dashboard/reports/stock/valuation" pathname={pathname}>💰 Stock Valuation</NavLink>
-              <NavLink href="/dashboard/reports/stock/dead" pathname={pathname}>💀 Dead Stock</NavLink>
-              <NavLink href="/dashboard/reports/stock/expiry" pathname={pathname}>⏰ Expiry Report</NavLink>
-              <NavLink href="/dashboard/reports/stock/turnover" pathname={pathname}>🔁 Stock Turnover</NavLink>
-              <NavLink href="/dashboard/reports/cogs" pathname={pathname}>🏭 COGS Report</NavLink>
-              <NavLink href="/dashboard/reports/discount-analysis" pathname={pathname}>🏷️ Discount Analysis</NavLink>
-            </NavGroup>
 
           </>)}
 
@@ -1985,21 +1964,6 @@ export default function DashboardLayout({
             </NavGroup>
           )}
 
-          {/* ── ACTIVITY REPORTS ── */}
-          {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
-            <NavGroup
-              title="Activity Reports"
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>}
-              open={openSection === "activityReports"}
-              onToggle={() => toggle("activityReports")}
-            >
-              {hasPermission(currentUser, PERMISSIONS.VIEW_AGEING_REPORT) && <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/payment-followup" pathname={pathname}>Payment Follow-up</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_STOCK_SUMMARY) && <NavLink href="/dashboard/reports/stock" pathname={pathname}>Stock Report</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_SALES_REPORT) && <NavLink href="/dashboard/reports/sales" pathname={pathname}>Sales Report</NavLink>}
-              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/audit-trail" pathname={pathname}>Audit Trail</NavLink>}
-            </NavGroup>
-          )}
 
           {/* ── ADVANCED FINANCIAL REPORTS ── */}
           {hasPermission(currentUser, PERMISSIONS.VIEW_REPORTS) && (
@@ -2027,7 +1991,12 @@ export default function DashboardLayout({
               open={openSection === "inventoryIntelligence"}
               onToggle={() => toggle("inventoryIntelligence")}
             >
+              {hasPermission(currentUser, PERMISSIONS.VIEW_STOCK_SUMMARY) && <NavLink href="/dashboard/reports/stock" pathname={pathname}>Stock Report</NavLink>}
+              <NavLink href="/dashboard/reports/stock-ledger" pathname={pathname}>Stock Ledger</NavLink>
               <NavLink href="/dashboard/reports/stock/movement" pathname={pathname}>Stock Movement</NavLink>
+              <NavLink href="/dashboard/reports/inventory/stock-summary" pathname={pathname}>Stock Summary</NavLink>
+              <NavLink href="/dashboard/reports/inventory/inward" pathname={pathname}>Inward Report</NavLink>
+              <NavLink href="/dashboard/reports/outward" pathname={pathname}>Outward Report</NavLink>
               <NavLink href="/dashboard/reports/stock/dead" pathname={pathname}>Dead Stock</NavLink>
               <NavLink href="/dashboard/reports/stock/turnover" pathname={pathname}>Stock Turnover</NavLink>
               <NavLink href="/dashboard/reports/stock/expiry" pathname={pathname}>Expiry Tracking</NavLink>
@@ -2044,6 +2013,7 @@ export default function DashboardLayout({
               open={openSection === "salesAnalytics"}
               onToggle={() => toggle("salesAnalytics")}
             >
+              {hasPermission(currentUser, PERMISSIONS.VIEW_SALES_REPORT) && <NavLink href="/dashboard/reports/sales" pathname={pathname}>Sales Report</NavLink>}
               <NavLink href="/dashboard/reports/customer-profitability" pathname={pathname}>Customer Profitability</NavLink>
               <NavLink href="/dashboard/reports/salesman-performance" pathname={pathname}>Salesman Performance</NavLink>
               <NavLink href="/dashboard/reports/discount-analysis" pathname={pathname}>Discount Analysis</NavLink>
@@ -2061,7 +2031,8 @@ export default function DashboardLayout({
               open={openSection === "receivablesPayables"}
               onToggle={() => toggle("receivablesPayables")}
             >
-              <NavLink href="/dashboard/reports/supplier-ageing" pathname={pathname}>Supplier Ageing (AP)</NavLink>
+              {hasPermission(currentUser, PERMISSIONS.VIEW_AGEING_REPORT) && <NavLink href="/dashboard/reports/ageing" pathname={pathname}>Ageing Report</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/payment-followup" pathname={pathname}>Payment Follow-up</NavLink>}
               <NavLink href="/dashboard/reports/payment-history" pathname={pathname}>Payment History</NavLink>
               <NavLink href="/dashboard/reports/bad-debts" pathname={pathname}>Bad Debts</NavLink>
               <NavLink href="/dashboard/reports/credit-analysis" pathname={pathname}>Credit Analysis</NavLink>
@@ -2111,6 +2082,7 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/users" pathname={pathname}>Roles & Permissions</NavLink> */}
               <NavLink href="/dashboard/users" pathname={pathname}>Team</NavLink>
               {hasPermission(currentUser, PERMISSIONS.VIEW_LOGS) && <NavLink href="/dashboard/users/logs" pathname={pathname}>System Logs</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_FINANCIAL_REPORTS) && <NavLink href="/dashboard/audit-trail" pathname={pathname}>Audit Trail</NavLink>}
             </NavGroup>
           )}
 
