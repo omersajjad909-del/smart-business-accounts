@@ -22,10 +22,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Backup file is empty or invalid." }, { status: 400 });
   }
 
-  // Safety: reject if backup belongs to a different company
-  if (data.companyId && data.companyId !== companyId) {
-    return NextResponse.json({ error: "This backup belongs to a different company and cannot be restored here." }, { status: 403 });
-  }
+  // Note: companyId mismatch is intentionally allowed for file uploads.
+  // This covers the case where a user restores their backup onto a new plan/account.
+  // All restored records are scoped to the current companyId regardless of what's in the file.
 
   // Basic structure check — must have at least one recognisable key
   const knownKeys = ["accounts", "items", "vouchers", "salesInvoices", "purchaseInvoices", "bankAccounts"];

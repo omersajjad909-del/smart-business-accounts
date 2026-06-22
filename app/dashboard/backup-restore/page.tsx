@@ -226,6 +226,7 @@ export default function BackupRestorePage() {
             <div style={{ fontSize: 14, fontWeight: 800, color: "#fbbf24", marginBottom: 3 }}>Restore from Downloaded File</div>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", lineHeight: 1.6 }}>
               Have a <code style={{ background: "rgba(255,255,255,.08)", padding: "1px 5px", borderRadius: 4 }}>.json</code> backup file on your computer? Upload it here to restore your data directly.
+              <span style={{ display: "block", marginTop: 4, color: "#34d399" }}>✓ Works across plans — even if you signed up fresh on a new subscription.</span>
             </div>
           </div>
         </div>
