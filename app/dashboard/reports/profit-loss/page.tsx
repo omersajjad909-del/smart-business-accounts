@@ -14,7 +14,7 @@ interface PLReport {
   grossSales: number; salesReturns: number; salesDiscounts: number; netSales: number;
   // COGS
   openingStock: number; purchases: number; freightInward: number;
-  purchaseDiscounts: number; closingStock: number; cogs: number;
+  purchaseDiscounts: number; purchaseReturns: number; closingStock: number; cogs: number;
   // Gross
   grossProfit: number; grossMarginPct: number;
   // OpEx
@@ -274,6 +274,7 @@ export default function ProfitLossPage() {
                   <PLRow label="+ Purchases"           amount={r.purchases}          dimZero />
                   <PLRow label="+ Freight / Carriage"  amount={r.freightInward}      dimZero />
                   {r.purchaseDiscounts > 0 && <PLRow label="— Purchase Discounts" amount={r.purchaseDiscounts} variant="deduct" indent />}
+                  {r.purchaseReturns   > 0 && <PLRow label="— Purchase Returns"   amount={r.purchaseReturns}   variant="deduct" indent />}
                   {r.closingStock > 0 && <PLRow label="— Closing Stock" amount={r.closingStock} variant="deduct" indent />}
                   <PLRow label="COST OF GOODS SOLD" amount={r.cogs} variant="total" />
                 </Section>

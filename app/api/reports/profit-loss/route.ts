@@ -97,11 +97,20 @@ export async function GET(req: NextRequest) {
     const uMap = toMap(invUpTo);
 
     const openingStock = Math.max(0,
-      (bMap["PURCHASE"] || 0) - (bMap["SALE"] || 0) + (bMap["SALE_RETURN"] || 0)
+      (bMap["PURCHASE"] || 0) - (bMap["SALE"] || 0) + (bMap["SALE_RETURN"] || 0) - (bMap["PURCHASE_RETURN"] || 0)
     );
     const closingStock = Math.max(0,
-      (uMap["PURCHASE"] || 0) - (uMap["SALE"] || 0) + (uMap["SALE_RETURN"] || 0)
+      (uMap["PURCHASE"] || 0) - (uMap["SALE"] || 0) + (uMap["SALE_RETURN"] || 0) - (uMap["PURCHASE_RETURN"] || 0)
     );
+
+    // Purchase returns during the period (from InventoryTxn)
+    const invPeriod = await prisma.inventoryTxn.groupBy({
+      by: ["type"],
+      where: { companyId, date: { gte: fromDate, lte: toDate } },
+      _sum: { amount: true },
+    });
+    const pMap = toMap(invPeriod);
+    const purchaseReturns = pMap["PURCHASE_RETURN"] || 0;
 
     // ── 4. PURCHASES ────────────────────────────────────────────────
     const purchaseInvoices = await prisma.purchaseInvoice.findMany({
@@ -114,12 +123,13 @@ export async function GET(req: NextRequest) {
       },
       select: { total: true, freight: true, discount: true },
     });
-    const purchases         = purchaseInvoices.reduce((s, r) => s + (r.total   || 0), 0);
-    const freightInward     = purchaseInvoices.reduce((s, r) => s + (r.freight || 0), 0);
+    // Gross purchases (before discount, before freight) since total = subtotal - discount + freight
+    const purchases         = purchaseInvoices.reduce((s, r) => s + (r.total || 0) + (r.discount || 0) - (r.freight || 0), 0);
+    const freightInward     = purchaseInvoices.reduce((s, r) => s + (r.freight  || 0), 0);
     const purchaseDiscounts = purchaseInvoices.reduce((s, r) => s + (r.discount || 0), 0);
 
-    // COGS = Opening + Purchases + Freight − PurchaseDiscounts − Closing
-    const cogs = Math.max(0, openingStock + purchases + freightInward - purchaseDiscounts - closingStock);
+    // COGS = Opening + Purchases + Freight − PurchaseDiscounts − PurchaseReturns − Closing
+    const cogs = Math.max(0, openingStock + purchases + freightInward - purchaseDiscounts - purchaseReturns - closingStock);
 
     const grossProfit    = netSales - cogs;
     const grossMarginPct = pct(grossProfit, netSales);
@@ -155,7 +165,6 @@ export async function GET(req: NextRequest) {
         else if (FINANCE_RE.test(name)) financeMap[name] = (financeMap[name] || 0) + amt;
         else                       opExMap[name]    = (opExMap[name]    || 0) + amt;
       } else if (type === "INCOME" || type === "REVENUE") {
-        if (amt >= 0) continue; // only credit-side income (stored negative in double-entry)
         otherIncMap[name] = (otherIncMap[name] || 0) + Math.abs(amt);
       }
     }
@@ -184,7 +193,7 @@ export async function GET(req: NextRequest) {
       // Revenue
       grossSales, salesReturns, salesDiscounts, netSales,
       // COGS
-      openingStock, purchases, freightInward, purchaseDiscounts, closingStock, cogs,
+      openingStock, purchases, freightInward, purchaseDiscounts, purchaseReturns, closingStock, cogs,
       // Gross Profit
       grossProfit, grossMarginPct,
       // Operating Expenses
