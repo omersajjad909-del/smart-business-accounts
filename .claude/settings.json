@@ -70,7 +70,8 @@
       "PowerShell(git push origin main)",
       "PowerShell(git add \".claude/settings.json\")",
       "PowerShell(git commit -m \"chore: settings\")",
-      "Bash(Select-Object Name, PSIsContainer)"
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Recurse -Directory -ErrorAction SilentlyContinue)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",

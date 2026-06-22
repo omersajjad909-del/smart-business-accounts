@@ -30,12 +30,12 @@ const FEATURE_CARDS = [
       "Full formal procurement flow with paper trail. Issue Purchase Orders to suppliers, receive goods via GRN, then match with Purchase Invoice.",
     simple: {
       label: "Simple Mode (OFF)",
-      flow: ["Supplier se maal aata hai", "→ Stock Receipts mein Receive dabao", "→ Done ✅"],
+      flow: ["Goods arrive from supplier", "→ Press Receive in Stock Receipts", "→ Done ✅"],
       note: "Quick 1-click stock receive. Perfect for small retail.",
     },
     advanced: {
       label: "Advanced Mode (ON)",
-      flow: ["Purchase Order banao → supplier ko bhejo", "→ Maal aaye to GRN karo (check karo)", "→ Purchase Invoice match karo", "→ Accounts mein entry ✅"],
+      flow: ["Create Purchase Order → send to supplier", "→ Goods arrive: create GRN (verify quantity)", "→ Match Purchase Invoice to GRN", "→ Auto-posted to accounts ✅"],
       note: "Formal procurement with full audit trail.",
     },
     unlocks: ["Purchase Orders (PO)", "GRN — Goods Receipt Note", "PO ↔ Invoice matching"],
@@ -54,7 +54,7 @@ const FEATURE_CARDS = [
       "Manage stock across multiple physical locations. Transfer stock between branches, track per-warehouse levels.",
     simple: {
       label: "Simple Mode (OFF)",
-      flow: ["Sab stock ek jagah track hota hai", "→ Branch filter se dekho", "→ Done ✅"],
+      flow: ["All stock tracked in one place", "→ Use branch filter to view", "→ Done ✅"],
       note: "Single location inventory. Best for one-store setup.",
     },
     advanced: {
