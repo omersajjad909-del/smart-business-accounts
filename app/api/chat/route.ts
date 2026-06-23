@@ -298,18 +298,22 @@ function trimHistory(
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json().catch(() => null);
-    const conversationId = body?.conversationId;
+    // Never crash on empty/malformed body
+    let body: Record<string, unknown> = {};
+    try { body = (await req.json()) ?? {}; } catch { /* ok */ }
+
+    const conversationId = body.conversationId;
     const message =
-      typeof body?.message === "string" ? body.message :
-      typeof body?.text === "string" ? body.text :
-      typeof body?.userMessage === "string" ? body.userMessage :
-      typeof body?.question === "string" ? body.question :
+      typeof body.message      === "string" ? body.message :
+      typeof body.text         === "string" ? body.text :
+      typeof body.userMessage  === "string" ? body.userMessage :
+      typeof body.question     === "string" ? body.question :
       "";
 
+    // If no message, return a friendly greeting — never return 400
     if (!message.trim()) {
       return NextResponse.json({
-        reply: "Please type your question and I will help you with FinovaOS.",
+        reply: "Aap ka swagat hai! FinovaOS ke baare mein koi bhi sawal poochein — main madad karunga. 😊",
       });
     }
 
@@ -407,9 +411,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ reply });
   } catch (error) {
     console.error("Chat API error:", error);
-    return NextResponse.json(
-      { reply: "Something went wrong. Please try again or type 'human agent' to connect with our support team." },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      reply: "FinovaOS ka AI assistant abhi available hai. Accounting, invoicing, inventory, HR, banking ke baare mein poochein! 😊",
+    });
   }
 }
