@@ -71,7 +71,10 @@
       "PowerShell(git add \".claude/settings.json\")",
       "PowerShell(git commit -m \"chore: settings\")",
       "Bash(Select-Object Name, PSIsContainer)",
-      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Recurse -Directory -ErrorAction SilentlyContinue)"
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\smart-business-accounts\" -Recurse -Directory -ErrorAction SilentlyContinue)",
+      "Bash(cat next.config.js)",
+      "Bash(cat next.config.ts)",
+      "Bash(cat next.config.mjs)"
     ],
     "additionalDirectories": [
       "d:\\projects\\smart-business-accounts\\app\\api\\chat\\conversations",
