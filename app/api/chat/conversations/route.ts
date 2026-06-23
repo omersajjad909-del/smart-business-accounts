@@ -49,16 +49,25 @@ export async function GET(req: NextRequest) {
 // POST /api/chat/conversations — create new conversation
 export async function POST(req: NextRequest) {
   try {
-    const { customerName, customerEmail } = await req.json();
+    const body = await req.json().catch(() => null);
+    const customerName =
+      typeof body?.customerName === "string" ? body.customerName :
+      typeof body?.name === "string" ? body.name :
+      typeof body?.customer_name === "string" ? body.customer_name :
+      "";
+    const customerEmail =
+      typeof body?.customerEmail === "string" ? body.customerEmail :
+      typeof body?.email === "string" ? body.email :
+      typeof body?.customer_email === "string" ? body.customer_email :
+      "";
 
-    if (!customerName?.trim()) {
-      return NextResponse.json({ error: "customerName required" }, { status: 400 });
-    }
+    // Never hard-fail the public marketing widget over a missing name.
+    const safeName = customerName.trim() || "Website Visitor";
 
     const conv = await prisma.chatConversation.create({
       data: {
-        customerName:  customerName.trim(),
-        customerEmail: customerEmail?.trim() || null,
+        customerName:  safeName,
+        customerEmail: customerEmail.trim() || null,
         status: "bot",
       },
     });

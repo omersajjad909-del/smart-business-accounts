@@ -300,10 +300,17 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);
     const conversationId = body?.conversationId;
-    const message = typeof body?.message === "string" ? body.message : "";
+    const message =
+      typeof body?.message === "string" ? body.message :
+      typeof body?.text === "string" ? body.text :
+      typeof body?.userMessage === "string" ? body.userMessage :
+      typeof body?.question === "string" ? body.question :
+      "";
 
-    if (!message) {
-      return NextResponse.json({ error: "Missing message" }, { status: 400 });
+    if (!message.trim()) {
+      return NextResponse.json({
+        reply: "Please type your question and I will help you with FinovaOS.",
+      });
     }
 
     // Load conversation history from DB
@@ -325,7 +332,7 @@ export async function POST(req: NextRequest) {
     const trimmedHistory = trimHistory(history);
     const localResult = (() => {
       try {
-        return runChatEngine(String(message), trimmedHistory);
+        return runChatEngine(String(message).trim(), trimmedHistory);
       } catch (error) {
         console.error("Local chat engine failed:", error);
         return null;
@@ -360,7 +367,7 @@ export async function POST(req: NextRequest) {
       const openAiReply = await Promise.race<string | null>([
         openAITextResponse(
           SUPPORT_SYSTEM_PROMPT,
-          [...aiHistory, { role: "user", content: String(message) }],
+          [...aiHistory, { role: "user", content: String(message).trim() }],
           800,
         ),
         new Promise<null>((resolve) => {
@@ -377,7 +384,7 @@ export async function POST(req: NextRequest) {
 
     // FALLBACK: Local keyword engine
     if (!reply) {
-      const result = localResult ?? runChatEngine(String(message), trimmedHistory);
+      const result = localResult ?? runChatEngine(String(message).trim(), trimmedHistory);
       reply = result.reply;
 
       // Add human agent hint if stuck
