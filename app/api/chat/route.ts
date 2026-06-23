@@ -298,7 +298,9 @@ function trimHistory(
 
 export async function POST(req: NextRequest) {
   try {
-    const { conversationId, message } = await req.json();
+    const body = await req.json().catch(() => null);
+    const conversationId = body?.conversationId;
+    const message = typeof body?.message === "string" ? body.message : "";
 
     if (!message) {
       return NextResponse.json({ error: "Missing message" }, { status: 400 });
@@ -321,6 +323,31 @@ export async function POST(req: NextRequest) {
     }
 
     const trimmedHistory = trimHistory(history);
+    const localResult = (() => {
+      try {
+        return runChatEngine(String(message), trimmedHistory);
+      } catch (error) {
+        console.error("Local chat engine failed:", error);
+        return null;
+      }
+    })();
+
+    // Fast path for common intents so the widget keeps working even if AI is slow/unavailable.
+    if (localResult && (localResult.confidence >= 0.72 || localResult.intentId === "greeting" || localResult.intentId === "escalate")) {
+      let reply = localResult.reply;
+
+      if (localResult.shouldEscalate && localResult.intentId === "fallback") {
+        const hints: Record<string, string> = {
+          en: "\n\nWould you like me to connect you with a human agent? 👤",
+          ur_roman: "\n\nWould you like me to connect you to a human agent? 👤",
+          ur_script: "\n\nWould you like me to connect you to a human agent? 👤",
+        };
+        reply += hints[localResult.language] ?? hints.en;
+      }
+
+      return NextResponse.json({ reply });
+    }
+
     let reply = "";
 
     // PRIMARY: OpenAI GPT-4o-mini
@@ -350,7 +377,7 @@ export async function POST(req: NextRequest) {
 
     // FALLBACK: Local keyword engine
     if (!reply) {
-      const result = runChatEngine(String(message), trimmedHistory);
+      const result = localResult ?? runChatEngine(String(message), trimmedHistory);
       reply = result.reply;
 
       // Add human agent hint if stuck
@@ -379,4 +406,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
