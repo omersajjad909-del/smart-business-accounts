@@ -30,10 +30,19 @@ const TOPIC_MAP: Record<string, string[]> = {
 
 /* ─── API helpers ─────────────────────────────────────────────────────────── */
 async function apiCreateConversation(name: string, email: string) {
+  const safeName = name.trim();
+  const safeEmail = email.trim();
   const res = await fetch("/api/chat/conversations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ customerName: name, customerEmail: email || null }),
+    body: JSON.stringify({
+      customerName: safeName,
+      customer_name: safeName,
+      name: safeName,
+      customerEmail: safeEmail || null,
+      customer_email: safeEmail || null,
+      email: safeEmail || null,
+    }),
   });
   return res.ok ? res.json() : null;
 }
@@ -68,10 +77,17 @@ async function apiGetConversation(id: string) {
 
 async function askBot(conversationId: string, userMessage: string): Promise<string> {
   try {
+    const safeMessage = userMessage.trim();
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ conversationId, message: userMessage }),
+      body: JSON.stringify({
+        conversationId,
+        message: safeMessage,
+        text: safeMessage,
+        userMessage: safeMessage,
+        question: safeMessage,
+      }),
     });
     const data = await res.json();
     return data.reply || "Something went wrong. Please try again or type 'human agent' to connect with support.";
