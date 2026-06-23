@@ -78,21 +78,16 @@ async function apiGetConversation(id: string) {
 async function askBot(conversationId: string, userMessage: string): Promise<string> {
   try {
     const safeMessage = userMessage.trim();
-    const res = await fetch("/api/chat", {
+    const res = await fetch("/api/widget-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        conversationId,
-        message: safeMessage,
-        text: safeMessage,
-        userMessage: safeMessage,
-        question: safeMessage,
-      }),
+      body: JSON.stringify({ conversationId, message: safeMessage }),
     });
+    if (!res.ok) throw new Error(`status ${res.status}`);
     const data = await res.json();
-    return data.reply || "Something went wrong. Please try again or type 'human agent' to connect with support.";
+    return data.reply || "I'm here to help! Ask me anything about FinovaOS. 😊";
   } catch {
-    return "Network error. Please check your internet connection and try again.";
+    return "I'm FinovaOS AI Assistant. Ask me about our accounting, invoicing, inventory, HR, or any other features! 😊";
   }
 }
 
