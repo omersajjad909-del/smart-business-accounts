@@ -11,6 +11,10 @@ type Message = {
 
 /* ─── Built-in knowledge base (works 100% offline / without server) ─────── */
 const KB: [RegExp, string][] = [
+  // Greetings
+  [/^(hi|hello|hey|salam|assalam|helo|hii|adaab|namaste|good morning|good afternoon|good evening|howdy|greetings)[\s!?.]*$/i,
+   "Hello! 👋 I'm FinovaOS AI Assistant.\n\nI can help you with:\n• What is FinovaOS?\n• Pricing plans\n• Invoice & billing\n• Inventory management\n• HR & Payroll\n• Banking & reports\n\nBas poochein — main yahan hoon! 😊"],
+
   [/what is finova|finova kya|ye kya|about finova|kaun sa|introduce|explain finova/i,
    "FinovaOS is a complete cloud-based Business OS for SMEs. It covers:\n\n• Accounting & double-entry bookkeeping\n• Sales & purchase invoicing\n• Inventory management\n• HR & Payroll\n• Banking & reconciliation\n• CRM & customer management\n• AI financial intelligence\n\nUsed by 12,000+ businesses across South Asia. 🚀"],
 
@@ -235,7 +239,7 @@ export default function ChatWidget() {
         reply = server;
       } else {
         // Fallback smart default
-        reply = `Great question! FinovaOS covers all your business needs:\n\n• Accounting & invoicing\n• Inventory management\n• HR & Payroll\n• Banking & reconciliation\n• CRM & AI intelligence\n\nFor detailed help:\n• Email: **finovaos.app@gmail.com**\n• Phone: **+92 304 7653693**\n• Type "human agent" to chat with our team`;
+        reply = `FinovaOS ke baare mein poochein — main help karunga! 😊\n\nMere paas in topics ki jankari hai:\n• Pricing & plans\n• Invoice & billing\n• Inventory & stock\n• HR & Payroll\n• Banking & reports\n• CRM & AI features\n\nYa seedha contact karein:\n• Email: **finovaos.app@gmail.com**\n• Phone: **+92 304 7653693**`;
       }
     }
 
