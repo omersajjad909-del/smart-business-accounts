@@ -145,52 +145,39 @@ function renderText(text: string): React.ReactNode[] {
 }
 
 /* ─── API helpers — never throw, never block UI ──────────────────────────── */
-async function apiCreateConversation(name: string, email: string): Promise<string> {
-  try {
-    const res = await fetch("/api/chat/conversations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ customerName: name, customerEmail: email || null }),
-    });
-    const data = await res.json();
-    return String(data?.id || "").trim() || `tmp-${Date.now()}`;
-  } catch {
-    return `tmp-${Date.now()}`;
-  }
-}
 
-async function apiGetAIReply(conversationId: string, message: string): Promise<string> {
+// Single endpoint: handles conversation creation + AI reply + message saving
+async function apiChat(
+  message: string,
+  conversationId: string | null,
+  name: string,
+  email: string
+): Promise<{ reply: string; conversationId: string | null }> {
   try {
-    const ctrl = new AbortController();
+    const ctrl  = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 9000);
     const res = await fetch("/api/widget-chat", {
-      method: "POST",
+      method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ conversationId, message }),
+      body: JSON.stringify({ message, conversationId, name, email }),
       signal: ctrl.signal,
     });
     clearTimeout(timer);
-    if (!res.ok) return "";
+    if (!res.ok) return { reply: "", conversationId };
     const data = await res.json();
-    return String(data?.reply || "").trim();
+    return {
+      reply:          String(data?.reply || "").trim(),
+      conversationId: data?.conversationId ? String(data.conversationId) : conversationId,
+    };
   } catch {
-    return "";
+    return { reply: "", conversationId };
   }
-}
-
-function apiSaveMsg(conversationId: string, sender: string, text: string) {
-  if (!conversationId || conversationId.startsWith("tmp-")) return;
-  fetch("/api/chat/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ conversationId, sender, text }),
-  }).catch(() => {});
 }
 
 function apiEscalate(conversationId: string) {
   if (!conversationId || conversationId.startsWith("tmp-")) return;
   fetch("/api/chat/escalate", {
-    method: "POST",
+    method:  "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ conversationId }),
   }).catch(() => {});
@@ -229,14 +216,10 @@ export default function ChatWidget() {
 
   useEffect(() => { if (open) setUnread(0); }, [open]);
 
-  /* ── Start chat: create conversation in DB ── */
-  async function startChat() {
+  /* ── Start chat: show welcome immediately, no API call needed ── */
+  function startChat() {
     if (!name.trim()) return;
     setStep("chat");
-
-    const id = await apiCreateConversation(name.trim(), email.trim());
-    setConvId(id);
-
     const firstName = name.trim().split(" ")[0];
     addMsg({
       sender: "bot",
@@ -245,18 +228,17 @@ export default function ChatWidget() {
     });
   }
 
-  /* ── Send message: AI reply + save both sides ── */
+  /* ── Send message: one API call handles everything ── */
   async function sendMessage(override?: string) {
     const text = (override || inputVal).trim();
     if (!text || typing) return;
     if (!override) setInputVal("");
 
     addMsg({ sender: "customer", text });
-    apiSaveMsg(convId!, "customer", text);
 
-    // Human agent request
+    // Human agent request — escalate and show message
     if (/\b(human|agent|person|real person|support staff|insaan|banda|live chat|connect me)\b/i.test(text)) {
-      apiEscalate(convId!);
+      if (convId) apiEscalate(convId);
       setEscalated(true);
       addMsg({
         sender: "bot",
@@ -267,8 +249,11 @@ export default function ChatWidget() {
 
     setTyping(true);
 
-    // Get AI reply from server (real OpenAI)
-    const serverReply = await apiGetAIReply(convId || "", text);
+    // POST to /api/widget-chat — handles everything: conv creation, AI reply, saving
+    const { reply: serverReply, conversationId: newConvId } = await apiChat(
+      text, convId, name.trim(), email.trim()
+    );
+    if (newConvId && newConvId !== convId) setConvId(newConvId);
 
     // Fallback to offline KB if server fails
     const reply = serverReply
@@ -276,7 +261,6 @@ export default function ChatWidget() {
       || `FinovaOS ke baare mein koi bhi sawal poochein! 😊\n\nMain in topics mein madad kar sakta hoon:\n• Pricing & plans\n• Invoice & billing\n• Inventory & stock\n• HR & Payroll\n• Banking & reports\n\nYa seedha contact karein:\n• **finovaos.app@gmail.com**\n• **+92 304 7653693**`;
 
     setTyping(false);
-    apiSaveMsg(convId!, "bot", reply);
 
     const topic = detectTopic(text + " " + reply);
     addMsg({ sender: "bot", text: reply, chips: topic ? TOPIC_CHIPS[topic] : undefined });

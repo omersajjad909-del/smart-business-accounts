@@ -52,10 +52,10 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: "/((?!api/).*)",
+        source: "/:path((?!api|_next|favicon|robots|sitemap|images|icons|fonts).*)*",
         has: [{ type: "host", value: "finovaos.app" }],
         destination: "https://www.finovaos.app/:path*",
-        permanent: true,
+        permanent: false,
       },
       {
         source: "/forge",
