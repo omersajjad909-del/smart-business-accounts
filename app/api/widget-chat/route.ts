@@ -38,15 +38,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 3. Try local keyword engine first (no API key needed, always fast)
-  try {
-    const local = runChatEngine(message, []);
-    if (local && local.confidence >= 0.72 && local.intentId !== "fallback") {
-      return NextResponse.json({ reply: local.reply, conversationId });
-    }
-  } catch { /* fall through */ }
-
-  // 4. Try OpenAI
+  // 3. Try OpenAI first (real AI — always preferred)
   if (process.env.OPENAI_API_KEY) {
     try {
       const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -64,7 +56,7 @@ export async function POST(req: NextRequest) {
     } catch { /* fall through to local */ }
   }
 
-  // 5. Always return something from local engine
+  // 4. Fallback: local keyword engine (when OpenAI is unavailable)
   try {
     const local = runChatEngine(message, []);
     return NextResponse.json({ reply: local.reply, conversationId });

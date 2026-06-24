@@ -218,29 +218,16 @@ export default function ChatWidget() {
 
     setBotTyping(true);
 
-    // 1. Try local knowledge base first (instant)
-    const local = getLocalAnswer(text);
-
-    // 2. Try server in parallel (max 7s)
-    const serverPromise = askServer(text);
+    // Always ask server first (real OpenAI AI)
+    const server = await askServer(text);
 
     let reply = "";
-
-    if (local) {
-      // We have a local answer — use it after a brief delay for UX
-      await new Promise(r => setTimeout(r, 600));
-      // Also wait for server if it responds quickly
-      const server = await Promise.race([serverPromise, new Promise<null>(r => setTimeout(() => r(null), 1500))]);
-      reply = (typeof server === "string" && server.length > 20) ? server : local;
+    if (server) {
+      reply = server;
     } else {
-      // No local answer — wait for server (up to 7s)
-      const server = await serverPromise;
-      if (server) {
-        reply = server;
-      } else {
-        // Fallback smart default
-        reply = `FinovaOS ke baare mein poochein — main help karunga! 😊\n\nMere paas in topics ki jankari hai:\n• Pricing & plans\n• Invoice & billing\n• Inventory & stock\n• HR & Payroll\n• Banking & reports\n• CRM & AI features\n\nYa seedha contact karein:\n• Email: **finovaos.app@gmail.com**\n• Phone: **+92 304 7653693**`;
-      }
+      // Server unavailable — use local KB as fallback
+      const local = getLocalAnswer(text);
+      reply = local ?? `FinovaOS ke baare mein poochein — main help karunga! 😊\n\nMere paas in topics ki jankari hai:\n• Pricing & plans\n• Invoice & billing\n• Inventory & stock\n• HR & Payroll\n• Banking & reports\n• CRM & AI features\n\nYa seedha contact karein:\n• Email: **finovaos.app@gmail.com**\n• Phone: **+92 304 7653693**`;
     }
 
     setBotTyping(false);
