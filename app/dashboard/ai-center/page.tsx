@@ -7,7 +7,7 @@ import type { CSSProperties } from "react";
 const AI_CATEGORIES = [
   {
     id: "core",
-    name: "AI Core",
+    name: "Core",
     icon: "AI",
     items: [
       { path: "/dashboard/ai?tab=overview", name: "AI Overview", desc: "Open the main AI dashboard with health, insights, and forecasts." },
