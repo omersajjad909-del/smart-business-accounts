@@ -18,8 +18,12 @@ export async function POST(req: NextRequest) {
   try {
     await prisma.chatConversation.update({
       where: { id: conversationId },
-      data:  { status: "human" },
+      data:  { status: "waiting" },
     });
+    // Save a system message so agent sees why it's waiting
+    await prisma.chatMessage.create({
+      data: { conversationId, sender: "bot", text: "⚡ Customer requested a human agent." },
+    }).catch(() => {});
   } catch { /* ignore — conversation may not exist yet */ }
 
   return NextResponse.json({ ok: true });

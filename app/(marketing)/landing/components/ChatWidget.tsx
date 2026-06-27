@@ -57,7 +57,7 @@ const KB: [RegExp, string][] = [
   [/multi.company|branch|company setup/i,
    "Multi-Company & Branch:\n\n• Manage multiple companies from one login\n• Each company has separate data\n• Branch-level reporting & controls\n• Available on Professional & Enterprise plans 🏢"],
 
-  [/security|safe|data|backup|2fa|encrypt/i,
+  [/security|\bsafe\b|data.{0,8}(protect|safe|secur|store)|backup|2fa|encrypt|password|soc.?2/i,
    "FinovaOS Security:\n\n• 256-bit bank-grade encryption\n• Two-factor authentication (2FA)\n• Role-based access control\n• Daily automated backups\n• SOC 2 Type II compliant (AWS)\n• Login history & session management 🔒"],
 
   [/mobile|app|android|ios|phone/i,
@@ -65,6 +65,21 @@ const KB: [RegExp, string][] = [
 
   [/currency|pkr|usd|rupee|dollar|exchange/i,
    "FinovaOS supports 150+ currencies:\n• PKR, USD, AED, GBP, EUR, SAR\n• Real-time exchange rates\n• Multi-currency invoicing\n\nPerfect for import/export businesses! 💱"],
+
+  [/marketing.?auto|whatsapp.?broadcast|email.?campaign|drip.?sequence|lead.?nurtur|send.?campaign|bulk.?message/i,
+   "FinovaOS Marketing Automation (Power Add-on):\n\n• Automated email campaigns\n• WhatsApp broadcasts to all customers\n• Lead nurturing & drip sequences\n• Customer segmentation by behavior\n• Open rate & click tracking\n\nAvailable as a Power Add-on on ANY plan!\nContact: finovaos.app@gmail.com for pricing 📣"],
+
+  [/\bapi\b|integration|webhook|third.?party|zapier|import.?data|custom.?integrat|connect.?with/i,
+   "FinovaOS API & Integrations:\n\n• Full REST API access (Enterprise plan)\n• Webhook support for real-time sync\n• CSV & Excel import/export on all plans\n• Custom integrations on request\n• Connect with eCommerce, payment gateways, banks\n\nContact: finovaos.app@gmail.com for custom integrations 🔌"],
+
+  [/why finova|better than|compare|versus|\bvs\b|quickbooks|xero|competitor|best accounting|alternative|kon sa software/i,
+   "Why FinovaOS over QuickBooks / Xero?\n\n• All-in-one: Accounting + HR + Inventory + CRM in ONE platform\n• Built for Pakistan: PKR pricing, Urdu support\n• 12,000+ businesses trust FinovaOS\n• 75% cheaper than international alternatives\n• Local support team available in Urdu/English\n• No hidden per-module fees\n• 14-day money-back guarantee\n\nSwitch with full data migration support! 🏆"],
+
+  [/\bgst\b|sales.?tax|withholding|\bfbr\b|\bntn\b|\bwht\b|income.?tax|\bvat\b|tax.?rate|tax.?setup/i,
+   "FinovaOS Tax Management:\n\n• GST/Sales Tax on invoices (any rate)\n• Withholding Tax (WHT) management\n• FBR-compliant reporting\n• Multiple tax rates & categories\n• Tax-inclusive & tax-exclusive pricing\n• Tax Summary report (PDF/Excel export)\n• Input/Output tax tracking\n\nDashboard → Reports → Tax Summary 📋"],
+
+  [/user.?role|permission|access.?control|team.?member|add.?user|invite.?user|staff.?access|kitne.?user|staff.?login/i,
+   "Users & Permissions in FinovaOS:\n\n• Add team members with role-based access\n• Roles: Admin, Accountant, Sales, Viewer, HR\n• Each role sees only their allowed modules\n• View-only mode for owners/investors\n• Login history & session management\n\nPlan limits:\n• Starter: up to 3 users\n• Professional: up to 10 users\n• Enterprise: up to 25 users\n\nDashboard → Settings → Team Members 👥"],
 ];
 
 const WELCOME_CHIPS = [
@@ -95,13 +110,13 @@ function matchKB(text: string): string | null {
 
 function detectTopic(text: string): string | null {
   const t = text.toLowerCase();
-  if (/pric|plan|starter|enterprise/.test(t)) return "pricing";
-  if (/invoice|bill|sales/.test(t))           return "invoice";
-  if (/inventor|stock|warehouse/.test(t))      return "inventory";
-  if (/hr|payroll|salary|leave/.test(t))       return "hr";
-  if (/bank|reconcil|voucher/.test(t))         return "banking";
+  if (/pric|plan|starter|enterprise/.test(t))                                               return "pricing";
+  if (/invoice|bill|sales/.test(t))                                                         return "invoice";
+  if (/inventor|stock|warehouse/.test(t))                                                   return "inventory";
+  if (/hr|payroll|salary|leave/.test(t))                                                    return "hr";
+  if (/bank|reconcil|voucher/.test(t))                                                      return "banking";
   if (/trial.?balance|p&l|profit.loss|balance.?sheet|cash.?flow|financial.?report/.test(t)) return "reports";
-  if (/ai|forecast|insight/.test(t))           return "ai";
+  if (/\bai\b|forecast|insight/.test(t))                                                    return "ai";
   return null;
 }
 
@@ -154,7 +169,8 @@ async function apiChat(
   message: string,
   conversationId: string | null,
   name: string,
-  email: string
+  email: string,
+  history: { role: "user" | "assistant"; content: string }[] = []
 ): Promise<{ reply: string; conversationId: string | null }> {
   try {
     const ctrl  = new AbortController();
@@ -162,7 +178,7 @@ async function apiChat(
     const res = await fetch("/api/widget-chat", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, conversationId, name, email }),
+      body: JSON.stringify({ message, conversationId, name, email, history }),
       signal: ctrl.signal,
     });
     clearTimeout(timer);
@@ -216,6 +232,20 @@ export default function ChatWidget() {
     return () => window.removeEventListener("open-chat", h);
   }, []);
 
+  // Restore conversation ID across page refreshes
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("fw_conv");
+      if (saved && !saved.startsWith("tmp-")) setConvId(saved);
+    } catch { /* ignore — private browsing */ }
+  }, []);
+
+  // Persist conversation ID so user can continue after refresh
+  useEffect(() => {
+    if (!convId || convId.startsWith("tmp-")) return;
+    try { sessionStorage.setItem("fw_conv", convId); } catch { /* ignore */ }
+  }, [convId]);
+
   // Show welcome message on first open
   useEffect(() => {
     if (open && messages.length === 0) {
@@ -257,9 +287,15 @@ export default function ChatWidget() {
 
     setTyping(true);
 
+    // Build conversation history for context-aware AI responses
+    const history = messages.slice(-10).map(m => ({
+      role: (m.sender === "customer" ? "user" : "assistant") as "user" | "assistant",
+      content: m.text,
+    }));
+
     // POST to /api/widget-chat — handles everything: conv creation, AI reply, saving
     const { reply: serverReply, conversationId: newConvId } = await apiChat(
-      text, convId, name.trim(), email.trim()
+      text, convId, name.trim(), email.trim(), history
     );
     if (newConvId && newConvId !== convId) setConvId(newConvId);
 

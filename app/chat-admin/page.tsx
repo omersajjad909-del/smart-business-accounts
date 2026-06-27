@@ -26,9 +26,10 @@ type Message = {
 };
 
 /* ─── Status config ─── */
-const STATUS = {
+const STATUS: Record<string, { label: string; color: string; bg: string; dot: string }> = {
   bot:     { label:"AI Bot",   color:"#818cf8", bg:"rgba(129,140,248,.12)", dot:"#6366f1" },
   waiting: { label:"Waiting",  color:"#fbbf24", bg:"rgba(251,191,36,.12)",  dot:"#f59e0b" },
+  human:   { label:"Waiting",  color:"#fbbf24", bg:"rgba(251,191,36,.12)",  dot:"#f59e0b" },
   agent:   { label:"Live",     color:"#34d399", bg:"rgba(52,211,153,.12)",  dot:"#10b981" },
   closed:  { label:"Closed",   color:"#6b7280", bg:"rgba(107,114,128,.12)", dot:"#6b7280" },
 };
@@ -187,7 +188,7 @@ export default function AgentDashboard() {
     return matchFilter && matchSearch;
   });
 
-  const waitingCount = conversations.filter(c => c.status === "waiting").length;
+  const waitingCount = conversations.filter(c => c.status === "waiting" || c.status === "human").length;
 
   function timeAgo(iso: string) {
     if (!nowMs) return "—";

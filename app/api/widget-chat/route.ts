@@ -96,12 +96,14 @@ export async function POST(req: NextRequest) {
   let customerName  = "Website Visitor";
   let customerEmail: string | null = null;
 
+  let history: { role: string; content: string }[] = [];
   try {
     const body = await req.json();
     message        = String(body?.message ?? body?.text ?? body?.userMessage ?? "").trim();
     conversationId = body?.conversationId ? String(body.conversationId) : null;
     customerName   = String(body?.name ?? body?.customerName ?? "Website Visitor").trim() || "Website Visitor";
     customerEmail  = body?.email ? String(body.email).trim() : null;
+    history        = Array.isArray(body?.history) ? body.history.slice(-10) : [];
   } catch { /* ok */ }
 
   // Empty message — return greeting
@@ -125,12 +127,20 @@ export async function POST(req: NextRequest) {
   if (process.env.OPENAI_API_KEY) {
     try {
       const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const historyMsgs = history
+        .map(h => ({
+          role: (h.role === "user" ? "user" : "assistant") as "user" | "assistant",
+          content: String(h.content || "").slice(0, 800),
+        }))
+        .filter(h => h.content);
+
       const res = await client.chat.completions.create({
         model:       process.env.OPENAI_MODEL || "gpt-4o-mini",
         max_tokens:  600,
         temperature: 0.5,
         messages: [
           { role: "system", content: SYSTEM },
+          ...historyMsgs,
           { role: "user",   content: message },
         ],
       });
