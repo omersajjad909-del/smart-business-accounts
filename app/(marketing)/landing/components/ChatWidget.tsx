@@ -214,6 +214,18 @@ export default function ChatWidget() {
     return () => window.removeEventListener("open-chat", h);
   }, []);
 
+  // Show welcome message on first open
+  useEffect(() => {
+    if (open && messages.length === 0) {
+      addMsg({
+        sender: "bot",
+        text: "Hello! 👋 I'm **FinovaOS AI Assistant**.\n\nAsk me anything about FinovaOS — accounting, invoicing, inventory, HR, payroll, banking, pricing, and more.\n\nHow can I help you today?",
+        chips: WELCOME_CHIPS,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
