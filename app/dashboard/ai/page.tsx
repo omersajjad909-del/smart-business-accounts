@@ -1216,15 +1216,12 @@ export default function AICommandCenter() {
   ];
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", height: "calc(100vh - 56px)", overflow: "hidden" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", overflow: "hidden" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         @keyframes aiPing { 0%{transform:scale(1);opacity:.9} 70%{transform:scale(1.6);opacity:0} 100%{transform:scale(1.6);opacity:0} }
-        .ai-nav-item { display:flex; align-items:center; gap:10px; width:100%; padding:9px 12px; border-radius:11px; font-family:inherit; background:none; border:1px solid transparent; cursor:pointer; color:rgba(255,255,255,.42); font-size:12.5px; font-weight:500; transition:all .18s; text-align:left; margin-bottom:1px; white-space:nowrap; }
-        .ai-nav-item.active { background:rgba(99,102,241,.16); color:#c7d2fe; border-color:rgba(99,102,241,.28); font-weight:700; }
-        .ai-nav-item:hover:not(.active) { background:rgba(255,255,255,.06); color:rgba(255,255,255,.8); }
         .kpi-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:20px 22px; transition:all .2s; }
         .kpi-card:hover { border-color:rgba(99,102,241,.3); background:rgba(99,102,241,.06); }
         .q-pill { background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.22); color:#c7d2fe; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .2s; text-align:left; }
@@ -1233,21 +1230,19 @@ export default function AICommandCenter() {
         .insight-block h1,h2,h3 { color:inherit }
         .ctx-quick-btn { display:block; width:100%; padding:8px 12px; border-radius:9px; background:none; border:1px solid rgba(255,255,255,.07); color:rgba(255,255,255,.55); font-size:11.5px; font-weight:500; cursor:pointer; font-family:inherit; text-align:left; margin-bottom:5px; transition:all .15s; }
         .ctx-quick-btn:hover { background:rgba(99,102,241,.12); border-color:rgba(99,102,241,.3); color:white; }
+        .ai-tabs-bar::-webkit-scrollbar { display:none; }
+        .ai-tab-btn:hover { color:rgba(255,255,255,.8) !important; }
       `}</style>
 
-      {/* ══ LEFT SIDEBAR ═══════════════════════════════════════════════════ */}
-      <div style={{ width: 216, background: "rgba(255,255,255,.022)", borderRight: "1px solid rgba(255,255,255,.07)", display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
-
-        {/* Brand header */}
-        <div style={{ padding: "18px 14px 14px", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(99,102,241,.45)", fontSize: 18, flexShrink: 0 }}>🧠</div>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-.2px", lineHeight: 1.2 }}>FinovaOS AI</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginTop: 1 }}>{ctx?.company.name || "Loading..."}</div>
-            </div>
+      {/* ══ TOP HEADER ═══════════════════════════════════════════════════════ */}
+      <div style={{ padding: "10px 24px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, background: "rgba(255,255,255,.018)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(99,102,241,.45)", fontSize: 16, flexShrink: 0 }}>🧠</div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-.2px", lineHeight: 1.2 }}>FinovaOS AI</div>
+            <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 1 }}>{ctx?.company.name || "Loading..."}</div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10.5, fontWeight: 700, color: "#6ee7b7", background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.18)", borderRadius: 999, padding: "4px 10px", width: "fit-content" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 10.5, fontWeight: 700, color: "#6ee7b7", background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.18)", borderRadius: 999, padding: "4px 10px", marginLeft: 4 }}>
             <span style={{ position: "relative", width: 7, height: 7, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ position: "absolute", width: "100%", height: "100%", borderRadius: "50%", background: "#10b981", animation: "aiPing 1.6s ease infinite" }} />
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
@@ -1255,51 +1250,38 @@ export default function AICommandCenter() {
             Live · Connected
           </div>
         </div>
-
-        {/* Nav */}
-        <nav style={{ flex: 1, padding: "10px 8px", overflowY: "auto" }}>
-          {TABS.map(t => (
-            <button key={t.id} className={`ai-nav-item ${tab === t.id ? "active" : ""}`} onClick={() => handleTab(t.id)}>
-              <span style={{ fontSize: 15, flexShrink: 0, width: 20, textAlign: "center" }}>{t.icon}</span>
-              <span>{t.label}</span>
-            </button>
-          ))}
-        </nav>
-
-        {/* Bottom: mini health score */}
-        {ctx && (
-          <div style={{ padding: "12px 14px", borderTop: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 38, height: 38, borderRadius: "50%", background: `conic-gradient(${risk.color} ${score}%, rgba(255,255,255,.08) 0%)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#0b0d1a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900, color: risk.color }}>{score}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {ctx && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 12px", borderRadius: 999, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)" }}>
+              <div style={{ width: 26, height: 26, borderRadius: "50%", background: `conic-gradient(${risk.color} ${score}%, rgba(255,255,255,.08) 0%)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#0b0d1a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 900, color: risk.color }}>{score}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: risk.color, lineHeight: 1.2 }}>{risk.label} Risk</div>
+                <div style={{ fontSize: 9.5, color: "rgba(255,255,255,.3)" }}>{score}/100 health</div>
+              </div>
             </div>
-            <div>
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: risk.color }}>{risk.label} Risk</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)" }}>{score}/100 health</div>
-            </div>
-          </div>
-        )}
+          )}
+          <button onClick={() => handleTab("report")} style={{ padding: "7px 14px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5, boxShadow: "0 4px 12px rgba(99,102,241,.3)" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+            Monthly Report
+          </button>
+        </div>
       </div>
 
-      {/* ══ RIGHT: MAIN CONTENT ═════════════════════════════════════════════ */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {/* ══ HORIZONTAL TAB BAR ════════════════════════════════════════════════ */}
+      <div className="ai-tabs-bar" style={{ padding: "0 20px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(255,255,255,.01)" }}>
+        {TABS.map(t => (
+          <button key={t.id} className="ai-tab-btn" onClick={() => handleTab(t.id)} style={{ padding: "11px 13px", border: "none", borderBottom: tab === t.id ? "2px solid #6366f1" : "2px solid transparent", background: "none", color: tab === t.id ? "#c7d2fe" : "rgba(255,255,255,.38)", fontSize: 12, fontWeight: tab === t.id ? 700 : 500, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap", transition: "all .15s", display: "flex", alignItems: "center", gap: 5, flexShrink: 0, marginTop: 2 }}>
+            <span style={{ fontSize: 12 }}>{t.icon}</span>
+            <span>{t.label}</span>
+          </button>
+        ))}
+      </div>
 
-        {/* Top strip (non-chat tabs) */}
-        {tab !== "chat" && (
-          <div style={{ padding: "16px 24px 12px", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 18 }}>{TABS.find(t => t.id === tab)?.icon}</span>
-              <h1 style={{ margin: 0, fontSize: 17, fontWeight: 800 }}>{TABS.find(t => t.id === tab)?.label}</h1>
-            </div>
-            <button onClick={() => handleTab("report")} style={{ padding: "7px 16px", borderRadius: 9, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5, boxShadow: "0 4px 12px rgba(99,102,241,.3)" }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-              Monthly Report
-            </button>
-          </div>
-        )}
-
-        {/* ── Scrollable content area ── */}
-        <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
-          <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "auto", padding: tab === "chat" ? 0 : "24px 24px 60px" }}>
+      {/* ── Content area ── */}
+      <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
+        <div style={{ flex: 1, overflowY: tab === "chat" ? "hidden" : "auto", padding: tab === "chat" ? 0 : "24px 32px 60px" }}>
 
         {/* ══ OVERVIEW ════════════════════════════════════════════════════ */}
         {tab === "overview" && (
@@ -3804,7 +3786,6 @@ export default function AICommandCenter() {
           </div>
         )}
 
-          </div>
         </div>
       </div>
     </div>
