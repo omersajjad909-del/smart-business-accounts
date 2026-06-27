@@ -1117,8 +1117,8 @@ export default function DashboardLayout({
             >
               <NavLink href="/dashboard/invoices" pathname={pathname}>🧾 View All Invoices</NavLink>
               {/* ── Purchase Flow ── */}
-              {bizFeatures?.advancedPurchasing && hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_ORDER) && <NavLink href="/dashboard/purchase-order" pathname={pathname}>Purchase Order</NavLink>}
-              {bizFeatures?.advancedPurchasing && hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/grn" pathname={pathname}>GRN (Goods Receipt)</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_ORDER) && <NavLink href="/dashboard/purchase-order" pathname={pathname}>Purchase Order</NavLink>}
+              {hasPermission(currentUser, PERMISSIONS.VIEW_INVENTORY) && <NavLink href="/dashboard/grn" pathname={pathname}>GRN (Goods Receipt)</NavLink>}
               {hasPermission(currentUser, PERMISSIONS.CREATE_PURCHASE_INVOICE) && <NavLink href="/dashboard/purchase-invoice" pathname={pathname}>Purchase Invoice</NavLink>}
               {/* ── Sales Flow ── */}
               {hasPermission(currentUser, PERMISSIONS.CREATE_QUOTATION) && <NavLink href="/dashboard/quotation" pathname={pathname}>Quotation</NavLink>}
@@ -1936,7 +1936,7 @@ export default function DashboardLayout({
             >
               {hasDashboardFeature("TRADING_OVERVIEW") && <NavLink href="/dashboard/trading" pathname={pathname}>Trading Overview</NavLink>}
               {hasDashboardFeature("TRADING_ORDER_DESK") && <NavLink href="/dashboard/trading/order-desk" pathname={pathname}>Order Desk</NavLink>}
-              {hasDashboardFeature("TRADING_PROCUREMENT") && bizFeatures?.advancedPurchasing && <NavLink href="/dashboard/trading/procurement" pathname={pathname}>Procurement</NavLink>}
+              {hasDashboardFeature("TRADING_PROCUREMENT") && <NavLink href="/dashboard/trading/procurement" pathname={pathname}>Procurement</NavLink>}
               {hasDashboardFeature("TRADING_STOCK_CONTROL") && <NavLink href="/dashboard/trading/stock-control" pathname={pathname}>Stock Control</NavLink>}
               {hasDashboardFeature("TRADING_OUTSTANDINGS") && <NavLink href="/dashboard/trading/outstandings" pathname={pathname}>Outstandings</NavLink>}
               {hasDashboardFeature("TRADING_DISPATCH_BOARD") && <NavLink href="/dashboard/trading/dispatch-board" pathname={pathname}>Dispatch Board</NavLink>}
