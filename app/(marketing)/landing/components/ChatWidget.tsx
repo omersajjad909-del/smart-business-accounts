@@ -232,16 +232,6 @@ export default function ChatWidget() {
   useEffect(() => { if (open) setUnread(0); }, [open]);
 
   /* ── Start chat: show welcome immediately, no API call needed ── */
-  function startChat() {
-    if (!name.trim()) return;
-    setStep("chat");
-    const firstName = name.trim().split(" ")[0];
-    addMsg({
-      sender: "bot",
-      text: `Hi ${firstName}! 👋 I'm **FinovaOS AI Assistant**.\n\nAsk me anything about FinovaOS — accounting, invoicing, inventory, HR, payroll, banking, and more.\n\nHow can I help you today?`,
-      chips: WELCOME_CHIPS,
-    });
-  }
 
   /* ── Send message: one API call handles everything ── */
   async function sendMessage(override?: string) {
@@ -283,8 +273,7 @@ export default function ChatWidget() {
     if (!open) setUnread(u => u + 1);
   }
 
-  const handleKey      = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
-  const handleStartKey = (e: React.KeyboardEvent) => { if (e.key === "Enter") startChat(); };
+  const handleKey = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
 
   /* ── JSX ── */
   return (
