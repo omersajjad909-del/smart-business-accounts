@@ -190,9 +190,8 @@ function apiEscalate(conversationId: string) {
 /* ─── Widget component ───────────────────────────────────────────────────── */
 export default function ChatWidget() {
   const [open,      setOpen]      = useState(false);
-  const [step,      setStep]      = useState<"form" | "chat">("chat");
-  const [name,      setName]      = useState("Visitor");
-  const [email,     setEmail]     = useState("");
+  const [name]  = useState("Visitor");
+  const [email] = useState("");
   const [convId,    setConvId]    = useState<string | null>(null);
   const [messages,  setMessages]  = useState<Msg[]>([]);
   const [inputVal,  setInputVal]  = useState("");
@@ -368,45 +367,8 @@ export default function ChatWidget() {
             </div>
           </div>
 
-          {/* ── Intro form ── */}
-          {step === "form" && (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "28px 24px", gap: 16, overflowY: "auto" }}>
-              <div style={{ textAlign: "center", marginBottom: 4 }}>
-                <div style={{ fontSize: 36, marginBottom: 10 }}>👋</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "white", marginBottom: 6 }}>Welcome to FinovaOS!</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", lineHeight: 1.6 }}>Enter your name to chat with our AI assistant.</div>
-              </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 4 }}>
-                {["📄 Accounting", "📦 Inventory", "👥 HR & Payroll", "🏦 Banking", "📊 Reports", "🤝 CRM"].map(f => (
-                  <span key={f} style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.4)", padding: "4px 10px", borderRadius: 20, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)" }}>{f}</span>
-                ))}
-              </div>
-              <div>
-                <label style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.4)", letterSpacing: ".07em", textTransform: "uppercase", display: "block", marginBottom: 7 }}>Your Name *</label>
-                <input value={name} onChange={e => setName(e.target.value)} onKeyDown={handleStartKey} placeholder="e.g. Ali Raza"
-                  style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.05)", border: "1.5px solid rgba(255,255,255,.1)", color: "white", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
-                  onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.7)")}
-                  onBlur={e  => (e.target.style.borderColor = "rgba(255,255,255,.1)")} />
-              </div>
-              <div>
-                <label style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.4)", letterSpacing: ".07em", textTransform: "uppercase", display: "block", marginBottom: 7 }}>
-                  Email <span style={{ color: "rgba(255,255,255,.2)", fontWeight: 400, fontSize: 11 }}>(optional)</span>
-                </label>
-                <input value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleStartKey} placeholder="you@company.com" type="email"
-                  style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.05)", border: "1.5px solid rgba(255,255,255,.1)", color: "white", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
-                  onFocus={e => (e.target.style.borderColor = "rgba(129,140,248,.7)")}
-                  onBlur={e  => (e.target.style.borderColor = "rgba(255,255,255,.1)")} />
-              </div>
-              <button onClick={startChat} disabled={!name.trim()}
-                style={{ padding: "13px", borderRadius: 13, border: "none", cursor: name.trim() ? "pointer" : "not-allowed", background: name.trim() ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.05)", color: name.trim() ? "white" : "rgba(255,255,255,.25)", fontSize: 15, fontWeight: 700, fontFamily: "inherit", boxShadow: name.trim() ? "0 6px 20px rgba(99,102,241,.45)" : "none" }}>
-                Start Chat →
-              </button>
-              <p style={{ fontSize: 11, color: "rgba(255,255,255,.18)", textAlign: "center", margin: 0 }}>Powered by FinovaOS AI · Available 24/7</p>
-            </div>
-          )}
-
           {/* ── Chat messages ── */}
-          {step === "chat" && (
+          {(
             <>
               <div style={{ flex: 1, overflowY: "auto", padding: "14px 14px 8px", display: "flex", flexDirection: "column", gap: 10 }}>
                 {messages.map(msg => (
