@@ -1936,7 +1936,7 @@ export default function DashboardLayout({
             >
               {hasDashboardFeature("TRADING_OVERVIEW") && <NavLink href="/dashboard/trading" pathname={pathname}>Trading Overview</NavLink>}
               {hasDashboardFeature("TRADING_ORDER_DESK") && <NavLink href="/dashboard/trading/order-desk" pathname={pathname}>Order Desk</NavLink>}
-              {hasDashboardFeature("TRADING_PROCUREMENT") && <NavLink href="/dashboard/trading/procurement" pathname={pathname}>Procurement</NavLink>}
+              {hasDashboardFeature("TRADING_PROCUREMENT") && bizFeatures?.advancedPurchasing && <NavLink href="/dashboard/trading/procurement" pathname={pathname}>Procurement</NavLink>}
               {hasDashboardFeature("TRADING_STOCK_CONTROL") && <NavLink href="/dashboard/trading/stock-control" pathname={pathname}>Stock Control</NavLink>}
               {hasDashboardFeature("TRADING_OUTSTANDINGS") && <NavLink href="/dashboard/trading/outstandings" pathname={pathname}>Outstandings</NavLink>}
               {hasDashboardFeature("TRADING_DISPATCH_BOARD") && <NavLink href="/dashboard/trading/dispatch-board" pathname={pathname}>Dispatch Board</NavLink>}

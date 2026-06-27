@@ -18,11 +18,20 @@ import {
 } from "../_shared";
 
 export default function TradingProcurementPage() {
+  const [advancedPurchasing, setAdvancedPurchasing] = useState<boolean | null>(null);
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderLite[]>([]);
   const [purchaseInvoices, setPurchaseInvoices] = useState<PurchaseInvoiceLite[]>([]);
   const [grns, setGrns] = useState<GrnLite[]>([]);
 
   useEffect(() => {
+    fetch("/api/company/admin-control")
+      .then(r => r.ok ? r.json() : {})
+      .then(d => setAdvancedPurchasing(d?.features?.advancedPurchasing === true))
+      .catch(() => setAdvancedPurchasing(false));
+  }, []);
+
+  useEffect(() => {
+    if (!advancedPurchasing) return;
     fetchJson<TradingControlCenter>("/api/trading/control-center", {
       summary: {},
       quotations: [],
@@ -41,7 +50,7 @@ export default function TradingProcurementPage() {
       setPurchaseInvoices(result.purchaseInvoices || []);
       setGrns(result.grns || []);
     });
-  }, []);
+  }, [advancedPurchasing]);
 
   const pendingPos = useMemo(
     () => purchaseOrders.filter((entry) => String(entry.status || "").toUpperCase() === "PENDING"),
@@ -55,6 +64,40 @@ export default function TradingProcurementPage() {
     () => purchaseInvoices.reduce((sum, entry) => sum + Number(entry.total || 0), 0),
     [purchaseInvoices]
   );
+
+  if (advancedPurchasing === null) {
+    return (
+      <div style={{ padding: "28px 32px", fontFamily: tradingFont, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 32, height: 32, border: "3px solid rgba(99,102,241,.3)", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      </div>
+    );
+  }
+
+  if (!advancedPurchasing) {
+    return (
+      <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center", maxWidth: 480 }}>
+          <div style={{ width: 72, height: 72, borderRadius: 20, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+            <svg width="32" height="32" fill="none" stroke="#6366f1" strokeWidth="2" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Advanced Purchasing is Off</div>
+          <div style={{ fontSize: 14, color: tradingMuted, lineHeight: 1.7, marginBottom: 28 }}>
+            The full PO → GRN → Purchase Invoice workflow is a premium feature. Enable it from Business Features to start issuing purchase orders, logging goods receipts, and matching supplier invoices.
+          </div>
+          <a href="/dashboard/business-features" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 10, background: "#6366f1", color: "white", textDecoration: "none", fontSize: 14, fontWeight: 700 }}>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Enable in Business Features
+          </a>
+          <div style={{ marginTop: 16, fontSize: 12, color: tradingMuted }}>
+            Admin → Business Features → Advanced Purchasing (toggle ON)
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: "28px 32px", fontFamily: tradingFont, color: "var(--text-primary)", minHeight: "100vh" }}>
