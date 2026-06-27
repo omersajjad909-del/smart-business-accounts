@@ -190,8 +190,8 @@ function apiEscalate(conversationId: string) {
 /* ─── Widget component ───────────────────────────────────────────────────── */
 export default function ChatWidget() {
   const [open,      setOpen]      = useState(false);
-  const [step,      setStep]      = useState<"form" | "chat">("form");
-  const [name,      setName]      = useState("");
+  const [step,      setStep]      = useState<"form" | "chat">("chat");
+  const [name,      setName]      = useState("Visitor");
   const [email,     setEmail]     = useState("");
   const [convId,    setConvId]    = useState<string | null>(null);
   const [messages,  setMessages]  = useState<Msg[]>([]);
