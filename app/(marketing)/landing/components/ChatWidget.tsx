@@ -19,7 +19,7 @@ const KB: [RegExp, string][] = [
    "FinovaOS is a complete cloud Business OS for SMEs — all in one platform:\n\n• Accounting & double-entry bookkeeping\n• Sales & purchase invoicing\n• Inventory management\n• HR & Payroll\n• Banking & reconciliation\n• CRM & customer management\n• AI financial intelligence\n\nUsed by 12,000+ businesses. 🚀"],
 
   [/pric|plan|cost|kitna|starter|professional|enterprise|subscription|fee|charge/i,
-   "FinovaOS offers 4 plans:\n\n1. **Starter** — 5 users | Accounting + invoicing\n2. **Professional** — 25 users | + Inventory, HR, Banking, CRM\n3. **Enterprise** — Unlimited users | Full features + API + WhatsApp\n4. **Custom** — Pay only for modules you need\n\nContact: finovaos.app@gmail.com 💰"],
+   "FinovaOS ke 4 plans hain:\n\n1. **Starter** — 3 users | PKR 13,622/mo | Invoicing, ledger, basic reports\n2. **Professional** — 10 users | PKR 27,522/mo | + Inventory, HR & Payroll, Banking, CRM\n3. **Enterprise** — 25 users | PKR 69,222/mo | + API access, integrations, priority support\n4. **Custom** — Sirf woh modules jo chahiye, pay per module\n\n🔥 Launch offer: 75% off pehle 3 mahine!\nContact: finovaos.app@gmail.com 💰"],
 
   [/invoice|bill|billing|sales invoice|create invoice|banao invoice/i,
    "Creating a Sales Invoice:\n\n1. Dashboard → Sales Invoice → New Invoice\n2. Select customer & add items\n3. Set quantity, price & tax\n4. Save → Send PDF via email\n\nFeatures: PDF generation, email delivery, payment tracking. 📄"],
