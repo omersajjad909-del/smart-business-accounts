@@ -163,8 +163,12 @@ async function apiChat(
       signal: ctrl.signal,
     });
     clearTimeout(timer);
-    if (!res.ok) return { reply: "", conversationId };
+    if (!res.ok) {
+      console.error("[ChatWidget] server error:", res.status);
+      return { reply: "", conversationId };
+    }
     const data = await res.json();
+    console.log("[ChatWidget] source:", data?.source, "| convId:", data?.conversationId);
     return {
       reply:          String(data?.reply || "").trim(),
       conversationId: data?.conversationId ? String(data.conversationId) : conversationId,

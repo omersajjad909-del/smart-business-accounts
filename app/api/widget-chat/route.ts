@@ -131,7 +131,35 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ reply, conversationId: convId, source });
 }
 
-// Health check
-export async function GET() {
-  return NextResponse.json({ ok: true, service: "widget-chat" });
+// Health check + OpenAI connectivity test
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+
+  if (searchParams.get("test") === "openai") {
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ ok: false, reason: "OPENAI_API_KEY not set in environment" });
+    }
+    try {
+      const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const res = await client.chat.completions.create({
+        model:      process.env.OPENAI_MODEL || "gpt-4o-mini",
+        max_tokens: 10,
+        messages:   [{ role: "user", content: "Say: ok" }],
+      });
+      return NextResponse.json({
+        ok:    true,
+        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+        reply: res.choices[0]?.message?.content,
+      });
+    } catch (err) {
+      return NextResponse.json({ ok: false, error: String(err) });
+    }
+  }
+
+  return NextResponse.json({
+    ok:      true,
+    service: "widget-chat",
+    hasKey:  !!process.env.OPENAI_API_KEY,
+    model:   process.env.OPENAI_MODEL || "gpt-4o-mini",
+  });
 }
