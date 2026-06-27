@@ -84,41 +84,51 @@ export async function POST(req: NextRequest) {
   saveMessageSilently(convId, "customer", message);
 
   let reply = "";
+  let source = "kb";
 
   // 1. Try OpenAI first (real AI)
   if (process.env.OPENAI_API_KEY) {
     try {
       const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
       const res = await client.chat.completions.create({
-        model:      process.env.OPENAI_MODEL || "gpt-4.1-mini",
-        max_tokens: 350,
+        model:       process.env.OPENAI_MODEL || "gpt-4o-mini",
+        max_tokens:  350,
         temperature: 0.5,
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user",   content: message },
         ],
       });
-      reply = res.choices[0]?.message?.content?.trim() ?? "";
-    } catch { /* fall through */ }
+      reply  = res.choices[0]?.message?.content?.trim() ?? "";
+      source = "openai";
+    } catch (err) {
+      console.error("[widget-chat] OpenAI error:", err);
+    }
+  } else {
+    console.warn("[widget-chat] OPENAI_API_KEY not set");
   }
 
   // 2. Fallback: local keyword engine
   if (!reply) {
     try {
       const local = runChatEngine(message, []);
-      reply = local.reply;
-    } catch { /* fall through */ }
+      reply  = local.reply;
+      source = "local-engine";
+    } catch (err) {
+      console.error("[widget-chat] local engine error:", err);
+    }
   }
 
   // 3. Last resort
   if (!reply) {
-    reply = "FinovaOS is a complete cloud accounting & ERP platform. For details visit finovaos.app or contact finovaos.app@gmail.com 😊";
+    reply  = "FinovaOS is a complete cloud accounting & ERP platform. For details visit finovaos.app or contact finovaos.app@gmail.com 😊";
+    source = "fallback";
   }
 
   // Save bot reply (fire & forget)
   saveMessageSilently(convId, "bot", reply);
 
-  return NextResponse.json({ reply, conversationId: convId });
+  return NextResponse.json({ reply, conversationId: convId, source });
 }
 
 // Health check
