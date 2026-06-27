@@ -11,7 +11,7 @@ import {
 } from "recharts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
-type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor" | "reconciliation" | "scan" | "invoice-gen" | "inv-forecast" | "cashflow-opt" | "churn" | "supplier-intel" | "gl-suggest";
+type Tab = "overview" | "chat" | "insights" | "alerts" | "forecast" | "recommendations" | "reminders" | "tax" | "report" | "market" | "advisor" | "reconciliation" | "scan" | "invoice-gen" | "inv-forecast" | "cashflow-opt" | "churn" | "supplier-intel" | "gl-suggest" | "expense-cat" | "budget" | "duplicate" | "customer-profit" | "ratios";
 
 // ── Scan Receipt types
 interface ScannedItem { description: string; qty: number | null; unitPrice: number | null; amount: number }
@@ -604,6 +604,18 @@ export default function AICommandCenter() {
   const [glResult, setGlResult] = useState<GLSuggestResult | null>(null);
   const [glLoading, setGlLoading] = useState(false);
 
+  // ── 5 New AI feature states ─────────────────────────────────────────────
+  const [expenseCat, setExpenseCat] = useState("");
+  const [expenseCatLoading, setExpenseCatLoading] = useState(false);
+  const [budgetAnalysis, setBudgetAnalysis] = useState("");
+  const [budgetLoading, setBudgetLoading] = useState(false);
+  const [duplicateResult, setDuplicateResult] = useState("");
+  const [duplicateLoading, setDuplicateLoading] = useState(false);
+  const [customerProfit, setCustomerProfit] = useState("");
+  const [customerProfitLoading, setCustomerProfitLoading] = useState(false);
+  const [ratiosResult, setRatiosResult] = useState("");
+  const [ratiosLoading, setRatiosLoading] = useState(false);
+
   // Chat state
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
@@ -933,6 +945,70 @@ export default function AICommandCenter() {
       const data = await res.json() as GLSuggestResult;
       setGlResult(data);
     } catch { /* silent */ } finally { setGlLoading(false); }
+  }
+
+  // ── Generic streaming AI helper for the 5 new features ─────────────────
+  async function runAIAnalysis(prompt: string, setResult: (s: string) => void, setLoading: (b: boolean) => void) {
+    setLoading(true);
+    setResult("");
+    try {
+      const res = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { ...getHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ message: prompt, history: [] }),
+      });
+      if (!res.ok || !res.body) throw new Error("api");
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let text = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        text += dec.decode(value, { stream: true });
+        setResult(text);
+      }
+    } catch { setResult("⚠️ Analysis failed. Please try again."); }
+    finally { setLoading(false); }
+  }
+
+  function handleExpenseCat() {
+    const data = ctx ? `Revenue: ${ctx.revenue.thisMonth}, Expenses: ${ctx.expenses.thisMonth}, Top expenses: ${ctx.topExpenses.map(e => `${e.category} (${e.amount})`).join(", ")}, Currency: ${ctx.company.currency}` : "No data loaded";
+    runAIAnalysis(
+      `You are a financial analyst. Using this business data: ${data}. Perform a detailed EXPENSE CATEGORIZATION analysis:\n1. Group all expenses into categories: Operations, HR/Salaries, Marketing, IT/Technology, Finance Charges, Logistics, Miscellaneous\n2. Show estimated percentage breakdown for each category\n3. Calculate monthly vs annual impact\n4. Identify top 3 categories to optimize\n5. Give concrete cost-cutting recommendations with expected savings\n6. Flag any unusually high spending areas\nUse clear headings and bullet points. Be specific with numbers.`,
+      setExpenseCat, setExpenseCatLoading
+    );
+  }
+
+  function handleBudgetAnalysis() {
+    const data = ctx ? `Revenue this month: ${ctx.revenue.thisMonth}, Last month: ${ctx.revenue.lastMonth}, This year: ${ctx.revenue.thisYear}, Expenses: ${ctx.expenses.thisMonth}, Last month expenses: ${ctx.expenses.lastMonth}, Profit: ${ctx.profit.thisMonth}, Currency: ${ctx.company.currency}` : "No data";
+    runAIAnalysis(
+      `You are a CFO-level financial advisor. Using this data: ${data}. Create a BUDGETING & VARIANCE ANALYSIS:\n1. Suggest realistic monthly budget targets for Revenue, COGS, Operating Expenses, Net Profit\n2. Show variance between actual vs suggested budget (% over/under)\n3. Identify months where performance was above/below budget\n4. Create a quarterly budget roadmap\n5. Give 5 specific actions to stay within budget\n6. Forecast next month budget based on trend\nUse tables where helpful. Be precise with numbers and percentages.`,
+      setBudgetAnalysis, setBudgetLoading
+    );
+  }
+
+  function handleDuplicateDetection() {
+    const data = ctx ? `Recent invoices: ${ctx.recentInvoices.map(i => `${i.ref} - ${i.customer} - ${i.amount}`).join("; ")}, Top customers: ${ctx.topCustomers.map(c => `${c.name}: ${c.amount}`).join(", ")}, Currency: ${ctx.company.currency}` : "No data";
+    runAIAnalysis(
+      `You are a fraud detection and audit expert. Using this business data: ${data}. Perform DUPLICATE & ANOMALY DETECTION analysis:\n1. Identify any potentially duplicate invoice patterns or suspicious repetitions\n2. Flag transactions that appear anomalous (unusual amounts, timing, or frequency)\n3. Check for round-number transactions that may indicate estimation rather than actual billing\n4. Identify customers with irregular payment patterns\n5. List specific invoice references that need manual review\n6. Recommend internal controls to prevent duplicate payments\n7. Give a risk score (Low/Medium/High) for current transaction integrity\nBe specific about what to investigate and why.`,
+      setDuplicateResult, setDuplicateLoading
+    );
+  }
+
+  function handleCustomerProfit() {
+    const data = ctx ? `Top customers: ${ctx.topCustomers.map(c => `${c.name}: ${c.amount}`).join(", ")}, Payment history: ${ctx.customerPaymentHistory.map(c => `${c.name} avg ${c.avgDaysToPay} days to pay, ${c.overdueCount} overdue`).join("; ")}, Total revenue: ${ctx.revenue.thisYear}, Currency: ${ctx.company.currency}` : "No data";
+    runAIAnalysis(
+      `You are a customer analytics expert. Using this data: ${data}. Perform a CUSTOMER PROFITABILITY ANALYSIS:\n1. Rank customers by revenue contribution with percentage of total\n2. Estimate profitability per customer (factoring in payment delays as cost)\n3. Identify "platinum", "gold", "silver", "at-risk" customer segments\n4. Calculate customer lifetime value (CLV) estimates\n5. Flag customers costing more to serve (slow payers, frequent returns)\n6. Recommend which customers to prioritize, nurture, or review pricing for\n7. Suggest upsell/cross-sell opportunities for top customers\nProvide actionable insights with specific customer names and numbers.`,
+      setCustomerProfit, setCustomerProfitLoading
+    );
+  }
+
+  function handleRatioAnalysis() {
+    const data = ctx ? `Revenue: ${ctx.revenue.thisMonth}, Expenses: ${ctx.expenses.thisMonth}, Profit: ${ctx.profit.thisMonth}, Receivables: ${ctx.receivables.total}, Payables: ${ctx.payables.total}, Cash: ${ctx.cashPosition}, Stock value: ${ctx.inventory.stockValue}, Currency: ${ctx.company.currency}` : "No data";
+    runAIAnalysis(
+      `You are a financial analyst specializing in ratio analysis. Using this data: ${data}. Calculate and interpret KEY FINANCIAL RATIOS:\n\n1. PROFITABILITY RATIOS:\n   - Gross Profit Margin, Net Profit Margin, Operating Margin\n\n2. LIQUIDITY RATIOS:\n   - Current Ratio, Quick Ratio, Cash Ratio\n\n3. EFFICIENCY RATIOS:\n   - Receivables Turnover, Days Sales Outstanding (DSO)\n   - Payables Turnover, Days Payable Outstanding (DPO)\n\n4. LEVERAGE/RISK RATIOS:\n   - Debt-to-Equity, Interest Coverage\n\n5. WORKING CAPITAL RATIOS:\n   - Working Capital, Working Capital Ratio\n\nFor each ratio: show the formula, calculated value, industry benchmark, and interpretation (Good/Warning/Critical). Give a final FINANCIAL HEALTH VERDICT with top 3 areas for improvement.`,
+      setRatiosResult, setRatiosLoading
+    );
   }
 
   async function handleScanReceipt() {
