@@ -33,7 +33,10 @@ const KB: [RegExp, string][] = [
   [/bank|reconcil|payment|voucher|cpv|crv|journal|jv/i,
    "Banking & Payments:\n\n• Multiple bank accounts\n• Bank reconciliation\n• Payment receipts (CRV)\n• Cash payment vouchers (CPV)\n• Journal vouchers (JV)\n• Bulk payments\n\nDashboard → Banking 🏦"],
 
-  [/report|trial balance|p&l|profit.loss|balance sheet|ledger|hisab|tax report/i,
+  [/\b(terms|privacy|policy|data.?protection|gdpr|refund|cancel|cancell|contract|shart|conditions|legal|agreement|money.?back)\b/i,
+   "FinovaOS Terms & Privacy:\n\n• Data Protection: 256-bit bank-grade encryption, stored on AWS (SOC 2 Type II)\n• Data Ownership: Your data belongs to you — FinovaOS never sells or shares it\n• GDPR Compliant: Access, modify, or delete your data anytime\n• Terms of Service: Subscription-based, cancel anytime, no long-term contracts\n• Money-back Guarantee: 14-day full refund if not satisfied\n• Daily automated backups, data recovery on request\n• Privacy Policy: finovaos.app/privacy\n• Full Terms: finovaos.app/terms\n\nKoi specific sawal hai? 😊"],
+
+  [/trial[\s-]?balance|p&?l\b|profit[\s-]?loss|balance[\s-]?sheet|ledger|hisab|tax[\s-]?report|cash[\s-]?flow|aging[\s-]?report|financial[\s-]?report|reports?\s+(section|page|kahan|dikhao|dekhna|banana|export)/i,
    "Financial Reports:\n\n• Profit & Loss (P&L)\n• Balance Sheet\n• Cash Flow Statement\n• Trial Balance\n• Tax Summary\n• Aging reports (receivable & payable)\n• Export to PDF, Excel, CSV\n\nDashboard → Reports 📊"],
 
   [/crm|customer|client|lead|pipeline/i,
@@ -97,7 +100,7 @@ function detectTopic(text: string): string | null {
   if (/inventor|stock|warehouse/.test(t))      return "inventory";
   if (/hr|payroll|salary|leave/.test(t))       return "hr";
   if (/bank|reconcil|voucher/.test(t))         return "banking";
-  if (/report|p&l|balance|cash flow/.test(t))  return "reports";
+  if (/trial.?balance|p&l|profit.loss|balance.?sheet|cash.?flow|financial.?report/.test(t)) return "reports";
   if (/ai|forecast|insight/.test(t))           return "ai";
   return null;
 }
