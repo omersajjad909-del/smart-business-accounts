@@ -53,8 +53,6 @@ export async function GET(req: NextRequest) {
       const movement = movMap[acc.id] ?? 0;
       const closing  = opening + movement;
 
-      if (Math.abs(closing) < 0.0001) continue;
-
       const type  = (acc.type      || "").toUpperCase();
       const party = (acc.partyType || "").toUpperCase();
 
@@ -64,20 +62,41 @@ export async function GET(req: NextRequest) {
       const isIncome    = type === "INCOME" || type === "REVENUE";
       const isExpense   = type === "EXPENSE" || type === "COST";
 
+      // Income/expense accounts: use only voucher movements (not opening balance).
+      // These accounts don't carry forward — they're closed to retained earnings each period.
+      if (isIncome) {
+        if (Math.abs(movement) > 0.0001) incomeTotal -= movement; // credit entries are negative → income
+        continue;
+      }
+      if (isExpense) {
+        if (Math.abs(movement) > 0.0001) expenseTotal += movement; // debit entries are positive → cost
+        continue;
+      }
+
+      if (Math.abs(closing) < 0.0001) continue;
+
       if (isAsset) {
         if (closing > 0) {
           assetsList.push({ name: acc.name, amount: closing });
+          totalAssets += closing;
         } else {
-          // Contra asset (e.g. accumulated depreciation) — deduction in assets section
-          assetsList.push({ name: `Less: ${acc.name}`, amount: closing });
+          // Customer with credit balance = advance/overpayment received → show as liability
+          const val = Math.abs(closing);
+          liabilitiesList.push({ name: `Advance: ${acc.name}`, amount: val });
+          totalLiabilities += val;
         }
-        totalAssets += closing;
       }
 
-      if (isLiability && closing < 0) {
-        const val = Math.abs(closing);
-        liabilitiesList.push({ name: acc.name, amount: val });
-        totalLiabilities += val;
+      if (isLiability) {
+        if (closing < 0) {
+          const val = Math.abs(closing);
+          liabilitiesList.push({ name: acc.name, amount: val });
+          totalLiabilities += val;
+        } else if (closing > 0) {
+          // Supplier with debit balance = advance paid to supplier → show as asset
+          assetsList.push({ name: `Advance to: ${acc.name}`, amount: closing });
+          totalAssets += closing;
+        }
       }
 
       if (isEquity && closing < 0) {
@@ -85,11 +104,6 @@ export async function GET(req: NextRequest) {
         equityList.push({ name: acc.name, amount: val });
         totalEquityAccounts += val;
       }
-
-      // Income: credit balance (negative closing) = revenue earned
-      if (isIncome)  incomeTotal  += -closing;
-      // Expense: debit balance (positive closing) = costs incurred
-      if (isExpense) expenseTotal += closing;
     }
 
     const netProfit   = incomeTotal - expenseTotal;
