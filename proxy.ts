@@ -87,6 +87,11 @@ export function proxy(req: NextRequest) {
     "/api/invitations/preview",
     "/api/public/",
     "/api/dev/",
+    // Marketing website chatbot — no auth needed
+    "/api/widget-chat",
+    "/api/chat/conversations",
+    "/api/chat/messages",
+    "/api/chat/escalate",
   ];
   const isApi = pathname.startsWith("/api/");
   const isPublic = publicApi.some((p) => pathname.startsWith(p));
