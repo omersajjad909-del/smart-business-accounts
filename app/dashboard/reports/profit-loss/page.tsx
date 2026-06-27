@@ -261,7 +261,7 @@ export default function ProfitLossPage() {
                 ═══════════════════════════════════ */}
 
                 {/* 1. REVENUE */}
-                <Section title="Revenue — آمدنی" color="#60a5fa" icon="💰">
+                <Section title="Revenue" color="#60a5fa" icon="💰">
                   <PLRow label="Gross Sales" amount={r.grossSales} />
                   {r.salesReturns  > 0 && <PLRow label="— Sales Returns"   amount={r.salesReturns}   variant="deduct" indent />}
                   {r.salesDiscounts > 0 && <PLRow label="— Sales Discounts" amount={r.salesDiscounts}  variant="deduct" indent />}
@@ -280,10 +280,10 @@ export default function ProfitLossPage() {
                 </Section>
 
                 {/* GROSS PROFIT */}
-                <ResultBar label="GROSS PROFIT — مجموعی منافع" amount={r.grossProfit} margin={r.grossMarginPct} color={isGP ? "#34d399" : "#f87171"} />
+                <ResultBar label="GROSS PROFIT" amount={r.grossProfit} margin={r.grossMarginPct} color={isGP ? "#34d399" : "#f87171"} />
 
                 {/* 3. OPERATING EXPENSES */}
-                <Section title="Operating Expenses — آپریٹنگ اخراجات" color="#f87171" icon="⚙️">
+                <Section title="Operating Expenses" color="#f87171" icon="⚙️">
                   {r.operatingExpenses.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "16px 0", color: "rgba(255,255,255,.25)", fontSize: 13 }}>No operating expenses recorded in this period</div>
                   ) : r.operatingExpenses.map((e, i) => (
@@ -297,7 +297,7 @@ export default function ProfitLossPage() {
 
                 {/* 4. OTHER INCOME / FINANCE COSTS */}
                 {(r.otherIncome.length > 0 || r.financeExpenses.length > 0) && (
-                  <Section title="Other Income & Finance Costs — غیر آپریٹنگ" color="#fbbf24" icon="🏦">
+                  <Section title="Other Income & Finance Costs" color="#fbbf24" icon="🏦">
                     {r.otherIncome.length > 0 && (
                       <>
                         <div style={{ fontSize: 10, fontWeight: 700, color: "#34d399", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 4 }}>Other Income</div>
