@@ -630,6 +630,7 @@ export default function AICommandCenter() {
       "overview", "chat", "insights", "alerts", "forecast",
       "recommendations", "reminders", "tax", "report", "market", "advisor", "reconciliation",
       "scan", "invoice-gen", "inv-forecast", "cashflow-opt", "churn", "supplier-intel", "gl-suggest",
+      "expense-cat", "budget", "duplicate", "customer-profit", "ratios",
     ]);
     if (nextTab && allowedTabs.has(nextTab as Tab)) {
       setTab(nextTab as Tab);
@@ -1207,6 +1208,11 @@ export default function AICommandCenter() {
     { id: "churn",            label: "Churn Prediction",                                      icon: "👥" },
     { id: "supplier-intel",   label: "Supplier Intel",                                        icon: "🤝" },
     { id: "gl-suggest",       label: "GL Auto-Code",                                          icon: "🏷️" },
+    { id: "expense-cat",      label: "Expense Categories",                                    icon: "📂" },
+    { id: "budget",           label: "Budget & Variance",                                     icon: "📊" },
+    { id: "duplicate",        label: "Duplicate Detection",                                   icon: "🔍" },
+    { id: "customer-profit",  label: "Customer Profitability",                                icon: "👤" },
+    { id: "ratios",           label: "Financial Ratios",                                      icon: "⚖️" },
   ];
 
   return (
@@ -3577,6 +3583,222 @@ export default function AICommandCenter() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── EXPENSE CATEGORIZATION TAB ──────────────────────────────────── */}
+        {tab === "expense-cat" && (
+          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#f59e0b,#d97706)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📂</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>Expense Categorization</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI groups your expenses into categories and highlights where to cut costs</div>
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
+                {[
+                  { label: "This Month Expenses", value: ctx ? `${ctx.company.currency} ${Number(ctx.expenses.thisMonth).toLocaleString()}` : "—", color: "#ef4444" },
+                  { label: "Top Expense", value: ctx?.topExpenses?.[0]?.category || "—", color: "#f59e0b" },
+                  { label: "Expense Categories", value: ctx?.topExpenses?.length ? `${ctx.topExpenses.length} detected` : "—", color: "#a78bfa" },
+                ].map(card => (
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={handleExpenseCat} disabled={expenseCatLoading}
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: expenseCatLoading ? "not-allowed" : "pointer", background: expenseCatLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#f59e0b,#d97706)", color: expenseCatLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                {expenseCatLoading ? "🔄 Analyzing expenses..." : "📂 Run Expense Categorization"}
+              </button>
+            </div>
+            {expenseCatLoading && (
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+                <div style={{ width: 20, height: 20, border: "2px solid rgba(245,158,11,.3)", borderTopColor: "#f59e0b", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
+                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is analyzing your expense patterns...</span>
+              </div>
+            )}
+            {expenseCat && !expenseCatLoading && (
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Categorization Report</div>
+                {renderMarkdown(expenseCat)}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── BUDGET & VARIANCE TAB ───────────────────────────────────────── */}
+        {tab === "budget" && (
+          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📊</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>Budget & Variance Analysis</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI suggests realistic budget targets and shows where you&apos;re over or under plan</div>
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
+                {[
+                  { label: "Revenue This Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.thisMonth).toLocaleString()}` : "—", color: "#10b981" },
+                  { label: "Revenue Last Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.lastMonth).toLocaleString()}` : "—", color: "#34d399" },
+                  { label: "Net Profit This Month", value: ctx ? `${ctx.company.currency} ${Number(ctx.profit.thisMonth).toLocaleString()}` : "—", color: "#a78bfa" },
+                ].map(card => (
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={handleBudgetAnalysis} disabled={budgetLoading}
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: budgetLoading ? "not-allowed" : "pointer", background: budgetLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#10b981,#059669)", color: budgetLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                {budgetLoading ? "🔄 Building budget plan..." : "📊 Generate Budget & Variance Report"}
+              </button>
+            </div>
+            {budgetLoading && (
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+                <div style={{ width: 20, height: 20, border: "2px solid rgba(16,185,129,.3)", borderTopColor: "#10b981", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
+                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is building your budget roadmap...</span>
+              </div>
+            )}
+            {budgetAnalysis && !budgetLoading && (
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Budget Plan & Variance</div>
+                {renderMarkdown(budgetAnalysis)}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── DUPLICATE DETECTION TAB ─────────────────────────────────────── */}
+        {tab === "duplicate" && (
+          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#ef4444,#b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🔍</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>Duplicate & Anomaly Detection</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI scans for duplicate invoices, suspicious patterns, and internal control gaps</div>
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
+                {[
+                  { label: "Recent Invoices Scanned", value: ctx?.recentInvoices?.length ? `${ctx.recentInvoices.length} invoices` : "—", color: "#ef4444" },
+                  { label: "Top Customer", value: ctx?.topCustomers?.[0]?.name || "—", color: "#f59e0b" },
+                  { label: "Overdue Count", value: ctx?.receivables?.overdueCount != null ? `${ctx.receivables.overdueCount} overdue` : "—", color: "#f87171" },
+                ].map(card => (
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={handleDuplicateDetection} disabled={duplicateLoading}
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: duplicateLoading ? "not-allowed" : "pointer", background: duplicateLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#ef4444,#b91c1c)", color: duplicateLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                {duplicateLoading ? "🔄 Scanning for anomalies..." : "🔍 Scan for Duplicates & Anomalies"}
+              </button>
+            </div>
+            {duplicateLoading && (
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+                <div style={{ width: 20, height: 20, border: "2px solid rgba(239,68,68,.3)", borderTopColor: "#ef4444", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
+                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is reviewing your transaction history...</span>
+              </div>
+            )}
+            {duplicateResult && !duplicateLoading && (
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Audit & Anomaly Report</div>
+                {renderMarkdown(duplicateResult)}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── CUSTOMER PROFITABILITY TAB ──────────────────────────────────── */}
+        {tab === "customer-profit" && (
+          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#38bdf8,#0284c7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>👤</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>Customer Profitability</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>AI ranks customers by revenue, payment behaviour, and estimated CLV</div>
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
+                {[
+                  { label: "Total Customers", value: ctx?.topCustomers?.length ? `${ctx.topCustomers.length} tracked` : "—", color: "#38bdf8" },
+                  { label: "Top Customer Revenue", value: ctx?.topCustomers?.[0] ? `${ctx.company?.currency} ${Number(ctx.topCustomers[0].amount).toLocaleString()}` : "—", color: "#34d399" },
+                  { label: "Total Receivables", value: ctx ? `${ctx.company.currency} ${Number(ctx.receivables.total).toLocaleString()}` : "—", color: "#f59e0b" },
+                ].map(card => (
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: card.color }}>{card.value}</div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={handleCustomerProfit} disabled={customerProfitLoading}
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: customerProfitLoading ? "not-allowed" : "pointer", background: customerProfitLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#38bdf8,#0284c7)", color: customerProfitLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                {customerProfitLoading ? "🔄 Ranking customers..." : "👤 Analyze Customer Profitability"}
+              </button>
+            </div>
+            {customerProfitLoading && (
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+                <div style={{ width: 20, height: 20, border: "2px solid rgba(56,189,248,.3)", borderTopColor: "#38bdf8", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
+                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is analysing customer value and CLV...</span>
+              </div>
+            )}
+            {customerProfit && !customerProfitLoading && (
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Customer Profitability Report</div>
+                {renderMarkdown(customerProfit)}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── FINANCIAL RATIOS TAB ────────────────────────────────────────── */}
+        {tab === "ratios" && (
+          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: "linear-gradient(135deg,#a78bfa,#7c3aed)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>⚖️</div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800 }}>Financial Ratio Analysis</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Full profitability, liquidity, efficiency, and leverage ratios with benchmarks</div>
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: "24px 26px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 18 }}>
+                {[
+                  { label: "Revenue", value: ctx ? `${ctx.company.currency} ${Number(ctx.revenue.thisMonth).toLocaleString()}` : "—", color: "#10b981" },
+                  { label: "Profit", value: ctx ? `${ctx.company.currency} ${Number(ctx.profit.thisMonth).toLocaleString()}` : "—", color: "#a78bfa" },
+                  { label: "Receivables", value: ctx ? `${ctx.company.currency} ${Number(ctx.receivables.total).toLocaleString()}` : "—", color: "#f59e0b" },
+                  { label: "Cash Position", value: ctx ? `${ctx.company.currency} ${Number(ctx.cashPosition).toLocaleString()}` : "—", color: "#38bdf8" },
+                ].map(card => (
+                  <div key={card.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,.4)", marginBottom: 6 }}>{card.label}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: card.color }}>{card.value}</div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={handleRatioAnalysis} disabled={ratiosLoading}
+                style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: ratiosLoading ? "not-allowed" : "pointer", background: ratiosLoading ? "rgba(255,255,255,.07)" : "linear-gradient(135deg,#a78bfa,#7c3aed)", color: ratiosLoading ? "rgba(255,255,255,.3)" : "white", fontSize: 14, fontWeight: 700, fontFamily: "inherit", transition: "all .2s" }}>
+                {ratiosLoading ? "🔄 Calculating ratios..." : "⚖️ Run Full Ratio Analysis"}
+              </button>
+            </div>
+            {ratiosLoading && (
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 24px", background: "rgba(255,255,255,.03)", borderRadius: 14, border: "1px solid rgba(255,255,255,.07)" }}>
+                <div style={{ width: 20, height: 20, border: "2px solid rgba(167,139,250,.3)", borderTopColor: "#a78bfa", borderRadius: "50%", animation: "spin .8s linear infinite", flexShrink: 0 }} />
+                <span style={{ color: "rgba(255,255,255,.5)", fontSize: 13 }}>AI is computing your financial ratios...</span>
+              </div>
+            )}
+            {ratiosResult && !ratiosLoading && (
+              <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "20px 22px" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>Financial Ratios Report</div>
+                {renderMarkdown(ratiosResult)}
               </div>
             )}
           </div>
