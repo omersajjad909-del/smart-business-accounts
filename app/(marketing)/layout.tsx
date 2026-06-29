@@ -25,9 +25,13 @@ export const metadata: Metadata = {
     "Karachi accounting software", "Lahore business software", "online accounting Pakistan",
     // UAE/Gulf
     "accounting software UAE", "cloud accounting Dubai", "SME software Dubai",
+    // AI
+    "AI accounting software", "AI business intelligence", "smart accounting software",
+    "AI ERP Pakistan", "business health score", "AI financial insights",
     // Features
     "invoicing software", "inventory management", "HR payroll software", "bank reconciliation",
     "CRM software", "financial management", "GST invoicing", "FBR compliant",
+    "ERP software Pakistan", "cloud ERP",
     // Brand
     "FinovaOS", "FinovaOS accounting",
   ],

@@ -18,8 +18,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/about`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${BASE}/contact`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${BASE}/careers`,           lastModified: now, changeFrequency: "weekly" as const,  priority: 0.7 },
-    { url: `${BASE}/roles`,             lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6 },
-    { url: `${BASE}/culture`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
     // Resources
     { url: `${BASE}/blog`,              lastModified: now, changeFrequency: "daily" as const,   priority: 0.8 },
     { url: `${BASE}/changelog`,         lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6 },
@@ -43,14 +41,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/case-studies`,      lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
   ];
 
-  // Additional high-priority pages
+  // Additional pages
   const extraPages = [
     { url: `${BASE}/get-started`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/updates`,            lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6  },
-    { url: `${BASE}/support`,            lastModified: now, changeFrequency: "monthly" as const, priority: 0.55 },
+    { url: `${BASE}/support`,            lastModified: now, changeFrequency: "monthly" as const, priority: 0.65 },
     { url: `${BASE}/developers/api`,     lastModified: now, changeFrequency: "monthly" as const, priority: 0.6  },
-    { url: `${BASE}/roles`,              lastModified: now, changeFrequency: "weekly" as const,  priority: 0.6  },
-    { url: `${BASE}/culture`,            lastModified: now, changeFrequency: "monthly" as const, priority: 0.55 },
+    { url: `${BASE}/docs`,               lastModified: now, changeFrequency: "weekly" as const,  priority: 0.65 },
+    { url: `${BASE}/features/accounting`,lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/invoicing`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/inventory`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/hr-payroll`,lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/ai`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
   ];
 
   // Blog articles — only add real published slugs here

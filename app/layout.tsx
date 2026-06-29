@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     creator: "@finova_io",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
-      "Cloud accounting software for modern SMEs. Used by 12,000+ businesses worldwide.",
+      "AI-powered cloud accounting for SMEs. Trusted by 500+ businesses in Pakistan, UAE & beyond.",
     images: [`${BASE_URL}${BRAND_ICON_PATH}`],
   },
   applicationName: "FinovaOS",
@@ -124,14 +124,9 @@ const softwareApplicationJsonLd = {
     priceCurrency: "USD",
     offerCount: "3",
   },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.8",
-    reviewCount: "2400",
-    bestRating: "5",
-    worstRating: "1",
-  },
   featureList: [
+    "AI Business Health Score",
+    "Ask AI — Natural Language Finance Queries",
     "Sales & Purchase Invoicing",
     "General Ledger & Trial Balance",
     "Inventory Management",
@@ -140,6 +135,8 @@ const softwareApplicationJsonLd = {
     "CRM",
     "Multi-Currency",
     "Financial Reports",
+    "Expense Auto-Categorization",
+    "Duplicate Transaction Detection",
   ],
 };
 

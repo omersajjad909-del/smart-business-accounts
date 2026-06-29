@@ -154,10 +154,18 @@ const JSON_LD = {
         },
         {
           "@type": "Question",
-          "name": "Is there a free plan available?",
+          "name": "Does FinovaOS have AI features?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. FinovaOS offers a free Starter plan for small businesses. You can upgrade to Pro or Enterprise as your business grows — no credit card required to get started.",
+            "text": "Yes. FinovaOS includes built-in AI Intelligence: a real-time Business Health Score, Ask AI for natural language finance queries, expense auto-categorization, duplicate transaction detection, budget variance analysis, and smart anomaly alerts — all powered by your live financial data.",
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "What is the pricing for FinovaOS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FinovaOS offers three plans: Starter ($49/mo), Professional ($99/mo), and Enterprise ($249/mo). A launch offer gives 75% off for the first 3 months on any plan. All plans include accounting, invoicing, inventory, and AI intelligence — no hidden add-ons.",
           },
         },
       ],
