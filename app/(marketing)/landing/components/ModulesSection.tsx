@@ -123,6 +123,21 @@ const CATEGORIES = [
       "Import Wizard (Excel/CSV)",
     ],
   },
+  {
+    label: "AI Intelligence",
+    icon: "🤖",
+    color: "#8b5cf6",
+    modules: [
+      "Business Health Score",
+      "Ask AI (Natural Language)",
+      "Expense Auto-Categorization",
+      "Budget Variance Analysis",
+      "Duplicate Transaction Detection",
+      "Customer Profitability Insights",
+      "Financial Ratio Analysis",
+      "Smart Alerts & Anomaly Detection",
+    ],
+  },
 ];
 
 export default function ModulesSection() {
@@ -177,7 +192,7 @@ export default function ModulesSection() {
             </span>
           </h2>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,.4)", lineHeight: 1.8, maxWidth: 520, margin: "0 auto" }}>
-            Unlike competitors that charge extra for each module, FinovaOS gives you everything — accounting, inventory, HR, CRM, banking, and reports — all in one subscription.
+            Unlike competitors that charge extra for each module, FinovaOS gives you everything — accounting, inventory, HR, CRM, banking, AI intelligence, and reports — all in one subscription.
           </p>
         </div>
 
