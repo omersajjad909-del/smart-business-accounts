@@ -66,7 +66,7 @@ const CATEGORIES = [
     desc: "First setup, company profile, onboarding walkthrough, and initial configuration.",
     count: "Browse →",
     color: "#6366f1",
-    href: "/help",
+    href: "/help/getting-started",
   },
   {
     icon: "💳",
@@ -74,7 +74,7 @@ const CATEGORIES = [
     desc: "Subscription management, plan upgrades, invoices, payment methods, and refunds.",
     count: "Browse →",
     color: "#10b981",
-    href: "/help",
+    href: "/pricing",
   },
   {
     icon: "🔧",
@@ -82,7 +82,7 @@ const CATEGORIES = [
     desc: "Error messages, performance, login issues, and platform troubleshooting steps.",
     count: "Browse →",
     color: "#f59e0b",
-    href: "/help",
+    href: "/support/ticket",
   },
   {
     icon: "🔗",
@@ -90,7 +90,7 @@ const CATEGORIES = [
     desc: "Bank connections, data import from Excel/CSV, third-party integrations, and APIs.",
     count: "Browse →",
     color: "#06b6d4",
-    href: "/help",
+    href: "/help/bank-reconciliation",
   },
   {
     icon: "🔒",
@@ -98,7 +98,7 @@ const CATEGORIES = [
     desc: "Encryption, backup policy, user permissions, compliance practices, and access logs.",
     count: "Browse →",
     color: "#a78bfa",
-    href: "/help",
+    href: "/trust",
   },
   {
     icon: "💡",
@@ -641,8 +641,8 @@ export default function SupportPage() {
                     Helpful Resources
                   </div>
                   {[
-                    { label: "Getting Started Guide", icon: "🚀", href: "/help" },
-                    { label: "Data Import Guide", icon: "📥", href: "/help" },
+                    { label: "Getting Started Guide", icon: "🚀", href: "/help/getting-started" },
+                    { label: "Data Import Guide", icon: "📥", href: "/help/bank-reconciliation" },
                     { label: "Changelog & Updates", icon: "📋", href: "/changelog" },
                     { label: "Submit a Support Ticket", icon: "🎫", href: "/support/ticket" },
                   ].map(({ label, icon, href }) => (
