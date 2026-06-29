@@ -332,23 +332,22 @@ export default function PricingSection() {
   // Auto-detect currency from location
   useEffect(() => {
     const stored = getStoredCurrencyPreference();
-    // Geo first, stored as fallback
-    fetch("/api/public/geo", { cache: "no-store" })
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (d?.currency && FX_USD[d.currency]) {
-          setCurrency(d.currency);
-          setStoredCurrencyPreference(d.currency, d.country || null);
-          if (d.country) setCountry(d.country);
-        } else {
-          if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
-          if (stored.country) setCountry(stored.country);
-        }
-      })
-      .catch(() => {
-        if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
-        if (stored.country) setCountry(stored.country);
-      });
+    if (stored.currency && FX_USD[stored.currency]) {
+      // User has previously chosen a currency — respect it, skip geo
+      setCurrency(stored.currency);
+      if (stored.country) setCountry(stored.country);
+    } else {
+      // First-time visitor — detect from IP, but don't save (user must choose manually)
+      fetch("/api/public/geo", { cache: "no-store" })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+          if (d?.currency && FX_USD[d.currency]) {
+            setCurrency(d.currency);
+            if (d.country) setCountry(d.country);
+          }
+        })
+        .catch(() => {});
+    }
     const onCurrencyChanged = (event: Event) => {
       const detail = (event as CustomEvent<{ currency?: string; country?: string | null }>).detail;
       if (detail?.currency && FX_USD[detail.currency]) setCurrency(detail.currency);

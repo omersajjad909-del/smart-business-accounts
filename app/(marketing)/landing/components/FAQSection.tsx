@@ -25,6 +25,7 @@ const CATEGORIES = [
   { id: "banking",       label: "Bank & Payments",  icon: "🏦" },
   { id: "billing",       label: "Plans & Billing",  icon: "💳" },
   { id: "security",      label: "Security",         icon: "🔒" },
+  { id: "ai",            label: "AI Intelligence",  icon: "🤖" },
 ];
 
 const FAQS = [
@@ -162,6 +163,38 @@ const FAQS = [
     a: "Your data stays accessible for 30 days after cancellation so you can export everything. After 30 days, it is securely deleted. We never hold your data hostage — export to Excel or PDF at any time, even while subscribed.",
   },
 
+  // ── AI Intelligence ──
+  {
+    cat: "ai", color: "#8b5cf6",
+    q: "What is AI Intelligence in FinovaOS?",
+    a: "AI Intelligence is a built-in module that analyses your financial data and surfaces actionable insights — automatically. It includes a Business Health Score, smart alerts, expense categorization, budget variance analysis, duplicate transaction detection, and more. No extra setup required.",
+  },
+  {
+    cat: "ai", color: "#8b5cf6",
+    q: "What is the Business Health Score?",
+    a: "The Business Health Score is a real-time 0–100 score that measures your company's financial fitness based on liquidity, profitability, cash flow, and debt ratios. It updates every time you post a transaction, giving you an instant pulse on your business.",
+  },
+  {
+    cat: "ai", color: "#8b5cf6",
+    q: "Can I ask FinovaOS questions in plain English?",
+    a: "Yes. The Ask AI feature lets you type questions like \"What was my profit last month?\" or \"Which customer owes me the most?\" — and get instant answers from your live financial data. No need to build reports manually.",
+  },
+  {
+    cat: "ai", color: "#8b5cf6",
+    q: "How does expense auto-categorization work?",
+    a: "When you record expenses, AI analyses the vendor name, description, and amount and suggests the correct expense category. Over time it learns your patterns, reducing manual input significantly.",
+  },
+  {
+    cat: "ai", color: "#8b5cf6",
+    q: "What does the duplicate detection catch?",
+    a: "AI scans your transactions for entries that are suspiciously similar in amount, date, vendor, and account — and flags them before they distort your books. This is especially useful when importing bank statements or bulk data.",
+  },
+  {
+    cat: "ai", color: "#8b5cf6",
+    q: "Is AI Intelligence included in all plans?",
+    a: "Core AI features (Health Score, Ask AI, smart alerts) are available on all plans. Advanced AI modules (Customer Profitability, Financial Ratios, Budget Variance Analysis) are available on Pro and Enterprise plans.",
+  },
+
   // ── Security ──
   {
     cat: "security", color: "#10b981",
@@ -247,7 +280,7 @@ function FAQItem({ faq, open, onToggle, i, vis }: {
 
 export default function FAQSection() {
   const [ref, vis]   = useInView();
-  const [cat, setCat] = useState("all");
+  const [cat, setCat] = useState("accounting");
   const [open, setOpen] = useState<number | null>(null);
 
   const filtered = cat === "all" ? FAQS : FAQS.filter(f => f.cat === cat);

@@ -388,21 +388,20 @@ export default function PricingPage() {
   useEffect(() => {
     (async () => {
       const stored = getStoredCurrencyPreference();
-      try {
-        const geo = await fetch("/api/public/geo", { cache: "no-store" });
-        if (geo.ok) {
-          const d = await geo.json();
-          if (d?.currency && FX_USD[d.currency]) setCurrency(d.currency);
-          else if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
-          if (d?.country) setCountry(d.country);
-          else if (stored.country) setCountry(stored.country);
-        } else {
-          if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
-          if (stored.country) setCountry(stored.country);
-        }
-      } catch {
-        if (stored.currency && FX_USD[stored.currency]) setCurrency(stored.currency);
+      if (stored.currency && FX_USD[stored.currency]) {
+        // User has a stored choice — use it, skip geo detection
+        setCurrency(stored.currency);
         if (stored.country) setCountry(stored.country);
+      } else {
+        // First-time visitor — detect from IP, but don't save automatically
+        try {
+          const geo = await fetch("/api/public/geo", { cache: "no-store" });
+          if (geo.ok) {
+            const d = await geo.json();
+            if (d?.currency && FX_USD[d.currency]) setCurrency(d.currency);
+            if (d?.country) setCountry(d.country);
+          }
+        } catch {}
       }
       try {
         const fx = await fetch("/api/public/fx", { cache: "no-store" });
@@ -469,8 +468,6 @@ export default function PricingPage() {
       } catch {}
     })();
   }, []);
-
-  useEffect(() => { if (currency) setStoredCurrencyPreference(currency, country); }, [currency, country]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -540,7 +537,7 @@ export default function PricingPage() {
               </button>
             ))}
           </div>
-          <select value={currency} onChange={e => setCurrency(e.target.value)} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 12, padding: "9px 12px", color: "rgba(255,255,255,.8)", fontSize: 12, fontWeight: 700, outline: "none", cursor: "pointer", fontFamily: ff }}>
+          <select value={currency} onChange={e => { const c = e.target.value; setCurrency(c); setStoredCurrencyPreference(c, country); window.dispatchEvent(new CustomEvent(FINOVA_CURRENCY_EVENT, { detail: { currency: c, country } })); }} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 12, padding: "9px 12px", color: "rgba(255,255,255,.8)", fontSize: 12, fontWeight: 700, outline: "none", cursor: "pointer", fontFamily: ff }}>
             {SUPPORTED_CURRENCIES.map(code => <option key={code} value={code}>{code} - {CURRENCY_LABEL[code]}</option>)}
           </select>
         </div>
