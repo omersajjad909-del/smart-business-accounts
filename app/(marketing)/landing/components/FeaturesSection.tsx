@@ -345,7 +345,7 @@ function FeatureRow({ f, i }: { f: typeof FEATURES[0]; i: number }) {
   const { Visual } = f;
 
   const text = (
-    <div style={{
+    <div className="feat-text" style={{
       opacity: vis ? 1 : 0,
       transform: vis ? "translateY(0)" : "translateY(24px)",
       transition: "all .65s cubic-bezier(.22,1,.36,1)",
@@ -398,7 +398,7 @@ function FeatureRow({ f, i }: { f: typeof FEATURES[0]; i: number }) {
   );
 
   const visual = (
-    <div style={{
+    <div className="feat-visual" style={{
       opacity: vis ? 1 : 0,
       transform: vis ? "translateY(0)" : "translateY(24px)",
       transition: "all .65s cubic-bezier(.22,1,.36,1) .15s",
