@@ -45,6 +45,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "permissions",      label: "Roles & Permissions", href: "/admin/permissions",       group: "System",    short: "RP", icon: "lock" },
   { id: "email-logs",       label: "Email Logs",        href: "/admin/email-logs",          group: "System",    short: "EM", icon: "mail" },
   { id: "tickets",          label: "Support Tickets",   href: "/admin/tickets",             group: "System",    short: "TK", icon: "message" },
+  { id: "support-inbox",    label: "Support Inbox",     href: "/admin/chat",                group: "System",    short: "SI", icon: "message", badge: "LIVE" },
   { id: "logs",             label: "Activity Logs",     href: "/admin/logs",                group: "System",    short: "LG", icon: "activity" },
   { id: "system",           label: "System Health",     href: "/admin/system",              group: "System",    short: "SY", icon: "shield" },
   { id: "backup-restore",   label: "Backup & Restore",  href: "/admin/backup-restore",      group: "System",    short: "BK", icon: "archive" },
