@@ -337,6 +337,9 @@ export default function ChatWidget() {
         .cw-chip:hover { background: rgba(129,140,248,.28) !important; border-color: rgba(129,140,248,.65) !important; color: white !important; transform: translateY(-1px); }
         ::-webkit-scrollbar { width: 3px; }
         ::-webkit-scrollbar-thumb { background: rgba(99,102,241,.3); border-radius: 99px; }
+        @media(max-width:480px){
+          .cw-window { bottom:84px !important; right:12px !important; left:12px !important; width:auto !important; max-width:none !important; height:72vh !important; max-height:520px !important; border-radius:18px !important; }
+        }
       `}</style>
 
       {/* ── FAB ── */}
@@ -366,7 +369,7 @@ export default function ChatWidget() {
 
       {/* ── Chat window ── */}
       {open && (
-        <div style={{
+        <div className="cw-window" style={{
           position: "fixed", bottom: 96, right: 24, zIndex: 9998,
           width: 390, maxWidth: "calc(100vw - 32px)",
           height: 600, maxHeight: "calc(100vh - 120px)",
