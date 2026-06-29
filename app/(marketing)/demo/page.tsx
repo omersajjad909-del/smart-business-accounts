@@ -731,16 +731,17 @@ export default function DemoPage() {
           14 business verticals. Each demo opens a real live workspace configured for your industry — with AI insights, workflows, and actual data pre-loaded.
         </p>
 
-        <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", gap: 8, padding: "10px 16px", borderRadius: 999, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", marginBottom: 8 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: "#fbbf24" }}>Live now:</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>Trading</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>|</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>Wholesale</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>|</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>Distribution</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>|</span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>Import / Export</span>
-        </div>
+        {BUSINESSES.filter(b => isDemoLive(b.liveBusinessType)).length > 0 && (
+          <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", gap: 8, padding: "10px 16px", borderRadius: 999, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", marginBottom: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: "#fbbf24" }}>Live now:</span>
+            {BUSINESSES.filter(b => isDemoLive(b.liveBusinessType)).map((b, i, arr) => (
+              <span key={b.id} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>{b.label}</span>
+                {i < arr.length - 1 && <span style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>|</span>}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Trust bar */}
         <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 10, marginBottom: 8 }}>
