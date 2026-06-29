@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 type Msg = {
   id: string;
-  sender: "customer" | "bot";
+  sender: "customer" | "bot" | "agent";
   text: string;
   time: string;
   chips?: string[];
@@ -208,18 +208,21 @@ function apiEscalate(conversationId: string) {
 
 /* ─── Widget component ───────────────────────────────────────────────────── */
 export default function ChatWidget() {
-  const [open,      setOpen]      = useState(false);
+  const [open,         setOpen]         = useState(false);
   const [name]  = useState("Visitor");
   const [email] = useState("");
-  const [convId,    setConvId]    = useState<string | null>(null);
-  const [messages,  setMessages]  = useState<Msg[]>([]);
-  const [inputVal,  setInputVal]  = useState("");
-  const [typing,    setTyping]    = useState(false);
-  const [escalated, setEscalated] = useState(false);
-  const [unread,    setUnread]    = useState(0);
-  const endRef   = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const seq      = useRef(0);
+  const [convId,       setConvId]       = useState<string | null>(null);
+  const [messages,     setMessages]     = useState<Msg[]>([]);
+  const [inputVal,     setInputVal]     = useState("");
+  const [typing,       setTyping]       = useState(false);
+  const [escalated,    setEscalated]    = useState(false);
+  const [agentReplied, setAgentReplied] = useState(false);
+  const [unread,       setUnread]       = useState(0);
+  const endRef         = useRef<HTMLDivElement>(null);
+  const inputRef       = useRef<HTMLInputElement>(null);
+  const seq            = useRef(0);
+  const escalatedAt    = useRef<Date | null>(null);
+  const shownAgentIds  = useRef<Set<string>>(new Set());
 
   function mkId() { return `m-${++seq.current}`; }
   function now()  { return new Date().toISOString(); }
@@ -265,6 +268,37 @@ export default function ChatWidget() {
 
   useEffect(() => { if (open) setUnread(0); }, [open]);
 
+  // Poll for agent replies when escalated (every 5 sec)
+  useEffect(() => {
+    if (!escalated || !convId || convId.startsWith("tmp-")) return;
+    escalatedAt.current = new Date();
+
+    async function pollAgent() {
+      try {
+        const res = await fetch(`/api/chat/messages?conversationId=${convId}`, { cache: "no-store" });
+        if (!res.ok) return;
+        const { data } = await res.json();
+        if (!Array.isArray(data)) return;
+        for (const msg of data) {
+          if (shownAgentIds.current.has(msg.id)) continue;
+          if (msg.sender !== "agent") { shownAgentIds.current.add(msg.id); continue; }
+          if (escalatedAt.current && new Date(msg.created_at) < escalatedAt.current) {
+            shownAgentIds.current.add(msg.id); continue;
+          }
+          shownAgentIds.current.add(msg.id);
+          setAgentReplied(true);
+          setMessages(p => [...p, { id: mkId(), sender: "agent", text: msg.text, time: msg.created_at }]);
+          if (!open) setUnread(u => u + 1);
+        }
+      } catch {}
+    }
+
+    const t = setInterval(pollAgent, 5000);
+    pollAgent();
+    return () => clearInterval(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [escalated, convId]);
+
   /* ── Start chat: show welcome immediately, no API call needed ── */
 
   /* ── Send message: one API call handles everything ── */
@@ -278,13 +312,23 @@ export default function ChatWidget() {
     addMsg({ sender: "customer", text });
 
     // Human agent request — escalate and show message
-    if (/\b(human|agent|person|real person|support staff|insaan|banda|live chat|connect me)\b/i.test(text)) {
+    if (!escalated && /\b(human|agent|person|real person|support staff|insaan|banda|live chat|connect me)\b/i.test(text)) {
       if (convId) apiEscalate(convId);
       setEscalated(true);
       addMsg({
         sender: "bot",
         text: "Connecting you to a human agent now. Someone will respond shortly.\n\nYou can also reach us directly:\n• Email: **finovaos.app@gmail.com**\n• Phone: **+92 304 7653693**",
       });
+      return;
+    }
+
+    // Escalated mode — post message directly to DB (agent will see it)
+    if (escalated && convId && !convId.startsWith("tmp-")) {
+      fetch("/api/chat/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conversationId: convId, sender: "customer", text }),
+      }).catch(() => {});
       return;
     }
 
@@ -389,9 +433,9 @@ export default function ChatWidget() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: "white", letterSpacing: "-.2px" }}>FinovaOS Support</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: escalated ? "#f59e0b" : "#6366f1", animation: "shimmer 2s ease infinite" }} />
-                  <span style={{ fontSize: 11, color: escalated ? "#fbbf24" : "#818cf8", fontWeight: 600 }}>
-                    {escalated ? "Connecting to agent…" : "AI Assistant • Online"}
+                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: agentReplied ? "#34d399" : escalated ? "#f59e0b" : "#6366f1", animation: "shimmer 2s ease infinite" }} />
+                  <span style={{ fontSize: 11, color: agentReplied ? "#34d399" : escalated ? "#fbbf24" : "#818cf8", fontWeight: 600 }}>
+                    {agentReplied ? "Agent • Online" : escalated ? "Connecting to agent…" : "AI Assistant • Online"}
                   </span>
                 </div>
               </div>
@@ -408,21 +452,26 @@ export default function ChatWidget() {
                 {messages.map(msg => (
                   <div key={msg.id} className="cw-msg">
                     <div style={{ display: "flex", justifyContent: msg.sender === "customer" ? "flex-end" : "flex-start", gap: 8, alignItems: "flex-end" }}>
-                      {msg.sender === "bot" && (
-                        <div style={{ width: 28, height: 28, borderRadius: 9, flexShrink: 0, marginBottom: 2, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, boxShadow: "0 3px 10px rgba(0,0,0,.3)" }}>🤖</div>
+                      {(msg.sender === "bot" || msg.sender === "agent") && (
+                        <div style={{ width: 28, height: 28, borderRadius: 9, flexShrink: 0, marginBottom: 2, background: msg.sender === "agent" ? "linear-gradient(135deg,#059669,#34d399)" : "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, boxShadow: "0 3px 10px rgba(0,0,0,.3)" }}>
+                          {msg.sender === "agent" ? "👤" : "🤖"}
+                        </div>
                       )}
                       <div style={{
                         maxWidth: "82%",
-                        padding: msg.sender === "bot" ? "11px 14px 10px" : "10px 14px",
+                        padding: msg.sender === "customer" ? "10px 14px" : "11px 14px 10px",
                         borderRadius: msg.sender === "customer" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                        background: msg.sender === "customer" ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.055)",
-                        border: msg.sender === "bot" ? "1px solid rgba(255,255,255,.07)" : "none",
+                        background: msg.sender === "customer" ? "linear-gradient(135deg,#6366f1,#4f46e5)" : msg.sender === "agent" ? "rgba(5,150,105,.12)" : "rgba(255,255,255,.055)",
+                        border: msg.sender === "customer" ? "none" : msg.sender === "agent" ? "1px solid rgba(52,211,153,.2)" : "1px solid rgba(255,255,255,.07)",
                         boxShadow: msg.sender === "customer" ? "0 4px 16px rgba(99,102,241,.3)" : "0 2px 8px rgba(0,0,0,.12)",
                       }}>
-                        {msg.sender === "bot"
-                          ? renderText(msg.text)
-                          : <span style={{ fontSize: 13.5, color: "rgba(255,255,255,.92)", lineHeight: 1.75 }}>{msg.text}</span>
+                        {msg.sender === "customer"
+                          ? <span style={{ fontSize: 13.5, color: "rgba(255,255,255,.92)", lineHeight: 1.75 }}>{msg.text}</span>
+                          : renderText(msg.text)
                         }
+                        {msg.sender === "agent" && (
+                          <div style={{ fontSize: 9.5, color: "#34d399", marginBottom: 4, fontWeight: 700 }}>Support Agent</div>
+                        )}
                         <div style={{ fontSize: 9.5, color: "rgba(255,255,255,.22)", marginTop: 5, textAlign: msg.sender === "customer" ? "right" : "left" }}>
                           {new Date(msg.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
@@ -476,11 +525,11 @@ export default function ChatWidget() {
                     value={inputVal}
                     onChange={e => setInputVal(e.target.value)}
                     onKeyDown={handleKey}
-                    disabled={escalated}
-                    placeholder={escalated ? "Waiting for agent..." : "Ask anything about FinovaOS..."}
+                    disabled={escalated && !agentReplied}
+                    placeholder={agentReplied ? "Reply to agent..." : escalated ? "Waiting for agent..." : "Ask anything about FinovaOS..."}
                     style={{ flex: 1, background: "none", border: "none", color: "white", fontSize: 14, fontFamily: "inherit", padding: "3px 0" }}
                   />
-                  <button onClick={() => sendMessage()} disabled={!inputVal.trim() || typing || escalated}
+                  <button onClick={() => sendMessage()} disabled={!inputVal.trim() || typing || (escalated && !agentReplied)}
                     style={{ width: 36, height: 36, borderRadius: 10, border: "none", cursor: inputVal.trim() && !typing ? "pointer" : "default", background: inputVal.trim() && !typing ? "linear-gradient(135deg,#6366f1,#4f46e5)" : "rgba(255,255,255,.04)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .2s" }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" opacity={inputVal.trim() && !typing ? 1 : 0.25}>
                       <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
