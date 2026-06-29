@@ -656,7 +656,7 @@ export default function PricingPage() {
           <div style={{ borderRadius: 24, background: "linear-gradient(135deg,rgba(124,58,237,.1),rgba(37,99,235,.08))", border: "1.5px solid rgba(124,58,237,.35)", overflow: "hidden", boxShadow: "0 0 60px rgba(124,58,237,.12)" }}>
             <div style={{ height: 3, background: "linear-gradient(90deg,#7c3aed,#2563eb,#38bdf8)" }} />
             <div style={{ padding: "36px 40px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
+              <div className="addon-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
 
                 {/* Left: Price + CTA */}
                 <div>
@@ -812,6 +812,7 @@ export default function PricingPage() {
                 </div>
               ))}
             </div>
+          </div>{/* /ct-inner */}
           </div>
         </div>
 
