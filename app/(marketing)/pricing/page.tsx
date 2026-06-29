@@ -691,7 +691,7 @@ export default function PricingPage() {
                 </div>
 
                 {/* Right: Features grid */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div className="addon-feat" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                   {[
                     { icon: "💬", label: "WhatsApp Auto-Reply", sub: "AI replies 24/7" },
                     { icon: "📧", label: "Email Drip Campaigns", sub: "Auto nurture leads" },
@@ -714,7 +714,7 @@ export default function PricingPage() {
               </div>
 
               {/* Value comparison bar */}
-              <div style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+              <div className="val-bar" style={{ marginTop: 28, paddingTop: 24, borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 13, color: "rgba(255,255,255,.4)" }}>These tools cost separately:</span>
                 {["WATI $99", "Mailchimp $99", "Intercom $74", "HubSpot $50", "Zapier $49", "Buffer $18", "Jasper $49"].map(t => (
                   <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5" }}>{t}</span>
@@ -829,7 +829,7 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <div style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div className="cp-row" style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
             {/* Left — Module picker + add-ons */}
             <div style={{ flex: "1 1 560px", minWidth: 0 }}>
               {MODULE_CATEGORIES.map(cat => {
