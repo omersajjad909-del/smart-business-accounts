@@ -92,6 +92,8 @@ export function proxy(req: NextRequest) {
     "/api/chat/conversations",
     "/api/chat/messages",
     "/api/chat/escalate",
+    // Public support ticket form (no login required)
+    "/api/support/ticket",
   ];
   const isApi = pathname.startsWith("/api/");
   const isPublic = publicApi.some((p) => pathname.startsWith(p));
