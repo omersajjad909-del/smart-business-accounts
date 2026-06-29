@@ -77,7 +77,7 @@ const DEFAULT_PUBLIC_PRICING: PlanPricing = {
 const DEFAULT_PLAN_LIMITS: Record<string, number | null> = {
   starter: 3,
   professional: 10,
-  enterprise: null,
+  enterprise: 25,
 };
 const DEFAULT_SEAT_PRICING = {
   monthly: 7,
@@ -95,7 +95,7 @@ const COMPARISON: Category[] = [
     icon: "🏗️",
     title: "Core Platform",
     features: [
-      { name: "Users", starter: "Up to 3", pro: "Up to 10", enterprise: "Unlimited" },
+      { name: "Users", starter: "Up to 3", pro: "Up to 10", enterprise: "Up to 25" },
       { name: "Branches", starter: "1", pro: "3", enterprise: "10" },
       { name: "Custom domain (white-label)", starter: false, pro: false, enterprise: true },
       { name: "API access", starter: false, pro: false, enterprise: true },
