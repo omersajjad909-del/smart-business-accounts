@@ -217,8 +217,9 @@ export default function ChatWidget() {
   const [typing,    setTyping]    = useState(false);
   const [escalated, setEscalated] = useState(false);
   const [unread,    setUnread]    = useState(0);
-  const endRef = useRef<HTMLDivElement>(null);
-  const seq    = useRef(0);
+  const endRef   = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const seq      = useRef(0);
 
   function mkId() { return `m-${++seq.current}`; }
   function now()  { return new Date().toISOString(); }
@@ -271,6 +272,8 @@ export default function ChatWidget() {
     const text = (override || inputVal).trim();
     if (!text || typing) return;
     if (!override) setInputVal("");
+    // Dismiss mobile keyboard after send
+    inputRef.current?.blur();
 
     addMsg({ sender: "customer", text });
 
