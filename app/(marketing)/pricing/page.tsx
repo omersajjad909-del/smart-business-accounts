@@ -894,7 +894,7 @@ export default function PricingPage() {
             </div>
 
             {/* Right — Price summary */}
-            <div style={{ width: 276, flexShrink: 0, position: "sticky", top: 24 }}>
+            <div className="cp-sidebar" style={{ width: 276, flexShrink: 0, position: "sticky", top: 24 }}>
               <div style={{ borderRadius: 20, background: "rgba(249,115,22,.07)", border: "1.5px solid rgba(249,115,22,.28)", padding: "24px 22px" }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: "#f97316", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 16 }}>Your Estimate</div>
 
