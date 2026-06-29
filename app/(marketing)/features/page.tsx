@@ -1466,6 +1466,394 @@ function MockScreen({ type, color }: { type: string; color: string }) {
       </div>
     ),
 
+    // CPV / CRV
+    cpv: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:2 }}>
+          <div style={{ fontSize:11, fontWeight:700, color, opacity:.8 }}>Cash Payment Voucher</div>
+          <div style={{ fontSize:9, padding:"2px 8px", borderRadius:10, background:`${color}20`, color, fontWeight:800 }}>#CPV-0421</div>
+        </div>
+        <div style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)", marginBottom:4 }}>
+          <div style={{ fontSize:9, color:"rgba(255,255,255,.4)", marginBottom:4 }}>Paid To: <span style={{ color:"white", fontWeight:600 }}>Al-Noor Traders</span></div>
+          {[
+            { acc:"Accounts Payable",   dr:"14,000", cr:"—" },
+            { acc:"Cash & Bank",        dr:"—",      cr:"14,000" },
+          ].map(r=>(
+            <div key={r.acc} style={{ display:"flex", justifyContent:"space-between", padding:"3px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+              <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{r.acc}</span>
+              <span style={{ fontSize:9, fontWeight:700, color:"#f87171", width:50, textAlign:"right" }}>{r.dr}</span>
+              <span style={{ fontSize:9, fontWeight:700, color:"#34d399", width:50, textAlign:"right" }}>{r.cr}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ display:"flex", gap:6 }}>
+          {[["CPV","8",color],["CRV","12","#34d399"],["Pending","3","#fbbf24"]].map(([l,v,c])=>(
+            <div key={String(l)} style={{ flex:1, padding:"5px 8px", borderRadius:7, background:`${c}10`, border:`1px solid ${c}25`, textAlign:"center" }}>
+              <div style={{ fontSize:11, fontWeight:800, color:c as string }}>{v}</div>
+              <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{l} Today</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ padding:"5px 8px", borderRadius:7, background:dim, border:`1px solid ${border}`, fontSize:9, color, fontWeight:700, textAlign:"center" }}>
+          ✓ Auto-posted to Ledger
+        </div>
+      </div>
+    ),
+
+    // Opening Balances
+    opening: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Opening Balances Setup</div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:4 }}>
+          {[["Financial Year","FY 2024–25"],["Start Date","Jul 1, 2024"],["Status","Locked ✓"],["Migration","Complete"]].map(([l,v])=>(
+            <div key={l} style={{ padding:"5px 7px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+              <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{l}</div>
+              <div style={{ fontSize:9, fontWeight:700, color:"white" }}>{v}</div>
+            </div>
+          ))}
+        </div>
+        {[
+          { acc:"Cash & Bank",   bal:"124,500", type:"Asset" },
+          { acc:"Receivables",   bal:"85,000",  type:"Asset" },
+          { acc:"Payables",      bal:"92,000",  type:"Liability" },
+          { acc:"Opening Stock", bal:"210,000", type:"Asset" },
+        ].map(r=>(
+          <div key={r.acc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{r.acc}</span>
+            <span style={{ fontSize:8, color:"rgba(255,255,255,.3)", marginRight:8 }}>{r.type}</span>
+            <span style={{ fontSize:9, fontWeight:700, color }}>{r.bal}</span>
+          </div>
+        ))}
+        <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", textAlign:"center" }}>Year-end closing posts carry-forward entries automatically</div>
+      </div>
+    ),
+
+    // Recurring Transactions
+    recurring: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Recurring Schedules</div>
+        {[
+          { desc:"Office Rent",           freq:"Monthly",  next:"Apr 1",  amt:"$4,250", active:true  },
+          { desc:"Electricity Bill",       freq:"Monthly",  next:"Apr 5",  amt:"$320",   active:true  },
+          { desc:"Software Subscription",  freq:"Monthly",  next:"Apr 10", amt:"$149",   active:true  },
+          { desc:"Annual Insurance",        freq:"Yearly",   next:"Dec 15", amt:"$2,400", active:false },
+        ].map(r=>(
+          <div key={r.desc} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"7px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+            <div>
+              <div style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.desc}</div>
+              <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{r.freq} · Next: {r.next}</div>
+            </div>
+            <div style={{ textAlign:"right" }}>
+              <div style={{ fontSize:9, fontWeight:700, color }}>{r.amt}</div>
+              <div style={{ fontSize:7, fontWeight:800, color:r.active?"#34d399":"rgba(255,255,255,.3)", marginTop:2 }}>{r.active?"● ACTIVE":"○ PAUSED"}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ),
+
+    // Cash Flow
+    cashflow: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Cash Flow Statement — Q1 2025</div>
+        {[
+          { section:"Operating Activities",  amt:"+$84,200", positive:true,  items:["Net profit","+ Depreciation","- AR increase"] },
+          { section:"Investing Activities",  amt:"-$42,000", positive:false, items:["Equipment purchase","- Software licenses"] },
+          { section:"Financing Activities",  amt:"+$20,000", positive:true,  items:["Bank loan drawdown"] },
+        ].map(r=>(
+          <div key={r.section} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+              <span style={{ fontSize:9, fontWeight:700, color:"white" }}>{r.section}</span>
+              <span style={{ fontSize:9, fontWeight:800, color:r.positive?"#34d399":"#f87171" }}>{r.amt}</span>
+            </div>
+            {r.items.map(it=>(
+              <div key={it} style={{ fontSize:8, color:"rgba(255,255,255,.35)", paddingLeft:8, marginBottom:1 }}>· {it}</div>
+            ))}
+          </div>
+        ))}
+        <div style={{ padding:"6px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, display:"flex", justifyContent:"space-between" }}>
+          <span style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.6)" }}>Net Cash Change</span>
+          <span style={{ fontSize:10, fontWeight:800, color }}>+$62,200</span>
+        </div>
+      </div>
+    ),
+
+    // Import Wizard
+    import: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Data Import Wizard</div>
+        <div style={{ display:"flex", gap:4, marginBottom:6 }}>
+          {[["1","Upload","done"],["2","Map Fields","done"],["3","Validate","active"],["4","Import","idle"]].map(([n,l,s])=>(
+            <div key={n} style={{ flex:1, textAlign:"center" }}>
+              <div style={{ width:20, height:20, borderRadius:"50%", background:s==="done"?`${color}30`:s==="active"?`${color}20`:"rgba(255,255,255,.05)", border:`1px solid ${s==="idle"?"rgba(255,255,255,.08)":border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, fontWeight:800, color:s==="done"||s==="active"?color:"rgba(255,255,255,.2)", margin:"0 auto 3px" }}>{s==="done"?"✓":n}</div>
+              <div style={{ fontSize:7, color:s==="active"?color:"rgba(255,255,255,.25)", fontWeight:s==="active"?700:400 }}>{l}</div>
+            </div>
+          ))}
+        </div>
+        {[
+          { field:"Customer Name → Party Name",    ok:true  },
+          { field:"Invoice Date → Transaction Date",ok:true  },
+          { field:"Amount → Total Amount",          ok:true  },
+          { field:"Tax Code → (unmapped)",          ok:false },
+        ].map(r=>(
+          <div key={r.field} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:r.ok?"rgba(255,255,255,.02)":"rgba(248,113,113,.05)", border:`1px solid ${r.ok?"rgba(255,255,255,.05)":"rgba(248,113,113,.2)"}` }}>
+            <span style={{ fontSize:8, color:r.ok?"rgba(255,255,255,.5)":"rgba(248,113,113,.8)" }}>{r.field}</span>
+            <span style={{ fontSize:9, color:r.ok?"#34d399":"#f87171" }}>{r.ok?"✓":"!"}</span>
+          </div>
+        ))}
+        <div style={{ padding:"5px 8px", borderRadius:7, background:dim, border:`1px solid ${border}`, fontSize:9, color, fontWeight:700, textAlign:"center" }}>
+          1,248 rows ready · 1 field needs mapping
+        </div>
+      </div>
+    ),
+
+    // Manufacturing
+    manufacturing: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Production Order #WO-0091</div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:4 }}>
+          {[["Product","Finished Fabric 60\""],["Qty","500 meters"],["Start","Mar 18"],["Status","IN PROGRESS"]].map(([l,v])=>(
+            <div key={l} style={{ padding:"5px 7px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+              <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{l}</div>
+              <div style={{ fontSize:9, fontWeight:700, color:"white" }}>{v}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase" as const, letterSpacing:".05em", marginBottom:4 }}>Bill of Materials</div>
+        {[
+          { material:"Cotton Yarn 40/2", required:"150 kg", available:"420 kg", ok:true  },
+          { material:"Polyester Fiber",  required:"100 kg", available:"85 kg",  ok:false },
+          { material:"Dyes (Blue)",      required:"20 kg",  available:"32 kg",  ok:true  },
+        ].map(r=>(
+          <div key={r.material} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(255,255,255,.03)", border:`1px solid ${r.ok?"rgba(255,255,255,.05)":"rgba(248,113,113,.2)"}` }}>
+            <span style={{ fontSize:9, color:"rgba(255,255,255,.6)", flex:1 }}>{r.material}</span>
+            <span style={{ fontSize:8, color:"rgba(255,255,255,.35)", marginRight:8 }}>Need: {r.required}</span>
+            <span style={{ fontSize:8, fontWeight:700, color:r.ok?"#34d399":"#f87171" }}>{r.available} {r.ok?"✓":"⚠"}</span>
+          </div>
+        ))}
+      </div>
+    ),
+
+    // Restaurant
+    restaurant: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Floor Plan — Live Orders</div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6, marginBottom:6 }}>
+          {[
+            { t:"T1", status:"occupied", orders:3 },
+            { t:"T2", status:"free",     orders:0 },
+            { t:"T3", status:"occupied", orders:5 },
+            { t:"T4", status:"bill",     orders:2 },
+            { t:"T5", status:"free",     orders:0 },
+            { t:"T6", status:"occupied", orders:4 },
+            { t:"T7", status:"occupied", orders:1 },
+            { t:"T8", status:"free",     orders:0 },
+          ].map(r=>{
+            const c = r.status==="occupied"?color:r.status==="bill"?"#fbbf24":"rgba(255,255,255,.15)";
+            return (
+              <div key={r.t} style={{ aspectRatio:"1", borderRadius:8, background:`${c}18`, border:`1px solid ${c}40`, display:"flex", flexDirection:"column" as const, alignItems:"center", justifyContent:"center" }}>
+                <div style={{ fontSize:9, fontWeight:800, color:r.status==="free"?"rgba(255,255,255,.3)":c }}>{r.t}</div>
+                {r.orders>0 && <div style={{ fontSize:7, color:`${c}`, marginTop:1 }}>{r.orders} items</div>}
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ padding:"7px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+          <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.6)", marginBottom:4 }}>T3 — Active Order</div>
+          {[["Biryani (2)","$24"],["Naan x4","$8"],["Drinks (3)","$12"]].map(([item,amt])=>(
+            <div key={item} style={{ display:"flex", justifyContent:"space-between", fontSize:8, color:"rgba(255,255,255,.45)", padding:"2px 0" }}>
+              <span>{item}</span><span style={{ color }}>{amt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+
+    // Real Estate
+    realestate: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Property Portfolio</div>
+        {[
+          { name:"Gulberg Plaza Unit 4A", tenant:"Ahmed & Sons",  rent:"$1,200", status:"PAID",    due:"Mar 31" },
+          { name:"DHA Shop #12",          tenant:"Sunrise Store", rent:"$850",   status:"OVERDUE", due:"Mar 15" },
+          { name:"Blue Area Office 3F",   tenant:"Tech Corp PK",  rent:"$2,500", status:"PAID",    due:"Mar 31" },
+        ].map(r=>{
+          const sc = r.status==="PAID"?"#34d399":"#f87171";
+          return (
+            <div key={r.name} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:`1px solid ${r.status==="OVERDUE"?"rgba(248,113,113,.2)":"rgba(255,255,255,.05)"}` }}>
+              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
+                <span style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.name}</span>
+                <span style={{ fontSize:8, fontWeight:800, color:sc, padding:"1px 7px", borderRadius:10, background:`${sc}18` }}>{r.status}</span>
+              </div>
+              <div style={{ display:"flex", justifyContent:"space-between", fontSize:8, color:"rgba(255,255,255,.35)" }}>
+                <span>{r.tenant}</span>
+                <span style={{ color }}>{r.rent}/mo</span>
+              </div>
+            </div>
+          );
+        })}
+        <div style={{ fontSize:9, fontWeight:800, color, textAlign:"right" }}>Monthly Rent Income: $4,550</div>
+      </div>
+    ),
+
+    // School
+    school: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Fee Collection — April 2025</div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6, marginBottom:6 }}>
+          {[["Students","248"],["Collected","$18,400"],["Pending","$4,200"]].map(([l,v])=>(
+            <div key={l} style={{ padding:"7px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
+              <div style={{ fontSize:9, fontWeight:800, color }}>{v}</div>
+              <div style={{ fontSize:7, color:"rgba(255,255,255,.35)" }}>{l}</div>
+            </div>
+          ))}
+        </div>
+        {[
+          { name:"Ali Hassan (Grade 7)", fee:"$250",  status:"PAID",    date:"Apr 2" },
+          { name:"Sara Khan (Grade 9)",  fee:"$250",  status:"PAID",    date:"Apr 3" },
+          { name:"Omar Farooq (Grade 5)",fee:"$250",  status:"OVERDUE", date:"—" },
+          { name:"Hira Baig (Grade 11)", fee:"$300",  status:"PAID",    date:"Apr 1" },
+        ].map(r=>{
+          const sc = r.status==="PAID"?"#34d399":"#f87171";
+          return (
+            <div key={r.name} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.04)" }}>
+              <div>
+                <div style={{ fontSize:9, color:"rgba(255,255,255,.65)" }}>{r.name}</div>
+                <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>{r.fee} · {r.date}</div>
+              </div>
+              <span style={{ fontSize:7, fontWeight:800, color:sc, padding:"1px 7px", borderRadius:10, background:`${sc}18` }}>{r.status}</span>
+            </div>
+          );
+        })}
+      </div>
+    ),
+
+    // Hospital
+    hospital: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>OPD — Today's Appointments</div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6, marginBottom:6 }}>
+          {[["Appointments","24"],["In Queue","7"],["Billed","$3,200"]].map(([l,v])=>(
+            <div key={l} style={{ padding:"7px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
+              <div style={{ fontSize:9, fontWeight:800, color }}>{v}</div>
+              <div style={{ fontSize:7, color:"rgba(255,255,255,.35)" }}>{l}</div>
+            </div>
+          ))}
+        </div>
+        {[
+          { patient:"Ahmed Raza",    doctor:"Dr. Sana",  time:"10:00 AM", status:"DONE",    fee:"$150" },
+          { patient:"Fatima Malik",  doctor:"Dr. Tariq", time:"10:30 AM", status:"WAITING", fee:"$200" },
+          { patient:"Bilal Hussain", doctor:"Dr. Sana",  time:"11:00 AM", status:"PENDING", fee:"$150" },
+        ].map(r=>{
+          const sc = r.status==="DONE"?"#34d399":r.status==="WAITING"?color:"rgba(255,255,255,.3)";
+          return (
+            <div key={r.patient} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+              <div>
+                <div style={{ fontSize:9, fontWeight:600, color:"white" }}>{r.patient}</div>
+                <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{r.doctor} · {r.time}</div>
+              </div>
+              <div style={{ textAlign:"right" }}>
+                <span style={{ fontSize:7, fontWeight:800, color:sc, display:"block", marginBottom:2 }}>{r.status}</span>
+                <span style={{ fontSize:8, fontWeight:700, color }}>{r.fee}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ),
+
+    // Retail POS
+    retail: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Point of Sale</div>
+        <div style={{ padding:"6px 8px", borderRadius:8, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
+          <div style={{ fontFamily:"monospace", fontSize:11, letterSpacing:2, color:"rgba(255,255,255,.35)" }}>|||||||</div>
+          <div style={{ flex:1, fontSize:9, color:"rgba(255,255,255,.6)" }}>Scan or search item...</div>
+        </div>
+        {[
+          { item:"Basmati Rice 5kg",   qty:2, price:"$18.00", total:"$36.00" },
+          { item:"Cooking Oil 3L",     qty:1, price:"$12.50", total:"$12.50" },
+          { item:"Sugar 1kg x3",       qty:3, price:"$2.80",  total:"$8.40"  },
+        ].map(r=>(
+          <div key={r.item} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid rgba(255,255,255,.04)" }}>
+            <span style={{ fontSize:9, color:"rgba(255,255,255,.55)", flex:1 }}>{r.item}</span>
+            <span style={{ fontSize:9, color:"rgba(255,255,255,.3)", width:20, textAlign:"center" }}>×{r.qty}</span>
+            <span style={{ fontSize:9, fontWeight:700, color, width:46, textAlign:"right" }}>{r.total}</span>
+          </div>
+        ))}
+        <div style={{ display:"flex", justifyContent:"space-between", padding:"8px 10px", borderRadius:8, background:dim, border:`1px solid ${border}` }}>
+          <span style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.7)" }}>Total</span>
+          <span style={{ fontSize:12, fontWeight:800, color }}>$56.90</span>
+        </div>
+        <div style={{ padding:"5px 8px", borderRadius:7, background:"rgba(52,211,153,.12)", border:"1px solid rgba(52,211,153,.25)", fontSize:9, color:"#34d399", fontWeight:700, textAlign:"center" }}>
+          ✓ Stock synced · Posted to Accounts
+        </div>
+      </div>
+    ),
+
+    // Services / Agency
+    services: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Client Projects</div>
+        {[
+          { client:"Horizon Corp",    project:"Brand Identity",  billed:"$4,200", remaining:"$1,800", pct:70 },
+          { client:"Tech Solutions",  project:"Website Redesign", billed:"$7,000", remaining:"$3,000", pct:70 },
+          { client:"Sunrise Media",   project:"SEO Retainer",     billed:"$1,200", remaining:"$0",     pct:100 },
+        ].map(r=>(
+          <div key={r.client} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.05)" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
+              <div>
+                <div style={{ fontSize:9, fontWeight:700, color:"white" }}>{r.client}</div>
+                <div style={{ fontSize:8, color:"rgba(255,255,255,.35)" }}>{r.project}</div>
+              </div>
+              <div style={{ textAlign:"right", fontSize:8 }}>
+                <div style={{ color, fontWeight:700 }}>{r.billed} billed</div>
+                <div style={{ color:"rgba(255,255,255,.35)" }}>{r.remaining} left</div>
+              </div>
+            </div>
+            <div style={{ height:3, borderRadius:2, background:"rgba(255,255,255,.06)" }}>
+              <div style={{ width:`${r.pct}%`, height:"100%", borderRadius:2, background:r.pct===100?"#34d399":color }}/>
+            </div>
+          </div>
+        ))}
+      </div>
+    ),
+
+    // Distribution / Wholesale
+    wholesale: (
+      <div style={{ padding:14, display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ fontSize:11, fontWeight:700, color, opacity:.8, marginBottom:4 }}>Van Sales — Route A</div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6, marginBottom:4 }}>
+          {[["Stops","12"],["Delivered","8"],["Sales","$24,800"]].map(([l,v])=>(
+            <div key={l} style={{ padding:"7px 8px", borderRadius:8, background:dim, border:`1px solid ${border}`, textAlign:"center" }}>
+              <div style={{ fontSize:9, fontWeight:800, color }}>{v}</div>
+              <div style={{ fontSize:7, color:"rgba(255,255,255,.35)" }}>{l}</div>
+            </div>
+          ))}
+        </div>
+        {[
+          { stop:"Al-Noor Mart",      order:"$3,200", status:"DELIVERED", limit:"OK"      },
+          { stop:"Sunrise Wholesale", order:"$7,500", status:"DELIVERED", limit:"OK"      },
+          { stop:"Metro Store",       order:"$4,100", status:"PENDING",   limit:"NEAR MAX" },
+          { stop:"City Traders",      order:"$2,800", status:"DELIVERED", limit:"OK"      },
+        ].map(r=>{
+          const sc = r.status==="DELIVERED"?"#34d399":"#fbbf24";
+          return (
+            <div key={r.stop} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"5px 8px", borderRadius:7, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.04)" }}>
+              <div>
+                <div style={{ fontSize:9, color:"rgba(255,255,255,.65)" }}>{r.stop}</div>
+                <div style={{ fontSize:7, color:"rgba(255,255,255,.3)" }}>Credit: {r.limit}</div>
+              </div>
+              <div style={{ textAlign:"right" }}>
+                <div style={{ fontSize:9, fontWeight:700, color }}>{r.order}</div>
+                <div style={{ fontSize:7, fontWeight:800, color:sc }}>{r.status}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ),
+
     // Coming Soon (phase-2 fallback)
     comingSoon: (
       <div style={{ padding:14, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", gap:14, textAlign:"center" }}>
