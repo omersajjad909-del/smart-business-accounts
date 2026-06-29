@@ -1084,7 +1084,7 @@ export default function DashboardLayout({
             <div style={{marginBottom:6}}>
               <NavLink href="/dashboard/business-guide" pathname={pathname}>Business Guide</NavLink>
               <NavLink href="/dashboard/owner-dashboard" pathname={pathname}>Owner Dashboard</NavLink>
-              <NavLink href="/dashboard/ai-center" pathname={pathname}>AI Intelligence</NavLink>
+              <NavLink href="/dashboard/ai" pathname={pathname}>AI Intelligence</NavLink>
               {hasPermission(currentUser, PERMISSIONS.AI_BUSINESS_OPERATOR) && (
                 <NavLink href="/dashboard/operator" pathname={pathname}>Business Operator</NavLink>
               )}
