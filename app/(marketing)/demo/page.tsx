@@ -584,6 +584,20 @@ export default function DemoPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "workflow" | "ai">("overview");
 
+  // Seed from hardcoded values so there's no flash on load
+  const [liveStatusMap, setLiveStatusMap] = useState<Record<string, string>>(
+    Object.fromEntries(BUSINESSES.map(b => [b.liveBusinessType, b.demoAvailable ? "live" : "coming_soon"]))
+  );
+
+  useEffect(() => {
+    fetch("/api/public/business-module-status", { cache: "no-store" })
+      .then(r => r.json())
+      .then(d => { if (d?.statusMap) setLiveStatusMap(d.statusMap); })
+      .catch(() => {});
+  }, []);
+
+  const isDemoLive = (liveBusinessType: string) => liveStatusMap[liveBusinessType] === "live";
+
   const filteredBusinesses = useMemo(
     () => (activeCategory ? BUSINESSES.filter((b) => b.category === activeCategory) : BUSINESSES),
     [activeCategory]
@@ -592,7 +606,7 @@ export default function DemoPage() {
   const biz = useMemo(() => BUSINESSES.find((b) => b.id === selectedBiz) || null, [selectedBiz]);
 
   async function handleTryDashboard() {
-    if (!biz || loading || !biz.demoAvailable) return;
+    if (!biz || loading || !isDemoLive(biz.liveBusinessType)) return;
     setLoading(true);
     setStoredDemoBusinessPreference(biz.liveBusinessType);
     try {
