@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { setCurrentUser, setStoredDemoBusinessPreference } from "@/lib/auth";
 
 const FONT = "'Outfit','Inter',sans-serif";

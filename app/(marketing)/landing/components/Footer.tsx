@@ -137,13 +137,19 @@ export default function Footer() {
         @media (max-width: 960px) {
           .ft-grid { grid-template-columns: 1fr 1fr !important; }
           .ft-brand { grid-column: 1 / -1; }
+          .ft-contact-col { grid-column: 1 / -1; }
         }
         @media (max-width: 600px) {
-          .ft-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-          .ft-brand { grid-column: auto; }
-          .ft-bottom-inner { flex-direction: column !important; align-items: flex-start !important; gap: 14px !important; }
-          .ft-bottom-links { justify-content: flex-start !important; flex-wrap: wrap; }
+          .ft-grid { grid-template-columns: 1fr 1fr !important; gap: 28px 20px !important; }
+          .ft-brand { grid-column: 1 / -1; }
+          .ft-contact-col { grid-column: 1 / -1; }
+          .ft-cta-card { display: none !important; }
+          .ft-contact-items { flex-direction: row !important; flex-wrap: wrap !important; gap: 10px !important; }
+          .ft-bottom-inner { flex-direction: column !important; align-items: center !important; gap: 12px !important; text-align: center; }
+          .ft-bottom-links { justify-content: center !important; flex-wrap: wrap; gap: 10px 16px !important; }
           .ft-stats-row { justify-content: flex-start !important; }
+          .ft-main-pad { padding: 48px 16px 0 !important; }
+          .ft-top-strip { margin-bottom: 32px !important; }
         }
         @media (max-width: 380px) {
           .ft-stats-box { padding: 8px 10px !important; }
