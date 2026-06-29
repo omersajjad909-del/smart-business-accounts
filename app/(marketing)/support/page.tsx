@@ -8,7 +8,7 @@ const CHANNELS = [
   {
     tag: "Most Popular",
     label: "Email Support",
-    href: `mailto:${SUPPORT_EMAIL}`,
+    href: `https://mail.google.com/mail/?view=cm&to=${SUPPORT_EMAIL}&su=Support+Request`,
     display: SUPPORT_EMAIL,
     note: "Reply within 4 business hours",
     color: "#818cf8",

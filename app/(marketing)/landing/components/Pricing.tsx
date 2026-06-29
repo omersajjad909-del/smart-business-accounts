@@ -133,7 +133,7 @@ const DEFAULT_PLAN_LIMITS = { starter: 3, pro: 10, enterprise: 25 };
 const DEFAULT_PLAN_HIGHLIGHTS = {
   starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support"],
   pro:        ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports"],
-  enterprise: ["Unlimited users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7"],
+  enterprise: ["Up to 25 users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7"],
 };
 
 function Check({ color }: { color: string }) {

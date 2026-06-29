@@ -2082,6 +2082,7 @@ export default function DashboardLayout({
               onToggle={() => toggle("admin")}
             >
               <NavLink href="/dashboard/admin-control" pathname={pathname}>Admin Control Center</NavLink>
+              <NavLink href="/dashboard/chat" pathname={pathname}>💬 Support Inbox</NavLink>
               <NavLink href="/dashboard/business-features" pathname={pathname}>⚡ Business Features</NavLink>
               {bizFeatures?.smsNotifications && <NavLink href="/dashboard/notifications-config" pathname={pathname}>💬 Notifications</NavLink>}
               <NavLink href="/dashboard/shortcuts" pathname={pathname}>Keyboard Shortcuts</NavLink>
