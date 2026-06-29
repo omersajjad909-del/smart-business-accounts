@@ -102,7 +102,7 @@ const COMMITMENTS = [
 const STATS = [
   { value: "2024", label: "Year Founded", color: "#818cf8" },
   { value: "6", label: "Industry Verticals", color: "#34d399" },
-  { value: "40+", label: "Core Modules", color: "#fbbf24" },
+  { value: "50+", label: "Core Modules", color: "#fbbf24" },
   { value: "Weekly", label: "Release Cadence", color: "#38bdf8" },
 ];
 
