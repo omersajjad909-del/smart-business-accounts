@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Block private/internal paths
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /admin/
+Disallow: /onboarding/
+
+# Allow public API endpoints that serve content
+Allow: /api/public/
+
+Sitemap: https://www.finovaos.app/sitemap.xml
