@@ -63,21 +63,18 @@ const CATEGORIES = [
         description: "Record all cash payments and receipts with structured vouchers. Every CPV and CRV is linked to the correct account, posted in real time, and carries a full audit trail — no untracked cash movements.",
         highlights: ["Cash payment vouchers", "Cash receipt vouchers", "Real-time ledger posting"],
         mockType: "cpv",
-        phase2: true,
       },
       {
         name: "Opening Balances & Financial Year",
         description: "Set your opening balances when migrating from another system. Lock closed financial years to prevent backdated entries. One-click year-end closing posts carry-forward entries automatically.",
         highlights: ["Migration-friendly setup", "Year locking", "Auto carry-forward"],
         mockType: "opening",
-        phase2: true,
       },
       {
         name: "Recurring Transactions",
         description: "Automate repeat entries — monthly rent, utility bills, subscriptions, and standing journal entries. Set frequency, end date, and FinovaOS posts them automatically — zero manual effort.",
         highlights: ["Auto-posting", "Flexible frequency", "Invoice & JV support"],
         mockType: "recurring",
-        phase2: true,
       },
       {
         name: "Journal Vouchers",
@@ -277,7 +274,6 @@ const CATEGORIES = [
         description: "See exactly where your cash is coming from and where it's going. FinovaOS generates a real-time cash flow statement categorized into operating, investing, and financing activities — no manual preparation.",
         highlights: ["Operating / investing / financing", "Real-time view", "Export-ready"],
         mockType: "cashflow",
-        phase2: true,
       },
     ],
   },
@@ -372,7 +368,6 @@ const CATEGORIES = [
         description: "Migrate from any accounting software or spreadsheet in minutes. Import customers, suppliers, inventory items, opening balances, and historical transactions with a guided step-by-step wizard and automatic field mapping.",
         highlights: ["Excel & CSV support", "Auto field mapping", "Validation before import"],
         mockType: "import",
-        phase2: true,
       },
       {
         name: "AI Financial Assistant",
