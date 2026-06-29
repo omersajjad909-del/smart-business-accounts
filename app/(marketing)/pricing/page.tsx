@@ -514,11 +514,26 @@ export default function PricingPage() {
           .cg{grid-template-columns:1fr !important}
         }
 
-        /* Comparison table horizontal scroll */
+        /* Comparison table — sticky first column on mobile */
         @media(max-width:700px){
           .ct{overflow-x:auto !important;}
-          .ct-inner{min-width:560px;}
+          .ct-inner{min-width:471px;}
           .ct-sticky{position:relative !important;top:auto !important;}
+          /* Fixed pixel column widths */
+          .ct .ct-sticky,
+          .ct .ct-cat,
+          .ct .feat-row,
+          .ct .ct-cta{grid-template-columns:150px 107px 107px 107px !important;}
+          /* Feature name column stays fixed */
+          .ct .ct-sticky>div:first-child,
+          .ct .feat-row>div:first-child,
+          .ct .ct-cta>div:first-child{
+            position:sticky !important;
+            left:0 !important;
+            background:#0c0f2e !important;
+            z-index:2 !important;
+            border-right:1px solid rgba(255,255,255,.08) !important;
+          }
         }
 
         @media(max-width:640px){
@@ -719,7 +734,7 @@ export default function PricingPage() {
                 {["WATI $99", "Mailchimp $99", "Intercom $74", "HubSpot $50", "Zapier $49", "Buffer $18", "Jasper $49"].map(t => (
                   <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5" }}>{t}</span>
                 ))}
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>= $438+/mo vs our {formatPrice(79)}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>= {formatPrice(438)}+/mo vs our {formatPrice(79)}</span>
               </div>
             </div>
           </div>
@@ -754,6 +769,7 @@ export default function PricingPage() {
               <div key={cat.id}>
                 {/* Category header — clickable */}
                 <button
+                  className="ct-cat"
                   onClick={() => toggleCat(cat.id)}
                   style={{ width: "100%", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", background: "rgba(255,255,255,.025)", border: "none", borderTop: "1px solid rgba(255,255,255,.06)", cursor: "pointer", fontFamily: ff, color: "white", padding: 0 }}
                 >
@@ -802,7 +818,7 @@ export default function PricingPage() {
             ))}
 
             {/* Bottom CTA row */}
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.015)" }}>
+            <div className="ct-cta" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid rgba(255,255,255,.08)", background: "rgba(255,255,255,.015)" }}>
               <div style={{ padding: "24px 24px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.3)" }}>Ready to start?</div>
               {PLANS.map((plan) => (
                 <div key={plan.slug} style={{ padding: "20px 16px", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
