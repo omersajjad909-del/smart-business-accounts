@@ -151,6 +151,7 @@ export default function SolutionSection() {
   const [indRef, indVis] = useInView();
   const [hovPain, setHovPain] = useState<number | null>(null);
   const [activeIndustry, setActiveIndustry] = useState<string>(FOCUSED_INDUSTRIES[0].slug);
+  const detailRef = useRef<HTMLDivElement>(null);
   const [statusMap, setStatusMap] = useState<BusinessModuleStatusResponse["statusMap"]>();
 
   useEffect(() => {
@@ -553,7 +554,12 @@ export default function SolutionSection() {
                 return (
                   <button
                     key={industry.slug}
-                    onClick={() => setActiveIndustry(industry.slug)}
+                    onClick={() => {
+                      setActiveIndustry(industry.slug);
+                      if (window.innerWidth < 900 && detailRef.current) {
+                        setTimeout(() => detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+                      }
+                    }}
                     style={{
                       display: "flex",
                       alignItems: "center",
