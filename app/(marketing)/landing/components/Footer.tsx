@@ -172,10 +172,10 @@ export default function Footer() {
       </div>
 
       {/* Main content */}
-      <div style={{ maxWidth: 1220, margin: "0 auto", padding: "80px 24px 0", position: "relative", zIndex: 1 }}>
+      <div className="ft-main-pad" style={{ maxWidth: 1220, margin: "0 auto", padding: "80px 24px 0", position: "relative", zIndex: 1 }}>
 
         {/* Top headline strip */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 56, flexWrap: "wrap" }}>
+        <div className="ft-top-strip" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 56, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 100, background: "rgba(99,102,241,.1)", border: "1px solid rgba(99,102,241,.2)" }}>
             <Zap size={12} color="#818cf8"/>
             <span style={{ fontSize: 11, fontWeight: 700, color: "#818cf8", letterSpacing: ".08em", textTransform: "uppercase" }}>Business OS</span>
@@ -271,13 +271,13 @@ export default function Footer() {
           </div>
 
           {/* Contact + CTA column */}
-          <div>
+          <div className="ft-contact-col">
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
               <div style={{ width: 3, height: 14, borderRadius: 2, background: "linear-gradient(180deg,#fbbf24,#f59e0b)" }}/>
               <span style={{ fontSize: 10, fontWeight: 700, color: "#fbbf24", letterSpacing: ".12em", textTransform: "uppercase" }}>Get in Touch</span>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
+            <div className="ft-contact-items" style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
               {[
                 { Icon: Mail,  text: "hello@finovaos.app", color: "#818cf8", href: "mailto:hello@finovaos.app" },
                 { Icon: Phone, text: "+92 304-7653693",        color: "#34d399", href: "https://wa.me/923047653693" },
@@ -297,7 +297,7 @@ export default function Footer() {
             </div>
 
             {/* CTA card */}
-            <div style={{
+            <div className="ft-cta-card" style={{
               borderRadius: 14, padding: "18px",
               background: "linear-gradient(135deg,rgba(99,102,241,.1),rgba(79,70,229,.06))",
               border: "1px solid rgba(99,102,241,.2)",
