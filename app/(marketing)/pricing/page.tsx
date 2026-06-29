@@ -322,9 +322,9 @@ function UseCaseWizard() {
       <div style={{ textAlign: "center", marginBottom: 20 }}>
         <div style={{ fontSize: 13, color: "#94a3b8", fontWeight: 600 }}>NOT SURE WHICH PLAN? TELL US ABOUT YOUR BUSINESS</div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: chosen ? 20 : 0 }}>
+      <div className="uc-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: chosen ? 20 : 0 }}>
         {USE_CASES.map(u => (
-          <button key={u.plan} onClick={() => setSelected(selected === u.plan ? null : u.plan)}
+          <button key={u.plan} className="uc-btn" onClick={() => setSelected(selected === u.plan ? null : u.plan)}
             style={{ padding: "16px 14px", borderRadius: 14, border: `1.5px solid ${selected === u.plan ? u.color + "66" : "rgba(255,255,255,.08)"}`, background: selected === u.plan ? `${u.color}10` : "rgba(255,255,255,.02)", cursor: "pointer", textAlign: "left", transition: "all .2s", position: "relative" }}>
             {u.popular && <div style={{ position: "absolute", top: -10, right: 12, background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 20 }}>MOST POPULAR</div>}
             <div style={{ fontSize: 24, marginBottom: 8 }}>{u.icon}</div>
@@ -507,12 +507,47 @@ export default function PricingPage() {
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         select option{background:#0f1629;color:white}
-        @media(max-width:900px){.pg{grid-template-columns:1fr !important}.cg{grid-template-columns:1fr !important}}
-        @media(max-width:700px){.ct{overflow-x:auto}}
         .feat-row:hover{background:rgba(255,255,255,.03)}
+
+        @media(max-width:900px){
+          .pg{grid-template-columns:1fr !important}
+          .cg{grid-template-columns:1fr !important}
+        }
+
+        /* Comparison table horizontal scroll */
+        @media(max-width:700px){
+          .ct{overflow-x:auto !important;}
+          .ct-inner{min-width:560px;}
+          .ct-sticky{position:relative !important;top:auto !important;}
+        }
+
+        @media(max-width:640px){
+          /* Top padding */
+          .pr-pad{padding:56px 16px 56px !important;}
+
+          /* Use-case wizard */
+          .uc-grid{grid-template-columns:1fr !important;gap:10px !important;}
+          .uc-btn{padding:14px 12px !important;}
+
+          /* Plan cards */
+          .pg{gap:14px !important;}
+
+          /* Automation add-on */
+          .addon-grid{grid-template-columns:1fr !important;gap:24px !important;}
+          .addon-feat{grid-template-columns:1fr 1fr !important;gap:8px !important;}
+          .val-bar{gap:8px !important;}
+          .val-bar-label{display:none !important;}
+
+          /* Custom plan */
+          .cp-row{flex-direction:column !important;}
+          .cp-sidebar{width:100% !important;position:static !important;top:auto !important;}
+
+          /* FAQ */
+          .pr-pad h2{font-size:24px !important;}
+        }
       `}</style>
 
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "96px 24px 88px" }}>
+      <div className="pr-pad" style={{ maxWidth: 1180, margin: "0 auto", padding: "96px 24px 88px" }}>
 
         {/* ── HERO ─────────────────────────────────────────── */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
