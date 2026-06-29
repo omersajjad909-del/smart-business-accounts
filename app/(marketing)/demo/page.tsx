@@ -572,7 +572,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 const CATEGORIES = Array.from(new Set(BUSINESSES.map((b) => b.category)));
 
 const TRUST_STATS = [
-  { value: "30+",          label: "Business Types",   icon: "🏢" },
+  { value: "60+",          label: "Business Types",   icon: "🏢" },
   { value: "Early Access", label: "Limited Spots",    icon: "🚀" },
   { value: "99.9%",        label: "Uptime SLA",       icon: "🔒" },
   { value: "< 2 min",      label: "Setup Time",       icon: "⚡" },
