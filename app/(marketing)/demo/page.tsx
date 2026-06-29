@@ -819,16 +819,16 @@ export default function DemoPage() {
                       alignItems: "center",
                       padding: "4px 10px",
                       borderRadius: 999,
-                      background: entry.demoAvailable ? "rgba(16,185,129,.12)" : "rgba(245,158,11,.1)",
-                      border: `1px solid ${entry.demoAvailable ? "rgba(16,185,129,.25)" : "rgba(245,158,11,.2)"}`,
-                      color: entry.demoAvailable ? "#34d399" : "#fbbf24",
+                      background: isDemoLive(entry.liveBusinessType) ? "rgba(16,185,129,.12)" : "rgba(245,158,11,.1)",
+                      border: `1px solid ${isDemoLive(entry.liveBusinessType) ? "rgba(16,185,129,.25)" : "rgba(245,158,11,.2)"}`,
+                      color: isDemoLive(entry.liveBusinessType) ? "#34d399" : "#fbbf24",
                       fontSize: 10,
                       fontWeight: 800,
                       letterSpacing: ".04em",
                       textTransform: "uppercase",
                     }}
                   >
-                    {entry.demoAvailable ? "Live Demo" : "Coming Soon"}
+                    {isDemoLive(entry.liveBusinessType) ? "Live Demo" : "Coming Soon"}
                   </span>
                 </div>
                 <div style={{ marginTop: 10, fontSize: 11, color: "rgba(255,255,255,.25)", fontWeight: 700 }}>{entry.users} users</div>
@@ -863,8 +863,8 @@ export default function DemoPage() {
                   <div style={{ padding: "4px 12px", borderRadius: 999, background: `${biz.color}20`, color: biz.color, fontSize: 11, fontWeight: 800 }}>
                     {biz.users} users
                   </div>
-                  <div style={{ padding: "4px 12px", borderRadius: 999, background: biz.demoAvailable ? "rgba(16,185,129,.14)" : "rgba(245,158,11,.12)", color: biz.demoAvailable ? "#34d399" : "#fbbf24", fontSize: 11, fontWeight: 800 }}>
-                    {biz.demoAvailable ? "Live Demo Ready" : "Coming Soon"}
+                  <div style={{ padding: "4px 12px", borderRadius: 999, background: isDemoLive(biz.liveBusinessType) ? "rgba(16,185,129,.14)" : "rgba(245,158,11,.12)", color: isDemoLive(biz.liveBusinessType) ? "#34d399" : "#fbbf24", fontSize: 11, fontWeight: 800 }}>
+                    {isDemoLive(biz.liveBusinessType) ? "Live Demo Ready" : "Coming Soon"}
                   </div>
                 </div>
                 <div style={{ fontSize: 14, color: "rgba(255,255,255,.5)", lineHeight: 1.7, maxWidth: 680 }}>{biz.description}</div>
@@ -872,17 +872,17 @@ export default function DemoPage() {
               <button
                 className="launch-btn"
                 onClick={handleTryDashboard}
-                disabled={loading || !biz.demoAvailable}
+                disabled={loading || !isDemoLive(biz.liveBusinessType)}
                 style={{
                   flexShrink: 0,
-                  background: biz.demoAvailable ? biz.gradient : "rgba(255,255,255,.08)",
-                  color: biz.demoAvailable ? "#fff" : "rgba(255,255,255,.45)",
+                  background: isDemoLive(biz.liveBusinessType) ? biz.gradient : "rgba(255,255,255,.08)",
+                  color: isDemoLive(biz.liveBusinessType) ? "#fff" : "rgba(255,255,255,.45)",
                   borderRadius: 16,
                   padding: "14px 28px",
                   fontSize: 14,
                   fontWeight: 800,
-                  cursor: loading || !biz.demoAvailable ? "not-allowed" : "pointer",
-                  boxShadow: biz.demoAvailable ? `0 10px 28px ${biz.color}35` : "none",
+                  cursor: loading || !isDemoLive(biz.liveBusinessType) ? "not-allowed" : "pointer",
+                  boxShadow: isDemoLive(biz.liveBusinessType) ? `0 10px 28px ${biz.color}35` : "none",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -890,7 +890,7 @@ export default function DemoPage() {
               </button>
             </div>
 
-            {!biz.demoAvailable && (
+            {!isDemoLive(biz.liveBusinessType) && (
               <div style={{ marginTop: -8, marginBottom: 20, padding: "14px 18px", borderRadius: 16, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", color: "rgba(255,255,255,.72)", fontSize: 13, lineHeight: 1.6 }}>
                 This business preview is available, but its live demo workspace has not launched yet. For now, Trading, Wholesale, Distribution, Import / Export, and Travel Agency open into a real live demo.
               </div>
