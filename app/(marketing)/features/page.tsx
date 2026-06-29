@@ -391,21 +391,18 @@ const CATEGORIES = [
         description: "Manage Bills of Materials (BOM), production orders, work orders, and raw material consumption. Track costs from raw material to finished goods with full costing visibility.",
         highlights: ["BOM management", "Production orders", "Cost tracking"],
         mockType: "manufacturing",
-        phase2: true,
       },
       {
         name: "Restaurant & Food Service",
         description: "Manage tables, menu items, kitchen orders, and recipe costing. Calculate the exact cost of every dish, track food waste, and monitor profitability per menu item.",
         highlights: ["Table management", "Kitchen display", "Recipe costing"],
         mockType: "restaurant",
-        phase2: true,
       },
       {
         name: "Real Estate & Property",
         description: "Track properties, tenants, rent collection, and lease agreements in one place. Automatic rent invoicing, overdue alerts, and property-wise profitability reports.",
         highlights: ["Tenant management", "Auto rent invoicing", "Property P&L"],
         mockType: "realestate",
-        phase2: true,
       },
       {
         name: "School & Academy",
