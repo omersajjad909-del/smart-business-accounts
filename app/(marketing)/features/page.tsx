@@ -409,35 +409,30 @@ const CATEGORIES = [
         description: "Manage students, fee collection, class schedules, and exam results. Automate fee reminders, generate fee receipts, and produce financial reports per academic term.",
         highlights: ["Fee management", "Student records", "Exam results"],
         mockType: "school",
-        phase2: true,
       },
       {
         name: "Hospital & Clinic",
         description: "Handle patient records, appointments, prescriptions, and lab tests. Fully integrated with billing so every patient visit is automatically invoiced and posted to accounts.",
         highlights: ["Patient records", "Appointment scheduling", "Lab billing"],
         mockType: "hospital",
-        phase2: true,
       },
       {
         name: "Retail & Point of Sale",
         description: "Run a full POS with barcode scanning, loyalty points, and real-time stock sync. Every sale posts instantly to accounts — no end-of-day reconciliation needed.",
         highlights: ["POS with barcode", "Loyalty program", "Live stock sync"],
         mockType: "retail",
-        phase2: true,
       },
       {
         name: "Services & Agency",
         description: "Built for consultancies, agencies, and professional service firms. Manage client projects, quotations, retainer billing, and expense tracking — all linked to your accounts.",
         highlights: ["Project billing", "Retainer invoices", "Client portal"],
         mockType: "services",
-        phase2: true,
       },
       {
         name: "Distribution & Wholesale",
         description: "Optimise your distribution network with route management, van sales, and delivery tracking. Wholesale-ready with multi-tier pricing, credit limits, and volume discount support.",
         highlights: ["Route management", "Van sales", "Credit limits"],
         mockType: "wholesale",
-        phase2: true,
       },
     ],
   },
@@ -1564,13 +1559,8 @@ function FeatureRow({ feature, globalIndex, color, glow, border, dim }: {
           <span style={{ width:5, height:5, borderRadius:"50%", background:color }}/>
           Feature {String(globalIndex+1).padStart(2,"0")}
         </div>
-        <h3 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(20px,2.5vw,28px)", fontWeight:700, color:"white", letterSpacing:"-.5px", lineHeight:1.25, marginBottom:(feature as any).phase2?10:12, display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" as const }}>
+        <h3 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(20px,2.5vw,28px)", fontWeight:700, color:"white", letterSpacing:"-.5px", lineHeight:1.25, marginBottom:12 }}>
           {feature.name}
-          {(feature as any).phase2 && (
-            <span style={{ fontSize:10, fontWeight:700, color:"#fbbf24", padding:"3px 10px", borderRadius:20, background:"rgba(251,191,36,.12)", border:"1px solid rgba(251,191,36,.28)", letterSpacing:".06em", textTransform:"uppercase" as const, fontFamily:"'Outfit',sans-serif", flexShrink:0 }}>
-              Coming Soon
-            </span>
-          )}
         </h3>
         <p style={{ fontSize:14.5, color:"rgba(255,255,255,.45)", lineHeight:1.8, marginBottom:22 }}>
           {feature.description}
