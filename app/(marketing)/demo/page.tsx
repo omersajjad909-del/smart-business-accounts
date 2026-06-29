@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { setCurrentUser, setStoredDemoBusinessPreference } from "@/lib/auth";
+import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
