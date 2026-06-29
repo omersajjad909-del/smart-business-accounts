@@ -610,6 +610,7 @@ export default function SolutionSection() {
             </div>
 
             <div
+              ref={detailRef}
               style={{
                 borderRadius: 24,
                 padding: "28px 28px 26px",

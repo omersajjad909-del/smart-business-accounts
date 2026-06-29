@@ -128,7 +128,7 @@ const PLANS = [
   },
 ];
 
-const DEFAULT_PLAN_LIMITS: { starter: number; pro: number; enterprise: number | null } = { starter: 3, pro: 10, enterprise: null };
+const DEFAULT_PLAN_LIMITS = { starter: 3, pro: 10, enterprise: 25 };
 
 const DEFAULT_PLAN_HIGHLIGHTS = {
   starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support"],
