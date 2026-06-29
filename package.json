@@ -58,7 +58,6 @@
     "react-barcode": "^1.6.1",
     "react-dom": "18.3.1",
     "react-hot-toast": "^2.6.0",
-    "react-leaflet": "^5.0.0",
     "react-plaid-link": "^4.1.1",
     "recharts": "^3.7.0",
     "resend": "^6.12.0"
