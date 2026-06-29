@@ -545,7 +545,7 @@ export default function Hero() {
         <div style={{ maxWidth:1220, margin:"0 auto", padding:"32px 28px" }}>
           <div className="hero-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:1 }}>
             {[
-              { n:"30+",         l:"Business Types", desc:"retail, clinics, trading & more", color:"#818cf8" },
+              { n:"60+",         l:"Business Types", desc:"retail, clinics, trading & more", color:"#818cf8" },
               { n:"99.9%",      l:"Uptime",       desc:"guaranteed SLA",                color:"#34d399" },
               { n:"Early Access",l:"Now Live",    desc:"limited spots available",        color:"#fbbf24" },
               { n:"< 2 min",    l:"Setup time",   desc:"from signup to first invoice",   color:"#60a5fa" },
