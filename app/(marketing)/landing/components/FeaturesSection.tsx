@@ -435,6 +435,8 @@ export default function FeaturesSection() {
         @media(max-width:860px){
           .feat-grid{grid-template-columns:1fr !important; gap:36px !important;}
           .feat-flip{flex-direction:column-reverse !important;}
+          .feat-text{order:1 !important;}
+          .feat-visual{order:2 !important;}
         }
       `}</style>
 
