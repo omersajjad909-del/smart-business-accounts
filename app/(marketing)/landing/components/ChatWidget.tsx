@@ -471,6 +471,7 @@ export default function ChatWidget() {
                   onFocusCapture={e => (e.currentTarget.style.borderColor = "rgba(129,140,248,.45)")}
                   onBlurCapture={e  => (e.currentTarget.style.borderColor = "rgba(255,255,255,.07)")}>
                   <input
+                    ref={inputRef}
                     className="cw-input"
                     value={inputVal}
                     onChange={e => setInputVal(e.target.value)}
