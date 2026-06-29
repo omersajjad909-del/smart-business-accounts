@@ -123,6 +123,7 @@ export default function Hero() {
           .hero-ctarow { justify-content:center !important; }
           .hero-proof  { justify-content:center !important; }
           .hero-tags   { justify-content:center !important; }
+          .hero-mobile-card { display:grid !important; }
         }
         @media(max-width:640px) {
           .hero-stats { grid-template-columns:repeat(2,1fr) !important; }
@@ -283,6 +284,38 @@ export default function Hero() {
                 <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>14-day money-back guarantee</span>
                 <span style={{ width:1, height:16, background:"rgba(255,255,255,.1)", display:"inline-block" }}/>
                 <span style={{ fontSize:12, fontWeight:600, color:"rgba(255,255,255,.35)" }}>Cancel anytime</span>
+              </div>
+
+              {/* ── Mobile-only product preview ── */}
+              <div className="hero-mobile-card" style={{ display:"none", gridTemplateColumns:"1fr 1fr", gap:10, marginTop:32, width:"100%", maxWidth:400 }}>
+                {/* Revenue card */}
+                <div style={{ borderRadius:16, padding:"16px", background:"rgba(16,185,129,.07)", border:"1px solid rgba(16,185,129,.2)" }}>
+                  <div style={{ fontSize:9, fontWeight:700, color:"rgba(52,211,153,.6)", letterSpacing:".07em", marginBottom:6 }}>REVENUE</div>
+                  <div style={{ fontSize:22, fontWeight:900, color:"#fff", letterSpacing:"-0.5px" }}>{fmt(rev)}</div>
+                  <Sparkline d={[48,62,50,75,60,85,76,95,82,110,94,120]} color="#10b981"/>
+                  <div style={{ fontSize:11, fontWeight:700, color:"#34d399", marginTop:6 }}>↑ 22% vs last month</div>
+                </div>
+                {/* Net Profit card */}
+                <div style={{ borderRadius:16, padding:"16px", background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.22)" }}>
+                  <div style={{ fontSize:9, fontWeight:700, color:"rgba(165,180,252,.6)", letterSpacing:".07em", marginBottom:6 }}>NET PROFIT</div>
+                  <div style={{ fontSize:22, fontWeight:900, color:"#a5b4fc", letterSpacing:"-0.5px" }}>{fmt(prof)}</div>
+                  <Sparkline d={[28,40,32,50,42,60,54,70,62,80,72,90]} color="#818cf8"/>
+                  <div style={{ fontSize:11, fontWeight:700, color:"#818cf8", marginTop:6 }}>63% profit margin</div>
+                </div>
+                {/* AI Insight strip */}
+                <div style={{ gridColumn:"1/-1", borderRadius:14, padding:"12px 14px", background:"rgba(8,10,28,.7)", border:"1px solid rgba(167,139,250,.2)", display:"flex", alignItems:"center", gap:10 }}>
+                  <div style={{ width:30, height:30, borderRadius:9, flexShrink:0, background:"rgba(167,139,250,.15)", border:"1px solid rgba(167,139,250,.25)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+                  </div>
+                  <div style={{ textAlign:"left" }}>
+                    <div style={{ fontSize:12, fontWeight:700, color:"#fff" }}>AI Insight: Revenue up 22% MoM</div>
+                    <div style={{ fontSize:10, color:"rgba(255,255,255,.35)", marginTop:1 }}>FinovaOS AI · Health score 91/100</div>
+                  </div>
+                  <div style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:4 }}>
+                    <div style={{ width:6, height:6, borderRadius:"50%", background:"#10b981", animation:"pulse2 2s infinite" }}/>
+                    <span style={{ fontSize:10, color:"#10b981", fontWeight:700 }}>Live</span>
+                  </div>
+                </div>
               </div>
             </div>
 

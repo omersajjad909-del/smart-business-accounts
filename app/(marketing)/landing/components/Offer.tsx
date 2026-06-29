@@ -13,7 +13,7 @@ export default function Offer() {
       fontFamily: "'Outfit',sans-serif",
       fontSize: 13,
       fontWeight: 600,
-      padding: "9px 16px",
+      padding: "9px 44px 9px 16px",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
