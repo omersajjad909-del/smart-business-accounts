@@ -13,26 +13,32 @@ export default function Offer() {
       fontFamily: "'Outfit',sans-serif",
       fontSize: 13,
       fontWeight: 600,
-      padding: "9px 44px 9px 16px",
+      padding: "8px 44px 8px 16px",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      gap: 10,
+      gap: 8,
       position: "relative",
       zIndex: 60,
       textAlign: "center",
-      flexWrap: "wrap",
+      flexWrap: "nowrap",
     }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+        @media(max-width:600px){
+          .offer-badge { display:none !important; }
+          .offer-text  { font-size:12px !important; }
+        }
+      `}</style>
 
       <span style={{ fontSize: 15 }}>🔥</span>
-      <span style={{
+      <span className="offer-badge" style={{
         background: "rgba(251,191,36,.2)", border: "1px solid rgba(251,191,36,.4)",
         borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 800,
         color: "#fbbf24", letterSpacing: ".06em",
       }}>Launch Offer</span>
-      <span style={{ color: "rgba(255,255,255,.85)" }}>
-       — 75% Off for the First 3 Months. Limited Time.
+      <span className="offer-text" style={{ color: "rgba(255,255,255,.85)" }}>
+        75% Off — First 3 Months. Limited Time.
       </span>
 
       <Link href="/pricing" style={{

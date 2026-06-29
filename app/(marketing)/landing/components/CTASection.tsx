@@ -299,40 +299,6 @@ export default function CTASection() {
         ))}
       </div>
 
-      {/* ── Footer nav ── */}
-      <div style={{
-        maxWidth: 860, margin: "0 auto",
-        paddingTop: 28,
-        borderTop: "1px solid rgba(255,255,255,.05)",
-        display: "flex", justifyContent: "center",
-        gap: 28, flexWrap: "wrap",
-        opacity: vis ? 1 : 0,
-        transition: "opacity .6s ease .6s",
-      }}>
-        {[
-          { label: "Privacy Policy", href: "/legal/privacy" },
-          { label: "Terms of Use",   href: "/legal/terms"   },
-          { label: "Security",       href: "/security" },
-          { label: "Help Center",    href: "/help"     },
-          { label: "Contact Sales",  href: "/contact"  },
-          { label: "System Status",  href: "/status"   },
-        ].map(({ label, href }) => (
-          <Link key={label} href={href} style={{ fontSize: 12, color: "rgba(255,255,255,.2)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,.6)")}
-            onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.2)")}>
-            {label}
-          </Link>
-        ))}
-      </div>
-
-      <div style={{
-        marginTop: 18, textAlign: "center",
-        fontSize: 12, color: "rgba(255,255,255,.13)",
-        opacity: vis ? 1 : 0,
-        transition: "opacity .6s ease .65s",
-      }}>
-        © {new Date().getFullYear()} FinovaOS · Built for growing businesses worldwide.
-      </div>
     </section>
   );
 }

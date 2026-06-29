@@ -47,7 +47,7 @@ const PLANS = [
     glow: "rgba(129,140,248,.2)",
     featured: false,
     features: [
-      { text: "Up to 5 users",            yes: true  },
+      { text: "Up to 3 users",            yes: true  },
       { text: "Invoicing & billing",       yes: true  },
       { text: "Ledger & trial balance",    yes: true  },
       { text: "Inventory management",      yes: true  },
@@ -69,7 +69,7 @@ const PLANS = [
     glow: "rgba(165,180,252,.28)",
     featured: true,
     features: [
-      { text: "Up to 25 users",            yes: true  },
+      { text: "Up to 10 users",            yes: true  },
       { text: "Everything in Starter",     yes: true  },
       { text: "Bank reconciliation",       yes: true  },
       { text: "Multi-branch support",      yes: true  },
@@ -128,7 +128,7 @@ const PLANS = [
   },
 ];
 
-const DEFAULT_PLAN_LIMITS = { starter: 3, pro: 10, enterprise: 25 };
+const DEFAULT_PLAN_LIMITS: { starter: number; pro: number; enterprise: number | null } = { starter: 3, pro: 10, enterprise: null };
 
 const DEFAULT_PLAN_HIGHLIGHTS = {
   starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support"],
