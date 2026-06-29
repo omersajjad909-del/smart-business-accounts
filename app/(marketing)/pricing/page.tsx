@@ -734,8 +734,9 @@ export default function PricingPage() {
 
           {/* Sticky header row */}
           <div className="ct" style={{ background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, overflow: "hidden" }}>
+          <div className="ct-inner">
             {/* Plan header */}
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "1px solid rgba(255,255,255,.08)", position: "sticky", top: 0, background: "#0c0f2e", zIndex: 10 }}>
+            <div className="ct-sticky" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "1px solid rgba(255,255,255,.08)", position: "sticky", top: 0, background: "#0c0f2e", zIndex: 10 }}>
               <div style={{ padding: "20px 24px", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".06em" }}>Features</div>
               {PLANS.map((plan, pi) => (
                 <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>

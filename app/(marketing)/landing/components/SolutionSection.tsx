@@ -506,7 +506,7 @@ export default function SolutionSection() {
             }}
           >
             {[
-              { value: String(visibleIndustries.length).padStart(2, "0"), label: "Focused Businesses", color: "#818cf8" },
+              { value: String(visibleIndustries.length).padStart(2, "0"), label: "Focused Businesses now", color: "#818cf8" },
               { value: "4-8", label: "Core Modules Each", color: "#34d399" },
               { value: "100%", label: "Workflow Guided", color: "#fbbf24" },
             ].map((stat) => (
