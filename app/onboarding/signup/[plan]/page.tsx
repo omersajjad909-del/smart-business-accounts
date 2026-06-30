@@ -596,7 +596,7 @@ export default function SignupByPlanPage() {
           .name-grid{grid-template-columns:1fr!important;}
           .phone-grid{grid-template-columns:1fr!important;}
           .steps{display:none!important;}
-          .signup-sidebar{order:2;}
+          .signup-sidebar{display:none!important;}
           .signup-form{order:1;}
           .signup-header{padding:14px 16px !important;}
           .signup-main{padding:24px 14px 64px !important;}
@@ -644,7 +644,7 @@ export default function SignupByPlanPage() {
                 <path d="M2 17l10 5 10-5"/>
                 <path d="M2 12l10 5 10-5"/>
               </svg> */}
-              <img src="/icon1.png w-12 h-12" alt="" />
+              <img src="/icon1.png" alt="FinovaOS" style={{ width:22, height:22, objectFit:"contain" }} />
 
             </div>
             <span style={{ fontFamily:"'Lora',serif", fontSize:18, fontWeight:700, color:"white", letterSpacing:"-.3px" }}>
