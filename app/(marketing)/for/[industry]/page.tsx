@@ -992,58 +992,66 @@ export default function IndustryPage() {
       </div>
 
       {/* ── PLAN COMPARISON ── */}
-      {type.isLive && (
-        <div style={{ maxWidth:1000, margin:"80px auto 0", padding:"0 24px" }}>
-          <h2 style={{ textAlign:"center", fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,34px)", fontWeight:700, letterSpacing:"-1px", marginBottom:10 }}>
-            Which plan suits your {type.label}?
-          </h2>
-          <p style={{ textAlign:"center", color:"rgba(255,255,255,.4)", fontSize:15, marginBottom:40 }}>
-            All plans include core accounting. Higher plans unlock more {type.label.toLowerCase()} features.
-          </p>
+      <div style={{ maxWidth:1000, margin:"80px auto 0", padding:"0 24px" }}>
+        <h2 style={{ textAlign:"center", fontFamily:"'Lora',serif", fontSize:"clamp(22px,3vw,34px)", fontWeight:700, letterSpacing:"-1px", marginBottom:10 }}>
+          Which plan suits your {type.label}?
+        </h2>
+        <p style={{ textAlign:"center", color:"rgba(255,255,255,.4)", fontSize:15, marginBottom:40 }}>
+          All plans include core accounting. Higher plans unlock more {type.label.toLowerCase()} features.
+        </p>
 
-          <div style={{ borderRadius:20, overflow:"hidden", border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.02)" }}>
-            {/* Headers */}
-            <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.02)" }}>
-              <div style={{ padding:"20px 24px", fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em" }}>Feature</div>
-              {PLANS.map(p => (
-                <div key={p.key} style={{ padding:"20px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", background:p.featured?"rgba(99,102,241,.06)":"transparent" }}>
-                  {p.featured && <div style={{ fontSize:9, fontWeight:800, color:"#fbbf24", letterSpacing:".08em", marginBottom:4 }}>POPULAR</div>}
-                  <div style={{ fontSize:12, fontWeight:900, color:p.color, marginBottom:4 }}>{p.name}</div>
-                  <div style={{ fontSize:16, fontWeight:800, color:"white" }}>{fmtPrice(p.price)}<span style={{ fontSize:10, color:"rgba(255,255,255,.4)", fontWeight:500 }}>/mo</span></div>
+        <div style={{ borderRadius:20, overflow:"hidden", border:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.02)" }}>
+          {/* Headers */}
+          <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.02)" }}>
+            <div style={{ padding:"20px 24px", fontSize:11, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase", letterSpacing:".06em" }}>Feature</div>
+            {PLANS.map(p => (
+              <div key={p.key} style={{ padding:"20px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", background:p.featured?"rgba(99,102,241,.06)":"transparent" }}>
+                {p.featured && <div style={{ fontSize:9, fontWeight:800, color:"#fbbf24", letterSpacing:".08em", marginBottom:4 }}>POPULAR</div>}
+                <div style={{ fontSize:12, fontWeight:900, color:p.color, marginBottom:4 }}>{p.name}</div>
+                <div style={{ fontSize:16, fontWeight:800, color:"white" }}>{fmtPrice(p.price)}<span style={{ fontSize:10, color:"rgba(255,255,255,.4)", fontWeight:500 }}>/mo</span></div>
+              </div>
+            ))}
+          </div>
+          {/* Rows */}
+          {(planRows as any[]).map((row:any,i:number) => (
+            <div key={i} style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.04)", background:i%2?"rgba(255,255,255,.01)":"transparent" }}>
+              <div style={{ padding:"13px 24px", fontSize:13, color:"rgba(255,255,255,.6)" }}>{row.feature}</div>
+              {(["starter","pro","enterprise"] as const).map(k => (
+                <div key={k} style={{ padding:"13px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.04)", background:k==="pro"?"rgba(99,102,241,.03)":"transparent" }}>
+                  <Cell val={row[k]} />
                 </div>
               ))}
             </div>
-            {/* Rows */}
-            {(planRows as any[]).map((row:any,i:number) => (
-              <div key={i} style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.04)", background:i%2?"rgba(255,255,255,.01)":"transparent" }}>
-                <div style={{ padding:"13px 24px", fontSize:13, color:"rgba(255,255,255,.6)" }}>{row.feature}</div>
-                {(["starter","pro","enterprise"] as const).map(k => (
-                  <div key={k} style={{ padding:"13px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.04)", background:k==="pro"?"rgba(99,102,241,.03)":"transparent" }}>
-                    <Cell val={row[k]} />
-                  </div>
-                ))}
-              </div>
-            ))}
-            {/* CTA */}
-            <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", background:"rgba(255,255,255,.02)", borderTop:"1px solid rgba(255,255,255,.08)" }}>
-              <div style={{ padding:"20px 24px", fontSize:12, color:"rgba(255,255,255,.28)" }}>🔥 75% off — first 3 months</div>
-              {PLANS.map(p => (
-                <div key={p.key} style={{ padding:"14px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", background:p.featured?"rgba(99,102,241,.06)":"transparent" }}>
+          ))}
+          {/* CTA row */}
+          <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", background:"rgba(255,255,255,.02)", borderTop:"1px solid rgba(255,255,255,.08)" }}>
+            <div style={{ padding:"20px 24px", fontSize:12, color:"rgba(255,255,255,.28)" }}>
+              {type.isLive ? "🔥 75% off — first 3 months" : "⏳ Launching soon — join the waitlist"}
+            </div>
+            {PLANS.map(p => (
+              <div key={p.key} style={{ padding:"14px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", background:p.featured?"rgba(99,102,241,.06)":"transparent" }}>
+                {type.isLive ? (
                   <Link href={`/onboarding/signup/${p.key==="pro"?"professional":p.key}?businessType=${type.id}`} style={{
                     display:"block", padding:"10px 0", borderRadius:10,
                     background:p.featured?p.gradient:"rgba(255,255,255,.07)",
                     border:p.featured?"none":`1px solid ${p.color}30`,
                     color:"white", fontWeight:700, fontSize:12, textDecoration:"none",
                   }}>Get {p.name}</Link>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div style={{ textAlign:"center", marginTop:14 }}>
-            <Link href="/pricing" style={{ fontSize:13, color:"#818cf8", textDecoration:"none", fontWeight:600 }}>View full pricing details →</Link>
+                ) : (
+                  <div style={{
+                    padding:"10px 0", borderRadius:10, fontSize:12, fontWeight:600,
+                    color:"rgba(255,255,255,.25)", border:"1px solid rgba(255,255,255,.08)",
+                    textAlign:"center",
+                  }}>Coming Soon</div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
-      )}
+        <div style={{ textAlign:"center", marginTop:14 }}>
+          <Link href="/pricing" style={{ fontSize:13, color:"#818cf8", textDecoration:"none", fontWeight:600 }}>View full pricing details →</Link>
+        </div>
+      </div>
 
       {/* ── FAQ ── */}
       <div style={{ maxWidth:760, margin:"80px auto 0", padding:"0 24px" }}>
