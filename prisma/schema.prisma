@@ -1999,6 +1999,7 @@ model Feedback {
   name        String?
   status      String    @default("open")      // open | in_review | resolved | closed
   priority    String    @default("normal")    // low | normal | high | urgent
+  module      String?                         // affected module/feature
   userId      String?
   companyId   String?
   adminNote   String?   @db.Text

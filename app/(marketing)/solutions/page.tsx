@@ -736,6 +736,182 @@ function useVisible(threshold = 0.1) {
   return [ref, visible] as const;
 }
 
+/* ─── industry-id → BUSINESS_PHASE_CONFIG key mapping ─── */
+const NOTIFY_TYPE: Record<string, string> = {
+  manufacturing: "manufacturing",
+  retail:        "retail",
+  restaurant:    "restaurant",
+  hospital:      "hospital",
+  hotel:         "hotel",
+  pharmacy:      "pharmacy",
+  travel:        "travel",
+  construction:  "construction",
+  ecommerce:     "ecommerce",
+  agriculture:   "agriculture",
+  transport:     "transport",
+  salon:         "salon",
+  school:        "school",
+  ngo:           "ngo",
+  real_estate:   "real_estate",
+  automotive:    "car_showroom",
+  advertising:   "advertising_agency",
+  saas:          "saas_company",
+  solar:         "solar_company",
+  events:        "event_planner",
+  repair:        "mobile_repair",
+  franchise:     "chain_store",
+};
+
+/* ─── Notify modal ─── */
+function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () => void }) {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
+
+  const submit = async () => {
+    if (!email.trim()) return;
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/public/notify-me", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, businessType: NOTIFY_TYPE[ind.id] || ind.id }),
+      });
+      const data = await res.json();
+      if (data.success) setDone(true);
+      else setError(data.error || "Something went wrong. Please try again.");
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        position:"fixed", inset:0, zIndex:9999,
+        display:"flex", alignItems:"center", justifyContent:"center",
+        background:"rgba(0,0,0,.75)", backdropFilter:"blur(8px)", padding:"24px",
+      }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div style={{
+        width:"100%", maxWidth:440, borderRadius:24,
+        background:"linear-gradient(145deg,rgba(15,18,50,.98),rgba(12,15,46,.98))",
+        border:"1.5px solid rgba(255,255,255,.1)",
+        boxShadow:"0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04)",
+        padding:"36px 32px", position:"relative", overflow:"hidden",
+      }}>
+        {/* Ambient glow */}
+        <div style={{ position:"absolute", width:260, height:260, borderRadius:"50%",
+          background:`radial-gradient(circle,${ind.glow},transparent 70%)`,
+          top:-60, right:-60, pointerEvents:"none" }}/>
+
+        {/* Close button */}
+        <button onClick={onClose} style={{
+          position:"absolute", top:16, right:16,
+          background:"rgba(255,255,255,.07)", border:"1px solid rgba(255,255,255,.12)",
+          borderRadius:"50%", width:32, height:32,
+          color:"rgba(255,255,255,.5)", fontSize:16, cursor:"pointer",
+          display:"flex", alignItems:"center", justifyContent:"center",
+          fontFamily:"inherit", transition:"all .2s",
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,.14)"; e.currentTarget.style.color="white"; }}
+          onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,.07)"; e.currentTarget.style.color="rgba(255,255,255,.5)"; }}
+        >✕</button>
+
+        <div style={{ position:"relative" }}>
+          <div style={{ fontSize:40, marginBottom:14 }}>{ind.emoji}</div>
+          <div style={{
+            display:"inline-flex", alignItems:"center", gap:6, padding:"4px 12px", borderRadius:20,
+            background:ind.dim, border:`1px solid ${ind.border}`,
+            fontSize:10, fontWeight:700, color:ind.color,
+            letterSpacing:".08em", textTransform:"uppercase" as const, marginBottom:16,
+          }}>PHASE {ind.phase} — COMING SOON</div>
+
+          <h3 style={{ fontFamily:"'Lora',serif", fontSize:22, fontWeight:700, color:"white",
+            letterSpacing:"-.5px", lineHeight:1.25, marginBottom:8 }}>
+            Get notified when {ind.label} launches
+          </h3>
+          <p style={{ fontSize:13.5, color:"rgba(255,255,255,.4)", lineHeight:1.7, marginBottom:28 }}>
+            We&apos;ll send you one email the moment {ind.label} goes live — including early access and any launch offer.
+          </p>
+
+          {done ? (
+            <div style={{ textAlign:"center" as const, padding:"16px 0 8px" }}>
+              <div style={{ fontSize:52, marginBottom:14 }}>🎉</div>
+              <div style={{ fontFamily:"'Lora',serif", fontSize:20, fontWeight:700, color:"white", marginBottom:8 }}>
+                You&apos;re on the list!
+              </div>
+              <p style={{ fontSize:13.5, color:"rgba(255,255,255,.4)", lineHeight:1.7, marginBottom:24 }}>
+                We&apos;ll notify you as soon as {ind.label} is ready. Keep an eye on your inbox.
+              </p>
+              <button onClick={onClose} style={{
+                padding:"10px 32px", borderRadius:12,
+                background:ind.color, border:"none",
+                color:"#0f172a", fontWeight:700, fontSize:14,
+                cursor:"pointer", fontFamily:"inherit",
+              }}>Done</button>
+            </div>
+          ) : (
+            <>
+              <div style={{ marginBottom:16 }}>
+                <label style={{
+                  display:"block", fontSize:11, fontWeight:700,
+                  color:"rgba(255,255,255,.4)", marginBottom:8,
+                  letterSpacing:".07em", textTransform:"uppercase" as const,
+                }}>Your Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && submit()}
+                  placeholder="you@company.com"
+                  style={{
+                    width:"100%", padding:"13px 16px", borderRadius:12,
+                    background:"rgba(255,255,255,.06)",
+                    border:`1.5px solid ${error ? "rgba(239,68,68,.5)" : "rgba(255,255,255,.12)"}`,
+                    color:"white", fontSize:14, fontFamily:"inherit", outline:"none",
+                    transition:"border-color .2s", boxSizing:"border-box" as const,
+                  }}
+                  onFocus={e => { e.currentTarget.style.borderColor = `${ind.color}80`; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = error ? "rgba(239,68,68,.5)" : "rgba(255,255,255,.12)"; }}
+                />
+                {error && <div style={{ fontSize:12, color:"#f87171", marginTop:6 }}>{error}</div>}
+              </div>
+
+              <button
+                onClick={submit}
+                disabled={loading || !email.trim()}
+                style={{
+                  width:"100%", padding:"13px", borderRadius:12, border:"none",
+                  background: !loading && email.trim()
+                    ? `linear-gradient(135deg,${ind.color},${ind.color}cc)`
+                    : "rgba(255,255,255,.08)",
+                  color: !loading && email.trim() ? "#0f172a" : "rgba(255,255,255,.3)",
+                  fontWeight:800, fontSize:15,
+                  cursor: loading || !email.trim() ? "not-allowed" : "pointer",
+                  fontFamily:"inherit", transition:"all .25s",
+                  boxShadow: !loading && email.trim() ? `0 6px 24px ${ind.glow}` : "none",
+                }}
+              >
+                {loading ? "Saving..." : `🔔 Notify me when ${ind.label} launches`}
+              </button>
+
+              <p style={{ fontSize:11.5, color:"rgba(255,255,255,.22)", textAlign:"center" as const, marginTop:14, lineHeight:1.6 }}>
+                No spam — just one launch notification.
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Small components ─── */
 function Check({ color }: { color: string }) {
   return (
@@ -746,7 +922,7 @@ function Check({ color }: { color: string }) {
 }
 
 /* ─── Coming-soon compact card ─── */
-function ComingSoonCard({ ind }: { ind: typeof INDUSTRIES[0] }) {
+function ComingSoonCard({ ind, onNotify }: { ind: typeof INDUSTRIES[0]; onNotify: (ind: typeof INDUSTRIES[0]) => void }) {
   return (
     <div id={ind.id} style={{
       padding:"22px", borderRadius:16,
@@ -771,19 +947,20 @@ function ComingSoonCard({ ind }: { ind: typeof INDUSTRIES[0] }) {
           </div>
         ))}
       </div>
-      <Link href={`/contact?subject=notify-${ind.id}`} style={{
-        display:"block", textAlign:"center", padding:"9px 0", borderRadius:10,
+      <button onClick={() => onNotify(ind)} style={{
+        display:"block", width:"100%", textAlign:"center", padding:"9px 0", borderRadius:10,
         background:"rgba(251,191,36,.08)", border:"1px solid rgba(251,191,36,.25)",
-        color:"#fbbf24", fontWeight:700, fontSize:12, textDecoration:"none",
+        color:"#fbbf24", fontWeight:700, fontSize:12,
+        cursor:"pointer", fontFamily:"inherit",
       }}>
         🔔 Notify me when live
-      </Link>
+      </button>
     </div>
   );
 }
 
 /* ─── Industry card ─── */
-function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; index: number; isLive: boolean }) {
+function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTRIES[0]; index: number; isLive: boolean; onNotify?: (ind: typeof INDUSTRIES[0]) => void }) {
   const [ref, visible] = useVisible(0.08);
   const [hoveredFeat, setHoveredFeat] = useState<number | null>(null);
   const isEven = index % 2 === 0;
@@ -951,18 +1128,18 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
             }}>
               {comingSoon ? (
                 <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                  <Link href={`/contact?subject=notify-${ind.id}`} style={{
+                  <button onClick={() => onNotify?.(ind)} style={{
                     display:"inline-flex", alignItems:"center", gap:8,
                     padding:"13px 28px", borderRadius:13,
                     background:"rgba(251,191,36,.12)", border:"1.5px solid rgba(251,191,36,.4)",
                     color:"#fbbf24", fontWeight:800, fontSize:14,
-                    textDecoration:"none", fontFamily:"inherit", transition:"all .25s",
+                    cursor:"pointer", fontFamily:"inherit", transition:"all .25s",
                   }}
                     onMouseEnter={e => { e.currentTarget.style.background="rgba(251,191,36,.2)"; e.currentTarget.style.transform="translateY(-2px)"; }}
                     onMouseLeave={e => { e.currentTarget.style.background="rgba(251,191,36,.12)"; e.currentTarget.style.transform="translateY(0)"; }}
                   >
                     🔔 Notify me when live
-                  </Link>
+                  </button>
                   <Link href={`/for/${ind.id}`} style={{
                     display:"inline-flex", alignItems:"center", gap:6,
                     padding:"13px 22px", borderRadius:13,
@@ -1060,6 +1237,7 @@ export default function SolutionsPage() {
   const [crossRef, crossVisible] = useVisible(0.1);
   const [ctaRef, ctaVisible] = useVisible(0.1);
   const [crossHover, setCrossHover] = useState<number | null>(null);
+  const [notifyInd, setNotifyInd] = useState<typeof INDUSTRIES[0] | null>(null);
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -1296,7 +1474,7 @@ export default function SolutionsPage() {
 
         {/* ── LIVE INDUSTRY SECTIONS ── */}
         {INDUSTRIES.filter(ind => isLive(ind)).map((ind, i) => (
-          <IndustrySection key={ind.id} ind={ind} index={i} isLive={true} />
+          <IndustrySection key={ind.id} ind={ind} index={i} isLive={true} onNotify={setNotifyInd} />
         ))}
 
         {/* ── COMING SOON ROADMAP ── */}
@@ -1316,7 +1494,7 @@ export default function SolutionsPage() {
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:16 }}>
                 {INDUSTRIES.filter(ind => !isLive(ind)).map(ind => (
-                  <ComingSoonCard key={ind.id} ind={ind} />
+                  <ComingSoonCard key={ind.id} ind={ind} onNotify={setNotifyInd} />
                 ))}
               </div>
             </div>
@@ -1521,6 +1699,9 @@ export default function SolutionsPage() {
           ))}
         </div>
       </div>
+
+      {/* ── NOTIFY MODAL ── */}
+      {notifyInd && <NotifyModal ind={notifyInd} onClose={() => setNotifyInd(null)} />}
     </>
   );
 }
