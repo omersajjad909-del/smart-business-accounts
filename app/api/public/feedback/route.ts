@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     if (!type || !subject?.trim() || !message?.trim())
       return NextResponse.json({ error: "type, subject and message are required" }, { status: 400 });
 
-    if (!["complaint", "suggestion", "bug", "general"].includes(type))
+    if (!["feedback", "complaint", "suggestion", "bug", "general"].includes(type))
       return NextResponse.json({ error: "Invalid type" }, { status: 400 });
 
     if (message.trim().length < 20)
