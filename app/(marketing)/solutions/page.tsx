@@ -745,6 +745,43 @@ function Check({ color }: { color: string }) {
   );
 }
 
+/* ─── Coming-soon compact card ─── */
+function ComingSoonCard({ ind }: { ind: typeof INDUSTRIES[0] }) {
+  return (
+    <div id={ind.id} style={{
+      padding:"22px", borderRadius:16,
+      background:"rgba(255,255,255,.02)", border:`1px solid ${ind.border}`,
+      position:"relative", overflow:"hidden",
+      display:"flex", flexDirection:"column", gap:0,
+    }}>
+      {/* Phase badge */}
+      <div style={{ position:"absolute", top:12, right:12, fontSize:9, fontWeight:800, color:"#fbbf24", padding:"3px 8px", borderRadius:10, background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.25)", letterSpacing:".05em" }}>
+        PHASE {ind.phase}
+      </div>
+      {/* Ambient */}
+      <div style={{ position:"absolute", width:160, height:160, borderRadius:"50%", background:`radial-gradient(circle,${ind.glow},transparent 70%)`, bottom:-40, right:-40, pointerEvents:"none" }}/>
+      <div style={{ fontSize:28, marginBottom:10 }}>{ind.emoji}</div>
+      <div style={{ fontSize:15, fontWeight:700, color:"white", marginBottom:4, lineHeight:1.3 }}>{ind.label}</div>
+      <div style={{ fontSize:12, color:ind.color, fontWeight:600, marginBottom:14, lineHeight:1.5 }}>{ind.subtitle}</div>
+      <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom:18, flex:1 }}>
+        {ind.features.slice(0, 3).map(f => (
+          <div key={f.title} style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <span style={{ fontSize:14, flexShrink:0 }}>{f.icon}</span>
+            <span style={{ fontSize:11.5, color:"rgba(255,255,255,.45)" }}>{f.title}</span>
+          </div>
+        ))}
+      </div>
+      <Link href={`/contact?subject=notify-${ind.id}`} style={{
+        display:"block", textAlign:"center", padding:"9px 0", borderRadius:10,
+        background:"rgba(251,191,36,.08)", border:"1px solid rgba(251,191,36,.25)",
+        color:"#fbbf24", fontWeight:700, fontSize:12, textDecoration:"none",
+      }}>
+        🔔 Notify me when live
+      </Link>
+    </div>
+  );
+}
+
 /* ─── Industry card ─── */
 function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; index: number; isLive: boolean }) {
   const [ref, visible] = useVisible(0.08);
@@ -878,7 +915,8 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
               ))}
             </div>
 
-            {/* Quote */}
+            {/* Quote — only for live industries */}
+            {!comingSoon && (
             <div style={{
               padding:"18px 20px", borderRadius:16,
               background:"rgba(255,255,255,.03)", border:`1.5px solid ${ind.border}`,
@@ -904,6 +942,7 @@ function IndustrySection({ ind, index, isLive }: { ind: typeof INDUSTRIES[0]; in
                 </div>
               </div>
             </div>
+            )}
 
             <div style={{
               marginTop:28,
