@@ -1273,8 +1273,13 @@ export default function SolutionsPage() {
     return () => window.clearTimeout(timer);
   }, []);
 
-  // Determine if an industry is live (fallback: phase 1 is live, others are coming soon)
-  const isLive = (ind: typeof INDUSTRIES[0]) => ind.phase === 1;
+  // Determine if an industry is live — respects admin panel toggle
+  const isLive = (ind: typeof INDUSTRIES[0]) => {
+    const bizKey = IND_BIZ_KEY[ind.id];
+    if (!bizKey) return true; // enterprise / unmapped → always live
+    if (Object.keys(statusMap).length === 0) return ind.phase === 1; // API still loading
+    return statusMap[bizKey] === "live";
+  };
 
   const scrollTo = (id: string) => {
     setActiveTab(id);
