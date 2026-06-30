@@ -1060,15 +1060,6 @@ export default function SolutionsPage() {
   const [crossRef, crossVisible] = useVisible(0.1);
   const [ctaRef, ctaVisible] = useVisible(0.1);
   const [crossHover, setCrossHover] = useState<number | null>(null);
-  const [liveTypes, setLiveTypes] = useState<Set<string> | null>(null);
-
-  useEffect(() => {
-    fetch("/api/public/business-module-status")
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.enabledTypes) setLiveTypes(new Set(d.enabledTypes)); })
-      .catch(() => {});
-  }, []);
-
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -1092,10 +1083,7 @@ export default function SolutionsPage() {
   }, []);
 
   // Determine if an industry is live (fallback: phase 1 is live, others are coming soon)
-  const isLive = (ind: typeof INDUSTRIES[0]) => {
-    if (liveTypes) return liveTypes.has(ind.id);
-    return ind.phase === 1; // default before API responds
-  };
+  const isLive = (ind: typeof INDUSTRIES[0]) => ind.phase === 1;
 
   const scrollTo = (id: string) => {
     setActiveTab(id);
