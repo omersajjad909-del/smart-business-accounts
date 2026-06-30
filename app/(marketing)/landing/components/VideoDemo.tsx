@@ -822,7 +822,7 @@ export default function VideoDemo() {
         @keyframes spin{to{transform:rotate(360deg)}}
         .demo-tab:hover{background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.12)!important;}
         .demo-tab-active{border-color:var(--tc)!important;background:rgba(255,255,255,.06)!important;}
-        @media(max-width:900px){.demo-layout{flex-direction:column!important;}.demo-tabs{flex-direction:row!important;flex-wrap:wrap!important;gap:8px!important;width:100%!important;}.demo-mock-sidebar{display:none!important;}}
+        @media(max-width:900px){.demo-layout{flex-direction:column!important;}.demo-tabs{width:100%!important;}.demo-mock-sidebar{display:none!important;}}
       `}</style>
 
       {/* BG */}
