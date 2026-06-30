@@ -39,25 +39,6 @@ function Cursor({ color = "#818cf8" }: { color?: string }) {
   return <span style={{ display:"inline-block", width:2, height:"1em", background:color, marginLeft:1, verticalAlign:"middle", animation:"blink .7s ease infinite" }}/>;
 }
 
-/* ── Field row (label + value) ── */
-function FieldRow({ label, value, show, delay = 0, highlight = false }: { label: string; value: string; show: boolean; delay?: number; highlight?: boolean }) {
-  return (
-    <div style={{
-      display:"flex", justifyContent:"space-between", alignItems:"center",
-      padding:"9px 14px", borderRadius:8,
-      background: highlight ? "rgba(129,140,248,.06)" : "transparent",
-      border: `1px solid ${highlight ? "rgba(129,140,248,.18)" : "rgba(255,255,255,.05)"}`,
-      opacity: show ? 1 : 0,
-      transform: show ? "translateX(0)" : "translateX(-8px)",
-      transition: `all .4s ease ${delay}s`,
-      marginBottom: 4,
-    }}>
-      <span style={{ fontSize:11, color:"rgba(255,255,255,.3)", fontWeight:500 }}>{label}</span>
-      <span style={{ fontSize:12, fontWeight:600, color: highlight ? "#a5b4fc" : "rgba(255,255,255,.75)" }}>{value}</span>
-    </div>
-  );
-}
-
 /* ── Badge ── */
 function Badge({ text, color, bg, border }: { text:string; color:string; bg:string; border:string }) {
   return (
@@ -364,7 +345,7 @@ function PayrollDemo({ step }: { step: number }) {
             { l:"Gross Total", v:"Rs. 3,33,000", c:"#818cf8" },
             { l:"Deductions",  v:"Rs. 3,330",    c:"#f87171" },
             { l:"Net Payable", v:`Rs. ${(total/100).toFixed(0) !== "0" ? (total/1000).toFixed(1)+"K" : "—"}`, c:"#34d399" },
-          ].map((s,i) => (
+          ].map(s => (
             <div key={s.l} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", textAlign:"center" }}>
               <div style={{ fontSize:9, color:"rgba(255,255,255,.3)", marginBottom:4 }}>{s.l}</div>
               <div style={{ fontSize:13, fontWeight:800, color:s.c }}>{s.v}</div>
@@ -530,6 +511,160 @@ function InventoryDemo({ step }: { step: number }) {
   );
 }
 
+/* ══════════════════════════════
+   AI INSIGHTS ANIMATION (13 steps)
+══════════════════════════════ */
+function AIDemo({ step }: { step: number }) {
+  const summaryText = useTypeWriter(
+    "June 2026 analysis complete: Revenue grew 18% vs May. Expense-to-revenue ratio improved to 45%. Cash reserves healthy at Rs. 4.2L. 3 invoices totalling Rs. 2,35,000 overdue — recommended to send WhatsApp reminders today.",
+    step >= 9, 28
+  );
+  const anomalyText = useTypeWriter(
+    "Unusual expense: Rs. 45,000 to 'Unknown Vendor' on 22 June — flagged for review.",
+    step === 4, 32
+  );
+  const txCount  = useCountUp(1847, step >= 2, 1200);
+  const anomalyN = useCountUp(3,    step >= 3, 800);
+
+  const categories = [
+    { label:"Inventory", pct:38, color:"#818cf8" },
+    { label:"Payroll",   pct:28, color:"#34d399" },
+    { label:"Rent",      pct:14, color:"#fbbf24" },
+    { label:"Utilities", pct:10, color:"#f97316" },
+    { label:"Other",     pct:10, color:"#f87171" },
+  ];
+
+  const forecastMonths = [
+    { month:"Jul", rev:2.8, exp:1.3 },
+    { month:"Aug", rev:3.1, exp:1.4 },
+    { month:"Sep", rev:3.4, exp:1.5 },
+  ];
+
+  return (
+    <div style={{ flex:1, padding:"14px 18px", display:"flex", flexDirection:"column", gap:8, overflow:"hidden" }}>
+      {/* Header */}
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+        <div>
+          <div style={{ fontSize:14, fontWeight:800, color:"white" }}>AI Insights</div>
+          <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>Powered by FinovaOS Intelligence · June 2026</div>
+        </div>
+        {step >= 2 && (
+          <div style={{ padding:"4px 10px", borderRadius:20, background:"rgba(167,139,250,.1)", border:"1px solid rgba(167,139,250,.3)", fontSize:10, fontWeight:700, color:"#a78bfa", animation:"slideIn .3s ease both" }}>
+            🤖 AI Active
+          </div>
+        )}
+      </div>
+
+      {/* Stats row */}
+      {step >= 2 && (
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:6, animation:"slideIn .35s ease both" }}>
+          {[
+            { l:"Transactions Analysed", v:txCount.toLocaleString(), c:"#a78bfa", i:"🔍" },
+            { l:"Anomalies Found",       v:step >= 3 ? String(anomalyN) : "—", c:"#f87171", i:"⚠️" },
+            { l:"AI Accuracy",           v:"98.7%", c:"#34d399", i:"✓" },
+          ].map(s => (
+            <div key={s.l} style={{ padding:"8px 10px", borderRadius:8, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", textAlign:"center" }}>
+              <div style={{ fontSize:14, marginBottom:4 }}>{s.i}</div>
+              <div style={{ fontSize:15, fontWeight:800, color:s.c }}>{s.v}</div>
+              <div style={{ fontSize:8, color:"rgba(255,255,255,.3)", marginTop:2, lineHeight:1.4 }}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Anomaly alert */}
+      {step >= 4 && (
+        <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(248,113,113,.07)", border:"1px solid rgba(248,113,113,.3)", animation:"slideIn .35s ease both" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#f87171", marginBottom:5, display:"flex", alignItems:"center", gap:6 }}>
+            <span style={{ animation:"blink 1.5s ease infinite" }}>⚠️</span> Anomaly Detected
+          </div>
+          <div style={{ fontSize:11, color:"rgba(255,255,255,.6)", lineHeight:1.6 }}>
+            {step === 4 ? <>{anomalyText}<Cursor color="#f87171"/></> : "Unusual expense: Rs. 45,000 to 'Unknown Vendor' on 22 June — flagged for review."}
+          </div>
+          {step >= 5 && (
+            <div style={{ display:"flex", gap:8, marginTop:8 }}>
+              <div style={{ padding:"5px 12px", borderRadius:7, background:"rgba(248,113,113,.12)", border:"1px solid rgba(248,113,113,.25)", fontSize:10, fontWeight:700, color:"#f87171" }}>Review Transaction →</div>
+              <div style={{ padding:"5px 12px", borderRadius:7, border:"1px solid rgba(255,255,255,.08)", fontSize:10, fontWeight:600, color:"rgba(255,255,255,.3)" }}>Dismiss</div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Cash flow forecast */}
+      {step >= 6 && (
+        <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)", animation:"slideIn .35s ease both" }}>
+          <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>3-Month Cash Flow Forecast</div>
+          <div style={{ display:"flex", gap:12, alignItems:"flex-end", height:60 }}>
+            {forecastMonths.map((m, i) => (
+              <div key={m.month} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
+                <div style={{ width:"100%", display:"flex", gap:3, alignItems:"flex-end", height:46 }}>
+                  <div style={{ flex:1, borderRadius:"3px 3px 0 0", background:"rgba(167,139,250,.55)", height: step >= 6 ? `${(m.rev/3.4)*100}%` : "0%", transition:`height .7s ease ${i*0.15}s`, minHeight:2 }}/>
+                  <div style={{ flex:1, borderRadius:"3px 3px 0 0", background:"rgba(249,115,22,.45)", height: step >= 6 ? `${(m.exp/3.4)*100}%` : "0%", transition:`height .7s ease ${i*0.15+0.1}s`, minHeight:2 }}/>
+                </div>
+                <div style={{ fontSize:8, color:"rgba(255,255,255,.3)" }}>{m.month}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display:"flex", gap:14, marginTop:6 }}>
+            {[{ c:"rgba(167,139,250,.6)", l:"Revenue (predicted)" }, { c:"rgba(249,115,22,.5)", l:"Expenses" }].map(k => (
+              <div key={k.l} style={{ display:"flex", alignItems:"center", gap:5 }}>
+                <div style={{ width:8, height:8, borderRadius:2, background:k.c }}/>
+                <span style={{ fontSize:9, color:"rgba(255,255,255,.3)" }}>{k.l}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Expense categories */}
+      {step >= 7 && (
+        <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)", animation:"slideIn .35s ease both" }}>
+          <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.4)", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>Auto-Categorised Expenses</div>
+          <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+            {categories.slice(0, Math.max(0, step - 6)).map(cat => (
+              <div key={cat.label} style={{ display:"flex", alignItems:"center", gap:8, animation:"slideIn .3s ease both" }}>
+                <div style={{ fontSize:9, color:"rgba(255,255,255,.4)", width:54, textAlign:"right", flexShrink:0 }}>{cat.label}</div>
+                <div style={{ flex:1, height:6, borderRadius:3, background:"rgba(255,255,255,.05)", overflow:"hidden" }}>
+                  <div style={{ height:"100%", borderRadius:3, background:cat.color, width:`${cat.pct}%`, transition:"width .8s ease" }}/>
+                </div>
+                <div style={{ fontSize:9, fontWeight:700, color:cat.color, width:26, flexShrink:0 }}>{cat.pct}%</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI summary */}
+      {step >= 9 && (
+        <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(167,139,250,.06)", border:"1px solid rgba(167,139,250,.22)", animation:"slideIn .35s ease both" }}>
+          <div style={{ fontSize:10, fontWeight:700, color:"#a78bfa", marginBottom:6, display:"flex", alignItems:"center", gap:5 }}>
+            🤖 AI Financial Summary
+          </div>
+          <p style={{ fontSize:11, color:"rgba(255,255,255,.62)", margin:0, lineHeight:1.75 }}>
+            {summaryText}
+            {summaryText.length < 225 && <Cursor color="#a78bfa"/>}
+          </p>
+        </div>
+      )}
+
+      {/* Smart suggestions */}
+      {step >= 12 && (
+        <div style={{ padding:"9px 12px", borderRadius:9, background:"rgba(52,211,153,.07)", border:"1px solid rgba(52,211,153,.25)", animation:"slideIn .3s ease both" }}>
+          <div style={{ fontSize:10, fontWeight:700, color:"#34d399", marginBottom:5 }}>✅ Smart Action Suggestions</div>
+          {[
+            "Send WhatsApp reminders to 3 overdue clients — Rs. 2,35,000 at risk",
+            "Flag Rs. 45,000 unknown expense — request receipt from team",
+          ].map((s, i) => (
+            <div key={i} style={{ fontSize:10, color:"rgba(255,255,255,.5)", marginBottom:3, display:"flex", gap:6, lineHeight:1.5 }}>
+              <span style={{ color:"#34d399", flexShrink:0 }}>→</span>{s}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ════════════════════════════════════════
    TABS CONFIG
 ════════════════════════════════════════ */
@@ -572,6 +707,16 @@ const TABS = [
       "All done ✓",
     ],
   },
+  { id: "ai", label: "AI Insights", icon: "🤖", color: "#a78bfa",
+    desc: "Anomaly detection, forecasts & AI summaries",
+    steps: [
+      "Opening AI Insights…","Analysing 1,847 transactions…","Scanning for anomalies…",
+      "3 anomalies detected","Showing anomaly details…","Generating cash flow forecast…",
+      "Forecast ready","Auto-categorising expenses…","Mapping expense categories…",
+      "Generating AI financial summary…","Summary written","Checking overdue invoices…",
+      "AI report complete ✓",
+    ],
+  },
 ];
 
 const FEATURES_BY_TAB: Record<string, string[]> = {
@@ -579,6 +724,7 @@ const FEATURES_BY_TAB: Record<string, string[]> = {
   dashboard: ["Live revenue tracking", "Expense breakdown", "Cash flow forecast", "AI anomaly alerts"],
   payroll:   ["Auto salary calculation", "Tax & EOBI deduction", "Payslip generation", "Bank transfer batch"],
   inventory: ["Low stock alerts", "Batch & expiry tracking", "Multi-warehouse view", "DRAP compliance"],
+  ai:        ["Anomaly detection", "3-month cash flow forecast", "Auto expense categorisation", "AI financial summary"],
 };
 
 const NAV_ITEMS: Record<string, { label:string; icon:string }[]> = {
@@ -614,10 +760,18 @@ const NAV_ITEMS: Record<string, { label:string; icon:string }[]> = {
     { label:"HR & Payroll",icon:"👥" },
     { label:"Reports",     icon:"📈" },
   ],
+  ai: [
+    { label:"Dashboard",   icon:"📊" },
+    { label:"AI Insights", icon:"🤖" },
+    { label:"Sales",       icon:"📄" },
+    { label:"Inventory",   icon:"📦" },
+    { label:"HR & Payroll",icon:"👥" },
+    { label:"Reports",     icon:"📈" },
+  ],
 };
 
 const ACTIVE_NAV: Record<string, string> = {
-  invoice:"Sales", dashboard:"Dashboard", payroll:"HR & Payroll", inventory:"Inventory",
+  invoice:"Sales", dashboard:"Dashboard", payroll:"HR & Payroll", inventory:"Inventory", ai:"AI Insights",
 };
 
 /* ════════════════════════════════════════
@@ -827,6 +981,7 @@ export default function VideoDemo() {
                     {activeTab === "dashboard" && <DashboardDemo step={step} />}
                     {activeTab === "payroll"   && <PayrollDemo   step={step} />}
                     {activeTab === "inventory" && <InventoryDemo step={step} />}
+                    {activeTab === "ai"        && <AIDemo        step={step} />}
                   </div>
 
                   {/* Bottom feature pills */}
