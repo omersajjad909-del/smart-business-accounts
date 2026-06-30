@@ -20,7 +20,7 @@ const ROWS: FeatureRow[] = [
   { feature: "💰 PRICING", category: true, finova: "", xero: "", zoho: "", wave: "", quickbooks: "" },
   { feature: "Starting price",      finova: "$49/mo",  xero: "$13/mo",  zoho: "$15/mo",  wave: "Free*",   quickbooks: "$30/mo", note: "FinovaOS includes far more at base tier" },
   { feature: "Free plan available", finova: false,     xero: false,     zoho: true,      wave: true,      quickbooks: false },
-  { feature: "Pakistan pricing",    finova: true,      xero: false,     zoho: false,     wave: false,     quickbooks: false },
+  { feature: "Regional pricing",    finova: true,      xero: false,     zoho: false,     wave: false,     quickbooks: false, note: "Localized pricing for PKR, AED, SAR & more" },
   { feature: "Multi-currency",      finova: true,      xero: true,      zoho: true,      wave: false,     quickbooks: true },
   { feature: "Per-user pricing",    finova: false,     xero: true,      xero2: true,     zoho: true,      wave: false,     quickbooks: true, note: "FinovaOS: unlimited users, no extra cost" } as FeatureRow,
 
@@ -72,7 +72,7 @@ const ROWS: FeatureRow[] = [
   { feature: "Salary Processing",       finova: true,  xero: true,  zoho: true,  wave: false, quickbooks: true },
   { feature: "Attendance Tracking",     finova: true,  xero: false, zoho: true,  wave: false, quickbooks: false },
   { feature: "Leave Management",        finova: true,  xero: false, zoho: true,  wave: false, quickbooks: false },
-  { feature: "EOBI / Tax deductions",   finova: true,  xero: false, zoho: false, wave: false, quickbooks: false, note: "Pakistan-specific payroll tax" },
+  { feature: "Statutory deductions",    finova: true,  xero: false, zoho: false, wave: false, quickbooks: false, note: "EOBI (PK), GOSI (KSA), GPSSA (UAE) & more" },
   { feature: "Salary Slip PDF",         finova: true,  xero: true,  zoho: true,  wave: false, quickbooks: true },
 
   // AI Features
@@ -94,12 +94,12 @@ const ROWS: FeatureRow[] = [
 
   // Support & Localisation
   { feature: "🌍 LOCALISATION & SUPPORT", category: true, finova: "", xero: "", zoho: "", wave: "", quickbooks: "" },
-  { feature: "Pakistan GST/Tax support",finova: true,  xero: false, zoho: false, wave: false, quickbooks: false },
-  { feature: "FBR integration (future)",finova: "Soon",xero: false, zoho: false, wave: false, quickbooks: false },
+  { feature: "Regional GST/Tax support",finova: true,  xero: true,  zoho: true,  wave: false, quickbooks: true, note: "FBR (PK), VAT (UAE/KSA), GCC tax compliance" },
+  { feature: "FBR integration",         finova: "Soon",xero: false, zoho: false, wave: false, quickbooks: false },
   { feature: "Arabic / Urdu UI",        finova: "Soon",xero: false, zoho: "AR",  wave: false, quickbooks: false },
   { feature: "WhatsApp support",        finova: true,  xero: false, zoho: false, wave: false, quickbooks: false },
   { feature: "24/7 support",            finova: false, xero: false, zoho: false, wave: false, quickbooks: true },
-  { feature: "Support in PKR plans",    finova: true,  xero: false, zoho: false, wave: false, quickbooks: false },
+  { feature: "Multi-region support",    finova: true,  xero: true,  zoho: true,  wave: false, quickbooks: true, note: "Pakistan, UAE, Saudi Arabia, Global" },
 ];
 
 const COMPETITORS = [
@@ -111,10 +111,10 @@ const COMPETITORS = [
 ];
 
 function Cell({ val, highlight }: { val: Val; highlight?: boolean }) {
-  if (val === true)  return <td style={{ textAlign: "center", padding: "10px 14px" }}><span style={{ color: highlight ? "#34d399" : "#4ade80", fontSize: 16 }}>✓</span></td>;
-  if (val === false) return <td style={{ textAlign: "center", padding: "10px 14px" }}><span style={{ color: "#374151", fontSize: 14 }}>—</span></td>;
-  if (typeof val === "string" && val !== "") return <td style={{ textAlign: "center", padding: "10px 14px", fontSize: 12, color: highlight ? "#fbbf24" : "#6b7280", fontWeight: 600 }}>{val}</td>;
-  return <td style={{ padding: "10px 14px" }} />;
+  if (val === true)  return <td className="col" style={{ textAlign: "center", padding: "10px 14px" }}><span style={{ color: highlight ? "#34d399" : "#4ade80", fontSize: 16 }}>✓</span></td>;
+  if (val === false) return <td className="col" style={{ textAlign: "center", padding: "10px 14px" }}><span style={{ color: "#374151", fontSize: 14 }}>—</span></td>;
+  if (typeof val === "string" && val !== "") return <td className="col" style={{ textAlign: "center", padding: "10px 14px", fontSize: 12, color: highlight ? "#fbbf24" : "#6b7280", fontWeight: 600 }}>{val}</td>;
+  return <td className="col" style={{ padding: "10px 14px" }} />;
 }
 
 function useInView() {
@@ -156,7 +156,7 @@ export default function ComparePage() {
         <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
           {[
             { icon: "🤖", label: "7 AI features — more than all competitors combined" },
-            { icon: "🇵🇰", label: "Only platform built for Pakistan market" },
+            { icon: "🌍", label: "Multi-region: PKR · AED · SAR · USD & more" },
             { icon: "👥", label: "Unlimited users — no per-seat fees" },
           ].map(b => (
             <div key={b.label} style={{ background: "rgba(129,140,248,.08)", border: "1px solid rgba(129,140,248,.2)", borderRadius: 12, padding: "8px 14px", fontSize: 12, color: "#94a3b8", display: "flex", alignItems: "center", gap: 6 }}>
@@ -175,14 +175,35 @@ export default function ComparePage() {
       </div>
 
       {/* Table */}
-      <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px 100px", opacity: vis ? 1 : 0, transition: "opacity .5s" }}>
-        <div style={{ overflowX: "auto", borderRadius: 20, border: "1px solid rgba(255,255,255,.08)" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
+      <div ref={ref} className="cmp-wrap" style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px 100px", opacity: vis ? 1 : 0, transition: "opacity .5s" }}>
+        <style>{`
+          .cmp-scroll{overflow-x:auto;border-radius:20px;border:1px solid rgba(255,255,255,.08);}
+          .cmp-table{width:100%;border-collapse:collapse;}
+          .cmp-table th.feat-col,.cmp-table td.feat-col{
+            position:sticky;left:0;background:#070a22;z-index:2;
+            border-right:1px solid rgba(255,255,255,.06);
+          }
+          .cmp-table thead th.feat-col{background:linear-gradient(90deg,#0a0e2d,#0a0e2dee);z-index:3;}
+          .cmp-table tr.cat-row td.feat-col{background:#0a0d28;}
+
+          @media(max-width:780px){
+            .cmp-table{min-width:600px;}
+            .cmp-table th.feat-col,.cmp-table td.feat-col{width:180px;min-width:180px;}
+            .cmp-table th.col,.cmp-table td.col{min-width:84px;}
+            .cmp-hint{display:flex !important;}
+          }
+          .cmp-hint{display:none;align-items:center;gap:6px;justify-content:center;color:#475569;font-size:11px;margin-top:8px;}
+        `}</style>
+
+        <div className="cmp-hint">← swipe to compare all competitors →</div>
+
+        <div className="cmp-scroll">
+          <table className="cmp-table">
             <thead>
               <tr style={{ background: "rgba(99,102,241,.1)" }}>
-                <th style={{ textAlign: "left", padding: "16px 20px", fontWeight: 700, fontSize: 14, width: "35%" }}>Feature</th>
+                <th className="feat-col" style={{ textAlign: "left", padding: "16px 20px", fontWeight: 700, fontSize: 14, width: "35%" }}>Feature</th>
                 {COMPETITORS.map(c => (
-                  <th key={c.key} style={{ textAlign: "center", padding: "16px 14px", fontWeight: 700, fontSize: 13 }}>
+                  <th key={c.key} className="col" style={{ textAlign: "center", padding: "16px 14px", fontWeight: 700, fontSize: 13 }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                       <div style={{ width: 30, height: 30, borderRadius: 8, background: c.highlight ? "linear-gradient(135deg,#4f46e5,#7c3aed)" : "rgba(255,255,255,.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: c.highlight ? "#fff" : "#64748b" }}>
                         {c.logo}
@@ -197,14 +218,15 @@ export default function ComparePage() {
               {filtered.map((row, i) => {
                 if (row.category) {
                   return (
-                    <tr key={i} style={{ background: "rgba(255,255,255,.03)" }}>
-                      <td colSpan={6} style={{ padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#64748b", letterSpacing: ".04em" }}>{row.feature}</td>
+                    <tr key={i} className="cat-row" style={{ background: "rgba(255,255,255,.03)" }}>
+                      <td className="feat-col" colSpan={1} style={{ padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#64748b", letterSpacing: ".04em", whiteSpace: "nowrap" }}>{row.feature}</td>
+                      <td className="col" colSpan={5} style={{ background: "rgba(255,255,255,.03)" }} />
                     </tr>
                   );
                 }
                 return (
                   <tr key={i} style={{ borderTop: "1px solid rgba(255,255,255,.04)", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,.01)" }}>
-                    <td style={{ padding: "10px 20px", fontSize: 14 }}>
+                    <td className="feat-col" style={{ padding: "10px 20px", fontSize: 14 }}>
                       {row.feature}
                       {row.note && <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>{row.note}</div>}
                     </td>
@@ -230,8 +252,11 @@ export default function ComparePage() {
         <h2 style={{ fontSize: 30, fontWeight: 700, margin: "0 0 12px" }}>Make the switch to FinovaOS</h2>
         <p style={{ color: "#64748b", marginBottom: 28, fontSize: 15 }}>Import your data from Xero, Zoho, or QuickBooks in minutes.</p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/get-started" style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "#fff", padding: "13px 28px", borderRadius: 12, fontWeight: 700, textDecoration: "none", fontSize: 15 }}>
-            Start Free Trial →
+          <Link href="/onboarding/choose-plan" style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "#fff", padding: "13px 28px", borderRadius: 12, fontWeight: 700, textDecoration: "none", fontSize: 15 }}>
+            Get Started →
+          </Link>
+          <Link href="/pricing" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#e2e8f0", padding: "13px 28px", borderRadius: 12, fontWeight: 600, textDecoration: "none", fontSize: 15 }}>
+            View Pricing
           </Link>
           <Link href="/roi-calculator" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#e2e8f0", padding: "13px 28px", borderRadius: 12, fontWeight: 600, textDecoration: "none", fontSize: 15 }}>
             Calculate ROI

@@ -285,8 +285,8 @@ export default function CaseStudiesPage() {
         <h2 style={{ fontSize: 32, fontWeight: 700, margin: "0 0 12px" }}>Ready to write your success story?</h2>
         <p style={{ color: "#64748b", marginBottom: 28, fontSize: 16 }}>Join 500+ businesses already running on FinovaOS.</p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/get-started" style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "#fff", padding: "13px 28px", borderRadius: 12, fontWeight: 700, textDecoration: "none", fontSize: 15 }}>
-            Start Free Trial →
+          <Link href="/onboarding/choose-plan" style={{ background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "#fff", padding: "13px 28px", borderRadius: 12, fontWeight: 700, textDecoration: "none", fontSize: 15 }}>
+            Get Started →
           </Link>
           <Link href="/roi-calculator" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "#e2e8f0", padding: "13px 28px", borderRadius: 12, fontWeight: 600, textDecoration: "none", fontSize: 15 }}>
             Calculate Your ROI
