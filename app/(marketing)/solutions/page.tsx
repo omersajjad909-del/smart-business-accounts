@@ -736,10 +736,15 @@ function useVisible(threshold = 0.1) {
   return [ref, visible] as const;
 }
 
-/* ─── industry-id → BUSINESS_PHASE_CONFIG key mapping ─── */
-const NOTIFY_TYPE: Record<string, string> = {
+/* ─── solutions ind.id → BUSINESS_PHASE_CONFIG key ─── */
+// "enterprise" has no admin type (marketing-only concept) — empty string means always-live fallback
+const IND_BIZ_KEY: Record<string, string> = {
+  trading:       "trading",
+  distribution:  "distribution",
   manufacturing: "manufacturing",
+  services:      "service",
   retail:        "retail",
+  enterprise:    "",
   restaurant:    "restaurant",
   hospital:      "hospital",
   hotel:         "hotel",
@@ -757,6 +762,7 @@ const NOTIFY_TYPE: Record<string, string> = {
   advertising:   "advertising_agency",
   saas:          "saas_company",
   solar:         "solar_company",
+  import:        "import_company",
   events:        "event_planner",
   repair:        "mobile_repair",
   franchise:     "chain_store",
@@ -777,7 +783,7 @@ function NotifyModal({ ind, onClose }: { ind: typeof INDUSTRIES[0]; onClose: () 
       const res = await fetch("/api/public/notify-me", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, businessType: NOTIFY_TYPE[ind.id] || ind.id }),
+        body: JSON.stringify({ email, businessType: IND_BIZ_KEY[ind.id] || ind.id }),
       });
       const data = await res.json();
       if (data.success) setDone(true);
@@ -1238,6 +1244,13 @@ export default function SolutionsPage() {
   const [ctaRef, ctaVisible] = useVisible(0.1);
   const [crossHover, setCrossHover] = useState<number | null>(null);
   const [notifyInd, setNotifyInd] = useState<typeof INDUSTRIES[0] | null>(null);
+  const [statusMap, setStatusMap] = useState<Record<string, string>>({});
+  useEffect(() => {
+    fetch("/api/public/business-module-status")
+      .then(r => r.json())
+      .then(d => { if (d.statusMap) setStatusMap(d.statusMap); })
+      .catch(() => {});
+  }, []);
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
