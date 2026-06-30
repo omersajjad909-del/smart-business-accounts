@@ -1306,10 +1306,34 @@ export default function SolutionsPage() {
           </div>
         </div>
 
-        {/* ── INDUSTRY SECTIONS ── */}
-        {INDUSTRIES.map((ind, i) => (
-          <IndustrySection key={ind.id} ind={ind} index={i} isLive={isLive(ind)} />
+        {/* ── LIVE INDUSTRY SECTIONS ── */}
+        {INDUSTRIES.filter(ind => isLive(ind)).map((ind, i) => (
+          <IndustrySection key={ind.id} ind={ind} index={i} isLive={true} />
         ))}
+
+        {/* ── COMING SOON ROADMAP ── */}
+        {INDUSTRIES.filter(ind => !isLive(ind)).length > 0 && (
+          <section style={{ padding:"80px 24px", borderTop:"1px solid rgba(255,255,255,.06)", background:"rgba(255,255,255,.01)" }}>
+            <div style={{ maxWidth:1160, margin:"0 auto" }}>
+              <div style={{ textAlign:"center", marginBottom:48 }}>
+                <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"5px 14px", borderRadius:24, background:"rgba(251,191,36,.08)", border:"1px solid rgba(251,191,36,.25)", fontSize:11, fontWeight:700, color:"#fbbf24", letterSpacing:".09em", textTransform:"uppercase", marginBottom:18 }}>
+                  🗺️ Roadmap
+                </div>
+                <h2 style={{ fontFamily:"'Lora',serif", fontSize:"clamp(24px,3vw,36px)", fontWeight:700, color:"white", letterSpacing:"-1px", marginBottom:10 }}>
+                  Industries Launching Next
+                </h2>
+                <p style={{ fontSize:14, color:"rgba(255,255,255,.38)", maxWidth:520, margin:"0 auto" }}>
+                  These industry solutions are actively in development. Register your interest to get early access.
+                </p>
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:16 }}>
+                {INDUSTRIES.filter(ind => !isLive(ind)).map(ind => (
+                  <ComingSoonCard key={ind.id} ind={ind} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── CROSS-PLATFORM FEATURES ── */}
         <section style={{ padding:"100px 24px", background:"rgba(255,255,255,.02)", borderTop:"1px solid rgba(255,255,255,.06)" }}>
