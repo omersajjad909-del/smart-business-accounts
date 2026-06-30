@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const TABS = [
   { id: "invoice",   label: "Sales Invoice",    icon: "📄", color: "#818cf8", desc: "Create & send professional invoices in 30 seconds" },
