@@ -5,12 +5,17 @@ import { getCurrentUser } from "@/lib/auth";
 
 type CompanyInfo = { name: string; plan: string; country: string | null; businessType: string | null };
 
-type FeedbackType = "complaint" | "suggestion" | "bug" | "general";
+type FeedbackType = "feedback" | "complaint" | "suggestion" | "bug" | "general";
 
 const TYPES: {
   id: FeedbackType; label: string; icon: string; color: string;
   desc: string; placeholder: string;
 }[] = [
+  {
+    id: "feedback", label: "Feedback", icon: "⭐", color: "#34d399",
+    desc: "Share your experience",
+    placeholder: "What do you like? What's working well? Share your overall experience with FinovaOS...",
+  },
   {
     id: "complaint", label: "Complaint", icon: "⚠️", color: "#f87171",
     desc: "Issue or problem",
@@ -62,7 +67,7 @@ type HistoryItem = {
 export default function FeedbackPage() {
   const user = getCurrentUser();
 
-  const [fbType,   setFbType]   = useState<FeedbackType>("complaint");
+  const [fbType,   setFbType]   = useState<FeedbackType>("feedback");
   const [subject,  setSubject]  = useState("");
   const [message,  setMessage]  = useState("");
   const [priority, setPriority] = useState("normal");
@@ -145,10 +150,10 @@ export default function FeedbackPage() {
       {/* Header */}
       <div style={{ marginBottom: "28px" }}>
         <h1 style={{ fontSize: "22px", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
-          Feedback & Complaints
+          Feedback & Support
         </h1>
         <p style={{ fontSize: "13px", color: "var(--text-muted)", marginTop: "4px" }}>
-          Report an issue, share an idea, or flag a bug — we're listening
+          Share your experience, report an issue, or suggest an improvement — we're listening
         </p>
       </div>
 
