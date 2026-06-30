@@ -653,7 +653,6 @@ const WORKFLOWS: Record<string, string[]> = {
   manufacturing: ["Raw Material PO", "Production Order", "BOM Consumption", "Finished Goods", "Customer Invoice"],
   services:      ["Client Quotation", "Agreement", "Work Delivery", "Invoice", "Payment Receipt"],
   retail:        ["Purchase Order", "Inventory Update", "POS Sale", "Daily Reconciliation", "Profit Reports"],
-  enterprise:    ["Company Setup", "Branch Assignment", "Transactions", "Consolidation", "Audit Trail"],
   restaurant:    ["Table Order", "Kitchen Ticket", "Bill Generation", "Payment", "Daily Close"],
   hospital:      ["Patient Registration", "Consultation", "Prescription", "Billing", "Collection"],
   hotel:         ["Reservation", "Check-In", "Room Services", "Check-Out Bill", "Revenue Report"],
@@ -683,7 +682,7 @@ const TAB_GROUPS = [
   { label: "F&B",          ids: ["restaurant","hotel"] },
   { label: "Services",     ids: ["services","travel","events"] },
   { label: "Healthcare",   ids: ["hospital","pharmacy"] },
-  { label: "Retail",       ids: ["retail","enterprise"] },
+  { label: "Retail",       ids: ["retail"] },
   { label: "Build",        ids: ["construction","real_estate"] },
   { label: "Tech & Media", ids: ["saas","advertising"] },
   { label: "Lifestyle",    ids: ["salon","school","ngo"] },
@@ -713,14 +712,12 @@ function useVisible(threshold = 0.1) {
 }
 
 /* ─── solutions ind.id → BUSINESS_PHASE_CONFIG key ─── */
-// "enterprise" has no admin type (marketing-only concept) — empty string means always-live fallback
 const IND_BIZ_KEY: Record<string, string> = {
   trading:       "trading",
   distribution:  "distribution",
   manufacturing: "manufacturing",
   services:      "service",
   retail:        "retail",
-  enterprise:    "",
   restaurant:    "restaurant",
   hospital:      "hospital",
   hotel:         "hotel",
@@ -1252,7 +1249,7 @@ export default function SolutionsPage() {
   // Determine if an industry is live — respects admin panel toggle
   const isLive = (ind: typeof INDUSTRIES[0]) => {
     const bizKey = IND_BIZ_KEY[ind.id];
-    if (!bizKey) return true; // enterprise / unmapped → always live
+    if (!bizKey) return ind.phase === 1; // unmapped → fallback to phase
     if (Object.keys(statusMap).length === 0) return ind.phase === 1; // API still loading
     return statusMap[bizKey] === "live";
   };

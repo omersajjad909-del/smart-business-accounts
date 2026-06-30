@@ -53,10 +53,10 @@ const MODULES = [
 ];
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
-  open:        { label: "Open",        color: "#60a5fa" },
-  in_progress: { label: "In Progress", color: "#fbbf24" },
-  resolved:    { label: "Resolved",    color: "#34d399" },
-  closed:      { label: "Closed",      color: "#64748b" },
+  open:        { label: "⏳ Pending Review", color: "#60a5fa" },
+  in_progress: { label: "🔄 In Progress",    color: "#fbbf24" },
+  resolved:    { label: "✅ Resolved",        color: "#34d399" },
+  closed:      { label: "🔒 Closed",          color: "#64748b" },
 };
 
 type HistoryItem = {
