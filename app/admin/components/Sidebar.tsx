@@ -21,6 +21,7 @@ const sections = [
   { name: 'CRM Workspace', icon: '🤝', href: '/admin/crm' },
   { name: 'Leads', icon: '🎯', href: '/admin/leads' },
   { name: 'Email Logs', icon: '✉️', href: '/admin/email-logs' },
+  { name: 'Feedback & Tickets', icon: '💬', href: '/admin/feedback' },
   { name: 'Testimonials', icon: '⭐', href: '/admin/testimonials' },
   { name: 'Web Content', icon: '🌐', href: '/admin/web' },
   { name: 'Dev Test Mode', icon: '🧪', href: '/admin/dev-test' },
