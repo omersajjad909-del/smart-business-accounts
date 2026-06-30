@@ -1119,7 +1119,7 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                   >
                     🔔 Notify me when live
                   </button>
-                  <Link href={`/for/${ind.id}`} style={{
+                  <Link href={`/for/${IND_BIZ_KEY[ind.id] || ind.id}`} style={{
                     display:"inline-flex", alignItems:"center", gap:6,
                     padding:"13px 22px", borderRadius:13,
                     background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)",
@@ -1151,7 +1151,7 @@ function IndustrySection({ ind, index, isLive, onNotify }: { ind: typeof INDUSTR
                       <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                     </svg>
                   </Link>
-                  <Link href={`/for/${ind.id}`} style={{
+                  <Link href={`/for/${IND_BIZ_KEY[ind.id] || ind.id}`} style={{
                     display:"inline-flex", alignItems:"center", gap:6,
                     padding:"13px 22px", borderRadius:13,
                     background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)",
