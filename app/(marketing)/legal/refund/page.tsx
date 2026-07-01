@@ -170,20 +170,6 @@ const SECTIONS = [
     ],
   },
   {
-    id: "free-trial",
-    icon: "🎁",
-    color: "#34d399",
-    dim: "rgba(52,211,153,.08)",
-    border: "rgba(52,211,153,.25)",
-    title: "Free Trials",
-    content: [
-      {
-        sub: "Trial Periods",
-        body: "If FinovaOS offers a free trial period, no refund applies to the trial itself as no charge is made during this period. Subscription charges begin only after the trial period ends and you choose to continue with a paid plan. If you do not cancel before the trial expires, you will be charged for the selected plan and the standard refund policy will apply from that point.",
-      },
-    ],
-  },
-  {
     id: "taxes",
     icon: "🧾",
     color: "#f59e0b",
