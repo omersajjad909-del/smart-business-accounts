@@ -354,13 +354,13 @@ export default function UpdatesPage() {
               Every update ships straight into your workspace. Start today and get access to everything we build.
             </p>
             <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
-              <Link href="/onboarding/signup/starter" style={{
+              <Link href="/onboarding/choose-plan" style={{
                 padding:"13px 28px", borderRadius:13,
                 background:"linear-gradient(135deg,#4f46e5,#7c3aed)",
                 color:"white", fontWeight:800, fontSize:14, textDecoration:"none",
                 boxShadow:"0 6px 24px rgba(79,70,229,.4)",
               }}>
-                Get Started Free →
+                Get Started →
               </Link>
               <Link href="/pricing" style={{
                 padding:"12px 24px", borderRadius:13,

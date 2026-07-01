@@ -86,9 +86,19 @@ export async function POST(req: NextRequest) {
       try {
         await (prisma as any).productUpdate.update({ where:{ id }, data });
       } catch {
-        await prisma.activityLog.create({
-          data: { action:"PRODUCT_UPDATE_EDIT", details:JSON.stringify({ id, ...data }), userId:adminId },
-        });
+        const logs = await prisma.activityLog.findMany({ where: { action: "PRODUCT_UPDATE" } });
+        for (const l of logs) {
+          try {
+            const d = JSON.parse(l.details || "{}");
+            if (d.id === id || l.id === id) {
+              await prisma.activityLog.update({
+                where: { id: l.id },
+                data: { details: JSON.stringify({ ...d, ...data }) },
+              });
+              break;
+            }
+          } catch {}
+        }
       }
       return NextResponse.json({ success:true });
     }
@@ -97,9 +107,19 @@ export async function POST(req: NextRequest) {
       try {
         await (prisma as any).productUpdate.update({ where:{ id }, data:{ published } });
       } catch {
-        await prisma.activityLog.create({
-          data: { action:"PRODUCT_UPDATE_TOGGLE", details:JSON.stringify({ id, published }), userId:adminId },
-        });
+        const logs = await prisma.activityLog.findMany({ where: { action: "PRODUCT_UPDATE" } });
+        for (const l of logs) {
+          try {
+            const d = JSON.parse(l.details || "{}");
+            if (d.id === id || l.id === id) {
+              await prisma.activityLog.update({
+                where: { id: l.id },
+                data: { details: JSON.stringify({ ...d, published }) },
+              });
+              break;
+            }
+          } catch {}
+        }
       }
       return NextResponse.json({ success:true });
     }
@@ -108,9 +128,16 @@ export async function POST(req: NextRequest) {
       try {
         await (prisma as any).productUpdate.delete({ where:{ id } });
       } catch {
-        await prisma.activityLog.create({
-          data: { action:"PRODUCT_UPDATE_DELETE", details:JSON.stringify({ id }), userId:adminId },
-        });
+        const logs = await prisma.activityLog.findMany({ where: { action: "PRODUCT_UPDATE" } });
+        for (const l of logs) {
+          try {
+            const d = JSON.parse(l.details || "{}");
+            if (d.id === id || l.id === id) {
+              await prisma.activityLog.delete({ where: { id: l.id } });
+              break;
+            }
+          } catch {}
+        }
       }
       return NextResponse.json({ success:true });
     }
