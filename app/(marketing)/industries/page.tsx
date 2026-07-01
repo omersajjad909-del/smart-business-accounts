@@ -107,6 +107,12 @@ export default function IndustriesPage() {
         .ind-search::placeholder { color: rgba(255,255,255,.3); }
         .ind-search:focus { border-color: rgba(99,102,241,.5); }
 
+        @media (max-width: 640px) {
+          .ind-hero { padding: 36px 16px 20px !important; }
+          .ind-phase-wrap { padding: 0 14px 40px !important; }
+          .ind-phase { margin-bottom: 32px !important; }
+          .ind-stats-wrap { padding: 0 14px 20px !important; }
+        }
         @media (max-width: 600px) {
           .ind-grid { grid-template-columns: 1fr 1fr !important; }
         }
@@ -116,7 +122,7 @@ export default function IndustriesPage() {
       `}</style>
 
       {/* Hero */}
-      <section style={{ padding: "90px 24px 60px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+      <section className="ind-hero" style={{ padding: "90px 24px 60px", textAlign: "center", position: "relative", overflow: "hidden" }}>
         <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(99,102,241,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.04) 1px,transparent 1px)", backgroundSize: "48px 48px" }}/>
           <div style={{ position: "absolute", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle,rgba(99,102,241,.1),transparent 65%)", top: -150, right: -80 }}/>
@@ -159,7 +165,7 @@ export default function IndustriesPage() {
       </section>
 
       {/* Filters */}
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px 36px" }}>
+      <div className="ind-stats-wrap" style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px 36px" }}>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
           <input
             className="ind-search"
@@ -184,7 +190,7 @@ export default function IndustriesPage() {
       </div>
 
       {/* Phase sections */}
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px 80px" }}>
+      <div className="ind-phase-wrap" style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px 80px" }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,.3)", fontSize: 14 }}>Loading...</div>
         ) : (
@@ -195,7 +201,7 @@ export default function IndustriesPage() {
             const isLivePhase = phase === 1;
 
             return (
-              <div key={phase} style={{ marginBottom: 64 }}>
+              <div key={phase} className="ind-phase" style={{ marginBottom: 64 }}>
                 {/* Phase header */}
                 <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24, flexWrap: "wrap" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

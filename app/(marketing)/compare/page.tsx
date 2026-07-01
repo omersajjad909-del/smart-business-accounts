@@ -111,10 +111,11 @@ const COMPETITORS = [
 ];
 
 function Cell({ val, highlight }: { val: Val; highlight?: boolean }) {
-  if (val === true)  return <td className="col" style={{ textAlign: "center", padding: "10px 14px" }}><span style={{ color: highlight ? "#34d399" : "#4ade80", fontSize: 16 }}>✓</span></td>;
-  if (val === false) return <td className="col" style={{ textAlign: "center", padding: "10px 14px" }}><span style={{ color: "#374151", fontSize: 14 }}>—</span></td>;
-  if (typeof val === "string" && val !== "") return <td className="col" style={{ textAlign: "center", padding: "10px 14px", fontSize: 12, color: highlight ? "#fbbf24" : "#6b7280", fontWeight: 600 }}>{val}</td>;
-  return <td className="col" style={{ padding: "10px 14px" }} />;
+  const cls = highlight ? "col finova-col" : "col";
+  if (val === true)  return <td className={cls} style={{ textAlign: "center", padding: "10px 14px" }}><span style={{ color: highlight ? "#34d399" : "#4ade80", fontSize: 16 }}>✓</span></td>;
+  if (val === false) return <td className={cls} style={{ textAlign: "center", padding: "10px 14px" }}><span style={{ color: "#374151", fontSize: 14 }}>—</span></td>;
+  if (typeof val === "string" && val !== "") return <td className={cls} style={{ textAlign: "center", padding: "10px 14px", fontSize: 12, color: highlight ? "#fbbf24" : "#6b7280", fontWeight: 600 }}>{val}</td>;
+  return <td className={cls} style={{ padding: "10px 14px" }} />;
 }
 
 function useInView() {
@@ -175,27 +176,39 @@ export default function ComparePage() {
       </div>
 
       {/* Table */}
-      <div ref={ref} className="cmp-wrap" style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px 100px", opacity: vis ? 1 : 0, transition: "opacity .5s" }}>
+      <div ref={ref} className="cmp-wrap" style={{ maxWidth: 1200, margin: "0 auto", padding: "0 12px 60px", opacity: vis ? 1 : 0, transition: "opacity .5s" }}>
         <style>{`
-          .cmp-scroll{overflow-x:auto;border-radius:20px;border:1px solid rgba(255,255,255,.08);}
-          .cmp-table{width:100%;border-collapse:collapse;}
+          .cmp-scroll{overflow-x:auto;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:#070a22;}
+          .cmp-table{width:100%;border-collapse:separate;border-spacing:0;background:#070a22;}
+          .cmp-table th,.cmp-table td{border-bottom:1px solid rgba(255,255,255,.04);}
           .cmp-table th.feat-col,.cmp-table td.feat-col{
             position:sticky;left:0;background:#070a22;z-index:2;
-            border-right:1px solid rgba(255,255,255,.06);
+            box-shadow:1px 0 0 rgba(255,255,255,.06);
           }
-          .cmp-table thead th.feat-col{background:linear-gradient(90deg,#0a0e2d,#0a0e2dee);z-index:3;}
-          .cmp-table tr.cat-row td.feat-col{background:#0a0d28;}
+          .cmp-table thead th.feat-col,.cmp-table thead th.finova-col{background:#0a0e2d;z-index:3;}
+          .cmp-table tr.cat-row td.feat-col,.cmp-table tr.cat-row td.finova-col{background:#0a0d28;}
 
           @media(max-width:780px){
-            .cmp-table{min-width:600px;}
-            .cmp-table th.feat-col,.cmp-table td.feat-col{width:180px;min-width:180px;}
-            .cmp-table th.col,.cmp-table td.col{min-width:84px;}
+            .cmp-wrap{padding:0 8px 40px !important;}
+            .cmp-table{min-width:520px;}
+            .cmp-table th.feat-col,.cmp-table td.feat-col{width:140px;min-width:140px;max-width:140px;}
+            .cmp-table th.finova-col,.cmp-table td.finova-col{
+              position:sticky;left:140px;z-index:1;
+              background:#0a0d28;
+              box-shadow:1px 0 0 rgba(129,140,248,.15);
+              width:78px;min-width:78px;
+            }
+            .cmp-table thead th.finova-col{background:linear-gradient(180deg,#0f1240,#0a0d28);}
+            .cmp-table tr.cat-row td.finova-col{background:#0a0d28;}
+            .cmp-table th.col,.cmp-table td.col{min-width:78px;}
+            .cmp-table td{padding:9px 8px !important;font-size:12px !important;}
+            .cmp-table th{padding:12px 8px !important;font-size:12px !important;}
             .cmp-hint{display:flex !important;}
           }
           .cmp-hint{display:none;align-items:center;gap:6px;justify-content:center;color:#475569;font-size:11px;margin-top:8px;}
         `}</style>
 
-        <div className="cmp-hint">← swipe to compare all competitors →</div>
+        <div className="cmp-hint">← swipe to compare Xero · Zoho · Wave · QuickBooks →</div>
 
         <div className="cmp-scroll">
           <table className="cmp-table">
@@ -203,7 +216,7 @@ export default function ComparePage() {
               <tr style={{ background: "rgba(99,102,241,.1)" }}>
                 <th className="feat-col" style={{ textAlign: "left", padding: "16px 20px", fontWeight: 700, fontSize: 14, width: "35%" }}>Feature</th>
                 {COMPETITORS.map(c => (
-                  <th key={c.key} className="col" style={{ textAlign: "center", padding: "16px 14px", fontWeight: 700, fontSize: 13 }}>
+                  <th key={c.key} className={c.highlight ? "col finova-col" : "col"} style={{ textAlign: "center", padding: "16px 14px", fontWeight: 700, fontSize: 13 }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                       <div style={{ width: 30, height: 30, borderRadius: 8, background: c.highlight ? "linear-gradient(135deg,#4f46e5,#7c3aed)" : "rgba(255,255,255,.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: c.highlight ? "#fff" : "#64748b" }}>
                         {c.logo}
