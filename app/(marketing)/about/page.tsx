@@ -100,7 +100,7 @@ const COMMITMENTS = [
 ];
 
 const STATS = [
-  { value: "2024", label: "Year Founded", color: "#818cf8" },
+  { value: "2025", label: "Year Founded", color: "#818cf8" },
   { value: "6", label: "Industry Verticals", color: "#34d399" },
   { value: "50+", label: "Core Modules", color: "#fbbf24" },
   { value: "Weekly", label: "Release Cadence", color: "#38bdf8" },
@@ -111,7 +111,7 @@ export default function AboutPage() {
   useEffect(() => { const t = setTimeout(() => setHeroVis(true), 80); return () => clearTimeout(t); }, []);
 
   return (
-    <main style={{
+    <main className="about-page" style={{
       minHeight: "100vh",
       background: "linear-gradient(160deg,#04061a 0%,#070a22 50%,#0a0620 100%)",
       color: "white",
@@ -149,6 +149,16 @@ export default function AboutPage() {
           .ab-stats{flex-direction:column!important;}
           .ab-stat-item{border-right:none!important;border-bottom:1px solid rgba(255,255,255,.07)!important;}
           .ab-stat-item:last-child{border-bottom:none!important;}
+        }
+        @media(max-width:640px){
+          .about-page section[style*="130px 24px 80px"]{padding:64px 16px 32px !important;}
+          .about-page [style*="0 24px 90px"]{padding:0 16px 40px !important;}
+          .about-page [style*="0 24px 120px"]{padding:0 16px 48px !important;}
+          .about-page [style*="64px 56px"],
+          .about-page [style*="64px 52px"]{padding:32px 20px !important;}
+          .about-page [style*="36px 28px"]{padding:24px 18px !important;}
+          .about-page [style*="28px 24px"]{padding:22px 18px !important;}
+          .about-page [style*="24px 22px"]{padding:20px 16px !important;}
         }
         @media(max-width:560px){
           .ab-3col{grid-template-columns:1fr!important;}

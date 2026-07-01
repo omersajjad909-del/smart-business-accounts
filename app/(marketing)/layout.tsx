@@ -59,7 +59,26 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-[#060919]">
+    <div className="mkt-page flex min-h-screen flex-col bg-[#060919]">
+      <style>{`
+        @media(max-width:640px){
+          .mkt-page [style*="130px 24px"]{padding-top:60px !important;padding-bottom:28px !important;}
+          .mkt-page [style*="120px 24px"]{padding-top:56px !important;padding-bottom:28px !important;}
+          .mkt-page [style*="110px 24px"]{padding-top:52px !important;padding-bottom:28px !important;}
+          .mkt-page [style*="100px 24px"]{padding-top:52px !important;padding-bottom:28px !important;}
+          .mkt-page [style*="90px 24px"]{padding-top:48px !important;padding-bottom:24px !important;}
+          .mkt-page [style*="0 24px 120px"]{padding:0 16px 48px !important;}
+          .mkt-page [style*="0 24px 100px"]{padding:0 16px 44px !important;}
+          .mkt-page [style*="0 24px 90px"]{padding:0 16px 40px !important;}
+          .mkt-page [style*="0 24px 80px"]{padding:0 16px 36px !important;}
+          .mkt-page [style*="0 24px 60px"]{padding:0 16px 28px !important;}
+          .mkt-page [style*="88px 24px"]{padding:48px 16px !important;}
+          .mkt-page [style*="80px 24px"]{padding:44px 16px !important;}
+          .mkt-page [style*="72px 24px"]{padding:40px 16px !important;}
+          .mkt-page [style*="64px 24px"]{padding:36px 16px !important;}
+          .mkt-page [style*="60px 24px"]{padding:32px 16px !important;}
+        }
+      `}</style>
       <Offer />
       <div className="sticky top-0 z-50">
         <Navbar />
