@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Offer from "./(marketing)/landing/components/Offer";
 import Navbar from "./(marketing)/landing/components/navbar";
 import Hero from "./(marketing)/landing/components/Hero";
+import VideoDemo from "./(marketing)/landing/components/VideoDemo";
 import SolutionSection from "./(marketing)/landing/components/SolutionSection";
 import FeaturesSection from "./(marketing)/landing/components/FeaturesSection";
 import ModulesSection from "./(marketing)/landing/components/ModulesSection";
@@ -47,6 +48,7 @@ export default async function RootPage() {
       </div>
       <main className="grow overflow-x-hidden">
         <Hero />
+        <VideoDemo />
         <SolutionSection />
         <FeaturesSection />
         <ModulesSection />
