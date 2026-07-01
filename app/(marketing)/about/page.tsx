@@ -160,9 +160,15 @@ export default function AboutPage() {
           .about-page [style*="28px 24px"]{padding:22px 18px !important;}
           .about-page [style*="24px 22px"]{padding:20px 16px !important;}
         }
-        @media(max-width:560px){
-          .ab-3col{grid-template-columns:1fr!important;}
-          .ab-mod-grid{grid-template-columns:repeat(3,1fr)!important;}
+        @media(max-width:640px){
+          .about-page .ab-3col{grid-template-columns:repeat(2,1fr)!important;gap:12px!important;}
+          .about-page .ind-card{padding:18px 14px !important;}
+          .about-page .commit-card{padding:20px 16px !important;}
+          .about-page .val-card{padding:20px 16px !important;}
+        }
+        @media(max-width:400px){
+          .about-page .ab-3col{grid-template-columns:1fr!important;}
+          .about-page .ab-mod-grid{grid-template-columns:repeat(3,1fr)!important;}
         }
       `}</style>
 
