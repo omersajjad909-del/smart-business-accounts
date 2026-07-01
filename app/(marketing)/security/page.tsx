@@ -7,10 +7,10 @@ import { useEffect, useRef, useState } from "react";
 
 // What is live today (honest framing)
 const CERTIFICATIONS = [
-  { icon:"🔐", label:"TLS 1.3 Encryption", sub:"All data in transit" },
-  { icon:"🔒", label:"AES-256 Field Encryption", sub:"Sensitive data at rest" },
-  { icon:"👤", label:"Role-Based Access (RBAC)", sub:"Granular permissions" },
-  { icon:"📋", label:"Immutable Audit Logs", sub:"Append-only security trail" },
+  { icon:"🔐", label:"TLS 1.3 Encryption",       sub:"All data in transit",       color:"#818cf8", glow:"rgba(129,140,248,.18)", border:"rgba(129,140,248,.35)" },
+  { icon:"🔒", label:"AES-256 Field Encryption",  sub:"Sensitive data at rest",    color:"#34d399", glow:"rgba(52,211,153,.18)",  border:"rgba(52,211,153,.35)"  },
+  { icon:"👤", label:"Role-Based Access (RBAC)",  sub:"Granular permissions",      color:"#fbbf24", glow:"rgba(251,191,36,.18)", border:"rgba(251,191,36,.35)"  },
+  { icon:"📋", label:"Immutable Audit Logs",      sub:"Append-only security trail",color:"#f87171", glow:"rgba(248,113,113,.18)",border:"rgba(248,113,113,.35)" },
 ];
 
 const PILLARS = [
@@ -211,7 +211,7 @@ function PillarSection({ p, index }: { p: typeof PILLARS[0]; index: number }) {
           </div>
 
           {/* Visual card */}
-          <div style={{ direction:"ltr" }}>
+          <div className="pillar-visual" style={{ direction:"ltr" }}>
             <div style={{
               borderRadius:24, overflow:"hidden",
               background:"rgba(255,255,255,.03)",
@@ -341,27 +341,35 @@ export default function SecurityPage() {
           @keyframes shieldBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
           @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
           @media(max-width:900px){
-            .pillar-grid{grid-template-columns:1fr!important;direction:ltr!important;gap:36px!important;}
+            .pillar-grid{grid-template-columns:1fr!important;direction:ltr!important;gap:28px!important;}
+            .pillar-visual{display:none!important;}
             .stats-grid{grid-template-columns:repeat(2,1fr)!important;}
           }
           @media(max-width:600px){
-            .pillar-section{padding:52px 16px!important;}
-            .cert-chip{padding:8px 12px!important;}
+            .pillar-section{padding:48px 16px!important;}
+            .cert-chip{padding:10px 14px!important;width:100%;box-sizing:border-box;}
+            .cert-chips-wrap{flex-direction:column!important;align-items:stretch!important;}
+            .sec-hero{padding:72px 16px 40px!important;}
           }
-          @media(max-width:500px){.stats-grid{grid-template-columns:1fr!important;}}
+          @media(max-width:500px){.stats-grid{grid-template-columns:repeat(2,1fr)!important;}}
           .cert-chip{
-            display:inline-flex;align-items:center;gap:9px;
-            padding:10px 18px;border-radius:14px;
+            display:inline-flex;align-items:center;gap:12px;
+            padding:12px 18px;border-radius:16px;
             background:rgba(255,255,255,.04);
             border:1.5px solid rgba(255,255,255,.09);
             backdropFilter:blur(12px);
             transition:all .25s;cursor:default;
+            position:relative;overflow:hidden;
+          }
+          .cert-chip::before{
+            content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+            border-radius:3px 0 0 3px;
           }
           .cert-chip:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);transform:translateY(-2px);}
         `}</style>
 
         {/* ── HERO ── */}
-        <section style={{ padding:"100px 24px 64px", position:"relative", overflow:"hidden" }}>
+        <section className="sec-hero" style={{ padding:"100px 24px 64px", position:"relative", overflow:"hidden" }}>
           {/* BG */}
           <div style={{ position:"absolute", inset:0, pointerEvents:"none" }}>
             <div style={{ position:"absolute", inset:0,
@@ -469,17 +477,39 @@ export default function SecurityPage() {
             </div>
 
             {/* Cert chips */}
-            <div style={{
+            <div className="cert-chips-wrap" style={{
               display:"flex", justifyContent:"center", flexWrap:"wrap", gap:10, marginBottom:48,
               opacity:heroVisible?1:0, transform:heroVisible?"translateY(0)":"translateY(14px)",
               transition:"all .6s ease .28s",
             }}>
               {CERTIFICATIONS.map(c => (
-                <div key={c.label} className="cert-chip">
-                  <span style={{ fontSize:20 }}>{c.icon}</span>
+                <div key={c.label} className="cert-chip" style={{ borderColor: c.border, background: c.glow }}>
+                  <div style={{
+                    position:"absolute", left:0, top:0, bottom:0, width:3,
+                    background: c.color, borderRadius:"3px 0 0 3px",
+                  }}/>
+                  <div style={{
+                    width:36, height:36, borderRadius:10, flexShrink:0,
+                    background:`rgba(0,0,0,.25)`, border:`1px solid ${c.border}`,
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                    fontSize:18,
+                  }}>
+                    {c.icon}
+                  </div>
                   <div style={{ textAlign:"left" }}>
-                    <div style={{ fontSize:12.5, fontWeight:700, color:"rgba(255,255,255,.85)", lineHeight:1.2 }}>{c.label}</div>
-                    <div style={{ fontSize:10.5, color:"rgba(255,255,255,.3)", fontWeight:500 }}>{c.sub}</div>
+                    <div style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,.9)", lineHeight:1.2 }}>{c.label}</div>
+                    <div style={{ fontSize:11, color: c.color, fontWeight:600, marginTop:2, opacity:.8 }}>{c.sub}</div>
+                  </div>
+                  <div style={{ marginLeft:"auto", paddingLeft:8 }}>
+                    <div style={{
+                      width:18, height:18, borderRadius:"50%",
+                      background:`${c.color}20`, border:`1px solid ${c.border}`,
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                    }}>
+                      <svg width="8" height="8" viewBox="0 0 12 10" fill="none">
+                        <path d="M1 5L4.5 8.5 11 1" stroke={c.color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -669,7 +699,7 @@ export default function SecurityPage() {
                 </span>
               </h2>
               <p style={{ fontSize:15.5, color:"rgba(255,255,255,.45)", marginBottom:36, maxWidth:460, margin:"0 auto 36px", lineHeight:1.8 }}>
-                Flexible plans. Full platform access. No credit card required.
+                Flexible plans. Full platform access. Built-in security from day one.
               </p>
               <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap" }}>
                 <Link href="/website-signup" style={{
