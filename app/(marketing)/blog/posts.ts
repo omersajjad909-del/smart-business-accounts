@@ -52,7 +52,7 @@ export const ALL_POSTS: Record<string, BlogPost> = {
       { type: "p", text: "FinovaOS's bank reconciliation module automatically imports your bank transactions daily through bank feeds or CSV upload. Our matching engine uses amount, date, and reference number to match 85–95% of transactions automatically. What used to take a full day now takes 20 minutes." },
       { type: "quote", text: "We process 200+ invoices a day. FinovaOS's reconciliation used to be our biggest headache. Now it's the first thing we tick off on Monday morning.", author: "Tariq Mahmood, CEO — Mahmood Trading Co." },
       { type: "h2", text: "Getting Started" },
-      { type: "p", text: "If you're a FinovaOS user, navigate to Banking → Reconciliation in your dashboard. Connect your bank account or upload your latest statement. The system does the rest. For new users, our 14-day free trial includes full access to bank reconciliation." },
+      { type: "p", text: "If you're a FinovaOS user, navigate to Banking → Reconciliation in your dashboard. Connect your bank account or upload your latest statement. The system does the rest. New users can sign up on any paid plan and get full access to bank reconciliation from day one." },
     ],
   },
 

@@ -1070,7 +1070,7 @@ export default function DemoPage() {
                   Ready to explore the {biz.label} dashboard?
                 </div>
                 <div style={{ fontSize: 14, color: "rgba(255,255,255,.45)", lineHeight: 1.7 }}>
-                  No sign-up. No credit card. Real features, real data, real AI. Click and the workspace opens instantly.
+                  Instant preview. Real features, real data, real AI. Click and the workspace opens instantly — no signup needed to explore.
                 </div>
               </div>
               <button

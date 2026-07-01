@@ -1092,13 +1092,13 @@ export default function IndustryPage() {
               Ready to transform your {type.label}?
             </h3>
             <p style={{ color:"rgba(255,255,255,.45)", fontSize:15, marginBottom:36, lineHeight:1.75, maxWidth:500, margin:"0 auto 36px" }}>
-              Join businesses already running on FinovaOS. Set up in under 30 minutes, no credit card required.
+              Join businesses already running on FinovaOS. Set up in under 30 minutes and start managing your operations from day one.
             </p>
             <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap", marginBottom:24 }}>
               {type.isLive ? (
                 <>
-                  <Link href={`/onboarding/signup/starter?businessType=${type.id}`} style={{ padding:"14px 36px", borderRadius:13, background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"white", fontWeight:800, fontSize:15, textDecoration:"none", boxShadow:"0 6px 24px rgba(99,102,241,.4)" }}>
-                    Get Started — Free →
+                  <Link href={`/onboarding/choose-plan?businessType=${type.id}`} style={{ padding:"14px 36px", borderRadius:13, background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"white", fontWeight:800, fontSize:15, textDecoration:"none", boxShadow:"0 6px 24px rgba(99,102,241,.4)" }}>
+                    Get Started →
                   </Link>
                   <Link href="/contact" style={{ padding:"14px 28px", borderRadius:13, background:"rgba(255,255,255,.07)", border:"1px solid rgba(255,255,255,.14)", color:"rgba(255,255,255,.75)", fontWeight:700, fontSize:15, textDecoration:"none" }}>
                     Talk to Sales
@@ -1112,7 +1112,7 @@ export default function IndustryPage() {
             </div>
             {/* Trust signals */}
             <div style={{ display:"flex", justifyContent:"center", gap:24, flexWrap:"wrap" }}>
-              {["✓ 10-min setup","✓ No credit card","✓ Cancel anytime","✓ Dedicated support"].map(t => (
+              {["✓ 10-min setup","✓ 14-day money-back","✓ Cancel anytime","✓ Dedicated support"].map(t => (
                 <span key={t} style={{ fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:600 }}>{t}</span>
               ))}
             </div>

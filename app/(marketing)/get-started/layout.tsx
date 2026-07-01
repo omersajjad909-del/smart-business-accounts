@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Get Started with FinovaOS",
-    description: "Set up in minutes. No credit card required.",
+    description: "Set up in minutes. Managed accounting for growing businesses.",
     images: [`${BASE}/icon.png`],
   },
 };
