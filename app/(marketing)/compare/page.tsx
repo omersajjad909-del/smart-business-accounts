@@ -179,20 +179,14 @@ export default function ComparePage() {
       <div ref={ref} className="cmp-wrap" style={{ maxWidth: 1200, margin: "0 auto", padding: "0 12px 60px", opacity: vis ? 1 : 0, transition: "opacity .5s" }}>
         <style>{`
           .cmp-scroll{overflow-x:auto;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:#070a22;}
-          .cmp-table{width:100%;border-collapse:separate;border-spacing:0;background:#070a22;}
+          .cmp-table{width:100%;border-collapse:collapse;background:#070a22;}
           .cmp-table th,.cmp-table td{border-bottom:1px solid rgba(255,255,255,.04);}
-          .cmp-table th.feat-col,.cmp-table td.feat-col{
-            position:sticky;left:0;background:#070a22;z-index:2;
-            box-shadow:2px 0 6px rgba(0,0,0,.4);
-          }
-          .cmp-table thead th.feat-col{background:#0a0e2d;z-index:3;}
-          .cmp-table tr.cat-row td.feat-col{background:#0a0d28;}
 
           @media(max-width:780px){
             .cmp-wrap{padding:0 8px 40px !important;}
-            .cmp-table{min-width:480px;}
-            .cmp-table th.feat-col,.cmp-table td.feat-col{width:130px;min-width:130px;max-width:130px;}
-            .cmp-table th.col,.cmp-table td.col{min-width:72px;}
+            .cmp-table{min-width:640px;}
+            .cmp-table th.feat-col,.cmp-table td.feat-col{min-width:150px;}
+            .cmp-table th.col,.cmp-table td.col{min-width:80px;}
             .cmp-table td{padding:9px 8px !important;font-size:12px !important;}
             .cmp-table th{padding:12px 8px !important;font-size:12px !important;}
             .cmp-hint{display:flex !important;}
