@@ -1,33 +1,66 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-// ── Upstash-backed limiter (used when env vars are set) ────────────────────
-const url   = process.env.UPSTASH_REDIS_REST_URL?.trim();
-const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
-const upstashConfigured = Boolean(url && token);
+// ── Upstash-backed limiter (lazy-init, defensive) ─────────────────────────
+// We do NOT construct the Redis client at module load. A bad env var (e.g.
+// a placeholder like "<from-upstash>") would otherwise throw during build.
+// Instead we validate the URL, and lazy-init on first use. Any construction
+// or reachability failure falls back to the in-memory bucket.
 
-const redis = upstashConfigured
-  ? new Redis({ url: url!, token: token! })
-  : null;
+const rawUrl   = process.env.UPSTASH_REDIS_REST_URL?.trim() || "";
+const rawToken = process.env.UPSTASH_REDIS_REST_TOKEN?.trim() || "";
 
-// Cache limiter instances per (max, windowMs) so we don't recreate them
+function looksLikeValidUpstash(url: string, token: string): boolean {
+  if (!url || !token) return false;
+  if (!/^https:\/\//i.test(url)) return false;
+  // Reject obvious placeholder values pasted from documentation
+  if (/[<>{}]/.test(url) || /[<>{}]/.test(token)) return false;
+  if (/^(PASTE|YOUR|CHANGE|FROM|TODO)/i.test(token)) return false;
+  return true;
+}
+
+const upstashConfigured = looksLikeValidUpstash(rawUrl, rawToken);
+
+let cachedRedis: Redis | null = null;
+let redisInitFailed = false;
+
+function getRedis(): Redis | null {
+  if (!upstashConfigured || redisInitFailed) return null;
+  if (cachedRedis) return cachedRedis;
+  try {
+    cachedRedis = new Redis({ url: rawUrl, token: rawToken });
+    return cachedRedis;
+  } catch (err) {
+    console.warn("[rateLimit] Upstash Redis init failed, falling back to in-memory:", (err as Error)?.message);
+    redisInitFailed = true;
+    return null;
+  }
+}
+
 const limiterCache = new Map<string, Ratelimit>();
 
-function getUpstashLimiter(max: number, windowMs: number): Ratelimit {
+function getUpstashLimiter(max: number, windowMs: number): Ratelimit | null {
+  const redis = getRedis();
+  if (!redis) return null;
   const key = `${max}:${windowMs}`;
   let l = limiterCache.get(key);
   if (l) return l;
-  l = new Ratelimit({
-    redis: redis!,
-    limiter: Ratelimit.slidingWindow(max, `${windowMs} ms`),
-    analytics: false,
-    prefix: "sba:rl",
-  });
-  limiterCache.set(key, l);
-  return l;
+  try {
+    l = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(max, `${windowMs} ms`),
+      analytics: false,
+      prefix: "sba:rl",
+    });
+    limiterCache.set(key, l);
+    return l;
+  } catch (err) {
+    console.warn("[rateLimit] Ratelimit init failed, falling back to in-memory:", (err as Error)?.message);
+    return null;
+  }
 }
 
-// ── In-memory fallback (used when Upstash env vars are not set) ────────────
+// ── In-memory fallback ────────────────────────────────────────────────────
 type Bucket = { count: number; windowStart: number };
 const store = new Map<string, Bucket>();
 
@@ -44,27 +77,23 @@ function memRateLimit(key: string, max: number, windowMs: number) {
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────
-// Sync-compatible interface (kept for existing callers). If Upstash is
-// configured, this call becomes fire-and-check via a Promise, and callers
-// should switch to `rateLimitAsync` for real distributed protection.
 export function rateLimit(key: string, max: number, windowMs: number) {
   return memRateLimit(key, max, windowMs);
 }
 
-// Preferred async API — uses Upstash sliding window when configured.
-// Falls back to the in-memory bucket in dev / when env is missing.
 export async function rateLimitAsync(
   key: string,
   max: number,
   windowMs: number
 ): Promise<{ allowed: boolean; remaining: number }> {
-  if (!upstashConfigured) return memRateLimit(key, max, windowMs);
+  const limiter = getUpstashLimiter(max, windowMs);
+  if (!limiter) return memRateLimit(key, max, windowMs);
   try {
-    const limiter = getUpstashLimiter(max, windowMs);
     const { success, remaining } = await limiter.limit(key);
     return { allowed: success, remaining };
-  } catch {
-    // Upstash reachability failure — degrade to in-memory rather than lock users out
+  } catch (err) {
+    // Reachability / auth failure — degrade to in-memory rather than lock users out
+    console.warn("[rateLimit] Upstash limit() failed, using in-memory:", (err as Error)?.message);
     return memRateLimit(key, max, windowMs);
   }
 }
