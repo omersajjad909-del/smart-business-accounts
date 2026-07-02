@@ -3,7 +3,7 @@ import { PrismaClient , Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { signJwt } from "@/lib/auth";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimitAsync } from "@/lib/rateLimit";
 import { sendLoginAlertEmail, sendShiftBlockedAlertEmail } from "@/lib/email";
 import { getCompanyAdminControlSettings } from "@/lib/companyAdminControl";
 import { getNowInTimezone, getShiftStatus, SHIFT_DAYS } from "@/lib/shiftUtils";
@@ -20,7 +20,7 @@ type RolePermission = Prisma.RolePermissionGetPayload<Prisma.RolePermissionDefau
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for") || "unknown";
-    const rl = rateLimit(`login:${ip}`, 10, 60_000);
+    const rl = await rateLimitAsync(`login:${ip}`, 10, 60_000);
     if (!rl.allowed) {
       return NextResponse.json({ message: "Too many attempts, slow down" }, { status: 429 });
     }

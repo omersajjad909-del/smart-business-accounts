@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
 
 import { prisma } from "@/lib/prisma";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimitAsync } from "@/lib/rateLimit";
 
 function hashResetToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const ip = (req.headers.get("x-forwarded-for") || "unknown")
       .split(",")[0]
       .trim();
-    const rl = rateLimit(`reset-password:${ip}`, 10, 60_000);
+    const rl = await rateLimitAsync(`reset-password:${ip}`, 10, 60_000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Too many attempts. Please wait a moment." },

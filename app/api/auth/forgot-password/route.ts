@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash, randomBytes } from "crypto";
 
 import { prisma } from "@/lib/prisma";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimitAsync } from "@/lib/rateLimit";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { getRuntimeAppUrl } from "@/lib/domains";
 
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const ip = (req.headers.get("x-forwarded-for") || "unknown")
       .split(",")[0]
       .trim();
-    const rl = rateLimit(`forgot-password:${ip}`, 5, 60_000);
+    const rl = await rateLimitAsync(`forgot-password:${ip}`, 5, 60_000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Too many reset requests. Please wait a moment." },

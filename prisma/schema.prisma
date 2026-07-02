@@ -2178,6 +2178,18 @@ model StatusSubscriber {
   createdAt   DateTime @default(now())
 }
 
+// ================= WEBHOOK IDEMPOTENCY =================
+
+model WebhookEvent {
+  id         String   @id @default(cuid())
+  provider   String
+  eventKey   String
+  receivedAt DateTime @default(now())
+
+  @@unique([provider, eventKey])
+  @@index([receivedAt])
+}
+
 // ================= DEMO BOOKINGS =================
 
 model DemoBooking {

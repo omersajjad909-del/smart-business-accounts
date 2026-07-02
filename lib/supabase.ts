@@ -11,6 +11,7 @@ export const supabaseAdmin = configured
   : null;
 
 export const PRODUCT_IMAGES_BUCKET = "product-images";
+export const ATTACHMENTS_BUCKET = "attachments";
 
 export function isSupabaseStorageConfigured() {
   return configured;

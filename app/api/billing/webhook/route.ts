@@ -189,6 +189,23 @@ async function sendPaymentFailedEmail(
   } catch {}
 }
 
+// ─── Idempotency ──────────────────────────────────────────────────────────────
+
+async function alreadyProcessed(provider: string, eventKey: string): Promise<boolean> {
+  if (!eventKey) return false;
+  try {
+    await (prisma as any).webhookEvent.create({
+      data: { provider, eventKey },
+    });
+    return false;
+  } catch (e: any) {
+    // Unique constraint violation => we've seen this event before
+    if (e?.code === "P2002") return true;
+    // Any other DB error: don't block processing — safer to re-run than drop
+    return false;
+  }
+}
+
 // ─── Lemon Squeezy ───────────────────────────────────────────────────────────
 
 async function handleLemonWebhook(req: NextRequest, raw: string) {
@@ -202,6 +219,13 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
   const eventName = String(meta?.event_name || "");
   const attrs     = payload?.data?.attributes || {};
   const custom    = meta?.custom_data || attrs?.custom_data || attrs?.first_subscription_item?.custom_data || {};
+
+  // Idempotency — dedupe on (webhook_id || data.id) + eventName. LemonSqueezy retries on failure.
+  const webhookId = String(meta?.webhook_id || payload?.data?.id || "");
+  const eventKey  = `${eventName}:${webhookId}`;
+  if (await alreadyProcessed("lemonsqueezy", eventKey)) {
+    return apiOk({ received: true, provider: "lemonsqueezy", duplicate: true });
+  }
 
   const companyId      = String(custom?.company_id || meta?.custom_data?.company_id || "").trim();
   const planCode       = String(custom?.plan_code || attrs?.product_name || "STARTER").toUpperCase();
@@ -297,6 +321,13 @@ async function handleStripeWebhook(req: NextRequest, raw: string) {
   const payload = JSON.parse(raw);
   const type    = payload.type;
   const data    = payload.data?.object || {};
+
+  // Idempotency — Stripe includes a unique event ID that we dedupe on
+  const stripeEventId = String(payload?.id || "");
+  const stripeEventKey = `${type}:${stripeEventId}`;
+  if (stripeEventId && await alreadyProcessed("stripe", stripeEventKey)) {
+    return apiOk({ received: true, provider: "stripe", duplicate: true });
+  }
 
   if (type === "customer.subscription.created" || type === "customer.subscription.updated") {
     const companyId          = data.metadata?.companyId || null;
