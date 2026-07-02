@@ -1,10 +1,30 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
 export default function DemoStartPage() {
+  return (
+    <Suspense fallback={<LoadingShell />}>
+      <DemoStartInner />
+    </Suspense>
+  );
+}
+
+function LoadingShell() {
+  return (
+    <div style={{
+      minHeight: "100vh", background: "linear-gradient(160deg,#040616,#0a0d24)",
+      color: "white", fontFamily: FONT, display: "flex", alignItems: "center",
+      justifyContent: "center", padding: 24,
+    }}>
+      <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)" }}>Loading…</div>
+    </div>
+  );
+}
+
+function DemoStartInner() {
   const params = useSearchParams();
   const router = useRouter();
   const token = params?.get("token");
