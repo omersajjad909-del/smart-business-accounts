@@ -3,20 +3,70 @@ import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 
 const FORGE_HOSTS = ["finovaforge.com", "www.finovaforge.com"];
 
+// Per-request CSP nonce — server components read it from the x-nonce header.
+// Base64 (RFC 4648) so it's safe inside CSP header + HTML attributes.
+function generateNonce(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Buffer.from(bytes).toString("base64");
+}
+
+function buildCsp(nonce: string): string {
+  // Same allowed hosts as before; script-src now includes nonce + strict-dynamic.
+  // 'unsafe-inline' kept as a fallback for browsers that don't understand nonces
+  // (modern browsers ignore it once a nonce is present, so this doesn't weaken CSP).
+  const isProd = process.env.NODE_ENV === "production";
+  const scriptSrc = [
+    "'self'",
+    `'nonce-${nonce}'`,
+    "'strict-dynamic'",
+    "'unsafe-inline'", // ignored by modern browsers when nonce/strict-dynamic present
+    ...(isProd ? [] : ["'unsafe-eval'"]),
+    "https://fonts.googleapis.com",
+    "https://www.googletagmanager.com",
+    "https://static.cloudflareinsights.com",
+  ].join(" ");
+
+  return [
+    "default-src 'self'",
+    `script-src ${scriptSrc}`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: blob: https:",
+    "connect-src 'self' https://ipapi.co https://www.googletagmanager.com https://static.cloudflareinsights.com https://cloudflareinsights.com https://www.google-analytics.com https://www.google.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+    "frame-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
+
 export function proxy(req: NextRequest) {
+  // Per-request CSP nonce — server components read this via next/headers.
+  const nonce = generateNonce();
+  const csp = buildCsp(nonce);
+
   // ── Forge hostname routing ──────────────────────────────────────
   const host = (req.headers.get("host") ?? "").split(":")[0];
   if (FORGE_HOSTS.includes(host)) {
     const { pathname, search } = req.nextUrl;
+    const fwdHeaders = new Headers(req.headers);
+    fwdHeaders.set("x-nonce", nonce);
     if (!pathname.startsWith("/forge") && !pathname.startsWith("/_next") && !pathname.startsWith("/api")) {
       const target = pathname === "/" ? "/forge/home" : `/forge${pathname}`;
-      return NextResponse.rewrite(new URL(target + search, req.url));
+      const res = NextResponse.rewrite(new URL(target + search, req.url), { request: { headers: fwdHeaders } });
+      res.headers.set("Content-Security-Policy", csp);
+      return res;
     }
-    return NextResponse.next();
+    const res = NextResponse.next({ request: { headers: fwdHeaders } });
+    res.headers.set("Content-Security-Policy", csp);
+    return res;
   }
   // ───────────────────────────────────────────────────────────────
 
   const headers = new Headers(req.headers);
+  headers.set("x-nonce", nonce);
 
   // 🔥 Clear incoming sensitive headers to prevent spoofing
   headers.delete("x-user-id");
@@ -112,7 +162,9 @@ export function proxy(req: NextRequest) {
     }
   }
 
-  return NextResponse.next({ request: { headers } });
+  const res = NextResponse.next({ request: { headers } });
+  res.headers.set("Content-Security-Policy", csp);
+  return res;
 }
 
 export const config = {

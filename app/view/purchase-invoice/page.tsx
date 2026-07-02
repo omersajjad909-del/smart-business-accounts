@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { headers } from "next/headers";
 import { fmtDate } from "@/lib/dateUtils";
 import BarcodeWrapper from "@/components/BarcodeWrapper";
 import QRCodeWrapper from "@/components/QRCodeWrapper";
@@ -12,6 +13,7 @@ export default async function PublicPurchaseInvoicePage({
   searchParams: Promise<{ id: string }>;
 }) {
   const { id } = await searchParams;
+  const nonce = (await headers()).get("x-nonce") || undefined;
 
   if (!id) return <div>Invalid Invoice ID</div>;
 
@@ -163,7 +165,7 @@ export default async function PublicPurchaseInvoicePage({
         </div>
         
         {/* Print Button Script */}
-        <script dangerouslySetInnerHTML={{__html: `
+        <script nonce={nonce} dangerouslySetInnerHTML={{__html: `
             document.querySelector('button').addEventListener('click', () => window.print());
         `}} />
     </div>

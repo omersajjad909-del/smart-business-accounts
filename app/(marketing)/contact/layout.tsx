@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
@@ -32,7 +33,8 @@ export const metadata: Metadata = {
   alternates: { canonical: `${BASE}/contact` },
 };
 
-export default function ContactLayout({ children }: { children: React.ReactNode }) {
+export default async function ContactLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get("x-nonce") || undefined;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ContactPage",
@@ -48,7 +50,7 @@ export default function ContactLayout({ children }: { children: React.ReactNode 
   };
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {children}
     </>
   );

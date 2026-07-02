@@ -1,24 +1,8 @@
 import type { NextConfig } from "next";
 
-// unsafe-eval removed in production — only kept in dev for Next.js HMR/fast-refresh
-const SCRIPT_SRC = process.env.NODE_ENV === "production"
-  ? "'self' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com https://static.cloudflareinsights.com"
-  : "'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://www.googletagmanager.com https://static.cloudflareinsights.com";
-
-const CSP = [
-  "default-src 'self'",
-  `script-src ${SCRIPT_SRC}`,
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: blob: https:",
-  "connect-src 'self' https://ipapi.co https://www.googletagmanager.com https://static.cloudflareinsights.com https://cloudflareinsights.com https://www.google-analytics.com https://www.google.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
-  "frame-src 'self'",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "upgrade-insecure-requests",
-].join("; ");
-
+// NOTE: Content-Security-Policy is set per-request from proxy.ts (the middleware)
+// so that we can include a fresh nonce on every response. All other security
+// headers remain static and live here.
 const SECURITY_HEADERS = [
   // Prevent clickjacking
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -32,8 +16,6 @@ const SECURITY_HEADERS = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Permissions policy — disable unused browser APIs
   { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(self), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" },
-  // Content Security Policy
-  { key: "Content-Security-Policy", value: CSP },
   // Prevent cross-origin info leakage
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
