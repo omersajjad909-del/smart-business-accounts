@@ -45,7 +45,6 @@ export async function POST(req: NextRequest) {
     }
 
     const emailNormalized = email.trim().toLowerCase();
-    console.log("🔍 LOGIN ATTEMPT:", { emailOrName: emailNormalized, hasPassword: !!password });
 
     // Check database connection - search by email OR name
     let user;
@@ -73,9 +72,6 @@ export async function POST(req: NextRequest) {
         });
         user = allUsers[0] || null;
       }
-
-      console.log("🔍 USER SEARCH:", { searchTerm: emailNormalized });
-      console.log("🔍 USER FOUND:", user ? { id: user.id, name: user.name, email: user.email, active: user.active } : "NOT FOUND");
     } catch (dbError: any) {
       console.error("❌ LOGIN DATABASE ERROR:", dbError.message);
       return NextResponse.json(
@@ -101,12 +97,7 @@ export async function POST(req: NextRequest) {
     // Verify password
     let passwordMatch = false;
     try {
-      console.log("🔐 PASSWORD CHECK:", {
-        hasStoredPassword: !!user.password,
-        storedPasswordLength: user.password?.length,
-      });
       passwordMatch = await bcrypt.compare(password, user.password);
-      console.log("🔐 PASSWORD MATCH:", passwordMatch);
     } catch (bcryptError: any) {
       console.error("❌ LOGIN BCRYPT ERROR:", bcryptError);
       console.error("❌ BCRYPT ERROR DETAILS:", {
@@ -120,7 +111,6 @@ export async function POST(req: NextRequest) {
     }
 
     if (!passwordMatch) {
-      console.log("❌ PASSWORD MISMATCH");
       return NextResponse.json(
         { message: "Invalid username/email or password" },
         { status: 401 }
