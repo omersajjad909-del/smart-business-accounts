@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 function useTypeWriter(text: string, active: boolean, speed = 45) {
   const [shown, setShown] = useState(0);
   useEffect(() => {
-    if (!active) { setShown(0); return; }
+    if (!active) return;
+    setShown(0);
     let i = 0;
     const t = setInterval(() => {
       i++;
