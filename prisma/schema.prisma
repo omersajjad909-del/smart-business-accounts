@@ -2193,21 +2193,22 @@ model WebhookEvent {
 // ================= DEMO BOOKINGS =================
 
 model DemoBooking {
-  id            String   @id @default(cuid())
-  businessType  String
-  slotStart     DateTime
-  slotEnd       DateTime
-  name          String
-  email         String
-  phone         String?
-  company       String?
-  status        String   @default("PENDING")
-  accessToken   String   @unique @default(cuid())
-  startedAt     DateTime?
-  endedAt       DateTime?
-  cleanedUp     Boolean  @default(false)
-  demoCompanyId String?
-  createdAt     DateTime @default(now())
+  id              String   @id @default(cuid())
+  businessType    String
+  slotStart       DateTime
+  slotEnd         DateTime
+  name            String
+  email           String
+  phone           String?
+  company         String?
+  status          String   @default("PENDING")
+  accessToken     String   @unique @default(cuid())
+  startedAt       DateTime?
+  endedAt         DateTime?
+  cleanedUp       Boolean  @default(false)
+  demoCompanyId   String?
+  reminderSentAt  DateTime?
+  createdAt       DateTime @default(now())
 
   @@unique([slotStart, businessType])
   @@index([email])

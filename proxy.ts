@@ -137,6 +137,7 @@ export function proxy(req: NextRequest) {
     "/api/demo/book",
     "/api/demo/start",
     "/api/demo/end",
+    "/api/cron/",
     "/api/invitations/accept",
     "/api/invitations/preview",
     "/api/public/",

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendBookingConfirmation } from "@/lib/demoBookingEmails";
 
 const SLOT_MINUTES = 30;
 
@@ -81,6 +82,20 @@ export async function POST(req: NextRequest) {
           email: true,
         },
       });
+
+      // Fire-and-forget confirmation email — don't block the response on it
+      sendBookingConfirmation({
+        id: booking.id,
+        name: booking.name,
+        email: booking.email,
+        businessType: booking.businessType,
+        slotStart: new Date(booking.slotStart),
+        slotEnd: new Date(booking.slotEnd),
+        accessToken: booking.accessToken,
+      }).catch(err => {
+        console.error("Booking confirmation email failed:", err?.message || err);
+      });
+
       return NextResponse.json({ booking });
     } catch (e: any) {
       if (e?.code === "P2002") {
