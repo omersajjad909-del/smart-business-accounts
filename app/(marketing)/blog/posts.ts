@@ -81,7 +81,7 @@ export const ALL_POSTS: Record<string, BlogPost> = {
       { type: "p", text: "FinovaOS fetches live exchange rates from a trusted market rate provider, refreshed automatically several times a day. You can also manually set a rate if you've agreed a fixed rate with a client, or if you want to add a small margin." },
       { type: "h2", text: "Step 4: Invoice and Receive Payment" },
       { type: "p", text: "Create the invoice as normal. The client sees the amount in their currency. When payment arrives, FinovaOS records both the foreign currency amount and the base currency equivalent at the rate on that day. Any exchange gain or loss is automatically posted to the correct account." },
-      { type: "list", items: ["Major world currencies supported (USD, GBP, EUR, AED, SAR, QAR, KWD, OMR, PKR, INR, CNY, JPY) with more added on request", "Live rates refreshed multiple times a day from a market rate provider", "Manual rate override available for negotiated deals", "Automatic gain/loss calculation on realised and unrealised FX", "Multi-currency balance sheet and P&L reports"] },
+      { type: "list", items: ["12 major currencies supported today (USD, GBP, EUR, AED, SAR, QAR, KWD, OMR, PKR, INR, CNY, JPY) — more on request", "Rates refreshed several times a day from a market rate provider", "Manual rate override available for negotiated deals", "Automatic FX gain/loss calculation on realised amounts", "Multi-currency balance sheet and P&L reports"] },
       { type: "quote", text: "We invoice clients in 8 different currencies. With FinovaOS, it's as easy as invoicing in one.", author: "Omar F., CFO — Global Logistics Ltd." },
     ],
   },
