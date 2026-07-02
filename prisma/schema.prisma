@@ -466,7 +466,8 @@ model Company {
   fraudRisk          String?    @default("NONE") // NONE | LOW | MEDIUM | HIGH — updated by fraud monitor
   flaggedAt          DateTime?  // When admin manually flagged this company
   flagNote           String?    // Admin note explaining the flag
-  logoUrl   String?  // Company logo stored as base64 data URL
+  logoUrl   String?  // Company logo — stored as base64 data URL OR Supabase Storage URL
+  brandColor String?  // Preset key from the 8-color brand palette (e.g. "teal", "indigo", "purple")
   createdAt DateTime @default(now())
 
   users        UserCompany[]
@@ -2176,6 +2177,18 @@ model StatusSubscriber {
   confirmed   Boolean  @default(false)
   token       String   @unique @default(uuid())
   createdAt   DateTime @default(now())
+}
+
+// ================= USER PREFERENCES =================
+
+model UserPreferences {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  themeMode       String   @default("auto")         // "light" | "dark" | "auto"
+  density         String   @default("comfortable")  // "compact" | "comfortable"
+  sidebarDefault  String   @default("expanded")     // "expanded" | "collapsed"
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 // ================= WEBHOOK IDEMPOTENCY =================
