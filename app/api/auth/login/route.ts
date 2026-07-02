@@ -430,11 +430,10 @@ export async function POST(req: NextRequest) {
     }
     return res;
   } catch (e: any) {
-    console.error("❌ LOGIN ERROR:", e);
-    console.error("❌ LOGIN ERROR DETAILS:", {
+    console.error("❌ LOGIN ERROR:", {
+      name: e.name,
       message: e.message,
       stack: e.stack,
-      name: e.name,
     });
     return NextResponse.json(
       {
