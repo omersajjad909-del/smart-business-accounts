@@ -19,6 +19,7 @@ import { useAutoLogout } from "@/hooks/useAutoLogout";
 import { ModeToggle } from "@/components/mode-toggle";
 import WhatsNew from "@/components/WhatsNew";
 import ImageAdjusterModal from "@/components/ImageAdjusterModal";
+import DemoSessionTimer from "@/components/DemoSessionTimer";
 import { resolvePlanPermissions } from "@/lib/planPermissions";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
@@ -928,6 +929,7 @@ export default function DashboardLayout({
 
   return (
     <div className="dashboard-root" style={{display:"flex",minHeight:"100vh",background:"var(--app-bg)",fontSize:13,color:"var(--text-primary)",position:"relative"}}>
+      <DemoSessionTimer />
 
       {/* ── Idle auto-logout warning modal ── */}
       {showIdleWarning && (

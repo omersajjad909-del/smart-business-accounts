@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { setCurrentUser, setStoredDemoBusinessPreference } from "@/lib/auth";
-import { BUSINESS_PHASE_CONFIG } from "@/lib/businessModules";
+import { setStoredDemoBusinessPreference } from "@/lib/auth";
+import BookingModal from "./BookingModal";
 
 const FONT = "'Outfit','Inter',sans-serif";
 
@@ -581,9 +581,9 @@ const TRUST_STATS = [
 
 export default function DemoPage() {
   const [selectedBiz, setSelectedBiz] = useState<DemoBusinessId | null>(null);
-  const [loading, setLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "workflow" | "ai">("overview");
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   // Seed from hardcoded values so there's no flash on load
   const [liveStatusMap, setLiveStatusMap] = useState<Record<string, string>>(
@@ -606,47 +606,10 @@ export default function DemoPage() {
 
   const biz = useMemo(() => BUSINESSES.find((b) => b.id === selectedBiz) || null, [selectedBiz]);
 
-  async function handleTryDashboard() {
-    if (!biz || loading || !isDemoLive(biz.liveBusinessType)) return;
-    setLoading(true);
+  function handleBook() {
+    if (!biz || !isDemoLive(biz.liveBusinessType)) return;
     setStoredDemoBusinessPreference(biz.liveBusinessType);
-    try {
-      const requestPath = `/api/demo/login?businessType=${encodeURIComponent(biz.liveBusinessType)}`;
-      const res = await fetch(requestPath, {
-        method: "POST",
-        credentials: "include",
-        cache: "no-store",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businessType: biz.liveBusinessType }),
-      });
-
-      let finalRes = res;
-      if (!finalRes.ok) {
-        finalRes = await fetch(requestPath, {
-          method: "GET",
-          credentials: "include",
-          cache: "no-store",
-        });
-      }
-
-      if (finalRes.ok) {
-        const data = await finalRes.json().catch(() => ({}));
-        const activeBusinessType = data.company?.businessType || biz.liveBusinessType;
-        if (data.user) {
-          setCurrentUser({
-            ...data.user,
-            businessType: activeBusinessType,
-          });
-        }
-        setStoredDemoBusinessPreference(activeBusinessType);
-        window.location.assign("/dashboard");
-        return;
-      }
-
-      const failText = await finalRes.text().catch(() => "");
-      console.error("Demo login failed", finalRes.status, failText);
-    } catch {}
-    setLoading(false);
+    setBookingOpen(true);
   }
 
   function selectBiz(id: DemoBusinessId) {
@@ -873,8 +836,8 @@ export default function DemoPage() {
               </div>
               <button
                 className="launch-btn"
-                onClick={handleTryDashboard}
-                disabled={loading || !isDemoLive(biz.liveBusinessType)}
+                onClick={handleBook}
+                disabled={!isDemoLive(biz.liveBusinessType)}
                 style={{
                   flexShrink: 0,
                   background: isDemoLive(biz.liveBusinessType) ? biz.gradient : "rgba(255,255,255,.08)",
@@ -883,12 +846,12 @@ export default function DemoPage() {
                   padding: "14px 28px",
                   fontSize: 14,
                   fontWeight: 800,
-                  cursor: loading || !isDemoLive(biz.liveBusinessType) ? "not-allowed" : "pointer",
+                  cursor: !isDemoLive(biz.liveBusinessType) ? "not-allowed" : "pointer",
                   boxShadow: isDemoLive(biz.liveBusinessType) ? `0 10px 28px ${biz.color}35` : "none",
                   whiteSpace: "nowrap",
                 }}
               >
-                {loading ? "Opening..." : `Try ${biz.label} Live →`}
+                📅 Book Live Demo
               </button>
             </div>
 
@@ -1007,16 +970,10 @@ export default function DemoPage() {
                     ))}
                   </div>
                   <div style={{ marginTop: 18, padding: "16px 18px", borderRadius: 16, background: `${biz.color}10`, border: `1px solid ${biz.color}25` }}>
-                    <div style={{ fontSize: 12, fontWeight: 800, color: biz.color, marginBottom: 6 }}>🚀 Ready to see this live?</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.6, marginBottom: 14 }}>Click below to open the real dashboard pre-configured for {biz.label}. No sign-up required.</div>
-                    <button
-                      className="launch-btn"
-                      onClick={handleTryDashboard}
-                      disabled={loading}
-                      style={{ width: "100%", background: biz.gradient, color: "#fff", borderRadius: 12, padding: "12px", fontSize: 13, fontWeight: 800, boxShadow: `0 6px 20px ${biz.color}28` }}
-                    >
-                      {loading ? "Opening live workspace..." : `Open ${biz.label} Demo`}
-                    </button>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: biz.color, marginBottom: 6 }}>🚀 Want to try it yourself?</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.6 }}>
+                      Book a 30-minute live session using the button at the top of this page. You&apos;ll get instant access to a real dashboard pre-configured for {biz.label}.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1063,40 +1020,39 @@ export default function DemoPage() {
               </div>
             )}
 
-            {/* Bottom CTA */}
-              <div className="demo-bottom-cta" style={{ marginTop: 28, padding: "32px 32px", borderRadius: 24, background: `linear-gradient(135deg,${biz.color}12,rgba(255,255,255,.03))`, border: `1px solid ${biz.color}25`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6 }}>
-                  Ready to explore the {biz.label} dashboard?
-                </div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,.45)", lineHeight: 1.7 }}>
-                  Instant preview. Real features, real data, real AI. Click and the workspace opens instantly — no signup needed to explore.
-                </div>
+            {/* Bottom info panel (single-CTA design — booking button is at the top of the section) */}
+            <div className="demo-bottom-cta" style={{ marginTop: 28, padding: "28px 32px", borderRadius: 24, background: `linear-gradient(135deg,${biz.color}12,rgba(255,255,255,.03))`, border: `1px solid ${biz.color}25` }}>
+              <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.5, marginBottom: 8 }}>
+                How the {biz.label} demo works
               </div>
-              <button
-                className="launch-btn"
-                onClick={handleTryDashboard}
-                disabled={loading}
-                style={{
-                  background: biz.gradient,
-                  color: "#fff",
-                  borderRadius: 18,
-                  padding: "16px 36px",
-                  fontSize: 15,
-                  fontWeight: 900,
-                  cursor: loading ? "not-allowed" : "pointer",
-                  boxShadow: `0 14px 36px ${biz.color}35`,
-                  letterSpacing: -0.3,
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                }}
-              >
-                {loading ? "Opening live workspace..." : `Open ${biz.label} Live Demo →`}
-              </button>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.75, marginBottom: 16 }}>
+                Use the <strong style={{ color: biz.color }}>📅 Book Live Demo</strong> button at the top of this section to pick a 30-minute slot. At your booked time, click the access link and you&apos;ll be dropped into a real dashboard pre-configured for {biz.label}. When your 30 minutes are up, all test data is automatically reset — nothing persists.
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {[
+                  { icon: "🗓️", text: "Pick a 30-min slot" },
+                  { icon: "⚡", text: "Real dashboard, real data" },
+                  { icon: "🧹", text: "Auto-clean when demo ends" },
+                ].map(pt => (
+                  <div key={pt.text} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px", borderRadius: 999, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", fontSize: 12, color: "rgba(255,255,255,.7)", fontWeight: 600 }}>
+                    <span>{pt.icon}</span> {pt.text}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
       </div>
+      {biz && (
+        <BookingModal
+          open={bookingOpen}
+          onClose={() => setBookingOpen(false)}
+          businessType={biz.liveBusinessType}
+          businessLabel={biz.label}
+          color={biz.color}
+          gradient={biz.gradient}
+        />
+      )}
     </div>
   );
 }
