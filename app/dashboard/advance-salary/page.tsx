@@ -257,7 +257,7 @@ export default function AdvanceSalaryPage() {
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button style={{ ...s.btn, flex: 1 }} onClick={handleSave} disabled={saving}>
-                  {saving ? "Savingâ€¦" : "Save Advance"}
+                  {saving ? "Saving" : "Save Advance"}
                 </button>
                 <button style={{ ...s.btn, background: "var(--border)", color: "var(--text-muted)", flex: 1 }} onClick={() => { setShowForm(false); setMsg(""); }}>
                   Cancel

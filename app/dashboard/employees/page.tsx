@@ -214,6 +214,30 @@ export default function EmployeesPage() {
                     <option value="HOURLY">Hourly</option>
                   </select>
                 </div>
+
+                <div>
+                  <label style={lbl}>Shift Start</label>
+                  <input
+                    type="time"
+                    value={formData.shiftStart}
+                    onChange={e => setFormData({ ...formData, shiftStart: e.target.value })}
+                    style={inp}
+                  />
+                </div>
+
+                <div>
+                  <label style={lbl}>Shift End</label>
+                  <input
+                    type="time"
+                    value={formData.shiftEnd}
+                    onChange={e => setFormData({ ...formData, shiftEnd: e.target.value })}
+                    style={inp}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "1 / -1", fontSize: 11, color: "var(--text-muted)", lineHeight: 1.5, marginTop: -6 }}>
+                  💡 Shift times default check-in/check-out on the attendance page. If employee works longer than shift end, the extra hours are counted as overtime and offset any absent/half-day deduction automatically.
+                </div>
               </div>
 
               <div style={{ display: "flex", gap: 10 }}>
