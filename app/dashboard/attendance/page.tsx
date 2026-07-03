@@ -51,6 +51,7 @@ function authH() {
 export default function AttendancePage() {
   const [employees,          setEmployees]          = useState<Employee[]>([]);
   const [records,            setRecords]            = useState<AttendanceRecord[]>([]);
+  const [holidays,           setHolidays]           = useState<{ date: string; name: string }[]>([]);
   const [loading,            setLoading]            = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [month,              setMonth]              = useState(new Date().toISOString().slice(0, 7));
@@ -62,7 +63,21 @@ export default function AttendancePage() {
   useEffect(() => {
     if (selectedEmployeeId) fetchAttendance(selectedEmployeeId, month);
     else setRecords([]);
+    fetchHolidays(month);
   }, [selectedEmployeeId, month]);
+
+  async function fetchHolidays(m: string) {
+    try {
+      const y = m.split("-")[0];
+      const r = await fetch(`/api/holidays?year=${y}`, { headers: authH() });
+      const d = await r.json();
+      setHolidays(Array.isArray(d)
+        ? d.map((h: any) => ({ date: String(h.date).slice(0, 10), name: h.name }))
+        : []);
+    } catch { setHolidays([]); }
+  }
+
+  const holidayFor = (date: Date) => holidays.find(h => h.date === toISO(date));
 
   async function fetchEmployees() {
     try {
@@ -363,10 +378,12 @@ export default function AttendancePage() {
                       );
 
                       const rec    = recFor(date);
+                      const hol    = holidayFor(date);
+                      const isHoliday = !!hol || isSun(date);
                       const ds     = toISO(date);
                       const today  = ds === toISO(new Date());
                       const isSel  = selectedDate === ds;
-                      const sunHol = !rec && isSun(date);
+                      const sunHol = !rec && isHoliday;
                       const sc     = rec ? (SC[rec.status] || SC.PRESENT) : null;
 
                       return (
@@ -380,11 +397,11 @@ export default function AttendancePage() {
                               checkOut: rec.checkOut ? new Date(rec.checkOut).toTimeString().slice(0,5) : "",
                               remarks:  rec.remarks || "",
                             } : {
-                              status: isSun(date) ? "HOLIDAY" : "PRESENT",
+                              status: isHoliday ? "HOLIDAY" : "PRESENT",
                               // Auto-fill from shift when marking a working day
-                              checkIn:  isSun(date) ? "" : shiftS,
-                              checkOut: isSun(date) ? "" : shiftE,
-                              remarks: "",
+                              checkIn:  isHoliday ? "" : shiftS,
+                              checkOut: isHoliday ? "" : shiftE,
+                              remarks: hol ? hol.name : "",
                             });
                           }}
                           style={{ minHeight: 90, padding: 8, cursor: "pointer",
