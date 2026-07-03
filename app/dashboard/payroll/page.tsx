@@ -27,6 +27,15 @@ export default function PayrollPage() {
   const [editingId,     setEditingId]     = useState<string | null>(null);
   const [showPreview,   setShowPreview]   = useState(false);
   const [detectedAdv,   setDetectedAdv]   = useState(0);
+  const [attSummary,    setAttSummary]    = useState<null | {
+    present: number; absent: number; halfDay: number; leave: number; late: number; holiday: number; unmarked: number;
+    otHours: number;
+    perDay: number; perHour: number;
+    absentDeduction: number; halfDayDeduction: number;
+    grossDeduction: number; otCredit: number;
+    netDeduction: number; otAllowance: number;
+    reasonText: string;
+  }>(null);
   const [monthYear,     setMonthYear]     = useState(() => {
     const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
   });
@@ -50,15 +59,16 @@ export default function PayrollPage() {
 
   async function calculateAutoDeductions() {
     try {
-      const [advRes, attRes] = await Promise.all([
+      const [advRes, calcRes] = await Promise.all([
         fetch(`/api/advance?employeeId=${form.employeeId}&status=PENDING&monthYear=${form.monthYear}`),
-        fetch(`/api/attendance?employeeId=${form.employeeId}&month=${form.monthYear}`),
+        fetch(`/api/payroll/calculate?employeeId=${form.employeeId}&monthYear=${form.monthYear}`, { cache: "no-store" }),
       ]);
-      const [advData, attData] = await Promise.all([advRes.json(), attRes.json()]);
+      const advData  = await advRes.json();
+      const calcData = calcRes.ok ? await calcRes.json() : null;
       const advTotal = Array.isArray(advData) ? advData.reduce((s: number, a: any) => s + a.amount, 0) : 0;
-      const absents  = Array.isArray(attData)  ? attData.filter((r: any) => r.status === "ABSENT").length : 0;
       setDetectedAdv(advTotal);
 
+      // Previous month unpaid balance
       let prevDeduction = 0;
       try {
         const [yr, mo] = form.monthYear.split("-").map(Number);
@@ -74,17 +84,62 @@ export default function PayrollPage() {
         }
       } catch {}
 
-      const perDay = form.baseSalary > 0 ? form.baseSalary / 30 : 0;
-      const absentDed = Math.round(absents * perDay);
-      const total = advTotal + absentDed + prevDeduction;
-
+      // Attendance-driven numbers (absent + half-day deduction offset by OT credit)
+      let attDeduction = 0;
+      let otAllowance  = 0;
       const parts: string[] = [];
-      if (prevDeduction > 0) parts.push(`Prev Bal: ${prevDeduction}`);
-      if (absents > 0) parts.push(`${absents} Absent`);
-      if (advTotal > 0) parts.push("Advance");
 
-      if (total > 0) setForm(p => ({ ...p, deductions: total, deductionReason: parts.join(", ") }));
-    } catch {}
+      if (calcData?.breakdown) {
+        const bd = calcData.breakdown;
+        attDeduction = Number(bd.netDeduction) || 0;
+        otAllowance  = Number(bd.otAllowance)  || 0;
+        setAttSummary({
+          present: calcData.counts.present,
+          absent:  calcData.counts.absent,
+          halfDay: calcData.counts.halfDay,
+          leave:   calcData.counts.leave,
+          late:    calcData.counts.late,
+          holiday: calcData.counts.holiday,
+          unmarked: calcData.counts.unmarked,
+          otHours: calcData.overtime.totalHours,
+          perDay:  calcData.rates.perDay,
+          perHour: calcData.rates.perHour,
+          absentDeduction:  bd.absentDeduction,
+          halfDayDeduction: bd.halfDayDeduction,
+          grossDeduction:   bd.grossDeduction,
+          otCredit:         bd.otCredit,
+          netDeduction:     bd.netDeduction,
+          otAllowance:      bd.otAllowance,
+          reasonText:       bd.reasonText,
+        });
+
+        if (calcData.counts.absent > 0)  parts.push(`${calcData.counts.absent} Absent`);
+        if (calcData.counts.halfDay > 0) parts.push(`${calcData.counts.halfDay} Half-day`);
+        if (calcData.overtime.totalHours > 0 && bd.otCredit >= bd.grossDeduction && bd.grossDeduction > 0) {
+          parts.push(`OT ${calcData.overtime.totalHours}h offsets deduction`);
+        } else if (calcData.overtime.totalHours > 0 && bd.otCredit > 0 && bd.grossDeduction > 0) {
+          parts.push(`OT ${calcData.overtime.totalHours}h partial offset`);
+        }
+      } else {
+        setAttSummary(null);
+      }
+
+      if (prevDeduction > 0) parts.unshift(`Prev Bal: ${prevDeduction}`);
+      if (advTotal > 0)      parts.push("Advance");
+
+      const totalDeduction = advTotal + attDeduction + prevDeduction;
+      const shouldUpdate   = totalDeduction > 0 || otAllowance > 0;
+      if (shouldUpdate) {
+        setForm(p => ({
+          ...p,
+          deductions: totalDeduction,
+          allowances: otAllowance > 0 ? otAllowance : p.allowances,
+          deductionReason: parts.join(", "),
+        }));
+      }
+    } catch (err) {
+      console.error("calculateAutoDeductions failed:", err);
+    }
   }
 
   async function fetchEmployees() {
@@ -241,6 +296,92 @@ export default function PayrollPage() {
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>Reduces net balance; negative balance carries forward</div>
           </div>
         </div>
+
+        {/* ── Attendance-driven breakdown card ── */}
+        {attSummary && form.employeeId && form.baseSalary > 0 && (
+          <div style={{
+            marginTop: 18, padding: "16px 18px", borderRadius: 12,
+            background: "rgba(34,197,94,.06)", border: "1px solid rgba(34,197,94,.22)",
+            fontSize: 12.5, color: "var(--text-primary)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".05em", textTransform: "uppercase", color: accent }}>
+                📊 Attendance Breakdown
+              </span>
+              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                (auto-applied to Deductions & Allowances above)
+              </span>
+            </div>
+
+            {/* Attendance chips */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
+              {[
+                { l: "Present",   v: attSummary.present,  c: "#22c55e" },
+                { l: "Absent",    v: attSummary.absent,   c: "#f87171" },
+                { l: "Half-day",  v: attSummary.halfDay,  c: "#fb923c" },
+                { l: "Leave",     v: attSummary.leave,    c: "#a78bfa" },
+                { l: "Late",      v: attSummary.late,     c: "#facc15" },
+                { l: "Holiday",   v: attSummary.holiday,  c: "#94a3b8" },
+                { l: "Unmarked",  v: attSummary.unmarked, c: "#64748b" },
+              ].filter(x => x.v > 0).map(x => (
+                <span key={x.l} style={{
+                  padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700,
+                  background: `${x.c}18`, color: x.c, border: `1px solid ${x.c}30`,
+                }}>{x.l}: {x.v}</span>
+              ))}
+              {attSummary.otHours > 0 && (
+                <span style={{
+                  padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 800,
+                  background: "rgba(99,102,241,.14)", color: "#818cf8", border: "1px solid rgba(99,102,241,.32)",
+                }}>⏱ OT: {attSummary.otHours}h</span>
+              )}
+            </div>
+
+            {/* Numbers grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, marginBottom: 12 }}>
+              <div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Per-day rate</div>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>Rs. {fmt(Math.round(attSummary.perDay))}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Absent deduction</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.absentDeduction > 0 ? "#f87171" : "var(--text-primary)" }}>
+                  Rs. {fmt(Math.round(attSummary.absentDeduction))}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Half-day deduction</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.halfDayDeduction > 0 ? "#fb923c" : "var(--text-primary)" }}>
+                  Rs. {fmt(Math.round(attSummary.halfDayDeduction))}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>OT credit (offset)</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: attSummary.otCredit > 0 ? "#818cf8" : "var(--text-primary)" }}>
+                  Rs. {fmt(Math.round(attSummary.otCredit))}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Net deduction</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: attSummary.netDeduction > 0 ? "#f87171" : "#22c55e" }}>
+                  Rs. {fmt(Math.round(attSummary.netDeduction))}
+                </div>
+              </div>
+              {attSummary.otAllowance > 0 && (
+                <div>
+                  <div style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".05em", textTransform: "uppercase" }}>Extra OT allowance</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#818cf8" }}>
+                    Rs. {fmt(Math.round(attSummary.otAllowance))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.6 }}>
+              {attSummary.reasonText}
+            </div>
+          </div>
+        )}
       </form>
 
       {/* Table */}
