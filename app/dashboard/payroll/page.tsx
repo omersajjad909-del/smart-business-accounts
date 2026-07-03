@@ -189,24 +189,31 @@ export default function PayrollPage() {
     w.document.open();
     w.document.close();
     w.document.documentElement.innerHTML = `<html><head><title>Payslip - ${p.employee.firstName}</title>
-    <style>body{font-family:sans-serif;padding:40px;max-width:600px;margin:0 auto;border:1px solid #ccc}
-    .row{display:flex;justify-content:space-between;margin-bottom:10px;border-bottom:1px dashed #eee;padding-bottom:5px}
-    .label{font-weight:bold;color:#555}.amt{font-family:monospace}
-    .footer{margin-top:40px;text-align:center;font-size:.8em;color:#888}
-    @media print{body{border:none}}</style></head><body>
-    <div style="text-align:center;margin-bottom:30px;border-bottom:2px solid #333;padding-bottom:10px">
-    <h1>Payslip</h1><p>Period: ${p.monthYear}</p></div>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      body{font-family:sans-serif;padding:40px;max-width:600px;margin:0 auto;border:1px solid #ccc;color:#000;background:#fff}
+      .row{display:flex;justify-content:space-between;margin-bottom:10px;border-bottom:1px dashed #eee;padding-bottom:5px}
+      .label{font-weight:bold;color:#000}.amt{font-family:monospace}
+      .footer{margin-top:40px;text-align:center;font-size:.8em;color:#000}
+      @media print{
+        body{border:none;margin:0;padding:20mm;max-width:none}
+        *{color:#000 !important;background:transparent !important;-webkit-print-color-adjust:exact !important}
+        .row{border-bottom:1px dashed #000}
+      }
+    </style></head><body>
+    <div style="text-align:center;margin-bottom:30px;border-bottom:2px solid #000;padding-bottom:10px">
+    <h1 style="margin:0">Payslip</h1><p style="margin:4px 0 0">Period: ${p.monthYear}</p></div>
     <div class="row"><span class="label">Employee ID:</span><span>${p.employee.employeeId}</span></div>
     <div class="row"><span class="label">Employee Name:</span><span>${p.employee.firstName} ${p.employee.lastName}</span></div>
     <div class="row"><span class="label">Basic Salary:</span><span class="amt">${fmt(p.baseSalary)}</span></div>
     <div class="row"><span class="label">Allowances:</span><span class="amt">${fmt(p.allowances)}</span></div>
-    <div class="row"><span class="label">Deductions:</span><span class="amt" style="color:red">-${fmt(p.deductions)}</span></div>
+    <div class="row"><span class="label">Deductions:</span><span class="amt">-${fmt(p.deductions)}</span></div>
     ${p.deductionReason ? `<div class="row"><span class="label">Deduction Reason:</span><span>${p.deductionReason}</span></div>` : ""}
     <div class="row" style="font-weight:bold"><span class="label">Net Pay:</span><span class="amt">${fmt(pay)}</span></div>
     ${p.additionalCash > 0 ? `<div class="row"><span class="label">Cash Paid:</span><span class="amt">-${fmt(p.additionalCash)}</span></div>` : ""}
-    <div class="row" style="font-weight:bold;${next < 0 ? "color:red" : ""}"><span class="label">Balance:</span><span class="amt">${fmt(next)}</span></div>
+    <div class="row" style="font-weight:bold;${next < 0 ? "color:#000" : ""}"><span class="label">Balance:</span><span class="amt">${fmt(next)}</span></div>
     <div class="footer"><p>System Generated Payslip</p></div>
-    <div style="margin-top:32px;border-top:1px solid #eee;padding-top:8px;text-align:center;font-size:10px;color:#aaa">Powered by FinovaOS</div>
+    <div style="margin-top:32px;border-top:1px solid #eee;padding-top:8px;text-align:center;font-size:10px;color:#000">Powered by FinovaOS</div>
     <script>window.print();</script></body></html>`;
   }
 
@@ -462,7 +469,15 @@ export default function PayrollPage() {
           </div>
 
           {/* Paper */}
-          <div style={{ background: "#fff", width: "100%", maxWidth: 820, minHeight: "297mm", padding: "20mm", borderRadius: 4, color: "#111", fontFamily: "Georgia, serif", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
+          <style>{`@media print {
+              body * { visibility: hidden !important; }
+              #payroll-printable, #payroll-printable * { visibility: visible !important; }
+              #payroll-printable { position: fixed; inset: 0; padding: 20mm !important; margin: 0 !important; box-shadow: none !important; background: #fff !important; color: #000 !important; font-family: Georgia, serif !important; }
+              #payroll-printable * { color: #000 !important; background: transparent !important; -webkit-print-color-adjust: exact !important; }
+              #payroll-printable table { border-collapse: collapse !important; }
+              #payroll-printable th, #payroll-printable td { border-color: #000 !important; color: #000 !important; }
+            }`}</style>
+          <div id="payroll-printable" style={{ background: "#fff", width: "100%", maxWidth: 820, minHeight: "297mm", padding: "20mm", borderRadius: 4, color: "#111", fontFamily: "Georgia, serif", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
             <div style={{ textAlign: "center", marginBottom: 32, borderBottom: "2px solid #111", paddingBottom: 16 }}>
               <h1 style={{ fontSize: 24, fontWeight: 900, textTransform: "uppercase", letterSpacing: 2, margin: 0 }}>Payroll Report</h1>
               <p style={{ margin: "8px 0 0", fontSize: 14, color: "#555" }}>Month: <strong>{monthYear}</strong></p>
