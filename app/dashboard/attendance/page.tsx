@@ -492,7 +492,18 @@ export default function AttendancePage() {
                   {(["PRESENT","ABSENT","LEAVE","HALF_DAY","LATE","HOLIDAY"] as const).map(s => {
                     const c = SC[s]; const active = formData.status === s;
                     return (
-                      <button key={s} type="button" onClick={() => setFormData(p => ({ ...p, status: s }))}
+                      <button key={s} type="button" onClick={() => {
+                        const shiftS = sel?.shiftStart || "09:00";
+                        const shiftE = sel?.shiftEnd   || "18:00";
+                        setFormData(p => {
+                          // Auto-fill or clear times based on the new status
+                          if (s === "PRESENT" || s === "HALF_DAY" || s === "LATE") {
+                            return { ...p, status: s, checkIn: p.checkIn || shiftS, checkOut: p.checkOut || shiftE };
+                          }
+                          // ABSENT / LEAVE / HOLIDAY — clear times
+                          return { ...p, status: s, checkIn: "", checkOut: "" };
+                        });
+                      }}
                         style={{ padding: "8px 4px", borderRadius: 10, cursor: "pointer", fontFamily: ff,
                           border: `1.5px solid ${active ? c.text : "var(--border)"}`,
                           background: active ? c.bg : "transparent",
