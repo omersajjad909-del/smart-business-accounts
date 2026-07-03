@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/requireRole";
 import { resolveCompanyId } from "@/lib/tenant";
+import { createAdvanceSalaryVoucher, deleteVoucherByTag } from "@/lib/payrollAccounting";
 
 // GET: Fetch advances
 export async function GET(req: NextRequest) {
@@ -90,6 +91,27 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Advance salary CPV — DR Employee Payable / CR Cash (money out today)
+    try {
+      const emp = await prisma.employee.findFirst({
+        where: { id: employeeId, companyId },
+        select: { employeeId: true, firstName: true, lastName: true },
+      });
+      if (emp) {
+        await createAdvanceSalaryVoucher({
+          companyId,
+          advanceId: advance.id,
+          employeeId,
+          employeeCode: emp.employeeId,
+          employeeName: `${emp.firstName} ${emp.lastName || ""}`.trim(),
+          amount: Number(amount),
+          date: new Date(date),
+        });
+      }
+    } catch (glErr: any) {
+      console.error("Advance salary voucher failed (non-fatal):", glErr?.message || glErr);
+    }
+
     console.log("✅ Saved:", advance);
     return NextResponse.json(advance, { status: 201 });
   } catch (error: any) {
@@ -120,6 +142,11 @@ export async function DELETE(req: NextRequest) {
     if (!record || record.companyId !== companyId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
+
+    // Reverse the advance's GL voucher
+    try {
+      await deleteVoucherByTag(companyId, `[ADVANCE:${id}]`);
+    } catch {}
 
     await prisma.advanceSalary.delete({
       where: { id },

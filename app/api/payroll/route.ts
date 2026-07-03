@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
+import {
+  createPayrollAccrualJV,
+  createPayrollPaymentCPV,
+  deleteVoucherByTag,
+} from "@/lib/payrollAccounting";
 
 // GET: Fetch payroll records
 export async function GET(req: NextRequest) {
@@ -92,6 +97,27 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Salary accrual JV — DR Salary Expense, CR Employee Payable
+    try {
+      const emp = await prisma.employee.findFirst({
+        where: { id: employeeId, companyId },
+        select: { employeeId: true, firstName: true, lastName: true },
+      });
+      if (emp && netSalary > 0) {
+        await createPayrollAccrualJV({
+          companyId,
+          payrollId: payroll.id,
+          employeeId,
+          employeeCode: emp.employeeId,
+          employeeName: `${emp.firstName} ${emp.lastName || ""}`.trim(),
+          monthYear,
+          grossPay: netSalary,
+        });
+      }
+    } catch (glErr: any) {
+      console.error("Payroll accrual JV failed (non-fatal):", glErr?.message || glErr);
+    }
+
     return NextResponse.json(payroll, { status: 201 });
   } catch (error: any) {
     if (error.code === "P2002") {
@@ -146,34 +172,26 @@ export async function PUT(req: NextRequest) {
     }
     const payroll = await prisma.payroll.findUnique({ where: { id } });
 
-    // Create GL journal entry when payroll is marked as PAID
+    // Payment CPV — DR Employee Payable / CR Cash (clears the accrued liability)
     if (wasUnpaid && nowPaid && payroll) {
       try {
-        const netAmt = Number(payroll.netSalary);
-        const [salaryAcc, cashAcc] = await Promise.all([
-          prisma.account.findFirst({ where: { companyId, name: { contains: "Salary", mode: "insensitive" } } }),
-          prisma.account.findFirst({ where: { companyId, name: { contains: "Cash", mode: "insensitive" } } }),
-        ]);
-        if (salaryAcc && cashAcc) {
-          const count = await prisma.voucher.count({ where: { type: "JV", companyId } });
-          await prisma.voucher.create({
-            data: {
-              companyId,
-              voucherNo: `JV-${count + 1}`,
-              type: "JV",
-              date: new Date(),
-              narration: `Payroll payment — ${payroll.monthYear}`,
-              entries: {
-                create: [
-                  { companyId, accountId: salaryAcc.id, amount: netAmt },
-                  { companyId, accountId: cashAcc.id, amount: -netAmt },
-                ],
-              },
-            },
+        const emp = await prisma.employee.findFirst({
+          where: { id: payroll.employeeId, companyId },
+          select: { employeeId: true, firstName: true, lastName: true },
+        });
+        if (emp) {
+          await createPayrollPaymentCPV({
+            companyId,
+            payrollId: payroll.id,
+            employeeId: payroll.employeeId,
+            employeeCode: emp.employeeId,
+            employeeName: `${emp.firstName} ${emp.lastName || ""}`.trim(),
+            amount: Number(payroll.netSalary),
+            monthYear: payroll.monthYear,
           });
         }
-      } catch (glErr) {
-        console.error("Payroll GL voucher error (non-fatal):", glErr);
+      } catch (glErr: any) {
+        console.error("Payroll payment CPV failed (non-fatal):", glErr?.message || glErr);
       }
     }
 
@@ -201,10 +219,16 @@ export async function DELETE(req: NextRequest) {
         return NextResponse.json({ error: "ID is required" }, { status: 400 });
       }
   
+      // Reverse any GL entries tied to this payroll
+      try {
+        await deleteVoucherByTag(companyId, `[PAYROLL:${id}]`);
+        await deleteVoucherByTag(companyId, `[PAYMENT:${id}]`);
+      } catch {}
+
       await prisma.payroll.deleteMany({
         where: { id, companyId },
       });
-  
+
       return NextResponse.json({ success: true });
     } catch (error) {
       console.error("Error deleting payroll:", error);

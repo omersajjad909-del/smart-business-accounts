@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/requireRole";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 import { safeEncryptField, safeDecryptFields } from "@/lib/fieldEncrypt";
+import { ensureEmployeePayableAccount } from "@/lib/payrollAccounting";
 
 const EMP_PII_FIELDS = ["cnic", "phone"] as const;
 
@@ -111,7 +112,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { cnic } = body;
+    const { cnic, shiftStart, shiftEnd } = body;
     const employee = await prisma.employee.create({
       data: {
         companyId,
@@ -126,8 +127,22 @@ export async function POST(req: NextRequest) {
         dateOfJoining: dateOfJoining ? new Date(dateOfJoining) : new Date(),
         salary,
         salaryFrequency,
-      },
+        ...(shiftStart ? { shiftStart: String(shiftStart) } : {}),
+        ...(shiftEnd   ? { shiftEnd:   String(shiftEnd)   } : {}),
+      } as any,
     });
+
+    // Auto-create per-employee Salary Payable account in Chart of Accounts
+    try {
+      await ensureEmployeePayableAccount({
+        companyId,
+        employeeId: employee.id,
+        employeeCode: employee.employeeId,
+        employeeName: `${employee.firstName} ${employee.lastName || ""}`.trim(),
+      });
+    } catch (glErr: any) {
+      console.error("Employee payable account creation failed (non-fatal):", glErr?.message || glErr);
+    }
 
     return NextResponse.json(safeDecryptFields(employee, EMP_PII_FIELDS), { status: 201 });
   } catch (error: any) {
