@@ -20,11 +20,25 @@ export async function POST(req: NextRequest) {
     let email = "";
     let role = "USER";
     let companyId = "";
+    let employeeStub: null | {
+      department: string;
+      designation: string;
+      dateOfJoining: string;
+      salary: number;
+    } = null;
     try {
       const d = JSON.parse(log.details || "{}");
       email = d.email || "";
       role = (d.role || "USER").toUpperCase();
       companyId = d.companyId || "";
+      if (d.employee && typeof d.employee === "object") {
+        employeeStub = {
+          department:    String(d.employee.department || "").trim(),
+          designation:   String(d.employee.designation || "").trim(),
+          dateOfJoining: String(d.employee.dateOfJoining || "").trim(),
+          salary:        Number(d.employee.salary) || 0,
+        };
+      }
     } catch {}
     if (!email || !companyId) return NextResponse.json({ error: "Malformed invite" }, { status: 400 });
 
@@ -69,13 +83,59 @@ export async function POST(req: NextRequest) {
       });
     } catch {}
 
+    // Optional: create Employee record if admin opted in at invite time
+    let employeeCreated = false;
+    if (employeeStub && employeeStub.department && employeeStub.dateOfJoining) {
+      try {
+        const nameParts = String(name || "").trim().split(/\s+/);
+        const firstName = nameParts[0] || email.split("@")[0];
+        const lastName  = nameParts.slice(1).join(" ");
+
+        const existingEmp = await prisma.employee.findFirst({
+          where: { companyId, email: email.toLowerCase() },
+          select: { id: true },
+        });
+
+        if (!existingEmp) {
+          const empCount = await prisma.employee.count({ where: { companyId } });
+          const generatedEmpId = `EMP-${String(empCount + 1).padStart(4, "0")}`;
+
+          const dojDate = new Date(employeeStub.dateOfJoining);
+          const doj = isNaN(dojDate.getTime()) ? new Date() : dojDate;
+
+          await prisma.employee.create({
+            data: {
+              companyId,
+              employeeId:    generatedEmpId,
+              firstName,
+              lastName:      lastName || "",
+              email:         email.toLowerCase(),
+              designations:  employeeStub.designation || "",
+              department:    employeeStub.department,
+              dateOfJoining: doj,
+              salary:        employeeStub.salary,
+              salaryFrequency: "MONTHLY",
+            } as any,
+          });
+          employeeCreated = true;
+        }
+      } catch (empErr: any) {
+        console.error("Employee stub creation failed (non-fatal):", empErr?.message || empErr);
+      }
+    }
+
     try {
       await prisma.activityLog.create({
-        data: { companyId, userId, action: "INVITE_ACCEPTED", details: JSON.stringify({ token }) },
+        data: {
+          companyId,
+          userId,
+          action: "INVITE_ACCEPTED",
+          details: JSON.stringify({ token, employeeCreated }),
+        },
       });
     } catch {}
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, employeeCreated });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

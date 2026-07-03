@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Company required" }, { status: 400 });
     }
 
-    const { email, role } = await req.json();
+    const body = await req.json();
+    const { email, role, name, branches, addAsEmployee, employeeInfo } = body;
     if (!email || !role) {
       return NextResponse.json({ error: "Email and role required" }, { status: 400 });
     }
@@ -40,7 +41,40 @@ export async function POST(req: NextRequest) {
     }
 
     const inviteToken = crypto.randomBytes(32).toString("hex");
-    const details = { token: inviteToken, email: emailNormalized, role: String(role).toUpperCase(), companyId };
+
+    // Optional employee stub — captured at invite time, created on accept
+    let employee: null | {
+      department: string;
+      designation: string;
+      dateOfJoining: string;
+      salary: number;
+    } = null;
+    if (addAsEmployee && employeeInfo && typeof employeeInfo === "object") {
+      const dept = String(employeeInfo.department || "").trim();
+      const dj   = String(employeeInfo.dateOfJoining || "").trim();
+      if (!dept || !dj) {
+        return NextResponse.json(
+          { error: "Department and Date of Joining are required to add as employee" },
+          { status: 400 }
+        );
+      }
+      employee = {
+        department:    dept,
+        designation:   String(employeeInfo.designation || "").trim(),
+        dateOfJoining: dj,
+        salary:        Number(employeeInfo.salary) || 0,
+      };
+    }
+
+    const details: any = {
+      token: inviteToken,
+      email: emailNormalized,
+      role: String(role).toUpperCase(),
+      companyId,
+      name: name ? String(name).trim() : undefined,
+      branches: Array.isArray(branches) ? branches : undefined,
+      employee, // null unless admin opted in
+    };
 
     await prisma.activityLog.create({
       data: { companyId, userId, action: "INVITE_SENT", details: JSON.stringify(details) },

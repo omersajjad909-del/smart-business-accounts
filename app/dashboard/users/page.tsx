@@ -119,6 +119,11 @@ export default function TeamAndPermissionsPage() {
   const [invName,     setInvName]     = useState("");
   const [invRole,     setInvRole]     = useState("VIEWER");
   const [invBranches, setInvBranches] = useState<string[]>([]);
+  const [invAddEmployee, setInvAddEmployee] = useState(false);
+  const [invEmpDept,     setInvEmpDept]     = useState("");
+  const [invEmpDesig,    setInvEmpDesig]    = useState("");
+  const [invEmpJoin,     setInvEmpJoin]     = useState(() => new Date().toISOString().slice(0, 10));
+  const [invEmpSalary,   setInvEmpSalary]   = useState<number | "">("");
   const [invLoading,  setInvLoading]  = useState(false);
 
   /* permissions */
@@ -250,10 +255,26 @@ export default function TeamAndPermissionsPage() {
       const res = await fetch("/api/team/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...h() },
-        body: JSON.stringify({ email: invEmail, role: invRole, name: invName || undefined, branches: invBranches }),
+        body: JSON.stringify({
+          email: invEmail,
+          role: invRole,
+          name: invName || undefined,
+          branches: invBranches,
+          addAsEmployee: invAddEmployee,
+          employeeInfo: invAddEmployee ? {
+            department:    invEmpDept.trim(),
+            designation:   invEmpDesig.trim(),
+            dateOfJoining: invEmpJoin,
+            salary:        typeof invEmpSalary === "number" ? invEmpSalary : 0,
+          } : undefined,
+        }),
       });
       const data = await res.json();
-      if (res.ok) { toast.success("Invitation sent successfully!"); setInvEmail(""); setInvName(""); setInvRole("VIEWER"); setInvBranches([]); }
+      if (res.ok) {
+        toast.success("Invitation sent successfully!");
+        setInvEmail(""); setInvName(""); setInvRole("VIEWER"); setInvBranches([]);
+        setInvAddEmployee(false); setInvEmpDept(""); setInvEmpDesig(""); setInvEmpSalary("");
+      }
       else toast.error(data.error || "Failed to send invite");
     } catch { toast.error("Network error"); }
     finally { setInvLoading(false); }
