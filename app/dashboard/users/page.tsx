@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
+import { DEPARTMENTS, DESIGNATIONS, fmtDept } from "@/lib/hrCatalog";
 
 const ff = "'Outfit','Inter',sans-serif";
 
@@ -528,8 +529,83 @@ export default function TeamAndPermissionsPage() {
                   <div style={{ fontSize: 11, color: "#334155", marginTop: 6 }}>Unchecked = access to all branches</div>
                 </div>
               )}
-              <button type="submit" disabled={invLoading || !invEmail} style={{ width: "100%", padding: 12, borderRadius: 10, background: invLoading || !invEmail ? "rgba(99,102,241,.3)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: invLoading || !invEmail ? "not-allowed" : "pointer" }}>
-                {invLoading ? "Sending…" : "✉️ Send Invitation"}
+              {/* ── Also add as Employee (opt-in) ── */}
+              <div style={{ marginBottom: 16, padding: "14px 16px", borderRadius: 10, background: invAddEmployee ? "rgba(34,197,94,.06)" : "rgba(255,255,255,.02)", border: `1px solid ${invAddEmployee ? "rgba(34,197,94,.28)" : "rgba(255,255,255,.07)"}`, transition: "all .15s" }}>
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={invAddEmployee}
+                    onChange={e => setInvAddEmployee(e.target.checked)}
+                    style={{ marginTop: 3, width: 16, height: 16, accentColor: "#22c55e", cursor: "pointer" }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "white", marginBottom: 2 }}>
+                      🧑‍💼 Also add to Employees list
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "#475569", lineHeight: 1.5 }}>
+                      Auto-creates a payroll/attendance record when they accept the invite. Tick this only if this person is your employee (skip for external accountants or consultants).
+                    </div>
+                  </div>
+                </label>
+
+                {invAddEmployee && (
+                  <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px dashed rgba(255,255,255,.08)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div>
+                      <label style={lbl}>Department <span style={{ color: "#f87171" }}>*</span></label>
+                      <input
+                        type="text"
+                        list="invite-department-suggestions"
+                        value={invEmpDept}
+                        onChange={e => setInvEmpDept(e.target.value)}
+                        placeholder="e.g. Sales, Marketing, Finance…"
+                        required={invAddEmployee}
+                        style={inp}
+                      />
+                      <datalist id="invite-department-suggestions">
+                        {DEPARTMENTS.map(d => <option key={d} value={fmtDept(d)} />)}
+                      </datalist>
+                    </div>
+                    <div>
+                      <label style={lbl}>Designation</label>
+                      <input
+                        type="text"
+                        list="invite-designation-suggestions"
+                        value={invEmpDesig}
+                        onChange={e => setInvEmpDesig(e.target.value)}
+                        placeholder="e.g. Director, Manager, Officer…"
+                        style={inp}
+                      />
+                      <datalist id="invite-designation-suggestions">
+                        {DESIGNATIONS.map(d => <option key={d} value={d} />)}
+                      </datalist>
+                    </div>
+                    <div>
+                      <label style={lbl}>Date of Joining <span style={{ color: "#f87171" }}>*</span></label>
+                      <input
+                        type="date"
+                        value={invEmpJoin}
+                        onChange={e => setInvEmpJoin(e.target.value)}
+                        required={invAddEmployee}
+                        style={inp}
+                      />
+                    </div>
+                    <div>
+                      <label style={lbl}>Salary <span style={{ color: "#334155", fontWeight: 400 }}>(optional)</span></label>
+                      <input
+                        type="number"
+                        value={invEmpSalary}
+                        onChange={e => setInvEmpSalary(e.target.value === "" ? "" : Number(e.target.value))}
+                        placeholder="0"
+                        min={0}
+                        style={inp}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button type="submit" disabled={invLoading || !invEmail || (invAddEmployee && (!invEmpDept.trim() || !invEmpJoin))} style={{ width: "100%", padding: 12, borderRadius: 10, background: (invLoading || !invEmail || (invAddEmployee && (!invEmpDept.trim() || !invEmpJoin))) ? "rgba(99,102,241,.3)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontFamily: ff, fontSize: 14, fontWeight: 700, cursor: (invLoading || !invEmail || (invAddEmployee && (!invEmpDept.trim() || !invEmpJoin))) ? "not-allowed" : "pointer" }}>
+                {invLoading ? "Sending…" : invAddEmployee ? "✉️ Send Invitation & Add as Employee" : "✉️ Send Invitation"}
               </button>
             </form>
           </div>
