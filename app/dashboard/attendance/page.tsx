@@ -13,7 +13,7 @@ interface AttendanceRecord {
   checkIn?: string; checkOut?: string; remarks?: string;
   employee: { firstName: string; lastName: string };
 }
-interface Employee { id: string; firstName: string; lastName: string; department: string; }
+interface Employee { id: string; firstName: string; lastName: string; department: string; shiftStart?: string; shiftEnd?: string; }
 
 const SC: Record<string, { bg: string; text: string; border: string; label: string }> = {
   PRESENT:  { bg: "rgba(52,211,153,.15)",  text: "#34d399", border: "rgba(52,211,153,.3)",  label: "Present"  },
@@ -372,12 +372,20 @@ export default function AttendancePage() {
                       return (
                         <div key={i} onClick={() => {
                             setSelectedDate(ds);
+                            const shiftS = sel?.shiftStart || "09:00";
+                            const shiftE = sel?.shiftEnd   || "18:00";
                             setFormData(rec ? {
                               status:   rec.status,
                               checkIn:  rec.checkIn  ? new Date(rec.checkIn).toTimeString().slice(0,5)  : "",
                               checkOut: rec.checkOut ? new Date(rec.checkOut).toTimeString().slice(0,5) : "",
                               remarks:  rec.remarks || "",
-                            } : { status: isSun(date) ? "HOLIDAY" : "PRESENT", checkIn: "", checkOut: "", remarks: "" });
+                            } : {
+                              status: isSun(date) ? "HOLIDAY" : "PRESENT",
+                              // Auto-fill from shift when marking a working day
+                              checkIn:  isSun(date) ? "" : shiftS,
+                              checkOut: isSun(date) ? "" : shiftE,
+                              remarks: "",
+                            });
                           }}
                           style={{ minHeight: 90, padding: 8, cursor: "pointer",
                             display: "flex", flexDirection: "column",
