@@ -260,7 +260,7 @@ export default function AdvanceSalaryPage() {
                   {saving ? "Saving" : "Save Advance"}
                 </button>
                 <button style={{ ...s.btn, background: "var(--border)", color: "var(--text-muted)", flex: 1 }} onClick={() => { setShowForm(false); setMsg(""); }}>
-                  Cancel
+                  Cancel1
                 </button>
               </div>
             </div>
