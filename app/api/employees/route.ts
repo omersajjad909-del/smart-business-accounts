@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
       orderBy: { firstName: "asc" },
     });
 
-    return NextResponse.json(employees.map(e => safeDecryptFields(e, EMP_PII_FIELDS)));
+    return NextResponse.json(employees.map(e => safeDecryptFields(e, EMP_PII_FIELDS as any)));
   } catch (error) {
     console.error("Error fetching employees:", error);
     return NextResponse.json({ error: "Failed to fetch employees" }, { status: 500 });
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
       console.error("Employee payable account creation failed (non-fatal):", glErr?.message || glErr);
     }
 
-    return NextResponse.json(safeDecryptFields(employee, EMP_PII_FIELDS), { status: 201 });
+    return NextResponse.json(safeDecryptFields(employee, EMP_PII_FIELDS as any), { status: 201 });
   } catch (error: any) {
     if (error.code === "P2002") {
       return NextResponse.json(
@@ -230,7 +230,7 @@ export async function PUT(req: NextRequest) {
     }
     const employee = await prisma.employee.findUnique({ where: { id } });
 
-    return NextResponse.json(employee ? safeDecryptFields(employee, EMP_PII_FIELDS) : null);
+    return NextResponse.json(employee ? safeDecryptFields(employee, EMP_PII_FIELDS as any) : null);
   } catch (error: any) {
     if (error.code === "P2025") {
       return NextResponse.json({ error: "Employee not found" }, { status: 404 });

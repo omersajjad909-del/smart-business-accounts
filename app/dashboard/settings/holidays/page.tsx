@@ -32,7 +32,7 @@ export default function HolidaysPage() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [form, setForm] = useState({ date: "", name: "", isRecurring: false });
   const [saving, setSaving] = useState(false);
-  const currentUser = getCurrentUser() as { role?: string } | null;
+  const currentUser = getCurrentUser() as { role?: string; id?: string } | null;
   const isAdmin = String(currentUser?.role || "").toUpperCase() === "ADMIN";
 
   const authH = (): Record<string, string> => ({
