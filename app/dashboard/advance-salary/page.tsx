@@ -247,7 +247,7 @@ export default function AdvanceSalaryPage() {
               </div>
               <div>
                 <label style={s.label}>Reason</label>
-                <input style={s.input} placeholder="Medical, rent, personalâ€¦" value={form.reason} onChange={e => setForm(p => ({ ...p, reason: e.target.value }))} />
+                <input style={s.input} placeholder="Medical, rent, personal" value={form.reason} onChange={e => setForm(p => ({ ...p, reason: e.target.value }))} />
               </div>
               <div>
                 <label style={s.label}>Deduct Over (months)</label>

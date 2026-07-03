@@ -1151,7 +1151,9 @@ model Employee {
   city            String?
   salary          Float
   salaryFrequency String // MONTHLY | WEEKLY | HOURLY
-  accountId       String? // Link to Chart of Accounts if needed
+  accountId       String? // Link to per-employee Salary Payable account in Chart of Accounts
+  shiftStart      String?   @default("09:00") // Default shift start "HH:MM" — auto-fills attendance
+  shiftEnd        String?   @default("18:00") // Default shift end "HH:MM"
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -2177,6 +2179,20 @@ model StatusSubscriber {
   confirmed   Boolean  @default(false)
   token       String   @unique @default(uuid())
   createdAt   DateTime @default(now())
+}
+
+// ================= HOLIDAYS =================
+
+model Holiday {
+  id          String   @id @default(cuid())
+  companyId   String
+  date        DateTime
+  name        String
+  isRecurring Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@unique([companyId, date])
+  @@index([companyId])
 }
 
 // ================= USER PREFERENCES =================

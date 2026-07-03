@@ -19,6 +19,8 @@ interface Employee {
   dateOfJoining: string;
   salary: number;
   salaryFrequency: string;
+  shiftStart?: string;
+  shiftEnd?: string;
   isActive: boolean;
 }
 
@@ -29,6 +31,7 @@ const EMPTY_FORM = {
   phone: "", designations: "", department: "",
   dateOfJoining: new Date().toISOString().slice(0, 10),
   salary: 0, salaryFrequency: "MONTHLY",
+  shiftStart: "09:00", shiftEnd: "18:00",
 };
 
 function authHeaders() {
@@ -89,6 +92,7 @@ export default function EmployeesPage() {
       email: emp.email, phone: emp.phone || "", designations: emp.designations,
       department: emp.department, dateOfJoining: emp.dateOfJoining.split("T")[0],
       salary: emp.salary, salaryFrequency: emp.salaryFrequency,
+      shiftStart: emp.shiftStart || "09:00", shiftEnd: emp.shiftEnd || "18:00",
     });
     setShowForm(true);
   }
