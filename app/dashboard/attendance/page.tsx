@@ -448,12 +448,20 @@ export default function AttendancePage() {
                               )}
                             </div>
                           ) : sunHol ? (
-                            <span style={{ display: "block", textAlign: "center", fontSize: 9, fontWeight: 700,
-                              padding: "3px 4px", borderRadius: 6,
-                              background: "rgba(167,139,250,.08)", color: "rgba(167,139,250,.5)",
-                              border: "1px solid rgba(167,139,250,.15)" }}>
-                              HOLIDAY
-                            </span>
+                            <div>
+                              <span style={{ display: "block", textAlign: "center", fontSize: 9, fontWeight: 700,
+                                padding: "3px 4px", borderRadius: 6,
+                                background: "rgba(167,139,250,.08)", color: "rgba(167,139,250,.5)",
+                                border: "1px solid rgba(167,139,250,.15)" }}>
+                                HOLIDAY
+                              </span>
+                              {hol && (
+                                <div style={{ fontSize: 8, textAlign: "center", color: "rgba(167,139,250,.7)",
+                                  marginTop: 3, fontWeight: 600 }}>
+                                  {hol.name.slice(0, 18)}
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
                               <span style={{ fontSize: 16, color: "var(--border)" }}>+</span>
