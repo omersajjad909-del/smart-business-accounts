@@ -242,7 +242,7 @@ export default function PayrollPage() {
             style={{ background: "rgba(255,255,255,0.07)", color: "var(--text-primary)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 16px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             Preview
           </button>
-          <button onClick={() => window.print()}
+          <button onClick={() => { if (!showPreview) { setShowPreview(true); setTimeout(() => window.print(), 300); } else window.print(); }}
             style={{ background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "9px 20px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             Print
           </button>
