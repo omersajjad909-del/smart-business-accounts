@@ -22,7 +22,44 @@ interface Employee {
   isActive: boolean;
 }
 
-const DEPARTMENTS = ["ACCOUNTS","GODOWN","HR","OPERATIONS","GATE","SECURITY","SALES","IT"];
+const DEPARTMENTS = [
+  "ACCOUNTS", "ADMINISTRATION", "CUSTOMER SERVICE", "DESIGN", "EXECUTIVE",
+  "FINANCE", "GATE", "GODOWN", "HR", "IT", "LEGAL", "LOGISTICS",
+  "MAINTENANCE", "MARKETING", "OPERATIONS", "PRODUCTION", "PURCHASE",
+  "QUALITY CONTROL", "R&D", "SALES", "SECURITY", "WAREHOUSE",
+];
+
+const DESIGNATIONS = [
+  // Executive / Leadership
+  "Chairman", "CEO", "COO", "CFO", "CTO", "Managing Director", "Director",
+  "General Manager", "VP", "Senior Manager", "Manager", "Assistant Manager",
+  // Individual contributors
+  "Team Lead", "Supervisor", "Senior Executive", "Executive", "Officer",
+  "Assistant", "Coordinator", "Analyst", "Senior Analyst", "Consultant",
+  // Finance / Accounts
+  "Chief Accountant", "Senior Accountant", "Accountant", "Cashier", "Auditor",
+  // Sales / Marketing
+  "Sales Manager", "Sales Executive", "Sales Officer", "Marketing Manager",
+  "Marketing Executive", "Business Development Manager", "Account Manager",
+  // HR
+  "HR Manager", "HR Executive", "Recruiter",
+  // IT / Engineering
+  "IT Manager", "Software Engineer", "Senior Software Engineer", "Developer",
+  "System Administrator", "Network Engineer", "Designer",
+  // Operations / Warehouse
+  "Warehouse Manager", "Store Keeper", "Inventory Officer", "Production Manager",
+  "Quality Manager",
+  // Support / Ground
+  "Receptionist", "Driver", "Security Guard", "Office Boy", "Peon",
+  "Trainee", "Intern",
+];
+
+function fmtDept(d: string): string {
+  // Keep acronyms upper-case; title-case everything else
+  const acronyms = new Set(["HR", "IT", "R&D", "CEO", "CFO", "CTO", "COO", "VP"]);
+  if (acronyms.has(d)) return d;
+  return d.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
 const FREQ_LABEL: Record<string, string> = { MONTHLY: "Monthly", WEEKLY: "Weekly", HOURLY: "Hourly" };
 const EMPTY_FORM = {
   employeeId: "", firstName: "", lastName: "", email: "",
@@ -143,12 +180,11 @@ export default function EmployeesPage() {
             <form onSubmit={handleSubmit}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 14 }}>
                 {[
-                  { key: "employeeId",   label: "Employee ID",  type: "text",  req: true  },
-                  { key: "firstName",    label: "First Name",   type: "text",  req: true  },
-                  { key: "lastName",     label: "Last Name",    type: "text",  req: false },
-                  { key: "email",        label: "Email",        type: "email", req: true  },
-                  { key: "phone",        label: "Phone",        type: "tel",   req: false },
-                  { key: "designations", label: "Designation",  type: "text",  req: false },
+                  { key: "employeeId", label: "Employee ID", type: "text",  req: true  },
+                  { key: "firstName",  label: "First Name",  type: "text",  req: true  },
+                  { key: "lastName",   label: "Last Name",   type: "text",  req: false },
+                  { key: "email",      label: "Email",       type: "email", req: true  },
+                  { key: "phone",      label: "Phone",       type: "tel",   req: false },
                 ].map(({ key, label, type, req }) => (
                   <div key={key}>
                     <label style={lbl}>{label}{req ? " *" : ""}</label>
@@ -163,10 +199,25 @@ export default function EmployeesPage() {
                 ))}
 
                 <div>
+                  <label style={lbl}>Designation</label>
+                  <input
+                    type="text"
+                    list="designation-suggestions"
+                    value={formData.designations}
+                    onChange={e => setFormData({ ...formData, designations: e.target.value })}
+                    placeholder="e.g. Director, Manager, Officer…"
+                    style={inp}
+                  />
+                  <datalist id="designation-suggestions">
+                    {DESIGNATIONS.map(d => <option key={d} value={d} />)}
+                  </datalist>
+                </div>
+
+                <div>
                   <label style={lbl}>Department *</label>
                   <select value={formData.department} onChange={e => setFormData({ ...formData, department: e.target.value })} required style={inp}>
                     <option value="">Select…</option>
-                    {DEPARTMENTS.map(d => <option key={d} value={d}>{d.charAt(0) + d.slice(1).toLowerCase()}</option>)}
+                    {DEPARTMENTS.map(d => <option key={d} value={d}>{fmtDept(d)}</option>)}
                   </select>
                 </div>
 
@@ -241,7 +292,7 @@ export default function EmployeesPage() {
                     <td style={{ padding: "13px 16px", color: "var(--text-muted)" }}>{emp.designations || "—"}</td>
                     <td style={{ padding: "13px 16px" }}>
                       <span style={{ padding: "3px 10px", borderRadius: 20, background: `${accent}18`, color: accent, fontSize: 11, fontWeight: 700 }}>
-                        {emp.department}
+                        {fmtDept(emp.department)}
                       </span>
                     </td>
                     <td style={{ padding: "13px 16px", color: "var(--text-primary)", fontFamily: "monospace" }}>
