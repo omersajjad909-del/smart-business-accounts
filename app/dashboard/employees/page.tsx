@@ -22,44 +22,7 @@ interface Employee {
   isActive: boolean;
 }
 
-const DEPARTMENTS = [
-  "ACCOUNTS", "ADMINISTRATION", "CUSTOMER SERVICE", "DESIGN", "EXECUTIVE",
-  "FINANCE", "GATE", "GODOWN", "HR", "IT", "LEGAL", "LOGISTICS",
-  "MAINTENANCE", "MARKETING", "OPERATIONS", "PRODUCTION", "PURCHASE",
-  "QUALITY CONTROL", "R&D", "SALES", "SECURITY", "WAREHOUSE",
-];
-
-const DESIGNATIONS = [
-  // Executive / Leadership
-  "Chairman", "CEO", "COO", "CFO", "CTO", "Managing Director", "Director",
-  "General Manager", "VP", "Senior Manager", "Manager", "Assistant Manager",
-  // Individual contributors
-  "Team Lead", "Supervisor", "Senior Executive", "Executive", "Officer",
-  "Assistant", "Coordinator", "Analyst", "Senior Analyst", "Consultant",
-  // Finance / Accounts
-  "Chief Accountant", "Senior Accountant", "Accountant", "Cashier", "Auditor",
-  // Sales / Marketing
-  "Sales Manager", "Sales Executive", "Sales Officer", "Marketing Manager",
-  "Marketing Executive", "Business Development Manager", "Account Manager",
-  // HR
-  "HR Manager", "HR Executive", "Recruiter",
-  // IT / Engineering
-  "IT Manager", "Software Engineer", "Senior Software Engineer", "Developer",
-  "System Administrator", "Network Engineer", "Designer",
-  // Operations / Warehouse
-  "Warehouse Manager", "Store Keeper", "Inventory Officer", "Production Manager",
-  "Quality Manager",
-  // Support / Ground
-  "Receptionist", "Driver", "Security Guard", "Office Boy", "Peon",
-  "Trainee", "Intern",
-];
-
-function fmtDept(d: string): string {
-  // Keep acronyms upper-case; title-case everything else
-  const acronyms = new Set(["HR", "IT", "R&D", "CEO", "CFO", "CTO", "COO", "VP"]);
-  if (acronyms.has(d)) return d;
-  return d.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-}
+import { DEPARTMENTS, DESIGNATIONS, fmtDept } from "@/lib/hrCatalog";
 const FREQ_LABEL: Record<string, string> = { MONTHLY: "Monthly", WEEKLY: "Weekly", HOURLY: "Hourly" };
 const EMPTY_FORM = {
   employeeId: "", firstName: "", lastName: "", email: "",
