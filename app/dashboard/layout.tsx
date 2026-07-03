@@ -2123,6 +2123,7 @@ export default function DashboardLayout({
               {/* {(!isCustomPlan || hasCustomActiveModule("whatsapp")) && <NavLink href="/dashboard/notifications" pathname={pathname}>Notifications & SMS</NavLink>} */}
               <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
               <NavLink href="/dashboard/settings/appearance" pathname={pathname}>🎨 Appearance</NavLink>
+              <NavLink href="/dashboard/settings/holidays"   pathname={pathname}>🎉 Public Holidays</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
               {(!isCustomPlan || hasCustomActiveModule("api_access")) && <NavLink href="/dashboard/integrations" pathname={pathname}>Integrations</NavLink>}
               <NavLink href="/dashboard/affiliate" pathname={pathname}>🤝 Affiliate Program</NavLink>
