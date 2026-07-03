@@ -215,10 +215,18 @@ export default function EmployeesPage() {
 
                 <div>
                   <label style={lbl}>Department *</label>
-                  <select value={formData.department} onChange={e => setFormData({ ...formData, department: e.target.value })} required style={inp}>
-                    <option value="">Select…</option>
-                    {DEPARTMENTS.map(d => <option key={d} value={d}>{fmtDept(d)}</option>)}
-                  </select>
+                  <input
+                    type="text"
+                    list="department-suggestions"
+                    value={formData.department}
+                    onChange={e => setFormData({ ...formData, department: e.target.value })}
+                    placeholder="e.g. Sales, Marketing, Finance…"
+                    required
+                    style={inp}
+                  />
+                  <datalist id="department-suggestions">
+                    {DEPARTMENTS.map(d => <option key={d} value={fmtDept(d)} />)}
+                  </datalist>
                 </div>
 
                 <div>
