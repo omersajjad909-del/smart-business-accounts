@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         success: true,
         user: { id: superAdmin.id, name: superAdmin.name, email: superAdmin.email, role: "ADMIN", isSuperAdmin: true, allowedPages: null },
       });
-      response.cookies.set("sb_auth", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 86400 });
+      response.cookies.set("sb_auth", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
       return response;
     }
 
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
         success: true,
         user: { id: teamMember.id, name: teamMember.name, email: teamMember.email, role: "ADMIN", isSuperAdmin: teamMember.isSuperAdmin, team: teamMember.team, allowedPages },
       });
-      response.cookies.set("sb_auth", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 86400 });
+      response.cookies.set("sb_auth", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/" });
       return response;
     }
 

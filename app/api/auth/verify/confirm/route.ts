@@ -128,7 +128,6 @@ export async function POST(req: NextRequest) {
       secure: true,
       sameSite: "lax",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60,
     });
     res.cookies.set("sb_verify", "", { path: "/", maxAge: 0 });
     return res;

@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     });
     const base = process.env.NEXT_PUBLIC_APP_URL || "";
     const res = NextResponse.redirect(`${base}/dashboard`);
-    res.cookies.set("sb_auth", session.token, { httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 7 });
+    res.cookies.set("sb_auth", session.token, { httpOnly: true, secure: true, sameSite: "lax", path: "/" });
     return res;
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
