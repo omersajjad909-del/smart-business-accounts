@@ -15,14 +15,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const now = Date.now();
-  const windowStart = new Date(now + 20 * 60 * 1000); // ≥ 20 min away
-  const windowEnd   = new Date(now + 40 * 60 * 1000); // ≤ 40 min away
+  // Vercel Hobby allows only daily crons. This runs at 08:00 each day and
+  // catches all bookings scheduled for the rest of today (from now until end
+  // of day) that haven't received a reminder yet.
+  const now = new Date();
+  const endOfDay = new Date(now);
+  endOfDay.setHours(23, 59, 59, 999);
 
   const dueBookings = await (prisma as any).demoBooking.findMany({
     where: {
       status: "PENDING",
-      slotStart: { gte: windowStart, lte: windowEnd },
+      slotStart: { gte: now, lte: endOfDay },
       reminderSentAt: null,
     },
     select: {
