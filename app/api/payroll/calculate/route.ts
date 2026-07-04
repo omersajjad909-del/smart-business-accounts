@@ -52,6 +52,11 @@ export async function GET(req: NextRequest) {
     });
 
     const rates: Partial<PayrollRates> = {};
+    // Default the "one day" length to this employee's shift length.
+    // Query-string overrides still win, so admin can force a different value.
+    if (shiftLen && shiftLen > 0 && shiftLen <= 24) {
+      rates.standardHoursPerDay = shiftLen;
+    }
     const wd = Number(searchParams.get("workingDays"));
     const std = Number(searchParams.get("standardHours"));
     const mult = Number(searchParams.get("otMultiplier"));
@@ -77,6 +82,9 @@ export async function GET(req: NextRequest) {
         id: employee.id,
         name: `${employee.firstName || ""} ${employee.lastName || ""}`.trim(),
         baseSalary: employee.salary || 0,
+        shiftStart: employee.shiftStart || null,
+        shiftEnd:   employee.shiftEnd   || null,
+        shiftLength: shiftLen,
       },
       defaults: DEFAULT_RATES,
       ...computed,
