@@ -20,9 +20,22 @@ export async function GET(req: NextRequest) {
 
     const employee = await prisma.employee.findFirst({
       where: { id: employeeId, companyId },
-      select: { id: true, firstName: true, lastName: true, salary: true },
-    });
+      select: { id: true, firstName: true, lastName: true, salary: true, shiftStart: true, shiftEnd: true } as any,
+    }) as any;
     if (!employee) return NextResponse.json({ error: "Employee not found" }, { status: 404 });
+
+    // Derive the "one day" length from the employee's own shift.
+    // e.g. shift 09:00–18:00 = 9 hours. Anything worked beyond that = OT.
+    function shiftHours(start?: string | null, end?: string | null): number | null {
+      if (!start || !end) return null;
+      const [sh, sm] = start.split(":").map(Number);
+      const [eh, em] = end.split(":").map(Number);
+      if ([sh, sm, eh, em].some(n => !Number.isFinite(n))) return null;
+      let mins = (eh * 60 + em) - (sh * 60 + sm);
+      if (mins <= 0) mins += 24 * 60; // shift crosses midnight (e.g. 22:00–06:00)
+      return mins / 60;
+    }
+    const shiftLen = shiftHours(employee.shiftStart, employee.shiftEnd);
 
     const [y, m] = monthYear.split("-").map(Number);
     const start  = new Date(y, m - 1, 1, 0, 0, 0);
