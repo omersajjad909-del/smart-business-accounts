@@ -11,7 +11,7 @@ function Chip({ children }: { children: React.ReactNode }) {
         display: "inline-flex",
         alignItems: "center",
         padding: "5px 14px",
-        borderRadius: 100,
+        borderRadius: 90,
         background: "rgba(245,158,11,.08)",
         border: "1px solid rgba(245,158,11,.2)",
         fontSize: 11,
