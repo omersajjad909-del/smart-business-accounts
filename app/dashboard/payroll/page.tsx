@@ -458,78 +458,189 @@ export default function PayrollPage() {
       )}
 
       {/* Preview Modal */}
-      {showPreview && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", overflowY: "auto", padding: "24px 16px" }}>
-          <div style={{ display: "flex", width: "100%", maxWidth: 820, justifyContent: "space-between", marginBottom: 16, alignItems: "center" }}>
-            <div style={{ color: "#fff", fontSize: 18, fontWeight: 700, fontFamily: ff }}>Print Preview — {monthYear}</div>
-            <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => window.print()} style={{ background: accent, color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Print Now</button>
-              <button onClick={() => setShowPreview(false)} style={{ background: "#f87171", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Close</button>
+      {showPreview && (() => {
+        const netPay = totalBasic - totalDed;
+        const monthLabel = new Date(monthYear + "-01").toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+        const generatedAt = new Date().toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+        const paidCount = payroll.filter(p => p.paymentStatus === "PAID").length;
+        const totalEmployees = payroll.length;
+
+        return (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(9, 12, 30, 0.85)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", overflowY: "auto", padding: "24px 16px" }}>
+          {/* Toolbar */}
+          <div style={{ display: "flex", width: "100%", maxWidth: 900, justifyContent: "space-between", marginBottom: 18, alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ color: "rgba(255,255,255,.5)", fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", fontFamily: ff }}>Print Preview</div>
+              <div style={{ color: "#fff", fontSize: 15, fontWeight: 700, fontFamily: ff }}>{monthLabel}</div>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => window.print()} style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 20px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 6px 20px rgba(34, 197, 94, .35)" }}>
+                🖨️  Print Now
+              </button>
+              <button onClick={() => setShowPreview(false)} style={{ background: "rgba(255,255,255,.08)", color: "#fff", border: "1px solid rgba(255,255,255,.14)", borderRadius: 10, padding: "10px 20px", fontFamily: ff, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                ✕  Close
+              </button>
             </div>
           </div>
 
-          {/* Paper */}
+          {/* Print styles */}
           <style>{`@media print {
+              @page { size: A4; margin: 0; }
               body * { visibility: hidden !important; }
               #payroll-printable, #payroll-printable * { visibility: visible !important; }
-              #payroll-printable { position: fixed; inset: 0; padding: 20mm !important; margin: 0 !important; box-shadow: none !important; background: #fff !important; color: #000 !important; font-family: Georgia, serif !important; }
-              #payroll-printable * { color: #000 !important; background: transparent !important; -webkit-print-color-adjust: exact !important; }
-              #payroll-printable table { border-collapse: collapse !important; }
-              #payroll-printable th, #payroll-printable td { border-color: #000 !important; color: #000 !important; }
+              #payroll-printable { position: fixed; inset: 0; margin: 0 !important; box-shadow: none !important; background: #fff !important; color: #0f172a !important; }
+              #payroll-printable * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             }`}</style>
-          <div id="payroll-printable" style={{ background: "#fff", width: "100%", maxWidth: 820, minHeight: "297mm", padding: "20mm", borderRadius: 4, color: "#111", fontFamily: "Georgia, serif", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
-            <div style={{ textAlign: "center", marginBottom: 32, borderBottom: "2px solid #111", paddingBottom: 16 }}>
-              <h1 style={{ fontSize: 24, fontWeight: 900, textTransform: "uppercase", letterSpacing: 2, margin: 0 }}>Payroll Report</h1>
-              <p style={{ margin: "8px 0 0", fontSize: 14, color: "#555" }}>Month: <strong>{monthYear}</strong></p>
+
+          {/* Paper */}
+          <div id="payroll-printable" style={{
+            background: "#fff", width: "100%", maxWidth: 900, minHeight: "297mm",
+            color: "#0f172a", fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            boxShadow: "0 30px 80px rgba(0,0,0,.4)", borderRadius: 6, overflow: "hidden",
+          }}>
+            {/* Accent bar */}
+            <div style={{ height: 6, background: "linear-gradient(90deg, #16a34a, #22c55e, #4ade80)" }} />
+
+            {/* Header */}
+            <div style={{ padding: "32px 40px 24px", borderBottom: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: "#22c55e", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 6 }}>
+                    Monthly Statement
+                  </div>
+                  <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 4px", color: "#0f172a" }}>
+                    Payroll Report
+                  </h1>
+                  <div style={{ fontSize: 14, color: "#64748b", fontWeight: 500 }}>
+                    {monthLabel} · {totalEmployees} employee{totalEmployees !== 1 ? "s" : ""}
+                  </div>
+                </div>
+                <div style={{ textAlign: "right", fontSize: 11, color: "#64748b", lineHeight: 1.7 }}>
+                  <div style={{ fontWeight: 700, color: "#0f172a", fontSize: 12 }}>Generated</div>
+                  <div>{generatedAt}</div>
+                  <div style={{ marginTop: 4, fontSize: 10, color: "#94a3b8" }}>Ref: PR-{monthYear}</div>
+                </div>
+              </div>
             </div>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-              <thead>
-                <tr style={{ background: "#f3f4f6" }}>
-                  {["ID","Employee Name","Basic","Deductions","Reason","Pay","Paid","Next Month"].map(h => (
-                    <th key={h} style={{ border: "2px solid #111", padding: "8px 10px", textAlign: ["Basic","Deductions","Pay","Paid","Next Month"].includes(h) ? "right" : "left" }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {payroll.map(p => {
-                  const pay  = p.baseSalary + p.allowances - p.deductions;
-                  const next = pay - (p.additionalCash || 0);
-                  return (
-                    <tr key={p.id}>
-                      <td style={{ border: "1px solid #999", padding: "7px 10px" }}>{p.employee.employeeId}</td>
-                      <td style={{ border: "1px solid #999", padding: "7px 10px" }}>{p.employee.firstName} {p.employee.lastName}</td>
-                      <td style={{ border: "1px solid #999", padding: "7px 10px", textAlign: "right" }}>{fmt(p.baseSalary)}</td>
-                      <td style={{ border: "1px solid #999", padding: "7px 10px", textAlign: "right", color: "#dc2626", fontWeight: 700 }}>{p.deductions > 0 ? `-${fmt(p.deductions)}` : "—"}</td>
-                      <td style={{ border: "1px solid #999", padding: "7px 10px" }}>{p.deductionReason || "—"}</td>
-                      <td style={{ border: "1px solid #999", padding: "7px 10px", textAlign: "right", fontWeight: 700 }}>{fmt(pay)}</td>
-                      <td style={{ border: "1px solid #999", padding: "7px 10px", textAlign: "right", color: "#2563eb" }}>{p.additionalCash > 0 ? fmt(p.additionalCash) : "—"}</td>
-                      <td style={{ border: "1px solid #999", padding: "7px 10px", textAlign: "right", fontWeight: 700, color: next < 0 ? "#dc2626" : "#16a34a", background: next < 0 ? "#fef2f2" : "transparent" }}>{fmt(next)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr style={{ background: "#f3f4f6", fontWeight: 700 }}>
-                  <td colSpan={2} style={{ border: "1px solid #999", padding: "8px 10px", textAlign: "right" }}>TOTALS:</td>
-                  <td style={{ border: "1px solid #999", padding: "8px 10px", textAlign: "right" }}>{fmt(totalBasic)}</td>
-                  <td style={{ border: "1px solid #999", padding: "8px 10px", textAlign: "right", color: "#dc2626" }}>-{fmt(totalDed)}</td>
-                  <td style={{ border: "1px solid #999", padding: "8px 10px" }}></td>
-                  <td style={{ border: "1px solid #999", padding: "8px 10px", textAlign: "right" }}>{fmt(totalBasic - totalDed)}</td>
-                  <td style={{ border: "1px solid #999", padding: "8px 10px", textAlign: "right", color: "#2563eb" }}>{fmt(totalPaid)}</td>
-                  <td style={{ border: "1px solid #999", padding: "8px 10px", textAlign: "right", color: totalNeg < 0 ? "#dc2626" : "#16a34a" }}>{fmt(totalNeg)}</td>
-                </tr>
-              </tfoot>
-            </table>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 80, padding: "0 20px" }}>
-              <div style={{ borderTop: "2px solid #111", width: 140, textAlign: "center", paddingTop: 8, fontSize: 12, fontWeight: 700, textTransform: "uppercase" }}>Prepared By</div>
-              <div style={{ borderTop: "2px solid #111", width: 140, textAlign: "center", paddingTop: 8, fontSize: 12, fontWeight: 700, textTransform: "uppercase" }}>Approved By</div>
+
+            {/* Summary strip */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+              {[
+                { label: "Total Basic",     val: fmt(totalBasic),          color: "#0f172a" },
+                { label: "Total Deductions",val: `-${fmt(totalDed)}`,      color: "#dc2626" },
+                { label: "Net Payable",     val: fmt(netPay),              color: "#16a34a" },
+                { label: "Paid / Pending",  val: `${paidCount}/${totalEmployees}`, color: "#0f172a", small: true },
+              ].map((s, i) => (
+                <div key={s.label} style={{ padding: "20px 24px", borderRight: i < 3 ? "1px solid #e2e8f0" : "none" }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: "#94a3b8", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{s.label}</div>
+                  <div style={{ fontSize: s.small ? 16 : 20, fontWeight: 800, color: s.color, letterSpacing: "-0.01em" }}>{s.val}</div>
+                </div>
+              ))}
             </div>
-            <div style={{ marginTop: 40, textAlign: "center", fontSize: 10, color: "#999" }}>
-              System Generated Report — {new Date().toLocaleString()} — Powered by FinovaOS
+
+            {/* Table */}
+            <div style={{ padding: "24px 40px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                <thead>
+                  <tr>
+                    {[
+                      { h: "ID",         align: "left"  },
+                      { h: "Employee",   align: "left"  },
+                      { h: "Basic",      align: "right" },
+                      { h: "Deductions", align: "right" },
+                      { h: "Reason",     align: "left"  },
+                      { h: "Pay",        align: "right" },
+                      { h: "Paid",       align: "right" },
+                      { h: "Next Month", align: "right" },
+                    ].map(({ h, align }) => (
+                      <th key={h} style={{
+                        borderBottom: "2px solid #0f172a",
+                        padding: "10px 8px",
+                        textAlign: align as any,
+                        fontSize: 10,
+                        fontWeight: 800,
+                        letterSpacing: ".08em",
+                        textTransform: "uppercase",
+                        color: "#0f172a",
+                      }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {payroll.map((p, idx) => {
+                    const pay  = p.baseSalary + p.allowances - p.deductions;
+                    const next = pay - (p.additionalCash || 0);
+                    return (
+                      <tr key={p.id} style={{ background: idx % 2 === 0 ? "#fff" : "#f8fafc" }}>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", fontWeight: 700, color: "#22c55e" }}>{p.employee.employeeId}</td>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", fontWeight: 600, color: "#0f172a" }}>{p.employee.firstName} {p.employee.lastName}</td>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmt(p.baseSalary)}</td>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", color: p.deductions > 0 ? "#dc2626" : "#cbd5e1", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                          {p.deductions > 0 ? `-${fmt(p.deductions)}` : "—"}
+                        </td>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", fontSize: 11, color: "#64748b" }}>{p.deductionReason || "—"}</td>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{fmt(pay)}</td>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", color: p.additionalCash > 0 ? "#2563eb" : "#cbd5e1", fontVariantNumeric: "tabular-nums" }}>
+                          {p.additionalCash > 0 ? fmt(p.additionalCash) : "—"}
+                        </td>
+                        <td style={{ padding: "11px 8px", borderBottom: "1px solid #e2e8f0", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums", color: next < 0 ? "#dc2626" : "#16a34a" }}>
+                          {fmt(next)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr style={{ background: "#0f172a", color: "#fff" }}>
+                    <td colSpan={2} style={{ padding: "12px 8px", textAlign: "right", fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase" }}>Totals</td>
+                    <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{fmt(totalBasic)}</td>
+                    <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, color: "#fca5a5", fontVariantNumeric: "tabular-nums" }}>-{fmt(totalDed)}</td>
+                    <td style={{ padding: "12px 8px" }}></td>
+                    <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{fmt(netPay)}</td>
+                    <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, color: "#93c5fd", fontVariantNumeric: "tabular-nums" }}>{fmt(totalPaid)}</td>
+                    <td style={{ padding: "12px 8px", textAlign: "right", fontWeight: 800, color: totalNeg < 0 ? "#fca5a5" : "#86efac", fontVariantNumeric: "tabular-nums" }}>{fmt(totalNeg)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            {/* Signature blocks */}
+            <div style={{ padding: "0 40px 24px", marginTop: 40 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 40 }}>
+                {["Prepared By", "Verified By", "Approved By"].map((label) => (
+                  <div key={label} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <div style={{ height: 60 }} />
+                    <div style={{ width: "100%", borderTop: "1.5px solid #0f172a" }} />
+                    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", color: "#0f172a", marginTop: 8 }}>{label}</div>
+                    <div style={{ fontSize: 9, color: "#94a3b8", marginTop: 2 }}>Name · Signature · Date</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              borderTop: "1px solid #e2e8f0",
+              padding: "16px 40px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: 10,
+              color: "#94a3b8",
+            }}>
+              <div>
+                Confidential — For internal use only. Any discrepancies to be reported within 7 days.
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontWeight: 700, color: "#0f172a" }}>FinovaOS</span>
+                <span>·</span>
+                <span>Page 1 of 1</span>
+              </div>
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
