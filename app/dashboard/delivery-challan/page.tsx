@@ -606,75 +606,38 @@ const [searchTerm, _setSearchTerm] = useState("");
 
           {/* PREVIEW */}
           {preview && (
-            <div className="bg-white border rounded shadow-lg mt-6 print:border-none print:shadow-none" id="print-area" style={{ padding: isThermalPrint ? 12 : 32, width: isThermalPrint ? thermalWidth : "100%", maxWidth: isThermalPrint ? thermalWidth : "100%" }}>
-              {printPrefs.headerNote && <div className="text-center text-gray-500 mb-2 text-sm">{printPrefs.headerNote}</div>}
-              <div className="text-center mb-8">
-                {printPrefs.showLogo && printPrefs.logoUrl && <img src={printPrefs.logoUrl} alt="Company logo" style={{ width: isThermalPrint ? 44 : 70, margin: "0 auto 8px" }} />}
-                <h1 className="text-3xl font-bold uppercase tracking-wide">Delivery Challan</h1>
-                <p className="text-gray-700 font-semibold">{companyName}</p>
-                <p className="text-gray-500">No: {savedChallan?.challanNo || challanNo}</p>
-              </div>
-
-              <div className="flex justify-between mb-8">
-                <div>
-                  <h3 className="font-bold text-gray-700">Customer:</h3>
-                  <p className="text-xl font-bold">{customerName}</p>
-                  <p className="text-sm text-gray-500">ID: {customerId}</p>
-                </div>
-                <div className="text-right">
-                  <h3 className="font-bold text-gray-700">Details:</h3>
-                  <p>Date: {fmtDate(date)}</p>
-                  {driverName && <p>Driver: {driverName}</p>}
-                  {vehicleNo && <p>Vehicle: {vehicleNo}</p>}
-                </div>
-              </div>
-
-              <table className="w-full mb-8">
-                <thead>
-                  <tr className="bg-gray-800 text-white">
-                    <th className="p-3 text-left">#</th>
-                    <th className="p-3 text-left">Item Description</th>
-                    <th className="p-3 text-right">Qty</th>
-                    {!isThermalPrint && <th className="p-3 text-right">Rate</th>}
-                    <th className="p-3 text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row, index) => (
-                    <tr key={index} className="border-b">
-                      <td className="p-3">{index + 1}</td>
-                      <td className="p-3">
-                        <span className="font-bold block">{row.name}</span>
-                        <span className="text-sm text-gray-500">{row.description}</span>
-                      </td>
-                      <td className="p-3 text-right font-bold">{row.qty}</td>
-                      {!isThermalPrint && <td className="p-3 text-right">{row.rate || "-"}</td>}
-                      <td className="p-3 text-right">{(Number(row.qty) * Number(row.rate) || 0).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {remarks && (
-                <div className="mb-8">
-                  <h3 className="font-bold text-gray-700">Remarks:</h3>
-                  <p className="text-gray-600">{remarks}</p>
-                </div>
-              )}
-
-              <div className="flex justify-between mt-12 pt-8 border-t">
-                <div className="text-center w-32">
-                    <p className="border-t border-gray-400 mt-8 pt-2">Prepared By</p>
-                </div>
-                <div className="text-center w-32">
-                    <p className="border-t border-gray-400 mt-8 pt-2">Checked By</p>
-                </div>
-                <div className="text-center w-32">
-                    <p className="border-t border-gray-400 mt-8 pt-2">Received By</p>
-                </div>
-              </div>
-              <div className="mt-8 text-center text-gray-500 text-sm">{printPrefs.footerNote}</div>
-            </div>
+            <PrintPaperWrapper>
+              <PrintDocA4
+                companyName={companyName}
+                docTitle="DELIVERY CHALLAN"
+                docNo={savedChallan?.challanNo || challanNo}
+                date={fmtDate(date)}
+                partyLabel="Customer"
+                partyName={customerName}
+                metaFields={[
+                  ...(driverName ? [{ label: "Driver", value: driverName }] : []),
+                  ...(vehicleNo ? [{ label: "Vehicle", value: vehicleNo }] : []),
+                ]}
+                columns={[
+                  { key: "no", label: "#", align: "center", width: 30 },
+                  { key: "name", label: "Description" },
+                  { key: "qty", label: "Qty", align: "center", width: 70 },
+                  { key: "unit", label: "Unit", align: "center", width: 70 },
+                ]}
+                rows={rows.filter(r => r.itemId && r.qty).map((row, index) => ({
+                  no: index + 1,
+                  name: row.name,
+                  qty: row.qty,
+                  unit: "—",
+                }))}
+                totalsLines={[
+                  { label: "Total Items:", value: rows.filter(r => r.itemId && r.qty).length, bold: true },
+                ]}
+                notes={remarks || undefined}
+                footerNote={printPrefs.footerNote || undefined}
+                signatureLabels={["Received By", "Delivered By"]}
+              />
+            </PrintPaperWrapper>
           )}
         </>
       )}

@@ -814,151 +814,46 @@ export default function QuotationPage() {
 
           {/* ── A4 PREVIEW ── */}
           {preview && savedQuotation && printMode !== "55mm" && (
-            <div className="qt-print qt-a4" style={{
-              background: "white", color: "#111",
-              fontFamily: "'Outfit','Inter',sans-serif",
-              borderRadius: 12, overflow: "hidden",
-              boxShadow: "0 8px 50px rgba(0,0,0,0.28)",
-              maxWidth: 860, margin: "0 auto 32px",
-            }}>
-              {/* Top accent bar */}
-              <div style={{ height: 6, background: "linear-gradient(90deg,#0f172a,#334155)" }} />
-
-              {/* Header */}
-              <div style={{ padding: "26px 36px 18px", borderBottom: "1.5px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
-                <div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: "#0f172a", letterSpacing: -0.8, lineHeight: 1 }}>{companyName}</div>
-                  <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1.2, marginTop: 6 }}>Quotation</div>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{
-                    background: "#0f172a", color: "white",
-                    padding: "6px 18px", borderRadius: 6,
-                    fontSize: 11, fontWeight: 800, letterSpacing: 3,
-                    textTransform: "uppercase", marginBottom: 12, display: "inline-block"
-                  }}>
-                    QUOTATION
-                  </div>
-                  <table style={{ fontSize: 12, borderCollapse: "collapse", marginLeft: "auto" }}>
-                    <tbody>
-                      <tr>
-                        <td style={{ padding: "3px 14px 3px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right", fontSize: 11 }}>QT #</td>
-                        <td style={{ padding: "3px 0", fontWeight: 900, color: "#0f172a", fontFamily: "monospace", fontSize: 14, letterSpacing: 0.5 }}>{savedQuotation.quotationNo}</td>
-                      </tr>
-                      <tr>
-                        <td style={{ padding: "3px 14px 3px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right", fontSize: 11 }}>Date</td>
-                        <td style={{ padding: "3px 0", fontWeight: 700, color: "#0f172a", fontSize: 12 }}>{fmtDate(savedQuotation.date)}</td>
-                      </tr>
-                      {savedQuotation.validUntil && (
-                        <tr>
-                          <td style={{ padding: "3px 14px 3px 0", color: "#94a3b8", fontWeight: 600, textAlign: "right", fontSize: 11 }}>Valid Until</td>
-                          <td style={{ padding: "3px 0", fontWeight: 700, color: "#0f172a", fontSize: 12 }}>{fmtDate(savedQuotation.validUntil)}</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Bill To */}
-              <div style={{ padding: "14px 36px 14px", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 5 }}>Bill To</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>
-                  {savedQuotation.customer?.name || customerName || "—"}
-                </div>
-              </div>
-
-              {/* Items Table */}
-              <div style={{ padding: "0 36px" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ borderBottom: "2px solid #0f172a" }}>
-                      <th style={{ padding: "12px 6px 8px 0", textAlign: "left", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 28 }}>#</th>
-                      <th style={{ padding: "12px 6px 8px", textAlign: "left", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8 }}>Item Description</th>
-                      <th style={{ padding: "12px 6px 8px", textAlign: "center", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 70 }}>Qty</th>
-                      {!hideRates && <th style={{ padding: "12px 6px 8px", textAlign: "right", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 110 }}>Rate</th>}
-                      {!hideRates && <th style={{ padding: "12px 0 8px 6px", textAlign: "right", fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: 120 }}>Amount</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {savedQuotation.items.map((item: any, i: number) => (
-                      <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                        <td style={{ padding: "11px 6px 11px 0", fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{i + 1}</td>
-                        <td style={{ padding: "11px 6px" }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{item.item?.name || item.itemId}</div>
-                          {item.item?.description && <div style={{ fontSize: 10, color: "#64748b", marginTop: 1 }}>{item.item.description}</div>}
-                        </td>
-                        <td style={{ padding: "11px 6px", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{item.qty}</td>
-                        {!hideRates && <td style={{ padding: "11px 6px", textAlign: "right", fontSize: 12, color: "#475569" }}>{Number(item.rate).toLocaleString()}</td>}
-                        {!hideRates && <td style={{ padding: "11px 0 11px 6px", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{(item.qty * item.rate).toLocaleString()}</td>}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Totals + Remarks */}
-              <div style={{ padding: "18px 36px 24px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24, borderTop: "1.5px solid #e2e8f0", marginTop: 6 }}>
-                {/* Remarks left */}
-                <div style={{ flex: 1 }}>
-                  {savedQuotation.remarks ? (
-                    <div style={{ borderLeft: "3px solid #cbd5e1", paddingLeft: 12 }}>
-                      <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>Remarks / Notes</div>
-                      <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.7 }}>{savedQuotation.remarks}</div>
-                    </div>
-                  ) : (
-                    <div style={{ borderLeft: "3px solid #e2e8f0", paddingLeft: 12 }}>
-                      <div style={{ fontSize: 9, fontWeight: 800, color: "#cbd5e1", textTransform: "uppercase", letterSpacing: 0.8 }}>Remarks / Notes</div>
-                      <div style={{ fontSize: 11, color: "#e2e8f0", marginTop: 3 }}>—</div>
-                    </div>
-                  )}
-                </div>
-                {/* Totals right */}
-                {!hideRates && (
-                  <div style={{ minWidth: 250 }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-                      <tbody>
-                        <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-                          <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>Sub Total</td>
-                          <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{Number(savedQuotation.total).toLocaleString()}</td>
-                        </tr>
-                        {Number(savedQuotation.freight) > 0 && (
-                          <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-                            <td style={{ padding: "7px 0", color: "#64748b", fontWeight: 600 }}>Freight</td>
-                            <td style={{ padding: "7px 0", textAlign: "right", fontWeight: 700, color: "#0f172a" }}>{Number(savedQuotation.freight).toLocaleString()}</td>
-                          </tr>
-                        )}
-                        <tr>
-                          <td colSpan={2} style={{ padding: 0 }}>
-                            <div style={{ background: "#0f172a", borderRadius: 6, marginTop: 4, display: "flex", justifyContent: "space-between", padding: "10px 14px" }}>
-                              <span style={{ color: "white", fontWeight: 800, fontSize: 13 }}>NET TOTAL</span>
-                              <span style={{ color: "white", fontWeight: 900, fontSize: 15 }}>
-                                {(Number(savedQuotation.total) + Number(savedQuotation.freight || 0)).toLocaleString()}
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-
-              {/* Signatures */}
-              <div style={{ padding: "0 36px 28px", display: "flex", gap: 32 }}>
-                {["Prepared By", "Checked By", "Authorized By"].map(label => (
-                  <div key={label} style={{ flex: 1, textAlign: "center", borderTop: "1.5px solid #cbd5e1", paddingTop: 8, marginTop: 44 }}>
-                    <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Footer */}
-              <div style={{ padding: "10px 36px", background: "#f8fafc", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ fontSize: 10, color: "#94a3b8" }}>{printPrefs.footerNote || "Thank you for your business!"}</div>
-                <div style={{ fontSize: 10, color: "#cbd5e1" }}>Generated by FinovaOS</div>
-              </div>
-            </div>
+            <PrintPaperWrapper>
+              <PrintDocA4
+                companyName={companyName}
+                docTitle="QUOTATION"
+                docNo={savedQuotation.quotationNo}
+                date={fmtDate(savedQuotation.date)}
+                partyLabel="Bill To"
+                partyName={savedQuotation.customer?.name || customerName || "—"}
+                metaFields={savedQuotation.validUntil ? [{ label: "Valid Until", value: fmtDate(savedQuotation.validUntil) }] : []}
+                columns={hideRates ? [
+                  { key: "no", label: "#", align: "center", width: 30 },
+                  { key: "name", label: "Description" },
+                  { key: "qty", label: "Qty", align: "center", width: 60 },
+                  { key: "unit", label: "Unit", align: "center", width: 60 },
+                ] : [
+                  { key: "no", label: "#", align: "center", width: 30 },
+                  { key: "name", label: "Description" },
+                  { key: "qty", label: "Qty", align: "center", width: 60 },
+                  { key: "unit", label: "Unit", align: "center", width: 60 },
+                  { key: "rate", label: "Rate", align: "right", width: 80 },
+                  { key: "amount", label: "Amount", align: "right", width: 90 },
+                ]}
+                rows={savedQuotation.items.map((item: any, i: number) => ({
+                  no: i + 1,
+                  name: item.item?.name || item.itemId || "",
+                  qty: item.qty,
+                  unit: item.unit || "—",
+                  rate: Number(item.rate).toLocaleString(),
+                  amount: (item.qty * item.rate).toLocaleString("en-US", { minimumFractionDigits: 2 }),
+                }))}
+                totalsLines={hideRates ? [] : [
+                  { label: "Subtotal:", value: Number(savedQuotation.total) },
+                  ...(Number(savedQuotation.freight) > 0 ? [{ label: "Freight:", value: Number(savedQuotation.freight) }] : []),
+                  { label: "TOTAL:", value: Number(savedQuotation.total) + Number(savedQuotation.freight || 0), bold: true, borderTop: true },
+                ]}
+                notes={savedQuotation.remarks || undefined}
+                footerNote={printPrefs.footerNote || "Thank you for your business!"}
+                signatureLabels={["Prepared By", "Checked By", "Authorized By"]}
+              />
+            </PrintPaperWrapper>
           )}
 
           {/* ── 55mm THERMAL PREVIEW ── */}

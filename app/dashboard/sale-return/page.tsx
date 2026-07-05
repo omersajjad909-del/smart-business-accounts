@@ -5,6 +5,8 @@ import { confirmToast } from "@/lib/toast-feedback";
 import toast from "react-hot-toast";
 import { useCallback, useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { PrintActionBar } from "@/components/print/PrintActionBar";
+import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 
 const FONT  = "'Outfit','Inter',sans-serif";
 const ACCENT = "#f87171";

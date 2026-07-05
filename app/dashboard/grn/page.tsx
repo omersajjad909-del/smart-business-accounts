@@ -5,6 +5,8 @@ import { confirmToast } from "@/lib/toast-feedback";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getCurrentUser } from "@/lib/auth";
+import { PrintActionBar } from "@/components/print/PrintActionBar";
+import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 
 const FONT = "'Outfit','Inter',sans-serif";
 const ACCENT = "#6366f1";
@@ -151,6 +153,28 @@ export default function GRNPage() {
   const filledRows = rows.filter(r => r.name && r.receivedQty);
   const supplierName = suppliers.find(s => s.id === supplierId)?.name || "";
   const poRef = pos.find(p => p.id === poId)?.poNo || "";
+
+  function shareWhatsApp() {
+    let msg = `*GOODS RECEIPT NOTE: ${grnNo}*\nDate: ${fmtDate(date)}\nSupplier: ${supplierName}`;
+    if (poRef) msg += `\nPO Ref: ${poRef}`;
+    msg += `\n\nTotal: ${totalAmt.toLocaleString()}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+  }
+
+  function sendEmail() {
+    const email = prompt("Supplier email:");
+    if (!email?.includes("@")) return;
+    fetch("/api/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "generic",
+        to: email,
+        subject: `Goods Receipt Note ${grnNo}`,
+        html: `<p>Dear ${supplierName},</p><p>Please find your Goods Receipt Note <strong>${grnNo}</strong> dated ${fmtDate(date)}.</p><p>Total received value: ${totalAmt.toLocaleString()}</p>`,
+      }),
+    }).then(r => r.ok ? toast.success("Email sent!") : toast.error("Email failed")).catch(() => toast.error("Email failed"));
+  }
 
   return (
     <div style={{ fontFamily: FONT, color: TEXT, minHeight: "100vh" }}>
@@ -405,112 +429,56 @@ export default function GRNPage() {
 
       {/* ── Preview Action Bar ── */}
       {!showList && preview && (
-        <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-          <button onClick={() => doPrint("a4")} style={{ padding: "10px 20px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/></svg>
-            Print A4
-          </button>
-          <button onClick={() => doPrint("58mm")} style={{ padding: "10px 20px", borderRadius: 8, border: "none", background: "#1e293b", color: "#f1f5f9", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Print 58mm
-          </button>
-          <button onClick={() => setPreview(false)} style={{ padding: "10px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: TEXT, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>✏️ Edit</button>
-          <button onClick={() => { resetForm(); }} style={{ padding: "10px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>+ New GRN</button>
+        <div className="no-print" style={{ marginBottom: 20 }}>
+          <PrintActionBar
+            onPrintA4={() => { setPrintMode("a4"); setTimeout(() => window.print(), 100); }}
+            onPrintThermal={() => { setPrintMode("58mm"); setTimeout(() => window.print(), 100); }}
+            thermalLabel="58mm"
+            onEmail={sendEmail}
+            onWhatsApp={shareWhatsApp}
+            onEdit={() => setPreview(false)}
+            onNew={() => { resetForm(); }}
+            newLabel="New GRN"
+          />
         </div>
       )}
 
       {/* ══ A4 PRINT PREVIEW ══ */}
-      {!showList && preview && (
-        <div className={`grn-print a4-print`} style={{
-          background: "white", color: "#111", fontFamily: "'Outfit','Inter',sans-serif",
-          borderRadius: 14, overflow: "hidden", boxShadow: "0 8px 50px rgba(0,0,0,0.25)",
-          maxWidth: 860, margin: "0 auto 32px", display: printMode === "58mm" ? "none" : "block",
-        }}>
-          <div style={{ height: 5, background: "#111" }} />
-
-          {/* Header */}
-          <div style={{ padding: "28px 36px 20px", borderBottom: "1.5px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            <div>
-              <div style={{ fontSize: 25, fontWeight: 900, color: "#0f172a", letterSpacing: -0.8, lineHeight: 1 }}>Goods Receipt Note</div>
-              <div style={{ fontSize: 11, color: "#64748b", marginTop: 4, fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase" }}>GRN Document</div>
-            </div>
-            <div style={{ textAlign: "right" }}>
-              <table style={{ fontSize: 12, borderCollapse: "collapse", marginLeft: "auto" }}>
-                {[["GRN No", grnNo], ["Date", fmtDate(date)], ...(poRef ? [["PO Ref", poRef]] : [])].map(([k,v]) => (
-                  <tr key={k}>
-                    <td style={{ padding: "2px 12px 2px 0", color: "#94a3b8", fontWeight: 600 }}>{k}</td>
-                    <td style={{ padding: "2px 0", fontWeight: 800, color: "#0f172a", fontFamily: k === "GRN No" || k === "PO Ref" ? "monospace" : "inherit" }}>{v}</td>
-                  </tr>
-                ))}
-              </table>
-            </div>
-          </div>
-
-          {/* Supplier */}
-          <div style={{ padding: "14px 36px", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Received From (Supplier)</div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a" }}>{supplierName || "—"}</div>
-            {remarks && <div style={{ fontSize: 11, color: "#64748b", marginTop: 3 }}>Note: {remarks}</div>}
-          </div>
-
-          {/* Items */}
-          <div style={{ padding: "0 36px" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: "2px solid #0f172a" }}>
-                  {[["#","left",30],["Item","left","auto"],["Ordered","center",80],["Received","center",80],["Rate","right",100],["Amount","right",110]].map(([l,a,w]) => (
-                    <th key={l as string} style={{ padding: "12px 0 8px", textAlign: a as any, fontSize: 9, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.8, width: w as any }}>{l}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filledRows.map((r, i) => {
-                  const short = r.orderedQty && Number(r.receivedQty) < Number(r.orderedQty);
-                  return (
-                    <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                      <td style={{ padding: "11px 0", fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{i + 1}</td>
-                      <td style={{ padding: "11px 0" }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{r.name}</div>
-                        {r.remarks && <div style={{ fontSize: 10, color: "#64748b", marginTop: 1 }}>Note: {r.remarks}</div>}
-                      </td>
-                      <td style={{ padding: "11px 0", textAlign: "center", fontSize: 12, color: "#475569" }}>{r.orderedQty || "—"}</td>
-                      <td style={{ padding: "11px 0", textAlign: "center", fontSize: 13, fontWeight: 700, color: short ? "#d97706" : "#059669" }}>{r.receivedQty}</td>
-                      <td style={{ padding: "11px 0", textAlign: "right", fontSize: 12, color: "#475569" }}>{Number(r.rate).toLocaleString()}</td>
-                      <td style={{ padding: "11px 0", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#0f172a" }}>{((Number(r.receivedQty)||0)*(Number(r.rate)||0)).toLocaleString()}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Total */}
-          <div style={{ padding: "16px 36px 28px", display: "flex", justifyContent: "flex-end", borderTop: "1.5px solid #e2e8f0", marginTop: 4 }}>
-            <table style={{ minWidth: 230, borderCollapse: "collapse", fontSize: 12 }}>
-              <tbody>
-                <tr style={{ background: "#0f172a" }}>
-                  <td style={{ padding: "10px 12px", color: "white", fontWeight: 800, fontSize: 13, borderRadius: "4px 0 0 4px" }}>TOTAL AMOUNT</td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", color: "white", fontWeight: 900, fontSize: 15, borderRadius: "0 4px 4px 0" }}>{totalAmt.toLocaleString()}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          {/* Signatures */}
-          <div style={{ padding: "0 36px 28px", display: "flex", gap: 32 }}>
-            {["Received By", "Checked By", "Approved By"].map(label => (
-              <div key={label} style={{ flex: 1, textAlign: "center", borderTop: "1.5px solid #cbd5e1", paddingTop: 7, marginTop: 40 }}>
-                <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Footer */}
-          <div style={{ padding: "10px 36px", background: "#f8fafc", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 10, color: "#94a3b8" }}>Generated by FinovaOS · {fmtDate(new Date())}</div>
-            <div style={{ fontSize: 10, color: "#94a3b8" }}>Computer generated document</div>
-          </div>
-        </div>
+      {!showList && preview && printMode !== "58mm" && (
+        <PrintPaperWrapper>
+          <PrintDocA4
+            companyName={companyInfo?.name || "Company Name"}
+            companyAddress={companyInfo?.address}
+            companyPhone={companyInfo?.phone}
+            docTitle="GOODS RECEIPT NOTE"
+            docNo={grnNo}
+            date={fmtDate(date)}
+            partyLabel="Supplier"
+            partyName={supplierName || "—"}
+            metaFields={poRef ? [{ label: "PO Reference", value: poRef }] : []}
+            columns={[
+              { key: "no", label: "#", align: "center", width: 30 },
+              { key: "name", label: "Item" },
+              { key: "ordered", label: "Ordered", align: "center", width: 70 },
+              { key: "received", label: "Received", align: "center", width: 70 },
+              { key: "rate", label: "Rate", align: "right", width: 80 },
+              { key: "amount", label: "Amount", align: "right", width: 90 },
+            ]}
+            rows={filledRows.map((r, i) => ({
+              no: i + 1,
+              name: r.name,
+              ordered: r.orderedQty || "—",
+              received: r.receivedQty,
+              rate: Number(r.rate).toLocaleString(),
+              amount: ((Number(r.receivedQty) || 0) * (Number(r.rate) || 0)).toLocaleString(),
+            }))}
+            totalsLines={[
+              { label: "Total Received Amount:", value: totalAmt, bold: true, borderTop: true },
+            ]}
+            notes={remarks || undefined}
+            signatureLabels={["Received By", "Verified By"]}
+          />
+        </PrintPaperWrapper>
       )}
 
       {/* ══ 58mm THERMAL PREVIEW ══ */}
