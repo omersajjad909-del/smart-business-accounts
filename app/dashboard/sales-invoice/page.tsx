@@ -1092,7 +1092,7 @@ function SalesInvoiceContent() {
             </div>
           </div>
 
-          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 18, fontSize: 12 , color: "#000"}}>
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 18, fontSize: 12 }}>
             <thead>
               <tr style={{ borderTop: "2px solid #000", borderBottom: "2px solid #000", background: "#f0f0f0" }}>
                 <th style={{ padding: "8px 10px", textAlign: "left" }}>Description</th>
