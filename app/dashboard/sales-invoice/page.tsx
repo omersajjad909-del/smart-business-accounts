@@ -460,43 +460,28 @@ function SalesInvoiceContent() {
 
     const pdfBase64 = doc.output("datauristring").split(",")[1];
 
-    // Try Business API if phone & config available
-    if (customerPhone) {
-      const toastId = toast.loading("Sending invoice via WhatsApp…");
-      try {
-        const res = await fetch("/api/whatsapp/send-invoice", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-user-role": user?.role || "",
-            "x-user-id": user?.id || "",
-          },
-          body: JSON.stringify({ phone: customerPhone, invoiceNo: savedInvoice.invoiceNo, customerName, pdfBase64 }),
-        });
-        const data = await res.json();
-        toast.dismiss(toastId);
-        if (data.success) {
-          toast.success(`Invoice sent to ${customerPhone} via WhatsApp!`);
-          return;
-        }
-        // API failed — fall through to wa.me with PDF download
-        toast.error(data.error || "WhatsApp API failed — opening WhatsApp instead");
-      } catch {
-        toast.dismiss(toastId);
+    if (!customerPhone) {
+      toast.error("Customer phone number not set. Add it in Chart of Accounts → Edit Customer.");
+      return;
+    }
+
+    const toastId = toast.loading("Sending invoice via WhatsApp…");
+    try {
+      const res = await fetch("/api/whatsapp/send-invoice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-user-role": user?.role || "", "x-user-id": user?.id || "" },
+        body: JSON.stringify({ phone: customerPhone, invoiceNo: savedInvoice.invoiceNo, customerName, pdfBase64 }),
+      });
+      const data = await res.json();
+      toast.dismiss(toastId);
+      if (data.success) {
+        toast.success(`Invoice sent to ${customerPhone} via WhatsApp!`);
+      } else {
+        toast.error(data.error || "WhatsApp send failed. Check Settings → Notifications → WhatsApp config.");
       }
-      // Fallback: download PDF + open wa.me with customer phone
-      doc.save(`invoice-${savedInvoice.invoiceNo}.pdf`);
-      let msg = `*Invoice: ${savedInvoice.invoiceNo}*\nDate: ${fmtDate(savedInvoice.date)}\nCustomer: ${customerName}\n\nItems:\n`;
-      savedInvoice.items.forEach((it: any, i: number) => { msg += `${i + 1}. ${it.item.name} x ${it.qty} @ ${it.rate} = ${(it.qty * it.rate).toLocaleString()}\n`; });
-      msg += `\n*Total: ${savedInvoice.total.toLocaleString()}*\n\n_(PDF attached above)_`;
-      window.open(`https://wa.me/${customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(msg)}`, "_blank");
-    } else {
-      // No phone — download PDF and open wa.me picker
-      doc.save(`invoice-${savedInvoice.invoiceNo}.pdf`);
-      let msg = `*Invoice: ${savedInvoice.invoiceNo}*\nDate: ${fmtDate(savedInvoice.date)}\nCustomer: ${customerName}\n\nItems:\n`;
-      savedInvoice.items.forEach((it: any, i: number) => { msg += `${i + 1}. ${it.item.name} x ${it.qty} @ ${it.rate} = ${(it.qty * it.rate).toLocaleString()}\n`; });
-      msg += `\n*Total: ${savedInvoice.total.toLocaleString()}*`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+    } catch {
+      toast.dismiss(toastId);
+      toast.error("WhatsApp send failed. Check your connection.");
     }
   }
 
