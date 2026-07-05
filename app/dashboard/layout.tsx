@@ -44,11 +44,11 @@ function FinovaLoader() {
         @keyframes finova-fadeup { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         @keyframes finova-bar { from{width:0} to{width:100%} }
         @keyframes finova-dot { 0%,80%,100%{opacity:.2;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
-        @keyframes finova-glow { 0%,100%{box-shadow:0 0 24px rgba(99,102,241,.4)} 50%{box-shadow:0 0 48px rgba(99,102,241,.8),0 0 80px rgba(99,102,241,.3)} }
+        @keyframes finova-glow { 0%,100%{box-shadow:0 0 24px rgba(var(--accent-rgb),.4)} 50%{box-shadow:0 0 48px rgba(var(--accent-rgb),.8),0 0 80px rgba(var(--accent-rgb),.3)} }
       `}</style>
 
       {/* Background grid */}
-      <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(99,102,241,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.04) 1px,transparent 1px)", backgroundSize:"48px 48px", pointerEvents:"none" }}/>
+      <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(rgba(var(--accent-rgb),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--accent-rgb),.04) 1px,transparent 1px)", backgroundSize:"48px 48px", pointerEvents:"none" }}/>
 
       {/* Outer glow ring */}
       <div style={{
@@ -61,14 +61,14 @@ function FinovaLoader() {
         <div style={{
           position: "absolute", inset: 0, borderRadius: "50%",
           border: "2px solid transparent",
-          borderTopColor: "#6366f1", borderRightColor: "rgba(99,102,241,.3)",
+          borderTopColor: "var(--accent)", borderRightColor: "rgba(var(--accent-rgb),.3)",
           animation: "finova-spin 1.2s linear infinite",
         }}/>
         {/* Inner spinning ring (opposite) */}
         <div style={{
           position: "absolute", inset: 8, borderRadius: "50%",
           border: "1.5px solid transparent",
-          borderBottomColor: "#818cf8", borderLeftColor: "rgba(129,140,248,.3)",
+          borderBottomColor: "var(--accent)", borderLeftColor: "rgba(var(--accent-rgb),.3)",
           animation: "finova-spin 1.8s linear infinite reverse",
         }}/>
         {/* Logo icon */}
@@ -97,7 +97,7 @@ function FinovaLoader() {
         <div style={{ height: 3, borderRadius: 8, background: "rgba(255,255,255,.08)", overflow: "hidden" }}>
           <div style={{
             height: "100%", borderRadius: 8,
-            background: "linear-gradient(90deg,#6366f1,#818cf8,#6366f1)",
+            background: "linear-gradient(90deg,var(--accent),var(--accent),var(--accent))",
             backgroundSize: "200% 100%",
             animation: "finova-bar 2s cubic-bezier(.4,0,.2,1) forwards",
           }}/>
@@ -107,7 +107,7 @@ function FinovaLoader() {
           {[0,1,2].map(i => (
             <div key={i} style={{
               width: 7, height: 7, borderRadius: "50%",
-              background: "#6366f1",
+              background: "var(--accent)",
               animation: `finova-dot 1.2s ease ${i * 0.18}s infinite`,
             }}/>
           ))}
@@ -921,7 +921,7 @@ export default function DashboardLayout({
     return (
       <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#080c1e"}}>
         <div style={{color:"#f87171",fontWeight:700,fontSize:18}}>Session expired.</div>
-        <button onClick={logout} style={{marginTop:16,color:"#a5b4fc",background:"none",border:"none",cursor:"pointer",textDecoration:"underline",fontSize:14}}>
+        <button onClick={logout} style={{marginTop:16,color:"var(--accent)",background:"none",border:"none",cursor:"pointer",textDecoration:"underline",fontSize:14}}>
           Back to Login
         </button>
       </div>
@@ -942,9 +942,9 @@ export default function DashboardLayout({
           fontFamily:"'Outfit','Inter',sans-serif",
         }}>
           <div style={{
-            background:"#0d1035", border:"1px solid rgba(99,102,241,0.4)",
+            background:"#0d1035", border:"1px solid rgba(var(--accent-rgb),0.4)",
             borderRadius:20, padding:"36px 40px", maxWidth:420, width:"90%",
-            boxShadow:"0 0 60px rgba(99,102,241,0.25)", textAlign:"center",
+            boxShadow:"0 0 60px rgba(var(--accent-rgb),0.25)", textAlign:"center",
           }}>
             <div style={{fontSize:44, marginBottom:12}}>⏱️</div>
             <div style={{fontSize:22, fontWeight:800, color:"#fff", marginBottom:8}}>
@@ -962,7 +962,7 @@ export default function DashboardLayout({
                 onClick={stayLoggedIn}
                 style={{
                   padding:"10px 28px", borderRadius:10, border:"none", cursor:"pointer",
-                  background:"linear-gradient(135deg,#6366f1,#818cf8)",
+                  background:"linear-gradient(135deg,var(--accent),var(--accent))",
                   color:"#fff", fontWeight:700, fontSize:14,
                 }}
               >
@@ -2135,16 +2135,16 @@ export default function DashboardLayout({
 
         {/* ── Upgrade Plan card ── */}
         {!sidebarCollapsed && !isCustomPlan && ["STARTER", "PRO"].includes(normalizedPlanCode) && (
-          <div style={{margin:"0 10px 10px",borderRadius:14,background:"linear-gradient(135deg,rgba(99,102,241,.18),rgba(139,92,246,.1))",border:"1px solid rgba(99,102,241,.28)",padding:"14px 14px 12px",position:"relative",overflow:"hidden"}}>
+          <div style={{margin:"0 10px 10px",borderRadius:14,background:"linear-gradient(135deg,rgba(var(--accent-rgb),.18),rgba(139,92,246,.1))",border:"1px solid rgba(var(--accent-rgb),.28)",padding:"14px 14px 12px",position:"relative",overflow:"hidden"}}>
             {/* X close */}
             <div style={{position:"absolute",top:8,right:8,width:18,height:18,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"rgba(255,255,255,.35)"}}
               onClick={e=>{e.currentTarget.parentElement!.style.display="none";}}>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </div>
-            <div style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,#6366f1,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,marginBottom:9}}>⭐</div>
+            <div style={{width:30,height:30,borderRadius:9,background:"linear-gradient(135deg,var(--accent),#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,marginBottom:9}}>⭐</div>
             <div style={{fontSize:12,fontWeight:800,color:"rgba(255,255,255,.9)",marginBottom:4}}>Upgrade Plan</div>
             <div style={{fontSize:10,color:"rgba(255,255,255,.45)",lineHeight:1.5,marginBottom:10}}>Unlock more features and grow your business.</div>
-            <a href="/pricing" style={{display:"flex",alignItems:"center",gap:5,padding:"7px 13px",borderRadius:9,background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:11,fontWeight:700,textDecoration:"none",boxShadow:"0 3px 12px rgba(99,102,241,.4)"}}>
+            <a href="/pricing" style={{display:"flex",alignItems:"center",gap:5,padding:"7px 13px",borderRadius:9,background:"linear-gradient(135deg,var(--accent),var(--accent-strong))",color:"white",fontSize:11,fontWeight:700,textDecoration:"none",boxShadow:"0 3px 12px rgba(var(--accent-rgb),.4)"}}>
               Upgrade Now
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
@@ -2220,7 +2220,7 @@ export default function DashboardLayout({
               </button>
               {/* Company logo + name */}
               <div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}>
-                <div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>
+                <div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,var(--accent-strong),#7c3aed)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>
                   {companyDetail?.logoUrl
                     ? <img src={companyDetail.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                     : <img src="/icon1.png" alt="FinovaOS" width={18} height={18} style={{objectFit:"contain"}}/>}
@@ -2233,7 +2233,7 @@ export default function DashboardLayout({
               <div style={{position:"relative",flexShrink:0}} data-panel-anchor="notif">
                 <button
                   onClick={()=>{ const next=!showNotifPanel; setShowNotifPanel(next); setShowHelpPanel(false); setShowUserMenu(false); if(next&&!notifsFetched)fetchNotifs(); }}
-                  style={{width:38,height:38,borderRadius:11,background:showNotifPanel?"rgba(99,102,241,0.15)":"rgba(255,255,255,0.06)",border:showNotifPanel?"1px solid rgba(99,102,241,0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:showNotifPanel?"#818cf8":"rgba(255,255,255,0.65)"}}>
+                  style={{width:38,height:38,borderRadius:11,background:showNotifPanel?"rgba(var(--accent-rgb),0.15)":"rgba(255,255,255,0.06)",border:showNotifPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:showNotifPanel?"var(--accent)":"rgba(255,255,255,0.65)"}}>
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
                   {unreadCount > 0 && (
                     <span style={{position:"absolute",top:7,right:7,minWidth:8,height:8,borderRadius:"50%",background:"#f87171",border:"1.5px solid rgba(10,15,35,0.97)"}}/>
@@ -2247,17 +2247,17 @@ export default function DashboardLayout({
                         <span style={{fontSize:13,fontWeight:700,color:"var(--text-primary)"}}>Notifications</span>
                         {unreadCount > 0 && <span style={{padding:"2px 7px",borderRadius:10,background:"rgba(248,113,113,0.12)",border:"1px solid rgba(248,113,113,0.25)",fontSize:10,fontWeight:700,color:"#f87171"}}>{unreadCount} new</span>}
                       </div>
-                      {unreadCount > 0 && <button onClick={markAllRead} style={{fontSize:11,color:"#818cf8",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:0}}>Mark all read</button>}
+                      {unreadCount > 0 && <button onClick={markAllRead} style={{fontSize:11,color:"var(--accent)",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:0}}>Mark all read</button>}
                     </div>
                     <div style={{maxHeight:300,overflowY:"auto"}}>
                       {notifsLoading ? (
-                        <div style={{padding:"32px 16px",textAlign:"center",color:"var(--text-muted)",fontSize:13}}><div style={{width:22,height:22,border:"2px solid var(--border)",borderTopColor:"#6366f1",borderRadius:"50%",animation:"finova-spin .7s linear infinite",margin:"0 auto 8px"}}/>Loading…</div>
+                        <div style={{padding:"32px 16px",textAlign:"center",color:"var(--text-muted)",fontSize:13}}><div style={{width:22,height:22,border:"2px solid var(--border)",borderTopColor:"var(--accent)",borderRadius:"50%",animation:"finova-spin .7s linear infinite",margin:"0 auto 8px"}}/>Loading…</div>
                       ) : notifs.length === 0 ? (
                         <div style={{padding:"36px 16px",textAlign:"center"}}><div style={{fontSize:28,marginBottom:8}}>🔔</div><div style={{fontSize:13,color:"var(--text-muted)",fontWeight:500}}>No notifications yet</div></div>
                       ) : notifs.map(n=>{
-                        const col=({INFO:"#818cf8",SUCCESS:"#34d399",WARNING:"#fbbf24",ERROR:"#f87171"} as any)[n.type]||"#818cf8";
+                        const col=({INFO:"var(--accent)",SUCCESS:"#34d399",WARNING:"#fbbf24",ERROR:"#f87171"} as any)[n.type]||"var(--accent)";
                         return (
-                          <div key={n.id} onClick={()=>{markRead(n.id);if(n.link){router.push(n.link);setShowNotifPanel(false);}}} style={{display:"flex",gap:12,padding:"12px 16px",borderBottom:"1px solid var(--border)",cursor:n.link?"pointer":"default",background:n.isRead?"transparent":"rgba(99,102,241,0.04)"}}>
+                          <div key={n.id} onClick={()=>{markRead(n.id);if(n.link){router.push(n.link);setShowNotifPanel(false);}}} style={{display:"flex",gap:12,padding:"12px 16px",borderBottom:"1px solid var(--border)",cursor:n.link?"pointer":"default",background:n.isRead?"transparent":"rgba(var(--accent-rgb),0.04)"}}>
                             <div style={{width:8,height:8,borderRadius:"50%",background:col,flexShrink:0,marginTop:5,opacity:n.isRead?0.3:1}}/>
                             <div style={{flex:1,minWidth:0}}>
                               <div style={{fontSize:12,fontWeight:700,color:"var(--text-primary)",marginBottom:2,opacity:n.isRead?0.6:1}}>{n.title}</div>
@@ -2269,7 +2269,7 @@ export default function DashboardLayout({
                       })}
                     </div>
                     <div style={{padding:"10px 16px",borderTop:"1px solid var(--border)"}}>
-                      <Link prefetch={false} href="/dashboard/notifications" onClick={()=>setShowNotifPanel(false)} style={{fontSize:12,color:"#818cf8",fontWeight:600,textDecoration:"none",display:"block",textAlign:"center"}}>View all notifications →</Link>
+                      <Link prefetch={false} href="/dashboard/notifications" onClick={()=>setShowNotifPanel(false)} style={{fontSize:12,color:"var(--accent)",fontWeight:600,textDecoration:"none",display:"block",textAlign:"center"}}>View all notifications →</Link>
                     </div>
                   </div>
                 )}
@@ -2311,7 +2311,7 @@ export default function DashboardLayout({
             {/* + New button — desktop only */}
             {!isMobileViewport && (
               <Link prefetch={false} href="/dashboard/sales-invoice"
-                style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:10,background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:13,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap",boxShadow:"0 2px 10px rgba(99,102,241,.4)"}}
+                style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:10,background:"linear-gradient(135deg,var(--accent),var(--accent-strong))",color:"white",fontSize:13,fontWeight:700,textDecoration:"none",whiteSpace:"nowrap",boxShadow:"0 2px 10px rgba(var(--accent-rgb),.4)"}}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 New
@@ -2329,7 +2329,7 @@ export default function DashboardLayout({
                   setShowUserMenu(false);
                   if (next && !notifsFetched) fetchNotifs();
                 }}
-                style={{position:"relative",width:36,height:36,borderRadius:10,background:showNotifPanel?"rgba(99,102,241,0.15)":"rgba(255,255,255,0.05)",border:showNotifPanel?"1px solid rgba(99,102,241,0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showNotifPanel?"#818cf8":"var(--text-muted)"}}
+                style={{position:"relative",width:36,height:36,borderRadius:10,background:showNotifPanel?"rgba(var(--accent-rgb),0.15)":"rgba(255,255,255,0.05)",border:showNotifPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showNotifPanel?"var(--accent)":"var(--text-muted)"}}
                 onMouseEnter={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
                 onMouseLeave={e=>{if(!showNotifPanel)e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -2352,7 +2352,7 @@ export default function DashboardLayout({
                       {unreadCount > 0 && <span style={{padding:"2px 7px",borderRadius:10,background:"rgba(248,113,113,0.12)",border:"1px solid rgba(248,113,113,0.25)",fontSize:10,fontWeight:700,color:"#f87171"}}>{unreadCount} new</span>}
                     </div>
                     {unreadCount > 0 && (
-                      <button onClick={markAllRead} style={{fontSize:11,color:"#818cf8",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:0}}>Mark all read</button>
+                      <button onClick={markAllRead} style={{fontSize:11,color:"var(--accent)",fontWeight:600,background:"none",border:"none",cursor:"pointer",padding:0}}>Mark all read</button>
                     )}
                   </div>
 
@@ -2360,7 +2360,7 @@ export default function DashboardLayout({
                   <div style={{maxHeight:320,overflowY:"auto"}}>
                     {notifsLoading ? (
                       <div style={{padding:"32px 16px",textAlign:"center",color:"var(--text-muted)",fontSize:13}}>
-                        <div style={{width:22,height:22,border:"2px solid var(--border)",borderTopColor:"#6366f1",borderRadius:"50%",animation:"finova-spin .7s linear infinite",margin:"0 auto 8px"}}/>
+                        <div style={{width:22,height:22,border:"2px solid var(--border)",borderTopColor:"var(--accent)",borderRadius:"50%",animation:"finova-spin .7s linear infinite",margin:"0 auto 8px"}}/>
                         Loading…
                       </div>
                     ) : notifs.length === 0 ? (
@@ -2370,15 +2370,15 @@ export default function DashboardLayout({
                         <div style={{fontSize:11,color:"var(--text-muted)",marginTop:4}}>System alerts will appear here</div>
                       </div>
                     ) : notifs.map(n => {
-                      const typeColor: Record<string,string> = { INFO:"#818cf8", SUCCESS:"#34d399", WARNING:"#fbbf24", ERROR:"#f87171" };
-                      const col = typeColor[n.type] || "#818cf8";
+                      const typeColor: Record<string,string> = { INFO:"var(--accent)", SUCCESS:"#34d399", WARNING:"#fbbf24", ERROR:"#f87171" };
+                      const col = typeColor[n.type] || "var(--accent)";
                       return (
                         <div
                           key={n.id}
                           onClick={()=>{ markRead(n.id); if(n.link) { router.push(n.link); setShowNotifPanel(false); } }}
-                          style={{display:"flex",gap:12,padding:"12px 16px",borderBottom:"1px solid var(--border)",cursor:n.link?"pointer":"default",background:n.isRead?"transparent":"rgba(99,102,241,0.04)",transition:"background .12s"}}
+                          style={{display:"flex",gap:12,padding:"12px 16px",borderBottom:"1px solid var(--border)",cursor:n.link?"pointer":"default",background:n.isRead?"transparent":"rgba(var(--accent-rgb),0.04)",transition:"background .12s"}}
                           onMouseEnter={e=>{ if(!n.isRead||n.link) e.currentTarget.style.background="rgba(255,255,255,0.03)"; }}
-                          onMouseLeave={e=>{ e.currentTarget.style.background=n.isRead?"transparent":"rgba(99,102,241,0.04)"; }}
+                          onMouseLeave={e=>{ e.currentTarget.style.background=n.isRead?"transparent":"rgba(var(--accent-rgb),0.04)"; }}
                         >
                           <div style={{width:8,height:8,borderRadius:"50%",background:col,flexShrink:0,marginTop:5,opacity:n.isRead?0.3:1}}/>
                           <div style={{flex:1,minWidth:0}}>
@@ -2388,7 +2388,7 @@ export default function DashboardLayout({
                               {new Date(n.createdAt).toLocaleDateString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}
                             </div>
                           </div>
-                          {!n.isRead && <div style={{width:6,height:6,borderRadius:"50%",background:"#6366f1",flexShrink:0,marginTop:6}}/>}
+                          {!n.isRead && <div style={{width:6,height:6,borderRadius:"50%",background:"var(--accent)",flexShrink:0,marginTop:6}}/>}
                         </div>
                       );
                     })}
@@ -2397,7 +2397,7 @@ export default function DashboardLayout({
                   {/* Footer */}
                   <div style={{padding:"10px 16px",borderTop:"1px solid var(--border)"}}>
                     <Link prefetch={false} href="/dashboard/notifications" onClick={()=>setShowNotifPanel(false)}
-                      style={{fontSize:12,color:"#818cf8",fontWeight:600,textDecoration:"none",display:"block",textAlign:"center"}}>
+                      style={{fontSize:12,color:"var(--accent)",fontWeight:600,textDecoration:"none",display:"block",textAlign:"center"}}>
                       View all notifications →
                     </Link>
                   </div>
@@ -2409,7 +2409,7 @@ export default function DashboardLayout({
             <div style={{position:"relative"}} data-panel-anchor="help">
               <button
                 onClick={()=>{ setShowHelpPanel(v=>!v); setShowNotifPanel(false); setShowUserMenu(false); }}
-                style={{width:36,height:36,borderRadius:10,background:showHelpPanel?"rgba(99,102,241,0.15)":"rgba(255,255,255,0.05)",border:showHelpPanel?"1px solid rgba(99,102,241,0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showHelpPanel?"#818cf8":"var(--text-muted)"}}
+                style={{width:36,height:36,borderRadius:10,background:showHelpPanel?"rgba(var(--accent-rgb),0.15)":"rgba(255,255,255,0.05)",border:showHelpPanel?"1px solid rgba(var(--accent-rgb),0.4)":"1px solid rgba(255,255,255,0.08)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"all .15s",color:showHelpPanel?"var(--accent)":"var(--text-muted)"}}
                 onMouseEnter={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
                 onMouseLeave={e=>{if(!showHelpPanel)e.currentTarget.style.background="rgba(255,255,255,0.05)";}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -2427,7 +2427,7 @@ export default function DashboardLayout({
                     </div>
                     {isAdmin && (
                       <Link prefetch={false} href="/dashboard/shortcuts" onClick={()=>setShowHelpPanel(false)}
-                        style={{fontSize:11,color:"#818cf8",fontWeight:600,textDecoration:"none",padding:"4px 10px",borderRadius:7,background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.25)"}}>
+                        style={{fontSize:11,color:"var(--accent)",fontWeight:600,textDecoration:"none",padding:"4px 10px",borderRadius:7,background:"rgba(var(--accent-rgb),0.1)",border:"1px solid rgba(var(--accent-rgb),0.25)"}}>
                         Manage
                       </Link>
                     )}
@@ -2441,7 +2441,7 @@ export default function DashboardLayout({
                         <div style={{display:"flex",gap:3,alignItems:"center"}}>
                           {s.keys.map((k,i)=>(
                             <span key={k}>
-                              <kbd style={{padding:"2px 6px",borderRadius:5,background:"rgba(99,102,241,0.12)",border:"1px solid rgba(99,102,241,0.25)",fontSize:10,fontWeight:700,color:"#818cf8",fontFamily:"inherit"}}>{k}</kbd>
+                              <kbd style={{padding:"2px 6px",borderRadius:5,background:"rgba(var(--accent-rgb),0.12)",border:"1px solid rgba(var(--accent-rgb),0.25)",fontSize:10,fontWeight:700,color:"var(--accent)",fontFamily:"inherit"}}>{k}</kbd>
                               {i<s.keys.length-1 && <span style={{fontSize:9,color:"var(--text-muted)",margin:"0 1px"}}>+</span>}
                             </span>
                           ))}
@@ -2455,7 +2455,7 @@ export default function DashboardLayout({
                   </div>
                   <div style={{padding:"10px 16px",borderTop:"1px solid var(--border)",display:"flex",flexDirection:"column",gap:6}}>
                     <Link prefetch={false} href="/dashboard/business-guide" onClick={()=>setShowHelpPanel(false)}
-                      style={{fontSize:12,color:"#818cf8",fontWeight:600,textDecoration:"none",display:"flex",alignItems:"center",gap:6}}>
+                      style={{fontSize:12,color:"var(--accent)",fontWeight:600,textDecoration:"none",display:"flex",alignItems:"center",gap:6}}>
                       📖 Business Guide
                     </Link>
                     <a href="mailto:finovaos.app@gmail.com"
@@ -2484,12 +2484,12 @@ export default function DashboardLayout({
             <div style={{position:"relative"}} data-panel-anchor="user">
               <div
                 className="hidden md:flex"
-                style={{display:"flex",alignItems:"center",gap:8,padding:"4px 8px 4px 4px",borderRadius:10,cursor:"pointer",transition:"background .15s",background:showUserMenu?"rgba(99,102,241,0.1)":"transparent"}}
+                style={{display:"flex",alignItems:"center",gap:8,padding:"4px 8px 4px 4px",borderRadius:10,cursor:"pointer",transition:"background .15s",background:showUserMenu?"rgba(var(--accent-rgb),0.1)":"transparent"}}
                 onMouseEnter={e=>{ if(!showUserMenu) e.currentTarget.style.background="rgba(255,255,255,0.06)"; }}
                 onMouseLeave={e=>{ if(!showUserMenu) e.currentTarget.style.background="transparent"; }}
                 onClick={()=>{ setShowUserMenu(v=>!v); setShowNotifPanel(false); setShowHelpPanel(false); }}
               >
-                <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"white",overflow:"hidden",flexShrink:0,border:"2px solid rgba(99,102,241,0.3)"}}>
+                <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,var(--accent-strong),var(--accent))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"white",overflow:"hidden",flexShrink:0,border:"2px solid rgba(var(--accent-rgb),0.3)"}}>
                   {(userAvatar || companyDetail?.logoUrl)
                     ? <img src={userAvatar || companyDetail?.logoUrl} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                     : (currentUser.name || currentUser.email || "U")[0].toUpperCase()
@@ -2521,13 +2521,13 @@ export default function DashboardLayout({
                     {/* User header */}
                     <div style={{padding:"10px 12px 10px",borderBottom:"1px solid rgba(255,255,255,0.07)",marginBottom:4,display:"flex",alignItems:"center",gap:10}}>
                       <label htmlFor="navbar-avatar-input" style={{cursor:"pointer",flexShrink:0,position:"relative"}}>
-                        <div style={{width:40,height:40,borderRadius:11,background:"linear-gradient(135deg,#4f46e5,#818cf8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"white",overflow:"hidden",border:"2px solid rgba(99,102,241,0.35)"}}>
+                        <div style={{width:40,height:40,borderRadius:11,background:"linear-gradient(135deg,var(--accent-strong),var(--accent))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"white",overflow:"hidden",border:"2px solid rgba(var(--accent-rgb),0.35)"}}>
                           {(userAvatar || companyDetail?.logoUrl)
                             ? <img src={userAvatar || companyDetail?.logoUrl} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                             : (currentUser.name || "U")[0].toUpperCase()
                           }
                         </div>
-                        <div style={{position:"absolute",bottom:-3,right:-3,width:16,height:16,borderRadius:"50%",background:"#4f46e5",border:"1.5px solid #0e1120",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                        <div style={{position:"absolute",bottom:-3,right:-3,width:16,height:16,borderRadius:"50%",background:"var(--accent-strong)",border:"1.5px solid #0e1120",display:"flex",alignItems:"center",justifyContent:"center"}}>
                           <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
                         </div>
                       </label>
@@ -2599,7 +2599,7 @@ export default function DashboardLayout({
                 </div>
                 <Link prefetch={false} href="/pricing" style={{
                   padding:isMobileViewport ? "6px 12px" : "7px 16px", borderRadius:8, fontSize:isMobileViewport ? 11 : 12, fontWeight:700,
-                  background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff",
+                  background:"linear-gradient(135deg,var(--accent),#8b5cf6)", color:"#fff",
                   textDecoration:"none", whiteSpace:"nowrap",
                 }}>
                   Get Started →
@@ -2610,14 +2610,14 @@ export default function DashboardLayout({
             {testMode?.isTestMode && (
               <div style={{
                 display:"flex", alignItems:"center", justifyContent:"space-between",
-                background:"linear-gradient(135deg,rgba(99,102,241,.12),rgba(79,70,229,.08))",
-                border:"1px solid rgba(99,102,241,.35)", borderRadius:12,
+                background:"linear-gradient(135deg,rgba(var(--accent-rgb),.12),rgba(79,70,229,.08))",
+                border:"1px solid rgba(var(--accent-rgb),.35)", borderRadius:12,
                 padding:isMobileViewport ? "8px 12px" : "10px 18px", marginBottom:isMobileViewport ? 12 : 20, gap:12, flexWrap:"wrap",
               }}>
                 <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
                   <span style={{fontSize:18}}>🧪</span>
                   <div>
-                    <span style={{fontSize:13,fontWeight:700,color:"#a5b4fc"}}>Dev Test Mode</span>
+                    <span style={{fontSize:13,fontWeight:700,color:"var(--accent)"}}>Dev Test Mode</span>
                     <span style={{fontSize:12,color:"rgba(255,255,255,.45)",marginLeft:10}}>
                       {testMode.testBusinessType} · {testMode.testPlan} — This is an isolated test workspace
                     </span>
@@ -2638,7 +2638,7 @@ export default function DashboardLayout({
                       await fetch("/api/admin/dev-test/exit", { method:"POST" });
                       window.location.href = "/admin/dev-test";
                     }}
-                    style={{ padding:"6px 14px", borderRadius:7, border:"1px solid rgba(99,102,241,.4)", background:"rgba(99,102,241,.12)", color:"#a5b4fc", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}
+                    style={{ padding:"6px 14px", borderRadius:7, border:"1px solid rgba(var(--accent-rgb),.4)", background:"rgba(var(--accent-rgb),.12)", color:"var(--accent)", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}
                   >
                     ✕ Exit Test Mode
                   </button>
@@ -2666,9 +2666,9 @@ export default function DashboardLayout({
           <Link prefetch={false} href="/dashboard" style={{
             flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
             gap:3, paddingTop:6, textDecoration:"none",
-            color: pathname==="/dashboard" ? "#818cf8" : "rgba(255,255,255,0.4)",
-            background: pathname==="/dashboard" ? "rgba(99,102,241,0.08)" : "transparent",
-            borderTop: pathname==="/dashboard" ? "2px solid #6366f1" : "2px solid transparent",
+            color: pathname==="/dashboard" ? "var(--accent)" : "rgba(255,255,255,0.4)",
+            background: pathname==="/dashboard" ? "rgba(var(--accent-rgb),0.08)" : "transparent",
+            borderTop: pathname==="/dashboard" ? "2px solid var(--accent)" : "2px solid transparent",
             transition:"color .15s",
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -2682,9 +2682,9 @@ export default function DashboardLayout({
               <Link prefetch={false} href="/dashboard/invoices" style={{
                 flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
                 gap:3, paddingTop:6, textDecoration:"none",
-                color: isSalesActive ? "#818cf8" : "rgba(255,255,255,0.4)",
-                background: isSalesActive ? "rgba(99,102,241,0.08)" : "transparent",
-                borderTop: isSalesActive ? "2px solid #6366f1" : "2px solid transparent",
+                color: isSalesActive ? "var(--accent)" : "rgba(255,255,255,0.4)",
+                background: isSalesActive ? "rgba(var(--accent-rgb),0.08)" : "transparent",
+                borderTop: isSalesActive ? "2px solid var(--accent)" : "2px solid transparent",
                 transition:"color .15s",
               }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -2699,15 +2699,15 @@ export default function DashboardLayout({
               onClick={() => router.push("/dashboard/sales-invoice")}
               style={{
                 width:52, height:52, borderRadius:"50%",
-                background:"linear-gradient(135deg,#6366f1,#4f46e5)",
+                background:"linear-gradient(135deg,var(--accent),var(--accent-strong))",
                 border:"none", cursor:"pointer",
                 display:"flex", alignItems:"center", justifyContent:"center",
-                boxShadow:"0 4px 20px rgba(99,102,241,.5)",
+                boxShadow:"0 4px 20px rgba(var(--accent-rgb),.5)",
                 transform:"translateY(-10px)",
                 transition:"transform .15s, box-shadow .15s",
               }}
-              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-12px)";e.currentTarget.style.boxShadow="0 6px 24px rgba(99,102,241,.6)";}}
-              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(-10px)";e.currentTarget.style.boxShadow="0 4px 20px rgba(99,102,241,.5)";}}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-12px)";e.currentTarget.style.boxShadow="0 6px 24px rgba(var(--accent-rgb),.6)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(-10px)";e.currentTarget.style.boxShadow="0 4px 20px rgba(var(--accent-rgb),.5)";}}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
@@ -2720,9 +2720,9 @@ export default function DashboardLayout({
               <Link prefetch={false} href="/dashboard/inventory" style={{
                 flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
                 gap:3, paddingTop:6, textDecoration:"none",
-                color: isInvActive ? "#818cf8" : "rgba(255,255,255,0.4)",
-                background: isInvActive ? "rgba(99,102,241,0.08)" : "transparent",
-                borderTop: isInvActive ? "2px solid #6366f1" : "2px solid transparent",
+                color: isInvActive ? "var(--accent)" : "rgba(255,255,255,0.4)",
+                background: isInvActive ? "rgba(var(--accent-rgb),0.08)" : "transparent",
+                borderTop: isInvActive ? "2px solid var(--accent)" : "2px solid transparent",
                 transition:"color .15s",
               }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
@@ -2735,8 +2735,8 @@ export default function DashboardLayout({
           <button onClick={() => setIsMobileMenuOpen(true)} style={{
             flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
             gap:3, paddingTop:6, background:"transparent", border:"none", cursor:"pointer",
-            color: isMobileMenuOpen ? "#818cf8" : "rgba(255,255,255,0.4)",
-            borderTop: isMobileMenuOpen ? "2px solid #6366f1" : "2px solid transparent",
+            color: isMobileMenuOpen ? "var(--accent)" : "rgba(255,255,255,0.4)",
+            borderTop: isMobileMenuOpen ? "2px solid var(--accent)" : "2px solid transparent",
             transition:"color .15s",
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -2756,7 +2756,7 @@ export default function DashboardLayout({
 
             {/* Header */}
             <div style={{ display:"flex",alignItems:"center",gap:14,marginBottom:24 }}>
-              <div style={{ width:50,height:50,borderRadius:13,background:"linear-gradient(135deg,#4f46e5,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>🏢</div>
+              <div style={{ width:50,height:50,borderRadius:13,background:"linear-gradient(135deg,var(--accent-strong),#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>🏢</div>
               <div>
                 <div style={{ fontSize:18,fontWeight:800,color:"white" }}>{companyDetail?.name || companyName}</div>
                 <div style={{ fontSize:12,color:"rgba(255,255,255,.35)",marginTop:3 }}>
@@ -2768,7 +2768,7 @@ export default function DashboardLayout({
             {/* Status badges */}
             <div style={{ display:"flex",gap:8,marginBottom:20,flexWrap:"wrap" }}>
               {[
-                { label: companyDetail?.plan || "STARTER", color: companyDetail?.plan==="ENTERPRISE"?"#fbbf24":companyDetail?.plan==="PRO"?"#34d399":"#818cf8" },
+                { label: companyDetail?.plan || "STARTER", color: companyDetail?.plan==="ENTERPRISE"?"#fbbf24":companyDetail?.plan==="PRO"?"#34d399":"var(--accent)" },
                 { label: companyDetail?.subscriptionStatus || "ACTIVE", color: companyDetail?.subscriptionStatus==="ACTIVE"?"#34d399":"#f87171" },
               ].map(b => (
                 <span key={b.label} style={{ padding:"4px 14px",borderRadius:20,background:`${b.color}15`,border:`1px solid ${b.color}30`,color:b.color,fontSize:12,fontWeight:700 }}>{b.label}</span>
@@ -2794,11 +2794,11 @@ export default function DashboardLayout({
 
             {/* Active Modules */}
             {companyDetail?.activeModules && (
-              <div style={{ padding:"14px 16px",borderRadius:12,background:"rgba(99,102,241,.07)",border:"1px solid rgba(99,102,241,.2)",marginBottom:16 }}>
-                <div style={{ fontSize:10,fontWeight:700,color:"rgba(99,102,241,.7)",textTransform:"uppercase",letterSpacing:".08em",marginBottom:10 }}>Active Modules</div>
+              <div style={{ padding:"14px 16px",borderRadius:12,background:"rgba(var(--accent-rgb),.07)",border:"1px solid rgba(var(--accent-rgb),.2)",marginBottom:16 }}>
+                <div style={{ fontSize:10,fontWeight:700,color:"rgba(var(--accent-rgb),.7)",textTransform:"uppercase",letterSpacing:".08em",marginBottom:10 }}>Active Modules</div>
                 <div style={{ display:"flex",flexWrap:"wrap",gap:6 }}>
                   {String(companyDetail.activeModules).split(",").filter(Boolean).map((m:string) => (
-                    <span key={m} style={{ padding:"3px 10px",borderRadius:12,background:"rgba(99,102,241,.15)",border:"1px solid rgba(99,102,241,.25)",fontSize:11,color:"#a5b4fc",fontWeight:600 }}>{m.trim()}</span>
+                    <span key={m} style={{ padding:"3px 10px",borderRadius:12,background:"rgba(var(--accent-rgb),.15)",border:"1px solid rgba(var(--accent-rgb),.25)",fontSize:11,color:"var(--accent)",fontWeight:600 }}>{m.trim()}</span>
                   ))}
                 </div>
               </div>
@@ -2806,7 +2806,7 @@ export default function DashboardLayout({
 
             {/* Actions */}
             <div style={{ display:"flex",gap:10,marginTop:4 }}>
-              <a href="/dashboard/company-profile" onClick={()=>setShowCompanyModal(false)} style={{ flex:1,padding:"11px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"white",fontSize:13,fontWeight:700,fontFamily:"inherit",cursor:"pointer",textDecoration:"none",textAlign:"center",display:"block",boxShadow:"0 4px 16px rgba(99,102,241,.3)" }}>
+              <a href="/dashboard/company-profile" onClick={()=>setShowCompanyModal(false)} style={{ flex:1,padding:"11px",borderRadius:10,border:"none",background:"linear-gradient(135deg,var(--accent),var(--accent-strong))",color:"white",fontSize:13,fontWeight:700,fontFamily:"inherit",cursor:"pointer",textDecoration:"none",textAlign:"center",display:"block",boxShadow:"0 4px 16px rgba(var(--accent-rgb),.3)" }}>
                 🏢 Company Profile
               </a>
             </div>
@@ -2838,20 +2838,20 @@ function NavDirectLink({ href, icon, children, pathname, exact }: {
   if (collapsed) {
     return (
       <Link prefetch={false} href={href} title={typeof label === "string" ? label : ""}
-        style={{display:"flex",alignItems:"center",justifyContent:"center",width:44,height:36,borderRadius:9,margin:"1px auto",cursor:"pointer",color:active?"#818cf8":"var(--sidebar-link-muted)",background:active?"rgba(99,102,241,0.15)":"transparent",textDecoration:"none",transition:"all .15s"}}
-        onMouseEnter={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.18)":"rgba(255,255,255,0.06)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.15)":"transparent";}}
+        style={{display:"flex",alignItems:"center",justifyContent:"center",width:44,height:36,borderRadius:9,margin:"1px auto",cursor:"pointer",color:active?"var(--accent)":"var(--sidebar-link-muted)",background:active?"rgba(var(--accent-rgb),0.15)":"transparent",textDecoration:"none",transition:"all .15s"}}
+        onMouseEnter={e=>{e.currentTarget.style.background=active?"rgba(var(--accent-rgb),0.18)":"rgba(255,255,255,0.06)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(var(--accent-rgb),0.15)":"transparent";}}
       ><span style={{display:"flex"}}>{icon}</span></Link>
     );
   }
 
   return (
     <Link prefetch={false} href={href}
-      style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",borderRadius:10,fontSize:13,fontWeight:active?700:500,color:active?"#c7d2fe":"var(--sidebar-link)",background:active?"rgba(99,102,241,0.15)":"transparent",textDecoration:"none",transition:"all .15s",marginBottom:2}}
+      style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",borderRadius:10,fontSize:13,fontWeight:active?700:500,color:active?"var(--accent)":"var(--sidebar-link)",background:active?"rgba(var(--accent-rgb),0.15)":"transparent",textDecoration:"none",transition:"all .15s",marginBottom:2}}
       onMouseEnter={e=>{if(!active){e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.color="var(--sidebar-link-hover)";}}}
       onMouseLeave={e=>{if(!active){e.currentTarget.style.background="transparent";e.currentTarget.style.color="var(--sidebar-link)";}}}
     >
-      <span style={{display:"flex",color:active?"#818cf8":"var(--sidebar-link-muted)",flexShrink:0,transition:"color .15s"}}>{icon}</span>
+      <span style={{display:"flex",color:active?"var(--accent)":"var(--sidebar-link-muted)",flexShrink:0,transition:"color .15s"}}>{icon}</span>
       {label}
     </Link>
   );
@@ -2876,12 +2876,12 @@ function NavGroup({ title, icon, open, onToggle, children }: {
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
           width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
-          color: open ? "#818cf8" : "var(--sidebar-link-muted)",
-          background: open ? "rgba(99,102,241,0.15)" : "transparent",
+          color: open ? "var(--accent)" : "var(--sidebar-link-muted)",
+          background: open ? "rgba(var(--accent-rgb),0.15)" : "transparent",
           transition:"all .15s",
         }}
         onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";e.currentTarget.style.color="var(--sidebar-text)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background=open?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=open?"#818cf8":"var(--sidebar-link-muted)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=open?"rgba(var(--accent-rgb),0.15)":"transparent";e.currentTarget.style.color=open?"var(--accent)":"var(--sidebar-link-muted)";}}
       >
         <span style={{display:"flex",fontSize:16}}>{icon}</span>
       </div>
@@ -2896,20 +2896,20 @@ function NavGroup({ title, icon, open, onToggle, children }: {
         style={{
           display:"flex",alignItems:"center",gap:9,padding:"8px 10px",
           borderRadius:10,cursor:"pointer",userSelect:"none",transition:"all .15s",
-          background: open ? "rgba(99,102,241,0.12)" : "transparent",
+          background: open ? "rgba(var(--accent-rgb),0.12)" : "transparent",
         }}
         onMouseEnter={e => { if (!open) e.currentTarget.style.background="rgba(255,255,255,0.05)";}}
         onMouseLeave={e => { if (!open) e.currentTarget.style.background="transparent";}}
       >
-        <span style={{color: open ? "#818cf8" : "var(--sidebar-link-muted)",display:"flex",flexShrink:0,transition:"color .15s"}}>{icon}</span>
-        <span style={{flex:1,fontSize:12.5,fontWeight:600,color: open ? "#c7d2fe" : "var(--sidebar-link)",transition:"color .15s"}}>{displayTitle}</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={open ? "rgba(129,140,248,0.7)" : "var(--sidebar-link-muted)"} strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s",flexShrink:0}}>
+        <span style={{color: open ? "var(--accent)" : "var(--sidebar-link-muted)",display:"flex",flexShrink:0,transition:"color .15s"}}>{icon}</span>
+        <span style={{flex:1,fontSize:12.5,fontWeight:600,color: open ? "var(--accent)" : "var(--sidebar-link)",transition:"color .15s"}}>{displayTitle}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={open ? "rgba(var(--accent-rgb),0.7)" : "var(--sidebar-link-muted)"} strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s",flexShrink:0}}>
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </div>
       {/* Children — indented */}
       {open && (
-        <div style={{marginTop:2,marginBottom:4,marginLeft:12,paddingLeft:10,borderLeft:"1px solid rgba(99,102,241,0.18)"}}>
+        <div style={{marginTop:2,marginBottom:4,marginLeft:12,paddingLeft:10,borderLeft:"1px solid rgba(var(--accent-rgb),0.18)"}}>
           {children}
         </div>
       )}
@@ -2932,13 +2932,13 @@ function NavSubGroup({ title, open, onToggle, children }: {
         onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";}}
         onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}
       >
-        <span style={{fontSize:10,fontWeight:700,color:"#818cf8",letterSpacing:".06em",textTransform:"uppercase"}}>{displayTitle}</span>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(99,102,241,0.4)" strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .15s"}}>
+        <span style={{fontSize:10,fontWeight:700,color:"var(--accent)",letterSpacing:".06em",textTransform:"uppercase"}}>{displayTitle}</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--accent-rgb),0.4)" strokeWidth="2.5" style={{transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .15s"}}>
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </div>
       {open && (
-        <div style={{marginLeft:8,borderLeft:"1px solid rgba(99,102,241,0.15)",paddingLeft:8,marginTop:1}}>
+        <div style={{marginLeft:8,borderLeft:"1px solid rgba(var(--accent-rgb),0.15)",paddingLeft:8,marginTop:1}}>
           {children}
         </div>
       )}
@@ -2996,12 +2996,12 @@ function NavLink({ href, children, pathname }: {
         style={{
           display:"flex", alignItems:"center", justifyContent:"center",
           width:44, height:36, borderRadius:8, margin:"1px auto", cursor:"pointer",
-          color: active ? "#818cf8" : "var(--sidebar-link)",
-          background: active ? "rgba(99,102,241,0.15)" : "transparent",
+          color: active ? "var(--accent)" : "var(--sidebar-link)",
+          background: active ? "rgba(var(--accent-rgb),0.15)" : "transparent",
           textDecoration:"none", transition:"all .15s",
         }}
         onMouseEnter={e=>{e.currentTarget.style.background="var(--sidebar-hover-bg)";e.currentTarget.style.color="var(--sidebar-text)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(99,102,241,0.15)":"transparent";e.currentTarget.style.color=active?"#818cf8":"var(--sidebar-link)";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=active?"rgba(var(--accent-rgb),0.15)":"transparent";e.currentTarget.style.color=active?"var(--accent)":"var(--sidebar-link)";}}
       >
         <span style={{display:"flex",fontSize:16}}>{collapsedIcon}</span>
       </Link>
@@ -3014,8 +3014,8 @@ function NavLink({ href, children, pathname }: {
       prefetch={false}
       style={{
         display:"flex",alignItems:"center",gap:8,padding:"7px 10px",borderRadius:9,fontSize:12.5,
-        color: active ? "#c7d2fe" : "var(--sidebar-link)",
-        background: active ? "rgba(99,102,241,0.15)" : "transparent",
+        color: active ? "var(--accent)" : "var(--sidebar-link)",
+        background: active ? "rgba(var(--accent-rgb),0.15)" : "transparent",
         fontWeight: active ? 600 : 400,
         textDecoration:"none",transition:"all .15s",
         marginBottom:1,

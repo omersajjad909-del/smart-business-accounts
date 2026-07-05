@@ -56,7 +56,8 @@ export default function AppearancePage() {
     document.documentElement.style.setProperty("--accent", preset.accent);
     document.documentElement.style.setProperty("--accent-strong", preset.accentStrong);
     document.documentElement.style.setProperty("--accent-soft", preset.accentSoft);
-  }, [preset.accent, preset.accentStrong, preset.accentSoft]);
+    document.documentElement.style.setProperty("--accent-rgb", preset.accentRgb);
+  }, [preset.accent, preset.accentStrong, preset.accentSoft, preset.accentRgb]);
 
   useEffect(() => {
     // Apply theme mode preview

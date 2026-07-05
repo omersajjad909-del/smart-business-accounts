@@ -450,9 +450,8 @@ html.dark .dashboard-root {
   --text-primary: #e8ecf5;
   --text-muted:   #8899bb;
 
-  --accent:       #6366f1;
-  --accent-strong:#4f46e5;
-  --accent-soft:  rgba(99,102,241,0.12);
+  /* --accent, --accent-strong, --accent-soft are set dynamically by AppearanceApplier
+     via JS on <html>. Do not override them here — it would break brand color theming. */
 
   --success: #34d399;
   --warning: #fbbf24;

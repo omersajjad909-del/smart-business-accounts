@@ -63,6 +63,7 @@ export default function AppearanceApplier() {
           root.style.setProperty("--accent", p.accent);
           root.style.setProperty("--accent-strong", p.accentStrong);
           root.style.setProperty("--accent-soft", p.accentSoft);
+          root.style.setProperty("--accent-rgb", p.accentRgb);
         }
       } catch {
         // silent — defaults remain

@@ -17,6 +17,7 @@ export type BrandPreset = {
   accent: string;         // main accent (buttons, active states)
   accentStrong: string;   // hover / pressed
   accentSoft: string;     // rgba tint for backgrounds
+  accentRgb: string;      // raw "R, G, B" for use in rgba(var(--accent-rgb), alpha)
 };
 
 export const BRAND_PRESETS: Record<BrandKey, BrandPreset> = {
@@ -26,6 +27,7 @@ export const BRAND_PRESETS: Record<BrandKey, BrandPreset> = {
     accent: "#0d9488",
     accentStrong: "#0f766e",
     accentSoft: "rgba(13, 148, 136, 0.1)",
+    accentRgb: "13, 148, 136",
   },
   indigo: {
     key: "indigo",
@@ -33,6 +35,7 @@ export const BRAND_PRESETS: Record<BrandKey, BrandPreset> = {
     accent: "#4f46e5",
     accentStrong: "#4338ca",
     accentSoft: "rgba(79, 70, 229, 0.1)",
+    accentRgb: "79, 70, 229",
   },
   purple: {
     key: "purple",
@@ -40,6 +43,7 @@ export const BRAND_PRESETS: Record<BrandKey, BrandPreset> = {
     accent: "#7c3aed",
     accentStrong: "#6d28d9",
     accentSoft: "rgba(124, 58, 237, 0.1)",
+    accentRgb: "124, 58, 237",
   },
   blue: {
     key: "blue",
@@ -47,6 +51,7 @@ export const BRAND_PRESETS: Record<BrandKey, BrandPreset> = {
     accent: "#2563eb",
     accentStrong: "#1d4ed8",
     accentSoft: "rgba(37, 99, 235, 0.1)",
+    accentRgb: "37, 99, 235",
   },
   green: {
     key: "green",
@@ -54,6 +59,7 @@ export const BRAND_PRESETS: Record<BrandKey, BrandPreset> = {
     accent: "#16a34a",
     accentStrong: "#15803d",
     accentSoft: "rgba(22, 163, 74, 0.1)",
+    accentRgb: "22, 163, 74",
   },
   orange: {
     key: "orange",
@@ -61,6 +67,7 @@ export const BRAND_PRESETS: Record<BrandKey, BrandPreset> = {
     accent: "#ea580c",
     accentStrong: "#c2410c",
     accentSoft: "rgba(234, 88, 12, 0.1)",
+    accentRgb: "234, 88, 12",
   },
   rose: {
     key: "rose",
@@ -68,6 +75,7 @@ export const BRAND_PRESETS: Record<BrandKey, BrandPreset> = {
     accent: "#e11d48",
     accentStrong: "#be123c",
     accentSoft: "rgba(225, 29, 72, 0.1)",
+    accentRgb: "225, 29, 72",
   },
   slate: {
     key: "slate",
@@ -75,6 +83,7 @@ export const BRAND_PRESETS: Record<BrandKey, BrandPreset> = {
     accent: "#475569",
     accentStrong: "#334155",
     accentSoft: "rgba(71, 85, 105, 0.1)",
+    accentRgb: "71, 85, 105",
   },
 };
 
