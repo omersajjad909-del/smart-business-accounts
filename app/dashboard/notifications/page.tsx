@@ -59,7 +59,7 @@ export default function NotificationsPage() {
 
     fetch("/api/company/comms-config", { headers: h }).then(r => r.ok ? r.json() : null).then(data => {
       if (!data) return;
-      if (data.whatsapp) setWa(w => ({ ...w, ...data.whatsapp, token: data.whatsapp.token === "********" ? "********" : (data.whatsapp.token || "") }));
+      if (data.whatsapp) setWa(w => ({ ...w, ...data.whatsapp, token: data.whatsapp.token === "********" ? "" : (data.whatsapp.token || "") }));
       if (data.email)    setEmail(e => ({ ...e, ...data.email, pass: data.email.pass === "********" ? e.pass : (data.email.pass || "") }));
     }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,7 +72,7 @@ export default function NotificationsPage() {
       const h = getHeaders();
       const res = await fetch("/api/company/comms-config", {
         method: "POST", headers: h,
-        body: JSON.stringify({ whatsapp: { enabled: wa.enabled, provider: "meta", token: wa.token || undefined, phoneId: wa.phoneId, apiVersion: wa.apiVersion } }),
+        body: JSON.stringify({ whatsapp: { enabled: wa.enabled, provider: "meta", token: wa.token.replace(/^\*+/, "").trim() || undefined, phoneId: wa.phoneId, apiVersion: wa.apiVersion } }),
       });
       if (!res.ok) throw new Error((await res.json()).error || "Save failed");
       toast.success("WhatsApp configuration saved securely.");
@@ -128,7 +128,7 @@ export default function NotificationsPage() {
       const h = getHeaders();
       const res = await fetch("/api/notifications/test", { method: "POST", headers: h, body: JSON.stringify({ channel: ch, phone: testDest }) });
       const d = await res.json();
-      setTestResult({ ok: !!d.success, msg: d.success ? `Test ${ch} message sent successfully!` : (d.error || "Failed to send") });
+      setTestResult({ ok: !!d.success, msg: d.success ? `Test ${ch} message sent successfully!` : (d.error || "Failed to send") + (d.companyId ? ` [cid:${d.companyId}]` : "") });
     } catch {
       setTestResult({ ok: false, msg: "Network error" });
     } finally {

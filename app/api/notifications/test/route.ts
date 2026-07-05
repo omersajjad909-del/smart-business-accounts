@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
     if (channel === "whatsapp") {
       const result = await sendWhatsApp(companyId || "", { to: phone, type: "text", text: testMsg });
-      return NextResponse.json({ success: result.success, error: result.success ? null : "WhatsApp not configured for this company" });
+      return NextResponse.json({ success: result.success, error: result.success ? null : result.error, companyId });
     }
 
     if (channel === "sms") {
