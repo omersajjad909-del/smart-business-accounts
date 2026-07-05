@@ -197,10 +197,8 @@ export function PrintDocA4({
           {rows.map((row, i) => (
             <tr
               key={i}
-              style={{
-                background: i % 2 === 1 ? "#f7f7f7" : "#fff",
-                borderBottom: "1px solid #ddd",
-              }}
+              className={i % 2 === 1 ? "print-row-alt" : undefined}
+              style={{ borderBottom: "1px solid #ddd" }}
             >
               {columns.map((c, ci) => (
                 <td
@@ -292,7 +290,7 @@ export function PrintDocA4({
 
       {/* ── Footer ───────────────────────────────────────────────── */}
       {footerNote && (
-        <div style={{ textAlign: "center", borderTop: "1px solid #ddd", paddingTop: 8, marginTop: 14, fontSize: 8.5, color: "#777" }}>
+        <div className="print-footer-note" style={{ textAlign: "center", borderTop: "1px solid #ddd", paddingTop: 8, marginTop: 14, fontSize: 8.5, color: "#777" }}>
           {footerNote}
         </div>
       )}
@@ -306,6 +304,32 @@ export function PrintPaperWrapper({ children }: { children: React.ReactNode }) {
   return (
     <>
       <style>{`
+        /* Force B&W colors — override any dark-mode or accent CSS */
+        .print-doc-a4 {
+          color: #000 !important;
+          background: #fff !important;
+          font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
+        }
+        .print-doc-a4 * {
+          color: #000 !important;
+          background-color: transparent !important;
+          font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
+          border-color: #ddd !important;
+        }
+        .print-doc-a4 thead th {
+          background-color: #000 !important;
+          color: #fff !important;
+          border-color: #333 !important;
+        }
+        .print-doc-a4 .print-row-alt td {
+          background-color: #f7f7f7 !important;
+        }
+        .print-doc-a4 .print-footer-note {
+          color: #777 !important;
+        }
+        .print-doc-a4 .print-muted {
+          color: #555 !important;
+        }
         @media screen {
           .print-paper-wrapper {
             background: #e8e8e8;
