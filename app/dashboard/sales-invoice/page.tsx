@@ -389,74 +389,94 @@ function SalesInvoiceContent() {
 
     const customerPhone = selectedCustomer?.phone || (savedInvoice.customer as any)?.phone;
 
-    // Generate professional PDF
+    // Generate B&W professional PDF for WhatsApp
     const { jsPDF } = await import("jspdf");
     const autoTable = (await import("jspdf-autotable")).default;
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
-    const accentRGB: [number, number, number] = [99, 102, 241];
 
-    // Header band
-    doc.setFillColor(...accentRGB);
-    doc.rect(0, 0, pageW, 38, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
+    // Header — B&W
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(14, 8, pageW - 14, 8);
+    doc.setTextColor(0);
+    doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
-    doc.text(companyInfo?.name || "FinovaOS", 14, 16);
-    doc.setFontSize(10);
+    doc.text("SALES INVOICE", pageW / 2, 18, { align: "center" });
+    doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
-    doc.text("SALES INVOICE", pageW - 14, 16, { align: "right" });
-    doc.text(`No: ${savedInvoice.invoiceNo}`, pageW - 14, 24, { align: "right" });
-    doc.text(`Date: ${fmtDate(savedInvoice.date)}`, pageW - 14, 31, { align: "right" });
+    doc.text(companyInfo?.name || "", pageW / 2, 25, { align: "center" });
+    if (companyInfo?.phone) { doc.setFontSize(9); doc.text(`Tel: ${companyInfo.phone}`, pageW / 2, 30, { align: "center" }); }
+    doc.line(14, 34, pageW - 14, 34);
+
+    // Invoice meta
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Invoice No: ${savedInvoice.invoiceNo}`, 14, 42);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Date: ${fmtDate(savedInvoice.date)}`, 14, 48);
 
     // Bill To
-    doc.setTextColor(60, 60, 60);
-    doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
-    doc.text("BILL TO", 14, 50);
+    doc.setFontSize(9);
+    doc.text("BILL TO:", pageW - 14, 42, { align: "right" });
     doc.setFont("helvetica", "normal");
-    doc.text(customerName, 14, 57);
-    if (selectedCustomer?.address) doc.text(selectedCustomer.address, 14, 63);
-    if (customerPhone) doc.text(`Tel: ${customerPhone}`, 14, 69);
+    doc.text(customerName, pageW - 14, 48, { align: "right" });
+    if (selectedCustomer?.address) doc.text(selectedCustomer.address, pageW - 14, 53, { align: "right" });
+    if (customerPhone) doc.text(`Tel: ${customerPhone}`, pageW - 14, 58, { align: "right" });
 
-    // Items table
+    // Items table — B&W
     autoTable(doc, {
-      startY: 80,
-      head: [["#", "Item Description", "Qty", "Unit Price", "Amount"]],
+      startY: 65,
+      head: [["#", "Item Description", "Qty", "Unit", "Rate", "Amount"]],
       body: savedInvoice.items.map((it: any, i: number) => [
         i + 1,
         it.item?.name || "",
         it.qty,
+        it.item?.unit || "",
         fmt(Number(it.rate)),
         fmt(Number(it.qty) * Number(it.rate)),
       ]),
       theme: "grid",
-      headStyles: { fillColor: accentRGB, textColor: [255, 255, 255], fontSize: 9, fontStyle: "bold" },
-      bodyStyles: { fontSize: 9, textColor: [40, 40, 40] },
-      alternateRowStyles: { fillColor: [245, 245, 255] },
+      headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255], fontSize: 9, fontStyle: "bold" },
+      bodyStyles: { fontSize: 9, textColor: [0, 0, 0] },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
       columnStyles: {
-        0: { halign: "center", cellWidth: 12 },
-        2: { halign: "center", cellWidth: 20 },
-        3: { halign: "right", cellWidth: 32 },
-        4: { halign: "right", cellWidth: 32 },
+        0: { halign: "center", cellWidth: 10 },
+        2: { halign: "center", cellWidth: 18 },
+        3: { halign: "center", cellWidth: 18 },
+        4: { halign: "right", cellWidth: 28 },
+        5: { halign: "right", cellWidth: 28 },
       },
       margin: { left: 14, right: 14 },
     });
 
-    // Total box
-    const finalY = (doc as any).lastAutoTable.finalY + 6;
-    doc.setFillColor(...accentRGB);
-    doc.roundedRect(pageW - 80, finalY, 66, 12, 2, 2, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "bold");
-    doc.text(`Total: ${fmt(savedInvoice.total)}`, pageW - 16, finalY + 8, { align: "right" });
+    // Totals section — full details
+    let ty = (doc as any).lastAutoTable.finalY + 6;
+    const totalsData: [string, string][] = [];
+    if (invSubtotal > 0) totalsData.push(["Subtotal:", fmt(invSubtotal)]);
+    if (invDiscount > 0) totalsData.push(["Discount:", `-${fmt(invDiscount)}`]);
+    if (invTax > 0) totalsData.push(["Tax:", fmt(invTax)]);
+    if (invFreight > 0) totalsData.push(["Freight:", fmt(invFreight)]);
+    totalsData.push(["TOTAL:", fmt(invTotal)]);
+
+    totalsData.forEach(([label, value], i) => {
+      const isTotal = i === totalsData.length - 1;
+      if (isTotal) { doc.setDrawColor(0); doc.line(pageW - 80, ty - 1, pageW - 14, ty - 1); }
+      doc.setFont("helvetica", isTotal ? "bold" : "normal");
+      doc.setFontSize(isTotal ? 11 : 9);
+      doc.setTextColor(0);
+      doc.text(label, pageW - 50, ty + 5, { align: "right" });
+      doc.text(value, pageW - 14, ty + 5, { align: "right" });
+      ty += isTotal ? 8 : 6;
+    });
 
     // Footer
-    doc.setTextColor(160, 160, 160);
+    doc.setTextColor(120);
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.text("Generated by FinovaOS Business Suite", pageW / 2, 287, { align: "center" });
+    doc.line(14, 283, pageW - 14, 283);
+    doc.text("Generated by FinovaOS Business Suite", pageW / 2, 288, { align: "center" });
 
     const pdfBase64 = doc.output("datauristring").split(",")[1];
 
