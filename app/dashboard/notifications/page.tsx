@@ -59,7 +59,7 @@ export default function NotificationsPage() {
 
     fetch("/api/company/comms-config", { headers: h }).then(r => r.ok ? r.json() : null).then(data => {
       if (!data) return;
-      if (data.whatsapp) setWa(w => ({ ...w, ...data.whatsapp, token: data.whatsapp.token === "********" ? w.token : (data.whatsapp.token || "") }));
+      if (data.whatsapp) setWa(w => ({ ...w, ...data.whatsapp, token: data.whatsapp.token === "********" ? "********" : (data.whatsapp.token || "") }));
       if (data.email)    setEmail(e => ({ ...e, ...data.email, pass: data.email.pass === "********" ? e.pass : (data.email.pass || "") }));
     }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
