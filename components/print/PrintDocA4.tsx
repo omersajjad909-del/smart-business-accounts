@@ -93,27 +93,27 @@ export function PrintDocA4({
     <div className="print-doc-a4" style={{ width: "210mm", minHeight: "297mm", boxSizing: "border-box", margin: "0 auto", background: "#fff" }}>
 
       {/* ── Coloured header band ─────────────────────────────────── */}
-      <div className="pdoc-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "14px 20px 14px", marginBottom: 0 }}>
+      <div className="pdoc-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "14px 20px 14px", marginBottom: 0, backgroundColor: "#1e293b", color: "#ffffff" }}>
         <div>
           {showLogo && logoUrl
             ? <img src={logoUrl} alt="logo" style={{ maxHeight: 44, maxWidth: 130, marginBottom: 6, objectFit: "contain" }} />
             : null}
-          <div style={{ fontWeight: "bold", fontSize: 18, letterSpacing: 0.3 }}>{companyName}</div>
-          {companyAddress && <div className="pdoc-muted" style={{ fontSize: 9.5, marginTop: 2 }}>{companyAddress}</div>}
-          {companyPhone && <div className="pdoc-muted" style={{ fontSize: 9.5 }}>Tel: {companyPhone}</div>}
-          {companyEmail && <div className="pdoc-muted" style={{ fontSize: 9.5 }}>{companyEmail}</div>}
+          <div style={{ fontWeight: "bold", fontSize: 18, letterSpacing: 0.3, color: "#ffffff" }}>{companyName}</div>
+          {companyAddress && <div style={{ fontSize: 9.5, marginTop: 2, color: "#94a3b8" }}>{companyAddress}</div>}
+          {companyPhone && <div style={{ fontSize: 9.5, color: "#94a3b8" }}>Tel: {companyPhone}</div>}
+          {companyEmail && <div style={{ fontSize: 9.5, color: "#94a3b8" }}>{companyEmail}</div>}
         </div>
         <div style={{ textAlign: "right" }}>
-          <div style={{ fontWeight: "bold", fontSize: 22, letterSpacing: 1.5, textTransform: "uppercase" }}>{docTitle}</div>
-          <div style={{ fontSize: 11, marginTop: 6 }}>
-            <span className="pdoc-muted">No: </span><strong>{docNo}</strong>
+          <div style={{ fontWeight: "bold", fontSize: 22, letterSpacing: 1.5, textTransform: "uppercase", color: "#ffffff" }}>{docTitle}</div>
+          <div style={{ fontSize: 11, marginTop: 6, color: "#ffffff" }}>
+            <span style={{ color: "#94a3b8" }}>No: </span><strong style={{ color: "#ffffff" }}>{docNo}</strong>
           </div>
-          <div style={{ fontSize: 10.5, marginTop: 2 }}>
-            <span className="pdoc-muted">Date: </span>{date}
+          <div style={{ fontSize: 10.5, marginTop: 2, color: "#ffffff" }}>
+            <span style={{ color: "#94a3b8" }}>Date: </span><span style={{ color: "#ffffff" }}>{date}</span>
           </div>
-          {dueDate && <div style={{ fontSize: 10.5, marginTop: 2 }}><span className="pdoc-muted">Due: </span>{dueDate}</div>}
+          {dueDate && <div style={{ fontSize: 10.5, marginTop: 2, color: "#ffffff" }}><span style={{ color: "#94a3b8" }}>Due: </span><span style={{ color: "#ffffff" }}>{dueDate}</span></div>}
           {status && (
-            <div className="pdoc-status-badge" style={{ display: "inline-block", border: "1px solid #fff", padding: "2px 10px", borderRadius: 3, fontSize: 9.5, fontWeight: "bold", marginTop: 6, letterSpacing: 0.5 }}>
+            <div style={{ display: "inline-block", border: "1px solid #94a3b8", padding: "2px 10px", borderRadius: 3, fontSize: 9.5, fontWeight: "bold", marginTop: 6, letterSpacing: 0.5, color: "#ffffff" }}>
               {status.toUpperCase()}
             </div>
           )}
@@ -146,9 +146,9 @@ export function PrintDocA4({
         {/* Items Table */}
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12, fontSize: 9.5 }}>
           <thead>
-            <tr>
+            <tr style={{ backgroundColor: "#334155" }}>
               {columns.map((c, i) => (
-                <th key={c.key} style={{ padding: "7px 8px", textAlign: (c.align || "left") as any, fontWeight: "bold", fontSize: 9, letterSpacing: 0.4, textTransform: "uppercase", width: c.width, borderRight: i < columns.length - 1 ? "1px solid rgba(255,255,255,0.2)" : undefined }}>
+                <th key={c.key} style={{ padding: "7px 8px", textAlign: (c.align || "left") as any, fontWeight: "bold", fontSize: 9, letterSpacing: 0.4, textTransform: "uppercase", width: c.width, backgroundColor: "#334155", color: "#ffffff", borderRight: i < columns.length - 1 ? "1px solid #475569" : undefined }}>
                   {c.label}
                 </th>
               ))}
@@ -156,9 +156,9 @@ export function PrintDocA4({
           </thead>
           <tbody>
             {rows.map((row, i) => (
-              <tr key={i} className={i % 2 === 1 ? "print-row-alt" : undefined} style={{ borderBottom: "1px solid #e2e8f0" }}>
+              <tr key={i} style={{ borderBottom: "1px solid #e2e8f0", backgroundColor: i % 2 === 1 ? "#f8fafc" : "#ffffff" }}>
                 {columns.map((c, ci) => (
-                  <td key={c.key} style={{ padding: "5px 8px", textAlign: (c.align || "left") as any, borderRight: ci < columns.length - 1 ? "1px solid #e2e8f0" : undefined, verticalAlign: "middle" }}>
+                  <td key={c.key} style={{ padding: "5px 8px", textAlign: (c.align || "left") as any, borderRight: ci < columns.length - 1 ? "1px solid #e2e8f0" : undefined, verticalAlign: "middle", color: "#1e293b" }}>
                     {c.render ? c.render(row[c.key], row, i) : (row[c.key] ?? "")}
                   </td>
                 ))}
