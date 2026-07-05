@@ -450,55 +450,70 @@ export default function SalesReturnPage() {
         {/* Preview */}
         {showForm && preview && savedData && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "14px 20px", display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button onClick={() => window.print()} style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: "#16a34a", color: "#fff", fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Print Voucher</button>
-              <button onClick={() => { setPreview(false); resetForm(); }} style={{ padding: "9px 18px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 13, cursor: "pointer" }}>New Return</button>
+            <div className="no-print">
+              <PrintActionBar
+                onPrintA4={() => window.print()}
+                onWhatsApp={() => {
+                  const msg = `*SALES RETURN VOUCHER: ${savedData.returnNo}*\nDate: ${savedData.date}\nCustomer: ${savedData.customerName}\nRef Invoice: ${savedData.invoiceNo}\n\nTotal: ${fmt(savedData.netTotal)}`;
+                  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+                }}
+                onEmail={() => {
+                  const email = prompt("Customer email:");
+                  if (!email?.includes("@")) return;
+                  fetch("/api/email/send", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      type: "generic",
+                      to: email,
+                      subject: `Sales Return Voucher ${savedData.returnNo}`,
+                      html: `<p>Dear ${savedData.customerName},</p><p>Your Sales Return Voucher <strong>${savedData.returnNo}</strong> dated ${savedData.date} has been processed.</p><p>Net Total: ${fmt(savedData.netTotal)}</p>`,
+                    }),
+                  }).then(r => r.ok ? toast.success("Email sent!") : toast.error("Email failed")).catch(() => toast.error("Email failed"));
+                }}
+                onEdit={() => setPreview(false)}
+                onNew={() => { setPreview(false); resetForm(); }}
+                newLabel="New Return"
+              />
             </div>
-            <div style={{ background: "#fff", color: "#111", borderRadius: 14, padding: 40, fontFamily: "'Outfit','Arial',sans-serif", boxShadow: "0 8px 40px rgba(0,0,0,0.2)", maxWidth: 800, margin: "0 auto", width: "100%" }}>
-              <div style={{ textAlign: "center", borderBottom: "3px solid #111", paddingBottom: 16, marginBottom: 24 }}>
-                <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: 1 }}>SALES RETURN VOUCHER</div>
-                <div style={{ fontSize: 13, color: "#555", marginTop: 4 }}>Date: {savedData.date} &nbsp;|&nbsp; Voucher No: {savedData.returnNo}</div>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20, fontSize: 14 }}>
-                <div><strong>Customer:</strong> {savedData.customerName}</div>
-                <div><strong>Ref Invoice:</strong> {savedData.invoiceNo}</div>
-                {savedData.driverName && <div><strong>Driver / Person:</strong> {savedData.driverName}</div>}
-                {savedData.vehicleNo  && <div><strong>Vehicle No:</strong> {savedData.vehicleNo}</div>}
-                {savedData.remarks    && <div style={{ gridColumn: "1 / -1" }}><strong>Reason:</strong> {savedData.remarks}</div>}
-              </div>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, marginBottom: 24 }}>
-                <thead>
-                  <tr style={{ borderTop: "2px solid #111", borderBottom: "2px solid #111", background: "#f5f5f5" }}>
-                    <th style={{ padding: "10px 12px", textAlign: "left" }}>Description</th>
-                    <th style={{ padding: "10px 12px", textAlign: "center", width: 80 }}>Qty</th>
-                    <th style={{ padding: "10px 12px", textAlign: "right", width: 100 }}>Rate</th>
-                    <th style={{ padding: "10px 12px", textAlign: "right", width: 110 }}>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {savedData.items.map((it, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid #e5e5e5" }}>
-                      <td style={{ padding: "10px 12px", fontWeight: 600 }}>{it.name}</td>
-                      <td style={{ padding: "10px 12px", textAlign: "center" }}>{it.qty}</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right" }}>{fmt(it.rate)}</td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontWeight: 600 }}>{fmt(it.qty * it.rate)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 32 }}>
-                <div style={{ width: 260, fontSize: 13 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Subtotal</span><span>{fmt(savedData.total)}</span></div>
-                  {(savedData.freight || 0) > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Freight</span><span>{fmt(savedData.freight || 0)}</span></div>}
-                  <div style={{ display: "flex", justifyContent: "space-between", borderTop: "3px solid #111", paddingTop: 10, fontWeight: 900, fontSize: 17 }}><span>Net Total</span><span>{fmt(savedData.netTotal)}</span></div>
-                </div>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40 }}>
-                {["Prepared By", "Received By"].map(l => (
-                  <div key={l}><div style={{ borderTop: "1px solid #111", paddingTop: 8, fontSize: 12, color: "#555" }}>{l}</div></div>
-                ))}
-              </div>
-            </div>
+            <PrintPaperWrapper>
+              <PrintDocA4
+                companyName={companyInfo?.name || "Company Name"}
+                companyAddress={companyInfo?.address}
+                companyPhone={companyInfo?.phone}
+                docTitle="SALES RETURN VOUCHER"
+                docNo={savedData.returnNo}
+                date={savedData.date}
+                partyLabel="Customer"
+                partyName={savedData.customerName}
+                metaFields={[
+                  { label: "Ref Invoice", value: savedData.invoiceNo },
+                  ...(savedData.driverName ? [{ label: "Driver", value: savedData.driverName }] : []),
+                  ...(savedData.vehicleNo ? [{ label: "Vehicle", value: savedData.vehicleNo }] : []),
+                ]}
+                columns={[
+                  { key: "no", label: "#", align: "center", width: 30 },
+                  { key: "name", label: "Description" },
+                  { key: "qty", label: "Qty", align: "center", width: 70 },
+                  { key: "rate", label: "Rate", align: "right", width: 80 },
+                  { key: "amount", label: "Amount", align: "right", width: 90 },
+                ]}
+                rows={savedData.items.map((it, idx) => ({
+                  no: idx + 1,
+                  name: it.name,
+                  qty: it.qty,
+                  rate: fmt(it.rate),
+                  amount: fmt(it.qty * it.rate),
+                }))}
+                totalsLines={[
+                  { label: "Subtotal:", value: savedData.total },
+                  ...(savedData.freight > 0 ? [{ label: "Freight:", value: savedData.freight }] : []),
+                  { label: "Net Total:", value: savedData.netTotal, bold: true, borderTop: true },
+                ]}
+                notes={savedData.remarks || undefined}
+                signatureLabels={["Received By", "Authorized By"]}
+              />
+            </PrintPaperWrapper>
           </div>
         )}
       </div>
