@@ -544,7 +544,7 @@ export async function PUT(req: NextRequest) {
       }
 
       return invoice;
-    });
+    }, { timeout: 30000 });
 
     return NextResponse.json({ success: true, invoice: result });
   } catch (e: any) {
@@ -618,7 +618,7 @@ export async function DELETE(req: NextRequest) {
 
       await tx.salesInvoiceItem.deleteMany({ where: { invoiceId: id } });
       await tx.salesInvoice.delete({ where: { id } });
-    });
+    }, { timeout: 30000 });
 
     return NextResponse.json({ success: true });
   } catch (e: any) {
