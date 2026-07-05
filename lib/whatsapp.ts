@@ -27,13 +27,14 @@ export async function sendWhatsApp(
 
     const { token, phoneId, apiVersion = "v18.0" } = config.whatsapp;
     const url = `https://graph.facebook.com/${apiVersion}/${phoneId}/messages`;
+    const to = formatPhone(message.to);
 
     let body: Record<string, unknown>;
 
     if (message.type === "template") {
       body = {
         messaging_product: "whatsapp",
-        to: message.to,
+        to,
         type: "template",
         template: {
           name: message.templateName,
@@ -46,7 +47,7 @@ export async function sendWhatsApp(
     } else {
       body = {
         messaging_product: "whatsapp",
-        to: message.to,
+        to,
         type: "text",
         text: { body: message.text || "" },
       };
@@ -66,7 +67,7 @@ export async function sendWhatsApp(
   }
 }
 
-// Format Pakistani number: 03001234567 → 923001234567
+// Normalize phone for WhatsApp API: strips +, spaces, dashes → e.g. 923001234567
 export function formatPhone(phone: string): string {
   let n = phone.replace(/[\s\-\+\(\)]/g, "");
   if (n.startsWith("0") && n.length === 11) n = "92" + n.slice(1);
