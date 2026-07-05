@@ -2,6 +2,8 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
+import { PrintActionBar } from "@/components/print/PrintActionBar";
+import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -804,14 +806,30 @@ const [searchTerm, setSearchTerm] = useState("");
             {piQueryMode ? "Cancel Query" : "Query Mode"}
           </button>
           {showPreview && (
-            <>
-              <button onClick={() => { setPrintMode("a4"); setTimeout(() => window.print(), 150); }} style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${BORDER}`, background: PANEL, color: TEXT, fontFamily: FONT, fontSize: 12.5, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                Print
-              </button>
-              <button onClick={sendInvoiceEmail} disabled={sendingEmail} style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: "rgba(99,102,241,.12)", color: ACCENT, fontFamily: FONT, fontSize: 12.5, fontWeight: 700, cursor: sendingEmail?"not-allowed":"pointer", opacity: sendingEmail?0.7:1 }}>{sendingEmail?"Sending…":"Email"}</button>
-              <button onClick={() => setShowPreview(false)} style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, fontFamily: FONT, fontSize: 12.5, cursor: "pointer" }}>Back to Edit</button>
-            </>
+            <PrintActionBar
+              onPrintA4={() => { setPrintMode("a4"); setTimeout(() => window.print(), 100); }}
+              onPrintThermal={() => { setPrintMode("55mm"); setTimeout(() => window.print(), 100); }}
+              thermalLabel="55mm"
+              onEmail={sendInvoiceEmail}
+              onWhatsApp={() => {
+                if (!savedInvoiceId) { toast.error("Please save the invoice first"); return; }
+                const supplier = suppliers.find(s => s.id === supplierId);
+                const phone = (supplier as any)?.phone || "";
+                let msg = `*Purchase Invoice: ${invoiceId}*\n`;
+                msg += `Date: ${fmtDate(date)}\n`;
+                msg += `Supplier: ${supplierName}\n\n`;
+                msg += `*Items:*\n`;
+                rows.filter(r => r.name).forEach((r, i) => {
+                  msg += `${i + 1}. ${r.name} x ${r.qty} @ ${Number(r.rate).toLocaleString()} = ${(Number(r.qty) * Number(r.rate)).toLocaleString()}\n`;
+                });
+                msg += `\n*Total: ${netTotal.toLocaleString()}*`;
+                const base = phone ? `https://wa.me/${phone.replace(/\D/g, "")}` : "https://wa.me/";
+                window.open(`${base}?text=${encodeURIComponent(msg)}`, "_blank");
+              }}
+              onEdit={() => setShowPreview(false)}
+              onNew={() => { setShowPreview(false); resetForm(); }}
+              newLabel="New Purchase Invoice"
+            />
           )}
           <button onClick={() => { setShowList(!showList); setShowForm(showList); setEditing(null); }}
             style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${BORDER}`, background: showList ? "rgba(99,102,241,0.1)" : PANEL, color: showList ? ACCENT : TEXT, fontFamily: FONT, fontSize: 12.5, fontWeight: 600, cursor: "pointer" }}>
@@ -1331,216 +1349,59 @@ const [searchTerm, setSearchTerm] = useState("");
           )}
 
           {/* ── A4 PREVIEW ── */}
-          {showPreview && (printMode === "none" || printMode === "a4") && (() => {
-            const showDisc = perItemDiscountAmt > 0 || discountAmt > 0;
-            const statusStyle = (s: string) => s === "APPROVED"
-              ? { bg:"#dcfce7", color:"#166534", border:"#bbf7d0" }
-              : s === "REJECTED"
-              ? { bg:"#fee2e2", color:"#991b1b", border:"#fca5a5" }
-              : s === "DRAFT"
-              ? { bg:"#f1f5f9", color:"#475569", border:"#cbd5e1" }
-              : { bg:"#fef9c3", color:"#713f12", border:"#fde68a" };
-            const ss = statusStyle(approvalStatus);
-            return (
-            <div className="pi-print pi-a4" style={{
-              background: "white", color: "#111",
-              fontFamily: "'Outfit','Inter',sans-serif",
-              borderRadius: 14, overflow: "hidden",
-              boxShadow: "0 8px 50px rgba(0,0,0,0.25)",
-              maxWidth: 860, margin: "0 auto 32px",
-            }}>
-              {/* Accent strip */}
-              <div style={{ height: 5, background: "linear-gradient(90deg,#6366f1,#818cf8,#22d3ee)" }} />
-
-              {/* ── Header: Our Company + Invoice Details ── */}
-              <div style={{ padding: "24px 36px 22px", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
-                {/* Left: Company letterhead */}
-                <div style={{ flex: 1 }}>
-                  {companyInfo?.logoUrl && (
-                    <img src={companyInfo.logoUrl} alt="" style={{ height: 44, marginBottom: 10, objectFit: "contain" }} />
-                  )}
-                  <div style={{ fontSize: 24, fontWeight: 900, color: "#0f172a", letterSpacing: -0.5, lineHeight: 1.1 }}>
-                    {companyInfo?.name || "Your Company"}
-                  </div>
-                  {companyInfo?.address && (
-                    <div style={{ fontSize: 11, color: "#64748b", marginTop: 5, maxWidth: 320, lineHeight: 1.55 }}>{companyInfo.address}</div>
-                  )}
-                  <div style={{ display: "flex", gap: 16, marginTop: 5, flexWrap: "wrap" }}>
-                    {companyInfo?.phone && (
-                      <div style={{ fontSize: 10.5, color: "#64748b" }}>📞 {companyInfo.phone}</div>
-                    )}
-                    {companyInfo?.ntn && (
-                      <div style={{ fontSize: 10.5, color: "#64748b" }}>NTN: {companyInfo.ntn}</div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right: Invoice badge + meta + QR */}
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#1e293b", color: "white", padding: "7px 20px", borderRadius: 8, fontSize: 12, fontWeight: 800, letterSpacing: 2.5, textTransform: "uppercase" as const, marginBottom: 14 }}>
-                    <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#6366f1", flexShrink: 0 }} />
-                    Purchase Invoice
-                  </div>
-                  <table style={{ fontSize: 12, borderCollapse: "collapse", marginLeft: "auto" }}>
-                    <tbody>
-                      {([
-                        ["Invoice #", invoiceId || "—"],
-                        ["Date",      fmtDate(date)],
-                        ...(reference ? [["Ref", reference]] : []),
-                      ] as [string,string][]).map(([k, v]) => (
-                        <tr key={k}>
-                          <td style={{ padding: "3px 14px 3px 0", color: "#94a3b8", fontWeight: 600, fontSize: 11, textAlign: "right" }}>{k}</td>
-                          <td style={{ padding: "3px 0", fontWeight: 800, color: "#0f172a", fontFamily: k === "Invoice #" ? "monospace" : "inherit", fontSize: k === "Invoice #" ? 13 : 12 }}>{v}</td>
-                        </tr>
-                      ))}
-                      <tr>
-                        <td style={{ padding: "4px 14px 4px 0", color: "#94a3b8", fontWeight: 600, fontSize: 11, textAlign: "right" }}>Status</td>
-                        <td style={{ padding: "4px 0" }}>
-                          <span style={{ padding: "2px 10px", borderRadius: 99, fontSize: 10, fontWeight: 800, background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>
-                            {approvalStatus}
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  {origin && savedInvoiceId && (
-                    <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-end" }}>
-                      <div style={{ textAlign: "center", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 10px" }}>
-                        <QRCodeSVG value={`${origin}/view/purchase-invoice?id=${savedInvoiceId}`} size={62} />
-                        <div style={{ fontSize: 7.5, fontWeight: 800, color: "#64748b", marginTop: 4, textTransform: "uppercase" as const, letterSpacing: 0.8 }}>Scan for online bill</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* ── Vendor / Supplier block ── */}
-              <div style={{ padding: "13px 36px 14px", background: "#f8fafc", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 14 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: "#6366f111", border: "1px solid #6366f128", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <svg width="16" height="16" fill="none" stroke="#6366f1" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                  </svg>
-                </div>
-                <div>
-                  <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase" as const, letterSpacing: 1.5, marginBottom: 3 }}>Vendor / Supplier</div>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: "#0f172a", letterSpacing: -0.3 }}>{supplierName || "—"}</div>
-                  {location && <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>Branch / Location: {location}</div>}
-                </div>
-              </div>
-
-              {/* ── Items Table ── */}
-              <div style={{ padding: "18px 36px 0" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ background: "#1e293b" }}>
-                      {(["#", "Item Description", "Unit", "Qty", "Rate", ...(showDisc ? ["Disc%"] : []), "Amount"] as string[]).map((h, hi) => (
-                        <th key={hi} style={{
-                          padding: "10px 0",
-                          fontSize: 9, fontWeight: 800,
-                          color: "rgba(255,255,255,.65)",
-                          textTransform: "uppercase" as const, letterSpacing: 0.8,
-                          textAlign: (h === "#" || h === "Item Description" ? "left" : h === "Amount" ? "right" : "center") as any,
-                          paddingLeft: h === "#" ? 14 : h === "Item Description" ? 0 : 0,
-                          paddingRight: h === "Amount" ? 14 : 0,
-                        }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.filter(r => r.name).map((r, i) => {
-                      const lineAmt = (Number(r.qty) * Number(r.rate) || 0) * (1 - (Number(r.discountPercent) || 0) / 100);
-                      return (
-                        <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                          <td style={{ padding: "11px 0 11px 14px", fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{i + 1}</td>
-                          <td style={{ padding: "11px 12px 11px 0" }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{r.name}</div>
-                            {r.description && <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 1 }}>{r.description}</div>}
-                            {r.sku && <div style={{ fontSize: 9.5, color: "#6366f1", fontFamily: "monospace", marginTop: 1 }}>SKU: {r.sku}</div>}
-                          </td>
-                          <td style={{ padding: "11px 0", textAlign: "center", fontSize: 12, color: "#64748b" }}>{r.unit || "—"}</td>
-                          <td style={{ padding: "11px 0", textAlign: "center", fontSize: 13, fontWeight: 700, color: "#0f172a" }}>{r.qty}</td>
-                          <td style={{ padding: "11px 0", textAlign: "center", fontSize: 12, color: "#475569" }}>{Number(r.rate).toLocaleString()}</td>
-                          {showDisc && (
-                            <td style={{ padding: "11px 0", textAlign: "center", fontSize: 11, color: Number(r.discountPercent) > 0 ? "#f59e0b" : "#94a3b8" }}>
-                              {Number(r.discountPercent) > 0 ? `${r.discountPercent}%` : "—"}
-                            </td>
-                          )}
-                          <td style={{ padding: "11px 14px 11px 0", textAlign: "right", fontSize: 13, fontWeight: 800, color: "#0f172a", fontFamily: "monospace" }}>
-                            {lineAmt.toLocaleString()}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* ── Totals ── */}
-              <div style={{ padding: "18px 36px 28px", display: "flex", justifyContent: "flex-end", borderTop: "1.5px solid #e2e8f0", marginTop: 14 }}>
-                <div style={{ minWidth: 270 }}>
-                  {([
-                    { label: "Sub Total",                   value: subtotal,          show: true },
-                    { label: `Item Discounts`,              value: -perItemDiscountAmt, show: perItemDiscountAmt > 0 },
-                    { label: `Discount (${discountType === "percent" ? `${discount}%` : "Flat"})`, value: -discountAmt, show: discountAmt > 0 },
-                    { label: "Freight",                     value: Number(freight),   show: Number(freight) > 0 },
-                    { label: selectedTax ? `${selectedTax.taxType} (${selectedTax.taxRate}%)` : "Tax", value: totalTax, show: totalTax > 0 },
-                  ] as {label:string;value:number;show:boolean}[]).filter(r => r.show).map((r, i) => (
-                    <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #f1f5f9", fontSize: 12 }}>
-                      <span style={{ color: "#64748b", fontWeight: 600 }}>{r.label}</span>
-                      <span style={{ color: r.value < 0 ? "#ef4444" : "#0f172a", fontWeight: 700, fontFamily: "monospace" }}>
-                        {r.value < 0 ? "−" : ""}{cur} {Math.abs(r.value).toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 16px", background: "linear-gradient(135deg,#6366f1,#4f46e5)", borderRadius: 10, marginTop: 12, boxShadow: "0 6px 20px rgba(99,102,241,.35)" }}>
-                    <span style={{ fontSize: 14, fontWeight: 800, color: "white", letterSpacing: 0.5 }}>NET PAYABLE</span>
-                    <span style={{ fontSize: 17, fontWeight: 900, color: "white", fontFamily: "monospace" }}>{cur} {netTotal.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Notes / Payment Info ── */}
-              {(notes || paymentMethod || paymentTerms) && (
-                <div style={{ padding: "14px 36px 18px", borderTop: "1px solid #e2e8f0", background: "#fafafa" }}>
-                  <div style={{ fontSize: 9.5, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase" as const, letterSpacing: 1.2, marginBottom: 8 }}>Notes & Payment</div>
-                  <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
-                    {notes && (
-                      <div style={{ flex: 1, minWidth: 200 }}>
-                        <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.65 }}>{notes}</div>
-                      </div>
-                    )}
-                    {(paymentMethod || paymentTerms) && (
-                      <div style={{ fontSize: 11.5, color: "#64748b", display: "grid", gap: 4 }}>
-                        {paymentMethod && <div><strong style={{ color: "#0f172a" }}>Method:</strong> {paymentMethod}</div>}
-                        {paymentTerms  && <div><strong style={{ color: "#0f172a" }}>Terms:</strong> {paymentTerms}</div>}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* ── Signatures ── */}
-              <div style={{ padding: "0 36px 28px", display: "flex", gap: 24 }}>
-                {["Prepared By", "Checked By", "Authorized By"].map(label => (
-                  <div key={label} style={{ flex: 1, textAlign: "center", borderTop: "2px solid #e2e8f0", paddingTop: 8, marginTop: 52 }}>
-                    <div style={{ fontSize: 9, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase" as const, letterSpacing: 0.8 }}>{label}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* ── Footer ── */}
-              <div style={{ padding: "10px 36px", background: "#f8fafc", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  <div style={{ width: 16, height: 16, borderRadius: 4, background: "#6366f1", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ width: 8, height: 8, borderRadius: 2, background: "white" }} />
-                  </div>
-                  <span style={{ fontSize: 10, color: "#94a3b8" }}>Generated by FinovaOS · {fmtDate(new Date().toISOString())}</span>
-                </div>
-                <div style={{ fontSize: 10, color: "#94a3b8" }}>Computer generated document</div>
-              </div>
-            </div>
-            );
-          })()}
+          {showPreview && (printMode === "none" || printMode === "a4") && (
+            <PrintPaperWrapper>
+              <PrintDocA4
+                companyName={companyInfo?.name || "Your Company"}
+                companyAddress={companyInfo?.address}
+                companyPhone={companyInfo?.phone}
+                logoUrl={companyInfo?.logoUrl}
+                showLogo={!!companyInfo?.logoUrl}
+                docTitle="PURCHASE INVOICE"
+                docNo={invoiceId || "—"}
+                date={fmtDate(date)}
+                status={approvalStatus}
+                partyLabel="Supplier"
+                partyName={supplierName || "—"}
+                metaFields={[
+                  ...(reference ? [{ label: "Ref", value: reference }] : []),
+                  ...(location ? [{ label: "Location", value: location }] : []),
+                ]}
+                columns={[
+                  { key: "no", label: "#", align: "center", width: 30 },
+                  { key: "name", label: "Item Description" },
+                  { key: "qty", label: "Qty", align: "center", width: 50 },
+                  { key: "unit", label: "Unit", align: "center", width: 50 },
+                  { key: "rate", label: "Rate", align: "right", width: 75 },
+                  { key: "disc", label: "Disc%", align: "center", width: 55 },
+                  { key: "amount", label: "Amount", align: "right", width: 85 },
+                ]}
+                rows={rows.filter(r => r.name).map((r, i) => {
+                  const lineAmt = (Number(r.qty) * Number(r.rate) || 0) * (1 - (Number(r.discountPercent) || 0) / 100);
+                  return {
+                    no: i + 1,
+                    name: r.name,
+                    qty: r.qty,
+                    unit: r.unit || "—",
+                    rate: Number(r.rate).toLocaleString(),
+                    disc: Number(r.discountPercent) > 0 ? `${r.discountPercent}%` : "—",
+                    amount: lineAmt.toLocaleString("en-US", { minimumFractionDigits: 2 }),
+                  };
+                })}
+                totalsLines={[
+                  { label: "Subtotal:", value: subtotal },
+                  ...(perItemDiscountAmt > 0 ? [{ label: "Item Discounts:", value: -perItemDiscountAmt }] : []),
+                  ...(discountAmt > 0 ? [{ label: `Discount (${discountType === "percent" ? `${discount}%` : "Flat"}):`, value: -discountAmt }] : []),
+                  ...(totalTax > 0 ? [{ label: selectedTax ? `${selectedTax.taxType} (${selectedTax.taxRate}%):` : "Tax:", value: totalTax }] : []),
+                  ...(Number(freight) > 0 ? [{ label: "Freight:", value: Number(freight) }] : []),
+                  { label: "NET PAYABLE:", value: netTotal, bold: true, borderTop: true },
+                ]}
+                notes={[notes, paymentMethod ? `Payment Method: ${paymentMethod}` : "", paymentTerms ? `Payment Terms: ${paymentTerms}` : ""].filter(Boolean).join("\n") || undefined}
+                signatureLabels={["Prepared By", "Checked By", "Authorized By"]}
+                footerNote="Generated by FinovaOS"
+              />
+            </PrintPaperWrapper>
+          )}
 
           {/* ── 55mm THERMAL PREVIEW ── */}
           {showPreview && (

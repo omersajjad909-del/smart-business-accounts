@@ -10,6 +10,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { QRCodeSVG } from "qrcode.react";
 import { hasPermission } from "@/lib/hasPermission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { PrintActionBar } from "@/components/print/PrintActionBar";
+import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
+import type { PrintColumn, PrintTotalsLine } from "@/components/print/PrintDocA4";
 
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -127,7 +130,6 @@ function SalesInvoiceContent() {
   const [scanCode, setScanCode]         = useState("");
   const [scanActive, setScanActive]     = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
-  const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
   const [origin, setOrigin]             = useState("");
 
   // ── Query Mode (F7 / F8) ────────────────────────────────────────────────────
@@ -514,6 +516,10 @@ function SalesInvoiceContent() {
   const invCustomer = savedInvoice?.customer?.name || customerName || "—";
   const invItems = savedInvoice?.items || rows.filter(r => r.itemId);
   const invTotal = savedInvoice?.total ?? netTotal;
+  const invSubtotal = savedInvoice ? (savedInvoice.items || []).reduce((s: number, r: any) => s + (Number(r.qty) * Number(r.rate) || 0), 0) : subtotal;
+  const invDiscount = savedInvoice ? (Number(savedInvoice.discount) || 0) : discountAmt;
+  const invTax      = savedInvoice ? (Number(savedInvoice.taxAmount) || 0) : totalTax;
+  const invFreight  = savedInvoice ? (Number(savedInvoice.freight) || 0) : (freight === "" ? 0 : Number(freight));
 
   return (
     <>
@@ -656,17 +662,19 @@ function SalesInvoiceContent() {
                   <button style={btnGhost} onClick={() => { setShowForm(false); setEditing(null); resetForm(); }}>Cancel</button>
                 </div>
               ) : (
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  <button style={{ ...btnPrimary, background: "#16a34a" }} onClick={() => { setPrintMode("a4"); setTimeout(() => window.print(), 100); }}>Print A4</button>
-                  <button style={{ ...btnPrimary, background: "#0891b2" }} onClick={() => { setPrintMode("55mm"); setTimeout(() => window.print(), 100); }}>Print 55mm</button>
-                  <button style={{ ...btnPrimary, background: "#7c3aed" }} onClick={() => setPreviewMode(p => p === "INVOICE" ? "DELIVERY" : "INVOICE")}>
-                    {previewMode === "DELIVERY" ? "Show Rates" : "Delivery Note"}
-                  </button>
-                  <button style={btnGhost} onClick={sendInvoiceEmail} disabled={sendingEmail}>{sendingEmail ? "Sending…" : "Email"}</button>
-                  <button style={{ ...btnGhost, color: "#22c55e", borderColor: "#22c55e44" }} onClick={async () => { setSendingWhatsApp(true); await shareWhatsApp(); setSendingWhatsApp(false); }} disabled={sendingWhatsApp}>{sendingWhatsApp ? "Sending…" : "WhatsApp"}</button>
-                  <button style={btnGhost} onClick={() => setPreview(false)}>Edit</button>
-                  <button style={btnGhost} onClick={() => { setPreview(false); resetForm(); }}>New Invoice</button>
-                </div>
+                <PrintActionBar
+                  onPrintA4={() => { setPrintMode("a4"); setTimeout(() => window.print(), 100); }}
+                  onPrintThermal={() => { setPrintMode("55mm"); setTimeout(() => window.print(), 100); }}
+                  thermalLabel="55mm"
+                  onEmail={sendInvoiceEmail}
+                  onWhatsApp={() => shareWhatsApp()}
+                  onEdit={() => setPreview(false)}
+                  onNew={() => { setPreview(false); resetForm(); }}
+                  newLabel="New Invoice"
+                  extraActions={[
+                    { label: previewMode === "DELIVERY" ? "Show Invoice" : "Delivery Note", icon: "📄", onClick: () => setPreviewMode(p => p === "INVOICE" ? "DELIVERY" : "INVOICE") }
+                  ]}
+                />
               )}
             </div>
 
@@ -1007,102 +1015,62 @@ function SalesInvoiceContent() {
 
         {/* ── Invoice Preview (screen) ── */}
             {preview && (
-              <div style={{ ...panelStyle, background: "#fff", color: "#111", padding: 40, maxWidth: 860, margin: "0 auto", fontFamily: "'Outfit','Arial',sans-serif" }}>
-                {/* Header */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "3px solid #111", paddingBottom: 20, marginBottom: 24 }}>
-                  <div>
-                    {printPrefs.showLogo && printPrefs.logoUrl && <img src={printPrefs.logoUrl} alt="logo" style={{ height: 56, marginBottom: 8 }} />}
-                    <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: 1 }}>{previewMode === "DELIVERY" ? "DELIVERY NOTE" : "SALES INVOICE"}</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "#555", letterSpacing: 2, textTransform: "uppercase", marginTop: 4 }}>{companyInfo?.name || ""}</div>
-                    {companyInfo?.phone && <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{companyInfo.phone}</div>}
-                    {companyInfo?.address && <div style={{ fontSize: 12, color: "#666" }}>{companyInfo.address}</div>}
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 13, marginBottom: 4 }}><b>Invoice #:</b> {invNo}</div>
-                    <div style={{ fontSize: 13, marginBottom: 4 }}><b>Date:</b> {invDate}</div>
-                    {location && <div style={{ fontSize: 13, marginBottom: 8 }}><b>Location:</b> {location}</div>}
-                    {origin && savedInvoice?.id && (
-                      <div style={{ textAlign: "center" }}>
-                        <QRCodeSVG value={`${origin}/view/sales-invoice?id=${savedInvoice.id}`} size={72} />
-                        <div style={{ fontSize: 9, fontWeight: 700, background: "#111", color: "#fff", padding: "2px 4px", marginTop: 2 }}>SCAN FOR ONLINE BILL</div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Bill To */}
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
-                  <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Bill To</div>
-                    <div style={{ fontSize: 20, fontWeight: 800 }}>{invCustomer}</div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    {(savedInvoice?.driverName || driverName) && <div style={{ fontSize: 13 }}><b>Driver:</b> {savedInvoice?.driverName || driverName}</div>}
-                    {(savedInvoice?.vehicleNo || vehicleNo) && <div style={{ fontSize: 13 }}><b>Vehicle:</b> {savedInvoice?.vehicleNo || vehicleNo}</div>}
-                    {linkedSoNo && <div style={{ fontSize: 12, color: "#6366f1", marginTop: 4 }}><b>SO Ref:</b> {linkedSoNo}</div>}
-                  </div>
-                </div>
-
-                {/* Items Table */}
-                <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 24, fontSize: 13 }}>
-                  <thead>
-                    <tr style={{ borderTop: "2px solid #111", borderBottom: "2px solid #111", background: "#f5f5f5" }}>
-                      <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 700 }}>Description</th>
-                      <th style={{ padding: "10px 12px", textAlign: "center", fontWeight: 700, width: 70 }}>Qty</th>
-                      {previewMode === "INVOICE" && <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, width: 100 }}>Rate</th>}
-                      {previewMode === "INVOICE" && <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, width: 110 }}>Amount</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {invItems.map((r: any, i: number) => {
-                      const name = r.item?.name || r.name || "—";
-                      const desc = r.item?.description || r.description || "";
-                      const qty = r.qty || 0;
-                      const rate = r.rate || 0;
-                      return (
-                        <tr key={i} style={{ borderBottom: "1px solid #e5e5e5" }}>
-                          <td style={{ padding: "10px 12px" }}>
-                            <div style={{ fontWeight: 600 }}>{name}</div>
-                            {desc && <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>{desc}</div>}
-                          </td>
-                          <td style={{ padding: "10px 12px", textAlign: "center" }}>{qty}</td>
-                          {previewMode === "INVOICE" && <td style={{ padding: "10px 12px", textAlign: "right" }}>{fmt(rate)}</td>}
-                          {previewMode === "INVOICE" && <td style={{ padding: "10px 12px", textAlign: "right", fontWeight: 600 }}>{fmt(qty * rate)}</td>}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-
-                {/* Totals */}
-                {previewMode === "INVOICE" && (
-                  <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 32 }}>
-                    <div style={{ width: 280, fontSize: 13 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
-                      {discountAmt > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, color: "#d00" }}><span>Discount</span><span>— {fmt(discountAmt)}</span></div>}
-                      {Number(freight) > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Freight</span><span>{fmt(Number(freight))}</span></div>}
-                      {applyTax && selectedTax && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>{selectedTax.taxType} ({selectedTax.taxRate}%)</span><span>{fmt(globalTaxAmt)}</span></div>}
-                      <div style={{ display: "flex", justifyContent: "space-between", borderTop: "3px solid #111", paddingTop: 10, fontWeight: 900, fontSize: 17 }}><span>Net Total</span><span>{fmt(invTotal)}</span></div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Signatures */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, marginBottom: 24 }}>
-                  {["Prepared By", "Received By"].map(label => (
-                    <div key={label}>
-                      <div style={{ borderTop: "1px solid #111", paddingTop: 8, fontSize: 12, color: "#555" }}>{label}</div>
-                      <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>_________________________</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Footer */}
-                {printPrefs.footerNote && (
-                  <div style={{ textAlign: "center", fontSize: 12, color: "#888", borderTop: "1px solid #eee", paddingTop: 12 }}>{printPrefs.footerNote}</div>
-                )}
-                <div style={{ textAlign: "center", fontSize: 10, color: "#bbb", marginTop: 10 }}>Powered by <b style={{ color: "#6366f1" }}>FinovaOS</b></div>
-              </div>
+              <PrintPaperWrapper>
+                <PrintDocA4
+                  companyName={companyInfo?.name || ""}
+                  companyAddress={companyInfo?.address}
+                  companyPhone={companyInfo?.phone}
+                  showLogo={printPrefs.showLogo}
+                  logoUrl={printPrefs.logoUrl}
+                  docTitle={previewMode === "DELIVERY" ? "DELIVERY NOTE" : "SALES INVOICE"}
+                  docNo={invNo}
+                  date={invDate}
+                  partyLabel="Bill To"
+                  partyName={invCustomer}
+                  partyPhone={selectedCustomer?.phone}
+                  partyAddress={selectedCustomer?.address}
+                  metaFields={[
+                    ...(savedInvoice?.driverName ? [{ label: "Driver", value: savedInvoice.driverName }] : []),
+                    ...(savedInvoice?.vehicleNo ? [{ label: "Vehicle", value: savedInvoice.vehicleNo }] : []),
+                    ...(linkedSoNo ? [{ label: "SO Ref", value: linkedSoNo }] : []),
+                  ]}
+                  columns={previewMode === "DELIVERY"
+                    ? [
+                        { key: "no", label: "#", align: "center", width: 30 },
+                        { key: "name", label: "Description" },
+                        { key: "qty", label: "Qty", align: "center", width: 60 },
+                        { key: "unit", label: "Unit", align: "center", width: 60 },
+                      ]
+                    : [
+                        { key: "no", label: "#", align: "center", width: 30 },
+                        { key: "name", label: "Description" },
+                        { key: "qty", label: "Qty", align: "center", width: 60 },
+                        { key: "unit", label: "Unit", align: "center", width: 60 },
+                        { key: "rate", label: "Rate", align: "right", width: 80 },
+                        { key: "amount", label: "Amount", align: "right", width: 90 },
+                      ]
+                  }
+                  rows={invItems.map((r: any, i: number) => ({
+                    no: i + 1,
+                    name: r.item?.name || r.name || "—",
+                    qty: r.qty,
+                    unit: r.item?.unit || "",
+                    rate: Number(r.rate).toLocaleString(),
+                    amount: (Number(r.qty) * Number(r.rate)).toLocaleString("en-US", { minimumFractionDigits: 2 }),
+                  }))}
+                  totalsLines={[
+                    ...(invSubtotal > 0 ? [{ label: "Subtotal:", value: invSubtotal }] : []),
+                    ...(invDiscount > 0 ? [{ label: "Discount:", value: -invDiscount }] : []),
+                    ...(invTax > 0 ? [{ label: "Tax:", value: invTax }] : []),
+                    ...(invFreight > 0 ? [{ label: "Freight:", value: invFreight }] : []),
+                    { label: "TOTAL:", value: invTotal, bold: true, borderTop: true },
+                  ]}
+                  notes={savedInvoice?.notes}
+                  terms={savedInvoice?.termsConditions}
+                  footerNote={printPrefs.footerNote || "Thank you for your business. — Generated by FinovaOS"}
+                  signatureLabels={["Prepared By", "Received By"]}
+                />
+              </PrintPaperWrapper>
             )}
           </>
         )}

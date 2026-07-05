@@ -2,6 +2,8 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
+import { PrintActionBar } from "@/components/print/PrintActionBar";
+import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -594,31 +596,31 @@ export default function QuotationPage() {
                 </button>
               </div>
             ) : (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                <button onClick={() => { setPrintMode("a4"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#16a34a", color: "white", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, fontSize: 13 }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
-                  Print A4
-                </button>
-                <button onClick={() => { setPrintMode("55mm"); setTimeout(() => window.print(), 150); }} style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#0891b2", color: "white", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, fontSize: 13 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                  Print 55mm
-                </button>
-                <button onClick={() => setHideRates(!hideRates)} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#7c3aed", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
-                  {hideRates ? "Show Rates" : "Hide Rates"}
-                </button>
-                <button onClick={shareOnWhatsApp} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#25D366", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
-                  📱 WhatsApp
-                </button>
-                <button onClick={shareOnSMS} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#3b82f6", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
-                  💬 SMS
-                </button>
-                <button onClick={() => setPreview(false)} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#d97706", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
-                  ✏️ Edit
-                </button>
-                <button onClick={() => { setPreview(false); resetForm(); loadQuotations(); }} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#475569", color: "white", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
-                  + New Quotation
-                </button>
-              </div>
+              <PrintActionBar
+                onPrintA4={() => { setPrintMode("a4"); setTimeout(() => window.print(), 100); }}
+                onPrintThermal={() => { setPrintMode("55mm"); setTimeout(() => window.print(), 100); }}
+                thermalLabel="55mm"
+                onWhatsApp={shareOnWhatsApp}
+                onSms={shareOnSMS}
+                onEmail={async () => {
+                  const email = prompt("Enter customer email address:");
+                  if (!email || !email.includes("@")) { toast.error("Please enter a valid email address"); return; }
+                  const res = await fetch("/api/email/send", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "x-user-role": user?.role || "", "x-user-id": user?.id || "" },
+                    body: JSON.stringify({ type: "quotation", quotationId: savedQuotation?.id, to: email }),
+                  });
+                  const data = await res.json();
+                  if (res.ok) toast.success("Email sent successfully!");
+                  else toast.error(`Failed to send email: ${data.error || "Unknown error"}`);
+                }}
+                onEdit={() => setPreview(false)}
+                onNew={() => { setPreview(false); resetForm(); loadQuotations(); }}
+                newLabel="New Quotation"
+                extraActions={[
+                  { label: hideRates ? "Show Rates" : "Hide Rates", icon: "👁️", onClick: () => setHideRates(r => !r) },
+                ]}
+              />
             )}
           </div>
 

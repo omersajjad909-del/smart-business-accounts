@@ -2,6 +2,8 @@
 import { fmtDate } from "@/lib/dateUtils";
 import { DateInput } from "@/app/dashboard/reports/_components/DateInput";
 import { confirmToast, alertToast } from "@/lib/toast-feedback";
+import { PrintActionBar } from "@/components/print/PrintActionBar";
+import { PrintDocA4, PrintPaperWrapper } from "@/components/print/PrintDocA4";
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -387,6 +389,21 @@ const [searchTerm, _setSearchTerm] = useState("");
     window.open(url, '_blank');
   };
 
+  function shareOnEmail() {
+    const email = prompt("Customer email:");
+    if (!email?.includes("@")) return;
+    fetch("/api/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "generic",
+        to: email,
+        subject: `Delivery Challan ${savedChallan?.challanNo || challanNo}`,
+        html: `<p>Dear ${customerName},</p><p>Please find your Delivery Challan <strong>${savedChallan?.challanNo || challanNo}</strong> dated ${fmtDate(date)}.</p><p>Thank you for your business.</p>`,
+      }),
+    }).then(r => r.ok ? toast.success("Email sent!") : toast.error("Email failed")).catch(() => toast.error("Email failed"));
+  }
+
   if (loading) return <div className="p-6">Loading...</div>;
   // if (!authorized) return <div className="p-6 text-red-600">Access Denied</div>;
 
@@ -492,29 +509,15 @@ const [searchTerm, _setSearchTerm] = useState("");
                 </button>
               </div>
             ) : (
-              <div className="flex flex-wrap gap-2">
-                <button onClick={() => window.print()} className="bg-green-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
-                  {printPrefs.paperSize === "A4" ? "Print A4" : "Print Thermal"}
-                </button>
-                <button 
-                  onClick={shareOnWhatsApp}
-                  className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 flex-1 md:flex-none"
-                >
-                  📱 WhatsApp
-                </button>
-                <button 
-                  onClick={shareOnSMS}
-                  className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 flex-1 md:flex-none"
-                >
-                  💬 SMS
-                </button>
-                <button onClick={() => setPreview(false)} className="bg-yellow-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
-                  Edit
-                </button>
-                <button onClick={() => { setPreview(false); resetForm(); }} className="bg-gray-600 text-white px-6 py-2 rounded flex-1 md:flex-none">
-                  New Challan
-                </button>
-              </div>
+              <PrintActionBar
+                onPrintA4={() => window.print()}
+                onWhatsApp={shareOnWhatsApp}
+                onSms={shareOnSMS}
+                onEmail={shareOnEmail}
+                onEdit={() => setPreview(false)}
+                onNew={() => { setPreview(false); resetForm(); }}
+                newLabel="New Challan"
+              />
             )}
           </div>
 
