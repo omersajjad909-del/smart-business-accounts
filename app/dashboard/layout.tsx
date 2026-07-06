@@ -151,6 +151,12 @@ type AdminControlSettings = {
     advancedPurchasing?: boolean;
     multiWarehouse?: boolean;
     approvalWorkflow?: boolean;
+    customerCreditLimits?: boolean;
+    discountEngine?: boolean;
+    productVariants?: boolean;
+    batchSerialTracking?: boolean;
+    taxConfiguration?: boolean;
+    smsNotifications?: boolean;
   };
 };
 

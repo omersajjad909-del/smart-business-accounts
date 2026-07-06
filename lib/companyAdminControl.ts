@@ -63,15 +63,27 @@ export type BranchGeoProfile = {
 };
 
 export type BusinessFeatureFlags = {
-  advancedPurchasing: boolean;  // PO → GRN → Purchase Invoice full flow
-  multiWarehouse:     boolean;  // Warehouses, Stock Transfers
-  approvalWorkflow:   boolean;  // Manager approval on PO / GRN
+  advancedPurchasing:   boolean;  // PO → GRN → Purchase Invoice full flow
+  multiWarehouse:       boolean;  // Warehouses, Stock Transfers
+  approvalWorkflow:     boolean;  // Manager approval on PO / GRN
+  customerCreditLimits: boolean;  // Per-customer credit limit enforcement
+  discountEngine:       boolean;  // Promotions & discount rules
+  productVariants:      boolean;  // SKU variants (size/color/etc.)
+  batchSerialTracking:  boolean;  // Batch & serial number tracking
+  taxConfiguration:     boolean;  // Advanced tax rules / multiple tax rates
+  smsNotifications:     boolean;  // SMS alerts for invoices / payments
 };
 
 export const DEFAULT_FEATURE_FLAGS: BusinessFeatureFlags = {
-  advancedPurchasing: false,
-  multiWarehouse:     false,
-  approvalWorkflow:   false,
+  advancedPurchasing:   false,
+  multiWarehouse:       false,
+  approvalWorkflow:     false,
+  customerCreditLimits: false,
+  discountEngine:       false,
+  productVariants:      false,
+  batchSerialTracking:  false,
+  taxConfiguration:     false,
+  smsNotifications:     false,
 };
 
 export type ShiftSetting = {
