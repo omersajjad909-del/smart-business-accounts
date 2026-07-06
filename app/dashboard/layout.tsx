@@ -1107,7 +1107,6 @@ export default function DashboardLayout({
               <NavLink href="/dashboard/crm/contacts" pathname={pathname}>Contacts</NavLink>
               <NavLink href="/dashboard/crm/opportunities" pathname={pathname}>Opportunities</NavLink>
               <NavLink href="/dashboard/crm/interactions" pathname={pathname}>Interactions</NavLink>
-              <NavLink href="/chat-admin" pathname={pathname}>💬 Chat Support</NavLink>
             </NavGroup>
           )}
 
