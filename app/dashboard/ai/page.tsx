@@ -2408,134 +2408,162 @@ export default function AICommandCenter() {
                 <div>AI is estimating your tax position...</div>
               </div>
             ) : taxEstimate ? (
-              taxEstimate.isPakistan ? (
-                /* ── Pakistan FBR Layout ── */
-                <div style={{ display: "grid", gap: 16 }}>
-                  {/* Header */}
-                  <div style={{ background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-                    <span style={{ fontSize: 28 }}>🇵🇰</span>
-                    <div>
-                      <div style={{ fontWeight: 800, fontSize: 16, color: "#10b981" }}>Pakistan FBR Tax Report</div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>Based on FBR Finance Act 2024-25 · {taxEstimate.month}</div>
-                    </div>
-                  </div>
-
-                  {/* GST + Income Tax two-column */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                    {/* Monthly GST */}
-                    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
-                        Monthly GST Return · {taxEstimate.gst?.month}
-                      </div>
-                      <div style={{ display: "grid", gap: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Output Tax (Sales)</span>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b" }}>PKR {(taxEstimate.gst?.outputTax ?? 0).toLocaleString()}</span>
+              taxEstimate.taxReport ? (
+                /* ── Country Tax Engine Layout (generic for all countries) ── */
+                (() => {
+                  const tr = taxEstimate.taxReport!;
+                  const cur = tr.currency;
+                  const fmtC = (n: number) => `${cur} ${n.toLocaleString()}`;
+                  return (
+                    <div style={{ display: "grid", gap: 16 }}>
+                      {/* Header */}
+                      <div style={{ background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                          <span style={{ fontSize: 28 }}>{tr.flagEmoji}</span>
+                          <div>
+                            <div style={{ fontWeight: 800, fontSize: 16, color: "#10b981" }}>{tr.reportTitle}</div>
+                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>{tr.lawReference} · {taxEstimate.month}</div>
+                          </div>
                         </div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Input Tax (Purchases)</span>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: "#10b981" }}>PKR {(taxEstimate.gst?.inputTax ?? 0).toLocaleString()}</span>
-                        </div>
-                        <div style={{ height: 1, background: "rgba(255,255,255,.08)", margin: "4px 0" }} />
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>
-                            {taxEstimate.gst?.isRefundable ? "Refundable" : "Net Payable"}
-                          </span>
-                          <span style={{ fontSize: 16, fontWeight: 900, color: taxEstimate.gst?.isRefundable ? "#10b981" : "#f59e0b" }}>
-                            PKR {(taxEstimate.gst?.netPayable ?? 0).toLocaleString()}
-                          </span>
-                        </div>
-                        <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
-                          Due: {taxEstimate.gst?.filingDeadline}
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", textAlign: "right" }}>
+                          <div style={{ fontWeight: 700 }}>{tr.country}</div>
+                          <div>{tr.currency}</div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Annual Income Tax */}
-                    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
-                        Annual Income Tax Est. · FY 2024-25
-                      </div>
-                      <div style={{ display: "grid", gap: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Net Profit (Est.)</span>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>PKR {(taxEstimate.incomeTax?.annualNetProfitEstimate ?? 0).toLocaleString()}</span>
+                      {/* Sales Tax + Income Tax two-column */}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                        {/* Sales Tax */}
+                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
+                            {tr.salesTax.taxName} · {(tr.salesTax.standardRate * 100).toFixed(0)}% Standard Rate
+                          </div>
+                          <div style={{ display: "grid", gap: 10 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Output Tax (Sales)</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b" }}>{fmtC(tr.salesTax.outputTax)}</span>
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Input Tax (Purchases)</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "#10b981" }}>{fmtC(tr.salesTax.inputTax)}</span>
+                            </div>
+                            <div style={{ height: 1, background: "rgba(255,255,255,.08)", margin: "4px 0" }} />
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>
+                                {tr.salesTax.isRefundable ? "Refundable" : "Net Payable"}
+                              </span>
+                              <span style={{ fontSize: 16, fontWeight: 900, color: tr.salesTax.isRefundable ? "#10b981" : "#f59e0b" }}>
+                                {fmtC(tr.salesTax.netPayable)}
+                              </span>
+                            </div>
+                            <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+                              Due: {tr.salesTax.filingDeadline}
+                            </div>
+                          </div>
                         </div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Effective Rate</span>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{taxEstimate.incomeTax?.effectiveRate ?? 0}%</span>
-                        </div>
-                        <div style={{ height: 1, background: "rgba(255,255,255,.08)", margin: "4px 0" }} />
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>Tax Payable</span>
-                          <span style={{ fontSize: 16, fontWeight: 900, color: "#f59e0b" }}>PKR {(taxEstimate.incomeTax?.estimatedTax ?? 0).toLocaleString()}</span>
-                        </div>
-                        <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
-                          Due: {taxEstimate.incomeTax?.filingDeadline}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Slab Breakdown */}
-                  {taxEstimate.incomeTax?.slabBreakdown && taxEstimate.incomeTax.slabBreakdown.length > 0 && (
-                    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Income Tax Slab Breakdown</div>
-                      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                        <thead>
-                          <tr>
-                            <th style={{ textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Slab</th>
-                            <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Taxable Amount</th>
-                            <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Tax</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {taxEstimate.incomeTax.slabBreakdown.map((row, i) => (
-                            <tr key={i} style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
-                              <td style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", padding: "8px 0" }}>{row.slab}</td>
-                              <td style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", textAlign: "right", padding: "8px 0" }}>PKR {row.taxableAmount.toLocaleString()}</td>
-                              <td style={{ fontSize: 12.5, color: "#f59e0b", textAlign: "right", padding: "8px 0", fontWeight: 700 }}>PKR {row.tax.toLocaleString()}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
-                  {/* WHT Section */}
-                  {taxEstimate.wht && (
-                    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Withholding Tax on Purchases (WHT)</div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                        <div>
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4 }}>If Supplier Registered (4%)</div>
-                          <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981" }}>PKR {taxEstimate.wht.registered.toLocaleString()}</div>
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4 }}>If Supplier Unregistered (8%)</div>
-                          <div style={{ fontSize: 16, fontWeight: 800, color: "#f59e0b" }}>PKR {taxEstimate.wht.unregistered.toLocaleString()}</div>
+                        {/* Income / Corporate Tax */}
+                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
+                            {tr.incomeTax.taxName}
+                          </div>
+                          <div style={{ display: "grid", gap: 10 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Annual Net Profit (Est.)</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{fmtC(tr.incomeTax.annualNetProfitEstimate)}</span>
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Effective Rate</span>
+                              <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{tr.incomeTax.effectiveRate}%</span>
+                            </div>
+                            <div style={{ height: 1, background: "rgba(255,255,255,.08)", margin: "4px 0" }} />
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>Estimated Tax</span>
+                              <span style={{ fontSize: 16, fontWeight: 900, color: "#f59e0b" }}>{fmtC(tr.incomeTax.estimatedTax)}</span>
+                            </div>
+                            <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+                              Due: {tr.incomeTax.filingDeadline}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
 
-                  {/* AI Summary */}
-                  <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
-                    <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 6 }}>AI Summary</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 14 }}>{taxEstimate.month} · based on taxed invoices and FBR 2024-25 rules</div>
-                    <div style={{ lineHeight: 1.8 }}>{renderMarkdown(taxEstimate.summary)}</div>
-                  </div>
+                      {/* Slab Breakdown */}
+                      {tr.incomeTax.slabBreakdown.length > 0 && (
+                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Tax Slab Breakdown</div>
+                          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <thead>
+                              <tr>
+                                <th style={{ textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Slab</th>
+                                <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Taxable Amount</th>
+                                <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Tax</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {tr.incomeTax.slabBreakdown.map((row, i) => (
+                                <tr key={i} style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                                  <td style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", padding: "8px 0" }}>{row.slab}</td>
+                                  <td style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", textAlign: "right", padding: "8px 0" }}>{fmtC(row.taxableAmount)}</td>
+                                  <td style={{ fontSize: 12.5, color: "#f59e0b", textAlign: "right", padding: "8px 0", fontWeight: 700 }}>{fmtC(row.tax)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
 
-                  {/* Disclaimer */}
-                  <div style={{ background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 12, padding: "12px 16px", display: "flex", gap: 10, alignItems: "flex-start" }}>
-                    <span style={{ fontSize: 16, marginTop: 1 }}>⚠️</span>
-                    <div style={{ fontSize: 12, color: "#f59e0b", lineHeight: 1.6 }}>
-                      This is an estimate only based on current month data and FBR Finance Act 2024-25 slabs. Actual tax liability may differ. Consult a qualified tax advisor or FBR-registered tax consultant before filing.
+                      {/* WHT Section */}
+                      {tr.wht.applicable && (
+                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Withholding Tax on Purchases</div>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                            <div>
+                              <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4 }}>Registered Supplier</div>
+                              <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981" }}>{fmtC(tr.wht.registered)}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4 }}>Unregistered Supplier</div>
+                              <div style={{ fontSize: 16, fontWeight: 800, color: "#f59e0b" }}>{fmtC(tr.wht.unregistered)}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Notes */}
+                      {tr.notes.length > 0 && (
+                        <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 12 }}>Key Notes &amp; Deadlines</div>
+                          <div style={{ display: "grid", gap: 8 }}>
+                            {tr.notes.map((note, i) => (
+                              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                                <span style={{ color: "#10b981", fontSize: 14, lineHeight: "20px", flexShrink: 0 }}>•</span>
+                                <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.65)", lineHeight: 1.6 }}>{note}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* AI Summary */}
+                      <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                        <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 6 }}>AI Summary</div>
+                        <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 14 }}>{taxEstimate.month} · {tr.lawReference}</div>
+                        <div style={{ lineHeight: 1.8 }}>{renderMarkdown(taxEstimate.summary)}</div>
+                      </div>
+
+                      {/* Disclaimer */}
+                      <div style={{ background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 12, padding: "12px 16px", display: "flex", gap: 10, alignItems: "flex-start" }}>
+                        <span style={{ fontSize: 16, marginTop: 1 }}>⚠️</span>
+                        <div style={{ fontSize: 12, color: "#f59e0b", lineHeight: 1.6 }}>
+                          This is an estimate based on current data and {tr.lawReference}. Actual tax liability may differ. Consult a qualified tax professional before filing.
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  );
+                })()
               ) : (
-                /* ── Non-Pakistan / Generic Layout ── */
+                /* ── Generic / No Engine Layout ── */
                 <div style={{ display: "grid", gap: 16 }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
                     <Panel>
