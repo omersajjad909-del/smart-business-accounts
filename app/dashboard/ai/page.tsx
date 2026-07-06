@@ -1237,7 +1237,7 @@ export default function AICommandCenter() {
   ];
 
   return (
-    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", overflow: "hidden" }}>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", overflow: "hidden", margin: "-16px -12px", width: "calc(100% + 24px)", maxWidth: "none" }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:translateY(0) } }
