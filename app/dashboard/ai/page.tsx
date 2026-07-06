@@ -561,6 +561,7 @@ export default function AICommandCenter() {
   const [sendingReminderRef, setSendingReminderRef] = useState<string | null>(null);
   const [marketIntel, setMarketIntel] = useState<MarketIntelligenceResult | null>(null);
   const [loadingMarket, setLoadingMarket] = useState(false);
+  const [marketError, setMarketError] = useState<string | null>(null);
   const [businessAdvisor, setBusinessAdvisor] = useState<BusinessAdvisorResult | null>(null);
   const [loadingAdvisor, setLoadingAdvisor] = useState(false);
   const [reconciliation, setReconciliation] = useState<ReconciliationResult | null>(null);
@@ -749,12 +750,25 @@ export default function AICommandCenter() {
   }
 
   function loadMarketIntel() {
-    if (marketIntel || loadingMarket) return;
+    if (loadingMarket) return;
     setLoadingMarket(true);
-    fetch("/api/ai/market-intelligence", { headers: getHeaders() })
+    setMarketError(null);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 28000);
+    fetch("/api/ai/market-intelligence", { headers: getHeaders(), signal: controller.signal })
       .then(r => r.json())
-      .then(d => { setMarketIntel(normalizeMarketIntel(d)); setLoadingMarket(false); })
-      .catch(() => setLoadingMarket(false));
+      .then(d => {
+        clearTimeout(timeout);
+        if (d?.error) { setMarketError(d.error); setLoadingMarket(false); return; }
+        const result = normalizeMarketIntel(d);
+        if (result) { setMarketIntel(result); } else { setMarketError("Could not parse market data."); }
+        setLoadingMarket(false);
+      })
+      .catch(e => {
+        clearTimeout(timeout);
+        setMarketError(e?.name === "AbortError" ? "Request timed out. Please try again." : "Failed to load market intelligence. Please try again.");
+        setLoadingMarket(false);
+      });
   }
 
   function loadBusinessAdvisor() {
@@ -2534,6 +2548,16 @@ export default function AICommandCenter() {
               <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
                 <Spinner size={36} />
                 <div style={{ color: "rgba(255,255,255,.4)", marginTop: 16 }}>Building market intelligence…</div>
+                <div style={{ color: "rgba(255,255,255,.25)", marginTop: 8, fontSize: 12 }}>This may take up to 20 seconds</div>
+              </Panel>
+            ) : marketError ? (
+              <Panel style={{ textAlign: "center", padding: "60px 24px" }}>
+                <div style={{ fontSize: 36, marginBottom: 16 }}>⚠️</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "white", marginBottom: 8 }}>Failed to Load</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>{marketError}</div>
+                <button onClick={loadMarketIntel} style={{ padding: "10px 24px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+                  Try Again
+                </button>
               </Panel>
             ) : marketIntel ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
