@@ -1128,10 +1128,15 @@ export default function AICommandCenter() {
 
   // ── Markdown renderer ──────────────────────────────────────────────────────
   function renderMarkdown(text: string) {
-    // Normalize: split ### into own lines so they always render as headings
+    // Normalize: ensure each block element starts on its own line
     const normalized = text
       .replace(/\r\n/g, "\n")
-      .replace(/#{1,4}\s*/g, (m) => "\n" + m)   // ensure headings start on new line
+      // numbered items run together: "text1. Next" → "text\n1. Next"
+      .replace(/([^\n])(\s*)(\d+)\.\s+/g, (_, before, _sp, num) => `${before}\n${num}. `)
+      // inline bullets "• " not at start of line → new line
+      .replace(/([^\n])\s*•\s+/g, (_, before) => `${before}\n• `)
+      // headings always on own line
+      .replace(/#{1,4}\s*/g, (m) => "\n" + m)
       .replace(/\n{3,}/g, "\n\n");               // collapse 3+ blank lines to 2
 
     const lines = normalized.split("\n");
