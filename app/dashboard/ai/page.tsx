@@ -3033,7 +3033,33 @@ export default function AICommandCenter() {
                   ))}
                 </div>
 
-                {/* Filter bar */}
+                {/* Empty state when no bank transactions exist */}
+                {reconciliation.summary.total === 0 && (
+                  <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: "40px 28px", textAlign: "center" }}>
+                    <div style={{ fontSize: 44, marginBottom: 16 }}>🏦</div>
+                    <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 10 }}>No Bank Transactions Found</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.45)", lineHeight: 1.8, maxWidth: 420, margin: "0 auto 24px" }}>
+                      Reconciliation matches your <strong style={{ color: "rgba(255,255,255,.75)" }}>bank statement entries</strong> with your invoices, payments, and expenses.
+                      To use this feature, first record bank transactions via <strong style={{ color: "rgba(255,255,255,.75)" }}>Banking &amp; Payments → Bank Transactions</strong>.
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12, maxWidth: 560, margin: "0 auto" }}>
+                      {[
+                        { icon: "📥", label: "Import Bank Statement", desc: "Upload CSV or Excel from your bank" },
+                        { icon: "✏️", label: "Enter Transactions Manually", desc: "Add bank entries one by one" },
+                        { icon: "🔄", label: "Auto-sync Bank Feed", desc: "Connect your bank for live sync" },
+                      ].map(s => (
+                        <div key={s.label} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 12, padding: "14px 16px", textAlign: "left" }}>
+                          <div style={{ fontSize: 22, marginBottom: 8 }}>{s.icon}</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.8)", marginBottom: 4 }}>{s.label}</div>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", lineHeight: 1.5 }}>{s.desc}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Filter bar — only show when there are entries */}
+                {reconciliation.summary.total > 0 && (
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {(["all", "pending", "auto_matched", "unmatched"] as const).map(f => (
                     <button key={f} onClick={() => setReconciliationFilter(f)} style={{
@@ -3046,9 +3072,10 @@ export default function AICommandCenter() {
                     </button>
                   ))}
                 </div>
+                )}
 
                 {/* Transaction rows */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {reconciliation.summary.total > 0 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {reconciliation.items
                     .filter(item => reconciliationFilter === "all" || item.status === reconciliationFilter)
                     .map(item => {
@@ -3150,7 +3177,7 @@ export default function AICommandCenter() {
                         </div>
                       );
                     })}
-                </div>
+                </div>}
               </div>
             )}
           </div>
