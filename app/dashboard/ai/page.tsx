@@ -279,6 +279,43 @@ interface InvoiceReminderResponse {
   };
 }
 
+interface TaxSlabBreakdown {
+  slab: string;
+  taxableAmount: number;
+  tax: number;
+}
+interface TaxReport {
+  country: string;
+  countryCode: string;
+  flagEmoji: string;
+  reportTitle: string;
+  lawReference: string;
+  currency: string;
+  salesTax: {
+    outputTax: number;
+    inputTax: number;
+    netPayable: number;
+    isRefundable: boolean;
+    filingDeadline: string;
+    taxName: string;
+    standardRate: number;
+  };
+  incomeTax: {
+    annualNetProfitEstimate: number;
+    estimatedTax: number;
+    effectiveRate: number;
+    slabBreakdown: TaxSlabBreakdown[];
+    filingDeadline: string;
+    taxName: string;
+  };
+  wht: {
+    estimatedOnPurchases: number;
+    registered: number;
+    unregistered: number;
+    applicable: boolean;
+  };
+  notes: string[];
+}
 interface TaxEstimateResponse {
   month: string;
   summary: string;
@@ -295,29 +332,7 @@ interface TaxEstimateResponse {
     taxCode: string;
     taxRate: number;
   }[];
-  isPakistan?: boolean;
-  annualRevenue?: number;
-  annualExpenses?: number;
-  gst?: {
-    outputTax: number;
-    inputTax: number;
-    netPayable: number;
-    isRefundable: boolean;
-    filingDeadline: string;
-    month: string;
-  };
-  incomeTax?: {
-    annualNetProfitEstimate: number;
-    estimatedTax: number;
-    effectiveRate: number;
-    slabBreakdown: { slab: string; taxableAmount: number; tax: number }[];
-    filingDeadline: string;
-  };
-  wht?: {
-    estimatedOnPurchases: number;
-    registered: number;
-    unregistered: number;
-  };
+  taxReport?: TaxReport | null;
 }
 
 interface MarketIntelligenceResult {

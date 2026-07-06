@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildFinancialContext, FINOVA_SYSTEM_PROMPT, openAITextResponse } from "@/lib/finovaAI";
-import {
-  calculateIncomeTax,
-  calculateGSTMonth,
-  getFilingDeadlineForMonth,
-  FILING_DEADLINES,
-  WHT_RATES,
-} from "@/lib/pakistanTaxRules";
+import { getTaxEngine } from "@/lib/taxRules/index";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -75,29 +69,21 @@ export async function GET(req: NextRequest) {
       taxRate: tax.taxRate,
     }));
 
-    const currency = ctx.company.currency || "PKR";
+    const currency = ctx.company.currency || "USD";
     const country = companyMeta?.country || "";
-    const isPakistan = country.toLowerCase() === "pakistan" || currency === "PKR";
-
-    const baseSummary = [
-      `Estimated output tax this month is ${currency} ${Math.round(outputTax).toLocaleString()}.`,
-      `Estimated input tax this month is ${currency} ${Math.round(inputTax).toLocaleString()}.`,
-      netTaxPayable >= 0
-        ? `Estimated net tax payable is ${currency} ${Math.round(netTaxPayable).toLocaleString()}.`
-        : `Estimated recoverable tax position is ${currency} ${Math.round(Math.abs(netTaxPayable)).toLocaleString()}.`,
-    ];
 
     const prompt = `You are preparing a short AI tax estimate summary.
 
 Company: ${ctx.company.name}
 Business Type: ${ctx.company.businessType}
 Currency: ${currency}
+Country: ${country || "Unknown"}
 Month: ${now.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
 
 Numbers:
-- Output tax: ${outputTax}
-- Input tax: ${inputTax}
-- Net tax payable: ${netTaxPayable}
+- Output tax: ${Math.round(outputTax).toLocaleString()} ${currency}
+- Input tax: ${Math.round(inputTax).toLocaleString()} ${currency}
+- Net tax payable: ${Math.round(netTaxPayable).toLocaleString()} ${currency}
 - Revenue this month: ${ctx.revenue.thisMonth}
 - Expenses this month: ${ctx.expenses.thisMonth}
 
@@ -112,7 +98,33 @@ Write a practical 3-bullet tax estimate note for a business owner. Mention compl
       350,
     );
 
-    const baseResponse = {
+    const baseSummary = [
+      `Estimated output tax this month is ${currency} ${Math.round(outputTax).toLocaleString()}.`,
+      `Estimated input tax this month is ${currency} ${Math.round(inputTax).toLocaleString()}.`,
+      netTaxPayable >= 0
+        ? `Estimated net tax payable is ${currency} ${Math.round(netTaxPayable).toLocaleString()}.`
+        : `Estimated recoverable tax position is ${currency} ${Math.round(Math.abs(netTaxPayable)).toLocaleString()}.`,
+    ];
+
+    const annualRevenue = ctx.revenue.thisYear;
+    const annualExpenses = ctx.expenses.thisMonth * 12;
+    const totalPurchases = purchaseInvoices.reduce((sum, inv) => sum + Number(inv.total || 0), 0);
+
+    const engine = getTaxEngine(country, currency);
+    const taxReport = engine
+      ? engine.buildReport({
+          outputTax,
+          inputTax,
+          annualRevenue,
+          annualExpenses,
+          totalPurchases,
+          month: now.getMonth(),
+          year: now.getFullYear(),
+          currency,
+        })
+      : null;
+
+    return NextResponse.json({
       month: now.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
       summary: aiSummary || baseSummary.join("\n"),
       metrics: {
@@ -124,49 +136,7 @@ Write a practical 3-bullet tax estimate note for a business owner. Mention compl
         taxedPurchaseInvoices: purchaseInvoices.length,
       },
       taxCoverage,
-      isPakistan,
-    };
-
-    if (!isPakistan) {
-      return NextResponse.json(baseResponse);
-    }
-
-    // Pakistan FBR full report
-    const annualRevenue = ctx.revenue.thisYear;
-    const annualExpenses = ctx.expenses.thisMonth * 12; // fallback annualization
-    const annualNetProfitEstimate = Math.max(0, annualRevenue - annualExpenses);
-
-    const incomeTaxCalc = calculateIncomeTax(annualNetProfitEstimate);
-    const gstCalc = calculateGSTMonth(outputTax, inputTax, now.getMonth(), now.getFullYear());
-    const filingDeadline = getFilingDeadlineForMonth(now.getMonth(), now.getFullYear());
-
-    const totalPurchases = purchaseInvoices.reduce((sum, inv) => sum + Number(inv.total || 0), 0);
-    const whtOnPurchases = {
-      registered: Math.round(totalPurchases * WHT_RATES.supplier_registered),
-      unregistered: Math.round(totalPurchases * WHT_RATES.supplier_unregistered),
-      estimatedOnPurchases: Math.round(totalPurchases * WHT_RATES.supplier_registered),
-    };
-
-    return NextResponse.json({
-      ...baseResponse,
-      annualRevenue,
-      annualExpenses,
-      gst: {
-        outputTax: Math.round(outputTax),
-        inputTax: Math.round(inputTax),
-        netPayable: gstCalc.netPayable,
-        isRefundable: gstCalc.isRefundable,
-        filingDeadline,
-        month: now.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
-      },
-      incomeTax: {
-        annualNetProfitEstimate: Math.round(annualNetProfitEstimate),
-        estimatedTax: incomeTaxCalc.tax,
-        effectiveRate: incomeTaxCalc.effectiveRate,
-        slabBreakdown: incomeTaxCalc.slabBreakdown,
-        filingDeadline: FILING_DEADLINES.incomeTaxAnnual,
-      },
-      wht: whtOnPurchases,
+      taxReport,
     });
   } catch (err) {
     console.error("AI tax estimate error:", err);
