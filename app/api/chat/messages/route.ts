@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireRole } from "@/lib/requireRole";
 
 export const runtime = "nodejs";
 
-// GET /api/chat/messages?conversationId=
+// GET /api/chat/messages?conversationId= (admin only)
 export async function GET(req: NextRequest) {
+  const guard = requireRole(req, ["ADMIN"]);
+  if (guard) return guard;
+
   try {
     const { searchParams } = new URL(req.url);
     const conversationId = searchParams.get("conversationId");

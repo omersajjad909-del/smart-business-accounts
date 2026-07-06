@@ -9,7 +9,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const guard = requireRole(req, ["ADMIN", "ACCOUNTANT", "SUPPORT"]);
+  const guard = requireRole(req, ["ADMIN"]);
   if (guard) return guard;
 
   try {

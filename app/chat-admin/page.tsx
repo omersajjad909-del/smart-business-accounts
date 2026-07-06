@@ -4,6 +4,8 @@
 // Uses Prisma API + polling (no Supabase needed)
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
 
 /* ─── Types ─── */
 type Conversation = {
@@ -80,6 +82,8 @@ const QUICK_REPLIES = [
 ];
 
 export default function AgentDashboard() {
+  const router = useRouter();
+  const [authorized,     setAuthorized]     = useState(false);
   const [conversations,  setConversations]  = useState<Conversation[]>([]);
   const [activeId,       setActiveId]       = useState<string | null>(null);
   const [messages,       setMessages]       = useState<Message[]>([]);
@@ -93,6 +97,15 @@ export default function AgentDashboard() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef       = useRef<HTMLTextAreaElement>(null);
   const prevWaiting    = useRef(0);
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user || user.role?.toUpperCase() !== "ADMIN") {
+      router.replace("/dashboard");
+    } else {
+      setAuthorized(true);
+    }
+  }, [router]);
 
   const activeConv = conversations.find(c => c.id === activeId);
 
@@ -200,6 +213,8 @@ export default function AgentDashboard() {
     if (h < 24) return `${h}h ago`;
     return `${Math.floor(h / 24)}d ago`;
   }
+
+  if (!authorized) return null;
 
   return (
     <div style={{ minHeight:"100vh", background:"#080c1e", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif", display:"flex", flexDirection:"column" }}>

@@ -4,9 +4,9 @@ import { requireRole } from "@/lib/requireRole";
 
 export const runtime = "nodejs";
 
-// GET /api/chat/conversations — list all (admin dashboard only)
+// GET /api/chat/conversations — list all (admin only)
 export async function GET(req: NextRequest) {
-  const guard = requireRole(req, ["ADMIN", "ACCOUNTANT", "SUPPORT"]);
+  const guard = requireRole(req, ["ADMIN"]);
   if (guard) return guard;
 
   try {
