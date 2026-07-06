@@ -626,18 +626,22 @@ export default function AICommandCenter() {
   // Inventory Forecast state
   const [invForecast, setInvForecast] = useState<InvForecastResult | null>(null);
   const [invForecastLoading, setInvForecastLoading] = useState(false);
+  const [invForecastError, setInvForecastError] = useState<string | null>(null);
 
   // Cashflow Optimizer state
   const [cashflowOpt, setCashflowOpt] = useState<CashflowOptResult | null>(null);
   const [cashflowOptLoading, setCashflowOptLoading] = useState(false);
+  const [cashflowOptError, setCashflowOptError] = useState<string | null>(null);
 
   // Churn Prediction state
   const [churnResult, setChurnResult] = useState<ChurnResult | null>(null);
   const [churnLoading, setChurnLoading] = useState(false);
+  const [churnError, setChurnError] = useState<string | null>(null);
 
   // Supplier Intel state
   const [supplierIntel, setSupplierIntel] = useState<SupplierIntelResult | null>(null);
   const [supplierIntelLoading, setSupplierIntelLoading] = useState(false);
+  const [supplierIntelError, setSupplierIntelError] = useState<string | null>(null);
 
   // GL Suggest state
   const [glDesc, setGlDesc] = useState("");
@@ -954,41 +958,57 @@ export default function AICommandCenter() {
   async function loadInvForecast() {
     if (invForecastLoading) return;
     setInvForecastLoading(true);
+    setInvForecastError(null);
     try {
       const res = await fetch("/api/ai/inventory-forecast", { headers: getHeaders() });
       const data = await res.json() as InvForecastResult;
+      if (!res.ok || (data as any)?.error) throw new Error((data as any).error || "Failed");
       setInvForecast(data);
-    } catch { /* silent */ } finally { setInvForecastLoading(false); }
+    } catch (e: any) {
+      setInvForecastError(e?.message || "Failed to load stock forecast. Please try again.");
+    } finally { setInvForecastLoading(false); }
   }
 
   async function loadCashflowOpt() {
     if (cashflowOptLoading) return;
     setCashflowOptLoading(true);
+    setCashflowOptError(null);
     try {
       const res = await fetch("/api/ai/cashflow-optimize", { headers: getHeaders() });
       const data = await res.json() as CashflowOptResult;
+      if (!res.ok || (data as any)?.error) throw new Error((data as any).error || "Failed");
       setCashflowOpt(data);
-    } catch { /* silent */ } finally { setCashflowOptLoading(false); }
+    } catch (e: any) {
+      setCashflowOptError(e?.message || "Failed to load cash optimizer. Please try again.");
+    } finally { setCashflowOptLoading(false); }
   }
 
   async function loadChurn() {
     if (churnLoading) return;
     setChurnLoading(true);
+    setChurnError(null);
     try {
       const res = await fetch("/api/ai/churn-prediction", { headers: getHeaders() });
       const data = await res.json() as ChurnResult;
+      if (!res.ok || (data as any)?.error) throw new Error((data as any).error || "Failed");
       setChurnResult(data);
-    } catch { /* silent */ } finally { setChurnLoading(false); }
+    } catch (e: any) {
+      setChurnError(e?.message || "Failed to load churn prediction. Please try again.");
+    } finally { setChurnLoading(false); }
   }
 
   async function loadSupplierIntel() {
     if (supplierIntelLoading) return;
     setSupplierIntelLoading(true);
+    setSupplierIntelError(null);
     try {
       const res = await fetch("/api/ai/supplier-intel", { headers: getHeaders() });
       const data = await res.json() as SupplierIntelResult;
+      if (!res.ok || (data as any)?.error) throw new Error((data as any).error || "Failed");
       setSupplierIntel(data);
-    } catch { /* silent */ } finally { setSupplierIntelLoading(false); }
+    } catch (e: any) {
+      setSupplierIntelError(e?.message || "Failed to load supplier intelligence. Please try again.");
+    } finally { setSupplierIntelLoading(false); }
   }
 
   async function handleGLSuggest() {
@@ -1264,31 +1284,43 @@ export default function AICommandCenter() {
   ];
 
   const TABS: { id: Tab; label: string; icon: string }[] = [
-    { id: "overview",         label: "Overview",                                              icon: "⚡" },
-    { id: "chat",             label: "Ask AI",                                                icon: "💬" },
-    { id: "insights",         label: "Insights",                                              icon: "✦" },
+    { id: "overview",         label: "Overview",              icon: "⚡" },
+    { id: "chat",             label: "Ask AI",                icon: "💬" },
+    { id: "insights",         label: "Insights",              icon: "✦" },
     { id: "alerts",           label: `Alerts${alerts.length > 0 ? ` (${alerts.length})` : ""}`, icon: "🔔" },
-    { id: "forecast",         label: "Forecast",                                              icon: "📈" },
-    { id: "recommendations",  label: "Recommendations",                                       icon: "🎯" },
-    { id: "reminders",        label: "Invoice Reminders",                                     icon: "🔔" },
-    { id: "tax",              label: "Tax Estimate",                                          icon: "🧾" },
-    { id: "report",           label: "Monthly Report",                                        icon: "📄" },
-    { id: "market",           label: "Market Intel",                                          icon: "🌐" },
-    { id: "advisor",          label: "Advisor",                                               icon: "🧭" },
-    { id: "reconciliation",   label: "Reconciliation",                                        icon: "🔗" },
-    { id: "scan",             label: "Scan Receipt",                                          icon: "📷" },
-    { id: "invoice-gen",      label: "Quick Invoice",                                         icon: "✍️" },
-    { id: "inv-forecast",     label: "Stock Forecast",                                        icon: "📦" },
-    { id: "cashflow-opt",     label: "Cash Optimizer",                                        icon: "💵" },
-    { id: "churn",            label: "Churn Prediction",                                      icon: "👥" },
-    { id: "supplier-intel",   label: "Supplier Intel",                                        icon: "🤝" },
-    { id: "gl-suggest",       label: "GL Auto-Code",                                          icon: "🏷️" },
-    { id: "expense-cat",      label: "Expense Categories",                                    icon: "📂" },
-    { id: "budget",           label: "Budget & Variance",                                     icon: "📊" },
-    { id: "duplicate",        label: "Duplicate Detection",                                   icon: "🔍" },
-    { id: "customer-profit",  label: "Customer Profitability",                                icon: "👤" },
-    { id: "ratios",           label: "Financial Ratios",                                      icon: "⚖️" },
+    { id: "forecast",         label: "Forecast",              icon: "📈" },
+    { id: "recommendations",  label: "Recommendations",       icon: "🎯" },
+    { id: "reminders",        label: "Invoice Reminders",     icon: "🔔" },
+    { id: "tax",              label: "Tax Estimate",          icon: "🧾" },
+    { id: "report",           label: "Monthly Report",        icon: "📄" },
+    { id: "market",           label: "Market Intel",          icon: "🌐" },
+    { id: "advisor",          label: "Advisor",               icon: "🧭" },
+    { id: "reconciliation",   label: "Reconciliation",        icon: "🔗" },
+    { id: "scan",             label: "Scan Receipt",          icon: "📷" },
+    { id: "invoice-gen",      label: "Quick Invoice",         icon: "✍️" },
+    { id: "inv-forecast",     label: "Stock Forecast",        icon: "📦" },
+    { id: "cashflow-opt",     label: "Cash Optimizer",        icon: "💵" },
+    { id: "churn",            label: "Churn Prediction",      icon: "👥" },
+    { id: "supplier-intel",   label: "Supplier Intel",        icon: "🤝" },
+    { id: "gl-suggest",       label: "GL Auto-Code",          icon: "🏷️" },
+    { id: "expense-cat",      label: "Expense Categories",    icon: "📂" },
+    { id: "budget",           label: "Budget & Variance",     icon: "📊" },
+    { id: "duplicate",        label: "Duplicate Detection",   icon: "🔍" },
+    { id: "customer-profit",  label: "Customer Profitability", icon: "👤" },
+    { id: "ratios",           label: "Financial Ratios",      icon: "⚖️" },
   ];
+
+  const TAB_GROUPS: { id: string; label: string; icon: string; color: string; tabs: Tab[] }[] = [
+    { id: "core",      label: "Core",       icon: "⚡", color: "#6366f1", tabs: ["overview", "chat", "insights", "alerts"] },
+    { id: "reports",   label: "Reports",    icon: "📊", color: "#10b981", tabs: ["forecast", "tax", "report", "ratios", "budget"] },
+    { id: "ops",       label: "Operations", icon: "⚙️", color: "#f59e0b", tabs: ["recommendations", "reminders", "invoice-gen", "scan", "reconciliation"] },
+    { id: "growth",    label: "Growth",     icon: "🌐", color: "#8b5cf6", tabs: ["market", "advisor"] },
+    { id: "inventory", label: "Inventory",  icon: "📦", color: "#0ea5e9", tabs: ["inv-forecast", "cashflow-opt", "supplier-intel"] },
+    { id: "analytics", label: "Analytics",  icon: "🔬", color: "#ec4899", tabs: ["churn", "customer-profit", "gl-suggest", "expense-cat", "duplicate"] },
+  ];
+
+  const activeGroup = TAB_GROUPS.find(g => g.tabs.includes(tab)) ?? TAB_GROUPS[0];
+  const tabsInGroup = TABS.filter(t => activeGroup.tabs.includes(t.id));
 
   return (
     <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", overflow: "hidden", margin: "-16px -12px", width: "calc(100% + 24px)", maxWidth: "none" }}>
@@ -1344,11 +1376,46 @@ export default function AICommandCenter() {
         </div>
       </div>
 
-      {/* ══ HORIZONTAL TAB BAR ════════════════════════════════════════════════ */}
-      <div className="ai-tabs-bar" style={{ padding: "0 20px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(255,255,255,.01)" }}>
-        {TABS.map(t => (
-          <button key={t.id} className="ai-tab-btn" onClick={() => handleTab(t.id)} style={{ padding: "11px 13px", border: "none", borderBottom: tab === t.id ? "2px solid #6366f1" : "2px solid transparent", background: "none", color: tab === t.id ? "#c7d2fe" : "rgba(255,255,255,.38)", fontSize: 12, fontWeight: tab === t.id ? 700 : 500, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap", transition: "all .15s", display: "flex", alignItems: "center", gap: 5, flexShrink: 0, marginTop: 2 }}>
-            <span style={{ fontSize: 12 }}>{t.icon}</span>
+      {/* ══ ROW 1: GROUPS ════════════════════════════════════════════════════ */}
+      <div className="ai-tabs-bar" style={{ padding: "0 16px", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", gap: 2, overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(255,255,255,.015)" }}>
+        {TAB_GROUPS.map(g => {
+          const isActive = activeGroup.id === g.id;
+          const hasBadge = g.id === "core" && alerts.length > 0;
+          return (
+            <button key={g.id} className="ai-tab-btn" onClick={() => {
+              if (!g.tabs.includes(tab)) handleTab(g.tabs[0] as Tab);
+            }} style={{
+              padding: "9px 14px", border: "none",
+              borderBottom: isActive ? `2px solid ${g.color}` : "2px solid transparent",
+              background: isActive ? `${g.color}12` : "none",
+              color: isActive ? "white" : "rgba(255,255,255,.42)",
+              fontSize: 12, fontWeight: isActive ? 700 : 500,
+              cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+              transition: "all .15s", display: "flex", alignItems: "center", gap: 5,
+              flexShrink: 0, marginTop: 1, borderRadius: "6px 6px 0 0",
+            }}>
+              <span style={{ fontSize: 13 }}>{g.icon}</span>
+              <span>{g.label}</span>
+              {hasBadge && <span style={{ background: "#ef4444", color: "white", borderRadius: 999, fontSize: 9, fontWeight: 800, padding: "1px 5px", lineHeight: 1.4 }}>{alerts.length}</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ══ ROW 2: TABS IN ACTIVE GROUP ══════════════════════════════════════ */}
+      <div className="ai-tabs-bar" style={{ padding: "0 16px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", overflowX: "auto", flexShrink: 0, scrollbarWidth: "none", background: "rgba(255,255,255,.008)", minHeight: 36 }}>
+        {tabsInGroup.map(t => (
+          <button key={t.id} className="ai-tab-btn" onClick={() => handleTab(t.id)} style={{
+            padding: "7px 11px", border: "none",
+            borderBottom: tab === t.id ? `2px solid ${activeGroup.color}` : "2px solid transparent",
+            background: "none",
+            color: tab === t.id ? "white" : "rgba(255,255,255,.38)",
+            fontSize: 11.5, fontWeight: tab === t.id ? 700 : 400,
+            cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+            transition: "all .15s", display: "flex", alignItems: "center", gap: 4,
+            flexShrink: 0,
+          }}>
+            <span style={{ fontSize: 11 }}>{t.icon}</span>
             <span>{t.label}</span>
           </button>
         ))}
@@ -3518,6 +3585,7 @@ export default function AICommandCenter() {
               <button onClick={loadInvForecast} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(245,158,11,.12)", border: "1px solid rgba(245,158,11,.3)", color: "#fbbf24", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
             </div>
             {invForecastLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing sales patterns...</div>}
+            {invForecastError && !invForecastLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {invForecastError} <button onClick={() => { setInvForecast(null); loadInvForecast(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {invForecast && !invForecastLoading && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
@@ -3575,6 +3643,7 @@ export default function AICommandCenter() {
               <button onClick={loadCashflowOpt} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(16,185,129,.12)", border: "1px solid rgba(16,185,129,.3)", color: "#6ee7b7", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
             </div>
             {cashflowOptLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing cash position...</div>}
+            {cashflowOptError && !cashflowOptLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {cashflowOptError} <button onClick={() => { setCashflowOpt(null); loadCashflowOpt(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {cashflowOpt && !cashflowOptLoading && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
@@ -3649,6 +3718,7 @@ export default function AICommandCenter() {
               <button onClick={loadChurn} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(139,92,246,.12)", border: "1px solid rgba(139,92,246,.3)", color: "#c4b5fd", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
             </div>
             {churnLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing customer behavior...</div>}
+            {churnError && !churnLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {churnError} <button onClick={() => { setChurnResult(null); loadChurn(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {churnResult && !churnLoading && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
@@ -3710,6 +3780,7 @@ export default function AICommandCenter() {
               <button onClick={loadSupplierIntel} style={{ marginLeft: "auto", padding: "8px 16px", borderRadius: 9, background: "rgba(14,165,233,.12)", border: "1px solid rgba(14,165,233,.3)", color: "#7dd3fc", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
             </div>
             {supplierIntelLoading && <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,.4)", fontSize: 14 }}>⏳ Analyzing purchase history...</div>}
+            {supplierIntelError && !supplierIntelLoading && <div style={{ textAlign: "center", padding: 40, color: "#f87171", fontSize: 13 }}>⚠️ {supplierIntelError} <button onClick={() => { setSupplierIntel(null); loadSupplierIntel(); }} style={{ marginLeft: 10, color: "#a5b4fc", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Retry</button></div>}
             {supplierIntel && !supplierIntelLoading && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
