@@ -1115,6 +1115,17 @@ export default function AICommandCenter() {
     }
   }
 
+  // ── AI sparkle icon ────────────────────────────────────────────────────────
+  function AiIcon({ size = 20, color = "white" }: { size?: number; color?: string }) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L13.6 9.4L21 11L13.6 12.6L12 20L10.4 12.6L3 11L10.4 9.4L12 2Z" fill={color} />
+        <path d="M19.5 14.5L20.4 17.6L23.5 18.5L20.4 19.4L19.5 22.5L18.6 19.4L15.5 18.5L18.6 17.6L19.5 14.5Z" fill={color} opacity="0.65" />
+        <path d="M5 3L5.7 5.3L8 6L5.7 6.7L5 9L4.3 6.7L2 6L4.3 5.3L5 3Z" fill={color} opacity="0.65" />
+      </svg>
+    );
+  }
+
   // ── Markdown renderer ──────────────────────────────────────────────────────
   function renderMarkdown(text: string) {
     // Normalize: split ### into own lines so they always render as headings
@@ -1191,7 +1202,7 @@ export default function AICommandCenter() {
   const TABS: { id: Tab; label: string; icon: string }[] = [
     { id: "overview",         label: "Overview",                                              icon: "⚡" },
     { id: "chat",             label: "Ask AI",                                                icon: "💬" },
-    { id: "insights",         label: "Insights",                                              icon: "🧠" },
+    { id: "insights",         label: "Insights",                                              icon: "✦" },
     { id: "alerts",           label: `Alerts${alerts.length > 0 ? ` (${alerts.length})` : ""}`, icon: "🔔" },
     { id: "forecast",         label: "Forecast",                                              icon: "📈" },
     { id: "recommendations",  label: "Recommendations",                                       icon: "🎯" },
@@ -1237,7 +1248,7 @@ export default function AICommandCenter() {
       {/* ══ TOP HEADER ═══════════════════════════════════════════════════════ */}
       <div style={{ padding: "10px 24px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, background: "rgba(255,255,255,.018)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(99,102,241,.45)", fontSize: 16, flexShrink: 0 }}>🧠</div>
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(99,102,241,.45)", flexShrink: 0 }}><AiIcon size={18} /></div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-.2px", lineHeight: 1.2 }}>FinovaOS AI</div>
             <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.3)", marginTop: 1 }}>{ctx?.company.name || "Loading..."}</div>
@@ -1382,7 +1393,7 @@ export default function AICommandCenter() {
                 <div style={{ display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 16, marginBottom: 20 }}>
                   <Panel>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>🧠 AI Insights Box</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 6 }}><AiIcon size={14} color="rgba(255,255,255,.6)" /> AI Insights Box</div>
                       <button
                         onClick={() => handleTab("insights")}
                         style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)", background: "rgba(99,102,241,.12)", color: "#a5b4fc", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
