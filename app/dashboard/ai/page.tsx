@@ -295,6 +295,29 @@ interface TaxEstimateResponse {
     taxCode: string;
     taxRate: number;
   }[];
+  isPakistan?: boolean;
+  annualRevenue?: number;
+  annualExpenses?: number;
+  gst?: {
+    outputTax: number;
+    inputTax: number;
+    netPayable: number;
+    isRefundable: boolean;
+    filingDeadline: string;
+    month: string;
+  };
+  incomeTax?: {
+    annualNetProfitEstimate: number;
+    estimatedTax: number;
+    effectiveRate: number;
+    slabBreakdown: { slab: string; taxableAmount: number; tax: number }[];
+    filingDeadline: string;
+  };
+  wht?: {
+    estimatedOnPurchases: number;
+    registered: number;
+    unregistered: number;
+  };
 }
 
 interface MarketIntelligenceResult {
@@ -2370,51 +2393,180 @@ export default function AICommandCenter() {
                 <div>AI is estimating your tax position...</div>
               </div>
             ) : taxEstimate ? (
-              <div style={{ display: "grid", gap: 16 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-                  <Panel>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Output Tax</div>
-                    <div style={{ fontSize: 20, fontWeight: 900, color: "#f59e0b" }}>{fmt(taxEstimate.metrics.outputTax, currency)}</div>
-                  </Panel>
-                  <Panel>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Input Tax</div>
-                    <div style={{ fontSize: 20, fontWeight: 900, color: "#10b981" }}>{fmt(taxEstimate.metrics.inputTax, currency)}</div>
-                  </Panel>
-                  <Panel>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Net Tax Position</div>
-                    <div style={{ fontSize: 20, fontWeight: 900, color: taxEstimate.metrics.netTaxPayable >= 0 ? "#f59e0b" : "#10b981" }}>{fmt(taxEstimate.metrics.netTaxPayable, currency)}</div>
-                  </Panel>
-                </div>
-
-                <Panel>
-                  <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 6 }}>AI Tax Estimate</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 14 }}>{taxEstimate.month} · estimate based on taxed sales, taxed purchases, and configured tax profiles.</div>
-                  <div style={{ lineHeight: 1.8 }}>{renderMarkdown(taxEstimate.summary)}</div>
-                </Panel>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                  <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>Coverage</div>
-                    <div style={{ display: "grid", gap: 8 }}>
-                      <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Tax configurations: {taxEstimate.metrics.taxConfigsCount}</div>
-                      <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Taxed sales invoices: {taxEstimate.metrics.taxedSalesInvoices}</div>
-                      <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Taxed purchase invoices: {taxEstimate.metrics.taxedPurchaseInvoices}</div>
+              taxEstimate.isPakistan ? (
+                /* ── Pakistan FBR Layout ── */
+                <div style={{ display: "grid", gap: 16 }}>
+                  {/* Header */}
+                  <div style={{ background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ fontSize: 28 }}>🇵🇰</span>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: 16, color: "#10b981" }}>Pakistan FBR Tax Report</div>
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 2 }}>Based on FBR Finance Act 2024-25 · {taxEstimate.month}</div>
                     </div>
-                  </Panel>
-                  <Panel>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>Tax Profiles</div>
-                    <div style={{ display: "grid", gap: 8 }}>
-                      {taxEstimate.taxCoverage.length ? taxEstimate.taxCoverage.map((tax) => (
-                        <div key={`${tax.taxCode}-${tax.taxType}`} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>
-                          {tax.taxType} · {tax.taxCode} · {tax.taxRate}%
+                  </div>
+
+                  {/* GST + Income Tax two-column */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                    {/* Monthly GST */}
+                    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
+                        Monthly GST Return · {taxEstimate.gst?.month}
+                      </div>
+                      <div style={{ display: "grid", gap: 10 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Output Tax (Sales)</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "#f59e0b" }}>PKR {(taxEstimate.gst?.outputTax ?? 0).toLocaleString()}</span>
                         </div>
-                      )) : (
-                        <div style={{ color: "rgba(255,255,255,.4)", fontSize: 13 }}>No tax configuration found.</div>
-                      )}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Input Tax (Purchases)</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "#10b981" }}>PKR {(taxEstimate.gst?.inputTax ?? 0).toLocaleString()}</span>
+                        </div>
+                        <div style={{ height: 1, background: "rgba(255,255,255,.08)", margin: "4px 0" }} />
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>
+                            {taxEstimate.gst?.isRefundable ? "Refundable" : "Net Payable"}
+                          </span>
+                          <span style={{ fontSize: 16, fontWeight: 900, color: taxEstimate.gst?.isRefundable ? "#10b981" : "#f59e0b" }}>
+                            PKR {(taxEstimate.gst?.netPayable ?? 0).toLocaleString()}
+                          </span>
+                        </div>
+                        <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+                          Due: {taxEstimate.gst?.filingDeadline}
+                        </div>
+                      </div>
                     </div>
-                  </Panel>
+
+                    {/* Annual Income Tax */}
+                    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>
+                        Annual Income Tax Est. · FY 2024-25
+                      </div>
+                      <div style={{ display: "grid", gap: 10 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Net Profit (Est.)</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>PKR {(taxEstimate.incomeTax?.annualNetProfitEstimate ?? 0).toLocaleString()}</span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: 13, color: "rgba(255,255,255,.6)" }}>Effective Rate</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>{taxEstimate.incomeTax?.effectiveRate ?? 0}%</span>
+                        </div>
+                        <div style={{ height: 1, background: "rgba(255,255,255,.08)", margin: "4px 0" }} />
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.8)" }}>Tax Payable</span>
+                          <span style={{ fontSize: 16, fontWeight: 900, color: "#f59e0b" }}>PKR {(taxEstimate.incomeTax?.estimatedTax ?? 0).toLocaleString()}</span>
+                        </div>
+                        <div style={{ marginTop: 6, fontSize: 11.5, color: "rgba(255,255,255,.35)" }}>
+                          Due: {taxEstimate.incomeTax?.filingDeadline}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Slab Breakdown */}
+                  {taxEstimate.incomeTax?.slabBreakdown && taxEstimate.incomeTax.slabBreakdown.length > 0 && (
+                    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Income Tax Slab Breakdown</div>
+                      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                        <thead>
+                          <tr>
+                            <th style={{ textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Slab</th>
+                            <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Taxable Amount</th>
+                            <th style={{ textAlign: "right", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", paddingBottom: 10 }}>Tax</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {taxEstimate.incomeTax.slabBreakdown.map((row, i) => (
+                            <tr key={i} style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
+                              <td style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", padding: "8px 0" }}>{row.slab}</td>
+                              <td style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", textAlign: "right", padding: "8px 0" }}>PKR {row.taxableAmount.toLocaleString()}</td>
+                              <td style={{ fontSize: 12.5, color: "#f59e0b", textAlign: "right", padding: "8px 0", fontWeight: 700 }}>PKR {row.tax.toLocaleString()}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* WHT Section */}
+                  {taxEstimate.wht && (
+                    <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.6)", marginBottom: 14 }}>Withholding Tax on Purchases (WHT)</div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                        <div>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4 }}>If Supplier Registered (4%)</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981" }}>PKR {taxEstimate.wht.registered.toLocaleString()}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)", marginBottom: 4 }}>If Supplier Unregistered (8%)</div>
+                          <div style={{ fontSize: 16, fontWeight: 800, color: "#f59e0b" }}>PKR {taxEstimate.wht.unregistered.toLocaleString()}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI Summary */}
+                  <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 16, padding: 20 }}>
+                    <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 6 }}>AI Summary</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 14 }}>{taxEstimate.month} · based on taxed invoices and FBR 2024-25 rules</div>
+                    <div style={{ lineHeight: 1.8 }}>{renderMarkdown(taxEstimate.summary)}</div>
+                  </div>
+
+                  {/* Disclaimer */}
+                  <div style={{ background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.2)", borderRadius: 12, padding: "12px 16px", display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <span style={{ fontSize: 16, marginTop: 1 }}>⚠️</span>
+                    <div style={{ fontSize: 12, color: "#f59e0b", lineHeight: 1.6 }}>
+                      This is an estimate only based on current month data and FBR Finance Act 2024-25 slabs. Actual tax liability may differ. Consult a qualified tax advisor or FBR-registered tax consultant before filing.
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                /* ── Non-Pakistan / Generic Layout ── */
+                <div style={{ display: "grid", gap: 16 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+                    <Panel>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Output Tax</div>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: "#f59e0b" }}>{fmt(taxEstimate.metrics.outputTax, currency)}</div>
+                    </Panel>
+                    <Panel>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Input Tax</div>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: "#10b981" }}>{fmt(taxEstimate.metrics.inputTax, currency)}</div>
+                    </Panel>
+                    <Panel>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>Net Tax Position</div>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: taxEstimate.metrics.netTaxPayable >= 0 ? "#f59e0b" : "#10b981" }}>{fmt(taxEstimate.metrics.netTaxPayable, currency)}</div>
+                    </Panel>
+                  </div>
+
+                  <Panel>
+                    <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 6 }}>AI Tax Estimate</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 14 }}>{taxEstimate.month} · estimate based on taxed sales, taxed purchases, and configured tax profiles.</div>
+                    <div style={{ lineHeight: 1.8 }}>{renderMarkdown(taxEstimate.summary)}</div>
+                  </Panel>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                    <Panel>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>Coverage</div>
+                      <div style={{ display: "grid", gap: 8 }}>
+                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Tax configurations: {taxEstimate.metrics.taxConfigsCount}</div>
+                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Taxed sales invoices: {taxEstimate.metrics.taxedSalesInvoices}</div>
+                        <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>Taxed purchase invoices: {taxEstimate.metrics.taxedPurchaseInvoices}</div>
+                      </div>
+                    </Panel>
+                    <Panel>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "rgba(255,255,255,.6)" }}>Tax Profiles</div>
+                      <div style={{ display: "grid", gap: 8 }}>
+                        {taxEstimate.taxCoverage.length ? taxEstimate.taxCoverage.map((tax) => (
+                          <div key={`${tax.taxCode}-${tax.taxType}`} style={{ fontSize: 12.5, color: "rgba(255,255,255,.72)" }}>
+                            {tax.taxType} · {tax.taxCode} · {tax.taxRate}%
+                          </div>
+                        )) : (
+                          <div style={{ color: "rgba(255,255,255,.4)", fontSize: 13 }}>No tax configuration found.</div>
+                        )}
+                      </div>
+                    </Panel>
+                  </div>
+                </div>
+              )
             ) : null}
           </div>
         )}

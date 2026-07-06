@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildFinancialContext, FINOVA_SYSTEM_PROMPT, openAITextResponse } from "@/lib/finovaAI";
+import {
+  calculateIncomeTax,
+  calculateGSTMonth,
+  getFilingDeadlineForMonth,
+  FILING_DEADLINES,
+  WHT_RATES,
+} from "@/lib/pakistanTaxRules";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -16,7 +23,7 @@ export async function GET(req: NextRequest) {
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
-    const [ctx, salesInvoices, purchaseInvoices, taxConfigs] = await Promise.all([
+    const [ctx, salesInvoices, purchaseInvoices, taxConfigs, companyMeta] = await Promise.all([
       buildFinancialContext(companyId),
       prisma.salesInvoice.findMany({
         where: {
@@ -39,6 +46,10 @@ export async function GET(req: NextRequest) {
       prisma.taxConfiguration.findMany({
         where: { companyId },
         orderBy: { createdAt: "asc" },
+      }),
+      prisma.company.findUnique({
+        where: { id: companyId },
+        select: { country: true },
       }),
     ]);
 
@@ -65,6 +76,9 @@ export async function GET(req: NextRequest) {
     }));
 
     const currency = ctx.company.currency || "PKR";
+    const country = companyMeta?.country || "";
+    const isPakistan = country.toLowerCase() === "pakistan" || currency === "PKR";
+
     const baseSummary = [
       `Estimated output tax this month is ${currency} ${Math.round(outputTax).toLocaleString()}.`,
       `Estimated input tax this month is ${currency} ${Math.round(inputTax).toLocaleString()}.`,
@@ -98,7 +112,7 @@ Write a practical 3-bullet tax estimate note for a business owner. Mention compl
       350,
     );
 
-    return NextResponse.json({
+    const baseResponse = {
       month: now.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
       summary: aiSummary || baseSummary.join("\n"),
       metrics: {
@@ -110,6 +124,49 @@ Write a practical 3-bullet tax estimate note for a business owner. Mention compl
         taxedPurchaseInvoices: purchaseInvoices.length,
       },
       taxCoverage,
+      isPakistan,
+    };
+
+    if (!isPakistan) {
+      return NextResponse.json(baseResponse);
+    }
+
+    // Pakistan FBR full report
+    const annualRevenue = ctx.revenue.thisYear;
+    const annualExpenses = ctx.expenses.thisMonth * 12; // fallback annualization
+    const annualNetProfitEstimate = Math.max(0, annualRevenue - annualExpenses);
+
+    const incomeTaxCalc = calculateIncomeTax(annualNetProfitEstimate);
+    const gstCalc = calculateGSTMonth(outputTax, inputTax, now.getMonth(), now.getFullYear());
+    const filingDeadline = getFilingDeadlineForMonth(now.getMonth(), now.getFullYear());
+
+    const totalPurchases = purchaseInvoices.reduce((sum, inv) => sum + Number(inv.total || 0), 0);
+    const whtOnPurchases = {
+      registered: Math.round(totalPurchases * WHT_RATES.supplier_registered),
+      unregistered: Math.round(totalPurchases * WHT_RATES.supplier_unregistered),
+      estimatedOnPurchases: Math.round(totalPurchases * WHT_RATES.supplier_registered),
+    };
+
+    return NextResponse.json({
+      ...baseResponse,
+      annualRevenue,
+      annualExpenses,
+      gst: {
+        outputTax: Math.round(outputTax),
+        inputTax: Math.round(inputTax),
+        netPayable: gstCalc.netPayable,
+        isRefundable: gstCalc.isRefundable,
+        filingDeadline,
+        month: now.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+      },
+      incomeTax: {
+        annualNetProfitEstimate: Math.round(annualNetProfitEstimate),
+        estimatedTax: incomeTaxCalc.tax,
+        effectiveRate: incomeTaxCalc.effectiveRate,
+        slabBreakdown: incomeTaxCalc.slabBreakdown,
+        filingDeadline: FILING_DEADLINES.incomeTaxAnnual,
+      },
+      wht: whtOnPurchases,
     });
   } catch (err) {
     console.error("AI tax estimate error:", err);
