@@ -1131,8 +1131,13 @@ export default function AICommandCenter() {
     // Normalize: ensure each block element starts on its own line
     const normalized = text
       .replace(/\r\n/g, "\n")
-      // numbered items run together: "text1. Next" → "text\n1. Next"
-      .replace(/([^\n])(\s*)(\d+)\.\s+/g, (_, before, _sp, num) => `${before}\n${num}. `)
+      // numbered items concatenated inline — only split when:
+      //   • preceded by a non-digit non-period char (avoids "2.5", "v3.1")
+      //   • number is 1–2 digits (list items, not large numbers)
+      //   • followed by a non-digit (avoids splitting "1.5 kg" etc.)
+      // e.g. "inventory:1. Wavy" → "inventory:\n1. Wavy"
+      //      "Wavy2. PEPSI"      → "Wavy\n2. PEPSI"
+      .replace(/([^0-9.\n])(\d{1,2})\.\s+([^0-9\n])/g, (_, a, n, c) => `${a}\n${n}. ${c}`)
       // inline bullets "• " not at start of line → new line
       .replace(/([^\n])\s*•\s+/g, (_, before) => `${before}\n• `)
       // headings always on own line
