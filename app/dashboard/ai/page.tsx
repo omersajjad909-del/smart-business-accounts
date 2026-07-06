@@ -346,6 +346,7 @@ interface MarketIntelligenceResult {
   competitorEdge: string[];
   score: number;
   summary: string;
+  aiEnhanced?: boolean;
 }
 
 interface BusinessAdvisorResult {
@@ -413,6 +414,7 @@ function normalizeMarketIntel(data: Partial<MarketIntelligenceResult> | null | u
     competitorEdge: Array.isArray(data.competitorEdge) ? data.competitorEdge : [],
     score: typeof data.score === "number" ? data.score : 0,
     summary: data.summary || "Market intelligence is currently unavailable.",
+    aiEnhanced: Boolean(data.aiEnhanced),
   };
 }
 
@@ -2760,9 +2762,15 @@ export default function AICommandCenter() {
                 <Panel style={{ display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap" }}>
                   <HealthRing score={marketIntel.score} />
                   <div style={{ flex: 1, minWidth: 200 }}>
-                    <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>Market Intelligence</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                      <div style={{ fontSize: 22, fontWeight: 800 }}>Market Intelligence</div>
+                      {marketIntel.aiEnhanced
+                        ? <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(99,102,241,.2)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,.3)" }}>GPT Enhanced</span>
+                        : <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.35)", border: "1px solid rgba(255,255,255,.1)" }}>Rule-based</span>
+                      }
+                    </div>
                     <div style={{ fontSize: 14, color: "rgba(255,255,255,.55)", marginBottom: 10 }}>{marketIntel.businessLabel} industry analysis</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.7 }}>{marketIntel.summary}</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.7 }}>{renderMarkdown(marketIntel.summary)}</div>
                   </div>
                 </Panel>
 

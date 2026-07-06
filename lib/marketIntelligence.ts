@@ -1551,7 +1551,21 @@ export function buildMarketIntelligence(ctx: FinancialContext): MarketIntelligen
     return !currentProducts.some(cp => nameWords.some(w => cp.toLowerCase().includes(w)));
   });
 
-  const score = calculateDiversificationScore(ctx, profile);
+  // Same formula as healthScore() in the AI page so all widgets show the same number.
+  const _stockVal = ctx.inventory.stockValue || 0;
+  const _monthlyExp = ctx.expenses.thisMonth || 1;
+  const _stockBonus = _stockVal >= _monthlyExp * 2 ? 15 : _stockVal >= _monthlyExp ? 10 : _stockVal >= _monthlyExp * 0.5 ? 5 : 0;
+  const score = Math.max(20, Math.min(100, Math.round(
+    60
+    + (ctx.revenue.change > 0 ? Math.min(ctx.revenue.change, 15) : Math.max(ctx.revenue.change, -15))
+    + (ctx.expenses.change < ctx.revenue.change ? 10 : 0)
+    - (ctx.expenses.change > 20 ? 10 : 0)
+    + (ctx.profit.thisMonth > 0 ? 10 : 0)
+    - (ctx.profit.thisMonth < 0 ? 20 : 0)
+    - (ctx.receivables.overdue > ctx.revenue.thisMonth * 0.3 ? 8 : 0)
+    - (ctx.inventory.lowStockItems > 5 ? 5 : 0)
+    + _stockBonus
+  )));
 
   const summary = currentProducts.length > 0
     ? `${ctx.company.name} currently sells ${currentProducts.slice(0, 3).join(", ")}${currentProducts.length > 3 ? ` and ${currentProducts.length - 3} more` : ""} in the ${profile.label} space. There are ${suggestedNew.length} high-potential additions that similar businesses use to grow revenue by 20-40%.`
