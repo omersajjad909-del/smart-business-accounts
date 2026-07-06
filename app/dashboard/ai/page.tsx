@@ -1697,7 +1697,7 @@ export default function AICommandCenter() {
                   <div style={{ fontSize: 28, fontWeight: 900, color: "white", marginBottom: 8, letterSpacing: "-.5px" }}>FinovaOS AI</div>
                   <div style={{ fontSize: 14, color: "rgba(255,255,255,.42)", marginBottom: 32, maxWidth: 400, lineHeight: 1.7 }}>
                     Your financial intelligence assistant — connected to your live business data.<br />
-                    <span style={{ color: "rgba(255,255,255,.28)" }}>Urdu ya English dono chalti hain.</span>
+                    <span style={{ color: "rgba(255,255,255,.28)", fontFamily: "'Noto Nastaliq Urdu', serif", fontSize: 13, lineHeight: 2 }}>اردو یا انگلش، دونوں چلتی ہیں۔</span>
                   </div>
 
                   {/* Suggestion cards */}
