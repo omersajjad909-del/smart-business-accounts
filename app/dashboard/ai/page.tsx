@@ -1409,12 +1409,16 @@ export default function AICommandCenter() {
                       })}
                     </div>
                     <div style={{ display: "grid", gap: 7 }}>
-                      {(insights || "").split("\n").filter(Boolean).slice(0, 4).map((line, index) => (
-                        <div key={index} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "rgba(255,255,255,.72)", fontSize: 12.5, lineHeight: 1.6 }}>
-                          <span style={{ color: "#6366f1" }}>•</span>
-                          <span>{line.replace(/^[-•]\s*/, "")}</span>
-                        </div>
-                      ))}
+                      {(insights || "").split("\n").filter(Boolean).slice(0, 4).map((line, index) => {
+                        const clean = line.replace(/^[-•*#\d.]\s*/, "");
+                        const html = clean.replace(/\*\*(.*?)\*\*/g, "<strong style=\"color:white;font-weight:700\">$1</strong>");
+                        return (
+                          <div key={index} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "rgba(255,255,255,.72)", fontSize: 12.5, lineHeight: 1.6 }}>
+                            <span style={{ color: "#6366f1", flexShrink: 0 }}>•</span>
+                            <span dangerouslySetInnerHTML={{ __html: html }} />
+                          </div>
+                        );
+                      })}
                     </div>
                   </Panel>
 
