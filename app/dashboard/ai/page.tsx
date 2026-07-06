@@ -2082,10 +2082,10 @@ export default function AICommandCenter() {
                           <span style={{ fontWeight: 800, fontSize: 14 }}>{alert.title}</span>
                           <SeverityBadge severity={alert.severity} />
                         </div>
-                        <div style={{ fontSize: 13, color: "rgba(255,255,255,.65)", lineHeight: 1.6, marginBottom: 10 }}>{alert.description}</div>
+                        <div style={{ fontSize: 13, color: "rgba(255,255,255,.65)", lineHeight: 1.6, marginBottom: 10 }}>{renderMarkdown(alert.description)}</div>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-                          <span style={{ fontSize: 12, color: "#a5b4fc", fontWeight: 600 }}>Action: {alert.action}</span>
+                          <span style={{ fontSize: 12, color: "#a5b4fc", fontWeight: 600 }}>Action: {renderMarkdown(alert.action)}</span>
                         </div>
                         {alert.link && (
                           <a href={alert.link} style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 10, fontSize: 12, color: "#818cf8", fontWeight: 600, textDecoration: "none", background: "rgba(99,102,241,.15)", padding: "5px 12px", borderRadius: 8, border: "1px solid rgba(99,102,241,.25)" }}>
@@ -2260,7 +2260,7 @@ export default function AICommandCenter() {
                         </div>
 
                         {/* Description */}
-                        <div style={{ fontSize: 13, color: "rgba(255,255,255,.65)", lineHeight: 1.65 }}>{rec.description}</div>
+                        <div style={{ fontSize: 13, color: "rgba(255,255,255,.65)", lineHeight: 1.65 }}>{renderMarkdown(rec.description)}</div>
 
                         {/* Impact */}
                         {rec.impact && (
@@ -2268,7 +2268,7 @@ export default function AICommandCenter() {
                             <span style={{ fontSize: 14, flexShrink: 0 }}>✨</span>
                             <div>
                               <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 2 }}>Expected Impact</div>
-                              <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>{rec.impact}</div>
+                              <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>{renderMarkdown(rec.impact)}</div>
                             </div>
                           </div>
                         )}
@@ -2277,7 +2277,7 @@ export default function AICommandCenter() {
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 2 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#a5b4fc", fontWeight: 600 }}>
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
-                            {rec.action}
+                            {renderMarkdown(rec.action)}
                           </div>
                           {rec.link && (
                             <a href={rec.link} style={{ padding: "5px 12px", borderRadius: 8, background: `${priorityColor}15`, border: `1px solid ${priorityColor}30`, color: priorityColor, fontSize: 11, fontWeight: 700, textDecoration: "none", flexShrink: 0 }}>
@@ -2915,7 +2915,7 @@ export default function AICommandCenter() {
                                 background: `${priorityColor}22`, color: priorityColor,
                               }}>{item.priority}</span>
                             </div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>Impact: {item.impact}</div>
+                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>Impact: {renderMarkdown(item.impact)}</div>
                             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                               {item.steps.map((step, j) => (
                                 <div key={j} style={{ fontSize: 12.5, color: "rgba(255,255,255,.7)", display: "flex", gap: 8 }}>
@@ -2968,8 +2968,8 @@ export default function AICommandCenter() {
                               <span style={{ fontSize: 13, fontWeight: 700, color: tone.color }}>{risk.title}</span>
                               <SeverityBadge severity={risk.severity} />
                             </div>
-                            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.65)", marginBottom: 6 }}>{risk.description}</div>
-                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Mitigation: {risk.mitigation}</div>
+                            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.65)", marginBottom: 6 }}>{renderMarkdown(risk.description)}</div>
+                            <div style={{ fontSize: 12, color: "rgba(255,255,255,.4)" }}>Mitigation: {renderMarkdown(risk.mitigation)}</div>
                           </div>
                         );
                       })}
@@ -3534,7 +3534,7 @@ export default function AICommandCenter() {
                     </div>
                   ))}
                 </div>
-                {invForecast.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{invForecast.narrative}</div>}
+                {invForecast.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(invForecast.narrative)}</div>}
                 <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, overflow: "hidden" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 90px 90px 90px 90px", padding: "10px 16px", background: "rgba(255,255,255,.04)", fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.35)", textTransform: "uppercase", gap: 8 }}>
                     <span>Product</span><span style={{ textAlign: "center" }}>Stock</span><span style={{ textAlign: "center" }}>Avg/Mo</span><span style={{ textAlign: "center" }}>Forecast</span><span style={{ textAlign: "center" }}>Days Left</span><span style={{ textAlign: "center" }}>Reorder</span>
@@ -3592,7 +3592,7 @@ export default function AICommandCenter() {
                     );
                   })}
                 </div>
-                {cashflowOpt.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{cashflowOpt.narrative}</div>}
+                {cashflowOpt.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(16,185,129,.05)", border: "1px solid rgba(16,185,129,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(cashflowOpt.narrative)}</div>}
                 {cashflowOpt.tips.length > 0 && (
                   <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 14, padding: "18px 20px", marginBottom: 20 }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 14 }}>💡 Optimization Actions</div>
@@ -3664,7 +3664,7 @@ export default function AICommandCenter() {
                     </div>
                   ))}
                 </div>
-                {churnResult.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(139,92,246,.06)", border: "1px solid rgba(139,92,246,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{churnResult.narrative}</div>}
+                {churnResult.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(139,92,246,.06)", border: "1px solid rgba(139,92,246,.18)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(churnResult.narrative)}</div>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {churnResult.customers.map(customer => {
                     const riskColor = customer.churnRisk === "critical" ? "#ef4444" : customer.churnRisk === "high" ? "#f59e0b" : customer.churnRisk === "medium" ? "#818cf8" : "#10b981";
@@ -3725,7 +3725,7 @@ export default function AICommandCenter() {
                     </div>
                   ))}
                 </div>
-                {supplierIntel.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(14,165,233,.05)", border: "1px solid rgba(14,165,233,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{supplierIntel.narrative}</div>}
+                {supplierIntel.narrative && <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(14,165,233,.05)", border: "1px solid rgba(14,165,233,.15)", fontSize: 13, color: "rgba(255,255,255,.75)", marginBottom: 18, lineHeight: 1.7 }}>{renderMarkdown(supplierIntel.narrative)}</div>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {supplierIntel.suppliers.map(supplier => {
                     const opColor = supplier.negotiationOpportunity === "high" ? "#10b981" : supplier.negotiationOpportunity === "medium" ? "#f59e0b" : "#818cf8";
