@@ -13,8 +13,12 @@ export async function GET(req: NextRequest) {
     const ctx = await buildFinancialContext(companyId);
     const result = buildMarketIntelligence(ctx);
 
-    // Enhance summary with GPT — runs in parallel, falls back to rule-based if GPT fails
-    const aiSummary = await generateMarketIntelligenceSummary(companyId, result).catch(() => "");
+    // Enhance summary with GPT — pass pre-built ctx to avoid a second DB round-trip.
+    // Race against a 10s hard cap so we never stall the whole response.
+    const aiSummary = await Promise.race([
+      generateMarketIntelligenceSummary(companyId, result, ctx).catch(() => ""),
+      new Promise<string>(resolve => setTimeout(() => resolve(""), 10_000)),
+    ]);
 
     return NextResponse.json({
       ...result,

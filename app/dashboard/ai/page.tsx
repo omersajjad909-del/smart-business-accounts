@@ -2875,7 +2875,7 @@ export default function AICommandCenter() {
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>Business Advisor</div>
                     <div style={{ fontSize: 14, color: "rgba(255,255,255,.55)", marginBottom: 6 }}>
-                      Growth Score: <span style={{ color: "#a5b4fc", fontWeight: 700 }}>{businessAdvisor.score?.label || "Unavailable"}</span>
+                      Health Score: <span style={{ color: businessAdvisor.score?.label === "Low Risk" ? "#10b981" : businessAdvisor.score?.label === "Medium Risk" ? "#f59e0b" : "#ef4444", fontWeight: 700 }}>{businessAdvisor.score?.label || "Unavailable"}</span>
                     </div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,.75)", lineHeight: 1.7 }}>
                       Personalized growth plan based on your financial data and industry profile.

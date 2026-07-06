@@ -1698,13 +1698,21 @@ export function buildBusinessAdvisor(ctx: FinancialContext): BusinessAdvisorResu
   if (quickWins.length < 3) quickWins.push("Set up WhatsApp Business catalog to enable digital ordering from customers");
   if (quickWins.length < 3) quickWins.push("Review pricing on your top 3 selling products — a 5% price increase often has zero sales impact");
 
-  const overallScore = Math.max(30, Math.min(95, 70
-    - (ctx.profit.thisMonth < 0 ? 20 : 0)
-    - (ctx.receivables.overdue > ctx.revenue.thisMonth * 0.3 ? 15 : 0)
+  // Same formula as the client-side healthScore() so header badge and advisor show the same number.
+  const stockVal = ctx.inventory.stockValue || 0;
+  const monthlyExp = ctx.expenses.thisMonth || 1;
+  const stockBonus = stockVal >= monthlyExp * 2 ? 15 : stockVal >= monthlyExp ? 10 : stockVal >= monthlyExp * 0.5 ? 5 : 0;
+  const overallScore = Math.max(20, Math.min(100, Math.round(
+    60
+    + (ctx.revenue.change > 0 ? Math.min(ctx.revenue.change, 15) : Math.max(ctx.revenue.change, -15))
+    + (ctx.expenses.change < ctx.revenue.change ? 10 : 0)
     - (ctx.expenses.change > 20 ? 10 : 0)
-    + (ctx.topCustomers.length >= 5 ? 10 : 0)
-    + (ctx.topProducts.length >= 5 ? 5 : 0)
-  ));
+    + (ctx.profit.thisMonth > 0 ? 10 : 0)
+    - (ctx.profit.thisMonth < 0 ? 20 : 0)
+    - (ctx.receivables.overdue > ctx.revenue.thisMonth * 0.3 ? 8 : 0)
+    - (ctx.inventory.lowStockItems > 5 ? 5 : 0)
+    + stockBonus
+  )));
 
   return {
     businessType: ctx.company.businessType,
@@ -1715,7 +1723,7 @@ export function buildBusinessAdvisor(ctx: FinancialContext): BusinessAdvisorResu
     quickWins: quickWins.slice(0, 3),
     score: {
       overall: overallScore,
-      label: overallScore >= 75 ? "Growth Ready" : overallScore >= 55 ? "Needs Attention" : "Action Required",
+      label: overallScore >= 75 ? "Low Risk" : overallScore >= 55 ? "Medium Risk" : "High Risk",
     },
   };
 }

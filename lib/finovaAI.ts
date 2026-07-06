@@ -1628,15 +1628,20 @@ ${contextStr}`;
 export async function generateMarketIntelligenceSummary(
   companyId: string,
   baseResult: { businessLabel: string; suggestedNewProducts: { name: string; reason: string }[]; trendsThisIndustry: string[]; seasonalOpportunities: { month: string; opportunities: string[] }[] },
+  prebuiltCtx?: FinancialContext,
 ): Promise<string> {
-  let ctx: FinancialContext;
-  try {
-    ctx = await buildFinancialContext(companyId);
-  } catch {
-    return "";
-  }
-
   if (!HAS_OPENAI_KEY) return "";
+
+  let ctx: FinancialContext;
+  if (prebuiltCtx) {
+    ctx = prebuiltCtx;
+  } else {
+    try {
+      ctx = await buildFinancialContext(companyId);
+    } catch {
+      return "";
+    }
+  }
 
   const contextStr = buildContextString(ctx);
   const top3Products = baseResult.suggestedNewProducts.slice(0, 3).map(p => `• ${p.name}: ${p.reason}`).join("\n");
