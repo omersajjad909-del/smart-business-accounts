@@ -1681,8 +1681,8 @@ export default function AICommandCenter() {
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, padding: "32px 20px 16px", textAlign: "center" }}>
                   {/* AI Avatar */}
                   <div style={{ position: "relative", marginBottom: 20 }}>
-                    <div style={{ width: 76, height: 76, borderRadius: 26, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 20px 60px rgba(79,70,229,.5), 0 0 0 1px rgba(99,102,241,.3)", fontSize: 36 }}>
-                      🧠
+                    <div style={{ width: 76, height: 76, borderRadius: 26, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 20px 60px rgba(79,70,229,.5), 0 0 0 1px rgba(99,102,241,.3)" }}>
+                      <AiIcon size={36} />
                     </div>
                     <div style={{ position: "absolute", bottom: -3, right: -3, width: 22, height: 22, borderRadius: "50%", background: "#10b981", border: "2.5px solid rgba(15,15,40,1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <div style={{ width: 7, height: 7, borderRadius: "50%", background: "white" }} />
@@ -1754,7 +1754,7 @@ export default function AICommandCenter() {
                         fontSize: m.role === "assistant" ? 16 : 13,
                         fontWeight: 800, color: "white",
                       }}>
-                        {m.role === "assistant" ? "🧠" : companyInitial}
+                        {m.role === "assistant" ? <AiIcon size={16} /> : companyInitial}
                       </div>
 
                       {/* Bubble */}
@@ -1778,7 +1778,7 @@ export default function AICommandCenter() {
                   {/* Typing indicator */}
                   {chatLoading && messages[messages.length - 1]?.content === "" && (
                     <div style={{ display: "flex", gap: 12, padding: "8px 20px", alignItems: "flex-start" }}>
-                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 16, boxShadow: "0 4px 16px rgba(79,70,229,.4)" }}>🧠</div>
+                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 4px 16px rgba(79,70,229,.4)" }}><AiIcon size={17} /></div>
                       <div style={{ padding: "14px 18px", borderRadius: "4px 20px 20px 20px", background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.09)", display: "flex", gap: 5, alignItems: "center" }}>
                         {[0,1,2].map(j => <div key={j} style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(99,102,241,.8)", animation: `pulse 1.1s ease ${j * .18}s infinite` }} />)}
                       </div>
@@ -1912,7 +1912,7 @@ export default function AICommandCenter() {
               <div style={{ display: "grid", gap: 16 }}>
                 <Panel className="insight-block">
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🧠</div>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}><AiIcon size={18} /></div>
                     <div>
                       <div style={{ fontWeight: 800, fontSize: 15 }}>AI Financial Insights</div>
                       <div style={{ fontSize: 11, color: "rgba(255,255,255,.35)" }}>Generated now based on your live data</div>
@@ -2109,7 +2109,7 @@ export default function AICommandCenter() {
 
                 {/* AI forecast text */}
                 <Panel>
-                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "rgba(255,255,255,.6)" }}>🤖 AI Cash Flow Analysis</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 6 }}><AiIcon size={14} color="rgba(255,255,255,.6)" /> AI Cash Flow Analysis</div>
                   <div style={{ lineHeight: 1.8 }}>{renderMarkdown(forecast.text)}</div>
                 </Panel>
 
