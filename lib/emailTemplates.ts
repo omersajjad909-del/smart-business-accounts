@@ -2,6 +2,8 @@
 // Billing & subscription email templates for FinovaOS
 // Usage: import { emailTemplates } from "@/lib/emailTemplates"
 
+import { getEmailTranslations, detectLanguageFromCountry, type SupportedLanguage } from "@/lib/emailI18n";
+
 export const emailTemplates = {
   /**
    * Welcome email for new subscription
@@ -11,8 +13,11 @@ export const emailTemplates = {
     planCode: string,
     features: string[],
     dashboardUrl: string,
-    country: string = "GLOBAL"
+    country: string = "GLOBAL",
+    language?: SupportedLanguage
   ): string => {
+    const lang = language || detectLanguageFromCountry(country);
+    const t = getEmailTranslations(lang);
     const planInfo = getPlanInfo(planCode, country);
     const brandColor = "#2563EB";
     const accentColor = "#1E40AF";
@@ -21,7 +26,7 @@ export const emailTemplates = {
 
     return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -133,56 +138,50 @@ export const emailTemplates = {
     <div class="container">
         <div class="header">
             <div class="header-logo">✦ FinovaOS</div>
-            <div class="header-subtitle">AI-Powered Accounting Platform</div>
+            <div class="header-subtitle">${t.welcome.headerSubtitle}</div>
         </div>
         <div class="content">
-            <div class="greeting">Welcome to FinovaOS, ${userName}! 🎉</div>
+            <div class="greeting">${t.greeting(userName)}</div>
             <div class="intro-text">
-                Your ${planInfo.displayName} plan is now active. You're all set to start managing your
-                business finances with intelligence and ease.
+                ${t.welcome.introText(planInfo.displayName)}
             </div>
             <div class="plan-card">
-                <div class="plan-name">${planInfo.displayName} Plan</div>
+                <div class="plan-name">${planInfo.displayName} ${t.welcome.planLabel}</div>
                 <div class="plan-price">${planInfo.priceDisplay}</div>
                 <div class="plan-billing">${planInfo.billingText}</div>
-                <div class="features-title">What's Included:</div>
+                <div class="features-title">${t.welcome.whatsIncluded}</div>
                 <ul class="features-list">
                     ${features.map(f => `<li>${f}</li>`).join("")}
                 </ul>
             </div>
             <div class="cta-section">
-                <a href="${dashboardUrl}" class="cta-button">Go to Dashboard →</a>
+                <a href="${dashboardUrl}" class="cta-button">${t.goToDashboard}</a>
             </div>
             <div class="next-steps">
-                <div class="next-steps-title">Next Steps:</div>
+                <div class="next-steps-title">${t.welcome.nextStepsTitle}</div>
                 <ol class="next-steps-list">
-                    <li>Log in to your FinovaOS dashboard</li>
-                    <li>Connect your bank accounts (optional)</li>
-                    <li>Import your first invoice or transaction</li>
-                    <li>Explore AI features for business insights</li>
+                    ${t.welcome.nextSteps.map(step => `<li>${step}</li>`).join("")}
                 </ol>
             </div>
             <div class="support-section">
-                <div class="support-title">🚀 Pro Tips:</div>
+                <div class="support-title">${t.welcome.proTipsTitle}</div>
                 <div class="support-text">
-                    • Use our AI Chat for instant accounting help<br>
-                    • Set up bank sync for automated reconciliation<br>
-                    • Create custom reports for your business needs
+                    ${t.welcome.proTips.map(tip => `• ${tip}`).join("<br>")}
                 </div>
             </div>
             <div class="divider"></div>
             <div class="support-section">
-                <div class="support-title">Need Help?</div>
-                <div class="support-text">Our support team is here to help you get the most out of FinovaOS.</div>
-                <a href="https://finovaos.app/support" class="support-link">Visit Help Center →</a>
+                <div class="support-title">${t.needHelp}</div>
+                <div class="support-text">${t.supportTeamText}</div>
+                <a href="https://finovaos.app/support" class="support-link">${t.visitHelpCenter}</a>
             </div>
         </div>
         <div class="footer">
             <div class="footer-text">You're receiving this because you just subscribed to FinovaOS.</div>
             <div class="footer-links">
-                <a href="https://finovaos.app/privacy">Privacy Policy</a>
-                <a href="https://finovaos.app/terms">Terms of Service</a>
-                <a href="https://finovaos.app/contact">Contact Us</a>
+                <a href="https://finovaos.app/privacy">${t.footerPrivacy}</a>
+                <a href="https://finovaos.app/terms">${t.footerTerms}</a>
+                <a href="https://finovaos.app/contact">${t.footerContact}</a>
             </div>
             <div class="social-links">
                 <a href="https://linkedin.com/company/finova-forge">in</a>
@@ -190,7 +189,7 @@ export const emailTemplates = {
                 <a href="https://facebook.com/finovoas">f</a>
             </div>
             <div class="footer-text" style="margin-top:16px;">
-                © ${new Date().getFullYear()} Finova Forge. All rights reserved.<br>
+                ${t.footerRights(new Date().getFullYear())}<br>
                 Faisalabad, Pakistan | <a href="https://finovaos.app" style="color:${brandColor};">finovaos.app</a>
             </div>
         </div>
@@ -209,8 +208,11 @@ export const emailTemplates = {
     currency: string,
     nextBillingDate: string,
     invoiceUrl: string,
-    dashboardUrl: string
+    dashboardUrl: string,
+    language?: SupportedLanguage
   ): string => {
+    const lang = language || "en";
+    const t = getEmailTranslations(lang);
     const planInfo = getPlanInfo(planCode);
     const brandColor = "#2563EB";
     const accentColor = "#1E40AF";
@@ -220,7 +222,7 @@ export const emailTemplates = {
 
     return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -286,51 +288,50 @@ export const emailTemplates = {
     <div class="container">
         <div class="header">
             <div class="header-icon">✓</div>
-            <div class="header-title">Payment Received</div>
+            <div class="header-title">${t.paymentConfirmation.headerTitle}</div>
         </div>
         <div class="content">
-            <div class="greeting">Thank you, ${userName}!</div>
+            <div class="greeting">${t.paymentConfirmation.thankYou(userName)}</div>
             <p style="font-size:15px;color:#475569;margin-bottom:20px;">
-                Your payment has been successfully processed. Your ${planInfo.displayName} plan is active and ready to use.
+                ${t.paymentConfirmation.successText(planInfo.displayName)}
             </p>
-            <div class="status-badge">✓ Payment Confirmed</div>
+            <div class="status-badge">${t.paymentConfirmation.statusBadge}</div>
             <div class="invoice-box">
                 <div class="invoice-row">
-                    <span class="invoice-label">Plan</span>
+                    <span class="invoice-label">${t.paymentConfirmation.labelPlan}</span>
                     <span class="invoice-value">${planInfo.displayName}</span>
                 </div>
                 <div class="invoice-row">
-                    <span class="invoice-label">Amount</span>
+                    <span class="invoice-label">${t.paymentConfirmation.labelAmount}</span>
                     <span class="invoice-value">${currency} ${amount.toFixed(2)}</span>
                 </div>
                 <div class="invoice-row">
-                    <span class="invoice-label">Payment Date</span>
+                    <span class="invoice-label">${t.paymentConfirmation.labelPaymentDate}</span>
                     <span class="invoice-value">${new Date().toLocaleDateString("en-GB")}</span>
                 </div>
                 <div class="invoice-row">
-                    <span class="invoice-label">Next Billing</span>
+                    <span class="invoice-label">${t.paymentConfirmation.labelNextBilling}</span>
                     <span class="invoice-value">${nextBillingDate}</span>
                 </div>
                 <div class="invoice-total">
-                    <span class="total-label">Total Paid</span>
+                    <span class="total-label">${t.paymentConfirmation.labelTotalPaid}</span>
                     <span class="total-amount">${currency} ${amount.toFixed(2)}</span>
                 </div>
             </div>
             <div class="button-group">
-                <a href="${dashboardUrl}" class="button button-primary">Go to Dashboard</a>
-                <a href="${invoiceUrl}" class="button button-secondary">Download Invoice</a>
+                <a href="${dashboardUrl}" class="button button-primary">${t.goToDashboard}</a>
+                <a href="${invoiceUrl}" class="button button-secondary">${t.paymentConfirmation.downloadInvoice}</a>
             </div>
             <p style="font-size:14px;color:#64748B;margin-top:20px;">
-                Your subscription will automatically renew on <strong>${nextBillingDate}</strong>.
-                You can manage your subscription anytime from your account dashboard.
+                ${t.paymentConfirmation.renewalNote(nextBillingDate)}
             </p>
         </div>
         <div class="footer">
             <div class="footer-text">
-                Questions? <a href="https://finovaos.app/support" style="color:${brandColor};">Contact our support team</a>.
+                ${t.paymentConfirmation.contactSupport} <a href="https://finovaos.app/support" style="color:${brandColor};">finovaos.app/support</a>
             </div>
             <div class="footer-text" style="margin-top:12px;">
-                © ${new Date().getFullYear()} Finova Forge | <a href="https://finovaos.app" style="color:${brandColor};">finovaos.app</a>
+                ${t.footerRights(new Date().getFullYear())} | <a href="https://finovaos.app" style="color:${brandColor};">finovaos.app</a>
             </div>
         </div>
     </div>
@@ -347,8 +348,11 @@ export const emailTemplates = {
     amount: number,
     currency: string,
     retryDate: string,
-    updatePaymentUrl: string
+    updatePaymentUrl: string,
+    language?: SupportedLanguage
   ): string => {
+    const lang = language || "en";
+    const t = getEmailTranslations(lang);
     const planInfo = getPlanInfo(planCode);
     const warningColor = "#DC2626";
     const lightBg = "#F8FAFC";
@@ -356,7 +360,7 @@ export const emailTemplates = {
 
     return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -409,42 +413,42 @@ export const emailTemplates = {
     <div class="container">
         <div class="header">
             <div class="header-icon">⚠</div>
-            <div class="header-title">Payment Failed</div>
+            <div class="header-title">${t.paymentFailed.headerTitle}</div>
         </div>
         <div class="content">
-            <div class="greeting">Hi ${userName},</div>
+            <div class="greeting">${t.paymentFailed.hi(userName)}</div>
             <div class="alert-box">
-                <div class="alert-title">Action Required</div>
+                <div class="alert-title">${t.paymentFailed.actionRequired}</div>
                 <div class="alert-text">
-                    We couldn't process your payment. Please update your billing information to avoid service interruption.
+                    ${t.paymentFailed.alertText}
                 </div>
             </div>
             <div class="info-box">
                 <div class="info-row">
-                    <span class="info-label">Plan</span>
+                    <span class="info-label">${t.paymentFailed.labelPlan}</span>
                     <span class="info-value">${planInfo.displayName}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Amount</span>
+                    <span class="info-label">${t.paymentFailed.labelAmount}</span>
                     <span class="info-value">${currency} ${amount.toFixed(2)}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Retry Date</span>
+                    <span class="info-label">${t.paymentFailed.labelRetryDate}</span>
                     <span class="info-value">${retryDate}</span>
                 </div>
             </div>
-            <a href="${updatePaymentUrl}" class="cta-button">Update Payment Method →</a>
+            <a href="${updatePaymentUrl}" class="cta-button">${t.paymentFailed.updatePayment}</a>
             <p style="font-size:14px;color:#64748B;">
-                <strong>What happens next?</strong><br>
-                We'll automatically retry your payment on ${retryDate}. If you update your payment method before then, we'll charge you immediately.
+                <strong>${t.paymentFailed.whatHappensNext}</strong><br>
+                ${t.paymentFailed.retryNote(retryDate)}
             </p>
             <p style="font-size:14px;color:#64748B;margin-top:16px;">
-                If this issue persists, please <a href="https://finovaos.app/support" style="color:${warningColor};font-weight:600;">contact our support team</a>.
+                ${t.paymentFailed.persistsNote} <a href="https://finovaos.app/support" style="color:${warningColor};font-weight:600;">${t.paymentFailed.contactSupport}</a>.
             </p>
         </div>
         <div class="footer">
             <div class="footer-text">
-                © ${new Date().getFullYear()} Finova Forge | <a href="https://finovaos.app" style="color:${warningColor};">finovaos.app</a>
+                ${t.footerRights(new Date().getFullYear())} | <a href="https://finovaos.app" style="color:${warningColor};">finovaos.app</a>
             </div>
         </div>
     </div>
@@ -460,8 +464,11 @@ export const emailTemplates = {
     oldPlan: string,
     newPlan: string,
     newFeatures: string[],
-    dashboardUrl: string
+    dashboardUrl: string,
+    language?: SupportedLanguage
   ): string => {
+    const lang = language || "en";
+    const t = getEmailTranslations(lang);
     const oldPlanInfo = getPlanInfo(oldPlan);
     const newPlanInfo = getPlanInfo(newPlan);
     const brandColor = "#2563EB";
@@ -471,7 +478,7 @@ export const emailTemplates = {
 
     return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -534,35 +541,35 @@ export const emailTemplates = {
     <div class="container">
         <div class="header">
             <div class="header-icon">🎉</div>
-            <div class="header-title">Plan Upgraded!</div>
+            <div class="header-title">${t.planUpgraded.headerTitle}</div>
         </div>
         <div class="content">
-            <div class="greeting">Welcome to ${newPlanInfo.displayName}, ${userName}!</div>
-            <div class="upgrade-badge">✓ Upgrade Successful</div>
+            <div class="greeting">${t.planUpgraded.greeting(newPlanInfo.displayName, userName)}</div>
+            <div class="upgrade-badge">${t.planUpgraded.upgradeBadge}</div>
             <div class="plan-comparison">
                 <div class="comparison-row">
-                    <span class="plan-label">Previous Plan</span>
+                    <span class="plan-label">${t.planUpgraded.labelPreviousPlan}</span>
                     <span class="old-plan">${oldPlanInfo.displayName}</span>
                 </div>
                 <div class="comparison-row">
-                    <span class="plan-label">New Plan</span>
+                    <span class="plan-label">${t.planUpgraded.labelNewPlan}</span>
                     <span class="new-plan">${newPlanInfo.displayName}</span>
                 </div>
             </div>
             <div class="new-features">
-                <div class="features-title">New Capabilities Unlocked:</div>
+                <div class="features-title">${t.planUpgraded.newCapabilities}</div>
                 <ul class="features-list">
                     ${newFeatures.map(f => `<li>${f}</li>`).join("")}
                 </ul>
             </div>
-            <a href="${dashboardUrl}" class="cta-button">Explore New Features →</a>
+            <a href="${dashboardUrl}" class="cta-button">${t.planUpgraded.exploreCta}</a>
             <p style="font-size:14px;color:#64748B;">
-                Your upgrade is effective immediately. Enjoy the enhanced capabilities!
+                ${t.planUpgraded.upgradeNote}
             </p>
         </div>
         <div class="footer">
             <div class="footer-text">
-                © ${new Date().getFullYear()} Finova Forge | <a href="https://finovaos.app" style="color:${brandColor};">finovaos.app</a>
+                ${t.footerRights(new Date().getFullYear())} | <a href="https://finovaos.app" style="color:${brandColor};">finovaos.app</a>
             </div>
         </div>
     </div>

@@ -470,6 +470,15 @@ model Company {
   brandColor String?  // Preset key from the 8-color brand palette (e.g. "teal", "indigo", "purple")
   createdAt DateTime @default(now())
 
+  // CCPA compliance
+  ccpaOptOut   Boolean   @default(false)
+  ccpaOptOutAt DateTime?
+
+  // Preferred language for emails & AI content
+  preferredLanguage String? @default("en") // en | es | de | fr | ur | ar | zh | hi | pt | it
+
+  gdprRequests GdprRequest[]
+
   users        UserCompany[]
   defaultUsers User[]        @relation("UserDefaultCompany")
 
@@ -670,6 +679,11 @@ model User {
   // Referral
   referralCode String? @unique
   referrals    Referral[] @relation("ReferrerUser")
+
+  // Preferred language
+  preferredLanguage String? @default("en")
+
+  gdprRequests GdprRequest[]
 }
 
 model Session {
@@ -2243,4 +2257,29 @@ model DemoBooking {
   @@index([email])
   @@index([status])
   @@index([slotStart])
+}
+
+// ================= GDPR / CCPA COMPLIANCE =================
+
+model GdprRequest {
+  id          String    @id @default(cuid())
+  companyId   String
+  userId      String
+  type        String    // EXPORT | DELETE | RESTRICT | PORTABILITY
+  status      String    @default("PENDING") // PENDING | PROCESSING | COMPLETED | REJECTED
+  requestedAt DateTime  @default(now())
+  completedAt DateTime?
+  rejectedAt  DateTime?
+  rejectedBy  String?
+  adminNote   String?   @db.Text
+  downloadUrl String?   // For EXPORT requests — signed URL to data archive
+  ipAddress   String?
+  userAgent   String?
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId],    references: [id], onDelete: Cascade)
+
+  @@index([companyId, status])
+  @@index([userId, requestedAt])
+  @@index([status, requestedAt])
 }

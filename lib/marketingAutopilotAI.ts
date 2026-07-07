@@ -44,7 +44,29 @@ function providerErrorMessage(error: unknown) {
   return message;
 }
 
-export async function generateMarketingText(prompt: string, maxTokens: number) {
+export type AILanguage = "en" | "es" | "de" | "fr" | "ur" | "ar" | "zh" | "hi" | "pt" | "it";
+
+const LANGUAGE_NAMES: Record<AILanguage, string> = {
+  en: "English",
+  es: "Spanish",
+  de: "German",
+  fr: "French",
+  ur: "Urdu",
+  ar: "Arabic",
+  zh: "Chinese (Simplified)",
+  hi: "Hindi",
+  pt: "Portuguese",
+  it: "Italian",
+};
+
+export function buildMultilingualPrompt(originalPrompt: string, language: AILanguage = "en"): string {
+  if (language === "en") return originalPrompt;
+  const langName = LANGUAGE_NAMES[language] || "English";
+  return `${originalPrompt}\n\nIMPORTANT: Write your entire response in ${langName}. Do not include any English text unless it is a proper noun, brand name, or technical term that has no ${langName} equivalent.`;
+}
+
+export async function generateMarketingText(prompt: string, maxTokens: number, language: AILanguage = "en") {
+  const localizedPrompt = buildMultilingualPrompt(prompt, language);
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
   const errors: string[] = [];
@@ -55,7 +77,7 @@ export async function generateMarketingText(prompt: string, maxTokens: number) {
       const response = await anthropic.messages.create({
         model: process.env.ANTHROPIC_MODEL || "claude-haiku-4-5-20251001",
         max_tokens: maxTokens,
-        messages: [{ role: "user", content: prompt }],
+        messages: [{ role: "user", content: localizedPrompt }],
       });
 
       const text = extractAnthropicText(response);
@@ -72,7 +94,7 @@ export async function generateMarketingText(prompt: string, maxTokens: number) {
       const response = await openai.chat.completions.create({
         model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
         max_tokens: maxTokens,
-        messages: [{ role: "user", content: prompt }],
+        messages: [{ role: "user", content: localizedPrompt }],
       });
 
       const text = response.choices[0]?.message?.content?.trim();
