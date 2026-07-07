@@ -31,8 +31,6 @@ import {
   learnCategoryRules,
   type TransactionForCategorization,
 } from "@/lib/autoCategorizeTx";
-import { Prisma } from "@prisma/client";
-
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
