@@ -161,6 +161,29 @@ async function fetchItems(
   return rows;
 }
 
+/** Fetch the party (customer or supplier) email for an invoice. */
+async function fetchPartyEmail(
+  invoiceId: string,
+  type: InvoiceType,
+): Promise<string | null> {
+  const rows = type === "sales"
+    ? await prisma.$queryRaw<Array<{ email: string | null }>>`
+        SELECT a.email
+        FROM "SalesInvoice" si
+        JOIN "Account" a ON a.id = si."customerId"
+        WHERE si.id = ${invoiceId}
+        LIMIT 1
+      `.catch(() => [])
+    : await prisma.$queryRaw<Array<{ email: string | null }>>`
+        SELECT a.email
+        FROM "PurchaseInvoice" pi
+        JOIN "Account" a ON a.id = pi."supplierId"
+        WHERE pi.id = ${invoiceId}
+        LIMIT 1
+      `.catch(() => []);
+  return rows[0]?.email ?? null;
+}
+
 /** Fetch company name from the Company table. */
 async function fetchCompanyInfo(
   companyId: string,
@@ -324,14 +347,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           }
 
           // Determine recipient email from party account
-          const emailRows = await prisma.$queryRaw<Array<{ email: string | null }>>`
-            SELECT a.email
-            FROM ${type === "sales" ? prisma.$queryRaw`"SalesInvoice" si JOIN "Account" a ON a.id = si."customerId"` : prisma.$queryRaw`"PurchaseInvoice" pi JOIN "Account" a ON a.id = pi."supplierId"`}
-            WHERE ${type === "sales" ? prisma.$queryRaw`si.id = ${invoiceId}` : prisma.$queryRaw`pi.id = ${invoiceId}`}
-            LIMIT 1
-          `.catch(() => []) as Array<{ email: string | null }>;
-
-          const recipientEmail = emailRows[0]?.email;
+          const recipientEmail = await fetchPartyEmail(invoiceId, type);
           if (!recipientEmail) {
             results.push({ invoiceId, invoiceNo: inv.invoiceNo, success: false, error: "No email on record" });
             continue;

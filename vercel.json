@@ -11,6 +11,30 @@
     {
       "path": "/api/cron/demo-reminders",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/subscriptions/lifecycle?action=process",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/inventory/reorder?action=process",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/automation/lifecycle?action=process",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/automation/lifecycle?action=auto_trigger",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/billing/dunning?action=process",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/automation/sms/reminder?action=cron",
+      "schedule": "0 10 * * *"
     }
   ]
 }
