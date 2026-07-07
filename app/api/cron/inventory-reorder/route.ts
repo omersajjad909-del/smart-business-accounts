@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     for (const co of companies) {
       try {
         const result = await checkAndTriggerReorders(co.id);
-        totalTriggered += result?.triggered ?? 0;
+        totalTriggered += result?.triggered?.length ?? 0;
       } catch {
         // continue other companies on individual failure
       }
