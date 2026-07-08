@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FX_USD, formatFromUSD } from "@/lib/currency";
+import { FX_USD, formatFromUSD } from "@/lib/currency-client";
 import {
   getStoredCurrencyPreference,
   setStoredCurrencyPreference,

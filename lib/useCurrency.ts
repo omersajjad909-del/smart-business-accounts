@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { CURRENCY_SYMBOL, currencyByCountry } from "./currency";
+import { CURRENCY_SYMBOL, currencyByCountry } from "./currency-client";
 
 let _cached: string | null = null;
 

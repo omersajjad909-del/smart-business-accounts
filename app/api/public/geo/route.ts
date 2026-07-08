@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currencyByCountry, pickCurrencyByAcceptLanguage } from "@/lib/currency";
+import { currencyByCountry, pickCurrencyByAcceptLanguage } from "@/lib/currency-client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
