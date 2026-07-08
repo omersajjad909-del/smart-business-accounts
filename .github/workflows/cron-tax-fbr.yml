@@ -1,0 +1,21 @@
+name: Cron — Tax FBR Deadline Reminder
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"   # every Monday at 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger tax-fbr cron
+        run: |
+          STATUS=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.APP_URL }}/api/cron/tax-fbr")
+          cat /tmp/resp.json
+          if [ "$STATUS" != "200" ]; then
+            echo "Cron failed with HTTP $STATUS"
+            exit 1
+          fi
