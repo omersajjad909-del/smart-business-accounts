@@ -1,0 +1,21 @@
+name: Cron — Backup
+
+on:
+  schedule:
+    - cron: "0 2 * * *"   # daily at 02:00 UTC
+  workflow_dispatch:        # manual trigger from GitHub UI
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger backup cron
+        run: |
+          STATUS=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.APP_URL }}/api/cron/backup")
+          cat /tmp/resp.json
+          if [ "$STATUS" != "200" ]; then
+            echo "Cron failed with HTTP $STATUS"
+            exit 1
+          fi
