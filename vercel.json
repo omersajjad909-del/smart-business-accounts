@@ -3,14 +3,7 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "crons": [
-    { "path": "/api/cron/backup",                     "schedule": "0 2 * * *" },
-    { "path": "/api/cron/demo-reminders",             "schedule": "0 8 * * *" },
-    { "path": "/api/cron/subscriptions-lifecycle",    "schedule": "0 5 * * *" },
-    { "path": "/api/cron/inventory-reorder",          "schedule": "0 6 * * *" },
-    { "path": "/api/cron/automation-lifecycle",       "schedule": "0 7 * * *" },
-    { "path": "/api/cron/automation-lifecycle-trigger","schedule": "0 8 * * *" },
-    { "path": "/api/cron/dunning",                    "schedule": "0 9 * * *" },
-    { "path": "/api/cron/sms-reminder",               "schedule": "0 10 * * *" },
-    { "path": "/api/cron/tax-fbr",                    "schedule": "0 9 * * 1" }
+    { "path": "/api/cron/backup",  "schedule": "0 2 * * *" },
+    { "path": "/api/cron/dunning", "schedule": "0 9 * * *" }
   ]
 }
