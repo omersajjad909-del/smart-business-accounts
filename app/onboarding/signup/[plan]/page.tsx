@@ -1,7 +1,7 @@
 ﻿"use client";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { CURRENCY_SYMBOL, FX_USD, currencyByCountry } from "@/lib/currency";
+import { CURRENCY_SYMBOL, FX_USD, currencyByCountry } from "@/lib/currency-client";
 import {
   getStoredCurrencyPreference,
   setStoredCurrencyPreference,

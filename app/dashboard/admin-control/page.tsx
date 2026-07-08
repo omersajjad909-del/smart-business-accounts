@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { PERMISSIONS } from "@/lib/permissions";
 import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
-import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency";
+import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency-client";
 import Link from "next/link";
 
 /* ─── types ─── */

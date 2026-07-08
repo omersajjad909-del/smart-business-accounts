@@ -5,7 +5,7 @@ import { PERMISSIONS } from "@/lib/permissions";
 import Link from "next/link";
 import { getCurrentUser, getStoredDemoBusinessPreference } from "@/lib/auth";
 import { BUSINESS_TYPES, type BusinessType } from "@/lib/businessModules";
-import { CURRENCY_SYMBOL } from "@/lib/currency";
+import { CURRENCY_SYMBOL } from "@/lib/currency-client";
 import DemoBusinessShowcase from "./DemoBusinessShowcase";
 import {
   LineChart,

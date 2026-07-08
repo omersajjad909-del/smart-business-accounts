@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser, updateStoredUser } from "@/lib/auth";
 import { getMaxUsersForPlan } from "@/lib/planLimits";
 import { COUNTRIES as ALL_COUNTRIES, sortCountries } from "@/lib/countries";
-import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency";
+import { CURRENCY_LABEL, SUPPORTED_CURRENCIES, currencyByCountry } from "@/lib/currency-client";
 import Link from "next/link";
 import ImageAdjusterModal from "@/components/ImageAdjusterModal";
 import { dispatchCompanyProfileUpdated, dispatchUserProfileUpdated } from "@/lib/dashboardProfileEvents";

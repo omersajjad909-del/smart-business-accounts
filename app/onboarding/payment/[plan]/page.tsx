@@ -3,7 +3,7 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { getCurrentUser, setCurrentUser } from "@/lib/auth";
-import { FX_USD, formatFromUSD } from "@/lib/currency";
+import { FX_USD, formatFromUSD } from "@/lib/currency-client";
 import { getStoredCurrencyPreference, setStoredCurrencyPreference } from "@/lib/currencyPreference";
 import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
 

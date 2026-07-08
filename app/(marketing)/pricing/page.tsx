@@ -7,7 +7,7 @@ import {
   FX_USD,
   SUPPORTED_CURRENCIES,
   formatFromUSD,
-} from "@/lib/currency";
+} from "@/lib/currency-client";
 import {
   FINOVA_CURRENCY_EVENT,
   getStoredCurrencyPreference,
