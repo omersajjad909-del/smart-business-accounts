@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   CURRENCY_LABEL, CURRENCY_SYMBOL, FX_USD, SUPPORTED_CURRENCIES,
   formatFromUSD,
-} from "@/lib/currency";
+} from "@/lib/currency-client";
 import {
   getStoredCurrencyPreference,
   setStoredCurrencyPreference,
