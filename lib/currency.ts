@@ -50,6 +50,78 @@ const FALLBACK_RATES: Record<string, number> = {
   VND: 25500,  PHP: 56.5,   NGN: 1500,   EGP: 49,     TRY: 32.5,
 };
 
+// ── Aliases for backwards-compat (used by Pricing, onboarding, dashboard) ────
+
+/** Alias for CURRENCY_SYMBOLS — e.g. CURRENCY_SYMBOL["USD"] === "$" */
+export const CURRENCY_SYMBOL = CURRENCY_SYMBOLS;
+
+/** Alias for CURRENCY_NAMES — e.g. CURRENCY_LABEL["USD"] === "US Dollar" */
+export const CURRENCY_LABEL = CURRENCY_NAMES;
+
+/** Sync fallback FX rates (USD-based) — used for client-side price display */
+export const FX_USD = FALLBACK_RATES;
+
+// ── Country → Currency mapping ────────────────────────────────────────────────
+
+const COUNTRY_TO_CURRENCY: Record<string, string> = {
+  US: "USD", PR: "USD", GU: "USD", VI: "USD",
+  GB: "GBP",
+  AU: "AUD",
+  CA: "CAD",
+  JP: "JPY",
+  CH: "CHF", LI: "CHF",
+  SG: "SGD",
+  IN: "INR",
+  AE: "AED",
+  SA: "SAR", BH: "SAR", KW: "SAR", QA: "SAR", OM: "SAR",
+  PK: "PKR",
+  MY: "MYR",
+  NZ: "NZD",
+  HK: "HKD",
+  NO: "NOK",
+  SE: "SEK",
+  DK: "DKK",
+  ZA: "ZAR",
+  BR: "BRL",
+  MX: "MXN",
+  KR: "KRW",
+  TW: "TWD",
+  ID: "IDR",
+  TH: "THB",
+  VN: "VND",
+  PH: "PHP",
+  NG: "NGN",
+  EG: "EGP",
+  TR: "TRY",
+  DE: "EUR", FR: "EUR", IT: "EUR", ES: "EUR", NL: "EUR",
+  BE: "EUR", AT: "EUR", PT: "EUR", IE: "EUR", FI: "EUR",
+  GR: "EUR", LU: "EUR", MT: "EUR", CY: "EUR", SK: "EUR",
+  SI: "EUR", EE: "EUR", LV: "EUR", LT: "EUR", HR: "EUR",
+};
+
+/** Maps a 2-letter ISO country code to a currency code, or null if unknown. */
+export function currencyByCountry(countryCode: string): string | null {
+  return COUNTRY_TO_CURRENCY[countryCode?.toUpperCase()] ?? null;
+}
+
+/** Picks a currency from the Accept-Language header (best-effort). */
+export function pickCurrencyByAcceptLanguage(acceptLanguage: string | null): string | null {
+  if (!acceptLanguage) return null;
+  const primaryTag = acceptLanguage.split(",")[0].split(";")[0].trim();
+  const regionCode  = primaryTag.split("-")[1]?.toUpperCase();
+  return regionCode ? currencyByCountry(regionCode) : null;
+}
+
+/**
+ * Synchronously convert a USD amount to a target currency and format it.
+ * Uses hardcoded fallback rates — suitable for client-side price display.
+ */
+export function formatFromUSD(usdAmount: number, currency: string): string {
+  const rate      = FALLBACK_RATES[currency] ?? 1;
+  const converted = Math.round(usdAmount * rate * 100) / 100;
+  return formatCurrency(converted, currency);
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface ExchangeRates {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { currencyByCountry, pickCurrencyByAcceptLanguage } from "@/lib/currency";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
