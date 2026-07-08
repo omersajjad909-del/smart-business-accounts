@@ -16,7 +16,8 @@ export async function sendSmsSns({
   let PublishCommand: any;
 
   try {
-    const mod = await import("@aws-sdk/client-sns");
+    // @ts-expect-error — optional peer dep, may not be installed
+    const mod = await import(/* webpackIgnore: true */ "@aws-sdk/client-sns");
     SNSClient = mod.SNSClient;
     PublishCommand = mod.PublishCommand;
   } catch {
