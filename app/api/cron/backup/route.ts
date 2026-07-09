@@ -195,9 +195,5 @@ async function runBackups() {
     }
   }
 
-  return NextResponse.json({
-    ran: results.length,
-    results,
-    timestamp: today.toISOString(),
-  });
+  console.log(`[cron] backup complete: ${results.length} runs`, results);
 }
