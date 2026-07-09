@@ -1,9 +1,13 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 const ff = "'Outfit','DM Sans',sans-serif";
+const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png";
+const forgeLogoWordmark = "/FinovaForge.png";
 
 export function ForgeNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -44,35 +48,30 @@ export function ForgeNav() {
         fontFamily: ff,
       }}
     >
-      {/* Logo */}
-      <Link href="/forge/home" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}>
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 10,
-            background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 13,
-            fontWeight: 900,
-            color: "white",
-            letterSpacing: "-.5px",
-            boxShadow: "0 4px 14px rgba(245,158,11,.3)",
-          }}
-        >
-          FF
-        </div>
-        <div style={{ lineHeight: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 900, color: "white", letterSpacing: "-.5px" }}>Finova Forge</div>
-          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".1em", textTransform: "uppercase", marginTop: 2 }}>
+      <Link href="/forge/home" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none", flexShrink: 0 }}>
+        <Image
+          src={forgeLogoMark}
+          alt="Finova Forge logo"
+          width={36}
+          height={36}
+          priority
+          style={{ width: 36, height: 36, borderRadius: 10, boxShadow: "0 4px 14px rgba(245,158,11,.3)" }}
+        />
+        <div style={{ lineHeight: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+          <Image
+            src={forgeLogoWordmark}
+            alt="Finova Forge"
+            width={144}
+            height={28}
+            priority
+            style={{ width: "auto", height: 22 }}
+          />
+          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".1em", textTransform: "uppercase" }}>
             Software Co.
           </div>
         </div>
       </Link>
 
-      {/* Nav links */}
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
         {links.map((l) => {
           const active = pathname === l.href;
@@ -122,7 +121,7 @@ export function ForgeNav() {
             el.style.boxShadow = "0 4px 14px rgba(245,158,11,.25)";
           }}
         >
-          Visit FinovaOS →
+          Visit FinovaOS {"\u2192"}
         </a>
       </div>
     </nav>
@@ -174,16 +173,29 @@ export function ForgeFooter() {
     <footer style={{ borderTop: "1px solid rgba(255,255,255,.06)", padding: "56px clamp(16px,3vw,40px) 32px", fontFamily: ff }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", gap: "0 40px", marginBottom: 48 }}>
-          {/* Brand */}
           <div>
-            <Link href="/forge/home" style={{ display: "inline-flex", alignItems: "center", gap: 9, textDecoration: "none", marginBottom: 14 }}>
-              <div style={{ width: 30, height: 30, borderRadius: 9, background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "white" }}>FF</div>
-              <span style={{ fontSize: 14, fontWeight: 900, color: "white" }}>Finova Forge</span>
+            <Link href="/forge/home" style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none", marginBottom: 14 }}>
+              <Image
+                src={forgeLogoMark}
+                alt="Finova Forge logo"
+                width={30}
+                height={30}
+                style={{ width: 30, height: 30, borderRadius: 9 }}
+              />
+              <Image
+                src={forgeLogoWordmark}
+                alt="Finova Forge"
+                width={126}
+                height={24}
+                style={{ width: "auto", height: 20 }}
+              />
             </Link>
             <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.28)", lineHeight: 1.85, maxWidth: 240, margin: "0 0 16px" }}>
               Building intelligent systems for modern businesses.
             </p>
-            <a href="mailto:hello@finovaforge.com" style={{ fontSize: 12, color: "rgba(245,158,11,.65)", textDecoration: "none", fontWeight: 600, transition: "color .2s" }}
+            <a
+              href="mailto:hello@finovaforge.com"
+              style={{ fontSize: 12, color: "rgba(245,158,11,.65)", textDecoration: "none", fontWeight: 600, transition: "color .2s" }}
               onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#f59e0b")}
               onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,158,11,.65)")}
             >
@@ -199,17 +211,25 @@ export function ForgeFooter() {
               {col.links.map(({ l, h, ext }: { l: string; h: string; ext?: boolean }) => (
                 <div key={l} style={{ marginBottom: 10 }}>
                   {ext ? (
-                    <a href={h} target="_blank" rel="noreferrer"
-                      style={{ fontSize: 13, color: "rgba(255,255,255,.38)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
-                      onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.85)")}
-                      onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.38)}")}
-                    >{l}</a>
-                  ) : (
-                    <Link href={h}
+                    <a
+                      href={h}
+                      target="_blank"
+                      rel="noreferrer"
                       style={{ fontSize: 13, color: "rgba(255,255,255,.38)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
                       onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.85)")}
                       onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.38)")}
-                    >{l}</Link>
+                    >
+                      {l}
+                    </a>
+                  ) : (
+                    <Link
+                      href={h}
+                      style={{ fontSize: 13, color: "rgba(255,255,255,.38)", textDecoration: "none", fontWeight: 500, transition: "color .2s" }}
+                      onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.85)")}
+                      onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.38)")}
+                    >
+                      {l}
+                    </Link>
                   )}
                 </div>
               ))}
@@ -219,7 +239,7 @@ export function ForgeFooter() {
 
         <div style={{ borderTop: "1px solid rgba(255,255,255,.05)", paddingTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span style={{ fontSize: 12, color: "rgba(255,255,255,.18)", fontWeight: 500 }}>
-            © {yr} Finova Forge. All rights reserved.
+            {"\u00A9"} {yr} Finova Forge. All rights reserved.
           </span>
           <span style={{ fontSize: 12, color: "rgba(255,255,255,.18)" }}>Built with purpose. Shipped with care.</span>
         </div>
@@ -231,13 +251,21 @@ export function ForgeFooter() {
 export function useInView(threshold = 0.12) {
   const ref = useRef<HTMLDivElement>(null);
   const [vis, setVis] = useState(false);
+
   useEffect(() => {
     const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect(); } },
-      { threshold }
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVis(true);
+          obs.disconnect();
+        }
+      },
+      { threshold },
     );
+
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, [threshold]);
+
   return [ref, vis] as const;
 }

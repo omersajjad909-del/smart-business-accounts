@@ -2,11 +2,16 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://finovaforge.com"),
-  title: "Finova Forge — We Build Intelligent Business Software",
+  title: "Finova Forge - We Build Intelligent Business Software",
   description:
     "Finova Forge is a software company building intelligent, industry-specific business tools for growing companies worldwide.",
   icons: {
-    icon: "/FinovaForge.png",
+    icon: [
+      { url: "/FinovaForge_Profile_OrangeBG_WhiteF.png", sizes: "32x32", type: "image/png" },
+      { url: "/FinovaForge_Profile_OrangeBG_WhiteF.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/FinovaForge_Profile_OrangeBG_WhiteF.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/FinovaForge_Profile_OrangeBG_WhiteF.png",
   },
 };
 

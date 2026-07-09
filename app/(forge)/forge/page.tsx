@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const ff = "'Outfit','DM Sans',sans-serif";
+const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png";
+const forgeLogoWordmark = "/FinovaForge.png";
 
 function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -36,17 +39,24 @@ function ForgeNav() {
       transition: "all .3s ease", fontFamily: ff,
     }}>
       {/* Logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{
-          width: 32, height: 32, borderRadius: 9,
-          background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 16, fontWeight: 900, color: "white",
-        }}>F</div>
-        <span style={{ fontSize: 17, fontWeight: 900, color: "white", letterSpacing: "-.4px" }}>
-          FinovaForge
-        </span>
-      </div>
+      <Link href="/forge/home" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
+        <Image
+          src={forgeLogoMark}
+          alt="Finova Forge logo"
+          width={32}
+          height={32}
+          priority
+          style={{ width: 32, height: 32, borderRadius: 9, boxShadow: "0 4px 14px rgba(245,158,11,.3)" }}
+        />
+        <Image
+          src={forgeLogoWordmark}
+          alt="Finova Forge"
+          width={148}
+          height={28}
+          priority
+          style={{ width: "auto", height: 22 }}
+        />
+      </Link>
 
       {/* Links */}
       <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
@@ -359,21 +369,37 @@ function Contact() {
 function ForgeFooter() {
   return (
     <footer style={{ borderTop: "1px solid rgba(255,255,255,.06)", padding: "32px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, fontFamily: ff }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 24, height: 24, borderRadius: 7, background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "white" }}>F</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <Image
+          src={forgeLogoMark}
+          alt="Finova Forge logo"
+          width={24}
+          height={24}
+          style={{ width: 24, height: 24, borderRadius: 7 }}
+        />
+        <Image
+          src={forgeLogoWordmark}
+          alt="Finova Forge"
+          width={108}
+          height={20}
+          style={{ width: "auto", height: 18 }}
+        />
         <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.35)" }}>
-          © {new Date().getFullYear()} FinovaForge. All rights reserved.
+          {"\u00A9"} {new Date().getFullYear()} Finova Forge. All rights reserved.
         </span>
       </div>
       <div style={{ display: "flex", gap: 20 }}>
         {[
           { label: "FinovaOS", href: "https://finovaos.app" },
-          { label: "Privacy",  href: "/privacy" },
-          { label: "Terms",    href: "/terms" },
-        ].map(l => (
-          <Link key={l.label} href={l.href} style={{ fontSize: 12, color: "rgba(255,255,255,.25)", textDecoration: "none", fontWeight: 600 }}
-            onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,.6)")}
-            onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,.25)")}
+          { label: "Privacy", href: "/forge/privacy" },
+          { label: "Terms", href: "/forge/terms" },
+        ].map((l) => (
+          <Link
+            key={l.label}
+            href={l.href}
+            style={{ fontSize: 12, color: "rgba(255,255,255,.25)", textDecoration: "none", fontWeight: 600 }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.6)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.25)")}
           >
             {l.label}
           </Link>
