@@ -1,19 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
 
-// Vercel calls this at 2:00 AM UTC daily (set in vercel.json)
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+// Cron: daily at 02:00 UTC. Fire-and-forget: response returns immediately
+// while backup snapshots are created + emailed in the background.
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  after(async () => {
+    await runBackups();
+  });
+
+  return NextResponse.json({ ok: true, started: true });
+}
+
+async function runBackups() {
   const today = new Date();
-  const dayOfWeek = today.getUTCDay(); // 0=Sun, 1=Mon ... 6=Sat
+  const dayOfWeek = today.getUTCDay();
   const dayOfMonth = today.getUTCDate();
 
-  // Find all active backup schedules
   const schedules = await prisma.backupSchedule.findMany({
     where: { isActive: true },
   });
