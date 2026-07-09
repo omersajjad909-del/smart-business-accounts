@@ -76,13 +76,21 @@ function ForgeNav() {
             {l.label}
           </a>
         ))}
-        <Link href="https://finovaos.app" target="_blank" style={{
-          padding: "8px 18px", borderRadius: 9,
-          background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-          color: "white", fontWeight: 700, fontSize: 13,
-          textDecoration: "none", boxShadow: "0 4px 16px rgba(245,158,11,.3)",
-        }}>
-          Visit FinovaOS →
+        <Link
+          href="https://finovaos.app"
+          target="_blank"
+          style={{
+            padding: "8px 18px",
+            borderRadius: 9,
+            background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+            color: "white",
+            fontWeight: 700,
+            fontSize: 13,
+            textDecoration: "none",
+            boxShadow: "0 4px 16px rgba(245,158,11,.3)",
+          }}
+        >
+          Visit FinovaOS {"\u2192"}
         </Link>
       </div>
     </nav>
@@ -123,7 +131,7 @@ function Hero() {
           We design and build intelligent, industry-specific business software for companies across South Asia and beyond.
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,.25)", marginBottom: 48 }}>
-          Lahore, Pakistan &nbsp;·&nbsp; Est. 2024
+          Lahore, Pakistan &nbsp;{"\u00B7"}&nbsp; Est. 2024
         </p>
 
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
