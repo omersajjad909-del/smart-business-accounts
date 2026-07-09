@@ -5,14 +5,17 @@ import { resolveCompanyId } from "@/lib/tenant";
 // Statuses with full access
 const ALLOWED_STATUSES = ["ACTIVE", "TRIALING"];
 
-// Read-only phase (Privacy Policy Phase 1: Days 1-30 after cancel).
-// During this window, GET requests succeed so users can log in and export
-// data. Any mutating request is rejected with 402.
+// Read-only phase (Privacy Policy Phase 1: Days 1-30 after cancel; ToS: 7-day
+// read-only window after payment failure). During this window, GET requests
+// succeed so users can log in and export data. Mutations are rejected with 402.
 function isReadOnlyRequest(method: string): boolean {
   return method.toUpperCase() === "GET" || method.toUpperCase() === "HEAD";
 }
 
 function inReadOnlyGracePeriod(status: string, cancelledAt: Date | null): boolean {
+  // Platform dunning read-only phase (payment failed 7+ days ago, not yet suspended)
+  if (status === "READ_ONLY") return true;
+  // Cancellation grace period (Days 1-30 after cancel)
   if (status !== "CANCELLED") return false;
   if (!cancelledAt) return false;
   const daysSinceCancel = (Date.now() - cancelledAt.getTime()) / (1000 * 60 * 60 * 24);
