@@ -4,8 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 const ff = "'Outfit','DM Sans',sans-serif";
-const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png";
-const forgeLogoWordmark = "/FinovaForge.png";
+const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=2";
+const forgeLogoWordmark = "/FinovaForge.png?v=2";
 
 function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -46,6 +46,7 @@ function ForgeNav() {
           width={32}
           height={32}
           priority
+          unoptimized
           style={{ width: 32, height: 32, borderRadius: 9, boxShadow: "0 4px 14px rgba(245,158,11,.3)" }}
         />
         <Image
@@ -54,6 +55,7 @@ function ForgeNav() {
           width={148}
           height={28}
           priority
+          unoptimized
           style={{ width: "auto", height: 22 }}
         />
       </Link>
@@ -383,6 +385,7 @@ function ForgeFooter() {
           alt="Finova Forge logo"
           width={24}
           height={24}
+          unoptimized
           style={{ width: 24, height: 24, borderRadius: 7 }}
         />
         <Image
@@ -390,6 +393,7 @@ function ForgeFooter() {
           alt="Finova Forge"
           width={108}
           height={20}
+          unoptimized
           style={{ width: "auto", height: 18 }}
         />
         <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.35)" }}>

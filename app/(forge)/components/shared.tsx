@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const ff = "'Outfit','DM Sans',sans-serif";
-const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png";
-const forgeLogoWordmark = "/FinovaForge.png";
+const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=2";
+const forgeLogoWordmark = "/FinovaForge.png?v=2";
 
 export function ForgeNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -55,6 +55,7 @@ export function ForgeNav() {
           width={36}
           height={36}
           priority
+          unoptimized
           style={{ width: 36, height: 36, borderRadius: 10, boxShadow: "0 4px 14px rgba(245,158,11,.3)" }}
         />
         <div style={{ lineHeight: 1, display: "flex", flexDirection: "column", gap: 4 }}>
@@ -64,6 +65,7 @@ export function ForgeNav() {
             width={144}
             height={28}
             priority
+            unoptimized
             style={{ width: "auto", height: 22 }}
           />
           <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".1em", textTransform: "uppercase" }}>
@@ -180,6 +182,7 @@ export function ForgeFooter() {
                 alt="Finova Forge logo"
                 width={30}
                 height={30}
+                unoptimized
                 style={{ width: 30, height: 30, borderRadius: 9 }}
               />
               <Image
@@ -187,6 +190,7 @@ export function ForgeFooter() {
                 alt="Finova Forge"
                 width={126}
                 height={24}
+                unoptimized
                 style={{ width: "auto", height: 20 }}
               />
             </Link>
