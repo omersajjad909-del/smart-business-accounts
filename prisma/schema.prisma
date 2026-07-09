@@ -463,6 +463,7 @@ model Company {
   currentPeriodEnd    DateTime?
   cancelledAt        DateTime?  // Timestamp when subscription was cancelled
   dataRetentionUntil DateTime?  // 90 days after cancellation — hard delete after this date
+  paymentFailedAt    DateTime?  // First failed platform payment in current streak — cleared on next success. Drives platform-dunning cron (7d → READ_ONLY, 30d → SUSPENDED per ToS)
   retentionReminder14SentAt DateTime? // Set when 14-day pre-deletion reminder email sent (idempotency guard)
   retentionReminder3SentAt  DateTime? // Set when 3-day final warning email sent (idempotency guard)
   fraudRisk          String?    @default("NONE") // NONE | LOW | MEDIUM | HIGH — updated by fraud monitor
