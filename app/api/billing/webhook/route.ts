@@ -189,6 +189,78 @@ async function sendPaymentFailedEmail(
   } catch {}
 }
 
+// Sent when LemonSqueezy refunds a payment. LemonSqueezy is the source of
+// truth for the refund — we only send a receipt confirmation and log the event.
+async function sendRefundConfirmationEmail(
+  companyId: string,
+  planCode: string,
+  amount: number,
+  currency: string,
+) {
+  try {
+    const uc = await getCompanyOwner(companyId);
+    if (!uc?.user?.email) return;
+
+    const formattedAmount = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency || "USD",
+    }).format(amount);
+
+    const html = `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#111;">
+        <h2 style="color:#0f766e;">Refund Confirmation</h2>
+        <p>Hi ${uc.user.name || "there"},</p>
+        <p>Your refund for the <strong>${planLabel(planCode)}</strong> plan has been processed by our payment provider.</p>
+        <p><strong>Amount refunded:</strong> ${formattedAmount}</p>
+        <p>Refunds typically appear in your account within 5–10 business days depending on your bank or card issuer.</p>
+        <p>If you have any questions, reply to this email or visit
+          <a href="https://finovaos.app/support" style="color:#0f766e;">finovaos.app/support</a>.
+        </p>
+        <p style="color:#666;font-size:12px;margin-top:24px;">
+          This confirmation was sent because a refund was processed on your FinovaOS subscription.
+        </p>
+      </div>
+    `;
+
+    await sendEmail({
+      to:      uc.user.email,
+      subject: `Refund processed — ${planLabel(planCode)} plan`,
+      html,
+    });
+  } catch {}
+}
+
+// Internal alert to legal@ when a duplicate charge is detected. We do NOT
+// auto-refund — a human must review.
+async function sendDuplicateChargeAlertEmail(
+  companyId: string,
+  subscriptionId: string | null,
+  amount: number,
+  currency: string,
+  originalEventAt: Date,
+) {
+  try {
+    const html = `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#111;">
+        <h2 style="color:#b91c1c;">Possible duplicate charge detected</h2>
+        <p>Two successful <code>subscription_payment_success</code> events fired within 60 minutes for the same subscription.</p>
+        <ul>
+          <li><strong>Company ID:</strong> ${companyId}</li>
+          <li><strong>Subscription ID:</strong> ${subscriptionId || "n/a"}</li>
+          <li><strong>Amount:</strong> ${amount} ${currency}</li>
+          <li><strong>Previous success:</strong> ${originalEventAt.toISOString()}</li>
+        </ul>
+        <p>Review in LemonSqueezy and issue a manual refund if warranted. Webhook did not auto-refund.</p>
+      </div>
+    `;
+    await sendEmail({
+      to:      "legal@finovaos.app",
+      subject: `[FinovaOS] Duplicate charge alert — company ${companyId}`,
+      html,
+    });
+  } catch {}
+}
+
 // ─── Idempotency ──────────────────────────────────────────────────────────────
 
 async function alreadyProcessed(provider: string, eventKey: string): Promise<boolean> {
@@ -265,6 +337,55 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         ? currentPeriodEnd.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })
         : "your next billing date";
       await sendPaymentConfirmationEmail(companyId, planCode, invoiceAmount, attrs?.currency || "USD", nextBilling);
+
+      // Successful payment ends any dunning streak — clear paymentFailedAt.
+      // Guarded because the column may not exist yet in the schema.
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Company" SET "paymentFailedAt" = NULL WHERE "id" = $1`,
+        companyId,
+      ).catch(() => {});
+
+      // ── Duplicate charge detection ────────────────────────────────────────
+      // Look for another SUCCESS log for the same subscriptionId within the
+      // last 60 minutes. If found, flag but do NOT auto-refund — LemonSqueezy
+      // remains the source of truth and a human must review.
+      if (subscriptionId) {
+        const sinceMs = 60 * 60 * 1000;
+        const recent = await prisma.activityLog.findFirst({
+          where: {
+            companyId,
+            action: "PAYMENT_EVENT",
+            createdAt: { gte: new Date(Date.now() - sinceMs) },
+            details: { contains: `"subscriptionId":"${subscriptionId}"` },
+          },
+          orderBy: { createdAt: "desc" },
+        }).catch(() => null);
+
+        if (recent) {
+          await prisma.activityLog.create({
+            data: {
+              companyId, userId: null,
+              action: "DUPLICATE_CHARGE_FLAGGED",
+              details: JSON.stringify({
+                provider: "LEMON_SQUEEZY",
+                subscriptionId,
+                amount: invoiceAmount,
+                currency: attrs?.currency || "USD",
+                previousEventAt: recent.createdAt.toISOString(),
+                note: "Second successful charge within 60 minutes — flagged for manual review. No auto-refund issued.",
+              }),
+            },
+          }).catch(() => {});
+
+          await sendDuplicateChargeAlertEmail(
+            companyId,
+            subscriptionId,
+            invoiceAmount,
+            attrs?.currency || "USD",
+            recent.createdAt,
+          );
+        }
+      }
     }
 
     if (eventName === "subscription_payment_failed") {
@@ -274,6 +395,109 @@ async function handleLemonWebhook(req: NextRequest, raw: string) {
         : "soon";
       const failedAmount = typeof attrs?.subtotal === "number" ? Number(attrs.subtotal) / 100 : 0;
       await sendPaymentFailedEmail(companyId, planCode, failedAmount, attrs?.currency || "USD", retryDate);
+
+      // ── Dunning state machine kickoff ─────────────────────────────────────
+      // Stamp paymentFailedAt on the Company row (idempotent — only set on the
+      // first failure of a streak; a subsequent success will clear it via the
+      // success handler above). The `platform-dunning` cron then progresses
+      // the account: 7 days → READ_ONLY, 30 days → SUSPENDED per Terms.
+      // NOTE: `paymentFailedAt` field is NOT yet in prisma/schema.prisma —
+      // see report. Using `$executeRawUnsafe` guarded try/catch until migrated.
+      try {
+        await prisma.$executeRawUnsafe(
+          `UPDATE "Company"
+             SET "paymentFailedAt" = COALESCE("paymentFailedAt", NOW()),
+                 "subscriptionStatus" = CASE
+                   WHEN "subscriptionStatus" IN ('ACTIVE','TRIALING')
+                     THEN 'PAST_DUE'
+                   ELSE "subscriptionStatus"
+                 END
+           WHERE "id" = $1`,
+          companyId,
+        );
+      } catch {
+        // Column doesn't exist yet — fall back to status-only update.
+        await prisma.company.update({
+          where: { id: companyId },
+          data: { subscriptionStatus: "PAST_DUE" },
+        }).catch(() => {});
+      }
+
+      await prisma.activityLog.create({
+        data: {
+          companyId, userId: null,
+          action: "PLATFORM_PAYMENT_FAILED",
+          details: JSON.stringify({
+            provider: "LEMON_SQUEEZY",
+            subscriptionId,
+            planCode,
+            amount: failedAmount,
+            currency: attrs?.currency || "USD",
+            nextRetry: retryDate,
+          }),
+        },
+      }).catch(() => {});
+    }
+
+    // ── Refund handling ─────────────────────────────────────────────────────
+    // LemonSqueezy fires `subscription_payment_refunded` when a refund is
+    // processed on a subscription payment. We treat this as receipt-only:
+    // log it, email the customer, do NOT auto-issue anything from our side.
+    if (eventName === "subscription_payment_refunded") {
+      const refundedAmount =
+        typeof attrs?.subtotal === "number" ? Number(attrs.subtotal) / 100 :
+        typeof attrs?.total    === "number" ? Number(attrs.total)    / 100 : 0;
+      const refundedCurrency = attrs?.currency || "USD";
+
+      await prisma.activityLog.create({
+        data: {
+          companyId, userId: null,
+          action: "REFUND_PROCESSED",
+          details: JSON.stringify({
+            provider: "LEMON_SQUEEZY",
+            eventName,
+            subscriptionId,
+            planCode,
+            amount: refundedAmount,
+            currency: refundedCurrency,
+            refundedAt: new Date().toISOString(),
+            source: "webhook_receipt", // LemonSqueezy is source of truth
+          }),
+        },
+      }).catch(() => {});
+
+      if (refundedAmount > 0) {
+        await sendRefundConfirmationEmail(companyId, planCode, refundedAmount, refundedCurrency);
+      }
+    }
+  }
+
+  // ── Order-level refund (one-off orders, not subscription payments) ────────
+  if (eventName === "order_refunded" && companyId) {
+    const refundedAmount =
+      typeof attrs?.subtotal === "number" ? Number(attrs.subtotal) / 100 :
+      typeof attrs?.total    === "number" ? Number(attrs.total)    / 100 : 0;
+    const refundedCurrency = attrs?.currency || "USD";
+
+    await prisma.activityLog.create({
+      data: {
+        companyId, userId: null,
+        action: "REFUND_PROCESSED",
+        details: JSON.stringify({
+          provider: "LEMON_SQUEEZY",
+          eventName,
+          orderId: payload?.data?.id || null,
+          planCode,
+          amount: refundedAmount,
+          currency: refundedCurrency,
+          refundedAt: new Date().toISOString(),
+          source: "webhook_receipt",
+        }),
+      },
+    }).catch(() => {});
+
+    if (refundedAmount > 0) {
+      await sendRefundConfirmationEmail(companyId, planCode, refundedAmount, refundedCurrency);
     }
   }
 
