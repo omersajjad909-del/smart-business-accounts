@@ -2,8 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId } from "@/lib/tenant";
 
-// Statuses that are allowed to use the product
+// Statuses with full access
 const ALLOWED_STATUSES = ["ACTIVE", "TRIALING"];
+
+// Read-only phase (Privacy Policy Phase 1: Days 1-30 after cancel).
+// During this window, GET requests succeed so users can log in and export
+// data. Any mutating request is rejected with 402.
+function isReadOnlyRequest(method: string): boolean {
+  return method.toUpperCase() === "GET" || method.toUpperCase() === "HEAD";
+}
+
+function inReadOnlyGracePeriod(status: string, cancelledAt: Date | null): boolean {
+  if (status !== "CANCELLED") return false;
+  if (!cancelledAt) return false;
+  const daysSinceCancel = (Date.now() - cancelledAt.getTime()) / (1000 * 60 * 60 * 24);
+  return daysSinceCancel <= 30;
+}
 
 export async function requireEntitlement(req: Request, entitlement: string) {
   const companyId = await resolveCompanyId(req as any);
@@ -13,16 +27,23 @@ export async function requireEntitlement(req: Request, entitlement: string) {
 
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { plan: true, subscriptionStatus: true },
+    select: { plan: true, subscriptionStatus: true, cancelledAt: true },
   });
 
   const plan   = (company?.plan || "STARTER").toUpperCase();
   const status = (company?.subscriptionStatus || "ACTIVE").toUpperCase();
 
-  // Allow ACTIVE and TRIALING — block everything else
   if (!ALLOWED_STATUSES.includes(status)) {
+    // Phase 1 read-only: allow GET/HEAD for cancelled accounts within 30 days
+    if (inReadOnlyGracePeriod(status, company?.cancelledAt ?? null) && isReadOnlyRequest(req.method)) {
+      return null;
+    }
     return NextResponse.json(
-      { error: "Subscription inactive. Please upgrade your plan." },
+      {
+        error: status === "CANCELLED"
+          ? "Account cancelled. Read-only export is available for 30 days after cancellation; write operations are blocked."
+          : "Subscription inactive. Please upgrade your plan.",
+      },
       { status: 402 }
     );
   }
@@ -72,12 +93,19 @@ export async function requireActiveSubscription(req: Request) {
   }
   const company = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { subscriptionStatus: true },
+    select: { subscriptionStatus: true, cancelledAt: true },
   });
   const status = (company?.subscriptionStatus || "ACTIVE").toUpperCase();
   if (!ALLOWED_STATUSES.includes(status)) {
+    if (inReadOnlyGracePeriod(status, company?.cancelledAt ?? null) && isReadOnlyRequest(req.method)) {
+      return null;
+    }
     return NextResponse.json(
-      { error: "Subscription inactive. Please renew your plan." },
+      {
+        error: status === "CANCELLED"
+          ? "Account cancelled. Read-only access is available for 30 days after cancellation; write operations are blocked."
+          : "Subscription inactive. Please renew your plan.",
+      },
       { status: 402 }
     );
   }

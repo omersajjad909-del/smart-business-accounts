@@ -17,7 +17,7 @@ const SECTIONS = [
     content: [
       { sub: "Customer as Controller", body: "The customer determines the purposes and means of processing personal data entered into FinovaOS — including employee records, customer contact information, and supplier details. The customer is the 'Data Controller' under GDPR." },
       { sub: "FinovaOS as Processor", body: "FinovaOS processes personal data only on documented instructions from the customer (as expressed through use of the platform and this agreement). FinovaOS is the 'Data Processor'." },
-      { sub: "Sub-processors", body: "FinovaOS uses approved sub-processors to deliver the service, including: Supabase (database, EU region), AWS (infrastructure, EU/APAC), SendGrid (transactional email), Stripe/Paddle (payments). A current list is maintained at finovaos.app/legal/sub-processors." },
+      { sub: "Sub-processors", body: "FinovaOS uses approved sub-processors to deliver the service, including: Supabase (database & storage), Vercel (application hosting), LemonSqueezy (payments & checkout), SMTP email provider (transactional email), and Twilio/BulkSMS providers (SMS notifications). A current list is maintained at finovaos.app/legal/sub-processors." },
     ],
   },
   {

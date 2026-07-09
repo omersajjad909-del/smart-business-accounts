@@ -41,9 +41,9 @@ const SECTIONS = [
   {
     icon: "🛡️", title: "Data Backup & Recovery",
     content: [
-      { sub: "Backup Frequency", body: "All customer data is backed up every 4 hours to geographically separate AWS regions. Daily snapshots are retained for 30 days. Monthly snapshots are retained for 12 months." },
-      { sub: "Recovery Point Objective (RPO)", body: "In the event of data loss, maximum data loss is limited to 4 hours (the backup interval)." },
-      { sub: "Recovery Time Objective (RTO)", body: "In the event of a full disaster requiring database restore, target recovery time is 4 hours for critical systems and 8 hours for full restoration." },
+      { sub: "Backup Frequency", body: "Automated daily snapshots of all customer data are taken and retained for 30 days. Companies on Pro and Enterprise plans may schedule additional on-demand backups via the Backup & Restore dashboard. Backup infrastructure is provided by our primary database provider with point-in-time recovery available on eligible plans." },
+      { sub: "Recovery Point Objective (RPO)", body: "In the event of data loss, maximum data loss is limited to 24 hours (the automated backup interval). Customers on eligible plans may reduce this window by scheduling more frequent backups." },
+      { sub: "Recovery Time Objective (RTO)", body: "In the event of a full disaster requiring database restore, target recovery time is 24 hours for critical systems. Point-in-time recovery on eligible plans can reduce RTO to 4 hours." },
       { sub: "Data Export", body: "Customers can export all their data (invoices, ledger, contacts, inventory) in CSV/PDF format at any time from the dashboard. Data export is available for 90 days after account closure." },
     ],
   },

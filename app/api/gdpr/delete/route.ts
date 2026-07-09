@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     if (!confirmDeletion) {
       return NextResponse.json({
         error: "You must confirm deletion by sending { confirmDeletion: true }",
-        warning: "This action will schedule deletion of ALL your company data. This cannot be undone after the 30-day review period.",
+        warning: "This action will schedule deletion of ALL your company data. This cannot be undone once the 7 business day processing window elapses.",
       }, { status: 400 });
     }
 
@@ -43,9 +43,11 @@ export async function POST(req: NextRequest) {
     const ipAddress = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || null;
     const userAgent = req.headers.get("user-agent") || null;
 
-    // Schedule deletion — set dataRetentionUntil to 30 days from now (compliance review period)
+    // Schedule deletion — Privacy Policy commits to 7 business days for immediate
+    // deletion requests. We use 10 calendar days to allow for weekends within a
+    // 7-business-day window.
     const deletionDate = new Date();
-    deletionDate.setDate(deletionDate.getDate() + 30);
+    deletionDate.setDate(deletionDate.getDate() + 10);
 
     const [gdprRequest] = await prisma.$transaction([
       prisma.gdprRequest.create({
@@ -83,7 +85,7 @@ export async function POST(req: NextRequest) {
           <p>We have received your request to delete all personal data associated with your FinovaOS account under <strong>GDPR Article 17 (Right to Erasure)</strong>.</p>
           <p><strong>What happens next:</strong></p>
           <ul>
-            <li>Our compliance team will review your request within 30 days</li>
+            <li>Our compliance team will process your request within <strong>7 business days</strong></li>
             <li>Data will be permanently deleted by: <strong>${deletionDate.toISOString().slice(0, 10)}</strong></li>
             <li>Certain data may be retained for legal compliance (e.g., tax records, as permitted by GDPR Art. 17(3)(b))</li>
             <li>You will receive a confirmation email when deletion is complete</li>
@@ -118,9 +120,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       requestId: gdprRequest.id,
-      message: "Your deletion request has been received. Data will be deleted within 30 days.",
+      message: "Your deletion request has been received. Data will be deleted within 7 business days.",
       scheduledDeletionDate: deletionDate.toISOString().slice(0, 10),
-      note: "You may cancel this request within 7 days by contacting privacy@finovaforge.com",
+      note: "You may cancel this request within 3 days by contacting privacy@finovaforge.com",
     }, { status: 201 });
   } catch (err: any) {
     console.error("GDPR delete error:", err);
