@@ -7,12 +7,12 @@ export const metadata: Metadata = {
     "Finova Forge is a software company building intelligent, industry-specific business tools for growing companies worldwide.",
   icons: {
     icon: [
-      { url: "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=3", sizes: "32x32", type: "image/png" },
-      { url: "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=3", sizes: "192x192", type: "image/png" },
-      { url: "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=3", sizes: "512x512", type: "image/png" },
+      { url: "/FinovaForge.png?v=4", sizes: "32x32", type: "image/png" },
+      { url: "/FinovaForge.png?v=4", sizes: "192x192", type: "image/png" },
+      { url: "/FinovaForge.png?v=4", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=3", sizes: "180x180", type: "image/png" }],
-    shortcut: "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=3",
+    apple: [{ url: "/FinovaForge.png?v=4", sizes: "180x180", type: "image/png" }],
+    shortcut: "/FinovaForge.png?v=4",
   },
 };
 

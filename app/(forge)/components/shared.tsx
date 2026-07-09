@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const ff = "'Outfit','DM Sans',sans-serif";
-const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=3";
+const forgeLogoMark = "/FinovaForge.png?v=4";
 
 export function ForgeNav() {
   const [scrolled, setScrolled] = useState(false);

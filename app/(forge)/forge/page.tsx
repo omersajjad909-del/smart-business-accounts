@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 const ff = "'Outfit','DM Sans',sans-serif";
-const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=3";
+const forgeLogoMark = "/FinovaForge.png?v=4";
 
 function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
