@@ -6,8 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const ff = "'Outfit','DM Sans',sans-serif";
-const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=2";
-const forgeLogoWordmark = "/FinovaForge.png?v=2";
+const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=3";
 
 export function ForgeNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -59,15 +58,12 @@ export function ForgeNav() {
           style={{ width: 36, height: 36, borderRadius: 10, boxShadow: "0 4px 14px rgba(245,158,11,.3)" }}
         />
         <div style={{ lineHeight: 1, display: "flex", flexDirection: "column", gap: 4 }}>
-          <Image
-            src={forgeLogoWordmark}
-            alt="Finova Forge"
-            width={144}
-            height={28}
-            priority
-            unoptimized
-            style={{ width: "auto", height: 22 }}
-          />
+          <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-.5px", color: "white" }}>
+            Finova
+            <span style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              Forge
+            </span>
+          </span>
           <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".1em", textTransform: "uppercase" }}>
             Software Co.
           </div>
@@ -185,14 +181,12 @@ export function ForgeFooter() {
                 unoptimized
                 style={{ width: 30, height: 30, borderRadius: 9 }}
               />
-              <Image
-                src={forgeLogoWordmark}
-                alt="Finova Forge"
-                width={126}
-                height={24}
-                unoptimized
-                style={{ width: "auto", height: 20 }}
-              />
+              <span style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-.4px", color: "white", lineHeight: 1 }}>
+                Finova
+                <span style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  Forge
+                </span>
+              </span>
             </Link>
             <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.28)", lineHeight: 1.85, maxWidth: 240, margin: "0 0 16px" }}>
               Building intelligent systems for modern businesses.

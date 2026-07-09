@@ -4,8 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 const ff = "'Outfit','DM Sans',sans-serif";
-const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=2";
-const forgeLogoWordmark = "/FinovaForge.png?v=2";
+const forgeLogoMark = "/FinovaForge_Profile_OrangeBG_WhiteF.png?v=3";
 
 function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -49,15 +48,12 @@ function ForgeNav() {
           unoptimized
           style={{ width: 32, height: 32, borderRadius: 9, boxShadow: "0 4px 14px rgba(245,158,11,.3)" }}
         />
-        <Image
-          src={forgeLogoWordmark}
-          alt="Finova Forge"
-          width={148}
-          height={28}
-          priority
-          unoptimized
-          style={{ width: "auto", height: 22 }}
-        />
+        <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-.5px", color: "white", lineHeight: 1 }}>
+          Finova
+          <span style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            Forge
+          </span>
+        </span>
       </Link>
 
       {/* Links */}
@@ -388,14 +384,12 @@ function ForgeFooter() {
           unoptimized
           style={{ width: 24, height: 24, borderRadius: 7 }}
         />
-        <Image
-          src={forgeLogoWordmark}
-          alt="Finova Forge"
-          width={108}
-          height={20}
-          unoptimized
-          style={{ width: "auto", height: 18 }}
-        />
+        <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-.3px", color: "white" }}>
+          Finova
+          <span style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            Forge
+          </span>
+        </span>
         <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.35)" }}>
           {"\u00A9"} {new Date().getFullYear()} Finova Forge. All rights reserved.
         </span>
