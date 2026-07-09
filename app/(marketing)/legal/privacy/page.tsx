@@ -522,7 +522,8 @@ export default function PrivacyPage() {
                     { icon:"🤖", text:"AI never trains on your data" },
                     { icon:"🏢", text:"Fully isolated workspaces" },
                     { icon:"📤", text:"Full data export anytime" },
-                    { icon:"🗑️", text:"Right to deletion" },
+                    { icon:"🗓️", text:"90-day grace period after cancel" },
+                    { icon:"⚡", text:"Instant deletion on email request" },
                   ].map(({ icon, text }) => (
                     <div key={text} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
                       <span style={{ fontSize:15 }}>{icon}</span>
