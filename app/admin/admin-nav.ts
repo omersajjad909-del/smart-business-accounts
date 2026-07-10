@@ -48,6 +48,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "support-inbox",    label: "Support Inbox",     href: "/admin/chat",                group: "System",    short: "SI", icon: "message", badge: "LIVE" },
   { id: "logs",             label: "Activity Logs",     href: "/admin/logs",                group: "System",    short: "LG", icon: "activity" },
   { id: "system",           label: "System Health",     href: "/admin/system",              group: "System",    short: "SY", icon: "shield" },
+  { id: "security-incidents", label: "Security Incidents", href: "/admin/security-incidents",  group: "System",    short: "SC", icon: "alert" },
   { id: "backup-restore",   label: "Backup & Restore",  href: "/admin/backup-restore",      group: "System",    short: "BK", icon: "archive" },
 
   // ── OTHERS ────────────────────────────────────────────────────────────────
