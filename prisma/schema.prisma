@@ -2286,3 +2286,57 @@ model GdprRequest {
   @@index([userId, requestedAt])
   @@index([status, requestedAt])
 }
+
+// ================= UPTIME MONITORING =================
+// Every scheduled probe (see /api/cron/uptime-probe) inserts one row per service.
+// The /status page reads 30-day rolling uptime from this table so the 99.9% SLA
+// commitment in /legal/sla is backed by real data, not a hard-coded value.
+
+model UptimeCheck {
+  id        String   @id @default(cuid())
+  serviceId String   // "web" | "api" | "db" | "reports" | "email" | "backups" | "cdn" | "search"
+  ok        Boolean
+  latencyMs Int?
+  error     String?
+  checkedAt DateTime @default(now())
+
+  @@index([serviceId, checkedAt])
+  @@index([checkedAt])
+}
+
+// ================= SECURITY / BREACH INCIDENTS =================
+// Records data-breach or security incidents so the "72-hour breach notification"
+// commitment in /legal/privacy and /legal/dpa is actually enforced.
+// The /api/cron/breach-notify cron notifies subscribers before deadlineAt.
+
+model SecurityIncident {
+  id            String    @id @default(cuid())
+
+  // What happened
+  severity      String    // "P1" | "P2" | "P3" | "P4"
+  category      String    // "DATA_BREACH" | "UNAUTHORIZED_ACCESS" | "SYSTEM_OUTAGE" | "OTHER"
+  title         String
+  summary       String    @db.Text
+  affectedScope String?   @db.Text // e.g. "all users", "companies in EU region"
+
+  // Lifecycle
+  status        String    @default("DETECTED") // DETECTED | NOTIFYING | NOTIFIED | RESOLVED
+  detectedAt    DateTime  @default(now())
+  deadlineAt    DateTime  // detectedAt + 72h — enforced by breach-notify cron
+  notifiedAt    DateTime? // When user-facing notification actually fired
+  resolvedAt    DateTime?
+  resolution    String?   @db.Text
+
+  // Notification tracking
+  notificationCount Int   @default(0)
+  lastNotifyError   String?
+
+  // Audit
+  createdBy     String?   // Admin userId who logged the incident
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, deadlineAt])
+  @@index([detectedAt])
+  @@index([severity])
+}
