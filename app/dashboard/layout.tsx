@@ -2127,6 +2127,7 @@ export default function DashboardLayout({
               {!isCustomPlan && hasPermission(currentUser, PERMISSIONS.BACKUP_RESTORE) && <NavLink href="/dashboard/backup-restore" pathname={pathname}>Backup & Restore</NavLink>}
               {/* {(!isCustomPlan || hasCustomActiveModule("whatsapp")) && <NavLink href="/dashboard/notifications" pathname={pathname}>Notifications & SMS</NavLink>} */}
               <NavLink href="/dashboard/account-settings" pathname={pathname}>Account Settings</NavLink>
+              <NavLink href="/dashboard/settings/billing"   pathname={pathname}>💳 My Billing</NavLink>
               <NavLink href="/dashboard/settings/appearance" pathname={pathname}>🎨 Appearance</NavLink>
               <NavLink href="/dashboard/settings/holidays"   pathname={pathname}>🎉 Public Holidays</NavLink>
               {!isCustomPlan && <NavLink href="/dashboard/security-access" pathname={pathname}>Security & Access</NavLink>}
@@ -2549,6 +2550,7 @@ export default function DashboardLayout({
                     {[
                       ...(currentUser?.role === "ADMIN" ? [{ icon:"🏢", label:"Company Profile", href:"/dashboard/company-profile" }] : []),
                       { icon:"👤", label:"Account Settings", href:"/dashboard/account-settings" },
+                      { icon:"💳", label:"My Billing",        href:"/dashboard/settings/billing" },
                       { icon:"🎨", label:"Appearance",       href:"/dashboard/settings/appearance" },
                       { icon:"👥", label:"Team Members",     href:"/dashboard/users" },
                       { icon:"🔔", label:"Notifications",    href:"/dashboard/notifications" },
