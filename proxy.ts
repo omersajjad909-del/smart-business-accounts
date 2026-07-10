@@ -53,7 +53,15 @@ export function proxy(req: NextRequest) {
     const { pathname, search } = req.nextUrl;
     const fwdHeaders = new Headers(req.headers);
     fwdHeaders.set("x-nonce", nonce);
-    if (!pathname.startsWith("/forge") && !pathname.startsWith("/_next") && !pathname.startsWith("/api")) {
+    // Skip rewrite for static files (any path with a file extension like .png, .svg, .ico, .txt, .json, etc.)
+    // so /FinovaForge.png resolves to public/FinovaForge.png instead of /forge/FinovaForge.png.
+    const isStaticFile = /\.[a-z0-9]+$/i.test(pathname);
+    if (
+      !isStaticFile &&
+      !pathname.startsWith("/forge") &&
+      !pathname.startsWith("/_next") &&
+      !pathname.startsWith("/api")
+    ) {
       const target = pathname === "/" ? "/forge/home" : `/forge${pathname}`;
       const res = NextResponse.rewrite(new URL(target + search, req.url), { request: { headers: fwdHeaders } });
       res.headers.set("Content-Security-Policy", csp);
