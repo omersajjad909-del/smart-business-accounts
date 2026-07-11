@@ -39,16 +39,22 @@ export default async function CareersLayout({ children }: { children: React.Reac
   const nonce = (await headers()).get("x-nonce") || undefined;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "JobPosting",
-    hiringOrganization: {
+    "@type": "WebPage",
+    name: "Careers at FinovaOS",
+    url: `${BASE}/careers`,
+    description:
+      "Join FinovaOS: remote-first, equity included, health coverage, learning budget. Hiring in engineering, product, and sales.",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "FinovaOS",
+      url: BASE,
+    },
+    about: {
       "@type": "Organization",
       name: "FinovaOS",
       sameAs: BASE,
       logo: `${BASE}/icon.png`,
     },
-    jobLocation: { "@type": "Place", address: "Remote — Worldwide" },
-    employmentType: "FULL_TIME",
-    description: "Multiple positions available in engineering, product, sales, and support.",
   };
   return (
     <>
