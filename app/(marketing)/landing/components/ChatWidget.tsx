@@ -19,7 +19,7 @@ const KB: [RegExp, string][] = [
    "FinovaOS is a complete cloud Business OS for SMEs — all in one platform:\n\n• Accounting & double-entry bookkeeping\n• Sales & purchase invoicing\n• Inventory management\n• HR & Payroll\n• Banking & reconciliation\n• CRM & customer management\n• AI financial intelligence\n\nUsed by 12,000+ businesses. 🚀"],
 
   [/pric|plan|cost|kitna|starter|professional|enterprise|subscription|fee|charge/i,
-   "FinovaOS ke 4 plans hain:\n\n1. **Starter** — 3 users | PKR 13,622/mo | Invoicing, ledger, basic reports\n2. **Professional** — 10 users | PKR 27,522/mo | + Inventory, HR & Payroll, Banking, CRM\n3. **Enterprise** — 25 users | PKR 69,222/mo | + API access, integrations, priority support\n4. **Custom** — Sirf woh modules jo chahiye, pay per module\n\n🔥 Launch offer: 75% off pehle 3 mahine!\nContact: finovaos.app@gmail.com 💰"],
+   "FinovaOS ke 4 plans hain:\n\n1. **Starter** — 3 users | PKR 13,622/mo | Invoicing, ledger, basic reports\n2. **Professional** — 10 users | PKR 27,522/mo | + Inventory, HR & Payroll, Banking, CRM\n3. **Enterprise** — 25 users | PKR 69,222/mo | + API access, integrations, priority support\n4. **Custom** — Sirf woh modules jo chahiye, pay per module\n\n🔥 Launch offer: 75% off pehle 3 mahine!\nContact: hello@finovaos.app 💰"],
 
   [/invoice|bill|billing|sales invoice|create invoice|banao invoice/i,
    "Creating a Sales Invoice:\n\n1. Dashboard → Sales Invoice → New Invoice\n2. Select customer & add items\n3. Set quantity, price & tax\n4. Save → Send PDF via email\n\nFeatures: PDF generation, email delivery, payment tracking. 📄"],
@@ -46,10 +46,10 @@ const KB: [RegExp, string][] = [
    "FinovaOS AI Intelligence:\n\n1. Business health score (0–100)\n2. Ask AI — chat with your data\n3. Financial insights & analysis\n4. Auto anomaly alerts\n5. 30/60/90-day forecasts\n6. Business recommendations\n7. Monthly CEO report\n\nDashboard → AI Intelligence 🤖"],
 
   [/demo|trial|try|start|sign up|register|get started|kaise shuru/i,
-   "Get started with FinovaOS:\n\n1. Visit **finovaos.app**\n2. Click 'Get Started'\n3. Set up your company (5 min)\n4. Our team will guide you through onboarding\n\nContact: finovaos.app@gmail.com | +92 304 7653693 🚀"],
+   "Get started with FinovaOS:\n\n1. Visit **finovaos.app**\n2. Click 'Get Started'\n3. Set up your company (5 min)\n4. Our team will guide you through onboarding\n\nContact: hello@finovaos.app | +92 304 7653693 🚀"],
 
   [/contact|email|phone|support|madad|helpline/i,
-   "Contact FinovaOS:\n\n• Email: **finovaos.app@gmail.com**\n• Phone: **+92 304 7653693**\n• Website: **finovaos.app**\n\nOr type 'human agent' to connect with our support team. 📞"],
+   "Contact FinovaOS:\n\n• Email: **hello@finovaos.app**\n• Phone: **+92 304 7653693**\n• Website: **finovaos.app**\n\nOr type 'human agent' to connect with our support team. 📞"],
 
   [/purchase|supplier|vendor|po|purchase order|khareed/i,
    "Purchase Management:\n\n• Purchase invoices from suppliers\n• Purchase Orders (PO) with approval\n• Goods Receipt Notes (GRN)\n• 3-way match: PO → GRN → Invoice\n• Advance payments to suppliers\n\nDashboard → Purchases 🛒"],
@@ -67,10 +67,10 @@ const KB: [RegExp, string][] = [
    "FinovaOS supports 150+ currencies:\n• PKR, USD, AED, GBP, EUR, SAR\n• Real-time exchange rates\n• Multi-currency invoicing\n\nPerfect for import/export businesses! 💱"],
 
   [/marketing.?auto|whatsapp.?broadcast|email.?campaign|drip.?sequence|lead.?nurtur|send.?campaign|bulk.?message/i,
-   "FinovaOS Marketing Automation (Power Add-on):\n\n• Automated email campaigns\n• WhatsApp broadcasts to all customers\n• Lead nurturing & drip sequences\n• Customer segmentation by behavior\n• Open rate & click tracking\n\nAvailable as a Power Add-on on ANY plan!\nContact: finovaos.app@gmail.com for pricing 📣"],
+   "FinovaOS Marketing Automation (Power Add-on):\n\n• Automated email campaigns\n• WhatsApp broadcasts to all customers\n• Lead nurturing & drip sequences\n• Customer segmentation by behavior\n• Open rate & click tracking\n\nAvailable as a Power Add-on on ANY plan!\nContact: hello@finovaos.app for pricing 📣"],
 
   [/\bapi\b|integration|webhook|third.?party|zapier|import.?data|custom.?integrat|connect.?with/i,
-   "FinovaOS API & Integrations:\n\n• Full REST API access (Enterprise plan)\n• Webhook support for real-time sync\n• CSV & Excel import/export on all plans\n• Custom integrations on request\n• Connect with eCommerce, payment gateways, banks\n\nContact: finovaos.app@gmail.com for custom integrations 🔌"],
+   "FinovaOS API & Integrations:\n\n• Full REST API access (Enterprise plan)\n• Webhook support for real-time sync\n• CSV & Excel import/export on all plans\n• Custom integrations on request\n• Connect with eCommerce, payment gateways, banks\n\nContact: hello@finovaos.app for custom integrations 🔌"],
 
   [/why finova|better than|compare|versus|\bvs\b|quickbooks|xero|competitor|best accounting|alternative|kon sa software/i,
    "Why FinovaOS over QuickBooks / Xero?\n\n• All-in-one: Accounting + HR + Inventory + CRM in ONE platform\n• Built for Pakistan: PKR pricing, Urdu support\n• 12,000+ businesses trust FinovaOS\n• 75% cheaper than international alternatives\n• Local support team available in Urdu/English\n• No hidden per-module fees\n• 14-day money-back guarantee\n\nSwitch with full data migration support! 🏆"],
@@ -317,7 +317,7 @@ export default function ChatWidget() {
       setEscalated(true);
       addMsg({
         sender: "bot",
-        text: "Connecting you to a human agent now. Someone will respond shortly.\n\nYou can also reach us directly:\n• Email: **finovaos.app@gmail.com**\n• Phone: **+92 304 7653693**",
+        text: "Connecting you to a human agent now. Someone will respond shortly.\n\nYou can also reach us directly:\n• Email: **hello@finovaos.app**\n• Phone: **+92 304 7653693**",
       });
       return;
     }
@@ -349,7 +349,7 @@ export default function ChatWidget() {
     // Fallback to offline KB if server fails
     const reply = serverReply
       || matchKB(text)
-      || `FinovaOS ke baare mein koi bhi sawal poochein! 😊\n\nMain in topics mein madad kar sakta hoon:\n• Pricing & plans\n• Invoice & billing\n• Inventory & stock\n• HR & Payroll\n• Banking & reports\n\nYa seedha contact karein:\n• **finovaos.app@gmail.com**\n• **+92 304 7653693**`;
+      || `FinovaOS ke baare mein koi bhi sawal poochein! 😊\n\nMain in topics mein madad kar sakta hoon:\n• Pricing & plans\n• Invoice & billing\n• Inventory & stock\n• HR & Payroll\n• Banking & reports\n\nYa seedha contact karein:\n• **hello@finovaos.app**\n• **+92 304 7653693**`;
 
     setTyping(false);
 
