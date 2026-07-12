@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, Globe, ArrowRight, Zap } from "lucide-react";
+import { Linkedin, Mail, Phone, Globe, ArrowRight, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const PRODUCT_LINKS = [
@@ -33,10 +33,12 @@ const COMPANY_LINKS = [
 ];
 
 const SOCIALS_DEFAULT = [
-  { Icon: Facebook,  key: "facebook",  label: "Facebook" },
-  { Icon: Twitter,   key: "twitter",   label: "Twitter/X" },
-  { Icon: Linkedin,  key: "linkedin",  label: "LinkedIn" },
-  { Icon: Instagram, key: "instagram", label: "Instagram" },
+  {
+    Icon: Linkedin,
+    key: "linkedin",
+    label: "LinkedIn",
+    href: "https://linkedin.com/company/finovaforge",
+  },
 ];
 
 const BOTTOM_LINKS = [
@@ -67,10 +69,10 @@ export default function Footer() {
       .catch(() => {});
   }, []);
 
-  const SOCIALS = SOCIALS_DEFAULT.map(s => ({
+  const SOCIALS = SOCIALS_DEFAULT.map((s) => ({
     ...s,
-    href: socialLinks[s.key] || "#",
-  }));
+    href: socialLinks[s.key] || s.href,
+  })).filter((social) => Boolean(social.href));
 
   return (
     <footer style={{

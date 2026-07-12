@@ -238,7 +238,7 @@ export default function AboutPage() {
             opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(20px)",
             transition: "opacity .6s ease .2s, transform .6s ease .2s",
           }}>
-            FinovaOS exists because growing businesses deserve enterprise-grade tools — without the enterprise-grade price, complexity, or waiting time.
+            FinovaOS is the flagship cloud ERP product built by Finova Forge for growing businesses that need enterprise-grade tools without the enterprise-grade price, complexity, or waiting time.
           </p>
 
           <div style={{

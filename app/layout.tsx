@@ -10,7 +10,7 @@ import VisitorTracker from "@/components/VisitorTracker";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 const GOOGLE_SITE_VERIFICATION =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined;
-const BRAND_ICON_PATH = "/icon1.png";
+const BRAND_ICON_PATH = "/icon.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     "AI ERP",
     "smart accounting software",
   ],
-  authors: [{ name: "FinovaOS", url: BASE_URL }],
-  creator: "FinovaOS",
-  publisher: "FinovaOS",
+  authors: [{ name: "Finova Forge", url: "https://finovaforge.com" }],
+  creator: "Finova Forge",
+  publisher: "Finova Forge",
   robots: {
     index: true,
     follow: true,
@@ -71,8 +71,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@finova_io",
-    creator: "@finova_io",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
       "AI-powered cloud accounting for SMEs. Trusted by 500+ businesses in Pakistan, UAE & beyond.",
@@ -83,10 +81,10 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   icons: {
     icon: [
-      { url: "/icon1.png", sizes: "any", type: "image/png" },
+      { url: "/icon.png", sizes: "any", type: "image/png" },
     ],
-    apple: [{ url: "/icon1.png", sizes: "180x180", type: "image/png" }],
-    shortcut: "/icon1.png",
+    apple: [{ url: "/icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/icon.png",
   },
   manifest: "/manifest.json",
   appleWebApp: {
@@ -112,12 +110,23 @@ export const viewport: Viewport = {
 const softwareApplicationJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
+  "@id": `${BASE_URL}/#software`,
   name: "FinovaOS",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description: "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM.",
   url: BASE_URL,
   screenshot: `${BASE_URL}${BRAND_ICON_PATH}`,
+  brand: {
+    "@type": "Brand",
+    name: "FinovaOS",
+  },
+  provider: {
+    "@id": `${BASE_URL}/#organization`,
+  },
+  publisher: {
+    "@id": `${BASE_URL}/#organization`,
+  },
   offers: {
     "@type": "AggregateOffer",
     lowPrice: "49",
@@ -144,15 +153,17 @@ const softwareApplicationJsonLd = {
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "FinovaOS",
-  url: BASE_URL,
+  "@id": `${BASE_URL}/#organization`,
+  name: "Finova Forge",
+  alternateName: "FinovaOS",
+  url: "https://finovaforge.com",
   logo: {
     "@type": "ImageObject",
     url: `${BASE_URL}${BRAND_ICON_PATH}`,
     width: 512,
     height: 512,
   },
-  description: "Cloud accounting and business management software for modern SMEs.",
+  description: "Finova Forge is the company behind FinovaOS, a cloud accounting and business management platform for modern SMEs.",
   foundingDate: "2023",
   numberOfEmployees: { "@type": "QuantitativeValue", value: 120 },
   contactPoint: [
@@ -160,20 +171,21 @@ const organizationJsonLd = {
       "@type": "ContactPoint",
       telephone: "+92-304-7653693",
       contactType: "customer service",
-      email: "finovaos.app@gmail.com",
+      email: "hello@finovaos.app",
+      url: `${BASE_URL}/contact`,
       availableLanguage: ["English", "Arabic", "Urdu"],
     },
     {
       "@type": "ContactPoint",
-      contactType: "sales",
-      email: "finovaos.app@gmail.com",
+      contactType: "legal",
+      email: "legal@finovaos.app",
+      url: `${BASE_URL}/legal/privacy`,
     },
   ],
   sameAs: [
-    "https://twitter.com/finova_io",
-    "https://linkedin.com/company/finova",
-    "https://facebook.com/finova",
-    "https://instagram.com/finova",
+    "https://finovaforge.com",
+    "https://www.finovaos.app",
+    "https://linkedin.com/company/finovaforge",
   ],
 };
 
@@ -183,6 +195,7 @@ const websiteJsonLd = {
   name: "FinovaOS",
   url: BASE_URL,
   description: "Cloud accounting software for modern SMEs.",
+  publisher: { "@id": `${BASE_URL}/#organization` },
   potentialAction: {
     "@type": "SearchAction",
     target: { "@type": "EntryPoint", urlTemplate: `${BASE_URL}/search?q={search_term_string}` },

@@ -379,7 +379,7 @@ export default function Hero() {
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="2">
                         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                       </svg>
-                      <span style={{ fontSize:10.5, color:"rgba(255,255,255,.3)", fontWeight:500 }}>usefinova.app/dashboard</span>
+                      <span style={{ fontSize:10.5, color:"rgba(255,255,255,.3)", fontWeight:500 }}>finovaos.app/dashboard</span>
                     </div>
                   </div>
                   <div style={{ display:"flex", alignItems:"center", gap:5 }}>
