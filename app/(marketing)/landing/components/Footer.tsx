@@ -17,12 +17,14 @@ const PRODUCT_LINKS = [
 
 const COMPANY_LINKS = [
   { label: "About Us",           href: "/about" },
+  { label: "Waitlist",           href: "/waitlist" },
   { label: "Blog",               href: "/blog" },
   { label: "Case Studies",       href: "/case-studies" },
   { label: "Careers",            href: "/careers" },
   { label: "Support Center",     href: "/support" },
   { label: "Affiliate Program",  href: "/affiliate" },
   { label: "Privacy Policy",     href: "/legal/privacy" },
+  { label: "Cookie Policy",      href: "/legal/cookies" },
   { label: "Terms of Service",   href: "/legal/terms" },
   { label: "Refund Policy",      href: "/legal/refund" },
   { label: "SLA",                href: "/legal/sla" },
@@ -38,7 +40,9 @@ const SOCIALS_DEFAULT = [
 ];
 
 const BOTTOM_LINKS = [
+  { label: "Waitlist", href: "/waitlist" },
   { label: "Privacy",  href: "/legal/privacy" },
+  { label: "Cookies",  href: "/legal/cookies" },
   { label: "Terms",    href: "/legal/terms" },
   { label: "Refund",   href: "/legal/refund" },
   { label: "Security", href: "/security" },

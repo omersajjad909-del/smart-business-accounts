@@ -18,6 +18,7 @@ const SITEMAP = [
       { label: "Solutions", href: "/solutions", desc: "Industry-specific use cases" },
       { label: "Security", href: "/security", desc: "Data security & compliance" },
       { label: "About Us", href: "/about", desc: "Our story, mission, and team" },
+      { label: "Waitlist", href: "/waitlist", desc: "Early access signup for launch updates" },
     ],
   },
   {
@@ -91,6 +92,7 @@ const SITEMAP = [
     title: "Legal & Support",
     links: [
       { label: "Privacy Policy", href: "/legal/privacy", desc: "Data collection & usage" },
+      { label: "Cookie Policy", href: "/legal/cookies", desc: "Cookie usage, analytics, and preferences" },
       { label: "Terms of Service", href: "/legal/terms", desc: "Usage terms & conditions" },
       { label: "Security", href: "/security", desc: "Security practices & compliance" },
       { label: "Support Center", href: "/support", desc: "Help docs & contact" },
