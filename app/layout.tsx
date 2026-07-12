@@ -15,11 +15,11 @@ const BRAND_ICON_PATH = "/icon.png";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "FinovaOS - Global Accounting & Business Management Platform",
+    default: "FinovaOS — AI Cloud Accounting Software for SMEs",
     template: "%s | FinovaOS",
   },
   description:
-    "AI-powered cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform. Trusted by 500+ businesses in Pakistan, UAE, and beyond.",
+    "FinovaOS is AI-powered cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, and CRM — all in one platform. Trusted by 500+ businesses in Pakistan, UAE, and beyond.",
   keywords: [
     "accounting software",
     "cloud accounting",

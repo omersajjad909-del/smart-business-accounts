@@ -171,7 +171,7 @@ export default function Hero() {
                     animation:"pulse2 2s infinite", display:"inline-block", flexShrink:0,
                   }}/>
                   <span style={{ fontSize:11, fontWeight:700, color:"#a5b4fc", letterSpacing:".07em" }}>
-                    PURPOSE-BUILT FOR TRADING & WHOLESALE
+                    FINOVAOS — AI CLOUD ACCOUNTING FOR SMEs
                   </span>
                 </div>
               </div>
@@ -182,7 +182,7 @@ export default function Hero() {
                 lineHeight:1.06, letterSpacing:"-2px",
                 color:"#fff", marginBottom:22,
               }}>
-                Run Your Business.{" "}
+                Run Your Business with FinovaOS.{" "}
                 <span style={{
                   background:"linear-gradient(135deg,#818cf8,#a78bfa,#60a5fa)",
                   backgroundSize:"200% auto",
@@ -199,7 +199,7 @@ export default function Hero() {
                 color:"rgba(255,255,255,.48)", marginBottom:32,
                 maxWidth:430,
               }}>
-                From accounting and inventory to payroll and CRM — FinovaOS manages your entire business while AI monitors your numbers and tells you exactly what to do next.
+                <strong style={{ color:"rgba(255,255,255,.72)", fontWeight:700 }}>FinovaOS</strong> is AI-powered cloud accounting software for modern SMEs — invoicing, inventory, HR &amp; payroll, bank reconciliation, and CRM in one platform, with AI that monitors your numbers and tells you what to do next.
               </p>
 
               {/* Outcome benefits */}
