@@ -27,6 +27,8 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   // ── ANALYTICS ─────────────────────────────────────────────────────────────
   { id: "revenue",          label: "Revenue",           href: "/admin/revenue",             group: "Analytics", short: "RV", icon: "chart" },
   { id: "geo",              label: "Geo Analytics",     href: "/admin/geo",                 group: "Analytics", short: "GE", icon: "globe" },
+  { id: "geo-countries",    label: "Countries",         href: "/admin/geo/countries",       group: "Analytics", short: "CT", icon: "globe" },
+  { id: "signup-analytics", label: "Signup Analytics",  href: "/admin/signup-analytics",    group: "Analytics", short: "SA", icon: "chart" },
   { id: "usage",            label: "Usage Insights",    href: "/admin/usage",               group: "Analytics", short: "UG", icon: "pulse" },
   { id: "audit-trail",      label: "Audit Trail",       href: "/admin/audit-trail",         group: "Analytics", short: "AT", icon: "list" },
   { id: "web",              label: "Web Metrics",       href: "/admin/web",                 group: "Analytics", short: "WB", icon: "monitor" },
@@ -39,10 +41,18 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "social",           label: "Social",            href: "/admin/social",              group: "Marketing", short: "SO", icon: "share" },
   { id: "feedback",         label: "Feedback",          href: "/admin/feedback",            group: "Marketing", short: "FB", icon: "message" },
   { id: "testimonials",     label: "Testimonials",      href: "/admin/testimonials",        group: "Marketing", short: "TS", icon: "star" },
+  { id: "affiliates",       label: "Affiliates",        href: "/admin/affiliates",          group: "Marketing", short: "AF", icon: "share" },
+  { id: "referrals",        label: "Referrals",         href: "/admin/referrals",           group: "Marketing", short: "RF", icon: "users" },
+  { id: "coupons",          label: "Coupons",           href: "/admin/coupons",             group: "Marketing", short: "CP", icon: "list" },
+  { id: "updates",          label: "Product Updates",   href: "/admin/updates",             group: "Marketing", short: "UP", icon: "spark" },
 
   // ── SYSTEM ────────────────────────────────────────────────────────────────
   { id: "settings",         label: "Settings",          href: "/admin/settings",            group: "System",    short: "ST", icon: "spark" },
   { id: "permissions",      label: "Roles & Permissions", href: "/admin/permissions",       group: "System",    short: "RP", icon: "lock" },
+  { id: "team",             label: "Admin Team",        href: "/admin/team",                group: "System",    short: "TM", icon: "users" },
+  { id: "sessions",         label: "User Sessions",     href: "/admin/sessions",            group: "System",    short: "SS", icon: "users" },
+  { id: "api-keys",         label: "API Keys",          href: "/admin/api-keys",            group: "System",    short: "AK", icon: "lock" },
+  { id: "business-types",   label: "Business Types",    href: "/admin/business-types",      group: "System",    short: "BT", icon: "box" },
   { id: "email-logs",       label: "Email Logs",        href: "/admin/email-logs",          group: "System",    short: "EM", icon: "mail" },
   { id: "tickets",          label: "Support Tickets",   href: "/admin/tickets",             group: "System",    short: "TK", icon: "message" },
   { id: "support-inbox",    label: "Support Inbox",     href: "/admin/chat",                group: "System",    short: "SI", icon: "message", badge: "LIVE" },

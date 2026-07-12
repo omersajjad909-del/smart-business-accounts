@@ -76,6 +76,13 @@ export default function AdminUsersPage() {
   const [editActive, setEditActive] = useState(true);
   const [saving, setSaving]         = useState(false);
 
+  // Utilities
+  const [orphanCount, setOrphanCount] = useState<number | null>(null);
+  const [cleaning, setCleaning]       = useState(false);
+  const [testEmail, setTestEmail]     = useState("");
+  const [testPlan, setTestPlan]       = useState("professional");
+  const [testing, setTesting]         = useState(false);
+
   // Toast
   const [toast, setToast]   = useState<{ msg: string; ok: boolean } | null>(null);
   const toastRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -113,7 +120,52 @@ export default function AdminUsersPage() {
     }
   }
 
-  useEffect(() => { loadUsers(); }, []);
+  useEffect(() => { loadUsers(); loadOrphanCount(); }, []);
+
+  async function loadOrphanCount() {
+    try {
+      const r = await fetch("/api/admin/users/cleanup", { headers: adminHeaders() });
+      const d = await r.json();
+      if (r.ok) setOrphanCount(d.orphanCount ?? 0);
+    } catch {}
+  }
+
+  async function runCleanup() {
+    if (!await confirmToast(`Permanently delete ${orphanCount ?? "all"} orphan users (users with no company)? This cannot be undone.`)) return;
+    setCleaning(true);
+    try {
+      const r = await fetch("/api/admin/users/cleanup", { method: "POST", headers: adminHeaders() });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d?.error || "Cleanup failed");
+      showToast(`${d.deleted ?? 0} orphan users deleted`);
+      setOrphanCount(0);
+      await loadUsers();
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "Cleanup failed", false);
+    } finally {
+      setCleaning(false);
+    }
+  }
+
+  async function sendTestWelcome() {
+    if (!testEmail.trim()) { showToast("Enter an email", false); return; }
+    setTesting(true);
+    try {
+      const r = await fetch("/api/admin/send-test-welcome", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...adminHeaders() },
+        body: JSON.stringify({ to: testEmail.trim(), name: "Test User", plan: testPlan, country: "PK" }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d?.error || "Send failed");
+      showToast(`Test welcome email sent to ${testEmail.trim()}`);
+      setTestEmail("");
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "Send failed", false);
+    } finally {
+      setTesting(false);
+    }
+  }
 
   async function sendInvite() {
     if (!inviteEmail.trim()) return;
@@ -263,6 +315,49 @@ export default function AdminUsersPage() {
           <button className="users-btn-primary" onClick={sendInvite} disabled={inviting}>
             {inviting ? "Sending…" : "Send Invite"}
           </button>
+        </div>
+      </div>
+
+      {/* Admin utilities */}
+      <div className="users-card users-invite" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+        <div>
+          <div className="users-invite-label">Send Test Welcome Email</div>
+          <div className="users-invite-row" style={{ flexWrap: "wrap" }}>
+            <input
+              className="users-input"
+              type="email"
+              placeholder="test-email@example.com"
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendTestWelcome()}
+              style={{ flex: 1, minWidth: 200 }}
+            />
+            <select className="users-select" value={testPlan} onChange={(e) => setTestPlan(e.target.value)}>
+              <option value="starter">Starter</option>
+              <option value="professional">Professional</option>
+              <option value="enterprise">Enterprise</option>
+              <option value="custom">Custom</option>
+            </select>
+            <button className="users-btn-primary" onClick={sendTestWelcome} disabled={testing}>
+              {testing ? "Sending…" : "Send"}
+            </button>
+          </div>
+        </div>
+        <div>
+          <div className="users-invite-label">Cleanup Orphan Users</div>
+          <div className="users-invite-row" style={{ alignItems: "center" }}>
+            <div style={{ flex: 1, fontSize: 13, color: "rgba(255,255,255,.5)" }}>
+              {orphanCount === null ? "Loading…" : orphanCount === 0 ? "No orphan users" : `${orphanCount} users have no company`}
+            </div>
+            <button
+              className="users-btn-primary"
+              onClick={runCleanup}
+              disabled={cleaning || !orphanCount}
+              style={{ background: orphanCount ? "#ef4444" : undefined }}
+            >
+              {cleaning ? "Cleaning…" : "Delete Orphans"}
+            </button>
+          </div>
         </div>
       </div>
 

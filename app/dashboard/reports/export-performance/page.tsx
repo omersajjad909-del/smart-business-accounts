@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
 import DateInput from "@/app/dashboard/reports/_components/DateInput";
+import { getCurrentUser } from "@/lib/auth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -74,45 +75,13 @@ function buildBar(value: number, max: number, color: string) {
   );
 }
 
-// ─── DEMO DATA GENERATOR ──────────────────────────────────────────────────────
-
-const COUNTRIES = ["UAE","Saudi Arabia","UK","USA","Germany","China","Turkey","Egypt","Kenya","Canada"];
-const CUSTOMERS = ["Al-Futtaim Trading","Gulf Star LLC","Tesco PLC","Amazon US","Müller GmbH","Alibaba Trading","Istanbul Textiles","Cairo Exports","Nairobi Goods","Maple Imports"];
-const PRODUCTS  = ["Cotton Fabric","Rice (Basmati)","Surgical Instruments","Leather Goods","Ceramic Tiles","Sports Goods","Cutlery Set","Marble Slabs","Textile Yarn","Embroidered Fabric"];
-const HS_CODES  = ["5208.11","1006.30","9018.39","4202.22","6908.90","9506.91","8215.99","2516.11","5509.21","5810.10"];
-
-function generateDemoData(from: string, to: string): ExportRecord[] {
-  const records: ExportRecord[] = [];
-  const start = new Date(from || "2024-01-01");
-  const end   = new Date(to   || "2024-12-31");
-  let id = 1;
-  const cur = new Date(start);
-  while (cur <= end) {
-    const count = Math.floor(Math.random() * 3) + 1;
-    for (let i = 0; i < count; i++) {
-      const ci = Math.floor(Math.random() * COUNTRIES.length);
-      const pi = Math.floor(Math.random() * PRODUCTS.length);
-      const qty = Math.floor(Math.random() * 500) + 50;
-      const rate = Math.floor(Math.random() * 800) + 100;
-      records.push({
-        id: String(id++),
-        invoiceNo: `EXP-${cur.getFullYear()}-${String(id).padStart(4,"0")}`,
-        date: cur.toISOString().split("T")[0],
-        customer: CUSTOMERS[ci],
-        country: COUNTRIES[ci],
-        product: PRODUCTS[pi],
-        hsCode: HS_CODES[pi],
-        currency: "USD",
-        amount: qty * rate,
-        amountUsd: qty * rate,
-        qty, unit: "PCS",
-        shipmentRef: `SHIP-${cur.getFullYear()}-${String(Math.floor(Math.random() * 999) + 1).padStart(3,"0")}`,
-        status: "SHIPPED",
-      });
-    }
-    cur.setDate(cur.getDate() + Math.floor(Math.random() * 5) + 1);
-  }
-  return records;
+function authHeaders(): Record<string, string> {
+  const u = getCurrentUser();
+  const h: Record<string, string> = {};
+  if (u?.role) h["x-user-role"] = u.role;
+  if (u?.id) h["x-user-id"] = u.id;
+  if (u?.companyId) h["x-company-id"] = u.companyId;
+  return h;
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -130,11 +99,14 @@ export default function ExportPerformancePage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
-    setTimeout(() => {
-      setRecords(generateDemoData(from, to));
-      setLoading(false);
-    }, 300);
+    fetch(`/api/reports/export-performance?from=${from}&to=${to}`, { headers: authHeaders() })
+      .then(r => r.ok ? r.json() : { records: [] })
+      .then(d => { if (!cancelled) setRecords(Array.isArray(d?.records) ? d.records : []); })
+      .catch(() => { if (!cancelled) setRecords([]); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [from, to]);
 
   const filtered = useMemo(() => {
@@ -169,19 +141,14 @@ export default function ExportPerformancePage() {
       cur.orders  += 1;
       map.set(r.country, cur);
     });
-
-    const prevRecords = generateDemoData(
-      new Date(new Date(from).setFullYear(new Date(from).getFullYear() - 1)).toISOString().split("T")[0],
-      new Date(new Date(to).setFullYear(new Date(to).getFullYear() - 1)).toISOString().split("T")[0]
-    );
-    const prevMap = new Map<string, number>();
-    prevRecords.forEach(r => prevMap.set(r.country, (prevMap.get(r.country) ?? 0) + r.amountUsd));
-
     return Array.from(map.entries()).map(([country, v]) => ({
-      country, revenue: v.revenue, orders: v.orders, avgOrder: v.revenue / v.orders,
-      growth: prevMap.get(country) ? ((v.revenue - (prevMap.get(country) ?? 0)) / (prevMap.get(country) ?? 1)) * 100 : 100,
+      country,
+      revenue: v.revenue,
+      orders: v.orders,
+      avgOrder: v.orders > 0 ? v.revenue / v.orders : 0,
+      growth: 0,
     })).sort((a, b) => b.revenue - a.revenue);
-  }, [records, from, to]);
+  }, [records]);
 
   const customerPerf: CustomerPerf[] = useMemo(() => {
     const map = new Map<string, { country: string; revenue: number; orders: number; lastOrder: string }>();
