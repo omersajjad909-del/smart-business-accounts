@@ -12,6 +12,13 @@ type PaymentMethod = {
   id: string; brand: string; last4: string;
   expMonth: number; expYear: number; holderName: string; isDefault: boolean;
 };
+type PaymentMethodsResponse = {
+  provider?: string;
+  managedExternally?: boolean;
+  paymentMethods?: PaymentMethod[];
+  defaultId?: string | null;
+  note?: string;
+};
 type Invoice = {
   id: string; number: string; date: string;
   amount: number; currency: string; status: "paid" | "open" | "void"; plan: string;
@@ -56,6 +63,9 @@ const CARD_BRANDS: Record<string, { label: string; grad: string }> = {
   discover:   { label: "DISCOVER",   grad: "linear-gradient(135deg,#7c3102,#f76f20)" },
   unknown:    { label: "CARD",       grad: "linear-gradient(135deg,#312e81,#4f46e5)" },
 };
+
+const DIRECT_ACCEPTED_METHODS = ["Visa", "Mastercard", "American Express", "Discover"];
+const LEMON_ACCEPTED_METHODS = ["Visa", "Mastercard", "American Express", "Discover"];
 
 function formatCardNumber(val: string) { return val.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim(); }
 function formatExpiry(val: string) { const d = val.replace(/\D/g,"").slice(0,4); return d.length>2?d.slice(0,2)+"/"+d.slice(2):d; }
@@ -260,6 +270,7 @@ function BillingPage() {
 
   const [subscription,      setSubscription]      = useState<Subscription | null>(null);
   const [paymentMethods,    setPaymentMethods]    = useState<PaymentMethod[]>([]);
+  const [paymentMeta,       setPaymentMeta]       = useState<PaymentMethodsResponse | null>(null);
   const [invoices,          setInvoices]          = useState<Invoice[]>([]);
   const [showAddCard,       setShowAddCard]        = useState(false);
   const [showCancel,        setShowCancel]         = useState(false);
@@ -314,7 +325,11 @@ function BillingPage() {
           setTotalUsers(Number(d.totalUsers || 0));
           setEffectiveUserLimit(d.effectiveUserLimit ?? null);
         }
-        if (pmRes.ok)  { const d = await pmRes.json();  setPaymentMethods(d.paymentMethods || []); }
+        if (pmRes.ok)  {
+          const d: PaymentMethodsResponse = await pmRes.json();
+          setPaymentMeta(d);
+          setPaymentMethods(d.paymentMethods || []);
+        }
         if (invRes.ok) { const d = await invRes.json(); setInvoices(d.invoices || []); }
         if (pricingRes.ok) {
           const d = await pricingRes.json();
@@ -438,6 +453,23 @@ function BillingPage() {
   const currentPlanCode = subscription?.plan?.toUpperCase() ?? "STARTER";
   const currentPlan     = PLANS.find(p => p.code === currentPlanCode) ?? PLANS[0];
   const isCanceled      = subscription?.status?.toLowerCase() === "canceled";
+  const paymentProvider = String(paymentMeta?.provider || "INTERNAL").toUpperCase();
+  const paymentManagedExternally = Boolean(paymentMeta?.managedExternally);
+  const paymentNote = paymentMeta?.note || "";
+  const acceptedMethods = paymentManagedExternally ? LEMON_ACCEPTED_METHODS : DIRECT_ACCEPTED_METHODS;
+
+  function openPaymentMethodFlow() {
+    if (paymentManagedExternally) {
+      setActiveTab("plans");
+      toast("Payment methods are collected during secure checkout.");
+      return;
+    }
+    if (paymentProvider === "INTERNAL" && paymentNote.toLowerCase().includes("not configured")) {
+      toast.error("Payment method setup is not configured yet.");
+      return;
+    }
+    setShowAddCard(true);
+  }
 
   if (loading) return (
     <div style={{ padding:"32px 28px", fontFamily:"'Outfit',sans-serif" }}>
@@ -501,13 +533,30 @@ function BillingPage() {
       )}
 
       {/* ── Page header ── */}
+      {(paymentManagedExternally || paymentNote) && (
+        <div style={{ marginBottom:20, padding:"14px 18px", borderRadius:16, background:paymentManagedExternally?"rgba(99,102,241,.10)":"rgba(251,191,36,.09)", border:paymentManagedExternally?"1px solid rgba(99,102,241,.24)":"1px solid rgba(251,191,36,.24)", display:"flex", alignItems:"flex-start", gap:12 }}>
+          <div style={{ width:36, height:36, borderRadius:12, background:paymentManagedExternally?"rgba(99,102,241,.14)":"rgba(251,191,36,.14)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>
+            {paymentManagedExternally ? "🔐" : "ℹ️"}
+          </div>
+          <div>
+            <div style={{ fontSize:14, fontWeight:800, color:paymentManagedExternally?"#a5b4fc":"#fcd34d", marginBottom:4 }}>
+              {paymentManagedExternally ? "Hosted billing is active" : "Billing setup is partial"}
+            </div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,.62)", lineHeight:1.6 }}>
+              {paymentManagedExternally
+                ? `${paymentNote} The card is added on the provider checkout page, not inside this form.`
+                : paymentNote}
+            </div>
+          </div>
+        </div>
+      )}
       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:24, flexWrap:"wrap", gap:12 }}>
         <div>
           <h1 style={{ margin:0, fontSize:24, fontWeight:800, letterSpacing:"-0.6px" }}>Billing &amp; Payments</h1>
           <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(255,255,255,.4)" }}>Manage your subscription, payment methods, and invoices</p>
         </div>
-        <button onClick={() => setShowAddCard(true)} style={{ padding:"9px 18px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
-          + Add Card
+        <button onClick={openPaymentMethodFlow} style={{ padding:"9px 18px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+          {paymentManagedExternally ? "Open Checkout" : "+ Add Card"}
         </button>
       </div>
 
@@ -687,8 +736,17 @@ function BillingPage() {
             </div>
             {paymentMethods.length === 0 ? (
               <div style={{ padding:"28px 24px", textAlign:"center" }}>                <div style={{ fontSize:26, marginBottom:8 }}>🧾</div>
-                <div style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,.4)", marginBottom:12 }}>No payment methods saved</div>
-                <button onClick={() => setShowAddCard(true)} style={{ padding:"9px 20px", borderRadius:10, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.3)", color:"#a5b4fc", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>+ Add Card</button>
+                <div style={{ fontSize:13, fontWeight:600, color:"rgba(255,255,255,.4)", marginBottom:12 }}>
+                  {paymentManagedExternally ? "No card details are stored in FinovaOS." : "No payment methods saved"}
+                </div>
+                <div style={{ fontSize:12, color:"rgba(255,255,255,.36)", marginBottom:14, maxWidth:420, marginInline:"auto", lineHeight:1.55 }}>
+                  {paymentManagedExternally
+                    ? "Your billing provider collects and stores payment methods during hosted checkout, so this page will not show raw card setup controls."
+                    : paymentNote || "Add a card for uninterrupted service."}
+                </div>
+                <button onClick={openPaymentMethodFlow} style={{ padding:"9px 20px", borderRadius:10, background:"rgba(99,102,241,.15)", border:"1px solid rgba(99,102,241,.3)", color:"#a5b4fc", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                  {paymentManagedExternally ? "Open Secure Checkout" : "+ Add Card"}
+                </button>
               </div>
             ) : paymentMethods.slice(0,2).map(pm => {
               const cfg = CARD_BRANDS[pm.brand] ?? CARD_BRANDS.unknown;
@@ -773,17 +831,29 @@ function BillingPage() {
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
             <div>
               <h2 style={{ margin:0, fontSize:18, fontWeight:800 }}>Payment Methods</h2>
-              <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(255,255,255,.4)" }}>Cards saved for automatic renewal</p>
+              <p style={{ margin:"4px 0 0", fontSize:13, color:"rgba(255,255,255,.4)" }}>
+                {paymentManagedExternally ? "Billing provider handles saved cards during hosted checkout" : "Cards saved for automatic renewal"}
+              </p>
             </div>
-            <button onClick={() => setShowAddCard(true)} style={{ padding:"9px 18px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>+ Add Card</button>
+            <button onClick={openPaymentMethodFlow} style={{ padding:"9px 18px", borderRadius:11, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+              {paymentManagedExternally ? "Open Checkout" : "+ Add Card"}
+            </button>
           </div>
           <div style={{ ...card }}>
             {paymentMethods.length === 0 ? (
               <div style={{ padding:"52px 24px", textAlign:"center" }}>
                 <div style={{ fontSize:40, marginBottom:12 }}>💳</div>
-                <div style={{ fontSize:15, fontWeight:700, marginBottom:6 }}>No payment methods</div>
-                <div style={{ fontSize:13, color:"rgba(255,255,255,.35)", marginBottom:20 }}>Add a card for uninterrupted service</div>
-                <button onClick={() => setShowAddCard(true)} style={{ padding:"10px 24px", borderRadius:12, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>+ Add Payment Method</button>
+                <div style={{ fontSize:15, fontWeight:700, marginBottom:6 }}>
+                  {paymentManagedExternally ? "No payment methods shown here" : "No payment methods"}
+                </div>
+                <div style={{ fontSize:13, color:"rgba(255,255,255,.35)", marginBottom:20, maxWidth:460, marginInline:"auto", lineHeight:1.55 }}>
+                  {paymentManagedExternally
+                    ? "Your active billing setup uses a hosted provider. The real card entry happens on the checkout page, and available payment options depend on country, currency, and provider support."
+                    : paymentNote || "Add a card for uninterrupted service"}
+                </div>
+                <button onClick={openPaymentMethodFlow} style={{ padding:"10px 24px", borderRadius:12, background:"linear-gradient(135deg,#6366f1,#7c3aed)", border:"none", color:"white", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>
+                  {paymentManagedExternally ? "Open Secure Checkout" : "+ Add Payment Method"}
+                </button>
               </div>
             ) : paymentMethods.map((pm, i) => {
               const cfg = CARD_BRANDS[pm.brand] ?? CARD_BRANDS.unknown;
@@ -811,8 +881,13 @@ function BillingPage() {
           {/* Processor badges */}
           <div style={{ marginTop:18, padding:"16px 20px", borderRadius:14, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
             <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>Accepted Payment Methods</div>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,.42)", marginBottom:10, lineHeight:1.55 }}>
+              {paymentManagedExternally
+                ? "These are the card networks we explicitly support through hosted checkout. Final availability can vary by billing country and provider checkout options."
+                : paymentNote || "Only methods with configured backend processing should be treated as live."}
+            </div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-              {["Visa","Mastercard","Amex","Discover","PayPal","Apple Pay","Google Pay","JazzCash","Easypaisa","Wise","Bitcoin","Ethereum","USDT","Klarna"].map(p => (
+              {acceptedMethods.map(p => (
                 <div key={p} style={{ padding:"4px 11px", borderRadius:7, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", fontSize:11, fontWeight:600, color:"rgba(255,255,255,.45)" }}>{p}</div>
               ))}
             </div>

@@ -931,7 +931,7 @@ export default function DashboardContent() {
           </div>
           <Link
             prefetch={false}
-            href="/billing"
+            href="/dashboard/billing"
             style={{
               padding: "7px 16px",
               borderRadius: 8,

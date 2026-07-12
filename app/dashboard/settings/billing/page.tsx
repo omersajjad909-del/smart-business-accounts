@@ -245,7 +245,7 @@ export default function BillingSettingsPage() {
           </p>
         </div>
         <Link
-          href="/billing"
+          href="/dashboard/billing"
           style={{
             ...ghostBtnStyle,
             textDecoration: "none",
@@ -330,7 +330,7 @@ export default function BillingSettingsPage() {
                 </div>
               )}
               <div style={{ marginTop: 22, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <Link href="/billing" style={{ ...primaryBtnStyle, textDecoration: "none" }}>
+                <Link href="/dashboard/billing" style={{ ...primaryBtnStyle, textDecoration: "none" }}>
                   Adjust Plan
                 </Link>
                 {isAdmin && (
@@ -381,7 +381,7 @@ export default function BillingSettingsPage() {
                 </div>
               </div>
               <div style={{ marginTop: 22, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <Link href="/billing" style={{ ...primaryBtnStyle, textDecoration: "none" }}>
+                <Link href="/dashboard/billing" style={{ ...primaryBtnStyle, textDecoration: "none" }}>
                   Update Card
                 </Link>
                 <button type="button" style={ghostBtnStyle} onClick={() => window.location.reload()}>
