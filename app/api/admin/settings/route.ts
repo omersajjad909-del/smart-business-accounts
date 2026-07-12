@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     // Default settings response
     const settings = {
       appName: "FinovaOS",
-      supportEmail: "finovaos.app@gmail.com",
+      supportEmail: "hello@finovaos.app",
       maintenanceMode: false,
       allowSignups: true,
       maxUsersPerCompany: 50,

@@ -1221,7 +1221,7 @@ export default function PaymentPage() {
 
             <div style={{ padding:"12px 18px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", fontSize:11, color:"rgba(255,255,255,.35)", lineHeight:1.7 }}>
               Questions? Contact us at{" "}
-              <a href="mailto:support@finovaforge.com" style={{ color:"#a5b4fc", textDecoration:"none", fontWeight:600 }}>support@finovaforge.com</a>
+              <a href="mailto:hello@finovaos.app" style={{ color:"#a5b4fc", textDecoration:"none", fontWeight:600 }}>hello@finovaos.app</a>
             </div>
           </div>
         )}

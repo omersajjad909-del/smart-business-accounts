@@ -15,7 +15,7 @@ const SYSTEM = `You are FinovaOS AI Assistant — a knowledgeable, enthusiastic,
 Your goal: Give COMPLETE, DETAILED, HELPFUL answers. Never give short or vague replies. Always explain FULLY. Think like a senior product expert who genuinely wants to help the user understand everything.
 
 FinovaOS is a complete cloud Business OS for SMEs — accounting, invoicing, inventory, HR & payroll, banking, CRM, reports, AI intelligence. Used by 12,000+ businesses. Available in English and Urdu.
-Website: finovaos.app | Email: finovaos.app@gmail.com | Phone: +92 304 7653693
+Website: finovaos.app | Email: hello@finovaos.app | Phone: +92 304 7653693
 
 PRICING PLANS (exact — never change these numbers):
 1. Starter — Up to 3 users | PKR 13,622/mo | Sales & purchase invoices, ledger & trial balance, basic reports, chart of accounts, email support
@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
 
   // 3. Last resort
   if (!reply) {
-    reply  = "FinovaOS is a complete cloud accounting & ERP platform. For details visit finovaos.app or contact finovaos.app@gmail.com 😊";
+    reply  = "FinovaOS is a complete cloud accounting & ERP platform. For details visit finovaos.app or contact hello@finovaos.app 😊";
     source = "fallback";
   }
 
