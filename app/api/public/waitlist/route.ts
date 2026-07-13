@@ -20,10 +20,16 @@ function buildWaitlistWelcomeEmail(name: string, company: string) {
         <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 12px 32px rgba(15,23,42,0.08);">
           <tr>
             <td style="background:linear-gradient(135deg,#4f46e5 0%,#6366f1 50%,#7c3aed 100%);padding:36px 40px;">
-              <div style="display:flex;align-items:center;gap:12px;">
-                <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.18);display:inline-block;text-align:center;line-height:44px;font-size:22px;font-weight:800;color:#ffffff;">F</div>
-                <div style="display:inline-block;vertical-align:middle;padding-left:10px;font-size:20px;font-weight:800;color:#ffffff;letter-spacing:-0.3px;">FinovaOS</div>
-              </div>
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:12px;">
+                    <img src="https://www.finovaos.app/icon.png" width="44" height="44" alt="FinovaOS" style="display:block;border-radius:12px;background:rgba(255,255,255,0.15);padding:4px;" />
+                  </td>
+                  <td style="vertical-align:middle;font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-0.3px;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                    FinovaOS
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           <tr>
