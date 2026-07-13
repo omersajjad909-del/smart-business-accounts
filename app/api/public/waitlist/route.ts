@@ -1,7 +1,67 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendEmail } from "@/lib/email";
 
 const db = prisma as any;
+
+function buildWaitlistWelcomeEmail(name: string, company: string) {
+  const firstName = name.split(" ")[0] || name;
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Welcome to the FinovaOS waitlist</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f6fb;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1e293b;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f6fb;padding:32px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 12px 32px rgba(15,23,42,0.08);">
+          <tr>
+            <td style="background:linear-gradient(135deg,#4f46e5 0%,#6366f1 50%,#7c3aed 100%);padding:36px 40px;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.18);display:inline-block;text-align:center;line-height:44px;font-size:22px;font-weight:800;color:#ffffff;">F</div>
+                <div style="display:inline-block;vertical-align:middle;padding-left:10px;font-size:20px;font-weight:800;color:#ffffff;letter-spacing:-0.3px;">FinovaOS</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px;">
+              <h1 style="margin:0 0 12px;font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.4px;">You're on the list, ${firstName}. 🎉</h1>
+              <p style="margin:0 0 22px;font-size:15px;line-height:1.7;color:#475569;">
+                Thanks for joining the FinovaOS early access waitlist for <strong style="color:#0f172a;">${company}</strong>. We're building the AI cloud accounting platform SMEs actually deserve, and you'll be among the first to try it.
+              </p>
+              <div style="background:#f1f5f9;border-radius:12px;padding:20px 22px;margin:0 0 24px;">
+                <div style="font-size:12px;font-weight:700;color:#4f46e5;letter-spacing:0.6px;text-transform:uppercase;margin-bottom:10px;">What happens next</div>
+                <ul style="margin:0;padding-left:20px;color:#334155;font-size:14px;line-height:1.7;">
+                  <li>Priority early access when new modules go live</li>
+                  <li>Launch pricing locked in — before public rollout</li>
+                  <li>Direct product updates from our team (no fluff)</li>
+                  <li>First look at AI features: Ask AI, Business Health Score</li>
+                </ul>
+              </div>
+              <p style="margin:0 0 24px;font-size:14px;line-height:1.7;color:#475569;">
+                Meanwhile, feel free to explore what we're building. If you have questions, just reply to this email — a real human will read it.
+              </p>
+              <div style="text-align:center;margin:8px 0 4px;">
+                <a href="https://www.finovaos.app/features" style="display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#ffffff;text-decoration:none;padding:13px 30px;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:0.2px;">Explore Features →</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 40px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
+              <p style="margin:0 0 6px;font-size:12px;color:#64748b;">Sent via <strong style="color:#6366f1;">FinovaOS</strong> · finovaos.app</p>
+              <p style="margin:0;font-size:11px;color:#94a3b8;">Faisalabad, Pakistan · You're getting this because you joined the FinovaOS waitlist.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -76,6 +136,14 @@ export async function POST(req: NextRequest) {
         }),
       },
     }).catch(() => {});
+
+    sendEmail({
+      to: email,
+      subject: "You're on the FinovaOS waitlist 🎉",
+      html: buildWaitlistWelcomeEmail(name, company),
+    }).catch(() => {
+      // Welcome email is best-effort — signup succeeds even if send fails.
+    });
 
     return NextResponse.json({
       success: true,
