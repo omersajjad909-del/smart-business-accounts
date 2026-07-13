@@ -5,6 +5,8 @@ export const alt = "FinovaOS — AI Cloud Accounting Software for SMEs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const LOGO_URL = "https://www.finovaos.app/icon.png";
+
 export default async function OpengraphImage() {
   return new ImageResponse(
     (
@@ -30,7 +32,7 @@ export default async function OpengraphImage() {
             right: 0,
             bottom: 0,
             backgroundImage:
-              "radial-gradient(circle at 20% 30%, rgba(99,102,241,0.25), transparent 55%), radial-gradient(circle at 80% 70%, rgba(129,140,248,0.18), transparent 55%)",
+              "radial-gradient(circle at 20% 30%, rgba(99,102,241,0.28), transparent 55%), radial-gradient(circle at 80% 70%, rgba(129,140,248,0.20), transparent 55%)",
             display: "flex",
           }}
         />
@@ -43,31 +45,22 @@ export default async function OpengraphImage() {
             zIndex: 1,
           }}
         >
-          <div
+          <img
+            src={LOGO_URL}
+            width={72}
+            height={72}
             style={{
-              width: 68,
-              height: 68,
               borderRadius: 18,
-              background:
-                "linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #7c3aed 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 12px 32px rgba(99,102,241,0.55)",
-              fontSize: 40,
-              fontWeight: 900,
-              color: "white",
-              letterSpacing: "-2px",
+              boxShadow: "0 12px 32px rgba(99,102,241,0.45)",
             }}
-          >
-            F
-          </div>
+            alt=""
+          />
           <div
             style={{
-              fontSize: 34,
+              fontSize: 36,
               fontWeight: 800,
               color: "white",
-              letterSpacing: "-0.5px",
+              letterSpacing: "-0.6px",
             }}
           >
             FinovaOS
@@ -78,17 +71,17 @@ export default async function OpengraphImage() {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: 24,
+            gap: 26,
             zIndex: 1,
           }}
         >
           <div
             style={{
-              fontSize: 68,
+              fontSize: 74,
               fontWeight: 800,
               color: "white",
-              letterSpacing: "-2px",
-              lineHeight: 1.05,
+              letterSpacing: "-2.2px",
+              lineHeight: 1.04,
               display: "flex",
               flexDirection: "column",
             }}
@@ -102,19 +95,19 @@ export default async function OpengraphImage() {
                 color: "transparent",
               }}
             >
-              Built for Modern SMEs
+              for Growing Businesses
             </span>
           </div>
           <div
             style={{
-              fontSize: 26,
-              color: "rgba(255,255,255,0.6)",
+              fontSize: 27,
+              color: "rgba(255,255,255,0.62)",
               fontWeight: 500,
-              maxWidth: 900,
+              maxWidth: 960,
               lineHeight: 1.35,
             }}
           >
-            Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one platform.
+            Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one intelligent platform.
           </div>
         </div>
 
@@ -129,32 +122,36 @@ export default async function OpengraphImage() {
           <div
             style={{
               display: "flex",
-              gap: 12,
+              gap: 10,
+              flexWrap: "wrap",
             }}
           >
-            {["Trusted by 500+ SMEs", "Pakistan · UAE · Global"].map((tag) => (
-              <div
-                key={tag}
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: 100,
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  color: "rgba(255,255,255,0.75)",
-                  fontSize: 18,
-                  fontWeight: 600,
-                  display: "flex",
-                }}
-              >
-                {tag}
-              </div>
-            ))}
+            {["Accounting", "Invoicing", "Inventory", "HR & Payroll", "AI"].map(
+              (tag) => (
+                <div
+                  key={tag}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: 100,
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    color: "rgba(255,255,255,0.78)",
+                    fontSize: 18,
+                    fontWeight: 600,
+                    display: "flex",
+                  }}
+                >
+                  {tag}
+                </div>
+              ),
+            )}
           </div>
           <div
             style={{
               fontSize: 20,
               color: "rgba(255,255,255,0.5)",
               fontWeight: 600,
+              letterSpacing: "0.3px",
             }}
           >
             finovaos.app
