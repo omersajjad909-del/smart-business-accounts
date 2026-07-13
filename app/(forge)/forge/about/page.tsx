@@ -31,7 +31,7 @@ function Hero() {
     <section
       style={{
         minHeight: "70vh",
-        padding: "140px clamp(20px,4vw,48px) 80px",
+        padding: "clamp(90px,15vw,140px) clamp(20px,4vw,48px) clamp(48px,8vw,80px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

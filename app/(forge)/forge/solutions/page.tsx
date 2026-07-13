@@ -65,7 +65,7 @@ const solutions = [
 
 function Hero() {
   return (
-    <section style={{ minHeight: "55vh", padding: "140px clamp(16px,3vw,48px) 80px", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,158,11,.16), transparent)", fontFamily: ff, position: "relative" }}>
+    <section style={{ minHeight: "55vh", padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(48px,8vw,80px)", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,158,11,.16), transparent)", fontFamily: ff, position: "relative" }}>
       <div style={{ position: "absolute", inset: 0, opacity: .04, backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
       <div style={{ maxWidth: 760, position: "relative", zIndex: 1 }}>
         <Chip>SOLUTIONS</Chip>
@@ -87,11 +87,11 @@ function Hero() {
 function SolutionGrid() {
   const [ref, vis] = useInView(0.05);
   return (
-    <section style={{ padding: "80px clamp(16px,3vw,48px) 120px", fontFamily: ff }}>
+    <section style={{ padding: "clamp(48px,8vw,80px) clamp(16px,3vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           {solutions.map((s, i) => (
-            <div key={i} style={{ padding: "36px 32px", borderRadius: 20, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 32, transition: "all .3s" }}
+            <div key={i} className="forge-sol-card" style={{ padding: "clamp(24px,4vw,36px) clamp(20px,3vw,32px)", borderRadius: 20, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 32, transition: "all .3s" }}
               onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = `${s.color}06`; el.style.borderColor = `${s.color}20`; }}
               onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = "rgba(255,255,255,.02)"; el.style.borderColor = "rgba(255,255,255,.07)"; }}>
               {/* Left */}
@@ -128,8 +128,8 @@ function SolutionGrid() {
 function CTA() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "0 clamp(16px,3vw,48px) 120px", fontFamily: ff }}>
-      <div ref={ref} style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "64px 40px", borderRadius: 24, background: "linear-gradient(135deg,rgba(245,158,11,.09),rgba(239,68,68,.05))", border: "1px solid rgba(245,158,11,.2)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
+    <section style={{ padding: "0 clamp(16px,3vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "clamp(40px,7vw,64px) clamp(20px,4vw,40px)", borderRadius: 24, background: "linear-gradient(135deg,rgba(245,158,11,.09),rgba(239,68,68,.05))", border: "1px solid rgba(245,158,11,.2)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <h2 style={{ fontSize: "clamp(24px,4vw,38px)", fontWeight: 900, color: "white", margin: "0 0 14px", letterSpacing: "-1.5px" }}>
           See these solutions in action
         </h2>
@@ -154,7 +154,14 @@ function CTA() {
 export default function SolutionsPage() {
   return (
     <div style={{ fontFamily: ff, color: "white" }}>
-      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:rgb(7,8,15)}`}</style>
+      <style>{`
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{background:rgb(7,8,15)}
+        @media (max-width: 600px) {
+          .forge-sol-card { grid-template-columns: 1fr !important; gap: 20px !important; }
+        }
+      `}</style>
       <ForgeNav />
       <Hero />
       <SolutionGrid />

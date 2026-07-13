@@ -62,7 +62,7 @@ const industries = [
 
 function Hero() {
   return (
-    <section style={{ minHeight: "55vh", padding: "140px clamp(16px,3vw,48px) 80px", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,158,11,.14), transparent)", fontFamily: ff, position: "relative" }}>
+    <section style={{ minHeight: "55vh", padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(48px,8vw,80px)", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,158,11,.14), transparent)", fontFamily: ff, position: "relative" }}>
       <div style={{ position: "absolute", inset: 0, opacity: .04, backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
       <div style={{ maxWidth: 760, position: "relative", zIndex: 1 }}>
         <Chip>INDUSTRIES</Chip>
@@ -84,11 +84,11 @@ function Hero() {
 function IndustryGrid() {
   const [ref, vis] = useInView(0.05);
   return (
-    <section style={{ padding: "40px clamp(16px,3vw,48px) 120px", fontFamily: ff }}>
+    <section style={{ padding: "clamp(24px,5vw,40px) clamp(16px,3vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
           {industries.map((ind, i) => (
-            <div key={i}
+            <div key={i} className="forge-industry-card"
               style={{ padding: "36px 32px", borderRadius: 20, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 32, transition: "all .3s", position: "relative" }}
               onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = `${ind.color}06`; el.style.borderColor = `${ind.color}20`; }}
               onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = "rgba(255,255,255,.02)"; el.style.borderColor = "rgba(255,255,255,.07)"; }}>
@@ -119,7 +119,7 @@ function IndustryGrid() {
               {/* Right: capabilities */}
               <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
                 <div style={{ fontSize: 10.5, fontWeight: 700, color: ind.color, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 14 }}>What FinovaOS Handles</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div className="forge-caps-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                   {ind.capabilities.map(cap => (
                     <div key={cap} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ width: 18, height: 18, borderRadius: 5, background: `${ind.color}18`, border: `1px solid ${ind.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, flexShrink: 0 }}>✓</div>
@@ -139,8 +139,8 @@ function IndustryGrid() {
 function NotListed() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "0 clamp(16px,3vw,48px) 80px", fontFamily: ff }}>
-      <div ref={ref} style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "52px 40px", borderRadius: 20, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
+    <section style={{ padding: "0 clamp(16px,3vw,48px) clamp(48px,8vw,80px)", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "clamp(36px,6vw,52px) clamp(20px,4vw,40px)", borderRadius: 20, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
         <div style={{ fontSize: 36, marginBottom: 14 }}>🤔</div>
         <h2 style={{ fontSize: "clamp(20px,3vw,26px)", fontWeight: 800, color: "white", margin: "0 0 12px", letterSpacing: "-.5px" }}>Your industry not listed?</h2>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,.4)", margin: "0 0 24px", lineHeight: 1.75, maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>

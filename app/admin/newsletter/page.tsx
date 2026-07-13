@@ -178,7 +178,7 @@ export default function AdminNewsletterPage() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid rgba(255,255,255,.07)" }}>
-              {["Email", "Name", "Source", "Status", "Date"].map((h) => (
+              {["Email", "Name", "Company", "Source", "Status", "Date"].map((h) => (
                 <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em" }}>
                   {h.toUpperCase()}
                 </th>
@@ -187,13 +187,14 @@ export default function AdminNewsletterPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" }}>Loading...</td></tr>
+              <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" }}>Loading...</td></tr>
             ) : items.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" }}>No subscribers found</td></tr>
+              <tr><td colSpan={6} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,.3)" }}>No subscribers found</td></tr>
             ) : items.map((s) => (
               <tr key={s.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                 <td style={{ padding: "13px 16px", fontSize: 13, fontWeight: 600 }}>{s.email}</td>
                 <td style={{ padding: "13px 16px", fontSize: 13, color: "rgba(255,255,255,.6)" }}>{s.name || "—"}</td>
+                <td style={{ padding: "13px 16px", fontSize: 13, color: "rgba(255,255,255,.6)" }}>{s.company || "—"}</td>
                 <td style={{ padding: "13px 16px" }}>
                   <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "rgba(99,102,241,.15)", color: "#a5b4fc" }}>
                     {s.source || "website"}

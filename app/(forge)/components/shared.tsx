@@ -10,6 +10,7 @@ const forgeLogoMark = "/FinovaForge.png?v=4";
 
 export function ForgeNav() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -17,6 +18,18 @@ export function ForgeNav() {
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
   }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (menuOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   const links = [
     { label: "Home", href: "/forge/home" },
@@ -28,101 +41,238 @@ export function ForgeNav() {
   ];
 
   return (
-    <nav
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        padding: "0 clamp(16px,3vw,40px)",
-        height: 64,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        background: scrolled ? "rgba(7,8,15,.93)" : "transparent",
-        backdropFilter: scrolled ? "blur(24px)" : "none",
-        borderBottom: scrolled ? "1px solid rgba(255,255,255,.06)" : "none",
-        transition: "all .3s ease",
-        fontFamily: ff,
-      }}
-    >
-      <Link href="/forge/home" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none", flexShrink: 0 }}>
-        <Image
-          src={forgeLogoMark}
-          alt="Finova Forge logo"
-          width={36}
-          height={36}
-          priority
-          unoptimized
-          style={{ width: 36, height: 36, borderRadius: 10, boxShadow: "0 4px 14px rgba(245,158,11,.3)" }}
-        />
-        <div style={{ lineHeight: 1, display: "flex", flexDirection: "column", gap: 4 }}>
-          <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-.5px", color: "white" }}>
-            Finova
-            <span style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              Forge
+    <>
+      <style>{`
+        @media (max-width: 900px) {
+          .forge-nav-links { display: none !important; }
+          .forge-nav-cta { display: none !important; }
+          .forge-nav-burger { display: flex !important; }
+        }
+      `}</style>
+      <nav
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          padding: "0 clamp(16px,3vw,40px)",
+          height: 64,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: scrolled || menuOpen ? "rgba(7,8,15,.93)" : "transparent",
+          backdropFilter: scrolled || menuOpen ? "blur(24px)" : "none",
+          borderBottom: scrolled || menuOpen ? "1px solid rgba(255,255,255,.06)" : "none",
+          transition: "all .3s ease",
+          fontFamily: ff,
+        }}
+      >
+        <Link href="/forge/home" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none", flexShrink: 0 }}>
+          <Image
+            src={forgeLogoMark}
+            alt="Finova Forge logo"
+            width={36}
+            height={36}
+            priority
+            unoptimized
+            style={{ width: 36, height: 36, borderRadius: 10, boxShadow: "0 4px 14px rgba(245,158,11,.3)" }}
+          />
+          <div style={{ lineHeight: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+            <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-.5px", color: "white" }}>
+              Finova
+              <span style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                Forge
+              </span>
             </span>
-          </span>
-          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".1em", textTransform: "uppercase" }}>
-            Software Co.
+            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".1em", textTransform: "uppercase" }}>
+              Software Co.
+            </div>
           </div>
-        </div>
-      </Link>
+        </Link>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-        {links.map((l) => {
-          const active = pathname === l.href;
-          return (
-            <Link
-              key={l.href}
-              href={l.href}
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: active ? "white" : "rgba(255,255,255,.4)",
-                textDecoration: "none",
-                transition: "color .2s",
-                whiteSpace: "nowrap",
-              }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "white")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = active ? "white" : "rgba(255,255,255,.4)")}
-            >
-              {l.label}
-            </Link>
-          );
-        })}
-        <a
-          href="https://finovaos.app"
-          target="_blank"
-          rel="noreferrer"
+        <div className="forge-nav-links" style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          {links.map((l) => {
+            const active = pathname === l.href;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: active ? "white" : "rgba(255,255,255,.4)",
+                  textDecoration: "none",
+                  transition: "color .2s",
+                  whiteSpace: "nowrap",
+                }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "white")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = active ? "white" : "rgba(255,255,255,.4)")}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
+          <a
+            href="https://finovaos.app"
+            target="_blank"
+            rel="noreferrer"
+            className="forge-nav-cta"
+            style={{
+              padding: "8px 16px",
+              borderRadius: 9,
+              background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+              color: "white",
+              fontWeight: 700,
+              fontSize: 12.5,
+              textDecoration: "none",
+              boxShadow: "0 4px 14px rgba(245,158,11,.25)",
+              transition: "all .2s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.transform = "translateY(-1px)";
+              el.style.boxShadow = "0 6px 20px rgba(245,158,11,.4)";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.transform = "translateY(0)";
+              el.style.boxShadow = "0 4px 14px rgba(245,158,11,.25)";
+            }}
+          >
+            Visit FinovaOS {"→"}
+          </a>
+        </div>
+
+        <button
+          className="forge-nav-burger"
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
           style={{
-            padding: "8px 16px",
-            borderRadius: 9,
-            background: "linear-gradient(135deg,#f59e0b,#ef4444)",
-            color: "white",
-            fontWeight: 700,
-            fontSize: 12.5,
-            textDecoration: "none",
-            boxShadow: "0 4px 14px rgba(245,158,11,.25)",
-            transition: "all .2s",
-            whiteSpace: "nowrap",
-          }}
-          onMouseEnter={(e) => {
-            const el = e.currentTarget as HTMLAnchorElement;
-            el.style.transform = "translateY(-1px)";
-            el.style.boxShadow = "0 6px 20px rgba(245,158,11,.4)";
-          }}
-          onMouseLeave={(e) => {
-            const el = e.currentTarget as HTMLAnchorElement;
-            el.style.transform = "translateY(0)";
-            el.style.boxShadow = "0 4px 14px rgba(245,158,11,.25)";
+            display: "none",
+            width: 40,
+            height: 40,
+            border: "1px solid rgba(255,255,255,.12)",
+            borderRadius: 10,
+            background: "rgba(255,255,255,.04)",
+            cursor: "pointer",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 0,
           }}
         >
-          Visit FinovaOS {"\u2192"}
-        </a>
-      </div>
-    </nav>
+          <div style={{ position: "relative", width: 18, height: 14 }}>
+            <span
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                height: 2,
+                borderRadius: 2,
+                background: "white",
+                top: menuOpen ? 6 : 0,
+                transform: menuOpen ? "rotate(45deg)" : "none",
+                transition: "all .25s ease",
+              }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                height: 2,
+                borderRadius: 2,
+                background: "white",
+                top: 6,
+                opacity: menuOpen ? 0 : 1,
+                transition: "opacity .2s ease",
+              }}
+            />
+            <span
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                height: 2,
+                borderRadius: 2,
+                background: "white",
+                top: menuOpen ? 6 : 12,
+                transform: menuOpen ? "rotate(-45deg)" : "none",
+                transition: "all .25s ease",
+              }}
+            />
+          </div>
+        </button>
+      </nav>
+
+      {menuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 64,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99,
+            background: "rgba(7,8,15,.98)",
+            backdropFilter: "blur(24px)",
+            padding: "24px clamp(16px,4vw,32px) 40px",
+            fontFamily: ff,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            overflowY: "auto",
+          }}
+        >
+          {links.map((l) => {
+            const active = pathname === l.href;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                style={{
+                  padding: "16px 18px",
+                  borderRadius: 12,
+                  fontSize: 15.5,
+                  fontWeight: 600,
+                  color: active ? "white" : "rgba(255,255,255,.72)",
+                  textDecoration: "none",
+                  background: active ? "rgba(245,158,11,.10)" : "transparent",
+                  border: active ? "1px solid rgba(245,158,11,.25)" : "1px solid rgba(255,255,255,.05)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span>{l.label}</span>
+                <span style={{ color: "rgba(255,255,255,.28)", fontSize: 14 }}>{"→"}</span>
+              </Link>
+            );
+          })}
+          <a
+            href="https://finovaos.app"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              marginTop: 16,
+              padding: "16px 22px",
+              borderRadius: 12,
+              background: "linear-gradient(135deg,#f59e0b,#ef4444)",
+              color: "white",
+              fontWeight: 700,
+              fontSize: 15,
+              textDecoration: "none",
+              textAlign: "center",
+              boxShadow: "0 8px 24px rgba(245,158,11,.35)",
+            }}
+          >
+            Visit FinovaOS {"→"}
+          </a>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -169,8 +319,43 @@ export function ForgeFooter() {
 
   return (
     <footer style={{ borderTop: "1px solid rgba(255,255,255,.06)", padding: "56px clamp(16px,3vw,40px) 32px", fontFamily: ff }}>
+      <style>{`
+        .forge-footer-grid {
+          display: grid;
+          grid-template-columns: 1.5fr 1fr 1fr 1fr;
+          gap: 40px;
+          margin-bottom: 48px;
+        }
+        @media (max-width: 900px) {
+          .forge-footer-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 32px 24px;
+          }
+        }
+        @media (max-width: 520px) {
+          .forge-footer-grid {
+            grid-template-columns: 1fr;
+            gap: 28px;
+          }
+        }
+        .forge-footer-bottom {
+          border-top: 1px solid rgba(255,255,255,.05);
+          padding-top: 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        @media (max-width: 520px) {
+          .forge-footer-bottom {
+            justify-content: center;
+            text-align: center;
+          }
+        }
+      `}</style>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", gap: "0 40px", marginBottom: 48 }}>
+        <div className="forge-footer-grid">
           <div>
             <Link href="/forge/home" style={{ display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none", marginBottom: 14 }}>
               <Image
@@ -235,9 +420,9 @@ export function ForgeFooter() {
           ))}
         </div>
 
-        <div style={{ borderTop: "1px solid rgba(255,255,255,.05)", paddingTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div className="forge-footer-bottom">
           <span style={{ fontSize: 12, color: "rgba(255,255,255,.18)", fontWeight: 500 }}>
-            {"\u00A9"} {yr} Finova Forge. All rights reserved.
+            {"©"} {yr} Finova Forge. All rights reserved.
           </span>
           <span style={{ fontSize: 12, color: "rgba(255,255,255,.18)" }}>Built with purpose. Shipped with care.</span>
         </div>
