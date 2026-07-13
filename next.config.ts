@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
         source: "/:path((?!api|_next|favicon|robots|sitemap|images|icons|fonts).*)*",
         has: [{ type: "host", value: "finovaos.app" }],
         destination: "https://www.finovaos.app/:path*",
-        permanent: false,
+        permanent: true,
       },
       {
         source: "/forge",
