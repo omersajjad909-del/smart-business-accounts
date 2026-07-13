@@ -137,13 +137,15 @@ export async function POST(req: NextRequest) {
       },
     }).catch(() => {});
 
-    sendEmail({
-      to: email,
-      subject: "You're on the FinovaOS waitlist 🎉",
-      html: buildWaitlistWelcomeEmail(name, company),
-    }).catch(() => {
+    try {
+      await sendEmail({
+        to: email,
+        subject: "You're on the FinovaOS waitlist 🎉",
+        html: buildWaitlistWelcomeEmail(name, company),
+      });
+    } catch {
       // Welcome email is best-effort — signup succeeds even if send fails.
-    });
+    }
 
     return NextResponse.json({
       success: true,
