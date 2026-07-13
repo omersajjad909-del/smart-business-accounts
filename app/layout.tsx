@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | FinovaOS",
   },
   description:
-    "AI-powered cloud accounting for SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one. Trusted by 500+ businesses in Pakistan & UAE.",
+    "AI cloud accounting for SMEs. Invoicing, inventory, HR, payroll, bank reconciliation, CRM — all in one. Trusted by 500+ SMEs in Pakistan and UAE.",
   keywords: [
     "accounting software",
     "cloud accounting",
