@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Offer from "./(marketing)/landing/components/Offer";
@@ -15,6 +16,10 @@ import NewsletterSection from "./(marketing)/landing/components/NewsletterSectio
 import CookieBanner from "./(marketing)/landing/components/CookieBanner";
 import Footer from "./(marketing)/landing/components/Footer";
 import ChatWidget from "./(marketing)/landing/components/ChatWidget";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 async function getRequestHost() {
   const headerStore = await headers();

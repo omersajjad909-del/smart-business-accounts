@@ -1,7 +1,21 @@
 // FILE LOCATION: app/help/[category]/[slug]/page.tsx
 // Ya agar tumhara route app/help/[slug]/page.tsx hai toh wahan bhi kaam karega
 
+import type { Metadata } from "next";
 import Link from "next/link";
+
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  return {
+    alternates: { canonical: `${BASE}/help/${slug}` },
+  };
+}
 
 /* ─────────────────────────────────────────
    ARTICLE DATABASE

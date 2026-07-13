@@ -14,7 +14,6 @@ const BRAND_ICON_PATH = "/icon.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  alternates: { canonical: "/" },
   title: {
     default: "FinovaOS — AI Cloud Accounting Software for SMEs",
     template: "%s | FinovaOS",
