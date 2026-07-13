@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | FinovaOS",
   },
   description:
-    "FinovaOS is AI-powered cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, and CRM — all in one platform. Trusted by 500+ businesses in Pakistan, UAE, and beyond.",
+    "AI-powered cloud accounting for SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM — all in one. Trusted by 500+ businesses in Pakistan & UAE.",
   keywords: [
     "accounting software",
     "cloud accounting",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     siteName: "FinovaOS",
     title: "FinovaOS - Global Accounting & Business Management Platform",
     description:
-      "Cloud accounting software for modern SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM - all in one platform.",
+      "AI cloud accounting for SMEs. Invoicing, inventory, HR & payroll, bank reconciliation, CRM in one platform.",
   },
   twitter: {
     card: "summary_large_image",
