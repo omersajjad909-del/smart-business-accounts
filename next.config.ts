@@ -62,6 +62,14 @@ const nextConfig: NextConfig = {
         source: "/(.*)\\.(ico|png|jpg|jpeg|svg|webp|woff|woff2|ttf)",
         headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
       },
+      {
+        // OG/Twitter preview images must be fetchable by external crawlers (LinkedIn, WhatsApp, Slack, opengraph.xyz)
+        source: "/:path(opengraph-image|twitter-image|icon|apple-icon).*",
+        headers: [
+          { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+        ],
+      },
     ];
   },
 };
