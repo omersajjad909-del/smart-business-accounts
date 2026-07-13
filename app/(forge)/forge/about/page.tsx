@@ -116,7 +116,7 @@ function Story() {
   return (
     <section
       style={{
-        padding: "100px clamp(20px,4vw,48px)",
+        padding: "clamp(64px,10vw,100px) clamp(20px,4vw,48px)",
         background: "rgba(255,255,255,.01)",
         borderTop: "1px solid rgba(255,255,255,.05)",
         fontFamily: ff,
@@ -150,6 +150,7 @@ function Story() {
           {chapters.map((ch, i) => (
             <div
               key={i}
+              className="forge-story-row"
               style={{
                 display: "grid",
                 gridTemplateColumns: "120px 1fr",
@@ -160,6 +161,7 @@ function Story() {
             >
               {i < chapters.length - 1 && (
                 <div
+                  className="forge-story-line"
                   style={{
                     position: "absolute",
                     left: 57,
@@ -171,6 +173,7 @@ function Story() {
                 />
               )}
               <div
+                className="forge-story-marker"
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -316,7 +319,7 @@ function Team() {
   return (
     <section
       style={{
-        padding: "100px clamp(20px,4vw,48px)",
+        padding: "clamp(64px,10vw,100px) clamp(20px,4vw,48px)",
         background: "rgba(255,255,255,.01)",
         borderTop: "1px solid rgba(255,255,255,.05)",
         fontFamily: ff,
@@ -448,7 +451,7 @@ function Team() {
 function CTA() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "100px clamp(20px,4vw,48px) 120px", fontFamily: ff }}>
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(20px,4vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
       <div
         ref={ref}
         style={{
@@ -553,6 +556,14 @@ export default function AboutPage() {
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
         body{background:rgb(7,8,15)}
+        @media (max-width: 600px) {
+          .forge-story-row {
+            grid-template-columns: 70px 1fr !important;
+            gap: 0 20px !important;
+            padding-bottom: 36px !important;
+          }
+          .forge-story-line { left: 33px !important; }
+        }
       `}</style>
       <ForgeNav />
       <Hero />

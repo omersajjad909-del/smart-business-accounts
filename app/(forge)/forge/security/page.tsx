@@ -81,8 +81,8 @@ const PRACTICES = [
 
 function Hero() {
   return (
-    <section style={{
-      minHeight: "60vh", padding: "140px clamp(20px,4vw,48px) 80px",
+    <section className="forge-sec-hero" style={{
+      minHeight: "60vh", padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(48px,8vw,80px)",
       display: "flex", alignItems: "center", justifyContent: "center",
       textAlign: "center", position: "relative", fontFamily: ff,
       background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(129,140,248,.16), transparent)",
@@ -109,7 +109,7 @@ function Hero() {
 function Pillars() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "80px clamp(16px,3vw,48px)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(48px,8vw,80px) clamp(16px,3vw,48px)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <Chip>SECURITY PILLARS</Chip>
@@ -117,7 +117,7 @@ function Pillars() {
             Eight layers of protection
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 18 }}>
+        <div className="forge-pillars-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 18 }}>
           {PILLARS.map((p, i) => (
             <div key={i}
               style={{ padding: "28px 24px", borderRadius: 18, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", transition: "all .3s" }}
@@ -144,7 +144,7 @@ function Pillars() {
 function Practices() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "80px clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(48px,8vw,80px) clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 900, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <div style={{ marginBottom: 40 }}>
           <Chip>DEVELOPMENT PRACTICES</Chip>
@@ -171,9 +171,9 @@ function Practices() {
 function Honesty() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "80px clamp(16px,3vw,48px)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(48px,8vw,80px) clamp(16px,3vw,48px)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 760, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
-        <div style={{ padding: "36px 36px", borderRadius: 22, background: "rgba(251,191,36,.04)", border: "1px solid rgba(251,191,36,.15)" }}>
+        <div className="forge-honesty-card" style={{ padding: "clamp(24px,5vw,36px) clamp(20px,5vw,36px)", borderRadius: 22, background: "rgba(251,191,36,.04)", border: "1px solid rgba(251,191,36,.15)" }}>
           <div style={{ fontSize: 28, marginBottom: 16 }}>⚠️</div>
           <h3 style={{ fontSize: 20, fontWeight: 900, color: "white", margin: "0 0 14px", letterSpacing: "-.5px" }}>
             What we don&apos;t claim
@@ -197,8 +197,8 @@ function Honesty() {
 function Disclosure() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "60px clamp(16px,3vw,48px) 100px", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
-      <div ref={ref} style={{ maxWidth: 900, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 32, alignItems: "start" }}>
+    <section style={{ padding: "clamp(40px,7vw,60px) clamp(16px,3vw,48px) clamp(64px,10vw,100px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
+      <div ref={ref} className="forge-disclosure-grid" style={{ maxWidth: 900, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 32, alignItems: "start" }}>
         <div>
           <Chip>RESPONSIBLE DISCLOSURE</Chip>
           <h2 style={{ fontSize: "clamp(22px,2.5vw,32px)", fontWeight: 900, color: "white", letterSpacing: "-1px", margin: "0 0 16px" }}>
@@ -239,7 +239,21 @@ function Disclosure() {
 export default function SecurityPage() {
   return (
     <div style={{ fontFamily: ff, color: "white" }}>
-      <style>{`*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } html { scroll-behavior: smooth; } body { background: rgb(7,8,15); }`}</style>
+      <style>{`
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { background: rgb(7,8,15); overflow-x: hidden; }
+        .forge-pillars-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        .forge-disclosure-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        @media (max-width: 900px) {
+          .forge-pillars-grid { grid-template-columns: repeat(2, 1fr); gap: 14px !important; }
+          .forge-disclosure-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+        }
+        @media (max-width: 600px) {
+          .forge-pillars-grid { grid-template-columns: 1fr !important; }
+          .forge-honesty-card { padding: 24px 20px !important; }
+        }
+      `}</style>
       <ForgeNav />
       <Hero />
       <Pillars />

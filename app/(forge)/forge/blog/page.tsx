@@ -71,7 +71,7 @@ const posts = [
 
 function Hero() {
   return (
-    <section style={{ padding: "140px clamp(16px,3vw,48px) 80px", fontFamily: ff, textAlign: "center", background: "radial-gradient(ellipse 70% 45% at 50% -5%, rgba(245,158,11,.12), transparent)", position: "relative" }}>
+    <section style={{ padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(48px,8vw,80px)", fontFamily: ff, textAlign: "center", background: "radial-gradient(ellipse 70% 45% at 50% -5%, rgba(245,158,11,.12), transparent)", position: "relative" }}>
       <div style={{ position: "absolute", inset: 0, opacity: .04, backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
       <div style={{ maxWidth: 660, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <Chip>INSIGHTS & BLOG</Chip>
@@ -96,7 +96,7 @@ function FeaturedPost() {
   return (
     <section style={{ padding: "0 clamp(16px,3vw,48px) 48px", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 1100, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
-        <div style={{ padding: "40px", borderRadius: 20, background: "linear-gradient(135deg,rgba(245,158,11,.07),rgba(239,68,68,.03))", border: "1px solid rgba(245,158,11,.18)", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 32, alignItems: "center" }}>
+        <div className="forge-featured-grid" style={{ padding: "clamp(24px,4vw,40px)", borderRadius: 20, background: "linear-gradient(135deg,rgba(245,158,11,.07),rgba(239,68,68,.03))", border: "1px solid rgba(245,158,11,.18)", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 32, alignItems: "center" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
               <span style={{ fontSize: 10.5, fontWeight: 700, color: post.tagColor, padding: "3px 10px", borderRadius: 100, background: `${post.tagColor}15`, border: `1px solid ${post.tagColor}25`, letterSpacing: ".06em", textTransform: "uppercase" }}>{post.tag}</span>
@@ -130,10 +130,10 @@ function FeaturedPost() {
 function PostGrid() {
   const [ref, vis] = useInView(0.05);
   return (
-    <section style={{ padding: "0 clamp(16px,3vw,48px) 120px", fontFamily: ff }}>
+    <section style={{ padding: "0 clamp(16px,3vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 1100, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.3)", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 20 }}>MORE ARTICLES</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 20 }}>
+        <div className="forge-post-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 20 }}>
           {posts.slice(1).map((post, i) => (
             <div key={i} style={{ padding: "26px 24px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", transition: "all .3s", display: "flex", flexDirection: "column", gap: 12 }}
               onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = `${post.tagColor}06`; el.style.borderColor = `${post.tagColor}20`; el.style.transform = "translateY(-2px)"; }}
@@ -164,8 +164,8 @@ function PostGrid() {
 function Newsletter() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "0 clamp(16px,3vw,48px) 120px", fontFamily: ff }}>
-      <div ref={ref} style={{ maxWidth: 600, margin: "0 auto", textAlign: "center", padding: "56px 40px", borderRadius: 24, background: "linear-gradient(135deg,rgba(245,158,11,.08),rgba(239,68,68,.04))", border: "1px solid rgba(245,158,11,.18)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
+    <section style={{ padding: "0 clamp(16px,3vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 600, margin: "0 auto", textAlign: "center", padding: "clamp(36px,6vw,56px) clamp(20px,4vw,40px)", borderRadius: 24, background: "linear-gradient(135deg,rgba(245,158,11,.08),rgba(239,68,68,.04))", border: "1px solid rgba(245,158,11,.18)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
         <div style={{ fontSize: 28, marginBottom: 12 }}>✉️</div>
         <h2 style={{ fontSize: "clamp(20px,3vw,28px)", fontWeight: 900, color: "white", margin: "0 0 10px", letterSpacing: "-.8px" }}>Stay in the loop</h2>
         <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.4)", margin: "0 0 24px", lineHeight: 1.75 }}>
@@ -182,7 +182,17 @@ function Newsletter() {
 export default function BlogPage() {
   return (
     <div style={{ fontFamily: ff, color: "white" }}>
-      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:rgb(7,8,15)}`}</style>
+      <style>{`
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{background:rgb(7,8,15);overflow-x:hidden}
+        @media (max-width: 700px) {
+          .forge-featured-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+        }
+        @media (max-width: 600px) {
+          .forge-post-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
       <ForgeNav />
       <Hero />
       <FeaturedPost />

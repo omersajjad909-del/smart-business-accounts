@@ -34,7 +34,7 @@ function Badge({ label, type }: { label: string; type: "live" | "dev" | "planned
 function Hero() {
   return (
     <section style={{
-      minHeight: "100vh", padding: "140px clamp(16px,3vw,48px) 100px",
+      minHeight: "100vh", padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(56px,10vw,100px)",
       display: "flex", alignItems: "center", justifyContent: "center",
       textAlign: "center", position: "relative", fontFamily: ff,
       background: `
@@ -77,7 +77,7 @@ function Hero() {
         </div>
 
         {/* Stats */}
-        <div style={{ marginTop: 80, display: "flex", gap: 56, justifyContent: "center", flexWrap: "wrap" }}>
+        <div className="forge-hero-stats" style={{ marginTop: "clamp(48px,8vw,80px)", display: "flex", gap: "clamp(24px,5vw,56px)", justifyContent: "center", flexWrap: "wrap" }}>
           {[
             { v: "2024", l: "Founded" },
             { v: "40+", l: "Countries" },
@@ -99,10 +99,10 @@ function Hero() {
 function CompanyIntro() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "100px clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
-      <div ref={ref} style={{
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
+      <div ref={ref} className="forge-intro-grid" style={{
         maxWidth: 1200, margin: "0 auto",
-        display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 64, alignItems: "center",
+        display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "clamp(32px,5vw,64px)", alignItems: "center",
         opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease"
       }}>
         <div>
@@ -126,7 +126,7 @@ function CompanyIntro() {
           </Link>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div className="forge-intro-cards" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
             { icon: "🏗️", title: "We Build", body: "SaaS platforms, ERP systems, AI tools, and business automation infrastructure." },
             { icon: "🎯", title: "We Focus", body: "Industry-specific solutions, not generic tools. Built for how your business actually works." },
@@ -152,7 +152,7 @@ function CompanyIntro() {
 function Products() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "100px clamp(16px,3vw,48px)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,48px)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <Chip>OUR PRODUCTS</Chip>
@@ -164,7 +164,7 @@ function Products() {
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 20 }}>
+        <div className="forge-products-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 20 }}>
 
           {/* FinovaOS — LIVE */}
           <div style={{ padding: "36px 32px", borderRadius: 22, background: "linear-gradient(145deg,rgba(245,158,11,.08),rgba(239,68,68,.04))", border: "1px solid rgba(245,158,11,.22)", position: "relative" }}>
@@ -241,7 +241,7 @@ function Services() {
     { icon: "🔧", title: "Business Infrastructure", color: "#f87171", desc: "Cloud infrastructure, data pipelines, monitoring, and security systems that form the backbone of modern business operations." },
   ];
   return (
-    <section style={{ padding: "100px clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <div style={{ marginBottom: 56 }}>
           <Chip>WHAT WE BUILD</Chip>
@@ -249,7 +249,7 @@ function Services() {
             Our capabilities
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 20 }}>
+        <div className="forge-services-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 20 }}>
           {services.map((s, i) => (
             <div key={i}
               style={{ padding: "32px 28px", borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", transition: "all .3s" }}
@@ -280,7 +280,7 @@ function TechStack() {
     { label: "AES-256", cat: "Security", color: "#f87171" },
   ];
   return (
-    <section style={{ padding: "100px clamp(16px,3vw,48px)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,48px)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 1200, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <Chip>TECHNOLOGY</Chip>
@@ -303,7 +303,7 @@ function TechStack() {
           ))}
         </div>
 
-        <div style={{ marginTop: 48, padding: "28px 32px", borderRadius: 16, background: "rgba(245,158,11,.04)", border: "1px solid rgba(245,158,11,.12)", display: "flex", gap: 32, flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={{ marginTop: 48, padding: "clamp(20px,3vw,28px) clamp(20px,3vw,32px)", borderRadius: 16, background: "rgba(245,158,11,.04)", border: "1px solid rgba(245,158,11,.12)", display: "flex", gap: "clamp(16px,3vw,32px)", flexWrap: "wrap", justifyContent: "center" }}>
           {[
             { icon: "⚡", label: "Realtime data sync" },
             { icon: "🔐", label: "End-to-end encryption" },
@@ -324,10 +324,10 @@ function TechStack() {
 function Vision() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "100px clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,48px)", background: "rgba(255,255,255,.015)", borderTop: "1px solid rgba(255,255,255,.05)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 900, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <Chip>OUR VISION</Chip>
-        <blockquote style={{ fontSize: "clamp(22px,3.5vw,38px)", fontWeight: 900, color: "white", letterSpacing: "-1.5px", lineHeight: 1.25, margin: "0 0 32px", borderLeft: "3px solid rgba(245,158,11,.4)", paddingLeft: 32 }}>
+        <blockquote style={{ fontSize: "clamp(22px,3.5vw,38px)", fontWeight: 900, color: "white", letterSpacing: "-1.5px", lineHeight: 1.25, margin: "0 0 32px", borderLeft: "3px solid rgba(245,158,11,.4)", paddingLeft: "clamp(20px,3vw,32px)" }}>
           &ldquo;Every modern business deserves intelligent operations. We&apos;re building the infrastructure to make that possible.&rdquo;
         </blockquote>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,.45)", lineHeight: 1.85, margin: "0 0 16px" }}>
@@ -349,10 +349,10 @@ function Vision() {
 function CTA() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "100px clamp(16px,3vw,48px) 120px", fontFamily: ff }}>
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
       <div ref={ref} style={{
         maxWidth: 900, margin: "0 auto", textAlign: "center",
-        padding: "80px clamp(28px,5vw,72px)",
+        padding: "clamp(48px,8vw,80px) clamp(24px,5vw,72px)",
         borderRadius: 28,
         background: "linear-gradient(135deg,rgba(245,158,11,.09),rgba(239,68,68,.05))",
         border: "1px solid rgba(245,158,11,.2)",
@@ -396,6 +396,17 @@ export default function HomePage() {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body { background: rgb(7,8,15); }
+        @media (max-width: 600px) {
+          .forge-intro-cards { grid-template-columns: 1fr !important; }
+          .forge-products-grid { grid-template-columns: 1fr !important; }
+          .forge-services-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 900px) {
+          .forge-services-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 600px) {
+          .forge-services-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
       <ForgeNav />
       <Hero />

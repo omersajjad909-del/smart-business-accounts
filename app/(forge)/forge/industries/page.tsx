@@ -159,8 +159,8 @@ function NotListed() {
 function CTA() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "0 clamp(16px,3vw,48px) 120px", fontFamily: ff }}>
-      <div ref={ref} style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "64px 40px", borderRadius: 24, background: "linear-gradient(135deg,rgba(245,158,11,.09),rgba(239,68,68,.05))", border: "1px solid rgba(245,158,11,.2)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
+    <section style={{ padding: "0 clamp(16px,3vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
+      <div ref={ref} style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "clamp(40px,7vw,64px) clamp(20px,4vw,40px)", borderRadius: 24, background: "linear-gradient(135deg,rgba(245,158,11,.09),rgba(239,68,68,.05))", border: "1px solid rgba(245,158,11,.2)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(28px)", transition: "all .65s ease" }}>
         <h2 style={{ fontSize: "clamp(24px,4vw,38px)", fontWeight: 900, color: "white", margin: "0 0 14px", letterSpacing: "-1.5px" }}>
           Ready to see it in action?
         </h2>
@@ -185,7 +185,17 @@ function CTA() {
 export default function IndustriesPage() {
   return (
     <div style={{ fontFamily: ff, color: "white" }}>
-      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:rgb(7,8,15)}`}</style>
+      <style>{`
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{background:rgb(7,8,15);overflow-x:hidden}
+        @media (max-width: 700px) {
+          .forge-industry-card { padding: 24px 20px !important; gap: 20px !important; }
+        }
+        @media (max-width: 480px) {
+          .forge-caps-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
       <ForgeNav />
       <Hero />
       <IndustryGrid />

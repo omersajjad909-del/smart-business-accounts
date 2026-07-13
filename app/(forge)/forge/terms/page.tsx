@@ -107,7 +107,7 @@ const sections = [
 
 function Hero() {
   return (
-    <section style={{ padding: "140px clamp(20px,4vw,48px) 60px", fontFamily: ff }}>
+    <section className="forge-terms-hero" style={{ padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(40px,7vw,60px)", fontFamily: ff }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <div
           style={{
@@ -149,7 +149,7 @@ function Hero() {
 function Content() {
   const [ref, vis] = useInView(0.05);
   return (
-    <section style={{ padding: "0 clamp(20px,4vw,48px) 120px", fontFamily: ff }}>
+    <section style={{ padding: "0 clamp(16px,3vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
       <div
         ref={ref}
         style={{
@@ -161,8 +161,9 @@ function Content() {
         }}
       >
         <div
+          className="forge-legal-callout"
           style={{
-            padding: "32px 36px",
+            padding: "clamp(22px,5vw,32px) clamp(20px,5vw,36px)",
             borderRadius: 16,
             background: "rgba(245,158,11,.05)",
             border: "1px solid rgba(245,158,11,.15)",
@@ -175,7 +176,7 @@ function Content() {
           </p>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
+        <div className="forge-legal-sections" style={{ display: "flex", flexDirection: "column", gap: 40 }}>
           {sections.map((s, i) => (
             <div key={i} style={{ borderBottom: "1px solid rgba(255,255,255,.05)", paddingBottom: 40 }}>
               <h2
@@ -193,6 +194,7 @@ function Content() {
                 {s.body.map((line, j) => (
                   <p
                     key={j}
+                    className="forge-legal-p"
                     style={{
                       fontSize: 14,
                       color: line.startsWith("•") ? "rgba(255,255,255,.5)" : "rgba(255,255,255,.4)",
@@ -219,7 +221,13 @@ export default function TermsPage() {
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
-        body{background:rgb(7,8,15)}
+        body{background:rgb(7,8,15); overflow-x: hidden;}
+        @media (max-width: 600px) {
+          .forge-legal-callout { padding: 22px 20px !important; margin-bottom: 32px !important; }
+          .forge-legal-sections { gap: 28px !important; }
+          .forge-legal-sections > div { padding-bottom: 28px !important; }
+          .forge-legal-p { font-size: 14px !important; }
+        }
       `}</style>
       <ForgeNav />
       <Hero />

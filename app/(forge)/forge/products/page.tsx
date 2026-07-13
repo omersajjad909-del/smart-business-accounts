@@ -31,7 +31,7 @@ function Hero() {
     <section
       style={{
         minHeight: "60vh",
-        padding: "140px clamp(20px,4vw,48px) 80px",
+        padding: "clamp(90px,15vw,140px) clamp(20px,4vw,48px) clamp(48px,8vw,80px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -110,7 +110,7 @@ function FinovaOSSection() {
   ];
 
   return (
-    <section style={{ padding: "100px clamp(20px,4vw,48px)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(20px,4vw,48px)", fontFamily: ff }}>
       <div
         ref={ref}
         style={{
@@ -222,7 +222,7 @@ function FinovaOSSection() {
             borderRadius: 24,
             background: "linear-gradient(145deg,rgba(245,158,11,.05),rgba(239,68,68,.03))",
             border: "1px solid rgba(245,158,11,.14)",
-            padding: "36px",
+            padding: "clamp(20px,4vw,36px)",
           }}
         >
           <div
@@ -238,9 +238,10 @@ function FinovaOSSection() {
             Included Modules
           </div>
           <div
+            className="forge-modules-grid"
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))",
+              gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))",
               gap: 12,
             }}
           >
@@ -317,7 +318,7 @@ function Roadmap() {
   return (
     <section
       style={{
-        padding: "100px clamp(20px,4vw,48px)",
+        padding: "clamp(64px,10vw,100px) clamp(20px,4vw,48px)",
         background: "rgba(255,255,255,.01)",
         borderTop: "1px solid rgba(255,255,255,.05)",
         fontFamily: ff,
@@ -450,7 +451,7 @@ function Pricing() {
   ];
 
   return (
-    <section style={{ padding: "100px clamp(20px,4vw,48px)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(20px,4vw,48px)", fontFamily: ff }}>
       <div
         ref={ref}
         style={{
@@ -584,7 +585,7 @@ function Pricing() {
 function CTA() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "100px clamp(20px,4vw,48px) 120px", fontFamily: ff }}>
+    <section style={{ padding: "clamp(64px,10vw,100px) clamp(20px,4vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
       <div
         ref={ref}
         style={{
@@ -662,6 +663,9 @@ export default function ProductsPage() {
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
         body{background:rgb(7,8,15)}
+        @media (max-width: 480px) {
+          .forge-modules-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
       <ForgeNav />
       <Hero />

@@ -45,7 +45,7 @@ function Hero() {
     <section
       style={{
         minHeight: "50vh",
-        padding: "140px clamp(20px,4vw,48px) 60px",
+        padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(40px,7vw,60px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -127,12 +127,13 @@ function ContactSection() {
   return (
     <section
       style={{
-        padding: "80px clamp(20px,4vw,48px) 120px",
+        padding: "clamp(48px,8vw,80px) clamp(16px,3vw,48px) clamp(72px,12vw,120px)",
         fontFamily: ff,
       }}
     >
       <div
         ref={ref}
+        className="forge-contact-grid"
         style={{
           maxWidth: 1100,
           margin: "0 auto",
@@ -162,6 +163,7 @@ function ContactSection() {
           </p>
 
           <div
+            className="forge-form-card"
             style={{
               padding: "36px",
               borderRadius: 20,
@@ -195,7 +197,7 @@ function ContactSection() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div className="forge-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                   <div>
                     <label
                       style={{
@@ -489,9 +491,16 @@ export default function ContactPage() {
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
-        body{background:rgb(7,8,15)}
+        body{background:rgb(7,8,15);overflow-x:hidden}
         input::placeholder,textarea::placeholder{color:rgba(255,255,255,.2)}
         select option{background:rgb(7,8,15);color:white}
+        @media (max-width: 900px) {
+          .forge-contact-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 700px) {
+          .forge-form-row { grid-template-columns: 1fr !important; }
+          .forge-form-card { padding: 24px 20px !important; }
+        }
       `}</style>
       <ForgeNav />
       <Hero />

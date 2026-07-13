@@ -36,7 +36,7 @@ const statusConfig = {
 function Hero() {
   const allOperational = services.every(s => s.status === "operational");
   return (
-    <section style={{ padding: "140px clamp(16px,3vw,48px) 80px", fontFamily: ff, textAlign: "center", background: allOperational ? "radial-gradient(ellipse 60% 40% at 50% -5%, rgba(52,211,153,.1), transparent)" : "radial-gradient(ellipse 60% 40% at 50% -5%, rgba(245,158,11,.1), transparent)", position: "relative" }}>
+    <section className="forge-stat-hero" style={{ padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(48px,8vw,80px)", fontFamily: ff, textAlign: "center", background: allOperational ? "radial-gradient(ellipse 60% 40% at 50% -5%, rgba(52,211,153,.1), transparent)" : "radial-gradient(ellipse 60% 40% at 50% -5%, rgba(245,158,11,.1), transparent)", position: "relative" }}>
       <div style={{ position: "absolute", inset: 0, opacity: .04, backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
       <div style={{ maxWidth: 640, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <Chip>SYSTEM STATUS</Chip>
@@ -62,19 +62,19 @@ function ServiceList() {
   return (
     <section style={{ padding: "0 clamp(16px,3vw,48px) 60px", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 860, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
-        <h2 style={{ fontSize: 16, fontWeight: 800, color: "rgba(255,255,255,.6)", letterSpacing: ".05em", textTransform: "uppercase", marginBottom: 20, fontSize: 11 }}>SERVICES</h2>
+        <h2 style={{ fontWeight: 800, color: "rgba(255,255,255,.6)", letterSpacing: ".05em", textTransform: "uppercase", marginBottom: 20, fontSize: 11 }}>SERVICES</h2>
         <div style={{ borderRadius: 16, border: "1px solid rgba(255,255,255,.08)", overflow: "hidden" }}>
           {services.map((svc, i) => {
             const cfg = statusConfig[svc.status as keyof typeof statusConfig];
             return (
-              <div key={svc.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 22px", gap: 16, borderTop: i > 0 ? "1px solid rgba(255,255,255,.05)" : "none", background: "rgba(255,255,255,.015)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div key={svc.name} className="forge-svc-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 22px", gap: 16, borderTop: i > 0 ? "1px solid rgba(255,255,255,.05)" : "none", background: "rgba(255,255,255,.015)", flexWrap: "wrap", minHeight: 44 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
                   <div style={{ width: 7, height: 7, borderRadius: "50%", background: cfg.dot, flexShrink: 0 }} />
                   <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,.75)" }}>{svc.name}</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0 }}>
+                <div className="forge-svc-meta" style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0, flexWrap: "wrap" }}>
                   <span style={{ fontSize: 12, color: "rgba(255,255,255,.3)", fontWeight: 500 }}>{svc.uptime} uptime</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: cfg.color, padding: "3px 10px", borderRadius: 100, background: `${cfg.color}12`, border: `1px solid ${cfg.color}20` }}>{cfg.label}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: cfg.color, padding: "6px 12px", borderRadius: 100, background: `${cfg.color}12`, border: `1px solid ${cfg.color}20`, minHeight: 28, display: "inline-flex", alignItems: "center" }}>{cfg.label}</span>
                 </div>
               </div>
             );
@@ -92,10 +92,10 @@ function UptimeGrid() {
     <section style={{ padding: "0 clamp(16px,3vw,48px) 60px", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 860, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
         <h2 style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.4)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 16 }}>60-DAY UPTIME</h2>
-        <div style={{ padding: "24px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)" }}>
-          <div style={{ display: "flex", gap: 3, alignItems: "flex-end" }}>
+        <div className="forge-uptime-card" style={{ padding: "clamp(16px,4vw,24px)", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)" }}>
+          <div className="forge-uptime-bars" style={{ display: "flex", gap: 3, alignItems: "flex-end" }}>
             {Array.from({ length: days }, (_, i) => (
-              <div key={i} style={{ flex: 1, height: 28, borderRadius: 3, background: "#34d399", opacity: Math.random() > 0.97 ? 0.3 : 0.7 + Math.random() * 0.3 }} />
+              <div key={i} style={{ flex: 1, minWidth: 2, height: 28, borderRadius: 3, background: "#34d399", opacity: Math.random() > 0.97 ? 0.3 : 0.7 + Math.random() * 0.3 }} />
             ))}
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
@@ -123,7 +123,7 @@ function Incidents() {
       <div ref={ref} style={{ maxWidth: 860, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
         <h2 style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.4)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 16 }}>RECENT INCIDENTS</h2>
         {incidents.length === 0 ? (
-          <div style={{ padding: "40px", borderRadius: 16, border: "1px solid rgba(255,255,255,.06)", textAlign: "center" }}>
+          <div style={{ padding: "clamp(28px,6vw,40px) clamp(20px,4vw,40px)", borderRadius: 16, border: "1px solid rgba(255,255,255,.06)", textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 10 }}>✅</div>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", margin: 0 }}>No incidents in the last 90 days.</p>
           </div>
@@ -152,7 +152,19 @@ function Incidents() {
 export default function StatusPage() {
   return (
     <div style={{ fontFamily: ff, color: "white" }}>
-      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:rgb(7,8,15)}`}</style>
+      <style>{`
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{background:rgb(7,8,15); overflow-x: hidden;}
+        @media (max-width: 600px) {
+          .forge-svc-row { padding: 14px 16px !important; gap: 10px !important; }
+          .forge-svc-meta { gap: 12px !important; width: 100%; justify-content: space-between; }
+          .forge-uptime-bars { gap: 2px !important; }
+        }
+        @media (max-width: 400px) {
+          .forge-uptime-bars > div { height: 22px !important; }
+        }
+      `}</style>
       <ForgeNav />
       <Hero />
       <ServiceList />

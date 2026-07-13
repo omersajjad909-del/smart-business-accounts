@@ -30,7 +30,7 @@ function Hero() {
     <section
       style={{
         minHeight: "60vh",
-        padding: "140px clamp(20px,4vw,48px) 80px",
+        padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(48px,8vw,80px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -122,7 +122,7 @@ function WhyUs() {
   return (
     <section
       style={{
-        padding: "100px clamp(20px,4vw,48px)",
+        padding: "clamp(56px,10vw,100px) clamp(16px,3vw,48px)",
         background: "rgba(255,255,255,.01)",
         borderTop: "1px solid rgba(255,255,255,.05)",
         fontFamily: ff,
@@ -153,7 +153,7 @@ function WhyUs() {
           </h2>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 20 }}>
+        <div className="forge-perks-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 20 }}>
           {perks.map((p, i) => (
             <div
               key={i}
@@ -191,7 +191,7 @@ function WhyUs() {
 function OpenRoles() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "100px clamp(20px,4vw,48px)", fontFamily: ff }}>
+    <section style={{ padding: "clamp(56px,10vw,100px) clamp(16px,3vw,48px)", fontFamily: ff }}>
       <div
         ref={ref}
         style={{
@@ -218,7 +218,7 @@ function OpenRoles() {
         {/* No roles state */}
         <div
           style={{
-            padding: "56px 40px",
+            padding: "clamp(40px,7vw,56px) clamp(20px,4vw,40px)",
             borderRadius: 20,
             background: "rgba(255,255,255,.02)",
             border: "1px dashed rgba(255,255,255,.1)",
@@ -262,7 +262,7 @@ function CTA() {
   return (
     <section
       style={{
-        padding: "60px clamp(20px,4vw,48px) 120px",
+        padding: "clamp(40px,7vw,60px) clamp(16px,3vw,48px) clamp(72px,12vw,120px)",
         fontFamily: ff,
       }}
     >
@@ -272,7 +272,7 @@ function CTA() {
           maxWidth: 800,
           margin: "0 auto",
           textAlign: "center",
-          padding: "56px 40px",
+          padding: "clamp(36px,6vw,56px) clamp(20px,4vw,40px)",
           borderRadius: 24,
           background: "linear-gradient(135deg,rgba(245,158,11,.08),rgba(239,68,68,.04))",
           border: "1px solid rgba(245,158,11,.2)",
@@ -340,7 +340,10 @@ export default function CareersPage() {
       <style>{`
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
-        body{background:rgb(7,8,15)}
+        body{background:rgb(7,8,15);overflow-x:hidden}
+        @media (max-width: 600px) {
+          .forge-perks-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
       <ForgeNav />
       <Hero />

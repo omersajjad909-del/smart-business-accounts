@@ -30,7 +30,7 @@ function ForgeNav() {
   return (
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-      padding: "0 40px", height: 64,
+      padding: "0 clamp(16px,3vw,40px)", height: 64,
       display: "flex", alignItems: "center", justifyContent: "space-between",
       background: scrolled ? "rgba(7,8,15,.92)" : "transparent",
       backdropFilter: scrolled ? "blur(20px)" : "none",
@@ -101,7 +101,7 @@ function Hero() {
   return (
     <section style={{
       minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-      padding: "120px 24px 80px", textAlign: "center", position: "relative", overflow: "hidden",
+      padding: "clamp(90px,15vw,120px) clamp(16px,3vw,24px) clamp(48px,8vw,80px)", textAlign: "center", position: "relative", overflow: "hidden",
     }}>
       {/* BG */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
@@ -157,7 +157,7 @@ function Hero() {
 function Products() {
   const [ref, vis] = useInView();
   return (
-    <section id="products" style={{ padding: "100px 24px", maxWidth: 1100, margin: "0 auto" }}>
+    <section id="products" style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,24px)", maxWidth: 1100, margin: "0 auto" }}>
       <div ref={ref} style={{ opacity: vis?1:0, transform: vis?"translateY(0)":"translateY(24px)", transition: "all .65s ease" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 100, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", marginBottom: 18 }}>
@@ -168,19 +168,19 @@ function Products() {
           </h2>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, alignItems: "stretch" }}>
+        <div className="forge-products-split" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, alignItems: "stretch" }}>
 
           {/* FinovaOS — main product */}
           <div style={{
-            borderRadius: 24, padding: "40px 40px",
+            borderRadius: 24, padding: "clamp(24px,4vw,40px) clamp(20px,4vw,40px)",
             background: "linear-gradient(145deg,rgba(99,102,241,.12),rgba(79,70,229,.06))",
             border: "1.5px solid rgba(99,102,241,.3)",
             boxShadow: "0 0 60px rgba(99,102,241,.08)",
             position: "relative", overflow: "hidden",
           }}>
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg,#6366f1,#818cf8,#a78bfa)" }} />
-            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🧠</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, flexWrap: "wrap" }}>
+              <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg,#6366f1,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🧠</div>
               <div>
                 <div style={{ fontSize: 22, fontWeight: 900, color: "white", letterSpacing: "-.4px" }}>FinovaOS</div>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 2 }}>finovaos.app</div>
@@ -194,7 +194,7 @@ function Products() {
               A full-stack cloud business management platform for SMEs. Covers accounting, invoicing, inventory, HR & payroll, CRM, bank reconciliation, multi-branch management, and AI-powered automation — all in one place.
             </p>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 32 }}>
+            <div className="forge-os-features" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 32 }}>
               {["Accounting & Finance","Invoicing & Sales","Inventory Management","HR & Payroll","CRM","Bank Reconciliation"].map(f => (
                 <div key={f} style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", fontSize: 11, color: "rgba(255,255,255,.5)", fontWeight: 600 }}>
                   {f}
@@ -202,7 +202,7 @@ function Products() {
               ))}
             </div>
 
-            <div style={{ display: "flex", gap: 12 }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Link href="https://finovaos.app" target="_blank" style={{
                 padding: "11px 24px", borderRadius: 10, textDecoration: "none",
                 background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white",
@@ -222,7 +222,7 @@ function Products() {
 
           {/* Coming Soon */}
           <div style={{
-            borderRadius: 24, padding: "36px 32px",
+            borderRadius: 24, padding: "clamp(24px,4vw,36px) clamp(20px,3vw,32px)",
             background: "rgba(255,255,255,.02)", border: "1px dashed rgba(255,255,255,.1)",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
             textAlign: "center", gap: 16,
@@ -254,7 +254,7 @@ function Mission() {
     { icon: "🌍", title: "Built for Emerging Markets", desc: "Designed for Pakistan, UAE, India — and every market where businesses are underserved by legacy software." },
   ];
   return (
-    <section id="mission" style={{ padding: "100px 24px", background: "rgba(255,255,255,.01)", borderTop: "1px solid rgba(255,255,255,.05)", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+    <section id="mission" style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,24px)", background: "rgba(255,255,255,.01)", borderTop: "1px solid rgba(255,255,255,.05)", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
       <div ref={ref} style={{ maxWidth: 1100, margin: "0 auto", opacity: vis?1:0, transform: vis?"translateY(0)":"translateY(24px)", transition: "all .65s ease" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 100, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", marginBottom: 18 }}>
@@ -268,7 +268,7 @@ function Mission() {
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+        <div className="forge-mission-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
           {values.map((v, i) => (
             <div key={i} style={{
               padding: "32px 28px", borderRadius: 20,
@@ -293,7 +293,7 @@ function Mission() {
 function Team() {
   const [ref, vis] = useInView();
   return (
-    <section id="team" style={{ padding: "100px 24px", maxWidth: 1100, margin: "0 auto" }}>
+    <section id="team" style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,24px)", maxWidth: 1100, margin: "0 auto" }}>
       <div ref={ref} style={{ opacity: vis?1:0, transform: vis?"translateY(0)":"translateY(24px)", transition: "all .65s ease" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 100, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", marginBottom: 18 }}>
@@ -306,7 +306,7 @@ function Team() {
 
         <div style={{ display: "flex", justifyContent: "center" }}>
           <div style={{
-            width: 340, padding: "36px 32px", borderRadius: 24, textAlign: "center",
+            width: "100%", maxWidth: 340, padding: "clamp(24px,4vw,36px) clamp(20px,3vw,32px)", borderRadius: 24, textAlign: "center",
             background: "linear-gradient(145deg,rgba(245,158,11,.08),rgba(239,68,68,.04))",
             border: "1px solid rgba(245,158,11,.2)",
           }}>
@@ -337,7 +337,7 @@ function Contact() {
     { icon: "💼", label: "LinkedIn", value: "finovaforge",           href: "https://linkedin.com/company/finovaforge" },
   ];
   return (
-    <section id="contact" style={{ padding: "100px 24px", background: "rgba(255,255,255,.01)", borderTop: "1px solid rgba(255,255,255,.05)" }}>
+    <section id="contact" style={{ padding: "clamp(64px,10vw,100px) clamp(16px,3vw,24px)", background: "rgba(255,255,255,.01)", borderTop: "1px solid rgba(255,255,255,.05)" }}>
       <div ref={ref} style={{ maxWidth: 680, margin: "0 auto", textAlign: "center", opacity: vis?1:0, transform: vis?"translateY(0)":"translateY(24px)", transition: "all .65s ease" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 100, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.2)", marginBottom: 18 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "#fbbf24", letterSpacing: ".08em" }}>GET IN TOUCH</span>
@@ -374,7 +374,7 @@ function Contact() {
 // ── Footer ─────────────────────────────────────────────────────────────────
 function ForgeFooter() {
   return (
-    <footer style={{ borderTop: "1px solid rgba(255,255,255,.06)", padding: "32px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, fontFamily: ff }}>
+    <footer style={{ borderTop: "1px solid rgba(255,255,255,.06)", padding: "32px clamp(16px,3vw,40px)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, fontFamily: ff }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <Image
           src={forgeLogoMark}
@@ -424,6 +424,15 @@ export default function ForgePage() {
         html{scroll-behavior:smooth}
         @media(max-width:768px){
           nav a:not(:last-child){display:none}
+        }
+        @media (max-width: 900px) {
+          .forge-products-split { grid-template-columns: 1fr !important; }
+          .forge-mission-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .forge-os-features { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 600px) {
+          .forge-mission-grid { grid-template-columns: 1fr !important; }
+          .forge-os-features { grid-template-columns: 1fr !important; }
         }
       `}</style>
       <ForgeNav />

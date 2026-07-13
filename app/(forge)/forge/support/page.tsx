@@ -54,7 +54,7 @@ const faqs = [
 
 function Hero() {
   return (
-    <section style={{ padding: "140px clamp(16px,3vw,48px) 80px", fontFamily: ff, textAlign: "center", background: "radial-gradient(ellipse 60% 40% at 50% -5%, rgba(245,158,11,.12), transparent)", position: "relative" }}>
+    <section className="forge-sup-hero" style={{ padding: "clamp(90px,15vw,140px) clamp(16px,3vw,48px) clamp(48px,8vw,80px)", fontFamily: ff, textAlign: "center", background: "radial-gradient(ellipse 60% 40% at 50% -5%, rgba(245,158,11,.12), transparent)", position: "relative" }}>
       <div style={{ position: "absolute", inset: 0, opacity: .04, backgroundImage: "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
       <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
         <Chip>HELP & SUPPORT</Chip>
@@ -86,9 +86,9 @@ function QuickLinks() {
     { icon: "👥", title: "Team & Permissions", desc: "Invite staff, assign roles, and control access per branch or module.", color: "#06b6d4" },
   ];
   return (
-    <section style={{ padding: "0 clamp(16px,3vw,48px) 80px", fontFamily: ff }}>
+    <section style={{ padding: "0 clamp(16px,3vw,48px) clamp(48px,8vw,80px)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 1100, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 16 }}>
+        <div className="forge-quicklinks-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 16 }}>
           {cards.map(c => (
             <div key={c.title} style={{ padding: "24px 22px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", cursor: "default", transition: "all .3s" }}
               onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.background = `${c.color}08`; el.style.borderColor = `${c.color}25`; }}
@@ -108,7 +108,7 @@ function FAQSection() {
   const [open, setOpen] = useState<string | null>(null);
   const [ref, vis] = useInView(0.05);
   return (
-    <section style={{ padding: "0 clamp(16px,3vw,48px) 80px", fontFamily: ff }}>
+    <section style={{ padding: "0 clamp(16px,3vw,48px) clamp(48px,8vw,80px)", fontFamily: ff }}>
       <div ref={ref} style={{ maxWidth: 860, margin: "0 auto", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
         <h2 style={{ fontSize: "clamp(22px,3.5vw,32px)", fontWeight: 900, color: "white", letterSpacing: "-1px", marginBottom: 40, textAlign: "center" }}>Frequently Asked Questions</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
@@ -123,12 +123,12 @@ function FAQSection() {
                   const isOpen = open === key;
                   return (
                     <div key={item.q} style={{ borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,.06)", background: isOpen ? "rgba(255,255,255,.03)" : "transparent", transition: "all .25s" }}>
-                      <button onClick={() => setOpen(isOpen ? null : key)} style={{ width: "100%", padding: "16px 18px", background: "none", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, textAlign: "left" }}>
+                      <button className="forge-faq-btn" onClick={() => setOpen(isOpen ? null : key)} style={{ width: "100%", padding: "16px 18px", background: "none", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, textAlign: "left", minHeight: 44 }}>
                         <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,.8)" }}>{item.q}</span>
                         <span style={{ color: cat.color, fontSize: 18, flexShrink: 0, transform: isOpen ? "rotate(45deg)" : "none", transition: "transform .2s" }}>+</span>
                       </button>
                       {isOpen && (
-                        <div style={{ padding: "0 18px 16px" }}>
+                        <div className="forge-faq-answer" style={{ padding: "0 18px 16px" }}>
                           <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.45)", lineHeight: 1.8, margin: 0 }}>{item.a}</p>
                         </div>
                       )}
@@ -147,8 +147,8 @@ function FAQSection() {
 function ContactBanner() {
   const [ref, vis] = useInView();
   return (
-    <section style={{ padding: "0 clamp(16px,3vw,48px) 120px", fontFamily: ff }}>
-      <div ref={ref} style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "52px 40px", borderRadius: 20, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
+    <section style={{ padding: "0 clamp(16px,3vw,48px) clamp(72px,12vw,120px)", fontFamily: ff }}>
+      <div ref={ref} className="forge-sup-contact" style={{ maxWidth: 800, margin: "0 auto", textAlign: "center", padding: "clamp(32px,6vw,52px) clamp(20px,5vw,40px)", borderRadius: 20, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.07)", opacity: vis ? 1 : 0, transform: vis ? "none" : "translateY(24px)", transition: "all .6s ease" }}>
         <h2 style={{ fontSize: "clamp(20px,3vw,28px)", fontWeight: 800, color: "white", margin: "0 0 12px", letterSpacing: "-.5px" }}>Still need help?</h2>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,.4)", margin: "0 0 24px", lineHeight: 1.75 }}>
           Our team responds within one business day. For urgent issues, include &quot;URGENT&quot; in your subject line.
@@ -169,7 +169,21 @@ function ContactBanner() {
 export default function SupportPage() {
   return (
     <div style={{ fontFamily: ff, color: "white" }}>
-      <style>{`*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:rgb(7,8,15)}`}</style>
+      <style>{`
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{background:rgb(7,8,15); overflow-x: hidden;}
+        .forge-quicklinks-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+        @media (max-width: 900px) {
+          .forge-quicklinks-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 600px) {
+          .forge-quicklinks-grid { grid-template-columns: 1fr !important; }
+          .forge-faq-btn { padding: 14px 14px !important; }
+          .forge-faq-answer { padding: 0 14px 14px !important; }
+          .forge-sup-contact { padding: 32px 20px !important; }
+        }
+      `}</style>
       <ForgeNav />
       <Hero />
       <QuickLinks />
