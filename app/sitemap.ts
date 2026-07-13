@@ -56,11 +56,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/features/ai`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
   ];
 
-  // Blog articles — only add real published slugs here
+  // Blog articles — only add real published slugs here (must exist in app/(marketing)/blog/posts.ts)
   const blogSlugs = [
     "bank-reconciliation-guide",
-    "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "10", "11", "12", "13", "14", "15",
+    "1",
+    "2",
+    "3",
   ];
   const blogPages = blogSlugs.map(slug => ({
     url: `${BASE}/blog/${slug}`,
