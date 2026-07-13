@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   const where: any = {};
   if (status !== "all") where.status = status;
 
-  const [items, total, activeCount, unsubCount] = await Promise.all([
+  const [subscribers, total, activeCount, unsubCount] = await Promise.all([
     db.newsletterSubscriber.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -40,6 +40,22 @@ export async function GET(req: NextRequest) {
     db.newsletterSubscriber.count({ where: { status: "active" } }),
     db.newsletterSubscriber.count({ where: { status: "unsubscribed" } }),
   ]);
+
+  const emails = subscribers.map((s: { email: string }) => s.email);
+  const leads = emails.length
+    ? await db.lead.findMany({
+        where: { email: { in: emails } },
+        select: { email: true, company: true },
+      })
+    : [];
+  const companyByEmail = new Map<string, string | null>(
+    leads.map((l: { email: string; company: string | null }) => [l.email, l.company]),
+  );
+
+  const items = subscribers.map((s: any) => ({
+    ...s,
+    company: companyByEmail.get(s.email) || null,
+  }));
 
   return NextResponse.json({ items, total, page, activeCount, unsubCount });
 }

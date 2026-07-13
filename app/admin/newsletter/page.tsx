@@ -6,6 +6,7 @@ type Subscriber = {
   id: string;
   email: string;
   name?: string | null;
+  company?: string | null;
   source?: string | null;
   status: string;
   createdAt: string;
