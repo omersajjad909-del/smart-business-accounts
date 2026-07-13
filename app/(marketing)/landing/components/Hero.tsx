@@ -239,12 +239,15 @@ export default function Hero() {
               </div>
 
               {/* CTAs */}
-              <div className="h4 hero-ctarow" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:40 }}>
-                <Link href="/onboarding/signup/starter" className="cta-primary">
-                  Get Started
+              <div className="h4 hero-ctarow" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:16 }}>
+                <Link href="/waitlist" className="cta-primary">
+                  Join the Waitlist
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                   </svg>
+                </Link>
+                <Link href="/onboarding/signup/starter" className="cta-ghost">
+                  Get Started
                 </Link>
                 <Link href="/demo" className="cta-ghost">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none">
@@ -253,6 +256,9 @@ export default function Hero() {
                   Watch Demo
                 </Link>
               </div>
+              <p style={{ fontSize:12.5, color:"rgba(255,255,255,.4)", marginBottom:32, fontWeight:500 }}>
+                Priority early access · No credit card required · Launch pricing locked in
+              </p>
 
               {/* Social proof row */}
               <div className="h5 hero-proof" style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
