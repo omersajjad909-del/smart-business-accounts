@@ -59,9 +59,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Blog articles — only add real published slugs here (must exist in app/(marketing)/blog/posts.ts)
   const blogSlugs = [
     "bank-reconciliation-guide",
-    "1",
-    "2",
-    "3",
+    "5-signs-outgrown-spreadsheets",
+    "multi-currency-invoicing-guide",
+    "cloud-erp-vs-accounting-software",
+    "hr-payroll-software-guide",
   ];
   const blogPages = blogSlugs.map(slug => ({
     url: `${BASE}/blog/${slug}`,
