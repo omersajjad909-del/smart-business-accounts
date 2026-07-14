@@ -1,6 +1,4 @@
-// FILE LOCATION: app/help/[category]/[slug]/page.tsx
-// Ya agar tumhara route app/help/[slug]/page.tsx hai toh wahan bhi kaam karega
-
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -968,18 +966,7 @@ export default async function HelpArticlePage({
   const { slug } = await params;
   const article = ARTICLES[slug];
 
-  if (!article) {
-    return (
-      <div style={{ minHeight:"100vh", background:"#080c1e", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontFamily:"'Outfit',sans-serif" }}>
-        <div style={{ textAlign:"center" }}>
-          <div style={{ fontSize:48, marginBottom:16 }}>🔍</div>
-          <h1 style={{ fontFamily:"'Lora',serif", fontSize:28, marginBottom:8 }}>Article not found</h1>
-          <p style={{ color:"rgba(255,255,255,.4)", marginBottom:24 }}>This article doesn&apos;t exist or may have moved.</p>
-          <Link href="/help" style={{ color:"#818cf8", fontWeight:600, fontSize:14 }}>← Back to Help Center</Link>
-        </div>
-      </div>
-    );
-  }
+  if (!article) notFound();
 
   return (
     <div style={{ minHeight:"100vh", background:"linear-gradient(180deg,#080c1e 0%,#0c0f2e 30%,#080c1e 100%)", color:"white", fontFamily:"'Outfit','DM Sans',sans-serif" }}>
