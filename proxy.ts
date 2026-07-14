@@ -55,6 +55,10 @@ export function proxy(req: NextRequest) {
     const fwdHeaders = new Headers(req.headers);
     fwdHeaders.set("x-nonce", nonce);
     fwdHeaders.set("x-pathname", req.nextUrl.pathname);
+    // Redirect /favicon.ico to the Finova Forge logo so Google Search picks it up.
+    if (pathname === "/favicon.ico") {
+      return NextResponse.redirect(new URL("/FinovaForge.png", req.url), { status: 301 });
+    }
     // Skip rewrite for static files (any path with a file extension like .png, .svg, .ico, .txt, .json, etc.)
     // so /FinovaForge.png resolves to public/FinovaForge.png instead of /forge/FinovaForge.png.
     const isStaticFile = /\.[a-z0-9]+$/i.test(pathname);
