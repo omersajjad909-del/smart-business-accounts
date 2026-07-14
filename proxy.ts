@@ -25,6 +25,7 @@ function buildCsp(nonce: string): string {
     "https://fonts.googleapis.com",
     "https://www.googletagmanager.com",
     "https://static.cloudflareinsights.com",
+    "https://www.clarity.ms",
   ].join(" ");
 
   return [
@@ -33,7 +34,7 @@ function buildCsp(nonce: string): string {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https:",
-    "connect-src 'self' https://ipapi.co https://www.googletagmanager.com https://static.cloudflareinsights.com https://cloudflareinsights.com https://www.google-analytics.com https://www.google.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+    "connect-src 'self' https://ipapi.co https://www.googletagmanager.com https://static.cloudflareinsights.com https://cloudflareinsights.com https://www.google-analytics.com https://www.google.com https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.clarity.ms",
     "frame-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
