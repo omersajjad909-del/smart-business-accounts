@@ -44,7 +44,8 @@ const sections = [
     title: "Payment and Billing",
     body: [
       "Paid plans are billed in advance on a monthly or annual basis depending on your selected plan.",
-      "All fees are non-refundable except where required by law.",
+      "Payments are processed by LemonSqueezy (Lemon Squeezy, LLC), our third-party payment provider. We do not store full card details.",
+      "Monthly plans are non-refundable. Yearly plans are eligible for a full refund within 14 days of the initial payment date. Refund requests must be sent to hello@finovaforge.com.",
       "We reserve the right to change pricing with 30 days' notice to existing subscribers.",
       "Failure to pay may result in suspension or termination of your account.",
     ],
@@ -139,7 +140,7 @@ function Hero() {
           Terms of Service
         </h1>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", margin: 0, lineHeight: 1.7 }}>
-          Last updated: May 2026 · Finova Forge
+          Last updated: July 2026 · Finova Forge
         </p>
       </div>
     </section>

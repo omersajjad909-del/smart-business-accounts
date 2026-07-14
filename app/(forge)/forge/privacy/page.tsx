@@ -10,7 +10,7 @@ const sections = [
       "When you use FinovaOS or visit finovaforge.com, we may collect the following information:",
       "• Account information: name, email address, company name, and password when you register.",
       "• Usage data: pages visited, features used, and actions taken within the platform.",
-      "• Payment information: processed securely through our payment providers. We do not store card details.",
+      "• Payment information: processed securely through LemonSqueezy (Lemon Squeezy, LLC), our third-party payment provider. We do not store full card numbers, CVV codes, or other sensitive cardholder data on our servers.",
       "• Device data: browser type, IP address, and operating system for security and analytics purposes.",
     ],
   },
@@ -29,7 +29,7 @@ const sections = [
     title: "Data Sharing",
     body: [
       "We do not sell, trade, or rent your personal information to third parties.",
-      "We may share data with trusted service providers who assist in operating our platform (e.g., cloud hosting, payment processing), under strict confidentiality agreements.",
+      "We share data with trusted service providers who assist in operating our platform — including cloud hosting providers and LemonSqueezy (our payment processor) — under strict confidentiality agreements. These providers may only process your data as directed by us.",
       "We may disclose information if required by law or to protect the rights, property, or safety of Finova Forge, our users, or the public.",
     ],
   },
@@ -127,7 +127,7 @@ function Hero() {
           Privacy Policy
         </h1>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,.35)", margin: 0, lineHeight: 1.7 }}>
-          Last updated: May 2026 · Finova Forge
+          Last updated: July 2026 · Finova Forge
         </p>
       </div>
     </section>

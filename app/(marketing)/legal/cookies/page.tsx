@@ -34,11 +34,18 @@ const SECTIONS = [
       "These cookies remember choices like theme, consent preferences, or visitor prompts so that the site feels consistent across visits.",
   },
   {
+    title: "Payment & Checkout Cookies",
+    icon: "💳",
+    color: "#34d399",
+    body:
+      "Payments on FinovaOS are processed by LemonSqueezy (Lemon Squeezy, LLC). When you visit the checkout or payment flow, LemonSqueezy may place its own cookies to handle session security, fraud prevention, and payment processing. These cookies are governed by LemonSqueezy's own privacy and cookie policy. FinovaOS does not control or have access to these cookies.",
+  },
+  {
     title: "Third-Party Services",
     icon: "🌐",
     color: "#a78bfa",
     body:
-      "Some functionality may rely on trusted third-party services such as analytics, embedded content, payment providers, or support tools. Those services may place their own cookies under their own policies.",
+      "Some functionality may rely on trusted third-party services such as analytics, embedded content, payment providers, or support tools. Those services may place their own cookies under their own policies. Current third-party services that may set cookies include: Google Analytics (traffic analytics), Microsoft Clarity (heatmaps and session recording), and LemonSqueezy (payment processing).",
   },
   {
     title: "How To Manage Cookies",
