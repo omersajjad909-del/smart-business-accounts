@@ -53,6 +53,7 @@ export function proxy(req: NextRequest) {
     const { pathname, search } = req.nextUrl;
     const fwdHeaders = new Headers(req.headers);
     fwdHeaders.set("x-nonce", nonce);
+    fwdHeaders.set("x-pathname", req.nextUrl.pathname);
     // Skip rewrite for static files (any path with a file extension like .png, .svg, .ico, .txt, .json, etc.)
     // so /FinovaForge.png resolves to public/FinovaForge.png instead of /forge/FinovaForge.png.
     const isStaticFile = /\.[a-z0-9]+$/i.test(pathname);
@@ -75,6 +76,7 @@ export function proxy(req: NextRequest) {
 
   const headers = new Headers(req.headers);
   headers.set("x-nonce", nonce);
+  headers.set("x-pathname", req.nextUrl.pathname);
 
   // 🔥 Clear incoming sensitive headers to prevent spoofing
   headers.delete("x-user-id");

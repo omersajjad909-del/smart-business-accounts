@@ -52,6 +52,11 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: SECURITY_HEADERS,
       },
+      // Private paths: block indexing via header (belt-and-suspenders with robots.txt)
+      {
+        source: "/(auth|admin|dashboard|onboarding)/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
       {
         // Cache static assets for 1 year
         source: "/_next/static/(.*)",

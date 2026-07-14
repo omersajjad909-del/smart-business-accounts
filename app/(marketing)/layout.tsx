@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Navbar from "./landing/components/navbar";
 import Offer from "./landing/components/Offer";
 import Footer from "./landing/components/Footer";
@@ -10,7 +11,11 @@ import VisitorTracker from "./landing/components/VisitorTracker";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://www.finovaos.app";
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const pathname = (await headers()).get("x-pathname") ?? "/";
+
+  return {
+  alternates: { canonical: `${BASE}${pathname}` },
   metadataBase: new URL(BASE),
   title: {
     default: "FinovaOS — Cloud Accounting Software for Pakistan & Gulf SMEs",
@@ -51,7 +56,8 @@ export const metadata: Metadata = {
     images: [`${BASE}/icon.png`],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } },
-};
+  };
+}
 
 export default function MarketingLayout({
   children,
