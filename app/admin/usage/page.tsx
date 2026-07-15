@@ -5,323 +5,250 @@ import { getCurrentUser } from "@/lib/auth";
 
 type UsageRow = Record<string, string | number | null>;
 
+function formatDate(value: string | number | null) {
+  if (!value) return "Never";
+  return new Date(String(value)).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function formatMoney(v: string | number | null) {
+  return `$${Number(v || 0).toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
+}
+
+function PlanBadge({ plan }: { plan: string }) {
+  const colors: Record<string, { bg: string; text: string }> = {
+    STARTER:    { bg: "rgba(100,116,139,.2)", text: "#94a3b8" },
+    PRO:        { bg: "rgba(99,102,241,.2)",  text: "#818cf8" },
+    ENTERPRISE: { bg: "rgba(56,189,248,.18)", text: "#38bdf8" },
+  };
+  const c = colors[String(plan || "").toUpperCase()] ?? { bg: "rgba(255,255,255,.08)", text: "#94a3b8" };
+  return (
+    <span style={{ padding: "2px 9px", borderRadius: 20, fontSize: 10, fontWeight: 800, letterSpacing: ".05em", background: c.bg, color: c.text }}>
+      {plan || "—"}
+    </span>
+  );
+}
+
 export default function AdminUsagePage() {
-  const [active, setActive] = useState<UsageRow[] | null>(null);
-  const [risk, setRisk] = useState<UsageRow[] | null>(null);
+  const [active,      setActive]      = useState<UsageRow[] | null>(null);
+  const [risk,        setRisk]        = useState<UsageRow[] | null>(null);
   const [highInvoice, setHighInvoice] = useState<UsageRow[] | null>(null);
 
   useEffect(() => {
-    let activePage = true;
+    let alive = true;
+    const u = getCurrentUser();
+    const headers: Record<string, string> = {};
+    if (u?.role)      headers["x-user-role"]   = u.role;
+    if (u?.id)        headers["x-user-id"]      = u.id;
+    if (u?.companyId) headers["x-company-id"]   = u.companyId;
+    const opts = { cache: "no-store" as const, headers, credentials: "include" as const };
 
-    const load = async () => {
-      const u = getCurrentUser();
-      const headers: Record<string, string> = {};
-      if (u?.role) headers["x-user-role"] = u.role;
-      if (u?.id) headers["x-user-id"] = u.id;
-      if (u?.companyId) headers["x-company-id"] = u.companyId;
+    Promise.all([
+      fetch("/api/admin/usage/top-active",  opts).then(r => r.ok ? r.json() : { rows: [] }),
+      fetch("/api/admin/usage/at-risk?days=14", opts).then(r => r.ok ? r.json() : { rows: [] }),
+      fetch("/api/admin/usage/high-invoice", opts).then(r => r.ok ? r.json() : { rows: [] }),
+    ]).then(([a, r, h]) => {
+      if (!alive) return;
+      setActive(a?.rows ?? []);
+      setRisk(r?.rows ?? []);
+      setHighInvoice(h?.rows ?? []);
+    }).catch(() => {
+      if (!alive) return;
+      setActive([]); setRisk([]); setHighInvoice([]);
+    });
 
-      try {
-        const response = await fetch("/api/admin/usage/top-active", {
-          cache: "no-store",
-          headers,
-          credentials: "include" as RequestCredentials,
-        });
-        const json = await response.json();
-        if (activePage) setActive(response.ok ? json.rows : []);
-      } catch {
-        if (activePage) setActive([]);
-      }
-
-      try {
-        const response = await fetch("/api/admin/usage/at-risk?days=14", {
-          cache: "no-store",
-          headers,
-          credentials: "include" as RequestCredentials,
-        });
-        const json = await response.json();
-        if (activePage) setRisk(response.ok ? json.rows : []);
-      } catch {
-        if (activePage) setRisk([]);
-      }
-
-      try {
-        const response = await fetch("/api/admin/usage/high-invoice", {
-          cache: "no-store",
-          headers,
-          credentials: "include" as RequestCredentials,
-        });
-        const json = await response.json();
-        if (activePage) setHighInvoice(response.ok ? json.rows : []);
-      } catch {
-        if (activePage) setHighInvoice([]);
-      }
-    };
-
-    load();
-    return () => {
-      activePage = false;
-    };
+    return () => { alive = false; };
   }, []);
 
   const stats = [
-    { label: "Top Active", value: active?.length ?? 0, helper: "Last 7 days" },
-    { label: "At Risk", value: risk?.length ?? 0, helper: "No recent usage" },
-    { label: "High Invoice", value: highInvoice?.length ?? 0, helper: "30 day leaders" },
+    { label: "Top Active",   value: active?.length       ?? 0, color: "#34d399", sub: "Last 7 days" },
+    { label: "At Risk",      value: risk?.length         ?? 0, color: "#f87171", sub: "No activity 14+ days" },
+    { label: "High Invoice", value: highInvoice?.length  ?? 0, color: "#fbbf24", sub: "30-day volume leaders" },
   ];
 
   return (
-    <div className="usage-page">
-      <style>{styles}</style>
+    <div style={{ fontFamily: "'Outfit','DM Sans',sans-serif", color: "white", padding: "0 0 80px" }}>
+      <style>{css}</style>
 
-      <div className="usage-header">
-        <div>
-          <h1>Usage Insights</h1>
-          <p>Live activity, risky accounts, and invoice-heavy companies from the current admin data.</p>
-        </div>
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800 }}>Usage Insights</h1>
+        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>
+          Live activity, risky accounts, and invoice-heavy companies.
+        </p>
       </div>
 
-      <div className="usage-stats">
-        {stats.map((item) => (
-          <article key={item.label} className="usage-stat">
-            <span>{item.label}</span>
-            <strong>{item.value}</strong>
-            <small>{item.helper}</small>
-          </article>
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
+        {stats.map(s => (
+          <div key={s.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+            <div style={{ fontSize: 30, fontWeight: 800, color: s.color }}>{s.value}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.65)", marginTop: 6 }}>{s.label}</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 3 }}>{s.sub}</div>
+          </div>
         ))}
       </div>
 
-      <div className="usage-grid">
-        <section className="usage-card">
-          <div className="usage-card-head">
-            <h2>Top 10 Most Active (7d)</h2>
-            <span>Real traces</span>
+      {/* Top 2 in a grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+        {/* Top Active */}
+        <div style={card}>
+          <div style={cardHead}>
+            <span style={{ fontSize: 15, fontWeight: 800 }}>Top 10 Most Active (7d)</span>
+            <span style={{ fontSize: 11, color: "#a78bfa", fontWeight: 700 }}>REAL TRACES</span>
           </div>
-          <UsageTable
-            rows={active}
-            cols={[
-              { k: "name", t: "Company" },
-              { k: "country", t: "Country" },
-              { k: "activity", t: "Usage", r: true },
-              { k: "sessions7d", t: "Sessions", r: true },
-            ]}
-          />
-        </section>
+          {!active ? (
+            <div style={emptyState}>Loading…</div>
+          ) : active.length === 0 ? (
+            <div style={emptyState}>No activity in last 7 days</div>
+          ) : (
+            <table style={tableStyle}>
+              <thead>
+                <tr>{["#", "Company", "Country", "Usage", "Sessions"].map(h => (
+                  <th key={h} style={thStyle}>{h}</th>
+                ))}</tr>
+              </thead>
+              <tbody>
+                {active.map((row, i) => (
+                  <tr key={String(row.id || i)} className="u-row">
+                    <td style={{ ...tdStyle, color: "rgba(255,255,255,.3)", fontSize: 12, width: 28 }}>{i + 1}</td>
+                    <td style={tdStyle}>
+                      <a href={`/admin/companies/${row.id}`} style={{ color: "#818cf8", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
+                        {String(row.name || "—")}
+                      </a>
+                    </td>
+                    <td style={{ ...tdStyle, fontSize: 12, color: "rgba(255,255,255,.5)" }}>{String(row.country || "—")}</td>
+                    <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700, color: "#34d399" }}>{String(row.activity ?? "—")}</td>
+                    <td style={{ ...tdStyle, textAlign: "right", color: "rgba(255,255,255,.5)" }}>{String(row.sessions7d ?? "—")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
 
-        <section className="usage-card">
-          <div className="usage-card-head">
-            <h2>At-Risk (no activity &gt;= 14d)</h2>
-            <span>Latest seen</span>
+        {/* At Risk */}
+        <div style={card}>
+          <div style={cardHead}>
+            <span style={{ fontSize: 15, fontWeight: 800 }}>At-Risk (no activity ≥ 14d)</span>
+            <span style={{ fontSize: 11, color: "#f87171", fontWeight: 700 }}>NEEDS ATTENTION</span>
           </div>
-          <UsageTable
-            rows={risk}
-            cols={[
-              { k: "name", t: "Company" },
-              { k: "plan", t: "Plan" },
-              { k: "lastLogin", t: "Last Seen", fmt: (v) => (v ? formatDate(v) : "Never") },
-            ]}
-          />
-        </section>
+          {!risk ? (
+            <div style={emptyState}>Loading…</div>
+          ) : risk.length === 0 ? (
+            <div style={emptyState}>No at-risk accounts</div>
+          ) : (
+            <table style={tableStyle}>
+              <thead>
+                <tr>{["Company", "Plan", "Last Seen"].map(h => (
+                  <th key={h} style={thStyle}>{h}</th>
+                ))}</tr>
+              </thead>
+              <tbody>
+                {risk.map((row, i) => (
+                  <tr key={String(row.id || i)} className="u-row">
+                    <td style={tdStyle}>
+                      <a href={`/admin/companies/${row.id}`} style={{ color: "#f87171", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
+                        {String(row.name || "—")}
+                      </a>
+                    </td>
+                    <td style={tdStyle}><PlanBadge plan={String(row.plan || "")} /></td>
+                    <td style={{ ...tdStyle, fontSize: 12, color: "rgba(255,255,255,.45)" }}>
+                      {formatDate(row.lastLogin as string | null)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
 
-        <section className="usage-card usage-card--wide">
-          <div className="usage-card-head">
-            <h2>High Invoice Volume (30d)</h2>
-            <span>Invoice output</span>
-          </div>
-          <UsageTable
-            rows={highInvoice}
-            cols={[
-              { k: "name", t: "Company" },
-              { k: "country", t: "Country" },
-              { k: "invoices", t: "Invoices", r: true },
-              { k: "amount", t: "Amount", r: true, fmt: (v) => `$${Number(v || 0).toFixed(0)}` },
-            ]}
-          />
-        </section>
+      {/* High Invoice — full width */}
+      <div style={card}>
+        <div style={cardHead}>
+          <span style={{ fontSize: 15, fontWeight: 800 }}>High Invoice Volume (30d)</span>
+          <span style={{ fontSize: 11, color: "#fbbf24", fontWeight: 700 }}>BILLING LEADERS</span>
+        </div>
+        {!highInvoice ? (
+          <div style={emptyState}>Loading…</div>
+        ) : highInvoice.length === 0 ? (
+          <div style={emptyState}>No invoices in last 30 days</div>
+        ) : (
+          <table style={tableStyle}>
+            <thead>
+              <tr>{["Company", "Country", "Invoices", "Amount"].map(h => (
+                <th key={h} style={h === "Amount" || h === "Invoices" ? { ...thStyle, textAlign: "right" } : thStyle}>{h}</th>
+              ))}</tr>
+            </thead>
+            <tbody>
+              {highInvoice.map((row, i) => (
+                <tr key={String(row.id || i)} className="u-row">
+                  <td style={tdStyle}>
+                    <a href={`/admin/companies/${row.id}`} style={{ color: "#fbbf24", fontWeight: 700, fontSize: 13, textDecoration: "none" }} className="u-link">
+                      {String(row.name || "—")}
+                    </a>
+                  </td>
+                  <td style={{ ...tdStyle, fontSize: 12, color: "rgba(255,255,255,.5)" }}>{String(row.country || "—")}</td>
+                  <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700 }}>{String(row.invoices ?? "—")}</td>
+                  <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700, color: "#34d399" }}>
+                    {formatMoney(row.amount as number | null)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
 }
 
-function UsageTable({
-  rows,
-  cols,
-}: {
-  rows: UsageRow[] | null;
-  cols: Array<{ k: string; t: string; r?: boolean; fmt?: (value: string | number | null) => string }>;
-}) {
-  if (!rows) return <div className="usage-empty">Loading...</div>;
-  if (rows.length === 0) return <div className="usage-empty">No live data found</div>;
+const card: React.CSSProperties = {
+  background: "linear-gradient(160deg, rgba(19,27,50,.98), rgba(15,22,42,.98))",
+  border: "1px solid rgba(255,255,255,.08)",
+  borderRadius: 20,
+  padding: "20px 22px",
+  boxShadow: "0 16px 40px rgba(3,8,21,.22)",
+};
 
-  return (
-    <div className="usage-table-wrap">
-      <table className="usage-table">
-        <thead>
-          <tr>
-            {cols.map((col) => (
-              <th key={col.k} className={col.r ? "is-right" : ""}>
-                {col.t}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, index) => (
-            <tr key={`${String(row.id || row.name)}-${index}`}>
-              {cols.map((col) => (
-                <td key={col.k} className={col.r ? "is-right" : ""}>
-                  {col.fmt ? col.fmt((row[col.k] as string | number | null) ?? null) : String(row[col.k] ?? "-")}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+const cardHead: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: 16,
+  paddingBottom: 12,
+  borderBottom: "1px solid rgba(255,255,255,.06)",
+};
 
-function formatDate(value: string | number | null) {
-  if (!value) return "Never";
-  return new Date(String(value)).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
+const tableStyle: React.CSSProperties = {
+  width: "100%",
+  borderCollapse: "collapse",
+};
 
-const styles = `
-.usage-page{
-  display:grid;
-  gap:18px;
-}
-.usage-header h1{
-  margin:0;
-  font-size:34px;
-  font-weight:800;
-  letter-spacing:-.05em;
-}
-.usage-header p{
-  margin:6px 0 0;
-  color:rgba(203,213,225,.72);
-  font-size:14px;
-}
-.usage-stats{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:16px;
-}
-.usage-stat,.usage-card{
-  border-radius:22px;
-  border:1px solid rgba(255,255,255,.08);
-  background:linear-gradient(180deg, rgba(19,27,46,.98), rgba(15,22,39,.96));
-  box-shadow:0 24px 70px rgba(3,6,18,.22);
-}
-.usage-stat{
-  padding:18px;
-}
-.usage-stat span{
-  font-size:13px;
-  color:rgba(203,213,225,.72);
-}
-.usage-stat strong{
-  display:block;
-  margin-top:10px;
-  font-size:34px;
-  line-height:1;
-}
-.usage-stat small{
-  display:block;
-  margin-top:8px;
-  color:#86efac;
-  font-size:12px;
-  font-weight:700;
-}
-.usage-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:16px;
-}
-.usage-card{
-  padding:18px;
-}
-.usage-card--wide{
-  grid-column:1 / -1;
-}
-.usage-card-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:14px;
-}
-.usage-card-head h2{
-  margin:0;
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:-.03em;
-}
-.usage-card-head span{
-  color:#bca9ff;
-  font-size:12px;
-  font-weight:700;
-}
-.usage-table-wrap{
-  overflow:auto;
-}
-.usage-table{
-  width:100%;
-  min-width:520px;
-  border-collapse:collapse;
-}
-.usage-table th,.usage-table td{
-  padding:12px 0;
-  border-bottom:1px solid rgba(255,255,255,.06);
-  text-align:left;
-}
-.usage-table th{
-  color:rgba(148,163,184,.72);
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-}
-.usage-table td{
-  color:#e2e8f0;
-  font-size:13px;
-}
-.usage-table .is-right{
-  text-align:right;
-}
-.usage-empty{
-  padding:16px 0;
-  color:rgba(148,163,184,.72);
-  font-size:13px;
-}
-@media (max-width: 1100px){
-  .usage-stats,
-  .usage-grid{
-    grid-template-columns:1fr;
-  }
-  .usage-card--wide{
-    grid-column:auto;
-  }
-}
-@media (max-width: 640px){
-  .usage-header h1{
-    font-size:26px;
-  }
-  .usage-stat{
-    padding:14px;
-  }
-  .usage-stat strong{
-    font-size:28px;
-  }
-  .usage-card{
-    padding:14px;
-    border-radius:18px;
-  }
-  .usage-card-head{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-}
+const thStyle: React.CSSProperties = {
+  padding: "0 0 10px",
+  fontSize: 10,
+  fontWeight: 700,
+  color: "rgba(148,163,184,.6)",
+  textTransform: "uppercase",
+  letterSpacing: ".08em",
+  textAlign: "left",
+};
+
+const tdStyle: React.CSSProperties = {
+  padding: "10px 0",
+  fontSize: 13,
+  borderBottom: "1px solid rgba(255,255,255,.05)",
+};
+
+const emptyState: React.CSSProperties = {
+  padding: "24px 0",
+  textAlign: "center",
+  color: "rgba(255,255,255,.3)",
+  fontSize: 13,
+};
+
+const css = `
+  .u-row:hover td { background:rgba(255,255,255,.02); }
+  .u-link:hover { text-decoration:underline !important; }
+  @media(max-width:900px){ .u-grid { grid-template-columns:1fr !important; } }
 `;

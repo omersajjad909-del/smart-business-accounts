@@ -8,69 +8,87 @@ type RevenuePayload = {
   planDistribution: { starter: number; pro: number; enterprise: number };
 };
 
+type FinancePayload = {
+  active: { starter: number; pro: number; enterprise: number };
+  mrr: number;
+  arr: number;
+};
+
+function fmtMoney(n: number) {
+  if (n >= 1000) return `$${(n / 1000).toFixed(1)}k`;
+  return `$${n.toFixed(0)}`;
+}
+
 export default function AdminRevenuePage() {
-  const [data, setData] = useState<RevenuePayload | null>(null);
+  const [data, setData]       = useState<RevenuePayload | null>(null);
+  const [finance, setFinance] = useState<FinancePayload | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
+    const u = getCurrentUser();
+    const headers: Record<string, string> = {};
+    if (u?.role) headers["x-user-role"] = u.role;
+    if (u?.id)   headers["x-user-id"]   = u.id;
+    if (u?.companyId) headers["x-company-id"] = u.companyId;
 
-    (async () => {
-      try {
-        const u = getCurrentUser();
-        const headers: Record<string, string> = {};
-        if (u?.role) headers["x-user-role"] = u.role;
-        if (u?.id) headers["x-user-id"] = u.id;
-        if (u?.companyId) headers["x-company-id"] = u.companyId;
+    Promise.all([
+      fetch("/api/admin/web/revenue", { cache: "no-store", headers, credentials: "include" }).then(r => r.ok ? r.json() : null),
+      fetch("/api/admin/web/finance", { cache: "no-store", headers, credentials: "include" }).then(r => r.ok ? r.json() : null),
+    ]).then(([rev, fin]) => {
+      if (!active) return;
+      setData(rev ?? { mrrSeries: [], planDistribution: { starter: 0, pro: 0, enterprise: 0 } });
+      setFinance(fin ?? { active: { starter: 0, pro: 0, enterprise: 0 }, mrr: 0, arr: 0 });
+    }).catch(() => {
+      if (!active) return;
+      setData({ mrrSeries: [], planDistribution: { starter: 0, pro: 0, enterprise: 0 } });
+      setFinance({ active: { starter: 0, pro: 0, enterprise: 0 }, mrr: 0, arr: 0 });
+    }).finally(() => { if (active) setLoading(false); });
 
-        const r = await fetch("/api/admin/web/revenue", {
-          cache: "no-store",
-          headers,
-          credentials: "include" as RequestCredentials,
-        });
-
-        if (!active) return;
-
-        if (r.ok) {
-          setData(await r.json());
-        } else {
-          setData({
-            mrrSeries: [],
-            planDistribution: { starter: 0, pro: 0, enterprise: 0 },
-          });
-        }
-      } catch {
-        if (!active) return;
-        setData({
-          mrrSeries: [],
-          planDistribution: { starter: 0, pro: 0, enterprise: 0 },
-        });
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, []);
 
+  const totalActive = finance
+    ? finance.active.starter + finance.active.pro + finance.active.enterprise
+    : 0;
+
+  const kpis = [
+    { label: "MRR",            val: fmtMoney(finance?.mrr ?? 0),   color: "#34d399", sub: "This month" },
+    { label: "ARR",            val: fmtMoney(finance?.arr ?? 0),   color: "#818cf8", sub: "Annualized" },
+    { label: "Active Accounts",val: String(totalActive),            color: "#38bdf8", sub: "Paid subscriptions" },
+    { label: "Enterprise",     val: String(finance?.active.enterprise ?? 0), color: "#fbbf24", sub: "Top-tier" },
+  ];
+
   const planBars = [
-    { label: "Starter", value: data?.planDistribution.starter ?? 0, color: "#6d7c97" },
-    { label: "Pro", value: data?.planDistribution.pro ?? 0, color: "#6b63ff" },
+    { label: "Starter",    value: data?.planDistribution.starter    ?? 0, color: "#6d7c97" },
+    { label: "Pro",        value: data?.planDistribution.pro        ?? 0, color: "#6b63ff" },
     { label: "Enterprise", value: data?.planDistribution.enterprise ?? 0, color: "#1fa0de" },
   ];
+  const maxPlan = Math.max(...planBars.map(b => b.value), 1);
 
   return (
     <div className="revenue-page">
       <style>{styles}</style>
 
       <div className="revenue-shell">
-        <div className="revenue-header">
-          <h1>Revenue Analytics</h1>
+        <div style={{ marginBottom: 28 }}>
+          <h1 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 800, color: "#f8fafc" }}>Revenue Analytics</h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.4)" }}>Live revenue trends, plan distribution, and billing overview.</p>
+        </div>
+
+        {/* KPI Row */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 28 }}>
+          {kpis.map(k => (
+            <div key={k.label} style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 16, padding: "20px 22px" }}>
+              <div style={{ fontSize: 26, fontWeight: 800, color: k.color }}>{loading ? "—" : k.val}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.55)", marginTop: 4 }}>{k.label}</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>{k.sub}</div>
+            </div>
+          ))}
         </div>
 
         <div className="revenue-grid">
+          {/* MRR Chart */}
           <section className="revenue-card">
             <h2>MRR Growth (last 6 months)</h2>
             <div className="chart-frame">
@@ -78,25 +96,34 @@ export default function AdminRevenuePage() {
             </div>
           </section>
 
+          {/* Plan Distribution */}
           <section className="revenue-card">
             <h2>Plan Distribution (Active)</h2>
             <div className="bars-wrap">
-              {planBars.map((item) => (
-                <div key={item.label} className="bar-row">
-                  <div className="bar-label">{item.label}</div>
-                  <div className="bar-track">
-                    <div
-                      className="bar-fill"
-                      style={{
-                        width: `${computePercent(item.value, planBars)}%`,
-                        background: item.color,
-                      }}
-                    >
-                      <span>{loading ? "..." : item.value}</span>
-                    </div>
+              {planBars.map(item => (
+                <div key={item.label} style={{ marginBottom: 18 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 7, fontSize: 13 }}>
+                    <span style={{ fontWeight: 700, color: "#fffaf0" }}>{item.label}</span>
+                    <span style={{ color: "rgba(255,255,255,.5)", fontWeight: 600 }}>{loading ? "—" : item.value} accounts</span>
+                  </div>
+                  <div style={{ height: 10, borderRadius: 999, background: "rgba(255,255,255,.07)", overflow: "hidden" }}>
+                    <div style={{
+                      width: loading ? "0%" : `${Math.max((item.value / maxPlan) * 100, item.value > 0 ? 8 : 0)}%`,
+                      height: "100%",
+                      borderRadius: 999,
+                      background: item.color,
+                      transition: "width .5s ease",
+                    }} />
                   </div>
                 </div>
               ))}
+
+              {/* Summary totals */}
+              <div style={{ marginTop: 24, padding: "14px 16px", background: "rgba(255,255,255,.03)", borderRadius: 12, border: "1px solid rgba(255,255,255,.06)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.35)", letterSpacing: ".07em", marginBottom: 10 }}>TOTAL ACTIVE</div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: "#34d399" }}>{loading ? "—" : totalActive}</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 3 }}>paid subscriptions</div>
+              </div>
             </div>
           </section>
         </div>
@@ -105,199 +132,104 @@ export default function AdminRevenuePage() {
   );
 }
 
-function computePercent(value: number, all: { value: number }[]) {
-  const max = Math.max(...all.map((item) => item.value), 1);
-  return Math.max(16, (value / max) * 100);
-}
+function RevenueLineChart({ rows, loading }: { rows: { label: string; value: number }[]; loading: boolean }) {
+  const safeRows = rows.length ? rows : [
+    { label: "—", value: 0 }, { label: "—", value: 0 }, { label: "—", value: 0 },
+    { label: "—", value: 0 }, { label: "—", value: 0 }, { label: "—", value: 0 },
+  ];
 
-function RevenueLineChart({ rows, loading }: { rows: RevenuePayload["mrrSeries"]; loading: boolean }) {
-  const safeRows = rows.length
-    ? rows
-    : [
-        { label: "2025-11", value: 0 },
-        { label: "2025-12", value: 0 },
-        { label: "2026-01", value: 0 },
-        { label: "2026-02", value: 0 },
-        { label: "2026-03", value: 0 },
-        { label: "2026-04", value: 0 },
-      ];
+  const W = 760, H = 260;
+  const PX = 28, PT = 20, PB = 36;
+  const cH = H - PT - PB, cW = W - PX * 2;
+  const max = Math.max(...safeRows.map(r => r.value), 1);
 
-  const width = 760;
-  const height = 290;
-  const paddingX = 20;
-  const paddingTop = 24;
-  const paddingBottom = 38;
-  const chartHeight = height - paddingTop - paddingBottom;
-  const chartWidth = width - paddingX * 2;
-  const max = Math.max(...safeRows.map((row) => row.value), 1);
+  const points = safeRows.map((r, i) => ({
+    x: PX + (i / Math.max(1, safeRows.length - 1)) * cW,
+    y: PT + cH - (r.value / max) * (cH * 0.82),
+    label: r.label,
+    value: r.value,
+  }));
 
-  const points = safeRows.map((row, index) => {
-    const x = paddingX + (index / Math.max(1, safeRows.length - 1)) * chartWidth;
-    const y = paddingTop + chartHeight - (row.value / max) * (chartHeight * 0.78 + 1);
-    return { x, y, label: row.label, value: row.value };
-  });
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+  const areaPath = `${linePath} L ${points[points.length - 1].x} ${PT + cH} L ${points[0].x} ${PT + cH} Z`;
 
-  const path = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+  const gradId = "revGrad";
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="line-chart" aria-hidden="true">
-      <rect x="1" y="1" width={width - 2} height={height - 2} rx="8" fill="none" stroke="rgba(255,255,255,.85)" />
-      <path d={path} fill="none" stroke="#1f2eff" strokeWidth="3" strokeLinecap="round" />
-      {points.map((point) => (
-        <g key={point.label}>
-          <circle cx={point.x} cy={point.y} r="5" fill="#1f2eff" />
-          <text x={point.x} y={height - 12} textAnchor="middle" fontSize="13" fill="rgba(166,176,197,.8)">
-            {point.label}
+    <svg viewBox={`0 0 ${W} ${H}`} className="line-chart" aria-hidden="true">
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#6366f1" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      {/* Grid lines */}
+      {[0.25, 0.5, 0.75, 1].map(p => {
+        const y = PT + cH - p * cH * 0.82;
+        return (
+          <line key={p} x1={PX} y1={y} x2={W - PX} y2={y} stroke="rgba(255,255,255,.06)" strokeWidth="1" />
+        );
+      })}
+
+      {/* Area fill */}
+      <path d={areaPath} fill={`url(#${gradId})`} />
+
+      {/* Line */}
+      <path d={linePath} fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+
+      {/* Points + labels */}
+      {points.map((p, i) => (
+        <g key={i}>
+          <circle cx={p.x} cy={p.y} r="4.5" fill="#6366f1" stroke="#0a0f1e" strokeWidth="2" />
+          {p.value > 0 && (
+            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="11" fill="rgba(255,255,255,.7)" fontWeight="700">
+              ${p.value.toLocaleString()}
+            </text>
+          )}
+          <text x={p.x} y={H - 8} textAnchor="middle" fontSize="11" fill="rgba(148,163,184,.7)">
+            {p.label}
           </text>
         </g>
       ))}
-      {loading ? (
-        <text x={paddingX + 8} y={paddingTop + 18} fontSize="14" fill="rgba(255,255,255,.74)">
-          Loading...
+
+      {loading && (
+        <text x={PX + 10} y={PT + 20} fontSize="13" fill="rgba(255,255,255,.4)">Loading…</text>
+      )}
+
+      {!loading && max === 1 && (
+        <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="13" fill="rgba(255,255,255,.25)">
+          No payment events recorded yet
         </text>
-      ) : null}
+      )}
     </svg>
   );
 }
 
 const styles = `
-.revenue-page{
-  min-height:100%;
-}
-.revenue-shell{
-  max-width:1520px;
-  margin:0 auto;
-  padding:18px 4px 80px;
-}
-.revenue-header{
-  margin-bottom:22px;
-}
-.revenue-header h1{
-  margin:0;
-  color:#f8fafc;
-  font-size:34px;
-  line-height:1;
-  font-weight:800;
-  letter-spacing:-.05em;
-}
-.revenue-header::after{
-  content:"Live revenue trends and active plan split.";
-  display:block;
-  margin-top:8px;
-  color:rgba(226,232,240,.62);
-  font-size:13px;
-  font-weight:500;
-}
-.revenue-grid{
+.revenue-page { min-height:100%; font-family:'Outfit','DM Sans',sans-serif; color:white; }
+.revenue-shell { max-width:1520px; margin:0 auto; padding:0 0 80px; }
+.revenue-grid {
   display:grid;
-  grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);
-  gap:30px;
+  grid-template-columns:minmax(0,1.3fr) minmax(0,0.7fr);
+  gap:20px;
 }
-.revenue-card{
-  min-height:365px;
-  padding:26px 24px 22px;
-  border-radius:26px;
-  background:linear-gradient(180deg, rgba(27,39,72,.98), rgba(26,36,67,.98));
+.revenue-card {
+  padding:24px;
+  border-radius:20px;
+  background:linear-gradient(160deg, rgba(22,32,60,.98), rgba(18,26,50,.98));
   border:1px solid rgba(255,255,255,.08);
-  box-shadow:0 22px 50px rgba(3,8,21,.32);
+  box-shadow:0 16px 40px rgba(3,8,21,.28);
 }
-.revenue-card h2{
-  margin:0 0 18px;
-  color:#fffaf0;
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:-.03em;
-}
-.chart-frame{
-  margin-top:6px;
-  border-radius:10px;
-  overflow:hidden;
-}
-.line-chart{
-  width:100%;
-  height:auto;
-  display:block;
-}
-.bars-wrap{
-  display:grid;
-  gap:16px;
-  margin-top:30px;
-}
-.bar-row{
-  display:grid;
-  grid-template-columns:120px minmax(0,1fr);
-  align-items:center;
-  gap:16px;
-}
-.bar-label{
+.revenue-card h2 {
+  margin:0 0 20px;
   color:#fffaf0;
   font-size:16px;
   font-weight:800;
+  letter-spacing:-.02em;
 }
-.bar-track{
-  height:30px;
-  border-radius:999px;
-  background:#d8dbe2;
-  overflow:hidden;
-}
-.bar-fill{
-  height:100%;
-  min-width:66px;
-  border-radius:999px;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  padding-right:12px;
-  transition:width .3s ease;
-}
-.bar-fill span{
-  color:white;
-  font-size:14px;
-  font-weight:800;
-}
-@media (max-width: 1100px){
-  .revenue-grid{
-    grid-template-columns:1fr;
-  }
-}
-@media (max-width: 640px){
-  .revenue-shell{
-    padding:4px 0 120px;
-  }
-  .revenue-header{
-    margin-bottom:16px;
-  }
-  .revenue-header h1{
-    font-size:28px;
-    color:#f8fafc;
-  }
-  .revenue-grid{
-    gap:14px;
-  }
-  .revenue-card{
-    min-height:auto;
-    padding:16px 14px;
-    border-radius:18px;
-  }
-  .revenue-card h2{
-    font-size:17px;
-  }
-  .revenue-header::after{
-    font-size:12px;
-  }
-  .bars-wrap{
-    gap:14px;
-    margin-top:10px;
-  }
-  .bar-row{
-    grid-template-columns:1fr;
-    gap:8px;
-  }
-  .bar-label{
-    font-size:14px;
-  }
-  .bar-track{
-    height:28px;
-  }
-}
+.chart-frame { border-radius:12px; overflow:hidden; }
+.line-chart { width:100%; height:auto; display:block; }
+.bars-wrap { padding-top:4px; }
+@media (max-width:1100px) { .revenue-grid { grid-template-columns:1fr; } }
 `;

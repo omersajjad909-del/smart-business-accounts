@@ -1,38 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { resolveCompanyId } from "@/lib/tenant";
-import { apiHasPermission } from "@/lib/apiPermission";
-import { PERMISSIONS } from "@/lib/permissions";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
-    const userRole = req.headers.get("x-user-role");
-    const companyId = await resolveCompanyId(req);
-    if (!companyId) {
-      return NextResponse.json({ error: "Company required" }, { status: 400 });
-    }
-    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.MANAGE_USERS, companyId);
-    if (!allowed) {
+    const userRole = String(req.headers.get("x-user-role") || "").toUpperCase();
+    if (userRole !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Latest session per user in this company
     const sessions = await prisma.session.findMany({
-      where: { companyId },
-      include: { user: true },
+      include: {
+        user: { select: { name: true, email: true, role: true } },
+        company: { select: { name: true } },
+      },
       orderBy: { createdAt: "desc" },
       distinct: ["userId"],
+      take: 500,
     } as any);
 
-    const rows = sessions.map((s) => ({
+    const rows = (sessions as any[]).map((s) => ({
       userId: s.userId,
-      name: (s as any).user?.name || "",
-      email: (s as any).user?.email || "",
-      role: (s as any).user?.role || "",
+      name: s.user?.name || "",
+      email: s.user?.email || "",
+      role: s.user?.role || "",
+      companyId: s.companyId || "",
+      companyName: s.company?.name || "",
       lastLogin: s.createdAt,
-      ip: (s as any).ip || "",
-      userAgent: (s as any).userAgent || "",
+      ip: s.ip || "",
+      userAgent: s.userAgent || "",
     }));
 
     return NextResponse.json({ sessions: rows });

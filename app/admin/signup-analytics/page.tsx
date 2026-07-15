@@ -12,6 +12,7 @@ type SignupData = {
   teamSizes: Slice[];
   plans: Slice[];
   businessTypes: Slice[];
+  countries: Slice[];
   signupsByDay: Daily[];
 };
 
@@ -87,11 +88,12 @@ export default function AdminSignupAnalyticsPage() {
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 16 }}>
-            <BreakdownCard title="Referral Sources" items={data.referralSources} color="#818cf8" />
-            <BreakdownCard title="Team Sizes"       items={data.teamSizes}       color="#f472b6" />
-            <BreakdownCard title="Plans"            items={data.plans}           color="#34d399" />
-            <BreakdownCard title="Top Business Types" items={data.businessTypes} color="#fbbf24" />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 16 }}>
+            <BreakdownCard title="Referral Sources"   items={data.referralSources} color="#818cf8" />
+            <BreakdownCard title="Team Sizes"         items={data.teamSizes}       color="#f472b6" />
+            <BreakdownCard title="Plans"              items={data.plans}           color="#34d399" />
+            <BreakdownCard title="Top Business Types" items={data.businessTypes}   color="#fbbf24" />
+            <BreakdownCard title="Top Countries"      items={data.countries ?? []} color="#38bdf8" />
           </div>
         </>
       )}

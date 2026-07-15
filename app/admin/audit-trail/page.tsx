@@ -93,11 +93,17 @@ export default function AdminAuditTrailPage() {
       </div>
 
       {pending && (
-        <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(245,158,11,.08)", border: "1px solid rgba(245,158,11,.25)", marginBottom: 24 }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b", marginBottom: 6 }}>⚠️ Migration Required</div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,.6)", lineHeight: 1.7 }}>
-            The <code style={{ background: "rgba(255,255,255,.08)", padding: "2px 6px", borderRadius: 4 }}>AdminActionLog</code> table does not exist yet.
-            Run the migration at <code style={{ background: "rgba(255,255,255,.08)", padding: "2px 6px", borderRadius: 4 }}>prisma/migrations/manual_admin_action_log.sql</code> in your Supabase SQL editor.
+        <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.3)", marginBottom: 24 }}>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#f59e0b", marginBottom: 8 }}>Migration Required — Table Not Yet Created</div>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,.65)", lineHeight: 1.8 }}>
+            The <code style={{ background: "rgba(255,255,255,.08)", padding: "2px 6px", borderRadius: 4, fontFamily: "monospace" }}>AdminActionLog</code> table does not exist in your database yet.<br />
+            Run the SQL file below in your <strong>Supabase SQL Editor</strong> to enable this feature:
+          </div>
+          <div style={{ marginTop: 12, background: "rgba(0,0,0,.3)", borderRadius: 10, padding: "10px 14px", fontFamily: "monospace", fontSize: 12, color: "#fbbf24", border: "1px solid rgba(255,255,255,.08)" }}>
+            prisma/manual_admin_action_log.sql
+          </div>
+          <div style={{ marginTop: 10, fontSize: 12, color: "rgba(255,255,255,.4)" }}>
+            After running the SQL, new admin actions (plan changes, impersonation, etc.) will automatically appear here.
           </div>
         </div>
       )}
