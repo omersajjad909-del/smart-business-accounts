@@ -65,6 +65,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   // ── OTHERS ────────────────────────────────────────────────────────────────
   { id: "feature-flags",    label: "Feature Flags",     href: "/admin/feature-flags",       group: "Others",    short: "FF", icon: "flag" },
   { id: "automation",       label: "Automation",        href: "/admin/automation",          group: "Others",    short: "AU", icon: "spark",  badge: "NEW" },
+  { id: "page-visibility",   label: "Page Visibility",   href: "/admin/page-visibility",     group: "Others",    short: "PV", icon: "monitor" },
   { id: "web-settings",     label: "Web Settings",      href: "/admin/web-settings",        group: "Others",    short: "WS", icon: "monitor" },
   { id: "marketing-autopilot", label: "Autopilot",      href: "/admin/marketing-autopilot", group: "Others",    short: "AI", icon: "spark",  badge: "AI" },
   { id: "fraud",            label: "Fraud Monitor",     href: "/admin/fraud",               group: "Others",    short: "FR", icon: "alert" },
