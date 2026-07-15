@@ -29,6 +29,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { id: "geo",              label: "Geo Analytics",     href: "/admin/geo",                 group: "Analytics", short: "GE", icon: "globe" },
   { id: "geo-countries",    label: "Countries",         href: "/admin/geo/countries",       group: "Analytics", short: "CT", icon: "globe" },
   { id: "signup-analytics", label: "Signup Analytics",  href: "/admin/signup-analytics",    group: "Analytics", short: "SA", icon: "chart" },
+  { id: "funnel",           label: "Funnel Analysis",   href: "/admin/funnel",              group: "Analytics", short: "FN", icon: "chart", badge: "NEW" },
   { id: "usage",            label: "Usage Insights",    href: "/admin/usage",               group: "Analytics", short: "UG", icon: "pulse" },
   { id: "audit-trail",      label: "Audit Trail",       href: "/admin/audit-trail",         group: "Analytics", short: "AT", icon: "list" },
   { id: "web",              label: "Web Metrics",       href: "/admin/web",                 group: "Analytics", short: "WB", icon: "monitor" },
