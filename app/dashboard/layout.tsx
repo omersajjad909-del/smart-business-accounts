@@ -1469,9 +1469,14 @@ export default function DashboardLayout({
           {/* ── PHARMACY ── */}
           {hasModule(businessType, "drug_inventory") && isBusinessEnabled(businessType) && (
             <NavGroup title="Pharmacy" icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.5 20H4a2 2 0 01-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 011.66.9l.82 1.2a2 2 0 001.66.9H20a2 2 0 012 2v3"/><circle cx="18" cy="18" r="3"/><path d="M18 15v6M15 18h6"/></svg>} open={openSection === "pharmacy"} onToggle={() => toggle("pharmacy")}>
-              <NavLink href="/dashboard/pharmacy/inventory" pathname={pathname}>💊 Drug Inventory</NavLink>
-              <NavLink href="/dashboard/pharmacy/prescriptions" pathname={pathname}>📋 Prescriptions</NavLink>
-              <NavLink href="/dashboard/pharmacy/expiry" pathname={pathname}>⚠️ Expiry Tracking</NavLink>
+              {hasDashboardFeature("PHARMACY_OVERVIEW") && <NavLink href="/dashboard/pharmacy" pathname={pathname}>Pharmacy Overview</NavLink>}
+              {hasDashboardFeature("PHARMACY_INVENTORY") && <NavLink href="/dashboard/pharmacy/inventory" pathname={pathname}>Drug Inventory</NavLink>}
+              {hasDashboardFeature("PHARMACY_BATCHES") && <NavLink href="/dashboard/pharmacy/batches" pathname={pathname}>Batch Control</NavLink>}
+              {hasDashboardFeature("PHARMACY_EXPIRY") && <NavLink href="/dashboard/pharmacy/expiry" pathname={pathname}>Expiry Tracking</NavLink>}
+              {hasDashboardFeature("PHARMACY_PURCHASES") && <NavLink href="/dashboard/pharmacy/purchases" pathname={pathname}>Medicine Purchases</NavLink>}
+              {hasDashboardFeature("PHARMACY_PRESCRIPTIONS") && <NavLink href="/dashboard/pharmacy/prescriptions" pathname={pathname}>Prescriptions</NavLink>}
+              {hasDashboardFeature("PHARMACY_COUNTER_SALES") && <NavLink href="/dashboard/pharmacy/counter-sales" pathname={pathname}>Counter Sales</NavLink>}
+              {hasDashboardFeature("PHARMACY_ANALYTICS") && <NavLink href="/dashboard/pharmacy/analytics" pathname={pathname}>Analytics</NavLink>}
             </NavGroup>
           )}
 
@@ -1956,6 +1961,22 @@ export default function DashboardLayout({
               {hasDashboardFeature("TRADING_PRODUCT_CATEGORIES") && <NavLink href="/dashboard/product-categories" pathname={pathname}>Product Categories</NavLink>}
               {hasDashboardFeature("TRADING_WAREHOUSE_TRANSFERS") && <NavLink href="/dashboard/warehouse-transfers" pathname={pathname}>Warehouse Transfers</NavLink>}
               {hasDashboardFeature("TRADING_PURCHASE_REQUISITION") && <NavLink href="/dashboard/purchase-requisition" pathname={pathname}>Purchase Requisition</NavLink>}
+            </NavGroup>
+          )}
+
+          {/* ── WHOLESALE ── */}
+          {!isCustomPlan && (businessType === "wholesale" || businessType === "wholesale_multistore") && (
+            <NavGroup
+              title="Wholesale"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>}
+              open={openSection === "wholesale"}
+              onToggle={() => toggle("wholesale")}
+            >
+              {hasDashboardFeature("WHOLESALE_OVERVIEW") && <NavLink href="/dashboard/wholesale" pathname={pathname}>Wholesale Overview</NavLink>}
+              {hasDashboardFeature("WHOLESALE_SALES_ORDER") && <NavLink href="/dashboard/sales-order" pathname={pathname}>Sales Orders</NavLink>}
+              {hasDashboardFeature("WHOLESALE_PRICE_LISTS") && <NavLink href="/dashboard/price-lists" pathname={pathname}>Price Lists</NavLink>}
+              {hasDashboardFeature("WHOLESALE_CREDIT_LIMITS") && <NavLink href="/dashboard/credit-limits" pathname={pathname}>Credit Limits</NavLink>}
+              {hasDashboardFeature("WHOLESALE_WAREHOUSES") && <NavLink href="/dashboard/warehouses" pathname={pathname}>Warehouses & Transfers</NavLink>}
             </NavGroup>
           )}
 
