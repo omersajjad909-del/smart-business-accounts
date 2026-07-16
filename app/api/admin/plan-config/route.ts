@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
-import { createDefaultDashboardFeatureFlags } from "@/lib/dashboardFeatureRegistry";
+import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags } from "@/lib/dashboardFeatureRegistry";
 
 const ADMIN_ONLY = "ADMIN";
 
@@ -100,6 +100,20 @@ function normalizePlanPermissions(savedPlanPermissions?: Record<string, string[]
   };
 }
 
+function normalizeDashboardFeatureFlags(savedFlags?: Record<string, string[]>) {
+  const defaults = createDefaultDashboardFeatureFlags();
+  const saved = savedFlags || {};
+  const clean = (list: string[] | undefined, fallback: string[]) =>
+    Array.isArray(list) ? list.filter((id) => DASHBOARD_FEATURE_IDS.includes(id)) : fallback;
+
+  return {
+    STARTER: clean(saved.STARTER || saved.starter, defaults.STARTER),
+    PRO: clean(saved.PRO || saved.pro, defaults.PRO),
+    ENTERPRISE: clean(saved.ENTERPRISE || saved.enterprise, defaults.ENTERPRISE),
+    CUSTOM: clean(saved.CUSTOM || saved.custom, defaults.CUSTOM),
+  };
+}
+
 // Canonical default plan config returned when no admin override exists
 const DEFAULT_CONFIG = {
   pricing: DEFAULT_PRICING,
@@ -165,7 +179,7 @@ const DEFAULT_CONFIG = {
   planPermissions: {
     ...normalizePlanPermissions(),
   },
-  dashboardFeatureFlags: createDefaultDashboardFeatureFlags(),
+  dashboardFeatureFlags: normalizeDashboardFeatureFlags(),
 };
 
 export async function GET(req: NextRequest) {
@@ -191,10 +205,7 @@ export async function GET(req: NextRequest) {
         customPlan: { ...DEFAULT_CUSTOM_PLAN, ...(saved.customPlan || {}), modules: saved.customPlan?.modules ?? DEFAULT_CUSTOM_PLAN.modules },
         planHighlights: { ...DEFAULT_PLAN_HIGHLIGHTS, ...(saved.planHighlights || {}) },
         planPermissions: normalizePlanPermissions(saved.planPermissions),
-        dashboardFeatureFlags: {
-          ...createDefaultDashboardFeatureFlags(),
-          ...(saved.dashboardFeatureFlags || {}),
-        },
+        dashboardFeatureFlags: normalizeDashboardFeatureFlags(saved.dashboardFeatureFlags),
       });
     }
 

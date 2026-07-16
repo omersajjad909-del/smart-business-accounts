@@ -27,7 +27,11 @@ import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
 import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
 
 // Context to pass sidebarCollapsed + expand function to nav components
-const SidebarCtx = createContext<{ collapsed: boolean; expand: () => void }>({ collapsed: false, expand: () => {} });
+const SidebarCtx = createContext<{ collapsed: boolean; expand: () => void; canShowHref: (href: string) => boolean }>({
+  collapsed: false,
+  expand: () => {},
+  canShowHref: () => true,
+});
 
 /* ── FinovaOS branded loading screen ─────────────────────── */
 function FinovaLoader() {
@@ -706,6 +710,12 @@ export default function DashboardLayout({
     return allowedDashboardFeatures.has(featureId);
   };
 
+  const canShowDashboardHref = (href: string) => {
+    const feature = findDashboardFeatureByRoute(href);
+    if (!feature) return true;
+    return hasDashboardFeature(feature.id);
+  };
+
   // Load business type and redirect to setup if not done
   useEffect(() => {
     if (!ready || !currentUser?.companyId) return;
@@ -1076,7 +1086,7 @@ export default function DashboardLayout({
         </div>
 
         {/* ---- NAV ---- */}
-        <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setSidebarCollapsed(false) }}>
+        <SidebarCtx.Provider value={{ collapsed: sidebarCollapsed, expand: () => setSidebarCollapsed(false), canShowHref: canShowDashboardHref }}>
         <nav style={{flex:1,overflowY:"auto",padding:"8px 8px",paddingBottom:80}}>
 
           {/* ── Main Dashboard link ── */}
@@ -2979,7 +2989,8 @@ function NavLink({ href, children, pathname }: {
   children: React.ReactNode;
   pathname: string;
 }) {
-  const { collapsed } = useContext(SidebarCtx);
+  const { collapsed, canShowHref } = useContext(SidebarCtx);
+  if (!canShowHref(href)) return null;
   const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
   const displayChildren = typeof children === "string" ? cleanNavLabel(children) : children;
   const isAiAssistant = displayChildren === "AI Intelligence" || displayChildren === "AI Assistant";

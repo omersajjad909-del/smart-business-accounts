@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PLAN_DEFAULT_PERMISSIONS } from "@/lib/planPermissions";
-import { createDefaultDashboardFeatureFlags } from "@/lib/dashboardFeatureRegistry";
+import { DASHBOARD_FEATURE_IDS, createDefaultDashboardFeatureFlags } from "@/lib/dashboardFeatureRegistry";
 
 const DEFAULT_PRICING = {
   starter:    { monthly: 49,  yearly: 39  },
@@ -66,6 +66,39 @@ function normalizePlanPermissions(savedPlanPermissions?: Record<string, string[]
   };
 }
 
+function normalizeDashboardFeatureFlags(savedFlags?: Record<string, string[]>) {
+  const defaults = createDefaultDashboardFeatureFlags();
+  const saved = savedFlags || {};
+  const clean = (list: string[] | undefined, fallback: string[]) =>
+    Array.isArray(list) ? list.filter((id) => DASHBOARD_FEATURE_IDS.includes(id)) : fallback;
+
+  return {
+    STARTER: clean(saved.STARTER || saved.starter, defaults.STARTER),
+    PRO: clean(saved.PRO || saved.pro, defaults.PRO),
+    ENTERPRISE: clean(saved.ENTERPRISE || saved.enterprise, defaults.ENTERPRISE),
+    CUSTOM: clean(saved.CUSTOM || saved.custom, defaults.CUSTOM),
+  };
+}
+
+async function loadGloballyHiddenDashboardFeatures(): Promise<Set<string>> {
+  try {
+    const log = await prisma.activityLog.findFirst({
+      where: { action: "PAGE_VISIBILITY_CONFIG" },
+      orderBy: { createdAt: "desc" },
+    });
+    return new Set(log?.details ? JSON.parse(log.details) as string[] : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function applyGlobalVisibility(flags: Record<string, string[]>, hidden: Set<string>) {
+  if (hidden.size === 0) return flags;
+  return Object.fromEntries(
+    Object.entries(flags).map(([plan, ids]) => [plan, ids.filter((id) => !hidden.has(id))])
+  );
+}
+
 export async function GET(req: NextRequest) {
   try {
     const latest = await prisma.activityLog.findFirst({
@@ -95,14 +128,11 @@ export async function GET(req: NextRequest) {
         saved.pricing = DEFAULT_PRICING;
       }
 
-      if (!saved.dashboardFeatureFlags || typeof saved.dashboardFeatureFlags !== "object") {
-        saved.dashboardFeatureFlags = createDefaultDashboardFeatureFlags();
-      } else {
-        saved.dashboardFeatureFlags = {
-          ...createDefaultDashboardFeatureFlags(),
-          ...saved.dashboardFeatureFlags,
-        };
-      }
+      const hiddenDashboardFeatures = await loadGloballyHiddenDashboardFeatures();
+      saved.dashboardFeatureFlags = applyGlobalVisibility(
+        normalizeDashboardFeatureFlags(saved.dashboardFeatureFlags),
+        hiddenDashboardFeatures
+      );
 
       saved.planPermissions = normalizePlanPermissions(saved.planPermissions);
 
@@ -110,6 +140,7 @@ export async function GET(req: NextRequest) {
     }
 
     // No saved config — return full defaults
+    const hiddenDashboardFeatures = await loadGloballyHiddenDashboardFeatures();
     return NextResponse.json({
       pricing: DEFAULT_PRICING,
       seatPricing: DEFAULT_SEAT_PRICING,
@@ -119,7 +150,7 @@ export async function GET(req: NextRequest) {
       planPermissions: {
         ...normalizePlanPermissions(),
       },
-      dashboardFeatureFlags: createDefaultDashboardFeatureFlags(),
+      dashboardFeatureFlags: applyGlobalVisibility(normalizeDashboardFeatureFlags(), hiddenDashboardFeatures),
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
