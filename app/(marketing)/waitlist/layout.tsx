@@ -14,12 +14,14 @@ export const metadata: Metadata = {
     url: `${BASE}/waitlist`,
     siteName: "FinovaOS",
     type: "website",
+    images: [{ url: `${BASE}/icon.png`, width: 1200, height: 630, alt: "FinovaOS — Join the Waitlist" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Join the Waitlist | FinovaOS",
     description:
       "Join the FinovaOS early access waitlist for launch updates and priority onboarding.",
+    images: [`${BASE}/icon.png`],
   },
 };
 
