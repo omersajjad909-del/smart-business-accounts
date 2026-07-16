@@ -3,6 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
 import { getCountryCenter, isFiniteCoordinate } from "@/lib/geoMapData";
 
+function safeDecode(val: string | null | undefined): string | null {
+  if (!val) return null;
+  try { return decodeURIComponent(val); } catch { return val; }
+}
+
 function isAdmin(req: NextRequest) {
   const headerRole = String(req.headers.get("x-user-role") || "").toUpperCase();
   if (headerRole === "ADMIN") return true;
@@ -105,16 +110,19 @@ export async function GET(req: NextRequest) {
         const exactLon = isFiniteCoordinate(visit.lon) ? visit.lon : null;
         const fallback = getCountryCenter(visit.country);
 
+        const city    = safeDecode(visit.city);
+        const page    = safeDecode(visit.page);
+        const cName   = safeDecode(visit.countryName);
         return {
           type: "visitor",
-          label: visit.countryName || visit.country || "Visitor",
-          subtitle: visit.city || visit.page || "Anonymous visit",
+          label: cName || visit.country || "Visitor",
+          subtitle: city || page || "Anonymous visit",
           country: visit.country || null,
           lat: exactLat ?? fallback?.lat ?? null,
           lon: exactLon ?? fallback?.lon ?? null,
           precision: exactLat !== null && exactLon !== null ? "exact" : "country",
-          city: visit.city || null,
-          page: visit.page || null,
+          city,
+          page,
           device: visit.device || null,
           flag: visit.flag || null,
           visitedAt: visit.visitedAt,

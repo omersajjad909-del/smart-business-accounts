@@ -31,10 +31,11 @@ function geoFromHeaders(req: NextRequest): GeoInfo {
     req.headers.get("x-vercel-ip-country") ||
     req.headers.get("cf-ipcountry") ||
     "US";
-  const city =
+  const rawCity =
     req.headers.get("x-vercel-ip-city") ||
     req.headers.get("x-appengine-city") ||
     "Unknown";
+  const city = (() => { try { return decodeURIComponent(rawCity); } catch { return rawCity; } })();
   const region =
     req.headers.get("x-vercel-ip-country-region") ||
     req.headers.get("x-appengine-region") ||
