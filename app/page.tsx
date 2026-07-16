@@ -18,7 +18,7 @@ import Footer from "./(marketing)/landing/components/Footer";
 import ChatWidget from "./(marketing)/landing/components/ChatWidget";
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/" },
+  alternates: { canonical: "https://www.finovaos.app/" },
 };
 
 async function getRequestHost() {

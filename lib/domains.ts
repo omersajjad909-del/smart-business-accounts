@@ -1,4 +1,4 @@
-const DEFAULT_MARKETING_URL = "https://finovaos.app";
+const DEFAULT_MARKETING_URL = "https://www.finovaos.app";
 const DEFAULT_APP_URL = "https://usefinova.app";
 
 function normalizeUrl(value: string | undefined, fallback: string) {
@@ -55,4 +55,3 @@ export function getRuntimeAppUrl(origin?: string) {
   if (!isLocalLikeUrl(configured) || !origin) return configured;
   return origin.replace(/\/+$/, "");
 }
-
