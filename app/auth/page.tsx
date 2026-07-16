@@ -66,41 +66,47 @@ const IconLoader = () => (
   </svg>
 );
 
-/* ─── Mini dashboard preview cards for left panel ───────────────────────── */
+/* ─── Mini dashboard preview for left panel ─────────────────────────────── */
+const barHeights = [28, 42, 35, 55, 48, 62, 52, 70, 58, 78, 65, 88];
 const DashPreview = () => (
   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-    {/* Revenue card */}
-    <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-      <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#6366f1,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    {/* Revenue trend chart card */}
+    <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "16px 18px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+        <div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 3 }}>Monthly Revenue</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", letterSpacing: "-0.6px" }}>$248,930</div>
+        </div>
+        <div style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.25)", borderRadius: 8, padding: "3px 10px", fontSize: 12, fontWeight: 600, color: "#6ee7b7" }}>↑ 18.3%</div>
       </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>Total Revenue</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", letterSpacing: "-0.5px" }}>$84,320</div>
+      {/* Mini bar chart */}
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 64 }}>
+        {barHeights.map((h, i) => (
+          <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px 4px 0 0", background: i === barHeights.length - 1 ? "linear-gradient(180deg,#818cf8,#6366f1)" : "rgba(99,102,241,0.25)", transition: "height 0.3s" }} />
+        ))}
       </div>
-      <div style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.25)", borderRadius: 8, padding: "2px 8px", fontSize: 11, fontWeight: 600, color: "#6ee7b7" }}>+12.4%</div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 10, color: "rgba(255,255,255,0.25)" }}>
+        <span>Jan</span><span>Apr</span><span>Jul</span><span>Dec</span>
+      </div>
     </div>
-    {/* Inventory card */}
-    <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-      <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#0ea5e9,#6366f1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+    {/* Two small metric cards side by side */}
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "14px 16px" }}>
+        <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg,#0ea5e9,#6366f1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 2 }}>Invoices</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px" }}>1,284</div>
+        <div style={{ fontSize: 10, color: "#6ee7b7", marginTop: 4 }}>94% paid on time</div>
       </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>Inventory Items</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", letterSpacing: "-0.5px" }}>2,847</div>
+      <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "14px 16px" }}>
+        <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 2 }}>Employees</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px" }}>38</div>
+        <div style={{ fontSize: 10, color: "#fcd34d", marginTop: 4 }}>Payroll processed</div>
       </div>
-      <div style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 8, padding: "2px 8px", fontSize: 11, fontWeight: 600, color: "#a5b4fc" }}>In stock</div>
-    </div>
-    {/* Payroll card */}
-    <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-      <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>Team Payroll</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", letterSpacing: "-0.5px" }}>$18,500</div>
-      </div>
-      <div style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 8, padding: "2px 8px", fontSize: 11, fontWeight: 600, color: "#fcd34d" }}>Processed</div>
     </div>
   </div>
 );
@@ -352,17 +358,17 @@ function AuthPageInner() {
               </div>
             </div>
 
-            {/* Bottom feature cards */}
+            {/* Bottom stats row */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 36 }}>
               {[
-                { icon: <IconShield />, color: "#34d399", bg: "rgba(52,211,153,0.1)", border: "rgba(52,211,153,0.2)", label: "Protected access", desc: "OTP-verified sign-in" },
-                { icon: <IconCheck />, color: "#818cf8", bg: "rgba(99,102,241,0.1)", border: "rgba(99,102,241,0.2)", label: "Team ready", desc: "Roles & permissions" },
-                { icon: <IconZap />, color: "#fbbf24", bg: "rgba(251,191,36,0.1)", border: "rgba(251,191,36,0.2)", label: "AI insights", desc: "Smart analytics" },
+                { value: "500+", label: "Businesses", desc: "across 6 countries", color: "#34d399", border: "rgba(52,211,153,0.2)", bg: "rgba(52,211,153,0.08)" },
+                { value: "99.9%", label: "Uptime", desc: "SLA guaranteed", color: "#818cf8", border: "rgba(99,102,241,0.2)", bg: "rgba(99,102,241,0.08)" },
+                { value: "4.9★", label: "Rating", desc: "from real users", color: "#fbbf24", border: "rgba(251,191,36,0.2)", bg: "rgba(251,191,36,0.08)" },
               ].map((c) => (
                 <div key={c.label} style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: 16, padding: "14px 16px" }}>
-                  <div style={{ color: c.color, marginBottom: 8 }}>{c.icon}</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", marginBottom: 3 }}>{c.label}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>{c.desc}</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: c.color, letterSpacing: "-0.5px", marginBottom: 2 }}>{c.value}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", marginBottom: 2 }}>{c.label}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{c.desc}</div>
                 </div>
               ))}
             </div>
