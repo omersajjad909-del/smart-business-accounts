@@ -563,29 +563,17 @@ export default function DashboardContent() {
         if (user.id) h["x-user-id"] = user.id;
         if (user.companyId) h["x-company-id"] = user.companyId;
 
-        const [sR, cR, mR, bR, eR, tR] = await Promise.allSettled([
-          fetch(`/api/reports/dashboard-summary?period=${period}`, {
-            headers: h,
-            cache: "no-store",
-          }),
-          fetch(`/api/reports/dashboard-charts?period=${period}`, {
-            headers: h,
-            cache: "no-store",
-          }),
-          fetch("/api/me/company", { cache: "no-store", headers: h }),
-          fetch("/api/company/business-type", {
-            headers: h,
-            cache: "no-store",
-          }),
-          fetch("/api/reports/expense-breakdown?period=month", {
-            headers: h,
-            cache: "no-store",
-          }),
-          fetch("/api/reports/today-stats", { headers: h, cache: "no-store" }),
-        ]);
+        const dashboardRes = await fetch(`/api/dashboard?period=${period}`, {
+          headers: h,
+          cache: "no-store",
+        });
+        if (!dashboardRes.ok) {
+          throw new Error("Dashboard data failed");
+        }
+        const dashboard = await dashboardRes.json();
 
-        if (sR.status === "fulfilled" && sR.value.ok) {
-          const d = await sR.value.json();
+        if (dashboard.summary) {
+          const d = dashboard.summary;
           setStats({
             revenue: Number(d.revenue || 0),
             expenses: Number(d.expenses || 0),
@@ -608,8 +596,8 @@ export default function DashboardContent() {
               : [],
           });
         }
-        if (cR.status === "fulfilled" && cR.value.ok) {
-          const ch = await cR.value.json();
+        if (dashboard.charts) {
+          const ch = dashboard.charts;
           const sA = ch.salesTrend || [],
             pA = ch.purchasesTrend || [];
           const MN = [
@@ -648,13 +636,13 @@ export default function DashboardContent() {
             }),
           );
         }
-        if (bR.status === "fulfilled" && bR.value.ok) {
-          const b = await bR.value.json();
+        if (dashboard.businessType) {
+          const b = dashboard.businessType;
           if (!initDemo && b.businessType)
             setBT(b.businessType as BusinessType);
         }
-        if (mR.status === "fulfilled" && mR.value.ok) {
-          const s = await mR.value.json();
+        if (dashboard.company) {
+          const s = dashboard.company;
           if (initDemo) setBT(initDemo);
           else if (s.businessType) setBT(s.businessType as BusinessType);
           setCompanyInfo({
@@ -667,8 +655,8 @@ export default function DashboardContent() {
             logoUrl: s.logoUrl || null,
           });
         }
-        if (eR.status === "fulfilled" && eR.value.ok) {
-          const eb = await eR.value.json();
+        if (dashboard.expenses) {
+          const eb = dashboard.expenses;
           const rows = eb.rows || [];
           const EC = ["#ef4444", "#f59e0b", "#6366f1", "#10b981", "#38bdf8"];
           const tot = rows.reduce(
@@ -684,8 +672,8 @@ export default function DashboardContent() {
               })),
             );
         }
-        if (tR.status === "fulfilled" && tR.value.ok) {
-          const t = await tR.value.json();
+        if (dashboard.todayStats) {
+          const t = dashboard.todayStats;
           setTodayStats({
             todaySales: Number(t.todaySales || 0),
             todayOrders: Number(t.todayOrders || 0),
@@ -693,13 +681,7 @@ export default function DashboardContent() {
             lowStockCount: Number(t.lowStockCount || 0),
           });
         }
-        // due-this-week (non-blocking, best-effort)
-        fetch("/api/reports/due-this-week", { headers: h, cache: "no-store" })
-          .then((r) => (r.ok ? r.json() : null))
-          .then((d) => {
-            if (d) setDueData(d);
-          })
-          .catch(() => {});
+        if (dashboard.dueData) setDueData(dashboard.dueData);
         // load avatar from stored user or me API
         const meUser = getCurrentUser() as any;
         if (meUser?.avatar) setUserAvatar(meUser.avatar);

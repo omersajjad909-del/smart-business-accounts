@@ -77,29 +77,34 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ rows });
     }
 
-    // Default: group by ExpenseItem.category
+    // Default: group by ExpenseItem.category in SQL, not by loading all rows into JS.
     const [currentItems, previousItems] = await Promise.all([
-      prisma.expenseItem.findMany({
-        where: { expenseVoucher: { companyId, date: { gte: start, lt: end }, deletedAt: null } },
-        select: { category: true, amount: true },
-      }),
-      prisma.expenseItem.findMany({
-        where: { expenseVoucher: { companyId, date: { gte: prevStart, lt: prevEnd }, deletedAt: null } },
-        select: { category: true, amount: true },
-      }),
+      prisma.$queryRaw<{ category: string; amount: number }[]>`
+        SELECT COALESCE(ei."category", 'Other') AS category,
+               COALESCE(SUM(ei."amount"), 0)::float AS amount
+        FROM "ExpenseItem" ei
+        INNER JOIN "ExpenseVoucher" ev ON ev."id" = ei."expenseVoucherId"
+        WHERE ev."companyId" = ${companyId}
+          AND ev."date" >= ${start}
+          AND ev."date" < ${end}
+          AND ev."deletedAt" IS NULL
+        GROUP BY COALESCE(ei."category", 'Other')
+      `,
+      prisma.$queryRaw<{ category: string; amount: number }[]>`
+        SELECT COALESCE(ei."category", 'Other') AS category,
+               COALESCE(SUM(ei."amount"), 0)::float AS amount
+        FROM "ExpenseItem" ei
+        INNER JOIN "ExpenseVoucher" ev ON ev."id" = ei."expenseVoucherId"
+        WHERE ev."companyId" = ${companyId}
+          AND ev."date" >= ${prevStart}
+          AND ev."date" < ${prevEnd}
+          AND ev."deletedAt" IS NULL
+        GROUP BY COALESCE(ei."category", 'Other')
+      `,
     ]);
 
-    // Aggregate by category
-    const aggCurrent: Record<string, number> = {};
-    for (const item of currentItems) {
-      const cat = item.category || "Other";
-      aggCurrent[cat] = (aggCurrent[cat] ?? 0) + item.amount;
-    }
-    const aggPrev: Record<string, number> = {};
-    for (const item of previousItems) {
-      const cat = item.category || "Other";
-      aggPrev[cat] = (aggPrev[cat] ?? 0) + item.amount;
-    }
+    const aggCurrent = Object.fromEntries(currentItems.map((item) => [item.category || "Other", Number(item.amount || 0)]));
+    const aggPrev = Object.fromEntries(previousItems.map((item) => [item.category || "Other", Number(item.amount || 0)]));
 
     const total = Object.values(aggCurrent).reduce((s, v) => s + v, 0);
     const rows = Object.entries(aggCurrent).map(([cat, amount]) => {

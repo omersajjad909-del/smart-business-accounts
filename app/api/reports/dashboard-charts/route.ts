@@ -3,8 +3,6 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { resolveCompanyId, resolveBranchId } from "@/lib/tenant";
 
-type SalesInvoice = Prisma.SalesInvoiceGetPayload<{ select: { date: true; total: true } }>;
-type PurchaseInvoice = Prisma.PurchaseInvoiceGetPayload<{ select: { date: true; total: true } }>;
 type TopCustomer = { customerId: string; _sum: { total: number | null } };
 
 export async function GET(req: NextRequest) {
@@ -60,76 +58,85 @@ export async function GET(req: NextRequest) {
       ...(branchId ? { branchId } : {}),
     };
 
-    const [salesInvoices, purchaseInvoices] = await Promise.all([
-      prisma.salesInvoice.findMany({ where: whereClause, select: { date: true, total: true } }),
-      prisma.purchaseInvoice.findMany({ where: whereClause, select: { date: true, total: true } }),
+    const branchClause = branchId ? Prisma.sql`AND "branchId" = ${branchId}` : Prisma.empty;
+    const salesBucket =
+      groupBy === "day"
+        ? Prisma.sql`TO_CHAR(DATE_TRUNC('day', "date"), 'YYYY-MM-DD')`
+        : groupBy === "month"
+          ? Prisma.sql`TO_CHAR(DATE_TRUNC('month', "date"), 'YYYY-MM')`
+          : Prisma.sql`TO_CHAR(DATE_TRUNC('year', "date"), 'YYYY')`;
+    const purchaseBucket = salesBucket;
+
+    const [
+      salesTrend,
+      purchasesTrend,
+      topCustomers,
+      topItems,
+    ] = await Promise.all([
+      prisma.$queryRaw<{ label: string; value: number }[]>`
+        SELECT ${salesBucket} AS label,
+               COALESCE(SUM("total"), 0)::float AS value
+        FROM "SalesInvoice"
+        WHERE "companyId" = ${companyId}
+          AND "deletedAt" IS NULL
+          AND "date" >= ${startDate}
+          ${branchClause}
+        GROUP BY label
+        ORDER BY label ASC
+      `,
+      prisma.$queryRaw<{ label: string; value: number }[]>`
+        SELECT ${purchaseBucket} AS label,
+               COALESCE(SUM("total"), 0)::float AS value
+        FROM "PurchaseInvoice"
+        WHERE "companyId" = ${companyId}
+          AND "deletedAt" IS NULL
+          AND "date" >= ${startDate}
+          ${branchClause}
+        GROUP BY label
+        ORDER BY label ASC
+      `,
+      prisma.salesInvoice.groupBy({
+        by: ["customerId"],
+        where: whereClause,
+        _sum: { total: true },
+        orderBy: { _sum: { total: "desc" } },
+        take: 5,
+      }),
+      prisma.salesInvoiceItem.groupBy({
+        by: ["itemId"],
+        where: { invoice: whereClause },
+        _sum: { qty: true, amount: true },
+        orderBy: { _sum: { amount: "desc" } },
+        take: 5,
+      }),
     ]);
 
-    function getKey(date: Date): string {
-      if (groupBy === "day") return date.toISOString().split("T")[0];
-      if (groupBy === "month") return date.toISOString().slice(0, 7);
-      return date.getFullYear().toString();
-    }
+    const [customers, items] = await Promise.all([
+      prisma.account.findMany({
+        where: { id: { in: (topCustomers as TopCustomer[]).map((item) => item.customerId) }, companyId },
+        select: { id: true, name: true },
+      }),
+      prisma.itemNew.findMany({
+        where: { id: { in: topItems.map((item) => item.itemId) }, companyId },
+        select: { id: true, name: true },
+      }),
+    ]);
 
-    function groupInvoices(invoices: { date: Date; total: any }[]) {
-      const map: Record<string, number> = {};
-      invoices.forEach(inv => {
-        const key = getKey(inv.date);
-        map[key] = (map[key] || 0) + Number(inv.total || 0);
-      });
-      return map;
-    }
-
-    const salesByPeriod = groupInvoices(salesInvoices as SalesInvoice[]);
-    const purchasesByPeriod = groupInvoices(purchaseInvoices as PurchaseInvoice[]);
-
-    // Top customers
-    const topCustomers = await prisma.salesInvoice.groupBy({
-      by: ["customerId"],
-      where: whereClause,
-      _sum: { total: true },
-      orderBy: { _sum: { total: "desc" } },
-      take: 5,
-    });
-
-    const customerDetails = await Promise.all(
-      (topCustomers as TopCustomer[]).map(async item => {
-        const customer = await prisma.account.findFirst({
-          where: { id: item.customerId, companyId },
-          select: { name: true },
-        });
-        return { name: customer?.name || "Unknown", total: Number(item._sum.total || 0) };
-      })
-    );
-
-    // Top items
-    const topItems = await prisma.salesInvoiceItem.groupBy({
-      by: ["itemId"],
-      where: { invoice: whereClause },
-      _sum: { qty: true, amount: true },
-      orderBy: { _sum: { amount: "desc" } },
-      take: 5,
-    });
-
-    const itemDetails = await Promise.all(
-      topItems.map(async (item: any) => {
-        const itemData = await prisma.itemNew.findFirst({
-          where: { id: item.itemId, companyId },
-          select: { name: true },
-        });
-        return {
-          name: itemData?.name || "Unknown",
-          qty: Number(item._sum.qty || 0),
-          amount: Number(item._sum.amount || 0),
-        };
-      })
-    );
+    const customerNameMap = new Map(customers.map((customer) => [customer.id, customer.name]));
+    const itemNameMap = new Map(items.map((item) => [item.id, item.name]));
 
     return NextResponse.json({
-      salesTrend: Object.entries(salesByPeriod).map(([label, value]) => ({ label, value })),
-      purchasesTrend: Object.entries(purchasesByPeriod).map(([label, value]) => ({ label, value })),
-      topCustomers: customerDetails,
-      topItems: itemDetails,
+      salesTrend,
+      purchasesTrend,
+      topCustomers: (topCustomers as TopCustomer[]).map((item) => ({
+        name: customerNameMap.get(item.customerId) || "Unknown",
+        total: Number(item._sum.total || 0),
+      })),
+      topItems: topItems.map((item) => ({
+        name: itemNameMap.get(item.itemId) || "Unknown",
+        qty: Number(item._sum.qty || 0),
+        amount: Number(item._sum.amount || 0),
+      })),
     });
   } catch (e: any) {
     console.error("❌ DASHBOARD CHARTS ERROR:", e);

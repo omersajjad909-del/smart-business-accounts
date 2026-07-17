@@ -33,6 +33,32 @@ const SidebarCtx = createContext<{ collapsed: boolean; expand: () => void; canSh
   canShowHref: () => true,
 });
 
+const apiCache = new Map<string, { expires: number; promise: Promise<any> }>();
+
+function cachedGetJson<T = any>(url: string, init: RequestInit = {}, ttlMs = 30_000): Promise<T> {
+  const headers = init.headers && !(init.headers instanceof Headers)
+    ? init.headers as Record<string, string>
+    : {};
+  const key = JSON.stringify({
+    url,
+    companyId: headers["x-company-id"] || "",
+    userId: headers["x-user-id"] || "",
+    role: headers["x-user-role"] || "",
+    branchId: headers["x-branch-id"] || "",
+  });
+  const now = Date.now();
+  const cached = apiCache.get(key);
+  if (cached && cached.expires > now) return cached.promise;
+
+  const promise = fetch(url, { ...init, cache: "default" }).then((res) => {
+    if (!res.ok) throw new Error(`GET ${url} failed`);
+    return res.json();
+  });
+  apiCache.set(key, { expires: now + ttlMs, promise });
+  promise.catch(() => apiCache.delete(key));
+  return promise;
+}
+
 /* ── FinovaOS branded loading screen ─────────────────────── */
 function FinovaLoader() {
   return (
@@ -253,9 +279,7 @@ export default function DashboardLayout({
     if (currentUser?.id) headers["x-user-id"] = currentUser.id;
     if (currentUser?.role) headers["x-user-role"] = currentUser.role;
     try {
-      const res = await fetch("/api/me/company", { cache: "no-store", headers });
-      if (!res.ok) return;
-      const data = await res.json();
+      const data = await cachedGetJson("/api/me/company", { headers });
       if (data?.name) setCompanyName(data.name);
       if (data?.plan) setCompanyPlan(String(data.plan));
       setCompanyDetail(data);
@@ -302,9 +326,7 @@ export default function DashboardLayout({
     };
     async function fetchCompany() {
       try {
-        const res = await fetch("/api/me/company", { headers: hdrs });
-        if (res.ok) {
-          const data = await res.json();
+        const data = await cachedGetJson("/api/me/company", { headers: hdrs });
           if (data?.name) setCompanyName(data.name);
           if (data?.plan) setCompanyPlan(String(data.plan));
           const preferredDemoBusiness =
@@ -322,12 +344,11 @@ export default function DashboardLayout({
             }));
           }
           setCompanyDetail(data);
-        }
       } catch (err) {}
     }
     fetchCompany();
     // Load company shortcuts
-    fetch("/api/company/shortcuts", { headers: hdrs }).then(r => r.json()).then(d => { if (d.shortcuts) setShortcuts(d.shortcuts); }).catch(() => {});
+    cachedGetJson("/api/company/shortcuts", { headers: hdrs }).then(d => { if (d.shortcuts) setShortcuts(d.shortcuts); }).catch(() => {});
   }, [currentUser?.companyId]);
 
   useEffect(() => {
@@ -649,12 +670,11 @@ export default function DashboardLayout({
     };
     (async () => {
       try {
-        const c = await fetch("/api/me/company", { cache: "no-store", headers: planHdrs });
-        const cfg = await fetch("/api/public/plan-config", { cache: "no-store" });
-        if (c.ok && cfg.ok) {
-          const cj = await c.json();
+        const [cj, conf] = await Promise.all([
+          cachedGetJson("/api/me/company", { headers: planHdrs }),
+          cachedGetJson("/api/public/plan-config", {}, 120_000),
+        ]);
           if (cj?.plan) setCompanyPlan(String(cj.plan));
-          const conf = await cfg.json();
           const list = resolvePlanPermissions({
             plan: cj?.plan,
             configuredPlanPermissions: conf?.planPermissions || null,
@@ -678,7 +698,6 @@ export default function DashboardLayout({
           } else {
             setAllowedDashboardFeatures(null);
           }
-        }
       } catch {
         setAllowedPlanPerms(null);
         setAllowedDashboardFeatures(null);
@@ -724,8 +743,7 @@ export default function DashboardLayout({
       ...(currentUser.id   ? { "x-user-id":   currentUser.id }   : {}),
       ...(currentUser.role ? { "x-user-role": currentUser.role } : {}),
     };
-    fetch("/api/company/business-type", { headers, cache: "no-store" })
-      .then(r => r.ok ? r.json() : null)
+    cachedGetJson("/api/company/business-type", { headers })
       .then(d => {
         if (!d) return;
         const preferredDemoBusiness =
@@ -893,8 +911,7 @@ export default function DashboardLayout({
         if (currentUser.id)        hdrs["x-user-id"]    = currentUser.id;
         if (currentUser.role)      hdrs["x-user-role"]  = currentUser.role;
         if (currentUser.companyId) hdrs["x-company-id"] = currentUser.companyId;
-        const res = await fetch("/api/branches", { headers: hdrs });
-        const data = await res.json();
+        const data = await cachedGetJson("/api/branches", { headers: hdrs });
         const list: Branch[] = Array.isArray(data) ? data : [];
         const scoped = allowedBranchIds?.length ? list.filter((b) => allowedBranchIds.includes(b.id)) : list;
         const activeOnly = scoped.filter(b => b.isActive !== false);

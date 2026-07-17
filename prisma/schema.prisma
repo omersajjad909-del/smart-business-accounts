@@ -205,6 +205,7 @@ model PurchaseInvoice {
 
   @@index([companyId, deletedAt])
   @@index([companyId, date])
+  @@index([companyId, branchId, deletedAt, date])
   @@index([companyId, supplierId])
 }
 
@@ -220,6 +221,9 @@ model PurchaseInvoiceItem {
 
   invoice PurchaseInvoice @relation(fields: [invoiceId], references: [id])
   item    ItemNew         @relation(fields: [itemId], references: [id])
+
+  @@index([invoiceId])
+  @@index([itemId])
 }
 
 model InventoryTxn {
@@ -300,6 +304,7 @@ model SalesInvoice {
 
   @@index([companyId, deletedAt])
   @@index([companyId, date])
+  @@index([companyId, branchId, deletedAt, date])
   @@index([companyId, customerId])
 }
 
@@ -315,6 +320,9 @@ model SalesInvoiceItem {
 
   invoice SalesInvoice @relation(fields: [invoiceId], references: [id])
   item    ItemNew      @relation(fields: [itemId], references: [id])
+
+  @@index([invoiceId])
+  @@index([itemId])
 }
 
 model Voucher {
@@ -858,6 +866,9 @@ model ExpenseVoucher {
   createdAt        DateTime            @default(now())
   deletedAt        DateTime?
   deletedBy        String?
+
+  @@index([companyId, deletedAt, date])
+  @@index([companyId, costCenterId, deletedAt, date])
 }
 
 model ExpenseItem {
@@ -867,6 +878,9 @@ model ExpenseItem {
   description      String
   amount           Float
   category         String // TRAVEL | FOOD | SUPPLIES | UTILITIES | OTHER
+
+  @@index([expenseVoucherId])
+  @@index([category])
 }
 
 model ExpenseAttachment {
