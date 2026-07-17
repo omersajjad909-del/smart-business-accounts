@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Linkedin, Mail, Phone, Globe, ArrowRight, Zap } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, Phone, Globe, ArrowRight, Zap, Twitter, Youtube, Music2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const PRODUCT_LINKS = [
@@ -34,10 +34,40 @@ const COMPANY_LINKS = [
 
 const SOCIALS_DEFAULT = [
   {
+    Icon: Facebook,
+    key: "facebook",
+    label: "Facebook",
+    href: "https://facebook.com/finovaforge",
+  },
+  {
+    Icon: Instagram,
+    key: "instagram",
+    label: "Instagram",
+    href: "https://instagram.com/finovaforge",
+  },
+  {
+    Icon: Twitter,
+    key: "twitter",
+    label: "X / Twitter",
+    href: "https://x.com/finovaforge",
+  },
+  {
     Icon: Linkedin,
     key: "linkedin",
     label: "LinkedIn",
     href: "https://linkedin.com/company/finovaforge",
+  },
+  {
+    Icon: Music2,
+    key: "tiktok",
+    label: "TikTok",
+    href: "https://tiktok.com/@finovaforge",
+  },
+  {
+    Icon: Youtube,
+    key: "youtube",
+    label: "YouTube",
+    href: "https://youtube.com/@finovaforge",
   },
 ];
 
