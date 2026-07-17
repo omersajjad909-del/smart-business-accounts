@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 
 export type BranchAssignmentMap = Record<string, string[]>;
 
@@ -280,22 +281,26 @@ function normalizeSettings(value: unknown): AdminControlSettings {
   };
 }
 
+const _cachedGetAdminControlSettings = unstable_cache(
+  async (companyId: string): Promise<AdminControlSettings> => {
+    const latest = await prisma.activityLog.findFirst({
+      where: { companyId, action: "COMPANY_ADMIN_CONTROL" },
+      orderBy: { createdAt: "desc" },
+      select: { details: true },
+    });
+    if (!latest?.details) return DEFAULT_ADMIN_CONTROL_SETTINGS;
+    try {
+      return normalizeSettings(JSON.parse(latest.details));
+    } catch {
+      return DEFAULT_ADMIN_CONTROL_SETTINGS;
+    }
+  },
+  ["company-admin-control-settings"],
+  { revalidate: 60 }
+);
+
 export async function getCompanyAdminControlSettings(companyId: string): Promise<AdminControlSettings> {
-  const latest = await prisma.activityLog.findFirst({
-    where: { companyId, action: "COMPANY_ADMIN_CONTROL" },
-    orderBy: { createdAt: "desc" },
-    select: { details: true },
-  });
-
-  if (!latest?.details) {
-    return DEFAULT_ADMIN_CONTROL_SETTINGS;
-  }
-
-  try {
-    return normalizeSettings(JSON.parse(latest.details));
-  } catch {
-    return DEFAULT_ADMIN_CONTROL_SETTINGS;
-  }
+  return _cachedGetAdminControlSettings(companyId);
 }
 
 export async function saveCompanyAdminControlSettings(

@@ -563,6 +563,14 @@ export default function DashboardContent() {
         if (user.id) h["x-user-id"] = user.id;
         if (user.companyId) h["x-company-id"] = user.companyId;
 
+        // Fire secondary requests immediately — they run in parallel with the main fetch
+        const meUser = getCurrentUser() as any;
+        const mePromise = meUser?.avatar
+          ? Promise.resolve(null)
+          : fetch("/api/me", { headers: h }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+        const notifPromise = fetch("/api/admin/notifications", { headers: h })
+          .then((r) => (r.ok ? r.json() : null)).catch(() => null);
+
         const dashboardRes = await fetch(`/api/dashboard?period=${period}`, {
           headers: h,
           cache: "no-store",
@@ -682,27 +690,15 @@ export default function DashboardContent() {
           });
         }
         if (dashboard.dueData) setDueData(dashboard.dueData);
-        // load avatar from stored user or me API
-        const meUser = getCurrentUser() as any;
+
+        // Collect secondary results (already in-flight since before dashboard fetch)
+        const [meData, notifData] = await Promise.all([mePromise, notifPromise]);
         if (meUser?.avatar) setUserAvatar(meUser.avatar);
-        else {
-          fetch("/api/me")
-            .then((r) => (r.ok ? r.json() : null))
-            .then((d) => {
-              if (d?.avatar) setUserAvatar(d.avatar);
-            })
-            .catch(() => {});
-        }
-        // load unread notification count
-        fetch("/api/admin/notifications")
-          .then((r) => (r.ok ? r.json() : null))
-          .then((d) => {
-            if (d?.notifications)
-              setUnreadNotifs(
-                (d.notifications as any[]).filter((n: any) => !n.isRead).length,
-              );
-          })
-          .catch(() => {});
+        else if (meData?.avatar) setUserAvatar(meData.avatar);
+        if (notifData?.notifications)
+          setUnreadNotifs(
+            (notifData.notifications as any[]).filter((n: any) => !n.isRead).length,
+          );
       } catch (e) {
         console.error("Dashboard:", e);
       } finally {

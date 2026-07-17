@@ -142,19 +142,21 @@ async function getSummary(companyId: string, branchId: string | null, period: st
   const expensesGrowth = prevExpenses > 0 ? ((expenses - prevExpenses) / prevExpenses) * 100 : (expenses > 0 ? 100 : 0);
   const profitGrowth = prevProfit !== 0 ? ((profit - prevProfit) / Math.abs(prevProfit)) * 100 : (profit !== 0 ? 100 : 0);
 
+  const salesMap = new Map(monthlySales.map((row) => {
+    const d = new Date(row.month);
+    return [`${d.getFullYear()}-${d.getMonth()}`, row.total];
+  }));
+  const expMap = new Map(monthlyExp.map((row) => {
+    const d = new Date(row.month);
+    return [`${d.getFullYear()}-${d.getMonth()}`, row.total];
+  }));
   const revenueHistory: number[] = [];
   const expensesHistory: number[] = [];
   for (let i = 11; i >= 0; i--) {
     const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const key = `${month.getFullYear()}-${month.getMonth()}`;
-    revenueHistory.push(Number(monthlySales.find((row) => {
-      const d = new Date(row.month);
-      return `${d.getFullYear()}-${d.getMonth()}` === key;
-    })?.total || 0));
-    expensesHistory.push(Number(monthlyExp.find((row) => {
-      const d = new Date(row.month);
-      return `${d.getFullYear()}-${d.getMonth()}` === key;
-    })?.total || 0));
+    revenueHistory.push(Number(salesMap.get(key) || 0));
+    expensesHistory.push(Number(expMap.get(key) || 0));
   }
 
   const [customerAccounts, recentCurrencies] = await Promise.all([
@@ -376,13 +378,15 @@ export async function GET(req: NextRequest) {
 
     const userId = req.headers.get("x-user-id");
     const userRole = req.headers.get("x-user-role");
-    const allowed = await apiHasPermission(userId, userRole, PERMISSIONS.VIEW_DASHBOARD, companyId);
+    const period = req.nextUrl.searchParams.get("period") || "month";
+
+    const [allowed, branchId] = await Promise.all([
+      apiHasPermission(userId, userRole, PERMISSIONS.VIEW_DASHBOARD, companyId),
+      resolveBranchId(req, companyId),
+    ]);
     if (!allowed) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-
-    const period = req.nextUrl.searchParams.get("period") || "month";
-    const branchId = await resolveBranchId(req, companyId);
 
     const [
       company,

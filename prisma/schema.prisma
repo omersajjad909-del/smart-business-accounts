@@ -725,6 +725,7 @@ model ActivityLog {
   company Company? @relation(fields: [companyId], references: [id])
 
   @@index([companyId])
+  @@index([companyId, action, createdAt])
 }
 
 model RolePermission {
@@ -779,6 +780,8 @@ model BankAccount {
   updatedAt DateTime @default(now()) @updatedAt
   deletedAt     DateTime?
   deletedBy     String?
+
+  @@index([companyId])
 }
 
 model BankStatement {

@@ -81,10 +81,9 @@ export async function resolveBranchId(req: NextRequest, companyId?: string | nul
 }
 
 export async function resolveBranchIdOrDefault(req: NextRequest, companyId?: string | null): Promise<string | null> {
-  const selected = await resolveBranchId(req, companyId);
-  if (selected) return selected;
   const cid = companyId ?? (await resolveCompanyId(req));
   if (!cid) return null;
+
   const userId = req.headers.get("x-user-id");
   let allowedBranchIds: string[] | null = null;
   if (userId) {
@@ -96,6 +95,14 @@ export async function resolveBranchIdOrDefault(req: NextRequest, companyId?: str
       }
     } catch {}
   }
+
+  const headerBranchId = req.headers.get("x-branch-id");
+  if (headerBranchId && headerBranchId !== "all") {
+    if (!allowedBranchIds || allowedBranchIds.includes(headerBranchId)) {
+      return headerBranchId;
+    }
+  }
+
   const branch = await prisma.branch.findFirst({
     where: {
       companyId: cid,

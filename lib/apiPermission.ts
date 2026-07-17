@@ -1,5 +1,18 @@
 import { prisma } from "./prisma";
 import { resolvePlanPermissions } from "@/lib/planPermissions";
+import { unstable_cache } from "next/cache";
+
+const _getCachedPlanConfig = unstable_cache(
+  async () => {
+    const latest = await prisma.activityLog.findFirst({
+      where: { action: "PLAN_CONFIG", companyId: "system" },
+      orderBy: { createdAt: "desc" },
+    });
+    return latest?.details ? JSON.parse(latest.details) : null;
+  },
+  ["global-plan-config"],
+  { revalidate: 300 }
+);
 
 export async function apiHasPermission(
   userId: string | null,
@@ -39,11 +52,7 @@ export async function apiHasPermission(
       select: { plan: true, activeModules: true },
     });
     const planCode = String(company?.plan || "STARTER").toUpperCase();
-    const latest = await prisma.activityLog.findFirst({
-      where: { action: "PLAN_CONFIG", companyId: "system" },
-      orderBy: { createdAt: "desc" },
-    });
-    const cfg = latest?.details ? JSON.parse(latest.details) : null;
+    const cfg = await _getCachedPlanConfig();
     const perms = resolvePlanPermissions({
       plan: planCode,
       configuredPlanPermissions: cfg?.planPermissions || null,
