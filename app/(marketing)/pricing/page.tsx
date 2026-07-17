@@ -654,6 +654,108 @@ export default function PricingPage() {
           })}
         </div>
 
+        {/* ── PAYMENT METHODS TRUST STRIP ─────────────────────── */}
+        <div style={{ marginBottom: 80 }}>
+          {currency === "PKR" ? (
+            /* ── PKR: Safepay ── */
+            <div style={{ borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", padding: "28px 32px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout · Powered by Safepay</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>256-bit SSL · PCI DSS compliant · No card data stored on our servers</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  {/* Visa */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#1A1F71", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", letterSpacing: "-.5px", fontStyle: "italic" }}>VISA</span>
+                  </div>
+                  {/* Mastercard */}
+                  <div style={{ display: "flex", alignItems: "center", gap: -6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 10px", height: 36 }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#EB001B", opacity: .9 }} />
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#F79E1B", opacity: .9, marginLeft: -8 }} />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.8)", marginLeft: 6 }}>Mastercard</span>
+                  </div>
+                  {/* JazzCash */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#CC0000", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>JazzCash</span>
+                  </div>
+                  {/* Easypaisa */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#44B549", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5" stroke="#44B549" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Easypaisa</span>
+                  </div>
+                  {/* Raast */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(59,94,198,.25)", border: "1px solid rgba(59,94,198,.55)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7ba4f8" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#7ba4f8" }}>Raast</span>
+                    <span style={{ fontSize: 10, color: "rgba(123,164,248,.6)", background: "rgba(59,94,198,.3)", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>FREE</span>
+                  </div>
+                  {/* Bank Transfer */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.6)" }}>Bank Transfer</span>
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,.35)", fontWeight: 600 }}>IBFT</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>All banks supported via 1Link network · HBL · UBL · Meezan · MCB · Faysal · Allied · and more</span>
+              </div>
+            </div>
+          ) : (
+            /* ── International: LemonSqueezy ── */
+            <div style={{ borderRadius: 20, background: "rgba(255,255,255,.025)", border: "1px solid rgba(255,255,255,.07)", padding: "28px 32px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#34d399" }}>Secure Checkout · Powered by LemonSqueezy</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>Merchant of Record · We handle tax, compliance & billing globally · 256-bit SSL</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  {/* Visa */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#1A1F71", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 13, fontWeight: 900, color: "#fff", letterSpacing: "-.5px", fontStyle: "italic" }}>VISA</span>
+                  </div>
+                  {/* Mastercard */}
+                  <div style={{ display: "flex", alignItems: "center", gap: -6, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, padding: "6px 10px", height: 36 }}>
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#EB001B", opacity: .9 }} />
+                    <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#F79E1B", opacity: .9, marginLeft: -8 }} />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.8)", marginLeft: 6 }}>Mastercard</span>
+                  </div>
+                  {/* Amex */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "#2E77BC", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 12, fontWeight: 900, color: "#fff", letterSpacing: ".5px" }}>AMEX</span>
+                  </div>
+                  {/* PayPal */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "#003087", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <span style={{ fontSize: 14, fontWeight: 900, color: "#009cde", fontStyle: "italic" }}>P</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>PayPal</span>
+                  </div>
+                  {/* Apple Pay */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "#000", border: "1px solid rgba(255,255,255,.15)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Apple Pay</span>
+                  </div>
+                  {/* Google Pay */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.12)", borderRadius: 8, padding: "6px 12px", height: 36 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 11v2.4h3.97c-.16 1.03-1.2 3.02-3.97 3.02-2.39 0-4.34-1.98-4.34-4.42S9.61 7.58 12 7.58c1.36 0 2.27.58 2.79 1.08l1.9-1.83C15.47 5.69 13.89 5 12 5c-3.87 0-7 3.13-7 7s3.13 7 7 7c4.04 0 6.72-2.84 6.72-6.84 0-.46-.05-.81-.11-1.16H12z" fill="white" opacity=".8"/></svg>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,.85)" }}>Google Pay</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.05)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,.28)", fontWeight: 600 }}>Regional wallets auto-detected at checkout · Sales tax handled automatically · Invoices issued by LemonSqueezy LLC</span>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* ── AUTOMATION ADD-ON ────────────────────────────────── */}
         <div style={{ marginBottom: 80 }}>
           <div style={{ textAlign: "center", marginBottom: 36 }}>
