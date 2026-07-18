@@ -23,8 +23,8 @@ type PlanPricing = {
 
 const DEFAULT_HIGHLIGHTS = {
   starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support"],
-  professional: ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports"],
-  enterprise: ["Unlimited users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7"],
+  professional: ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports","🤖 AI Assistant (ask anything)","🤖 Smart invoice & expense AI"],
+  enterprise: ["Up to 25 users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7","🤖 Full AI Suite (forecast + anomaly detection)","🤖 AI Business Operator"],
 };
 
 const PLANS = [
