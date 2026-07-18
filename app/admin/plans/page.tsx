@@ -45,7 +45,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 type PlanCode = "STARTER" | "PRO" | "ENTERPRISE" | "CUSTOM";
-type TabKey = "pricing" | "permissions" | "pages" | "custom-plans" | "modules" | "addon";
+type TabKey = "pricing" | "permissions" | "pages" | "custom-plans" | "modules" | "addon" | "pkr-pricing" | "pkr-permissions";
 
 type AddonCompany = {
   id: string; name: string; plan: string; createdAt: string;
@@ -121,6 +121,27 @@ export default function AdminPlansPage() {
   );
   const [loadingMods, setLoadingMods] = useState(false);
   const [savingMod, setSavingMod]     = useState<string | null>(null);
+
+  /* ── PKR pricing & permissions ── */
+  const [pkrPricing, setPkrPricing] = useState({
+    starter:    { monthly: 4999,  yearly: 3999  },
+    pro:        { monthly: 9999,  yearly: 7999  },
+    enterprise: { monthly: 24999, yearly: 19999 },
+  });
+  const [pkrPlanPermissions, setPkrPlanPermissions] = useState<Record<string, string[]>>({
+    STARTER: PLAN_DEFAULT_PERMISSIONS.STARTER,
+    PRO:     PLAN_DEFAULT_PERMISSIONS.PRO,
+    ENTERPRISE: PLAN_DEFAULT_PERMISSIONS.ENTERPRISE,
+    CUSTOM: [],
+  });
+  const [pkrDashboardFeatureFlags, setPkrDashboardFeatureFlags] = useState<Record<PlanCode, string[]>>({
+    STARTER: [...DASHBOARD_FEATURE_IDS],
+    PRO: [...DASHBOARD_FEATURE_IDS],
+    ENTERPRISE: [...DASHBOARD_FEATURE_IDS],
+    CUSTOM: [...DASHBOARD_FEATURE_IDS],
+  });
+  const [loadingPkrConfig, setLoadingPkrConfig] = useState(false);
+  const [savingPkrConfig,  setSavingPkrConfig]  = useState(false);
 
   /* ─── Load plan config ─── */
   useEffect(() => {
@@ -210,6 +231,53 @@ export default function AdminPlansPage() {
         toast.success("Add-on removed");
       }
     } finally { setSavingAddon(null); }
+  }
+
+  /* ─── Load PKR plan config ─── */
+  useEffect(() => {
+    if (tab !== "pkr-pricing" && tab !== "pkr-permissions") return;
+    (async () => {
+      setLoadingPkrConfig(true);
+      try {
+        const r = await fetch("/api/admin/pkr-plan-config");
+        if (r.ok) {
+          const d = await r.json();
+          if (d?.pricing)              setPkrPricing(d.pricing);
+          if (d?.planPermissions)      setPkrPlanPermissions(d.planPermissions);
+          if (d?.dashboardFeatureFlags) setPkrDashboardFeatureFlags(d.dashboardFeatureFlags);
+        }
+      } finally { setLoadingPkrConfig(false); }
+    })();
+  }, [tab]);
+
+  /* ─── Save PKR plan config ─── */
+  async function savePkrConfig() {
+    setSavingPkrConfig(true);
+    try {
+      const r = await fetch("/api/admin/pkr-plan-config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pricing: pkrPricing, planPermissions: pkrPlanPermissions, dashboardFeatureFlags: pkrDashboardFeatureFlags }),
+      });
+      if (r.ok) toast.success("PKR configuration saved!");
+      else { const j = await r.json(); toast.error(j?.error || "Save failed"); }
+    } finally { setSavingPkrConfig(false); }
+  }
+
+  function togglePkrPlanPermission(planCode: PlanCode, perm: string) {
+    setPkrPlanPermissions(prev => {
+      const list = new Set(prev[planCode] || []);
+      if (list.has(perm)) list.delete(perm); else list.add(perm);
+      return { ...prev, [planCode]: Array.from(list) };
+    });
+  }
+
+  function togglePkrDashboardFeature(planCode: PlanCode, featureId: string) {
+    setPkrDashboardFeatureFlags(prev => {
+      const list = new Set(prev[planCode] || []);
+      if (list.has(featureId)) list.delete(featureId); else list.add(featureId);
+      return { ...prev, [planCode]: Array.from(list) };
+    });
   }
 
   /* ─── Load module prices ─── */
@@ -311,12 +379,14 @@ export default function AdminPlansPage() {
   };
 
   const TABS: { key: TabKey; label: string; icon: string }[] = [
-    { key: "pricing",      label: "Pricing",           icon: "💰" },
-    { key: "permissions",  label: "Permissions",        icon: "🔐" },
-    { key: "pages",        label: "Pages",              icon: "P" },
-    { key: "custom-plans", label: "Custom Requests",    icon: "📋" },
-    { key: "modules",      label: "Module Pricing",     icon: "🧩" },
-    { key: "addon",        label: "Automation Add-on",  icon: "⚡" },
+    { key: "pricing",          label: "Pricing (USD)",      icon: "💰" },
+    { key: "permissions",      label: "Permissions",        icon: "🔐" },
+    { key: "pages",            label: "Pages",              icon: "📄" },
+    { key: "pkr-pricing",      label: "PKR Pricing",        icon: "🇵🇰" },
+    { key: "pkr-permissions",  label: "PKR Permissions",    icon: "🔒" },
+    { key: "custom-plans",     label: "Custom Requests",    icon: "📋" },
+    { key: "modules",          label: "Module Pricing",     icon: "🧩" },
+    { key: "addon",            label: "Automation Add-on",  icon: "⚡" },
   ];
 
   const PLAN_COLORS: Record<string, string> = { starter: "#38bdf8", pro: "#818cf8", enterprise: "#c4b5fd" };
@@ -339,6 +409,12 @@ export default function AdminPlansPage() {
           <button onClick={saveConfig} disabled={savingConfig || loadingConfig}
             style={{ padding: "10px 22px", borderRadius: 12, background: savingConfig ? "#4338ca" : "linear-gradient(135deg,#4f46e5,#7c3aed)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: savingConfig ? .7 : 1 }}>
             {savingConfig ? "Saving…" : "Save Changes"}
+          </button>
+        )}
+        {(tab === "pkr-pricing" || tab === "pkr-permissions") && (
+          <button onClick={savePkrConfig} disabled={savingPkrConfig || loadingPkrConfig}
+            style={{ padding: "10px 22px", borderRadius: 12, background: savingPkrConfig ? "#065f46" : "linear-gradient(135deg,#059669,#047857)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: savingPkrConfig ? .7 : 1 }}>
+            {savingPkrConfig ? "Saving…" : "Save PKR Config"}
           </button>
         )}
         {tab === "modules" && (
@@ -371,6 +447,9 @@ export default function AdminPlansPage() {
 
       {loadingConfig && (tab === "pricing" || tab === "permissions" || tab === "pages") && (
         <div style={{ padding: "40px 0", textAlign: "center", color: "#475569" }}>Loading configuration…</div>
+      )}
+      {loadingPkrConfig && (tab === "pkr-pricing" || tab === "pkr-permissions") && (
+        <div style={{ padding: "40px 0", textAlign: "center", color: "#475569" }}>Loading PKR configuration…</div>
       )}
 
       {/* ══ TAB: PRICING ══ */}
@@ -508,6 +587,175 @@ export default function AdminPlansPage() {
             })}
           </div>
         </Card>
+      )}
+
+      {/* ══ TAB: PKR PRICING ══ */}
+      {tab === "pkr-pricing" && !loadingPkrConfig && (
+        <>
+          {/* Info banner */}
+          <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(5,150,105,.08)", border: "1px solid rgba(5,150,105,.25)", marginBottom: 24, display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ fontSize: 28 }}>🇵🇰</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#34d399", marginBottom: 3 }}>Pakistani Rupee (PKR) Pricing</div>
+              <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.6 }}>
+                These prices are shown directly to Pakistani users (IP-detected). They override FX-converted USD rates.
+                Prices are in <strong style={{ color: "#94a3b8" }}>PKR (₨)</strong> — enter actual PKR amounts.
+              </div>
+            </div>
+          </div>
+
+          <Card title="PKR Plan Pricing" subtitle="Monthly and annual per-month prices in Pakistani Rupees">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 20 }}>
+              {(["starter", "pro", "enterprise"] as const).map(k => {
+                const COLORS: Record<string, string> = { starter: "#38bdf8", pro: "#818cf8", enterprise: "#c4b5fd" };
+                const color = COLORS[k];
+                return (
+                  <div key={k} style={{ borderRadius: 16, border: `1px solid ${color}30`, background: `${color}08`, padding: "22px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: `${color}20`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+                        {k === "starter" ? "🌱" : k === "pro" ? "🚀" : "🏆"}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "white", textTransform: "capitalize" }}>{k}</div>
+                        <div style={{ fontSize: 11, color: "#475569" }}>per company / month (PKR)</div>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: 14 }}>
+                      <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>MONTHLY PRICE (₨)</label>
+                      <div style={{ position: "relative" }}>
+                        <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 12, fontWeight: 700 }}>₨</span>
+                        <input type="number" min={0} value={(pkrPricing as any)[k].monthly}
+                          onChange={e => setPkrPricing(p => ({ ...p, [k]: { ...p[k], monthly: Number(e.target.value) } }))}
+                          style={{ width: "100%", padding: "10px 12px 10px 28px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 14, outline: "none" }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: ".06em", display: "block", marginBottom: 6 }}>ANNUAL PRICE / MO (₨)</label>
+                      <div style={{ position: "relative" }}>
+                        <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#64748b", fontSize: 12, fontWeight: 700 }}>₨</span>
+                        <input type="number" min={0} value={(pkrPricing as any)[k].yearly}
+                          onChange={e => setPkrPricing(p => ({ ...p, [k]: { ...p[k], yearly: Number(e.target.value) } }))}
+                          style={{ width: "100%", padding: "10px 12px 10px 28px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: "white", fontSize: 14, outline: "none" }} />
+                      </div>
+                      <div style={{ fontSize: 11, color: "#475569", marginTop: 6 }}>
+                        Annual total: ₨{(pkrPricing as any)[k].yearly * 12}/yr &nbsp;·&nbsp;
+                        <span style={{ color: "#22c55e" }}>
+                          {(pkrPricing as any)[k].monthly > 0 ? `${Math.round((1 - (pkrPricing as any)[k].yearly / (pkrPricing as any)[k].monthly) * 100)}% saving` : "—"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(5,150,105,.06)", border: "1px solid rgba(5,150,105,.15)" }}>
+              <div style={{ fontSize: 13, color: "#34d399", fontWeight: 700, marginBottom: 6 }}>Preview</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+                {(["starter", "pro", "enterprise"] as const).map(k => (
+                  <div key={k} style={{ fontSize: 12, color: "#94a3b8" }}>
+                    <strong style={{ color: "white", textTransform: "capitalize" }}>{k}</strong>
+                    <br />Monthly: ₨{(pkrPricing as any)[k].monthly.toLocaleString()}
+                    <br />Yearly: ₨{(pkrPricing as any)[k].yearly.toLocaleString()}/mo (₨{((pkrPricing as any)[k].yearly * 12).toLocaleString()}/yr)
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </>
+      )}
+
+      {/* ══ TAB: PKR PERMISSIONS ══ */}
+      {tab === "pkr-permissions" && !loadingPkrConfig && (
+        <>
+          <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(5,150,105,.08)", border: "1px solid rgba(5,150,105,.25)", marginBottom: 24, display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ fontSize: 28 }}>🔒</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#34d399", marginBottom: 3 }}>PKR User Permissions</div>
+              <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.6 }}>
+                Configure which features are available to Pakistani (PKR) users. Since PKR prices are lower,
+                you can restrict certain premium features here.
+              </div>
+            </div>
+          </div>
+
+          <Card title="PKR Plan Permissions" subtitle="Features available to PKR users per plan">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
+              {(["STARTER", "PRO", "ENTERPRISE", "CUSTOM"] as const).map(pc => {
+                const count = (pkrPlanPermissions[pc] || []).length;
+                const total = PERMISSION_CATEGORIES.reduce((sum, c) => sum + c.permissions.length, 0);
+                return (
+                  <div key={pc} style={{ borderRadius: 16, border: "1px solid rgba(5,150,105,.2)", background: "rgba(5,150,105,.04)", overflow: "hidden" }}>
+                    <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(5,150,105,.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "white", textTransform: "capitalize" }}>PKR · {pc.toLowerCase()}</div>
+                      <span style={{ fontSize: 11, color: "#475569" }}>{count}/{total}</span>
+                    </div>
+                    <div style={{ height: 3, background: "rgba(255,255,255,.06)" }}>
+                      <div style={{ height: "100%", width: `${total ? (count / total) * 100 : 0}%`, background: "linear-gradient(90deg,#059669,#34d399)", transition: "width .3s" }} />
+                    </div>
+                    <div style={{ maxHeight: 320, overflowY: "auto", padding: "12px 16px" }}>
+                      {PERMISSION_CATEGORIES.map(cat => (
+                        <div key={`pkr-${pc}-${cat.key}`} style={{ marginBottom: 12 }}>
+                          <div style={{ fontSize: 9, fontWeight: 800, color: "#334155", letterSpacing: ".08em", marginBottom: 4, textTransform: "uppercase" }}>{cat.label}</div>
+                          {cat.permissions.map(perm => (
+                            <label key={`pkr-${pc}-${perm}`} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: pkrPlanPermissions[pc]?.includes(perm) ? "#94a3b8" : "#334155", padding: "3px 0", cursor: "pointer" }}>
+                              <input type="checkbox" className="perm-check"
+                                checked={!!pkrPlanPermissions[pc]?.includes(perm)}
+                                onChange={() => togglePkrPlanPermission(pc, perm)} />
+                              <span style={{ fontFamily: "monospace", fontSize: 10 }}>{perm}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* PKR Dashboard Feature Flags */}
+          <Card title="PKR Dashboard Pages" subtitle="Which dashboard pages are visible to PKR users per plan">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+              {(["STARTER", "PRO", "ENTERPRISE", "CUSTOM"] as const).map(pc => {
+                const enabled = new Set(pkrDashboardFeatureFlags[pc] || []);
+                const grouped = DASHBOARD_FEATURE_DEFS.reduce((acc, feature) => {
+                  const key = feature.businessLabel || feature.business;
+                  (acc[key] ||= []).push(feature);
+                  return acc;
+                }, {} as Record<string, typeof DASHBOARD_FEATURE_DEFS>);
+                return (
+                  <div key={pc} style={{ borderRadius: 16, border: "1px solid rgba(5,150,105,.15)", background: "rgba(5,150,105,.03)", overflow: "hidden" }}>
+                    <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(5,150,105,.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: "white", textTransform: "capitalize" }}>PKR · {pc.toLowerCase()}</div>
+                      <span style={{ fontSize: 11, color: "#475569" }}>{enabled.size}/{DASHBOARD_FEATURE_DEFS.length}</span>
+                    </div>
+                    <div style={{ maxHeight: 400, overflowY: "auto", padding: "12px 16px" }}>
+                      {Object.entries(grouped).map(([group, features]) => (
+                        <div key={`pkr-pages-${pc}-${group}`} style={{ marginBottom: 14 }}>
+                          <div style={{ fontSize: 9, fontWeight: 800, color: "#64748b", letterSpacing: ".08em", marginBottom: 5, textTransform: "uppercase" }}>{group}</div>
+                          {features.map(feature => (
+                            <label key={`pkr-pages-${pc}-${feature.id}`} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 11, color: enabled.has(feature.id) ? "#cbd5e1" : "#475569", padding: "4px 0", cursor: "pointer" }}>
+                              <input type="checkbox" className="perm-check"
+                                checked={enabled.has(feature.id)}
+                                onChange={() => togglePkrDashboardFeature(pc, feature.id)} />
+                              <span>
+                                <span style={{ display: "block", fontWeight: 700 }}>{feature.label}</span>
+                                <span style={{ display: "block", fontFamily: "monospace", fontSize: 10, color: "#64748b" }}>{feature.route}</span>
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </>
       )}
 
       {tab === "custom-plans" && (

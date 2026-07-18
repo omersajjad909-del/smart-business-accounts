@@ -365,6 +365,8 @@ export default function PricingPage() {
   const [openCats, setOpenCats] = useState<Set<string>>(new Set(["platform", "accounting", "ai"]));
   const [featureMap, setFeatureMap] = useState<Record<string, { starter: boolean; pro: boolean; enterprise: boolean }>>({});
   const [publicPricing, setPublicPricing] = useState<PlanPricing>(DEFAULT_PUBLIC_PRICING);
+  // Admin-set PKR prices (null = not configured, fall back to FX conversion)
+  const [pkrPricing, setPkrPricing] = useState<{ starter: { monthly: number; yearly: number }; professional: { monthly: number; yearly: number }; enterprise: { monthly: number; yearly: number } } | null>(null);
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
   const [branchLimits, setBranchLimits] = useState<Record<string, number | null>>({ starter: 1, pro: 3, enterprise: 10 });
   const [seatPricing, setSeatPricing] = useState<{ monthly: number; yearly: number }>(DEFAULT_SEAT_PRICING);
@@ -459,6 +461,13 @@ export default function PricingPage() {
           if (d?.planHighlights) {
             setPlanHighlights(h => ({ ...h, ...d.planHighlights }));
           }
+          if (d?.pkrPricing) {
+            setPkrPricing({
+              starter:      { monthly: Number(d.pkrPricing.starter?.monthly ?? 4999),     yearly: Math.round(Number(d.pkrPricing.starter?.yearly ?? 59988) / 12) },
+              professional: { monthly: Number(d.pkrPricing.pro?.monthly ?? 9999),         yearly: Math.round(Number(d.pkrPricing.pro?.yearly ?? 95988) / 12) },
+              enterprise:   { monthly: Number(d.pkrPricing.enterprise?.monthly ?? 24999), yearly: Math.round(Number(d.pkrPricing.enterprise?.yearly ?? 239988) / 12) },
+            });
+          }
         }
       } catch {}
       // Load live plan feature overrides from admin config
@@ -493,6 +502,18 @@ export default function PricingPage() {
   );
   const customDisplayUsd = billing === "yearly" ? Math.round(customMonthly * (1 - yearlyDiscount / 100)) : customMonthly;
   const formatPrice = (usd: number) => formatFromUSD(usd, currency, rates);
+
+  // When country is PK and admin has set PKR prices, use those directly
+  const isPKUser = country === "PK" || currency === "PKR";
+  const getPlanPrice = (slug: "starter" | "professional" | "enterprise") => {
+    const usdPrice = billing === "yearly" ? publicPricing[slug].yearly : publicPricing[slug].monthly;
+    if (isPKUser && pkrPricing) {
+      const pkr = pkrPricing[slug];
+      const amount = billing === "yearly" ? pkr.yearly : pkr.monthly;
+      return `₨${amount.toLocaleString("en-PK")}`;
+    }
+    return formatPrice(usdPrice);
+  };
   const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
   const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
@@ -604,6 +625,13 @@ export default function PricingPage() {
             const pricingKey = plan.slug as keyof PlanPricing;
             const regularPrice = billing === "yearly" ? publicPricing[pricingKey].yearly : publicPricing[pricingKey].monthly;
             const introPrice = Math.round(regularPrice * 0.25);
+
+            // Use admin-set PKR prices when visitor is from Pakistan
+            const pkrPlanKey = plan.slug as keyof typeof pkrPricing;
+            const useAdminPkr = isPKUser && pkrPricing;
+            const pkrAmount = useAdminPkr ? (billing === "yearly" ? pkrPricing![pkrPlanKey].yearly : pkrPricing![pkrPlanKey].monthly) : 0;
+            const displayRegular = useAdminPkr ? `₨${pkrAmount.toLocaleString("en-PK")}` : formatPrice(regularPrice);
+            const displayIntro   = useAdminPkr ? `₨${Math.round(pkrAmount * 0.25).toLocaleString("en-PK")}` : formatPrice(introPrice);
             return (
               <div key={plan.slug} style={{ position: "relative", borderRadius: 22, background: plan.featured ? "linear-gradient(160deg,rgba(99,102,241,.16),rgba(255,255,255,.03))" : "rgba(255,255,255,.03)", border: `1.5px solid ${plan.border}`, overflow: "hidden", boxShadow: plan.featured ? "0 28px 80px rgba(99,102,241,.22)" : "0 10px 30px rgba(0,0,0,.16)" }}>
                 <div style={{ height: 3, background: plan.gradient }} />
@@ -616,9 +644,9 @@ export default function PricingPage() {
                       <span style={{ fontSize: 11, color: "rgba(255,255,255,.55)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 800 }}>Now</span>
                       <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(249,115,22,.18)", border: "1px solid rgba(249,115,22,.4)", fontSize: 10, fontWeight: 800, color: "#fb923c" }}>75% OFF x 3 months</span>
                     </div>
-                    <div style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{formatPrice(introPrice)}</div>
+                    <div style={{ fontSize: 42, fontWeight: 900, color: plan.color, letterSpacing: "-.03em", lineHeight: 1 }}>{displayIntro}</div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,.92)", marginTop: 6, fontWeight: 700 }}>
-                      Then {formatPrice(regularPrice)}/mo
+                      Then {displayRegular}/mo
                     </div>
                     {/* <div style={{ fontSize: 11, color: "rgba(255,255,255,.36)", marginTop: 6 }}>
                       {billing === "yearly" ? "Intro price for first 3 months, then yearly-plan monthly equivalent applies." : "Intro price for first 3 months, then regular monthly billing starts."}
@@ -843,7 +871,7 @@ export default function PricingPage() {
                 <div key={plan.slug} style={{ padding: "20px 16px", textAlign: "center", borderLeft: "1px solid rgba(255,255,255,.06)", background: plan.featured ? "rgba(99,102,241,.06)" : "transparent" }}>
                   <div style={{ fontSize: 14, fontWeight: 900, color: PLAN_COLORS[pi], marginBottom: 4 }}>{plan.name}</div>
                   <div style={{ fontSize: 14, color: "rgba(255,255,255,.9)", fontWeight: 800 }}>
-                    {formatPrice(billing === "yearly" ? publicPricing[plan.slug as keyof PlanPricing].yearly : publicPricing[plan.slug as keyof PlanPricing].monthly)}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
+                    {getPlanPrice(plan.slug as "starter" | "professional" | "enterprise")}<span style={{ fontSize: 10, color: "rgba(255,255,255,.5)" }}>/mo</span>
                   </div>
                   {plan.featured && <div style={{ marginTop: 4, fontSize: 10, fontWeight: 800, color: "#fbbf24", letterSpacing: ".06em" }}>POPULAR</div>}
                 </div>

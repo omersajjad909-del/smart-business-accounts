@@ -246,6 +246,332 @@ const ARTICLES: Record<string, {
     ],
   },
 
+  "chart-of-accounts": {
+    title: "Chart of accounts overview",
+    category: "Accounting & Ledger", categorySlug: "accounting",
+    time: "4 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"The chart of accounts is the foundation of your books. It defines every ledger account used to record business transactions." },
+      { type:"heading", text:"How the chart is organized" },
+      { type:"list", items:["Assets — cash, bank accounts, receivables", "Liabilities — payables, loans, credit cards", "Equity — owner capital and retained earnings", "Revenue — sales, fees, discounts", "Expenses — cost of goods sold and operating expenses"] },
+      { type:"step", step:1, text:"Go to **Settings → Chart of Accounts** to view and edit account groups." },
+      { type:"step", step:2, text:"Use the account type, code, and description to keep your ledgers structured and easy to report on." },
+      { type:"tip", text:"Keep your chart of accounts simple. Group similar accounts together and avoid duplicate account names so reporting is clearer." },
+    ],
+    related: [
+      { title:"Journal entries & JVs", slug:"journal-entries", category:"Accounting & Ledger", categorySlug:"accounting" },
+      { title:"Profit & Loss statement", slug:"pl-statement", category:"Reports & Analytics", categorySlug:"reports" },
+    ],
+  },
+
+  "journal-entries": {
+    title: "Journal entries & JVs",
+    category: "Accounting & Ledger", categorySlug: "accounting",
+    time: "4 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Journal entries record every transaction in double-entry format. Every entry debits one account and credits another." },
+      { type:"heading", text:"When to use a journal entry" },
+      { type:"list", items:["Corrections to posted invoices or payments", "Opening balances for a new accounting period", "Adjustments for accruals or prepayments", "Non-cash transactions like depreciation or transfers"] },
+      { type:"step", step:1, text:"Open **Accounting → Journal Entries** to create or review entries." },
+      { type:"step", step:2, text:"Select the debit account and credit account, then enter the amount, date, and narration." },
+      { type:"tip", text:"Use descriptive narrations so you can trace why the entry was posted when reviewing the audit trail later." },
+    ],
+    related: [
+      { title:"Chart of accounts overview", slug:"chart-of-accounts", category:"Accounting & Ledger", categorySlug:"accounting" },
+      { title:"Trial balance report", slug:"trial-balance", category:"Accounting & Ledger", categorySlug:"accounting" },
+    ],
+  },
+
+  "trial-balance": {
+    title: "Trial balance report",
+    category: "Accounting & Ledger", categorySlug: "accounting",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"A trial balance lists all account balances and verifies that total debits equal total credits." },
+      { type:"step", step:1, text:"Go to **Reports → Trial Balance**." },
+      { type:"step", step:2, text:"Select the date range and generate the report." },
+      { type:"step", step:3, text:"Review accounts with unexpected balances and drill into the underlying journal entries." },
+      { type:"tip", text:"Use the trial balance before closing a month or preparing financial statements. It helps catch posting mistakes early." },
+    ],
+    related: [
+      { title:"Journal entries & JVs", slug:"journal-entries", category:"Accounting & Ledger", categorySlug:"accounting" },
+      { title:"Profit & Loss statement", slug:"pl-statement", category:"Reports & Analytics", categorySlug:"reports" },
+    ],
+  },
+
+  "period-locking": {
+    title: "Period locking & audit trails",
+    category: "Accounting & Ledger", categorySlug: "accounting",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Period locking prevents changes to closed accounting periods and keeps your financial reports stable." },
+      { type:"step", step:1, text:"Go to **Settings → Accounting Settings → Period Locking**." },
+      { type:"step", step:2, text:"Choose the period to lock and confirm the date range." },
+      { type:"step", step:3, text:"After locking, only authorized users can make adjustments through reversal or opening entries." },
+      { type:"tip", text:"Lock the previous month as soon as the books are reviewed and approved. This protects your audit trail and prevents accidental edits." },
+    ],
+    related: [
+      { title:"Chart of accounts overview", slug:"chart-of-accounts", category:"Accounting & Ledger", categorySlug:"accounting" },
+      { title:"Trial balance report", slug:"trial-balance", category:"Accounting & Ledger", categorySlug:"accounting" },
+    ],
+  },
+
+  "getting-started": {
+    title: "Getting started with FinovaOS",
+    category: "Getting Started", categorySlug: "getting-started",
+    time: "4 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"This guide helps you launch FinovaOS quickly, from signup to your first invoices and reports." },
+      { type:"heading", text:"First steps" },
+      { type:"list", items:["Create your account and verify your email", "Set up your company profile", "Add your bank account and chart of accounts", "Invite your team members and assign roles"] },
+      { type:"step", step:1, text:"Go to **Settings → Company Profile** and enter your business details." },
+      { type:"step", step:2, text:"Configure your currency, financial year, and tax settings before recording transactions." },
+      { type:"tip", text:"Start with a simple chart of accounts and expand it as your business grows. Avoid overcomplicating the structure at first." },
+    ],
+    related: [
+      { title:"Setting up your company profile", slug:"company-profile", category:"Getting Started", categorySlug:"getting-started" },
+      { title:"Connecting your bank account", slug:"connect-bank", category:"Getting Started", categorySlug:"getting-started" },
+    ],
+  },
+
+  "grn": {
+    title: "Goods received notes (GRN)",
+    category: "Inventory & Stock", categorySlug: "inventory",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"GRNs document the receipt of goods from suppliers and are essential for matching inventory receipts with purchase orders." },
+      { type:"step", step:1, text:"Go to **Inventory → GRN** and click **New GRN**." },
+      { type:"step", step:2, text:"Select the supplier, add received items, and enter quantities and batch details." },
+      { type:"step", step:3, text:"Save the GRN to update inventory levels and link it to the corresponding purchase order." },
+      { type:"tip", text:"Use GRNs to verify what arrived before approving supplier invoices. This reduces errors and stock discrepancies." },
+    ],
+    related: [
+      { title:"Purchase orders", slug:"purchase-orders", category:"Inventory & Stock", categorySlug:"inventory" },
+      { title:"Stock in / stock out entries", slug:"stock-entries", category:"Inventory & Stock", categorySlug:"inventory" },
+    ],
+  },
+
+  "purchase-orders": {
+    title: "Purchase orders",
+    category: "Inventory & Stock", categorySlug: "inventory",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Purchase orders help you control purchasing, compare supplier quotes, and start the goods receipt process." },
+      { type:"step", step:1, text:"Go to **Inventory → Purchase Orders → New PO**." },
+      { type:"step", step:2, text:"Choose the supplier, add items, quantities, prices, and expected delivery date." },
+      { type:"step", step:3, text:"Save the PO and use it to receive goods with a GRN later." },
+      { type:"tip", text:"Issue purchase orders for every major supplier purchase. It creates a clear audit trail and improves inventory accuracy." },
+    ],
+    related: [
+      { title:"Goods received notes (GRN)", slug:"grn", category:"Inventory & Stock", categorySlug:"inventory" },
+      { title:"Stock transfer between branches", slug:"stock-transfer", category:"Inventory & Stock", categorySlug:"inventory" },
+    ],
+  },
+
+  "crv": {
+    title: "Cash receipt vouchers (CRV)",
+    category: "Banking & Reconciliation", categorySlug: "banking",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Cash receipt vouchers record money received into your cash or bank accounts, such as customer collections or other receipts." },
+      { type:"step", step:1, text:"Go to **Banking → Payment Vouchers → New CRV**." },
+      { type:"step", step:2, text:"Select the account receiving the cash or bank deposit and enter the source of funds." },
+      { type:"step", step:3, text:"Choose the ledger account to credit and add a narration." },
+      { type:"tip", text:"Use CRVs for receipts that are not linked to an invoice, such as deposits, refunds, or other income." },
+    ],
+    related: [
+      { title:"Cash payment vouchers (CPV)", slug:"cpv", category:"Banking & Reconciliation", categorySlug:"banking" },
+      { title:"How bank reconciliation works", slug:"bank-reconciliation", category:"Banking & Reconciliation", categorySlug:"banking" },
+    ],
+  },
+
+  "add-employees": {
+    title: "Adding employees & departments",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Add employee records and departments so payroll, attendance, and leave tracking work accurately." },
+      { type:"step", step:1, text:"Go to **HR → Employees → Add Employee**." },
+      { type:"step", step:2, text:"Enter personal details, job title, department, salary, and bank details." },
+      { type:"step", step:3, text:"Assign the employee to a department or branch for reporting and approval workflows." },
+      { type:"tip", text:"Keep employee details up to date, especially salary and bank information, to avoid payroll mistakes." },
+    ],
+    related: [
+      { title:"Attendance & timesheets", slug:"attendance", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Leave management", slug:"leave-management", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "attendance": {
+    title: "Attendance & timesheets",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Track employee attendance and timesheets so payroll and productivity are based on real work data." },
+      { type:"step", step:1, text:"Go to **HR → Attendance** and choose the employee or team." },
+      { type:"step", step:2, text:"Record check-in/check-out times, overtime, and any absences." },
+      { type:"step", step:3, text:"Review and approve timesheets before running payroll." },
+      { type:"tip", text:"Use the attendance report to identify late arrivals, absences, and overtime before payroll runs." },
+    ],
+    related: [
+      { title:"Leave management", slug:"leave-management", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Run monthly payroll", slug:"run-payroll", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "leave-management": {
+    title: "Leave management",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Leave management helps you track employee vacation, sick leave, and other absence requests." },
+      { type:"step", step:1, text:"Go to **HR → Leave Management**." },
+      { type:"step", step:2, text:"Create leave types, set approval rules, and define leave quotas." },
+      { type:"step", step:3, text:"Approve or reject leave requests and monitor leave balances." },
+      { type:"tip", text:"Automate recurring leave types, such as annual or sick leave, to reduce manual approvals." },
+    ],
+    related: [
+      { title:"Attendance & timesheets", slug:"attendance", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Run monthly payroll", slug:"run-payroll", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "run-payroll": {
+    title: "Run monthly payroll",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "4 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Run payroll each month to generate payslips, post salary entries, and pay your employees accurately." },
+      { type:"step", step:1, text:"Go to **HR → Payroll** and choose the payroll period." },
+      { type:"step", step:2, text:"Review employee salaries, allowances, deductions, and attendance." },
+      { type:"step", step:3, text:"Approve payroll and generate payslips for distribution." },
+      { type:"tip", text:"Run a payroll preview first to catch any errors before posting the accounting entries." },
+    ],
+    related: [
+      { title:"Payslips & PDF export", slug:"payslips", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Salary advance management", slug:"salary-advance", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "payslips": {
+    title: "Payslips & PDF export",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Generate professional payslips and export them as PDF for employees to download or email." },
+      { type:"step", step:1, text:"After payroll runs, go to **Payroll → Payslips**." },
+      { type:"step", step:2, text:"Select the month and employee list, then click **Generate Payslips**." },
+      { type:"step", step:3, text:"Download or email the PDF payslips directly from the system." },
+      { type:"tip", text:"Include net pay, deductions, employer contributions, and bank details on every payslip for transparency." },
+    ],
+    related: [
+      { title:"Run monthly payroll", slug:"run-payroll", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Attendance & timesheets", slug:"attendance", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "salary-advance": {
+    title: "Salary advance management",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Salary advances let employees receive part of their salary early while keeping the repayment schedule clear." },
+      { type:"step", step:1, text:"Go to **HR → Advances → New Salary Advance**." },
+      { type:"step", step:2, text:"Enter the employee, advance amount, repayment plan, and approval details." },
+      { type:"step", step:3, text:"Save the advance and monitor repayments through the payroll module." },
+      { type:"tip", text:"Link advances to payroll so repayment deductions are automated each month." },
+    ],
+    related: [
+      { title:"Run monthly payroll", slug:"run-payroll", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Payslips & PDF export", slug:"payslips", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "add-branch": {
+    title: "Adding branches and locations",
+    category: "Multi-Company", categorySlug: "accounting",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Add branches to manage separate locations, inventory, and sales while keeping consolidated reporting." },
+      { type:"step", step:1, text:"Go to **Settings → Branches** and click **Add Branch**." },
+      { type:"step", step:2, text:"Enter branch name, address, contact details, and operating currency." },
+      { type:"step", step:3, text:"Assign users and permissions to the new branch as needed." },
+      { type:"tip", text:"Use branches for physical locations like stores, warehouses, or offices to keep transactions separate and easy to reconcile." },
+    ],
+    related: [
+      { title:"Multi-company setup", slug:"multi-company", category:"Multi-Company", categorySlug:"accounting" },
+      { title:"Per-branch roles & permissions", slug:"branch-roles", category:"Multi-Company", categorySlug:"accounting" },
+    ],
+  },
+
+  "consolidated-pl": {
+    title: "Consolidated P&L report",
+    category: "Multi-Company", categorySlug: "accounting",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"A consolidated profit & loss report combines revenue and expense data across all companies or branches." },
+      { type:"step", step:1, text:"Go to **Reports → Consolidated P&L**." },
+      { type:"step", step:2, text:"Choose the companies or branches to include and set the date range." },
+      { type:"step", step:3, text:"Generate the report and review total revenue, expenses, and net profit across entities." },
+      { type:"tip", text:"Use consolidated reports to understand group-level performance and make better multi-entity decisions." },
+    ],
+    related: [
+      { title:"Multi-company setup", slug:"multi-company", category:"Multi-Company", categorySlug:"accounting" },
+      { title:"Switching between companies", slug:"switch-company", category:"Multi-Company", categorySlug:"accounting" },
+    ],
+  },
+
+  "branch-roles": {
+    title: "Per-branch roles & permissions",
+    category: "Multi-Company", categorySlug: "accounting",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Branch roles let you control who can access each location’s data and what they can do there." },
+      { type:"step", step:1, text:"Go to **Settings → Roles & Permissions**." },
+      { type:"step", step:2, text:"Create or edit a role, then assign branch-level access rules." },
+      { type:"step", step:3, text:"Apply the role to users to limit access by branch and function." },
+      { type:"tip", text:"Use branch roles to keep store-level staff from seeing corporate financials, while managers get the access they need." },
+    ],
+    related: [
+      { title:"Adding branches and locations", slug:"add-branch", category:"Multi-Company", categorySlug:"accounting" },
+      { title:"Multi-company setup", slug:"multi-company", category:"Multi-Company", categorySlug:"accounting" },
+    ],
+  },
+
+  "multi-company": {
+    title: "Multi-company setup",
+    category: "Multi-Company", categorySlug: "accounting",
+    time: "4 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Set up multiple companies so you can manage separate legal entities from one FinovaOS workspace." },
+      { type:"step", step:1, text:"Go to **Settings → Companies → Add Company**." },
+      { type:"step", step:2, text:"Enter the company name, registration details, currency, and financial year." },
+      { type:"step", step:3, text:"Switch between companies using the top-left company selector." },
+      { type:"tip", text:"Keep each company’s books separate for taxes and reporting, while using consolidated dashboards for group visibility." },
+    ],
+    related: [
+      { title:"Adding branches and locations", slug:"add-branch", category:"Multi-Company", categorySlug:"accounting" },
+      { title:"Switching between companies", slug:"switch-company", category:"Multi-Company", categorySlug:"accounting" },
+    ],
+  },
+
+  "switch-company": {
+    title: "Switching between companies",
+    category: "Multi-Company", categorySlug: "accounting",
+    time: "3 min", updatedAt: "May 10, 2026",
+    content: [
+      { type:"intro", text:"Switch companies quickly to work in the right legal entity while keeping your login and permissions intact." },
+      { type:"step", step:1, text:"Click the company selector in the top-left of the dashboard." },
+      { type:"step", step:2, text:"Choose the company you want to open from the list." },
+      { type:"step", step:3, text:"Your dashboard and reports will refresh to show the selected company’s data." },
+      { type:"tip", text:"Switch before creating invoices, expenses, or payroll to ensure the transaction is recorded in the correct company." },
+    ],
+    related: [
+      { title:"Multi-company setup", slug:"multi-company", category:"Multi-Company", categorySlug:"accounting" },
+      { title:"Consolidated P&L report", slug:"consolidated-pl", category:"Multi-Company", categorySlug:"accounting" },
+    ],
+  },
+
   "pl-statement": {
     title: "Understanding your P&L statement",
     category: "Reports & Analytics", categorySlug: "reports",

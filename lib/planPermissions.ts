@@ -411,11 +411,26 @@ export function resolvePlanPermissions(params: {
   plan: string | null | undefined;
   configuredPlanPermissions?: Record<string, string[]> | null;
   activeModules?: string | null;
+  // Pass true when the company pays in PKR (Safepay) — uses PKR-specific permission config
+  isPkrUser?: boolean;
+  pkrPlanPermissions?: Record<string, string[]> | null;
 }): string[] {
   const planCode = normalizePlanCode(params.plan);
 
   if (planCode === "CUSTOM") {
     return getCustomPlanPermissions(params.activeModules);
+  }
+
+  // PKR users get their own permission set (lower-priced, potentially restricted)
+  if (params.isPkrUser && params.pkrPlanPermissions) {
+    const pkrCfg = params.pkrPlanPermissions;
+    const pkrConfigured =
+      pkrCfg[planCode] ||
+      pkrCfg[planCode.toLowerCase()] ||
+      pkrCfg[planCode.toUpperCase()];
+    if (Array.isArray(pkrConfigured) && pkrConfigured.length > 0) {
+      return pkrConfigured;
+    }
   }
 
   const cfg = params.configuredPlanPermissions || {};

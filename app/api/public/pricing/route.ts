@@ -71,10 +71,29 @@ const DEFAULT_CUSTOM_PLAN = {
 
 export async function GET() {
   try {
-    const latest = await prisma.activityLog.findFirst({
-      where: { action: "PLAN_CONFIG" },
-      orderBy: { createdAt: "desc" },
-    });
+    const [latest, pkrLatest] = await Promise.all([
+      prisma.activityLog.findFirst({
+        where: { action: "PLAN_CONFIG" },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.activityLog.findFirst({
+        where: { action: "PKR_PLAN_CONFIG" },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    // PKR pricing — admin-set PKR prices (null if not configured yet)
+    const pkrPricing = pkrLatest?.details
+      ? (() => {
+          const p = JSON.parse(pkrLatest.details)?.pricing;
+          if (!p) return null;
+          return {
+            starter:    { monthly: p.starter?.monthly    ?? 4999,  yearly: (p.starter?.yearly    ?? 3999)  * 12 },
+            pro:        { monthly: p.pro?.monthly        ?? 9999,  yearly: (p.pro?.yearly        ?? 7999)  * 12 },
+            enterprise: { monthly: p.enterprise?.monthly ?? 24999, yearly: (p.enterprise?.yearly ?? 19999) * 12 },
+          };
+        })()
+      : null;
 
     if (!latest?.details) {
       return NextResponse.json({
@@ -86,6 +105,7 @@ export async function GET() {
         planHighlights: DEFAULT_PLAN_HIGHLIGHTS,
         features: null,
         featureMatrix: null,
+        pkrPricing,
         updatedAt: null,
       });
     }
@@ -116,6 +136,7 @@ export async function GET() {
           : DEFAULT_PLAN_HIGHLIGHTS,
         features: payload?.features ?? null,
         featureMatrix: payload?.featureMatrix ?? null,
+        pkrPricing,
         updatedAt: latest.createdAt,
       });
     }
@@ -129,11 +150,12 @@ export async function GET() {
       planHighlights: DEFAULT_PLAN_HIGHLIGHTS,
       features: null,
       featureMatrix: null,
+      pkrPricing,
       updatedAt: latest.createdAt,
     });
   } catch (e: unknown) {
     return NextResponse.json(
-      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, branchLimits: DEFAULT_BRANCH_LIMITS, seatPricing: DEFAULT_SEAT_PRICING, customPlan: DEFAULT_CUSTOM_PLAN, planHighlights: DEFAULT_PLAN_HIGHLIGHTS, error: e instanceof Error ? e.message : "unknown" },
+      { pricing: DEFAULT_PRICING, planLimits: DEFAULT_PLAN_LIMITS, branchLimits: DEFAULT_BRANCH_LIMITS, seatPricing: DEFAULT_SEAT_PRICING, customPlan: DEFAULT_CUSTOM_PLAN, planHighlights: DEFAULT_PLAN_HIGHLIGHTS, pkrPricing: null, error: e instanceof Error ? e.message : "unknown" },
       { status: 200 },
     );
   }

@@ -29,14 +29,24 @@ export async function POST(req: NextRequest) {
       CUSTOM:     [],
     };
 
-    const latest = await prisma.activityLog.findFirst({
-      where: { action: "PLAN_CONFIG" },
-      orderBy: { createdAt: "desc" },
-    });
+    const [latest, pkrLatest] = await Promise.all([
+      prisma.activityLog.findFirst({ where: { action: "PLAN_CONFIG" },     orderBy: { createdAt: "desc" } }),
+      prisma.activityLog.findFirst({ where: { action: "PKR_PLAN_CONFIG" }, orderBy: { createdAt: "desc" } }),
+    ]);
+
     if (latest?.details) {
       const saved = JSON.parse(latest.details);
       if (saved?.planPermissions) {
         savedPermissions = { ...savedPermissions, ...saved.planPermissions };
+      }
+    }
+
+    // PKR permissions — used for companies whose subscription provider is SAFEPAY
+    let pkrPermissions: Record<string, string[]> = { ...savedPermissions };
+    if (pkrLatest?.details) {
+      const pkrSaved = JSON.parse(pkrLatest.details);
+      if (pkrSaved?.planPermissions) {
+        pkrPermissions = { ...pkrPermissions, ...pkrSaved.planPermissions };
       }
     }
 
@@ -49,12 +59,16 @@ export async function POST(req: NextRequest) {
       return up;
     };
 
-    // ── 3. Get all companies (filtered by plan if requested) ─────────────
+    // ── 3. Get all companies with their subscription provider ────────────
     const companies = await prisma.company.findMany({
       where: plansToSync
         ? { plan: { in: plansToSync.map(p => p.toUpperCase()) } }
         : undefined,
-      select: { id: true, plan: true },
+      select: {
+        id: true,
+        plan: true,
+        subscription: { select: { provider: true } },
+      },
     });
 
     if (companies.length === 0) {
@@ -66,8 +80,10 @@ export async function POST(req: NextRequest) {
     let totalPermsWritten = 0;
 
     for (const company of companies) {
-      const planKey    = normalizePlan(company.plan);
-      const newPerms   = savedPermissions[planKey] || [];
+      const planKey = normalizePlan(company.plan);
+      // Use PKR permissions if the company pays via Safepay (Pakistani users)
+      const isPkrCompany = company.subscription?.provider === "SAFEPAY";
+      const newPerms = (isPkrCompany ? pkrPermissions : savedPermissions)[planKey] || [];
 
       // Get all users in this company
       const userCompanies = await prisma.userCompany.findMany({
