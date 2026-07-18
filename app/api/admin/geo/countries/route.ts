@@ -7,6 +7,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyJwt } from "@/lib/auth";
+import { COUNTRIES } from "@/lib/countries";
+
+// Full country name (uppercase) → ISO 2-letter code, built from COUNTRIES list
+const NAME_TO_CODE: Record<string, string> = {};
+for (const c of COUNTRIES) NAME_TO_CODE[c.name.toUpperCase()] = c.code;
+
+function normalizeCountryCode(raw: string): string {
+  const upper = raw.toUpperCase().trim();
+  // Already a valid 2-letter ISO code
+  if (/^[A-Z]{2}$/.test(upper)) return upper;
+  // Full name like "PAKISTAN" → "PK"
+  return NAME_TO_CODE[upper] || upper;
+}
 
 // Country code → name map for display
 const COUNTRY_NAMES: Record<string,string> = {
@@ -36,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     const countryByCompany = new Map<string, string>();
     for (const c of companies) {
-      if ((c as any).country) countryByCompany.set(c.id, String((c as any).country).toUpperCase());
+      if ((c as any).country) countryByCompany.set(c.id, normalizeCountryCode(String((c as any).country)));
     }
 
     // 2. ActivityLog country logs
@@ -51,7 +64,8 @@ export async function GET(req: NextRequest) {
         if (!l.companyId || countryByCompany.has(l.companyId)) continue;
         try {
           const d = l.details ? JSON.parse(l.details) : null;
-          const code = String(d?.country || d?.country_code || "").toUpperCase();
+          const raw = String(d?.country || d?.country_code || "");
+          const code = raw ? normalizeCountryCode(raw) : "";
           if (code) countryByCompany.set(l.companyId, code);
         } catch {}
       }
@@ -87,7 +101,8 @@ export async function GET(req: NextRequest) {
     const userByCountry: Record<string, Set<string>> = {};
     for (const s of sessions) {
       // Try session.country first, then company country
-      let code = String(s.country || "").toUpperCase();
+      const rawCode = String(s.country || "");
+      let code = rawCode ? normalizeCountryCode(rawCode) : "";
       if (!code && s.companyId) code = countryByCompany.get(s.companyId) || "";
       if (!code) continue;
       if (!userByCountry[code]) userByCountry[code] = new Set();
