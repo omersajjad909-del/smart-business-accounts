@@ -3,14 +3,36 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_ORG    = process.env.OPENAI_ORG;
-const OPENAI_PROJECT = process.env.OPENAI_PROJECT;
+const OPENAI_API_KEY  = process.env.OPENAI_API_KEY;
+const OPENAI_ORG      = process.env.OPENAI_ORG;
+const OPENAI_PROJECT  = process.env.OPENAI_PROJECT;
+const GEMINI_API_KEY  = process.env.GEMINI_API_KEY;
+const HAS_VISION_KEY  = Boolean(GEMINI_API_KEY || OPENAI_API_KEY);
+
+// Gemini Vision — extract JSON from receipt/invoice image
+async function geminiVisionExtract(base64: string, mimeType: string, prompt: string): Promise<string> {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mimeType, data: base64 } }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 1200 },
+      }),
+    },
+  );
+  if (!res.ok) throw new Error(`Gemini Vision error ${res.status}: ${await res.text().catch(() => "")}`);
+  const json = await res.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+  const text = json.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+  if (!text) throw new Error("Gemini returned empty response");
+  return text;
+}
 
 export async function POST(req: NextRequest) {
   try {
-    if (!OPENAI_API_KEY) {
-      return NextResponse.json({ error: "OpenAI API key not configured" }, { status: 500 });
+    if (!HAS_VISION_KEY) {
+      return NextResponse.json({ error: "No vision AI key configured (GEMINI_API_KEY or OPENAI_API_KEY)" }, { status: 500 });
     }
 
     const formData = await req.formData();
@@ -23,13 +45,6 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const base64 = Buffer.from(bytes).toString("base64");
     const mimeType = file.type || "image/jpeg";
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    };
-    if (OPENAI_PROJECT) headers["OpenAI-Project"] = OPENAI_PROJECT;
-    if (OPENAI_ORG)     headers["OpenAI-Organization"] = OPENAI_ORG;
 
     const prompt = `You are a receipt/invoice OCR assistant for a Pakistani accounting system.
 
@@ -59,42 +74,54 @@ Rules:
 - If any field is not visible or unclear, use null (never guess)
 - category should be your best judgment based on vendor name and items`;
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          {
+    // ── Gemini Vision (primary — free tier, multimodal) ───────────────────────
+    let raw = "{}";
+    if (GEMINI_API_KEY) {
+      try {
+        raw = await geminiVisionExtract(base64, mimeType, prompt);
+        // Gemini sometimes wraps JSON in ```json ... ``` — strip it
+        raw = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+      } catch (geminiErr) {
+        console.warn("Gemini Vision failed, falling back to OpenAI:", geminiErr);
+        raw = "{}";
+      }
+    }
+
+    // ── OpenAI Vision (fallback) ───────────────────────────────────────────────
+    if ((raw === "{}" || !raw) && OPENAI_API_KEY) {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      };
+      if (OPENAI_PROJECT) headers["OpenAI-Project"] = OPENAI_PROJECT;
+      if (OPENAI_ORG)     headers["OpenAI-Organization"] = OPENAI_ORG;
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [{
             role: "user",
             content: [
               { type: "text", text: prompt },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:${mimeType};base64,${base64}`,
-                  detail: "high",
-                },
-              },
+              { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64}`, detail: "high" } },
             ],
-          },
-        ],
-        max_tokens: 1200,
-        temperature: 0.1,
-        response_format: { type: "json_object" },
-      }),
-    });
+          }],
+          max_tokens: 1200,
+          temperature: 0.1,
+          response_format: { type: "json_object" },
+        }),
+      });
 
-    if (!response.ok) {
-      const err = await response.text().catch(() => `OpenAI error ${response.status}`);
-      return NextResponse.json({ error: err }, { status: 502 });
+      if (!response.ok) {
+        const err = await response.text().catch(() => `OpenAI error ${response.status}`);
+        return NextResponse.json({ error: err }, { status: 502 });
+      }
+
+      const json = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+      raw = json.choices?.[0]?.message?.content || "{}";
     }
-
-    const json = await response.json() as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-
-    const raw = json.choices?.[0]?.message?.content || "{}";
     let extracted: Record<string, unknown>;
     try {
       extracted = JSON.parse(raw);

@@ -12,6 +12,14 @@ const OPENAI_PROJECT = process.env.OPENAI_PROJECT;
 const OPENAI_ORG = process.env.OPENAI_ORG;
 const HAS_OPENAI_KEY = Boolean(OPENAI_API_KEY);
 
+// Groq — OpenAI-compatible, faster + free tier (primary provider)
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+const HAS_GROQ_KEY = Boolean(GROQ_API_KEY);
+
+// Any AI provider available
+const HAS_AI_KEY = HAS_OPENAI_KEY || HAS_GROQ_KEY;
+
 // ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
 // Complete FinovaOS knowledge base — plans, modules, features, navigation, accounting
 
@@ -934,68 +942,73 @@ export async function openAITextResponse(
   messages: Array<{ role: "user" | "assistant"; content: string }>,
   maxTokens = 1500,
 ): Promise<string> {
-  if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is missing");
+  if (!HAS_AI_KEY) throw new Error("No AI provider configured. Set GROQ_API_KEY or OPENAI_API_KEY.");
+
+  const input = [{ role: "system" as const, content: system }, ...messages];
+
+  // ── Groq (primary — free tier, OpenAI-compatible) ───────────────────────────
+  if (HAS_GROQ_KEY) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${GROQ_API_KEY}` },
+        body: JSON.stringify({ model: GROQ_MODEL, messages: input, max_tokens: maxTokens, temperature: 0.4 }),
+        signal: controller.signal,
+      });
+      if (res.ok) {
+        const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+        const text = json.choices?.[0]?.message?.content?.trim();
+        if (text) return text;
+      } else {
+        console.warn("Groq request failed with status", res.status, "— falling back to OpenAI");
+      }
+    } catch (err) {
+      console.warn("Groq request error, falling back to OpenAI:", err);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  // ── OpenAI (fallback) ────────────────────────────────────────────────────────
+  if (!OPENAI_API_KEY) throw new Error("Groq failed and OPENAI_API_KEY is not set.");
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 25000);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${OPENAI_API_KEY}`,
   };
-
   if (OPENAI_PROJECT) headers["OpenAI-Project"] = OPENAI_PROJECT;
   if (OPENAI_ORG) headers["OpenAI-Organization"] = OPENAI_ORG;
 
   try {
-    const input = [
-      { role: "system", content: system },
-      ...messages,
-    ];
-
     const responsesApi = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        input,
-        max_output_tokens: maxTokens,
-        temperature: 0.4,
-      }),
+      body: JSON.stringify({ model: OPENAI_MODEL, input, max_output_tokens: maxTokens, temperature: 0.4 }),
       signal: controller.signal,
     });
 
     if (responsesApi.ok) {
       const json = await responsesApi.json() as {
         output_text?: string;
-        output?: Array<{
-          content?: Array<{
-            type?: string;
-            text?: string;
-          }>;
-        }>;
+        output?: Array<{ content?: Array<{ type?: string; text?: string }> }>;
       };
-
       const directText = json.output_text?.trim();
       if (directText) return directText;
-
       const nestedText = json.output
         ?.flatMap((item) => item.content || [])
         .filter((item) => item.type === "output_text" || item.type === "text")
         .map((item) => item.text || "")
-        .join("\n")
-        .trim();
-
+        .join("\n").trim();
       if (nestedText) return nestedText;
     }
 
     const chatCompletions = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        messages: input,
-        max_tokens: maxTokens,
-        temperature: 0.4,
-      }),
+      body: JSON.stringify({ model: OPENAI_MODEL, messages: input, max_tokens: maxTokens, temperature: 0.4 }),
       signal: controller.signal,
     });
 
@@ -1004,10 +1017,7 @@ export async function openAITextResponse(
       throw new Error(body);
     }
 
-    const json = await chatCompletions.json() as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-
+    const json = await chatCompletions.json() as { choices?: Array<{ message?: { content?: string } }> };
     return json.choices?.[0]?.message?.content?.trim() || "";
   } catch (error) {
     console.error("OpenAI chat request failed:", error);
@@ -1388,7 +1398,7 @@ export async function finovaChat(
     }
   }
 
-  if (!HAS_OPENAI_KEY) {
+  if (!HAS_AI_KEY) {
     const fallback = localAIReply(message, ctx);
     return (async function* () {
       yield fallback;
@@ -1442,7 +1452,7 @@ Be specific with numbers. Be direct. Use bullet points. Keep it under 400 words.
 
 ${contextStr}`;
 
-  if (!HAS_OPENAI_KEY) {
+  if (!HAS_AI_KEY) {
     return localAIReply("give me insights", ctx);
   }
 
@@ -1611,7 +1621,7 @@ Be specific with numbers. Use the actual data. Keep it practical.
 
 ${contextStr}`;
 
-  if (!HAS_OPENAI_KEY) {
+  if (!HAS_AI_KEY) {
     return localAIReply("cashflow forecast", ctx);
   }
 
@@ -1630,7 +1640,7 @@ export async function generateMarketIntelligenceSummary(
   baseResult: { businessLabel: string; suggestedNewProducts: { name: string; reason: string }[]; trendsThisIndustry: string[]; seasonalOpportunities: { month: string; opportunities: string[] }[] },
   prebuiltCtx?: FinancialContext,
 ): Promise<string> {
-  if (!HAS_OPENAI_KEY) return "";
+  if (!HAS_AI_KEY) return "";
 
   let ctx: FinancialContext;
   if (prebuiltCtx) {
@@ -1681,7 +1691,7 @@ export async function generateAdvisorQuickWins(
     return [];
   }
 
-  if (!HAS_OPENAI_KEY) return [];
+  if (!HAS_AI_KEY) return [];
 
   const contextStr = buildContextString(ctx);
   const risks = baseResult.riskWarnings.slice(0, 2).map(r => `• ${r.title}: ${r.description}`).join("\n");

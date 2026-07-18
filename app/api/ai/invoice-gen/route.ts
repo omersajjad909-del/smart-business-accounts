@@ -7,11 +7,14 @@ export const maxDuration = 60;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_ORG     = process.env.OPENAI_ORG;
 const OPENAI_PROJECT = process.env.OPENAI_PROJECT;
+const GROQ_API_KEY   = process.env.GROQ_API_KEY;
+const GROQ_MODEL     = "llama-3.3-70b-versatile";
+const HAS_AI_KEY     = Boolean(GROQ_API_KEY || OPENAI_API_KEY);
 
 export async function POST(req: NextRequest) {
   try {
-    if (!OPENAI_API_KEY) {
-      return NextResponse.json({ error: "OpenAI API key not configured" }, { status: 500 });
+    if (!HAS_AI_KEY) {
+      return NextResponse.json({ error: "No AI provider configured (GROQ_API_KEY or OPENAI_API_KEY)" }, { status: 500 });
     }
 
     const companyId = req.headers.get("x-company-id");
@@ -95,38 +98,67 @@ Rules:
 - Infer description from context ("consulting fee", "product sale", etc.)
 - Match customer name to the known customer list if similar (case-insensitive, partial match ok)`;
 
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    };
-    if (OPENAI_PROJECT) headers["OpenAI-Project"] = OPENAI_PROJECT;
-    if (OPENAI_ORG)     headers["OpenAI-Organization"] = OPENAI_ORG;
+    const chatMessages = [
+      { role: "system" as const, content: systemPrompt },
+      { role: "user"   as const, content: prompt },
+    ];
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user",   content: prompt },
-        ],
-        max_tokens: 800,
-        temperature: 0.1,
-        response_format: { type: "json_object" },
-      }),
-    });
+    let raw = "{}";
 
-    if (!response.ok) {
-      const err = await response.text().catch(() => `OpenAI error ${response.status}`);
-      return NextResponse.json({ error: err }, { status: 502 });
+    // ── Groq (primary — free, fast, supports JSON mode) ───────────────────────
+    if (GROQ_API_KEY) {
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${GROQ_API_KEY}` },
+          body: JSON.stringify({
+            model: GROQ_MODEL,
+            messages: chatMessages,
+            max_tokens: 800,
+            temperature: 0.1,
+            response_format: { type: "json_object" },
+          }),
+        });
+        if (res.ok) {
+          const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+          raw = json.choices?.[0]?.message?.content || "{}";
+        } else {
+          console.warn("Groq invoice-gen failed, falling back to OpenAI:", res.status);
+        }
+      } catch (err) {
+        console.warn("Groq invoice-gen error, falling back:", err);
+      }
     }
 
-    const json = await response.json() as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
+    // ── OpenAI (fallback) ─────────────────────────────────────────────────────
+    if ((raw === "{}" || !raw) && OPENAI_API_KEY) {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      };
+      if (OPENAI_PROJECT) headers["OpenAI-Project"] = OPENAI_PROJECT;
+      if (OPENAI_ORG)     headers["OpenAI-Organization"] = OPENAI_ORG;
 
-    const raw = json.choices?.[0]?.message?.content || "{}";
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: chatMessages,
+          max_tokens: 800,
+          temperature: 0.1,
+          response_format: { type: "json_object" },
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.text().catch(() => `OpenAI error ${response.status}`);
+        return NextResponse.json({ error: err }, { status: 502 });
+      }
+
+      const json = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+      raw = json.choices?.[0]?.message?.content || "{}";
+    }
     let draft: Record<string, unknown>;
     try {
       draft = JSON.parse(raw);
