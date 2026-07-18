@@ -1194,6 +1194,328 @@ const ARTICLES: Record<string, {
     ],
   },
 
+  "getting-started": {
+    title: "Getting started with FinovaOS",
+    category: "Getting Started", categorySlug: "getting-started",
+    time: "4 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"This guide helps you launch FinovaOS quickly: set up your company, add your first users, and start recording transactions." },
+      { type:"step", step:1, text:"Sign in and complete the company profile with your business name, address, and base currency." },
+      { type:"step", step:2, text:"Invite your team and assign roles so the right people can access accounting, sales, or payroll features." },
+      { type:"step", step:3, text:"Add your first customers, suppliers, and bank accounts." },
+      { type:"step", step:4, text:"Create your first invoice or payment voucher to begin posting transactions." },
+      { type:"tip", text:"Start with the dashboard overview — it shows your cash position, receivables, and top action items in one place." },
+    ],
+    related: [
+      { title:"Create your account", slug:"create-account", category:"Getting Started", categorySlug:"getting-started" },
+      { title:"Connecting your bank account", slug:"connect-bank", category:"Getting Started", categorySlug:"getting-started" },
+      { title:"How bank reconciliation works", slug:"bank-reconciliation", category:"Banking & Reconciliation", categorySlug:"banking" },
+    ],
+  },
+
+  "chart-of-accounts": {
+    title: "Chart of accounts overview",
+    category: "Accounting & Ledger", categorySlug: "accounting",
+    time: "4 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"The chart of accounts is the backbone of your business books. It organizes assets, liabilities, revenue, and expenses for accurate reporting." },
+      { type:"step", step:1, text:"Review the default accounts FinovaOS creates for your business type." },
+      { type:"step", step:2, text:"Add or rename accounts to match your local chart of accounts and reporting needs." },
+      { type:"step", step:3, text:"Use account groups such as Assets, Liabilities, Equity, Income, and Expenses to keep your ledger structured." },
+      { type:"tip", text:"Keep account names clear and avoid duplicate accounts. This makes financial statements easier to read and reconcile." },
+    ],
+    related: [
+      { title:"Journal entries & JVs", slug:"journal-entries", category:"Accounting & Ledger", categorySlug:"accounting" },
+      { title:"Profit & Loss statement", slug:"pl-statement", category:"Reports & Analytics", categorySlug:"reports" },
+      { title:"Balance sheet walkthrough", slug:"balance-sheet", category:"Reports & Analytics", categorySlug:"reports" },
+    ],
+  },
+
+  "journal-entries": {
+    title: "Journal entries & JVs",
+    category: "Accounting & Ledger", categorySlug: "accounting",
+    time: "4 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Journal entries record business activity in your ledger. Every debit has a matching credit, keeping your books balanced." },
+      { type:"step", step:1, text:"Use JVs for adjustments, opening balances, and transactions that don't come from sales or expenses." },
+      { type:"step", step:2, text:"Select the accounts to debit and credit, enter the amount, and add a clear description." },
+      { type:"tip", text:"Use journal entries to correct posting errors, record depreciation, or allocate shared costs across departments." },
+    ],
+    related: [
+      { title:"Chart of accounts overview", slug:"chart-of-accounts", category:"Accounting & Ledger", categorySlug:"accounting" },
+      { title:"Trial balance", slug:"trial-balance", category:"Accounting & Ledger", categorySlug:"accounting" },
+    ],
+  },
+
+  "period-locking": {
+    title: "Period locking & audit trails",
+    category: "Accounting & Ledger", categorySlug: "accounting",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Period locking prevents changes after a financial period is closed. It protects your reports and keeps your audit trail intact." },
+      { type:"step", step:1, text:"Close the accounting period after reconciling your books for the month or year." },
+      { type:"step", step:2, text:"Enable period locking to lock transactions and prevent edits to closed periods." },
+      { type:"tip", text:"Keep a clear audit trail by adding notes to adjustments and journal entries made before closing a period." },
+    ],
+    related: [
+      { title:"Trial balance", slug:"trial-balance", category:"Accounting & Ledger", categorySlug:"accounting" },
+      { title:"Balance sheet walkthrough", slug:"balance-sheet", category:"Reports & Analytics", categorySlug:"reports" },
+    ],
+  },
+
+  "trial-balance": {
+    title: "Trial balance",
+    category: "Accounting & Ledger", categorySlug: "accounting",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"The trial balance lists account totals to confirm debits equal credits before final reports are prepared." },
+      { type:"step", step:1, text:"Run the trial balance after posting all transactions for the period." },
+      { type:"step", step:2, text:"Review accounts with unexpected balances and investigate any differences." },
+      { type:"tip", text:"If debits and credits do not match, check recent journal entries and reconciliations for missing or incorrect postings." },
+    ],
+    related: [
+      { title:"Chart of accounts overview", slug:"chart-of-accounts", category:"Accounting & Ledger", categorySlug:"accounting" },
+      { title:"Balance sheet walkthrough", slug:"balance-sheet", category:"Reports & Analytics", categorySlug:"reports" },
+    ],
+  },
+
+  "grn": {
+    title: "Goods received notes (GRN)",
+    category: "Inventory & Stock", categorySlug: "inventory",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"A GRN records goods received from suppliers and updates stock levels in FinovaOS." },
+      { type:"step", step:1, text:"Go to **Inventory → GRN** and select the supplier." },
+      { type:"step", step:2, text:"Add the products received, quantities, and purchase costs." },
+      { type:"step", step:3, text:"Save the GRN to update inventory and trigger a purchase ledger entry." },
+      { type:"tip", text:"Use GRNs for incoming stock deliveries so your inventory stays accurate and purchase costs are tracked properly." },
+    ],
+    related: [
+      { title:"Adding products and services", slug:"add-products", category:"Inventory & Stock", categorySlug:"inventory" },
+      { title:"Purchase orders", slug:"purchase-orders", category:"Inventory & Stock", categorySlug:"inventory" },
+    ],
+  },
+
+  "purchase-orders": {
+    title: "Purchase orders",
+    category: "Inventory & Stock", categorySlug: "inventory",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Purchase orders help you order supplies, track expected receipts, and compare against actual deliveries." },
+      { type:"step", step:1, text:"Go to **Inventory → Purchase Orders → New Purchase Order**." },
+      { type:"step", step:2, text:"Select the vendor and add the items you want to purchase." },
+      { type:"step", step:3, text:"Send the PO to your supplier and receive materials against the GRN when they arrive." },
+      { type:"tip", text:"Match each GRN to the original purchase order to keep your inventory and accounts aligned." },
+    ],
+    related: [
+      { title:"Goods received notes (GRN)", slug:"grn", category:"Inventory & Stock", categorySlug:"inventory" },
+      { title:"Stock transfer between branches", slug:"stock-transfer", category:"Inventory & Stock", categorySlug:"inventory" },
+    ],
+  },
+
+  "crv": {
+    title: "Cash receipt vouchers (CRV)",
+    category: "Banking & Reconciliation", categorySlug: "banking",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"A CRV records money received into cash or bank accounts, keeping your receipts and ledger balanced." },
+      { type:"step", step:1, text:"Go to **Banking → Payment Vouchers → New CRV**." },
+      { type:"step", step:2, text:"Select the receiving account and enter the payer, date, and amount." },
+      { type:"step", step:3, text:"Choose the income or receivable account to credit and save the voucher." },
+      { type:"tip", text:"Use CRVs for customer receipts, loan recoveries, or any cash/bank inflow that isn't from an invoice." },
+    ],
+    related: [
+      { title:"How bank reconciliation works", slug:"bank-reconciliation", category:"Banking & Reconciliation", categorySlug:"banking" },
+      { title:"Recording payments & receipts", slug:"record-payment", category:"Invoicing & Billing", categorySlug:"invoicing" },
+    ],
+  },
+
+  "add-employees": {
+    title: "Adding employees & departments",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "4 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Add employees and departments so payroll, attendance, and HR records are linked correctly in FinovaOS." },
+      { type:"step", step:1, text:"Go to **HR → Employees → Add Employee**." },
+      { type:"step", step:2, text:"Fill in personal details, salary structure, and department assignment." },
+      { type:"step", step:3, text:"Save the employee profile and repeat for your team members." },
+      { type:"tip", text:"Group employees into departments to run payroll and attendance reports by team." },
+    ],
+    related: [
+      { title:"Attendance & timesheets", slug:"attendance", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Run monthly payroll", slug:"run-payroll", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "attendance": {
+    title: "Attendance & timesheets",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Track employee attendance, check-ins, and work hours to calculate payroll accurately." },
+      { type:"step", step:1, text:"Go to **HR → Attendance** and select the month or date range." },
+      { type:"step", step:2, text:"Review employee entries, add missing times, and approve the final timesheet." },
+      { type:"tip", text:"Approve attendance before payroll is processed so salaries reflect the correct hours worked." },
+    ],
+    related: [
+      { title:"Leave management", slug:"leave-management", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Run monthly payroll", slug:"run-payroll", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "leave-management": {
+    title: "Leave management",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Manage employee leaves, approvals, and remaining balances from one place." },
+      { type:"step", step:1, text:"Go to **HR → Leave Management**." },
+      { type:"step", step:2, text:"Create leave policies, add leave types, and assign them to employees." },
+      { type:"step", step:3, text:"Review leave requests and approve or reject them with notes." },
+      { type:"tip", text:"Link leave management to payroll so unpaid leaves or advance leaves are reflected automatically." },
+    ],
+    related: [
+      { title:"Attendance & timesheets", slug:"attendance", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Run monthly payroll", slug:"run-payroll", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "run-payroll": {
+    title: "Run monthly payroll",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "4 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Process payroll each month and generate salary payments, deductions, and payslips." },
+      { type:"step", step:1, text:"Go to **HR → Payroll → Run Payroll**." },
+      { type:"step", step:2, text:"Verify employee salary details, allowances, and deductions." },
+      { type:"step", step:3, text:"Approve the payroll run and post the salary journal entry." },
+      { type:"tip", text:"Run payroll after attendance and leave are finalized so amounts are accurate." },
+    ],
+    related: [
+      { title:"Payslips & PDF export", slug:"payslips", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Salary advance management", slug:"salary-advance", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "payslips": {
+    title: "Payslips & PDF export",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Generate payslips for employees and export them as PDF files for payroll records." },
+      { type:"step", step:1, text:"Open the payroll run and select employees for payslip generation." },
+      { type:"step", step:2, text:"Review the salary, deductions, and net pay amounts." },
+      { type:"step", step:3, text:"Export payslips to PDF or email them directly to employees." },
+      { type:"tip", text:"Use payslip exports to share payroll details with employees securely and keep a copy for compliance." },
+    ],
+    related: [
+      { title:"Run monthly payroll", slug:"run-payroll", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Salary advance management", slug:"salary-advance", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "salary-advance": {
+    title: "Salary advance management",
+    category: "HR & Payroll", categorySlug: "payroll",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Record salary advances paid to employees and deduct them from future payrolls." },
+      { type:"step", step:1, text:"Go to **HR → Payroll → Salary Advances**." },
+      { type:"step", step:2, text:"Select the employee and enter the advance amount and date." },
+      { type:"step", step:3, text:"Save the advance and allow FinovaOS to apply it during the next payroll run." },
+      { type:"tip", text:"Keep advance records current so payroll net pay reflects outstanding employee advances." },
+    ],
+    related: [
+      { title:"Run monthly payroll", slug:"run-payroll", category:"HR & Payroll", categorySlug:"payroll" },
+      { title:"Payslips & PDF export", slug:"payslips", category:"HR & Payroll", categorySlug:"payroll" },
+    ],
+  },
+
+  "add-branch": {
+    title: "Add a new branch / location",
+    category: "Multi-Branch & Companies", categorySlug: "account",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Create a new branch or location in FinovaOS to track transactions separately by site." },
+      { type:"step", step:1, text:"Go to **Settings → Branches** and click **Add Branch**." },
+      { type:"step", step:2, text:"Enter the branch name, address, and contact details." },
+      { type:"step", step:3, text:"Save the branch and assign users or cost centers as needed." },
+      { type:"tip", text:"Use branch-level tracking to compare performance and inventory across locations." },
+    ],
+    related: [
+      { title:"Stock transfer between branches", slug:"stock-transfer", category:"Inventory & Stock", categorySlug:"inventory" },
+      { title:"Per-branch roles & permissions", slug:"branch-roles", category:"Multi-Branch & Companies", categorySlug:"account" },
+    ],
+  },
+
+  "consolidated-pl": {
+    title: "Consolidated P&L report",
+    category: "Multi-Branch & Companies", categorySlug: "account",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"The consolidated P&L report combines revenues and expenses from multiple branches or companies into one financial statement." },
+      { type:"step", step:1, text:"Go to **Reports → Consolidated P&L**." },
+      { type:"step", step:2, text:"Select the branches or companies to include in the report." },
+      { type:"step", step:3, text:"Generate the report and export it to PDF or Excel." },
+      { type:"tip", text:"Use consolidated reports for group-level analysis and board presentation." },
+    ],
+    related: [
+      { title:"Trial balance", slug:"trial-balance", category:"Accounting & Ledger", categorySlug:"accounting" },
+      { title:"Multi-company setup", slug:"multi-company", category:"Multi-Branch & Companies", categorySlug:"account" },
+    ],
+  },
+
+  "branch-roles": {
+    title: "Per-branch roles & permissions",
+    category: "Multi-Branch & Companies", categorySlug: "account",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Assign different access levels to users for each branch — so employees only see the locations they work with." },
+      { type:"step", step:1, text:"Go to **Settings → User Roles → Branch Access**." },
+      { type:"step", step:2, text:"Select the user and enable access to the required branches." },
+      { type:"step", step:3, text:"Save permissions and verify that the user can only switch to allowed branches." },
+      { type:"tip", text:"Use branch-based access to protect sensitive financial data and reduce accidental entries in the wrong location." },
+    ],
+    related: [
+      { title:"Add a new branch / location", slug:"add-branch", category:"Multi-Branch & Companies", categorySlug:"account" },
+      { title:"Multi-company setup", slug:"multi-company", category:"Multi-Branch & Companies", categorySlug:"account" },
+    ],
+  },
+
+  "multi-company": {
+    title: "Multi-company setup",
+    category: "Multi-Branch & Companies", categorySlug: "account",
+    time: "4 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Set up multiple companies within FinovaOS to manage separate ledgers, invoices, and reporting for each entity." },
+      { type:"step", step:1, text:"Go to **Settings → Companies → Add Company**." },
+      { type:"step", step:2, text:"Enter the legal company name, tax details, and base currency." },
+      { type:"step", step:3, text:"Save the company and assign users with company-specific access." },
+      { type:"tip", text:"Use multi-company only if you need separate financial records for different legal entities." },
+    ],
+    related: [
+      { title:"Switching between companies", slug:"switch-company", category:"Multi-Branch & Companies", categorySlug:"account" },
+      { title:"Consolidated P&L report", slug:"consolidated-pl", category:"Multi-Branch & Companies", categorySlug:"account" },
+    ],
+  },
+
+  "switch-company": {
+    title: "Switching between companies",
+    category: "Multi-Branch & Companies", categorySlug: "account",
+    time: "3 min", updatedAt: "July 18, 2026",
+    content: [
+      { type:"intro", text:"Switch between companies quickly to work in the correct set of books and reports." },
+      { type:"step", step:1, text:"Click the company selector in the top navigation bar." },
+      { type:"step", step:2, text:"Choose the company you want to work in." },
+      { type:"step", step:3, text:"Confirm the switch and wait for FinovaOS to reload the selected company context." },
+      { type:"tip", text:"Switch companies before creating invoices or payments to avoid posting in the wrong entity." },
+    ],
+    related: [
+      { title:"Multi-company setup", slug:"multi-company", category:"Multi-Branch & Companies", categorySlug:"account" },
+      { title:"Consolidated P&L report", slug:"consolidated-pl", category:"Multi-Branch & Companies", categorySlug:"account" },
+    ],
+  },
+
 };
 
 /* ─── Bold text renderer ─── */
