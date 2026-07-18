@@ -5,6 +5,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { sendEmail } from "@/lib/email";
 import { emailTemplates } from "@/lib/emailTemplates";
 import { mapLemonSubscriptionStatus, verifyLemonSignature } from "@/lib/lemonsqueezy";
+import { mapSafepayEventToStatus, verifySafepaySignature } from "@/lib/safepay";
 
 function safeDate(value: unknown) {
   if (!value) return null;
@@ -16,8 +17,11 @@ async function applySuccessfulPlanUpdate(params: {
   companyId: string;
   planCode: string;
   status: string;
+  provider?: string | null;
   providerCustomerId?: string | null;
   providerSubscriptionId?: string | null;
+  safepayTracker?: string | null;
+  safepayOrderId?: string | null;
   currentPeriodEnd?: Date | null;
   billingCycle?: string | null;
   displayCurrency?: string | null;
@@ -62,25 +66,33 @@ async function applySuccessfulPlanUpdate(params: {
     },
   });
 
+  const provider = String(params.provider || "LEMONSQUEEZY").toUpperCase();
+
   await prisma.subscription.upsert({
     where: { companyId: params.companyId },
     update: {
       plan: normalizedPlan,
       status: params.status,
+      provider,
       billingCycle: normalizedCycle,
       currentPeriodEnd: params.currentPeriodEnd || undefined,
       ...(params.providerCustomerId     ? { stripeCustomerId: params.providerCustomerId }         : {}),
       ...(params.providerSubscriptionId ? { stripeSubscriptionId: params.providerSubscriptionId } : {}),
+      ...(params.safepayTracker         ? { safepayTracker: params.safepayTracker }               : {}),
+      ...(params.safepayOrderId         ? { safepayOrderId: params.safepayOrderId }               : {}),
       ...(typeof params.invoiceAmount === "number" ? { pricePerMonth: params.invoiceAmount } : {}),
     },
     create: {
       companyId: params.companyId,
       plan: normalizedPlan,
       status: params.status,
+      provider,
       billingCycle: normalizedCycle,
       currentPeriodEnd: params.currentPeriodEnd || undefined,
       stripeCustomerId: params.providerCustomerId || undefined,
       stripeSubscriptionId: params.providerSubscriptionId || undefined,
+      safepayTracker: params.safepayTracker || undefined,
+      safepayOrderId: params.safepayOrderId || undefined,
       pricePerMonth: typeof params.invoiceAmount === "number" ? params.invoiceAmount : 0,
     },
   });
@@ -628,13 +640,139 @@ async function handleStripeWebhook(req: NextRequest, raw: string) {
   return apiOk({ received: true, provider: "stripe" });
 }
 
+// ─── Safepay ──────────────────────────────────────────────────────────────────
+
+async function handleSafepayWebhook(req: NextRequest, raw: string) {
+  const sig = req.headers.get("x-sfpy-signature");
+  if (!verifySafepaySignature(raw, sig)) {
+    return apiError("Invalid Safepay signature", 400);
+  }
+
+  const payload  = JSON.parse(raw);
+  const event    = String(payload?.type || payload?.event || "");
+  const data     = payload?.data || payload?.payload || {};
+  const tracker  = String(data?.tracker?.token || data?.tracker || payload?.tracker || "");
+  const orderId  = String(data?.order?.ref || data?.order_id || payload?.order_id || "");
+  const meta     = data?.metadata || data?.order?.metadata || payload?.metadata || {};
+
+  // Extract companyId from metadata or order ref pattern (fnv-<companyId>-<ts>)
+  let companyId = String(meta?.company_id || "").trim();
+  if (!companyId && orderId.startsWith("fnv-")) {
+    const parts = orderId.split("-");
+    if (parts.length >= 2) companyId = parts.slice(1, -1).join("-");
+  }
+  if (!companyId) return apiError("Missing company_id in Safepay webhook", 400);
+
+  const planCode     = String(meta?.plan_code     || "STARTER").toUpperCase();
+  const billingCycle = String(meta?.billing_cycle || "MONTHLY").toUpperCase() === "YEARLY" ? "YEARLY" : "MONTHLY";
+
+  // Idempotency — use tracker or orderId as the unique event key
+  const eventKey = `${event}:${tracker || orderId}`;
+  if (eventKey !== ":" && await alreadyProcessed("safepay", eventKey)) {
+    return apiOk({ received: true, provider: "safepay", duplicate: true });
+  }
+
+  const status = mapSafepayEventToStatus(event);
+
+  const amountPkr = typeof data?.order?.amount === "number" ? data.order.amount : null;
+
+  if (status === "ACTIVE") {
+    // Calculate 30-day (monthly) or 365-day (yearly) period end
+    const periodDays = billingCycle === "YEARLY" ? 365 : 30;
+    const currentPeriodEnd = new Date(Date.now() + periodDays * 24 * 60 * 60 * 1000);
+
+    await applySuccessfulPlanUpdate({
+      companyId,
+      planCode,
+      status,
+      provider: "SAFEPAY",
+      safepayTracker: tracker || null,
+      safepayOrderId: orderId || null,
+      currentPeriodEnd,
+      billingCycle,
+      displayCurrency: "PKR",
+      displayCountry: "PK",
+      invoiceAmount: amountPkr,
+    });
+
+    await prisma.activityLog.create({
+      data: {
+        companyId, userId: null,
+        action: "SAFEPAY_PAYMENT_SUCCESS",
+        details: JSON.stringify({ event, planCode, billingCycle, tracker, orderId, amountPkr }),
+      },
+    }).catch(() => {});
+
+    // Clear dunning state on successful payment
+    await prisma.$executeRawUnsafe(
+      `UPDATE "Company" SET "paymentFailedAt" = NULL WHERE "id" = $1`,
+      companyId,
+    ).catch(() => {});
+
+    const nextBilling = currentPeriodEnd.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+    await sendPaymentConfirmationEmail(companyId, planCode, amountPkr || 0, "PKR", nextBilling);
+
+    if (event.includes("subscription:activated") || event.includes("payment:created")) {
+      await sendWelcomeSubscriptionEmail(companyId, planCode, "PK");
+    }
+  }
+
+  if (status === "PAST_DUE") {
+    try {
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Company"
+           SET "paymentFailedAt" = COALESCE("paymentFailedAt", NOW()),
+               "subscriptionStatus" = CASE
+                 WHEN "subscriptionStatus" IN ('ACTIVE','TRIALING') THEN 'PAST_DUE'
+                 ELSE "subscriptionStatus"
+               END
+         WHERE "id" = $1`,
+        companyId,
+      );
+    } catch {
+      await prisma.company.update({
+        where: { id: companyId },
+        data: { subscriptionStatus: "PAST_DUE" },
+      }).catch(() => {});
+    }
+
+    await prisma.activityLog.create({
+      data: {
+        companyId, userId: null,
+        action: "SAFEPAY_PAYMENT_FAILED",
+        details: JSON.stringify({ event, planCode, tracker, orderId, amountPkr }),
+      },
+    }).catch(() => {});
+
+    await sendPaymentFailedEmail(companyId, planCode, amountPkr || 0, "PKR", "soon");
+  }
+
+  if (status === "CANCELLED") {
+    await prisma.company.update({
+      where: { id: companyId },
+      data:  { subscriptionStatus: "INACTIVE" },
+    }).catch(() => {});
+
+    await prisma.activityLog.create({
+      data: {
+        companyId, userId: null,
+        action: "SAFEPAY_SUBSCRIPTION_CANCELLED",
+        details: JSON.stringify({ event, planCode, tracker, orderId }),
+      },
+    }).catch(() => {});
+  }
+
+  return apiOk({ received: true, provider: "safepay" });
+}
+
 // ─── Entry point ──────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
   try {
     const raw = await req.text();
-    if (req.headers.get("x-signature"))     return await handleLemonWebhook(req, raw);
-    if (req.headers.get("stripe-signature")) return await handleStripeWebhook(req, raw);
+    if (req.headers.get("x-sfpy-signature"))  return await handleSafepayWebhook(req, raw);
+    if (req.headers.get("x-signature"))        return await handleLemonWebhook(req, raw);
+    if (req.headers.get("stripe-signature"))   return await handleStripeWebhook(req, raw);
     return apiError("Unsupported webhook signature", 400);
   } catch (e: any) {
     return apiError(e.message, 500);
