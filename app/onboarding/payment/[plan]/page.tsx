@@ -100,20 +100,16 @@ const METHOD_GROUPS: MethodGroup[] = [
     methods: [
       { id: "card",      label: "Credit / Debit Card",  desc: "Visa, Mastercard, Amex, Discover", popular: true, processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconCard /> },
       { id: "paypal",    label: "PayPal",                desc: "Pay with your PayPal balance",                    processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconPayPal /> },
-      { id: "applepay",  label: "Apple Pay",             desc: "Touch ID / Face ID checkout",                     processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconApplePay /> },
-      { id: "googlepay", label: "Google Pay",            desc: "One-tap payment",                                  processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconGooglePay /> },
     ],
   },
   {
-    label: "Wise",
+    label: "Pakistan",
     color: "#34d399",
     bg: "rgba(52,211,153,0.06)",
     border: "rgba(52,211,153,0.2)",
-    badge: "Bank Transfer",
+    badge: "Safepay",
     methods: [
-      { id: "bank", label: "Bank Transfer via Wise", desc: "Local bank rates, fast settlement", processor: "Wise", processorColor: "#34d399", icon: <IconBank /> },
-      { id: "ach", label: "ACH Transfer", desc: "US bank debit / account transfer", processor: "Wise", processorColor: "#34d399", icon: <IconAch /> },
-      { id: "sepa", label: "SEPA Transfer", desc: "European bank transfer", processor: "Wise", processorColor: "#34d399", icon: <IconSepa /> },
+      { id: "bank", label: "Safepay Bank Transfer", desc: "Automated local bank transfer", processor: "Safepay", processorColor: "#34d399", icon: <IconBank /> },
     ],
   },
   {
@@ -127,22 +123,10 @@ const METHOD_GROUPS: MethodGroup[] = [
       { id: "easypaisa", label: "Easypaisa",  desc: "Pakistan mobile wallet",  processor: "Easypaisa", processorColor: "#38bdf8", icon: <IconJazz /> },
     ],
   },
-  {
-    label: "More Methods",
-    color: "#a78bfa",
-    bg: "rgba(167,139,250,0.06)",
-    border: "rgba(167,139,250,0.2)",
-    badge: "Crypto & BNPL",
-    methods: [
-      { id: "crypto",  label: "Cryptocurrency", desc: "Bitcoin, Ethereum, USDT, SOL",   processor: "Self-custody", processorColor: "#a78bfa", icon: <IconCrypto /> },
-      { id: "klarna",  label: "Klarna / BNPL",  desc: "Buy now, pay later in 4x",       processor: "Klarna",       processorColor: "#a78bfa", icon: <IconKlarna /> },
-    ],
-  },
 ];
 
 const FALLBACK_ENABLED_METHODS: PayMethod[] = [
-  "card", "paypal", "applepay", "googlepay", "bank", "ach", "sepa",
-  "jazzcash", "easypaisa", "crypto", "klarna",
+  "card", "paypal", "bank", "jazzcash", "easypaisa",
 ];
 
 /* ── Helpers ────────────────────────────────────────────── */
@@ -836,48 +820,18 @@ export default function PaymentPage() {
                     </div>
                   )}
 
-                  {/* APPLE PAY */}
-                  {method === "applepay" && (
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
-                      <div style={{ width:64, height:64, borderRadius:18, background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                        <IconApplePay />
-                      </div>
-                      <div style={{ fontSize:15, fontWeight:700 }}>Apple Pay</div>
-                      <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", textAlign:"center", maxWidth:280 }}>Complete your purchase using Touch ID or Face ID. Available on Safari and iOS devices.</div>
-                      <div style={{ width:"100%" }}><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
-                      <div style={{ padding:"10px 16px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center" }}>
-                        Apple Pay will launch automatically at checkout
-                      </div>
-                    </div>
-                  )}
-
-                  {/* GOOGLE PAY */}
-                  {method === "googlepay" && (
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
-                      <div style={{ width:64, height:64, borderRadius:18, background:"rgba(66,133,244,.1)", border:"1px solid rgba(66,133,244,.25)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                        <IconGooglePay />
-                      </div>
-                      <div style={{ fontSize:15, fontWeight:700 }}>Google Pay</div>
-                      <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", textAlign:"center", maxWidth:280 }}>One-tap payment using your saved Google Pay cards.</div>
-                      <div style={{ width:"100%" }}><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
-                      <div style={{ padding:"10px 16px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center" }}>
-                        Google Pay will launch automatically at checkout
-                      </div>
-                    </div>
-                  )}
-
-                  {/* BANK / WISE */}
+                  {/* SAFEPAY BANK TRANSFER */}
                   {(method === "bank" || method === "ach" || method === "sepa") && (
                     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
                       <div style={{ width:64, height:64, borderRadius:18, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399" }}>
                         {method === "sepa" ? <IconSepa /> : method === "ach" ? <IconAch /> : <IconBank />}
                       </div>
                       <div style={{ fontSize:15, fontWeight:700 }}>
-                        {method === "bank" ? "Bank Transfer via Wise" : method === "ach" ? "ACH Bank Transfer" : "SEPA Bank Transfer"}
+                        {method === "bank" ? "Safepay Bank Transfer" : method === "ach" ? "ACH Bank Transfer" : "SEPA Bank Transfer"}
                       </div>
                       <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, width:"100%", marginTop:4 }}>
                         {(method === "bank"
-                          ? ["Local bank rates","Fast settlement","No hidden fees","Secure transfer"]
+                          ? ["Local bank transfer","Unique checkout reference","Automatic verification","Secure Safepay flow"]
                           : method === "ach"
                           ? ["US bank debit","Low processing fee","2–3 business days","No card needed"]
                           : ["EU bank transfer","Single Euro Payments","1–2 business days","No card needed"]
@@ -888,7 +842,7 @@ export default function PaymentPage() {
                         ))}
                       </div>
                       <div style={{ width:"100%", padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center", lineHeight:1.65 }}>
-                        Bank transfer details will be shown at checkout · Powered by LemonSqueezy
+                        Bank transfer details will be shown at checkout · Powered by Safepay
                       </div>
                       <div style={{ width:"100%" }}><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
@@ -1112,7 +1066,7 @@ export default function PaymentPage() {
 
                 {/* Processor logos row */}
                 <div style={{ marginTop:12, display:"flex", alignItems:"center", justifyContent:"center", gap:10, flexWrap:"wrap" }}>
-                  {["LemonSqueezy","Wise","JazzCash","Easypaisa","Crypto","Klarna"].map(p => (
+                  {["LemonSqueezy","PayPal","Safepay","JazzCash","Easypaisa"].map(p => (
                     <div key={p} style={{ padding:"3px 9px", borderRadius:6, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.08)", fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".04em" }}>{p}</div>
                   ))}
                 </div>

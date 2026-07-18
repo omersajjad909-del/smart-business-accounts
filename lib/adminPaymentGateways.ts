@@ -11,34 +11,29 @@ export type AdminPaymentGatewaySeed = {
 
 export const ADMIN_PAYMENT_GATEWAY_DEFAULTS: AdminPaymentGatewaySeed[] = [
   { key: "CASH", name: "Cash", description: "Physical cash payments accepted in-store", category: "OFFLINE", isEnabled: true, sortOrder: 1 },
-  { key: "BANK", name: "Bank Transfer", description: "Direct bank-to-bank wire or IBFT transfers", category: "OTHER", isEnabled: true, sortOrder: 2 },
+  { key: "BANK", name: "Safepay Bank Transfer", description: "Automated Pakistan bank transfer via Safepay", category: "OTHER", isEnabled: true, sortOrder: 2 },
   { key: "CHEQUE", name: "Cheque", description: "Payment by cheque or check", category: "OFFLINE", isEnabled: true, sortOrder: 3 },
   { key: "STRIPE", name: "Card", description: "Credit and debit card checkout", category: "CARD", isEnabled: true, sortOrder: 4 },
   { key: "PAYPAL", name: "PayPal", description: "PayPal wallet and linked card payments", category: "CARD", isEnabled: true, sortOrder: 5 },
-  { key: "APPLEPAY", name: "Apple Pay", description: "Apple wallet checkout for supported devices", category: "CARD", isEnabled: true, sortOrder: 6 },
-  { key: "GOOGLEPAY", name: "Google Pay", description: "Google wallet checkout for supported devices", category: "CARD", isEnabled: true, sortOrder: 7 },
-  { key: "ACH", name: "ACH Transfer", description: "US bank debit and account transfer", category: "OTHER", isEnabled: true, sortOrder: 8 },
-  { key: "SEPA", name: "SEPA Transfer", description: "European bank transfer", category: "OTHER", isEnabled: true, sortOrder: 9 },
-  { key: "JAZZCASH", name: "JazzCash", description: "Pakistan mobile wallet - JazzCash", category: "MOBILE", isEnabled: true, sortOrder: 10 },
-  { key: "EASYPAISA", name: "Easypaisa", description: "Pakistan mobile wallet - Easypaisa", category: "MOBILE", isEnabled: true, sortOrder: 11 },
-  { key: "SADAD", name: "SADAD", description: "Saudi Arabia bill payment system", category: "MOBILE", isEnabled: true, sortOrder: 12 },
-  { key: "RAZORPAY", name: "Razorpay", description: "India cards, UPI, netbanking, wallets", category: "CARD", isEnabled: true, sortOrder: 13 },
-  { key: "CRYPTO", name: "Cryptocurrency", description: "Bitcoin, ETH, USDT and other crypto payments", category: "CRYPTO", isEnabled: true, sortOrder: 14 },
-  { key: "KLARNA", name: "Klarna / BNPL", description: "Buy now, pay later installments", category: "OTHER", isEnabled: true, sortOrder: 15 },
+  { key: "JAZZCASH", name: "JazzCash", description: "Pakistan mobile wallet - JazzCash", category: "MOBILE", isEnabled: true, sortOrder: 6 },
+  { key: "EASYPAISA", name: "Easypaisa", description: "Pakistan mobile wallet - Easypaisa", category: "MOBILE", isEnabled: true, sortOrder: 7 },
+];
+
+const DEPRECATED_CHECKOUT_GATEWAY_KEYS = [
+  "APPLEPAY",
+  "GOOGLEPAY",
+  "ACH",
+  "SEPA",
+  "CRYPTO",
+  "KLARNA",
 ];
 
 export const GATEWAY_METHOD_MAP: Record<string, string[]> = {
   STRIPE: ["card"],
   PAYPAL: ["paypal"],
-  APPLEPAY: ["applepay"],
-  GOOGLEPAY: ["googlepay"],
   BANK: ["bank"],
-  ACH: ["ach"],
-  SEPA: ["sepa"],
   JAZZCASH: ["jazzcash"],
   EASYPAISA: ["easypaisa"],
-  CRYPTO: ["crypto"],
-  KLARNA: ["klarna"],
 };
 
 export function isMissingAdminPaymentGatewayTableError(error: unknown) {
@@ -110,6 +105,11 @@ export async function syncAdminPaymentGatewayDefaults() {
       data: { isEnabled: true },
     });
   }
+
+  await prisma.adminPaymentGateway.updateMany({
+    where: { key: { in: DEPRECATED_CHECKOUT_GATEWAY_KEYS } },
+    data: { isEnabled: false },
+  });
 
   return listAdminPaymentGateways();
 }
