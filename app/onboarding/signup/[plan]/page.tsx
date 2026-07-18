@@ -406,10 +406,22 @@ export default function SignupByPlanPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneCountry, setPhoneCountry] = useState("PK");
-  const [dialCode, setDialCode] = useState("92");
+  const [phoneCountry, setPhoneCountry] = useState(() => {
+    const cc = (searchParams.get("country") || "").toUpperCase();
+    return cc || "PK";
+  });
+  const [dialCode, setDialCode] = useState(() => {
+    const cc = (searchParams.get("country") || "").toUpperCase();
+    return cc ? (DIAL_CODES[cc] || "92") : "92";
+  });
   const [phone, setPhone] = useState("");
-  const [location, setLocation] = useState("United States");
+  const [location, setLocation] = useState(() => {
+    const cc = (searchParams.get("country") || "").toUpperCase();
+    const cur = (searchParams.get("currency") || "").toUpperCase();
+    const code = cc || (cur === "PKR" ? "PK" : "");
+    if (code) return COUNTRIES.find(c => c.code === code)?.name || "United States";
+    return "United States";
+  });
   const [companyName, setCompanyName] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
