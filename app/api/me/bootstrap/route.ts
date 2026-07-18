@@ -74,6 +74,7 @@ export async function GET(req: NextRequest) {
       company,
       branches,
       planConfigLog,
+      pkrPlanConfigLog,
       pageVisibilityLog,
       businessModuleLog,
       shortcutsLog,
@@ -107,6 +108,11 @@ export async function GET(req: NextRequest) {
       }).catch(() => [] as any[]),
       prisma.activityLog.findFirst({
         where: { action: "PLAN_CONFIG" },
+        orderBy: { createdAt: "desc" },
+        select: { details: true },
+      }).catch(() => null),
+      prisma.activityLog.findFirst({
+        where: { action: "PKR_PLAN_CONFIG" },
         orderBy: { createdAt: "desc" },
         select: { details: true },
       }).catch(() => null),
@@ -166,11 +172,19 @@ export async function GET(req: NextRequest) {
       } catch {}
     }
 
+    // Detect PKR company (Pakistan-based: baseCurrency=PKR or country=PK/Pakistan)
+    const isPkrCompany =
+      company.baseCurrency === "PKR" ||
+      String(company.country || "").toUpperCase() === "PK" ||
+      String(company.country || "").toLowerCase() === "pakistan";
+
     // Plan config: permissions + dashboard features
+    // PKR companies use admin-set PKR-specific permissions/features
     let planPermsMap: Record<string, string[]>;
     let dashboardFlagsMap: Record<string, string[]>;
-    if (planConfigLog?.details) {
-      const saved = JSON.parse(planConfigLog.details);
+    const activeConfigLog = isPkrCompany && pkrPlanConfigLog ? pkrPlanConfigLog : planConfigLog;
+    if (activeConfigLog?.details) {
+      const saved = JSON.parse(activeConfigLog.details);
       planPermsMap = normalizePlanPermissions(saved.planPermissions);
       dashboardFlagsMap = normalizeDashboardFeatureFlags(saved.dashboardFeatureFlags);
     } else {
@@ -234,6 +248,7 @@ export async function GET(req: NextRequest) {
       dashboardFeatures,
       moduleStatus,
       bizFeatures,
+      isPkrCompany,
     }, {
       headers: { "Cache-Control": "private, no-store" },
     });
