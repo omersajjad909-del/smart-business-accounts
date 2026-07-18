@@ -128,6 +128,7 @@ const METHOD_GROUPS: MethodGroup[] = [
 const FALLBACK_ENABLED_METHODS: PayMethod[] = [
   "card", "paypal", "bank", "jazzcash", "easypaisa",
 ];
+const ALLOWED_CHECKOUT_METHODS = new Set<PayMethod>(FALLBACK_ENABLED_METHODS);
 
 /* ── Helpers ────────────────────────────────────────────── */
 function fmt4(v: string) { return v.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim(); }
@@ -241,7 +242,7 @@ export default function PaymentPage() {
       const saved = localStorage.getItem("finovaPayMethod");
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed?.type) {
+        if (parsed?.type && ALLOWED_CHECKOUT_METHODS.has(parsed.type as PayMethod)) {
           setSavedPayMethod(parsed);
           setMethod(parsed.type as PayMethod);
         }
@@ -330,7 +331,7 @@ export default function PaymentPage() {
         if (!response.ok) return;
         const data = await response.json();
         if (Array.isArray(data?.enabledMethodIds) && data.enabledMethodIds.length > 0) {
-          setEnabledMethods(data.enabledMethodIds as PayMethod[]);
+          setEnabledMethods((data.enabledMethodIds as PayMethod[]).filter((methodId) => ALLOWED_CHECKOUT_METHODS.has(methodId)));
         }
         if (Array.isArray(data?.gateways)) {
           const jzGw = data.gateways.find((g: any) => g.key === "JAZZCASH");
@@ -821,21 +822,16 @@ export default function PaymentPage() {
                   )}
 
                   {/* SAFEPAY BANK TRANSFER */}
-                  {(method === "bank" || method === "ach" || method === "sepa") && (
+                  {method === "bank" && (
                     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
                       <div style={{ width:64, height:64, borderRadius:18, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399" }}>
-                        {method === "sepa" ? <IconSepa /> : method === "ach" ? <IconAch /> : <IconBank />}
+                        <IconBank />
                       </div>
                       <div style={{ fontSize:15, fontWeight:700 }}>
-                        {method === "bank" ? "Safepay Bank Transfer" : method === "ach" ? "ACH Bank Transfer" : "SEPA Bank Transfer"}
+                        Safepay Bank Transfer
                       </div>
                       <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, width:"100%", marginTop:4 }}>
-                        {(method === "bank"
-                          ? ["Local bank transfer","Unique checkout reference","Automatic verification","Secure Safepay flow"]
-                          : method === "ach"
-                          ? ["US bank debit","Low processing fee","2–3 business days","No card needed"]
-                          : ["EU bank transfer","Single Euro Payments","1–2 business days","No card needed"]
-                        ).map(t => (
+                        {["Local bank transfer","Unique checkout reference","Automatic verification","Secure Safepay flow"].map(t => (
                           <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.6)", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"9px 12px" }}>
                             <span style={{ color:"#34d399", fontSize:12 }}>✓</span>{t}
                           </div>
