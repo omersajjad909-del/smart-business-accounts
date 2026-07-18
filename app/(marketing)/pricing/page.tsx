@@ -501,7 +501,7 @@ export default function PricingPage() {
     [customModuleTotal, extraUsers, extraBranches, seatRate]
   );
   const customDisplayUsd = billing === "yearly" ? Math.round(customMonthly * (1 - yearlyDiscount / 100)) : customMonthly;
-  const formatPrice = (usd: number) => formatFromUSD(usd, currency, rates);
+  const formatPrice = (usd: number) => formatFromUSD(usd, currency);
 
   // When country is PK and admin has set PKR prices, use those directly
   const isPKUser = country === "PK" || currency === "PKR";
@@ -627,8 +627,8 @@ export default function PricingPage() {
             const introPrice = Math.round(regularPrice * 0.25);
 
             // Use admin-set PKR prices when visitor is from Pakistan
-            const pkrPlanKey = plan.slug as keyof typeof pkrPricing;
-            const useAdminPkr = isPKUser && pkrPricing;
+            const pkrPlanKey = plan.slug as "starter" | "professional" | "enterprise";
+            const useAdminPkr = isPKUser && pkrPricing != null;
             const pkrAmount = useAdminPkr ? (billing === "yearly" ? pkrPricing![pkrPlanKey].yearly : pkrPricing![pkrPlanKey].monthly) : 0;
             const displayRegular = useAdminPkr ? `₨${pkrAmount.toLocaleString("en-PK")}` : formatPrice(regularPrice);
             const displayIntro   = useAdminPkr ? `₨${Math.round(pkrAmount * 0.25).toLocaleString("en-PK")}` : formatPrice(introPrice);

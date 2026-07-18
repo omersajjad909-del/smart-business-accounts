@@ -59,17 +59,21 @@ export async function POST(req: NextRequest) {
       return up;
     };
 
-    // ── 3. Get all companies with their subscription provider ────────────
+    // ── 3. Get all companies and their subscription providers ────────────
     const companies = await prisma.company.findMany({
       where: plansToSync
         ? { plan: { in: plansToSync.map(p => p.toUpperCase()) } }
         : undefined,
-      select: {
-        id: true,
-        plan: true,
-        subscription: { select: { provider: true } },
-      },
+      select: { id: true, plan: true },
     });
+
+    // Fetch Safepay subscription providers for PKR detection
+    const safepayCompanyIds = new Set(
+      (await prisma.subscription.findMany({
+        where: { companyId: { in: companies.map(c => c.id) }, provider: "SAFEPAY" },
+        select: { companyId: true },
+      })).map(s => s.companyId)
+    );
 
     if (companies.length === 0) {
       return NextResponse.json({ success: true, updated: 0, message: "No companies found for selected plan(s)" });
