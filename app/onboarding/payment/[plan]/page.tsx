@@ -18,7 +18,7 @@ const PLAN_META: Record<string, { name: string; price: number; yearlyPrice: numb
 };
 
 /* ── Payment method types ───────────────────────────────── */
-type PayMethod = "card" | "paypal" | "applepay" | "googlepay" | "bank" | "ach" | "sepa" | "jazzcash" | "easypaisa" | "crypto" | "klarna";
+type PayMethod = "card" | "paypal" | "bank" | "jazzcash" | "easypaisa";
 
 type MethodDef = {
   id: PayMethod;
@@ -92,14 +92,14 @@ type MethodGroup = { label: string; color: string; bg: string; border: string; b
 
 const METHOD_GROUPS: MethodGroup[] = [
   {
-    label: "LemonSqueezy",
+    label: "International",
     color: "#fbbf24",
     bg: "rgba(251,191,36,0.06)",
     border: "rgba(251,191,36,0.2)",
-    badge: "Global · Instant",
+    badge: "LemonSqueezy · Global",
     methods: [
-      { id: "card",      label: "Credit / Debit Card",  desc: "Visa, Mastercard, Amex, Discover", popular: true, processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconCard /> },
-      { id: "paypal",    label: "PayPal",                desc: "Pay with your PayPal balance",                    processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconPayPal /> },
+      { id: "card",   label: "Credit / Debit Card", desc: "Visa, Mastercard, Amex, Discover", popular: true, processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconCard /> },
+      { id: "paypal", label: "PayPal",               desc: "Pay with your PayPal balance",                   processor: "LemonSqueezy", processorColor: "#fbbf24", icon: <IconPayPal /> },
     ],
   },
   {
@@ -107,27 +107,16 @@ const METHOD_GROUPS: MethodGroup[] = [
     color: "#34d399",
     bg: "rgba(52,211,153,0.06)",
     border: "rgba(52,211,153,0.2)",
-    badge: "Safepay",
+    badge: "Safepay 🇵🇰",
     methods: [
-      { id: "bank", label: "Safepay Bank Transfer", desc: "Automated local bank transfer", processor: "Safepay", processorColor: "#34d399", icon: <IconBank /> },
-    ],
-  },
-  {
-    label: "Pakistan",
-    color: "#38bdf8",
-    bg: "rgba(56,189,248,0.06)",
-    border: "rgba(56,189,248,0.2)",
-    badge: "Local Wallets 🇵🇰",
-    methods: [
-      { id: "jazzcash",  label: "JazzCash",   desc: "Pakistan mobile wallet",  processor: "JazzCash",  processorColor: "#38bdf8", icon: <IconJazz /> },
-      { id: "easypaisa", label: "Easypaisa",  desc: "Pakistan mobile wallet",  processor: "Easypaisa", processorColor: "#38bdf8", icon: <IconJazz /> },
+      { id: "jazzcash",  label: "JazzCash",      desc: "Pakistan mobile wallet",                    processor: "JazzCash",  processorColor: "#CC0000", icon: <IconJazz /> },
+      { id: "easypaisa", label: "Easypaisa",     desc: "Pakistan mobile wallet",                    processor: "Easypaisa", processorColor: "#44B549", icon: <IconJazz /> },
+      { id: "bank",      label: "Bank Transfer", desc: "IBFT · HBL, UBL, Meezan & all 1Link banks", processor: "Safepay",   processorColor: "#34d399", icon: <IconBank /> },
     ],
   },
 ];
 
-const FALLBACK_ENABLED_METHODS: PayMethod[] = [
-  "card", "paypal", "bank", "jazzcash", "easypaisa",
-];
+const FALLBACK_ENABLED_METHODS: PayMethod[] = ["card", "paypal", "jazzcash", "easypaisa", "bank"];
 const ALLOWED_CHECKOUT_METHODS = new Set<PayMethod>(FALLBACK_ENABLED_METHODS);
 
 /* ── Helpers ────────────────────────────────────────────── */
