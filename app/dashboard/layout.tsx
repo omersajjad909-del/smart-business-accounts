@@ -21,7 +21,6 @@ import WhatsNew from "@/components/WhatsNew";
 import ImageAdjusterModal from "@/components/ImageAdjusterModal";
 import DemoSessionTimer from "@/components/DemoSessionTimer";
 import AppearanceApplier from "@/components/AppearanceApplier";
-import { resolvePlanPermissions } from "@/lib/planPermissions";
 import { hasModule as baseHasModule, type BusinessType } from "@/lib/businessModules";
 import { findDashboardFeatureByRoute } from "@/lib/dashboardFeatureRegistry";
 import { FINOVA_COMPANY_PROFILE_UPDATED, FINOVA_USER_PROFILE_UPDATED } from "@/lib/dashboardProfileEvents";
@@ -317,39 +316,6 @@ export default function DashboardLayout({
     }
   }
 
-  useEffect(() => {
-    if (!currentUser?.companyId) return;
-    const hdrs: Record<string, string> = {
-      "x-company-id": currentUser.companyId,
-      ...(currentUser.id   ? { "x-user-id":   currentUser.id }   : {}),
-      ...(currentUser.role ? { "x-user-role": currentUser.role } : {}),
-    };
-    async function fetchCompany() {
-      try {
-        const data = await cachedGetJson("/api/me/company", { headers: hdrs });
-          if (data?.name) setCompanyName(data.name);
-          if (data?.plan) setCompanyPlan(String(data.plan));
-          const preferredDemoBusiness =
-            initialUser?.email === "finovaos.app@gmail.com" && typeof window !== "undefined"
-              ? (getStoredDemoBusinessPreference() as BusinessType | null)
-              : null;
-          if (preferredDemoBusiness) {
-            setBusinessType(preferredDemoBusiness);
-          } else if (data?.businessType) {
-            setBusinessType(data.businessType as BusinessType);
-            updateStoredUser((parsed) => ({
-              ...(parsed || {}),
-              businessType: data.businessType,
-              user: parsed?.user ? { ...parsed.user, businessType: data.businessType } : undefined,
-            }));
-          }
-          setCompanyDetail(data);
-      } catch (err) {}
-    }
-    fetchCompany();
-    // Load company shortcuts
-    cachedGetJson("/api/company/shortcuts", { headers: hdrs }).then(d => { if (d.shortcuts) setShortcuts(d.shortcuts); }).catch(() => {});
-  }, [currentUser?.companyId]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -561,149 +527,70 @@ export default function DashboardLayout({
   const hasCustomActiveModule = (moduleId: string) =>
     customActiveModules.has(String(moduleId || "").trim().toLowerCase().replace(/-/g, "_"));
 
+  // Single bootstrap call replaces 6+ separate API calls on load
   useEffect(() => {
-    const loadFreshPermissions = async () => {
-      let u = getCurrentUser() as CurrentUser;
-
-      // If localStorage is empty but cookie exists, fetch user from server
-      if (!u) {
-        try {
-          const res = await fetch("/api/me", { cache: "no-store" });
-          if (res.ok) {
-            const data = await res.json();
-            if (data?.user) {
-              storeUser(data.user);
-              u = data.user as CurrentUser;
-            }
-          }
-        } catch {}
-      }
-
-      if (!u) {
-        setCurrentUser(null);
-        setReady(true);
-        return;
-      }
-
-      if (u.avatar) setUserAvatar(u.avatar);
-
-      if (u.role === "ADMIN") {
-        setCurrentUser(u);
-        setReady(true);
-        return;
-      }
-
+    const load = async () => {
       try {
-        const res = await fetch("/api/me/permissions", {
-          headers: {
-            "x-user-id": u.id,
-            "x-user-role": u.role,
-            "x-company-id": u.companyId || "",
-          },
-        });
-
-        if (!res.ok) {
-          setCurrentUser(u);
+        const res = await fetch("/api/me/bootstrap", { cache: "no-store" });
+        if (res.status === 401 || res.status === 403) {
+          setCurrentUser(null);
           setReady(true);
           return;
         }
+        if (!res.ok) throw new Error(`bootstrap ${res.status}`);
 
-        const data = (await res.json()) as {
-          role: string;
-          permissions: string[];
-          rolePermissions: string[];
-        };
+        const d = await res.json();
+        const user = d.user as CurrentUser;
+        if (!user) { setCurrentUser(null); setReady(true); return; }
 
-        const updatedUser: CurrentUser = {
-          ...u,
-          role: data.role || u.role,
-          permissions: data.permissions,
-          rolePermissions: data.rolePermissions,
-        };
+        storeUser(user);
+        setCurrentUser(user);
+        if (user?.avatar) setUserAvatar(user.avatar);
 
-        setCurrentUser(updatedUser);
-        try {
-          const c = await fetch("/api/me/company", {
-            headers: {
-              "x-user-id": u.id,
-              "x-user-role": u.role,
-              "x-company-id": u.companyId || "",
-            },
-          });
-          if (c.ok) {
-            const cj = await c.json();
-            const status = String(cj.subscriptionStatus || "").toUpperCase();
-            if (status === "INACTIVE" || status === "TRIALING") {
-              const plan = String(cj.plan || "starter").toLowerCase();
-              router.replace(`/onboarding/payment/${plan}`);
-              return;
-            }
-            setIsPro(String(cj.plan || "").toUpperCase() === "PRO" && status === "ACTIVE");
-            if (cj?.plan) setCompanyPlan(String(cj.plan));
-            setSubInfo({ plan: String(cj.plan || "STARTER"), status });
-          } else {
-            setIsPro(false);
-            setSubInfo(null);
+        if (d.company) {
+          const preferredDemoBusiness =
+            user.email === "finovaos.app@gmail.com" && typeof window !== "undefined"
+              ? (getStoredDemoBusinessPreference() as BusinessType | null)
+              : null;
+          setCompanyName(d.company.name || "");
+          setCompanyPlan(String(d.company.plan || "STARTER"));
+          setCompanyDetail(d.company);
+          const status = String(d.company.subscriptionStatus || "").toUpperCase();
+          setIsPro(String(d.company.plan || "").toUpperCase() === "PRO" && status === "ACTIVE");
+          setSubInfo({ plan: String(d.company.plan || "STARTER"), status });
+          if (preferredDemoBusiness) {
+            setBusinessType(preferredDemoBusiness);
+            updateStoredUser(p => ({ ...(p||{}), businessType: preferredDemoBusiness, user: p?.user ? { ...p.user, businessType: preferredDemoBusiness } : undefined }));
+          } else if (d.company.businessType) {
+            setBusinessType(d.company.businessType as BusinessType);
+            updateStoredUser(p => ({ ...(p||{}), businessType: d.company.businessType, user: p?.user ? { ...p.user, businessType: d.company.businessType } : undefined }));
           }
-        } catch {
-          setIsPro(false);
-          setSubInfo(null);
         }
-        setReady(true);
-      } catch (err) {
-        console.error("Failed to fetch current user permissions:", err);
-        setCurrentUser(u);
+
+        if (Array.isArray(d.shortcuts)) setShortcuts(d.shortcuts);
+        if (Array.isArray(d.branches)) setBranches(d.branches);
+        if (d.moduleStatus?.enabledTypes) setEnabledTypes(new Set<string>(d.moduleStatus.enabledTypes));
+        else setEnabledTypes(null);
+
+        if (Array.isArray(d.planPerms) && d.planPerms.length > 0) setAllowedPlanPerms(new Set(d.planPerms));
+        else setAllowedPlanPerms(null);
+
+        if (Array.isArray(d.dashboardFeatures)) setAllowedDashboardFeatures(new Set(d.dashboardFeatures));
+        else setAllowedDashboardFeatures(null);
+
+        if (d.bizFeatures) setBizFeatures(d.bizFeatures);
+
+      } catch {
+        const u = getCurrentUser() as CurrentUser;
+        if (u) { storeUser(u); setCurrentUser(u); }
+      } finally {
         setReady(true);
       }
     };
-
-    loadFreshPermissions();
+    load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Load plan-permission allowlist for menu gating
-  useEffect(() => {
-    if (!currentUser?.companyId) return;
-    const planHdrs: Record<string, string> = {
-      "x-company-id": currentUser.companyId,
-      ...(currentUser.id   ? { "x-user-id":   currentUser.id }   : {}),
-      ...(currentUser.role ? { "x-user-role": currentUser.role } : {}),
-    };
-    (async () => {
-      try {
-        const [cj, conf] = await Promise.all([
-          cachedGetJson("/api/me/company", { headers: planHdrs }),
-          cachedGetJson("/api/public/plan-config", {}, 120_000),
-        ]);
-          if (cj?.plan) setCompanyPlan(String(cj.plan));
-          const list = resolvePlanPermissions({
-            plan: cj?.plan,
-            configuredPlanPermissions: conf?.planPermissions || null,
-            activeModules: cj?.activeModules || null,
-          });
-          const planCode = String(cj?.plan || "STARTER").toUpperCase() === "PROFESSIONAL"
-            ? "PRO"
-            : String(cj?.plan || "STARTER").toUpperCase();
-          const dashboardList =
-            conf?.dashboardFeatureFlags?.[planCode] ||
-            conf?.dashboardFeatureFlags?.[planCode.toLowerCase()] ||
-            conf?.dashboardFeatureFlags?.[planCode.toUpperCase()] ||
-            null;
-          if (Array.isArray(list) && list.length > 0) {
-            setAllowedPlanPerms(new Set(list));
-          } else {
-            setAllowedPlanPerms(null);
-          }
-          if (Array.isArray(dashboardList)) {
-            setAllowedDashboardFeatures(new Set(dashboardList));
-          } else {
-            setAllowedDashboardFeatures(null);
-          }
-      } catch {
-        setAllowedPlanPerms(null);
-        setAllowedDashboardFeatures(null);
-      }
-    })();
-  }, [currentUser?.companyId]);
 
   const hasPermission = (user: any, perm: string) => {
     if (!allowedPlanPerms) return baseHasPermission(user, perm);
@@ -735,40 +622,11 @@ export default function DashboardLayout({
     return hasDashboardFeature(feature.id);
   };
 
-  // Load business type and redirect to setup if not done
+  // Redirect to business-setup if company hasn't completed setup
   useEffect(() => {
-    if (!ready || !currentUser?.companyId) return;
-    const headers: Record<string, string> = {
-      "x-company-id": currentUser.companyId,
-      ...(currentUser.id   ? { "x-user-id":   currentUser.id }   : {}),
-      ...(currentUser.role ? { "x-user-role": currentUser.role } : {}),
-    };
-    cachedGetJson("/api/company/business-type", { headers })
-      .then(d => {
-        if (!d) return;
-        const preferredDemoBusiness =
-          initialUser?.email === "finovaos.app@gmail.com" && typeof window !== "undefined"
-            ? (getStoredDemoBusinessPreference() as BusinessType | null)
-            : null;
-        if (preferredDemoBusiness) {
-          setBusinessType(preferredDemoBusiness);
-          updateStoredUser((parsed) => ({
-            ...(parsed || {}),
-            businessType: preferredDemoBusiness,
-            user: parsed?.user ? { ...parsed.user, businessType: preferredDemoBusiness } : undefined,
-          }));
-        } else if (d.businessType) {
-          setBusinessType(d.businessType as BusinessType);
-          updateStoredUser((parsed) => ({
-            ...(parsed || {}),
-            businessType: d.businessType,
-            user: parsed?.user ? { ...parsed.user, businessType: d.businessType } : undefined,
-          }));
-        }
-        if (!d.businessSetupDone) router.replace("/business-setup");
-      })
-      .catch(() => {});
-  }, [ready, currentUser?.companyId]);
+    if (!ready || !companyDetail) return;
+    if (!companyDetail.businessSetupDone) router.replace("/business-setup");
+  }, [ready, companyDetail?.businessSetupDone]);
 
   useEffect(() => {
     if (!ready) return;
@@ -885,60 +743,13 @@ export default function DashboardLayout({
     } catch {}
   }, [currentUser?.companyId, activeBranchId]);
 
+  // Reset to "all" branch if selected branch no longer exists (e.g. after bootstrap refresh)
   useEffect(() => {
-    if (!currentUser?.companyId) return;
-    if (currentUser.role === "ADMIN") {
-      setAllowedBranchIds(null);
-      return;
+    if (!branches.length) return;
+    if (activeBranchId !== "all" && !branches.some(b => b.id === activeBranchId)) {
+      setActiveBranchId("all");
     }
-    (async () => {
-      try {
-        const res = await fetch("/api/company/admin-control");
-        if (!res.ok) return;
-        const data: AdminControlSettings = await res.json();
-        const assigned = data?.branchAssignments?.[currentUser.id];
-        setAllowedBranchIds(Array.isArray(assigned) && assigned.length > 0 ? assigned : null);
-        setBizFeatures(data?.features || {});
-      } catch {}
-    })();
-  }, [currentUser?.companyId, currentUser?.id, currentUser?.role]);
-
-  useEffect(() => {
-    if (!currentUser) return;
-    (async () => {
-      try {
-        const hdrs: Record<string, string> = {};
-        if (currentUser.id)        hdrs["x-user-id"]    = currentUser.id;
-        if (currentUser.role)      hdrs["x-user-role"]  = currentUser.role;
-        if (currentUser.companyId) hdrs["x-company-id"] = currentUser.companyId;
-        const data = await cachedGetJson("/api/branches", { headers: hdrs });
-        const list: Branch[] = Array.isArray(data) ? data : [];
-        const scoped = allowedBranchIds?.length ? list.filter((b) => allowedBranchIds.includes(b.id)) : list;
-        const activeOnly = scoped.filter(b => b.isActive !== false);
-        setBranches(activeOnly);
-        if (activeBranchId !== "all" && activeOnly.length && !activeOnly.some(b => b.id === activeBranchId)) {
-          setActiveBranchId("all");
-        }
-      } catch {
-        setBranches([]);
-      }
-    })();
-  }, [activeBranchId, allowedBranchIds, currentUser?.id]);
-
-  // Fetch admin-controlled business module enablement status
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/public/business-module-status", { cache: "no-store" });
-        if (res.ok) {
-          const data = await res.json();
-          setEnabledTypes(new Set<string>(data.enabledTypes || []));
-        }
-      } catch {
-        setEnabledTypes(null); // null = allow all (fallback)
-      }
-    })();
-  }, []);
+  }, [activeBranchId, branches]);
 
   // Returns true if this business type is globally enabled by admin (or status unknown).
   // IMPORTANT: always returns true for the user's OWN business type — existing users
