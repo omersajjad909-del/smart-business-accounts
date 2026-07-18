@@ -4,6 +4,7 @@ import { resolveCompanyId } from "@/lib/tenant";
 import { apiError, apiOk } from "@/lib/apiError";
 import { getRuntimeAppUrl } from "@/lib/domains";
 import { createLemonCheckout, hasLemonSqueezyConfig } from "@/lib/lemonsqueezy";
+import { createSafepayCheckout, hasSafepayConfig, usdToPkr } from "@/lib/safepay";
 import { getCompanyExtraSeats } from "@/lib/companySeatLimit";
 import { getCustomPlanCycleAmountUsd, parseCustomModules } from "@/lib/customPlanPricing";
 
@@ -123,6 +124,60 @@ export async function POST(req: NextRequest) {
       planCode === "CUSTOM"
         ? ((computedCustomCycleAmount > 0 ? computedCustomCycleAmount : (customPrice > 0 ? customPrice : 0)) + seatAddonCycleAmount)
         : computedCycleAmount;
+
+    // ── Safepay (PKR customers) ───────────────────────────────────────────────
+    const isPkrCustomer =
+      displayCountry === "PK" ||
+      displayCurrency === "PKR" ||
+      company.country === "PK" ||
+      company.baseCurrency === "PKR";
+
+    if (isPkrCustomer && hasSafepayConfig()) {
+      const base      = getRuntimeAppUrl(req.nextUrl.origin);
+      const amountPkr = usdToPkr(finalCustomPrice > 0 ? finalCustomPrice : planBasePerMonth);
+      const orderId   = `fnv-${companyId}-${Date.now()}`;
+
+      const checkout = await createSafepayCheckout({
+        orderId,
+        amountPkr,
+        companyId,
+        userId,
+        planCode,
+        billingCycle,
+        successUrl: successUrl || `${base}/dashboard/billing?upgrade=success`,
+        cancelUrl:  cancelUrl  || `${base}/dashboard/billing?cancel=1`,
+        customerEmail: user?.email || null,
+        customerName:  user?.name  || company.name || null,
+      });
+
+      await prisma.activityLog.create({
+        data: {
+          companyId,
+          userId: userId || null,
+          action: "BILLING_CHECKOUT_CREATED",
+          details: JSON.stringify({
+            provider: "SAFEPAY",
+            planCode,
+            billingCycle,
+            orderId,
+            tracker: checkout.tracker,
+            amountPkr,
+            displayCurrency: "PKR",
+            displayCountry:  "PK",
+            baseCycleAmount,
+            createdAt: new Date().toISOString(),
+          }),
+        },
+      }).catch(() => {});
+
+      return apiOk({
+        url:      checkout.checkoutUrl,
+        provider: "safepay",
+        tracker:  checkout.tracker,
+        orderId,
+      });
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     if (hasLemonSqueezyConfig()) {
       const base = getRuntimeAppUrl(req.nextUrl.origin);

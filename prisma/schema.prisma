@@ -1539,9 +1539,14 @@ model Subscription {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   plan                 String // STARTER | PROFESSIONAL | ENTERPRISE
-  status               String  @default("ACTIVE") // ACTIVE | SUSPENDED | CANCELLED | EXPIRED
+  status               String  @default("ACTIVE") // ACTIVE | PAST_DUE | SUSPENDED | CANCELLED | INACTIVE
+  provider             String  @default("LEMONSQUEEZY") // LEMONSQUEEZY | SAFEPAY | STRIPE
   stripeCustomerId     String? @unique
   stripeSubscriptionId String? @unique
+
+  // Safepay-specific fields
+  safepayTracker       String? // Safepay tracker token for current billing period
+  safepayOrderId       String? // Our order reference sent to Safepay
 
   currentPeriodStart DateTime?
   currentPeriodEnd   DateTime?
@@ -1558,6 +1563,7 @@ model Subscription {
   updatedAt DateTime @updatedAt
 
   @@index([status, currentPeriodEnd])
+  @@index([provider, status])
 }
 
 // ================= LOGIN & GEO TRACKING =================
