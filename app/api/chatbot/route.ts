@@ -171,21 +171,41 @@ export async function POST(req: NextRequest) {
       "Answer customer questions politely and concisely. If you don't know something, say so honestly. " +
       "Do not make up information. Keep responses under 150 words.";
 
-    // Call OpenAI
+    const aiMsgs = [
+      { role: "system" as const, content: sysPrompt },
+      ...history.map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
+    ];
+
     let reply = "I'm having trouble responding right now. Please try again.";
-    try {
-      const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      const res = await client.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
-        max_tokens: 300,
-        messages: [
-          { role: "system", content: sysPrompt },
-          ...history.map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
-        ],
-      });
-      reply = res.choices[0]?.message?.content?.trim() || reply;
-    } catch (e) {
-      console.error("Chatbot AI error:", e);
+
+    // Groq (primary — free)
+    if (process.env.GROQ_API_KEY) {
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+          body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: aiMsgs, max_tokens: 300 }),
+        });
+        if (res.ok) {
+          const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+          reply = json.choices?.[0]?.message?.content?.trim() || reply;
+        }
+      } catch (e) { console.error("Chatbot Groq error:", e); }
+    }
+
+    // OpenAI (fallback)
+    if (reply === "I'm having trouble responding right now. Please try again." && process.env.OPENAI_API_KEY) {
+      try {
+        const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const res = await client.chat.completions.create({
+          model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+          max_tokens: 300,
+          messages: aiMsgs,
+        });
+        reply = res.choices[0]?.message?.content?.trim() || reply;
+      } catch (e) {
+        console.error("Chatbot AI error:", e);
+      }
     }
     /* -- Anthropic version (keep for future use) --
     try {

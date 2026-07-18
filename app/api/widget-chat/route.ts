@@ -123,34 +123,52 @@ export async function POST(req: NextRequest) {
   let reply = "";
   let source = "kb";
 
-  // 1. Try OpenAI first (real AI)
-  if (process.env.OPENAI_API_KEY) {
+  const historyMsgs = history
+    .map(h => ({
+      role: (h.role === "user" ? "user" : "assistant") as "user" | "assistant",
+      content: String(h.content || "").slice(0, 800),
+    }))
+    .filter(h => h.content);
+
+  const aiMessages = [
+    { role: "system" as const, content: SYSTEM },
+    ...historyMsgs,
+    { role: "user" as const, content: message },
+  ];
+
+  // 1. Groq (primary — free tier, fast)
+  if (!reply && process.env.GROQ_API_KEY) {
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: aiMessages, max_tokens: 600, temperature: 0.5 }),
+      });
+      if (res.ok) {
+        const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+        reply  = json.choices?.[0]?.message?.content?.trim() ?? "";
+        source = "groq";
+      }
+    } catch (err) {
+      console.error("[widget-chat] Groq error:", err);
+    }
+  }
+
+  // 2. OpenAI (fallback)
+  if (!reply && process.env.OPENAI_API_KEY) {
     try {
       const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      const historyMsgs = history
-        .map(h => ({
-          role: (h.role === "user" ? "user" : "assistant") as "user" | "assistant",
-          content: String(h.content || "").slice(0, 800),
-        }))
-        .filter(h => h.content);
-
       const res = await client.chat.completions.create({
         model:       process.env.OPENAI_MODEL || "gpt-4o-mini",
         max_tokens:  600,
         temperature: 0.5,
-        messages: [
-          { role: "system", content: SYSTEM },
-          ...historyMsgs,
-          { role: "user",   content: message },
-        ],
+        messages:    aiMessages,
       });
       reply  = res.choices[0]?.message?.content?.trim() ?? "";
       source = "openai";
     } catch (err) {
       console.error("[widget-chat] OpenAI error:", err);
     }
-  } else {
-    console.warn("[widget-chat] OPENAI_API_KEY not set");
   }
 
   // 2. Fallback: local keyword engine
