@@ -367,6 +367,7 @@ export default function PricingPage() {
   const [publicPricing, setPublicPricing] = useState<PlanPricing>(DEFAULT_PUBLIC_PRICING);
   // Admin-set PKR prices (null = not configured, fall back to FX conversion)
   const [pkrPricing, setPkrPricing] = useState<{ starter: { monthly: number; yearly: number }; professional: { monthly: number; yearly: number }; enterprise: { monthly: number; yearly: number } } | null>(null);
+  const [pkrAddonPricing, setPkrAddonPricing] = useState<{ monthly: number; yearly: number } | null>(null);
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
   const [branchLimits, setBranchLimits] = useState<Record<string, number | null>>({ starter: 1, pro: 3, enterprise: 10 });
   const [seatPricing, setSeatPricing] = useState<{ monthly: number; yearly: number }>(DEFAULT_SEAT_PRICING);
@@ -469,6 +470,12 @@ export default function PricingPage() {
               enterprise:   { monthly: Number(d.pkrPricing.enterprise?.monthly ?? 24999), yearly: Math.round(Number(d.pkrPricing.enterprise?.yearly ?? 239988) / 12) },
             });
           }
+          if (d?.pkrAddonPricing) {
+            setPkrAddonPricing({
+              monthly: Number(d.pkrAddonPricing.monthly ?? 22000),
+              yearly:  Math.round(Number(d.pkrAddonPricing.yearly ?? 237600) / 12),
+            });
+          }
         }
       } catch {}
       // Load live plan feature overrides from admin config
@@ -516,6 +523,21 @@ export default function PricingPage() {
     }
     return formatPrice(usdPrice);
   };
+  const getAddonDisplayPrice = (usdMonthly: number, usdYearly: number) => {
+    if (isPKUser && pkrAddonPricing) {
+      const amount = billing === "yearly" ? pkrAddonPricing.yearly : pkrAddonPricing.monthly;
+      return `₨${amount.toLocaleString("en-PK")}`;
+    }
+    return formatPrice(billing === "yearly" ? usdYearly : usdMonthly);
+  };
+  const getAddonYearlySaving = (usdDiffPerMonth: number) => {
+    if (isPKUser && pkrAddonPricing) {
+      const saving = (pkrAddonPricing.monthly - pkrAddonPricing.yearly) * 12;
+      return `₨${saving.toLocaleString("en-PK")}`;
+    }
+    return formatPrice(usdDiffPerMonth * 12);
+  };
+
   const buildHref = (slug: string) => `/onboarding/signup/${slug}?cycle=${billing}&currency=${currency}&country=${country}`;
   const buildCustomHref = () => `/onboarding/choose-plan?plan=custom&modules=${selectedModules.join(",")}&extraUsers=${extraUsers}&extraBranches=${extraBranches}&cycle=${billing}&currency=${currency}&country=${country}`;
   const toggleModule = (id: string) => setSelectedModules(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
@@ -800,12 +822,12 @@ export default function PricingPage() {
                 <div>
                   <div style={{ fontSize: 13, color: "#a78bfa", fontWeight: 700, marginBottom: 6 }}>AUTOMATION ADD-ON</div>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 52, fontWeight: 900, color: "#fff", letterSpacing: "-.03em" }}>{formatPrice(79)}</span>
+                    <span style={{ fontSize: 52, fontWeight: 900, color: "#fff", letterSpacing: "-.03em" }}>{getAddonDisplayPrice(79, 69)}</span>
                     <span style={{ fontSize: 14, color: "rgba(255,255,255,.4)" }}>/month</span>
                   </div>
                   {billing === "yearly" && (
                     <div style={{ fontSize: 13, color: "#34d399", marginBottom: 8 }}>
-                      {formatPrice(69)}/month on yearly plan — save {formatPrice(10 * 12)}/year
+                      {getAddonDisplayPrice(79, 69)}/month on yearly plan — save {getAddonYearlySaving(10)}/year
                     </div>
                   )}
                   <div style={{ fontSize: 13, color: "rgba(255,255,255,.4)", marginBottom: 28 }}>
@@ -857,7 +879,7 @@ export default function PricingPage() {
                 {["WATI $99", "Mailchimp $99", "Intercom $74", "HubSpot $50", "Zapier $49", "Buffer $18", "Jasper $49"].map(t => (
                   <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 6, background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.2)", color: "#fca5a5" }}>{t}</span>
                 ))}
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>= {formatPrice(438)}+/mo vs our {formatPrice(79)}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>= {formatPrice(438)}+/mo vs our {getAddonDisplayPrice(79, 69)}</span>
               </div>
             </div>
           </div>
