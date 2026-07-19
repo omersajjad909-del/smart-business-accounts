@@ -226,10 +226,11 @@ function TrustIcon({ kind, color }: { kind: string; color: string }) {
 }
 
 function FloatingInput({
-  label, type = "text", value, onChange, required, autoComplete,
+  label, type = "text", value, onChange, required, autoComplete, onBlur,
 }: {
   label: string; type?: string; value: string;
   onChange: (v: string) => void; required?: boolean; autoComplete?: string;
+  onBlur?: () => void;
 }) {
   const [focused, setFocused] = useState(false);
   const lifted = focused || value.length > 0;
@@ -239,7 +240,7 @@ function FloatingInput({
         type={type} value={value}
         onChange={e => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        onBlur={() => { setFocused(false); onBlur?.(); }}
         required={required} autoComplete={autoComplete}
         style={{
           width:"100%", borderRadius:12,
@@ -429,6 +430,7 @@ export default function SignupByPlanPage() {
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailWarning, setEmailWarning] = useState<string | null>(null);
   const [businessType, setBusinessType] = useState<string>(
     searchParams.get("businessType") || ""
   );
@@ -502,10 +504,21 @@ export default function SignupByPlanPage() {
 
 
 
+  function validateEmail(val: string) {
+    const local = val.split("@")[0] || "";
+    const domainTlds = [".com", ".net", ".org", ".app", ".io", ".co", ".pk", ".in", ".ae"];
+    if (domainTlds.some(tld => local.toLowerCase().endsWith(tld))) {
+      setEmailWarning(`"${val}" looks like a domain was typed as email. Did you mean to type just your email address?`);
+    } else {
+      setEmailWarning(null);
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     if (disabled) return;
+    validateEmail(email);
     setLoading(true);
 
     try {
@@ -869,7 +882,20 @@ export default function SignupByPlanPage() {
                 </div>
 
                 {/* Email */}
-                <FloatingInput label="Work email" type="email" value={email} onChange={setEmail} required autoComplete="email"/>
+                <div>
+                  <FloatingInput
+                    label="Work email" type="email" value={email}
+                    onChange={v => { setEmail(v); if (emailWarning) validateEmail(v); }}
+                    required autoComplete="email"
+                    onBlur={() => { if (email) validateEmail(email); }}
+                  />
+                  {emailWarning && (
+                    <div style={{ marginTop: 6, padding: "8px 12px", borderRadius: 8, background: "rgba(251,191,36,.1)", border: "1px solid rgba(251,191,36,.3)", display: "flex", alignItems: "flex-start", gap: 8 }}>
+                      <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
+                      <span style={{ fontSize: 12, color: "#fbbf24", lineHeight: 1.5 }}>{emailWarning}</span>
+                    </div>
+                  )}
+                </div>
 
                 {/* Country select */}
                 <div>
