@@ -228,7 +228,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Fallback for local/demo usage when no billing provider is configured.
+    // No payment provider configured — block checkout in production
+    if (process.env.NODE_ENV === "production") {
+      return apiError("Payment provider not configured. Please contact support.", 503);
+    }
+
+    // Development/local fallback only
     await prisma.company.update({
       where: { id: companyId },
       data: {

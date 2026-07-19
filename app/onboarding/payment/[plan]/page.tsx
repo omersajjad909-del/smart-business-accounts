@@ -18,7 +18,7 @@ const PLAN_META: Record<string, { name: string; price: number; yearlyPrice: numb
 };
 
 /* ── Payment method types ───────────────────────────────── */
-type PayMethod = "card" | "paypal" | "bank" | "jazzcash" | "easypaisa";
+type PayMethod = "card" | "paypal" | "bank" | "jazzcash" | "easypaisa" | "card-pk";
 
 type MethodDef = {
   id: PayMethod;
@@ -107,16 +107,17 @@ const METHOD_GROUPS: MethodGroup[] = [
     color: "#34d399",
     bg: "rgba(52,211,153,0.06)",
     border: "rgba(52,211,153,0.2)",
-    badge: "Safepay 🇵🇰",
+    badge: "Safepay 🇵🇰 · Automatic",
     methods: [
-      { id: "jazzcash",  label: "JazzCash",      desc: "Pakistan mobile wallet",                    processor: "JazzCash",  processorColor: "#CC0000", icon: <IconJazz /> },
-      { id: "easypaisa", label: "Easypaisa",     desc: "Pakistan mobile wallet",                    processor: "Easypaisa", processorColor: "#44B549", icon: <IconJazz /> },
+      { id: "card-pk",   label: "Card Payment",  desc: "Visa, Mastercard, Debit · Safepay",         popular: true, processor: "Safepay",   processorColor: "#34d399", icon: <IconCard /> },
+      { id: "jazzcash",  label: "JazzCash",      desc: "Mobile wallet · via Safepay",               processor: "Safepay",   processorColor: "#CC0000", icon: <IconJazz /> },
+      { id: "easypaisa", label: "Easypaisa",     desc: "Mobile wallet · via Safepay",               processor: "Safepay",   processorColor: "#44B549", icon: <IconJazz /> },
       { id: "bank",      label: "Bank Transfer", desc: "IBFT · HBL, UBL, Meezan & all 1Link banks", processor: "Safepay",   processorColor: "#34d399", icon: <IconBank /> },
     ],
   },
 ];
 
-const FALLBACK_ENABLED_METHODS: PayMethod[] = ["card", "paypal", "jazzcash", "easypaisa", "bank"];
+const FALLBACK_ENABLED_METHODS: PayMethod[] = ["card", "paypal", "jazzcash", "easypaisa", "bank", "card-pk"];
 const ALLOWED_CHECKOUT_METHODS = new Set<PayMethod>(FALLBACK_ENABLED_METHODS);
 
 /* ── Helpers ────────────────────────────────────────────── */
@@ -379,7 +380,7 @@ export default function PaymentPage() {
   const verificationEmail = (lockedVerificationEmail || email).trim().toLowerCase();
   const isVerificationEmailLocked = !!lockedVerificationEmail;
 
-  const isPkMethod = method === "jazzcash" || method === "easypaisa";
+  const isPkMethod = false; // All PK methods now go through Safepay checkout automatically
   const pkrRate = rates?.PKR || FX_USD["PKR"] || 280;
   const pkrAmount = Math.round(finalPrice * pkrRate);
   const pkAccountNumber = method === "jazzcash" ? jazzNumber : epNumber;
@@ -833,61 +834,51 @@ export default function PaymentPage() {
                     </div>
                   )}
 
-                  {/* JAZZCASH / EASYPAISA */}
+                  {/* JAZZCASH / EASYPAISA — automated via Safepay */}
                   {(method === "jazzcash" || method === "easypaisa") && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-
-                      {/* Amount pill */}
-                      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, padding:"12px 16px", borderRadius:12, background:"rgba(56,189,248,.08)", border:"1px solid rgba(56,189,248,.2)" }}>
-                        <span style={{ fontSize:11, color:"rgba(255,255,255,.5)" }}>Send exactly</span>
-                        <span style={{ fontSize:18, fontWeight:900, color:"#38bdf8" }}>PKR {pkrAmount.toLocaleString()}</span>
-                        <span style={{ fontSize:11, color:"rgba(255,255,255,.5)" }}>via {method==="jazzcash"?"JazzCash":"Easypaisa"}</span>
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
+                      <div style={{ width:64, height:64, borderRadius:18, background:method==="jazzcash"?"rgba(204,0,0,.1)":"rgba(68,181,73,.1)", border:`1px solid ${method==="jazzcash"?"rgba(204,0,0,.3)":"rgba(68,181,73,.3)"}`, display:"flex", alignItems:"center", justifyContent:"center", color:method==="jazzcash"?"#CC0000":"#44B549" }}>
+                        <IconJazz />
                       </div>
-
-                      {/* QR Code block */}
-                      {pkQrCode ? (
-                        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
-                          <div style={{ padding:"14px 16px", borderRadius:14, background:"rgba(56,189,248,.06)", border:"1px solid rgba(56,189,248,.2)", width:"100%", textAlign:"center" }}>
-                            <div style={{ fontSize:11, fontWeight:800, color:"#38bdf8", letterSpacing:".06em", textTransform:"uppercase", marginBottom:12 }}>
-                              Scan QR to Pay
-                            </div>
-                            <img
-                              src={pkQrCode}
-                              alt={`${method==="jazzcash"?"JazzCash":"Easypaisa"} QR Code`}
-                              style={{ width:190, height:190, borderRadius:12, objectFit:"contain", background:"#fff", padding:10, margin:"0 auto", display:"block" }}
-                            />
-                            <div style={{ marginTop:12, fontSize:11, color:"rgba(255,255,255,.45)", lineHeight:1.65 }}>
-                              <strong style={{ color:"rgba(255,255,255,.7)" }}>On mobile?</strong> Screenshot this QR, open {method==="jazzcash"?"JazzCash":"Easypaisa"} app → Pay → Scan QR → <em>Choose from Gallery</em>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div style={{ padding:"14px 16px", borderRadius:12, background:"rgba(56,189,248,.06)", border:"1px solid rgba(56,189,248,.2)" }}>
-                          <div style={{ fontSize:11, fontWeight:800, color:"#38bdf8", letterSpacing:".06em", textTransform:"uppercase", marginBottom:10 }}>
-                            How to Pay
-                          </div>
-                          {[
-                            { n:"1", text: pkAccountNumber
-                                ? `Send PKR ${pkrAmount.toLocaleString()} to ${method==="jazzcash"?"JazzCash":"Easypaisa"} number: ${pkAccountNumber}`
-                                : `Contact support for our ${method==="jazzcash"?"JazzCash":"Easypaisa"} account number` },
-                            { n:"2", text:"Enter your mobile number and the transaction ID from your payment receipt below" },
-                            { n:"3", text:"Submit — our team will verify and activate your plan within a few hours" },
-                          ].map(s=>(
-                            <div key={s.n} style={{ display:"flex", gap:10, marginBottom:s.n==="3"?0:8, alignItems:"flex-start" }}>
-                              <div style={{ width:20, height:20, borderRadius:"50%", background:"rgba(56,189,248,.2)", border:"1px solid rgba(56,189,248,.35)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, color:"#38bdf8", flexShrink:0, marginTop:1 }}>{s.n}</div>
-                              <div style={{ fontSize:12, color:"rgba(255,255,255,.65)", lineHeight:1.55 }}>{s.text}</div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      <div><label style={lbl}>Your Mobile Number</label><input value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,"").slice(0,11))} placeholder="03XX-XXXXXXX" style={{...inp,fontFamily:"monospace",letterSpacing:1}}/></div>
-                      <div>
-                        <label style={lbl}>Transaction ID <span style={{ color:"#f87171" }}>*</span></label>
-                        <input value={txId} onChange={e=>setTxId(e.target.value.trim())} placeholder="Paste TX ID from SMS receipt" style={{...inp,fontFamily:"monospace"}}/>
-                        <div style={{ fontSize:10, color:"rgba(255,255,255,.25)", marginTop:4 }}>Sent by {method==="jazzcash"?"JazzCash":"Easypaisa"} via SMS after payment</div>
+                      <div style={{ textAlign:"center" }}>
+                        <div style={{ fontSize:15, fontWeight:700, marginBottom:4 }}>{method==="jazzcash"?"JazzCash":"Easypaisa"} via Safepay</div>
+                        <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", lineHeight:1.65 }}>You&apos;ll complete your {method==="jazzcash"?"JazzCash":"Easypaisa"} payment on Safepay&apos;s secure checkout — no manual steps needed.</div>
                       </div>
-                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
+                      <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, width:"100%" }}>
+                        {["Automatic verification","Instant activation","Secure Safepay flow","No TX ID needed"].map(t => (
+                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.6)", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"9px 12px" }}>
+                            <span style={{ color:"#34d399", fontSize:12 }}>✓</span>{t}
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ width:"100%", padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center", lineHeight:1.65 }}>
+                        Click &ldquo;Proceed&rdquo; below → you&apos;ll be redirected to Safepay to complete payment
+                      </div>
+                      <div style={{ width:"100%" }}><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
+                    </div>
+                  )}
+
+                  {/* PKR CARD — Safepay */}
+                  {method === "card-pk" && (
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
+                      <div style={{ width:64, height:64, borderRadius:18, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399" }}>
+                        <IconCard />
+                      </div>
+                      <div style={{ textAlign:"center" }}>
+                        <div style={{ fontSize:15, fontWeight:700, marginBottom:4 }}>Pay by Card via Safepay</div>
+                        <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", lineHeight:1.65 }}>Pakistani Visa, Mastercard, and debit cards accepted. You&apos;ll enter card details on Safepay&apos;s secure page.</div>
+                      </div>
+                      <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, width:"100%" }}>
+                        {["Visa & Mastercard","Debit cards accepted","Automatic activation","Powered by Safepay"].map(t => (
+                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.6)", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"9px 12px" }}>
+                            <span style={{ color:"#34d399", fontSize:12 }}>✓</span>{t}
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ width:"100%", padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center", lineHeight:1.65 }}>
+                        Click &ldquo;Proceed&rdquo; below → card details entered securely on Safepay&apos;s checkout
+                      </div>
+                      <div style={{ width:"100%" }}><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
