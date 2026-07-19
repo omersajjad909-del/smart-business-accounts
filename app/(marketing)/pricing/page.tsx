@@ -394,6 +394,7 @@ export default function PricingPage() {
         // User has a stored choice — use it, skip geo detection
         setCurrency(stored.currency);
         if (stored.country) setCountry(stored.country);
+        else if (stored.currency === "PKR") setCountry("PK");
       } else {
         // First-time visitor — detect from IP, but don't save automatically
         try {
@@ -483,6 +484,7 @@ export default function PricingPage() {
       const d = (e as CustomEvent<{ currency?: string; country?: string | null }>).detail;
       if (d?.currency && FX_USD[d.currency]) setCurrency(d.currency);
       if (d?.country) setCountry(d.country);
+      else if (d?.currency === "PKR") setCountry("PK");
     };
     window.addEventListener(FINOVA_CURRENCY_EVENT, handler as EventListener);
     return () => window.removeEventListener(FINOVA_CURRENCY_EVENT, handler as EventListener);
@@ -608,7 +610,14 @@ export default function PricingPage() {
               </button>
             ))}
           </div>
-          <select value={currency} onChange={e => { const c = e.target.value; setCurrency(c); setStoredCurrencyPreference(c, country); window.dispatchEvent(new CustomEvent(FINOVA_CURRENCY_EVENT, { detail: { currency: c, country } })); }} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 12, padding: "9px 12px", color: "rgba(255,255,255,.8)", fontSize: 12, fontWeight: 700, outline: "none", cursor: "pointer", fontFamily: ff }}>
+          <select value={currency} onChange={e => {
+              const c = e.target.value;
+              const newCountry = c === "PKR" ? "PK" : country;
+              setCurrency(c);
+              setCountry(newCountry);
+              setStoredCurrencyPreference(c, newCountry);
+              window.dispatchEvent(new CustomEvent(FINOVA_CURRENCY_EVENT, { detail: { currency: c, country: newCountry } }));
+            }} style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.09)", borderRadius: 12, padding: "9px 12px", color: "rgba(255,255,255,.8)", fontSize: 12, fontWeight: 700, outline: "none", cursor: "pointer", fontFamily: ff }}>
             {SUPPORTED_CURRENCIES.map(code => <option key={code} value={code}>{code} - {CURRENCY_LABEL[code]}</option>)}
           </select>
         </div>
