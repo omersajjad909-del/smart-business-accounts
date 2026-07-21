@@ -772,7 +772,10 @@ export default function PaymentPage() {
                 </div>
 
                 {/* ── Form based on method ── */}
-                <div style={{ borderRadius:18, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", padding:"22px" }}>
+                <div style={{ borderRadius:18, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", padding:"20px" }}>
+                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:16 }}>
+                    Payment Details
+                  </div>
 
                   {/* CARD */}
                   {method === "card" && (
