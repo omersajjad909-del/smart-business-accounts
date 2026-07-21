@@ -598,9 +598,8 @@ export default function PaymentPage() {
         input::placeholder{color:rgba(255,255,255,.2)}
         input:focus,select:focus{border-color:rgba(99,102,241,.7)!important;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
         select option{background:#1e293b;color:white}
-        .mcard:hover{border-color:rgba(255,255,255,.22)!important;background:rgba(255,255,255,.07)!important;transform:translateY(-1px)}
-        .mcard.sel{border-color:rgba(99,102,241,.65)!important;background:rgba(99,102,241,.1)!important}
-        .mcard{transition:all .18s}
+        .pay-meth-row{transition:all .18s;cursor:pointer}
+        .pay-meth-row:hover{border-color:rgba(255,255,255,.18)!important;background:rgba(255,255,255,.05)!important}
         .cycle-btn{transition:all .2s}
         .cycle-btn.active{background:rgba(255,255,255,.12)!important;color:white!important}
         @media(max-width:900px){
@@ -610,7 +609,6 @@ export default function PaymentPage() {
           .pay-steps{display:none!important}
         }
         @media(max-width:600px){
-          .pay-meth-grid{grid-template-columns:1fr!important}
           .pay-two{grid-template-columns:1fr!important}
           .pay-perks{grid-template-columns:1fr!important}
         }
@@ -704,44 +702,68 @@ export default function PaymentPage() {
               <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
 
                 {/* ── Method Groups ── */}
-                <div style={{ borderRadius:18, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", padding:"20px" }}>
+                <div style={{ borderRadius:18, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", padding:"20px 20px 14px" }}>
                   <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".1em", textTransform:"uppercase", marginBottom:16 }}>Select Payment Method</div>
 
                   {availableGroups.length === 0 ? (
                     <div style={{ padding:"16px", borderRadius:12, background:"rgba(239,68,68,.08)", border:"1px solid rgba(239,68,68,.18)", fontSize:12, color:"#fca5a5" }}>
                       No payment methods are enabled right now. Please contact support or try again later.
                     </div>
-                  ) : availableGroups.map(group => (
-                    <div key={group.label} style={{ marginBottom:18 }}>
+                  ) : availableGroups.map((group, gi) => (
+                    <div key={group.label} style={{ marginBottom: gi < availableGroups.length - 1 ? 20 : 4 }}>
                       {/* Group header */}
-                      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-                        <div style={{ flex:1, height:1, background:"rgba(255,255,255,.07)" }}/>
-                        <div style={{ display:"flex", alignItems:"center", gap:7, padding:"3px 10px", borderRadius:99, background:group.bg, border:`1px solid ${group.border}`, fontSize:10, fontWeight:700, color:group.color, letterSpacing:".04em", whiteSpace:"nowrap" }}>
-                          {group.label}
-                          <span style={{ opacity:.6, fontWeight:500 }}>· {group.badge}</span>
+                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                        <div style={{ padding:"4px 11px", borderRadius:99, background:group.bg, border:`1px solid ${group.border}`, fontSize:10, fontWeight:700, color:group.color, letterSpacing:".04em", whiteSpace:"nowrap" }}>
+                          {group.label === "International" ? "🌍" : "🇵🇰"} {group.label}
                         </div>
-                        <div style={{ flex:1, height:1, background:"rgba(255,255,255,.07)" }}/>
+                        <div style={{ flex:1, height:1, background:"rgba(255,255,255,.06)" }}/>
+                        <div style={{ fontSize:9, fontWeight:600, color:"rgba(255,255,255,.2)", letterSpacing:".04em", whiteSpace:"nowrap" }}>via {group.badge.split(" · ")[0]}</div>
                       </div>
 
-                      <div className="pay-meth-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                      <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                         {group.methods.map(m => (
                           <div key={m.id}
-                            className={`mcard${method===m.id?" sel":""}`}
+                            className="pay-meth-row"
                             onClick={() => setMethod(m.id)}
-                            style={{ padding:"13px 14px", borderRadius:13, border:"1.5px solid rgba(255,255,255,.08)", background:"rgba(255,255,255,.03)", cursor:"pointer", position:"relative" }}>
-                            {m.popular && (
-                              <div style={{ position:"absolute", top:-8, right:10, padding:"2px 8px", borderRadius:10, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", fontSize:8, fontWeight:800, color:"white", letterSpacing:".06em" }}>POPULAR</div>
-                            )}
-                            <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:8 }}>
-                              <div style={{ color: method===m.id ? m.processorColor : "rgba(255,255,255,.5)" }}>{m.icon}</div>
-                              {method===m.id && (
-                                <div style={{ width:18, height:18, borderRadius:"50%", background:"#6366f1", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                                  <svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5 11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                                </div>
-                              )}
+                            style={{
+                              display:"flex", alignItems:"center", gap:13, padding:"13px 15px",
+                              borderRadius:13,
+                              border:`1.5px solid ${method===m.id ? "rgba(99,102,241,.55)" : "rgba(255,255,255,.07)"}`,
+                              background: method===m.id ? "rgba(99,102,241,.07)" : "rgba(255,255,255,.02)",
+                              position:"relative",
+                            }}>
+                            {/* Radio */}
+                            <div style={{
+                              width:19, height:19, borderRadius:"50%", flexShrink:0,
+                              border:`2px solid ${method===m.id ? "#6366f1" : "rgba(255,255,255,.18)"}`,
+                              display:"flex", alignItems:"center", justifyContent:"center",
+                              background: method===m.id ? "rgba(99,102,241,.15)" : "transparent",
+                              transition:"all .18s",
+                            }}>
+                              {method===m.id && <div style={{ width:9, height:9, borderRadius:"50%", background:"#6366f1" }}/>}
                             </div>
-                            <div style={{ fontSize:12, fontWeight:700, color:"white", marginBottom:2 }}>{m.label}</div>
-                            <div style={{ fontSize:10, color:"rgba(255,255,255,.33)" }}>{m.desc}</div>
+                            {/* Icon */}
+                            <div style={{
+                              width:40, height:40, borderRadius:11, flexShrink:0,
+                              background: method===m.id ? `${m.processorColor}18` : "rgba(255,255,255,.04)",
+                              border:`1px solid ${method===m.id ? `${m.processorColor}35` : "rgba(255,255,255,.07)"}`,
+                              display:"flex", alignItems:"center", justifyContent:"center",
+                              color: method===m.id ? m.processorColor : "rgba(255,255,255,.4)",
+                              transition:"all .18s",
+                            }}>
+                              {m.icon}
+                            </div>
+                            {/* Label + desc */}
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <div style={{ fontSize:13, fontWeight:700, color:method===m.id?"white":"rgba(255,255,255,.82)", lineHeight:1.2 }}>{m.label}</div>
+                              <div style={{ fontSize:11, color:"rgba(255,255,255,.32)", marginTop:3 }}>{m.desc}</div>
+                            </div>
+                            {/* Badge */}
+                            {m.popular ? (
+                              <div style={{ padding:"2px 9px", borderRadius:8, background:"linear-gradient(135deg,#6366f1,#8b5cf6)", fontSize:9, fontWeight:800, color:"white", letterSpacing:".05em", whiteSpace:"nowrap", flexShrink:0 }}>POPULAR</div>
+                            ) : (
+                              <div style={{ fontSize:9, color:"rgba(255,255,255,.18)", fontWeight:600, flexShrink:0, textAlign:"right", lineHeight:1.4 }}>{m.processor}</div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -799,86 +821,102 @@ export default function PaymentPage() {
 
                   {/* PAYPAL */}
                   {method === "paypal" && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-                      <div style={{ textAlign:"center", padding:"28px 20px 20px" }}>
-                        <div style={{ width:64, height:64, borderRadius:18, background:"rgba(0,156,222,.12)", border:"1px solid rgba(0,156,222,.3)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px" }}>
+                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 18px", borderRadius:14, background:"rgba(0,156,222,.06)", border:"1px solid rgba(0,156,222,.18)" }}>
+                        <div style={{ width:48, height:48, borderRadius:14, background:"rgba(0,156,222,.12)", border:"1px solid rgba(0,156,222,.3)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                           <IconPayPal />
                         </div>
-                        <div style={{ fontSize:16, fontWeight:700, marginBottom:6 }}>Pay with PayPal</div>
-                        <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", marginBottom:20 }}>Enter your PayPal email to receive a payment request</div>
-                        <div><label style={lbl}>PayPal Email</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="paypal@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
+                        <div>
+                          <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>Pay with PayPal</div>
+                          <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>You&apos;ll be redirected to PayPal to complete your subscription. Auto-renewal included.</div>
+                        </div>
                       </div>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                        {["Auto-recurring billing","Cancel anytime","Secure PayPal flow","Instant activation"].map(t=>(
+                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.55)", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"8px 11px" }}>
+                            <span style={{ color:"#009cde", flexShrink:0 }}>✓</span>{t}
+                          </div>
+                        ))}
+                      </div>
+                      <div><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
                   {/* SAFEPAY BANK TRANSFER */}
                   {method === "bank" && (
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
-                      <div style={{ width:64, height:64, borderRadius:18, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399" }}>
-                        <IconBank />
+                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 18px", borderRadius:14, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.18)" }}>
+                        <div style={{ width:48, height:48, borderRadius:14, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399", flexShrink:0 }}>
+                          <IconBank />
+                        </div>
+                        <div>
+                          <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>Bank Transfer via Safepay</div>
+                          <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>IBFT — HBL, UBL, Meezan, Faysal &amp; all 1Link banks. Details shown at checkout.</div>
+                        </div>
                       </div>
-                      <div style={{ fontSize:15, fontWeight:700 }}>
-                        Safepay Bank Transfer
-                      </div>
-                      <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, width:"100%", marginTop:4 }}>
-                        {["Local bank transfer","Unique checkout reference","Automatic verification","Secure Safepay flow"].map(t => (
-                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.6)", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"9px 12px" }}>
-                            <span style={{ color:"#34d399", fontSize:12 }}>✓</span>{t}
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                        {["All 1Link banks","Unique reference","Auto-verification","Secure Safepay flow"].map(t=>(
+                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.55)", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"8px 11px" }}>
+                            <span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{t}
                           </div>
                         ))}
                       </div>
-                      <div style={{ width:"100%", padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center", lineHeight:1.65 }}>
-                        Bank transfer details will be shown at checkout · Powered by Safepay
+                      <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.05)", border:"1px solid rgba(52,211,153,.14)", fontSize:11, color:"rgba(255,255,255,.38)", textAlign:"center", lineHeight:1.65 }}>
+                        Click &ldquo;Proceed&rdquo; → Bank details shown on Safepay checkout · Auto-activated on confirmation
                       </div>
-                      <div style={{ width:"100%" }}><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
+                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
                   {/* JAZZCASH / EASYPAISA — automated via Safepay */}
                   {(method === "jazzcash" || method === "easypaisa") && (
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
-                      <div style={{ width:64, height:64, borderRadius:18, background:method==="jazzcash"?"rgba(204,0,0,.1)":"rgba(68,181,73,.1)", border:`1px solid ${method==="jazzcash"?"rgba(204,0,0,.3)":"rgba(68,181,73,.3)"}`, display:"flex", alignItems:"center", justifyContent:"center", color:method==="jazzcash"?"#CC0000":"#44B549" }}>
-                        <IconJazz />
+                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 18px", borderRadius:14, background:method==="jazzcash"?"rgba(204,0,0,.06)":"rgba(68,181,73,.06)", border:`1px solid ${method==="jazzcash"?"rgba(204,0,0,.2)":"rgba(68,181,73,.2)"}` }}>
+                        <div style={{ width:48, height:48, borderRadius:14, background:method==="jazzcash"?"rgba(204,0,0,.1)":"rgba(68,181,73,.1)", border:`1px solid ${method==="jazzcash"?"rgba(204,0,0,.3)":"rgba(68,181,73,.3)"}`, display:"flex", alignItems:"center", justifyContent:"center", color:method==="jazzcash"?"#CC0000":"#44B549", flexShrink:0 }}>
+                          <IconJazz />
+                        </div>
+                        <div>
+                          <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>{method==="jazzcash"?"JazzCash":"Easypaisa"} via Safepay</div>
+                          <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>You&apos;ll complete payment on Safepay&apos;s secure checkout — fully automated, no manual steps.</div>
+                        </div>
                       </div>
-                      <div style={{ textAlign:"center" }}>
-                        <div style={{ fontSize:15, fontWeight:700, marginBottom:4 }}>{method==="jazzcash"?"JazzCash":"Easypaisa"} via Safepay</div>
-                        <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", lineHeight:1.65 }}>You&apos;ll complete your {method==="jazzcash"?"JazzCash":"Easypaisa"} payment on Safepay&apos;s secure checkout — no manual steps needed.</div>
-                      </div>
-                      <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, width:"100%" }}>
-                        {["Automatic verification","Instant activation","Secure Safepay flow","No TX ID needed"].map(t => (
-                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.6)", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"9px 12px" }}>
-                            <span style={{ color:"#34d399", fontSize:12 }}>✓</span>{t}
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                        {["Auto-verification","Instant activation","Secure Safepay flow","No TX ID needed"].map(t=>(
+                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.55)", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"8px 11px" }}>
+                            <span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{t}
                           </div>
                         ))}
                       </div>
-                      <div style={{ width:"100%", padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center", lineHeight:1.65 }}>
-                        Click &ldquo;Proceed&rdquo; below → you&apos;ll be redirected to Safepay to complete payment
+                      <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.05)", border:"1px solid rgba(52,211,153,.14)", fontSize:11, color:"rgba(255,255,255,.38)", textAlign:"center", lineHeight:1.65 }}>
+                        Click &ldquo;Proceed&rdquo; → redirected to Safepay to complete {method==="jazzcash"?"JazzCash":"Easypaisa"} payment
                       </div>
-                      <div style={{ width:"100%" }}><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
+                      <div><label style={lbl}>Email for Confirmation</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
                   {/* PKR CARD — Safepay */}
                   {method === "card-pk" && (
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16, padding:"28px 20px" }}>
-                      <div style={{ width:64, height:64, borderRadius:18, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399" }}>
-                        <IconCard />
+                    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 18px", borderRadius:14, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.18)" }}>
+                        <div style={{ width:48, height:48, borderRadius:14, background:"rgba(52,211,153,.1)", border:"1px solid rgba(52,211,153,.25)", display:"flex", alignItems:"center", justifyContent:"center", color:"#34d399", flexShrink:0 }}>
+                          <IconCard />
+                        </div>
+                        <div>
+                          <div style={{ fontSize:14, fontWeight:700, color:"white", marginBottom:3 }}>Card via Safepay 🇵🇰</div>
+                          <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", lineHeight:1.55 }}>Pakistani Visa, Mastercard &amp; debit cards. You&apos;ll enter details on Safepay&apos;s secure checkout page.</div>
+                        </div>
                       </div>
-                      <div style={{ textAlign:"center" }}>
-                        <div style={{ fontSize:15, fontWeight:700, marginBottom:4 }}>Pay by Card via Safepay</div>
-                        <div style={{ fontSize:12, color:"rgba(255,255,255,.4)", lineHeight:1.65 }}>Pakistani Visa, Mastercard, and debit cards accepted. You&apos;ll enter card details on Safepay&apos;s secure page.</div>
-                      </div>
-                      <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:10, width:"100%" }}>
-                        {["Visa & Mastercard","Debit cards accepted","Automatic activation","Powered by Safepay"].map(t => (
-                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.6)", background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"9px 12px" }}>
-                            <span style={{ color:"#34d399", fontSize:12 }}>✓</span>{t}
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                        {["Visa & Mastercard","Debit cards OK","Auto-activation","Powered by Safepay"].map(t=>(
+                          <div key={t} style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"rgba(255,255,255,.55)", background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:9, padding:"8px 11px" }}>
+                            <span style={{ color:"#34d399", flexShrink:0 }}>✓</span>{t}
                           </div>
                         ))}
                       </div>
-                      <div style={{ width:"100%", padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.06)", border:"1px solid rgba(52,211,153,.15)", fontSize:11, color:"rgba(255,255,255,.4)", textAlign:"center", lineHeight:1.65 }}>
-                        Click &ldquo;Proceed&rdquo; below → card details entered securely on Safepay&apos;s checkout
+                      <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(52,211,153,.05)", border:"1px solid rgba(52,211,153,.14)", fontSize:11, color:"rgba(255,255,255,.38)", textAlign:"center", lineHeight:1.65 }}>
+                        Click &ldquo;Proceed&rdquo; → card details entered securely on Safepay&apos;s checkout
                       </div>
-                      <div style={{ width:"100%" }}><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
+                      <div><label style={lbl}>Email for Receipt</label><input value={verificationEmail} onChange={e=>!isVerificationEmailLocked && setEmail(e.target.value)} readOnly={isVerificationEmailLocked} placeholder="you@example.com" type="email" style={{...inp, opacity:isVerificationEmailLocked ? 0.78 : 1, cursor:isVerificationEmailLocked ? "not-allowed" : "text"}}/></div>
                     </div>
                   )}
 
@@ -1040,28 +1078,30 @@ export default function PaymentPage() {
                   🔒 256-bit SSL encrypted checkout
                 </div>
 
-                {/* Processor logos row */}
-                <div style={{ marginTop:12, display:"flex", alignItems:"center", justifyContent:"center", gap:10, flexWrap:"wrap" }}>
-                  {["LemonSqueezy","PayPal","Safepay","JazzCash","Easypaisa"].map(p => (
-                    <div key={p} style={{ padding:"3px 9px", borderRadius:6, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.08)", fontSize:9, fontWeight:700, color:"rgba(255,255,255,.3)", letterSpacing:".04em" }}>{p}</div>
-                  ))}
-                </div>
-                <div style={{ marginTop:16, padding:"14px 14px 12px", borderRadius:12, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)" }}>
-                  <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.35)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>
-                    Subscription System
-                  </div>
-                  <div style={{ display:"grid", gap:8 }}>
+                {/* We accept */}
+                <div style={{ marginTop:14, padding:"13px 14px", borderRadius:12, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
+                  <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:10 }}>We accept</div>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                     {[
-                      "Monthly plan",
-                      "Yearly plan",
-                      "Cancel subscription",
-                      "Upgrade plan",
-                      "Downgrade plan",
-                      "Invoices",
-                      "Billing history",
-                    ].map(item => (
-                      <div key={item} style={{ display:"flex", alignItems:"center", gap:8, fontSize:11, color:"rgba(255,255,255,.62)" }}>
-                        <span style={{ color:meta.color, fontWeight:800 }}>•</span>
+                      { label:"Visa",       color:"#1a1f71" },
+                      { label:"Mastercard", color:"#eb001b" },
+                      { label:"PayPal",     color:"#003087" },
+                      { label:"JazzCash",   color:"#CC0000" },
+                      { label:"Easypaisa", color:"#44B549" },
+                      { label:"1Link",      color:"#0ea5e9" },
+                    ].map(p => (
+                      <div key={p.label} style={{ padding:"3px 10px", borderRadius:7, background:`${p.color}18`, border:`1px solid ${p.color}30`, fontSize:10, fontWeight:700, color:`${p.color}cc`, letterSpacing:".03em" }}>{p.label}</div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Subscription features */}
+                <div style={{ marginTop:10, padding:"13px 14px 12px", borderRadius:12, background:"rgba(255,255,255,.02)", border:"1px solid rgba(255,255,255,.06)" }}>
+                  <div style={{ fontSize:9, fontWeight:700, color:"rgba(255,255,255,.28)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:9 }}>Included in all plans</div>
+                  <div style={{ display:"grid", gap:7 }}>
+                    {["Auto-renewal","Cancel anytime","Upgrade / Downgrade","Invoices & history","Dedicated support"].map(item => (
+                      <div key={item} style={{ display:"flex", alignItems:"center", gap:8, fontSize:11, color:"rgba(255,255,255,.55)" }}>
+                        <span style={{ color:meta.color, fontWeight:800, fontSize:12 }}>✓</span>
                         <span>{item}</span>
                       </div>
                     ))}
