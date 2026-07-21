@@ -6,19 +6,24 @@
 
 import { prisma } from "@/lib/prisma";
 import { getMarketIntelligenceLocalReply, getBusinessAdvisorLocalReply } from "@/lib/marketIntelligence";
+import { groqRequest, HAS_GROQ, GROQ_KEY_COUNT } from "@/lib/groqKeyRotator";
+
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_MODEL = "gpt-4o-mini";
 const OPENAI_PROJECT = process.env.OPENAI_PROJECT;
 const OPENAI_ORG = process.env.OPENAI_ORG;
 const HAS_OPENAI_KEY = Boolean(OPENAI_API_KEY);
 
-// Groq — OpenAI-compatible, faster + free tier (primary provider)
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
+// Groq — multi-account rotation (primary provider)
 const GROQ_MODEL = "llama-3.3-70b-versatile";
-const HAS_GROQ_KEY = Boolean(GROQ_API_KEY);
+const HAS_GROQ_KEY = HAS_GROQ;
 
 // Any AI provider available
 const HAS_AI_KEY = HAS_OPENAI_KEY || HAS_GROQ_KEY;
+
+if (HAS_GROQ) {
+  console.log(`[FinovaAI] Groq rotation active — ${GROQ_KEY_COUNT} key(s) loaded`);
+}
 
 // ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
 // Complete FinovaOS knowledge base — plans, modules, features, navigation, accounting
@@ -946,26 +951,16 @@ export async function openAITextResponse(
 
   const input = [{ role: "system" as const, content: system }, ...messages];
 
-  // ── Groq (primary — free tier, OpenAI-compatible) ───────────────────────────
+  // ── Groq (primary — multi-account rotation) ─────────────────────────────────
   if (HAS_GROQ_KEY) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
     try {
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${GROQ_API_KEY}` },
-        body: JSON.stringify({ model: GROQ_MODEL, messages: input, max_tokens: maxTokens, temperature: 0.4 }),
-        signal: controller.signal,
-      });
-      if (res.ok) {
-        const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
-        const text = json.choices?.[0]?.message?.content?.trim();
-        if (text) return text;
-      } else {
-        console.warn("Groq request failed with status", res.status, "— falling back to OpenAI");
-      }
+      const text = await groqRequest(input, GROQ_MODEL, maxTokens, 0.4, controller.signal);
+      if (text) return text;
+      console.warn("[FinovaAI] All Groq keys failed — falling back to OpenAI");
     } catch (err) {
-      console.warn("Groq request error, falling back to OpenAI:", err);
+      console.warn("[FinovaAI] Groq rotation error, falling back to OpenAI:", err);
     } finally {
       clearTimeout(timeoutId);
     }
