@@ -967,6 +967,15 @@ export default function PaymentPage() {
                   <div style={{ padding:"10px 16px", borderRadius:10, background:"rgba(239,68,68,.1)", border:"1px solid rgba(239,68,68,.25)", color:"#fca5a5", fontSize:12 }}>{otpError}</div>
                 )}
 
+                {/* Trust row above submit */}
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:18, padding:"10px 0 2px", fontSize:11, color:"rgba(255,255,255,.28)" }}>
+                  <span style={{ display:"flex", alignItems:"center", gap:5 }}>🔒 SSL Encrypted</span>
+                  <span style={{ width:3, height:3, borderRadius:"50%", background:"rgba(255,255,255,.15)", display:"inline-block" }}/>
+                  <span>No card stored here</span>
+                  <span style={{ width:3, height:3, borderRadius:"50%", background:"rgba(255,255,255,.15)", display:"inline-block" }}/>
+                  <span>Cancel anytime</span>
+                </div>
+
                 {/* Submit */}
                 <button onClick={handlePaymentSubmit} disabled={processing||activating||allAvailableMethods.length===0}
                   style={{
