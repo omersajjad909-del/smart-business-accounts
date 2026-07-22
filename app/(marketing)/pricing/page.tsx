@@ -22,9 +22,9 @@ type PlanPricing = {
 };
 
 const DEFAULT_HIGHLIGHTS = {
-  starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support"],
+  starter:    ["Up to 3 users","Sales & purchase invoices","Ledger & trial balance","Basic reports","Chart of accounts","Email support","🤖 AI Chat"],
   professional: ["Up to 10 users","Everything in Starter","Inventory management","Bank reconciliation","HR & Payroll","CRM + Advanced reports","🤖 AI Assistant (ask anything)","🤖 Smart invoice & expense AI"],
-  enterprise: ["Up to 25 users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7","🤖 Full AI Suite (forecast + anomaly detection)","🤖 AI Business Operator"],
+  enterprise: ["Up to 25 users","Everything in Professional","API access","Custom integrations","Multi-currency","Priority support 24/7","🤖 AI Chat","🤖 AI Financial Insights","🤖 Smart Alerts & Anomaly Detection","🤖 Revenue Forecast","🤖 Market Intelligence","🤖 AI Business Advisor","🤖 Full AI Suite"],
 };
 
 const PLANS = [
