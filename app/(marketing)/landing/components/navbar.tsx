@@ -34,21 +34,21 @@ const FEATURES_COLS = [
     links: [
       { label: "Bank Reconciliation",    href: "/features/bank-reconciliation" },
       { label: "Payment Receipts",       href: "/features/invoicing" },
-      { label: "Payment Vouchers",       href: "/features/invoicing" },
+      { label: "Payment Vouchers",       href: "/features/purchase-grn" },
       { label: "Recurring Transactions", href: "/features/invoicing" },
-      { label: "Bank Accounts",          href: "/features/banking" },
+      { label: "Bank Accounts",          href: "/features/bank-reconciliation" },
     ],
   },
   {
     heading: "AI Intelligence",
     color: "#a78bfa",
     links: [
-      { label: "AI Financial Insights",   href: "/features/ai-intelligence" },
+      { label: "AI Financial Insights",   href: "/features" },
       { label: "Ask AI (Chat)",           href: "/demo" },
-      { label: "Smart Alerts",            href: "/features/ai-intelligence" },
-      { label: "Revenue Forecast",        href: "/features/ai-intelligence" },
-      { label: "Market Intelligence",     href: "/features/ai-intelligence" },
-      { label: "AI Business Advisor",     href: "/features/ai-intelligence" },
+      { label: "Smart Alerts",            href: "/features" },
+      { label: "Revenue Forecast",        href: "/features" },
+      { label: "Market Intelligence",     href: "/features" },
+      { label: "AI Business Advisor",     href: "/features" },
     ],
   },
 ]
@@ -108,7 +108,7 @@ const SOLUTIONS_COLS = [
     links: [
       { label: "Multi-currency Accounting", href: "/features/accounting", icon: "💱" },
       { label: "Global Tax Compliance",     href: "/features/accounting", icon: "📋" },
-      { label: "Payroll Management",        href: "/features/payroll", icon: "👥" },
+      { label: "Payroll Management",        href: "/features/hr-payroll", icon: "👥" },
       { label: "Inventory Tracking",        href: "/features/inventory", icon: "📦" },
       { label: "Financial Reporting",       href: "/features/reports", icon: "📊" },
     ],

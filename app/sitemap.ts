@@ -49,17 +49,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/support`,                  lastModified: now, changeFrequency: "monthly" as const, priority: 0.65 },
     { url: `${BASE}/developers/api`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.6  },
     { url: `${BASE}/docs`,                     lastModified: now, changeFrequency: "weekly" as const,  priority: 0.65 },
-    // Feature detail pages — slugs must exist in app/(marketing)/features/[slug]/page.tsx MODULES
-    { url: `${BASE}/features/accounting`,      lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/features/invoicing`,       lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/features/inventory`,       lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
-    { url: `${BASE}/features/crm`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
-    { url: `${BASE}/features/reports`,         lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
-    { url: `${BASE}/features/pos`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
-    { url: `${BASE}/features/bank-reconciliation`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${BASE}/features/banking`,         lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
-    { url: `${BASE}/features/payroll`,         lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
-    { url: `${BASE}/features/ai-intelligence`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
+    // Feature detail pages — all slugs verified against MODULES in features/[slug]/page.tsx
+    { url: `${BASE}/features/accounting`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/invoicing`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/inventory`,           lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/bank-reconciliation`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/hr-payroll`,          lastModified: now, changeFrequency: "monthly" as const, priority: 0.85 },
+    { url: `${BASE}/features/crm`,                 lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
+    { url: `${BASE}/features/reports`,             lastModified: now, changeFrequency: "monthly" as const, priority: 0.8  },
+    { url: `${BASE}/features/pos`,                 lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/purchase-grn`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/multi-currency`,      lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
+    { url: `${BASE}/features/multi-branch`,        lastModified: now, changeFrequency: "monthly" as const, priority: 0.75 },
   ];
 
   // Blog articles — only add real published slugs here (must exist in app/(marketing)/blog/posts.ts)
