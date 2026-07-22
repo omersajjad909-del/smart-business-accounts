@@ -7,9 +7,9 @@ const ADMIN_ONLY = "ADMIN";
 
 // Default PKR prices (in Pakistani Rupees)
 export const DEFAULT_PKR_PRICING = {
-  starter:    { monthly: 4999,  yearly: 3999  },  // PKR/mo · PKR/mo billed yearly
-  pro:        { monthly: 9999,  yearly: 7999  },
-  enterprise: { monthly: 24999, yearly: 19999 },
+  starter:    { monthly: 3999,  yearly: 3199  },  // PKR/mo · PKR/mo billed yearly (20% off)
+  pro:        { monthly: 8999,  yearly: 7199  },
+  enterprise: { monthly: 14999, yearly: 11999 },
 };
 
 export const DEFAULT_PKR_SEAT_PRICING = {
