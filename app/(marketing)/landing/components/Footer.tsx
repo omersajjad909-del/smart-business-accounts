@@ -37,13 +37,13 @@ const SOCIALS_DEFAULT = [
     Icon: Facebook,
     key: "facebook",
     label: "Facebook",
-    href: "https://facebook.com/finovaforge",
+    href: "https://www.facebook.com/Finovaos",
   },
   {
     Icon: Instagram,
     key: "instagram",
     label: "Instagram",
-    href: "https://instagram.com/finovaforge",
+    href: "https://instagram.com/finovaos",
   },
   {
     Icon: Twitter,
@@ -55,7 +55,7 @@ const SOCIALS_DEFAULT = [
     Icon: Linkedin,
     key: "linkedin",
     label: "LinkedIn",
-    href: "https://linkedin.com/company/finovaforge",
+    href: "https://www.linkedin.com/in/umer-sajjad-657936417",
   },
   {
     Icon: Music2,
@@ -67,7 +67,7 @@ const SOCIALS_DEFAULT = [
     Icon: Youtube,
     key: "youtube",
     label: "YouTube",
-    href: "https://youtube.com/@finovaforge",
+    href: "https://youtube.com/@finovaos",
   },
 ];
 
