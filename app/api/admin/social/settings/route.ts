@@ -30,10 +30,12 @@ export async function POST(req: NextRequest) {
     if (!isAdmin(req)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
+    const normalized = normalizeSocialUrls(body);
+
     await prisma.activityLog.create({
       data: {
         action: "SOCIAL_CONFIG",
-        details: JSON.stringify(body),
+        details: JSON.stringify(normalized),
         userId: null,
         companyId: null,
       },
@@ -43,6 +45,29 @@ export async function POST(req: NextRequest) {
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
+}
+
+function normalizeSocialUrls(body: any) {
+  if (!body || typeof body !== "object") return body;
+
+  return Object.fromEntries(
+    Object.entries(body).map(([platform, cfg]) => {
+      if (!cfg || typeof cfg !== "object") return [platform, cfg];
+      const normalizedCfg = { ...cfg } as Record<string, any>;
+      if (typeof normalizedCfg.pageUrl === "string") {
+        normalizedCfg.pageUrl = normalizeUrl(normalizedCfg.pageUrl);
+      }
+      return [platform, normalizedCfg];
+    }),
+  );
+}
+
+function normalizeUrl(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^\/\//.test(trimmed)) return `https:${trimmed}`;
+  return `https://${trimmed}`;
 }
 
 function getDefaultSettings() {

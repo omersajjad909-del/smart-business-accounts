@@ -365,9 +365,14 @@ export default function PricingPage() {
   const [openCats, setOpenCats] = useState<Set<string>>(new Set(["platform", "accounting", "ai"]));
   const [featureMap, setFeatureMap] = useState<Record<string, { starter: boolean; pro: boolean; enterprise: boolean }>>({});
   const [publicPricing, setPublicPricing] = useState<PlanPricing>(DEFAULT_PUBLIC_PRICING);
-  // Admin-set PKR prices (null = not configured, fall back to FX conversion)
-  const [pkrPricing, setPkrPricing] = useState<{ starter: { monthly: number; yearly: number }; professional: { monthly: number; yearly: number }; enterprise: { monthly: number; yearly: number } } | null>(null);
-  const [pkrAddonPricing, setPkrAddonPricing] = useState<{ monthly: number; yearly: number } | null>(null);
+  // Admin-set PKR prices — hardcoded defaults, overridden by API if configured
+  const DEFAULT_PKR_PRICING = {
+    starter:      { monthly: 3999,  yearly: 3199  }, // 3,999/mo → 20% off yearly = 3,199/mo
+    professional: { monthly: 8999,  yearly: 7199  }, // 8,999/mo → 20% off yearly = 7,199/mo
+    enterprise:   { monthly: 14999, yearly: 11999 }, // 14,999/mo → 20% off yearly = 11,999/mo
+  };
+  const [pkrPricing, setPkrPricing] = useState<{ starter: { monthly: number; yearly: number }; professional: { monthly: number; yearly: number }; enterprise: { monthly: number; yearly: number } } | null>(DEFAULT_PKR_PRICING);
+  const [pkrAddonPricing, setPkrAddonPricing] = useState<{ monthly: number; yearly: number } | null>({ monthly: 1800, yearly: 1440 });
   const [planLimits, setPlanLimits] = useState<Record<string, number | null>>(DEFAULT_PLAN_LIMITS);
   const [branchLimits, setBranchLimits] = useState<Record<string, number | null>>({ starter: 1, pro: 3, enterprise: 10 });
   const [seatPricing, setSeatPricing] = useState<{ monthly: number; yearly: number }>(DEFAULT_SEAT_PRICING);
@@ -465,15 +470,15 @@ export default function PricingPage() {
           }
           if (d?.pkrPricing) {
             setPkrPricing({
-              starter:      { monthly: Number(d.pkrPricing.starter?.monthly ?? 4999),     yearly: Math.round(Number(d.pkrPricing.starter?.yearly ?? 59988) / 12) },
-              professional: { monthly: Number(d.pkrPricing.pro?.monthly ?? 9999),         yearly: Math.round(Number(d.pkrPricing.pro?.yearly ?? 95988) / 12) },
-              enterprise:   { monthly: Number(d.pkrPricing.enterprise?.monthly ?? 24999), yearly: Math.round(Number(d.pkrPricing.enterprise?.yearly ?? 239988) / 12) },
+              starter:      { monthly: Number(d.pkrPricing.starter?.monthly      ?? 3999),  yearly: Math.round(Number(d.pkrPricing.starter?.yearly      ?? 38388)  / 12) },
+              professional: { monthly: Number(d.pkrPricing.pro?.monthly          ?? 8999),  yearly: Math.round(Number(d.pkrPricing.pro?.yearly          ?? 86388)  / 12) },
+              enterprise:   { monthly: Number(d.pkrPricing.enterprise?.monthly   ?? 14999), yearly: Math.round(Number(d.pkrPricing.enterprise?.yearly   ?? 143988) / 12) },
             });
           }
           if (d?.pkrAddonPricing) {
             setPkrAddonPricing({
-              monthly: Number(d.pkrAddonPricing.monthly ?? 22000),
-              yearly:  Math.round(Number(d.pkrAddonPricing.yearly ?? 237600) / 12),
+              monthly: Number(d.pkrAddonPricing.monthly ?? 1800),
+              yearly:  Math.round(Number(d.pkrAddonPricing.yearly ?? 17280) / 12),
             });
           }
         }
