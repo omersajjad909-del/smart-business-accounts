@@ -18,7 +18,7 @@ const PRODUCT_LINKS = [
 const COMPANY_LINKS = [
   { label: "About Us",           href: "/about" },
   { label: "Waitlist",           href: "/waitlist" },
-  { label: "Blog",               href: "/blog" },
+  { label: "Changelog",          href: "/changelog" },
   { label: "Case Studies",       href: "/case-studies" },
   { label: "Careers",            href: "/careers" },
   { label: "Support Center",     href: "/support" },
